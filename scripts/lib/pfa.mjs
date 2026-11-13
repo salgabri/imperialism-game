@@ -34,7 +34,9 @@ export function parseTeamSeason(html) {
   if (!m) throw new Error(`Not a team-season page: ${title}`);
   const page = { year: Number(m[1]), team: m[2], league: m[3], games: [], roster: [], stats: {}, totals: {}, notes: [] };
   for (const [, table] of html.matchAll(/<table>([\s\S]*?)<\/table>/g)) {
-    const rows = [...table.matchAll(/<tr([^>]*)>([\s\S]*?)<\/tr>/g)].map(([, attrs, inner]) => ({
+    // A row ends at its </tr>, or where the next begins: the 2024 Eagles' page leaves Kelee Ringo's scoring row unclosed,
+    // which would otherwise take the Team Totals row into it.
+    const rows = [...table.matchAll(/<tr([^>]*)>([\s\S]*?)(?:<\/tr>|(?=<tr[\s>]))/g)].map(([, attrs, inner]) => ({
       kind: /class="([^"]*)"/.exec(attrs)?.[1] ?? '',
       heads: [...inner.matchAll(/<th\b[^>]*>([\s\S]*?)<\/th>/g)].map(c => decode(c[1])),
       cells: [...inner.matchAll(/<td\b[^>]*>([\s\S]*?)<\/td>/g)].map(c => c[1]),

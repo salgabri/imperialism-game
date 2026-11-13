@@ -9,9 +9,11 @@ test('shootouts stop on an early clinch and sudden death ends after equal kick c
   const prepared = football.prepareMatch(side('A'), side('D'));
   const rng = makeRng(20261002);
   let early = 0, sudden = 0, defenderFirst = 0;
-  for (let fixture = 0; fixture < 5000; fixture++) {
+  for (let fixture = 0; fixture < 8000; fixture++) {
     const result = football.sampleResult(rng, prepared, 6);
-    if (!result.tie) continue;
+    // A level ninety goes to extra time first; only a game still level after it has a shoot-out.
+    if (result.tie?.by !== 'penalties') continue;
+    assert.equal(result.ga, result.gd, 'a shoot-out follows a level extra time');
     const tie = result.tie;
     const first = tie.first === 'D' ? 'D' : 'A', second = first === 'A' ? 'D' : 'A';
     const scores = { A: 0, D: 0 }, taken = { A: 0, D: 0 };
@@ -42,13 +44,16 @@ test('the bounded long-shootout fallback can award either side a recorded decisi
     let draws = 0;
     const rng = () => {
       const index = draws++;
-      // Draw 6 settles the goalless score's low-score correction; 7 picks the first kicker.
-      if (index === 7) return first === 'A' ? 0 : .9;
-      if (index === 58) return coin;
+      // Draw 6 settles the goalless score's low-score correction; 7 to 10 are extra time's halves (goalless at 0), and
+      // 11 picks the first kicker.
+      if (index === 11) return first === 'A' ? 0 : .9;
+      if (index === 62) return coin;
       return 0;
     };
     const result = football.simulate(rng, attacker, defender, 0);
     assert.equal(result.ga, 0); assert.equal(result.gd, 0);
+    assert.deepEqual(result.tie.periods, [[0, 0], [0, 0]]);
+    assert.equal(result.tie.end, 120);
     assert.equal(result.winner, winner);
     assert.equal(result.tie.first, first);
     assert.equal(result.tie.A.length, 26); assert.equal(result.tie.D.length, 26);
@@ -56,6 +61,6 @@ test('the bounded long-shootout fallback can award either side a recorded decisi
     assert.equal(result.tie.D.at(-1), winner === 'D' ? 1 : 0);
     assert.equal(result.tie.ga, result.tie.A.reduce((sum, kick) => sum + kick, 0));
     assert.equal(result.tie.gd, result.tie.D.reduce((sum, kick) => sum + kick, 0));
-    assert.equal(draws, 59);
+    assert.equal(draws, 63);
   }
 });

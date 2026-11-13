@@ -174,6 +174,57 @@ test('full time, penalties and the series end state', () => {
   assert.equal(buildFeedRows(settled, 0)[0].text, 'Full time — SRB 1–1 ITA · 2–3 on penalties');
 });
 
+test('football extra time: the feed runs on past 90\', says how the level game was settled and ends at 120\'', () => {
+  const level = [{ m: 24, tid: '688', name: 'Sergej Milinković-Savić', pts: 1 }, { m: 29, tid: '380', name: 'Giovanni Di Lorenzo', pts: 1 }];
+  const shown = [...level, { m: 98, tid: '380', name: 'Federico Chiesa', pts: 1 }];
+  const tie = { by: 'extra-time', periods: [[0, 1], [0, 0]], end: 120, A: [], D: [], ga: 0, gd: 0 };
+  const patch = { shown, allEv: shown, ga: 1, gd: 2, finalGa: 1, finalGd: 2, tie };
+  const live = buildLiveMatch(liveState(patch), ctxFor());
+  assert.equal(live.ot, 15, 'extra time\'s halves on the chart\'s axis');
+  const rows = buildFeedRows(live, 104);
+  assert.equal(rows[0].text, 'Live — SRB 1–2 ITA · extra time, 16 minutes left');
+  assert.equal(rows[0].minute, "104'");
+  assert.ok(rows.some(row => row.key === 'overtime' && row.minute === "90'" && row.text === 'Extra time — SRB 1–1 ITA'));
+  assert.ok(rows.some(row => row.minute === "98'" && row.text === 'GOAL — Federico Chiesa (ITA)'));
+  assert.equal(buildFeedRows(live, 90)[0].text, 'Live — SRB 1–2 ITA · final minute');
+
+  const ft = buildLiveMatch(liveState({ ...patch, status: 'FULL TIME', done: true }), ctxFor());
+  assert.equal(ft.state, 'full-time');
+  assert.equal(ft.statusLabel, 'FULL TIME');
+  assert.equal(ft.statusDetail, 'after extra time');
+  assert.equal(ft.minuteFallback, 120);
+  assert.equal(ft.kicks, null);
+  assert.deepEqual(buildFeedRows(ft, 0).slice(0, 2).map(row => [row.minute, row.text]),
+    [["120'", 'Full time — SRB 1–2 ITA · after extra time'], ["98'", 'GOAL — Federico Chiesa (ITA)']]);
+
+  // 1969/70: a goalless extra time settled by the drawing of lots. 1997/98: a golden goal ends the match at its minute.
+  const lots = { by: 'lots', periods: [[0, 0], [0, 0]], end: 120, A: [], D: [], ga: 0, gd: 0, lots: 'D' };
+  const coin = buildLiveMatch(liveState({ shown: level, allEv: level, finalGa: 1, finalGd: 1, tie: lots, status: 'FULL TIME', done: true }), ctxFor());
+  assert.equal(coin.statusDetail, 'after extra time, on the drawing of lots');
+  assert.equal(coin.minuteFallback, 120);
+  assert.equal(buildFeedRows(coin, 0)[0].text, 'Full time — SRB 1–1 ITA · after extra time, on the drawing of lots');
+  const golden = [...level, { m: 97, tid: '380', name: 'Federico Chiesa', pts: 1, kind: 'golden' }];
+  const gg = buildLiveMatch(liveState({ shown: golden, allEv: golden, ga: 1, gd: 2, finalGa: 1, finalGd: 2, status: 'FULL TIME', done: true,
+    tie: { by: 'golden-goal', periods: [[0, 1]], end: 97, A: [], D: [], ga: 0, gd: 0 } }), ctxFor());
+  assert.equal(gg.statusDetail, 'after a golden goal in extra time');
+  assert.equal(gg.minuteFallback, 97);
+  assert.equal(buildFeedRows(gg, 0)[1].text, 'GOLDEN GOAL — Federico Chiesa (ITA)');
+  assert.equal(gg.b.scorers, "Di Lorenzo 29' · Chiesa 97'");
+
+  // Archived: the history keeps the copy and the minute play ended.
+  const entry = { id: 'match-9', round: '012', aId: '688', dId: '380',
+    a: { teamId: '688', id: '688', code: 'SRB', name: 'Serbia', score: 1, eff: '80.5' },
+    b: { teamId: '380', id: '380', code: 'ITA', name: 'Italy', score: 1, eff: '85.1' },
+    events: [{ when: "24'", text: 'GOAL — S. Milinković-Savić (SRB)' }, { when: "29'", text: 'GOAL — G. Di Lorenzo (ITA)' }],
+    winnerId: '380', result: { winnerId: '380', tieText: 'After extra time, on the drawing of lots', end: 120 } };
+  const archived = buildLiveMatch({ ...liveState(), match: null, history: [entry] }, ctxFor());
+  assert.equal(archived.minuteFallback, 120);
+  assert.equal(buildFeedRows(archived, 0)[0].text, 'Full time — SRB 1–1 ITA · After extra time, on the drawing of lots');
+  const goldenEntry = { ...entry, b: { ...entry.b, score: 2 }, events: [...entry.events, { when: "97'", text: 'GOLDEN GOAL — F. Chiesa (ITA)' }],
+    result: { winnerId: '380', tieText: 'After a golden goal in extra time', end: 97 } };
+  assert.equal(buildLiveMatch({ ...liveState(), match: null, history: [goldenEntry] }, ctxFor()).b.scorers, "Di Lorenzo 29' · Chiesa 97'");
+});
+
 test('basketball: FINAL label, points scorers, tip-off and an overtime row', () => {
   const bball = getSport('basketball');
   const guard = (name, pos, rating) => ({ name, pos, rating });

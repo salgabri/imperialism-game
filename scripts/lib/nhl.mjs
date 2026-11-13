@@ -13,6 +13,7 @@
 // as in baseball; that strength counts those places at the sport's baseline.
 import { NATIONS, nationIdentity, selectLineup } from '../../src/data/teams.js';
 import { BASELINE, hockey } from '../../src/sports/hockey.js';
+import { namesOfTheDay } from '../../src/data/namesOfTheDay.js';
 
 const SPORT = 'hockey';
 export const ROSTER_SIZE = 23;
@@ -114,9 +115,11 @@ export function clubsOf(players, teams) {
 
 /**
  * The nations, strongest first, each `{ id, name, str, squad, open }`: `open` the lineup places its own players cannot
- * fill (counted at the baseline in `str`).
+ * fill (counted at the baseline in `str`). `year`: an earlier season's end year, whose nations go by their names of the
+ * day (src/data/namesOfTheDay.js: Czechoslovakia to 1991/92); today's names without one.
  */
-export function nationsOf(players) {
+export function nationsOf(players, year = null) {
+  const day = namesOfTheDay(SPORT, year);
   const pools = new Map();
   for (const player of players) {
     if (player.nation == null) continue;
@@ -126,7 +129,7 @@ export function nationsOf(players) {
   }
   return [...pools.entries()].map(([id, pool]) => {
     const { squad } = rosterOf(pool.slice().sort(byRating));
-    return { id, name: nationIdentity(id, hockey).name, ...nationStrength(squad), squad };
+    return { id, name: day[id]?.name ?? nationIdentity(id, hockey).name, ...nationStrength(squad), squad };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
 }
 

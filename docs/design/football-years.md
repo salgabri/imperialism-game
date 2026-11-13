@@ -210,9 +210,12 @@ dates:
   Czech flag.
 - **West Germany** (Germany FR, FRG, revision 1384613198) until reunification on 3
   October 1990 (German reunification, revision 1383934904), after 1989/90's
-  cutoff: its name and code only, under Germany's flag. **East Germany** has no
-  shape on the map, so it fields no team (decided 2026-11-09: no new shape), and
-  1973/74 has one World Cup finalist fewer.
+  cutoff: its name and code only, under Germany's flag. **East Germany** had no
+  shape on the map until 2026-11-10 (decided 2026-11-09: no new shape), so 1973/74
+  had one World Cup finalist fewer. Since then the map of every season to 1989/90
+  has it, cut from Germany along the inner German border, at the user's request
+  ([Earlier maps](historic-maps.md)): it fields its 1974 finalists and the 1989/90
+  database's East German clubs' players.
 - **Zaire** (revision 1383080856): the DR Congo was renamed on 27 October 1971 and
   renamed back in May 1997, before 1996/97's cutoff.
 
@@ -314,7 +317,7 @@ Soviet Union's, the CIS's, Yugoslavia's and Zaire's land.
 **Checks.** `scripts/football-federations.test.mjs` (in `npm run
 test:football-sets`): the table against FIFA's dates; territory and identities
 of 1969/70 (the Soviet Union holding Ukraine and the Baltic states), 1973/74
-(Zaire, no East Germany), 1981/82 (Yugoslavia holding Croatia), 1989/90
+(Zaire, and East Germany beside West Germany), 1981/82 (Yugoslavia holding Croatia), 1989/90
 (Czechoslovakia holding Slovakia), 1991/92 and 1992/93 to 1995/96; the
 suspensions; every year 1961/62 to 1995/96 consistent and none from 1996/97 with
 an identity; the CM 01/02 builder's pooling and names; the loader's refusals; and
@@ -324,8 +327,8 @@ federation's real land.
 
 Spot check against history (2026-11-09): every one of the 176 men's World Cup
 finalists of 1962 to 1994 (the Fjelstul World Cup Database's qualified teams)
-takes part in its season, none neutral or held, but East Germany in 1974, which
-has no shape. They play as the Soviet Union in 1962, 1966, 1970, 1982, 1986 and
+takes part in its season, none neutral or held; East Germany in 1974 on its own
+land since 2026-11-10 (before, it had no shape). They play as the Soviet Union in 1962, 1966, 1970, 1982, 1986 and
 1990, Yugoslavia in 1962, 1974, 1982 and 1990, Czechoslovakia in 1962, 1970,
 1982 and 1990, West Germany in every one from 1962 to 1990, and Zaire in 1974;
 the 1994 finalists, Russia and Germany among them, all under their own names.
@@ -1280,7 +1283,7 @@ setup's Season note says those seasons are computed.
 | 1961/62 | `wc-1962` | 16 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany | World, Europe, South America | Brazil 87, Soviet Union 81.2, Czechoslovakia 80.4 | 76% |
 | 1965/66 | `wc-1966` | 16 | Soviet Union, West Germany | World, Europe, South America | England 87, West Germany 85.4, Soviet Union 84.8 | 70% |
 | 1969/70 | `wc-1970` | 16 | Soviet Union, Czechoslovakia, West Germany | World, Europe | Brazil 87, West Germany 83.0, England 82.3 | 78% |
-| 1973/74 | `wc-1974` | 15 (no East Germany) | Yugoslavia, West Germany, Zaire | World, Europe, South America | West Germany 87, Netherlands 84.6, Poland 84.1 | 74% |
+| 1973/74 | `wc-1974` | 16 | Yugoslavia, West Germany, Zaire | World, Europe, South America | West Germany 87, Netherlands 84.6, Poland 84.1 | 74% |
 | 1977/78 | `wc-1978` | 16 | West Germany | World, Europe | Brazil 87, Netherlands 84.3, Argentina 83.7 | 66% |
 | 1981/82 | `wc-1982` | 24 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany | World, Europe, South America | Brazil 87, Italy 85.4, West Germany 84.4 | 70% |
 | 1985/86 | `wc-1986` | 24 | Soviet Union, West Germany | World, Europe, South America | Argentina 87, France 86.2, Brazil 86.2 | 66% |
@@ -1360,8 +1363,8 @@ CC BY-SA asks for and licenses the season files under it.
   resolves to in its year (`dayNationResolver`: the Soviet Union 643, West
   Germany 276, Yugoslavia 688, Czechoslovakia 203, Zaire 180, the Republic of
   Ireland 372 by the manifest's alias); the build stops on a finalist whose shape
-  the year merges or leaves out, and none does. East Germany (1974) has no shape
-  and fields no team. Territory and identities are `territoryFor` and
+  the year merges or leaves out, and none does. East Germany (1974) plays on its
+  own land of the day (it had none, and fielded no team, until 2026-11-10). Territory and identities are `territoryFor` and
   `identitiesFor` of the season-end year with only the finalists fielding
   (`fields`): a federation of the day holds its members' land only where it is a
   finalist (the Soviet Union in 1969/70 holds Ukraine and the Baltic states;
@@ -1908,18 +1911,22 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
   shows FR Yugoslavia, and 1994/95, whose SWOS has no Yugoslavia squad, leaves
   Serbia neutral.
 - Seasons ending before 1962 are refused.
-- East Germany has no shape on the map, so it never fields a team, and its
-  players, where a database lists them as Germany's, play for West Germany, but
-  in Simon Treanor's 1989/90, where a 'Germany' player at an East German club
-  plays for no nation. That rule places a club by its stadium's city: an East
+- East Germany is on the map of every season to 1989/90 ([Earlier maps](historic-maps.md)),
+  but no database of 1993/94 or later lists East Germans: where one lists them as
+  Germany's they play for Germany. In Simon Treanor's 1989/90 a 'Germany' player
+  at an East German club plays for East Germany (until 2026-11-10, when it had no
+  shape, for no nation). That rule places a club by its stadium's city: an East
   German playing in the West (Andreas Thom joined Leverkusen in December 1989; the
   database still has him at Dynamo Berlin) would count as West German, and
   Berlin's clubs are placed by hand (the database gives Hertha's reserves the
   Jahn-Sportpark, in the east; they count as West German).
-- Only the seven federations of the day play under names of their own. Other
-  nations of 1961/62 to 1995/96 play under today's names and flags (Swaziland as
-  Eswatini, Burma as Myanmar, Upper Volta as Burkina Faso), and so does the DR
-  Congo before Zaire.
+- The seven federations of the day play under names of their own, and from
+  2026-11-10 so do Swaziland and Macedonia before their renaming, and FR
+  Yugoslavia and Serbia and Montenegro in the seasons from 1996/97
+  (src/data/namesOfTheDay.js, [Earlier maps](historic-maps.md)). Other nations play
+  under today's names (Burma as Myanmar, Upper Volta as Burkina Faso, none of them
+  fielded in a season whose file carries no names), and so does the DR Congo
+  before Zaire. Macedonia flies today's flag in 1993/94 and 1994/95.
 - FIFA dates many admissions by the year alone (1 January). A nation admitted
   after 30 June of that year counts one season early.
 - Colonies stay neutral until their association joined FIFA; the map draws no
@@ -2050,7 +2057,7 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
   Asia and North America never reach four sides. The Elo is computed from results
   alone: Asian and North American sides rate higher than SWOS's ratings of autumn
   1994 put them, and the scale is narrower than eloratings.net's.
-- East Germany, with no shape, fields no team, so 1973/74 has 15 finalists.
+- East Germany fields its 1974 finalists on its land of the day (until 2026-11-10 it had no shape, and 1973/74 had 15).
 
 ## Invariants kept
 

@@ -1,7 +1,7 @@
 // Owner: WP-MATCH (see PLAN.md §4). Live match view-models (PLAN §3.6, B§5, DEC D6/D7/D11).
 // Pure: no window/document/timers/RNG. The live minute is NOT read here (it lives in the minute store, DEC D7);
 // components pass it to buildFeedRows and to the win-probability series.
-import { clockLabel, getSport, matchSport, overtimeEnd, overtimePeriodsOf, overtimeText } from '../sports/index.js';
+import { clockLabel, getSport, matchSport, overtimeEnd, overtimePeriodsOf, settledText, shootoutOf } from '../sports/index.js';
 import { isTennisSport, selectLineup } from '../data/teams.js';
 import { estimateTitle, isEstimated } from '../data/estimates.js';
 import { BENCH } from '../sports/basketball.js';
@@ -44,15 +44,19 @@ function oddsOf(odds) {
  * two who scored most; a shoot-out's goal is the side's, nobody's own), "Sinner · Bolelli/Vavassori" (tennis: who won the
  * side's rubbers, in order; a set that does not win its rubber counts nothing) or "Walsh 2 tries · Cleary 3 PG" (rugby
  * league: the two who scored most, a try ranked as its four points, a penalty goal as two and a field goal as one; a
- * conversion is the try's, nobody's own).
+ * conversion is the try's, nobody's own). `sport` is a sport id or a season's rules (matchSport): an ice hockey season
+ * before the shoot-out has none to leave out.
  */
-export function scorersLine(shown, teamId, teams, sportId = 'football') {
+export function scorersLine(shown, teamId, teams, sport = 'football') {
+  const sportId = typeof sport === 'object' && sport ? sport.id : sport;
   const own = (Array.isArray(shown) ? shown : []).filter(e => e && e.tid === teamId && e.name);
   if (!own.length) return '';
   if (isTennisSport(sportId)) return own.filter(e => Number(e.pts) > 0).map(e => shortName(e.name)).join(' · ');
   if (sportId === 'hockey') {
+    const rules = typeof sport === 'object' && sport ? sport : getSport(sportId);
+    const shootoutAt = rules.overtime?.shootoutAt === undefined ? PERIOD_MODEL.SHOOTOUT_MINUTE : rules.overtime.shootoutAt;
     const totals = new Map();
-    for (const e of own) if (Number(e.m) <= PERIOD_MODEL.MINUTES + PERIOD_MODEL.OVERTIME) totals.set(e.name, (totals.get(e.name) || 0) + 1);
+    for (const e of own) if (shootoutAt == null || Number(e.m) < shootoutAt) totals.set(e.name, (totals.get(e.name) || 0) + 1);
     return [...totals.entries()].sort((x, y) => y[1] - x[1]).slice(0, 2).map(([name, goals]) => `${shortName(name)} ${goals} G`).join(' · ');
   }
   if (sportId === 'rugby-league') {
@@ -184,12 +188,15 @@ const halfOf = (sport, length) => (sport?.words?.half === null ? 0 : length / 2)
  */
 const otOf = sport => Number(sport?.clock?.ot) || (sport?.tieBreak === 'overtime' ? 5 : 0);
 
+/** Whether a level game plays on past regulation: the overtime sports', and football's extra time before its shoot-out. */
+const playsOn = sport => sport?.tieBreak === 'overtime' || (sport?.tieBreak === 'shootout' && Number(sport?.clock?.ot) > 0);
+
 /**
- * History keeps each event's formatted copy only ("GOAL — Name (ITA)", "+3 — Name (SRB)", "TD — Name (KCC)",
+ * History keeps each event's formatted copy only ("GOAL — Name (ITA)", "GOLDEN GOAL — Name (ITA)", "+3 — Name (SRB)", "TD — Name (KCC)",
  * "SAFETY — Name (KCC)", "2 RBI — Name (NYY)"): read the scorer and the side back from it, so an archived full-time
  * header carries the same scorer lines as the live one. The copy keeps no touchdown's try, so a touchdown reads as 6.
  */
-const EVENT_COPY = /^(?:GOAL|\+(\d+)|(TD|FG|SAFETY)|(\d+) RBI)\s+—\s+(.+?)\s+\(([^()]*)\)$/;
+const EVENT_COPY = /^(?:(?:GOLDEN )?GOAL|\+(\d+)|(TD|FG|SAFETY)|(\d+) RBI)\s+—\s+(.+?)\s+\(([^()]*)\)$/;
 // Tennis's rubber line, "SINGLES — Jannik Sinner (ITA) 6–4 7–6(5)", and a set's, "SET 1 — Jannik Sinner (ITA) 6–4".
 const TENNIS_COPY = /^(SINGLES|DOUBLES|SET \d+)\s+—\s+(.+?)\s+\(([A-Z]{3})\)\s/;
 const SCORE_POINTS = { TD: 6, FG: 3, SAFETY: 2 };
@@ -261,7 +268,7 @@ const EMPTY = Object.freeze({
   empty: null, source: null, state: null, sport: 'football', statusLabel: '', statusDetail: null, live: false,
   a: null, b: null, minuteFallback: 0, minuteFloor: 0, length: 90, ot: 0, perspective: null, model: null,
   goals: [], final: null, chartNote: null, lineups: { a: { title: '', teamId: null, rows: [] }, b: { title: '', teamId: null, rows: [] } },
-  feedBase: null, kicks: null, preMatch: null,
+  feedBase: null, kicks: null, preMatch: null, clockSport: null,
 });
 
 function fromMatch(st, ctx, sport, m) {
@@ -272,8 +279,9 @@ function fromMatch(st, ctx, sport, m) {
   const shown = Array.isArray(m.shown) ? m.shown : [];
   const allEv = Array.isArray(m.allEv) ? m.allEv : shown;
   const lastTick = allEv.reduce((n, e) => Math.max(n, Number(e?.m) || 0), length);
-  // The full-time minute: the last event, or the end of the last overtime period (same as the history fallback).
-  const finalMinute = Math.max(lastTick, overtimeEnd(sport, (m.tie?.periods || []).length));
+  // The full-time minute: the last event, the end of the last overtime period, or football's end of extra time (same as
+  // the history fallback).
+  const finalMinute = Math.max(lastTick, overtimeEnd(sport, (m.tie?.periods || []).length), Number(m.tie?.end) || 0);
   const shootout = sport.tieBreak === 'shootout';
   const kicks = kickCounts(m.tieShown);
   const kicksPending = !!(kicks && m.tie && (kicks.kicksA.length < (m.tie.A || []).length || kicks.kicksB.length < (m.tie.D || []).length));
@@ -284,9 +292,10 @@ function fromMatch(st, ctx, sport, m) {
   const minuteFloor = shown.reduce((n, e) => Math.max(n, Number(e?.m) || 0), 0);
   let tieDetail = null;
   if (state === 'full-time' && m.tie) {
-    tieDetail = shootout
+    // A shoot-out's kicks (attacker first), football's "after extra time" (or golden goal, lots), the overtime periods.
+    tieDetail = shootoutOf(sport, m.tie)
       ? `${m.tie.ga ?? kicks?.a ?? 0}–${m.tie.gd ?? kicks?.b ?? 0} on penalties`
-      : overtimeText(sport, (m.tie.periods || []).length || 1);
+      : settledText(sport, m.tie);
   }
   const statusLabel = state === 'live' ? labels.live : state === 'penalties' ? labels.tie : labels.end;
   const statusDetail = state === 'penalties' ? `${kicks?.a ?? 0}–${kicks?.b ?? 0}` : tieDetail;
@@ -301,8 +310,11 @@ function fromMatch(st, ctx, sport, m) {
   return {
     ...EMPTY,
     source: 'live', state, sport: sport.id, statusLabel, statusDetail, live: state === 'live',
-    a: sideOf(A, 'Attack', scoreA, scorersLine(shown, A.id, teams, sport.id)),
-    b: sideOf(D, 'Defend', scoreB, scorersLine(shown, D.id, teams, sport.id)),
+    // The rules the clock, the chart's axis and the feed are read with: an earlier season's (an ice hockey season before
+    // the shoot-out counts its overtime in twenty-minute periods).
+    clockSport: sport,
+    a: sideOf(A, 'Attack', scoreA, scorersLine(shown, A.id, teams, sport)),
+    b: sideOf(D, 'Defend', scoreB, scorersLine(shown, D.id, teams, sport)),
     minuteFallback: state === 'live' ? minuteFloor : finalMinute, minuteFloor, length,
     ot: otOf(sport),
     perspective: perspectiveOf(ctx, A, D, m.aId, m.dId),
@@ -316,7 +328,7 @@ function fromMatch(st, ctx, sport, m) {
     feedBase: {
       sport: sport.id, state, aCode: A.code || A.name, bCode: D.code || D.name, aName: A.name, bName: D.name,
       aId: m.aId, dId: m.dId, length, half: halfOf(sport, length), finalMinute, scoreA, scoreB,
-      kickoff: getSport(sport.id).words.kickoff, endLabel: getSport(sport.id).words.end, overtime: sport.tieBreak === 'overtime',
+      kickoff: getSport(sport.id).words.kickoff, endLabel: getSport(sport.id).words.end, overtime: playsOn(sport),
       kicks: kicks ? { a: kicks.a, b: kicks.b } : null, tieDetail,
       events: shown.map((e, i) => ({ key: `e${i}`, m: Number(e.m) || 0, label: clockLabel(sport, e.m), tid: e.tid,
         pts: ptsOf(e), text: sport.formatEvent(e, codeOf(e.tid)).text })),
@@ -340,10 +352,11 @@ function fromHistory(st, ctx, sport, entry) {
   });
   const winnerId = entry.result?.winnerId ?? entry.winnerId;
   const tieDetail = entry.result?.tieText || null;
-  // The minute the match ended: the last timed event, or the end of the overtime the tie text records.
+  // The minute the match ended: the last timed event, the end of the overtime the tie text records, or the minute the
+  // match card recorded (football's 120' after a goalless extra time).
   const periods = overtimePeriodsOf(sport, tieDetail);
   const lastEvent = events.reduce((n, e) => Math.max(n, Number(e.m) || 0), 0);
-  const finalMinute = Math.max(length, lastEvent, overtimeEnd(sport, periods));
+  const finalMinute = Math.max(length, lastEvent, overtimeEnd(sport, periods), Number(entry.result?.end) || 0);
   const aCode = entry.a?.code || A.code, dCode = entry.b?.code || D.code;
   const scorers = historyShown(entry, aId, dId, aCode, dCode);
   // The last finished match is the latest conquest: undo its player move so the XIs show who played (DEC D11).
@@ -353,9 +366,9 @@ function fromHistory(st, ctx, sport, entry) {
   return {
     ...EMPTY,
     source: 'history', state: 'full-time', sport: sport.id, statusLabel: sport.labels?.end || 'FULL TIME', statusDetail: tieDetail,
-    live: false,
-    a: sideOf(A, 'Attack', scoreA, scorersLine(scorers, aId, teams, sport.id)),
-    b: sideOf(D, 'Defend', scoreB, scorersLine(scorers, dId, teams, sport.id)),
+    live: false, clockSport: sport,
+    a: sideOf(A, 'Attack', scoreA, scorersLine(scorers, aId, teams, sport)),
+    b: sideOf(D, 'Defend', scoreB, scorersLine(scorers, dId, teams, sport)),
     minuteFallback: finalMinute, minuteFloor: finalMinute, length, ot: otOf(sport),
     perspective: perspectiveOf(ctx, A, D, aId, dId), model: null, goals: [],
     final: winnerId === aId ? { winnerSide: 'A' } : winnerId === dId ? { winnerSide: 'D' } : null,
@@ -364,7 +377,7 @@ function fromHistory(st, ctx, sport, entry) {
     feedBase: {
       sport: sport.id, state: 'full-time', aCode: A.code || A.name, bCode: D.code || D.name, aName: A.name, bName: D.name,
       aId, dId, length, half: halfOf(sport, length), finalMinute, scoreA, scoreB,
-      kickoff: getSport(sport.id).words.kickoff, endLabel: getSport(sport.id).words.end, overtime: sport.tieBreak === 'overtime',
+      kickoff: getSport(sport.id).words.kickoff, endLabel: getSport(sport.id).words.end, overtime: playsOn(sport),
       kicks: null, tieDetail, events, roundLabel: historyRound(entry) ? `Round ${roman(historyRound(entry))}` : null,
     },
     kicks: null,
@@ -395,7 +408,8 @@ export function buildFeedRows(model, minute) {
   const now = Math.max(0, Math.floor(Number(minute) || 0));
   const state = base.state || 'live';
   const events = Array.isArray(base.events) ? base.events : [];
-  const sport = getSport(base.sport);
+  // The season's rules when the model names them (an earlier ice hockey season's overtime minutes), else the sport's.
+  const sport = model.clockSport?.id === base.sport ? model.clockSport : getSport(base.sport);
   const clock = m => clockLabel(sport, m);
   const rows = events.map((e, i) => ({ key: e.key || `e${i}`, n: e.m ?? i, i, minute: e.label || clock(e.m), text: e.text, weight: 700 }));
   const scored = (tid, limit) => events.reduce((n, e) => n + (e.tid === tid && e.m != null && e.m <= limit ? ptsOf(e) : 0), 0);

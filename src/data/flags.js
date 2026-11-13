@@ -54,6 +54,7 @@ export const FLAG_CODES = {
   '270': 'gm',        // Gambia
   '275': 'ps',        // Palestine
   '276': 'de',        // Germany
+  '278': 'dd',        // East Germany (on the map in its years: src/engine/historicMap.js)
   '288': 'gh',        // Ghana
   '300': 'gr',        // Greece
   '320': 'gt',        // Guatemala
@@ -197,6 +198,8 @@ export const FLAG_CODES = {
   'YUG': 'yu',        // Yugoslavia (SFR Yugoslavia)
   'FRY': 'yu-1992',   // FR Yugoslavia
   'ZAI': 'zr',        // Zaire
+  'RVN': 'rvn',       // South Vietnam
+  'UAR': 'uar',       // United Arab Republic (Egypt)
 };
 
 /** URL of a nation's flag, or null for shapes without a mapped national flag. */

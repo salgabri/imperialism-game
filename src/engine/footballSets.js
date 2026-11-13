@@ -9,7 +9,8 @@
 // bound to the season. The built-in data (src/data/rosters.js, clubs.football.js, the basketball and baseball modules)
 // never changes.
 
-import { DEPENDENCIES, HOME_NATIONS, NATIONS, PACIFIC_ISLANDS, fieldsRealSide } from '../data/teams.js';
+import { DEPENDENCIES, HISTORIC_NATIONS, HISTORIC_THROUGH, HOME_NATIONS, NATIONS, PACIFIC_ISLANDS, fieldsRealSide } from '../data/teams.js';
+import { namesOfTheDay } from '../data/namesOfTheDay.js';
 import { CM_CONVERSION, CM_ROLES, CM_SCALE, cmTupleOf, expandCmTuple } from '../data/cmPlayers.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../data/eaPlayers.js';
 import { SWOS_CONVERSION, SWOS_ROLES, SWOS_SCALE, expandSwosTuple, swosTupleOf } from '../data/swosPlayers.js';
@@ -148,6 +149,9 @@ const beforeHomeNations = nations => HOME_NATIONS.every(id => !Object.hasOwn(nat
 // Nor does a set built before the map had Tonga, Samoa and the Cook Islands list them: they field no team, and their
 // land stays neutral, as on the map the set was built for (no source it was built from rated their players).
 const beforePacificIslands = nations => PACIFIC_ISLANDS.every(id => !Object.hasOwn(nations, id));
+// A nation of the map's earlier years (East Germany) is listed only by a season whose source rates its players: unlisted,
+// it fields no team (and has no shape on today's map).
+const unlistedHistoric = nations => HISTORIC_NATIONS.filter(id => !Object.hasOwn(nations, id));
 
 // ---------- index ----------
 
@@ -394,7 +398,8 @@ export function decodeFootballSet(data, id = data?.id) {
     })),
     clubs: clubs.map(club => ({ ...club, squad: club.squad.map(expand) })),
     territory: { merged: { ...territory.merged, ...(englandHolds ? Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])) : {}) },
-      inactive: [...territory.inactive, ...(beforePacificIslands(nations) ? PACIFIC_ISLANDS : [])] },
+      inactive: [...territory.inactive, ...(beforePacificIslands(nations) ? PACIFIC_ISLANDS : []),
+        ...unlistedHistoric(nations).filter(id => !territory.inactive.includes(id))] },
   };
 }
 
@@ -607,7 +612,7 @@ function validateFootballSet(data, id) {
   if (unknown.length) fail(`nations has unknown ids ${unknown.slice(0, 5).join(', ')}`);
   const older = beforeHomeNations(nations), islandless = beforePacificIslands(nations);
   const missing = women ? [] : Object.keys(NATIONS).filter(key => !Object.hasOwn(nations, key) && !(older && HOME_NATIONS.includes(key))
-    && !(islandless && PACIFIC_ISLANDS.includes(key)));
+    && !(islandless && PACIFIC_ISLANDS.includes(key)) && !HISTORIC_NATIONS.includes(key));
   if (missing.length) fail(`nations must list all ${Object.keys(NATIONS).length} nations; missing ${missing.slice(0, 5).join(', ')}`);
   for (const [key, entry] of Object.entries(nations)) {
     const at = `nations[${key}]`;
@@ -617,6 +622,10 @@ function validateFootballSet(data, id) {
     players(at, list);
     if (!Number.isInteger(pool) || pool < list.length) fail(`${at} poolSize must be an integer of at least its ${list.length} players`);
     if (women && !list.length) fail(`${at} has no players: a nation with none is inactive, not listed`);
+    // A nation the map has only in earlier years (East Germany) plays only in a season of its years.
+    if (HISTORIC_NATIONS.includes(key) && list.length && !(data.year <= HISTORIC_THROUGH[key])) {
+      fail(`${at} has players, but ${NATIONS[key][0]} is on the map only up to ${HISTORIC_THROUGH[key]}`);
+    }
   }
 
   // League names are the built-in ones, so a club reads the same in every data set.
@@ -657,7 +666,8 @@ function validateFootballSet(data, id) {
   }
   // In a women's season a nation fields a team exactly when it is listed: the others' land stays neutral.
   if (women) {
-    const fielded = Object.keys(NATIONS).filter(key => !inactive.has(key) && !Object.hasOwn(territory.merged, key));
+    const fielded = Object.keys(NATIONS).filter(key => !inactive.has(key) && !Object.hasOwn(territory.merged, key)
+      && (Object.hasOwn(nations, key) || !HISTORIC_NATIONS.includes(key)));
     const unlisted = fielded.filter(key => !Object.hasOwn(nations, key)), idle = Object.keys(nations).filter(key => !fielded.includes(key));
     if (unlisted.length) fail(`territory leaves ${unlisted.slice(0, 5).join(', ')} active with no players`);
     if (idle.length) fail(`territory makes listed nations ${idle.slice(0, 5).join(', ')} inactive or merged`);
@@ -807,7 +817,8 @@ function validateTennisSeason(data, id, fail) {
     }
     if (Object.hasOwn(nations, shape)) fail(`territory.merged ${shape} fields a team of its own`);
   }
-  const inactive = Object.keys(NATIONS).filter(key => !Object.hasOwn(territory.merged, key) && !Object.hasOwn(nations, key));
+  // East Germany (HISTORIC_NATIONS) never played the Davis Cup or the Fed Cup: no tennis season lists it.
+  const inactive = Object.keys(NATIONS).filter(key => !HISTORIC_NATIONS.includes(key) && !Object.hasOwn(territory.merged, key) && !Object.hasOwn(nations, key));
   if (JSON.stringify(territory.inactive) !== JSON.stringify(inactive)) fail('territory.inactive must be every nation the season neither lists nor merges');
 }
 
@@ -1107,8 +1118,11 @@ export function seasonSport(set) {
         // Every nation has an entry (validated), so this only guards the rule that no other season borrows it.
         fallbackStrength: () => EMPTY_STRENGTH, ...identity };
     // A season of another era plays the federations of its day under their own names, codes and flags (the Soviet
-    // Union on Russia's shape), as Great Britain plays on England's: teams.js nationIdentity reads `playsAs`.
-    if (meta.identities && sport.id === 'football') sport = { ...sport, playsAs: { ...sport.playsAs, ...meta.identities } };
+    // Union on Russia's shape), as Great Britain plays on England's: teams.js nationIdentity reads `playsAs`. A file's
+    // own (men's football's to 1995/96) win over the names of the day the game knows for its sport and year
+    // (src/data/namesOfTheDay.js: tennis's federations, FR Yugoslavia, Swaziland, Macedonia).
+    const identities = { ...namesOfTheDay(sport.id, meta.year), ...(sport.id === 'football' ? meta.identities : null) };
+    if (Object.keys(identities).length) sport = { ...sport, playsAs: { ...sport.playsAs, ...identities } };
     sports.set(set, sport);
   }
   return sport;
@@ -1139,8 +1153,10 @@ export function fieldedNations(sport) {
   const cacheable = !!sport && typeof sport === 'object';
   if (cacheable && fieldedCache.has(sport)) return fieldedCache.get(sport);
   const { merged, inactive } = sport?.territory || NO_TERRITORY;
+  // A nation the map has only in earlier years (East Germany) plays only in a season of those years, whose map draws it.
+  const onMap = id => !HISTORIC_NATIONS.includes(id) || (Number.isInteger(sport?.dataYear) && sport.dataYear <= HISTORIC_THROUGH[id]);
   const fielded = Object.freeze(Object.keys(NATIONS)
-    .filter(id => !Object.hasOwn(merged, id) && !inactive.includes(id) && fieldsRealSide(id, sport)));
+    .filter(id => onMap(id) && !Object.hasOwn(merged, id) && !inactive.includes(id) && fieldsRealSide(id, sport)));
   if (cacheable) fieldedCache.set(sport, fielded);
   return fielded;
 }

@@ -10,7 +10,7 @@ import { act } from 'react';
 import { SAVE_KEY } from '../src/config.js';
 import { CM_CONVERSION, expandCmTuple } from '../src/data/cmPlayers.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
-import { NATIONS, selectLineup } from '../src/data/teams.js';
+import { HISTORIC_NATIONS, NATIONS, selectLineup } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { parseCampaign } from '../src/engine/storage.js';
 import { BUILT_IN_SETS, setSportOf } from '../src/engine/footballSets.js';
@@ -44,7 +44,8 @@ function syntheticSet() {
   const expanded = tuples => tuples.map(tuple => expandCmTuple(tuple, SOURCE));
   const strength = tuples => Math.round(selectLineup({ sport: 'football',
     squad: expanded(tuples).map(([name, pos, rating, info]) => ({ name, pos, rating, positions: info.positions })) }).rating);
-  const nations = Object.fromEntries(Object.keys(NATIONS).map(nation => {
+  // Every nation of today's map (East Germany, a nation of the map's earlier years, is no 2002 set's).
+  const nations = Object.fromEntries(Object.keys(NATIONS).filter(nation => !HISTORIC_NATIONS.includes(nation)).map(nation => {
     if ([EMPTY, '499', 'KOS'].includes(nation)) return [nation, [40, 0, []]];
     const squad = XI.map((key, i) => player(nation, key, i));
     return [nation, [strength(squad), squad.length, squad]];
@@ -66,7 +67,8 @@ const SET = syntheticSet();
 const INDEX = { format: 1, sets: [{ id: ID, version: SET.version, year: 2002, season: '2001/02', label: SET.label,
   provider: SOURCE.provider, local: true, coverage: SET.coverage }] };
 const SET_URL = `/football/${ID}.json`;
-const UEFA_NATIONS = Object.values(NATIONS).filter(nation => nation[2] === 'UEFA').length;
+// Europe's nations on today's map (East Germany, HISTORIC_NATIONS, is on the map of its years only).
+const UEFA_NATIONS = Object.entries(NATIONS).filter(([id, nation]) => nation[2] === 'UEFA' && !HISTORIC_NATIONS.includes(id)).length;
 // The set's European teams: without Montenegro and Kosovo, which have no federation, and Luxembourg, whom nobody plays
 // for (a nation fields a team only with a real side).
 const UEFA_FIELD = UEFA_NATIONS - 3;
@@ -482,7 +484,8 @@ test('Retry this setup loads the set first, and refuses clearly when it cannot',
     app.pickSetup('role', 'manager');
     app.pickSetup('managedTeamId', '688');
     app.startCampaign();
-    assert.equal(app.state.campaignName, 'Football 2001/02 · Europe · Serbia');
+    // Serbia's team of 2001/02 is FR Yugoslavia's (src/data/namesOfTheDay.js).
+    assert.equal(app.state.campaignName, 'Football 2001/02 · Europe · FR Yugoslavia');
     const first = app.state.campaignId;
 
     // Serbia is knocked out, and the checkpoint recording it was saved.

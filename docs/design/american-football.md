@@ -2,7 +2,8 @@
 
 Status: implemented 2026-10-31; touchdown tries, safeties and the NFL's key margins
 2026-11-01 (simulation version 3); 2026-11-02 (version 4), an overtime side a
-touchdown down no longer settles for a field goal. A third sport beside football and basketball: the
+touchdown down no longer settles for a field goal; 2026-11-10 (version 5, the earlier seasons only), each earlier
+season plays its own day's scoring, kicking, tries and overtime ([Rules by era](#rules-by-era)). A third sport beside football and basketball: the
 32 NFL franchises, rated by Madden NFL 27, fight over the USA. It is played with
 clubs only, on the NFL's own map ([domestic-campaigns.md](domestic-campaigns.md#the-nfl-map)).
 Everything outside the match (territory, the draw, targeting, conquest, signings,
@@ -106,7 +107,8 @@ guard. Every franchise fields all 23 at natural positions.
   exactly 3, twice as many as by exactly 7, as the NFL's do. Independent drives left
   them 13 apart, and with every touchdown worth 7 (simulation version 2) more games
   ended by 7 than by 3. Who wins hardly moves.
-- **Overtime**, playoff rules, ten-minute periods: both sides possess once
+- **Overtime** (today's: the built-in season's, and the seasons from 2022; an earlier season's is its
+  playoffs' of the day, [Rules by era](#rules-by-era)), playoff rules, ten-minute periods: both sides possess once
   (toss for the first). The first kicks after a touchdown; the second plays to its
   score (level or a field goal down it plays for three, a touchdown down it needs
   one), and its touchdown wins outright, or is kicked to win after a missed extra
@@ -151,7 +153,11 @@ one possession to answer it: a touchdown wins against up to 5 and, with its extr
 point, against 6, and levels 7 with the extra point; a field goal wins against 1 or
 2 and levels 3. A live model saved before tries (simulation version 2) charts every
 extra point as made. At kickoff the chart is within 0.3 points of the fixture's
-simulated odds on average (at most 1) under every Upsets setting.
+simulated odds on average (at most 1) under every Upsets setting. An earlier season's chart plays its own rules (the
+prepared match's `rules`): its drive odds, tries and safeties, its overtime periods' length (`ot`, fifteen minutes before
+2017) and its overtime (`overtime`, which today's model leaves out): in sudden death a lead in overtime has won, and in
+modified sudden death only a first possession's field goal leaves an answer. Both chains are exact for the model before
+form, as today's is ([Rules by era](#rules-by-era)).
 
 ## Interface
 
@@ -616,6 +622,155 @@ the same rule and frozen weights, from the 95 Pro Football Archives pages saved 
   their clubs, sections and shapes; only their seasons (now the `pfa-` ids) and so their versions changed. Neither the
   withdrawn `madden-1998`, `madden-1999` and `madden-2000` nor these maps ever reached the live game, so no saved
   campaign there names them, and the change touches no season or map that did.
+
+## Rules by era
+
+Status: built 2026-11-10, finished 2026-11-13. Every earlier season plays its own day's game: its league's scoring, its kicking, its tries
+and its playoffs' overtime. `matchSport` (src/sports/index.js) asks the sport for a campaign's rules (`rulesFor`), and
+`americanFootballIn(settings)` gives one sport object per season, under `seasonRules(league, year, dataSet)`, simulation
+version 5. The built-in season (no data set) gets `americanFootball` itself: today's rules and results, unchanged (its
+version stays 4).
+
+| Seasons | Two-point try | Overtime (the playoffs') | Overtime periods |
+| --- | --- | --- | --- |
+| AFL 1960–1969 | yes | sudden death | 15 minutes |
+| NFL 1960–1993 | no: every touchdown kicked | sudden death | 15 minutes |
+| NFL 1994–2009 | yes | sudden death | 15 minutes |
+| NFL 2010–2016 | yes | modified sudden death | 15 minutes |
+| NFL 2017–2021 | yes | modified sudden death | 10 minutes |
+| NFL 2022 on, and the built-in season | yes | both sides possess | 10 minutes |
+
+**Scoring by season.** `src/data/nflLeagueAverages.js` holds each league season's regular-season totals: team-games,
+points, touchdowns, extra points made and tried, two-point tries made and tried, field goals made and tried and safeties,
+summed over its clubs' Pro Football Archives team-season pages (each club's SCORING table, its Team Totals row). Every
+point is accounted for (6 a touchdown, 1 an extra point, 2 a two-point try, 3 a field goal, 2 a safety, and from 2015 2
+for the defence's returned try) in every one of the 75 league seasons, the NFL's 1960 to 2024 and the AFL's ten, bar a
+point or two in a few seasons' tables and one touchdown in 2022's (below). `npm run build:nfl-scoring` (`scripts/build-nfl-scoring.mjs`) writes it from
+`scripts/data/nfl-scoring.json`, which holds the totals, nflverse's check and every page's SHA-256; `--check` rebuilds both
+byte for byte where `data-src/` has the pages, else the module from the committed table.
+
+- **The pages.** 1960 to 1989, 1991, 1996 to 2005 and the AFL's ten seasons are the computed seasons' own (saved 2026-11-09
+  and 2026-11-10, pinned in `scripts/data/pfa-pages.json`). The rest, 1990, 1992 to 1995 and 2006 to 2024 (774 pages),
+  were saved on 2026-11-10 and 2026-11-13 into the ignored `data-src/nfl-scoring/` (`npm run build:nfl-scoring -- --fetch`) as
+  politely as `fetch:pfa`: robots.txt first (still HTTP 404), one request every 5 s, User-Agent `imperialism-game-data/1.0`,
+  every answer logged, anything but 200 or 404 stopping the run. The 2008 index links its draft page as `2008nflraft.html`
+  (HTTP 404); it is no club's. The site had no 2025 season on 2026-11-13 (its index answered HTTP 404), so the table ends
+  with 2024 and the 2025 season (Madden NFL 26) plays 2024's figures, as any season past the table does. Facts only are
+  taken.
+- **The second source.** nflverse's games (`github.com/nflverse/nfldata`, `data/games.csv` at commit `cf94eee`, read
+  through jsDelivr on 2026-11-10) list every regular-season score from 1999: its points and team-games agree with the
+  table's in all 26 seasons from 1999 to 2024, and the build stops if they ever do not. In 2005 the
+  site's score tables sum 10 points over its scoring tables (10,566 against 10,556); nflverse has 10,556, so the scoring
+  tables' points are the ones kept. The site's overtime marks miss games (21 in 2002 where nflverse has 25), so overtime
+  games are counted from nflverse only, and ties (before 1974) from the site's score tables.
+- **The site's slips.** Each club's points are taken as two of its three figures agree: its SCORING table's points, what
+  that table's touchdowns, tries, field goals and safeties add up to, and its score table's sum. Every club of 1960 to
+  2024 has two that agree; six totals are overruled (the Vikings' 378 for 379 in 2012, the Ravens' "32" for 320 and the
+  Patriots' 244 for 444 in 2013, the Giants' 320 for 420 and the Saints' 406 for 408 in 2015, the Bengals' 450 for 460
+  in 2021: the table's `corrected`). The defence's returned tries (DX, since 2015) are counted. The Bills' game at
+  Cincinnati of 2 January 2023, suspended in the first quarter and never finished, is no game, as nflverse has it. The
+  2022 Steelers' scoring lists 29 of their 30 touchdowns (their points and score table agree on 308), which the table
+  keeps as found (`scoredParts`). The 2024 Eagles' page leaves one row of its scoring table unclosed, which the reader
+  (`scripts/lib/pfa.mjs`) now ends at the next row.
+- **The average matchup.** `NFL_SEASON_MATCHUPS` holds each season's clubs' mean offence less their mean defence (`edge`) and
+  their mean kicker (`kicking`), as the match model rates their lineups, and the built-in clubs' (0.79 and 78.3). Editions
+  rate the units differently against each other: Tecmo Super Bowl's 1990 clubs, every one a lineman and a corner short on
+  defence, average 3.53; computed seasons 0.5–1.5. A season's drive odds are stated at its own average matchup, so every
+  season's average game scores as its league's did, and a club's edge over that average is worth what it is today.
+
+**How a season's figures become its drive odds** (`seasonRules`). The possession model is today's (eleven possessions a
+side, late-game play-calling, the same rating scales); only its rates move:
+
+- **Touchdowns and field-goal tries.** At the season's average matchup a possession's touchdown odds, and its field-goal
+  try odds when it ends in none, sit from today's at the built-in clubs' average matchup as far, in log odds, as the
+  season's touchdowns (and field-goal tries) per possession, over eleven a side, sit from 2023 and 2024's, the seasons
+  today's odds were tuned on.
+- **Field goals and extra points made.** The league's own rates at the season's average kicker, each rating point above it
+  worth 0.6 more field goals in a hundred, as today, and 0.3 more extra points scaled by the league's misses against
+  today's 5% (`xpSlope`: none in the AFL of 1965, whose kickers made all 267, so its clubs make 99.9% of theirs; today's
+  slope, cut off at the 99.9% ceiling, gave them 98.2%); held within 25 below and 12 above (field goals, 97% at most)
+  and 10 below and 4 above (extra points, 99.9% at most).
+- **Two-point tries.** None in the NFL before 1994: every touchdown is kicked. The AFL's and the NFL's from 1994 are made
+  as often as the league's were between equals, and go for two as much more or less often than 2023 and 2024's did as the
+  league's did: the early touchdowns' share (EARLY_TWO) scaled by that ratio, and late the chart's calls followed that
+  often (all of them from a ratio of 1).
+- **Safeties.** The league's a possession.
+
+**Overtime.** A conquest needs a winner, so a level game goes to the overtime of its season's playoffs:
+
+- **Sudden death** (the AFL 1960–69, the NFL to 2009): possessions alternate from the toss and the first score wins, a
+  touchdown without its try; a safety wins for the defence.
+- **Modified sudden death** (2010–2021): a touchdown on the first possession wins, as does the defence's safety; a field
+  goal gives the other side a possession, played a field goal down as late in a game (its touchdown wins, its field goal
+  draws level); then, or after a first possession without a score, sudden death.
+- **Both possess** (2022 on, and the built-in season): today's.
+- **Periods.** Fifteen minutes to 2016 and in the AFL; ten from 2017, the regular season's length since, which the game's
+  overtime has always had (the playoffs kept fifteen). A period holds six possessions at most under every rule; after the
+  third level period the bounded decisive field goal decides, as today. A score is timed within its period, about three
+  minutes a possession, so a sudden-death season's overtime scores fall at minutes 61–105.
+
+The live chart, the clock (`clock.ot`), the ticker (OT rows, "after 2 overtime periods") and the setup's campaign preview
+read the season's sport object, so all follow its overtime.
+
+**Sources** (read 2026-11-10):
+
+- Pro Football Archives' team-season pages (`https://www.profootballarchives.com/<year>nfl.html` and each club's), and
+  nflverse's games (`https://cdn.jsdelivr.net/gh/nflverse/nfldata@cf94eee45c7af1955914145a1a84fab705327724/data/games.csv`),
+  as above.
+- The two-point try in the AFL 1960–1969 and in the NFL from 1994: Wikipedia, "Two-point conversion",
+  `https://en.wikipedia.org/w/index.php?oldid=1379654292`.
+- Sudden death in the NFL's championship games from 1946 (first played in the 1958 game), in the regular season from 1974
+  (fifteen minutes, ten from 2017), and from the 2010–11 playoffs each side's possession unless the receiving side scores
+  a touchdown or the defence scores; both sides from the 2022 playoffs: Wikipedia, "Sudden death (sport)",
+  `https://en.wikipedia.org/w/index.php?oldid=1379231725`.
+- Fifteen-minute periods in every game to 2016, ten in the regular season from 2017, fifteen in the playoffs still; the
+  modified rule voted for the playoffs in March 2010 and extended to the regular season in 2012; the AFL's 1962 title game
+  won by a field goal in double overtime: Wikipedia, "Overtime (sports)", `https://en.wikipedia.org/w/index.php?oldid=1383118578`.
+- The 1962 AFL Championship Game's field goal at 17:54 of sudden-death overtime: Wikipedia, "1962 American Football League
+  Championship Game", `https://en.wikipedia.org/w/index.php?oldid=1371314417`.
+- The goal posts moved from the goal line to the end line in 1974 (field goals and extra points longer, the 1974 dips
+  above): Wikipedia, "1974 NFL season", `https://en.wikipedia.org/w/index.php?oldid=1379210354`.
+- The extra point from the 15-yard line from 2015, and the share going for two rising from about 5% to about 8%:
+  Wikipedia, "Conversion (gridiron football)", `https://en.wikipedia.org/w/index.php?oldid=1360354547`.
+
+**Measured.** Each season's clubs over 160 seasons of their league's own schedule (`npm run simulation:realism`, run
+2026-11-13), the league's figure in brackets; the level games' real share is the ties' before 1974 and nflverse's overtime
+games' from 1999, none between.
+
+| Season | Overtime | Points a team | Touchdowns | Field goals | Extra points made | Going for two | Level after 60 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| NFL 1965 | sudden death | 23.6 (23.1) | 2.96 (2.87) | 1.00 (1.00) | 95.7% (95.6%) | none (none) | 5.8% (2.0%) |
+| AFL 1965 | sudden death | 22.1 (21.5) | 2.63 (2.53) | 1.21 (1.23) | 99.9% (100.0%) | 5.2% (5.7%) | 5.3% (8.9%) |
+| NFL 1977 | sudden death | 17.8 (17.2) | 2.17 (2.08) | 0.92 (0.92) | 90.6% (91.1%) | none (none) | 5.7% |
+| NFL 1985 | sudden death | 22.0 (21.5) | 2.58 (2.51) | 1.32 (1.33) | 95.5% (95.7%) | none (none) | 5.6% |
+| NFL 1993 | sudden death | 19.4 (18.7) | 2.13 (2.02) | 1.48 (1.50) | 96.7% (96.8%) | none (none) | 5.0% |
+| NFL 2000 | sudden death | 21.3 (20.7) | 2.42 (2.32) | 1.45 (1.47) | 99.1% (99.1%) | 7.2% (7.4%) | 5.5% (5.2%) |
+| NFL 2010 | modified | 22.6 (22.0) | 2.56 (2.48) | 1.54 (1.55) | 99.1% (99.1%) | 3.9% (4.1%) | 5.4% (7.4%) |
+| NFL 2024 | both possess | 23.4 (22.9) | 2.61 (2.55) | 1.72 (1.72) | 95.8% (95.8%) | 9.8% (9.7%) | 5.5% (5.9%) |
+
+Points run about half a point a team high in every era, overtime's included: within the point
+`scripts/simulation-realism.test.mjs` allows. Level games stay near today's share in every era: the late-game play-calling
+is today's, so a season with more ties (the AFL of 1965) or fewer has its own only through its scoring.
+
+**Tests.** `scripts/american-football-eras.test.mjs`: the built-in season's rules and object unchanged; the record's
+overtime and two-point rules by year; every earlier season's own sport object, rules, clock and kicking; the table's
+rebuild, its points accounted for and nflverse's agreement; every one of the 76 built-in seasons scoring within a point of its
+league (all its pairings, about 4,000 games a season); kicked tries only in the NFL before 1994, and the share going for two near the
+league's after; sudden-death and modified sudden-death overtimes as the rules have them, in fifteen-minute periods; the
+live chart's chains against simulated overtimes, its periods and its leads in each rule; and the clock, the ticker's labels
+and the setup's preview. `scripts/nfl-seasons.test.mjs` has the running App play a 1977 campaign's match under that
+season's sport, its result from the campaign's stream and its live chart sudden death in fifteen-minute periods.
+`scripts/simulation-realism.test.mjs` holds the eight seasons above to their leagues' points, touchdowns, field goals,
+extra points and two-point share.
+
+**Limits.**
+
+- Possessions stay at eleven a side, today's; real ones varied by era, so a season's rates per possession absorb the
+  difference. Late-game play-calling and the two-point chart are today's in every era that had the try.
+- Before 1974 the NFL's regular season had no overtime (ties stood) and the AFL's never did: the game plays the playoffs'
+  sudden death, since a conquest needs a winner.
+- A season's two-point success is its league's own, from few tries in the AFL (4 of 18 in 1969); kicks have no distance.
+- Kicking and the two-point share are the league's averages; clubs differ only by their kicker's rating.
 
 ## Known limits
 

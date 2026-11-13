@@ -28,6 +28,7 @@ import sharp from 'sharp';
 import { NATIONS, DEPENDENCIES } from '../src/data/teams.js';
 import { FLAG_CODES } from '../src/data/flags.js';
 import { WorldGeometry, closestPair } from '../src/engine/geo.js';
+import { atlasOfYear } from '../src/engine/historicMap.js';
 import { empireFill, themedPaint } from '../src/theme.js';
 import { colourDistance, oklchHex, rgbToOklab, toOklch } from '../src/engine/colour.js';
 
@@ -97,7 +98,8 @@ async function fittingColours(id) {
 }
 
 // ---- Who neighbours whom ----
-const geo = new WorldGeometry(JSON.parse(await readFile(path.join(root, 'public/world-110m.v1.json'), 'utf8')));
+const atlas = JSON.parse(await readFile(path.join(root, 'public/world-110m.v1.json'), 'utf8'));
+const geo = new WorldGeometry(atlas);
 const ids = Object.keys(NATIONS).sort();
 const ownerOf = shape => (NATIONS[shape] ? shape : DEPENDENCIES[shape]?.of ?? null);
 const neighbours = new Map(ids.map(id => [id, new Map()]));
@@ -166,6 +168,26 @@ for (let sweep = 0, changed = true; changed && sweep < 100; sweep++) {
     }
     if (best !== pick.get(id)) { pick.set(id, best); changed = true; }
   }
+}
+
+// ---- Shapes of earlier years ----
+// A nation the map draws only in earlier years (East Germany: src/engine/historicMap.js) has no shape on today's map,
+// so it has no neighbours above and changes nobody's choice. It chooses last, against its neighbours on the map of its
+// years, by land and across the sea, everyone else keeping theirs.
+for (const id of ids.filter(id => !geo.countries.some(country => country.id === id))) {
+  const through = atlas.objects.historic?.geometries.find(geometry => String(geometry.id) === id)?.properties?.through;
+  if (!through) continue;
+  const era = new WorldGeometry(atlasOfYear(atlas, through));
+  const near = new Map([...(era.adj[id] || [])].map(shape => [ownerOf(shape), 1]).filter(([other]) => other && other !== id));
+  const own = era.projected[id].flat(2);
+  for (const country of era.countries) {
+    const other = ownerOf(country.id);
+    if (!other || other === id || near.has(other)) continue;
+    if (closestPair(own, era.projected[country.id].flat(2)).dist < SEA_GAP) near.set(other, SEA_WEIGHT);
+  }
+  const cost = choice => choice.cost + [...near].reduce((sum, [other, weight]) => sum + weight * clash(choice, pick.get(other)), 0);
+  pick.set(id, choices.get(id).reduce((a, b) => (cost(b) < cost(a) - 1e-9 ? b : a)));
+  for (const [other, weight] of near) neighbours.get(id).set(other, weight);
 }
 
 // ---- Module ----

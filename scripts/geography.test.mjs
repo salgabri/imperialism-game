@@ -5,7 +5,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import * as geometry from '../src/engine/geo.js';
-import { NATIONS } from '../src/data/teams.js';
+import { HISTORIC_NATIONS, HISTORIC_THROUGH, NATIONS } from '../src/data/teams.js';
+import { atlasOfYear, capitalsOfYear } from '../src/engine/historicMap.js';
 import { CAPITALS } from '../src/data/capitals.js';
 
 const FILES = ['countries-50m.json', 'world-110m.v1.json'];
@@ -361,16 +362,22 @@ test('every nation\'s route anchor lies in its own drawn land and in no other co
     }
     return inside;
   };
-  const world = new geometry.WorldGeometry(topologies('world-110m.v1.json'), CAPITALS).fitTo(Object.keys(NATIONS));
-  const { s, tx, ty } = world.fit;
-  const display = new geometry.WorldGeometry(geometry.mergeSharedIds(topologies('countries-50m.json')), CAPITALS);
-  const routing = geometry.drawnPaths(display.buildPaths(s, tx, ty), world.countries);
+  // Today's map, the map of 1990, whose East Germany holds Berlin and whose West Germany is anchored on Bonn, and the
+  // map of 1975, whose South Vietnam holds Saigon (src/engine/historicMap.js).
   const misplaced = [];
-  for (const id of Object.keys(NATIONS)) {
-    for (const [atlas, paths] of [['110m', world.paths], ['50m', routing]]) {
-      const anchor = [paths[id].cx, paths[id].cy];
-      const foreign = Object.keys(paths).filter(other => other !== id && evenOdd(paths[other].labelRings, anchor));
-      if (!evenOdd(paths[id].labelRings, anchor) || foreign.length) misplaced.push(`${NATIONS[id][0]} (${atlas}) in ${foreign.join(',') || 'the sea'}`);
+  for (const year of [null, 1975, 1990]) {
+    const world = new geometry.WorldGeometry(atlasOfYear(topologies('world-110m.v1.json'), year), capitalsOfYear(topologies('world-110m.v1.json'), year))
+      .fitTo(Object.keys(NATIONS));
+    const { s, tx, ty } = world.fit;
+    const atlas = topologies('countries-50m.json');
+    const display = new geometry.WorldGeometry(geometry.mergeSharedIds(atlasOfYear(atlas, year)), capitalsOfYear(atlas, year));
+    const routing = geometry.drawnPaths(display.buildPaths(s, tx, ty), world.countries);
+    for (const id of Object.keys(NATIONS).filter(id => !HISTORIC_NATIONS.includes(id) || (year != null && year <= HISTORIC_THROUGH[id]))) {
+      for (const [scale, paths] of [['110m', world.paths], ['50m', routing]]) {
+        const anchor = [paths[id].cx, paths[id].cy];
+        const foreign = Object.keys(paths).filter(other => other !== id && evenOdd(paths[other].labelRings, anchor));
+        if (!evenOdd(paths[id].labelRings, anchor) || foreign.length) misplaced.push(`${NATIONS[id][0]} (${scale}) in ${foreign.join(',') || 'the sea'}`);
+      }
     }
   }
   // Island anchors that miss a coarse coastline fall back to the centroid and may sit offshore; none may sit in a

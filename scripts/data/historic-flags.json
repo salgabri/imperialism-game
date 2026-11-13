@@ -1,5 +1,5 @@
 {
-  "about": "Flags of football federations of another day that flag-icons does not have (docs/design/football-years.md, 'Federations of the day'). Each is a public-domain SVG from Wikimedia Commons, read 2026-11-09 from the file page named (robots.txt allows /wiki/ pages and upload.wikimedia.org), committed under scripts/data/historic-flags/ and redrawn on flag-icons' 4:3 canvas (640 x 480) by npm run build:historic-flags, which writes public/flags/<file>.svg; --check rebuilds them byte for byte. The redrawing keeps every path of the original: the flag is scaled by its height to 480 and cut to 640 wide, at the fly for a flag whose emblem sits in the canton, evenly on both sides for a centred one; a plain field is redrawn as rectangles in the new coordinates. sha256 is the original as served by upload.wikimedia.org, lfSha256 the committed snapshot (git keeps text with LF line endings).",
+  "about": "Flags of nations and federations of another day that flag-icons does not have (docs/design/football-years.md, 'Federations of the day'; docs/design/historic-maps.md, 'Names of the day'). Each is a public-domain SVG from Wikimedia Commons, read 2026-11-09 (the first five) and 2026-11-10 (East Germany, South Vietnam, the United Arab Republic) from the file page named (robots.txt allows /wiki/ pages and upload.wikimedia.org), committed under scripts/data/historic-flags/ and redrawn on flag-icons' 4:3 canvas (640 x 480) by npm run build:historic-flags, which writes public/flags/<file>.svg; --check rebuilds them byte for byte. The redrawing keeps every path of the original: the flag is scaled by its height to 480 and cut to 640 wide, at the fly for a flag whose emblem sits in the canton, evenly on both sides for a centred one; a plain field is redrawn as rectangles in the new coordinates. sha256 is the original as served by upload.wikimedia.org, lfSha256 the committed snapshot (git keeps text with LF line endings).",
   "flags": [
     {
       "file": "su",
@@ -89,6 +89,60 @@
       "sha256": "20904257182ac9481320fe17ab5870958cebd7a1c336cbc849be0da45420b9b8",
       "lfSha256": "20904257182ac9481320fe17ab5870958cebd7a1c336cbc849be0da45420b9b8",
       "bytes": 5068,
+      "layout": "centred"
+    },
+    {
+      "file": "dd",
+      "flagId": "278",
+      "name": "East Germany (German Democratic Republic)",
+      "flies": "1959-1990",
+      "source": "scripts/data/historic-flags/Flag_of_East_Germany.svg",
+      "commons": {
+        "title": "File:Flag of East Germany.svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_East_Germany.svg",
+        "revision": 1291263799,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/a/a1/Flag_of_East_Germany.svg"
+      },
+      "licence": "Public domain: the flag of a German body governed by public law, and under section 5 (1) of the German Copyright Act official works such as flags are in the public domain (gemeinfrei), as the file page states",
+      "sha256": "a56cc5793f494284e649b5fcbfae6195fb1fe7cfe177eb9c7cacf32e2d9b585f",
+      "lfSha256": "a56cc5793f494284e649b5fcbfae6195fb1fe7cfe177eb9c7cacf32e2d9b585f",
+      "bytes": 28802,
+      "layout": "centred"
+    },
+    {
+      "file": "rvn",
+      "flagId": "RVN",
+      "name": "South Vietnam (Republic of Vietnam)",
+      "flies": "1955-1975",
+      "source": "scripts/data/historic-flags/Flag_of_South_Vietnam.svg",
+      "commons": {
+        "title": "File:Flag of South Vietnam.svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_South_Vietnam.svg",
+        "revision": 1298812248,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/e/e9/Flag_of_South_Vietnam.svg"
+      },
+      "licence": "Public domain: simple geometry, ineligible for copyright (Commons: PD-ineligible), as the file page states",
+      "sha256": "20aff916fd3b09925c74e1de95a6312103bf5db72bb6aaf21902588df6a7b743",
+      "lfSha256": "20aff916fd3b09925c74e1de95a6312103bf5db72bb6aaf21902588df6a7b743",
+      "bytes": 200,
+      "layout": "stripes"
+    },
+    {
+      "file": "uar",
+      "flagId": "UAR",
+      "name": "United Arab Republic (Egypt until 1971)",
+      "flies": "1958-1971",
+      "source": "scripts/data/historic-flags/Flag_of_the_United_Arab_Republic_(1958-1971).svg",
+      "commons": {
+        "title": "File:Flag of the United Arab Republic (1958–1971), Flag of Syria (1980–2024).svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_United_Arab_Republic.svg",
+        "revision": 1277863493,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Flag_of_the_United_Arab_Republic_%281958%E2%80%931971%29%2C_Flag_of_Syria_%281980%E2%80%932024%29.svg"
+      },
+      "licence": "Public domain: an Egyptian work out of copyright in Egypt under Intellectual Property Law 82 of 2002 (Commons: PD-Egypt), as the file page states (which also offers it under the GFDL and CC BY-SA 3.0)",
+      "sha256": "331d12374444f1c149149292314b12eccf532b16d06468a6dd9b8f581fd969e5",
+      "lfSha256": "331d12374444f1c149149292314b12eccf532b16d06468a6dd9b8f581fd969e5",
+      "bytes": 311,
       "layout": "centred"
     }
   ]

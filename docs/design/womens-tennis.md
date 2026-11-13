@@ -18,7 +18,69 @@ the doubles first on day two and then the two reverse singles, first to three. T
 doubles last; the cup moved it. So the women's tie is the men's, in the men's order: day one, each side's No. 1 plays
 the other's No. 2; day two, the doubles, then No. 1 against No. 1 and No. 2 against No. 2. Every rubber is a
 best-of-three match of tie-break sets, and dead rubbers are not played, so a tie ends 3–0, 3–1 or 3–2. The Finals (two
-singles and a doubles on one day, first to two) are not offered, as the Davis Cup's Final 8 is not.
+singles and a doubles on one day, first to two) are not offered, as the Davis Cup's Final 8 is not. That is the built-in
+season's format; an earlier season plays its own year's, three-rubber ties and advantage sets included
+([Format by year](#format-by-year)).
+
+## Format by year
+
+Status: implemented 2026-11-10, with the men's ([tennis.md](tennis.md#format-by-year)). An earlier season plays the
+cup of its year, the Federation Cup to 1994, the Fed Cup to 2019 and the Billie Jean King Cup after: `matchSport` asks
+the sport for its season's rules (`rulesFor`) and `FED_CUP_FORMATS` in `src/sports/tennis.js` answers, one sport object
+a format. Every rubber is best of three sets in every year; what changed is the tie and the tie-break.
+
+| Seasons | Tie | Sets | Source |
+| --- | --- | --- | --- |
+| 1968–1975 | Three rubbers, first to two, at one venue in one week: the No. 2s' singles, the No. 1s', the doubles | Advantage sets | [Billie Jean King Cup](https://en.wikipedia.org/w/index.php?oldid=1380349265): "a team championship played over one week"; [1995 Fed Cup](https://en.wikipedia.org/w/index.php?oldid=1369040089): "Two singles rubbers were added to the ties" in 1995 |
+| 1976 | The same | Tie-break sets | [1976 Federation Cup](https://en.wikipedia.org/w/index.php?oldid=1368553932): "The tiebreaker also was used for the first time" |
+| 1977–1979 | The same | Advantage sets | The match files |
+| 1980–1994 | The same | A tie-break in the first two sets, the third an advantage set | The match files |
+| 1995–1999 | Five rubbers over two days, home and away: No. 1 against No. 2 each way, the reverse singles, the doubles last | The same | [1995 Fed Cup](https://en.wikipedia.org/w/index.php?oldid=1369040089); [Billie Jean King Cup](https://en.wikipedia.org/w/index.php?oldid=1380349265): "The final match is a doubles" |
+| 2000–2001 | Three rubbers: the World Group in round-robin pools at one venue | The same | [2000 Fed Cup](https://en.wikipedia.org/w/index.php?oldid=1369039908); [2001 Fed Cup](https://en.wikipedia.org/w/index.php?oldid=1369040095) |
+| 2002–2017 | Five rubbers, the doubles last | The same | The match files; the Billie Jean King Cup article on the World Group of 2005 |
+| 2018–2024 | Five rubbers, the doubles last: the qualifiers and play-offs, home and away (the Finals of 2020–2024 played three-rubber ties) | Tie-break sets | The match files; [2024 qualifying round](https://en.wikipedia.org/w/index.php?oldid=1370525899): rubbers 1–4 singles, 5 the doubles |
+| 2025 | Three rubbers: the qualifiers and play-offs in round-robin groups of three at one venue each | Tie-break sets | [2025 qualifying round](https://en.wikipedia.org/w/index.php?oldid=1322355180); [2025 play-offs](https://en.wikipedia.org/w/index.php?oldid=1324057027) |
+| 2026 (built-in) | Five rubbers over two days, the doubles third, as in the Davis Cup | Tie-break sets | [2026 Billie Jean King Cup](https://en.wikipedia.org/w/index.php?oldid=1382241565): "with doubles rubber moved to the third game, coinciding with Davis Cup" |
+
+The revisions were read on 2026-11-10, each article page fetched once under `/wiki/`. Jeff Sackmann's match files (the
+pinned archive of Earlier seasons) hold the singles of every tie and bear the rest out, as `node
+scripts/tennis-formats-real.mjs` counts them (2026-11-10):
+
+- **Three rubbers.** Every World Group tie of 1968–1994 has two singles, numbered 1 and 2, so the doubles came third (as
+  the 2025 qualifying round's ties list it); the first singles is the weaker pair's (the No. 2s') in 560 of the 571 ties
+  of 1975–1994 whose four players have a ranking, and in 29 of the 30 round-robin ties of 2000–2001.
+- **Five rubbers.** All 357 World Group and play-off ties of 1995–2022 number their singles 1 to 4: the doubles came
+  fifth. The first reverse singles is the No. 1s' in 259 of the 275 of them whose players have a ranking.
+- **Tie-breaks.** None of the 1,124 Fed Cup sets of 1968–1975 ended 7–6, and 68 went past 7–5. Of 1976's 158, twelve
+  ended 7–6 and none went past it. In 1977–1979, 31 of 547 went past 7–5 and two ended 7–6. From 1980 to 2017 the World
+  Group's first two sets ended 7–6 (459 of 5,600) and never went past it, while 70 of its 761 deciding sets went past
+  7–5 and the six that ended 7–6 were all dead rubbers. From 2018 none of 1,715 sets went past 7–5.
+
+**The model.** The men's ([tennis.md](tennis.md#format-by-year)), at the WTA's serve:
+
+- **Three rubbers.** The No. 2s, the No. 1s, then the doubles, first to two: a tie ends 2–0 or 2–1, and its clock is
+  two rubbers long (40 units) with the third as overtime, so the chart ticks R1 and R2, then R3 once it is played, and the
+  feed reads "rubber 2 of 3". Fewer rubbers mean more upsets: by the live model's exact odds, 1985's sixteen strongest
+  nations' favourites win 77.2% of their three-rubber ties, 80.7% were they today's five-rubber ones.
+- **Advantage sets**, game by game until a side is two clear, with the WTA's holds: of the sets that play on past 7–5,
+  about 46% end 8–6 (the men's 32%), as women break more often.
+- **The doubles last** changes no tie's odds: the rubbers are the same, only which of them go unplayed.
+
+**Realism** (`npm run simulation:realism`, "The cups by year": each season's sixteen strongest nations, 40 seasons, 4,800
+ties; real: the World Group's singles, every tie's, in the match files):
+
+| Measure | 1972 | Real, 1968–1975 | 1985 | Real, 1980–1994 | 2005 | Real, 1995–2017 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Ties won 2–0 / 2–1 | 72.2 / 27.8% | 64.8 / 35.2% | 61.9 / 38.1% | 57.6 / 42.4% | — | — |
+| Ties won 3–0 / 3–1 / 3–2 | — | — | — | — | 40.8 / 33.6 / 25.6% | 38.5 / 34.0 / 27.5% |
+| Rubbers to a third set | 29.9% | 23.6% | 33.1% | 23.8% | 33.6% | 31.6% |
+| Sets that reached 6–6 | 10.1% | 6.0% | 10.4% | 7.2% | 10.6% | 10.3% |
+| Sets past 7–5 ending 8–6 / 9–7 / longer | 47.5 / 23.4 / 29.1% | 54.5 / 21.2 / 24.2% (with 1977–1979) | 43.1 / 26.1 / 30.7% | 38.6 / 24.3 / 37.1% (deciding sets, 1980–2017) | 45.9 / 25.0 / 29.1% | the same |
+
+The real samples (`scripts/tennis-formats-real.mjs`): 250, 806 and 265 ties; 1,118, 3,607 and 2,399 sets; 99 sets and
+70 deciding sets past 7–5. The Federation Cup to 1994 was an open event, every entrant in one draw rather than sixteen of
+the strongest: its rubbers were more one-sided (fewer went to a third set) and more of its ties split the two singles
+(2–1) than the model's. The World Group of 1995–2017, a field of the strongest like the game's, lands within three points.
 
 ## Data
 
@@ -148,7 +210,10 @@ serve; the odds and the live chart; setup, the season, challenge links; the cour
 App launching the world, playing the United States against Russia and saving it. `scripts/setup-wizard.test.mjs` holds
 the three rows of tiles; `scripts/home-advantage.test.mjs` and `scripts/simulation-realism.test.mjs` the host's edge;
 `npm run smoke` adds a Billie Jean King Cup campaign of the world. `scripts/womens-tennis-seasons.test.mjs` holds the
-earlier seasons (below).
+earlier seasons (below), and `scripts/tennis-formats.test.mjs` their formats by year with the men's: the cup's format of
+each year, a 1990 tie of three rubbers (the No. 2s first, first to two, the third set an advantage set) and a 1997 one
+with the doubles last, the live chart and the clock of a three-rubber tie, the feed's "rubber 2 of 3", the win chart's
+ticks, and the running App playing a 1985 season in three-rubber ties.
 
 ## Known limits
 
@@ -159,6 +224,12 @@ earlier seasons (below).
   grass Elo.
 - **The home edge is the Davis Cup's**, not measured for the women's cup.
 - **Players by the country Tennis Abstract files them under**, not by cup nominations.
+- **A three-rubber year's team strength** still weighs its places as five rubbers do (`TENNIS_WEIGHTS` in
+  `src/data/teams.js`: the No. 1 and No. 2 two rubbers each, the pair one), so the strength shown before a tie of
+  1968–1994, 2000–2001 or 2025 leans a little more on the singles than its rubbers do; the ties themselves play each
+  rubber by its own players' ratings.
+- **Every year at today's serve**, as the men's: the Fed Cup's sets reached 6–6 less often than the model's (7.2% in
+  1980–1994, 10.4% in the model's 1985).
 - **Licence**: Tennis Abstract's reports and Sackmann's match files are CC BY-NC-SA 4.0 (credit "Jeff Sackmann / Tennis
   Abstract", non-commercial), as the men's ratings are; the ads question in the men's notes applies here too.
 
@@ -171,7 +242,7 @@ Fed Cup nations of that day, nations only
 ([tennis.md](tennis.md), "Earlier seasons") and the user's choices for them: Tennis Abstract's own published lists where
 they exist, earlier years computed from Jeff Sackmann's match results by Tennis Abstract's published method, on today's
 scale and labelled as computed. The same scripts build both tours (`--tour=wta`), and the men's files rebuild byte for
-byte.
+byte. Since 2026-11-10 each season plays its year's cup format ([Format by year](#format-by-year)).
 
 ### Sources
 
@@ -254,8 +325,9 @@ As the men's (`scripts/lib/tennis-seasons.mjs`), with the Fed Cup's ties for the
 plays for the nation she played the Fed Cup for in the nearest season (within six), read from the ties' names in the
 match files ("Fed Cup WG F: USA vs AUS"; 349 rubbers place nobody, among them the Wightman Cup's and the Billie Jean King
 Cup's of 2024–2026, whose names give no sides), else for her country by Sackmann's player file; then as that season's state knew it, with the men's
-federations (Czechoslovakia, the Soviet Union, the CIS, Yugoslavia, FR Yugoslavia, West Germany) and their land. East
-Germany never played the Fed Cup: its players play for nobody before 1991.
+federations (Czechoslovakia, the Soviet Union, the CIS, Yugoslavia, FR Yugoslavia, West Germany) and their land, under
+their own names and flags since 2026-11-10 (src/data/namesOfTheDay.js). East Germany never played the Fed Cup: its players
+play for nobody before 1991, and its land, on the map of every season to 1990, stays neutral.
 
 - **Barred:** South Africa from 1978 until 1991 (the files have no South African tie from 1978 until 1992; it played the
   1977 cup), and FR Yugoslavia in 1993 and 1994 (none in those years; back in 1995).

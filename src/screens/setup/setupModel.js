@@ -25,8 +25,10 @@ export function campaignPreview(count, sport, setup) {
   const matches = Math.max(0, count - 1);
   // A best-of-three final plays two or three games where a single final plays one.
   const range = setup.finale === 'best-of-three' && matches > 0 ? `${matches + 1}–${matches + 2}` : `${matches}`;
-  // The clock of the rules the campaign will play (a season's sport object carries the built-in one's).
-  const { clock } = matchSport({ sport: sport.id, layer: setup.layer, clubScope: setup.clubScope });
+  // The clock of the rules the campaign will play: its season's day's, read from a season's sport object (seasonSport
+  // carries the season's identity), else today's.
+  const { clock } = matchSport({ sport: sport.id, layer: setup.layer, clubScope: setup.clubScope, dataSet: sport.dataSet,
+    dataYear: sport.dataYear, dataSeason: sport.dataSeason });
   const seconds = setup.express ? 2.5 : setup.resolution === 'instant' ? 5 : clock.length * clock.msPerUnit / 1000 + 7;
   const minutes = Math.max(1, Math.ceil(matches * seconds / 60));
   return { matches: range, duration: `about ${minutes}–${Math.ceil(minutes * 1.35)} min at 1× autoplay` };

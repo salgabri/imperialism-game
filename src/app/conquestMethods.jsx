@@ -15,7 +15,7 @@ import ConquestCallout from '../screens/conquest/ConquestCallout.jsx';
 import * as conqVM from '../viewModels/conquest.js';
 import { memo, roman, territoryWord } from '../viewModels/format.js';
 import { BATTLE_SCARS, LOG_CAP } from './shared.js';
-import { overtimeShort } from '../sports/index.js';
+import { finishLabel, settledShort } from '../sports/index.js';
 
 /** Render-time builders only run on a campaign (PLAN rule 9). */
 function inCampaign(st) {
@@ -29,13 +29,13 @@ function sentenceCase(text) {
 }
 
 /**
- * The tie-break beside a level score: the shoot-out's kicks ("4–2 PENS"), or the overtime periods ("OT", "2OT"; a
- * baseball game's final inning, "F/11").
- * Overtime points are already in the final score (basketball's tie.ga/gd are those totals), so they are not repeated.
+ * The tie-break beside a level score: the shoot-out's kicks ("4–2 PENS"), football's extra time ("AET", "GOLDEN GOAL",
+ * "LOTS"), or the overtime periods ("OT", "2OT"; a baseball game's final inning, "F/11").
+ * Overtime points and extra time's goals are already in the final score (basketball's tie.ga/gd are those totals), so
+ * they are not repeated.
  */
 function tieBreakText(m, sport) {
-  if (sport.tieBreak === 'shootout') return `${m.tie.ga}–${m.tie.gd} ${sport.labels.tieShort}`;
-  return overtimeShort(sport, Array.isArray(m.tie.periods) ? m.tie.periods.length : 1);
+  return settledShort(sport, m.tie);
 }
 
 /**
@@ -305,7 +305,7 @@ export function applyConquest(playerIndex, decided = null) {
       }
 
       // v4 white map notices (DEC D15): copy in source case, the notice CSS uppercases the label/title/sub lines.
-      const resultLabel = sentenceCase(m.tie ? sport.labels.tie : sport.labels.end);
+      const resultLabel = sentenceCase(finishLabel(sport, m.tie));
       const roundNumeral = roman(st.round);
       this.showPopup(
         {

@@ -6,7 +6,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { NATIONS, selectLineup } from '../src/data/teams.js';
+import { HISTORIC_NATIONS, NATIONS, selectLineup } from '../src/data/teams.js';
 import { loadFootballData, NATION_ARBITRATION, personKeyOf, pickNationSquads, playerTuple, readIdentityOverrides,
   readReepBridge } from './lib/football-data.mjs';
 import { rostersModule } from './lib/data-module.mjs';
@@ -41,6 +41,8 @@ const unmappedNationalities = [...unmapped.values()].sort((a, b) => b.players - 
 const picked = pickNationSquads(pools);
 const rosters = {}, coverage = [];
 for (const [id, rec] of Object.entries(NATIONS)) {
+  // Today's season is played on today's map, which has no East Germany or South Vietnam (HISTORIC_NATIONS).
+  if (HISTORIC_NATIONS.includes(id)) continue;
   const { pool, squad } = picked[id];
   const lineup = selectLineup({ sport: 'football', squad });
   rosters[id] = [Math.round(lineup.rating), pool.length, squad.map(playerTuple)];

@@ -6,6 +6,7 @@ import { CLUB_SCOPES, nationTheatre, worldClubTheatreName } from './data/scopes.
 import { CAPITALS } from './data/capitals.js';
 import { teamMarkUrls } from './data/teamMarks.js';
 import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.js';
+import { atlasOfYear, capitalsOfYear, mapEraOf } from './engine/historicMap.js';
 import { requestMaps, takeMapRequests } from './mapRequests.js';
 import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
@@ -35,7 +36,7 @@ import { canDrawShareImage, deliverShareImage, drawShareCard } from './engine/sh
 import { politicalFill } from './data/empireColours.js';
 import { flagUrl } from './data/flags.js';
 import { clubLogoUrl } from './data/clubLogos.js';
-import { DEFAULT_SETUP, LOG_CAP, dataSetOf, domesticIdOf, setClubScope } from './app/shared.js';
+import { DEFAULT_SETUP, LOG_CAP, dataSetOf, domesticIdOf, mapYearOf, setClubScope } from './app/shared.js';
 import * as mapM from './app/mapMethods.jsx';
 import * as colM from './app/columnMethods.jsx';
 import * as matchM from './app/matchMethods.jsx';
@@ -464,9 +465,12 @@ export default class App extends React.Component {
       linkPlayers?.catch(() => { /* reported below, once the map is in */ });
       const res = await map;
       if (!res.ok) throw new Error('map fetch ' + res.status);
-      this.geo = new WorldGeometry(await res.json(), CAPITALS);
+      // The rules atlas stays: another year's map (src/engine/historicMap.js) is decoded from it when a season needs it.
+      this.rulesAtlas = await res.json();
+      this.geo = new WorldGeometry(this.rulesAtlas, CAPITALS);
       // fitMap frames the same nations below and keeps this frame. Club seeding reads its paths.
       this.geo.fitTo(Object.keys(NATIONS));
+      this.worldGeos = new Map([['', this.geo]]);
       this.rng = makeRng((Date.now() % 1000000007) >>> 0);
       // A retry's team list is built again, on this geometry.
       this.setupTeamsCache = null;
@@ -617,13 +621,30 @@ export default class App extends React.Component {
   }
 
   /**
-   * Rules and display run on one geometry: the world (id null) or a loaded
-   * country's sections. Sections are their own routing paths, so there is no
-   * display atlas. The world's rules geometry is kept for the way back (setup
-   * reads it while a country is shown); its display atlas is not, as fitMap
-   * redraws it on return anyway: it is built again from the atlas, as boot does.
+   * The world map's rules geometry as it stood in `year` (src/engine/historicMap.js; null for today's): boot decodes
+   * today's, and another era's is decoded from the rules atlas the first time a setup or campaign of that year needs
+   * it, fitted on every nation as boot fits today's, and kept. A geometry given without its atlas (a test's) is the
+   * only world there is.
    */
-  useGeometry(id) {
+  worldGeometry(year = null) {
+    const today = this.worldGeos?.get('') ?? (this.domesticId ? this.worldGeo : this.geo);
+    const era = this.rulesAtlas ? mapEraOf(this.rulesAtlas, year) : '';
+    if (!era) return today;
+    if (!this.worldGeos.has(era)) {
+      const geo = new WorldGeometry(atlasOfYear(this.rulesAtlas, year), capitalsOfYear(this.rulesAtlas, year));
+      geo.fitTo(Object.keys(NATIONS));
+      this.worldGeos.set(era, geo);
+    }
+    return this.worldGeos.get(era);
+  }
+
+  /**
+   * Rules and display run on one geometry: the world (id null) as it stood in `year` (null for today's map), or a
+   * loaded country's sections. Sections are their own routing paths, so there is no display atlas. Each year's world
+   * rules geometry is kept for the way back (setup reads it while a country is shown); its display atlas is not, as
+   * fitMap redraws it on return anyway: it is built again from the atlas, as boot does.
+   */
+  useGeometry(id, year = null) {
     const shown = this.geo;
     if (id) {
       const loaded = getLoadedDomestic(id);
@@ -632,12 +653,16 @@ export default class App extends React.Component {
       this.geo = loaded.geo;
       this.displayGeo = null;
       this.domesticId = id;
-    } else if (this.domesticId) {
-      const atlas = this.worldAtlas();
-      this.geo = this.worldGeo;
-      this.displayGeo = atlas ? new WorldGeometry(atlas, CAPITALS, { keepPolys: false, borderLengths: false }) : null;
-      this.domesticId = null;
-      this.backdrop = [];
+    } else {
+      const world = this.worldGeometry(year);
+      if (this.domesticId || world !== this.geo) {
+        const atlas = this.worldAtlas();
+        this.geo = world;
+        this.displayGeo = atlas ? new WorldGeometry(atlasOfYear(atlas, year), capitalsOfYear(atlas, year),
+          { keepPolys: false, borderLengths: false }) : null;
+        this.domesticId = null;
+        this.backdrop = [];
+      }
     }
     // A memoised view model keeps its inputs, the map's geometry among them, until it is next built (some never are on
     // the new map): drop them all, so the map left behind and its display atlas can go.
@@ -742,11 +767,12 @@ export default class App extends React.Component {
    * geometry does not change.
    */
   showSetupMap(setup = this.state.setup, refit = false) {
-    const id = domesticIdOf(setup), token = ++this.setupMapToken;
+    const id = domesticIdOf(setup), token = ++this.setupMapToken, year = mapYearOf(setup);
     const loaded = id ? getLoadedDomestic(id) : null;
     const shown = loaded ? id : id && this.domesticId ? this.domesticId : null;
-    if (refit || shown !== this.domesticId) {
-      this.useGeometry(shown);
+    // The world as it stood in the chosen season (East Germany on it up to 1990).
+    if (refit || shown !== this.domesticId || (!shown && this.worldGeometry(year) !== this.geo)) {
+      this.useGeometry(shown, year);
       this.fitMap(Object.keys(NATIONS));
     }
     const domesticLoad = { id, state: !id ? 'idle' : loaded ? 'ready' : 'loading', message: null };
@@ -760,7 +786,7 @@ export default class App extends React.Component {
     this.setupLoadTimer = setTimeout(() => current() && this.loadCountry(id).then(() => { if (current()) this.showSetupMap(); }, error => {
       if (!current()) return;
       if (this.domesticId) {
-        this.useGeometry(null);
+        this.useGeometry(null, year);
         this.fitMap(Object.keys(NATIONS));
       }
       const name = domesticEntry(setup.clubScope)?.name || 'this country';
@@ -1334,7 +1360,7 @@ export default class App extends React.Component {
     }
     // Fronts on the board the campaign opens on: the country's sections, else the world (never a previewed country,
     // which this.geo may still show between a theatre pick and its showSetupMap callback).
-    const geo = domesticId ? loaded?.geo : this.domesticId ? this.worldGeo : this.geo;
+    const geo = domesticId ? loaded?.geo : this.worldGeometry(mapYearOf(setup));
     const board = geo?.adj ? { geo, own: opening } : null;
     // Country clubs (ids like "d826-679") are unknown to the sport's club list: pass their own code and kind. One lineup
     // per team gives both its rating (teamEff's) and its best starters: selectLineup is pure, and filter copies before
@@ -1397,8 +1423,8 @@ export default class App extends React.Component {
       const scope = CLUB_SCOPES(sport).find(x => x.id === su.clubScope) || CLUB_SCOPES(sport)[0];
       included = sport.clubs.filter(scope.filter).map(c => buildClub(c, sport));
       scopeName = plainScopeName(scope.name);
-      // World clubs always seed on the world map, even while a country preview is shown.
-      const world = this.domesticId ? this.worldGeo : this.geo;
+      // World clubs always seed on the world map of their season, even while a country preview is shown.
+      const world = this.worldGeometry(mapYearOf(su));
       if (world) {
         own = seedClubs(world, included);
         included = included.filter(c => Object.values(own).includes(c.id));
@@ -1511,7 +1537,7 @@ export default class App extends React.Component {
         if (teams[holder]) own[shapeId] = holder;
       }
     }
-    this.useGeometry(domesticId);
+    this.useGeometry(domesticId, mapYearOf(settings));
     this.retainMaps(0);
     this.fitMap(Object.keys(own), su);
     // Empty land a team already encloses at kick-off takes its colour.
@@ -1590,7 +1616,7 @@ export default class App extends React.Component {
     this.engagement = new SessionEngagement(s.metrics?.engagement);
     this.rng = makeRng(s.seed ?? 1);
     this.rng.setState(s.rngState ?? s.seed ?? 1);
-    this.useGeometry(loaded ? loaded.meta.id : null);
+    this.useGeometry(loaded ? loaded.meta.id : null, mapYearOf(s.settings));
     this.retainMaps(0);
     this.fitMap(Object.keys(s.own), s.settings);
     // A save from another build was moved club by club onto this map; its saved draw is stale.
@@ -2535,6 +2561,8 @@ export default class App extends React.Component {
     const primary = this.primaryAction();                // {id,label,mastLabel?,disabled?,run}|null — pure
     const scopeName = this.scopeName();
     const sport = getSport(playing ? st.settings.sport : st.setup.sport);
+    // The live minute under the campaign's rules (an earlier ice hockey season's overtime periods), else the sport's.
+    const clockSport = playing ? this.sport() : sport;
     const victory = st.phase === 'victory' ? this.victoryPanel() : null;
     const { countries, flagPatterns } = this.mapCountries();
     const completed = playing && st.aliveIds.length <= 1;
@@ -2570,7 +2598,7 @@ export default class App extends React.Component {
       onSetting: (key, value) => this.setSetting(key, value), managementEnded: st.managementEnded,
       managedName: st.teams?.[st.managedTeamId]?.name || null,
       onManageSaves: () => this.openStorageDialog('slots') };
-    const matchCardNode = currentCard ? <MatchCard {...currentCard} variant="compact" minuteStore={this.minuteStore} clockSport={sport.id}
+    const matchCardNode = currentCard ? <MatchCard {...currentCard} variant="compact" minuteStore={this.minuteStore} clockSport={clockSport}
       eventsRef={this.eventsRef} onViewConquest={result => this.viewConquest(result)} onSelectTeam={id => this.selectTeam(id)} /> : null;
     return (
       <div className={`app-shell${playing ? ' has-campaign' : ''}`} data-view={view} data-role={ctx.managedId ? 'manager' : 'spectator'}>
@@ -2638,7 +2666,7 @@ export default class App extends React.Component {
             onViewConquest={result => this.viewConquest(result)} onSelectTeam={id => this.selectTeam(id)} />}
           {playing && view === 'map' && <Ticker {...this.tickerModel()} />}
         </main>
-        {playing && <PhoneBar primary={primary} {...this.phoneBarModel()} minuteStore={this.minuteStore} clockSport={sport.id} onPrimary={() => this.runPrimary()}
+        {playing && <PhoneBar primary={primary} {...this.phoneBarModel()} minuteStore={this.minuteStore} clockSport={clockSport} onPrimary={() => this.runPrimary()}
           playback={this.phonePlaybackModel()} onAutoplay={() => this.togglePlay()} onSpeed={() => this.cycleSpeed()}
           skip={this.canSkipAhead()} onSkip={() => this.skipToNextMatch()} />}
         {playing && <PhoneTabBar active={this.navView(view)} hidden={view === 'conquest'} locked={!!st.choice || !!st.pendingTarget}

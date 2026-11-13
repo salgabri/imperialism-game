@@ -11,7 +11,11 @@ import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { NATIONS } from '../src/data/teams.js';
+import { HISTORIC_NATIONS, NATIONS } from '../src/data/teams.js';
+
+// The nations of today's map: East Germany and South Vietnam (HISTORIC_NATIONS) are on the maps of their years only, and
+// the squad gate measures the built-in season.
+const TODAY_NATIONS = Object.keys(NATIONS).filter(id => !HISTORIC_NATIONS.includes(id));
 import { ELO_CODES } from './lib/elo-codes.mjs';
 import { OFF_MAP_RESULTS_NAMES, RESULTS_NAMES, nationForResultsName } from './lib/results-names.mjs';
 import { FORECAST, clusterBootstrapSe, clusterJackknifeSe, clusteredSe, criticalValue, fitOrderedLogit, forecastTrack, groupFolds,
@@ -71,7 +75,7 @@ test('the bootstrap interval is seeded and brackets the estimate', () => {
 });
 
 test('every map nation has a distinct Elo code', () => {
-  const ids = Object.keys(NATIONS);
+  const ids = [...TODAY_NATIONS];
   assert.deepEqual(Object.keys(ELO_CODES).sort(), ids.sort());
   assert.equal(new Set(Object.values(ELO_CODES)).size, ids.length);
   assert.ok(Object.values(ELO_CODES).every(code => /^[A-Z]{2}$/.test(code)));
@@ -824,7 +828,7 @@ test('a window results.csv does not cover yet keeps its verdict, marked partial 
 
 // ---- results names ----
 test('every map nation has one martj42 results name, distinct from the off-map sides', () => {
-  assert.deepEqual(Object.keys(RESULTS_NAMES).sort(), Object.keys(NATIONS).sort());
+  assert.deepEqual(Object.keys(RESULTS_NAMES).sort(), [...TODAY_NATIONS].sort());
   const names = Object.values(RESULTS_NAMES);
   assert.equal(new Set(names).size, names.length);
   assert.equal(new Set(OFF_MAP_RESULTS_NAMES).size, OFF_MAP_RESULTS_NAMES.length, 'off-map names are unique');

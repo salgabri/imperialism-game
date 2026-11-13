@@ -12,7 +12,7 @@ import { basketball } from '../src/sports/basketball.js';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { NATIONS } from '../src/data/teams.js';
+import { HISTORIC_NATIONS, NATIONS } from '../src/data/teams.js';
 import { ageOn, clubsAgree, eaNameForms, fmAgeDate, fmGameRating, linkingCheck, loadEaPlayers, loadFootballData, nameTokens, normalName,
   parseCsv, pickNationSquads, readIdentityOverrides, readReepBridge, resolvePersons } from './lib/football-data.mjs';
 import { foldTokens, namesAgree } from './lib/reep-bridge.mjs';
@@ -125,7 +125,8 @@ test('player rows expose database evidence and distinguish secondary roles from 
 });
 
 test('every nation football fields has a complete natural XI of source-backed players', () => {
-  assert.equal(Object.keys(NATIONS).length, 176);
+  // 176 nations on today's map, and East Germany (278) and South Vietnam (RVN) on the maps of their years only.
+  assert.equal(Object.keys(NATIONS).length, 178);
   // No source rates a Tongan, Samoan or Cook Islands player: those three field no team, and nobody else is left out.
   assert.deepEqual(football.territory, { merged: {}, inactive: ['184', '776', '882'] });
   for (const id of football.territory.inactive) assert.deepEqual(football.rosters[id], [40, 0, []], NATIONS[id][0]);
@@ -349,12 +350,14 @@ test('the shipped XIs are the build\'s: one record per person, in the pool of it
   for (const { nation, player } of data.persons) if (nameToId[nation]) pools[nameToId[nation]].push(player);
   const picked = pickNationSquads(pools);
   const stale = 'src/data/rosters.js is stale against its sources, the Reep bridge or the identity overrides; run npm run build-rosters';
-  for (const id of Object.keys(NATIONS)) {
+  // Today's map's nations: the built-in season has none of the earlier maps' (HISTORIC_NATIONS).
+  const today = Object.keys(NATIONS).filter(id => !HISTORIC_NATIONS.includes(id));
+  for (const id of today) {
     const [, pool, players] = football.rosters[id];
     assert.equal(pool, picked[id].pool.length, `${stale} (${NATIONS[id][0]}'s pool)`);
     assert.deepEqual(players.map(tuple => tuple[3].id), picked[id].squad.map(player => player.sourceInfo.id), `${stale} (${NATIONS[id][0]}'s XI)`);
   }
-  assert.deepEqual(builtInAudit.coverage.map(row => row.personKeys), Object.keys(NATIONS).map(id => picked[id].squad.map(player => player.personKey)), stale);
+  assert.deepEqual(builtInAudit.coverage.map(row => row.personKeys), today.map(id => picked[id].squad.map(player => player.personKey)), stale);
   assert.deepEqual(builtInAudit.linking, data.linking, stale);
   assert.equal(builtInAudit.fresherSource, 'ea', 'EA FC 27 (2026-11-01) postdates FM 26 26.3.0 (2026-03-30)');
 });

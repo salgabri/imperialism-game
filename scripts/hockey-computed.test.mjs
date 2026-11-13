@@ -9,9 +9,10 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { SAVE_KEY } from '../src/config.js';
 import { BUILT_IN_HOCKEY_SEASONS } from '../src/data/hockeySeasons.js';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
-import { selectLineup } from '../src/data/teams.js';
+import { nationIdentity, selectLineup } from '../src/data/teams.js';
+import { namesOfTheDay } from '../src/data/namesOfTheDay.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
-import { BUILT_IN_SETS, decodeFootballSet, setHasClubs, setHasNations } from '../src/engine/footballSets.js';
+import { BUILT_IN_SETS, decodeFootballSet, seasonSport, setHasClubs, setHasNations } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
 import { pointInPolys } from './lib/domestic-partition.mjs';
 import {
@@ -19,7 +20,7 @@ import {
   seasonBefore, skaterValue, spearman, stepRating, windowOf,
 } from './lib/nhl-computed.mjs';
 import { hdbBirthCountry, hdbPosition, moneypuckStints } from './lib/nhl-stats.mjs';
-import { mapOf, parseIgnAttributes, teamsOf } from './lib/nhl-seasons.mjs';
+import { FEDERATIONS, mapOf, parseIgnAttributes, teamsOf } from './lib/nhl-seasons.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
@@ -202,9 +203,47 @@ test('birth countries: the Hockey Databank\'s, a birth city in another country t
   assert.equal(hdbBirthCountry(m('', '')), null);
   assert.throws(() => hdbBirthCountry(m('USSR', 'Atlantis')), /No country today/);
   assert.equal(hdbPosition('L/C'), 'LW');
-  const doc = seasonFile('nhl-1983');
-  const nationOf = name => Object.keys(doc.nations).filter(id => doc.nations[id][2].some(([player]) => player === name));
-  assert.deepEqual(nationOf('Peter Stastny'), ['703'], 'Peter Stastny for Slovakia, born in Bratislava');
+  // Born in Bratislava, Peter Stastny plays for Czechoslovakia (on Czechia's shape) to 1991/92, for Slovakia after.
+  assert.deepEqual(nationIn('nhl-1983', 'Peter Stastny'), ['203']);
+  assert.deepEqual(nationIn('nhl-1993', 'Peter Stastny'), ['703']);
+});
+
+const nationIn = (id, name) => Object.keys(seasonFile(id).nations).filter(nation => seasonFile(id).nations[nation][2].some(([player]) => player === name));
+
+test('the federations of the day: Czechoslovakia to 1991/92, the Soviet Union to 1990/91, the CIS in 1991/92', () => {
+  // The same federations, years and member lands as tennis's seasons (docs/design/tennis.md, "Nations of the day").
+  const tennis = JSON.parse(read('scripts/data/tennis-seasons.json')).nations.territory;
+  const plain = list => list.map(({ name, from, through, holder, shapes }) => ({ name, from, through, holder, shapes: [...shapes].sort() }));
+  assert.deepEqual(plain(FEDERATIONS), plain(tennis));
+  for (const entry of MANIFEST.seasons.filter(season => setHasNations(season.id))) {
+    const doc = seasonFile(entry.id);
+    // A member's players play for the holder in the federation's years, so no member lists a nation of its own then.
+    for (const federation of FEDERATIONS.filter(f => (f.from ?? 0) <= entry.year && entry.year <= f.through)) {
+      assert.ok(federation.shapes.every(shape => !doc.nations[shape]), `${entry.id}: ${federation.name}'s members play for it`);
+    }
+    for (const [shape, holder] of Object.entries(doc.territory.merged)) {
+      if (['SCO', 'WAL', 'NIR'].includes(shape)) continue;
+      assert.ok(auditOf(entry.id).realSides.includes(namesOfTheDay('hockey', entry.year)[holder]?.name), `${entry.id}: ${holder} fields a real side`);
+    }
+  }
+  // 1989/90: Czechoslovakia and the Soviet Union field real sides, Helmut Balderis (born in Riga) among the Soviets.
+  assert.deepEqual(auditOf('nhl-1990').realSides.filter(name => ['Czechoslovakia', 'Soviet Union'].includes(name)), ['Czechoslovakia', 'Soviet Union']);
+  assert.deepEqual(nationIn('nhl-1990', 'Helmut Balderis'), ['643']);
+  assert.equal(seasonFile('nhl-1990').territory.merged['428'], '643', 'Latvia in the Soviet Union\'s empire');
+  // 1991/92: the CIS holds Ukraine (Dmitri Khristich, born in Kyiv, plays for it), not the Baltic states: Arturs Irbe
+  // plays for Latvia.
+  assert.deepEqual(nationIn('nhl-1992', 'Dmitri Khristich'), ['643']);
+  assert.deepEqual(nationIn('nhl-1992', 'Arturs Irbe'), ['428']);
+  assert.equal(seasonFile('nhl-1992').territory.merged['804'], '643');
+  assert.equal(seasonFile('nhl-1992').territory.merged['428'], undefined);
+  // 1992/93: Czechia and Slovakia apart, Russia and Ukraine apart, nobody holding another's land.
+  assert.deepEqual(nationIn('nhl-1993', 'Dmitri Khristich'), ['804']);
+  assert.deepEqual(seasonFile('nhl-1993').territory.merged, { SCO: '826', WAL: '826', NIR: '826' });
+  // Names of the day on the campaign's teams.
+  const sportIn = id => seasonSport(decodeFootballSet(seasonFile(id), id));
+  assert.deepEqual(['nhl-1983', 'nhl-1991', 'nhl-1992', 'nhl-1993'].map(id => [nationIdentity('203', sportIn(id)).name, nationIdentity('643', sportIn(id)).name]),
+    [['Czechoslovakia', 'Soviet Union'], ['Czechoslovakia', 'Soviet Union'], ['Czechoslovakia', 'CIS'], ['Czechia', 'Russia']]);
+  assert.equal(nationIdentity('276', sportIn('nhl-1990')).name, 'West Germany');
 });
 
 test('a name MoneyPuck dropped letters from is put back: Tim Stutzle, not Tim Sttzle', () => {

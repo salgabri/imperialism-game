@@ -469,7 +469,7 @@
       "listing": "Simon Treanor's fan-made 1989/90 database for CM 01/02, Beta 5, its ratings his, nations only (the CM0102 Starter Kit's cm89_data.zip)",
       "maker": "Simon Treanor",
       "compiler": "Simon Treanor, \"Championship Manager 1989/90 update for CM 01/02\", Beta 5 of 8 April 2017 (its readme; cm8990.wordpress.com), a fan-made database in the CM 01/02 format; as nckstwrt's CM0102 Starter Kit ships it (data/cm89_data.zip, whose loader starts the game in 1989)",
-      "provenance": "Fan-made: its players' abilities are Simon Treanor's. Its readme calls it a beta in which many teams keep squads of the early 2000s, and names the English, Scottish, German and Italian leagues as complete. Its nationalities are today's (Ukraine, Croatia, Slovakia, East Germans as 'Germany'), so the season plays the federations of 1989/90: the Soviet Union, Yugoslavia and Czechoslovakia field their republics' players, and a 'Germany' player at an East German club plays for no nation (noNationAt). Nations only: its Spanish and Portuguese first divisions are 1989/90's (1989-90 La Liga and 1989-90 Primeira Divisão on Wikipedia, revisions 1337764526 and 1374234667), but Logroñés (7 rated players), Castellón and Tenerife (10 each) and eight of Portugal's eighteen (Chaves, Feirense, Marítimo, Nacional, Penafiel, Portimonense, Tirsense, União da Madeira) cannot field eleven.",
+      "provenance": "Fan-made: its players' abilities are Simon Treanor's. Its readme calls it a beta in which many teams keep squads of the early 2000s, and names the English, Scottish, German and Italian leagues as complete. Its nationalities are today's (Ukraine, Croatia, Slovakia, East Germans as 'Germany'), so the season plays the federations of 1989/90: the Soviet Union, Yugoslavia and Czechoslovakia field their republics' players, and a 'Germany' player at an East German club plays for East Germany (noNationAt, playsFor 278), on the map of its years (docs/design/historic-maps.md); until 2026-11-10, when East Germany had no shape, he played for no nation. Nations only: its Spanish and Portuguese first divisions are 1989/90's (1989-90 La Liga and 1989-90 Primeira Divisão on Wikipedia, revisions 1337764526 and 1374234667), but Logroñés (7 rated players), Castellón and Tenerife (10 each) and eight of Portugal's eighteen (Chaves, Feirense, Marítimo, Nacional, Penafiel, Portimonense, Tirsense, União da Madeira) cannot field eleven.",
       "rights": "A fan-made database for CM 01/02, which Eidos made free to download in December 2008 for personal, non-commercial use; it names no licence. Its players and ratings are its maker's and the game's data rights are reserved; the user chose to ship it, credited to Simon Treanor (2026-11-09).",
       "birthdays": [
         [
@@ -516,6 +516,7 @@
       "noNationAt": {
         "nationality": "Germany",
         "label": "East German clubs",
+        "playsFor": "278",
         "rule": "The database's German clubs with a rated 'Germany' player whose stadium's city (its own stadium and city records) GeoNames' cities1000 places only in the five eastern states, or that scripts/lib/east-german-clubs.mjs lists by hand (East Berlin's, and towns the gazetteer names twice or not at all).",
         "gazetteer": {
           "name": "GeoNames cities1000.txt (CC BY 4.0)",

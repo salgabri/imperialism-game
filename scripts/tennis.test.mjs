@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { ROSTERS, SOURCE } from '../src/data/rosters.tennis.js';
-import { buildTeam, HOME_NATIONS, makeRng, NATIONS, selectLineup, teamEff, teamSportId } from '../src/data/teams.js';
+import { HISTORIC_NATIONS, buildTeam, HOME_NATIONS, makeRng, NATIONS, selectLineup, teamEff, teamSportId } from '../src/data/teams.js';
 import { clockLabel, clockTick, getSport, overtimeEnd, SPORT_LIST } from '../src/sports/index.js';
 import {
   bestOfThree, BLOCK, daySetChances, HOME_EDGE, holdChance, matchOdds, playMatch, playMatchWon, RUBBER_MODEL, sampleResult,
@@ -80,7 +80,8 @@ test('a nation with fewer than two players fields no team, and Great Britain\'s 
   assert.deepEqual(Object.keys(merged).sort(), HOME_NATIONS.slice().sort());
   assert.ok(Object.values(merged).every(holder => holder === '826'));
   for (const id of Object.keys(NATIONS)) {
-    if (HOME_NATIONS.includes(id)) continue;
+    // East Germany is not on today's map (HISTORIC_NATIONS): no 2026 tie is played there.
+    if (HOME_NATIONS.includes(id) || HISTORIC_NATIONS.includes(id)) continue;
     assert.equal(inactive.includes(id), !Object.hasOwn(ROSTERS, id), NATIONS[id][0]);
   }
   assert.equal(nation('380').squad.length, 5, 'no generated players');

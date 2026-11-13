@@ -244,7 +244,7 @@ test('every season rebuilds byte for byte from its committed facts, with its cre
   assert.match(run.stdout, /12 files rebuild byte for byte/);
 });
 
-const NATION_COUNTS = { 'wc-1962': 16, 'wc-1966': 16, 'wc-1970': 16, 'wc-1974': 15, 'wc-1978': 16, 'wc-1982': 24, 'wc-1986': 24, 'wc-1990': 24, 'wc-1994': 24 };
+const NATION_COUNTS = { 'wc-1962': 16, 'wc-1966': 16, 'wc-1970': 16, 'wc-1974': 16, 'wc-1978': 16, 'wc-1982': 24, 'wc-1986': 24, 'wc-1990': 24, 'wc-1994': 24 };
 
 test('each season decodes: its finalists, eleven players each, rated 1–99 strongest first, the XI\'s mean the nation\'s T', () => {
   for (const id of IDS) {
@@ -312,10 +312,10 @@ test('spot checks: each season\'s strongest nations and players are history\'s',
   assert.ok(names(committed('wc-1962'), '826').includes('Bobby Charlton'));
   assert.ok(names(committed('wc-1966'), '276').includes('Helmut Haller'));
   assert.ok(names(committed('wc-1986'), '276').includes('Ditmar Jakobs'));
-  // 29 of the 1,925 places, in 21 XIs, are a short role's.
+  // 29 of the 1,936 places, in 21 XIs, are a short role's.
   const audited = JSON.parse(read('docs/design/football-world-cup-seasons-audit.json')).seasons.flatMap(season => season.nations);
   const short = audited.filter(nation => nation.filled.length);
-  assert.deepEqual([audited.length * 11, short.length, short.reduce((sum, nation) => sum + nation.filled.length, 0)], [1925, 21, 29]);
+  assert.deepEqual([audited.length * 11, short.length, short.reduce((sum, nation) => sum + nation.filled.length, 0)], [1936, 21, 29]);
   // A name is written once: the database's given name "El Arbi Hababi" already ends with his family name, "Hababi".
   for (const id of IDS) {
     for (const nation of facts(id).nations) for (const { name } of nation.squad) assert.ok(!/(?:^|\s)(\S+) \1$/u.test(name), `${id}: ${name}`);
@@ -341,12 +341,14 @@ test('the federations of the day: the finalists play under their own names, and 
   assert.equal(nationIdentity('688', sportOf('wc-1982')).name, 'Yugoslavia');
   assert.equal(committed('wc-1990').territory.merged['703'], '203');
   assert.equal(nationIdentity('276', sportOf('wc-1990')).name, 'West Germany');
-  // 1973/74: Zaire under its name and flag; East Germany has no shape, so 15 of the 16 finalists play.
+  // 1973/74: Zaire under its name and flag; East Germany, on the map of its years (src/engine/historicMap.js), plays its
+  // own finalists beside West Germany: all 16 play.
   const s1974 = sportOf('wc-1974');
   assert.deepEqual(nationIdentity('180', s1974), { name: 'Zaire', code: 'ZAI', flagId: 'ZAI' });
-  assert.deepEqual(JSON.parse(read('docs/design/football-world-cup-seasons-audit.json')).seasons.find(s => s.id === 'wc-1974').dropped,
-    [{ team: 'East Germany', why: 'no shape on the map' }]);
-  assert.ok(facts('wc-1974').nations.some(n => n.team === 'East Germany'));
+  assert.deepEqual(JSON.parse(read('docs/design/football-world-cup-seasons-audit.json')).seasons.find(s => s.id === 'wc-1974').dropped, []);
+  assert.deepEqual(nationIdentity('278', s1974), { name: 'East Germany', code: 'GDR', flagId: '278' });
+  assert.ok(fieldedNations(s1974).includes('278') && fieldedNations(s1974).includes('276'));
+  assert.ok(['Jürgen Sparwasser', 'Jürgen Croy', 'Joachim Streich'].every(name => names(committed('wc-1974'), '278').includes(name)));
   // 1993/94: no federation of the day; Russia and Germany under their own names.
   assert.ok(!('identities' in committed('wc-1994')));
   assert.equal(nationIdentity('643', sportOf('wc-1994')).name, 'Russia');

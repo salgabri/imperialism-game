@@ -410,6 +410,16 @@ the lookup and 30 game-by-game archives of 329 MB in all) is pinned by SHA-256 i
   gives, the NHL's (Olaf Kolzig counts for Germany there); where it gives none, the databank's birth country of the one
   player of 2008/09 to 2017/18 with that name (Pavel Datsyuk, Chris Pronger and 25 more in 2010/11). None to one player a
   season to 2017/18 is left without a nation, 5 to 37 after (2025/26's mostly rookies); they play for no nation.
+- *Federations of the day* (added 2026-11-13). A birth country is then read as the state of the season's day, as
+  tennis's seasons read theirs (`FEDERATIONS` and `federationOf` in `scripts/lib/nhl-seasons.mjs`, held to tennis's
+  table by test): a player born in Slovakia plays for Czechoslovakia to 1991/92, one born in another Soviet republic for
+  the Soviet Union to 1990/91, and in 1991/92 one born in one of the ten other republics of the CIS for the CIS (not the
+  Baltic states or Georgia: Arturs Irbe plays for Latvia). Each plays on its largest member's shape under the name and
+  flag of its day (`src/data/namesOfTheDay.js`), and where it fields a real side its members' land starts in its empire.
+  Czechoslovakia then fields a real side every season from 1982/83 to 1991/92 (Peter Stastny among them), the Soviet
+  Union in 1989/90 and 1990/91 (Larionov, Krutov, Makarov, Fetisov, and Helmut Balderis, born in Riga), the CIS in
+  1991/92; before, Czechia did in 1982/83 and from 1988/89, Russia from 1990/91. The NHL's birth country still decides
+  whose a player is: Peter Bondra, born in Lutsk, plays for the Soviet Union and then the CIS.
 - *Namesakes.* Two players of one season who share a name carry their birth year ("Sebastian Aho (1997)"), or their
   birth date where that is shared too ("Steve Smith (1963-04-04)").
 - *Dropped letters.* MoneyPuck's files from its 2022/23 season on drop every letter of a name that is not plain ASCII
@@ -543,6 +553,76 @@ Newark, 12 km within New Jersey, and the Penguins' 0.2 km keep it): its version 
 on it resumes through the existing remap path (tested). 2025/26 plays on today's `nhl` map, and the builder checks its
 clubs and arenas are today's. The five maps of the editions are unchanged.
 
+## Rules by era
+
+Added 2026-11-13, for the request of 2026-11-10 that "the rules of the games are correct, the results realistic". An
+earlier season plays its own day's scoring, late game and overtime (`hockeyIn`, read through `matchSport`: one rules
+object a season, simulation version 2). The built-in season plays today's rules: `hockey` itself, version 1, untouched.
+
+**Scoring.** `src/data/nhlLeagueAverages.js` (`node scripts/build-nhl-league.mjs`, `--check` to verify) holds each
+built-in season's goals a club scored a game, a shoot-out's deciding goal left out: to 2017/18 from the Hockey
+Databank's Teams.csv (goals for less shoot-out wins, over games), from 2018/19 from MoneyPuck.com's game files (2021/22,
+which it keeps no game file of, from its season summary over the 32 clubs' 82 games). Every download is pinned by
+SHA-256 in `scripts/data/nhl-seasons-sources.json`. The league scored 2.57 goals a club in 2003/04 and 4.01 in 1981/82.
+A season's `scoring` is the factor on both sides' rates that brings its clubs to its league's goals under its own
+overtime, solved over every pairing of its clubs (`solveScoring` in `scripts/lib/nhl-league.mjs`): 0.80 for 2003/04, 1.31
+for 1981/82.
+
+**The late game.** Before 1999/2000 a side losing in overtime got nothing, and before 1983/84 there was no overtime, so a
+level game late on was a point each to keep, not one the overtime guaranteed, and a goalie came off later. Every late
+effect of today's (a level game tightening up, the chase and the sitting back, the pulled goalie, the empty net) plays at
+35% of its distance from none (`lateOf`). The model's games over the clubs of 1966/67 to 1982/83 are then level after
+sixty 16.3% of the time, against the league's 16.8% (1,817 ties in 10,826 games, the databank), where today's late game
+gave 21%. Its empty-net goals come at about 0.1 a game, as the databank's goalies conceded 0.05 to 0.17 then (today 0.25).
+
+**Overtime.** A conquest needs a winner, so a level game is settled as near its day as a winner allows (`overtimeOf`;
+Wikipedia's "Overtime (ice hockey)", revision 1380480724, and its 1983–84, 1999–2000, 2005–06 and 2015–16 season
+articles, revisions 1377826696, 1374052089, 1374051010 and 1382868437, read 2026-11-10):
+
+| Seasons | The NHL's regular season | The model |
+| --- | --- | --- |
+| to 1982/83 | no overtime (from November 1942): a tie | the playoffs' overtime |
+| 1983/84 to 1998/99 | five minutes of sudden death at five on five, else a tie | the playoffs' overtime |
+| 1999/2000 to 2004/05 | five minutes at four on four, else a tie | the playoffs' overtime |
+| 2005/06 to 2014/15 | five minutes at four on four, then a shoot-out | the same, the rates × 1.41 |
+| 2015/16 on | five minutes at three on three, then a shoot-out | the same, today's (× 2.4) |
+
+- *The playoffs' overtime*, every season before the shoot-out: twenty-minute periods at five on five until a goal. The
+  fifth, as deep as any NHL game since 1967 has gone (Keith Primeau's goal of 4 May 2000, 92:01 into overtime), always
+  ends in one. Its pace was the playoffs' whatever a season scored, so it plays the clubs' rates as a season of three
+  goals a club would (its boost × 3 ÷ the season's goals): 1.17 for the seasons to 1988/89, 0.75 from 1989/90 to
+  2003/04. NHL.com's lists of every playoff overtime game (`scripts/data/nhl-playoff-overtimes.json`, from the Wayback
+  Machine's copies of 10 November 2012) settle 176 of the 196 of 1967–1989 in the first period (89.8%) and 210 of the
+  276 of 1990–2004 (76.1%); the model's level games over those seasons' clubs, 89.4% and 75.1%.
+- *Four on four*: 1,306 of the 2,889 level games of 2005/06 to 2014/15 ended in the overtime (45.2%, the databank's
+  overtime losses less shoot-out losses); the model's 43.8%, with 14.2% of its games going to a shoot-out (the league's
+  13.4%).
+- *Three on three*: today's, 66.1% of level games settled in the overtime over the seasons since 2015/16 (the league's
+  61–72% a season).
+
+**The clock.** The playoffs' overtime brings its own clock and words (`playoffClock`): the chart ticks each twenty-minute
+period ("OT" at 80', then "2OT", "3OT"), a goal keeps its minute ("87'"), and the result reads "in double overtime" up to
+"in quintuple overtime", short "2OT". No minute is a shoot-out's, so a goal after the 65th minute is its scorer's, in
+the scorers' line too. The match screen, the score header, the feed and the chart read the season's clock (`clockSport`).
+Four on four keeps today's clock and words.
+
+**The live chart.** `liveModelFor` carries a season's overtime where it is not today's: the periods' length and number,
+their rate (`otBoost`), whether it is the playoffs' (`playoff`), and before 1999/2000 the late game (`late`). In the
+playoffs' overtime the next goal wins whenever it comes, so a level game's chance holds through every period and a
+lead has won. At puck drop the chart is within two points of the fixture's simulated odds. Today's model names none of
+these fields, so a chart saved before reads as it did.
+
+**Results.** Every pairing of each season's clubs, 3,000 games a season (`scripts/hockey-eras.test.mjs`, measured
+2026-11-13): every season within 0.055 of its league's goals a club (1970/71 3.10 against 3.12, 1981/82 3.99 against
+4.01, 1992/93 3.60 against 3.63, 2003/04 2.58 against 2.57, 2010/11 2.69 against 2.73). `npm run simulation:realism`
+plays five seasons whole on their own schedules ([match-simulation.md](match-simulation.md#realism-against-real-leagues)).
+
+**Not modelled.** Power plays and penalties, in any era: a season's rules reach the game only through its goals, its late
+game and its overtime. A level game is never left a tie.
+
+**Saves.** A campaign of an earlier season saved before plays its next matches under version 2: their scores, overtime
+and clock follow the season's day. The built-in season's campaigns are unchanged.
+
 ## Credits
 
 The Hockey Databank's terms ask that its statement be displayed prominently and in its entirety on the product, and
@@ -602,7 +682,9 @@ weights, 2004/05 skipped, the club by most games); the mid-rank ratings, ties an
 computed rating NHL 27's and every group's order kept; the stars and clubs of known seasons; the
 calibration against the five editions (F ≥ 0.84, D ≥ 0.75, G ≥ 0.59, players ≤ 2.8 and clubs ≤ 1.7
 apart; minutes a game better for NHL 22; goals against within 0.03 of save percentage); nations from
-1977/78; the birth-city rule; the names MoneyPuck dropped letters from put back; NHL 08 and NHL 09
+1977/78; the birth-city rule; the federations of the day (tennis's table, no member listing a nation in its
+federation's years, the land held only by a real side, Stastny, Balderis, Khristich and Irbe, the names on the teams);
+the names MoneyPuck dropped letters from put back; NHL 08 and NHL 09
 (the attribute lists, the 255 rows, the three rows broken pages hide, NHL 07's self-check from the
 pinned pages); the eras (club counts, the Seals and Barons, the 1979/80 Whalers at Springfield, the
 editions' lists reproduced); every map serving its seasons; the loader's refusals; every season's
@@ -611,6 +693,14 @@ seasons, none on the editions, the season files untouched) and the databank's re
 when it is on the computer; and the running App playing a 1967/68 clubs campaign, a 1985/86 nations
 campaign, a 2025/26 clubs campaign on today's map and a 2007/08 nations campaign (each saved and the
 last two resumed), and resuming a 2006/07 campaign saved on `nhl2007` before it served more seasons.
+
+`scripts/hockey-eras.test.mjs` holds the rules by era: one rules object a season, the built-in season's untouched; the
+league's goals sourced and covering every season, and every season's clubs scoring within 0.06 of them; level games
+settled at their era's shares, the playoffs' overtime always ending by the fifth period with nothing after its goal; the
+playoff overtimes as NHL.com lists them (recomputed from the pinned pages and downloads when they are on the computer);
+the clock, feed, texts and chart ticks of the playoffs' periods; the live chart against the odds; and the running App
+playing a 1981/82 clubs campaign through the playoffs' overtime. `scripts/simulation-realism.test.mjs` holds the five
+seasons the harness plays whole.
 
 `scripts/setup-wizard.test.mjs` holds the generic side: a listed set's credit in the model and on
 screen under the Season choice, gone with a season without one, and the CSS that never cuts it and
@@ -631,7 +721,7 @@ duel campaign with the live ticker and a hockey nations campaign.
   good as ice time and scoring. A shutdown defender rates low.
 - The built-in season, 2026/27: EA's site shows only the current edition, and each rollover
   needs a new pull. The earlier seasons are fixed files ("Earlier seasons").
-- NHL players only, by nationality or birth country.
+- NHL players only, by nationality or birth country (in an earlier season, the federation of its day).
 - 52 seasons are computed, not rated by any game ("Computed seasons"): their clubs sit closer together than an
   edition's, goalies rank worst (Spearman 0.60 to 0.83 against the editions), and before 2010/11 defenders rank by
   points alone, so a shutdown defender rates low. No time on ice before 2008/09 and no goalies' shots against before

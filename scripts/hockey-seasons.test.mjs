@@ -15,15 +15,15 @@ import { SAVE_KEY } from '../src/config.js';
 import { BUILT_IN_HOCKEY_SEASONS } from '../src/data/hockeySeasons.js';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { CLUBS } from '../src/data/clubs.hockey.js';
-import { buildTeam, makeRng, selectLineup } from '../src/data/teams.js';
+import { buildTeam, fieldsRealSide, makeRng, selectLineup } from '../src/data/teams.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import { BUILT_IN_SETS, builtInSeasonOf, decodeFootballSet, seasonMapOf, seasonSport, setHasClubs, setHasNations, setSportOf, sportOf } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
-import { BASELINE } from '../src/sports/hockey.js';
+import { BASELINE, hockey } from '../src/sports/hockey.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { pointInPolys } from './lib/domestic-partition.mjs';
 import {
-  findPlayer, nhl94Overall, nhlpa93Displayed, nhlpa93Overall, norm, quantileRescale, ratingsOf, seasonIdOf, teamsOf,
+  federationLands, findPlayer, nhl94Overall, nhlpa93Displayed, nhlpa93Overall, norm, quantileRescale, ratingsOf, seasonIdOf, teamsOf,
 } from './lib/nhl-seasons.mjs';
 import { bundleComponents, findElement, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
@@ -128,7 +128,10 @@ test('every season loads and fits its era\'s map: its clubs named, coded and hou
     const snapshot = snapshotOf(listed.id);
     assert.equal(doc.coverage.players, snapshot.players.length);
     assert.equal(doc.coverage.left, snapshot.left.length);
-    assert.deepEqual(doc.territory, { merged: { SCO: '826', WAL: '826', NIR: '826' }, inactive: [] }, 'Great Britain plays as one');
+    // Great Britain plays as one, and a federation of the day that fields a real side holds its other members' land.
+    const fielded = new Set(Object.keys(doc.nations).filter(id => fieldsRealSide(id, { ...hockey, rosters: doc.nations })));
+    assert.deepEqual(doc.territory, { merged: { SCO: '826', WAL: '826', NIR: '826', ...federationLands(listed.year, fielded) }, inactive: [] },
+      'Great Britain plays as one');
     if (setHasNations(listed.id)) assert.ok(doc.nations['124'][0] >= doc.nations['840'][0], `${listed.season}: Canada first`);
   }
 });

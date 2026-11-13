@@ -1,6 +1,6 @@
 {
   "about": "The computed World Cup seasons, 1961/62 to 1993/94 (docs/design/football-years.md, \"Computed World Cup seasons\"): every source pinned and every constant of the method, so a later change of the built-in data changes nothing. npm run sync:world-cup-seasons reads the sources from data-src/ into the committed facts (scripts/data/world-cup-seasons/), and npm run build:world-cup-seasons turns the facts into public/football/wc-<year>.json.",
-  "decided": "2026-11-09: the user approved computed ratings for football's 1960s to 1980s, from national-team Elo adjusted per player and labelled as computed. Claude chose the rest under that request, approved by the user with the release of 2026-11-10: World Cup squads only (no Wikidata pools), the nation's strength from its Elo the day after the final by a line (not by rank), each XI ordered by the players' records, the federations of the day under their own names and flags. East Germany, with no map shape, fields no team.",
+  "decided": "2026-11-09: the user approved computed ratings for football's 1960s to 1980s, from national-team Elo adjusted per player and labelled as computed. Claude chose the rest under that request, approved by the user with the release of 2026-11-10: World Cup squads only (no Wikidata pools), the nation's strength from its Elo the day after the final by a line (not by rank), each XI ordered by the players' records, the federations of the day under their own names and flags. East Germany fielded no team while it had no map shape; since 2026-11-10 it has its own on the map of its years (docs/design/historic-maps.md, asked for by the user, who named West and East Germany), so it fields its 1974 finalists.",
   "retrieved": "2026-11-09",
   "licence": "CC BY-SA 4.0",
   "sources": {
@@ -464,9 +464,7 @@
       "aliases": {
         "Republic of Ireland": "372"
       },
-      "noTeam": [
-        "East Germany"
-      ]
+      "noTeam": []
     },
     "ballonDorNationalities": {
       "USSR": "Soviet Union",

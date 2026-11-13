@@ -69,7 +69,8 @@ const credits = (season, retrieved) => ({ compiler: season.compiler, ...(season.
 /**
  * A CM 01/02-format database: the zip's .dat files, read by the CM 01/02 builder as a known release. A season may name
  * players of its own day to check the stored birth years against (`birthdays`), the clubs whose players of a nationality
- * play for no nation (`noNationAt`), and its nations alone (src/engine/footballSets.js setHasClubs).
+ * play for another nation of their day (`noNationAt.playsFor`: East Germany's clubs, in 1989/90) or for none (`noNationAt`), and its
+ * nations alone (src/engine/footballSets.js setHasClubs).
  */
 async function buildCmZip(season, dataDir, retrieved) {
   const zip = await pinned(dataDir, season.file);

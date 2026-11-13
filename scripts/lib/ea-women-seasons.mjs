@@ -8,7 +8,7 @@
 // fields no team (its land stays neutral); every club EA rates plays, those of the leagues EA licenses whole in leagues
 // of their own and the rest together. A club keeps the game's id for its EA team id, so its crest and colour follow it
 // from season to season, and the name EA gave it that season.
-import { NATIONS, selectLineup } from '../../src/data/teams.js';
+import { HISTORIC_NATIONS, NATIONS, selectLineup } from '../../src/data/teams.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../../src/data/eaPlayers.js';
 import { FOOTBALL_SET_FORMAT, contentHash, serializeFootballSet } from '../../src/data/footballSetBuild.js';
 import { pickFootballSquad } from '../../src/data/footballSquad.js';
@@ -94,7 +94,8 @@ export function assembleWomensSeason(records, { id, fifaVersion, edition, update
     nationAudit.push({ id: nation, name: rec[0], pool: pool.length, players: squad.length, strength: nations[nation][0],
       naturalLineup: squad.length === SIZE && lineup.slots.every(slot => slot.player && !slot.outOfPosition) });
   }
-  const inactive = Object.keys(NATIONS).filter(nation => !Object.hasOwn(nations, nation));
+  // A nation of the map's earlier years (East Germany) is no women's season's: it is not on the map these seasons play.
+  const inactive = Object.keys(NATIONS).filter(nation => !Object.hasOwn(nations, nation) && !HISTORIC_NATIONS.includes(nation));
 
   // ---------- the clubs ----------
   const byTeam = new Map();

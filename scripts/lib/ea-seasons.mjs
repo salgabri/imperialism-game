@@ -7,7 +7,7 @@
 // buildEaSeason reads the FIFA 15 – EA FC 24 export, buildSnapshotEaSeason the committed EA FC 26 snapshot and
 // scripts/lib/ea-legacy-seasons.mjs joins the FIFA 07 – FIFA 14 sources. All hand their players to assembleEaSeason,
 // so every season is made the same way.
-import { NATIONS, PACIFIC_ISLANDS, selectLineup } from '../../src/data/teams.js';
+import { NATIONS, HISTORIC_NATIONS, PACIFIC_ISLANDS, selectLineup } from '../../src/data/teams.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../../src/data/eaPlayers.js';
 import { FOOTBALL_FEDERATIONS } from '../../src/data/footballFederations.js';
 import { FOOTBALL_SET_FORMAT, contentHash, presentClubs, serializeFootballSet, territoryFor } from '../../src/data/footballSetBuild.js';
@@ -161,6 +161,8 @@ export function assembleEaSeason(records, { id, year, edition, update, source, f
   const islands = PACIFIC_ISLANDS.some(nation => pools.get(nation)?.length);
   for (const [nation, rec] of Object.entries(NATIONS)) {
     if (!islands && PACIFIC_ISLANDS.includes(nation)) continue;
+    // East Germany is no EA nation: a nation of the map's earlier years is listed only with players of its own.
+    if (HISTORIC_NATIONS.includes(nation) && !pools.get(nation)?.length) continue;
     const pool = pools.get(nation) || [];
     const squad = pickFootballSquad(pool);
     const lineup = selectLineup({ sport: 'football', squad });

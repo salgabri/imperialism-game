@@ -10,12 +10,12 @@ Pick your sport at kick-off:
 
 | Sport | Lineup | Clock | Level game |
 | --- | --- | --- | --- |
-| Football, and women's football | XI in a 4-4-2 | 90 minutes | penalty shootout |
+| Football, and women's football | XI in a 4-4-2 | 90 minutes | extra time, then a penalty shootout (in earlier seasons the rules of their day: the drawing of lots to 1969/70, the golden goal 1995/96–2001/02, the silver goal 2002/03–2003/04) |
 | Basketball | starting five | 40 minutes for nations and EuroLeague clubs (FIBA), 48 for NBA clubs | overtime periods |
 | American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
-| Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings |
+| Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings (each half from 2020 with a runner on second) |
 | Ice hockey | four lines, three pairs and the goalie | 60 minutes | sudden-death overtime, then a shoot-out |
-| Tennis, and women's tennis | a Davis Cup (or Billie Jean King Cup) team: No. 1 and No. 2 in the singles, a doubles pair | five rubbers, first to three, each best of three sets | none: a tie always has a winner |
+| Tennis, and women's tennis | a Davis Cup (or Billie Jean King Cup) team: No. 1 and No. 2 in the singles, a doubles pair | five rubbers, first to three, each best of three sets; an earlier season plays its year's ([format by year](#tennis-seasons)) | none: a tie always has a winner |
 | Rugby league | the matchday 17: thirteen and four on the bench | 80 minutes | golden point |
 
 And pick who fights:
@@ -122,13 +122,16 @@ npm run sync:euroleague  # snapshot the EuroLeague's rosters and box scores from
 npm run build:euroleague # rebuild the EuroLeague's clubs, every rating an estimate from that snapshot (--check compares byte for byte)
 npm run sync:madden      # snapshot Madden NFL ratings from EA's site into scripts/data/madden-nfl-27.json (network, cached)
 npm run build-nfl        # rebuild the NFL clubs from that snapshot (--check compares byte for byte)
+npm run build:nfl-scoring # the NFL's and AFL's scoring season by season, 1960–2024, from Pro Football Archives' pages (--fetch saves missing pages politely; --check compares byte for byte)
 npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public API into scripts/data/mlb-the-show-26.json (network, cached)
 npm run build-mlb        # rebuild the MLB clubs and the baseball nations from that snapshot (--check compares byte for byte)
 npm run import:mlb-war   # rebuild the 1960–2017 baseball snapshots from the pinned WAR and Baseball Databank files in data-src/mlb-war/ (--check compares byte for byte)
+npm run sync:mlb-league-runs # each club's runs and shutouts from MLB's Stats API for the seasons after the Databank's (network; writes scripts/data/mlb-league-runs.json)
 npm run build:mlb-map    # rebuild MLB's maps of the USA and Canada, today's and the 43 of earlier seasons (1–2 minutes a map; --check compares byte for byte)
 npm run sync:nhl         # snapshot EA's NHL 27 ratings and the NHL's rosters and statistics into scripts/data/nhl-27.json (the NHL's from the cache only; no --refresh)
 npm run build-hockey     # rebuild the NHL clubs and the hockey nations from that snapshot (--check compares byte for byte)
 npm run build:nhl-map    # rebuild the NHL's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
+npm run build:nhl-league # each earlier NHL season's goals and scoring factor, and the playoff overtimes (--fetch saves missing NHL.com pages; --check compares byte for byte)
 npm run sync:nrl         # snapshot Rugby League 26's NRL ratings, Zero Tackle's profiles and NRL.com's 2025 team lists into scripts/data/rugby-league-26.json (network, cached)
 npm run build-rugby-league # rebuild the NRL clubs and the rugby league nations from that snapshot (--check compares byte for byte)
 npm run build:nrl-map    # rebuild the NRL's map of Australia and New Zealand (seconds; --check compares byte for byte)
@@ -444,7 +447,8 @@ with shorter pauses for routine matches, but your team's matches still on the li
 ticker). It stores the existing `resolution` and `express` settings. Under Live and
 Fast-forward your team's match (the managed team, or the followed team while
 spectating) plays at 1× whatever the speed, and the chosen speed returns with the
-result; a speed picked during the match is kept. Level games go to penalties in football and
+result; a speed picked during the match is kept. Level games go to extra time in football, then
+penalties (an earlier season plays the knockout rules of its day: [match-simulation.md](docs/design/match-simulation.md#knockout-rules-by-era)), and
 overtime in basketball and American football. The draw, the opponent choice, upsets, the final, computer
 signings, home advantage and your role are fixed at launch. During a campaign the masthead's
 **Settings** button (More on phones) changes Show matches at any time, except
@@ -463,18 +467,26 @@ their season did: about 93 a side in 2003/04, 116 today; EuroLeague clubs play F
 EuroLeague's pace and scoring rate, 74 possessions and 86 points a side. American football plays about 11
 possessions a side, each ending in a touchdown and its try (the extra point or two points),
 a field goal, now and then a safety, or nothing by its offence against the opposing defence,
-with late-game play-calling that makes 3 the commonest margin, as in the NFL, and playoff overtime.
+with late-game play-calling that makes 3 the commonest margin, as in the NFL, and playoff overtime. An earlier season
+plays its own day's: its league's scoring and kicking (about 17 points a side in 1977, 23 in 2024), no two-point try in
+the NFL before 1994, and its playoffs' overtime (sudden death to 2009 and in the AFL, fifteen-minute periods before 2017).
 Ice hockey plays three-minute slices whose rates follow the score (a level game tightens up late, a side behind
-pushes and at the end pulls its goalie), then five minutes of sudden death and a shoot-out. Women's football plays
+pushes and at the end pulls its goalie), then five minutes of sudden death and a shoot-out. An earlier season plays its
+own day's: its league's goals (four a side in 1981/82, two and a half in 2003/04), a calmer late game before 1999/2000,
+and before the shoot-out came in (2005/06) the playoffs' twenty-minute overtime periods until a goal; four on four, then
+the shoot-out, to 2014/15. Women's football plays
 football's model. Tennis plays a Davis Cup tie: four singles and a doubles, first to three rubbers, each rubber won with
 Elo's odds for the gap between the players and played out set by set, game by game. Women's tennis plays the Billie Jean
-King Cup's tie the same way, its games with the WTA's serve: more breaks, fewer tie-breaks.
+King Cup's tie the same way, its games with the WTA's serve: more breaks, fewer tie-breaks. An earlier season plays its
+year's format: to 2018 the Davis Cup's rubbers are best of five sets (Elo's odds over five sets, so the favourite wins
+more often), with no tie-break until 1989 and none in the fifth set until 2016, so a set can run to 13–11; the Fed
+Cup's ties are three rubbers, first to two, until 1994.
 Stronger teams are favourites, while
 every Upsets setting retains scoring randomness and possible upsets.
 **Home advantage** is off by default: every match is played on neutral ground, so
 the defending team wins half of even games. On, the defender plays at home and
 wins about as often as home teams do in its sport's league: 45% of even football
-games in ninety minutes (58% with the shoot-outs), 56% in basketball (64% in the EuroLeague), 54% in
+games in ninety minutes (59% with extra time and the shoot-outs), 56% in basketball (64% in the EuroLeague), 54% in
 American football and ice hockey and 53% in baseball. A Davis Cup host picks the surface and fills the stands:
 even ties go its way 60% of the time. Attacks fail more often, and a failed
 attack hands the defender the attacker's territory, so conquests change hands but
@@ -607,7 +619,8 @@ scorers, the score and the minute ("67' · LIVE", then FULL TIME, FINAL for
 basketball, or PENALTIES). Below it, a **win-probability chart** follows the
 match from your side: the managed team, else the followed team, else the
 attacker. It marks goals and half-time. Football uses a Poisson model of the
-goals still to come, built from the match's own lineups. Basketball uses a
+goals still to come, built from the match's own lineups, through extra time
+(the axis runs on to 105' and 120' when a level game reaches them). Basketball uses a
 normal approximation of the remaining margin. **Chart | Lineups** switches to
 both lineups, with claimed players tagged and ratings coloured by tier. Lineups
 longer than the window (American football's 23) page together. A dark match feed lists
@@ -1609,8 +1622,12 @@ considered, back to 1872, and their terms.
   of its day under their own names and flags (the Soviet Union on Russia's shape,
   holding the other republics, to 1990/91; the CIS in 1991/92; Yugoslavia to
   1990/91; FR Yugoslavia in 1994/95 and 1995/96; Czechoslovakia to 1992/93; West
-  Germany to 1989/90; Zaire from 1971/72), leaves suspended associations out (South
-  Africa, FR Yugoslavia, China PR) and fields no East Germany, which has no shape.
+  Germany to 1989/90; Zaire from 1971/72), and leaves suspended associations out (South
+  Africa, FR Yugoslavia, China PR). Seasons from 1996/97 play FR Yugoslavia and Serbia
+  and Montenegro, Swaziland and Macedonia under their names of the day
+  (src/data/namesOfTheDay.js). Up to 1989/90 the map has **East Germany**, cut from
+  Germany along the inner German border, which fields a team where a season rates
+  its players (1973/74, 1989/90): see [Earlier maps](#earlier-maps).
 - **Saves are self-contained:** players are packed as compact EA or CM tuples,
   so a season campaign resumes or imports without its season file.
 
@@ -1636,7 +1653,8 @@ nations only, 15 to 24 of them.
   files the same way).
 - **Federations of the day:** the Soviet Union, Yugoslavia, Czechoslovakia, West
   Germany and Zaire play under their own names and flags, holding their members'
-  land where they are finalists. East Germany has no shape and fields no team.
+  land where they are finalists. East Germany plays on its own land of the day:
+  all sixteen finalists of 1974 take part.
 - **Theatres:** the world, Europe, and South America where it had four
   finalists; never the Elite 32.
 - **Rebuild:** `npm run sync:world-cup-seasons` reads the pinned sources in
@@ -1791,6 +1809,16 @@ file in `public/american-football/` (about 30 KB) that loads only when chosen.
   `npm run fetch:pfa` (polite, resumable), `npm run sync:pfa`, then
   `npm run build:nfl-seasons`, `npm run build:nfl-map` and
   `node scripts/build-club-maps.mjs --league=afl`.
+- **Rules of their day:** each season plays its league's own scoring that year,
+  touchdowns, field goals and extra points made, two-point tries (none in the NFL
+  before 1994; the AFL had them), safeties, and its playoffs' overtime: sudden
+  death to 2009 and in the AFL, a first-possession field goal answered from 2010
+  to 2021, both sides possessing from 2022, in fifteen-minute periods before 2017.
+  The totals come from Pro Football Archives' club pages, checked against
+  nflverse's scores from 1999 (`npm run build:nfl-scoring`, which writes
+  `src/data/nflLeagueAverages.js`; `-- --fetch` saves the pages no cache holds,
+  `-- --check` rebuilds byte for byte). The built-in 2026 keeps today's rules.
+  [The design notes](docs/design/american-football.md#rules-by-era) have the table and sources.
 - **What is missing:** anything before 1960. Madden NFL 97 and 98 are not used
   (their ratings check poorly, so 1996 and 1997 are computed), nor is NFL Draft
   Buzz's copy of Madden NFL 97 to 2001, because its site refuses automated
@@ -1847,6 +1875,13 @@ only when chosen.
   the Databank's licence statement and Retrosheet's notice (the Databank's home games
   come from Retrosheet's game logs), and names Baseball-Reference and FanGraphs as the
   WAR's origin.
+- **Rules of their day:** a season plays its league's runs a game (3.42 in 1968,
+  5.14 in 2000, 4.48 in 2026; the Baseball Databank's totals to 2022, MLB's Stats API's
+  after, in `src/data/mlbLeagueAverages.js`) and its extra innings: each half starts
+  with a runner on second from 2020, and before it plays as the ninth, up to twelve
+  extra innings. Every season still bats a designated hitter, though the National
+  League had none until 2020 and nobody before 1973
+  ([design notes](docs/design/baseball.md#rules-by-era)).
 - **A source error:** MLB The Show 24's API gives the wrong country for players
   born outside the United States (Juan Soto "At Sea", Ronald Acuña Jr. "Slovenia").
   The build takes each such player's birthplace from the nearest sound edition
@@ -1859,7 +1894,8 @@ only when chosen.
   npm run import:mlb-showzone   # 2018–2020's snapshots, from the pinned ShowZone cache in data-src/showzone/ (--check)
   npm run sync:mlb-birthplaces  # MLB 18's missing birthplaces from MLB's Stats API, pinned in scripts/data/mlb-birthplaces.json
   npm run import:mlb-war      # 1960–2017's snapshots, from the pinned WAR and Baseball Databank files in data-src/mlb-war/ (--check)
-  npm run build:mlb-seasons   # the season files, src/data/baseballSeasons.js and the audits (--check compares byte for byte)
+  npm run build:mlb-seasons   # the season files, src/data/baseballSeasons.js, each season's pitching premium and the audits (--check compares byte for byte)
+  node scripts/sync-mlb-league-runs.mjs  # each club's games, runs, shutouts and outs from MLB's Stats API (network) into scripts/data/mlb-league-runs.json
   npm run build:mlb-map       # today's map and the era maps from scripts/data/mlb-seasons.json and mlb-war-seasons.json
   ```
 - **Saves** hold every player as played, so a season campaign resumes without
@@ -1954,6 +1990,13 @@ file in `public/tennis/` (13–56 KB) that loads only when chosen.
   Yugoslavia its six through 1991; West Germany plays as Germany. South Africa
   (1970–1972 and 1979–1992) and FR Yugoslavia (1993–1995), barred from the Davis
   Cup, field no team; the Soviet Union plays from 1962, its first cup.
+- **The format of the day:** a season plays its year's Davis Cup ties. Through 2018
+  a tie was five rubbers over three days, every rubber best of five sets: no
+  tie-break before 1989 (a set runs on until a side is two games clear), a tie-break
+  in all but the fifth set from 1989 and in every set from 2016. From 2019 the ties
+  are today's, best of three sets. A best-of-five rubber's clock runs 1.6 times as
+  long, and the live chart counts five sets
+  ([design notes](docs/design/tennis.md#format-by-year)).
 - **Licence:** Tennis Abstract's ratings and Jeff Sackmann's match data are
   CC BY-NC-SA 4.0 (attribution, non-commercial, share-alike), as for the built-in
   season: `public/tennis/ATTRIBUTION.txt` credits them. `scripts/data/tennis-seasons.json`
@@ -1994,6 +2037,11 @@ men's are, by the same scripts with `--tour=wta`
   defection, and Mandlikova for Australia from 1988. Monica Seles, Yugoslav until 1994,
   is Yugoslavia's only rated player in 1991 and 1992, so she sits those seasons out, as
   every nation of one does.
+- **The format of the day:** a season plays its year's cup ties, every rubber best of
+  three sets. Until 1994, in 2000–2001 and in 2025 a tie is three rubbers, the No. 2s'
+  singles, the No. 1s', then the doubles, first to two; otherwise five, the doubles
+  last. Sets have no tie-break until 1975 and in 1977–1979, and the third set none until
+  2017 ([design notes](docs/design/womens-tennis.md#format-by-year)).
 - **Licence:** as the men's: `public/womens-tennis/ATTRIBUTION.txt` credits Jeff
   Sackmann / Tennis Abstract (CC BY-NC-SA 4.0). `scripts/data/womens-tennis-seasons.json`
   pins the 117 archive files (Aneeshers/tennis-sackmann-archive at 8373358) and the
@@ -2346,6 +2394,27 @@ them: they load as neutral land, as nations outside a theatre are, and nothing i
 migrated. See [Pacific islands](docs/design/pacific-islands.md) for which sports
 field them and what that changes.
 
+### Earlier maps
+
+A season of another day plays the map as it stood then. Both atlases keep today's
+shapes as they are and add the shapes of earlier years in a collection of their own
+(`historic`), which the app swaps in for a season whose end year they cover
+(`src/engine/historicMap.js`); today's season, and any season after them, decodes
+exactly as before. Up to 1990 Germany is cut along the inner German border, read off
+Natural Earth's states (the six eastern ones, Berlin among them, share it with the
+western ones): **East Germany** (278, ISO 3166's code for it) borders West Germany,
+Poland and Czechoslovakia and is anchored on East Berlin, and West Germany on Bonn.
+It flies its own flag (Wikimedia Commons, public domain) and takes gold on the
+political map. It fields a team only where a season rates its players: the 1974
+World Cup's sixteen finalists include it, and in the 1989/90 database the players of
+the East German clubs play for it. Elsewhere its land is neutral, as in tennis, whose
+Davis Cup and Fed Cup it never played. Up to 1975 Vietnam is cut the same way at the 17th
+parallel: **South Vietnam** fields its Davis Cup team of 1964 and 1965. Each sport's seasons also play their nations
+under their names of the day (`src/data/namesOfTheDay.js`): Czechoslovakia, the
+Soviet Union, the CIS, Yugoslavia, FR Yugoslavia, Serbia and Montenegro and West
+Germany in tennis, Swaziland and Macedonia everywhere before their renaming. See
+[Earlier maps](docs/design/historic-maps.md).
+
 Closed coastline rings are clipped at ±180° longitude before projection, so
 date-line crossings cannot create diagonal closure wedges through Russia or
 Pacific islands. New seam edges follow the projected meridian, and the same
@@ -2453,10 +2522,10 @@ src/
   ads.js               AdSense script and banner settings (off by default)
   theme.js             design tokens for JS (v4 colours, map values, rating tiers)
   sports/              per-sport lineup, match model and vocabulary
-    football.js        4-4-2, 90 minutes, penalty shootouts
+    football.js        4-4-2, 90 minutes, extra time, then the knockout rules of each season's day
     basketball.js      starting five, 40 minutes (FIBA: nations, EuroLeague clubs) or 48 (NBA clubs), overtime
-    americanFootball.js  23 starters, 60 minutes of possessions, playoff overtime
-    baseball.js        nine batters, a starter and three relievers, nine innings, walk-offs, extra innings
+    americanFootball.js  23 starters, 60 minutes of possessions, playoff overtime; each earlier season by its day's rules
+    baseball.js        nine batters, a starter and three relievers, nine innings, walk-offs, extra innings; each season's runs and extra innings
     index.js           the registry, and each sport's clock and tie-break copy (clockLabel, overtimeText)
   data/teams.js        176 nations: identity, squad building
   data/rosters.js      GENERATED football squads (npm run build-rosters)
@@ -2465,8 +2534,11 @@ src/
   data/clubs.basketball.js    GENERATED NBA fives (npm run build-clubs)
   data/clubs.euroleague.js    GENERATED EuroLeague fives, every rating an estimate (npm run build:euroleague)
   data/clubs.american-football.js  GENERATED NFL lineups and backups (npm run build-nfl)
+  data/nflLeagueAverages.js   GENERATED NFL and AFL scoring by season, each season's average matchup (npm run build:nfl-scoring)
   data/clubs.baseball.js      GENERATED MLB lineups and active rosters (npm run build-mlb)
   data/baseballSeasons.js     GENERATED listing of the earlier baseball seasons (npm run build:mlb-seasons)
+  data/baseballSeasonPremiums.js  GENERATED each earlier baseball season's pitching premium (npm run build:mlb-seasons)
+  data/mlbLeagueAverages.js   MLB's games, runs, outs and shutouts of each season since 1960, which its seasons play to
   data/rosters.baseball.js    GENERATED baseball nations by birthplace (npm run build-mlb)
   data/sourceTable.js  compact player rows of the generated football files: one
                        JSON line per nation or club, metadata keys and shared
@@ -2542,9 +2614,11 @@ scripts/
   build-club-maps.mjs  builds the NBA's maps of the USA and Canada (today's and each era's), the NFL's of the USA and MLB's of the USA and Canada
   sync-madden.mjs      snapshots Madden NFL ratings from EA's ratings site
   build-nfl.mjs        builds the NFL clubs from that snapshot
+  build-nfl-scoring.mjs  the NFL's and AFL's scoring by season, from Pro Football Archives (checked against nflverse)
   sync-mlb-the-show.mjs  snapshots MLB The Show's Live cards from its public API
   build-mlb.mjs        builds the MLB clubs and the baseball nations from that snapshot
   build-mlb-seasons.mjs  builds the earlier baseball seasons from their snapshots (lib/mlb.mjs holds the shared rules)
+  sync-mlb-league-runs.mjs  snapshots each MLB club's games, runs, shutouts and outs from MLB's Stats API
   build-nba-seasons.mjs  builds the earlier basketball seasons from the pinned 2K Archive page
   sync-euroleague.mjs  snapshots the EuroLeague's rosters and box scores from its public API
   build-euroleague.mjs builds the EuroLeague's clubs, estimating every rating (scripts/lib/euroleague.mjs)
@@ -2631,6 +2705,7 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `turn-panels`, `turn-wiring` | Turn strip, Choose a target, spectator panel, and the turn flow in the real App |
 | `win-probability` | The live win-probability model against the football and basketball match models |
 | `american-football` | NFL clubs from the Madden snapshot, the match model, its live win probability, the NFL map, setup, squad and the App |
+| `american-football-eras` | each earlier NFL and AFL season's rules of its day: scoring against its league's, tries, overtime, the live chart |
 | `euroleague` | The EuroLeague's clubs rebuilt from the snapshot, its estimates, positions and names, its rules, its map, setup, launch, saves and links; the EuroBasket theatre and its fives |
 | `save-size` | Save size and storage-quota behaviour for 173-nation campaigns |
 | `pacific-islands` | Tonga, Samoa and the Cook Islands: the rules map's rings from the 50m map, their nations, which sports field them, and world wars with them playing or neutral |

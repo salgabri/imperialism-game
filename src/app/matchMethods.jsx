@@ -9,7 +9,7 @@
 import React from 'react';
 import { C, pad3, tint } from '../theme.js';
 import { liveModelFor } from '../engine/winProbability.js';
-import { overtimeEnd, overtimeText } from '../sports/index.js';
+import { finishLabel, overtimeEnd, settledText, shootoutOf } from '../sports/index.js';
 import { roman } from '../viewModels/format.js';
 import * as matchVM from '../viewModels/match.js';
 
@@ -26,11 +26,12 @@ const TASKS = new WeakMap();
 
 /**
  * The last minute of play: regulation, the last event, or the end of the last overtime period played, so a game won
- * in the top of an extra inning still plays out its bottom half on the clock (overtimeEnd).
+ * in the top of an extra inning still plays out its bottom half on the clock (overtimeEnd); a football tie's own end
+ * (`tie.end`: 120' after the whole of extra time, a golden goal's minute, 105' after a silver goal).
  */
 function lastTickOf(m, sport) {
   const last = (m?.allEv || []).reduce((n, e) => Math.max(n, Number(e?.m) || 0), Number(sport?.clock?.length) || 0);
-  return Math.max(last, overtimeEnd(sport, Array.isArray(m?.tie?.periods) ? m.tie.periods.length : 0));
+  return Math.max(last, overtimeEnd(sport, Array.isArray(m?.tie?.periods) ? m.tie.periods.length : 0), Number(m?.tie?.end) || 0);
 }
 
 function lastShownMinute(m) {
@@ -159,6 +160,13 @@ function finalWhistle(sport, lastTick) {
     track.call(this, 'finish', 420, () => this.finishMatch());
     return;
   }
+  if (sport.tieBreak === 'shootout' && !shootoutOf(sport, m.tie)) {
+    // Football's extra time settled it (its goals are in the feed), or the drawing of lots did: full time, and the
+    // status line says how.
+    this.patchMatch({ status: sport.labels.end });
+    track.call(this, 'finish', 700, () => this.finishMatch());
+    return;
+  }
   if (sport.tieBreak !== 'shootout') {
     // Overtime has already been played out through the event feed.
     this.patchMatch({ status: sport.labels.tie });
@@ -184,12 +192,13 @@ export function revealAll() {
   for (const token of pendingTasks.call(this)) cancelTask.call(this, token);
   this.stopMinuteClock();
   this.minuteStore?.set(lastTickOf(m, sport));
+  const kicks = shootoutOf(sport, m.tie);
   this.patchMatch({
     shown: m.allEv,
     ga: m.finalGa,
     gd: m.finalGd,
-    tieShown: m.tie && sport.tieBreak === 'shootout' ? { A: m.tie.A, D: m.tie.D } : null,
-    status: m.tie ? sport.labels.tie : sport.labels.end,
+    tieShown: kicks ? { A: kicks.A, D: kicks.D } : null,
+    status: finishLabel(sport, m.tie),
   });
   this.after(m.express ? 18 : 500, () => this.finishMatch());
 }
@@ -236,7 +245,9 @@ export function matchCard(m = this.state.match, teams = this.state.teams) {
         winnerName: m.winnerName, loserName: m.loserName, territories: m.territoriesGained, player: m.playerTaken,
         strengthBefore: m.strengthBefore, strengthAfter: m.strengthAfter, strengthGain: m.strengthGained,
         territoryNames: m.territoryNames || [], territoryIds: m.territoryIds || [], replacedPlayer: m.replacedPlayer,
-        tieText: m.tie ? (sport.tieBreak === 'shootout' ? `${m.tie.ga}–${m.tie.gd} on penalties` : sentence(overtimeText(sport, m.tie.periods.length))) : null }
+        // "4–3 on penalties" (attacker first), "After extra time", "After 2 overtime periods"; `end` is the minute play
+        // ended, which an archived match's feed reads back (football's 120' after extra time with no goal in it).
+        tieText: m.tie ? sentence(settledText(sport, m.tie)) : null, end: lastTickOf(m, sport) }
       : null,
   };
 }

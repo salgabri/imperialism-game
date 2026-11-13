@@ -131,6 +131,15 @@ test('tie-breaks are sport-aware and winner-first', () => {
   assert.equal(winnerScore({ ...overtime, tie: { periods: [[9, 9], [8, 5]], ga: 98, gd: 95 } }, '380', basketball), '98–95 after 2 overtime periods');
   assert.equal(winnerScore({ aId: 'a', dId: 'b', finalGa: 0, finalGd: 3 }, 'b'), '3–0');
   assert.equal(winnerScore({ aId: 'a', dId: 'b' }, 'a'), '', 'unknown score → no score text');
+  // Football's extra time: settled in it, by its golden goal, by the drawing of lots, or a shoot-out after it.
+  const extra = (by, ga, gd, more = {}) => ({ aId: 'a', dId: 'b', finalGa: ga, finalGd: gd,
+    tie: { by, periods: [[0, 0], [0, 0]], end: 120, A: [], D: [], ga: 0, gd: 0, ...more } });
+  assert.equal(winnerScore(extra('extra-time', 1, 2), 'b', sport), '2–1 after extra time');
+  assert.equal(winnerScore(extra('golden-goal', 2, 1, { end: 98 }), 'a', sport), '2–1 after a golden goal in extra time');
+  assert.equal(winnerScore(extra('silver-goal', 0, 1, { end: 105 }), 'b'), '1–0 after a silver goal in extra time', 'without the sport');
+  assert.equal(winnerScore(extra('lots', 0, 0, { lots: 'b' }), 'b', sport), '0–0 after extra time, on the drawing of lots');
+  assert.equal(winnerScore(extra('penalties', 1, 1, { A: [1, 0, 1, 1], D: [1, 1, 1, 1, 1], ga: 3, gd: 5 }), 'b', sport),
+    '1–1, 5–3 on penalties');
 });
 
 test('effects report the taken land and the empire after the conquest', () => {

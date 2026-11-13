@@ -382,6 +382,11 @@ function tieSuffix(entry, ctx) {
   const text = entry?.result?.tieText;
   if (!text) return '';
   if (/penalt/i.test(text)) return ' (pens)';
+  // A football game settled in extra time: by lots, a golden or silver goal, or the whole of it.
+  if (/drawing of lots/i.test(text)) return ' (lots)';
+  if (/golden goal/i.test(text)) return ' (golden goal)';
+  if (/silver goal/i.test(text)) return ' (silver goal)';
+  if (/extra time/i.test(text)) return ' (aet)';
   if (/overtime/i.test(text)) return ' (OT)';
   // An ice hockey game decided after overtime.
   if (/shoot-?out/i.test(text)) return ' (SO)';

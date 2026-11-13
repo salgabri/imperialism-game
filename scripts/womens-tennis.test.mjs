@@ -8,7 +8,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { ROSTERS, SOURCE } from '../src/data/rosters.womens-tennis.js';
 import { ROSTERS as MEN } from '../src/data/rosters.tennis.js';
-import { buildTeam, HOME_NATIONS, isTennisSport, makeRng, NATIONS, selectLineup, teamEff, teamSportId } from '../src/data/teams.js';
+import { buildTeam, HISTORIC_NATIONS, HOME_NATIONS, isTennisSport, makeRng, NATIONS, selectLineup, teamEff, teamSportId } from '../src/data/teams.js';
 import { getSport, SPORT_LIST } from '../src/sports/index.js';
 import { ATP, holdChance, matchOdds, playMatch, playMatchWon, sampleResult, serveEdge, setChance, simulateTie, WTA } from '../src/sports/tennis.js';
 import { estimateWinProbability } from '../src/engine/odds.js';
@@ -93,7 +93,8 @@ test('a nation with fewer than two players fields no team, and Great Britain\'s 
   assert.deepEqual(Object.keys(merged).sort(), HOME_NATIONS.slice().sort());
   assert.ok(Object.values(merged).every(holder => holder === '826'));
   for (const id of Object.keys(NATIONS)) {
-    if (HOME_NATIONS.includes(id)) continue;
+    // East Germany is not on today's map (HISTORIC_NATIONS): no 2026 tie is played there.
+    if (HOME_NATIONS.includes(id) || HISTORIC_NATIONS.includes(id)) continue;
     assert.equal(inactive.includes(id), !Object.hasOwn(ROSTERS, id), NATIONS[id][0]);
   }
   assert.ok(inactive.includes('208') && inactive.includes('608'), 'Denmark and the Philippines stay neutral');

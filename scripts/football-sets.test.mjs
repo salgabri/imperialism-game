@@ -17,7 +17,7 @@ import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { CM_CONVERSION, expandCmTuple } from '../src/data/cmPlayers.js';
 import { expandFmTuple } from '../src/data/fmPlayers.js';
 import { expandSwosTuple } from '../src/data/swosPlayers.js';
-import { DEPENDENCIES, NATIONS, buildClub, buildTeam, makeRng, selectLineup } from '../src/data/teams.js';
+import { HISTORIC_NATIONS, DEPENDENCIES, NATIONS, buildClub, buildTeam, makeRng, selectLineup } from '../src/data/teams.js';
 import { WorldGeometry } from '../src/engine/geo.js';
 import { getSport } from '../src/sports/index.js';
 import {
@@ -51,7 +51,10 @@ const strengthOf = tuples => Math.round(selectLineup({ sport: 'football', squad:
   return { name, pos, rating, positions: info.positions };
 }) }).rating);
 
-/** A complete format-1 file: every nation, an empty one, clubs in two leagues, Montenegro with Serbia, no Kosovo. */
+/**
+ * A complete format-1 file: every nation of today's map (East Germany, a nation of the map's earlier years, is not listed),
+ * an empty one, clubs in two leagues, Montenegro with Serbia, no Kosovo.
+ */
 function syntheticSet({ id = ID, year = 2002, label = 'CM 01/02 · Test 2002', base = 0 } = {}) {
   let next = base + 1;
   const player = (nation, key, i, club = '') => {
@@ -59,7 +62,7 @@ function syntheticSet({ id = ID, year = 2002, label = 'CM 01/02 · Test 2002', b
     return [cmId, `Fake${nation} ${key.toUpperCase()}${i}`, i % 3 ? 0 : `Fakeson Fake${nation} ${i}`, 60 + (cmId * 37) % 140,
       key === 'cb' && i % 2 ? 'cb,rb' : key, NATIONS[nation][0], club, i % 2 ? '' : `19${70 + i}-0${1 + (i % 9)}-1${i % 9}`];
   };
-  const nations = Object.fromEntries(Object.keys(NATIONS).map(nation => {
+  const nations = Object.fromEntries(Object.keys(NATIONS).filter(nation => !HISTORIC_NATIONS.includes(nation)).map(nation => {
     if ([EMPTY, '499', 'KOS'].includes(nation)) return [nation, [40, 0, []]];
     const squad = XI.map((key, i) => player(nation, key, i));
     return [nation, [strengthOf(squad), squad.length + 5, squad]];
@@ -118,7 +121,8 @@ test('a format-1 file decodes into the built-in roster and club shapes, every pl
   assert.equal(set.clubs.length, 5);
   assert.deepEqual(set.clubs[0].squad[0], credited(SET.clubs[0].squad[0]));
   assert.deepEqual(Object.keys(set.clubs[0]), ['id', 'name', 'code', 'league', 'country', 'col', 'str', 'squad']);
-  assert.deepEqual(set.territory, { merged: { 499: '688' }, inactive: ['KOS'] });
+  // East Germany, unlisted as in every set built for today's map, fields no team.
+  assert.deepEqual(set.territory, { merged: { 499: '688' }, inactive: ['KOS', ...HISTORIC_NATIONS] });
   const [, , rating, info] = players[2];
   assert.equal(rating, Math.max(1, Math.round(info.rawRating * 99 / 200)));
   assert.equal(info.source, 'cm0102');
@@ -193,7 +197,7 @@ test('a set built before Tonga, Samoa and the Cook Islands were on the map lists
   const older = structuredClone(SET);
   for (const id of islands) delete older.nations[id];
   const sport = seasonSport(decodeFootballSet(older, ID));
-  assert.deepEqual(sport.territory.inactive, ['KOS', '776', '882', '184'], 'inactive, as on the map the set was built for');
+  assert.deepEqual(sport.territory.inactive, ['KOS', '776', '882', '184', ...HISTORIC_NATIONS], 'inactive, as on the map the set was built for');
   assert.ok(islands.every(id => !fieldedNations(sport).includes(id) && sport.rosters[id][2].length === 0));
   // A set that lists them fields them, here with the fake database's players.
   const current = seasonSport(decodeFootballSet(structuredClone(SET), ID));
@@ -378,10 +382,10 @@ test('seasonSport binds the set to the football sport; sportOf picks it only onc
   assert.deepEqual([empty.squad.length, empty.real, empty.str], [0, 0, 40], 'nobody is invented for an empty nation');
   assert.equal(buildClub(sport.clubs[0], sport).home, '826', 'a set club seeds from its country');
 
-  assert.deepEqual(Object.keys(NATIONS).filter(id => !fieldedNations(football).includes(id)), ['184', '776', '882'],
-    'the built-in season fields every nation a source rates: none rates Tonga, Samoa or the Cook Islands');
-  assert.deepEqual(Object.keys(NATIONS).filter(id => !fieldedNations(sport).includes(id)).sort(), [EMPTY, '499', 'KOS'],
-    'Montenegro plays for Serbia, Kosovo has no federation and the empty nation no side');
+  assert.deepEqual(Object.keys(NATIONS).filter(id => !fieldedNations(football).includes(id)), ['184', '278', '776', '882', 'RVN'],
+    'the built-in season fields every nation a source rates: none rates Tonga, Samoa or the Cook Islands, and East Germany and South Vietnam are not on the map of today');
+  assert.deepEqual(Object.keys(NATIONS).filter(id => !fieldedNations(sport).includes(id)).sort(), ['278', EMPTY, '499', 'KOS', 'RVN'],
+    'Montenegro plays for Serbia, Kosovo has no federation, the empty nation no side and East Germany and South Vietnam no shape in 2001/02');
   assert.deepEqual(heldShapes(football), Object.entries(DEPENDENCIES).map(([shape, dep]) => [shape, dep.of]));
   assert.deepEqual(heldShapes(sport).at(-1), ['499', '688'], 'Montenegro starts with Serbia, after the dependencies');
 });
@@ -661,7 +665,8 @@ test('a 170-nation data set world campaign stays inside the save budgets from ki
     await app.startCampaign();
     assert.equal(app.state.phase, 'playing', app.state.saveStatus?.message);
     assert.deepEqual(calls, [`/football/${ID}.json`], 'launch loads the chosen set once');
-    assert.equal(app.state.aliveIds.length, Object.keys(NATIONS).length - 3, 'Montenegro, Kosovo and the empty nation field no team');
+    assert.equal(app.state.aliveIds.length, Object.keys(NATIONS).length - 3 - HISTORIC_NATIONS.length,
+      'Montenegro, Kosovo, the empty nation and the nations of earlier maps field no team');
     for (let steps = 0; app.state.aliveIds.length > 1 && steps < 5000; steps++) {
       const st = app.state;
       if (st.match && !st.match.applied) app.finishMatch();

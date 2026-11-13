@@ -9,11 +9,12 @@ import { SAVE_KEY } from '../src/config.js';
 import { FLAG_CODES } from '../src/data/flags.js';
 import { FLAG_SYMBOLS } from '../src/data/flagSymbols.js';
 import { FOOTBALL_FEDERATIONS as TABLE } from '../src/data/footballFederations.js';
+import { namesOfTheDay } from '../src/data/namesOfTheDay.js';
 import { CM0102_NATIONS } from '../src/data/cm0102Nations.js';
 import {
   FIRST_YEAR, NO_TEAM, buildFootballSet, dayNationResolver, federationTeamOf, identitiesFor, nationResolver, territoryFor,
 } from '../src/data/footballSetBuild.js';
-import { NATIONS, buildTeam, makeRng, nationIdentity } from '../src/data/teams.js';
+import { HISTORIC_NATIONS, HISTORIC_THROUGH, NATIONS, buildTeam, makeRng, nationIdentity } from '../src/data/teams.js';
 import { decodeFootballSet, fieldedNations, heldShapes, seasonSport } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
@@ -38,7 +39,10 @@ const FRG = identity('West Germany', 'FRG', '276'), ZAI = identity('Zaire', 'ZAI
 test('every shape whose association joined FIFA after 30 June 1962 has FIFA\'s own date, read from its page', () => {
   assert.equal(FIRST_YEAR, 1962);
   const fifa = JSON.parse(read('scripts/data/fifa-member-associations.json')).associations;
-  assert.deepEqual(Object.keys(fifa).sort(), Object.keys(NATIONS).sort(), 'the snapshot covers every game nation');
+  // East Germany's association (the DFV, a FIFA member until reunification) has no page of FIFA's today: it is a nation of the
+  // map's earlier years only.
+  assert.deepEqual(Object.keys(fifa).sort(), Object.keys(NATIONS).filter(id => !HISTORIC_NATIONS.includes(id)).sort(),
+    'the snapshot covers every game nation on today\'s map');
   for (const [shape, entry] of Object.entries(TABLE.shapes)) {
     assert.ok(NATIONS[shape], shape);
     assert.equal(entry.fifa, fifa[shape].fifa, shape);
@@ -82,8 +86,9 @@ test('the federations of the day: FIFA\'s codes of the day, the flags the game h
     assert.ok(NATIONS[suspension.shape]);
     assert.match(suspension.source, /^https:\/\/en\.wikipedia\.org\/w\/index\.php\?oldid=\d+$/);
   }
-  // East Germany has no shape, so it fields no team.
-  assert.ok(!Object.values(NATIONS).some(([name]) => /East Germany|German Democratic/.test(name)));
+  // East Germany is a nation of its own, on the map up to 1990 (src/engine/historicMap.js): no federation holds it.
+  assert.deepEqual([HISTORIC_NATIONS, NATIONS['278'][0], HISTORIC_THROUGH['278']], [['278', 'RVN'], 'East Germany', 1990]);
+  assert.ok(!TABLE.federations.some(federation => federation.holder === '278' || federation.members.includes('278')));
 });
 
 test('the table refuses what it cannot apply', () => {
@@ -189,7 +194,7 @@ test('a federation of the day fields its members\' players, and a nation named a
   const resolve = nationResolver(CM0102_NATIONS);
   const of = year => dayNationResolver(resolve, TABLE, year);
   assert.deepEqual(['Soviet Union', 'Czechoslovakia', 'West Germany', 'Zaire', 'Commonwealth of Soviet States', 'East Germany'].map(of(1970)),
-    ['643', '203', '276', NO_TEAM, NO_TEAM, NO_TEAM]);
+    ['643', '203', '276', NO_TEAM, NO_TEAM, '278']);
   assert.deepEqual(['Zaire', 'Commonwealth of Soviet States', 'Soviet Union'].map(of(1992)), ['180', '643', NO_TEAM]);
   assert.deepEqual(['Soviet Union', 'Czechoslovakia', 'West Germany', 'Zaire', 'Russia'].map(of(1997)), [NO_TEAM, NO_TEAM, NO_TEAM, NO_TEAM, '643']);
 });
@@ -286,7 +291,8 @@ test('a season with identities plays the Soviet Union on Russia\'s shape, under 
   assert.ok(Object.isFrozen(set.meta.identities) && Object.isFrozen(set.meta.identities[643]));
   assert.notEqual(set.meta.identities, SEASON.identities, 'a copy: the sport cannot change the file');
   const sport = seasonSport(set);
-  assert.deepEqual(sport.playsAs, SEASON.identities);
+  // The file's own identities, over the names of the day the game knows for its year (src/data/namesOfTheDay.js).
+  assert.deepEqual(sport.playsAs, { ...namesOfTheDay('football', SEASON.year), ...SEASON.identities });
   assert.deepEqual(nationIdentity('643', sport), URS);
   assert.deepEqual(nationIdentity('688', sport), YUG);
   assert.deepEqual(nationIdentity('276', sport), FRG);

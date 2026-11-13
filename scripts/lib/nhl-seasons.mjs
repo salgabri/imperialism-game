@@ -391,3 +391,45 @@ export function nationOf(born) {
   if (!nation || !NATIONS[nation]) throw new Error(`No nation for the birth country ${JSON.stringify(born)}`);
   return nation;
 }
+
+// ---------- the federations of the day ----------
+
+/**
+ * The federations that played as one in their years, as tennis's seasons field them (scripts/data/tennis-seasons.json
+ * `nations.territory`, which scripts/hockey-computed.test.mjs holds this to; docs/design/historic-maps.md, "Names of the
+ * day"): from season-end year `from` to `through`, a player born in one of `shapes` plays for `holder`, whose name of the
+ * day src/data/namesOfTheDay.js gives. A season ending in 1992, 1991/92, follows the calendar year it ended in, as
+ * tennis's 1992 does: Czechoslovakia stood until 31 December 1992, the Soviet Union until 26 December 1991, and the
+ * CIS played its one year as the Unified Team in 1992.
+ */
+export const FEDERATIONS = Object.freeze([
+  { name: 'Czechoslovakia', through: 1992, holder: '203', shapes: ['703'] },
+  { name: 'Soviet Union', through: 1991, holder: '643',
+    shapes: ['804', '112', '268', '051', '031', '398', '860', '795', '762', '417', '498', '233', '428', '440'] },
+  { name: 'Commonwealth of Independent States', from: 1992, through: 1992, holder: '643',
+    shapes: ['804', '112', '051', '031', '398', '860', '795', '762', '417', '498'] },
+  { name: 'Yugoslavia', through: 1991, holder: '688', shapes: ['191', '705', '070', '807', '499', 'KOS'] },
+  { name: 'FR Yugoslavia, then Serbia and Montenegro', from: 1992, through: 2006, holder: '688', shapes: ['499', 'KOS'] },
+  // Kosovo declared its independence on 17 February 2008: Serbia's last season holding it ends in 2007.
+  { name: 'Serbia with Kosovo', from: 2007, through: 2007, holder: '688', shapes: ['KOS'] },
+].map(federation => Object.freeze({ ...federation, shapes: Object.freeze(federation.shapes) })));
+
+const federationsOf = year => FEDERATIONS.filter(f => (f.from ?? -Infinity) <= year && year <= f.through);
+
+/** The nation a player of `nation` (by birth country) played for in the season ending in `year`: its federation's holder, if any. */
+export function federationOf(nation, year) {
+  return federationsOf(year).find(f => f.shapes.includes(nation))?.holder ?? nation;
+}
+
+/**
+ * The shapes the season ending in `year` starts in a federation's empire, as `{ [shape]: holder }`: its members' land,
+ * where its holder fields a real side (`fielded`, a Set of ids), as tennis's seasons give it.
+ */
+export function federationLands(year, fielded) {
+  const merged = {};
+  for (const federation of federationsOf(year)) {
+    if (!fielded.has(federation.holder)) continue;
+    for (const shape of federation.shapes) if (!fielded.has(shape)) merged[shape] = federation.holder;
+  }
+  return merged;
+}
