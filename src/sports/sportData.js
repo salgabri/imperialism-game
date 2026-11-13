@@ -1,6 +1,6 @@
 // Each sport's players: its national rosters and its clubs. The page's first download holds every sport's rules and
-// football's players; every other sport's players come in a chunk of their own (sportData.lazy.js), loaded the first
-// time that sport is played (`loadSportData`). Node (the tests and scripts) has every sport's players from the start
+// football's players; every other sport's players come in a later chunk (sportData.lazy.js), loaded the first time
+// that sport is played (`loadSportData`). Node (the tests and scripts) has every sport's players from the start
 // (sportData.eager.js): package.json "imports" resolves `#sport-data` to one or the other, so nothing there waits.
 //
 // A sport's `rosters`, `clubs` and any `territory` worked out from them read the loaded players (`defineSportData`).

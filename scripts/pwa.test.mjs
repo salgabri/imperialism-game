@@ -100,6 +100,24 @@ test('the precache is the app shell only; seasons, country maps, flags and crest
   assert.equal(isRuntimeCached('https://imperialism.test/sub/domestic/826.json'), true, 'served from a subpath');
 });
 
+test('browsers keep flags, crests and icons a month, so a returning player asks the host for none of them', () => {
+  // Each request counts against the host's allowance, a 304 too (README "Caching"): kept a day, the flags cost a
+  // returning player about 185 requests a day on the Flags map. The worker still shows its copy at once, offline too,
+  // and refreshes it in the background, which the browser answers from its own copy while that is under a month old.
+  assert.equal(RUNTIME_CACHES.find(cache => cache.cacheName === 'imperialism-images').handler, 'StaleWhileRevalidate');
+  const { headers } = JSON.parse(readFileSync(path.join(ROOT, 'vercel.json'), 'utf8'));
+  const cacheControl = rule => rule?.headers.find(header => header.key === 'Cache-Control')?.value ?? '';
+  const month = new RegExp(`\\bmax-age=${30 * 24 * 60 * 60}\\b`);
+  for (const folder of ['flags', 'flags-symbols', 'club-logos']) {
+    assert.match(cacheControl(headers.find(rule => rule.source === `/${folder}/(.*)`)), month, folder);
+  }
+  const icons = headers.find(rule => rule.source.startsWith('/:icon('));
+  assert.match(cacheControl(icons), month, 'icons');
+  for (const icon of [...PAGE_ICONS, ...APP_MANIFEST.icons.map(entry => entry.src)]) {
+    assert.ok(icons.source.includes(icon.replaceAll('.', '\\.')), `${icon} is kept a month too`);
+  }
+});
+
 test('a build serves the world maps and the fonts hashed in assets/, so a first visit downloads each once', () => {
   const plugin = hashedShell();
   assert.equal(plugin.apply, 'build', 'the dev server and the tests keep public/\'s names');
@@ -124,7 +142,7 @@ test('a build serves the world maps and the fonts hashed in assets/, so a first 
   const elsewhere = { ...declaration("url('/fonts/archivo-latin-variable.woff2')"), source: { input: { file: path.join(ROOT, 'src', 'styles', 'x.css') } } };
   const other = declaration("url('/flags/fr.svg')");
   fonts.Once({ walkDecls: visit => [...declarations, elsewhere, other].forEach(visit) });
-  assert.ok(declarations.length >= 6, `${declarations.length} fonts`);
+  assert.ok(declarations.length >= 4, `${declarations.length} fonts`);
   for (const { value } of declarations) {
     const url = value.match(/^url\('([^']+)'\) format\('woff2'\)$/)?.[1];
     assert.match(url ?? value, /^\.\.\/public\/fonts\/archivo-[\w-]+\.woff2$/);
@@ -311,11 +329,11 @@ test('the crash screen\'s Reload hands the page to a waiting version, since a pl
   assert.equal(env.location.reloads, 1);
 }));
 
-test('a long session looks for new versions every hour', async () => {
+test('a long session looks for new versions every six hours', async () => {
   resetServiceWorker();
   const { env, registration } = browser({ controller: new Worker('activated') });
   await registerServiceWorker('./sw.js', env);
-  assert.deepEqual(env.intervals.map(([, ms]) => ms), [60 * 60 * 1000]);
+  assert.deepEqual(env.intervals.map(([, ms]) => ms), [6 * 60 * 60 * 1000]);
   env.intervals[0][0]();
   await flush();
   assert.equal(registration.updates, 1);

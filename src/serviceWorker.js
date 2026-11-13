@@ -6,9 +6,11 @@
 import { useEffect, useState } from 'react';
 import { isRuntimeCached } from './pwa.js';
 
-const CHECK_EVERY_MS = 60 * 60 * 1000;
+// A page left open looks for a new version this often. Each look is a request for sw.js against the host's allowance
+// (README "Caching"): hourly, an open tab cost 24 a day.
+const CHECK_EVERY_MS = 6 * 60 * 60 * 1000;
 // Coming back to the tab checks again, at most this often.
-const CHECK_AGAIN_MS = 10 * 60 * 1000;
+const CHECK_AGAIN_MS = 60 * 60 * 1000;
 // cacheForOffline's fetches at once, beside the game's own requests.
 const OFFLINE_FETCHES = 4;
 // A first visit's page waits at most this long for App's first boot before it registers anyway, so a slow or stuck
