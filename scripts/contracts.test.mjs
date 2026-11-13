@@ -415,7 +415,13 @@ test('App renders CommandBar and CampaignStorageDialog as literal elements of it
       method.traverse({
         ReturnStatement(ret) {
           if (ret.getFunctionParent() !== method || ret.node.argument?.type !== 'JSXElement') return;
-          for (const child of ret.node.argument.children) {
+          // The root may sit in the season-year provider (src/components/seasonYear.js), which findElement walks through.
+          let root = ret.node.argument;
+          const opening = root.openingElement.name;
+          if (opening.type === 'JSXMemberExpression' && opening.object.name === 'SeasonYear' && opening.property.name === 'Provider') {
+            root = root.children.find(child => child.type === 'JSXElement');
+          }
+          for (const child of root.children) {
             const element = child.type === 'JSXElement' ? child
               : child.type === 'JSXExpressionContainer' && child.expression.type === 'LogicalExpression' && child.expression.right.type === 'JSXElement'
                 ? child.expression.right : null;

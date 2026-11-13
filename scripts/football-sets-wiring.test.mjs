@@ -482,7 +482,8 @@ test('Retry this setup loads the set first, and refuses clearly when it cannot',
     app.pickSetup('role', 'manager');
     app.pickSetup('managedTeamId', '688');
     app.startCampaign();
-    assert.equal(app.state.campaignName, 'Football 2001/02 · Europe · Serbia');
+    // Serbia's team of 2001/02 is FR Yugoslavia's (src/data/namesOfTheDay.js).
+    assert.equal(app.state.campaignName, 'Football 2001/02 · Europe · FR Yugoslavia');
     const first = app.state.campaignId;
 
     // Serbia is knocked out, and the checkpoint recording it was saved.

@@ -2188,6 +2188,33 @@ does not have, under flag ids of their own (`URS`, `CIS`, `YUG`, `FRY`, `ZAI`):
 public-domain Wikimedia Commons SVGs, pinned in `scripts/data/historic-flags.json`
 and redrawn on the same 4:3 canvas by `npm run build:historic-flags`.
 
+### Flags and crests of the day
+
+A season of another day shows each nation under the flag it flew on the season's
+cutoff (30 June of the season's year) and each club under the crest it wore that
+season ([period-marks.md](docs/design/period-marks.md)). Canada flies the Red Ensign
+before 1965, the United States 49 stars in 1960, Spain the eagle of 1945 or 1977
+before 1982, South Africa its 1928 flag before 1994, Iran the lion and sun, and so
+on (`src/data/flagsOfTheDay.js`); a state of another name plays under it
+(`src/data/namesOfTheDay.js`: the Soviet Union, Czechoslovakia, Yugoslavia, West
+Germany, Rhodesia, Zaire, FR Yugoslavia). Today's flags are flag-icons', except
+Honduras's: navy blue again since 27 January 2026 (its turquoise flag flies only in
+the seasons of 2022 to 2025). The flags of the day are Wikimedia Commons SVGs, most
+in the public domain, a few (Spain's and Bulgaria's arms) CC BY-SA and credited in
+`public/flags/SOURCES-historic.tsv`; a drawing bigger than 40 KB ships as a 640×480
+WebP inside its SVG.
+
+A club's crests by season are in `scripts/data/crest-eras.json`: each period crest's
+club, years, source and licence, and each club's eras. `npm run sync:crest-eras`
+draws them (from the originals cached in the ignored `data-src/crest-eras/`) into
+`public/club-logos/<club id>.<first year>.webp`, lists them in
+`public/club-logos/SOURCES-eras.tsv` and writes `src/data/clubCrestEras.js`. Where
+the game knows a club wore another crest but has no picture of it, the club shows its
+monogram in those seasons rather than a crest it did not have yet; seasons no source
+dates, and clubs not yet researched, keep today's crest. Period crests come
+only from sources whose robots.txt allows it: Wikipedia articles and file pages in
+any language, Wikimedia Commons, and the Wayback Machine's copies of them.
+
 ### Club crests
 
 A club with a crest shows it wherever a nation shows its flag: the masthead,

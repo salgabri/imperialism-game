@@ -102,6 +102,7 @@
     "test:tennis": "node --test scripts/tennis.test.mjs scripts/tennis-seasons.test.mjs",
     "test:womens-tennis": "node --test scripts/womens-tennis.test.mjs scripts/womens-tennis-seasons.test.mjs",
     "sync:club-logos": "node scripts/sync-club-logos.mjs",
+    "sync:crest-eras": "node scripts/sync-crest-eras.mjs",
     "build:club-colours": "node scripts/build-club-colours.mjs",
     "build:nation-colours": "node scripts/build-nation-colours.mjs",
     "build:home-nations": "node scripts/build-home-nations.mjs",

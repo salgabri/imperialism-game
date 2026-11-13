@@ -9,6 +9,7 @@ import { SAVE_KEY } from '../src/config.js';
 import { FLAG_CODES } from '../src/data/flags.js';
 import { FLAG_SYMBOLS } from '../src/data/flagSymbols.js';
 import { FOOTBALL_FEDERATIONS as TABLE } from '../src/data/footballFederations.js';
+import { namesOfTheDay } from '../src/data/namesOfTheDay.js';
 import { CM0102_NATIONS } from '../src/data/cm0102Nations.js';
 import {
   FIRST_YEAR, NO_TEAM, buildFootballSet, dayNationResolver, federationTeamOf, identitiesFor, nationResolver, territoryFor,
@@ -286,7 +287,8 @@ test('a season with identities plays the Soviet Union on Russia\'s shape, under 
   assert.ok(Object.isFrozen(set.meta.identities) && Object.isFrozen(set.meta.identities[643]));
   assert.notEqual(set.meta.identities, SEASON.identities, 'a copy: the sport cannot change the file');
   const sport = seasonSport(set);
-  assert.deepEqual(sport.playsAs, SEASON.identities);
+  // The file's own identities, over the names of the day the game knows for its year (src/data/namesOfTheDay.js).
+  assert.deepEqual(sport.playsAs, { ...namesOfTheDay('football', SEASON.year), ...SEASON.identities });
   assert.deepEqual(nationIdentity('643', sport), URS);
   assert.deepEqual(nationIdentity('688', sport), YUG);
   assert.deepEqual(nationIdentity('276', sport), FRG);
@@ -308,7 +310,9 @@ test('the historic flags are vendored, and the Soviet, Yugoslav, Zairean and CIS
   }
   const manifest = JSON.parse(read('scripts/data/historic-flags.json'));
   for (const flag of manifest.flags) {
-    assert.match(flag.licence, /^Public domain/);
+    // Public domain, or (where Commons has no public-domain drawing: Spain's and Bulgaria's arms, Rhodesia's flag of 1964)
+    // CC BY-SA with its author, credited in public/flags/SOURCES-historic.tsv.
+    assert.match(flag.licence, /^(Public domain|CC BY-SA \d\.\d( \(or GFDL 1\.2 or later, at the reuser's choice\))?, by \S)/);
     assert.match(flag.commons.page, /^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
     assert.ok(Number.isInteger(flag.commons.revision));
     assert.match(flag.sha256, /^[0-9a-f]{64}$/);

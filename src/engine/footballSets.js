@@ -10,6 +10,7 @@
 // never changes.
 
 import { DEPENDENCIES, HOME_NATIONS, NATIONS, PACIFIC_ISLANDS, fieldsRealSide } from '../data/teams.js';
+import { namesOfTheDay } from '../data/namesOfTheDay.js';
 import { CM_CONVERSION, CM_ROLES, CM_SCALE, cmTupleOf, expandCmTuple } from '../data/cmPlayers.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../data/eaPlayers.js';
 import { SWOS_CONVERSION, SWOS_ROLES, SWOS_SCALE, expandSwosTuple, swosTupleOf } from '../data/swosPlayers.js';
@@ -1107,8 +1108,11 @@ export function seasonSport(set) {
         // Every nation has an entry (validated), so this only guards the rule that no other season borrows it.
         fallbackStrength: () => EMPTY_STRENGTH, ...identity };
     // A season of another era plays the federations of its day under their own names, codes and flags (the Soviet
-    // Union on Russia's shape), as Great Britain plays on England's: teams.js nationIdentity reads `playsAs`.
-    if (meta.identities && sport.id === 'football') sport = { ...sport, playsAs: { ...sport.playsAs, ...meta.identities } };
+    // Union on Russia's shape), as Great Britain plays on England's: teams.js nationIdentity reads `playsAs`. A file's
+    // own (men's football's to 1995/96) win over the names of the day the game knows for its sport and year
+    // (src/data/namesOfTheDay.js: tennis's federations, FR Yugoslavia, Swaziland, Macedonia).
+    const identities = { ...namesOfTheDay(sport.id, meta.year), ...(sport.id === 'football' ? meta.identities : null) };
+    if (Object.keys(identities).length) sport = { ...sport, playsAs: { ...sport.playsAs, ...identities } };
     sports.set(set, sport);
   }
   return sport;

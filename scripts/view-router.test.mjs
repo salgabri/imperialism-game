@@ -56,7 +56,9 @@ function renderPure(app, label) {
   assert.ok(bar, `${label}: CommandBar is found by name`);
   assert.ok('saveStatus' in bar.props, `${label}: CommandBar receives saveStatus`);
   assert.equal(typeof bar.props.onCancelNew, 'function', `${label}: CommandBar receives onCancelNew`);
-  assert.equal(React.Children.toArray(tree.props.children)[0].type.name, 'CommandBar', `${label}: CommandBar is the first root child`);
+  // The root sits in the season-year provider (src/components/seasonYear.js), which passes its one child through.
+  const root = tree.type?.$$typeof === Symbol.for('react.provider') ? tree.props.children : tree;
+  assert.equal(React.Children.toArray(root.props.children)[0].type.name, 'CommandBar', `${label}: CommandBar is the first root child`);
   return html;
 }
 

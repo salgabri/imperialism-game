@@ -54,7 +54,8 @@ test('every club the list gives a crest has its file, a source row, and nothing 
   assert.ok(withCrest.length > 1000, `crests for ${withCrest.length} clubs`);
   for (const id of withCrest) assert.ok(files.has(`${clubLogoFile(id)}.webp`), `${id}: ${clubLogoFile(id)}.webp is vendored`);
   const used = new Set(withCrest.map(id => `${clubLogoFile(id)}.webp`));
-  assert.deepEqual([...files].filter(name => !used.has(name)), [], 'no orphan crest files');
+  // Period crests ('<club id>.<year>.webp') are scripts/period-marks.test.mjs's.
+  assert.deepEqual([...files].filter(name => !used.has(name) && !/\.\d{4}\.webp$/.test(name)), [], 'no orphan crest files');
   const rows = new Map(sources.map(row => [row[0], row]));
   assert.deepEqual(withCrest.filter(id => !rows.has(id)), [], 'every crest has a SOURCES.tsv row');
   assert.deepEqual([...rows.keys()].filter(id => !clubLogoFile(id)), [], 'no source row without a crest');

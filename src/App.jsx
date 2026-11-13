@@ -34,7 +34,8 @@ import { buildShareCard, shareLine } from './viewModels/shareCard.js';
 import { canDrawShareImage, deliverShareImage, drawShareCard } from './engine/shareImage.js';
 import { politicalFill } from './data/empireColours.js';
 import { flagUrl } from './data/flags.js';
-import { clubLogoUrl } from './data/clubLogos.js';
+import { crestUrl } from './data/crests.js';
+import { SeasonYear } from './components/seasonYear.js';
 import { DEFAULT_SETUP, LOG_CAP, dataSetOf, domesticIdOf, setClubScope } from './app/shared.js';
 import * as mapM from './app/mapMethods.jsx';
 import * as colM from './app/columnMethods.jsx';
@@ -1110,7 +1111,7 @@ export default class App extends React.Component {
       frame: this.viewFocus, seed: st.seed,
       kicker: `Campaign complete · Round ${roman(st.round)}`,
       line: shareLine(victory), site: typeof window !== 'undefined' ? window.location.host : '',
-      mark: champ.kind === 'club' ? { kind: 'crest', url: clubLogoUrl(champ.id), code: champ.code, color: champ.col }
+      mark: champ.kind === 'club' ? { kind: 'crest', url: crestUrl(champ.id, st.settings?.dataYear ?? null), code: champ.code, color: champ.col }
         : { kind: 'flag', url: flagUrl(champ.flagId ?? champ.id), code: champ.code, color: champ.col },
     });
     const file = drawShareCard(card).then(blob => (blob ? new File([blob], card.filename, { type: 'image/png' }) : null), () => null);
@@ -1351,7 +1352,8 @@ export default class App extends React.Component {
     }).sort((a, b) => a.name.localeCompare(b.name));
     // What each team flies on the step-1 card in Flags mode (setupMapFlags): a nation its flag, a club its crest.
     const marks = Object.fromEntries(included.map(team => [team.id, { kind: team.kind, flagId: team.flagId ?? null, col: team.col }]));
-    this.setupTeamsCache = { key, teams, opening, homes: Object.keys(own), marks };
+    // `year`: the chosen season's, whose crests the step-1 card shows (src/data/crests.js); null for today's season.
+    this.setupTeamsCache = { key, teams, opening, homes: Object.keys(own), marks, year: sport?.dataYear ?? null };
     return teams;
   }
 
@@ -1568,8 +1570,8 @@ export default class App extends React.Component {
       },
       () => {
         this.persist();
-        // In the installed app, every team's crest or flag, so the campaign looks the same offline (README §Running it).
-        keepCampaignMarks(teamMarkUrls(teams));
+        // In the installed app, every team's crest (of its season) or flag, so the campaign looks the same offline (README §Running it).
+        keepCampaignMarks(teamMarkUrls(teams, this.state.settings?.dataYear ?? null));
       },
     );
   }
@@ -1655,7 +1657,7 @@ export default class App extends React.Component {
       if (!gated && s.match && !s.match.applied) this.presentMatch();
       else if (!gated && s.spin && !remapped) this.startMatch(s.spin.attackerId, s.spin.targetId, s.spin);
       this.persist();
-      keepCampaignMarks(teamMarkUrls(s.teams));
+      keepCampaignMarks(teamMarkUrls(s.teams, this.state.settings?.dataYear ?? null));
       // The checkpoint re-stamps the map version; keep telling the player why the draw restarts.
       if (remapped) this.setState(state => state.saveStatus?.ok && !state.storageConflict ? { saveStatus: { ...state.saveStatus, message } } : null);
     });
@@ -2572,7 +2574,10 @@ export default class App extends React.Component {
       onManageSaves: () => this.openStorageDialog('slots') };
     const matchCardNode = currentCard ? <MatchCard {...currentCard} variant="compact" minuteStore={this.minuteStore} clockSport={sport.id}
       eventsRef={this.eventsRef} onViewConquest={result => this.viewConquest(result)} onSelectTeam={id => this.selectTeam(id)} /> : null;
+    // The season every crest on screen is drawn for (src/data/crests.js): the campaign's, or the one chosen in setup.
+    const seasonYear = (playing ? st.settings.dataYear : st.phase === 'setup' ? sportOf(st.setup)?.dataYear : null) ?? null;
     return (
+      <SeasonYear.Provider value={seasonYear}>
       <div className={`app-shell${playing ? ' has-campaign' : ''}`} data-view={view} data-role={ctx.managedId ? 'manager' : 'spectator'}>
         <CommandBar
           show={playing} sportName={sport.name} layerName={st.settings.layer === 'clubs' ? 'Clubs' : 'Nations'}
@@ -2704,6 +2709,7 @@ export default class App extends React.Component {
           {st.err && st.errReload && <button className="button" onClick={reloadPage}>Reload</button>}
         </div>}
       </div>
+      </SeasonYear.Provider>
     );
   }
 }

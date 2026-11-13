@@ -45,9 +45,9 @@ for (const code of historic) {
   }
 }
 
-// Drop anything left behind by an earlier map.
+// Drop anything left behind by an earlier map (the historic flags' sources list is build-historic-flags.mjs's).
 for (const file of await readdir(target)) {
-  if (!wanted.has(path.basename(file, '.svg'))) await rm(path.join(target, file));
+  if (file !== 'SOURCES-historic.tsv' && !wanted.has(path.basename(file, '.svg'))) await rm(path.join(target, file));
 }
 
 console.log(`synced ${copied} flags into public/flags (${(bytes / 1024).toFixed(0)} KB)`);
