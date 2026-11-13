@@ -21,7 +21,7 @@
 // [source key, name, club, position, birth country or nationality, lines] (scripts/lib/nhl-history.mjs), a converted
 // season's [name, club, position, country, skill attributes].
 //
-// The computed seasons read the Hockey Databank (1964/65–2009/10 here) and MoneyPuck.com (2008/09 on), never the NHL's
+// The computed seasons read the Hockey Databank (1958/59–2009/10 here) and MoneyPuck.com (2008/09 on), never the NHL's
 // own API, whose robots.txt turns away this project's agents (docs/design/hockey.md, "Computed seasons").
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';

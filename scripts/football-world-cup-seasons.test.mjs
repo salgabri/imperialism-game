@@ -199,11 +199,14 @@ test('the nine seasons are built in, after the games\' seasons, labelled compute
   assert.deepEqual(MANIFEST.seasons.map(season => season.id), IDS);
   const listed = BUILT_IN_SEASONS.filter(set => setKindOf(set.id) === 'wc');
   assert.deepEqual(listed.map(set => set.id), IDS.slice().reverse(), 'newest first');
-  // The earliest seasons: the World Cups, with the fan-made 1993/94 and 1989/90 beside 1994's and 1990's.
+  // The earliest seasons: the World Cups, with the fan-made 1993/94 and 1989/90 beside 1994's and 1990's, and the
+  // computed national-team seasons between them (scripts/football-national-team-seasons.test.mjs).
   const tail = BUILT_IN_SEASONS.slice(BUILT_IN_SEASONS.findIndex(set => set.id === IDS.at(-1)));
   assert.deepEqual(tail.filter(set => setKindOf(set.id) === 'wc'), listed, 'the earliest seasons');
-  assert.deepEqual(tail.filter(set => setKindOf(set.id) !== 'wc').map(set => set.id), ['cm0102-2020-11-cm93', 'cm0102-2017-04-cm89'],
+  assert.deepEqual(tail.filter(set => !['wc', 'nt'].includes(setKindOf(set.id))).map(set => set.id), ['cm0102-2020-11-cm93', 'cm0102-2017-04-cm89'],
     'only the two fan-made seasons share their years');
+  const worldCupYears = new Set(listed.map(set => set.year));
+  assert.ok(tail.filter(set => setKindOf(set.id) === 'nt').every(set => !worldCupYears.has(set.year)), 'no national-team season shares a World Cup\'s');
   for (const set of listed) {
     const doc = committed(set.id);
     assert.deepEqual([doc.id, doc.version, doc.year, doc.season, doc.label], [set.id, set.version, set.year, set.season, set.label]);
@@ -222,7 +225,7 @@ test('the nine seasons are built in, after the games\' seasons, labelled compute
     assert.equal(source.results.commit, MANIFEST.sources.results.commit);
     assert.deepEqual(Object.keys(source.wikipedia.ballonDor).map(Number), [doc.year - 1, doc.year]);
   }
-  assert.ok(SEASON_NOTES.football.includes('1961/62 to 1993/94 are computed'), 'the setup note says so');
+  assert.ok(SEASON_NOTES.football.includes('The World Cups of 1961/62 to 1993/94 and the seasons between them are computed'), 'the setup note says so');
   assert.ok(read('src/data/footballSeasons.js').includes('by npm run build:world-cup-seasons, computed'));
 });
 
@@ -463,7 +466,7 @@ test('a 1969/70 campaign plays the Soviet Union\'s computed eleven, saves its pl
     assert.deepEqual([soviet.name, soviet.code, soviet.flagId], ['Soviet Union', 'URS', 'URS']);
     const model = buildSetupModel(app.state.setup, { managerTeams: wall, season: app.seasonStatus() });
     assert.equal(model.campaignSummary, 'Football · Nations · Europe · 1969/70');
-    assert.match(model.season.note, /1961\/62 to 1993\/94 are computed/);
+    assert.match(model.season.note, /1961\/62 to 1993\/94 and the seasons between them are computed/);
 
     app.startCampaign();
     const st = app.state;

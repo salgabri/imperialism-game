@@ -16,7 +16,9 @@ files, and the two fan-made CM databases of 1993/94 and 1989/90, 2026-11-09; the
 seasons no game rated, 1960/61 to 1997/98, computed from Basketball-Reference's
 statistics, 2026-11-09; the nine World Cups from 1961/62 to 1993/94 as computed
 seasons, 2026-11-10 ([Computed World Cup seasons](#computed-world-cup-seasons)); 2003/04 from Alex Sawczuk's fan-made
-October 2003 update of SI's CM 01/02, built 2026-11-09 and shipped by the user's choice of 2026-11-10. The CM 01/02
+October 2003 update of SI's CM 01/02, built 2026-11-09 and shipped by the user's choice of 2026-11-10; the 24 seasons
+between the World Cups, 1962/63 to 1992/93, computed from Wikidata's national-team records, 2026-11-13
+([Computed national-team seasons](#computed-national-team-seasons)), so that every year has a season. The CM 01/02
 path now runs on real databases (SI's own and the CM3 port); the community's
 still need a forum login. Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
@@ -36,7 +38,10 @@ kinds:
   data, three editions of Sensible World of Soccer, and two fan-made CM databases.
   See [Seasons before FIFA 05](#seasons-before-fifa-05). Before those, the World Cups of
   1962 to 1994, nations only, their ratings computed from the nations' Elo and the
-  players' records. See [Computed World Cup seasons](#computed-world-cup-seasons).
+  players' records. See [Computed World Cup seasons](#computed-world-cup-seasons). And
+  between the World Cups, every other season from 1962/63 to 1992/93, computed alike
+  from Wikidata's national-team records. See
+  [Computed national-team seasons](#computed-national-team-seasons).
 - **Local CM 01/02 seasons**: a Championship Manager 01/02 database the user has
   downloaded, built on their computer. Until the database authors allow
   redistribution these stay local: the user puts the database in the ignored
@@ -1450,6 +1455,197 @@ Brazil and Gerd Müller for West Germany in 1969/70, Cruyff in 1973/74, Kempes i
 1977/78, Paolo Rossi in 1981/82, Maradona in 1985/86, Matthäus (93) in 1989/90
 and Roberto Baggio in 1993/94.
 
+## Computed national-team seasons
+
+Built 2026-11-13. The World Cup seasons left three years in four empty between
+1961/62 and 1993/94, so the user asked to cover the gaps ("there are many year gaps
+in the various sports can you cover them"). The 24 seasons between the World Cups,
+1962/63 to 1992/93, are **computed** the same way, under the user's approval of
+2026-11-09 for computed football ratings of the 1960s to 1980s: each nation's
+strength from its Elo by the World Cup seasons' line, its XI ordered by the
+players' records. Claude chose the rest: the players come from **Wikidata's
+national-team records** (each player's stints for his national team, with their
+start and end years, caps and goals), which the World Cup seasons left out; the
+Elo is read on 1 July of the season's end year; the XI is the players with the
+most caps a year. Each season is a data set of `kind: 'nt'`, nations only,
+labelled "Computed · national teams", which the Season list shows as "1971/72 ·
+computed". With them, men's football has a season ending in every year from 1962
+to 2027.
+
+| Season | Id | Nations fielded | Identities | Theatres | Strongest (T) | Team share |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1992/93 | `nt-1993` | 81 | Czechoslovakia | World, Europe, South America, Africa, Asia, North America, Elite 32 | Germany 87, Argentina 86.4, Italy 85.9 | 80% |
+| 1991/92 | `nt-1992` | 72 | Zaire, Czechoslovakia, CIS | the same | Netherlands 87, Argentina 86.7, Germany 86.4 | 81% |
+| 1990/91 | `nt-1991` | 68 | Czechoslovakia, Soviet Union, Yugoslavia | the same | Germany 87, England 85.5, Italy 85.2 | 81% |
+| 1988/89 | `nt-1989` | 68 | Czechoslovakia, West Germany, Soviet Union, Yugoslavia | the same | Netherlands 87, West Germany 85.1, Soviet Union 85 | 80% |
+| 1987/88 | `nt-1988` | 66 | the same | the same | Netherlands 87, Soviet Union 85.5, West Germany 84.4 | 78% |
+| 1986/87 | `nt-1987` | 64 | the same | the same | Brazil 87, England 85.7, Argentina 85.5 | 78% |
+| 1984/85 | `nt-1985` | 63 | the same | the same | France 87, Soviet Union 86.4, West Germany 86.2 | 77% |
+| 1983/84 | `nt-1984` | 63 | the same | the same | Soviet Union 87, France 86.9, West Germany 85.2 | 79% |
+| 1982/83 | `nt-1983` | 62 | the same | the same | Brazil 87, Soviet Union 84.1, West Germany 83.8 | 80% |
+| 1980/81 | `nt-1981` | 62 | the same | the same | Brazil 87, West Germany 86.3, Argentina 84.5 | 80% |
+| 1979/80 | `nt-1980` | 61 | the same | the same | West Germany 87, Brazil 84.9, England 84.2 | 80% |
+| 1978/79 | `nt-1979` | 57 | the same | the same | Brazil 87, Argentina 83.9, West Germany 83.3 | 80% |
+| 1976/77 | `nt-1977` | 55 | Zaire and the four above | the same | West Germany 87, Netherlands 85.4, Brazil 85.1 | 76% |
+| 1975/76 | `nt-1976` | 54 | the same | the same | West Germany 87, Brazil 86.4, Netherlands 85 | 76% |
+| 1974/75 | `nt-1975` | 53 | the same | the same | West Germany 87, Netherlands 86.8, Brazil 85.4 | 77% |
+| 1972/73 | `nt-1973` | 51 | the same | the same | Brazil 87, West Germany 85.8, Italy 81.9 | 77% |
+| 1971/72 | `nt-1972` | 49 | the same | the same | Brazil 87, West Germany 87, England 82.7 | 76% |
+| 1970/71 | `nt-1971` | 48 | Czechoslovakia, West Germany, Soviet Union, Yugoslavia | World, Europe, South America, Africa, Asia, Elite 32 | Brazil 87, England 82.4, West Germany 82.3 | 78% |
+| 1968/69 | `nt-1969` | 45 | the same | World, Europe, South America, Asia, Elite 32 | England 87, Brazil 84.8, West Germany 84.5 | 74% |
+| 1967/68 | `nt-1968` | 43 | the same | the same | England 87, West Germany 84.9, Brazil 84.3 | 72% |
+| 1966/67 | `nt-1967` | 39 | the same | the same | England 87, West Germany 85.3, Soviet Union 85.1 | 75% |
+| 1964/65 | `nt-1965` | 38 | the same | World, Europe, South America, Elite 32 | Soviet Union 87, Brazil 86.5, Hungary 86.4 | 75% |
+| 1963/64 | `nt-1964` | 37 | the same | the same | Soviet Union 87, Argentina 86.3, Hungary 85.5 | 78% |
+| 1962/63 | `nt-1963` | 38 | the same | the same | Soviet Union 87, Hungary 86.2, Brazil 85.4 | 76% |
+
+They field far more nations than the World Cups (37 to 81 against 15 to 24), so
+they offer the Elite 32 and, from 1966/67, more continents. East Germany fields its
+side in every one up to 1988/89, on its own land of the day.
+
+### Sources
+
+| Source | Pinned | Use | Licence |
+| --- | --- | --- | --- |
+| Wikidata, through QLever (`https://qlever.dev/api/wikidata`) | four answers by SHA-256, saved 2026-11-13 | The men's national teams (instances of Q135408445); their players' memberships (P54) with start (P580), end (P582), matches played (P1350) and goals (P1351); the players' names, dates of birth, English Wikipedia articles and positions (P413) | CC0 1.0 |
+| [martj42/international_results](https://github.com/martj42/international_results), `results.csv` | the World Cup seasons' commit `b0948cb` | Every men's full international to 1993, for the Elo | CC0-1.0 |
+| English Wikipedia, "<year> Ballon d'Or" | 32 revisions, 1962–1993 (the World Cup seasons' 16, and 16 saved 2026-11-13) | The voting tables: points per player | CC BY-SA 4.0 (the votes are France Football's) |
+
+The Wikidata Query Service and Wikidata's API are disallowed for every agent by
+their robots.txt, so the queries go to QLever (no robots.txt), one at a time a
+minute apart: its nginx answers a client that asks again too soon with HTTP 429.
+The Wikipedia pages were saved from their article paths, 2 seconds apart, as the
+World Cup seasons' were. `scripts/data/national-team-seasons.json` pins all of it
+and holds the four queries; `public/football/ATTRIBUTION-national-teams.txt` gives
+the credits and licenses the season files under CC BY-SA 4.0.
+
+### How a season is made
+
+- **Wikidata's records** (`scripts/lib/national-team-facts.mjs`). A team's country
+  is its English label less "men's national (association) football/soccer team",
+  with three spellings mapped (Canadian, Cuban, Emirates). Six items classed as men's
+  national teams are not a FIFA member's full side and are left out: the pre-1950
+  IFA Ireland, Italy's under-21s, Hungary's "Golden Team", Great Britain's Olympic
+  team, the FLN team and the Basque Country's. A stint is kept with its start; a
+  deprecated one is left out; one with two values of a qualifier counts the
+  earliest start, the latest end and the most caps and goals. A stint Wikidata has
+  not closed (no end) ends as its caps would run out at 8 a year, start +
+  ⌈caps / 8⌉ − 1, and the player's source says so (`toEstimated`): six touch these
+  seasons, and two reach an XI, Paolo Maldini's for Italy from 1988 (126 caps, so
+  to 2003; he played to 2002) and Gastón Taborga's for Bolivia from 1980 (17 caps,
+  to 1982). One with neither end nor caps (71 in the answers, none of note) is left
+  out. A goalkeeper's goals conceded,
+  which Wikidata writes as negative goals, are not kept. Positions map to GK, DF,
+  MF or FW (`positions` in the manifest: wing half is MF, inside forward and winger
+  FW, centre-half and libero DF); other sports' positions are left out.
+- **Who plays for whom.** A team plays as the game nation its country resolves to
+  that year, by the World Cup seasons' resolver (`dayNationResolver`: the Soviet
+  Union, West Germany, Yugoslavia, Czechoslovakia and Zaire as their holders),
+  with the manifest's `byYear` where Wikidata keeps one team across two
+  federations or dates a team before its first match: Yugoslavia's players of
+  1991/92 and 1992/93 play for FR Yugoslavia, which was suspended (so for no one);
+  the Soviet Union's players of autumn 1991 and the CIS's of 1992 are one side in
+  1991/92, the CIS; Russia's own team plays from 1992/93 and the Czech Republic's
+  from 1993/94, an earlier stint of theirs being the predecessor's. A shape merged
+  into a federation of the day, or inactive that year (suspended, or not yet a FIFA
+  member), fields no team, nor do the countries with no shape: Malta, San Marino,
+  the Faroe Islands, Liechtenstein and Singapore (`noTeam`). East Germany plays on
+  its own shape, which the map draws to 1990 (`HISTORIC_NATIONS`), so its players
+  field a team up to 1988/89; a stint of theirs that reaches 1990/91 counts for no
+  one, its land being Germany's then.
+- **The pool.** A nation's pool for the season ending in Y is every named player
+  with a position whose stint for one of its teams covers Y − 1 or Y. His figure is
+  the stint's caps a year, caps / (end − start + 1), halved when the stint covers
+  one of the two years only. A player in two nations' pools plays for the one where
+  his figure is higher.
+- **Who fields a team.** A nation whose pool holds 11 players or more, one a
+  goalkeeper, that played a full international in the four years before (so it has
+  an Elo), and whose shape takes part that year. The rest are listed with why in
+  the audit (`dropped`): from 1966/67 on, Ghana, Indonesia, Guatemala and Panama
+  among those with players but no goalkeeper on Wikidata.
+- **Strength.** The World Cup seasons' line: T = 87 − 3.2 × (E_best − E) / 100, E
+  the nation's Elo on 1 July of the season's end year (every match up to 30 June,
+  the federations' cutoff) and E_best the best of the teams that played in the
+  four years before. The Elo is the same engine on the same pinned results.
+- **The XI.** For each role (1 GK, 4 DF, 4 MF, 2 FW) the pool's players of that
+  position, the highest figure first, then the most caps for the nation by the
+  season's end, then the lower Wikidata id; a player with two positions counts for
+  the first role that takes him. A role short of players takes the highest figures
+  left, out of position: 261 of the 14,707 XI places, mostly in small nations.
+- **Order and ratings.** By Ballon d'Or points of the season's two calendar years,
+  then the player's caps for the nation by the season's end (each stint's caps
+  spread evenly over its years, so a newcomer of that season ranks below the
+  regulars who would outlast him), then the figure. The k-th player is T + D_k with
+  the World Cup seasons' profile and rounding. A vote is a player's by its article
+  (his English Wikipedia sitelink), else by one of three pinned redirects (Jef
+  Jurion, Fedor Cherenkov, Harald Schumacher), else by his name within the
+  nation's players of that year: of 32 years' votes, two stay unmatched (Joaquín
+  Peiró in 1962, whose last stint ended in 1959, and Johnny Bjerregaard in 1967,
+  who has none).
+- **Players' records.** A player is `[name, position, rating, source]`, his
+  position the role he fills then his other positions ('MF/FW'). His source
+  names him (`wd:Q…`), his team, its Elo, his place in the XI and the stint that
+  covers the season (`from`, `to`, `caps`, `goals` where Wikidata gives them),
+  with his Ballon d'Or points and date of birth where known; its link is his
+  English Wikipedia article, else his Wikidata item. The Source column reads
+  "1971/72 national team, computed", and its tooltip names the team's Elo and its
+  day, never a database snapshot. Two players of one XI who share a name carry
+  their birth year.
+- **Nations and federations.** Territory and identities are `territoryFor` and
+  `identitiesFor` of the season-end year with only the nations that field a team.
+
+### Calibration and checks
+
+- The constants are the World Cup seasons' (`elo`, `strength`, `xi`, `profile`,
+  equal by test), so the computed seasons sit on one scale: 1969/70's World Cup
+  and 1970/71's national teams both rate Brazil 87.
+- The rule picks the sides of the day: England 1971/72 is Banks, Moore, Hughes,
+  McFarland, Storey, Peters, Ball, Bell, Mullery, Chivers, Hurst; West Germany's
+  Maier, Beckenbauer, Vogts, Höttges, Schwarzenbeck, Overath, Müller; Denmark
+  1991/92 is Schmeichel, Sivebæk, Olsen, Rieper, Høgh, John Jensen, the Laudrups,
+  Vilfort and Povlsen; Japan 1967/68 the Olympic bronze side of Kamamoto and
+  Yokoyama.
+- **Thin records.** 647 of the XI places (4.4%) are players whose stint has no
+  caps on Wikidata: they come after every player with caps, so they fill only the
+  places their nation's players with caps cannot (mostly in Africa, Asia and
+  Central America, as for Zaire and El Salvador in 1971/72).
+- **Saves.** A computed player is a plain record, as the World Cup seasons' are:
+  a whole world campaign of 1992/93, the largest season (81 nations), stays within
+  the checkpoint budget (`scripts/save-size.test.mjs`).
+
+### Files and commands
+
+```bash
+npm run sync:national-team-seasons -- --fetch   # download what data-src/ lacks (QLever a minute apart, Wikipedia 2 s), then sync
+npm run sync:national-team-seasons -- --pin     # record the SHA-256 of every source after a deliberate new download
+npm run sync:national-team-seasons              # data-src/ → scripts/data/national-team-seasons/ (--check compares)
+npm run build:national-team-seasons             # facts → public/football/nt-<year>.json, the listing, the audit (--check)
+```
+
+- `scripts/data/national-team-seasons.json`: the manifest (the queries, every pin,
+  the constants, the selection rule, the position map, the names).
+- `scripts/data/national-team-seasons/`: the committed facts. `wikidata.json` holds
+  the teams, players and stints that touch 1962–1993 (CC0); `elo.json` each
+  season's Elo of every team active then; `ballon-dor.json` each year's points by
+  Wikidata player and the votes matched to none. The sync needs `data-src/`; the
+  build reads only these and the manifest, so it rebuilds offline.
+- `public/football/nt-<year>.json`: `nations` lists the nations that field a team,
+  each `[strength, pool size, eleven]`; `clubs` is empty; `territory` and
+  `identities` as above. Its source says `method: 'computed'`, `computed: true`,
+  `rawScale: 'Elo'`, the Elo's day, the rule (`conversion`), the licence and the
+  pins it was built from.
+- `docs/design/football-national-team-seasons-audit.json`: per season each nation's
+  Elo, rank, T, strength, pool, XI and out-of-position places, the teams that field
+  no side and why, and the Ballon d'Or votes matched to no player.
+- The loader (`KINDS.nt`, `validateNationalTeamSeason` in
+  `src/engine/footballSets.js`) refuses a season whose source does not say it is
+  computed, a nation without eleven players or out of order, a player whose source
+  does not name him, his team, its Elo, his place and a stint covering the season,
+  any club, and a holder that fields no team.
+- `src/data/footballSeasons.js` is written alike by the four football builders
+  (`scripts/lib/football-seasons-listing.mjs`), each reading the others' committed
+  seasons.
+
 ## Earlier basketball seasons
 
 Basketball has 66 earlier seasons, every one from 1960/61 to 2025/26. The 36
@@ -1892,7 +2088,7 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
   that dialog is still open. It plays the version of the set loaded now, which
   can differ from the saved `dataVersion`, as country maps can.
 - `parseCampaign` accepts `dataSet` (`^cm0102-\d{4}-\d{2}(-[a-z0-9]+)?$`,
-  `^cm-\d{4}$`, `^swos-\d{4}$`, `^wc-\d{4}$`, `^ea-(fifa|fc)-\d{2}$` or `^nba-2k\d{2}$`, among
+  `^cm-\d{4}$`, `^swos-\d{4}$`, `^wc-\d{4}$`, `^nt-\d{4}$`, `^ea-(fifa|fc)-\d{2}$` or `^nba-2k\d{2}$`, among
   the other sports' kinds),
   `dataVersion` (`<dataSet>-<8 hex>`), `dataYear` (an integer from 1872 to 2100)
   and `dataSeason` (the season of `dataYear`), all four or none. It also rejects
@@ -2058,6 +2254,20 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
   alone: Asian and North American sides rate higher than SWOS's ratings of autumn
   1994 put them, and the scale is narrower than eloratings.net's.
 - East Germany fields its 1974 finalists on its land of the day (until 2026-11-10 it had no shape, and 1973/74 had 15).
+- The computed national-team seasons (1962/63 to 1992/93) know a player's years
+  for his national team and his caps in all, not the matches of the season: his
+  figure is his career's caps a year, so a player who was capped once in a
+  season inside a long career counts as a regular, and the XI is the regulars of
+  those years, not the side of one match. Caps are spread evenly over a stint for
+  the order, so a young star who went on to a long career (Maradona in 1978/79)
+  ranks below the veterans of that season, and Ballon d'Or votes, Europeans only
+  before 1995, lift only Europe's stars.
+- Wikidata's coverage decides who fields a team: a nation needs eleven players
+  with a position, one a goalkeeper, so Ghana, Indonesia, Guatemala and Panama,
+  among others, sit out seasons where their records lack a keeper, and 4.4% of
+  the XI places are players Wikidata gives no caps for (ranked after every player
+  with caps). Its years are calendar years, so a stint of 1972 covers the whole of
+  1971/72 and 1972/73.
 
 ## Invariants kept
 

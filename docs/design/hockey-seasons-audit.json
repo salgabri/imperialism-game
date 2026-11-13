@@ -7361,6 +7361,330 @@
       "notes": {
         "renamed": []
       }
+    },
+    {
+      "id": "nhl-1966",
+      "version": "nhl-1966-00541631",
+      "season": "1965/66",
+      "label": "Computed from statistics",
+      "method": "computed",
+      "source": "hdb",
+      "map": "nhl1967",
+      "form": {
+        "skaters": "points",
+        "goalies": "goals"
+      },
+      "players": 182,
+      "squads": 138,
+      "ratings": {
+        "lowest": 71,
+        "median": 82,
+        "highest": 99
+      },
+      "best": {
+        "forwards": [
+          "Bobby Hull (CHI) 99",
+          "Stan Mikita (CHI) 95",
+          "Gordie Howe (DET) 94"
+        ],
+        "defenders": [
+          "Pierre Pilote (CHI) 95",
+          "Pat Stapleton (CHI) 91",
+          "Jacques Laperriere (MTL) 90"
+        ],
+        "goalies": [
+          "Johnny Bower (TOR) 94",
+          "Glenn Hall (CHI) 88",
+          "Charlie Hodge (MTL) 87"
+        ]
+      },
+      "clubs": [
+        "Chicago Black Hawks 84.4 (24 players)",
+        "Montreal Canadiens 83.8 (25 players)",
+        "Detroit Red Wings 83.5 (32 players)",
+        "Toronto Maple Leafs 83.2 (34 players)",
+        "New York Rangers 81.4 (30 players)",
+        "Boston Bruins 81.2 (37 players)"
+      ],
+      "nations": "clubs only",
+      "realSides": [
+        "Canada"
+      ],
+      "noNation": [],
+      "left": [],
+      "notes": {
+        "renamed": []
+      }
+    },
+    {
+      "id": "nhl-1965",
+      "version": "nhl-1965-c2806ce1",
+      "season": "1964/65",
+      "label": "Computed from statistics",
+      "method": "computed",
+      "source": "hdb",
+      "map": "nhl1967",
+      "form": {
+        "skaters": "points",
+        "goalies": "goals"
+      },
+      "players": 166,
+      "squads": 136,
+      "ratings": {
+        "lowest": 71,
+        "median": 81,
+        "highest": 99
+      },
+      "best": {
+        "forwards": [
+          "Stan Mikita (CHI) 99",
+          "Bobby Hull (CHI) 95",
+          "Gordie Howe (DET) 94"
+        ],
+        "defenders": [
+          "Pierre Pilote (CHI) 95",
+          "Bob Woytowich (BOS) 91",
+          "Harry Howell (NYR) 89"
+        ],
+        "goalies": [
+          "Glenn Hall (CHI) 94",
+          "Charlie Hodge (MTL) 88",
+          "Johnny Bower (TOR) 87"
+        ]
+      },
+      "clubs": [
+        "Toronto Maple Leafs 83.6 (24 players)",
+        "Chicago Black Hawks 83.5 (21 players; the game fills D)",
+        "Montreal Canadiens 83.2 (26 players)",
+        "Detroit Red Wings 82.6 (31 players)",
+        "Boston Bruins 82.2 (28 players)",
+        "New York Rangers 81.5 (36 players)"
+      ],
+      "nations": "clubs only",
+      "realSides": [
+        "Canada"
+      ],
+      "noNation": [],
+      "left": [],
+      "notes": {
+        "renamed": []
+      }
+    },
+    {
+      "id": "nhl-1964",
+      "version": "nhl-1964-aec2930c",
+      "season": "1963/64",
+      "label": "Computed from statistics",
+      "method": "computed",
+      "source": "hdb",
+      "map": "nhl1967",
+      "form": {
+        "skaters": "points",
+        "goalies": "goals"
+      },
+      "players": 165,
+      "squads": 136,
+      "ratings": {
+        "lowest": 71,
+        "median": 82,
+        "highest": 99
+      },
+      "best": {
+        "forwards": [
+          "Stan Mikita (CHI) 99",
+          "Gordie Howe (DET) 95",
+          "Andy Bathgate (NYR) 94"
+        ],
+        "defenders": [
+          "Pierre Pilote (CHI) 95",
+          "Doug Mohns (BOS) 91",
+          "Doug Harvey (NYR) 90"
+        ],
+        "goalies": [
+          "Charlie Hodge (MTL) 94",
+          "Glenn Hall (CHI) 88",
+          "Johnny Bower (TOR) 86"
+        ]
+      },
+      "clubs": [
+        "Montreal Canadiens 84.1 (30 players)",
+        "Toronto Maple Leafs 83.3 (25 players)",
+        "New York Rangers 82.9 (27 players)",
+        "Chicago Black Hawks 82.5 (21 players)",
+        "Detroit Red Wings 82.4 (37 players)",
+        "Boston Bruins 81.7 (25 players)"
+      ],
+      "nations": "clubs only",
+      "realSides": [
+        "Canada"
+      ],
+      "noNation": [],
+      "left": [],
+      "notes": {
+        "renamed": []
+      }
+    },
+    {
+      "id": "nhl-1963",
+      "version": "nhl-1963-d2b6d3f0",
+      "season": "1962/63",
+      "label": "Computed from statistics",
+      "method": "computed",
+      "source": "hdb",
+      "map": "nhl1967",
+      "form": {
+        "skaters": "points",
+        "goalies": "goals"
+      },
+      "players": 151,
+      "squads": 135,
+      "ratings": {
+        "lowest": 71,
+        "median": 81,
+        "highest": 99
+      },
+      "best": {
+        "forwards": [
+          "Andy Bathgate (NYR) 99",
+          "Gordie Howe (DET) 95",
+          "Frank Mahovlich (TOR) 94"
+        ],
+        "defenders": [
+          "Pierre Pilote (CHI) 95",
+          "Doug Mohns (BOS) 91",
+          "Jean-Guy Talbot (MTL) 90"
+        ],
+        "goalies": [
+          "Jacques Plante (MTL) 94",
+          "Glenn Hall (CHI) 88",
+          "Johnny Bower (TOR) 87"
+        ]
+      },
+      "clubs": [
+        "Montreal Canadiens 84.4 (25 players)",
+        "Toronto Maple Leafs 83.1 (26 players)",
+        "New York Rangers 82.6 (26 players)",
+        "Detroit Red Wings 82.2 (30 players)",
+        "Chicago Black Hawks 81.4 (20 players; the game fills C)",
+        "Boston Bruins 81.1 (24 players)"
+      ],
+      "nations": "clubs only",
+      "realSides": [
+        "Canada"
+      ],
+      "noNation": [],
+      "left": [],
+      "notes": {
+        "renamed": []
+      }
+    },
+    {
+      "id": "nhl-1962",
+      "version": "nhl-1962-f422a796",
+      "season": "1961/62",
+      "label": "Computed from statistics",
+      "method": "computed",
+      "source": "hdb",
+      "map": "nhl1967",
+      "form": {
+        "skaters": "points",
+        "goalies": "goals"
+      },
+      "players": 149,
+      "squads": 134,
+      "ratings": {
+        "lowest": 71,
+        "median": 81,
+        "highest": 99
+      },
+      "best": {
+        "forwards": [
+          "Bernie Geoffrion (MTL) 99",
+          "Jean Beliveau (MTL) 95",
+          "Andy Bathgate (NYR) 94"
+        ],
+        "defenders": [
+          "Doug Mohns (BOS) 95",
+          "Pierre Pilote (CHI) 91",
+          "Doug Harvey (NYR) 89"
+        ],
+        "goalies": [
+          "Glenn Hall (CHI) 94",
+          "Johnny Bower (TOR) 87",
+          "Jacques Plante (MTL) 86"
+        ]
+      },
+      "clubs": [
+        "Montreal Canadiens 84.1 (22 players)",
+        "Chicago Black Hawks 83.5 (20 players)",
+        "Toronto Maple Leafs 83.5 (27 players)",
+        "Detroit Red Wings 82.5 (30 players)",
+        "New York Rangers 81.9 (26 players)",
+        "Boston Bruins 80.7 (24 players)"
+      ],
+      "nations": "clubs only",
+      "realSides": [
+        "Canada"
+      ],
+      "noNation": [],
+      "left": [],
+      "notes": {
+        "renamed": []
+      }
+    },
+    {
+      "id": "nhl-1961",
+      "version": "nhl-1961-2b3178bc",
+      "season": "1960/61",
+      "label": "Computed from statistics",
+      "method": "computed",
+      "source": "hdb",
+      "map": "nhl1967",
+      "form": {
+        "skaters": "points",
+        "goalies": "goals"
+      },
+      "players": 158,
+      "squads": 134,
+      "ratings": {
+        "lowest": 71,
+        "median": 82,
+        "highest": 99
+      },
+      "best": {
+        "forwards": [
+          "Jean Beliveau (MTL) 99",
+          "Bernie Geoffrion (MTL) 95",
+          "Dickie Moore (MTL) 94"
+        ],
+        "defenders": [
+          "Doug Mohns (BOS) 95",
+          "Pierre Pilote (CHI) 91",
+          "Bill Gadsby (NYR) 89"
+        ],
+        "goalies": [
+          "Jacques Plante (MTL) 94",
+          "Glenn Hall (CHI) 88",
+          "Johnny Bower (TOR) 86"
+        ]
+      },
+      "clubs": [
+        "Montreal Canadiens 85.2 (25 players)",
+        "Boston Bruins 82.5 (25 players)",
+        "Toronto Maple Leafs 82.4 (25 players; the game fills D)",
+        "New York Rangers 82.1 (38 players)",
+        "Chicago Black Hawks 81.2 (19 players; the game fills D)",
+        "Detroit Red Wings 80.4 (26 players)"
+      ],
+      "nations": "clubs only",
+      "realSides": [
+        "Canada"
+      ],
+      "noNation": [],
+      "left": [],
+      "notes": {
+        "renamed": []
+      }
     }
   ]
 }

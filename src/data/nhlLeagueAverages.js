@@ -13,6 +13,12 @@
 // built-in season, 2026/27, plays today's level, 1: its clubs average 3.05 goals a game, the latest full season's league
 // 3.08.
 export const NHL_LEAGUE_AVERAGES = Object.freeze({
+  '1960/61': Object.freeze({ goals: 3.00, scoring: 0.9333 }),
+  '1961/62': Object.freeze({ goals: 3.01, scoring: 0.9269 }),
+  '1962/63': Object.freeze({ goals: 2.97, scoring: 0.9733 }),
+  '1963/64': Object.freeze({ goals: 2.78, scoring: 0.876 }),
+  '1964/65': Object.freeze({ goals: 2.88, scoring: 0.9149 }),
+  '1965/66': Object.freeze({ goals: 3.04, scoring: 0.9865 }),
   '1966/67': Object.freeze({ goals: 2.98, scoring: 0.9422 }),
   '1967/68': Object.freeze({ goals: 2.79, scoring: 0.8989 }),
   '1968/69': Object.freeze({ goals: 2.98, scoring: 0.9497 }),

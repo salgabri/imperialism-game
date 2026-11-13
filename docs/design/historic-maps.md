@@ -64,7 +64,8 @@ colours (East Germany national football team, Wikipedia, revision 1377070853).
 | --- | --- |
 | Football 1973/74 (computed World Cup) | its 1974 finalists: Croy; Bransch, Weise, Kische, Kurbjuweit; Sparwasser, Irmscher, Pommerenke, Lauck; Streich, Hoffmann (strength 80) |
 | Football 1989/90 (Simon Treanor's database) | the 1,431 rated 'Germany' players of the 67 East German clubs (`noNationAt.playsFor`): Bräutigam; Rohde, Reich, Böger; Sammer, Doll, Ernst, Scholz, Steinmann; Thom, Kirsten (69) |
-| Every other football season to 1989/90 | no team: not a World Cup finalist; its land neutral |
+| Football 1962/63 to 1988/89 between the World Cups (computed national teams, added 2026-11-13) | its Wikidata players of each season ([football-years.md](football-years.md#computed-national-team-seasons)): in 1975/76 Croy; Weise, Bransch, Kische, Dörner; Lauck, Sparwasser, Weber; Riediger, Hoffmann, Streich (80) |
+| The other computed World Cups to 1989/90 | no team: not a finalist; its land neutral |
 | Tennis and women's tennis to 1990 | no team: it never played the Davis Cup or the Fed Cup; its land neutral |
 | Ice hockey and baseball to 1990 | no team: no NHL or MLB player was born there before; its land neutral |
 | Everything later | not on the map |

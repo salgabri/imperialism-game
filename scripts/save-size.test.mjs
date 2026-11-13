@@ -367,6 +367,8 @@ const RUNS = {
   'Top 124 of Europe': { sport: 'football', layer: 'clubs', clubScope: 'domestic:eu124' },
   // A computed World Cup season's players are plain records, their sources inline (docs/design/football-years.md).
   'World Cup 1989/90': { sport: 'football', layer: 'nations', scope: 'world', dataSet: 'wc-1990' },
+  // So are a computed national-team season's: 1992/93 is the largest, 81 nations (scripts/lib/national-team-seasons.mjs).
+  'national teams 1992/93': { sport: 'football', layer: 'nations', scope: 'world', dataSet: 'nt-1993' },
 };
 const played = new Map();
 /** Each run is played once per process into its own fresh 5M storage, which later tests may keep using. */
@@ -399,6 +401,10 @@ for (const name of Object.keys(RUNS)) {
       if (i) assert.equal(save.tier, 'both', `${at} drops a recovery copy`);
     });
     const peak = Math.max(...saves.map(save => save.size));
+    if (RUNS[name].dataSet) {
+      assert.equal(st.settings.dataSet, RUNS[name].dataSet, 'the season it was set up with');
+      assert.equal(Object.keys(st.teams).length, Object.keys(load(`football/${RUNS[name].dataSet}.json`).nations).length, 'every nation the season fields');
+    }
     if (name === 'football world') {
       assert.ok(saves[0].size < 300_000, `kickoff checkpoint is ${saves[0].size} code units`);
       assert.ok(peak < 650_000, `the football world peak is ${peak} code units`);
