@@ -40,8 +40,10 @@ export const PRECACHE = Object.freeze(['index.html', 'assets/**/*']);
 /**
  * Everything else in public/ is cached the first time the game uses it. Seasons and country maps come from the
  * network while online, so they always match the deployed build, and from the last copy offline. Flags and crests
- * rarely change: they show from the cache at once and refresh in the background. `pattern` is tested on the whole
- * URL; the caps hold every file in public/ with room to spare.
+ * rarely change: they show from the cache at once and refresh in the background, and the browser answers that refresh
+ * from its own copy for a month (vercel.json), so a returning player asks the host for none of them until then. Offline,
+ * the worker's copy shows however old it is. `pattern` is tested on the whole URL; the caps hold every file in public/
+ * with room to spare.
  */
 export const RUNTIME_CACHES = Object.freeze([
   Object.freeze({ cacheName: 'imperialism-data', handler: 'NetworkFirst', maxEntries: 1000,

@@ -140,6 +140,7 @@ npm run sync:womens-tennis # snapshot Tennis Abstract's women's Elo ratings and 
 npm run build-womens-tennis # rebuild the women's tennis nations from that snapshot (--check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 npm run build:icons      # render favicon.ico, apple-touch-icon.png and the app icons from public/favicon.svg
+npm run build:fonts      # cut the Latin Extended + Vietnamese font files from the pinned Archivo sources (--check compares byte for byte)
 ```
 
 The production build installs as an app (Chrome's install button, or Share › Add
@@ -155,10 +156,11 @@ them again. Everything else in `public/` (about 100 MB), the icons included, is
 cached the first time the game uses it. Seasons and
 country maps come from the network while online, so they always match the
 deployed build, and from the cache offline. Flags and crests show from the cache
-at once and refresh in the background. In the installed app, starting or
-resuming a campaign online also fetches every one of its teams' crests and flags
-that is not cached yet, a few at a time, so teams the game never showed online
-still show offline. A browser tab skips that: a world campaign has about 200 of
+at once and refresh in the background, which the browser answers from its own
+copy for a month. In the installed app, starting or resuming a campaign online
+also fetches every one of its teams' crests and flags that is not cached yet, a
+few at a time, so teams the game never showed online still show offline. A
+browser tab skips that: a world campaign has about 200 of
 them, each a request against the host's allowance (see **Caching** below). A
 first visit installs the worker only once the setup screen is up and the page
 is idle, or about 10 seconds after the game starts if setup takes longer, so its
@@ -169,9 +171,10 @@ fails to load, with **Retry**, and a flag or crest the game has neither shown
 online nor, in the installed app, kept for a campaign stays blank.
 
 The first download holds the game and football's players, the default setup's.
-Every other sport's players are a file of their own (4 to 43 KB compressed),
-loaded the first time that sport is picked, a challenge link names it, or a saved
-or imported campaign of it opens. Until they arrive, the sport's card shows as
+Women's football's players are a file of their own (50 KB compressed) and the
+seven other sports' share one (56 KB), loaded the first time one of its sports is
+picked, a challenge link names it, or a saved or imported campaign of it opens.
+Until they arrive, the sport's card shows as
 picked and setup holds its next steps and Launch; picking another sport first
 drops the wait. Players that fail to load say so, with **Retry** and **Reload**.
 
@@ -179,10 +182,11 @@ A new version never reloads the page by itself. Its worker downloads in the
 background and waits, and a **New version ready** panel offers **Reload** or
 **Later**. Reload writes the open campaign's checkpoint, as closing the page
 does, and reloads that tab only. Other tabs keep the version they loaded until
-they reload, all but the players of a sport they have not loaded yet: the new
-version has replaced those files, so picking that sport there fails until
-**Reload**. Later hides the panel for that page; closing every tab also updates.
-The page looks for a new version every hour and when you return to it.
+they reload, all but the players of a sport they have not loaded yet when the new
+version changed them: once another tab has reloaded, picking that sport there
+fails until **Reload**. Later hides the panel for that page; closing every tab
+also updates. The page looks for a new version every six hours, and when you
+return to it after an hour or more.
 
 ### Network requests
 
@@ -247,9 +251,13 @@ the Hobby account's access tokens ("User not found. (404)").
 year: the hashed bundle, and the fonts and world maps the build copies there
 under hashed names. The worker's runtime, `workbox-<hash>.js`, is named by its
 content too and kept as long, so checking for a new version fetches `sw.js`
-alone. `public/fonts/`, flags, flag symbols, club crests and the icons are
-cached for a day and revalidated in the background for a week; a stale image is
-harmless.
+alone. Flags, flag symbols, club crests and the icons are cached for 30 days,
+then revalidated in the background for 30 more. Kept a day, they cost a
+returning player about 185 requests a day on the Flags map, since the worker's
+background refresh of each one reached the host once the browser's copy was a
+day old. An image changed under the same name keeps its old look for up to a
+month, so a fix that must show at once needs a new file name. `public/fonts/`
+is cached for a day and revalidated in the background for a week.
 Everything else revalidates on every load: `index.html` and the season and
 country files keep their names from one release to the next and must match the
 code that reads them. That includes `sw.js`, which must never be cached for
@@ -263,7 +271,12 @@ about 2.5 KB, a crest about 7 KB), so every one counts, a 304 or a 404 too. A
 deployed build never asks for `football/index.json` unless it was built with
 one (`localSeasonIndex` in `vite.config.js`), the worker leaves the icons out of
 its precache, and only the installed app fetches a campaign's crests and flags
-ahead of time.
+ahead of time. A first visit asks for 19 files: the seven smaller sports' players
+share one chunk, each font family's Latin Extended and Vietnamese characters
+share one file (`npm run build:fonts`), and React and football's players are a
+chunk of their own (`chunkOf` in `vite.config.js`). That chunk keeps a release
+cheap: when only the game's code changed, a returning player downloads about
+290 KB, not 500 KB. An open page looks for a new version every six hours.
 
 **Link previews.** `index.html` carries a description, a canonical URL, and
 Open Graph and Twitter tags, so a shared link shows a card. Crawlers need
@@ -2552,6 +2565,7 @@ scripts/
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
   build-football-set.mjs  builds a local football season from a CM 01/02 database
   build-icons.mjs      renders the site icons from public/favicon.svg
+  build-fonts.mjs      cuts the Latin Extended + Vietnamese webfonts from the pinned Archivo sources
 .github/workflows/ci.yml  tests, build and smoke on every push; Vercel waits for it before going live
 vercel.json            cache headers for the deployed site
 ```
@@ -2638,6 +2652,8 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `football-validate`, `football-engine-scale` | The football squad gate: Elo snapshots and replays, the cross-section against Elo, the forecast track, the engine-scale tolerances, and the committed reports against the shipped squads |
 | `error-boundary` | The crash screen: a render error shows it with focus on its heading, Export campaign downloads the stored checkpoint unchanged, and the report link carries the error |
 | `font-audit` | Only Archivo and Archivo Narrow, no serif, monospace or italics in shipped source |
+| `build-fonts` | Each family's two font files, their Unicode ranges against Google's, and the Latin Extended + Vietnamese files rebuilt from the pinned sources |
+| `chunks` | The build's chunks: React and football's players in a stable chunk, the seven smaller sports' players in one, neither importing the chunk every release changes |
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |
 | `campaign-column`, `match-screen`, `squad-screen`, `conquest-screen`, `ledger-chronicle`, `map-v4`, `map-v4-engine` | Each v4 screen's view-models and components |
 | `column-wiring`, `match-wiring`, `squad-wiring`, `conquest-wiring`, `ledger-wiring`, `map-wiring` | Each screen wired to the running App |

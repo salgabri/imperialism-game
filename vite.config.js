@@ -76,6 +76,32 @@ export function fontsAsAssets(publicDir) {
   };
 }
 
+// React and football's built-in players and clubs (with sourceTable.js, which unpacks them and women's football's):
+// about 170 KB compressed that a release of the game's code leaves alone.
+const STABLE_MODULES = [
+  /\/node_modules\/(?:react|react-dom|scheduler)\//,
+  /\/src\/data\/(?:rosters|clubs\.football|sourceTable)\.js$/,
+];
+// The players of every sport but football (first download) and women's football (about as big as these seven together).
+const SPORT_PLAYERS = /\/src\/data\/players\/(?!womens-football\.js$)[^/]+\.js$/;
+
+/**
+ * The chunk a module joins, Rollup's manualChunks (README "Caching"). Each release re-sends every file whose content
+ * changed to every returning player, and a first visit's worker fetches every chunk:
+ * - 'stable': STABLE_MODULES, out of the first chunk, which changes with every release. When only the game's code
+ *   changes, a release re-sends about 290 KB compressed, not 500.
+ * - 'sports': the seven smaller sports' players, one file instead of seven (4 to 11 KB compressed each), loaded the
+ *   first time any of them is played (src/sports/sportData.lazy.js). Women's football's stay a chunk of their own.
+ * Neither may import the first chunk, or every release would change them too: scripts/chunks.test.mjs checks the
+ * import graph. Rollup adds a module's dependencies to its chunk, so a sport's own data files go with it.
+ */
+export function chunkOf(id) {
+  const file = normalizePath(id);
+  if (STABLE_MODULES.some(pattern => pattern.test(file))) return 'stable';
+  if (SPORT_PLAYERS.test(file)) return 'sports';
+  return undefined;
+}
+
 /**
  * AdSense (src/ads.js, README "Advertising"): a mistyped publisher or slot id stops the build instead of quietly serving
  * no ads, and a build with a publisher writes the ads.txt line AdSense looks for at the root of the domain.
@@ -113,8 +139,8 @@ export default defineConfig(({ mode }) => ({
       includeManifestIcons: false,
       workbox: {
         globPatterns: PRECACHE,
-        // The first chunk (the game and football's players) is about 1.8 MB; past this the build fails rather than ship a
-        // worker without it. Every other sport's players are a chunk of their own (src/sports/sportData.lazy.js).
+        // The largest chunk (the game's code) is about 1 MB, football's players with React about 0.8 MB (chunkOf); past
+        // this the build fails rather than ship a worker without one of them.
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         // The first install takes control of the open page, so what it loads next is cached for offline play. A
         // new version still waits (no skipWaiting) until the prompt's Reload.
@@ -134,6 +160,7 @@ export default defineConfig(({ mode }) => ({
       },
     }),
   ],
+  build: { rollupOptions: { output: { manualChunks: chunkOf } } },
   // Relative asset URLs so `dist/` can be served from any subpath.
   base: './',
 }));

@@ -1,5 +1,5 @@
-// Basketball's players: a chunk of its own on the page (src/sports/sportData.lazy.js),
-// loaded the first time the sport is played.
+// Basketball's players: on the page, one chunk with the other smaller sports' players (vite.config.js chunkOf), loaded
+// the first time one of them is played (src/sports/sportData.lazy.js).
 import { CLUBS as NBA } from '../clubs.basketball.js';
 import { CLUBS as EUROLEAGUE } from '../clubs.euroleague.js';
 
