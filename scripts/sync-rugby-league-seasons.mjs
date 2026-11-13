@@ -2,9 +2,10 @@
 // 2008 NRL season from Rugby League 2: World Cup Edition's own database (RLDatabase.xml, in the zip posted on
 // rugbyleaguemods.net), each player checked against the Rugby League Project's (rugbyleagueproject.org) 2008 records, and
 // the overall, which the game does not give, computed from the database's attributes (scripts/lib/rugby-league-seasons.mjs).
-// Then the seasons 2009 to 2024, which no game rated, computed from NRL.com's match centre (its draw and every game's
-// team lists and player stats, the season itself and the two either side), with the Rugby League Project's career
-// positions for the few players NRL.com never shows starting.
+// Then the seasons 1998 to 2007 and 2009 to 2024, which no game rated, computed from NRL.com's match centre (its draw and
+// every game's team lists and player stats, the season itself and the two either side; none before 1998, NRL.com's
+// first season with team lists), with the Rugby League Project's career positions for the few players NRL.com never
+// shows starting.
 // The inputs stay in the ignored data-src/rugby-league-seasons/ (NRL.com's replies in nrlcom/), each pinned by SHA-256 in
 // scripts/data/rugby-league-seasons-sources.json; only the snapshots are committed.
 //
@@ -28,7 +29,7 @@ import {
   ATTRIBUTE_ORDER, CORE, CORE_REASONS, DEFAULTS, KEPT, PREVIOUS_WEIGHT, REASONS, TEAM_RATING_PARTS, WEIGHTS, areaUnderCurve, bornAlike, clubGamesOf,
   clubOf, clubShiftOf, corePoints, drawGames, drawRounds, findListed, fold, gridPart, matchRecord, mostStarted, overallOf, playerPart,
   positionScore, readOff, readRl2Database, referenceOf, resultsPart, rlpGrid, rlpPlayer, rlpPositions, rlpResults, rlpSquads, rlpTestPlayers,
-  seasonFigures, seasonPlayers, seasonValue, spearman, squadsPart, srsOf, teamRatingOf, teamsOf, testsPart,
+  seasonFigures, seasonPlayers, seasonValue, spearman, squadsPart, srsOf, statCensus, teamRatingOf, teamsOf, testsPart,
 } from './lib/rugby-league-seasons.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -392,11 +393,17 @@ function nrlcomPin(key, url, kind, content, extra = {}) {
 const nrlcomSeasons = new Map();
 /**
  * An NRL premiership season from NRL.com's draw and match centre: its finished games in kick-off order, `{ order, round,
- * title, regular, url, venue, home: { team, club, score, players }, away }`, `club` today's id of NRL.com's team, `score` the
- * draw's, `players` the team list (matchRecord's rows), null where the match centre has none.
+ * title, regular, url, venue, home: { team, club, score, players }, away }`, `club` today's id of NRL.com's team (a defunct
+ * club's own), `score` the draw's, `players` the team list (matchRecord's rows), null where the match centre has none. A
+ * season before NRL.com's first with team lists (the manifest's `nrlcom.from`, 1998) has no games here: its replies give
+ * scores only, so nothing of it is read.
  */
 async function nrlcomSeason(year) {
   if (nrlcomSeasons.has(year)) return nrlcomSeasons.get(year);
+  if (year < manifest.nrlcom.from) {
+    nrlcomSeasons.set(year, []);
+    return [];
+  }
   const { competition, teams } = manifest.nrlcom;
   const seasonUrl = `${NRLCOM}/draw/data?competition=${competition}&season=${year}`;
   const rounds = drawRounds(await nrlcomReply(`draw/${competition}-${year}.json`, seasonUrl));
@@ -442,8 +449,38 @@ function gameCounts(games, key = side => side.club) {
   return counts;
 }
 
-/** The formula as the season's source.conversion states it. */
-function computedFormula(year) {
+const NUMBER = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
+const STAT_NAME = { tries: 'tries', tryAssists: 'try assists', lineBreaks: 'line breaks', lineBreakAssists: 'line-break assists', tacklesMade: 'tackles',
+  missedTackles: 'missed tackles', tackleBreaks: 'tackle breaks', offloads: 'offloads', errors: 'errors', allRunMetres: 'run metres', kickMetres: 'kick metres' };
+const listOf = names => (names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names.at(-1)}` : names[0]);
+
+/**
+ * What a season's value counts, `stats` (computedSnapshotOf's): the stats NRL.com recorded that season and whether the
+ * season before counts. → `{ metric, sentence }`: the measure as source.metric names it, and what the formula adds to
+ * its rule for a season that does not count all eleven stats with the season before (none from 2004 on).
+ */
+function statsWording(year, stats) {
+  const all = stats.counted.length === Object.keys(CORE).length;
+  if (all && stats.seasonBefore) {
+    return { metric: 'core points a club game: NRL Fantasy\'s points for eleven NRL.com stats, the season before at half weight', sentence: '' };
+  }
+  const n = stats.counted.length;
+  const partial = Object.entries(manifest.nrlcom.partial?.[year] ?? {}).map(([stat, why]) => `its ${STAT_NAME[stat]} ${why}`);
+  const recorded = all ? '' : ` NRL.com recorded ${NUMBER[n]} of the eleven in ${year} (\`stats\`: ${listOf(stats.counted.map(stat => STAT_NAME[stat]))}${
+    partial.length ? `; ${partial.join('; ')}` : ''}), and only they count.`;
+  const before = stats.seasonBefore ? ''
+    : stats.census[year - 1] ? ` The season before counts only when NRL.com recorded the same stats in it, and it recorded fewer in ${year - 1}: ${year}'s values are the season's alone.`
+      : ` NRL.com has no team lists before ${manifest.nrlcom.from}: ${year}'s values are the season's alone.`;
+  return {
+    metric: `core points a club game: NRL Fantasy's points for ${all ? 'eleven NRL.com stats' : `the ${NUMBER[n]} NRL.com stats recorded in ${stats.seasonBefore ? `${year - 1} and ${year}` : year}`}, `
+      + (stats.seasonBefore ? 'the season before at half weight' : 'the season alone'),
+    sentence: `${recorded}${before}`,
+  };
+}
+
+/** The formula as the season's source.conversion states it (`stats`, what its value counts: statsWording). */
+function computedFormula(year, stats) {
+  const { sentence } = statsWording(year, stats);
   return `No game rated the ${year} season: each overall is computed from NRL.com's match centre, the season's premiership `
     + 'games, regular season and finals. Players: everyone NRL.com lists taking the field (a player named off the field '
     + 'only with minutes or a counted stat); his club is the one he played most games for (of two as many, the last). '
@@ -453,7 +490,7 @@ function computedFormula(year) {
     + 'break, 2 a line-break assist, 1 a tackle, -2 a missed tackle, 2 a tackle break, 4 an offload, -2 an error (where '
     + 'NRL.com records no errors for a game, as for every game of 2013-2015, a handling error), 1 every 10 metres run and 1 '
     + 'every 30 kicked; goals and field goals not counted), the season\'s in full and the season before\'s '
-    + `at half weight when he played in it, over his club's games in each. Overall: the value's mid-rank percentile among the `
+    + `at half weight when he played in it, over his club's games in each.${sentence} Overall: the value's mid-rank percentile among the `
     + 'season\'s players at his position (ties sharing one), read off `reference`, Rugby League 26\'s overalls at that '
     + 'position (scripts/data/rugby-league-26.json), as many of each 2025 club\'s best as the season\'s clubs carry per club '
     + '(`quota`), by linear interpolation; rounded and held to 1-99. Club shift: the season\'s results set each club\'s '
@@ -485,6 +522,8 @@ async function computedSnapshotOf(season) {
   const previousClubGames = gameCounts(previousGames);
   const records = new Map();
   for (const at of [year - 2, year - 1, year, year + 1, year + 2]) records.set(at, seasonPlayers(await nrlcomSeason(at)));
+  // The seasons read, from NRL.com's first with team lists (1998's window starts there).
+  const window = [Math.max(year - 2, manifest.nrlcom.from), year + 2];
   const record = (at, id) => records.get(at).get(id) ?? null;
 
   // Positions: the season itself, then a season either side, then two either side, then RLP's career positions.
@@ -504,7 +543,7 @@ async function computedSnapshotOf(season) {
     const grid = rlpGrid(await page(`seasons/nrl-${year}/${team.rlp}/players.html`));
     const [first, ...rest] = player.name.split(' ');
     const hit = findListed(grid, { first, last: rest.join(' ') });
-    const nowhere = `started at no position on NRL.com from ${year - 2} to ${year + 2}`;
+    const nowhere = `started at no position on NRL.com from ${window[0]} to ${window[1]}`;
     if (!hit || hit.how === 'near spelling') {
       left.push([player.id, player.name, club, player.games, `${nowhere}, and the Rugby League Project lists nobody of his name at ${team.name} in ${year}`]);
       continue;
@@ -539,16 +578,26 @@ async function computedSnapshotOf(season) {
     }
   }
 
+  // What a value counts: the stats NRL.com recorded throughout the season (statCensus), and the season before only when
+  // it recorded the same ones (none of 1997, which has no team lists; fewer in 1998 than 1999, in 2002 than 2003).
+  const partial = at => Object.keys(manifest.nrlcom.partial?.[at] ?? {});
+  const census = { [year]: statCensus(games, partial(year)) };
+  if (year - 1 >= manifest.nrlcom.from) census[year - 1] = statCensus(previousGames, partial(year - 1));
+  const counted = census[year].recorded;
+  const stats = { counted, seasonBefore: Boolean(census[year - 1]) && census[year - 1].recorded.join() === counted.join(),
+    census: Object.fromEntries(Object.entries(census).map(([at, c]) => [at, { games: c.games, given: Object.values(c.given), recorded: c.recorded,
+      ...(partial(Number(at)).length ? { partial: partial(Number(at)) } : {}) }])) };
+
   // Values: core points a club game, the season before at half weight.
   for (const entry of placed) {
     const { player } = entry;
     entry.clubs = Object.keys(player.clubs).map(franchise => [clubOfFranchise.get(franchise).id, player.clubs[franchise]])
       .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-    const before = record(year - 1, player.id);
+    const before = stats.seasonBefore ? record(year - 1, player.id) : null;
     entry.previous = before ? [before.games, Object.keys(before.clubs).sort().map(franchise => [franchise, before.clubs[franchise]]),
       before.sums.slice(0, Object.keys(CORE).length)] : null;
-    entry.value = seasonValue({ points: corePoints(player.sums), clubGames: clubGamesOf(entry.clubs, clubGames) },
-      before ? { points: corePoints(entry.previous[2]), clubGames: clubGamesOf(entry.previous[1], previousClubGames) } : null);
+    entry.value = seasonValue({ points: corePoints(player.sums, counted), clubGames: clubGamesOf(entry.clubs, clubGames) },
+      before ? { points: corePoints(entry.previous[2], counted), clubGames: clubGamesOf(entry.previous[1], previousClubGames) } : null);
   }
 
   // The overall: the value's mid-rank percentile at the position, read off Rugby League 26's overalls there.
@@ -585,12 +634,12 @@ async function computedSnapshotOf(season) {
     || a.player.id - b.player.id);
   return {
     source: { id: season.id, method: 'computed', edition: season.edition, label: season.label, retrieved: season.retrieved, url: season.url,
-      window: [year - 2, year + 2], games: games.length, regular: regular.length,
+      window, games: games.length, regular: regular.length,
       teamLists: games.filter(game => game.home.players && game.away.players).length },
     conversion: {
-      formula: computedFormula(year),
-      metric: 'core points a club game: NRL Fantasy\'s points for eleven NRL.com stats, the season before at half weight',
-      core: { weights: CORE, reasons: CORE_REASONS }, previous: PREVIOUS_WEIGHT, kept: KEPT, quota, reference, values,
+      formula: computedFormula(year, stats),
+      metric: statsWording(year, stats).metric,
+      core: { weights: CORE, reasons: CORE_REASONS }, previous: PREVIOUS_WEIGHT, kept: KEPT, stats, quota, reference, values,
       clubShift: { reference: clubStrengths, homeEdge,
         note: 'Each club\'s `team`: its regular season\'s Simple Rating System (`srs`, points a game, home edge `homeEdge`), its '
           + 'target, its lineup\'s strength unshifted (`strength`) and shifted (`shifted`), and the shift.' },

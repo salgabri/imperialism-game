@@ -158,7 +158,8 @@ PlayStation 2, 2008) rates them, on a map of their own day (`nrl2008`). Clubs on
 seasons' is ([american-football.md](american-football.md#tecmo-seasons)), then shifted club by club by the game's own team
 ratings. The user chose this on 2026-11-08 ("Build 2008", then "Adjust by team ratings"). The seasons from 2009 to 2024,
 which no game rated, are computed from NRL.com's match stats ([Computed seasons](#computed-seasons-20092024), built
-2026-11-09).
+2026-11-09), and so are 1998 to 2007, the NRL's first ten seasons, with the clubs of their day
+([Computed seasons, 1998–2007](#computed-seasons-19982007), built 2026-11-13): every NRL season from 1998 is playable.
 
 - **The database.** `RLDatabase.xml`, the game's own database, extracted from its data pak by Wouldubeinta and posted on
   rugbyleaguemods.net (thread "Data pak File", post 570, 30 March 2012, attachment 56), read from the Wayback Machine's raw
@@ -325,7 +326,8 @@ you can use to make ratings"); the research pass planned the method, and these d
 - one method for all sixteen seasons; Rugby League Live 3 (2015) and Live 4 (2017) only as a cross-check;
 - each club moved by its season's Simple Rating System (real margins, adjusted for the opponents), read off the built-in
   clubs' strengths: the season's results set each club's level, while its players keep their order;
-- the venue rules R1–R3 (three new maps, below); clubs only; nrl-2008 kept as shipped; nothing before 2008.
+- the venue rules R1–R3 (three new maps, below); clubs only; nrl-2008 kept as shipped; nothing before 2008 (1998–2007
+  followed on 2026-11-13, [below](#computed-seasons-19982007)).
 
 ### The source
 
@@ -541,7 +543,7 @@ not its shapes; a saved 2008 campaign is moved club by club onto the new version
 ### Files
 
 `scripts/sync-rugby-league-seasons.mjs` (`--fetch`, `--pin`, `--check`) writes `scripts/data/rugby-league-seasons/
-nrl-2009.json` … `nrl-2024.json`; `scripts/build-rugby-league-seasons.mjs` (`--check`, `--realism`) writes
+nrl-2009.json` … `nrl-2024.json` (and `nrl-1998.json` … `nrl-2007.json`, below); `scripts/build-rugby-league-seasons.mjs` (`--check`, `--realism`) writes
 `public/rugby-league/nrl-<year>.json` (kind `nrl`, `source.method` "computed" with `metric` and `conversion`, which the
 loader requires), the listing `src/data/rugbyLeagueSeasons.js` and the audit; rules in
 `scripts/lib/rugby-league-seasons.mjs`. The audit, `docs/design/rugby-league-seasons-audit.json`, gives each season's
@@ -568,6 +570,168 @@ and the real season's figures.
 - **No nations.** A nations game plays the built-in 2025 nations; the season's Tests (NRL.com competitions 133, 131 and
   195) could field them later.
 
+## Computed seasons, 1998–2007
+
+Status: built 2026-11-13. The NRL's first ten seasons, **1998 to 2007**, computed by the 2009–2024 method above from
+what NRL.com's match centre kept of them, each labelled "Computed from NRL.com match stats" and each on a map of its day
+with the clubs of its day: rugby league now has every NRL season from 1998 to 2025. The user asked on 2026-11-13 to
+cover the year gaps in every sport; the session that took the rest of the gaps left this one for its own pass, as it
+needed a new download and maps with clubs that no longer exist. The decisions of 2026-11-09 stand: one method, each club
+moved by its season's Simple Rating System, clubs only, the ratings labelled computed.
+
+### The source
+
+NRL.com's match centre keeps every premiership game's team list and its players' stats from **1998**: the draw of every
+round and each game's reply, as for 2009–2024. Its replies for 1997 and before give scores only (1997's first game,
+checked 2026-11-13; the research pass's census of 1990, 1995 and 1997 found the same), and 1997 had two competitions, so
+1998 is where NRL.com's record, and this pass, begins (the manifest's `nrlcom.from`): 1998 has no season before, and
+1998 and 1999 no seasons two before.
+
+- **Download.** The draws and games of 1998–2006 (2007's were cached), 2,073 requests on 2026-11-13 and 3 more for 1997's first game, every one through
+  `scripts/lib/polite-fetch.mjs` (robots.txt read for its agent and Anthropic's crawlers, a generic user agent), one at a
+  time, at least 1.2 seconds apart, no retries; every reply 200. They stay in the ignored `data-src/rugby-league-seasons/nrlcom/`
+  under the sync's file names, with `FETCH-LOG.tsv`; pins as for 2009–2024 (what is read of each season's rounds and each
+  round's games). 278 Rugby League Project pages (each season's summary for its clubs' slugs, 101 club lists and 168
+  player pages for the players NRL.com never shows starting), one every three seconds at least, the same way.
+- **Team ids.** NRL.com gives the clubs that are gone ids of their own (10002 the North Sydney Bears, 10029 Illawarra,
+  10031 the Gold Coast Chargers, 10043 the Adelaide Rams, 10053 the Northern Eagles, 10059 Balmain, 10060 Western
+  Suburbs; its filter lists number them otherwise, its draws and match replies agree), and files St. George's 1998 games
+  under the St. George Illawarra Dragons' team (500022): the 1998 Dragons are an era of that club, as NRL.com has them.
+
+### What NRL.com recorded
+
+NRL.com did not keep all eleven counted stats from the start. A stat counts in a season when it appears in at least 95%
+of the season's games with team lists (`RECORDED_SHARE`; from 2003 every stat appears in 96% or more, so 2003–2024
+count all eleven, and nothing of 2009–2024 changes), less one the manifest marks as recorded in part:
+
+| Season | Stats counted | Not counted |
+| --- | --- | --- |
+| 1998 | six: tries, line breaks, tackles, missed tackles, offloads, errors | try assists, line-break assists, tackle breaks, kick metres (only in a few finals); run metres, given in every game but only for some runs (1,108 of the regular season's 8,148 player-games, 136 metres a game against 2,443 in 1999: `nrlcom.partial`) |
+| 1999–2001 | eight: those and try assists and run metres | line-break assists, tackle breaks, kick metres |
+| 2002 | the same eight | line-break assists, in 92.6% of games at 3 a game (6 from 2003), and tackle breaks and kick metres |
+| 2003 on | all eleven | |
+
+A season's points count only its own stats, so its players are ranked on one footing. The season before counts at half
+weight only when NRL.com recorded the same stats in it: a season before with fewer would pull down every player who
+played in it against a newcomer. So **1998, 1999 and 2003 are their seasons alone** (no season before on NRL.com; 1998's
+six against 1999's eight; 2002's eight against 2003's eleven), 2000–2002 blend with the season before on their eight, and
+2004 on as 2009–2024. The thinner sets lose little: counted on the 2016 and 2024 snapshots' sums, a season's points a
+club game from 1998's six stats rank its players against all eleven at Spearman 0.97 within position, and from the
+eight of 1999–2002 at 0.99 (the research pass's 0.987–0.991). Each snapshot keeps the census behind this
+(`conversion.stats`: the games each stat appears in, the season's and the season before's), and the season's
+`source.metric` and conversion say what it counts.
+
+### The clubs
+
+| Season | Clubs |
+| --- | --- |
+| 1998 | twenty: the sixteen of 2007 but the Titans, the Wests Tigers and St. George Illawarra, with the Adelaide Rams, the Gold Coast Chargers, the Illawarra Steelers, the St. George Dragons, the North Sydney Bears, the Balmain Tigers and the Western Suburbs Magpies |
+| 1999 | seventeen: Adelaide and the Chargers excluded, St. George and Illawarra joined as the St. George Illawarra Dragons |
+| 2000, 2001 | fourteen: Balmain and Western Suburbs joined as the Wests Tigers, Manly and North Sydney as the Northern Eagles, South Sydney excluded |
+| 2002 | fifteen: South Sydney readmitted |
+| 2003–2006 | fifteen: Manly in place of the Northern Eagles |
+| 2007 | sixteen: the Gold Coast Titans |
+
+- **Names of the day.** A club plays under its name that season: the Canterbury Bulldogs in 1998 and 1999 and the
+  Bulldogs from 2000 (`nrl-canterbury-bulldogs`, CBY; `nrl-bulldogs`, BUL, as in 2008), the Sydney City Roosters to 1999
+  (`nrl-sydney-city-roosters`), the Auckland Warriors to 2000 (`nrl-auckland-warriors`, AKL), the Sharks from 1999 to 2002
+  (`nrl-sharks`, SHA, Rugby League 2's code for the club) and the St. George Dragons of 1998 (`nrl-st-george-dragons`,
+  STG), each an era of today's club with its colour, by English Wikipedia's club and season articles.
+- **The defunct clubs** (`defunct`): the Adelaide Rams (ADE), the Balmain Tigers (BAL), the Gold Coast Chargers (GCC),
+  the Illawarra Steelers (ILL), the North Sydney Bears (NSB), the Northern Eagles (NEA) and the Western Suburbs Magpies
+  (WSM), no club of today's continuing them, each under its own id (which is its `franchise` too). The codes are ours; the
+  colour is the club's own hashed hue, as every built-in club's and the NHL's Seals' (`colourFor`); none has a crest.
+
+### Grounds and maps
+
+A club grows from the ground of most of its regular-season home games that season, by NRL.com's draw (level counts keep
+the season before's), or from its training base when it shares that ground with another club's, as today. Two
+joint ventures split their home games between their founders' grounds every season: the Wests Tigers (Leichhardt and
+Campbelltown, from 2003 Stadium Australia too; no ground more than 7 of 12 or 13) grow from Concord Oval, as in 2008 and
+today (where they trained before 2008 is not recorded); St. George Illawarra from WIN Stadium, as in 2008, where most of
+its home games were in every season but 2000 and 2007 (6 each with Sydney). The third, the Northern Eagles, follows the
+rule: Gosford in 2000 and 2001 (7 of 13), Brookvale in 2002 (9 of 12). Names follow the R3 rule: a ground no club
+plays at today keeps its name of the era's first season (ANZ Stadium for the Broncos' Queen Elizabeth II Jubilee Sports
+Centre to 2002, Malanda then Dairy Farmers Stadium in Townsville, the Sydney Football Stadium and from 2002 Aussie
+Stadium, Colonial Stadium, the Sydney Showgrounds Main Arena, NorthPower Stadium at Gosford, Carrara Stadium), one
+still played at its present name (Accor Stadium for Stadium Australia, Jubilee Stadium for Kogarah, WIN Stadium,
+Campbelltown Sports Stadium). Every ground's name of the day and point come from English Wikipedia's articles at the
+revisions the manifest pins (`wikipedia`, 53 articles); the season articles list each club's ground.
+
+| Map | Seasons | What sets it apart |
+| --- | --- | --- |
+| `nrl1998` | 1998 | twenty clubs, thirteen of them in New South Wales; the Rams hold South Australia; Canterbury at Belmore; the Rabbitohs, tenants at the Roosters' Sydney Football Stadium, from Redfern Oval (in every season) |
+| `nrl1999` | 1999 | seventeen: St. George Illawarra at Wollongong; the Canterbury Bulldogs at Stadium Australia, Homebush, from its opening |
+| `nrl2000` | 2000 | fourteen: the Wests Tigers from Concord, the Northern Eagles at Gosford (7 of 13 home games), no Rabbitohs |
+| `nrl2001` | 2001 | the New Zealand Warriors by name; the Storm at Colonial Stadium (all 13); the Bulldogs at the Sydney Showground |
+| `nrl2002` | 2002 | the Rabbitohs back; the Northern Eagles at Brookvale (9 of 12) in their last season; the SFS as Aussie Stadium |
+| `nrl2003` | 2003–2005 | Manly again; the Broncos at Suncorp Stadium from its reopening (8 of 12 in 2003); the Bulldogs at Stadium Australia |
+| `nrl2006` | 2006 | the Rabbitohs move to Stadium Australia, the Bulldogs' ground: both grow from their training grounds, Redfern and Belmore |
+| `nrl2007` | 2007 | sixteen: the Titans at Carrara Stadium (10 of 12) before Robina opened in 2008 |
+
+`node scripts/build-club-maps.mjs --league=nrl` builds them (132–134 KB each); `nrlSpecs` ranks the defunct clubs after
+today's, in `defunct`'s order, and refuses any other club that is no franchise of today's. The Bulldogs at Homebush
+(1999–2005) cut the City of Parramatta with the Eels, as in 2008.
+
+### The seasons
+
+| Season | Games | Players | Placed by: season / ±1 / ±2 / RLP | Left out | Clubs, shifted | Shifts | Home edge | Clubs against wins: stats → shifted |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1998 | 253 | 576 | 487 / 43 / 6 / 40 | 24 | 81.9–85.2 | −1 to +2 | 4.9 | 0.83 → 0.85 |
+| 1999 | 213 | 506 | 449 / 35 / 8 / 14 | 10 | 81.5–84.6 | −1 to +1 | 3.9 | 0.67 → 0.83 |
+| 2000 | 191 | 448 | 387 / 46 / 9 / 6 | 8 | 81.8–85.5 | −2 to +2 | 7.3 | 0.36 → 0.79 |
+| 2001 | 191 | 421 | 372 / 35 / 6 / 8 | 10 | 81.6–84.8 | −1 to +1 | 3.9 | 0.58 → 0.75 |
+| 2002 | 189 | 454 | 412 / 27 / 5 / 10 | 13 | 81.7–85.3 | −1 to +1 | 4.8 | 0.68 → 0.87 |
+| 2003 | 189 | 460 | 396 / 40 / 10 / 14 | 16 | 81.5–85.4 | −2 to +2 | 2.0 | 0.70 → 0.91 |
+| 2004 | 189 | 468 | 416 / 30 / 11 / 11 | 9 | 81.9–85.4 | −1 to +1 | 5.3 | 0.66 → 0.91 |
+| 2005 | 189 | 428 | 381 / 35 / 8 / 4 | 3 | 82.0–84.8 | −1 to +1 | 5.3 | 0.36 → 0.86 |
+| 2006 | 189 | 430 | 379 / 31 / 14 / 6 | 8 | 81.9–84.8 | −1 to +2 | 1.8 | 0.40 → 0.85 |
+| 2007 | 201 | 463 | 417 / 34 / 6 / 6 | 6 | 81.7–84.8 | −1 to +1 | 5.1 | 0.64 → 0.61 |
+
+Columns as for 2009–2024. Every club had 23 to 43 players and fields its matchday 17 from its own. The players rate 66–94
+as played (overalls 67–93, median 79–80). The 107 left out are bench players of one to nine games (two the median): 102
+whose Rugby League Project page gives no position, or only "Utility Forward", and 5 it lists under another name; 1998 has
+the most (24 of 600), as NRL.com has no season before it to place its bench players. The shifted strengths follow each
+season's SRS at Spearman 0.93–0.97, against 0.53–0.79 from the stats alone; against the season's wins they rank at
+0.75–0.91 but in 2007, when margins and wins parted most (the Cowboys won 15 of 24 games and conceded 618 points to 547;
+Cronulla lost 14 with a positive difference): the SRS itself ranks against 2007's wins at 0.73, the shifted strengths at
+0.61, the stats at 0.64.
+
+**Realism** (40 seeded seasons of each, `--realism`): points a team 22.7–23.1 (real 20.1–24.4), mean margin 15.0–16.6
+(real 14.0–17.0), win% spread 0.144–0.183 (real 0.104–0.194), best and worst records 17.9–20.2 and 4.3–5.5 wins of 24
+(real 16–21 and 3–8). The model's wins rank against the real season's at 0.68–0.92, 2007's at 0.52.
+
+**Spot checks against the record.** The strongest club by margin, the SRS's first, is the premier in 1998 and 2000 (the
+Broncos) and 2007 (Melbourne, its title stripped in 2010), and the minor premier in 1999 (the Sharks), 2001 and 2005 (the
+Eels), 2004 (the Roosters, level on wins with the Bulldogs) and 2006 (Melbourne). In 2002 it is the Bulldogs, 20 wins
+before they lost their points; in 2003 the Bulldogs too, the Panthers, premiers and minor premiers on close wins, fourth.
+The best-rated of each season (the audit's `best`) are the period's stars with the box score's leanings: Andrew Johns and
+Darren Lockyer (2000), Stacey Jones (1999, 2001), Nathan Hindmarsh (2000, 2001, 2005–2007), Brett Finch (2002, 2004,
+2005), Cameron Smith (2005, 2006), Shane Webcke and Alan Tongue (2006), and the busiest tacklers of weak sides
+(Western Suburbs' hooker Ciriaco Mescia in 1999, the Gold Coast Chargers' Jamie Goddard in 1998).
+
+### Season quirks
+
+- **1998.** Twenty clubs of 24 games each (240 regular-season games) and a top-ten finals series (13 games): 600
+  players took the field. Each position's quota is the season's players there per club, so with twenty clubs a 1998
+  backup still meets 2025's backups.
+- **1999 and 2002–2006.** An odd number of clubs (seventeen, fifteen) and a bye each round, as in 2023 and 2024.
+- **2000 and 2001.** Fourteen clubs of 26 games each, South Sydney excluded (readmitted in 2002).
+- **2002.** The Bulldogs, leading the competition, were stripped of their 37 points for salary-cap breaches and finished
+  last; the New Zealand Warriors were minor premiers. The SRS reads margins, so the Bulldogs rate by their play.
+- **2003.** The Broncos moved to Suncorp Stadium when it reopened, mid-season.
+
+### Limits
+
+- **Fewer stats before 2003**, and a different season before: 1998 ranks its players on six stats, run metres among the
+  missing, so a forward's carries count only through his line breaks and offloads; 1999–2002 on eight, without
+  tackle breaks or kick metres (a half's kicking counts nowhere). 1998, 1999 and 2003 stand on their own season.
+- **The clubs since gone keep no crest** and play in a colour of their own; their codes are ours.
+- **Grounds by the majority of home games**: a club that moved during a season (the Rams from Adelaide Oval to
+  Hindmarsh, the Broncos to Suncorp in 2003) plays the whole season at the ground of most of them.
+- **Today's rules:** golden point came in 2003 (a level regular-season game was a draw before), but a campaign needs a
+  winner, so every season plays it, as every season since 2008 does.
+
 ## Tests
 
 `scripts/rugby-league.test.mjs`: the data rebuilds byte for byte; every rating and position is the snapshot's; the
@@ -579,16 +743,20 @@ and its home sides, `scripts/home-advantage.test.mjs` the edge and the live char
 the map's state rule with Australian and New Zealand towns. `npm run smoke` adds an NRL duel with the live ticker and a
 rugby league nations blitz of Asia and Oceania.
 
-`scripts/rugby-league-seasons.test.mjs` covers the earlier seasons: all seventeen rebuild byte for byte, and their
+`scripts/rugby-league-seasons.test.mjs` covers the earlier seasons: all twenty-seven rebuild byte for byte, and their
 snapshots from the pinned inputs when `data-src/rugby-league-seasons/` is present. For 2008, the reader, the naming
 check, the weights and every overall, the club shift and the map. For the computed seasons: NRL Fantasy's eleven
-weights with a reason each and the season before at half weight; who took the field (a prop in 15 started, an unused
-18th man has no game) and the order positions come from; errors read as handling errors where a game records none, and
-goals as conversions and penalty goals, every season keeping both; every value, overall, SRS, target and shift
-recomputed from each snapshot; sixteen clubs to 2022 and the Dolphins from 2023, the 2009 Bulldogs, each era's grounds
-and map; the City of Parramatta cut only while the Bulldogs trained at Olympic Park; four seasons played 40 times with
-the model's wins ranking against the real ones at 0.6 or better; the loader's rules; and the App launching a 2015
-campaign on `nrl2012`, saving and resuming it, and a 2023 one on today's map.
+weights with a reason each and the season before at half weight; the stats each season counts, NRL.com's census of
+them, and the season before only where it recorded the same (1998, 1999 and 2003 alone); who took the field (a prop in
+15 started, an unused 18th man has no game) and the order positions come from; errors read as handling errors where a
+game records none, and goals as conversions and penalty goals, every season keeping both; every value, overall, SRS,
+target and shift recomputed from each snapshot; the clubs of every season, twenty in 1998 down to fourteen and the
+Dolphins from 2023, each under its name of that season, the defunct ones by their own ids and colours, every article
+behind them pinned; each era's grounds and map, and on the maps of 1998–2007 every club holding the point it grows
+from; the City of Parramatta cut only while the Bulldogs trained at Olympic Park or played at Homebush; six seasons
+played 40 times with the model's wins ranking against the real ones at 0.6 or better; the loader's rules; and the App
+launching a 2015 campaign on `nrl2012` and a 1998 one with its twenty clubs on `nrl1998`, saving and resuming each, and
+a 2023 one on today's map.
 
 ## Known limits
 
@@ -606,7 +774,7 @@ campaign on `nrl2012`, saving and resuming it, and a 2023 one on today's map.
   two, smaller even than Washington's District of Columbia; Parramatta and Penrith take the west of the state.
 - **One conversion rate.** Every kicker converts 75.5%: the game's overall says nothing of goal-kicking.
 - **No two-point field goals, sin bins or penalty counts:** a try, a goal and a field goal are all there is.
-- **Nothing before 2008.** NRL.com keeps team lists and stats back to 1998 and the same method would rate them, but
-  those seasons have clubs that are gone (the Adelaide Rams, the Gold Coast Chargers, Illawarra and St George to 1998,
-  Balmain, Western Suburbs and North Sydney to 1999, the Northern Eagles to 2002), whose maps the builder does not draw.
-  NRL.com's replies before 1998 carry scores only; 1997 had two competitions.
+- **Nothing before 1998.** NRL.com's replies before 1998 carry scores only (no team lists, no player stats), and 1997
+  had two competitions, the ARL's and Super League's. Earlier seasons would need the Rugby League Project's team lists
+  and scorers and a selection-based rating (the research pass's estimate: 0.77 against Rugby League 26 in 2025's
+  conditions), with all-Sydney maps of the NSWRL.

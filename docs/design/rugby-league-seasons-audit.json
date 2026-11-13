@@ -3277,6 +3277,1724 @@
         "bestWins": 17,
         "worstWins": 5
       }
+    },
+    {
+      "id": "nrl-2007",
+      "version": "nrl-2007-00c8fa54",
+      "season": "2007",
+      "edition": "NRL.com match centre, the 2007 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2007",
+      "method": "computed",
+      "games": {
+        "played": 201,
+        "regular": 192,
+        "withTeamLists": 201
+      },
+      "players": {
+        "placed": 463,
+        "bySeason": 417,
+        "bySeasonEitherSide": 34,
+        "byTwoEitherSide": 6,
+        "byRlp": 6,
+        "left": 6,
+        "inSquads": 383
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 67,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 80,
+          "highest": 93
+        }
+      },
+      "byPosition": {
+        "FB": "30 players (1.875 a club), overall 70–91 (median 84), played 70–91",
+        "WG": "69 players (4.3125 a club), overall 68–90 (median 79), played 68–90",
+        "CE": "61 players (3.8125 a club), overall 68–91 (median 80), played 68–91",
+        "FE": "33 players (2.0625 a club), overall 70–90 (median 78), played 70–90",
+        "HB": "25 players (1.5625 a club), overall 74–93 (median 82), played 74–93",
+        "HK": "42 players (2.625 a club), overall 67–91 (median 78), played 67–91",
+        "PR": "95 players (5.9375 a club), overall 69–93 (median 77), played 69–93",
+        "SR": "80 players (5 a club), overall 69–91 (median 81), played 69–91",
+        "LK": "28 players (1.75 a club), overall 78–92 (median 84), played 78–93"
+      },
+      "best": [
+        "Steve Price (NZW PR) 93",
+        "Alan Tongue (CBR LK) 93",
+        "John Morris (WST HB) 93",
+        "Robbie Farah (WST HK) 91",
+        "Nathan Hindmarsh (PAR SR) 91",
+        "Matthew Bowen (NQC FB) 91",
+        "Cooper Cronk (MEL HB) 91",
+        "Justin Hodges (BRI CE) 91",
+        "Kurt Gidley (NEW FB) 91",
+        "Luke Patten (BUL FB) 91",
+        "Anthony Watmough (MAN SR) 90",
+        "Cameron Smith (MEL HK) 90"
+      ],
+      "clubs": [
+        "Melbourne Storm 84.8 (28 players, 24 in the squad; out of position: Jeremy Smith (SR) at LK; 2007: 21–0–3, 627–277)",
+        "New Zealand Warriors 84.5 (23 players, 23 in the squad; out of position: Epalahame Lauaki (SR) at PR, Wairangi Koopu (SR) at LK; 2007: 13–1–10, 593–434)",
+        "Cronulla-Sutherland Sharks 84.1 (31 players, 24 in the squad; out of position: Mitch Brown (FB) at CE, Lance Thompson (SR) at LK; 2007: 10–0–14, 463–403)",
+        "Manly Warringah Sea Eagles 84.1 (28 players, 24 in the squad; 2007: 18–0–6, 597–377)",
+        "Bulldogs 83.9 (30 players, 24 in the squad; 2007: 12–0–12, 575–528)",
+        "Parramatta Eels 83.8 (25 players, 24 in the squad; out of position: Chad Robinson (SR) at PR, Nathan Hindmarsh (SR) at LK; 2007: 13–0–11, 573–481)",
+        "Brisbane Broncos 83.2 (30 players, 24 in the squad; out of position: Sam Thaiday (SR) at PR; 2007: 11–0–13, 511–476)",
+        "Wests Tigers 83.1 (26 players, 24 in the squad; out of position: Dene Halatau (LK) at PR; 2007: 11–0–13, 541–561)",
+        "South Sydney Rabbitohs 83 (31 players, 24 in the squad; out of position: Luke Stuart (SR) at PR, David Kidwell (SR) at LK; 2007: 12–0–12, 408–399)",
+        "Penrith Panthers 82.7 (29 players, 24 in the squad; out of position: Trent Waterhouse (SR) at PR, Junior Moors (SR) at LK; 2007: 8–0–16, 539–607)",
+        "St. George Illawarra Dragons 82.7 (32 players, 24 in the squad; out of position: Corey Payne (SR) at LK; 2007: 9–0–15, 431–509)",
+        "Canberra Raiders 82.6 (31 players, 24 in the squad; out of position: David Howell (FB) at WG, Neville Costigan (SR) at PR; 2007: 9–0–15, 522–652)",
+        "North Queensland Cowboys 82.4 (30 players, 24 in the squad; 2007: 15–0–9, 547–618)",
+        "Gold Coast Titans 82.3 (29 players, 24 in the squad; out of position: Gavin Cooper (SR) at PR; 2007: 10–0–14, 409–559)",
+        "Sydney Roosters 82.2 (25 players, 24 in the squad; out of position: Nate Myles (SR) at PR, Shane Shackleton (SR) at LK; 2007: 10–1–13, 445–610)",
+        "Newcastle Knights 81.7 (35 players, 24 in the squad; out of position: Reegan Tanner (LK) at PR; 2007: 9–0–15, 418–708)"
+      ],
+      "clubShift": [
+        "Melbourne Storm: SRS +13.371, target 85.08, shift 0, strength 84.8 → 84.8",
+        "Manly Warringah Sea Eagles: SRS +8.775, target 84.38, shift 0, strength 84.1 → 84.1",
+        "New Zealand Warriors: SRS +6.524, target 84.15, shift 0, strength 84.5 → 84.5",
+        "Parramatta Eels: SRS +3.852, target 83.9, shift 0, strength 83.8 → 83.8",
+        "Bulldogs: SRS +2.125, target 83.87, shift +1, strength 82.9 → 83.9",
+        "Cronulla-Sutherland Sharks: SRS +1.977, target 83.66, shift +1, strength 83.1 → 84.1",
+        "Brisbane Broncos: SRS +1.664, target 83.32, shift 0, strength 83.2 → 83.2",
+        "South Sydney Rabbitohs: SRS +0.282, target 83.2, shift +1, strength 82 → 83",
+        "Wests Tigers: SRS -0.36, target 83.2, shift 0, strength 83.1 → 83.1",
+        "Penrith Panthers: SRS -3.024, target 83.02, shift 0, strength 82.7 → 82.7",
+        "North Queensland Cowboys: SRS -3.14, target 82.83, shift 0, strength 82.4 → 82.4",
+        "St. George Illawarra Dragons: SRS -3.147, target 82.66, shift 0, strength 82.7 → 82.7",
+        "Canberra Raiders: SRS -5.147, target 82.37, shift +1, strength 81.6 → 82.6",
+        "Gold Coast Titans: SRS -6.1, target 82.13, shift 0, strength 82.3 → 82.3",
+        "Sydney Roosters: SRS -6.41, target 81.83, shift -1, strength 83.2 → 82.2",
+        "Newcastle Knights: SRS -11.244, target 81.8, shift 0, strength 81.7 → 81.7"
+      ],
+      "homeEdge": 5.141,
+      "strengthAndResults": {
+        "stats": 0.636,
+        "shifted": 0.609
+      },
+      "placedByRlp": [
+        "nrl-brisbane-broncos: Clifford Manua: PR (RLP 2838)",
+        "nrl-brisbane-broncos: John Te Reo: SR (RLP 5559)",
+        "nrl-canberra-raiders: Andrew Dunemann: FE (RLP 21)",
+        "nrl-manly-warringah-sea-eagles: Vic Mauro: LK (RLP 5690)",
+        "nrl-new-zealand-warriors: Corey Lawrie: HK (RLP 5576)",
+        "nrl-newcastle-knights: Luke Davico: PR (RLP 217)"
+      ],
+      "left": [
+        "nrl-bulldogs: Aaron Wheatley (2 games): started at no position on NRL.com from 2005 to 2009, and the Rugby League Project gives no position for him (3438)",
+        "nrl-manly-warringah-sea-eagles: Sione Finefeuiaki (1 game): started at no position on NRL.com from 2005 to 2009, and the Rugby League Project gives no position for him (5677)",
+        "nrl-north-queensland-cowboys: John Frith (1 game): started at no position on NRL.com from 2005 to 2009, and the Rugby League Project gives no position for him (5659)",
+        "nrl-penrith-panthers: John Nuumaalii (1 game): started at no position on NRL.com from 2005 to 2009, and the Rugby League Project gives no position for him (5674)",
+        "nrl-sydney-roosters: Danny Williams (5 games): started at no position on NRL.com from 2005 to 2009, and the Rugby League Project gives no position for him (5691)",
+        "nrl-sydney-roosters: Willie Brown (2 games): started at no position on NRL.com from 2005 to 2009, and the Rugby League Project gives no position for him (5569)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.875,
+          "WG": 4.3125,
+          "CE": 3.8125,
+          "FE": 2.0625,
+          "HB": 1.5625,
+          "HK": 2.625,
+          "PR": 5.9375,
+          "SR": 5,
+          "LK": 1.75
+        }
+      },
+      "real": {
+        "games": 192,
+        "pointsPerTeam": 21.352,
+        "teamPointsSd": 11.757,
+        "draws": 1,
+        "marginMean": 14.141,
+        "byOne": 0.063,
+        "withinSix": 0.365,
+        "withinTwelve": 0.568,
+        "byThirteenPlus": 0.427,
+        "byTwentyFivePlus": 0.177,
+        "nilRate": 0.01,
+        "fortyPlusRate": 0.065,
+        "homeWins": 0.555,
+        "winPctSd": 0.141,
+        "bestWins": 21,
+        "worstWins": 8
+      }
+    },
+    {
+      "id": "nrl-2006",
+      "version": "nrl-2006-6a86ceb3",
+      "season": "2006",
+      "edition": "NRL.com match centre, the 2006 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2006",
+      "method": "computed",
+      "games": {
+        "played": 189,
+        "regular": 180,
+        "withTeamLists": 189
+      },
+      "players": {
+        "placed": 430,
+        "bySeason": 379,
+        "bySeasonEitherSide": 31,
+        "byTwoEitherSide": 14,
+        "byRlp": 6,
+        "left": 8,
+        "inSquads": 360
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 68,
+          "median": 80,
+          "highest": 93
+        }
+      },
+      "byPosition": {
+        "FB": "23 players (1.5333 a club), overall 71–91 (median 84), played 71–92",
+        "WG": "60 players (4 a club), overall 68–90 (median 79), played 68–90",
+        "CE": "58 players (3.8667 a club), overall 68–91 (median 80), played 68–91",
+        "FE": "25 players (1.6667 a club), overall 70–90 (median 80), played 70–90",
+        "HB": "28 players (1.8667 a club), overall 71–93 (median 79), played 72–93",
+        "HK": "39 players (2.6 a club), overall 68–91 (median 78), played 68–92",
+        "PR": "91 players (6.0667 a club), overall 69–93 (median 77), played 69–93",
+        "SR": "72 players (4.8 a club), overall 69–91 (median 81), played 68–91",
+        "LK": "34 players (2.2667 a club), overall 70–92 (median 83), played 70–93"
+      },
+      "best": [
+        "Alan Tongue (CBR LK) 93",
+        "Shane Webcke (BRI PR) 93",
+        "Grant Rovelli (NZW HB) 93",
+        "Cameron Smith (MEL HK) 92",
+        "Clinton Schifcofske (CBR FB) 92",
+        "Nathan Hindmarsh (PAR SR) 91",
+        "Mark Gasnier (SGI CE) 91",
+        "Peter Cusack (SOU PR) 91",
+        "Scott Prince (WST HB) 91",
+        "Matthew Bowen (NQC FB) 91",
+        "Luke Patten (BUL FB) 91",
+        "Lance Thompson (CRO SR) 90"
+      ],
+      "clubs": [
+        "Bulldogs 84.8 (28 players, 24 in the squad; out of position: Nate Myles (SR) at PR; 2006: 16–0–8, 608–468)",
+        "Melbourne Storm 84.6 (26 players, 24 in the squad; 2006: 20–0–4, 605–404)",
+        "New Zealand Warriors 84.1 (24 players, 24 in the squad; out of position: Micheal Luck (SR) at PR; 2006: 12–0–12, 552–463)",
+        "Newcastle Knights 84 (26 players, 24 in the squad; 2006: 14–0–10, 608–538)",
+        "Brisbane Broncos 83.8 (31 players, 24 in the squad; out of position: Brad Thorn (SR) at PR; 2006: 14–0–10, 497–392)",
+        "North Queensland Cowboys 83.5 (29 players, 24 in the squad; out of position: Steve Southern (SR) at LK; 2006: 11–0–13, 450–463)",
+        "St. George Illawarra Dragons 83.5 (29 players, 24 in the squad; out of position: Ben Creagh (SR) at PR; 2006: 14–0–10, 519–481)",
+        "Manly Warringah Sea Eagles 83.3 (26 players, 24 in the squad; out of position: Luke Williamson (SR) at LK; 2006: 14–0–10, 534–493)",
+        "Parramatta Eels 83.1 (31 players, 24 in the squad; out of position: Luke Burt (FB) at CE, Chad Robinson (SR) at LK; 2006: 12–0–12, 506–483)",
+        "Canberra Raiders 82.9 (29 players, 24 in the squad; out of position: Todd Carney (HB) at HK; 2006: 13–0–11, 525–573)",
+        "Cronulla-Sutherland Sharks 82.9 (30 players, 24 in the squad; out of position: Greg Bird (SR) at PR; 2006: 9–0–15, 515–544)",
+        "Wests Tigers 82.9 (34 players, 24 in the squad; out of position: Chris Heighington (SR) at PR; 2006: 10–0–14, 490–565)",
+        "Penrith Panthers 82.6 (25 players, 24 in the squad; out of position: Shane Rodney (SR) at PR; 2006: 10–0–14, 510–587)",
+        "Sydney Roosters 82.1 (30 players, 24 in the squad; 2006: 8–0–16, 528–650)",
+        "South Sydney Rabbitohs 81.9 (32 players, 24 in the squad; out of position: Joe Galuvao (SR) at PR; 2006: 3–0–21, 429–772)"
+      ],
+      "clubShift": [
+        "Melbourne Storm: SRS +8.051, target 85.05, shift +1, strength 83.6 → 84.6",
+        "Bulldogs: SRS +5.611, target 84.36, shift +2, strength 82.8 → 84.8",
+        "Brisbane Broncos: SRS +4.332, target 84.1, shift 0, strength 83.8 → 83.8",
+        "New Zealand Warriors: SRS +3.417, target 83.9, shift 0, strength 84.1 → 84.1",
+        "Newcastle Knights: SRS +2.932, target 83.84, shift 0, strength 84 → 84",
+        "Manly Warringah Sea Eagles: SRS +1.497, target 83.51, shift 0, strength 83.3 → 83.3",
+        "St. George Illawarra Dragons: SRS +1.377, target 83.23, shift 0, strength 83.5 → 83.5",
+        "Parramatta Eels: SRS +0.931, target 83.2, shift 0, strength 83.1 → 83.1",
+        "North Queensland Cowboys: SRS -0.663, target 83.16, shift +1, strength 82.5 → 83.5",
+        "Cronulla-Sutherland Sharks: SRS -1.149, target 82.87, shift 0, strength 82.9 → 82.9",
+        "Canberra Raiders: SRS -2.063, target 82.72, shift +1, strength 81.9 → 82.9",
+        "Wests Tigers: SRS -2.868, target 82.44, shift 0, strength 82.9 → 82.9",
+        "Penrith Panthers: SRS -2.948, target 82.17, shift -1, strength 83.6 → 82.6",
+        "Sydney Roosters: SRS -4.748, target 81.86, shift -1, strength 83.1 → 82.1",
+        "South Sydney Rabbitohs: SRS -13.709, target 81.8, shift +1, strength 80.9 → 81.9"
+      ],
+      "homeEdge": 1.789,
+      "strengthAndResults": {
+        "stats": 0.403,
+        "shifted": 0.848
+      },
+      "placedByRlp": [
+        "nrl-bulldogs: Jon Green: PR (RLP 3518)",
+        "nrl-manly-warringah-sea-eagles: Mailangi Styles: SR (RLP 3712)",
+        "nrl-parramatta-eels: Peter Lewis: CE (RLP 1481)",
+        "nrl-sydney-roosters: Mark Edmondson: PR (RLP 2454)",
+        "nrl-wests-tigers: Rocky Trimarchi: LK (RLP 3543)",
+        "nrl-wests-tigers: Tevita Metuisela: LK (RLP 1917)"
+      ],
+      "left": [
+        "nrl-bulldogs: Billy Ngawini (3 games): started at no position on NRL.com from 2004 to 2008, and the Rugby League Project gives no position for him (3705)",
+        "nrl-cronulla-sutherland-sharks: Luke Harlen (2 games): started at no position on NRL.com from 2004 to 2008, and the Rugby League Project gives no position for him (3529)",
+        "nrl-north-queensland-cowboys: Robert Tanielu (3 games): started at no position on NRL.com from 2004 to 2008, and the Rugby League Project gives no position for him (3161)",
+        "nrl-parramatta-eels: Marcus Perenara (1 game): started at no position on NRL.com from 2004 to 2008, and the Rugby League Project gives no position for him (3537)",
+        "nrl-south-sydney-rabbitohs: Dale Newton (1 game): started at no position on NRL.com from 2004 to 2008, and the Rugby League Project gives no position for him (3268)",
+        "nrl-south-sydney-rabbitohs: Joe Lichaa (2 games): started at no position on NRL.com from 2004 to 2008, and the Rugby League Project gives no position for him (3716)",
+        "nrl-sydney-roosters: Steve Meredith (1 game): started at no position on NRL.com from 2004 to 2008, and the Rugby League Project gives no position for him (3533)",
+        "nrl-wests-tigers: Keith Eshman (1 game): started at no position on NRL.com from 2004 to 2008, and the Rugby League Project gives no position for him (3765)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.5333,
+          "WG": 4,
+          "CE": 3.8667,
+          "FE": 1.6667,
+          "HB": 1.8667,
+          "HK": 2.6,
+          "PR": 6.0667,
+          "SR": 4.8,
+          "LK": 2.2667
+        }
+      },
+      "real": {
+        "games": 180,
+        "pointsPerTeam": 21.878,
+        "teamPointsSd": 11.02,
+        "draws": 0,
+        "marginMean": 14.044,
+        "byOne": 0.039,
+        "withinSix": 0.339,
+        "withinTwelve": 0.533,
+        "byThirteenPlus": 0.467,
+        "byTwentyFivePlus": 0.161,
+        "nilRate": 0.014,
+        "fortyPlusRate": 0.078,
+        "homeWins": 0.567,
+        "winPctSd": 0.157,
+        "bestWins": 20,
+        "worstWins": 3
+      }
+    },
+    {
+      "id": "nrl-2005",
+      "version": "nrl-2005-d307111f",
+      "season": "2005",
+      "edition": "NRL.com match centre, the 2005 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2003",
+      "method": "computed",
+      "games": {
+        "played": 189,
+        "regular": 180,
+        "withTeamLists": 189
+      },
+      "players": {
+        "placed": 428,
+        "bySeason": 381,
+        "bySeasonEitherSide": 35,
+        "byTwoEitherSide": 8,
+        "byRlp": 4,
+        "left": 3,
+        "inSquads": 360
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 80,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 80,
+          "highest": 92
+        }
+      },
+      "byPosition": {
+        "FB": "21 players (1.4 a club), overall 72–91 (median 85), played 72–91",
+        "WG": "60 players (4 a club), overall 68–90 (median 79), played 68–91",
+        "CE": "61 players (4.0667 a club), overall 68–91 (median 79), played 67–91",
+        "FE": "31 players (2.0667 a club), overall 70–90 (median 78), played 71–90",
+        "HB": "26 players (1.7333 a club), overall 74–93 (median 81), played 74–92",
+        "HK": "35 players (2.3333 a club), overall 68–91 (median 79), played 68–91",
+        "PR": "86 players (5.7333 a club), overall 69–93 (median 77), played 69–92",
+        "SR": "77 players (5.1333 a club), overall 69–91 (median 81), played 68–91",
+        "LK": "31 players (2.0667 a club), overall 70–92 (median 84), played 71–92"
+      },
+      "best": [
+        "Paul Gallen (CRO LK) 92",
+        "Brett Finch (SYD HB) 92",
+        "Craig Smith (NEW PR) 92",
+        "Trent Waterhouse (PEN LK) 91",
+        "Nathan Hindmarsh (PAR SR) 91",
+        "Cameron Smith (MEL HK) 91",
+        "Luke Priddis (PEN HK) 91",
+        "Shane Webcke (BRI PR) 91",
+        "Matt Orford (MEL HB) 91",
+        "Michael Monaghan (MAN HB) 91",
+        "Steven Bell (MEL CE) 91",
+        "Clinton Schifcofske (CBR FB) 91"
+      ],
+      "clubs": [
+        "Melbourne Storm 84.8 (26 players, 24 in the squad; out of position: Glen Turner (SR) at PR; 2005: 13–0–11, 640–462)",
+        "Parramatta Eels 84.8 (29 players, 24 in the squad; 2005: 16–0–8, 704–456)",
+        "St. George Illawarra Dragons 84.3 (27 players, 24 in the squad; out of position: Ben Creagh (SR) at LK; 2005: 16–0–8, 655–510)",
+        "Wests Tigers 83.9 (26 players, 24 in the squad; out of position: Chris Heighington (SR) at HK, Liam Fulton (LK) at PR; 2005: 14–0–10, 676–575)",
+        "Penrith Panthers 83.6 (26 players, 24 in the squad; out of position: Joe Galuvao (SR) at LK; 2005: 11–0–13, 554–554)",
+        "Brisbane Broncos 83.5 (29 players, 24 in the squad; out of position: David Stagg (SR) at PR, Dane Carlaw (SR) at LK; 2005: 15–0–9, 597–484)",
+        "North Queensland Cowboys 83.5 (28 players, 24 in the squad; out of position: Carl Webb (SR) at LK; 2005: 14–0–10, 639–563)",
+        "Manly Warringah Sea Eagles 83.2 (29 players, 24 in the squad; out of position: Sam Harris (SR) at PR, Luke Williamson (SR) at LK; 2005: 12–0–12, 554–632)",
+        "New Zealand Warriors 82.9 (24 players, 24 in the squad; 2005: 10–0–14, 515–528)",
+        "Sydney Roosters 82.8 (30 players, 24 in the squad; out of position: Chris Flannery (FE) at HK, Michael Crocker (SR) at LK; 2005: 11–0–13, 488–487)",
+        "Cronulla-Sutherland Sharks 82.7 (28 players, 24 in the squad; out of position: Phillip Leuluai (SR) at LK; 2005: 12–0–12, 550–564)",
+        "Bulldogs 82.4 (31 players, 24 in the squad; out of position: Nate Myles (SR) at PR; 2005: 9–1–14, 472–670)",
+        "Canberra Raiders 82.4 (30 players, 24 in the squad; 2005: 9–0–15, 465–606)",
+        "South Sydney Rabbitohs 82.2 (31 players, 24 in the squad; out of position: David Fa'alogo (SR) at PR, Bryan Fletcher (SR) at LK; 2005: 9–1–14, 482–700)",
+        "Newcastle Knights 82 (34 players, 24 in the squad; 2005: 8–0–16, 467–667)"
+      ],
+      "clubShift": [
+        "Parramatta Eels: SRS +9.353, target 85.05, shift 0, strength 84.8 → 84.8",
+        "Melbourne Storm: SRS +6.553, target 84.36, shift 0, strength 84.8 → 84.8",
+        "St. George Illawarra Dragons: SRS +6.095, target 84.1, shift +1, strength 83.3 → 84.3",
+        "Brisbane Broncos: SRS +4.792, target 83.9, shift +1, strength 82.5 → 83.5",
+        "Wests Tigers: SRS +4.312, target 83.84, shift +1, strength 82.9 → 83.9",
+        "North Queensland Cowboys: SRS +2.473, target 83.51, shift +1, strength 82.5 → 83.5",
+        "Penrith Panthers: SRS +0.272, target 83.23, shift +1, strength 82.6 → 83.6",
+        "New Zealand Warriors: SRS -0.225, target 83.2, shift -1, strength 83.9 → 82.9",
+        "Cronulla-Sutherland Sharks: SRS -0.265, target 83.16, shift 0, strength 82.7 → 82.7",
+        "Sydney Roosters: SRS -0.527, target 82.87, shift -1, strength 83.8 → 82.8",
+        "Manly Warringah Sea Eagles: SRS -3.687, target 82.72, shift +1, strength 82.2 → 83.2",
+        "Canberra Raiders: SRS -5.345, target 82.44, shift 0, strength 82.4 → 82.4",
+        "Bulldogs: SRS -7.625, target 82.17, shift 0, strength 82.4 → 82.4",
+        "Newcastle Knights: SRS -7.728, target 81.86, shift -1, strength 83 → 82",
+        "South Sydney Rabbitohs: SRS -8.448, target 81.8, shift +1, strength 81.2 → 82.2"
+      ],
+      "homeEdge": 5.322,
+      "strengthAndResults": {
+        "stats": 0.357,
+        "shifted": 0.855
+      },
+      "placedByRlp": [
+        "nrl-brisbane-broncos: Nick Kenny: PR (RLP 2749)",
+        "nrl-bulldogs: Daniel Conn: LK (RLP 1689)",
+        "nrl-cronulla-sutherland-sharks: Clifford Manua: PR (RLP 2838)",
+        "nrl-melbourne-storm: Tevita Metuisela: LK (RLP 1917)"
+      ],
+      "left": [
+        "nrl-bulldogs: Brett Oliver (1 game): started at no position on NRL.com from 2003 to 2007, and the Rugby League Project gives no position for him (154)",
+        "nrl-newcastle-knights: Kurt Hancock (1 game): started at no position on NRL.com from 2003 to 2007, and the Rugby League Project gives no position for him (3426)",
+        "nrl-south-sydney-rabbitohs: Peter Taylor (1 game): started at no position on NRL.com from 2003 to 2007, and the Rugby League Project gives no position for him (1763)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.4,
+          "WG": 4,
+          "CE": 4.0667,
+          "FE": 2.0667,
+          "HB": 1.7333,
+          "HK": 2.3333,
+          "PR": 5.7333,
+          "SR": 5.1333,
+          "LK": 2.0667
+        }
+      },
+      "real": {
+        "games": 180,
+        "pointsPerTeam": 23.494,
+        "teamPointsSd": 11.758,
+        "draws": 1,
+        "marginMean": 15.756,
+        "byOne": 0.022,
+        "withinSix": 0.222,
+        "withinTwelve": 0.494,
+        "byThirteenPlus": 0.5,
+        "byTwentyFivePlus": 0.206,
+        "nilRate": 0.006,
+        "fortyPlusRate": 0.103,
+        "homeWins": 0.587,
+        "winPctSd": 0.104,
+        "bestWins": 16,
+        "worstWins": 8
+      }
+    },
+    {
+      "id": "nrl-2004",
+      "version": "nrl-2004-a274c50b",
+      "season": "2004",
+      "edition": "NRL.com match centre, the 2004 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2003",
+      "method": "computed",
+      "games": {
+        "played": 189,
+        "regular": 180,
+        "withTeamLists": 189
+      },
+      "players": {
+        "placed": 468,
+        "bySeason": 416,
+        "bySeasonEitherSide": 30,
+        "byTwoEitherSide": 11,
+        "byRlp": 11,
+        "left": 9,
+        "inSquads": 360
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 67,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 68,
+          "median": 79,
+          "highest": 94
+        }
+      },
+      "byPosition": {
+        "FB": "23 players (1.5333 a club), overall 71–91 (median 84), played 72–92",
+        "WG": "69 players (4.6 a club), overall 68–90 (median 78), played 68–89",
+        "CE": "59 players (3.9333 a club), overall 68–91 (median 79), played 68–91",
+        "FE": "30 players (2 a club), overall 70–90 (median 79), played 70–91",
+        "HB": "34 players (2.2667 a club), overall 71–93 (median 78), played 70–94",
+        "HK": "45 players (3 a club), overall 67–91 (median 77), played 68–91",
+        "PR": "93 players (6.2 a club), overall 69–93 (median 77), played 69–92",
+        "SR": "82 players (5.4667 a club), overall 69–91 (median 80), played 68–91",
+        "LK": "33 players (2.2 a club), overall 70–92 (median 83), played 69–92"
+      },
+      "best": [
+        "Brett Finch (SYD HB) 94",
+        "Danny Nutley (CRO PR) 92",
+        "Trent Waterhouse (PEN LK) 92",
+        "Anthony Minichiello (SYD FB) 92",
+        "Brad Fittler (SYD FE) 91",
+        "Luke Priddis (PEN HK) 91",
+        "Nathan Hindmarsh (PAR SR) 91",
+        "Clinton Schifcofske (CBR FB) 91",
+        "Matthew Cooper (SGI CE) 91",
+        "Kurt Gidley (NEW HB) 90",
+        "Paul Rauhihi (NQC PR) 90",
+        "Corey Parker (BRI SR) 90"
+      ],
+      "clubs": [
+        "Sydney Roosters 85.4 (28 players, 24 in the squad; out of position: Michael Crocker (SR) at PR, Chad Robinson (SR) at LK; 2004: 19–0–5, 710–368)",
+        "Bulldogs 84.2 (26 players, 24 in the squad; out of position: Roy Asotasi (SR) at PR, Reni Maitua (SR) at LK; 2004: 19–0–5, 760–491)",
+        "Melbourne Storm 84 (29 players, 24 in the squad; out of position: Ryan Hoffman (LK) at PR; 2004: 13–0–11, 684–517)",
+        "St. George Illawarra Dragons 83.8 (33 players, 24 in the squad; out of position: Ashton Sims (PR) at LK; 2004: 14–0–10, 624–415)",
+        "North Queensland Cowboys 83.7 (28 players, 24 in the squad; out of position: Luke O'Donnell (SR) at PR; 2004: 12–1–11, 526–514)",
+        "Penrith Panthers 83.4 (29 players, 24 in the squad; out of position: Shane Rodney (SR) at HK; 2004: 15–0–9, 672–567)",
+        "Brisbane Broncos 83.1 (33 players, 24 in the squad; out of position: Gorden Tallis (SR) at PR, Brad Meyers (SR) at PR; 2004: 16–1–7, 602–533)",
+        "Canberra Raiders 83.1 (33 players, 24 in the squad; out of position: Michael Hodgson (SR) at PR; 2004: 11–0–13, 554–613)",
+        "Newcastle Knights 82.7 (33 players, 24 in the squad; 2004: 10–0–14, 516–617)",
+        "Wests Tigers 82.7 (32 players, 24 in the squad; out of position: Ben Galea (SR) at PR; 2004: 10–0–14, 509–534)",
+        "Parramatta Eels 82.4 (36 players, 24 in the squad; 2004: 9–0–15, 517–626)",
+        "Cronulla-Sutherland Sharks 82.3 (29 players, 24 in the squad; out of position: Sam Isemonger (SR) at PR; 2004: 10–0–14, 528–645)",
+        "Manly Warringah Sea Eagles 82 (29 players, 24 in the squad; out of position: Sam Harris (SR) at LK; 2004: 9–0–15, 615–754)",
+        "South Sydney Rabbitohs 82 (39 players, 24 in the squad; out of position: Garth Wood (FB) at CE, Shane Rigon (LK) at PR; 2004: 5–2–17, 455–812)",
+        "New Zealand Warriors 81.9 (31 players, 24 in the squad; out of position: Wairangi Koopu (SR) at LK, Epalahame Lauaki (SR) at LK; 2004: 6–0–18, 427–693)"
+      ],
+      "clubShift": [
+        "Sydney Roosters: SRS +13.079, target 85.05, shift +1, strength 84.4 → 85.4",
+        "Bulldogs: SRS +10.823, target 84.36, shift +1, strength 83.2 → 84.2",
+        "St. George Illawarra Dragons: SRS +8.423, target 84.1, shift 0, strength 83.8 → 83.8",
+        "Melbourne Storm: SRS +6.079, target 83.9, shift -1, strength 85 → 84",
+        "Penrith Panthers: SRS +4.739, target 83.84, shift 0, strength 83.4 → 83.4",
+        "Brisbane Broncos: SRS +2.159, target 83.51, shift 0, strength 83.1 → 83.1",
+        "North Queensland Cowboys: SRS -0.121, target 83.23, shift 0, strength 83.7 → 83.7",
+        "Wests Tigers: SRS -0.461, target 83.2, shift +1, strength 81.7 → 82.7",
+        "Canberra Raiders: SRS -2.297, target 83.16, shift 0, strength 83.1 → 83.1",
+        "Newcastle Knights: SRS -3.501, target 82.87, shift -1, strength 83.7 → 82.7",
+        "Cronulla-Sutherland Sharks: SRS -4.141, target 82.72, shift -1, strength 83.3 → 82.3",
+        "Parramatta Eels: SRS -4.297, target 82.44, shift 0, strength 82.4 → 82.4",
+        "Manly Warringah Sea Eagles: SRS -6.161, target 82.17, shift 0, strength 82 → 82",
+        "New Zealand Warriors: SRS -10.101, target 81.86, shift 0, strength 81.9 → 81.9",
+        "South Sydney Rabbitohs: SRS -14.217, target 81.8, shift +1, strength 81 → 82"
+      ],
+      "homeEdge": 5.317,
+      "strengthAndResults": {
+        "stats": 0.664,
+        "shifted": 0.914
+      },
+      "placedByRlp": [
+        "nrl-bulldogs: Adrian Rainey: SR (RLP 3383)",
+        "nrl-canberra-raiders: Michael Weyman: PR (RLP 1599)",
+        "nrl-canberra-raiders: Darren Porter: PR (RLP 2840)",
+        "nrl-cronulla-sutherland-sharks: Michael Greenfield: PR (RLP 3452)",
+        "nrl-manly-warringah-sea-eagles: Mark Lennon: HB (RLP 3365)",
+        "nrl-manly-warringah-sea-eagles: Nick Paterson: PR (RLP 2299)",
+        "nrl-newcastle-knights: Kevin Henderson: CE (RLP 2488)",
+        "nrl-parramatta-eels: Feleti Mateo: SR (RLP 2462)",
+        "nrl-south-sydney-rabbitohs: Fili Lolohea: PR (RLP 2452)",
+        "nrl-st-george-illawarra-dragons: Bryan Norrie: PR (RLP 1577)",
+        "nrl-wests-tigers: Jeff Lima: PR (RLP 3440)"
+      ],
+      "left": [
+        "nrl-bulldogs: Brett Oliver (3 games): started at no position on NRL.com from 2002 to 2006, and the Rugby League Project gives no position for him (154)",
+        "nrl-manly-warringah-sea-eagles: Dave Warry (1 game): started at no position on NRL.com from 2002 to 2006, and the Rugby League Project gives no position for him (3446)",
+        "nrl-new-zealand-warriors: Herewini Rangi (1 game): started at no position on NRL.com from 2002 to 2006, and the Rugby League Project gives no position for him (3450)",
+        "nrl-new-zealand-warriors: Kane Ferris (1 game): started at no position on NRL.com from 2002 to 2006, and the Rugby League Project gives no position for him (3454)",
+        "nrl-new-zealand-warriors: Paul Atkins (1 game): started at no position on NRL.com from 2002 to 2006, and the Rugby League Project gives no position for him (3455)",
+        "nrl-new-zealand-warriors: Shannon Stowers (2 games): started at no position on NRL.com from 2002 to 2006, and the Rugby League Project gives no position for him (3436)",
+        "nrl-penrith-panthers: Jason Wrigley (2 games): started at no position on NRL.com from 2002 to 2006, and the Rugby League Project gives no position for him (3435)",
+        "nrl-south-sydney-rabbitohs: Brian Siemsen (1 game): started at no position on NRL.com from 2002 to 2006, and the Rugby League Project gives no position for him (3424)",
+        "nrl-st-george-illawarra-dragons: Aaron Wheatley (5 games): started at no position on NRL.com from 2002 to 2006, and the Rugby League Project gives no position for him (3438)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.5333,
+          "WG": 4.6,
+          "CE": 3.9333,
+          "FE": 2,
+          "HB": 2.2667,
+          "HK": 3,
+          "PR": 6.2,
+          "SR": 5.4667,
+          "LK": 2.2
+        }
+      },
+      "real": {
+        "games": 180,
+        "pointsPerTeam": 24.164,
+        "teamPointsSd": 12.566,
+        "draws": 2,
+        "marginMean": 16.483,
+        "byOne": 0.028,
+        "withinSix": 0.256,
+        "withinTwelve": 0.489,
+        "byThirteenPlus": 0.5,
+        "byTwentyFivePlus": 0.233,
+        "nilRate": 0.011,
+        "fortyPlusRate": 0.111,
+        "homeWins": 0.579,
+        "winPctSd": 0.165,
+        "bestWins": 19,
+        "worstWins": 5
+      }
+    },
+    {
+      "id": "nrl-2003",
+      "version": "nrl-2003-393aa6ca",
+      "season": "2003",
+      "edition": "NRL.com match centre, the 2003 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2003",
+      "method": "computed",
+      "games": {
+        "played": 189,
+        "regular": 180,
+        "withTeamLists": 189
+      },
+      "players": {
+        "placed": 460,
+        "bySeason": 396,
+        "bySeasonEitherSide": 40,
+        "byTwoEitherSide": 10,
+        "byRlp": 14,
+        "left": 16,
+        "inSquads": 360
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 67,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 66,
+          "median": 79,
+          "highest": 92
+        }
+      },
+      "byPosition": {
+        "FB": "30 players (2 a club), overall 70–91 (median 84), played 69–92",
+        "WG": "65 players (4.3333 a club), overall 68–90 (median 79), played 68–90",
+        "CE": "60 players (4 a club), overall 68–91 (median 79), played 68–91",
+        "FE": "32 players (2.1333 a club), overall 70–90 (median 79), played 70–91",
+        "HB": "30 players (2 a club), overall 71–93 (median 78), played 69–92",
+        "HK": "42 players (2.8 a club), overall 67–91 (median 78), played 66–92",
+        "PR": "85 players (5.6667 a club), overall 69–93 (median 77), played 67–91",
+        "SR": "81 players (5.4 a club), overall 69–91 (median 80), played 68–91",
+        "LK": "35 players (2.3333 a club), overall 70–92 (median 83), played 70–91"
+      },
+      "best": [
+        "Craig Wing (SYD HK) 92",
+        "Shaun Berrigan (BRI HB) 92",
+        "Clinton Schifcofske (CBR FB) 92",
+        "Brad Fittler (SYD FE) 91",
+        "Danny Nutley (CRO SR) 91",
+        "Craig Gower (PEN HB) 91",
+        "Robbie Kearns (MEL PR) 91",
+        "Brett Finch (SYD HB) 91",
+        "Glenn Morrison (NQC LK) 91",
+        "Phil Bailey (CRO CE) 91",
+        "Rhys Wesser (PEN FB) 91",
+        "Anthony Minichiello (SYD FB) 91"
+      ],
+      "clubs": [
+        "Bulldogs 85.4 (27 players, 24 in the squad; out of position: Jamie Feeney (SR) at PR; 2003: 16–0–8, 702–419)",
+        "Sydney Roosters 84.8 (29 players, 24 in the squad; out of position: Chad Robinson (SR) at PR, Adrian Morley (SR) at LK; 2003: 17–0–7, 680–445)",
+        "Canberra Raiders 83.9 (26 players, 24 in the squad; out of position: Michael Hodgson (SR) at LK; 2003: 16–0–8, 620–463)",
+        "Parramatta Eels 83.6 (33 players, 24 in the squad; 2003: 11–0–13, 570–582)",
+        "Penrith Panthers 83.6 (28 players, 24 in the squad; out of position: Tony Puletua (SR) at PR; 2003: 18–0–6, 659–527)",
+        "Melbourne Storm 83.5 (33 players, 24 in the squad; 2003: 15–0–9, 564–486)",
+        "New Zealand Warriors 83.3 (28 players, 24 in the squad; 2003: 15–0–9, 545–510)",
+        "Brisbane Broncos 83.2 (32 players, 24 in the squad; out of position: Brad Meyers (SR) at PR; 2003: 12–0–12, 497–464)",
+        "Newcastle Knights 82.9 (29 players, 24 in the squad; out of position: Robbie O'Davis (FB) at CE, Kurt Gidley (HB) at HK, Matthew Jobson (SR) at PR; 2003: 14–0–10, 632–635)",
+        "North Queensland Cowboys 82.6 (31 players, 24 in the squad; out of position: Micheal Luck (SR) at LK; 2003: 10–0–14, 606–629)",
+        "St. George Illawarra Dragons 82.6 (34 players, 24 in the squad; out of position: John Cross (LK) at HK; 2003: 11–0–13, 548–593)",
+        "Cronulla-Sutherland Sharks 82.5 (33 players, 24 in the squad; out of position: Matt Bickerstaff (SR) at PR; 2003: 8–0–16, 497–704)",
+        "Wests Tigers 82.5 (35 players, 24 in the squad; out of position: Joel Caine (FB) at CE, Terry Hill (LK) at PR; 2003: 7–0–17, 470–598)",
+        "Manly Warringah Sea Eagles 81.6 (27 players, 24 in the squad; out of position: Solomon Haumono (SR) at HK, Tony Jensen (SR) at LK; 2003: 7–0–17, 557–791)",
+        "South Sydney Rabbitohs 81.5 (35 players, 24 in the squad; out of position: Bryan Fletcher (SR) at LK; 2003: 3–0–21, 457–758)"
+      ],
+      "clubShift": [
+        "Bulldogs: SRS +11.089, target 85.05, shift +2, strength 83.4 → 85.4",
+        "Sydney Roosters: SRS +9.167, target 84.36, shift +1, strength 83.8 → 84.8",
+        "Canberra Raiders: SRS +6.744, target 84.1, shift +1, strength 82.9 → 83.9",
+        "Penrith Panthers: SRS +5.049, target 83.9, shift 0, strength 83.6 → 83.6",
+        "Melbourne Storm: SRS +2.887, target 83.84, shift -2, strength 85.5 → 83.5",
+        "Brisbane Broncos: SRS +1.784, target 83.51, shift -1, strength 84.2 → 83.2",
+        "New Zealand Warriors: SRS +1.167, target 83.23, shift 0, strength 83.3 → 83.3",
+        "Newcastle Knights: SRS +0.344, target 83.2, shift 0, strength 82.9 → 82.9",
+        "Parramatta Eels: SRS -0.711, target 83.16, shift +2, strength 81.6 → 83.6",
+        "North Queensland Cowboys: SRS -1.151, target 82.87, shift -1, strength 83.6 → 82.6",
+        "St. George Illawarra Dragons: SRS -2.033, target 82.72, shift 0, strength 82.6 → 82.6",
+        "Wests Tigers: SRS -5.353, target 82.44, shift 0, strength 82.5 → 82.5",
+        "Cronulla-Sutherland Sharks: SRS -8.511, target 82.17, shift 0, strength 82.5 → 82.5",
+        "Manly Warringah Sea Eagles: SRS -8.896, target 81.86, shift 0, strength 81.6 → 81.6",
+        "South Sydney Rabbitohs: SRS -11.576, target 81.8, shift 0, strength 81.5 → 81.5"
+      ],
+      "homeEdge": 1.956,
+      "strengthAndResults": {
+        "stats": 0.698,
+        "shifted": 0.905
+      },
+      "placedByRlp": [
+        "nrl-canberra-raiders: Michael Weyman: PR (RLP 1599)",
+        "nrl-melbourne-storm: Keith Mason: PR (RLP 2394)",
+        "nrl-melbourne-storm: Nathan Sologinkin: PR (RLP 1479)",
+        "nrl-melbourne-storm: Antonio Kaufusi: PR (RLP 1691)",
+        "nrl-new-zealand-warriors: Evarn Tuimavave: PR (RLP 1690)",
+        "nrl-penrith-panthers: Peter Lewis: CE (RLP 1481)",
+        "nrl-south-sydney-rabbitohs: James Storer: HK (RLP 3423)",
+        "nrl-south-sydney-rabbitohs: Fili Lolohea: PR (RLP 2452)",
+        "nrl-st-george-illawarra-dragons: Michael Henderson: PR (RLP 1620)",
+        "nrl-st-george-illawarra-dragons: Robbie Simpson: SR (RLP 2884)",
+        "nrl-sydney-roosters: Fred Petersen: WG (RLP 2877)",
+        "nrl-sydney-roosters: Lopini Paea: PR (RLP 2833)",
+        "nrl-sydney-roosters: Tevita Metuisela: LK (RLP 1917)",
+        "nrl-wests-tigers: Gray Viane: WG (RLP 2332)"
+      ],
+      "left": [
+        "nrl-bulldogs: Brett Oliver (2 games): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (154)",
+        "nrl-cronulla-sutherland-sharks: Don Tweddle (5 games): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (3260)",
+        "nrl-cronulla-sutherland-sharks: Nathan Vagg (2 games): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (3273)",
+        "nrl-cronulla-sutherland-sharks: Shaun Wessel (3 games): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project lists nobody of his name at Cronulla-Sutherland Sharks in 2003",
+        "nrl-manly-warringah-sea-eagles: Craig Hayne (1 game): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (3270)",
+        "nrl-manly-warringah-sea-eagles: Gary Winter (4 games): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (3150)",
+        "nrl-newcastle-knights: Todd Bates (4 games): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (3262)",
+        "nrl-north-queensland-cowboys: Derrick Watkins (1 game): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (3174)",
+        "nrl-parramatta-eels: Nathan McMillan (1 game): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (3275)",
+        "nrl-south-sydney-rabbitohs: Brian Siemsen (2 games): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (3424)",
+        "nrl-south-sydney-rabbitohs: Jess Caine (4 games): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (3281)",
+        "nrl-south-sydney-rabbitohs: Stacey Katu (2 games): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (3259)",
+        "nrl-st-george-illawarra-dragons: Peter Ellis (1 game): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (1678)",
+        "nrl-sydney-roosters: Ben Wellington (3 games): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (3422)",
+        "nrl-sydney-roosters: Todd Ollivier (1 game): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (3416)",
+        "nrl-wests-tigers: Clint Hill (1 game): started at no position on NRL.com from 2001 to 2005, and the Rugby League Project gives no position for him (3421)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 2,
+          "WG": 4.3333,
+          "CE": 4,
+          "FE": 2.1333,
+          "HB": 2,
+          "HK": 2.8,
+          "PR": 5.6667,
+          "SR": 5.4,
+          "LK": 2.3333
+        }
+      },
+      "real": {
+        "games": 180,
+        "pointsPerTeam": 23.9,
+        "teamPointsSd": 11.624,
+        "draws": 0,
+        "marginMean": 14.422,
+        "byOne": 0.033,
+        "withinSix": 0.322,
+        "withinTwelve": 0.533,
+        "byThirteenPlus": 0.467,
+        "byTwentyFivePlus": 0.189,
+        "nilRate": 0.008,
+        "fortyPlusRate": 0.094,
+        "homeWins": 0.528,
+        "winPctSd": 0.176,
+        "bestWins": 18,
+        "worstWins": 3
+      }
+    },
+    {
+      "id": "nrl-2002",
+      "version": "nrl-2002-b218af5d",
+      "season": "2002",
+      "edition": "NRL.com match centre, the 2002 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2002",
+      "method": "computed",
+      "games": {
+        "played": 189,
+        "regular": 180,
+        "withTeamLists": 189
+      },
+      "players": {
+        "placed": 454,
+        "bySeason": 412,
+        "bySeasonEitherSide": 27,
+        "byTwoEitherSide": 5,
+        "byRlp": 10,
+        "left": 13,
+        "inSquads": 360
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 68,
+          "median": 80,
+          "highest": 93
+        }
+      },
+      "byPosition": {
+        "FB": "27 players (1.8 a club), overall 70–91 (median 84), played 71–92",
+        "WG": "67 players (4.4667 a club), overall 68–90 (median 78), played 69–91",
+        "CE": "60 players (4 a club), overall 68–91 (median 79), played 68–92",
+        "FE": "33 players (2.2 a club), overall 70–90 (median 78), played 71–91",
+        "HB": "31 players (2.0667 a club), overall 71–93 (median 78), played 72–93",
+        "HK": "36 players (2.4 a club), overall 68–91 (median 79), played 69–91",
+        "PR": "90 players (6 a club), overall 69–93 (median 77), played 69–92",
+        "SR": "80 players (5.3333 a club), overall 69–91 (median 81), played 69–92",
+        "LK": "30 players (2 a club), overall 70–92 (median 84), played 71–91"
+      },
+      "best": [
+        "Brett Finch (CBR HB) 93",
+        "Ali Lauiti'iti (NZW SR) 92",
+        "Danny Nutley (SHA PR) 92",
+        "Craig Wing (SYD HB) 92",
+        "Nigel Vagana (BUL CE) 92",
+        "Darren Lockyer (BRI FB) 92",
+        "Brad Fittler (SYD FE) 91",
+        "Robert Mears (WST HK) 91",
+        "Jason Ryles (SGI PR) 91",
+        "Nick Graham (SHA LK) 91",
+        "Luke Ricketson (SYD LK) 91",
+        "Andrew Johns (NEW HB) 91"
+      ],
+      "clubs": [
+        "Bulldogs 85.3 (29 players, 24 in the squad; 2002: 20–1–3, 707–435)",
+        "Brisbane Broncos 84.5 (32 players, 24 in the squad; out of position: Corey Parker (SR) at PR; 2002: 16–1–7, 672–425)",
+        "New Zealand Warriors 84.4 (29 players, 24 in the squad; out of position: Logan Swann (SR) at PR; 2002: 17–0–7, 688–454)",
+        "Newcastle Knights 84.2 (27 players, 24 in the squad; out of position: John Morris (WG) at CE, Daniel Abraham (SR) at PR, Clint Newton (SR) at LK; 2002: 17–0–7, 724–498)",
+        "Sydney Roosters 84.2 (33 players, 24 in the squad; out of position: Chris Flannery (SR) at PR, Michael Crocker (SR) at LK; 2002: 15–1–8, 621–405)",
+        "Parramatta Eels 83.9 (32 players, 24 in the squad; out of position: Andrew Ryan (SR) at PR; 2002: 10–2–12, 531–440)",
+        "Sharks 83.2 (28 players, 24 in the squad; out of position: Matt Bickerstaff (SR) at LK; 2002: 15–0–9, 653–597)",
+        "St. George Illawarra Dragons 83.2 (31 players, 24 in the squad; out of position: Ben Hornby (FB) at WG, Brent Kite (SR) at PR; 2002: 9–3–12, 632–546)",
+        "Wests Tigers 83.1 (29 players, 24 in the squad; 2002: 7–0–17, 498–642)",
+        "Canberra Raiders 82.8 (29 players, 24 in the squad; out of position: Tyran Smith (SR) at HK; 2002: 10–1–13, 471–641)",
+        "Melbourne Storm 82.8 (27 players, 24 in the squad; out of position: Kirk Reynoldson (PR) at HK; 2002: 9–1–14, 556–586)",
+        "Penrith Panthers 82.8 (30 players, 24 in the squad; out of position: Tony Puletua (SR) at HK; 2002: 7–0–17, 546–654)",
+        "North Queensland Cowboys 81.8 (31 players, 24 in the squad; 2002: 8–0–16, 496–803)",
+        "South Sydney Rabbitohs 81.8 (37 players, 24 in the squad; out of position: Brett Sheehan (HB) at HK, Andrew Hart (SR) at PR; 2002: 5–0–19, 385–817)",
+        "Northern Eagles 81.7 (30 players, 24 in the squad; out of position: David Westley (PR) at LK; 2002: 10–0–14, 503–740)"
+      ],
+      "clubShift": [
+        "Bulldogs: SRS +10.529, target 85.05, shift +1, strength 84.3 → 85.3",
+        "Brisbane Broncos: SRS +10.408, target 84.36, shift +1, strength 83.5 → 84.5",
+        "New Zealand Warriors: SRS +9.183, target 84.1, shift +1, strength 83.4 → 84.4",
+        "Newcastle Knights: SRS +8.689, target 83.9, shift +1, strength 83.2 → 84.2",
+        "Sydney Roosters: SRS +8.289, target 83.84, shift +1, strength 83.2 → 84.2",
+        "Parramatta Eels: SRS +3.463, target 83.51, shift 0, strength 83.9 → 83.9",
+        "St. George Illawarra Dragons: SRS +3.263, target 83.23, shift +1, strength 82.2 → 83.2",
+        "Sharks: SRS +2.768, target 83.2, shift -1, strength 84.2 → 83.2",
+        "Melbourne Storm: SRS -0.672, target 83.16, shift -1, strength 83.8 → 82.8",
+        "Penrith Panthers: SRS -4.497, target 82.87, shift 0, strength 82.8 → 82.8",
+        "Wests Tigers: SRS -6.111, target 82.72, shift +1, strength 82.1 → 83.1",
+        "Canberra Raiders: SRS -6.977, target 82.44, shift 0, strength 82.8 → 82.8",
+        "Northern Eagles: SRS -8.952, target 82.17, shift +1, strength 80.7 → 81.7",
+        "North Queensland Cowboys: SRS -12.631, target 81.86, shift 0, strength 81.8 → 81.8",
+        "South Sydney Rabbitohs: SRS -16.752, target 81.8, shift 0, strength 81.8 → 81.8"
+      ],
+      "homeEdge": 4.772,
+      "strengthAndResults": {
+        "stats": 0.676,
+        "shifted": 0.865
+      },
+      "placedByRlp": [
+        "nrl-bulldogs: Adam Brideson: HK (RLP 752)",
+        "nrl-bulldogs: Nathan Sologinkin: PR (RLP 1479)",
+        "nrl-canberra-raiders: Darren Porter: PR (RLP 2840)",
+        "nrl-canberra-raiders: Mark Bryant: PR (RLP 1365)",
+        "nrl-melbourne-storm: Keith Mason: PR (RLP 2394)",
+        "nrl-melbourne-storm: Michael Russo: SR (RLP 3141)",
+        "nrl-new-zealand-warriors: Evarn Tuimavave: PR (RLP 1690)",
+        "nrl-north-queensland-cowboys: Tevita Amone: PR (RLP 1448)",
+        "nrl-south-sydney-rabbitohs: Chris Caruana: CE (RLP 1302)",
+        "nrl-south-sydney-rabbitohs: Fili Lolohea: PR (RLP 2452)"
+      ],
+      "left": [
+        "nrl-brisbane-broncos: Steve La Caze (1 game): started at no position on NRL.com from 2000 to 2004, and the Rugby League Project gives no position for him (3162)",
+        "nrl-canberra-raiders: James Buser (2 games): started at no position on NRL.com from 2000 to 2004, and the Rugby League Project gives no position for him (3169)",
+        "nrl-newcastle-knights: Daniel Quinn (1 game): started at no position on NRL.com from 2000 to 2004, and the Rugby League Project gives no position for him (2870)",
+        "nrl-newcastle-knights: Trent Estatheo (3 games): started at no position on NRL.com from 2000 to 2004, and the Rugby League Project gives no position for him (3147)",
+        "nrl-north-queensland-cowboys: Ben Laity (1 game): started at no position on NRL.com from 2000 to 2004, and the Rugby League Project gives no position for him (3156)",
+        "nrl-north-queensland-cowboys: Derrick Watkins (2 games): started at no position on NRL.com from 2000 to 2004, and the Rugby League Project gives no position for him (3174)",
+        "nrl-north-queensland-cowboys: Grant Reibel (3 games): started at no position on NRL.com from 2000 to 2004, and the Rugby League Project gives no position for him (2891)",
+        "nrl-northern-eagles: Gary Winter (5 games): started at no position on NRL.com from 2000 to 2004, and the Rugby League Project gives no position for him (3150)",
+        "nrl-sharks: Brett Sargent (3 games): started at no position on NRL.com from 2000 to 2004, and the Rugby League Project gives no position for him (3175)",
+        "nrl-south-sydney-rabbitohs: Gerald Symonds (2 games): started at no position on NRL.com from 2000 to 2004, and the Rugby League Project gives no position for him (3179)",
+        "nrl-south-sydney-rabbitohs: Noah Sete (2 games): started at no position on NRL.com from 2000 to 2004, and the Rugby League Project gives no position for him (3166)",
+        "nrl-south-sydney-rabbitohs: Wesley Maas (2 games): started at no position on NRL.com from 2000 to 2004, and the Rugby League Project gives no position for him (3153)",
+        "nrl-sydney-roosters: George Azzi (1 game): started at no position on NRL.com from 2000 to 2004, and the Rugby League Project gives no position for him (3146)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.8,
+          "WG": 4.4667,
+          "CE": 4,
+          "FE": 2.2,
+          "HB": 2.0667,
+          "HK": 2.4,
+          "PR": 6,
+          "SR": 5.3333,
+          "LK": 2
+        }
+      },
+      "real": {
+        "games": 180,
+        "pointsPerTeam": 24.119,
+        "teamPointsSd": 12.508,
+        "draws": 5,
+        "marginMean": 17.039,
+        "byOne": 0.017,
+        "withinSix": 0.2,
+        "withinTwelve": 0.433,
+        "byThirteenPlus": 0.539,
+        "byTwentyFivePlus": 0.256,
+        "nilRate": 0.008,
+        "fortyPlusRate": 0.119,
+        "homeWins": 0.594,
+        "winPctSd": 0.185,
+        "bestWins": 20,
+        "worstWins": 5
+      }
+    },
+    {
+      "id": "nrl-2001",
+      "version": "nrl-2001-15cc6a97",
+      "season": "2001",
+      "edition": "NRL.com match centre, the 2001 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2001",
+      "method": "computed",
+      "games": {
+        "played": 191,
+        "regular": 182,
+        "withTeamLists": 191
+      },
+      "players": {
+        "placed": 421,
+        "bySeason": 372,
+        "bySeasonEitherSide": 35,
+        "byTwoEitherSide": 6,
+        "byRlp": 8,
+        "left": 10,
+        "inSquads": 336
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 79,
+          "highest": 93
+        }
+      },
+      "byPosition": {
+        "FB": "24 players (1.7143 a club), overall 70–91 (median 84), played 70–92",
+        "WG": "64 players (4.5714 a club), overall 68–90 (median 78), played 68–91",
+        "CE": "56 players (4 a club), overall 68–91 (median 79), played 67–91",
+        "FE": "28 players (2 a club), overall 70–90 (median 79), played 70–91",
+        "HB": "30 players (2.1429 a club), overall 71–93 (median 78), played 71–93",
+        "HK": "34 players (2.4286 a club), overall 68–91 (median 79), played 68–91",
+        "PR": "80 players (5.7143 a club), overall 69–93 (median 77), played 68–92",
+        "SR": "76 players (5.4286 a club), overall 69–91 (median 80), played 69–92",
+        "LK": "29 players (2.0714 a club), overall 71–92 (median 84), played 72–92"
+      },
+      "best": [
+        "Stacey Jones (NZW HB) 93",
+        "Nathan Hindmarsh (PAR SR) 92",
+        "Robbie Kearns (MEL PR) 92",
+        "Scott Sattler (PEN LK) 92",
+        "Brett Finch (CBR HB) 92",
+        "Darren Lockyer (BRI FB) 92",
+        "Bryan Fletcher (SYD SR) 91",
+        "Glenn Morrison (NQC LK) 91",
+        "Wendell Sailor (BRI WG) 91",
+        "Brad Fittler (SYD FE) 91",
+        "Luke Priddis (BRI HK) 91",
+        "Nigel Vagana (BUL CE) 91"
+      ],
+      "clubs": [
+        "Brisbane Broncos 84.8 (29 players, 24 in the squad; out of position: Carl Webb (SR) at PR, Gorden Tallis (SR) at PR; 2001: 14–1–11, 696–511)",
+        "Parramatta Eels 84.8 (25 players, 24 in the squad; out of position: David Solomona (SR) at PR; 2001: 20–2–4, 839–406)",
+        "Newcastle Knights 84.3 (28 players, 24 in the squad; out of position: Paul Marquet (SR) at LK; 2001: 16–1–9, 782–639)",
+        "Sharks 84.2 (30 players, 24 in the squad; out of position: Sean Ryan (SR) at PR, Luke Stuart (SR) at LK; 2001: 15–2–9, 594–513)",
+        "Sydney Roosters 83.7 (30 players, 24 in the squad; out of position: Michael Crocker (SR) at PR; 2001: 13–1–12, 647–589)",
+        "St. George Illawarra Dragons 83.4 (27 players, 24 in the squad; out of position: Darren Treacy (SR) at LK; 2001: 12–2–12, 661–573)",
+        "Canberra Raiders 83.2 (34 players, 24 in the squad; out of position: Terry Martin (SR) at HK; 2001: 9–1–16, 600–623)",
+        "Melbourne Storm 83.2 (26 players, 24 in the squad; out of position: Robbie Ross (FB) at WG, Tasesa Lavea (FE) at HK; 2001: 11–1–14, 704–725)",
+        "New Zealand Warriors 83 (26 players, 24 in the squad; out of position: Mark Tookey (PR) at LK; 2001: 12–2–12, 638–629)",
+        "Bulldogs 82.8 (29 players, 24 in the squad; out of position: Dennis Scott (SR) at PR, Willie Mason (SR) at PR; 2001: 17–3–6, 617–568)",
+        "Northern Eagles 82.6 (33 players, 24 in the squad; out of position: Wayne Evans (SR) at PR; 2001: 11–1–14, 603–750)",
+        "Penrith Panthers 82.2 (32 players, 24 in the squad; 2001: 7–0–19, 521–847)",
+        "North Queensland Cowboys 82.1 (38 players, 24 in the squad; out of position: Matthew Bowen (FB) at WG, Micheal Luck (SR) at LK; 2001: 6–2–18, 514–771)",
+        "Wests Tigers 81.6 (34 players, 24 in the squad; 2001: 9–1–16, 474–746)"
+      ],
+      "clubShift": [
+        "Parramatta Eels: SRS +15.187, target 85.03, shift +1, strength 83.8 → 84.8",
+        "Brisbane Broncos: SRS +6.607, target 84.34, shift +1, strength 83.8 → 84.8",
+        "Newcastle Knights: SRS +5.107, target 84.04, shift +1, strength 83.3 → 84.3",
+        "St. George Illawarra Dragons: SRS +3.143, target 83.9, shift 0, strength 83.4 → 83.4",
+        "Sharks: SRS +2.893, target 83.8, shift 0, strength 84.2 → 84.2",
+        "Sydney Roosters: SRS +2.071, target 83.36, shift +1, strength 82.7 → 83.7",
+        "Bulldogs: SRS +1.75, target 83.2, shift 0, strength 82.8 → 82.8",
+        "New Zealand Warriors: SRS +0.321, target 83.2, shift 0, strength 83 → 83",
+        "Melbourne Storm: SRS -0.75, target 82.95, shift -1, strength 84.2 → 83.2",
+        "Canberra Raiders: SRS -0.821, target 82.79, shift +1, strength 82.2 → 83.2",
+        "Northern Eagles: SRS -5.25, target 82.53, shift -1, strength 83.6 → 82.6",
+        "North Queensland Cowboys: SRS -9.179, target 82.21, shift +1, strength 81.1 → 82.1",
+        "Wests Tigers: SRS -9.714, target 81.9, shift 0, strength 81.6 → 81.6",
+        "Penrith Panthers: SRS -11.365, target 81.8, shift 0, strength 82.2 → 82.2"
+      ],
+      "homeEdge": 3.884,
+      "strengthAndResults": {
+        "stats": 0.581,
+        "shifted": 0.75
+      },
+      "placedByRlp": [
+        "nrl-canberra-raiders: Darren Porter: PR (RLP 2840)",
+        "nrl-new-zealand-warriors: Anthony Seu Seu: PR (RLP 18078)",
+        "nrl-north-queensland-cowboys: Bruce Mamando: SR (RLP 1823)",
+        "nrl-parramatta-eels: Adrian Rainey: SR (RLP 3383)",
+        "nrl-penrith-panthers: David McLean: LK (RLP 336)",
+        "nrl-sharks: Ben Sammut: FB (RLP 717)",
+        "nrl-sharks: Scott Murray: FE (RLP 1855)",
+        "nrl-sharks: Stuart Pierce: PR (RLP 2783)"
+      ],
+      "left": [
+        "nrl-bulldogs: Royce Simms (2 games): started at no position on NRL.com from 1999 to 2003, and the Rugby League Project gives no position for him (2821)",
+        "nrl-canberra-raiders: Jarrad Lawrence (1 game): started at no position on NRL.com from 1999 to 2003, and the Rugby League Project gives no position for him (3103)",
+        "nrl-new-zealand-warriors: Jonathon Smith (5 games): started at no position on NRL.com from 1999 to 2003, and the Rugby League Project gives no position for him (2922)",
+        "nrl-northern-eagles: Scott Asimus (4 games): started at no position on NRL.com from 1999 to 2003, and the Rugby League Project gives no position for him (1675)",
+        "nrl-northern-eagles: Steve Carew (2 games): started at no position on NRL.com from 1999 to 2003, and the Rugby League Project gives no position for him (2314)",
+        "nrl-parramatta-eels: Danny Sullivan (5 games): started at no position on NRL.com from 1999 to 2003, and the Rugby League Project gives no position for him (2822)",
+        "nrl-penrith-panthers: Chris Levy (1 game): started at no position on NRL.com from 1999 to 2003, and the Rugby League Project gives no position for him (2867)",
+        "nrl-penrith-panthers: Robbie Duffy (2 games): started at no position on NRL.com from 1999 to 2003, and the Rugby League Project gives no position for him (3098)",
+        "nrl-st-george-illawarra-dragons: Andrew Bobbin (1 game): started at no position on NRL.com from 1999 to 2003, and the Rugby League Project gives no position for him (3109)",
+        "nrl-sydney-roosters: Monah Elahmad (1 game): started at no position on NRL.com from 1999 to 2003, and the Rugby League Project gives no position for him (3739)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.7143,
+          "WG": 4.5714,
+          "CE": 4,
+          "FE": 2,
+          "HB": 2.1429,
+          "HK": 2.4286,
+          "PR": 5.7143,
+          "SR": 5.4286,
+          "LK": 2.0714
+        }
+      },
+      "real": {
+        "games": 182,
+        "pointsPerTeam": 24.423,
+        "teamPointsSd": 12.234,
+        "draws": 10,
+        "marginMean": 15.714,
+        "byOne": 0.033,
+        "withinSix": 0.22,
+        "withinTwelve": 0.434,
+        "byThirteenPlus": 0.511,
+        "byTwentyFivePlus": 0.231,
+        "nilRate": 0.016,
+        "fortyPlusRate": 0.124,
+        "homeWins": 0.558,
+        "winPctSd": 0.152,
+        "bestWins": 20,
+        "worstWins": 6
+      }
+    },
+    {
+      "id": "nrl-2000",
+      "version": "nrl-2000-7bd5421a",
+      "season": "2000",
+      "edition": "NRL.com match centre, the 2000 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl2000",
+      "method": "computed",
+      "games": {
+        "played": 191,
+        "regular": 182,
+        "withTeamLists": 191
+      },
+      "players": {
+        "placed": 448,
+        "bySeason": 387,
+        "bySeasonEitherSide": 46,
+        "byTwoEitherSide": 9,
+        "byRlp": 6,
+        "left": 8,
+        "inSquads": 336
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 67,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 79,
+          "highest": 93
+        }
+      },
+      "byPosition": {
+        "FB": "25 players (1.7857 a club), overall 70–91 (median 84), played 70–93",
+        "WG": "64 players (4.5714 a club), overall 68–90 (median 78), played 68–92",
+        "CE": "58 players (4.1429 a club), overall 68–91 (median 79), played 68–91",
+        "FE": "28 players (2 a club), overall 70–90 (median 79), played 70–90",
+        "HB": "30 players (2.1429 a club), overall 71–93 (median 78), played 71–93",
+        "HK": "38 players (2.7143 a club), overall 67–91 (median 78), played 68–91",
+        "PR": "92 players (6.5714 a club), overall 68–93 (median 77), played 67–93",
+        "SR": "81 players (5.7857 a club), overall 68–91 (median 80), played 69–92",
+        "LK": "32 players (2.2857 a club), overall 71–92 (median 83), played 72–92"
+      },
+      "best": [
+        "David Fairleigh (NEW PR) 93",
+        "Andrew Johns (NEW HB) 93",
+        "Darren Lockyer (BRI FB) 93",
+        "Nick Graham (SHA LK) 92",
+        "Nathan Hindmarsh (PAR SR) 92",
+        "Wendell Sailor (BRI WG) 92",
+        "Robert Mears (AKL HK) 91",
+        "John Cross (PEN LK) 91",
+        "Darren Britt (BUL PR) 91",
+        "Russell Bawden (MEL CE) 91",
+        "Brett Kimmorley (MEL HB) 91",
+        "David Peachey (SHA FB) 91"
+      ],
+      "clubs": [
+        "Brisbane Broncos 85.5 (30 players, 24 in the squad; out of position: Ashley Harrison (SR) at LK; 2000: 18–2–6, 696–388)",
+        "Newcastle Knights 84.3 (30 players, 24 in the squad; out of position: Steve Simpson (SR) at LK; 2000: 15–1–10, 686–532)",
+        "Melbourne Storm 84.1 (27 players, 24 in the squad; out of position: Paul Marquet (SR) at PR, Ben Roarty (SR) at PR, Danny Williams (SR) at LK; 2000: 14–1–11, 672–529)",
+        "Sharks 84 (30 players, 24 in the squad; out of position: Sean Ryan (SR) at LK; 2000: 13–0–13, 570–463)",
+        "Sydney Roosters 83.7 (31 players, 24 in the squad; out of position: Adrian Lam (HB) at HK, Darren Burns (SR) at PR; 2000: 16–0–10, 601–520)",
+        "Parramatta Eels 83.6 (33 players, 24 in the squad; 2000: 14–1–11, 476–456)",
+        "Bulldogs 83 (32 players, 24 in the squad; out of position: Steve Reardon (SR) at PR; 2000: 10–1–15, 469–553)",
+        "Canberra Raiders 82.9 (34 players, 24 in the squad; out of position: Ken Nagas (FB) at WG, Mark McLinden (FE) at HK, Justin Morgan (SR) at PR, Alan Tongue (SR) at PR; 2000: 15–0–11, 506–479)",
+        "Penrith Panthers 82.8 (27 players, 24 in the squad; out of position: Tony Puletua (SR) at LK; 2000: 15–0–11, 573–562)",
+        "Wests Tigers 82.8 (33 players, 24 in the squad; 2000: 11–2–13, 519–642)",
+        "St. George Illawarra Dragons 82.6 (33 players, 24 in the squad; out of position: Andrew Hart (SR) at HK; 2000: 12–0–14, 576–656)",
+        "Northern Eagles 82.5 (32 players, 24 in the squad; out of position: Nik Kosef (LK) at PR; 2000: 9–0–17, 476–628)",
+        "Auckland Warriors 82.2 (33 players, 24 in the squad; out of position: Tony Tuimavave (SR) at HK, Monty Betham (LK) at PR; 2000: 8–2–16, 426–662)",
+        "North Queensland Cowboys 81.8 (43 players, 24 in the squad; out of position: Kyle Warren (SR) at PR, Mark Shipway (SR) at PR; 2000: 7–0–19, 436–612)"
+      ],
+      "clubShift": [
+        "Brisbane Broncos: SRS +11, target 85.03, shift +2, strength 83.5 → 85.5",
+        "Newcastle Knights: SRS +5.5, target 84.34, shift 0, strength 84.3 → 84.3",
+        "Melbourne Storm: SRS +5.107, target 84.04, shift 0, strength 84.1 → 84.1",
+        "Sharks: SRS +3.299, target 83.9, shift 0, strength 84 → 84",
+        "Sydney Roosters: SRS +2.893, target 83.8, shift 0, strength 83.7 → 83.7",
+        "Canberra Raiders: SRS +0.964, target 83.36, shift 0, strength 82.9 → 82.9",
+        "Parramatta Eels: SRS +0.714, target 83.2, shift +1, strength 82.6 → 83.6",
+        "Penrith Panthers: SRS +0.393, target 83.2, shift +1, strength 81.8 → 82.8",
+        "St. George Illawarra Dragons: SRS -2.335, target 82.95, shift 0, strength 82.6 → 82.6",
+        "Bulldogs: SRS -3, target 82.79, shift +1, strength 82 → 83",
+        "Wests Tigers: SRS -4.393, target 82.53, shift 0, strength 82.8 → 82.8",
+        "Northern Eagles: SRS -5.429, target 82.21, shift -2, strength 84.5 → 82.5",
+        "North Queensland Cowboys: SRS -6.286, target 81.9, shift +1, strength 80.8 → 81.8",
+        "Auckland Warriors: SRS -8.429, target 81.8, shift 0, strength 82.2 → 82.2"
+      ],
+      "homeEdge": 7.312,
+      "strengthAndResults": {
+        "stats": 0.362,
+        "shifted": 0.791
+      },
+      "placedByRlp": [
+        "nrl-bulldogs: Nathan Sologinkin: PR (RLP 1479)",
+        "nrl-newcastle-knights: Daniel Smailes: SR (RLP 1668)",
+        "nrl-north-queensland-cowboys: Des Clark: SR (RLP 625)",
+        "nrl-sharks: Scott Murray: FE (RLP 1855)",
+        "nrl-sharks: Stuart Pierce: PR (RLP 2783)",
+        "nrl-st-george-illawarra-dragons: Robbie Simpson: SR (RLP 2884)"
+      ],
+      "left": [
+        "nrl-auckland-warriors: Jonathon Smith (2 games): started at no position on NRL.com from 1998 to 2002, and the Rugby League Project gives no position for him (2922)",
+        "nrl-melbourne-storm: Chris Essex (1 game): started at no position on NRL.com from 1998 to 2002, and the Rugby League Project gives no position for him (2917)",
+        "nrl-melbourne-storm: Wade Fenton (3 games): started at no position on NRL.com from 1998 to 2002, and the Rugby League Project gives no position for him (2901)",
+        "nrl-north-queensland-cowboys: Grant Reibel (2 games): started at no position on NRL.com from 1998 to 2002, and the Rugby League Project gives no position for him (2891)",
+        "nrl-northern-eagles: Daniel Quinn (3 games): started at no position on NRL.com from 1998 to 2002, and the Rugby League Project gives no position for him (2870)",
+        "nrl-northern-eagles: Scott Asimus (2 games): started at no position on NRL.com from 1998 to 2002, and the Rugby League Project gives no position for him (1675)",
+        "nrl-parramatta-eels: Adam Wheeler (1 game): started at no position on NRL.com from 1998 to 2002, and the Rugby League Project gives no position for him (2938)",
+        "nrl-penrith-panthers: Chris Levy (6 games): started at no position on NRL.com from 1998 to 2002, and the Rugby League Project gives no position for him (2867)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 1.7857,
+          "WG": 4.5714,
+          "CE": 4.1429,
+          "FE": 2,
+          "HB": 2.1429,
+          "HK": 2.7143,
+          "PR": 6.5714,
+          "SR": 5.7857,
+          "LK": 2.2857
+        }
+      },
+      "real": {
+        "games": 182,
+        "pointsPerTeam": 21.104,
+        "teamPointsSd": 11.602,
+        "draws": 5,
+        "marginMean": 14.725,
+        "byOne": 0.027,
+        "withinSix": 0.28,
+        "withinTwelve": 0.577,
+        "byThirteenPlus": 0.396,
+        "byTwentyFivePlus": 0.231,
+        "nilRate": 0.014,
+        "fortyPlusRate": 0.088,
+        "homeWins": 0.684,
+        "winPctSd": 0.122,
+        "bestWins": 18,
+        "worstWins": 7
+      }
+    },
+    {
+      "id": "nrl-1999",
+      "version": "nrl-1999-230d640b",
+      "season": "1999",
+      "edition": "NRL.com match centre, the 1999 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl1999",
+      "method": "computed",
+      "games": {
+        "played": 213,
+        "regular": 204,
+        "withTeamLists": 213
+      },
+      "players": {
+        "placed": 506,
+        "bySeason": 449,
+        "bySeasonEitherSide": 35,
+        "byTwoEitherSide": 8,
+        "byRlp": 14,
+        "left": 10,
+        "inSquads": 408
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 79,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 67,
+          "median": 79,
+          "highest": 93
+        }
+      },
+      "byPosition": {
+        "FB": "34 players (2 a club), overall 70–91 (median 84), played 71–92",
+        "WG": "69 players (4.0588 a club), overall 68–90 (median 79), played 67–90",
+        "CE": "66 players (3.8824 a club), overall 68–91 (median 80), played 68–91",
+        "FE": "42 players (2.4706 a club), overall 70–90 (median 78), played 70–90",
+        "HB": "34 players (2 a club), overall 71–93 (median 78), played 70–93",
+        "HK": "40 players (2.3529 a club), overall 68–91 (median 79), played 69–92",
+        "PR": "96 players (5.6471 a club), overall 69–93 (median 77), played 69–93",
+        "SR": "96 players (5.6471 a club), overall 68–91 (median 80), played 67–91",
+        "LK": "29 players (1.7059 a club), overall 78–92 (median 84), played 78–92"
+      },
+      "best": [
+        "Michael Vella (PAR PR) 93",
+        "Stacey Jones (AKL HB) 93",
+        "John Cross (PEN LK) 92",
+        "Ciriaco Mescia (WSM HK) 92",
+        "David Peachey (SHA FB) 92",
+        "Bryan Fletcher (SYD SR) 91",
+        "David Furner (CBR SR) 91",
+        "Nick Graham (SHA LK) 91",
+        "Harvey Howard (WSM PR) 91",
+        "David Kidwell (PAR CE) 91",
+        "Brett Kimmorley (MEL HB) 91",
+        "Robbie Ross (MEL FB) 91"
+      ],
+      "clubs": [
+        "Sharks 84.6 (26 players, 24 in the squad; 1999: 18–0–6, 586–332)",
+        "Canberra Raiders 84.3 (29 players, 24 in the squad; out of position: Mark McLinden (FE) at HK, Ruben Wiki (SR) at PR; 1999: 13–1–10, 618–439)",
+        "Melbourne Storm 84.1 (26 players, 24 in the squad; out of position: Matt Rua (SR) at PR, Paul Marquet (SR) at PR, Robbie Kearns (SR) at LK; 1999: 16–0–8, 639–392)",
+        "Parramatta Eels 83.8 (29 players, 24 in the squad; out of position: Jarrod McCracken (SR) at LK; 1999: 17–0–7, 500–294)",
+        "St. George Illawarra Dragons 83.8 (25 players, 24 in the squad; 1999: 15–0–9, 588–416)",
+        "Brisbane Broncos 83.5 (25 players, 24 in the squad; out of position: Peter Ryan (SR) at LK; 1999: 13–2–9, 510–368)",
+        "Sydney City Roosters 83.5 (31 players, 24 in the squad; out of position: David Barnhill (SR) at HK; 1999: 16–0–8, 592–377)",
+        "Penrith Panthers 83.3 (30 players, 24 in the squad; 1999: 11–1–12, 492–428)",
+        "Newcastle Knights 82.9 (32 players, 24 in the squad; out of position: David Lomax (SR) at LK; 1999: 14–1–9, 575–484)",
+        "Canterbury Bulldogs 82.8 (28 players, 24 in the squad; out of position: Dennis Scott (SR) at LK; 1999: 15–1–8, 520–462)",
+        "North Sydney Bears 82.8 (28 players, 24 in the squad; out of position: Brett Dallas (WG) at CE; 1999: 8–0–16, 490–642)",
+        "Auckland Warriors 82.5 (32 players, 24 in the squad; out of position: Matthew Ridge (FB) at CE; 1999: 10–0–14, 538–498)",
+        "South Sydney Rabbitohs 82.4 (26 players, 24 in the squad; out of position: Julian O'Neill (FE) at HK, Troy Slattery (LK) at PR; 1999: 10–0–14, 349–556)",
+        "Manly Warringah Sea Eagles 82.3 (28 players, 24 in the squad; out of position: Anthony Colella (SR) at PR; 1999: 9–1–14, 454–623)",
+        "Western Suburbs Magpies 82.2 (36 players, 24 in the squad; out of position: Matt Spence (SR) at PR, Mick Brabek (SR) at LK; 1999: 3–0–21, 285–944)",
+        "North Queensland Cowboys 81.9 (36 players, 24 in the squad; out of position: Chad Halliday (FB) at CE, Mark Shipway (SR) at LK; 1999: 4–1–19, 398–588)",
+        "Balmain Tigers 81.5 (39 players, 24 in the squad; 1999: 8–0–16, 345–636)"
+      ],
+      "clubShift": [
+        "Sharks: SRS +10.417, target 85.1, shift +1, strength 83.6 → 84.6",
+        "Melbourne Storm: SRS +10.039, target 84.4, shift 0, strength 84.1 → 84.1",
+        "Parramatta Eels: SRS +9.027, target 84.2, shift 0, strength 83.8 → 83.8",
+        "Sydney City Roosters: SRS +7.743, target 83.9, shift 0, strength 83.5 → 83.5",
+        "Canberra Raiders: SRS +6.833, target 83.9, shift +1, strength 83.3 → 84.3",
+        "St. George Illawarra Dragons: SRS +6.719, target 83.8, shift -1, strength 84.8 → 83.8",
+        "Brisbane Broncos: SRS +6.264, target 83.4, shift 0, strength 83.5 → 83.5",
+        "Newcastle Knights: SRS +2.759, target 83.2, shift 0, strength 82.9 → 82.9",
+        "Penrith Panthers: SRS +2.37, target 83.2, shift 0, strength 83.3 → 83.3",
+        "Canterbury Bulldogs: SRS +2.15, target 83.2, shift 0, strength 82.8 → 82.8",
+        "Auckland Warriors: SRS +1.904, target 82.9, shift 0, strength 82.5 → 82.5",
+        "North Sydney Bears: SRS -5.408, target 82.8, shift -1, strength 83.8 → 82.8",
+        "Manly Warringah Sea Eagles: SRS -6.698, target 82.6, shift -1, strength 83.3 → 82.3",
+        "North Queensland Cowboys: SRS -7.326, target 82.3, shift +1, strength 80.9 → 81.9",
+        "South Sydney Rabbitohs: SRS -8.376, target 82.1, shift 0, strength 82.4 → 82.4",
+        "Balmain Tigers: SRS -12.497, target 81.8, shift 0, strength 81.5 → 81.5",
+        "Western Suburbs Magpies: SRS -25.919, target 81.8, shift +1, strength 81.2 → 82.2"
+      ],
+      "homeEdge": 3.929,
+      "strengthAndResults": {
+        "stats": 0.667,
+        "shifted": 0.831
+      },
+      "placedByRlp": [
+        "nrl-balmain-tigers: James Gannon: PR (RLP 1322)",
+        "nrl-balmain-tigers: Kylie Leuluai: PR (RLP 833)",
+        "nrl-balmain-tigers: Andrew Meads: LK (RLP 47)",
+        "nrl-brisbane-broncos: John Driscoll: HK (RLP 1672)",
+        "nrl-canberra-raiders: Jerome Guisset: PR (RLP 1657)",
+        "nrl-canberra-raiders: David Cox: PR (RLP 600)",
+        "nrl-canberra-raiders: Nathan Sologinkin: PR (RLP 1479)",
+        "nrl-newcastle-knights: Brock Mueller: HK (RLP 1698)",
+        "nrl-newcastle-knights: Shane O'Grady: PR (RLP 1487)",
+        "nrl-newcastle-knights: Daniel Smailes: SR (RLP 1668)",
+        "nrl-north-sydney-bears: Wes Tillott: WG (RLP 3432)",
+        "nrl-parramatta-eels: Tim Patterson: WG (RLP 623)",
+        "nrl-south-sydney-rabbitohs: Scott Murray: FE (RLP 1855)",
+        "nrl-western-suburbs-magpies: Ray Cashmere: PR (RLP 1721)"
+      ],
+      "left": [
+        "nrl-balmain-tigers: Garth Wood (3 games): started at no position on NRL.com from 1998 to 2001, and the Rugby League Project gives no position for him (1370)",
+        "nrl-manly-warringah-sea-eagles: Jason Lussick (1 game): started at no position on NRL.com from 1998 to 2001, and the Rugby League Project gives no position for him (3700)",
+        "nrl-manly-warringah-sea-eagles: Wes Doyle (2 games): started at no position on NRL.com from 1998 to 2001, and the Rugby League Project gives no position for him (1438)",
+        "nrl-newcastle-knights: Chris Mandalidis (6 games): started at no position on NRL.com from 1998 to 2001, and the Rugby League Project gives no position for him (1488)",
+        "nrl-north-queensland-cowboys: Scott Asimus (1 game): started at no position on NRL.com from 1998 to 2001, and the Rugby League Project gives no position for him (1675)",
+        "nrl-north-sydney-bears: Beau Gallagher (3 games): started at no position on NRL.com from 1998 to 2001, and the Rugby League Project gives no position for him (1709)",
+        "nrl-north-sydney-bears: David Hicks (5 games): started at no position on NRL.com from 1998 to 2001, and the Rugby League Project gives no position for him (1717)",
+        "nrl-south-sydney-rabbitohs: Ben Tyrrell (2 games): started at no position on NRL.com from 1998 to 2001, and the Rugby League Project lists nobody of his name at South Sydney Rabbitohs in 1999",
+        "nrl-western-suburbs-magpies: Paul Jeffries (3 games): started at no position on NRL.com from 1998 to 2001, and the Rugby League Project gives no position for him (1340)",
+        "nrl-western-suburbs-magpies: Robbie Payne (2 games): started at no position on NRL.com from 1998 to 2001, and the Rugby League Project gives no position for him (1339)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 2,
+          "WG": 4.0588,
+          "CE": 3.8824,
+          "FE": 2.4706,
+          "HB": 2,
+          "HK": 2.3529,
+          "PR": 5.6471,
+          "SR": 5.6471,
+          "LK": 1.7059
+        }
+      },
+      "real": {
+        "games": 204,
+        "pointsPerTeam": 20.782,
+        "teamPointsSd": 12.435,
+        "draws": 4,
+        "marginMean": 16.103,
+        "byOne": 0.044,
+        "withinSix": 0.27,
+        "withinTwelve": 0.471,
+        "byThirteenPlus": 0.51,
+        "byTwentyFivePlus": 0.206,
+        "nilRate": 0.029,
+        "fortyPlusRate": 0.088,
+        "homeWins": 0.585,
+        "winPctSd": 0.178,
+        "bestWins": 18,
+        "worstWins": 3
+      }
+    },
+    {
+      "id": "nrl-1998",
+      "version": "nrl-1998-91ef5227",
+      "season": "1998",
+      "edition": "NRL.com match centre, the 1998 NRL premiership",
+      "label": "Computed from NRL.com match stats",
+      "map": "nrl1998",
+      "method": "computed",
+      "games": {
+        "played": 253,
+        "regular": 240,
+        "withTeamLists": 253
+      },
+      "players": {
+        "placed": 576,
+        "bySeason": 487,
+        "bySeasonEitherSide": 43,
+        "byTwoEitherSide": 6,
+        "byRlp": 40,
+        "left": 24,
+        "inSquads": 477
+      },
+      "ratings": {
+        "overall": {
+          "lowest": 68,
+          "median": 80,
+          "highest": 93
+        },
+        "played": {
+          "lowest": 68,
+          "median": 80,
+          "highest": 93
+        }
+      },
+      "byPosition": {
+        "FB": "48 players (2.4 a club), overall 70–91 (median 84), played 70–92",
+        "WG": "81 players (4.05 a club), overall 68–90 (median 79), played 69–90",
+        "CE": "79 players (3.95 a club), overall 68–91 (median 79), played 68–91",
+        "FE": "34 players (1.7 a club), overall 70–90 (median 79), played 70–91",
+        "HB": "39 players (1.95 a club), overall 71–93 (median 78), played 71–93",
+        "HK": "47 players (2.35 a club), overall 68–91 (median 79), played 68–91",
+        "PR": "105 players (5.25 a club), overall 70–93 (median 78), played 70–92",
+        "SR": "104 players (5.2 a club), overall 69–91 (median 81), played 69–91",
+        "LK": "39 players (1.95 a club), overall 70–92 (median 84), played 69–92"
+      },
+      "best": [
+        "Geoff Toovey (MAN HB) 93",
+        "Travis Norton (CBY LK) 92",
+        "Robbie Kearns (MEL PR) 92",
+        "Mark McLinden (CBR FB) 92",
+        "Steve Menzies (MAN SR) 91",
+        "Jamie Goddard (GCC HK) 91",
+        "Dean Pay (PAR PR) 91",
+        "Brad Fittler (SYD FE) 91",
+        "Darren Smith (BRI CE) 91",
+        "Michael Buettner (NSB CE) 91",
+        "Andrew Johns (NEW HB) 91",
+        "Adrian Lam (SYD HB) 91"
+      ],
+      "clubs": [
+        "Brisbane Broncos 85.2 (23 players, 23 in the squad; no player of the unit for PR; out of position: Michael De Vere (FB) at PR, Petero Civoniceva (SR) at PR; 1998: 18–1–5, 688–310)",
+        "North Sydney Bears 84.8 (23 players, 23 in the squad; out of position: Willie Leyshon (SR) at PR, Glenn Morrison (SR) at LK; 1998: 17–0–7, 663–367)",
+        "Sydney City Roosters 84.5 (29 players, 24 in the squad; out of position: Nathan Wood (HB) at HK, Scott Gourley (SR) at LK; 1998: 16–0–8, 680–383)",
+        "Canberra Raiders 83.9 (31 players, 24 in the squad; out of position: Brett Mullins (FB) at FE, Anthony Seibold (SR) at PR; 1998: 15–0–9, 564–429)",
+        "Cronulla-Sutherland Sharks 83.6 (30 players, 24 in the squad; out of position: Ben Sammut (FB) at WG, Chris McKenna (LK) at HK; 1998: 12–1–11, 438–387)",
+        "Melbourne Storm 83.6 (26 players, 24 in the squad; out of position: Russell Bawden (SR) at PR; 1998: 17–1–6, 546–372)",
+        "Newcastle Knights 83.6 (30 players, 24 in the squad; out of position: Robbie O'Davis (FB) at CE, Troy Fletcher (SR) at PR, Wayne Richards (SR) at LK; 1998: 18–1–5, 562–381)",
+        "St. George Dragons 83.6 (26 players, 24 in the squad; out of position: Robbie Simpson (SR) at HK; 1998: 13–1–10, 486–490)",
+        "Penrith Panthers 83.5 (34 players, 24 in the squad; out of position: Morvin Edwards (FB) at CE, Jody Gall (SR) at PR; 1998: 8–2–14, 525–580)",
+        "Parramatta Eels 83.4 (31 players, 24 in the squad; out of position: Dallas Weston (SR) at PR, Jarrod McCracken (SR) at LK; 1998: 17–1–6, 468–349)",
+        "Canterbury Bulldogs 83.2 (32 players, 24 in the squad; out of position: Greg Fleming (FB) at CE, Tony Grimaldi (SR) at LK; 1998: 13–0–11, 489–411)",
+        "Manly Warringah Sea Eagles 83.2 (23 players, 23 in the squad; out of position: Corey Underwood (PR) at LK; 1998: 13–0–11, 503–473)",
+        "Auckland Warriors 83.1 (28 players, 24 in the squad; out of position: Awen Guttenbeil (SR) at LK; 1998: 9–0–15, 417–518)",
+        "Illawarra Steelers 82.9 (28 players, 24 in the squad; out of position: Brendon Reeves (FB) at WG; 1998: 11–1–12, 476–539)",
+        "Balmain Tigers 82.5 (29 players, 24 in the squad; out of position: Ben Duckworth (LK) at PR; 1998: 9–1–14, 381–463)",
+        "North Queensland Cowboys 82.5 (30 players, 24 in the squad; out of position: Mark Shipway (SR) at PR; 1998: 9–0–15, 361–556)",
+        "Gold Coast Chargers 82.2 (32 players, 24 in the squad; out of position: Heath Cruckshank (SR) at HK; 1998: 4–0–20, 289–654)",
+        "Adelaide Rams 82.1 (31 players, 24 in the squad; out of position: Tony Iro (SR) at HK; 1998: 7–0–17, 393–615)",
+        "Western Suburbs Magpies 82.1 (33 players, 24 in the squad; 1998: 4–0–20, 371–802)",
+        "South Sydney Rabbitohs 81.9 (27 players, 24 in the squad; out of position: Jeremy Schloss (SR) at PR; 1998: 5–0–19, 339–560)"
+      ],
+      "clubShift": [
+        "Brisbane Broncos: SRS +14.384, target 85.1, shift 0, strength 85.2 → 85.2",
+        "North Sydney Bears: SRS +12.469, target 84.56, shift +1, strength 83.8 → 84.8",
+        "Sydney City Roosters: SRS +11.609, target 84.28, shift +1, strength 83.5 → 84.5",
+        "Newcastle Knights: SRS +6.969, target 84.06, shift 0, strength 83.6 → 83.6",
+        "Melbourne Storm: SRS +6.689, target 83.9, shift -1, strength 84.6 → 83.6",
+        "Canberra Raiders: SRS +4.664, target 83.88, shift +1, strength 82.9 → 83.9",
+        "Parramatta Eels: SRS +4.024, target 83.79, shift 0, strength 83.4 → 83.4",
+        "Canterbury Bulldogs: SRS +3.498, target 83.45, shift 0, strength 83.2 → 83.2",
+        "Cronulla-Sutherland Sharks: SRS +2.669, target 83.26, shift 0, strength 83.6 → 83.6",
+        "Manly Warringah Sea Eagles: SRS +1.578, target 83.2, shift 0, strength 83.2 → 83.2",
+        "St. George Dragons: SRS -0.431, target 83.2, shift 0, strength 83.6 → 83.6",
+        "Penrith Panthers: SRS -1.822, target 83.12, shift +2, strength 81.5 → 83.5",
+        "Illawarra Steelers: SRS -1.891, target 82.89, shift 0, strength 82.9 → 82.9",
+        "Auckland Warriors: SRS -3.411, target 82.8, shift 0, strength 83.1 → 83.1",
+        "Balmain Tigers: SRS -4.016, target 82.64, shift -1, strength 83.5 → 82.5",
+        "North Queensland Cowboys: SRS -7.422, target 82.4, shift +1, strength 81.5 → 82.5",
+        "South Sydney Rabbitohs: SRS -9.111, target 82.2, shift 0, strength 81.9 → 81.9",
+        "Adelaide Rams: SRS -9.616, target 81.99, shift 0, strength 82.1 → 82.1",
+        "Gold Coast Chargers: SRS -14.222, target 81.8, shift 0, strength 82.2 → 82.2",
+        "Western Suburbs Magpies: SRS -16.611, target 81.8, shift +1, strength 81.1 → 82.1"
+      ],
+      "homeEdge": 4.929,
+      "strengthAndResults": {
+        "stats": 0.827,
+        "shifted": 0.85
+      },
+      "placedByRlp": [
+        "nrl-balmain-tigers: Jody Rudd: WG (RLP 441)",
+        "nrl-balmain-tigers: James Gannon: PR (RLP 1322)",
+        "nrl-balmain-tigers: Chris Mcpherson: PR (RLP 3069)",
+        "nrl-balmain-tigers: Chris St Clair: SR (RLP 3077)",
+        "nrl-balmain-tigers: Andrew Meads: LK (RLP 47)",
+        "nrl-balmain-tigers: David McLean: LK (RLP 336)",
+        "nrl-brisbane-broncos: John Driscoll: HK (RLP 1672)",
+        "nrl-canberra-raiders: Nathan Sologinkin: PR (RLP 1479)",
+        "nrl-canberra-raiders: David Cox: PR (RLP 600)",
+        "nrl-canberra-raiders: Danny Lima: PR (RLP 638)",
+        "nrl-canberra-raiders: Anthony Seibold: SR (RLP 3210)",
+        "nrl-canterbury-bulldogs: Scott Wilson: FB (RLP 87)",
+        "nrl-canterbury-bulldogs: Trent Runciman: SR (RLP 2296)",
+        "nrl-cronulla-sutherland-sharks: Ben Sammut: FB (RLP 717)",
+        "nrl-cronulla-sutherland-sharks: Stuart Pierce: PR (RLP 2783)",
+        "nrl-cronulla-sutherland-sharks: Luke Stuart: SR (RLP 1378)",
+        "nrl-cronulla-sutherland-sharks: Les Davidson: SR (RLP 412)",
+        "nrl-gold-coast-chargers: Chris Lawler: HB (RLP 480)",
+        "nrl-gold-coast-chargers: Gavin Whittaker: PR (RLP 1899)",
+        "nrl-manly-warringah-sea-eagles: Damian Browne: WG (RLP 2288)",
+        "nrl-melbourne-storm: Anthony Bonus: PR (RLP 568)",
+        "nrl-melbourne-storm: Daniel Frame: LK (RLP 2337)",
+        "nrl-newcastle-knights: Mick Jenkins: HK (RLP 3233)",
+        "nrl-newcastle-knights: Brock Mueller: HK (RLP 1698)",
+        "nrl-newcastle-knights: Daniel Smailes: SR (RLP 1668)",
+        "nrl-newcastle-knights: Jarrod O'Doherty: SR (RLP 3067)",
+        "nrl-newcastle-knights: Stephen Crowe: SR (RLP 400)",
+        "nrl-north-queensland-cowboys: Scott Whiting: CE (RLP 3148)",
+        "nrl-north-queensland-cowboys: Luke Scott: SR (RLP 2795)",
+        "nrl-north-sydney-bears: Mark Reber: HK (RLP 1884)",
+        "nrl-parramatta-eels: Ian Herron: WG (RLP 701)",
+        "nrl-parramatta-eels: Casey Mcguire: HK (RLP 120)",
+        "nrl-penrith-panthers: Morvin Edwards: FB (RLP 461)",
+        "nrl-penrith-panthers: Frank Puletua: PR (RLP 338)",
+        "nrl-south-sydney-rabbitohs: Shane Millard: HK (RLP 2204)",
+        "nrl-south-sydney-rabbitohs: Matt Munro: LK (RLP 204)",
+        "nrl-st-george-dragons: Craig Stapleton: PR (RLP 2309)",
+        "nrl-st-george-dragons: Tony Hearn: PR (RLP 250)",
+        "nrl-st-george-dragons: Robbie Simpson: SR (RLP 2884)",
+        "nrl-st-george-dragons: Willie Poching: SR (RLP 58)"
+      ],
+      "left": [
+        "nrl-adelaide-rams: Sam Falaafi (1 game): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project lists nobody of his name at Adelaide Rams in 1998",
+        "nrl-auckland-warriors: Frank Watane (1 game): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project lists nobody of his name at Auckland Warriors in 1998",
+        "nrl-canterbury-bulldogs: Matua Parkinson (1 game): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (5318)",
+        "nrl-gold-coast-chargers: Adam Hutchison (2 games): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project lists nobody of his name at Gold Coast Chargers in 1998",
+        "nrl-gold-coast-chargers: Jared Fox (1 game): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (5359)",
+        "nrl-gold-coast-chargers: Michael Goodridge (1 game): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (3062)",
+        "nrl-illawarra-steelers: Brendon Tunbridge (9 games): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (3037)",
+        "nrl-manly-warringah-sea-eagles: Jamie Bennett (2 games): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (5352)",
+        "nrl-manly-warringah-sea-eagles: Jason Lussick (2 games): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (3700)",
+        "nrl-melbourne-storm: Wade Fenton (2 games): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (2901)",
+        "nrl-newcastle-knights: Aaron Grainger (2 games): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (5340)",
+        "nrl-newcastle-knights: Jason Allen (2 games): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (5339)",
+        "nrl-north-queensland-cowboys: Denny Lambert (1 game): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (5349)",
+        "nrl-north-queensland-cowboys: John Malu (2 games): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (3137)",
+        "nrl-north-queensland-cowboys: Liam Johnson (2 games): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (2727)",
+        "nrl-parramatta-eels: Andrew Carige (2 games): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (2729)",
+        "nrl-penrith-panthers: Brian Leauma (1 game): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (5335)",
+        "nrl-penrith-panthers: Chris Levy (1 game): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (2867)",
+        "nrl-south-sydney-rabbitohs: Brian Seimson (2 games): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (5337)",
+        "nrl-south-sydney-rabbitohs: Garth Wood (2 games): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (1370)",
+        "nrl-st-george-dragons: Robert Henare (1 game): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (3090)",
+        "nrl-western-suburbs-magpies: Aaron Cotter (3 games): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (5346)",
+        "nrl-western-suburbs-magpies: Ashley Rhodes (1 game): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (5344)",
+        "nrl-western-suburbs-magpies: Don Smith (2 games): started at no position on NRL.com from 1998 to 2000, and the Rugby League Project gives no position for him (5341)"
+      ],
+      "conversion": {
+        "core": {
+          "tries": 8,
+          "tryAssists": 5,
+          "lineBreaks": 4,
+          "lineBreakAssists": 2,
+          "tacklesMade": 1,
+          "missedTackles": -2,
+          "tackleBreaks": 2,
+          "offloads": 4,
+          "errors": -2,
+          "allRunMetres": 0.1,
+          "kickMetres": 0.03333333333333333
+        },
+        "previous": 0.5,
+        "quota": {
+          "FB": 2.4,
+          "WG": 4.05,
+          "CE": 3.95,
+          "FE": 1.7,
+          "HB": 1.95,
+          "HK": 2.35,
+          "PR": 5.25,
+          "SR": 5.2,
+          "LK": 1.95
+        }
+      },
+      "real": {
+        "games": 240,
+        "pointsPerTeam": 20.081,
+        "teamPointsSd": 11.853,
+        "draws": 5,
+        "marginMean": 15.321,
+        "byOne": 0.029,
+        "withinSix": 0.263,
+        "withinTwelve": 0.492,
+        "byThirteenPlus": 0.488,
+        "byTwentyFivePlus": 0.175,
+        "nilRate": 0.01,
+        "fortyPlusRate": 0.075,
+        "homeWins": 0.596,
+        "winPctSd": 0.194,
+        "bestWins": 18,
+        "worstWins": 4
+      }
     }
   ]
 }

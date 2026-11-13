@@ -33,6 +33,22 @@
     },
     "previous": 0.5,
     "kept": ["tries", "tryAssists", "lineBreaks", "lineBreakAssists", "tacklesMade", "missedTackles", "tackleBreaks", "offloads", "errors", "allRunMetres", "kickMetres", "minutesPlayed", "goals", "fieldGoals"],
+    "stats": {
+      "counted": ["tries", "tryAssists", "lineBreaks", "lineBreakAssists", "tacklesMade", "missedTackles", "tackleBreaks", "offloads", "errors", "allRunMetres", "kickMetres"],
+      "seasonBefore": true,
+      "census": {
+        "2019": {
+          "games": 201,
+          "given": [201, 199, 201, 200, 201, 201, 201, 201, 201, 201, 201],
+          "recorded": ["tries", "tryAssists", "lineBreaks", "lineBreakAssists", "tacklesMade", "missedTackles", "tackleBreaks", "offloads", "errors", "allRunMetres", "kickMetres"]
+        },
+        "2020": {
+          "games": 169,
+          "given": [168, 168, 168, 165, 168, 168, 168, 168, 168, 168, 168],
+          "recorded": ["tries", "tryAssists", "lineBreaks", "lineBreakAssists", "tacklesMade", "missedTackles", "tackleBreaks", "offloads", "errors", "allRunMetres", "kickMetres"]
+        }
+      }
+    },
     "quota": {
       "FB": 1.5,
       "WG": 4.1875,
