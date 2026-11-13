@@ -33,6 +33,22 @@
     },
     "previous": 0.5,
     "kept": ["tries", "tryAssists", "lineBreaks", "lineBreakAssists", "tacklesMade", "missedTackles", "tackleBreaks", "offloads", "errors", "allRunMetres", "kickMetres", "minutesPlayed", "goals", "fieldGoals"],
+    "stats": {
+      "counted": ["tries", "tryAssists", "lineBreaks", "lineBreakAssists", "tacklesMade", "missedTackles", "tackleBreaks", "offloads", "errors", "allRunMetres", "kickMetres"],
+      "seasonBefore": true,
+      "census": {
+        "2014": {
+          "games": 201,
+          "given": [201, 201, 200, 197, 201, 201, 201, 201, 201, 201, 201],
+          "recorded": ["tries", "tryAssists", "lineBreaks", "lineBreakAssists", "tacklesMade", "missedTackles", "tackleBreaks", "offloads", "errors", "allRunMetres", "kickMetres"]
+        },
+        "2015": {
+          "games": 201,
+          "given": [201, 201, 201, 200, 201, 201, 201, 201, 201, 201, 201],
+          "recorded": ["tries", "tryAssists", "lineBreaks", "lineBreakAssists", "tacklesMade", "missedTackles", "tackleBreaks", "offloads", "errors", "allRunMetres", "kickMetres"]
+        }
+      }
+    },
     "quota": {
       "FB": 1.3125,
       "WG": 4.25,
@@ -524,7 +540,7 @@
     [500013,"Boyd Cordner","nrl-sydney-roosters","SR","S",25,[["nrl-sydney-roosters",25]],[7,3,3,2,722,32,42,7,2,3060,0,1826,0,0],[22,[["nrl-sydney-roosters",22]],[9,1,11,0,699,37,36,11,20,2743,0]],42.151852,88,0],
     [500011,"Aidan Guerra","nrl-sydney-roosters","SR","S",22,[["nrl-sydney-roosters",22]],[5,2,2,3,761,43,31,14,12,2118,39,1616,0,0],[23,[["nrl-sydney-roosters",23]],[6,2,7,4,722,43,52,6,6,2327,7]],39.149794,86,0],
     [500016,"Mitchell Aubusson","nrl-sydney-roosters","SR","S",26,[["nrl-sydney-roosters",26]],[5,5,8,5,629,23,43,11,6,1807,0,1738,0,0],[26,[["nrl-sydney-roosters",26]],[5,1,5,1,526,19,32,8,3,1148,0]],33.792593,85,0],
-    [503118,"Willie Manu","nrl-sydney-roosters","SR","RLP",4,[["nrl-sydney-roosters",4]],[0,0,0,0,42,2,2,0,1,175,0,72,0,0],null,2.12963,74,0],
+    [1115,"Willie Manu","nrl-sydney-roosters","SR","RLP",4,[["nrl-sydney-roosters",4]],[0,0,0,0,42,2,2,0,1,175,0,72,0,0],null,2.12963,74,0],
     [501179,"Siosiua Taukeiaho","nrl-sydney-roosters","LK","S",27,[["nrl-sydney-roosters",27]],[2,0,3,0,687,11,50,7,7,3217,0,1112,0,0],null,41.803704,88,0],
     [500038,"Isaac Liu","nrl-sydney-roosters","LK","S",26,[["nrl-sydney-roosters",26]],[1,1,2,2,659,19,24,2,6,2118,0,1121,0,0],[23,[["nrl-sydney-roosters",23]],[2,0,2,1,449,30,22,2,4,1272,0]],29.503704,84,0],
     [500663,"James Tedesco","nrl-wests-tigers","FB","S",24,[["nrl-wests-tigers",24]],[17,12,14,17,106,31,167,26,29,3616,228,1924,0,0],[8,[["nrl-wests-tigers",8]],[6,6,5,5,22,10,37,5,6,1069,72]],34.1625,90,0],
@@ -552,7 +568,7 @@
     [500661,"Curtis Sironen","nrl-wests-tigers","SR","S",19,[["nrl-wests-tigers",19]],[1,0,0,2,467,34,22,15,12,1496,32,1372,0,0],[13,[["nrl-wests-tigers",13]],[2,1,1,1,277,21,11,11,12,979,177]],23.487964,81,0],
     [500960,"Martin Taupau","nrl-wests-tigers","LK","S",21,[["nrl-wests-tigers",21]],[4,0,6,0,573,42,91,28,10,2288,26,1007,0,0],[24,[["nrl-wests-tigers",24]],[3,0,5,1,447,33,72,22,7,2173,0]],41.106019,87,0]
   ],
-  "rlp": {"500264":20827,"500327":19963,"500340":20468,"500472":21705,"500521":22780,"500546":21547,"500577":847,"500583":20288,"500590":20256,"500613":5577,"500692":20636,"500792":20722,"500827":20276,"501034":20848,"501120":20278,"503118":814},
+  "rlp": {"1115":814,"500264":20827,"500327":19963,"500340":20468,"500472":21705,"500521":22780,"500546":21547,"500577":847,"500583":20288,"500590":20256,"500613":5577,"500692":20636,"500792":20722,"500827":20276,"501034":20848,"501120":20278},
   "left": [
     [500333,"Lagi Setu","nrl-sydney-roosters",2,"started at no position on NRL.com from 2013 to 2017, and the Rugby League Project gives no position for him (5562)"],
     [501296,"Lamar Manuel-Liolevave","nrl-wests-tigers",1,"started at no position on NRL.com from 2013 to 2017, and the Rugby League Project lists nobody of his name at Wests Tigers in 2015"]

@@ -145,6 +145,7 @@ npm run sync:womens-tennis # snapshot Tennis Abstract's women's Elo ratings and 
 npm run build-womens-tennis # rebuild the women's tennis nations from that snapshot (--check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 npm run build:icons      # render favicon.ico, apple-touch-icon.png and the app icons from public/favicon.svg
+npm run build:fonts      # cut the Latin Extended + Vietnamese font files from the pinned Archivo sources (--check compares byte for byte)
 ```
 
 The production build installs as an app (Chrome's install button, or Share › Add
@@ -160,10 +161,11 @@ them again. Everything else in `public/` (about 100 MB), the icons included, is
 cached the first time the game uses it. Seasons and
 country maps come from the network while online, so they always match the
 deployed build, and from the cache offline. Flags and crests show from the cache
-at once and refresh in the background. In the installed app, starting or
-resuming a campaign online also fetches every one of its teams' crests and flags
-that is not cached yet, a few at a time, so teams the game never showed online
-still show offline. A browser tab skips that: a world campaign has about 200 of
+at once and refresh in the background, which the browser answers from its own
+copy for a month. In the installed app, starting or resuming a campaign online
+also fetches every one of its teams' crests and flags that is not cached yet, a
+few at a time, so teams the game never showed online still show offline. A
+browser tab skips that: a world campaign has about 200 of
 them, each a request against the host's allowance (see **Caching** below). A
 first visit installs the worker only once the setup screen is up and the page
 is idle, or about 10 seconds after the game starts if setup takes longer, so its
@@ -174,9 +176,10 @@ fails to load, with **Retry**, and a flag or crest the game has neither shown
 online nor, in the installed app, kept for a campaign stays blank.
 
 The first download holds the game and football's players, the default setup's.
-Every other sport's players are a file of their own (4 to 43 KB compressed),
-loaded the first time that sport is picked, a challenge link names it, or a saved
-or imported campaign of it opens. Until they arrive, the sport's card shows as
+Women's football's players are a file of their own (50 KB compressed) and the
+seven other sports' share one (56 KB), loaded the first time one of its sports is
+picked, a challenge link names it, or a saved or imported campaign of it opens.
+Until they arrive, the sport's card shows as
 picked and setup holds its next steps and Launch; picking another sport first
 drops the wait. Players that fail to load say so, with **Retry** and **Reload**.
 
@@ -184,10 +187,11 @@ A new version never reloads the page by itself. Its worker downloads in the
 background and waits, and a **New version ready** panel offers **Reload** or
 **Later**. Reload writes the open campaign's checkpoint, as closing the page
 does, and reloads that tab only. Other tabs keep the version they loaded until
-they reload, all but the players of a sport they have not loaded yet: the new
-version has replaced those files, so picking that sport there fails until
-**Reload**. Later hides the panel for that page; closing every tab also updates.
-The page looks for a new version every hour and when you return to it.
+they reload, all but the players of a sport they have not loaded yet when the new
+version changed them: once another tab has reloaded, picking that sport there
+fails until **Reload**. Later hides the panel for that page; closing every tab
+also updates. The page looks for a new version every six hours, and when you
+return to it after an hour or more.
 
 ### Network requests
 
@@ -252,9 +256,13 @@ the Hobby account's access tokens ("User not found. (404)").
 year: the hashed bundle, and the fonts and world maps the build copies there
 under hashed names. The worker's runtime, `workbox-<hash>.js`, is named by its
 content too and kept as long, so checking for a new version fetches `sw.js`
-alone. `public/fonts/`, flags, flag symbols, club crests and the icons are
-cached for a day and revalidated in the background for a week; a stale image is
-harmless.
+alone. Flags, flag symbols, club crests and the icons are cached for 30 days,
+then revalidated in the background for 30 more. Kept a day, they cost a
+returning player about 185 requests a day on the Flags map, since the worker's
+background refresh of each one reached the host once the browser's copy was a
+day old. An image changed under the same name keeps its old look for up to a
+month, so a fix that must show at once needs a new file name. `public/fonts/`
+is cached for a day and revalidated in the background for a week.
 Everything else revalidates on every load: `index.html` and the season and
 country files keep their names from one release to the next and must match the
 code that reads them. That includes `sw.js`, which must never be cached for
@@ -268,7 +276,12 @@ about 2.5 KB, a crest about 7 KB), so every one counts, a 304 or a 404 too. A
 deployed build never asks for `football/index.json` unless it was built with
 one (`localSeasonIndex` in `vite.config.js`), the worker leaves the icons out of
 its precache, and only the installed app fetches a campaign's crests and flags
-ahead of time.
+ahead of time. A first visit asks for 19 files: the seven smaller sports' players
+share one chunk, each font family's Latin Extended and Vietnamese characters
+share one file (`npm run build:fonts`), and React and football's players are a
+chunk of their own (`chunkOf` in `vite.config.js`). That chunk keeps a release
+cheap: when only the game's code changed, a returning player downloads about
+290 KB, not 500 KB. An open page looks for a new version every six hours.
 
 **Link previews.** `index.html` carries a description, a canonical URL, and
 Open Graph and Twitter tags, so a shared link shows a card. Crawlers need
@@ -356,8 +369,8 @@ manager of the theatre's favourite, with decisions from the first match.
    statistics), nations or clubs on the map of their day, tennis its 2026 (Elo of 2 November) then its
    [earlier seasons](#tennis-seasons) 2025 back to 1960, women's tennis its 2026 (Elo of
    2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1968, rugby league its built-in 2025
-   (Rugby League 26) then [its earlier seasons](#rugby-league-seasons) 2024 back to 2009 (computed from
-   NRL.com's match statistics) and 2008 (Rugby League 2, the overall ours), NRL clubs on the map of their day.
+   (Rugby League 26) then [its earlier seasons](#rugby-league-seasons) 2024 back to 1998 (computed from
+   NRL.com's match statistics, but 2008: Rugby League 2, the overall ours), NRL clubs on the map of their day.
    The Season list names a season by its years, adding "· computed", "· converted"
    or "· fan-made" where its label calls its ratings so ("1969/70 · computed"); a
    year with two seasons (football's 1993/94 and 1989/90, the NFL's and AFL's of
@@ -1436,7 +1449,8 @@ Rugby league clubs have one theatre, **NRL**: the 17 clubs fight over Australia 
 territory or region its ground stands in and nothing else. New South Wales (ten clubs, eight of them in Sydney) and
 Queensland (four) are divided between their clubs; the Storm hold Victoria, the Raiders the Australian Capital Territory
 and the Warriors the Auckland Region, and every other state and region stays empty. The map is `public/domestic/nrl.json`
-(134 KB); grounds are in `scripts/data/nrl-teams.json`.
+(134 KB); grounds are in `scripts/data/nrl-teams.json`. The [earlier seasons](#rugby-league-seasons) play on maps of
+their day, `nrl1998` to `nrl2020`, built by the same command (the Adelaide Rams hold South Australia in 1998).
 
 ```bash
 npm run build:nrl-map                      # boundaries + grounds → public/domestic/nrl.json and its index entry (seconds)
@@ -2115,15 +2129,20 @@ under **Season** in setup. Each season is a file in `public/womens-football/`
 
 ## Rugby league seasons
 
-Rugby league can be played on seventeen earlier seasons as well as the built-in
-2025: 2008, from Rugby League 2: World Cup Edition's own database (Sidhe, 2008),
-extracted by Wouldubeinta and kept by the Wayback Machine's copy of
-rugbyleaguemods.net, and 2009 to 2024, which no game rated, computed from
-NRL.com's match centre (below). Pick one under **Season** in setup; it plays the
-NRL clubs of that season, clubs only, on the map of their day: the sixteen of
-2008 to 2022 (no Dolphins; the Bulldogs under their 2008 name in 2008 and 2009),
-the seventeen of 2023 and 2024. Each season is a file in `public/rugby-league/`
-(14–16 KB) that loads only when chosen.
+Rugby league can be played on twenty-seven earlier seasons, every NRL season
+from 1998, as well as the built-in 2025: 2008, from Rugby League 2: World Cup
+Edition's own database (Sidhe, 2008), extracted by Wouldubeinta and kept by the
+Wayback Machine's copy of rugbyleaguemods.net, and 1998 to 2007 and 2009 to
+2024, which no game rated, computed from NRL.com's match centre (below). Pick one
+under **Season** in setup; it plays the NRL clubs of that season, clubs only, on
+the map of their day: the twenty of 1998 (St. George and Illawarra apart, the
+Adelaide Rams, the Gold Coast Chargers, the North Sydney Bears, Balmain and
+Western Suburbs), the seventeen of 1999, the fourteen of 2000 and 2001 (the Wests
+Tigers and the Northern Eagles, no South Sydney), the fifteen of 2002 to 2006,
+the sixteen of 2007 to 2022 (no Dolphins) and the seventeen of 2023 and 2024,
+each under its name of that season (the Canterbury Bulldogs, the Bulldogs, the
+Sydney City Roosters, the Auckland Warriors, the Sharks). Each season is a file
+in `public/rugby-league/` (13–18 KB) that loads only when chosen.
 
 - **2008's players:** every one is checked against the Rugby League Project's 2008
   records, so 414 of the database's 462 NRL players are kept and the game's
@@ -2138,11 +2157,14 @@ the seventeen of 2023 and 2024. Each season is a file in `public/rugby-league/`
   follows 2008's only loosely (rank correlation 0.33 in simulated seasons), as
   the game rated some sides well above their year (the Cowboys and Bulldogs
   won 5 games each).
-- **2009 to 2024 are computed** (labelled "Computed from NRL.com match stats"):
-  NRL.com's match centre keeps every game's team lists and player stats. A
-  player's value is NRL Fantasy's points for eleven of those stats (tries, try
-  assists, line breaks, tackles, metres and the rest; goals count nowhere) per
-  club game, the season before at half weight; his overall is that value's
+- **1998 to 2007 and 2009 to 2024 are computed** (labelled "Computed from NRL.com
+  match stats"): NRL.com's match centre keeps every game's team lists and player
+  stats from 1998. A player's value is NRL Fantasy's points for eleven of those
+  stats (tries, try assists, line breaks, tackles, metres and the rest; goals
+  count nowhere) per club game, the season before at half weight. NRL.com kept
+  fewer before 2003 (six in 1998, eight from 1999 to 2002): a season counts only
+  the stats it recorded, and the season before only when it recorded the same
+  ones. His overall is that value's
   percentile at the position he started at most, read off Rugby League 26's
   ratings there, as 2008's score is. Then every player of a club moves by one
   whole number so the club lands where its Simple Rating System, fitted to the
@@ -2156,9 +2178,13 @@ the seventeen of 2023 and 2024. Each season is a file in `public/rugby-league/`
 - **Maps:** each club grows from its ground, or from its training base where it
   shares one, and three rules keep the maps few: a ground being rebuilt stays its
   club's (R1), COVID-19 relocations are ignored (R2), and a rename on the same
-  site does not split a map (R3). 2008 and 2009 play on `nrl2008`, 2010 and 2011
-  on `nrl2010`, 2012 to 2019 on `nrl2012`, 2020 to 2022 on `nrl2020`, and 2023
-  and 2024, with the Dolphins, on today's `nrl`.
+  site does not split a map (R3). From 1998 to 2007 the clubs changed nearly
+  every season: 1998, 1999, 2000, 2001, 2002, 2006 and 2007 each have a map of
+  their own (`nrl1998` …), 2003 to 2005 share `nrl2003`, and the clubs since gone
+  (the Adelaide Rams, the North Sydney Bears, the Northern Eagles …) hold their
+  own territory there. 2008 and 2009 play on `nrl2008`, 2010 and 2011 on
+  `nrl2010`, 2012 to 2019 on `nrl2012`, 2020 to 2022 on `nrl2020`, and 2023 and
+  2024, with the Dolphins, on today's `nrl`.
 - **No nations:** 2008's World Cup squads mix Super League players rated on a
   more generous scale, and the computed seasons rate club games only, so a
   nations game plays the built-in season's.
@@ -2169,12 +2195,13 @@ the seventeen of 2023 and 2024. Each season is a file in `public/rugby-league/`
   ```bash
   npm run sync:rugby-league-seasons -- --fetch   # missing inputs into data-src/ (the database, RLP pages, NRL.com's games), then scripts/data/rugby-league-seasons/nrl-<year>.json (--check)
   npm run build:rugby-league-seasons             # the season files, their listing and the audit (--check; --realism plays them)
-  npm run build:nrl-map                          # today's map and the era maps nrl2008, nrl2010, nrl2012 and nrl2020
+  npm run build:nrl-map                          # today's map and the era maps nrl1998 … nrl2007, nrl2008, nrl2010, nrl2012 and nrl2020
   ```
 
 The [design notes](docs/design/rugby-league.md#earlier-seasons) give the
-weights and their reasons, the club shift, the
-[computed seasons](docs/design/rugby-league.md#computed-seasons-20092024) and the
+weights and their reasons, the club shift, the computed seasons
+([2009–2024](docs/design/rugby-league.md#computed-seasons-20092024),
+[1998–2007](docs/design/rugby-league.md#computed-seasons-19982007)) and the
 known limits.
 
 ## Squad economics
@@ -2684,6 +2711,7 @@ scripts/
   build-ea-seasons.mjs  builds the earlier football seasons from the pinned EA export
   build-football-set.mjs  builds a local football season from a CM 01/02 database
   build-icons.mjs      renders the site icons from public/favicon.svg
+  build-fonts.mjs      cuts the Latin Extended + Vietnamese webfonts from the pinned Archivo sources
 .github/workflows/ci.yml  tests, build and smoke on every push; Vercel waits for it before going live
 vercel.json            cache headers for the deployed site
 ```
@@ -2771,6 +2799,8 @@ UI suites listed under [Running it](#running-it), the v4 redesign added:
 | `football-validate`, `football-engine-scale` | The football squad gate: Elo snapshots and replays, the cross-section against Elo, the forecast track, the engine-scale tolerances, and the committed reports against the shipped squads |
 | `error-boundary` | The crash screen: a render error shows it with focus on its heading, Export campaign downloads the stored checkpoint unchanged, and the report link carries the error |
 | `font-audit` | Only Archivo and Archivo Narrow, no serif, monospace or italics in shipped source |
+| `build-fonts` | Each family's two font files, their Unicode ranges against Google's, and the Latin Extended + Vietnamese files rebuilt from the pinned sources |
+| `chunks` | The build's chunks: React and football's players in a stable chunk, the seven smaller sports' players in one, neither importing the chunk every release changes |
 | `setup-wizard` | Setup steps, rules of war, launch normalisation and Space |
 | `campaign-column`, `match-screen`, `squad-screen`, `conquest-screen`, `ledger-chronicle`, `map-v4`, `map-v4-engine` | Each v4 screen's view-models and components |
 | `column-wiring`, `match-wiring`, `squad-wiring`, `conquest-wiring`, `ledger-wiring`, `map-wiring` | Each screen wired to the running App |

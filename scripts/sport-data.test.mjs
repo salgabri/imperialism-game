@@ -1,5 +1,5 @@
 // The page's sport data (src/sports/sportData.js): football's players come with the first download and every other
-// sport's in a chunk of its own, loaded the first time it is played. Node, and so every other test, has every sport's
+// sport's in a later chunk, loaded the first time it is played. Node, and so every other test, has every sport's
 // players from the start (sportData.eager.js), and the smoke run bundles without splitting, so there every chunk
 // "arrives" within a microtask. These tests run the page's path: the real App, React and storage, with loaders that wait
 // until the test lets them arrive or fail (scripts/lib/sport-data-control.mjs).

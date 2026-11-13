@@ -128,7 +128,9 @@ const LEAGUES = {
   nrl: { id: 'nrl', sport: 'rugby-league', league: 'NRL', name: 'Australia and New Zealand', countries: [AUS, NZL], joins: {},
     entry: { venue: 'ground', lines: 'state or region' }, east: true, border: null, grouping: 'state, territory or region', maxGapKm: 0.5,
     venues: 'Ground locations: scripts/data/nrl-teams.json (the Rabbitohs and the Bulldogs, who share Accor Stadium, and the Wests Tigers, who play at three grounds, grow from their training bases).',
-    eraVenues: 'Ground locations: scripts/data/rugby-league-seasons.json, every club of each season at the ground it played at (a club that shared its ground, or played at several, grows from where it trained).' },
+    eraVenues: 'Ground locations: scripts/data/rugby-league-seasons.json, every club of each season at the ground it played at (a club that shared its ground, or played at several, grows from where it trained).',
+    // The seasons 1998–2007, whose defunct clubs and grounds of the day are placed and named from English Wikipedia.
+    earlyVenues: 'Ground locations: scripts/data/rugby-league-seasons.json, every club of each season at the ground it played most of its home games at (a club that shared its ground, or played at several, grows from where it trained), each ground placed and named as it was then from English Wikipedia\'s articles (CC BY-SA 4.0) at the revisions the manifest\'s `wikipedia` pins; home games counted from NRL.com\'s draw.' },
   // Women's football's NWSL (src/data/clubs.womens-football.js): its European clubs play the Europe maps
   // (scripts/build-europe-maps.mjs). Centreville Bank Stadium is in Rhode Island, but Boston Legacy FC is Boston's: it
   // plays there only until White Stadium opens in 2028.
@@ -417,8 +419,10 @@ async function mlbSpecs() {
  * The NRL's maps, `{ id, seasons, clubs: [{ id, name, city, arena, home }] }`: today's from the game's clubs and their
  * grounds (`seasons` null), then one per earlier era of scripts/data/rugby-league-seasons.json, whose seasons must all
  * have the same clubs at the same grounds. An era's clubs rank as their franchises rank today, so section ids follow the
- * same order on every map. Seasons with today's clubs at today's grounds (2023 on) play on today's map, which is
- * built once.
+ * same order on every map; a defunct club, which no club of today's continues (the manifest's `defunct`: the Adelaide
+ * Rams, the North Sydney Bears …), ranks after them in that list's order, under its own id. Seasons with today's clubs at
+ * today's grounds (2023 on) play on today's map, which is built once. The maps of 1998–2007 cite the Wikipedia articles
+ * their clubs' grounds are placed and named from (`earlyVenues`).
  */
 async function nrlSpecs() {
   const grounds = JSON.parse(await readFile(nrlGroundsFile, 'utf8')).teams;
@@ -427,20 +431,29 @@ async function nrlSpecs() {
     .map(c => ({ id: c.id, name: c.name, city: grounds[c.id].city, arena: grounds[c.id].ground, home: grounds[c.id].home }));
   const specs = [{ id: LEAGUES.nrl.id, seasons: null, clubs }];
   const rank = new Map(clubs.map((c, i) => [c.id, i]));
-  const teamsAt = year => nrlTeamsOf(manifest, year).sort((a, b) => rank.get(a.franchise) - rank.get(b.franchise));
+  const defunct = manifest.defunct ?? [];
+  const stale = defunct.filter(id => rank.has(id));
+  if (stale.length) throw new Error(`${stale.join(', ')}: a defunct club that is a club of today's`);
+  const rankOf = t => (rank.has(t.franchise) ? rank.get(t.franchise) : defunct.includes(t.franchise) ? clubs.length + defunct.indexOf(t.franchise) : undefined);
+  const teamsAt = year => {
+    const teams = nrlTeamsOf(manifest, year);
+    const unranked = teams.filter(t => rankOf(t) === undefined);
+    if (unranked.length) throw new Error(`${year}: ${unranked.map(t => t.name).join(', ')} is no franchise of today's and no defunct club of the manifest's`);
+    return teams.sort((a, b) => rankOf(a) - rankOf(b));
+  };
   const places = teams => JSON.stringify(teams.map(t => [t.id, t.name, t.city, t.ground, t.base ?? null, t.home]));
   const today = places(clubs.map(c => ({ ...c, ground: c.arena, base: grounds[c.id].base })));
   for (const map of manifest.maps) {
     const [first, ...rest] = map.seasons;
     const teams = teamsAt(first);
-    if (teams.some(t => !rank.has(t.franchise))) throw new Error(`${map.id}: a club of ${first} is no franchise of today's`);
     const differs = rest.find(year => places(teamsAt(year)) !== places(teams));
     if (differs) throw new Error(`${map.id}: the clubs or grounds of ${differs} are not those of ${first}`);
     if (map.id === LEAGUES.nrl.id) {
       if (places(teams) !== today) throw new Error(`${map.id}: the seasons ${map.seasons.join(', ')} are not today's clubs and grounds`);
       continue;
     }
-    specs.push({ id: map.id, seasons: map.seasons.map(nrlSeasonIdOf), clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.ground, home: t.home })) });
+    specs.push({ id: map.id, seasons: map.seasons.map(nrlSeasonIdOf), ...(first < 2008 ? { venues: LEAGUES.nrl.earlyVenues } : {}),
+      clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.ground, home: t.home })) });
   }
   return specs;
 }

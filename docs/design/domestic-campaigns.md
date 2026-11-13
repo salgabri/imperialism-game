@@ -1040,13 +1040,27 @@ territory; Victoria, the ACT and Auckland are one club's, Cairns the Cowboys', W
 seeded duel campaigns reach a champion across the Tasman; the App launches on the map. `scripts/club-maps.test.mjs`
 holds it to the state rule with towns of each state and region. The smoke runs an NRL duel.
 
-**Era maps** (2026-11-08 and 2026-11-09): the earlier seasons ([rugby-league.md](rugby-league.md#earlier-seasons))
+**Era maps** (2026-11-08, 2026-11-09 and 2026-11-13): the earlier seasons ([rugby-league.md](rugby-league.md#earlier-seasons))
 play on maps of their day, built by the same command from `teams` and `maps` in `scripts/data/rugby-league-seasons.json`,
-16 clubs each, about 134 KB. Rules R1–R3 decide when a ground change makes a new map: a club keeps its own ground while
-it is rebuilt (R1), COVID-19 relocations are ignored (R2), and a rename on the same site does not split a map (R3).
+14 to 20 clubs each, about 134 KB. Rules R1–R3 decide when a ground change makes a new map: a club keeps its own ground while
+it is rebuilt (R1), COVID-19 relocations are ignored (R2), and a rename on the same site does not split a map (R3). For
+1998–2007 ([rugby-league.md](rugby-league.md#computed-seasons-19982007)) a club plays at the ground of most of its home
+games that season, by NRL.com's draw (level counts keep the season before's), named as it was then from English
+Wikipedia's articles at pinned revisions. The clubs no club of today's continues (the manifest's `defunct`: the Adelaide
+Rams, Balmain, the Gold Coast Chargers, Illawarra, North Sydney, the Northern Eagles and Western Suburbs) keep their own
+ids and rank after today's clubs, so section ids still follow one order; `nrlSpecs` refuses any other club that is no
+franchise of today's.
 
 | Map | Seasons | Grounds and bases that set it apart |
 | --- | --- | --- |
+| `nrl1998` | 1998 | twenty clubs, thirteen in New South Wales: St. George (Kogarah) and Illawarra (Wollongong) apart, the Adelaide Rams holding South Australia, the Gold Coast Chargers, the North Sydney Bears, Balmain (Leichhardt) and Western Suburbs (Campbelltown); Canterbury at Belmore |
+| `nrl1999` | 1999 | seventeen: the St. George Illawarra Dragons at Wollongong; Canterbury at Stadium Australia, which cuts the City of Parramatta with the Eels |
+| `nrl2000` | 2000 | fourteen: the Wests Tigers from Concord Oval, the Northern Eagles at Gosford, no South Sydney |
+| `nrl2001` | 2001 | the New Zealand Warriors by name; the Storm at Colonial Stadium; the Bulldogs at the Sydney Showground |
+| `nrl2002` | 2002 | fifteen: the Rabbitohs back, from Redfern Oval; the Northern Eagles at Brookvale in their last season |
+| `nrl2003` | 2003–2005 | Manly again; the Broncos at Suncorp Stadium |
+| `nrl2006` | 2006 | the Rabbitohs and the Bulldogs share Stadium Australia: both grow from their training grounds, Redfern Oval and Belmore |
+| `nrl2007` | 2007 | sixteen: the Gold Coast Titans at Carrara Stadium |
 | `nrl2008` | 2008, 2009 | the Bulldogs (as "Bulldogs") train at Sydney Olympic Park and share the City of Parramatta with the Eels; the Storm at Olympic Park Stadium |
 | `nrl2010` | 2010, 2011 | Canterbury-Bankstown again, still at Sydney Olympic Park until October 2011; the Storm at AAMI Park |
 | `nrl2012` | 2012–2019 | the Bulldogs back at Belmore; the Cowboys still at Dairy Farmers (1300SMILES) Stadium |
@@ -1055,8 +1069,10 @@ it is rebuilt (R1), COVID-19 relocations are ignored (R2), and a rename on the s
 2023 and 2024 have today's clubs at today's grounds and play on `nrl.json` itself: `nrlSpecs` checks that they equal
 `scripts/data/nrl-teams.json` and builds no copy. Each era's clubs rank as their franchises do today, so section ids
 follow the same order on every map. `scripts/rugby-league-seasons.test.mjs` checks the City of Parramatta (cut between
-the Bulldogs and the Eels only while the Bulldogs were at Olympic Park), Redcliffe (the Broncos' until the Dolphins
-came) and each era's Rabbitohs.
+the Bulldogs and the Eels only while the Bulldogs were at Olympic Park or Homebush), Redcliffe (the Broncos' until the
+Dolphins came), each era's Rabbitohs, and on the maps of 1998–2007 that every club holds the point it grows from, South
+Australia the Rams' in 1998 alone, St. George and Illawarra apart in 1998 only, and the Northern Eagles at Gosford, then
+Brookvale.
 
 ## The NWSL map
 

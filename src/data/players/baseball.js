@@ -1,4 +1,4 @@
-// Baseball's players: a chunk of its own on the page (src/sports/sportData.lazy.js),
-// loaded the first time the sport is played.
+// Baseball's players: on the page, one chunk with the other smaller sports' players (vite.config.js chunkOf), loaded
+// the first time one of them is played (src/sports/sportData.lazy.js).
 export { ROSTERS } from '../rosters.baseball.js';
 export { CLUBS } from '../clubs.baseball.js';
