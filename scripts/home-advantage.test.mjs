@@ -54,7 +54,8 @@ function equalSides(sport, clubs) {
 }
 
 // Each sport's league range for home wins; FIBA nations share the NBA's (their per-possession edge is the same). Football
-// reads in ninety minutes: about 45% home wins and 26% draws, and the shoot-out stays even, so 58% in all. Women's football
+// reads in ninety minutes: about 45% home wins and 26% draws; extra time keeps the edge and the shoot-out stays even, so
+// 59% in all. Women's football
 // plays the men's model and has no real range to meet: the band only says the men's edge reads the same on its median
 // club, whose attack outrates its defence, so its mirror game is an open one (3.5 goals, fewer draws).
 const SPORTS = [

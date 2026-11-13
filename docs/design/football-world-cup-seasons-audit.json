@@ -1,7 +1,7 @@
 {
   "generatedBy": "scripts/build-world-cup-seasons.mjs",
   "retrieved": "2026-11-09",
-  "decided": "2026-11-09: the user approved computed ratings for football's 1960s to 1980s, from national-team Elo adjusted per player and labelled as computed. Claude chose the rest under that request, approved by the user with the release of 2026-11-10: World Cup squads only (no Wikidata pools), the nation's strength from its Elo the day after the final by a line (not by rank), each XI ordered by the players' records, the federations of the day under their own names and flags. East Germany, with no map shape, fields no team.",
+  "decided": "2026-11-09: the user approved computed ratings for football's 1960s to 1980s, from national-team Elo adjusted per player and labelled as computed. Claude chose the rest under that request, approved by the user with the release of 2026-11-10: World Cup squads only (no Wikidata pools), the nation's strength from its Elo the day after the final by a line (not by rank), each XI ordered by the players' records, the federations of the day under their own names and flags. East Germany fielded no team while it had no map shape; since 2026-11-10 it has its own on the map of its years (docs/design/historic-maps.md, asked for by the user, who named West and East Germany), so it fields its 1974 finalists.",
   "elo": {
     "formula": "R' = R + K × G × (W − We), We = 1 / (1 + 10^(−dr / 400)), dr = R_home − R_away + home (none at a neutral venue); W is 1, ½ or 0, a match level after extra time a draw",
     "home": 100,
@@ -1900,7 +1900,7 @@
     },
     {
       "id": "wc-1974",
-      "version": "wc-1974-e3e160a1",
+      "version": "wc-1974-60fb5351",
       "season": "1973/74",
       "tournament": {
         "id": "WC-1974",
@@ -1919,13 +1919,8 @@
           "elo": 1959.8
         }
       },
-      "teamShare": 0.74,
-      "dropped": [
-        {
-          "team": "East Germany",
-          "why": "no shape on the map"
-        }
-      ],
+      "teamShare": 0.73,
+      "dropped": [],
       "identities": {
         "180": {
           "name": "Zaire",
@@ -2069,6 +2064,31 @@
             "Francesco Morini DF 79 0g 246'",
             "Tarcisio Burgnich DF 79 0g 213'",
             "Gigi Riva FW 78 0g 180'"
+          ]
+        },
+        {
+          "id": "278",
+          "name": "East Germany",
+          "team": "East Germany",
+          "elo": 1748.4,
+          "rank": 7,
+          "T": 80.24,
+          "strength": 80,
+          "mean": 80.27,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Jürgen Sparwasser MF 86 BdO 4 1g 540'",
+            "Joachim Streich FW 84 2g 350'",
+            "Martin Hoffmann FW 82 1g 485'",
+            "Jürgen Croy GK 81 0g 540'",
+            "Bernd Bransch DF 80 0g 540'",
+            "Konrad Weise DF 80 0g 540'",
+            "Gerd Kische DF 79 0g 540'",
+            "Lothar Kurbjuweit DF 79 0g 360'",
+            "Harald Irmscher MF 78 0g 289'",
+            "Jürgen Pommerenke MF 78 0g 270'",
+            "Reinhard Lauck MF 76 0g 218'"
           ]
         },
         {

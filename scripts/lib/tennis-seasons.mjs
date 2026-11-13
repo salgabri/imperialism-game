@@ -7,7 +7,7 @@
 // is the shape of the nation that holds its land: Czechia holds Slovakia's, Russia the other Soviet republics', Serbia
 // the other Yugoslav republics'. A nation fields its five best by Elo, and needs two to play, as in the 2026 season;
 // a nation barred from the Davis Cup that season fields no team.
-import { HOME_NATIONS, NATIONS, nationIdentity, selectLineup } from '../../src/data/teams.js';
+import { HISTORIC_NATIONS, HOME_NATIONS, NATIONS, nationIdentity, selectLineup } from '../../src/data/teams.js';
 import { tennis } from '../../src/sports/tennis.js';
 import { gameRating, MIN_PLAYERS, TEAM_SIZE } from './tennis.mjs';
 
@@ -71,6 +71,9 @@ export function nationOfDay({ id, ioc, davisCup }, season, rules) {
  */
 export function nationIdOf(code, season, rules) {
   if (code == null || rules.offMap.includes(code)) return null;
+  // A nation of the map's earlier years a code stood for then (`dayNations`): Vietnam's team to 1975 was South Vietnam's.
+  const day = (rules.dayNations || []).find(entry => entry.code === code && season <= entry.through);
+  if (day) return day.nation;
   const federation = federationNamed(code, rules);
   if (federation) return federation.holder;
   const id = rules.iocNations[code] ?? NATION_OF_FIFA.get(code);
@@ -92,7 +95,8 @@ export function territoryOf(season, fielded, rules) {
     if (!active(land, season) || !fielded.has(land.holder)) continue;
     for (const shape of land.shapes) if (!fielded.has(shape)) merged[shape] = land.holder;
   }
-  const inactive = Object.keys(NATIONS).filter(id => !Object.hasOwn(merged, id) && !fielded.has(id));
+  // East Germany (HISTORIC_NATIONS) fielded no Davis Cup or Fed Cup team: no tennis season lists it.
+  const inactive = Object.keys(NATIONS).filter(id => !HISTORIC_NATIONS.includes(id) && !Object.hasOwn(merged, id) && !fielded.has(id));
   return { merged, inactive };
 }
 

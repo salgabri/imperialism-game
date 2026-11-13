@@ -11,7 +11,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { unzipSync } from 'fflate';
 import { SAVE_KEY } from '../src/config.js';
-import { NATIONS } from '../src/data/teams.js';
+import { HISTORIC_NATIONS, NATIONS } from '../src/data/teams.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { EUROPE_MAPS } from '../src/data/europeMaps.js';
 import { ELITE_CLUBS, TOP_CLUBS, strongestClubs } from '../src/data/scopes.js';
@@ -90,7 +90,7 @@ const COVERAGE = {
   'swos-9596': { players: 2926, nations: 132, completeXIs: 132, clubs: 134, leagues: 7 },
   'swos-9495': { players: 2915, nations: 131, completeXIs: 131, clubs: 134, leagues: 7 },
   'cm0102-2020-11-cm93': { players: 2266, nations: 124, completeXIs: 77, clubs: 130, leagues: 7 },
-  'cm0102-2017-04-cm89': { players: 1205, nations: 137, completeXIs: 88, clubs: 0, leagues: 0 },
+  'cm0102-2017-04-cm89': { players: 1216, nations: 138, completeXIs: 89, clubs: 0, leagues: 0 },
 };
 
 test('each season decodes, with the nations and clubs its source rates; 1989/90 has nations only', () => {
@@ -99,6 +99,8 @@ test('each season decodes, with the nations and clubs its source rates; 1989/90 
     const set = decodeFootballSet(doc);
     assert.deepEqual(doc.coverage, COVERAGE[id], id);
     assert.equal(Object.keys(set.rosters).length, Object.keys(NATIONS).length, id);
+    // East Germany (HISTORIC_NATIONS) is listed only by 1989/90, whose map has it: elsewhere its roster is empty.
+    assert.equal(set.rosters['278'][2].length, id === 'cm0102-2017-04-cm89' ? 11 : 0, id);
     assert.ok(set.clubs.every(club => club.squad.length === 11), `${id}: every club fields eleven`);
   }
   assert.deepEqual(IDS.filter(id => !setHasClubs(id)), ['cm0102-2017-04-cm89']);
@@ -197,7 +199,7 @@ test('the federations of each season\'s day, as far as its source fields them', 
   assert.ok(!fieldedNations(sport89).includes('804') && cm89.nations['804'][2].length === 0, 'Ukraine plays for the Soviet Union');
 });
 
-test('1989/90: a German at an East German club plays for no nation, so West Germany is West German', () => {
+test('1989/90: a German at an East German club plays for East Germany, so West Germany is West German', () => {
   const doc = committed('cm0102-2017-04-cm89');
   const { noNationAt } = entry('cm0102-2017-04-cm89');
   assert.equal(noNationAt.nationality, 'Germany');
@@ -211,9 +213,17 @@ test('1989/90: a German at an East German club plays for no nation, so West Germ
   assert.equal(westGermany.length, 11);
   assert.ok(westGermany.every(tuple => tuple[5] === 'Germany' && !noNationAt.clubs.includes(tuple[6])));
   assert.ok(!westGermany.some(tuple => ['Matthias Sammer', 'Andreas Thom', 'Ulf Kirsten'].includes(tuple[1])));
+  // They play for East Germany, on the map of 1989/90 (src/engine/historicMap.js).
+  assert.equal(noNationAt.playsFor, '278');
+  const eastGermany = doc.nations['278'][2];
+  assert.equal(eastGermany.length, 11);
+  assert.ok(eastGermany.every(tuple => tuple[5] === 'Germany' && noNationAt.clubs.includes(tuple[6])));
+  assert.ok(['Matthias Sammer', 'Andreas Thom', 'Ulf Kirsten'].every(name => eastGermany.some(tuple => tuple[1] === name)));
+  assert.equal(doc.nations['278'][1], 1431, 'every rated German at an East German club');
   assert.ok(westGermany.some(tuple => tuple[1] === 'Lothar Matthäus' && tuple[6] === 'Internazionale'));
   const audit = JSON.parse(read('docs/design/football-retro-seasons-audit.json')).seasons.find(season => season.id === 'cm0102-2017-04-cm89').audit;
-  assert.equal(audit.noTeam['Germany at East German clubs'], 1431);
+  assert.equal(audit.noTeam['Germany at East German clubs'], undefined, 'they play for East Germany');
+  assert.deepEqual(audit.noNationAt, { nationality: 'Germany', label: 'East German clubs', clubs: 67, playsFor: '278' });
   assert.deepEqual(audit.federations.pooled['643']['804'] > 0 && audit.federations.pooled['688']['191'] > 0 && audit.federations.pooled['203']['703'] > 0, true);
   assert.equal(audit.birthShift.oracle.conclusive && audit.birthShift.oracle.agreeing, 10, 'ten players of 1989/90 date the births');
 });

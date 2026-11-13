@@ -26,7 +26,7 @@ import { setHasNations } from '../src/engine/footballSets.js';
 import { hockey } from '../src/sports/hockey.js';
 import { colourFor } from './lib/club-identity.mjs';
 import { nationsOf, nationStrength } from './lib/nhl.mjs';
-import { clubSquadOf, mapOf, nationOf, quantileRescale, ratingsOf, teamsOf } from './lib/nhl-seasons.mjs';
+import { clubSquadOf, federationLands, federationOf, mapOf, nationOf, quantileRescale, ratingsOf, teamsOf } from './lib/nhl-seasons.mjs';
 import {
   RULE, attributeMean, calibrationOf, groupOf, groupRatings, ratingsOfHistogram, scoreOf, stepRating, windowOf,
 } from './lib/nhl-computed.mjs';
@@ -48,7 +48,7 @@ function buildSeason(entry, snapshot, manifest) {
   if (snapshot.source.id !== id) throw new Error(`scripts/data/nhl-seasons/${id}.json is ${snapshot.source.id}'s snapshot`);
   const players = snapshot.players.map(([name, team, pos, rating, born, nhlId]) => {
     if (!Number.isInteger(rating) || rating < 1 || rating > 99) throw new Error(`${id}: ${name} has the rating ${rating}`);
-    return { name, team, pos, rating, game: rating, nation: nationOf(born), nhlId };
+    return { name, team, pos, rating, game: rating, nation: federationOf(nationOf(born), year), nhlId };
   });
   // A classic season's overalls, rescaled onto NHL 27's (the player's choice, scripts/data/nhl-seasons.json `rescale`):
   // its squads are picked by the game's own overalls, then every rating is rescaled and the strengths taken from those.
@@ -69,9 +69,9 @@ function buildSeason(entry, snapshot, manifest) {
       str: scale ? selectLineup({ sport: 'hockey', squad: listed }).rating : lineup.rating, squad: listed, short, players: pool.length };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
   const nations = scale
-    ? nationsOf(players).map(n => { const squad = rated(n.squad).sort(byPlace); return { ...n, ...nationStrength(squad), squad }; })
+    ? nationsOf(players, year).map(n => { const squad = rated(n.squad).sort(byPlace); return { ...n, ...nationStrength(squad), squad }; })
       .sort((a, b) => b.str - a.str || a.name.localeCompare(b.name))
-    : nationsOf(players);
+    : nationsOf(players, year);
   const doc = {
     format: 1, kind: 'nhl', id, version: '', year, season: seasonLabel(year), label: entry.label, local: false,
     source: { provider: entry.provider, edition: entry.edition, compiler: entry.compiler, url: entry.url, retrieved: entry.retrieved,
@@ -81,8 +81,7 @@ function buildSeason(entry, snapshot, manifest) {
     nations: Object.fromEntries(nations.map(n => [n.id, [n.str, n.squad.length, n.squad.map(tupleOf)]])),
     clubs: clubs.map(c => ({ id: c.id, name: c.name, code: c.code, league: 'NHL', country: c.country, col: c.col, str: c.str,
       squad: c.squad.slice().sort(byPlace).map(tupleOf) })),
-    // Great Britain plays as one, as in the built-in season: the home nations start in the United Kingdom's empire.
-    territory: { merged: Object.fromEntries(HOME_NATIONS.map(home => [home, '826'])), inactive: [] },
+    territory: territoryOf(year, nations),
     coverage: { players: players.length, clubs: clubs.length, nations: nations.length, left: snapshot.left.length },
   };
   doc.version = `${id}-${contentHash(doc)}`;
@@ -133,7 +132,7 @@ function buildComputed(entry, snapshot, manifest) {
   if (snapshot.source.id !== id || snapshot.source.method !== 'computed') throw new Error(`scripts/data/nhl-seasons/${id}.json is not ${id}'s computed snapshot`);
   const src = manifest.computed.sources[entry.source.kind];
   const histograms = manifest.computed.histograms;
-  const players = snapshot.players.map(([key, name, team, pos, born, lines]) => ({ key, name, team, pos, born, lines, nation: nationOf(born),
+  const players = snapshot.players.map(([key, name, team, pos, born, lines]) => ({ key, name, team, pos, born, lines, nation: federationOf(nationOf(born), year),
     score: scoreOf({ pos, lines }, year, snapshot.leagues, snapshot.form) }));
   if (players.some(p => p.score === null)) throw new Error(`${id}: a player without a line of the season`);
   // Provisional ratings over every player of the season pick each club's squad (the game's own lineup picker); the final
@@ -158,7 +157,7 @@ function buildComputed(entry, snapshot, manifest) {
     return { id: team.id, name: team.name, code: team.code, country: team.country, col: colours.get(team.id) ?? colourFor(team.id),
       str: lineup.rating, squad: listed, players: pool.length, open: lineup.slots.filter(slot => !slot.player || slot.penalty > 4).map(slot => slot.position) };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
-  const nations = nationsOf(all);
+  const nations = nationsOf(all, year);
   const realSides = realSidesOf(nations);
   const hasNations = setHasNations(id);
   const counts = { players: players.length, squad: squadPlayers.length,
@@ -172,7 +171,7 @@ function buildComputed(entry, snapshot, manifest) {
     nations: hasNations ? Object.fromEntries(nations.map(n => [n.id, [n.str, n.squad.length, n.squad.map(tupleOf)]])) : {},
     clubs: clubs.map(c => ({ id: c.id, name: c.name, code: c.code, league: 'NHL', country: c.country, col: c.col, str: c.str,
       squad: c.squad.slice().sort(byPlace).map(tupleOf) })),
-    territory: { merged: Object.fromEntries(HOME_NATIONS.map(home => [home, '826'])), inactive: [] },
+    territory: territoryOf(year, hasNations ? nations : []),
     coverage: { players: players.length, clubs: clubs.length, nations: hasNations ? nations.length : 0, left: snapshot.left.length },
   };
   doc.version = `${id}-${contentHash(doc)}`;
@@ -194,10 +193,24 @@ function buildComputed(entry, snapshot, manifest) {
 }
 
 /** The nations that would field a real side (src/data/teams.js fieldsRealSide), strongest first. */
-function realSidesOf(nations) {
+function realSideNations(nations) {
   const rosters = Object.fromEntries(nations.map(n => [n.id, [n.str, n.squad.length, n.squad.map(tupleOf)]]));
   const sport = { ...hockey, rosters, territory: { merged: {}, inactive: [] } };
-  return nations.filter(n => fieldsRealSide(n.id, sport)).map(n => n.name);
+  return nations.filter(n => fieldsRealSide(n.id, sport));
+}
+
+/** Their names, as the audit lists them. */
+const realSidesOf = nations => realSideNations(nations).map(n => n.name);
+
+/**
+ * A season's territory: the home nations in the United Kingdom's empire (Great Britain plays as one, as in the built-in
+ * season), and a federation of the day's other members in its holder's where it fields a real side (federationLands:
+ * Slovakia in Czechoslovakia's to 1991/92, the other republics in the Soviet Union's to 1990/91 and the CIS's in
+ * 1991/92), as tennis's seasons give them.
+ */
+function territoryOf(year, nations) {
+  const fielded = new Set(realSideNations(nations).map(n => n.id));
+  return { merged: { ...Object.fromEntries(HOME_NATIONS.map(home => [home, '826'])), ...federationLands(year, fielded) }, inactive: [] };
 }
 
 /** The converted season `entry` (NHL 08, NHL 09): its data set document and its audit row. */
@@ -208,7 +221,7 @@ function buildConverted(entry, snapshot, manifest) {
   const players = snapshot.players.map(([name, team, pos, born, values]) => {
     const score = attributeMean(values);
     if (score === null) throw new Error(`${id}: ${name} has an attribute outside 0-99`);
-    return { name, team, pos, born, nation: nationOf(born), score };
+    return { name, team, pos, born, nation: federationOf(nationOf(born), year), score };
   });
   const ratings = groupRatings(players, 'score', histograms);
   for (const p of players) p.rating = ratings.get(p);
@@ -220,7 +233,7 @@ function buildConverted(entry, snapshot, manifest) {
     return { id: team.id, name: team.name, code: team.code, country: team.country, col: colours.get(team.id) ?? colourFor(team.id),
       str: lineup.rating, squad, players: pool.length, open: lineup.slots.filter(slot => !slot.player || slot.penalty > 4).map(slot => slot.position) };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
-  const nations = nationsOf(players);
+  const nations = nationsOf(players, year);
   const counts = Object.fromEntries(['F', 'D', 'G'].map(g => [g, players.filter(p => groupOf(p.pos) === g).length]));
   const reference = Object.fromEntries(['F', 'D', 'G'].map(g => [g, ratingsOfHistogram(histograms[g]).length]));
   const attributes = snapshot.attributes;
@@ -237,7 +250,7 @@ function buildConverted(entry, snapshot, manifest) {
     nations: Object.fromEntries(nations.map(n => [n.id, [n.str, n.squad.length, n.squad.map(tupleOf)]])),
     clubs: clubs.map(c => ({ id: c.id, name: c.name, code: c.code, league: 'NHL', country: c.country, col: c.col, str: c.str,
       squad: c.squad.slice().sort(byPlace).map(tupleOf) })),
-    territory: { merged: Object.fromEntries(HOME_NATIONS.map(home => [home, '826'])), inactive: [] },
+    territory: territoryOf(year, nations),
     coverage: { players: players.length, clubs: clubs.length, nations: nations.length, left: snapshot.left.length },
   };
   doc.version = `${id}-${contentHash(doc)}`;

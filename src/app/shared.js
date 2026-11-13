@@ -3,7 +3,7 @@ import { C } from '../theme.js';
 import { DEFAULT_SPORT, getSport } from '../sports/index.js';
 import { domesticScope, domesticScopeId } from '../engine/domestic.js';
 import { clubMapScope, domesticEntry, hasTheatreMaps, isCountryScope, isEuropeScope, theatreMapsOf, theatreOf } from '../data/domesticScope.js';
-import { seasonMapOf, setHasClubs, setHasNations, setSportOf } from '../engine/footballSets.js';
+import { BUILT_IN_SETS, getLoadedFootballSet, seasonMapOf, setHasClubs, setHasNations, setSportOf } from '../engine/footballSets.js';
 
 export const LOG_CAP = 220;
 export const FEED_CAP = 90;
@@ -47,6 +47,19 @@ export function dataSetOf(settings) {
   // Any other sport's season plays the layer it has: its clubs (on its era's map or its own maps, if it has them), or its
   // nations.
   return (settings.layer === 'clubs' ? setHasClubs(id) : setHasNations(id)) ? id : null;
+}
+
+/**
+ * The year whose world map a setup or saved campaign plays (src/engine/historicMap.js): the end year of the season it
+ * is played on (a campaign's `dataYear`, else the listed or loaded season's), or null for today's map (the built-in
+ * season, or a country map's built-in data). Pure.
+ */
+export function mapYearOf(settings) {
+  const id = dataSetOf(settings);
+  if (id == null) return null;
+  if (Number.isInteger(settings.dataYear)) return settings.dataYear;
+  const year = BUILT_IN_SETS.find(set => set.id === id)?.year ?? getLoadedFootballSet(id)?.meta.year;
+  return Number.isInteger(year) ? year : null;
 }
 
 /**

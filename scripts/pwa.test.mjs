@@ -78,7 +78,7 @@ test('the precache is the app shell only; seasons, country maps, flags and crest
 
   const cacheOf = file => RUNTIME_CACHES.find(cache => cache.pattern.test(`https://imperialism.test/${file}`))?.cacheName ?? null;
   // Every file but the licences and source lists beside the data, which the game never loads.
-  const files = folder => readdirSync(publicFile(folder)).filter(file => !/^(README\.md|LICENSE|SOURCES\.tsv|ATTRIBUTION[\w-]*\.txt)$/.test(file))
+  const files = folder => readdirSync(publicFile(folder)).filter(file => !/^(README\.md|LICENSE|SOURCES[\w-]*\.tsv|ATTRIBUTION[\w-]*\.txt)$/.test(file))
     .map(file => `${folder}/${file}`);
   // Every sport's season folder (a sport with no earlier seasons has none) and the maps.
   const dataFolders = ['football', 'womens-football', 'basketball', 'american-football', 'baseball', 'hockey', 'tennis', 'womens-tennis', 'rugby-league', 'domestic']

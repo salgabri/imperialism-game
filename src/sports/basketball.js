@@ -293,6 +293,12 @@ const basketballRules = {
   territory: { merged: Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])), inactive: [] },
   // That empire plays as Great Britain, under the Union Jack.
   playsAs: { '826': GREAT_BRITAIN },
+  /**
+   * The rules a campaign plays (matchSport): clubs are an NBA season's franchises, at that season's pace and scoring
+   * rate (`nbaBasketballIn`), or the EuroLeague's on its map; nations play FIBA's. Every rulebook below shares this.
+   */
+  rulesFor: settings => (settings.layer !== 'clubs' ? basketball
+    : settings.clubScope === EUROLEAGUE_SCOPE ? euroleagueBasketball : nbaBasketballIn(settings.dataSeason)),
 
   squadSize: 5,
   formation: { PG: 1, SG: 1, SF: 1, PF: 1, C: 1 },

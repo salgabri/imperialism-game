@@ -110,7 +110,8 @@ Strength is the mean effective rating of the thirteen, as in the other sports.
   and its spread of a side's runs (a 3.1 standard deviation); 0.038 a rating point
   spreads a 162-game season as MLB's did in 2022–2025 (about 106 wins to 56). The old
   0.28, 3/7 and 0.05 gave the best club 112 wins and three games in ten decided by
-  a run.
+  a run. These are the built-in season's odds, 2026's 4.48 runs a game; an earlier
+  season scores at its own league's rate ([Rules by era](#rules-by-era)).
 - **Home and away.** The attacker bats first (the top of each inning); the defender,
   holding the territory, is the home side and bats last. The bottom of the ninth is
   not played when the home side leads, and the hit that puts the home side ahead in
@@ -120,10 +121,12 @@ Strength is the mean effective rating of the thirteen, as in the other sports.
   side batting last also gains 1.4 rating points of edge in its half-innings and
   the visitors lose as much in theirs, so equal sides win 53% at home, as MLB home
   sides do ([match simulation](match-simulation.md#home-advantage-optional)).
-- **Extra innings**, MLB's regular-season rule: each half starts with a runner on
-  second, so a run comes with `logistic(logit(0.6) + 0.05·edge)`. After six extra
-  innings still level, a decisive run goes to either side with
-  `logistic(0.08·(edgeA − edgeD))`, an even coin flip between equals.
+- **Extra innings**, MLB's regular-season rule since 2020: each half starts with a
+  runner on second, so a run comes with `logistic(logit(0.6) + 0.038·edge)` (61.4%
+  of the time from second with nobody out in 2010–15, Tom Tango's tables). After six
+  extra innings still level, a decisive run goes to either side with
+  `logistic(0.08·(edgeA − edgeD))`, an even coin flip between equals. A season before
+  2020 plays its extra innings as the ninth, twelve of them ([Rules by era](#rules-by-era)).
 - **Form.** One match-day draw, `N(0, drama·0.6)` rating points, raises the
   attacker's edge and lowers the defender's, as American football's does.
 - **Events.** Each scoring half-inning is told as runs batted in, one to four at a
@@ -166,7 +169,10 @@ then the decisive run) is exact too. Neither the unplayed bottom of the ninth no
 walk-off changes who wins, so the full nine are counted. Match-day form is integrated
 over its normal spread with seven-point Gauss–Hermite quadrature. At first pitch the
 chart is within 0.4 points of the fixture's simulated odds under every Upsets
-setting.
+setting. A match of an earlier season keeps its own odds in the model it saves
+(`score`, `extra` and `more`, and twelve extra innings before 2020), so the chart plays
+out that season's scoring and its extra innings; the built-in season's model has
+none of them and reads as it always did.
 
 ## Interface
 
@@ -206,6 +212,8 @@ the map (one territory per club, its ballpark inside, Chicago split, Toronto's
 Ontario, campaigns to a champion); setup; the squad screen; and the running App
 launching on the MLB map and saving. `npm run smoke` adds an MLB duel campaign with
 the live ticker, a baseball nations campaign and an MLB resume.
+`scripts/baseball-eras.test.mjs` holds each earlier season to its own rules
+([Rules by era](#rules-by-era)).
 
 ## Earlier seasons
 
@@ -574,6 +582,160 @@ its names and birth countries as it gives them (the Peñas become Pena, Rod Care
 Eden Panama's), Elmer Valo's alone corrected; the calibration's record check limited to the
 Databank's seasons (2018–2022) rather than a second source for 2023–24.
 
+## Rules by era
+
+Status: built 2026-11-10. Every earlier season plays its own day's baseball: its
+league's runs a game, its extra innings and its ratings' own balance. The built-in
+2026 season plays today's rules exactly as before (simulation version 2, its seeds'
+results unchanged); the earlier seasons are version 3. `matchSport` asks baseball for
+a season's rules (`rulesFor`, `baseballIn` in `src/sports/baseball.js`): one sport
+object a season, its rules carried on each prepared match (`prepared.rules`), so the
+score-only draw, the full game, the odds and the live chart all read them.
+
+| Seasons | Extra innings in MLB's regular season | In the game | Designated hitter in MLB |
+| --- | --- | --- | --- |
+| 1960–1972 | as the ninth | as the ninth; twelve, then the decisive run | none |
+| 1973–2019 | as the ninth | as the ninth; twelve, then the decisive run | the American League (interleague games from 1997: the home club's league) |
+| 2020 | a runner on second | the runner; six, then the decisive run | both leagues |
+| 2021 | a runner on second | the runner; six, then the decisive run | the American League |
+| 2022–2026 | a runner on second (permanent from 2023) | the runner; six, then the decisive run | both leagues |
+
+Never in the postseason: the runner is the regular season's rule, which every
+campaign match plays. The game fields a designated hitter in every season (below).
+
+**The run level.** `src/data/mlbLeagueAverages.js` holds each regular season's games,
+runs, outs and shutouts, summed over its clubs. 1960 to 2022 are the Baseball
+Databank's Teams.csv (G, R, IPouts and SHO of every American and National League club,
+the commit the WAR seasons pin); `npm run import:mlb-war` sums them again and stops on
+any figure the module gives otherwise. 2023 to 2026 are MLB's own Stats API
+(`https://statsapi.mlb.com/api/v1/teams/stats?season=<year>&sportIds=1&group=hitting&stats=season&gameType=R`,
+group `pitching` for outs and shutouts; statsapi.mlb.com serves no robots.txt), read
+2026-11-10 by `node scripts/sync-mlb-league-runs.mjs` into
+`scripts/data/mlb-league-runs.json`, club by club. The API gives the same games and
+runs as the Databank in all twelve seasons the file holds of both (1960, 1968, 1981,
+1987, 1994, 2000, 2010, 2018–2022); its shutouts and outs differ only in 2020's
+shutouts (100 against 99) and the outs of 1960 and 1968 (13 and 21 more). Retrosheet's
+game logs were not used: retrosheet.org's robots.txt disallows `/gamelogs/`. 2026's
+season is complete (its last games were played in September), so it is the latest full
+season, the built-in season's own.
+
+A season's half-innings score so that a game between equal sides brings its runs a
+game in the proportion the real ones bear to 2026's 4.48: `gameRuns` works out a
+game's runs exactly as the model plays it (the unplayed bottom of the ninth, walk-offs,
+the season's extra innings and the decisive run) and `eraRules` finds the scoring rate
+that gives it. Three quarters of a season's change in rate goes into how often a
+half-inning scores, a quarter into how many a scoring one brings: across Tom Tango's
+four eras of 1950–2015 (run expectancy from the start of an inning and the chance of a
+run in it, from Retrosheet's data: [re24](http://www.tangotiger.net/re24.html), read
+2026-11-10; 0.476 to 0.547 runs an inning, a run in 26.3% to 29.4% of them) the chance
+moves with the runs at a slope of 0.75, log against log, and the Databank's shutouts by
+season agree best at 0.75 (of 0.5, 0.75 and 1). With the runner on second, an extra
+half-inning's chance moves by as much in logit.
+
+**Each season's pitching premium.** MLB The Show rates its hitters against its
+pitchers differently each year, and the computed seasons inherit 2018–24's balance, so
+the 2.3 premium that makes the built-in clubs' average matchup an even edge would give
+2025's hitters 1.4 rating points too much. Each season takes its own,
+`seasonPremium` of its clubs (their defence's mean rating above their batting's):
+0.93 for MLB The Show 25, 1.53 for 19, 2.68 for 22, 1.72 to 2.71 for the computed
+seasons. `npm run build:mlb-seasons` writes them to `src/data/baseballSeasonPremiums.js`
+(and `--check` holds them), and a season's nations play its clubs' premium.
+
+| Season | Runs a game | Runs a nine innings | Shut out | A half-inning scores | Runs a scoring one | Premium | The game: runs, shut out |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1960 | 4.31 | 4.32 | 6.4% | 25.9% | 1.84 | 1.99 | 4.36, 6.7% |
+| 1963 | 3.95 | 3.95 | 8.5% | 24.2% | 1.80 | 2.26 | 3.95, 8.6% |
+| 1968 | 3.42 | 3.42 | 10.4% | 21.6% | 1.73 | 2.46 | 3.40, 10.9% |
+| 1972 | 3.69 | 3.69 | 9.6% | 22.9% | 1.76 | 2.61 | 3.67, 9.5% |
+| 1977 | 4.47 | 4.48 | 5.7% | 26.7% | 1.86 | 2.39 | 4.46, 6.6% |
+| 1987 | 4.72 | 4.76 | 5.0% | 27.8% | 1.88 | 2.20 | 4.74, 5.4% |
+| 1994 | 4.92 | 4.96 | 4.5% | 28.7% | 1.90 | 2.28 | 4.90, 5.1% |
+| 2000 | 5.14 | 5.20 | 4.2% | 29.7% | 1.92 | 2.37 | 5.09, 4.5% |
+| 2010 | 4.38 | 4.43 | 6.8% | 26.3% | 1.85 | 2.34 | 4.38, 6.5% |
+| 2014 | 4.07 | 4.08 | 7.3% | 24.8% | 1.81 | 2.25 | 4.07, 7.6% |
+| 2019 | 4.83 | 4.86 | 5.5% | 28.3% | 1.89 | 1.53 | 4.81, 5.5% |
+| 2020 | 4.65 | 4.85 | 5.5% | 27.3% | 1.87 | 2.28 | 4.64, 6.2% |
+| 2021 | 4.53 | 4.65 | 6.2% | 26.7% | 1.86 | 0.89 | 4.50, 6.5% |
+| 2025 | 4.45 | 4.52 | 6.8% | 26.3% | 1.85 | 0.93 | 4.49, 6.8% |
+| 2026, built in | 4.48 | 4.55 | 6.2% | 26.5% | 1.85 | 2.3 | 4.50, 6.6% |
+
+The real columns are the module's (shut out: the share of a side's games it scored no
+runs in); "the game" plays every pairing of the season's clubs twelve times under its
+rules. Over all 67 seasons the game's runs a game sit within 1.8% of the league's (0.2%
+under on average) and its shutouts half a point above the league's on average (at most
+1.4 points, 1982). 2020 and 2021 scheduled seven-inning doubleheaders
+([Wikipedia](https://en.wikipedia.org/w/index.php?oldid=1370243501), read 2026-11-10),
+which the game does not play, so their runs a game sit 2–4% under their runs a nine
+innings; the game plays their games at their runs a game.
+
+**Extra innings.** MLB put a runner on second at the start of each extra half-inning
+in the 2020 regular season, extended it through 2021 and 2022 and made it permanent
+from 2023; postseason games never use it ([Wikipedia, "Extra innings"](https://en.wikipedia.org/w/index.php?oldid=1380896790),
+read 2026-11-10). Before 2020 an extra inning plays as the ninth, at the season's own
+odds, and between average sides 52–63% of them end level: 45% of the game's 2019
+extra-inning games end in the tenth, as 43.9% of 2019's did, and 72% with the runner,
+as 69.1% of 2020's did (the same article, citing The Boston Globe of 18 July 2023).
+Six extra innings, which with the runner leave 0.06% of extra-inning games to the
+decisive run, would leave 2–6% of them to it before 2020, so those seasons play twelve
+(21 innings; the era's longest games went 24 and 25, the same article): 0.04–0.4% then
+end on the decisive run, and about one game in 140 of 1968 runs past fifteen innings.
+The live chart's extra innings follow the season's rule and its cap.
+
+**The designated hitter is not played by era.** MLB had none before 1973; the American
+League has used it since 1973, the National League in 2020 and since 2022; interleague
+games from 1997 to 2021 took the home club's league's rule, and the World Series had
+none in 1973–75, used it in every game of the even years 1976–85 and in the American
+League's park from 1986 ([Wikipedia, "Designated hitter"](https://en.wikipedia.org/w/index.php?oldid=1382529081),
+read 2026-11-10). Every season here still bats a designated hitter, because playing the
+rule properly would take:
+
+- **Lineups by rule, not by sport.** `selectLineup` (`src/data/teams.js`) picks every
+  lineup from one plan a sport (`LINEUP_PLANS.baseball`, with its DH) and is called with
+  the team alone from about fifteen places: the strength shown and fought with
+  (`teamEff`), conquest gains, tactics, odds, the squad screen, the match's lineups, the
+  ledger. A pitcher batting ninth needs a plan per team (1960–72) or per match (from
+  1973, by the home club's league) threaded through all of them, and the strength each
+  works out must be the match's, or `prepareMatch`'s tactics offset (the strength given
+  less the lineup's own rating) cancels the difference.
+- **Each club's league by season.** The season files call every club's league "MLB".
+  The WAR snapshots hold each club's AL or NL from the Databank (1960–2017); 2018–25
+  would need MLB's Stats API. Only the Brewers (to the National League in 1998) and the
+  Astros (to the American League in 2013) changed league in 1960–2026.
+- **A batting rating for pitchers.** No source rates them as hitters, and the game's own
+  rule for a pitcher at the plate (40 points off his rating) would make an ace a better
+  hitter.
+- **A rule for nations from 1973 to 2021**, which had no league: no source gives one
+  (the World Baseball Classic began in 2006).
+- **Strength, nations and saves.** A season's club strengths are its thirteen-place
+  lineups with a designated hitter; a twelve-place lineup changes every club's strength
+  and perhaps which nations field a team (half the places, `fieldsRealSide`), and a
+  saved campaign's teams would change strength when resumed.
+
+Doing 1960–72 alone, where no league is needed, would leave the National League's clubs
+a designated hitter for 47 seasons. The run level is right either way: each season
+scores at its league's real rate, the pitchers' batting included.
+
+**Decisions** (2026-11-10, the builder's, under the user's request for each era's rules
+and realistic results, not yet confirmed by the user): the run level matches runs a
+game, not runs a nine innings (whose 2020 and 2021 would run 2–4% above their games);
+the split of three quarters in how often an inning scores; twelve extra innings before
+2020; each season's own pitching premium; MLB's Stats API for 2023–2026, as the
+birthplaces already use it; the designated hitter left as it is.
+
+**Checks.** `scripts/baseball-eras.test.mjs` (in `npm run test:baseball`): the league
+totals from 1960, the API's sums against the module and the Databank; the built-in
+season's rules untouched and each earlier season's its own, one object a season, which
+differs from today's only in its model; the extra innings by season; each premium its
+clubs' own and every season's average matchup an even edge; every one of the 67
+seasons within 3.5% of its league's runs a game (within 1% on average) and 2.2 points
+of its shutouts; 2019's extra-inning games ending in the tenth as 2019's did, 2020's as
+2020's; a game of 1968 to the twenty-first inning; and the live chart at the fixture
+odds, its extra innings exact for the season's rule. `npm run simulation:realism` plays
+1968, 1987, 2000 and 2019 as whole 162-game seasons beside the built-in clubs
+([match simulation](match-simulation.md#realism-against-real-leagues)), and the 1961
+clubs campaign in `scripts/baseball-war-seasons.test.mjs` checks the App plays 1961's
+rules and resumes with them.
+
 ## Known limits
 
 - MLB The Show's nine seasons, 2018 to 2026: ShowZone keeps nothing older, so 1960 to
@@ -589,8 +751,9 @@ Databank's seasons (2018–2022) rather than a second source for 2023–24.
   rule. A player's club is his last stint's: a deadline acquisition counts for the club
   that acquired him, a released player stays with the club that released him. Every
   season is played with a designated hitter and rosters of up to 26, which those seasons
-  did not have. The WAR averages Baseball-Reference's and FanGraphs', whose terms could
-  not be read.
+  did not have ([Rules by era](#rules-by-era) says what the designated hitter would
+  take); each scores at its league's runs a game all the same. The WAR averages
+  Baseball-Reference's and FanGraphs', whose terms could not be read.
 - Names and birthplaces of 1960 to 2017 are the Baseball Databank's of November 2023, a
   resource its own README calls legacy, its legacy parts unmaintained: names without
   diacritics, and whatever it has not corrected since. Its seasons end with 2022, so the
@@ -600,3 +763,8 @@ Databank's seasons (2018–2022) rather than a second source for 2023–24.
   pitches or unearned runs, no home runs as such.
 - The bottom of the ninth still takes its three outs on the clock when it is not
   played, so a game reads "Final" at B9 either way.
+- Each season scores at its league's rate, but its clubs keep 2018–24's spread of
+  ratings (the computed seasons) or The Show's: 1968's, 1987's and 2000's standings
+  spread as the real ones did (a winning percentage's standard deviation 0.058–0.064
+  against 0.059–0.061), 2019's narrower (0.083 against 0.096). Nothing models a
+  season's own style beyond its runs: stolen bases, home runs, complete games.

@@ -3,10 +3,13 @@
 // plain block when it has no crest.
 import React from 'react';
 import Flag from '../../components/Flag.jsx';
-import { clubLogoUrl } from '../../data/clubLogos.js';
+import { crestUrl } from '../../data/crests.js';
+import { useSeasonYear } from '../../components/seasonYear.js';
 
 export default function SquadFlag({ flagId = null, teamId = null, isClub = false, width = 16, height = Math.round(width * 0.75), className = '' }) {
-  const logo = isClub ? clubLogoUrl(teamId) : null;
+  // A club wears the crest of the season on screen (src/data/crests.js).
+  const year = useSeasonYear();
+  const logo = isClub ? crestUrl(teamId, year) : null;
   return (
     <span className={`squad-flag${logo ? ' squad-flag--logo' : ''}${className ? ` ${className}` : ''}`} style={{ width, height }} aria-hidden="true">
       {!isClub && flagId != null && <Flag nationId={flagId} width={width} height={height} className="squad-flag__img" />}

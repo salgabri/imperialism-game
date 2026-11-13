@@ -11,7 +11,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { SAVE_KEY } from '../src/config.js';
 import { BUILT_IN_WOMENS_TENNIS_SEASONS } from '../src/data/womensTennisSeasons.js';
-import { HOME_NATIONS, NATIONS, makeRng, buildTeam } from '../src/data/teams.js';
+import { HISTORIC_NATIONS, HOME_NATIONS, NATIONS, makeRng, buildTeam } from '../src/data/teams.js';
 import { BUILT_IN_SETS, builtInSeasonOf, decodeFootballSet, fieldedNations, seasonSport, setHasClubs, setHasNations, setKindOf, setSportOf,
   sportOf } from '../src/engine/footballSets.js';
 import { WTA } from '../src/sports/tennis.js';
@@ -282,7 +282,8 @@ test('a season binds women\'s tennis, the WTA\'s serve and its nations; its fiel
   assert.equal(czechs.sport, 'womens-tennis');
   assert.equal(sportOf({ sport: 'womens-tennis', layer: 'nations', dataSet: 'wta-1985' }), null, 'until it has loaded');
   assert.equal(sportOf({ sport: 'tennis', layer: 'nations', dataSet: 'wta-1985' }).id, 'tennis', 'a women\'s season never plays as the men\'s');
-  assert.equal(Object.keys(NATIONS).length, set.territory.inactive.length + Object.keys(set.territory.merged).length + fielded.length);
+  // Every nation of today's map; East Germany (HISTORIC_NATIONS) never played the Davis Cup or the Fed Cup.
+  assert.equal(Object.keys(NATIONS).length - HISTORIC_NATIONS.length, set.territory.inactive.length + Object.keys(set.territory.merged).length + fielded.length);
 });
 
 // ---------- the running App ----------

@@ -115,6 +115,41 @@ test('penalty reveals respect the sampled first kicker and legacy saves default 
   }
 });
 
+test('a level game settled in extra time, or by lots, plays to its end and finishes at full time with no kicks', async () => {
+  const settled = [
+    { by: 'extra-time', periods: [[1, 0], [0, 0]], end: 120, A: [], D: [], ga: 0, gd: 0 },
+    { by: 'lots', periods: [[0, 0], [0, 0]], end: 120, A: [], D: [], ga: 0, gd: 0, lots: 'D' },
+    { by: 'golden-goal', periods: [[0, 0], [0, 1]], end: 111, A: [], D: [], ga: 0, gd: 0 },
+  ];
+  for (const tie of settled) {
+    const f = await fixture();
+    try {
+      const tasks = [];
+      f.app.after = (ms, callback) => tasks.push({ ms, callback });
+      let finished = 0;
+      f.app.finishMatch = () => { finished++; };
+      await act(async () => f.app.setState(state => ({
+        settings: { ...state.settings, sport: 'football' },
+        match: { ...state.match, tie, tieShown: null },
+      })));
+      f.app.presentMatch();
+      // The whistle a minute after play ends, at football's 46 ms a minute after the kick-off notice's 450.
+      assert.deepEqual(tasks.map(task => task.ms), [450 + (tie.end + 1) * 46], `${tie.by}: the whistle after extra time`);
+      await act(async () => tasks.shift().callback());
+      assert.equal(f.app.state.match.status, 'FULL TIME', `${tie.by}: full time, not penalties`);
+      assert.equal(f.app.state.match.tieShown, null, 'no kicks to reveal');
+      assert.equal(tasks.length, 1);
+      await act(async () => tasks.shift().callback());
+      assert.equal(finished, 1);
+      // Revealed at once (Final score only, a skip), the same.
+      await act(async () => f.app.setState(state => ({ match: { ...state.match, status: 'LIVE' } })));
+      await act(async () => f.app.revealAll());
+      assert.equal(f.app.state.match.status, 'FULL TIME');
+      assert.equal(f.app.state.match.tieShown, null);
+    } finally { await f.close(); }
+  }
+});
+
 test('resuming between shootout kicks reveals the pending opponent reply before the next round', async () => {
   const cases = [
     { first: 'A', A: [1, 0], D: [0, 1], expected: ['D', 'A', 'D'] },

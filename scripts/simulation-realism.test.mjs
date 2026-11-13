@@ -1,12 +1,13 @@
 // Whole league seasons played with the built-in clubs land in each real league's range (REAL in
-// simulation-realism.mjs, with its seasons and sources). Only what the models set out to match is held here. Matches
+// simulation-realism.mjs, with its seasons and sources), and a few earlier NFL and AFL seasons' clubs, each under its own
+// day's rules, score as their leagues did. Only what the models set out to match is held here. Matches
 // are at a neutral venue unless a campaign turns Home advantage on, so the home sides' wins are checked with it on.
 // The known gaps are reported by `npm run simulation:realism` and not tested: NBA and EuroLeague games decided by three or
 // fewer, the EuroLeague's best and worst clubs (a little too close to the middle), MLB's worst club.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { LATEST_NBA_SEASON, NBA_LEAGUE_AVERAGES } from '../src/data/nbaLeagueAverages.js';
-import { REAL, realismReport } from './simulation-realism.mjs';
+import { mlbEraReal, REAL, realismReport } from './simulation-realism.mjs';
 
 const report = realismReport({ seasons: 12 });
 // `slack` allows for twelve seasons' sampling where the model sits at the edge of the real range.
@@ -36,6 +37,18 @@ test('football: Europe\'s top five leagues score, draw and finish as they do in 
     within(firstHalf, real.firstHalfShare, `${league.league} first-half goals`);
     within(league.penaltyConversion, real.penaltyConversion, `${league.league} shoot-out kicks scored`);
   }
+});
+
+test('football: extra time leaves as many level games for penalties as the World Cups\' knockout games', () => {
+  // The share of extra times still level is what extra time's rate is calibrated to (src/sports/football.js EXTRA_RATE);
+  // the golden goal settles more of them, the silver goal some. The rest is reported (npm run simulation:realism): the
+  // nations draw fewer ninety minutes than knockout games do, and their extra times score less.
+  const knockouts = report.footballKnockouts;
+  within(knockouts.levelAfterExtraTime, REAL.footballKnockouts.levelAfterExtraTime, 'extra times still level after 120', 0.01);
+  within(knockouts.penaltyConversion, REAL.football.penaltyConversion, 'shoot-out kicks scored');
+  assert.ok(report.goldenGoalKnockouts.levelAfterExtraTime < report.silverGoalKnockouts.levelAfterExtraTime
+    && report.silverGoalKnockouts.levelAfterExtraTime < knockouts.levelAfterExtraTime + 0.01, 'the golden goal settles most, the silver goal more than none');
+  within(knockouts.attackerWinsLevel, [0.47, 0.53], 'a level game goes either way between equals on average');
 });
 
 test('NBA: points, margins, overtime, the standings and the box score look like an NBA season', () => {
@@ -86,6 +99,20 @@ test('NFL: the key margins, one-score games, the tries and the safeties', () => 
   within(nfl.safetiesPerSeason, real.safetiesPerSeason, 'safeties a season');
 });
 
+test('NFL and AFL seasons of other eras score as their leagues did, under their own day\'s rules', () => {
+  assert.deepEqual(report.nflEras.map(era => `${era.league} ${era.year} ${era.overtimeRule}`), ['NFL 1965 sudden', 'AFL 1965 sudden',
+    'NFL 1977 sudden', 'NFL 1985 sudden', 'NFL 1993 sudden', 'NFL 2000 sudden', 'NFL 2010 modified', 'NFL 2024 both']);
+  for (const era of report.nflEras) {
+    const label = `${era.league} ${era.year}`;
+    const near = (value, real, by, what) => within(value, [real - by, real + by], `${label} ${what}`);
+    near(era.pointsPerTeam, era.realPoints, 1, 'points a team');
+    near(era.touchdowns, era.realTouchdowns, 0.15, 'touchdowns a team');
+    near(era.fieldGoals, era.realFieldGoals, 0.15, 'field goals a team');
+    near(era.xpRate, era.realXpRate, 0.015, 'extra points made');
+    near(era.twoPointShare, era.realTwoPointShare, 0.02, 'touchdowns going for two');
+  }
+});
+
 test('MLB: runs, close games, extra innings and the standings look like an MLB season', () => {
   const mlb = report.mlb, real = REAL.mlb;
   within(mlb.runsPerTeam, real.runsPerTeam, 'runs a team');
@@ -96,6 +123,46 @@ test('MLB: runs, close games, extra innings and the standings look like an MLB s
   // (27.8–29.4%).
   within(mlb.extraInnings, real.extraInnings, 'extra innings', 0.015);
   within(mlb.oneRun, real.oneRun, 'one-run games', 0.01);
+});
+
+test('MLB by era: 1968, 1987, 2000 and 2019 each score their own runs, with their own extra innings', () => {
+  for (const era of report.mlbEras) {
+    const real = mlbEraReal(era.year);
+    within(era.runsPerTeam, [0.97 * real.runsPerTeam, 1.03 * real.runsPerTeam], `${era.year} runs a team`);
+    within(era.shutoutRate, [real.shutoutRate - 0.015, real.shutoutRate + 0.015], `${era.year} shutouts`);
+    within(era.extraInnings, [0.07, 0.13], `${era.year} extra innings`);
+    // The standings stay as sane as the built-in season's calibration made them, and as wide as the real ones.
+    within(era.bestWins, [92, 114], `${era.year} best record`);
+    within(era.worstWins, [46, 72], `${era.year} worst record`);
+    if (real.winPctSd != null) within(era.winPctSd, [real.winPctSd - 0.015, real.winPctSd + 0.015], `${era.year} spread of the standings`);
+  }
+  // Without the runner on second, 43.9% of 2019's extra-inning games ended in the tenth; with it, 69.1% of 2020's.
+  const { endedInTenth } = REAL.mlbEras;
+  within(report.mlbEras.find(era => era.year === 2019).endedInTenth, [endedInTenth[2019] - 0.04, endedInTenth[2019] + 0.04], '2019 extras ended in the tenth');
+  within(report.mlb.endedInTenth, [endedInTenth.withRunner - 0.04, endedInTenth.withRunner + 0.04], 'extras ended in the tenth with the runner');
+});
+
+test('NHL eras: each earlier season scores like its league and settles its level games as its day did', () => {
+  assert.deepEqual(report.nhlEras.map(era => era.season), ['1970/71', '1981/82', '1992/93', '2003/04', '2010/11']);
+  for (const era of report.nhlEras) {
+    const real = REAL.nhlEras[era.season];
+    // The season's own goals, and its league's figure is the one the game holds it to.
+    assert.equal(era.league, real.goalsPerTeam);
+    within(era.goalsPerTeam, [real.goalsPerTeam - 0.06, real.goalsPerTeam + 0.06], `${era.season} goals a team`);
+    // Level after sixty, where the league kept it: the pre-1999/2000 late game is calibrated on 1966/67–1982/83 as a whole.
+    if (real.overtime !== undefined) within(era.overtime, [real.overtime - 0.035, real.overtime + 0.035], `${era.season} level after sixty`);
+    if (era.playoffOvertime) {
+      assert.equal(era.shootout, 0, `${era.season} has no shoot-out`);
+      within(era.firstPeriod, [real.firstPeriod - 0.05, real.firstPeriod + 0.05], `${era.season} settled in the first overtime`);
+      assert.ok(era.longest <= 5, `${era.season}: the fifth overtime always ends`);
+    } else {
+      within(era.shootout, [real.shootout - 0.025, real.shootout + 0.025], `${era.season} shoot-outs`);
+      // The four-on-four era's 45.2% of 2005/06–2014/15 (2010/11 alone 49.8%).
+      within(era.decidedInOvertime, [0.452 - 0.04, 0.452 + 0.04], `${era.season} settled before the shoot-out`);
+    }
+    // A sane spread: the 1990s' rescaled editions run wide (docs/design/hockey.md, "The scale"), never wild.
+    within(era.winPctSd, [0.06, 0.2], `${era.season} spread of the standings`);
+  }
 });
 
 test('NRL: points, tries, goals, margins, golden point, the standings and who scores the tries', () => {

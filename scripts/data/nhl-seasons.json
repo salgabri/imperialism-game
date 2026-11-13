@@ -10,6 +10,12 @@
     {"id":"nhl-1995","year":1995,"edition":"NHL 95","label":"NHL 95","released":"October 1994","provider":"EA Sports","compiler":"Jon Morris's NHL 95 sheet (nhl-95.com), the Genesis game's overalls; the Rangers' skaters from Segathon's NHL 95 ratings","url":"http://nhl-95.com/","retrieved":"2026-11-08","rawScale":99,"overall":"the Genesis game's own","api":"19941995","apiAround":["19931994"],"files":{"ratings":"nhl95/nhl-95-com-player-stats.csv","segathon":"nhl95/segathon-nhl-95-player-ratings.html"},"source":{"kind":"nhl95","fromSegathon":["NYR"],"leaveOut":{},"aliases":{"Adam Chreighton":"Adam Creighton","Allan Conroy":"John Conroy","Dan Marois":"Daniel Marois","Dave Mackey":"David Mackey","Dave Maley":"David Maley","Dave Volek":"David Volek","Dimitri Filmanov":"Dmitri Filimonov","Dmitri Kvartalnov":"Dimitri Kvartalnov","Ian Fraser":"Iain Fraser","Jim Waite":"Jimmy Waite","Kieth Acton":"Keith Acton","Mike O' Neil":"Michael O'Neill","Mike Krushelnski":"Mike Krushelnyski","Mike Needham":"Michael Needham","Ted Crowley":"Edward Crowley"},"codes":{"Det":"DET","Chi":"CHI","Bos":"BOS","Mtl":"MTL","Pit":"PIT","La":"LAK","LA":"LAK","Dal":"DAL","Buf":"BUF","WPG":"WIN","PHL":"PHI","Que":"QUE","Cgy":"CGY","NJ":"NJD","Edm":"EDM","SJ":"SJS","TBY":"TBL","TB":"TBL","Hfd":"HFD","Fla":"FLA","Ana":"ANA","ANH":"ANA","OTW":"OTT","WAS":"WSH"}},"rescale":true},
     {"id":"nhl-2007","year":2007,"edition":"NHL 07","label":"NHL 07","released":"September 2006","provider":"EA Sports","compiler":"IGN's NHL 07 ratings pages (sports.ign.com/nhl07, EA's ratings), archived by the Wayback Machine","url":"https://web.archive.org/web/2007/http://sports.ign.com/nhl07/","retrieved":"2026-11-08","rawScale":99,"overall":"EA's own (a goalie's decimals rounded)","api":"20062007","apiAround":["20052006","20072008"],"files":{"teams":{"ANA":"nhl07/anaheim.html","ATL":"nhl07/atlanta.html","BOS":"nhl07/boston.html","BUF":"nhl07/buffalo.html","CGY":"nhl07/calgary.html","CAR":"nhl07/carolina.html","CHI":"nhl07/chicago.html","COL":"nhl07/colorado.html","CBJ":"nhl07/columbus.html","DAL":"nhl07/dallas.html","DET":"nhl07/detroit.html","EDM":"nhl07/edmonton.html","FLA":"nhl07/florida.html","LAK":"nhl07/losangeles.html","MIN":"nhl07/minnesota.html","MTL":"nhl07/montreal.html","NSH":"nhl07/nashville.html","NJD":"nhl07/newjersey.html","NYI":"nhl07/nyislanders.html","NYR":"nhl07/nyrangers.html","OTT":"nhl07/ottawa.html","PHI":"nhl07/philadelphia.html","PHX":"nhl07/phoenix.html","PIT":"nhl07/pittsburgh.html","SJS":"nhl07/sanjose.html","STL":"nhl07/stlouis.html","TBL":"nhl07/tampabay.html","TOR":"nhl07/toronto.html","VAN":"nhl07/vancouver.html","WSH":"nhl07/washington.html"},"goalies":"nhl07/goalies.html","countries":["nhl08/avalanche.html","nhl08/blackhawks.html","nhl08/bluejackets.html","nhl08/blues.html","nhl08/bruins.html","nhl08/canadiens.html","nhl08/canucks.html","nhl08/captials.html","nhl08/coyotes.html","nhl08/devils.html","nhl08/ducks.html","nhl08/flames.html","nhl08/flyers.html","nhl08/hurricanes.html","nhl08/islanders.html","nhl08/kings.html","nhl08/lightning.html","nhl08/mapleleafs.html","nhl08/oilers.html","nhl08/panthers.html","nhl08/penguins.html","nhl08/predators.html","nhl08/rangers.html","nhl08/redwings.html","nhl08/sabres.html","nhl08/senators.html","nhl08/sharks.html","nhl08/stars.html","nhl08/thrashers.html","nhl08/wild.html"]},"nation":"EA's Country field in IGN's NHL 08 pages (sports.ign.com/nhl08, one year on) where it names the player, else the NHL's birth country","source":{"kind":"nhl07","aliases":{"Ben Simon":"Benjamin Simon","Jean-Phillipe Cote":"Jean-Philippe Cote","Jean-Pierre Dumont":"J-P Dumont","Michael Rupp":"Mike Rupp","Norm Milley":"Norman Milley","Pat Leahy":"Patrick Leahy","Rob McVicar":"Robert McVicar"},"codes":{"Free Agents":null,"Anaheim":"ANA","Atlanta":"ATL","Boston":"BOS","Buffalo":"BUF","Calgary":"CGY","Carolina":"CAR","Chicago":"CHI","Colorado":"COL","Columbus":"CBJ","Dallas":"DAL","Detroit":"DET","Edmonton":"EDM","Florida":"FLA","Los Angeles":"LAK","Minnesota":"MIN","Montreal":"MTL","Nashville":"NSH","New Jersey":"NJD","NY Islanders":"NYI","Ny Rangers":"NYR","Ottawa":"OTT","Philadelphia":"PHI","Phoenix":"PHX","Pittsburgh":"PIT","San Jose":"SJS","St. Louis":"STL","Tampa Bay":"TBL","Toronto":"TOR","Vancouver":"VAN","Washington":"WSH"}}},
     {"id":"nhl-2022","year":2022,"edition":"NHL 22","label":"NHL 22","released":"October 2021","provider":"EA Sports","compiler":"NHLRatings.net's team pages (a fan site that lists EA's ratings and names no source), as CommonCrawl captured them from January to May 2022: EA's launch rosters and ratings; EA's own launch lists add two players the pages leave out","url":"https://www.nhlratings.net/","retrieved":"2026-11-08","rawScale":99,"overall":"EA's NHL 22 launch ratings as the site lists them: every player EA's own launch lists rate (the top 50 and the top ten at each position) has EA's overall there","nation":"EA's nationality where EA's launch lists name the player, else the NHL's birth country","api":"20212022","apiAround":[],"titleEdition":"22","files":{"pages":{"ANA":"nhlratings/nhl22-anaheim-ducks.html","ARI":"nhlratings/nhl22-arizona-coyotes.html","BOS":"nhlratings/nhl22-boston-bruins.html","BUF":"nhlratings/nhl22-buffalo-sabres.html","CAR":"nhlratings/nhl22-carolina-hurricanes.html","CBJ":"nhlratings/nhl22-columbus-blue-jackets.html","CGY":"nhlratings/nhl22-calgary-flames.html","CHI":"nhlratings/nhl22-chicago-blackhawks.html","COL":"nhlratings/nhl22-colorado-avalanche.html","DAL":"nhlratings/nhl22-dallas-stars.html","DET":"nhlratings/nhl22-detroit-red-wings.html","EDM":"nhlratings/nhl22-edmonton-oilers.html","FLA":"nhlratings/nhl22-florida-panthers.html","LAK":"nhlratings/nhl22-los-angeles-kings.html","MIN":"nhlratings/nhl22-minnesota-wild.html","MTL":"nhlratings/nhl22-montreal-canadiens.html","NJD":"nhlratings/nhl22-new-jersey-devils.html","NSH":"nhlratings/nhl22-nashville-predators.html","NYI":"nhlratings/nhl22-new-york-islanders.html","NYR":"nhlratings/nhl22-new-york-rangers.html","OTT":"nhlratings/nhl22-ottawa-senators.html","PHI":"nhlratings/nhl22-philadelphia-flyers.html","PIT":"nhlratings/nhl22-pittsburgh-penguins.html","SEA":"nhlratings/nhl22-seattle-kraken.html","SJS":"nhlratings/nhl22-san-jose-sharks.html","STL":"nhlratings/nhl22-st-louis-blues.html","TBL":"nhlratings/nhl22-tampa-bay-lightning.html","TOR":"nhlratings/nhl22-toronto-maple-leafs.html","VAN":"nhlratings/nhl22-vancouver-canucks.html","VGK":"nhlratings/nhl22-vegas-golden-knights.html","WPG":"nhlratings/nhl22-winnipeg-jets.html","WSH":"nhlratings/nhl22-washington-capitals.html"},"ea":["ea-ratings-api/nhl-22-top-50.json","ea-ratings-api/nhl-22-c.json","ea-ratings-api/nhl-22-lw.json","ea-ratings-api/nhl-22-rw.json","ea-ratings-api/nhl-22-defensemen.json","ea-ratings-api/nhl-22-goalie.json"]},"source":{"kind":"nhlratings"}},
+    {"id":"nhl-1961","year":1961,"method":"computed","label":"Computed from statistics","retrieved":"2026-11-09","source":{"kind":"hdb"}},
+    {"id":"nhl-1962","year":1962,"method":"computed","label":"Computed from statistics","retrieved":"2026-11-09","source":{"kind":"hdb"}},
+    {"id":"nhl-1963","year":1963,"method":"computed","label":"Computed from statistics","retrieved":"2026-11-09","source":{"kind":"hdb"}},
+    {"id":"nhl-1964","year":1964,"method":"computed","label":"Computed from statistics","retrieved":"2026-11-09","source":{"kind":"hdb"}},
+    {"id":"nhl-1965","year":1965,"method":"computed","label":"Computed from statistics","retrieved":"2026-11-09","source":{"kind":"hdb"}},
+    {"id":"nhl-1966","year":1966,"method":"computed","label":"Computed from statistics","retrieved":"2026-11-09","source":{"kind":"hdb"}},
     {"id":"nhl-1967","year":1967,"method":"computed","label":"Computed from statistics","retrieved":"2026-11-09","source":{"kind":"hdb"}},
     {"id":"nhl-1968","year":1968,"method":"computed","label":"Computed from statistics","retrieved":"2026-11-09","source":{"kind":"hdb"}},
     {"id":"nhl-1969","year":1969,"method":"computed","label":"Computed from statistics","retrieved":"2026-11-09","source":{"kind":"hdb"}},
@@ -71,7 +77,7 @@
     { "id": "nhl1995", "seasons": [1995] },
     { "id": "nhl2007", "seasons": [2007, 2008, 2009, 2010, 2011] },
     { "id": "nhl2022", "seasons": [2022] },
-    { "id": "nhl1967", "seasons": [1967] },
+    { "id": "nhl1967", "seasons": [1961, 1962, 1963, 1964, 1965, 1966, 1967] },
     { "id": "nhl1968", "seasons": [1968, 1969, 1970] },
     { "id": "nhl1971", "seasons": [1971, 1972] },
     { "id": "nhl1973", "seasons": [1973, 1974] },
@@ -260,7 +266,7 @@
         {"from":2007,"to":2027,"name":"Anaheim Ducks","code":"ANA","city":"Anaheim","arena":"Honda Center","home":[-117.8766,33.8078],"country":"840"}
       ],
       "nhl-boston-bruins": [
-        {"from":1967,"to":1995,"name":"Boston Bruins","code":"BOS","city":"Boston","arena":"Boston Garden","home":[-71.0617,42.3657],"country":"840"},
+        {"from":1961,"to":1995,"name":"Boston Bruins","code":"BOS","city":"Boston","arena":"Boston Garden","home":[-71.0617,42.3657],"country":"840"},
         {"from":1996,"to":2004,"name":"Boston Bruins","code":"BOS","city":"Boston","arena":"FleetCenter","home":[-71.0622,42.3662],"country":"840"},
         {"from":2006,"to":2009,"name":"Boston Bruins","code":"BOS","city":"Boston","arena":"TD Banknorth Garden","home":[-71.0622,42.3662],"country":"840"},
         {"from":2010,"to":2027,"name":"Boston Bruins","code":"BOS","city":"Boston","arena":"TD Garden","home":[-71.0622,42.3662],"country":"840"}
@@ -290,7 +296,7 @@
         {"from":2025,"to":2027,"name":"Carolina Hurricanes","code":"CAR","city":"Raleigh","arena":"Lenovo Center","home":[-78.7219,35.8033],"country":"840"}
       ],
       "nhl-chicago-blackhawks": [
-        {"from":1967,"to":1986,"name":"Chicago Black Hawks","code":"CHI","city":"Chicago","arena":"Chicago Stadium","home":[-87.6728,41.8817],"country":"840"},
+        {"from":1961,"to":1986,"name":"Chicago Black Hawks","code":"CHI","city":"Chicago","arena":"Chicago Stadium","home":[-87.6728,41.8817],"country":"840"},
         {"from":1987,"to":1994,"name":"Chicago Blackhawks","code":"CHI","city":"Chicago","arena":"Chicago Stadium","home":[-87.6728,41.8817],"country":"840"},
         {"from":1995,"to":2027,"name":"Chicago Blackhawks","code":"CHI","city":"Chicago","arena":"United Center","home":[-87.6742,41.8807],"country":"840"}
       ],
@@ -310,7 +316,7 @@
         {"from":2002,"to":2027,"name":"Dallas Stars","code":"DAL","city":"Dallas","arena":"American Airlines Center","home":[-96.8103,32.7905],"country":"840"}
       ],
       "nhl-detroit-red-wings": [
-        {"from":1967,"to":1979,"name":"Detroit Red Wings","code":"DET","city":"Detroit","arena":"Detroit Olympia","home":[-83.1006,42.3544],"country":"840"},
+        {"from":1961,"to":1979,"name":"Detroit Red Wings","code":"DET","city":"Detroit","arena":"Detroit Olympia","home":[-83.1006,42.3544],"country":"840"},
         {"from":1980,"to":2017,"name":"Detroit Red Wings","code":"DET","city":"Detroit","arena":"Joe Louis Arena","home":[-83.0514,42.3253],"country":"840"},
         {"from":2018,"to":2027,"name":"Detroit Red Wings","code":"DET","city":"Detroit","arena":"Little Caesars Arena","home":[-83.0552,42.3411],"country":"840"}
       ],
@@ -341,7 +347,7 @@
         {"from":2026,"to":2027,"name":"Minnesota Wild","code":"MIN","city":"Saint Paul","arena":"Grand Casino Arena","home":[-93.101,44.9448],"country":"840"}
       ],
       "nhl-montreal-canadiens": [
-        {"from":1967,"to":1996,"name":"Montreal Canadiens","code":"MTL","city":"Montreal","arena":"Montreal Forum","home":[-73.5847,45.4903],"country":"124"},
+        {"from":1961,"to":1996,"name":"Montreal Canadiens","code":"MTL","city":"Montreal","arena":"Montreal Forum","home":[-73.5847,45.4903],"country":"124"},
         {"from":1997,"to":2002,"name":"Montreal Canadiens","code":"MTL","city":"Montreal","arena":"Molson Centre","home":[-73.5693,45.4961],"country":"124"},
         {"from":2003,"to":2027,"name":"Montreal Canadiens","code":"MTL","city":"Montreal","arena":"Bell Centre","home":[-73.5693,45.4961],"country":"124"}
       ],
@@ -366,7 +372,7 @@
         {"from":2022,"to":2027,"name":"New York Islanders","code":"NYI","city":"Long Island","arena":"UBS Arena","home":[-73.7263,40.7126],"country":"840"}
       ],
       "nhl-new-york-rangers": [
-        {"from":1967,"to":1968,"name":"New York Rangers","code":"NYR","city":"Manhattan","arena":"Madison Square Garden","home":[-73.9877,40.7624],"country":"840"},
+        {"from":1961,"to":1968,"name":"New York Rangers","code":"NYR","city":"Manhattan","arena":"Madison Square Garden","home":[-73.9877,40.7624],"country":"840"},
         {"from":1969,"to":2027,"name":"New York Rangers","code":"NYR","city":"Manhattan","arena":"Madison Square Garden","home":[-73.9934,40.7505],"country":"840"}
       ],
       "nhl-ottawa-senators": [
@@ -419,7 +425,7 @@
         {"from":2026,"to":2027,"name":"Tampa Bay Lightning","code":"TBL","city":"Tampa","arena":"Benchmark International Arena","home":[-82.4519,27.9427],"country":"840"}
       ],
       "nhl-toronto-maple-leafs": [
-        {"from":1967,"to":1999,"name":"Toronto Maple Leafs","code":"TOR","city":"Toronto","arena":"Maple Leaf Gardens","home":[-79.3803,43.6622],"country":"124"},
+        {"from":1961,"to":1999,"name":"Toronto Maple Leafs","code":"TOR","city":"Toronto","arena":"Maple Leaf Gardens","home":[-79.3803,43.6622],"country":"124"},
         {"from":2000,"to":2018,"name":"Toronto Maple Leafs","code":"TOR","city":"Toronto","arena":"Air Canada Centre","home":[-79.3791,43.6435],"country":"124"},
         {"from":2019,"to":2027,"name":"Toronto Maple Leafs","code":"TOR","city":"Toronto","arena":"Scotiabank Arena","home":[-79.3791,43.6435],"country":"124"}
       ],

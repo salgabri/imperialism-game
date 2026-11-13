@@ -4,7 +4,7 @@
 import { DEPENDENCIES, NATIONS } from '../data/teams.js';
 import { isEstimated } from '../data/estimates.js';
 import { roman, signedDelta, territoryWord } from './format.js';
-import { getSport, overtimeText } from '../sports/index.js';
+import { getSport, overtimeText, settledText } from '../sports/index.js';
 
 function territoryName(ctx, cid) {
   // A country map's sections first (ctx.sectionNames); the geometry fallback below is an O(n) find.
@@ -65,7 +65,8 @@ const isFiniteScore = value => value !== null && value !== '' && Number.isFinite
 
 /**
  * Winner-first result score with sport-aware tie-break text (DEC D15):
- * '2–1' · '1–1, 4–3 on penalties' (shoot-out kicks, winner first) · '98–95 after 1 overtime period' · '5–4 after 11 innings'.
+ * '2–1' · '1–1, 4–3 on penalties' (shoot-out kicks, winner first) · '2–1 after extra time' (football's, or after its golden
+ * or silver goal, or '0–0 after extra time, on the drawing of lots') · '98–95 after 1 overtime period' · '5–4 after 11 innings'.
  * `m` is a live/finished match ({ aId, dId, finalGa|ga, finalGd|gd, tie }); '' when the score is unknown.
  */
 export function winnerScore(m, winnerId, sport) {
@@ -76,9 +77,13 @@ export function winnerScore(m, winnerId, sport) {
   let text = `${winnerIsA ? ga : gd}–${winnerIsA ? gd : ga}`;
   const tie = m.tie;
   if (tie) {
-    const tieBreak = sport?.tieBreak || (Array.isArray(tie.periods) ? 'overtime' : 'shootout');
+    // A football tie names how it was settled (`by`); without the sport, a tie of overtime periods is an overtime sport's.
+    const tieBreak = sport?.tieBreak || (!tie.by && Array.isArray(tie.periods) ? 'overtime' : 'shootout');
     if (tieBreak === 'overtime') {
       text += ` ${overtimeText(sport, Array.isArray(tie.periods) && tie.periods.length ? tie.periods.length : 1)}`;
+    } else if ((tie.by ?? 'penalties') !== 'penalties') {
+      // Football's extra time, golden or silver goal, or the drawing of lots: "2–1 after extra time".
+      text += ` ${settledText(sport ?? 'football', tie)}`;
     } else if (isFiniteScore(tie.ga) && isFiniteScore(tie.gd)) {
       text += `, ${winnerIsA ? tie.ga : tie.gd}–${winnerIsA ? tie.gd : tie.ga} on penalties`;
     } else {

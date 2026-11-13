@@ -1,19 +1,22 @@
 // Owner: WP-0 (see PLAN.md §4). Final in W1, frozen in W2 (PLAN §3.5).
 import React from 'react';
 import Flag from './Flag.jsx';
-import { clubLogoUrl } from '../data/clubLogos.js';
+import { crestUrl } from '../data/crests.js';
+import { useSeasonYear } from './seasonYear.js';
 
 /**
  * A team's mark: the nation's flag, or a club's crest, or a club monogram chip when the club has no crest. A club is
- * found by `teamId` (or `id`, which a club only carries where its team id stands in for the flag id). Its root never
- * carries a `title` (smoke reads `.fi-standing-team > span[title]` as the team name). Mark size travels in custom
+ * found by `teamId` (or `id`, which a club only carries where its team id stands in for the flag id), and wears the
+ * crest of the season on screen (SeasonYear). Its root never carries a `title` (smoke reads
+ * `.fi-standing-team > span[title]` as the team name). Mark size travels in custom
  * properties so a container (e.g. the masthead) can resize it with CSS; a crest sits in the monogram's box, so every
  * container that sizes a monogram sizes a crest too.
  */
 export default function TeamMark({ id, teamId, code, color, isClub, width = 48, height }) {
   const markHeight = height ?? Math.round(width * 0.75);
+  const year = useSeasonYear();
   if (isClub) {
-    const logo = clubLogoUrl(teamId ?? id);
+    const logo = crestUrl(teamId ?? id, year);
     const size = { '--team-color': color, '--mark-w': `${width}px`, '--mark-h': `${markHeight}px` };
     if (logo) {
       return (

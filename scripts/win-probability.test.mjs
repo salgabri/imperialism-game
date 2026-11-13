@@ -36,6 +36,9 @@ function readmeFormula(rA, rD, diff, remaining, level = 0.5) {
   return win + tie * level;
 }
 
+/** A's chance from level after ninety: extra time's thirty minutes at the model's own share of the rates, then ½. */
+const extraTimeFormula = model => readmeFormula(model.rA * model.extra, model.rD * model.extra, 0, 30 / 90);
+
 const close = (actual, expected, tolerance, message) =>
   assert.ok(Math.abs(actual - expected) <= tolerance, `${message ?? ''} expected ${expected}, got ${actual} (±${tolerance})`);
 
@@ -52,20 +55,22 @@ test('footballRate is the README rate and the football model\'s mean scoring rat
   close(footballRate(1e9), 1.28 * Math.exp(1.5), 1e-12);
   close(footballRate(-1e9), 1.28 * Math.exp(-1.5), 1e-12);
   for (const log of [-2, -0.7, 0.3, 0.6, 1.9]) close(footballRate(log), 1.28 * Math.exp(1.5 * Math.tanh(log / 1.5)), 1e-15);
-  // Predictable (no form): the sampled goals average the README rate (tempo has mean 1).
+  // Predictable (no form): the ninety minutes' sampled goals average the README rate (tempo has mean 1).
   for (const [a, d] of [['ESP', 'BUL'], ['ITA', 'GER']]) {
     const prepared = prepareFootballMatch(nation(football, a), nation(football, d));
     const rng = makeRng(90210), count = 30000;
     let goalsA = 0, goalsD = 0;
-    for (let i = 0; i < count; i++) { const result = football.sampleResult(rng, prepared, 0); goalsA += result.ga; goalsD += result.gd; }
+    for (let i = 0; i < count; i++) { const result = football.sampleResult(rng, prepared, 0); goalsA += result.regA; goalsD += result.regD; }
     close(goalsA / count, footballRate(prepared.logA), footballRate(prepared.logA) * 0.03, `${a} mean goals`);
     close(goalsD / count, footballRate(prepared.logD), footballRate(prepared.logD) * 0.04, `${d} mean goals`);
   }
 });
 
 test('the kick-off value is the README formula on the match\'s prepareFootballMatch logA/logD with its effA/effD', () => {
-  // The README formula's values on the built-in 2026/27 rosters (EA FC 27 + FM 26), as engine-diff §4a.1 first measured them.
+  // The README formula's values on the built-in 2026/27 rosters (EA FC 27 + FM 26), as engine-diff §4a.1 first measured them
+  // with a level ninety worth ½; and the kick-off value the chart shows, where a level ninety goes to extra time.
   const pinned = { 'ITA-HUN': 0.731, 'GER-AUT': 0.768, 'ESP-BUL': 0.951, 'ITA-GER': 0.461 };
+  const kickOff = { 'ITA-HUN': 0.749, 'GER-AUT': 0.786, 'ESP-BUL': 0.963, 'ITA-GER': 0.458 };
   for (const [a, d] of FOOTBALL_PAIRS.slice(0, 4)) {
     const attacker = nation(football, a), defender = nation(football, d);
     const plain = liveModelFor(football, attacker, defender);
@@ -75,7 +80,9 @@ test('the kick-off value is the README formula on the match\'s prepareFootballMa
     const p0 = footballWinProbability({ rA: plain.rA, rD: plain.rD, diff: 0, remaining: 1 });
     close(p0, readmeFormula(plain.rA, plain.rD, 0, 1), 1e-9, `${a}-${d} README formula`);
     close(p0, pinned[`${a}-${d}`], 0.001, `${a}-${d} engine-diff value`);
-    close(winProbabilityAt(plain, 0, 0), p0, 1e-15);
+    const live = winProbabilityAt(plain, 0, 0);
+    close(live, readmeFormula(plain.rA, plain.rD, 0, 1, extraTimeFormula(plain)), 1e-9, `${a}-${d} with extra time`);
+    close(live, kickOff[`${a}-${d}`], 0.001, `${a}-${d} kick-off value`);
 
     // Tactics move effA/effD; the model follows the match's own strengths, not the squads' base ratings.
     const effA = selectLineup(attacker).rating + 2.5, effD = selectLineup(defender).rating - 1;
@@ -179,9 +186,12 @@ test('liveModelFor returns small persistable models and null when it cannot mode
   const ba = nation(basketball, 'SRB'), bd = nation(basketball, 'ITA');
   const before = JSON.stringify([fa, fd, ba, bd]);
   const footballModel = liveModelFor(football, fa, fd, 80.1, 74.2, 6);
-  assert.deepEqual(Object.keys(footballModel), ['kind', 'rA', 'rD', 'length']);
+  assert.deepEqual(Object.keys(footballModel), ['kind', 'rA', 'rD', 'length', 'ot', 'maxOt', 'extra']);
   assert.equal(footballModel.kind, 'poisson');
   assert.equal(footballModel.length, 90);
+  // Extra time: two halves of fifteen minutes at the model's own share of the rates.
+  assert.deepEqual([footballModel.ot, footballModel.maxOt, footballModel.extra], [15, 2, footballModule.FOOTBALL_MODEL.EXTRA_RATE]);
+  assert.ok(isLiveModel({ kind: 'poisson', rA: 1.2, rD: 0.8, length: 90 }), 'a model saved before extra time came in');
 
   const basketballModel = liveModelFor(basketball, ba, bd, undefined, undefined, 6);
   assert.deepEqual(Object.keys(basketballModel), ['kind', 'pace', 'effA', 'effD', 'formSd', 'length', 'ot', 'maxOt']);
@@ -210,6 +220,8 @@ test('liveModelFor returns small persistable models and null when it cannot mode
   assert.equal(liveModelFor({ ...football, prepareMatch() { throw new Error('broken'); } }, fa, fd), null);
   assert.equal(liveModelFor({ ...football, tieBreak: 'replay' }, fa, fd), null, 'an unknown tie-break is not modelled');
   for (const junk of [null, undefined, {}, 'poisson', { kind: 'poisson', rA: NaN, rD: 1, length: 90 }, { kind: 'poisson', rA: 1, rD: -1, length: 90 },
+    { ...footballModel, maxOt: undefined }, { ...footballModel, extra: -1 }, { ...footballModel, sudden: 'bronze' },
+    { kind: 'poisson', rA: 1, rD: 1, length: 90, extra: 0.5 },
     { ...basketballModel, maxOt: 1.5 }, { ...basketballModel, pace: 0 }, { kind: 'elo' }]) {
     assert.equal(isLiveModel(junk), false, JSON.stringify(junk));
     assert.deepEqual(winSeries({ model: junk, goals: [], aId: 'A', minute: 30 }), []);
@@ -330,7 +342,9 @@ test('winSeries: one point per minute from 0\', goals step at their minute, the 
   const series = winSeries({ model, goals, aId, minute: 38 });
   assert.equal(series.length, 39);
   assert.deepEqual(series.map(point => point.t), Array.from({ length: 39 }, (_, t) => t));
-  const at = (diff, t) => footballWinProbability({ rA: model.rA, rD: model.rD, diff, remaining: (90 - t) / 90 });
+  // A score level at 90' is worth A's chance through extra time.
+  const extra = winProbabilityAt(model, 90, 0);
+  const at = (diff, t) => footballWinProbability({ rA: model.rA, rD: model.rD, diff, remaining: (90 - t) / 90, shootoutA: extra });
   assert.equal(series[0].p, at(0, 0));
   assert.equal(series[23].p, at(0, 23));
   assert.equal(series[24].p, at(-1, 24));
@@ -347,27 +361,37 @@ test('winSeries: one point per minute from 0\', goals step at their minute, the 
   // The chart never lags the revealed score: a goal shown at 24' while the minute store still reads 23.
   assert.equal(winSeries({ model, goals: goals.slice(0, 1), aId, minute: 23 }).length, 25);
   assert.deepEqual(winSeries({ model, goals: [], aId, minute: -4 }), [{ t: 0, p: at(0, 0) }]);
-  assert.equal(winSeries({ model, goals: [], aId, minute: 140 }).length, 91, 'football stops at 90\'');
+  assert.equal(winSeries({ model, goals: [], aId, minute: 140 }).length, 121, 'football stops at the end of extra time, 120\'');
+  const saved = { kind: 'poisson', rA: model.rA, rD: model.rD, length: 90 };
+  assert.equal(winSeries({ model: saved, goals: [], aId, minute: 140 }).length, 91, 'a model saved before extra time stops at 90\'');
   assert.equal(winSeries({ model, goals: [{ m: 50, tid: aId }], aId, minute: 60 }).at(-1).p, at(1, 60), 'pts defaults to 1');
 });
 
-test('winSeries at full time: 1 / 0 for the winner, ½ when level, the shoot-out winner snaps to 1', () => {
+test('winSeries at full time: 1 / 0 for the winner, extra time when level, the shoot-out winner snaps to 1', () => {
   const attacker = nation(football, 'GER'), defender = nation(football, 'AUT');
   const model = liveModelFor(football, attacker, defender);
   const aId = attacker.id, dId = defender.id;
   const level = [{ m: 12, tid: aId, pts: 1 }, { m: 70, tid: dId, pts: 1 }];
   assert.equal(winSeries({ model, goals: [{ m: 12, tid: aId, pts: 1 }], aId, minute: 90 }).at(-1).p, 1);
   assert.equal(winSeries({ model, goals: [{ m: 12, tid: dId, pts: 1 }], aId, minute: 90 }).at(-1).p, 0);
-  assert.equal(winSeries({ model, goals: level, aId, minute: 90 }).at(-1).p, 0.5, 'level at 90\': the shoot-out is 50/50');
+  const extra = winSeries({ model, goals: level, aId, minute: 90 }).at(-1).p;
+  close(extra, extraTimeFormula(model), 1e-9, 'level at 90\': extra time, then the 50/50 tie-break');
+  assert.ok(extra > 0.55, `the stronger side is favoured in extra time (${extra})`);
+  assert.equal(winSeries({ model, goals: level, aId, minute: 120 }).at(-1).p, 0.5, 'level at 120\': the shoot-out is 50/50');
+  const saved = { kind: 'poisson', rA: model.rA, rD: model.rD, length: 90 };
+  assert.equal(winSeries({ model: saved, goals: level, aId, minute: 90 }).at(-1).p, 0.5, 'a model saved before extra time: 50/50 at 90\'');
 
-  // Shoot-out won by the defender: the series ends at 0 from A's side, 1 from the winner's side.
-  const shootout = winSeries({ model, goals: level, aId, dId, minute: 90, final: { winnerSide: 'D' } });
-  assert.equal(shootout.length, 91);
+  // Shoot-out won by the defender after extra time: the series ends at 0 from A's side, 1 from the winner's side.
+  const shootout = winSeries({ model, goals: level, aId, dId, minute: 120, final: { winnerSide: 'D' } });
+  assert.equal(shootout.length, 121);
   assert.equal(shootout.at(-1).p, 0);
-  assert.equal(shootout.at(-2).p, winSeries({ model, goals: level, aId, minute: 90 }).at(-2).p, 'only the last point snaps');
-  assert.equal(winSeries({ model, goals: level, aId, dId, minute: 90, perspective: 'D', final: { winnerSide: 'D' } }).at(-1).p, 1);
-  assert.equal(winSeries({ model, goals: level, aId, dId, minute: 90, final: { winnerId: aId } }).at(-1).p, 1);
-  assert.equal(winSeries({ model, goals: level, aId, dId, minute: 90, perspective: dId, final: { winnerId: dId } }).at(-1).p, 1);
+  assert.equal(shootout.at(-2).p, winSeries({ model, goals: level, aId, minute: 120 }).at(-2).p, 'only the last point snaps');
+  assert.equal(winSeries({ model, goals: level, aId, dId, minute: 120, perspective: 'D', final: { winnerSide: 'D' } }).at(-1).p, 1);
+  assert.equal(winSeries({ model, goals: level, aId, dId, minute: 120, final: { winnerId: aId } }).at(-1).p, 1);
+  assert.equal(winSeries({ model, goals: level, aId, dId, minute: 120, perspective: dId, final: { winnerId: dId } }).at(-1).p, 1);
+  // An extra-time goal: the match plays the whole of extra time, so a finished one is drawn to 120'.
+  const late = level.concat([{ m: 98, tid: aId, pts: 1 }]);
+  assert.equal(winSeries({ model, goals: late, aId, dId, minute: 98, final: { winnerSide: 'A' } }).length, 121);
   // A finished match (revealAll) is drawn to full time whatever the minute store says.
   const revealed = winSeries({ model, goals: [{ m: 12, tid: dId, pts: 1 }], aId, dId, minute: 40, final: { winnerId: dId } });
   assert.equal(revealed.length, 91);
@@ -445,6 +469,9 @@ test('winMarkers, chartDomain and liveWinChart give the chart its markers, axis 
 
   assert.deepEqual(chartDomain(model, 38), { length: 90, half: 45, ticks: [0, 15, 30, 45, 60, 75, 90], guides: [45] });
   assert.deepEqual(chartDomain(null), chartDomain(model), 'no model: the football axis');
+  // Extra time's halves join the axis as they are reached, with a guide at the end of the ninety.
+  assert.deepEqual(chartDomain(model, 97), { length: 105, half: 45, ticks: [0, 15, 30, 45, 60, 75, 90, 105], guides: [45, 90] });
+  assert.deepEqual(chartDomain(model, 140), { length: 120, half: 45, ticks: [0, 15, 30, 45, 60, 75, 90, 105, 120], guides: [45, 90] });
   const bModel = liveModelFor(basketball, nation(basketball, 'ESP'), nation(basketball, 'FRA'), undefined, undefined, 6);
   assert.deepEqual(chartDomain(bModel, 30), { length: 40, half: 20, ticks: [0, 10, 20, 30, 40], guides: [10, 20, 30] });
   assert.deepEqual(chartDomain(bModel, 47), { length: 50, half: 20, ticks: [0, 10, 20, 30, 40, 45, 50], guides: [10, 20, 30] });
@@ -505,8 +532,10 @@ test('the live model never touches an RNG and stays pure', () => {
 });
 
 test('sport profile exports: the match model\'s positional ratings, without the effective offset', () => {
-  // Append-only exports: every existing export is still there and the sport objects are unchanged.
-  assert.deepEqual(Object.keys(footballModule).sort(), ['football', 'footballProfile', 'prepareFootballMatch', 'sampleFootballResult']);
+  // Append-only exports: every existing export is still there and the sport objects are unchanged. Football adds its
+  // knockout rules by season and the extra-time constants the live model mirrors.
+  assert.deepEqual(Object.keys(footballModule).sort(), ['FOOTBALL_MODEL', 'football', 'footballIn', 'footballProfile', 'knockoutIn',
+    'prepareFootballMatch', 'sampleFootballResult']);
   assert.deepEqual(Object.keys(basketballModule).sort(), ['BASKETBALL_MODEL', 'BENCH', 'EUROLEAGUE_MAP', 'EUROLEAGUE_SCOPE', 'basketball',
     'basketballProfile', 'euroleagueBasketball', 'nbaBasketball', 'nbaBasketballIn', 'prepareMatch', 'sampleResult']);
   assert.equal(football.prepareMatch, prepareFootballMatch);

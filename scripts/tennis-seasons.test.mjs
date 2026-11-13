@@ -12,7 +12,7 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { SAVE_KEY } from '../src/config.js';
 import { BUILT_IN_TENNIS_SEASONS } from '../src/data/tennisSeasons.js';
-import { HOME_NATIONS, NATIONS, makeRng, buildTeam } from '../src/data/teams.js';
+import { HISTORIC_NATIONS, HOME_NATIONS, NATIONS, makeRng, buildTeam } from '../src/data/teams.js';
 import { BUILT_IN_SETS, builtInSeasonOf, decodeFootballSet, fieldedNations, seasonSport, setHasClubs, setHasNations, setSportOf, sportOf } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
@@ -342,7 +342,8 @@ test('a season binds tennis to its nations; its fielded nations are the Davis Cu
   const czechs = buildTeam('203', makeRng(1985), sport);
   assert.deepEqual(czechs.squad.map(player => player.name), set.rosters['203'][2].map(([name]) => name));
   assert.equal(sportOf({ sport: 'tennis', layer: 'nations', dataSet: 'tennis-1985' }), null, 'until it has loaded');
-  assert.equal(Object.keys(NATIONS).length, set.territory.inactive.length + Object.keys(set.territory.merged).length + fielded.length);
+  // Every nation of today's map; East Germany (HISTORIC_NATIONS) never played the Davis Cup or the Fed Cup.
+  assert.equal(Object.keys(NATIONS).length - HISTORIC_NATIONS.length, set.territory.inactive.length + Object.keys(set.territory.merged).length + fielded.length);
 });
 
 // ---------- the running App ----------

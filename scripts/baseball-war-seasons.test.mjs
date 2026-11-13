@@ -375,6 +375,10 @@ test('the Season choice lists 1960 to 2017 after MLB The Show\'s seasons, and a 
     assert.deepEqual([st.settings.clubScope, st.settings.dataSet, st.settings.dataVersion, st.settings.dataSeason],
       ['domestic:mlb1961', 'mlb-war-1961', doc.version, '1961']);
     assert.equal(st.campaignName, 'Baseball 1961 · MLB · USA and Canada');
+    // It plays 1961's rules (docs/design/baseball.md, "Rules by era"): extra innings as the ninth, twelve of them.
+    const sport = app.sport();
+    const rules = sport.prepareMatch(st.teams['mlb-new-york-yankees'], st.teams['mlb-detroit-tigers']).rules;
+    assert.deepEqual([sport.simulationVersion, rules.runner, rules.maxExtra], [3, false, 12]);
     assert.deepEqual(Object.keys(st.teams).sort(), doc.clubs.map(club => club.id).sort());
     const yankees = st.teams['mlb-new-york-yankees'];
     assert.ok(yankees.squad.some(p => p.name === 'Roger Maris') && yankees.squad.some(p => p.name === 'Mickey Mantle'));
@@ -388,6 +392,7 @@ test('the Season choice lists 1960 to 2017 after MLB The Show\'s seasons, and a 
     app.continueSaved(saved);
     assert.equal(app.state.phase, 'playing');
     assert.deepEqual([app.state.settings.clubScope, app.state.settings.dataSet], ['domestic:mlb1961', 'mlb-war-1961']);
+    assert.equal(app.sport(), sport, 'the resumed campaign plays the same rules');
     assert.equal(JSON.stringify(app.state.teams), JSON.stringify(st.teams));
     const edited = edit => { const data = JSON.parse(text); edit(data.settings); if (data.initialSettings) edit(data.initialSettings); return JSON.stringify(data); };
     const map1962 = CLUB_MAPS.find(entry => entry.id === 'mlb1962').version;

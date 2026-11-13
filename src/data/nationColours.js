@@ -65,13 +65,14 @@ export const NATION_COLOURS = Object.freeze({
   '270': ['#d0433e', 1], // Gambia
   '275': ['#70983a', 0], // Palestine
   '276': ['#e8e8ec', 0], // Germany
+  '278': ['#fecd01', 0], // East Germany
   '288': ['#e8b93c', 0], // Ghana
   '300': ['#57a8e0', 2], // Greece
   '320': ['#58aede', 0], // Guatemala
   '324': ['#009900', 0], // Guinea
   '328': ['#4c9e5c', 1], // Guyana
   '332': ['#d21034', 2], // Haiti
-  '340': ['#ffffff', 1], // Honduras
+  '340': ['#feffff', 1], // Honduras
   '348': ['#4c9e5c', 1], // Hungary
   '352': ['#4b6fd8', 1], // Iceland
   '356': ['#4b8be0', 1], // India
@@ -179,6 +180,7 @@ export const NATION_COLOURS = Object.freeze({
   '894': ['#4ca86a', 1], // Zambia
   'KOS': ['#0896d5', 0], // Kosovo
   'NIR': ['#048e80', 2], // Northern Ireland
+  'RVN': ['#e8b820', 0], // South Vietnam
   'SCO': ['#2b4fa8', 1], // Scotland
   'WAL': ['#00ab39', 2], // Wales
 });

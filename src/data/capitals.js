@@ -35,6 +35,7 @@ export const CAPITALS = {
   '620': [-9.14, 38.72],   // Lisbon
   '528': [4.90, 52.37],    // Amsterdam
   '276': [13.40, 52.52],   // Berlin
+  '278': [13.40, 52.52],   // East Berlin: East Germany's, on the map in its years only (src/engine/historicMap.js)
   '056': [4.35, 50.85],    // Brussels
   '380': [12.50, 41.90],   // Rome
   '191': [15.98, 45.81],   // Zagreb
@@ -164,6 +165,7 @@ export const CAPITALS = {
   '156': [116.41, 39.90],  // Beijing
   '764': [100.50, 13.76],  // Bangkok
   '704': [105.83, 21.03],  // Hanoi
+  'RVN': [106.70, 10.78],  // Saigon: South Vietnam's, on the map in its years only (src/engine/historicMap.js)
   '360': [106.85, -6.21],  // Jakarta
   '458': [101.69, 3.14],   // Kuala Lumpur
   '608': [120.98, 14.60],  // Manila

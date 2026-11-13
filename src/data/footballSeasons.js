@@ -19,6 +19,8 @@
 // 1989/90: Simon Treanor's fan-made 1989/90 database for CM 01/02, Beta 5, its ratings his, nations only (the CM0102 Starter Kit's cm89_data.zip)
 // and by npm run build:world-cup-seasons, computed (scripts/data/world-cup-seasons.json):
 // 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994: each World Cup's finalists, rated from their Elo and their players' records
+// and by npm run build:national-team-seasons, computed (scripts/data/national-team-seasons.json):
+// 1963, 1964, 1965, 1967, 1968, 1969, 1971, 1972, 1973, 1975, 1976, 1977, 1979, 1980, 1981, 1983, 1984, 1985, 1987, 1988, 1989, 1991, 1992, 1993: the seasons between them, each nation rated from its Elo and its players' Wikidata caps
 // The built-in earlier seasons, newest first. Each is public/football/<id>.json, loaded when a setup chooses it
 // (src/engine/footballSets.js); docs/design/football-years.md describes them.
 export const BUILT_IN_SEASONS = Object.freeze([
@@ -56,13 +58,37 @@ export const BUILT_IN_SEASONS = Object.freeze([
   Object.freeze({ id: 'swos-9495', version: 'swos-9495-3d369a28', year: 1995, season: '1994/95', label: 'SWOS 94/95' }),
   Object.freeze({ id: 'wc-1994', version: 'wc-1994-7f151aae', year: 1994, season: '1993/94', label: 'Computed · 1994 World Cup' }),
   Object.freeze({ id: 'cm0102-2020-11-cm93', version: 'cm0102-2020-11-cm93-1c31e5ae', year: 1994, season: '1993/94', label: 'CM 01/02 · 93/94 by Cam F, fan-made' }),
+  Object.freeze({ id: 'nt-1993', version: 'nt-1993-80393f50', year: 1993, season: '1992/93', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1992', version: 'nt-1992-9ae86e07', year: 1992, season: '1991/92', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1991', version: 'nt-1991-a6f949b2', year: 1991, season: '1990/91', label: 'Computed · national teams' }),
   Object.freeze({ id: 'wc-1990', version: 'wc-1990-246f9a35', year: 1990, season: '1989/90', label: 'Computed · 1990 World Cup' }),
-  Object.freeze({ id: 'cm0102-2017-04-cm89', version: 'cm0102-2017-04-cm89-51f49124', year: 1990, season: '1989/90', label: 'CM 01/02 · 89/90 by Simon Treanor, fan-made' }),
+  Object.freeze({ id: 'cm0102-2017-04-cm89', version: 'cm0102-2017-04-cm89-20e6ef32', year: 1990, season: '1989/90', label: 'CM 01/02 · 89/90 by Simon Treanor, fan-made' }),
+  Object.freeze({ id: 'nt-1989', version: 'nt-1989-f3da5a0d', year: 1989, season: '1988/89', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1988', version: 'nt-1988-fe3b688f', year: 1988, season: '1987/88', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1987', version: 'nt-1987-b2187f9b', year: 1987, season: '1986/87', label: 'Computed · national teams' }),
   Object.freeze({ id: 'wc-1986', version: 'wc-1986-f5178adb', year: 1986, season: '1985/86', label: 'Computed · 1986 World Cup' }),
+  Object.freeze({ id: 'nt-1985', version: 'nt-1985-53d63f73', year: 1985, season: '1984/85', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1984', version: 'nt-1984-23172718', year: 1984, season: '1983/84', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1983', version: 'nt-1983-d7d6e3fc', year: 1983, season: '1982/83', label: 'Computed · national teams' }),
   Object.freeze({ id: 'wc-1982', version: 'wc-1982-b965e996', year: 1982, season: '1981/82', label: 'Computed · 1982 World Cup' }),
+  Object.freeze({ id: 'nt-1981', version: 'nt-1981-d49bc8af', year: 1981, season: '1980/81', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1980', version: 'nt-1980-37fff507', year: 1980, season: '1979/80', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1979', version: 'nt-1979-96a59517', year: 1979, season: '1978/79', label: 'Computed · national teams' }),
   Object.freeze({ id: 'wc-1978', version: 'wc-1978-0201c2e5', year: 1978, season: '1977/78', label: 'Computed · 1978 World Cup' }),
-  Object.freeze({ id: 'wc-1974', version: 'wc-1974-e3e160a1', year: 1974, season: '1973/74', label: 'Computed · 1974 World Cup' }),
+  Object.freeze({ id: 'nt-1977', version: 'nt-1977-f2f71d40', year: 1977, season: '1976/77', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1976', version: 'nt-1976-b4650a74', year: 1976, season: '1975/76', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1975', version: 'nt-1975-3762b211', year: 1975, season: '1974/75', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'wc-1974', version: 'wc-1974-60fb5351', year: 1974, season: '1973/74', label: 'Computed · 1974 World Cup' }),
+  Object.freeze({ id: 'nt-1973', version: 'nt-1973-c19e9060', year: 1973, season: '1972/73', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1972', version: 'nt-1972-b43999d9', year: 1972, season: '1971/72', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1971', version: 'nt-1971-46950e07', year: 1971, season: '1970/71', label: 'Computed · national teams' }),
   Object.freeze({ id: 'wc-1970', version: 'wc-1970-a986f212', year: 1970, season: '1969/70', label: 'Computed · 1970 World Cup' }),
+  Object.freeze({ id: 'nt-1969', version: 'nt-1969-7c2094ba', year: 1969, season: '1968/69', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1968', version: 'nt-1968-2ef1d499', year: 1968, season: '1967/68', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1967', version: 'nt-1967-a72cb83a', year: 1967, season: '1966/67', label: 'Computed · national teams' }),
   Object.freeze({ id: 'wc-1966', version: 'wc-1966-5da76335', year: 1966, season: '1965/66', label: 'Computed · 1966 World Cup' }),
+  Object.freeze({ id: 'nt-1965', version: 'nt-1965-8cbcba34', year: 1965, season: '1964/65', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1964', version: 'nt-1964-d35f1858', year: 1964, season: '1963/64', label: 'Computed · national teams' }),
+  Object.freeze({ id: 'nt-1963', version: 'nt-1963-7fdddb9b', year: 1963, season: '1962/63', label: 'Computed · national teams' }),
   Object.freeze({ id: 'wc-1962', version: 'wc-1962-9241b337', year: 1962, season: '1961/62', label: 'Computed · 1962 World Cup' }),
 ]);

@@ -542,6 +542,13 @@ test('latest results: newest first, winner-first titles, pens/OT, claims, series
   const all = buildLatestResults(st, { ...ctx, cache: new Map() }, { limit: 10 }).rows;
   assert.equal(all.at(-1).meta, 'CZE 0–1 GER · claims P. Schick');
   assert.equal(all.at(-1).title, 'Germany beat Czechia');
+  // Football's extra time: settled in it, by its golden or silver goal, or by the drawing of lots.
+  const extra = [['After extra time', '(aet)'], ['After a golden goal in extra time', '(golden goal)'],
+    ['After a silver goal in extra time', '(silver goal)'], ['After extra time, on the drawing of lots', '(lots)']];
+  const settled = extra.map(([tieText], i) => ({ ...HISTORY[1], id: `extra-${i}`, a: { ...HISTORY[1].a, score: 2 },
+    result: { ...HISTORY[1].result, tieText } }));
+  const extraRows = buildLatestResults(state({ history: settled }), context(state({ history: settled })), { limit: 10 }).rows;
+  assert.deepEqual(extraRows.map(row => row.meta).reverse(), extra.map(([, suffix]) => `ITA 2–1 SRB ${suffix} · claims Dušan Vlahović`));
 });
 
 test('ticker: last seven, newest first, "R XXVI  CZECHIA 0  GERMANY 1 · CZECHIA OUT" in source case', () => {
