@@ -12,7 +12,7 @@
 // 1999/00: SI's Championship Manager 99/00 database, original release 3.70 (the UK retail CD's data files, archive.org championship-manager-season-9900)
 // 1998/99: SI's Championship Manager 3 data in the CM 01/02 format, Cam F's port (the CM0102 Starter Kit's cm3_data.zip)
 // 1997/98: SI's Championship Manager 97/98 database as baskeyx extracted it to JSON (github.com/baskeyx/cm9798)
-// 1996/97: Sensible Software's Sensible World of Soccer 96/97 national squads (Whiteulver's database, as keyser1884's SWOS-MCP holds it)
+// 1996/97: Sensible Software's Sensible World of Soccer 96/97, its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)
 // 1995/96: Sensible Software's Sensible World of Soccer 95/96, its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)
 // 1994/95: Sensible Software's original Sensible World of Soccer (1994), its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)
 // 1993/94: Cam F's fan-made 1993/94 database for CM 01/02, its ratings Cam F's (the CM0102 Starter Kit's cm93_data.zip)
@@ -20,7 +20,7 @@
 // and by npm run build:world-cup-seasons, computed (scripts/data/world-cup-seasons.json):
 // 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994: each World Cup's finalists, rated from their Elo and their players' records
 // and by npm run build:national-team-seasons, computed (scripts/data/national-team-seasons.json):
-// 1963, 1964, 1965, 1967, 1968, 1969, 1971, 1972, 1973, 1975, 1976, 1977, 1979, 1980, 1981, 1983, 1984, 1985, 1987, 1988, 1989, 1991, 1992, 1993: the seasons between them, each nation rated from its Elo and its players' Wikidata caps
+// 1961, 1963, 1964, 1965, 1967, 1968, 1969, 1971, 1972, 1973, 1975, 1976, 1977, 1979, 1980, 1981, 1983, 1984, 1985, 1987, 1988, 1989, 1991, 1992, 1993: the seasons between them, each nation rated from its Elo and its players' Wikidata caps
 // The built-in earlier seasons, newest first. Each is public/football/<id>.json, loaded when a setup chooses it
 // (src/engine/footballSets.js); docs/design/football-years.md describes them.
 export const BUILT_IN_SEASONS = Object.freeze([
@@ -53,7 +53,7 @@ export const BUILT_IN_SEASONS = Object.freeze([
   Object.freeze({ id: 'cm-9900', version: 'cm-9900-e4639df6', year: 2000, season: '1999/00', label: 'CM 99/00 · 3.70' }),
   Object.freeze({ id: 'cm0102-2020-11-cm3', version: 'cm0102-2020-11-cm3-5b8d03bc', year: 1999, season: '1998/99', label: 'CM3 · 98/99 for CM 01/02' }),
   Object.freeze({ id: 'cm-9798', version: 'cm-9798-cb9596fd', year: 1998, season: '1997/98', label: 'CM 97/98' }),
-  Object.freeze({ id: 'swos-9697', version: 'swos-9697-189aa2ca', year: 1997, season: '1996/97', label: 'SWOS 96/97' }),
+  Object.freeze({ id: 'swos-9697', version: 'swos-9697-5e7af2be', year: 1997, season: '1996/97', label: 'SWOS 96/97' }),
   Object.freeze({ id: 'swos-9596', version: 'swos-9596-ef95edc8', year: 1996, season: '1995/96', label: 'SWOS 95/96' }),
   Object.freeze({ id: 'swos-9495', version: 'swos-9495-3d369a28', year: 1995, season: '1994/95', label: 'SWOS 94/95' }),
   Object.freeze({ id: 'wc-1994', version: 'wc-1994-7f151aae', year: 1994, season: '1993/94', label: 'Computed · 1994 World Cup' }),
@@ -91,4 +91,5 @@ export const BUILT_IN_SEASONS = Object.freeze([
   Object.freeze({ id: 'nt-1964', version: 'nt-1964-d35f1858', year: 1964, season: '1963/64', label: 'Computed · national teams' }),
   Object.freeze({ id: 'nt-1963', version: 'nt-1963-7fdddb9b', year: 1963, season: '1962/63', label: 'Computed · national teams' }),
   Object.freeze({ id: 'wc-1962', version: 'wc-1962-9241b337', year: 1962, season: '1961/62', label: 'Computed · 1962 World Cup' }),
+  Object.freeze({ id: 'nt-1961', version: 'nt-1961-e8cee68a', year: 1961, season: '1960/61', label: 'Computed · national teams' }),
 ]);

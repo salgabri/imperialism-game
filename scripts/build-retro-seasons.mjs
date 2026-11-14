@@ -7,19 +7,18 @@
 //   npm run build:retro-seasons -- --data=<dir>  the downloaded sources elsewhere (default data-src/)
 //
 // 2002/03 and 2001/02 are SI's own Championship Manager 01/02 databases (3.9.68 and 3.9.60) and 1998/99 SI's
-// Championship Manager 3 data in the CM 01/02 format, all three read by the CM 01/02 builder (src/data/footballSetBuild.js)
-// from the CM0102 Starter Kit's zips; 2000/01 and 1999/00 are SI's own CM 00/01 and CM 99/00 databases, whose files are
-// the same tables, read by it from the files npm run sync:retro-cds takes from their retail CDs (reader 'tables');
-// 1997/98 is SI's Championship Manager 97/98 database as extracted to JSON
-// (scripts/lib/cm9798.mjs); 1996/97 is Sensible World of Soccer 96/97's national squads (scripts/lib/swos.mjs), nations
-// only; 1995/96 and 1994/95 are SWOS's own team files with their clubs (scripts/lib/swos-files.mjs); 1993/94 and 1989/90
-// are the Starter Kit's two fan-made databases (Cam F's; Simon Treanor's, nations only). Every source is pinned by
-// SHA-256 in the manifest and the build stops on any other file, so every season rebuilds byte for byte. Their Europe
-// maps come from npm run build:europe-maps, as the EA seasons' do.
+// Championship Manager 3 data in the CM 01/02 format, all three read by the CM 01/02 builder
+// (src/data/footballSetBuild.js) from the CM0102 Starter Kit's zips; 2000/01 and 1999/00 are SI's own CM 00/01 and CM
+// 99/00 databases, whose files are the same tables, read by it from the files npm run sync:retro-cds takes from their
+// retail CDs (reader 'tables'); 1997/98 is SI's Championship Manager 97/98 database as extracted to JSON
+// (scripts/lib/cm9798.mjs); 1996/97, 1995/96 and 1994/95 are Sensible World of Soccer's own team files, nations and
+// clubs (scripts/lib/swos-files.mjs, scripts/lib/swos.mjs); 1993/94 and 1989/90 are the Starter Kit's two fan-made
+// databases (Cam F's; Simon Treanor's, nations only). Every source is pinned by SHA-256 in the manifest and the build
+// stops on any other file, so every season rebuilds byte for byte. Their Europe maps come from npm run
+// build:europe-maps, as the EA seasons' do.
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { DatabaseSync } from 'node:sqlite';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { unzipSync } from 'fflate';
@@ -94,20 +93,6 @@ async function buildCm9798(season, dataDir, retrieved) {
   return buildCm9798Season({ players, teams }, { source, year: seasonYear(season.season) });
 }
 
-async function buildSwos(season, dataDir, retrieved) {
-  const [file] = season.files;
-  await pinned(dataDir, file);
-  const db = new DatabaseSync(path.join(dataDir, file.folder, file.name), { readOnly: true });
-  try {
-    const rows = db.prepare("SELECT * FROM players WHERE type = 'NATIONAL' ORDER BY id").all().map(row => ({ ...row }));
-    const source = { provider: season.maker, edition: season.edition, version: season.version, snapshotDate: season.snapshotDate, url: season.url,
-      rawScale: SWOS_SCALE, conversion: SWOS_CONVERSION, ...credits(season, retrieved) };
-    return buildSwosSeason(rows, { source, year: seasonYear(season.season), prices: SWOS_PRICES });
-  } finally {
-    db.close();
-  }
-}
-
 /**
  * A SWOS edition read from the game's own team files (scripts/lib/swos-files.mjs): its national squads, and its seven
  * leagues' top-division clubs.
@@ -130,8 +115,8 @@ async function buildSwosFiles(season, dataDir, retrieved) {
   return { ...result, audit: { ...result.audit, clamped } };
 }
 
-// By the season's `reader` where it names one, else by its kind.
-const BUILDERS = { cm0102: buildCmZip, cm: buildCm9798, swos: buildSwos, 'swos-files': buildSwosFiles, tables: buildCmTables };
+// By the season's `reader` where it names one, else by its kind (every SWOS season names its reader, 'swos-files').
+const BUILDERS = { cm0102: buildCmZip, cm: buildCm9798, 'swos-files': buildSwosFiles, tables: buildCmTables };
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
@@ -140,8 +125,8 @@ async function main() {
   const dataDir = path.resolve(args.data ?? path.join(root, 'data-src'));
   const results = [];
   for (const season of manifest.seasons) {
-    // A season's reader, where its kind is read from more than one kind of source (SWOS: a database, or team files;
-    // CM: a zip, or a CD's tables).
+    // A season's reader, where its kind is read from more than one kind of source (CM: a zip, or a CD's tables) or
+    // from one of its own (SWOS: the game's team files).
     const build = BUILDERS[season.reader ?? season.kind];
     if (!build) throw new Error(`${season.id} has kind ${season.kind}${season.reader ? ` and reader ${season.reader}` : ''}, which no builder makes`);
     // A season read later than the others names its own day.

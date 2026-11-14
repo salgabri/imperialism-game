@@ -73,6 +73,8 @@ test('the seasons before FIFA 05 are built in, after EA\'s, each its committed f
       assert.ok(Number.isInteger(file.bytes) && file.bytes > 0);
       // A download pinned to a commit, or a table read from a pinned CD image (npm run sync:retro-cds).
       if (season.cd) assert.equal(file.download, undefined);
+      // SWOS's team files come from the SWOS United server, each pinned by its SHA-256 (the server has no commits).
+      else if (season.reader === 'swos-files') assert.equal(file.download, `${season.url}${file.name}`);
       else assert.match(file.download, /^https:\/\/raw\.githubusercontent\.com\/[^/]+\/[^/]+\/[0-9a-f]{40}\//, 'pinned to a commit');
     }
     if (season.cd) {
@@ -121,7 +123,7 @@ const COVERAGE = {
   'cm-9900': { players: 2178, nations: 123, completeXIs: 74, clubs: 130, leagues: 7 },
   'cm0102-2020-11-cm3': { players: 2066, nations: 113, completeXIs: 64, clubs: 130, leagues: 7 },
   'cm-9798': { players: 1899, nations: 102, completeXIs: 52, clubs: 124, leagues: 7 },
-  'swos-9697': { players: 1463, nations: 133, completeXIs: 133, clubs: 0, leagues: 0 },
+  'swos-9697': { players: 2937, nations: 133, completeXIs: 133, clubs: 134, leagues: 7 },
 };
 
 test('each season decodes, and fields the nations and clubs its source rates', () => {
@@ -136,8 +138,13 @@ test('each season decodes, and fields the nations and clubs its source rates', (
     const ids = tuplesOf(doc).map(tuple => tuple[0]);
     assert.equal(new Set(ids).size, new Set(ids.map(String)).size, `${id}: one id per player`);
   }
-  // Only SWOS 96/97 has nations only, as FIFA 05 and FIFA 06 do.
-  assert.deepEqual(IDS.filter(id => !setHasClubs(id)), ['swos-9697']);
+  // Every one has clubs: SWOS 96/97 too, read from the game's own team files since 2026-11-13.
+  assert.deepEqual(IDS.filter(id => !setHasClubs(id)), []);
+  // Its clubs are of the summer of 1996: Shearer at Newcastle, Zidane at Juventus, Ronaldo at Barcelona, Ravanelli at
+  // Middlesbrough, Vialli at Chelsea.
+  const at = who => committed('swos-9697').clubs.filter(club => club.squad.some(tuple => tuple[1] === who)).map(club => club.name);
+  assert.deepEqual(['Alan Shearer', 'Zinedine Zidane', 'Ronaldo', 'Fabrizio Ravanelli', 'Gianluca Vialli'].map(at),
+    [['Newcastle United'], ['Juventus'], ['FC Barcelona'], ['Middlesbrough'], ['Chelsea']]);
 });
 
 test('each season with clubs plays on its own two Europe maps: its strongest 124 and 32 clubs', () => {
@@ -164,7 +171,7 @@ test('each season with clubs plays on its own two Europe maps: its strongest 124
 // ---------- federations ----------
 
 test('the federations of the seasons\' own years: FR Yugoslavia holds Montenegro, and Kosovo until 1999', () => {
-  assert.equal(FIRST_YEAR, 1962, 'the first World Cup season the federations table covers');
+  assert.equal(FIRST_YEAR, 1961, 'the first season the federations table covers, 1960/61');
   const year = id => committed(id).year;
   for (const id of IDS) assert.deepEqual(committed(id).territory, territoryFor(FOOTBALL_FEDERATIONS, year(id)), id);
   // These seasons were built before identities: none carries one, and none of their years has a federation of the day.
@@ -385,7 +392,7 @@ test('SWOS names are set in their country\'s case, changing only the case', () =
     assert.equal(cased.toUpperCase(), name);
   }
   const doc = committed('swos-9697');
-  assert.ok(tuplesOf(doc).every(tuple => tuple[1] === properCase(tuple[1].toUpperCase(), null) || /\b(van|de|der|del|la|da|dos)\b/.test(tuple[1])));
+  assert.ok(tuplesOf(doc).every(tuple => tuple[1] === properCase(tuple[1].toUpperCase(), null) || /\b(van|von|de|den|der|del|la|da|dos|ten|ter)\b/.test(tuple[1])));
 });
 
 const SOURCE_SWOS = { provider: 'Sensible Software', edition: 'SWOS 96/97', version: 'test', snapshotDate: '1996', url: 'https://example.test/swos',
@@ -494,15 +501,18 @@ function resumes({ app, items, calls, gone }, url, pack) {
   assert.equal(calls.length, before, 'resuming fetched nothing');
 }
 
-test('the running App launches a 1996/97 nations campaign on SWOS\'s squads, and resumes it without the file', async () => {
+test('the running App plays 1996/97\'s clubs on its own maps, and launches and resumes a nations campaign on SWOS\'s squads', async () => {
   const doc = committed('swos-9697');
   await withApp(async fixture => {
     const { app, time } = fixture;
     await app.requestSeasons();
     assert.ok(app.state.footballSets.some(set => set.id === 'swos-9697' && set.season === '1996/97'), 'listed before any request');
+    // Its clubs play on its own Europe maps, as every season with clubs does.
     app.pickSetup('layer', 'clubs');
+    app.pickSetup('clubScope', 'domestic:eu32');
     app.pickSetup('dataSet', 'swos-9697');
-    assert.equal(app.state.setup.layer, 'nations', 'a season with nations only takes the nations');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32s1997'], 'the theatre follows the season');
+    app.pickSetup('layer', 'nations');
     time.advance(200);
     await app.loadSet('swos-9697');
     await settle();

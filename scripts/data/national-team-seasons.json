@@ -1,6 +1,6 @@
 {
-  "about": "The computed national-team seasons between the computed World Cups, 1962/63 to 1992/93 (docs/design/football-years.md, \"Computed national-team seasons\"): every source pinned and every constant of the method, so a later change of the built-in data changes nothing. npm run sync:national-team-seasons reads the sources from data-src/ into the committed facts (scripts/data/national-team-seasons/), and npm run build:national-team-seasons turns the facts into public/football/nt-<year>.json. elo, strength, xi and profile are the World Cup seasons' (scripts/data/world-cup-seasons.json), equal by test.",
-  "decided": "2026-11-13: the user asked to cover the year gaps in every sport (\"there are many year gaps in the various sports can you cover them\"). The seasons between the World Cups are computed like them: the user approved computed football ratings for the 1960s to 1980s on 2026-11-09 (national-team Elo adjusted per player, labelled as computed), and the World Cup seasons shipped on 2026-11-10. Claude chose the rest: each nation's players from Wikidata's national-team records (their stints and caps), which the World Cup seasons left out; its strength from its Elo on 1 July of the season's end year, by the World Cup seasons' line; the XI by caps a year and its order by Ballon d'Or votes and caps.",
+  "about": "The computed national-team seasons before and between the computed World Cups, 1960/61 and 1962/63 to 1992/93 (docs/design/football-years.md, \"Computed national-team seasons\"): every source pinned and every constant of the method, so a later change of the built-in data changes nothing. npm run sync:national-team-seasons reads the sources from data-src/ into the committed facts (scripts/data/national-team-seasons/), and npm run build:national-team-seasons turns the facts into public/football/nt-<year>.json. elo, strength, xi and profile are the World Cup seasons' (scripts/data/world-cup-seasons.json), equal by test.",
+  "decided": "2026-11-13: the user asked to cover the year gaps in every sport (\"there are many year gaps in the various sports can you cover them\"). The seasons between the World Cups are computed like them: the user approved computed football ratings for the 1960s to 1980s on 2026-11-09 (national-team Elo adjusted per player, labelled as computed), and the World Cup seasons shipped on 2026-11-10. Claude chose the rest: each nation's players from Wikidata's national-team records (their stints and caps), which the World Cup seasons left out; its strength from its Elo on 1 July of the season's end year, by the World Cup seasons' line; the XI by caps a year and its order by Ballon d'Or votes and caps. 2026-11-14: asked whether to fill 1960/61 too, the season before the first computed World Cup, the user answered \"Yes, both\" (with 1996/97's clubs): it is computed the same way.",
   "retrieved": "2026-11-13",
   "licence": "CC BY-SA 4.0",
   "sources": {
@@ -66,9 +66,23 @@
       "name": "English Wikipedia, \"<year> Ballon d'Or\": the voting tables (the votes are France Football's)",
       "licence": "CC BY-SA 4.0",
       "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0/legalcode",
-      "fetched": "The article pages (https://en.wikipedia.org/wiki/<title>), one every 2 s: robots.txt disallows /w/ and /api/ to every user agent and allows /wiki/. Sixteen were saved for the World Cup seasons on 2026-11-09, the other sixteen on 2026-11-13. A page saved again shows the same revision, not always the same bytes.",
+      "fetched": "The article pages (https://en.wikipedia.org/wiki/<title>), one every 2 s: robots.txt disallows /w/ and /api/ to every user agent and allows /wiki/. Seventeen were saved for the World Cup seasons on 2026-11-09, sixteen on 2026-11-13 and 1960's on 2026-11-14. A page saved again shows the same revision, not always the same bytes.",
       "folder": "wikipedia-ballon-dor-1961-1994",
       "pages": [
+        {
+          "title": "1960 Ballon d'Or",
+          "file": "1960.html",
+          "revision": 1354465351,
+          "sha256": "38e96bb349414ea96931c47c595159ae0afc40f60bf6b3a7cda320f2883f25bb",
+          "bytes": 246495
+        },
+        {
+          "title": "1961 Ballon d'Or",
+          "file": "1961.html",
+          "revision": 1354465261,
+          "sha256": "eec4c13cc20895da403c4fcc850643d61fced056379059c87a37b8317034ebb3",
+          "bytes": 294599
+        },
         {
           "title": "1962 Ballon d'Or",
           "revision": 1354465181,
@@ -514,11 +528,25 @@
         "nationality": "West Germany",
         "qid": "Q157847",
         "name": "Toni Schumacher"
+      },
+      {
+        "vote": "Gert Dörfel",
+        "nationality": "West Germany",
+        "qid": "Q460866",
+        "name": "Gert Dörfel"
       }
     ],
     "ballonDorPlayersNote": "Votes whose link is a redirect to another title of the same man's article (Jef Jurion to Armand Jurion, Fedor to Fyodor Cherenkov, Harald to Toni Schumacher), each the Wikidata item whose English article the redirect leads to, checked by hand on 2026-11-13."
   },
   "seasons": [
+    {
+      "id": "nt-1961",
+      "year": 1961,
+      "ballonDor": [
+        1960,
+        1961
+      ]
+    },
     {
       "id": "nt-1963",
       "year": 1963,

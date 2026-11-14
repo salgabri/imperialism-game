@@ -117,7 +117,7 @@ npm run sync:early-nationalities # ask Wikidata (via QLever) for the FIFA 05 and
 npm run sync:world-cup-seasons # read the pinned World Cup, results and Wikipedia sources in data-src/ into scripts/data/world-cup-seasons/
 npm run build:world-cup-seasons # rebuild the computed World Cup seasons 1961/62 to 1993/94 from those facts (offline; --check to verify)
 npm run sync:national-team-seasons # read the pinned Wikidata answers (via QLever), results and Ballon d'Or pages in data-src/ into scripts/data/national-team-seasons/ (--fetch downloads what is missing)
-npm run build:national-team-seasons # rebuild the computed seasons between those World Cups, 1962/63 to 1992/93, from those facts (offline; --check to verify)
+npm run build:national-team-seasons # rebuild the computed seasons before and between those World Cups, 1960/61 and 1962/63 to 1992/93, from those facts (offline; --check to verify)
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
 npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page and sources in data-src/
 npm run sync:euroleague  # snapshot the EuroLeague's rosters and box scores from its public API into scripts/data/euroleague-2026-27.json (network, cached)
@@ -342,11 +342,11 @@ manager of the theatre's favourite, with decisions from the first match.
    to 1989/90 (EA FIFA and FC ratings of each to 2004/05, then SI's
    Championship Manager, for 2003/04 as Alex Sawczuk's fan update of it,
    Sensible World of Soccer for 1996/97 to 1994/95, and fans' databases for
-   1993/94 and 1989/90; 2005/06, 2004/05, 1996/97 and 1989/90 have nations
+   1993/94 and 1989/90; 2005/06, 2004/05 and 1989/90 have nations
    only), the World Cups of 1961/62 to 1993/94 (computed from each
    finalist's Elo and its players' records, nations only) and every season
-   between them (computed from each nation's Elo and its players' Wikidata
-   caps, nations only), so every year has a season, and any local
+   between them and 1960/61 (computed from each nation's Elo and its players'
+   Wikidata caps, nations only), so every year has a season, and any local
    CM 01/02 season built on this computer. Basketball's lists the built-in
    2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
    1999/00 (NBA 2K ratings of each), then 1998/99 (NBA Live 99), 1991/92 and
@@ -1355,7 +1355,7 @@ not England. AS Monaco, a Ligue 1 club, holds the land around Monaco in France.
 
 The earlier [football seasons](#football-seasons) hold the seven big leagues only, so
 their maps draw on those: the strongest 124 and 32 of that season's 124–134 clubs,
-one pair of maps per season. 2005/06, 2004/05, 1996/97, 1989/90 and the nine World
+one pair of maps per season. 2005/06, 2004/05, 1989/90 and the nine World
 Cups have nations only, so no maps. Football's "One country · top clubs" campaigns are
 unchanged. A world campaign saved before these maps stays on the world, and resumes
 as it was; a CM 01/02 set built on your own computer has no map of Europe, so it
@@ -1551,7 +1551,7 @@ databases, one source each:
 | 1999/00 | SI's Championship Manager 99/00, 3.70 | 74 | 130 |
 | 1998/99 | SI's Championship Manager 3, ported to CM 01/02 | 64 | 130 |
 | 1997/98 | SI's Championship Manager 97/98 | 52 | 124 |
-| 1996/97 | Sensible World of Soccer 96/97, its national squads | 133 | nations only |
+| 1996/97 | Sensible World of Soccer 96/97, the game's own team files | 133 | 134 |
 | 1995/96 | Sensible World of Soccer 95/96, the game's own team files | 132 | 134 |
 | 1994/95 | Sensible World of Soccer (the original, 1994), the game's own team files | 131 | 134 |
 | 1993/94 | Cam F's 93/94 for CM 01/02, fan-made | 77 | 130 |
@@ -1580,9 +1580,9 @@ as West Germany, and a German at an East German club plays for no nation.
   Manager Magazine's issue 5 cover CD carries it (archive.org), shipped only if
   the user chooses; CM3's data was ported to CM 01/02 by
   Gio and released by Cam F on champman0102.co.uk; CM 97/98's database is as
-  baskeyx extracted it. SWOS 96/97 is Sensible Software's (now Codemasters'),
-  from Whiteulver's database and xflea's spreadsheet as keyser1884's SWOS-MCP
-  holds them; SWOS 94/95 and 95/96 are the game's own team files as the SWOS
+  baskeyx extracted it. SWOS is Sensible Software's (now Codemasters'):
+  SWOS 96/97 (read until 2026-11-14 from Whiteulver's database and xflea's
+  spreadsheet as keyser1884's SWOS-MCP holds them), 94/95 and 95/96 are the game's own team files as the SWOS
   United server keeps them. The fan-made 1993/94 is Cam F's ("Season 93/94 For
   0102") and 1989/90 Simon Treanor's ("Championship Manager 1989/90 update for CM
   01/02", cm8990.wordpress.com), both as the CM0102 Starter Kit ships them. None
@@ -1635,11 +1635,12 @@ considered, back to 1872, and their terms.
   Serbia's until June 1999 (1996/97 and 1997/98), then stays neutral until 2015,
   as Timor-Leste does until 2005. Bosnia and Herzegovina plays from 1996/97,
   Eritrea and Palestine from 1997/98, Mongolia from 1998/99 and Bhutan from
-  2000/01. The table goes back to 1961/62: a season of then plays the federations
+  2000/01. The table goes back to 1960/61: a season of then plays the federations
   of its day under their own names and flags (the Soviet Union on Russia's shape,
   holding the other republics, to 1990/91; the CIS in 1991/92; Yugoslavia to
   1990/91; FR Yugoslavia in 1994/95 and 1995/96; Czechoslovakia to 1992/93; West
-  Germany to 1989/90; Zaire from 1971/72), and leaves suspended associations out (South
+  Germany to 1989/90; the United Arab Republic, Egypt holding Syria in 1960/61 and
+  alone to 1970/71; Zaire from 1971/72), and leaves suspended associations out (South
   Africa, FR Yugoslavia, China PR). Seasons from 1996/97 play FR Yugoslavia and Serbia
   and Montenegro, Swaziland and Macedonia under their names of the day
   (src/data/namesOfTheDay.js). Up to 1989/90 the map has **East Germany**, cut from
@@ -1678,17 +1679,18 @@ nations only, 15 to 24 of them.
   `data-src/` into the committed facts; `npm run build:world-cup-seasons` turns
   them into the season files, offline, and `--check` compares byte for byte.
 
-### The seasons between the World Cups, 1962/63 to 1992/93 (computed)
+### The seasons before and between the World Cups, 1960/61 to 1992/93 (computed)
 
-The 24 seasons between those World Cups are computed the same way, so football
-has a season ending in every year from 1962 on ("1971/72 · computed"). Their
+The 24 seasons between those World Cups, and 1960/61 before the first, are
+computed the same way, so football has a season ending in every year from 1961
+on ("1971/72 · computed"). Their
 players come from Wikidata's national-team records (CC0, read through QLever):
 each player's stints for his national team with their years, caps and goals.
 
 - **Who plays:** every nation whose players' stints cover the season name eleven
   with a position, one a goalkeeper, and that played a full international in the
-  four years before: 37 nations in 1963/64, 81 in 1992/93. Each plays under the
-  federation of its day, as in the World Cup seasons (the CIS in 1991/92;
+  four years before: 39 nations in 1960/61, 37 in 1963/64, 81 in 1992/93. Each plays under the
+  federation of its day, as in the World Cup seasons (Syria the United Arab Republic's in 1960/61; the CIS in 1991/92;
   Yugoslavia sits out its suspension of 1992).
 - **Ratings:** the World Cup seasons' line from the nation's Elo on 1 July of the
   season's end year; its eleven the players of each role with the most caps a

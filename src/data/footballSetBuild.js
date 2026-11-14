@@ -20,12 +20,12 @@ export const SET_ID = /^cm0102-\d{4}-\d{2}(?:-[a-z0-9]+)?$/;
 // `cm-<season>`, the loader's kind 'cm' (src/engine/footballSets.js), which its set names.
 const CM_EDITION_ID = /^cm-\d{4}$/;
 /**
- * The earliest season-end year a set is built for: 1961/62, the first World Cup season the game covers.
+ * The earliest season-end year a set is built for: 1960/61, the first computed national-team season the game covers.
  * footballFederations.js gives every year from then on its federations: the shapes held by another, those with no team,
- * and the federations of the day (the Soviet Union, Yugoslavia, Czechoslovakia, West Germany, Zaire) with the names,
- * codes and flags their holders play under (identitiesFor).
+ * and the federations of the day (the Soviet Union, Yugoslavia, Czechoslovakia, West Germany, the United Arab Republic,
+ * Zaire) with the names, codes and flags their holders play under (identitiesFor).
  */
-export const FIRST_YEAR = 1962;
+export const FIRST_YEAR = 1961;
 /** The last season-end year the game loads (isDataYear in src/engine/footballSets.js). */
 export const LAST_YEAR = 2100;
 export const NO_TEAM = 'noTeam';

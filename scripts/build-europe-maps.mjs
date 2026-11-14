@@ -508,7 +508,7 @@ function attributionText(entries, docs) {
 
 /**
  * The maps to build: for the built-in season and each earlier season with clubs (src/data/footballSeasons.js), its
- * strongest TOP_CLUBS and ELITE_CLUBS clubs. FIFA 05, FIFA 06 and SWOS 96/97 have nations only, so no maps. Then the
+ * strongest TOP_CLUBS and ELITE_CLUBS clubs. FIFA 05, FIFA 06, 1989/90 and the computed seasons have nations only, so no maps. Then the
  * women's game's (src/data/womensFootballSeasons.js), from FIFA 23 on: every European club ('Europe', the NWSL's play on
  * a map of their own, scripts/build-club-maps.mjs) and the ELITE_CLUBS strongest of them, where there are more. Last the
  * EuroLeague's, in the built-in season only.

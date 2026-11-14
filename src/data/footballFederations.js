@@ -1,8 +1,8 @@
-// The football federations of every season from 1961/62 on (docs/design/football-years.md, 'Federations by year' and
+// The football federations of every season from 1960/61 on (docs/design/football-years.md, 'Federations by year' and
 // 'Federations of the day'), the state on the cutoff, 30 June of the season-end year. territoryFor and identitiesFor in
 // footballSetBuild.js read this.
 //
-// `shapes`: game shapes whose association joined FIFA after 30 June 1962, the cutoff of the earliest season (1961/62).
+// `shapes`: game shapes whose association joined FIFA after 30 June 1961, the cutoff of the earliest season (1960/61).
 // A shape takes part in season-end year Y when its association was a FIFA member by the cutoff. Before then it is held
 // by heldBy (merged into that nation's empire at kick-off) where it was part of that nation, until heldUntil where the
 // holder lost it earlier (by the same cutoff), or, with no holder, stays neutral (inactive): so do colonies, since the
@@ -12,7 +12,7 @@
 // known, and that day is used: such an association counts from the season ending in its year. Where another source
 // gives the day (`dateSource`), that day is used. New Caledonia was admitted by the FIFA Congress in Paris on 20-21 May
 // 2004; the Congress's last day is used because no more exact date was found. Either day is before that year's 30 June
-// cutoff. Every other game nation's association was a FIFA member by 30 June 1962, or plays through a federation of the
+// cutoff. Every other game nation's association was a FIFA member by 30 June 1961, or plays through a federation of the
 // day below.
 //
 // `federations`: the federations of the day, each in its season-end years `from` to `through` (either open): its holder
@@ -75,6 +75,9 @@ export const FOOTBALL_FEDERATIONS = {
     '112': { name: 'Belarus', fifa: 'BLR', member: '1992-01-01', heldBy: null,
       source: 'https://inside.fifa.com/associations/BLR',
       before: 'A Soviet republic: the Soviet Union\'s, then the CIS\'s, to 1991/92 (federations).' },
+    '120': { name: 'Cameroon', fifa: 'CMR', member: '1962-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/CMR',
+      before: 'No FIFA member: neutral.' },
     '140': { name: 'Central African Republic', fifa: 'CTA', member: '1964-01-01', heldBy: null,
       source: 'https://inside.fifa.com/associations/CTA',
       before: 'No FIFA member: neutral.' },
@@ -123,11 +126,17 @@ export const FOOTBALL_FEDERATIONS = {
     '275': { name: 'Palestine', fifa: 'PLE', member: '1998-01-01', heldBy: null,
       source: 'https://inside.fifa.com/associations/PLE',
       before: 'No FIFA member: neutral.' },
+    '324': { name: 'Guinea', fifa: 'GUI', member: '1962-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/GUI',
+      before: 'No FIFA member: neutral.' },
     '328': { name: 'Guyana', fifa: 'GUY', member: '1970-01-01', heldBy: null,
       source: 'https://inside.fifa.com/associations/GUY',
       before: 'No FIFA member: neutral.' },
     '384': { name: 'Côte d\'Ivoire', fifa: 'CIV', member: '1964-01-01', heldBy: null,
       source: 'https://inside.fifa.com/associations/CIV',
+      before: 'No FIFA member: neutral.' },
+    '388': { name: 'Jamaica', fifa: 'JAM', member: '1962-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/JAM',
       before: 'No FIFA member: neutral.' },
     '398': { name: 'Kazakhstan', fifa: 'KAZ', member: '1994-01-01', heldBy: null,
       source: 'https://inside.fifa.com/associations/KAZ',
@@ -221,6 +230,9 @@ export const FOOTBALL_FEDERATIONS = {
       before: 'A Yugoslav republic: Yugoslavia\'s to 1990/91 (federations). FIFA gives only the year, 1992; its association '
         + 'joined on 3 July 1992 (Football Association of Slovenia, Wikipedia), with Croatia\'s, after the cutoff of 1991/92: '
         + 'neutral that season.' },
+    '706': { name: 'Somalia', fifa: 'SOM', member: '1962-01-01', heldBy: null,
+      source: 'https://inside.fifa.com/associations/SOM',
+      before: 'No FIFA member: neutral.' },
     '716': { name: 'Zimbabwe', fifa: 'ZIM', member: '1965-01-01', heldBy: null,
       source: 'https://inside.fifa.com/associations/ZIM',
       before: 'No FIFA member: neutral.' },
@@ -322,6 +334,18 @@ export const FOOTBALL_FEDERATIONS = {
       source: 'https://en.wikipedia.org/w/index.php?oldid=1383080856',
       note: 'The DR Congo was renamed Zaire on 27 October 1971, in season 1971/72, and the DR Congo again in May 1997, '
         + 'before the cutoff of 1996/97.' },
+    { id: 'UAR', name: 'United Arab Republic', code: 'UAR', flagId: 'UAR', holder: '818', from: 1958, through: 1961, members: ['760'],
+      source: 'https://en.wikipedia.org/w/index.php?oldid=1385534949',
+      note: 'Egypt and Syria were one state, the United Arab Republic, from 22 February 1958 until Syria left it on 28 '
+        + 'September 1961, after the cutoff of 1960/61 (United Arab Republic, Wikipedia, revision 1381605934). Between 1958 '
+        + 'and 1961 the Syrian team combined with Egypt\'s as the United Arab Republic\'s, though FIFA files its records '
+        + 'under Egypt (Syria national football team, Wikipedia, revision 1385534949); Syria played no match of its own from '
+        + 'May 1957 to March 1963 (martj42\'s results).' },
+    { id: 'UAR-EGY', name: 'United Arab Republic', code: 'UAR', flagId: 'UAR', holder: '818', from: 1962, through: 1971, members: [],
+      source: 'https://en.wikipedia.org/w/index.php?oldid=1381605934',
+      note: 'Egypt kept the United Arab Republic\'s name and flag after Syria left, until it became the Arab Republic of '
+        + 'Egypt on 11 September 1971, before the cutoff of 1971/72 (United Arab Republic, Wikipedia, revision 1381605934); '
+        + 'martj42\'s results name its team so from 22 February 1958 to 11 September 1971.' },
   ],
   suspensions: [
     { shape: '156', name: 'China PR', from: '1958-07-08', until: '1980-07-07',

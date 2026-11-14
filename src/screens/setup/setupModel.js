@@ -340,9 +340,10 @@ export const SEASON_NOTES = Object.freeze({
   football: 'Earlier seasons use EA FIFA ratings of that season, before 2004/05 SI\'s Championship Manager ratings (2003/04: '
     + 'Alex Sawczuk\'s fan update of them; 1994/95 to 1996/97: Sensible World of Soccer\'s; 1993/94 and 1989/90: fans\' ratings, '
     + 'Cam F\'s and Simon Treanor\'s), with clubs from the seven biggest leagues. A nation with fewer than six rated players '
-    + 'fields no team, and one without eleven starts short-handed. 2005/06, 2004/05, 1996/97 and 1989/90 have nations only. '
-    + 'The World Cups of 1961/62 to 1993/94 and the seasons between them are computed and have nations only: each nation '
-    + 'rated from its Elo, its eleven from its World Cup squad or, between World Cups, from its players\' caps on Wikidata.',
+    + 'fields no team, and one without eleven starts short-handed. 2005/06, 2004/05 and 1989/90 have nations only. '
+    + '1960/61, the World Cups of 1961/62 to 1993/94 and the seasons between them are computed and have nations only: each '
+    + 'nation rated from its Elo, its eleven from its World Cup squad or, in the other seasons, from its players\' caps on '
+    + 'Wikidata.',
   'womens-football': 'EA SPORTS FC ratings of the women\'s game in each season (2026/27: EA FC 27, as of 7 November 2026). '
     + 'EA rated national teams only until 2021/22. A nation with fewer than six rated players fields no team, and one '
     + 'without eleven starts short-handed.',

@@ -9,7 +9,7 @@ ratings, on maps of their eras, 2026-10-30; FIFA 05 and FIFA 06, nations only,
 and CM 97/98 databases and SWOS 96/97's national squads, 2026-11-08; the federations
 of every season from 1961/62, with those of their day (the Soviet Union, the CIS,
 Yugoslavia, FR Yugoslavia, Czechoslovakia, West Germany and Zaire) under their own
-names and flags, 2026-11-09 ([Federations of the day](#federations-of-the-day-196162-to-199596));
+names and flags, 2026-11-09 ([Federations of the day](#federations-of-the-day-196061-to-199596));
 2000/01 and 1999/00 from SI's own CM 00/01 and CM 99/00 databases, read from their
 retail CDs, SWOS 94/95 and 95/96 with their clubs, read from the game's own team
 files, and the two fan-made CM databases of 1993/94 and 1989/90, 2026-11-09; the basketball
@@ -18,7 +18,9 @@ statistics, 2026-11-09; the nine World Cups from 1961/62 to 1993/94 as computed
 seasons, 2026-11-10 ([Computed World Cup seasons](#computed-world-cup-seasons)); 2003/04 from Alex Sawczuk's fan-made
 October 2003 update of SI's CM 01/02, built 2026-11-09 and shipped by the user's choice of 2026-11-10; the 24 seasons
 between the World Cups, 1962/63 to 1992/93, computed from Wikidata's national-team records, 2026-11-13
-([Computed national-team seasons](#computed-national-team-seasons)), so that every year has a season. The CM 01/02
+([Computed national-team seasons](#computed-national-team-seasons)), so that every year has a season; 1960/61,
+computed alike, with the federations of its day (the United Arab Republic among them), and 1996/97's clubs, read from
+SWOS 96/97's own team files, 2026-11-14 ([Sensible World of Soccer 96/97](#sensible-world-of-soccer-9697-199697)). The CM 01/02
 path now runs on real databases (SI's own and the CM3 port); the community's
 still need a forum login. Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
@@ -39,8 +41,8 @@ kinds:
   See [Seasons before FIFA 05](#seasons-before-fifa-05). Before those, the World Cups of
   1962 to 1994, nations only, their ratings computed from the nations' Elo and the
   players' records. See [Computed World Cup seasons](#computed-world-cup-seasons). And
-  between the World Cups, every other season from 1962/63 to 1992/93, computed alike
-  from Wikidata's national-team records. See
+  before and between the World Cups, 1960/61 and every other season from 1962/63 to
+  1992/93, computed alike from Wikidata's national-team records. See
   [Computed national-team seasons](#computed-national-team-seasons).
 - **Local CM 01/02 seasons**: a Championship Manager 01/02 database the user has
   downloaded, built on their computer. Until the database authors allow
@@ -110,12 +112,12 @@ unknown folder, a conclusive estimate that disagrees with `--dob-shift` stops
 the build. For a known release, it raises a loud warning and the manifest's shift
 is kept.
 
-**Seasons ending before 1962 are refused** (`FIRST_YEAR`). 1961/62, the first
-World Cup season the game covers, is the first one accepted, and the federations
+**Seasons ending before 1961 are refused** (`FIRST_YEAR`). 1960/61, the first
+computed national-team season the game covers, is the first one accepted, and the federations
 table covers every year from then on, with the federations of the day a season
-of 1961/62 to 1995/96 plays under their own names and flags
-([below](#federations-of-the-day-196162-to-199596)). Until 2026-11-09 the first
-year was 1997.
+of 1960/61 to 1995/96 plays under their own names and flags
+([below](#federations-of-the-day-196061-to-199596)). Until 2026-11-09 the first
+year was 1997, and until 2026-11-14 1962.
 
 ### Federations by year
 
@@ -144,20 +146,21 @@ Yugoslav and Czechoslovak successor states by 1994. In the seasons from 1996/97,
 built before identities, Serbia keeps its modern name and flag in its FR
 Yugoslavia and Serbia and Montenegro years. The seasons before 1996/97 are below.
 
-### Federations of the day (1961/62 to 1995/96)
+### Federations of the day (1960/61 to 1995/96)
 
 Decided 2026-11-09, for the seasons before 1996/97 that the computed World Cup
 seasons, SWOS 94/95 and 95/96 and the fan-made CM databases add (SWOS's and the
 fan-made ones ship: [Seasons before FIFA 05](#seasons-before-fifa-05); so do the
 computed World Cup seasons, [below](#computed-world-cup-seasons)).
-`FIRST_YEAR` is 1962, and `src/data/footballFederations.js` gives every
-season from 1961/62 its federations, as the state on its cutoff (30 June of the
+`FIRST_YEAR` is 1961 (1962 until 2026-11-14, when 1960/61 was added), and
+`src/data/footballFederations.js` gives every season from 1960/61 its federations, as the state on its cutoff (30 June of the
 season-end year), in three parts. Every year from 1996/97 keeps exactly the
 territory it had, and has no identity, so every season the game ships rebuilds
 byte for byte.
 
 **Admissions** (`shapes`). Every game nation whose association joined FIFA after
-30 June 1962 has its date, 79 shapes from Australia (1963) and Algeria (1964) to
+30 June 1961 has its date, 83 shapes from Cameroon, Guinea, Jamaica and Somalia
+(1962, so out of 1960/61 alone), Australia (1963) and Algeria (1964) to
 Kosovo (2016), each from FIFA's page for the association ("FIFA member since",
 read 2026-11-09; `scripts/data/fifa-member-associations.json` keeps all 176 game
 nations', and a test checks the table against it). FIFA gives 1 January where
@@ -184,6 +187,7 @@ dates:
 | Czechoslovakia | TCH | Czech (`cz`) | Czechia (203) | Slovakia | to 1992/93 |
 | West Germany | FRG | German (`de`) | Germany (276) | nothing | to 1989/90 |
 | Zaire | ZAI | `zr` (new) | DR Congo (180) | nothing | 1971/72 to 1995/96 |
+| United Arab Republic | UAR | `uar` | Egypt (818) | Syria in 1960/61; nothing after | to 1970/71 |
 
 - **The Soviet Union and the CIS** (Soviet Union and CIS national football team,
   Wikipedia, revisions 1384615907 and 1384484443). The Soviet team's last match
@@ -223,6 +227,15 @@ dates:
   database's East German clubs' players.
 - **Zaire** (revision 1383080856): the DR Congo was renamed on 27 October 1971 and
   renamed back in May 1997, before 1996/97's cutoff.
+- **The United Arab Republic** (added 2026-11-14 with 1960/61; United Arab Republic, revision 1381605934; Syria national
+  football team, revision 1385534949). Egypt and Syria were one state from 22 February 1958 until Syria left on 28
+  September 1961, after 1960/61's cutoff, and the Syrian team combined with Egypt's as the UAR's (FIFA files its
+  records under Egypt); Syria played no match of its own from May 1957 to March 1963 (martj42's results). Egypt kept
+  the name and flag until it became the Arab Republic of Egypt on 11 September 1971, and martj42's results name its
+  team so to then, so 1961/62 to 1970/71 play Egypt alone under it (`UAR-EGY`), as tennis's seasons already did
+  ([Earlier maps](historic-maps.md#names-of-the-day)). No season of those years fields Egypt (the computed seasons
+  find eleven Egyptian players only from 1974/75), so no file changed; where Egypt fields no team, Syria's land is
+  neutral in 1960/61.
 
 A nation in a database named after a federation of its year plays for the
 holder (`dayNationResolver`): SI's 'Soviet Union', 'Czechoslovakia', 'West
@@ -264,8 +277,8 @@ given `fields`, fields a side:
 
 | Seasons | Identities |
 | --- | --- |
-| 1961/62 to 1970/71 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany |
-| 1971/72 to 1989/90 | the same and Zaire |
+| 1960/61 to 1970/71 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany, United Arab Republic |
+| 1971/72 to 1989/90 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany, Zaire |
 | 1990/91 | Soviet Union, Yugoslavia, Czechoslovakia, Zaire |
 | 1991/92 | CIS, Czechoslovakia, Zaire |
 | 1992/93 | Czechoslovakia, Zaire |
@@ -323,8 +336,9 @@ Soviet Union's, the CIS's, Yugoslavia's and Zaire's land.
 test:football-sets`): the table against FIFA's dates; territory and identities
 of 1969/70 (the Soviet Union holding Ukraine and the Baltic states), 1973/74
 (Zaire, and East Germany beside West Germany), 1981/82 (Yugoslavia holding Croatia), 1989/90
-(Czechoslovakia holding Slovakia), 1991/92 and 1992/93 to 1995/96; the
-suspensions; every year 1961/62 to 1995/96 consistent and none from 1996/97 with
+(Czechoslovakia holding Slovakia), 1991/92 and 1992/93 to 1995/96, and 1960/61 (the United Arab Republic
+holding Syria, the four associations of 1962 out); the
+suspensions; every year 1960/61 to 1995/96 consistent and none from 1996/97 with
 an identity; the CM 01/02 builder's pooling and names; the loader's refusals; and
 a 1969/70 campaign launched, drawn, flagged, saved and resumed as the Soviet
 Union. `scripts/flag-symbol-layout.test.mjs` fits each historic emblem on its
@@ -398,9 +412,9 @@ the 1994 finalists, Russia and Germany among them, all under their own names.
   Timor-Leste before 2006). They stay neutral land, as non-participants do in a
   continental theatre. Both come from `footballFederations.js`, keyed by
   year.
-- `identities` (optional, men's football seasons of 1961/62 to 1995/96 only) names
+- `identities` (optional, men's football seasons of 1960/61 to 1995/96 only) names
   the federations of the day the season plays: its holder's team takes that name,
-  code and flag ([Federations of the day](#federations-of-the-day-196162-to-199596)).
+  code and flag ([Federations of the day](#federations-of-the-day-196061-to-199596)).
   A season without it plays every nation under its own.
 
 ### Ratings and positions
@@ -712,8 +726,9 @@ to their makers: each season's source block names
 its maker (`provider`), who compiled or ported it (`compiler`), where it comes from
 (`url`) and when it was read (`retrieved`; a season read later than the others
 names its own day in the manifest). The manifest's `reader` names the builder
-where a kind is read from two kinds of source (SWOS: a database, or the game's
-team files; CM: a zip, or a CD's tables).
+where a kind is read from two kinds of source (CM: a zip, or a CD's tables) or
+from a source of its own (SWOS: the game's team files, for all three editions
+since 2026-11-14, when 1996/97 left its database for them and gained its clubs).
 
 | Season | Id | Source | Nations with players (full XIs) | Clubs |
 | --- | --- | --- | --- | --- |
@@ -724,7 +739,7 @@ team files; CM: a zip, or a CD's tables).
 | 1999/00 | `cm-9900` | SI's CM 99/00 3.70, from its UK retail CD | 123 (74) | 130 |
 | 1998/99 | `cm0102-2020-11-cm3` | SI's CM3 data, ported to CM 01/02 | 113 (64) | 130 |
 | 1997/98 | `cm-9798` | SI's CM 97/98, extracted to JSON | 102 (52) | 124 |
-| 1996/97 | `swos-9697` | Sensible World of Soccer 96/97's national squads | 133 (133) | nations only |
+| 1996/97 | `swos-9697` | Sensible World of Soccer 96/97's team files | 133 (133) | 134 |
 | 1995/96 | `swos-9596` | Sensible World of Soccer 95/96's team files | 132 (132) | 134 |
 | 1994/95 | `swos-9495` | Sensible World of Soccer's team files (the original, v1.0) | 131 (131) | 134 |
 | 1993/94 | `cm0102-2020-11-cm93` | Cam F's fan-made 93/94 for CM 01/02 | 124 (77) | 130 |
@@ -1005,26 +1020,60 @@ without it ([football-year-permissions.md](football-year-permissions.md)).
   Retired players play for nobody; free agents and the "Minor Team", "Non League"
   and "Schoolboy" records for no club.
 
-### Sensible World of Soccer 96/97: 1996/97, nations only
+### Sensible World of Soccer 96/97: 1996/97
+
+Shipped 2026-11-08 with nations only, from a database of the game; read from the
+game's own team files, with its clubs, since 2026-11-14, when the user answered
+"Yes, both" to filling 1996/97's clubs and 1960/61.
 
 - **Source**: Sensible Software's SWOS 96/97 (1996; published by Renegade and GT
-  Interactive, now Codemasters'), its national teams' records as Whiteulver's
-  database holds them, in xflea's spreadsheet v1.1 (December 2018), as
-  keyser1884's [SWOS-MCP](https://github.com/keyser1884/SWOS-MCP) holds it
+  Interactive, now Codemasters'), its own team files as the SWOS United server
+  keeps them (`cern.swos.eu/data/amiga/9697/`, the server's only 96/97 edition):
+  the six national team files and the seven league files, read as 1994/95's and
+  1995/96's are ([below](#sensible-world-of-soccer-9495-and-9596-nations-and-clubs)),
+  fetched one at a time through `scripts/lib/polite-fetch.mjs` on 2026-11-13 (UTC,
+  the season's `retrieved`), pinned by bytes and SHA-256, and equal to the
+  research pass's copies of 2026-11-09. A SWOS United thread (2021) says some
+  minor nations' squads and nationalities in the game predate 1996.
+- **Until 2026-11-14** it was read from Whiteulver's database of the game, in
+  xflea's spreadsheet v1.1 (December 2018), as keyser1884's
+  [SWOS-MCP](https://github.com/keyser1884/SWOS-MCP) holds it
   (`swos_database.db`, commit `ac15d74`, 9 July 2025; MIT code, the game's data
-  not). Its Swedish club records equal the game's own team file (304 of 304
-  players), and its national squads gazchap's database (64 of 64 checked). A SWOS
-  United thread (2021) says some minor nations' squads and nationalities in the
-  game predate 1996.
-- **Nations only**, as FIFA 05 and 06: at club level 688 full names appear at two
-  clubs (Bierhoff at both Ascoli and Udinese), so the clubs are not one moment's.
-  Each nation plays its own national team record of sixteen, and its best XI by
-  SWOS's positions; a player's club records are not read.
-- **Kind `swos`** (`swos-<season>`, `nationsOnly`). A tuple is
+  not), nations only, as FIFA 05 and 06: at club level that database names 688
+  full names at two clubs across all its divisions (Bierhoff at both Ascoli and
+  Udinese), so its clubs were not one moment's. The game's seven league files
+  name 20 at two top-division clubs, mostly namesakes (Emerson at Middlesbrough,
+  St. Pauli and Belenenses), and Thomas Wolter twice at Werder Bremen, as 1994/95's
+  and 1995/96's do; each club keeps its own sixteen.
+- **The nations as before**: read from the files, every nation keeps the database
+  build's strength and squad size, and 127 of the 133 with players the same
+  eleven. Two names keep the apostrophe the database dropped (Jacinto D'Silva of
+  India, Bassem Shar'aa of Jordan), and four ties between players of one price
+  step fall to the files' order, a winger for a central midfielder (Brazil fields
+  Leonardo, not Dunga; Bolivia, Estonia and Iceland likewise). Steps 0 and 49 are
+  read as the database stored them (0 as 1, 49 as 48): 51 players, Shearer and
+  Maldini at 49, listed in the audit (`clamped`).
+- **Clubs**: the seven leagues' 134 top-division clubs (Premier League 20, La
+  Liga 22, Serie A 18, Bundesliga 18, Ligue 1 20, Eredivisie 18, Liga Portugal
+  18), each its own sixteen and best natural XI, on two Europe maps of their own
+  (`eu124s1997`, `eu32s1997`). Fourteen SWOS names are new to `SWOS_CLUBS`: thirteen
+  take the name other seasons give their club, so each keeps its id, colour and
+  crest (Derby County, Sunderland, Extremadura C.F., Hércules CF, Bologna, Perugia,
+  Hellas Verona FC, DSC Arminia Bielefeld, Olympique de Marseille, AS
+  Nancy-Lorraine, AZ Alkmaar, Rio Ave FC, and RCD Espanyol, which 96/97 spells
+  ESPANYOL and the earlier editions ESPANOL); SC Espinho, which no season had,
+  takes a new one, and needs no ground row (it is not among the strongest 124).
+  The squads are of the summer of 1996: Shearer at Newcastle, Zidane at Juventus,
+  Ronaldo at Barcelona, Ravanelli at Middlesbrough, Vialli at Chelsea, Zola still
+  at Parma. Milan (89), Barcelona (86), Juventus and Manchester United (85) are
+  the strongest.
+- **Kind `swos`** (`swos-<season>`). A tuple is
   `[swosId, name, 0, value, position, nationality, '', '', skills]`
   (`src/data/swosPlayers.js`): a CM tuple's layout, whose full name, club and
-  date of birth SWOS's national records do not have, plus the seven skill digits.
-  `swosId` is the database's row id; `nationality` its national team's name.
+  date of birth SWOS's records do not have, plus the seven skill digits.
+  `swosId` is the player's file id (`swosFileId`, below; the database's row id
+  until 2026-11-14); `nationality` his national team's name, or a club player's
+  SWOS code.
 - **Rating**: SWOS rates no player overall. Each has a price, one of 50 value
   steps (1 = 25K … 48 = 15M; 49 = 16M is unused). An outfield player's step is
   the sum of his seven skills, 0–7 each (passing, velocity, heading, tackling,
@@ -1058,7 +1107,9 @@ without it ([football-year-permissions.md](football-year-permissions.md)).
 Decided 2026-11-09 by Claude, under the user's request to cover every missing
 season, and approved by the user with the release of 2026-11-10: both seasons ship, with their nations
 and their clubs on four Europe maps; 1995/96 is SWOS 95/96's launch edition, not
-its European Championship Edition; SWOS 96/97 stays as it is, nations only.
+its European Championship Edition; SWOS 96/97 stayed as it was, nations only, until
+2026-11-14, when it was read the same way, with its clubs
+([above](#sensible-world-of-soccer-9697-199697)).
 
 - **Source**: Sensible Software's Sensible World of Soccer, the original game
   (`swos-9495`, v1.0, whose READ.ME is Sensible Software's note of Christmas 1994;
@@ -1084,7 +1135,7 @@ its European Championship Edition; SWOS 96/97 stays as it is, nations only.
   the file's number, the team's place and his slot (`swosFileId`: 80,001 is the
   first player of TEAM.008's first team).
 - **Read as 96/97 is**: SWOS 96/97's own files, read the same way, agree with the
-  shipped 96/97 database for 1,441 of its 1,463 national players; the other 22 are
+  96/97 database (1996/97's source until 2026-11-14) for 1,441 of its 1,463 national players; the other 22 are
   that database's price step 0 stored as 25K, Maldini's and Shearer's step 49
   stored as 15M, and namesakes. So steps are read as that database stores them, 0
   as 1 and 49 as 48: 63 players in 1994/95 (Roberto Baggio and Romário at 49,
@@ -1128,8 +1179,9 @@ its European Championship Edition; SWOS 96/97 stays as it is, nations only.
   Uerdingen 05, FC Martigues, FC Gueugnon, FC Tirsense, FC Felgueiras and Sporting
   Clube Campomaiorense (which needs no ground row: it is never among a season's
   strongest 124).
-- **Kind `swos`**: `nationsOnly` names `swos-9697` alone, and the manifest's
-  `reader: 'swos-files'` builds these two (`scripts/build-retro-seasons.mjs`).
+- **Kind `swos`**: no SWOS season has nations only since 2026-11-14 (`nationsOnly`
+  named `swos-9697` until then), and the manifest's `reader: 'swos-files'` builds
+  all three (`scripts/build-retro-seasons.mjs`; its database reader is gone).
 - **Spot check against history** (2026-11-09): 1994/95 has Klinsmann at Tottenham,
   Cantona at Manchester United, Romário at Barcelona, Baggio at Juventus, Weah at
   Paris Saint-Germain and Gullit at Sampdoria; 1995/96 Klinsmann at Bayern, Baggio
@@ -1469,8 +1521,23 @@ start and end years, caps and goals), which the World Cup seasons left out; the
 Elo is read on 1 July of the season's end year; the XI is the players with the
 most caps a year. Each season is a data set of `kind: 'nt'`, nations only,
 labelled "Computed · national teams", which the Season list shows as "1971/72 ·
-computed". With them, men's football has a season ending in every year from 1962
+computed". With them, men's football has a season ending in every year from 1961
 to 2027.
+
+1960/61 (`nt-1961`), the season before the first computed World Cup, was added on
+2026-11-14, when the user answered "Yes, both" to filling it and 1996/97's clubs.
+It is computed the same way: the Wikidata answers already held its stints (the
+queries have no lower date bound), its Elo is that of 1 July 1961, and its XIs are
+ordered by the Ballon d'Or votes of 1960 and 1961 (1960's page saved 2026-11-14;
+Gert Dörfel's vote of 1961 links a redirect, so it is pinned to his Wikidata item
+as three others are). `FIRST_YEAR` became 1961, and the federations table reaches
+its cutoff ([Federations of the day](#federations-of-the-day-196061-to-199596)):
+Cameroon, Guinea, Jamaica and Somalia, FIFA members from 1962, sit it out, and
+Syria is the United Arab Republic's (Egypt fields no team, so its land is
+neutral). Its squads are the players of the day: Pelé, Garrincha, Didi and Nílton
+Santos for Brazil, Di Stéfano and Gento for Spain, Sívori (the Ballon d'Or of
+1961) for Italy, Yashin for the Soviet Union, Haynes, Charlton and Greaves for
+England, Masopust for Czechoslovakia.
 
 | Season | Id | Nations fielded | Identities | Theatres | Strongest (T) | Team share |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -1498,6 +1565,7 @@ to 2027.
 | 1964/65 | `nt-1965` | 38 | the same | World, Europe, South America, Elite 32 | Soviet Union 87, Brazil 86.5, Hungary 86.4 | 75% |
 | 1963/64 | `nt-1964` | 37 | the same | the same | Soviet Union 87, Argentina 86.3, Hungary 85.5 | 78% |
 | 1962/63 | `nt-1963` | 38 | the same | the same | Soviet Union 87, Hungary 86.2, Brazil 85.4 | 76% |
+| 1960/61 | `nt-1961` | 39 | the same | the same | Brazil 87, Hungary 83.8, Argentina 83.5 | 80% |
 
 They field far more nations than the World Cups (37 to 81 against 15 to 24), so
 they offer the Elite 32 and, from 1966/67, more continents. East Germany fields its
@@ -1509,7 +1577,7 @@ side in every one up to 1988/89, on its own land of the day.
 | --- | --- | --- | --- |
 | Wikidata, through QLever (`https://qlever.dev/api/wikidata`) | four answers by SHA-256, saved 2026-11-13 | The men's national teams (instances of Q135408445); their players' memberships (P54) with start (P580), end (P582), matches played (P1350) and goals (P1351); the players' names, dates of birth, English Wikipedia articles and positions (P413) | CC0 1.0 |
 | [martj42/international_results](https://github.com/martj42/international_results), `results.csv` | the World Cup seasons' commit `b0948cb` | Every men's full international to 1993, for the Elo | CC0-1.0 |
-| English Wikipedia, "<year> Ballon d'Or" | 32 revisions, 1962–1993 (the World Cup seasons' 16, and 16 saved 2026-11-13) | The voting tables: points per player | CC BY-SA 4.0 (the votes are France Football's) |
+| English Wikipedia, "<year> Ballon d'Or" | 34 revisions, 1960–1993 (the World Cup seasons' 17, 16 saved 2026-11-13 and 1960's saved 2026-11-14) | The voting tables: points per player | CC BY-SA 4.0 (the votes are France Football's) |
 
 The Wikidata Query Service and Wikidata's API are disallowed for every agent by
 their robots.txt, so the queries go to QLever (no robots.txt), one at a time a
@@ -2046,8 +2114,8 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
     eleven rated players start short-handed.
   - Picking a set loads it, with the same loading, error and Retry block as a
     country map, and Launch waits for it.
-  - A season with nations only (2005/06, 2004/05, 1996/97, 1989/90 and the World
-    Cups) takes Nations when chosen, and choosing Clubs goes back to the built-in
+  - A season with nations only (2005/06, 2004/05, 1989/90 and the computed
+    seasons) takes Nations when chosen, and choosing Clubs goes back to the built-in
     season. With no Europe maps it keeps the plain theatre (`all` or `elite`), so
     Clubs opens on the built-in season's map of it. A challenge link that asks
     for clubs with such a season has its `teams` ignored.
@@ -2149,8 +2217,15 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
   archive.org, which can go dark; the pinned SHA-256 and MD5 digests let any copy
   of the same CD feed the build (`--image`). CM 00/01 is the UK release-day
   database, a few transfers short of SI's later European pressing.
-- 2005/06, 2004/05, 1996/97 and 1989/90 have no clubs, and a local CM 01/02
-  database is the only way to clubs in 2005/06 and 2004/05.
+- 2005/06, 2004/05 and 1989/90 have no clubs (1996/97 has had them since
+  2026-11-14), and a local CM 01/02 database is the only way to clubs in 2005/06
+  and 2004/05.
+- The period crests (`src/data/clubCrestEras.js`, [period-marks.md](period-marks.md))
+  were researched before 1996/97 had clubs. 57 of its 134 clubs have an era
+  covering it; the clubs no neighbouring season has (Bologna, Sunderland, Hércules,
+  Hellas Verona, AZ, SC Espinho) have none, and Marseille, Derby County and Arminia
+  Bielefeld have eras only from 1997/98: in 1996/97 all of them show today's crest,
+  as an unresearched club-season does, until the crest research covers it.
 - 1993/94 and 1989/90 rate as their makers rated, fans, not as any game's maker
   did, and 1993/94 keeps CM 01/02's league sizes (a 20-club Premier League, an
   18-club French First Division). Simon Treanor's 1989/90 is a beta whose readme
@@ -2254,7 +2329,7 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
   alone: Asian and North American sides rate higher than SWOS's ratings of autumn
   1994 put them, and the scale is narrower than eloratings.net's.
 - East Germany fields its 1974 finalists on its land of the day (until 2026-11-10 it had no shape, and 1973/74 had 15).
-- The computed national-team seasons (1962/63 to 1992/93) know a player's years
+- The computed national-team seasons (1960/61, and 1962/63 to 1992/93) know a player's years
   for his national team and his caps in all, not the matches of the season: his
   figure is his career's caps a year, so a player who was capped once in a
   season inside a long career counts as a regular, and the XI is the regulars of

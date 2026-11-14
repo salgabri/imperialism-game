@@ -158,10 +158,10 @@ test('the Season choice offers the built-in season, then every earlier season bu
       assert.equal(seasonPicker(document).tagName, 'SELECT', 'the seasons are a dropdown');
       assert.equal(seasonPicker(document).getAttribute('aria-labelledby'), 'setup-season-label');
       assert.deepEqual(seasonNames(document), ['2026/27', ...EARLIER_NAMES]);
-      assert.deepEqual(seasonNames(document).slice(-3), ['1963/64 · computed', '1962/63 · computed', '1961/62 · computed'],
+      assert.deepEqual(seasonNames(document).slice(-3), ['1962/63 · computed', '1961/62 · computed', '1960/61 · computed'],
         'a computed season says so on screen, not only in the note');
       assert.deepEqual(EARLIER.slice(0, 3), ['2025/26', '2024/25', '2023/24'], 'the last built-in season, then the earlier ones');
-      assert.equal(EARLIER.at(-1), '1961/62', 'back to the 1962 World Cup, computed');
+      assert.equal(EARLIER.at(-1), '1960/61', 'back to 1960/61, computed');
       assert.equal(seasonPicker(document).selectedIndex, 0, 'the built-in season by default');
       assert.equal(seasonPicker(document).value, '');
       assert.match(document.getElementById('setup-season-note').textContent, /Earlier seasons use EA FIFA ratings/);
@@ -634,10 +634,10 @@ test('a season with nations only takes the nations, and choosing clubs goes back
       '1989/90', '1989/90'],
       'the earliest seasons: two of 1993/94 and of 1989/90 (a fan\'s database and a computed World Cup), and every year between computed');
     const before = EARLIER.filter(season => season < '1989/90');
-    assert.equal(before.length, 1989 - 1961, 'a season for every year back to 1961/62, computed');
-    assert.deepEqual(before.slice(-7), ['1967/68', '1966/67', '1965/66', '1964/65', '1963/64', '1962/63', '1961/62']);
-    assert.match(modelOf().season.note, /2005\/06, 2004\/05, 1996\/97 and 1989\/90 have nations only/);
-    assert.match(modelOf().season.note, /The World Cups of 1961\/62 to 1993\/94 and the seasons between them are computed and have nations only/);
+    assert.equal(before.length, 1989 - 1960, 'a season for every year back to 1960/61, computed');
+    assert.deepEqual(before.slice(-7), ['1966/67', '1965/66', '1964/65', '1963/64', '1962/63', '1961/62', '1960/61']);
+    assert.match(modelOf().season.note, /2005\/06, 2004\/05 and 1989\/90 have nations only/);
+    assert.match(modelOf().season.note, /1960\/61, the World Cups of 1961\/62 to 1993\/94 and the seasons between them are computed and have nations only/);
 
     // From clubs: the season takes the nations. It has no maps of Europe, so the theatre is kept as the plain elite
     // for when clubs come back.

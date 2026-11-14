@@ -127,7 +127,10 @@ seasons do the same since 2026-11-13 (`FEDERATIONS` in `scripts/lib/nhl-seasons.
 player born in Slovakia plays for Czechoslovakia to 1991/92, one born in another Soviet republic for the Soviet Union to
 1990/91 and the CIS in 1991/92, and the federation holds its members' land where it fields a real side, so the 1980s'
 seasons field Czechoslovakia and 1989/90 and 1990/91 the Soviet Union ([hockey.md](hockey.md), "Federations of the day"). Football's seasons from
-1996/97 hold Montenegro in Serbia's empire, as FR Yugoslavia did. The South Vietnam and United Arab Republic flags are
+1996/97 hold Montenegro in Serbia's empire, as FR Yugoslavia did. Football's to 1995/96 carry their federations of the day
+in their own files, the United Arab Republic among them since 2026-11-14 (Egypt holding Syria in 1960/61, alone to 1970/71:
+[football-years.md](football-years.md#federations-of-the-day-196061-to-199596)), so the table lists it for tennis only.
+The South Vietnam and United Arab Republic flags are
 new (Commons, public domain: PD-ineligible and PD-Egypt), redrawn as the others.
 
 ## Known gaps

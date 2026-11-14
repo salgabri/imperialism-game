@@ -1104,9 +1104,10 @@ strongest first: 20 clubs each from England and Spain, 19 Italy, 16 Germany, 15 
 6 the Netherlands, 4 each from Portugal, Turkey, Belgium and Greece, 3 Czechia, 2 each
 from Denmark, Ukraine and Scotland, and one each from Norway, Croatia and Bulgaria.
 The strongest `ELITE_CLUBS` (32) are the elite. An earlier season's file holds the
-seven big leagues only, and its two fields are the strongest of those. FIFA 06, FIFA 05,
-SWOS 96/97 and Simon Treanor's fan-made 1989/90 (2005/06, 2004/05, 1996/97, 1989/90) and
-the nine computed World Cups (1961/62 to 1993/94) have nations only, so they have no maps.
+seven big leagues only, and its two fields are the strongest of those. FIFA 06, FIFA 05
+and Simon Treanor's fan-made 1989/90 (2005/06, 2004/05, 1989/90) and the computed seasons
+(1960/61 to 1993/94) have nations only, so they have no maps; SWOS 96/97 has had its clubs,
+and its two maps, since 2026-11-14.
 
 **Build** (`npm run build:europe-maps`, `scripts/build-europe-maps.mjs`, about 8 minutes;
 `--only=eu124,eu32`, `--check`, `--dry-run`, `--boundaries=<dir>` for another boundary cache).
@@ -1196,7 +1197,7 @@ its old name ("All Leagues"). "Another team" after a defeat there opens on the m
 replaced it. An old link's `theatre=Premier+League` is reported as not offered.
 A CM 01/02 set built on this computer has no maps, so it plays the two theatres on the
 world, dealt by `seedClubs` as all clubs once were. A season with nations only (FIFA 05,
-FIFA 06, SWOS 96/97, 1989/90, the World Cups) has no clubs to play: it keeps the plain
+FIFA 06, 1989/90, the computed seasons) has no clubs to play: it keeps the plain
 theatre, `all` or `elite`, and choosing clubs goes back to the built-in season and its map.
 
 **Checks**: `scripts/europe-maps.test.mjs`: index, files, fields and hashes; each club's
