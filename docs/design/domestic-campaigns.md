@@ -1040,19 +1040,41 @@ territory; Victoria, the ACT and Auckland are one club's, Cairns the Cowboys', W
 seeded duel campaigns reach a champion across the Tasman; the App launches on the map. `scripts/club-maps.test.mjs`
 holds it to the state rule with towns of each state and region. The smoke runs an NRL duel.
 
-**Era maps** (2026-11-08, 2026-11-09 and 2026-11-13): the earlier seasons ([rugby-league.md](rugby-league.md#earlier-seasons))
-play on maps of their day, built by the same command from `teams` and `maps` in `scripts/data/rugby-league-seasons.json`,
-14 to 20 clubs each, about 134 KB. Rules R1–R3 decide when a ground change makes a new map: a club keeps its own ground while
-it is rebuilt (R1), COVID-19 relocations are ignored (R2), and a rename on the same site does not split a map (R3). For
-1998–2007 ([rugby-league.md](rugby-league.md#computed-seasons-19982007)) a club plays at the ground of most of its home
-games that season, by NRL.com's draw (level counts keep the season before's), named as it was then from English
-Wikipedia's articles at pinned revisions. The clubs no club of today's continues (the manifest's `defunct`: the Adelaide
-Rams, Balmain, the Gold Coast Chargers, Illawarra, North Sydney, the Northern Eagles and Western Suburbs) keep their own
-ids and rank after today's clubs, so section ids still follow one order; `nrlSpecs` refuses any other club that is no
-franchise of today's.
+**Era maps** (2026-11-08, 2026-11-09, 2026-11-13 and 2026-11-14): the earlier seasons
+([rugby-league.md](rugby-league.md#earlier-seasons)) play on maps of their day, built by the same command from `teams`
+and `maps` in `scripts/data/rugby-league-seasons.json`, 10 to 20 clubs each, about 134 KB. Rules R1–R3 decide when a
+ground change makes a new map: a club keeps its own ground while it is rebuilt (R1), COVID-19 relocations are ignored
+(R2), and a rename on the same site does not split a map (R3). For 1998–2007
+([rugby-league.md](rugby-league.md#computed-seasons-19982007)) a club plays at the ground of most of its home games that
+season, by NRL.com's draw (level counts keep the season before's), named as it was then from English Wikipedia's articles
+at pinned revisions; for 1960–1997 ([rugby-league.md](rugby-league.md#computed-seasons-19601997)) by the Rugby League
+Project's results the same way, leaving out the games the league staged at the SCG and the Sydney Sports Ground before
+1988 (but Eastern Suburbs' at the Sports Ground, its own). The clubs no club of today's continues (the manifest's
+`defunct`: the Adelaide Rams, Balmain, the Gold Coast Chargers, Illawarra, North Sydney, the Northern Eagles, Western
+Suburbs, Newtown, the South Queensland Crushers, the Western Reds and the Hunter Mariners) keep their own ids and rank
+after today's clubs, so section ids still follow one order; `nrlSpecs` refuses any other club that is no franchise of
+today's. A season is keyed by its year, but Super League's 1997, which ran beside the ARL's, by its id (`nrl-sl-1997`).
 
 | Map | Seasons | Grounds and bases that set it apart |
 | --- | --- | --- |
+| `nrl1960` | 1960–1966 | the NSWRFL's ten, all of them Sydney's: New South Wales split among them, every other state empty; Western Suburbs at Pratten Park, Parramatta at Cumberland Oval, Eastern Suburbs at the Sydney Sports Ground |
+| `nrl1967` | 1967 | twelve: Cronulla-Sutherland (Sutherland Oval) and Penrith; Western Suburbs at Lidcombe Oval |
+| `nrl1968` | 1968–1970 | Cronulla-Sutherland at Endeavour Field |
+| `nrl1971` | 1971–1972 | Balmain at Eastern Suburbs' Sports Ground, growing from Leichhardt Oval |
+| `nrl1973` | 1973–1976 | the Newtown Jets; Balmain back at Leichhardt |
+| `nrl1977` | 1977 | Eastern Suburbs at the SCG |
+| `nrl1978` | 1978–1981 | the Canterbury-Bankstown Bulldogs |
+| `nrl1982` | 1982–1983 | fourteen: Canberra at Seiffert Oval in Queanbeyan, so a corner of New South Wales and no Territory; Illawarra at Wollongong; Parramatta keeps Cumberland Oval's site while it is rebuilt (R1) |
+| `nrl1984` | 1984–1986 | thirteen, without Newtown; St. George keeps Kogarah while it is rebuilt (R1) |
+| `nrl1987` | 1987 | Western Suburbs at Campbelltown; Eastern Suburbs keeps the Sports Ground's site, rebuilt as the Sydney Football Stadium (R1) |
+| `nrl1988` | 1988–1989 | sixteen: the Broncos at Lang Park, the Gold Coast-Tweed Giants at Tweed Heads (New South Wales), the Newcastle Knights; the Rabbitohs from Redfern Oval |
+| `nrl1990` | 1990 | Eastern Suburbs at Henson Park, the Rabbitohs alone at the Sydney Football Stadium; Canberra at Bruce Stadium, the Territory theirs |
+| `nrl1991` | 1991–1992 | Eastern Suburbs back at the Sydney Football Stadium |
+| `nrl1993` | 1993–1994 | the Broncos at ANZ Stadium |
+| `nrl1995` | 1995 | the ARL's twenty: Auckland, North Queensland, the South Queensland Crushers (Lang Park), the Western Reds (the WACA); the Sydney Bulldogs and Sydney Tigers at Parramatta Stadium, from Belmore and Leichhardt |
+| `nrl1996` | 1996 | the Canterbury Bulldogs back at Belmore; the Gold Coast Chargers at Carrara |
+| `nrl1997` | 1997 | the ARL's twelve: no Brisbane, Canberra, Canterbury, Cronulla, Penrith, Auckland, North Queensland or Perth |
+| `sl1997` | Super League 1997 | Super League's ten: the Adelaide Rams hold South Australia, the Perth Reds Western Australia, the Hunter Mariners (Topper Stadium) the Hunter, the Warriors Auckland |
 | `nrl1998` | 1998 | twenty clubs, thirteen in New South Wales: St. George (Kogarah) and Illawarra (Wollongong) apart, the Adelaide Rams holding South Australia, the Gold Coast Chargers, the North Sydney Bears, Balmain (Leichhardt) and Western Suburbs (Campbelltown); Canterbury at Belmore |
 | `nrl1999` | 1999 | seventeen: the St. George Illawarra Dragons at Wollongong; Canterbury at Stadium Australia, which cuts the City of Parramatta with the Eels |
 | `nrl2000` | 2000 | fourteen: the Wests Tigers from Concord Oval, the Northern Eagles at Gosford, no South Sydney |
@@ -1072,7 +1094,9 @@ follow the same order on every map. `scripts/rugby-league-seasons.test.mjs` chec
 the Bulldogs and the Eels only while the Bulldogs were at Olympic Park or Homebush), Redcliffe (the Broncos' until the
 Dolphins came), each era's Rabbitohs, and on the maps of 1998–2007 that every club holds the point it grows from, South
 Australia the Rams' in 1998 alone, St. George and Illawarra apart in 1998 only, and the Northern Eagles at Gosford, then
-Brookvale.
+Brookvale; on the eighteen of 1960–1997 the same of every club (or, its ground on an estuary the simplified coast leaves
+out, Seagulls Stadium on the Tweed, the section of its town), Sydney's clubs alone until 1982, the Territory empty until
+Canberra moved to Bruce Stadium in 1990, and Super League's clubs in Perth, Adelaide, the Hunter and Auckland.
 
 ## The NWSL map
 

@@ -18,8 +18,9 @@
 //
 // The computed seasons (1998–2007 and 2009–2024, `method` "computed"; docs/design/rugby-league.md, "Computed seasons")
 // are built the same way from their snapshots: every player NRL.com shows taking the field for the club that season, at
-// the overall computed from his match stats and his club's shift. Clubs only, as 2008; the clubs of 1998–2007 that no
-// club of today's continues (the manifest's `defunct`) play in colours of their own.
+// the overall computed from his match stats and his club's shift. So are the seasons before 1998 (`basis` "selection",
+// 1960–1997, two in 1997), from the Rugby League Project's lists of who started, where and how often, and his tries.
+// Clubs only, as 2008; the clubs that no club of today's continues (the manifest's `defunct`) play in colours of their own.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -27,7 +28,7 @@ import path from 'node:path';
 import { CLUBS } from '../src/data/clubs.rugby-league.js';
 import { contentHash, serializeFootballSet } from '../src/data/footballSetBuild.js';
 import { colourFor } from './lib/club-identity.mjs';
-import { clubSquadOf, mapOf, nationSquadOf, playSeasons, spearman, teamsOf } from './lib/rugby-league-seasons.mjs';
+import { clubSquadOf, mapOf, nationSquadOf, playSeasons, seasonKeyOf, spearman, teamsOf } from './lib/rugby-league-seasons.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const outDir = path.join(root, 'public/rugby-league');
@@ -124,9 +125,10 @@ function buildSeason(entry, snapshot, manifest) {
   return { doc, text: serializeFootballSet(doc), audit };
 }
 
-/** Computed season `entry` of the manifest (1998–2007, 2009–2024): its data set document and its audit row. */
+/** Computed season `entry` of the manifest (1960–2007, 2009–2024): its data set document and its audit row. */
 function buildComputedSeason(entry, snapshot, manifest) {
   const { id, year } = entry;
+  const key = seasonKeyOf(entry);
   if (snapshot.source.id !== id || snapshot.source.method !== 'computed') throw new Error(`scripts/data/rugby-league-seasons/${id}.json is not ${id}'s computed snapshot`);
   // A player plays at his computed overall moved by his club's shift, held to 1–99.
   const players = snapshot.players.map(([nrlId, name, club, pos, how, games, , , , value, overall, shift]) => {
@@ -138,7 +140,7 @@ function buildComputedSeason(entry, snapshot, manifest) {
   // which no club of today's continues (the manifest's `defunct`), in a colour of its own, as the NHL's Seals do.
   const defunct = new Set(manifest.defunct ?? []);
   const colours = new Map([...CLUBS.map(club => [club.id, club.col]), ...[...defunct].map(club => [club, colourFor(club)])]);
-  const clubs = teamsOf(manifest, year).map(team => {
+  const clubs = teamsOf(manifest, key).map(team => {
     const row = snapshot.clubs.find(club => club.id === team.id);
     if (!row) throw new Error(`${id}: the snapshot has no ${team.name}`);
     const pool = players.filter(p => p.club === team.id);
@@ -155,7 +157,7 @@ function buildComputedSeason(entry, snapshot, manifest) {
     format: 1, kind: 'nrl', id, version: '', year, season: String(year), label: entry.label, local: false,
     source: { provider: entry.provider, edition: entry.edition, compiler: entry.compiler, url: entry.url, retrieved: entry.retrieved, method: 'computed',
       metric: snapshot.conversion.metric, conversion: snapshot.conversion.formula },
-    map: mapOf(manifest, year),
+    map: mapOf(manifest, key),
     clubs: clubs.map(c => ({ id: c.id, name: c.name, code: c.code, league: 'NRL', country: c.country, col: c.col, str: c.str, squad: c.squad.map(tupleOf) })),
     coverage: { players: players.length, clubs: clubs.length, left: snapshot.left.length },
   };
@@ -192,7 +194,8 @@ function buildComputedSeason(entry, snapshot, manifest) {
       Math.round(spearman(clubs.map(value), clubs.map(wins)) * 1000) / 1000])),
     placedByRlp: snapshot.players.filter(row => row[4] === 'RLP').map(([nrlId, name, club, pos]) => `${club}: ${name}: ${pos} (RLP ${snapshot.rlp[nrlId]})`),
     left: snapshot.left.map(([, name, club, games, reason]) => `${club}: ${name} (${games} game${games === 1 ? '' : 's'}): ${reason}`),
-    conversion: { core: snapshot.conversion.core.weights, previous: snapshot.conversion.previous, quota: snapshot.conversion.quota },
+    conversion: { ...(snapshot.conversion.core ? { core: snapshot.conversion.core.weights } : { selection: snapshot.conversion.selection }),
+      previous: snapshot.conversion.previous, quota: snapshot.conversion.quota },
     real: snapshot.real.figures,
   };
   return { doc, text: serializeFootballSet(doc), audit };
@@ -202,7 +205,9 @@ function listingModule(docs) {
   const rows = docs.map(doc => `  Object.freeze({ id: '${doc.id}', version: '${doc.version}', year: ${doc.year}, season: '${doc.season}', label: '${doc.label}', map: '${doc.map}' }),`);
   return `// GENERATED by scripts/build-rugby-league-seasons.mjs; do not edit.
 // The built-in earlier rugby league seasons, newest first: each NRL season's clubs, 2008's overalls converted from Rugby
-// League 2's attributes, 1998–2007's and 2009–2024's computed from NRL.com's match stats. Each is
+// League 2's attributes, 1998–2007's and 2009–2024's computed from NRL.com's match stats, and the premierships before
+// (1960–1997, the NSWRFL's, the NSWRL's and the ARL's, and Super League's of 1997) from the Rugby League Project's
+// lists of who started, where and how often. Each is
 // public/rugby-league/<id>.json, loaded when a setup chooses it (src/engine/footballSets.js), and its clubs play on their
 // era's map (\`map\`, public/domestic/<map>.json).
 export const BUILT_IN_RUGBY_LEAGUE_SEASONS = Object.freeze([
@@ -247,7 +252,8 @@ async function main() {
     const snapshot = JSON.parse(await readFile(file, 'utf8'));
     results.push({ ...(entry.method === 'computed' ? buildComputedSeason : buildSeason)(entry, snapshot, manifest), snapshot });
   }
-  results.sort((a, b) => b.doc.year - a.doc.year);
+  // Newest first; a year with two seasons (1997, the ARL's and Super League's) in id order.
+  results.sort((a, b) => b.doc.year - a.doc.year || a.doc.id.localeCompare(b.doc.id));
   for (const { doc, text, audit } of results) {
     const played = `(${audit.ratings.played.lowest}-${audit.ratings.played.highest}, median ${audit.ratings.played.median}), ${Math.round(Buffer.byteLength(text) / 1024)} KB`;
     console.log(audit.method === 'computed'

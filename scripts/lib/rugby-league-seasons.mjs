@@ -212,9 +212,10 @@ export function rlpPlayer(html) {
 }
 
 /**
- * A season's games from its results page: `[{ competition, round, home, away, homeScore, awayScore }]`, the clubs by
- * RLP's slug for the season ('melbourne', 'bulldogs' …), the regular season's rounds as 'Round 1' … and the finals by
- * name.
+ * A season's games from its results page: `[{ competition, round, home, away, homeScore, awayScore, venue }]`, the clubs
+ * by RLP's slug for the season ('melbourne', 'bulldogs' …), the regular season's rounds as 'Round 1' … and the finals by
+ * name, `venue` RLP's `[id, name]` of the ground (null where it names none). A page that heads its rounds' games by month
+ * as well ("March 1997", Super League's) reads the same: a month is no round.
  */
 export function rlpResults(html) {
   const games = [];
@@ -223,12 +224,204 @@ export function rlpResults(html) {
     const heading = row.match(/<h3[^>]*><a href="[^"]*">([^<]*)<\/a><\/h3>/);
     if (heading) { competition = decode(heading[1]).trim(); continue; }
     const roundHead = row.match(/^<th colspan="\d+">(?:<a [^>]*>)?([^<]+)/);
-    if (roundHead) { round = decode(roundHead[1]).trim(); continue; }
-    const teams = [...row.matchAll(/<td class="team"><a href="\/seasons\/[^/]+\/([^/]+)\/summary\.html">[^<]*<\/a><\/td><td class="n">(\d+)<\/td>/g)];
+    if (roundHead) {
+      const name = decode(roundHead[1]).trim();
+      if (!new RegExp(`^(${MONTHS.join('|')}) \\d{4}$`).test(name)) round = name;
+      continue;
+    }
+    const teams = [...row.matchAll(/<td(?: class="(?:team|pad)")?><a href="\/seasons\/[^/]+\/([^/]+)\/summary\.html">[^<]*<\/a><\/td><td class="(?:pad )?n">(\d+)<\/td>/g)];
     if (teams.length !== 2) continue;
-    games.push({ competition, round, home: teams[0][1], away: teams[1][1], homeScore: Number(teams[0][2]), awayScore: Number(teams[1][2]) });
+    const venue = row.match(/<a href="\/venues\/(\d+)">([^<]*)<\/a>/);
+    games.push({ competition, round, home: teams[0][1], away: teams[1][1], homeScore: Number(teams[0][2]), awayScore: Number(teams[1][2]),
+      venue: venue ? [Number(venue[1]), decode(venue[2]).trim()] : null });
   }
   return games;
+}
+
+// ---------- the Rugby League Project's season lists (the seasons before 1998) ----------
+
+/** A season's or a competition's players page: its "All Players" table, the part read and pinned. */
+export const listPart = html => between(html, '<table class="list x">', '</table>', 'players table');
+
+/**
+ * A representative competition's players page: its "All Players" table, or, for a competition of one match (NSW City v
+ * Country, the 1980 and 1981 State of Origin, Super League's Anzac Test), which RLP shows as that match, the match's
+ * team lists.
+ */
+export const representativePart = html => (html.includes('<table class="list x">') ? listPart(html)
+  : between(html, '<tbody id="match_teams">', '</tbody>', 'team lists'));
+
+/**
+ * Each player's games in a representative series that RLP shows by squads (the interstate series, State of Origin from
+ * 1982): a squad table's "App" column, summed over the squads he is in.
+ */
+export function rlpSquadGames(html) {
+  const games = new Map();
+  for (const table of squadsPart(html).split('<h3>').slice(1)) {
+    const head = table.match(/<tr><th colspan="2">Player<\/th>((?:<th[^>]*>[^<]*<\/th>)+)<\/tr>/);
+    if (!head) throw new Error("RLP's squad has no Player and App columns");
+    const app = [...head[1].matchAll(/<th[^>]*>([^<]*)<\/th>/g)].map(m => m[1]).indexOf('App');
+    if (app < 0) throw new Error("RLP's squad has no App column");
+    for (const row of table.matchAll(/<tr><td[^>]*colspan="2"><a href="\/players\/(\d+)">[^<]*<\/a><\/td>((?:<td[^>]*>[^<]*<\/td>)+)<\/tr>/g)) {
+      const cells = [...row[2].matchAll(/<td[^>]*>([^<]*)<\/td>/g)].map(m => m[1].trim());
+      const n = cells[app] === '-' ? 0 : Number(cells[app]);
+      if (!Number.isInteger(n)) throw new Error(`RLP's squad: unreadable App for player ${row[1]}`);
+      if (n) games.set(Number(row[1]), (games.get(Number(row[1])) ?? 0) + n);
+    }
+  }
+  if (!games.size) throw new Error("RLP's squads list nobody");
+  return games;
+}
+
+/** Each player's games in a representative competition (representativePart): his games in its table, or 1 in its one match. */
+export function rlpRepresentative(html) {
+  if (html.includes('<table class="list x">')) return new Map(rlpSeasonList(html).map(player => [player.id, player.games]));
+  const ids = [...representativePart(html).matchAll(/<a href="\/players\/(\d+)">/g)].map(m => Number(m[1]));
+  if (!ids.length) throw new Error("RLP's match lists nobody");
+  return new Map([...new Set(ids)].map(id => [id, 1]));
+}
+
+/** The positions a season's players list counts starts at ("FB-12, W-3, B-2", B the bench), as the game's. */
+export const RLP_LIST_POSITION = Object.freeze({ FB: 'FB', W: 'WG', C: 'CE', FE: 'FE', HB: 'HB', FR: 'PR', HK: 'HK', '2R': 'SR', L: 'LK' });
+
+/**
+ * A surname as RLP's lists print it, in capitals but for a Mc or Mac ("BEETSON", "McARTHUR", "O'CONNOR", "ADDO-CARR"), as
+ * it is written: Beetson, McArthur, O'Connor, Addo-Carr. A word in lower case already ("de", "van") stays as it is.
+ */
+export function rlpSurname(text) {
+  return decode(text).trim().split(/\s+/).map(word => {
+    if (word === word.toLowerCase()) return word;
+    const prefix = word.match(/^(Mc|Mac)(?=\p{Lu})/u)?.[0] ?? '';
+    return prefix + word.slice(prefix.length).toLowerCase().replace(/(^|['’-])(\p{L})/gu, (_, mark, letter) => mark + letter.toUpperCase());
+  }).join(' ');
+}
+
+/**
+ * A season's or a competition's players page, every row of its "All Players" table read by the table's own column heads
+ * (they vary: "Perc" from 1986): `[{ id, name, teams, positions, starts, interchange, games, won, lost, drawn, tries }]`,
+ * `teams` RLP's club or side codes with his games for each (`[['CBY', 13]]`, in RLP's order), `positions` his starts at
+ * each position (RLP's codes; `B` the bench, which is no start).
+ */
+export function rlpSeasonList(html) {
+  const part = listPart(html);
+  const cellsOf = row => row.split(/<t[dh]\b/).slice(1).map(cell => decode(cell.replace(/^[^>]*>/, '').replace(/<[^>]+>/g, ' ')
+    .replace(/&uarr;/g, ' ')).replace(/\s+/g, ' ').trim());
+  const head = cellsOf(part.slice(part.indexOf('<thead>'), part.indexOf('</thead>')).split('<tr>').at(-1));
+  const at = name => {
+    const index = head.indexOf(name);
+    if (index < 0) throw new Error(`RLP's players table has no ${name} column (it has ${head.join(', ')})`);
+    return index;
+  };
+  const column = Object.fromEntries(['Player', 'Team(s)', 'Position(s)', 'APP', 'INT', 'TOT', 'W', 'L', 'D', 'T'].map(name => [name, at(name)]));
+  const count = text => (text === '-' || text === '' ? 0 : /^\d+$/.test(text) ? Number(text) : NaN);
+  const pairs = text => (text ? text.split(',').map(item => {
+    const m = item.trim().match(/^(.+)-(\d+)$/);
+    if (!m) throw new Error(`RLP's ${JSON.stringify(text)} is no list of codes and counts`);
+    return [m[1], Number(m[2])];
+  }) : []);
+  const players = [];
+  for (const row of part.slice(part.indexOf('</thead>')).split('<tr>').slice(1)) {
+    const link = row.match(/^<td><a href="\/players\/(\d+)">([^<]*)<\/a>/);
+    if (!link) continue;
+    const cells = cellsOf(row);
+    const { first, last } = rlpListName(link[2]);
+    const player = { id: Number(link[1]), name: `${first} ${rlpSurname(last)}`, teams: pairs(cells[column['Team(s)']]),
+      positions: Object.fromEntries(pairs(cells[column['Position(s)']])), starts: count(cells[column.APP]), interchange: count(cells[column.INT]),
+      games: count(cells[column.TOT]), won: count(cells[column.W]), lost: count(cells[column.L]), drawn: count(cells[column.D]), tries: count(cells[column.T]) };
+    for (const key of ['starts', 'interchange', 'games', 'won', 'lost', 'drawn', 'tries']) {
+      if (!Number.isInteger(player[key])) throw new Error(`RLP's ${player.name} (${player.id}): unreadable ${key}`);
+    }
+    if (player.starts + player.interchange !== player.games || player.won + player.lost + player.drawn !== player.games) {
+      throw new Error(`RLP's ${player.name} (${player.id}): ${player.starts} starts and ${player.interchange} off the bench are not his ${player.games} games`);
+    }
+    for (const code of Object.keys(player.positions)) if (code !== 'B' && !Object.hasOwn(RLP_LIST_POSITION, code)) throw new Error(`RLP's position ${code} is no position of the game's`);
+    players.push(player);
+  }
+  if (!players.length) throw new Error("RLP's players table lists nobody");
+  return players;
+}
+
+/**
+ * Which club of a season each of RLP's club codes is: its slug in the season's results, by name (a code keeps one club
+ * throughout but for NEW, Newtown until 1983 and Newcastle from 1988).
+ */
+export const RLP_CLUB_CODES = Object.freeze({
+  ADL: /^adelaide-rams$/, BAL: /^(balmain-tigers|sydney-tigers)$/, BRI: /^brisbane-broncos$/, CAN: /^canberra-raiders$/,
+  CBY: /^(canterbury|canterbury-bankstown|sydney-bulldogs|canterbury-bulldogs)$/, CRO: /^cronulla$/, GLD: /^gold-coast(-tweed-heads|-chargers)?$/,
+  HUN: /^hunter-mariners$/, ILL: /^illawarra-steelers$/, MAN: /^manly-warringah-sea-eagles$/, NEW: /^(newtown|newtown-jets|newcastle-knights)$/,
+  NOR: /^north-sydney(-bears)?$/, NQL: /^north-queensland-cowboys$/, PAR: /^parramatta-eels$/, PEN: /^penrith-panthers$/,
+  PER: /^(western-reds|perth-reds)$/, SOU: /^south-sydney-rabbitohs$/, SQL: /^south-queensland-crushers$/, STG: /^st-george-dragons$/,
+  SYD: /^(eastern-suburbs|easts|sydney-city)$/, WAR: /^auckland$/, WES: /^western-suburbs-magpies$/,
+});
+
+/**
+ * Each club of a season's results (`games`, rlpResults) under RLP's code for it: `{ code: { slug, games, won, drawn, lost } }`.
+ * Every club must answer to exactly one code and every code to at most one club.
+ */
+export function clubsByCode(games) {
+  const slugs = [...new Set(games.flatMap(game => [game.home, game.away]))].sort();
+  const byCode = {};
+  for (const slug of slugs) {
+    const codes = Object.keys(RLP_CLUB_CODES).filter(code => RLP_CLUB_CODES[code].test(slug));
+    if (codes.length !== 1) throw new Error(`RLP's club ${slug} answers to ${codes.length ? codes.join(' and ') : 'no code'}`);
+    if (byCode[codes[0]]) throw new Error(`RLP's ${codes[0]} is both ${byCode[codes[0]].slug} and ${slug}`);
+    byCode[codes[0]] = { slug, games: 0, won: 0, drawn: 0, lost: 0 };
+  }
+  const codeOf = new Map(Object.entries(byCode).map(([code, club]) => [club.slug, code]));
+  for (const game of games) {
+    for (const [side, other, mine, theirs] of [[game.home, game.away, game.homeScore, game.awayScore], [game.away, game.home, game.awayScore, game.homeScore]]) {
+      const club = byCode[codeOf.get(side)];
+      club.games++;
+      club[mine > theirs ? 'won' : mine === theirs ? 'drawn' : 'lost']++;
+    }
+  }
+  return byCode;
+}
+
+/**
+ * The checks that a season's players list and its results tell of the same clubs: every code of the list is a club of
+ * the results, and a player of one club played no more games, and won, drew and lost no more, than his club did.
+ */
+export function checkListAgainstResults(players, byCode, season) {
+  for (const player of players) {
+    for (const [code] of player.teams) if (!byCode[code]) throw new Error(`${season}: RLP lists ${player.name} at ${code}, no club of its results`);
+    if (player.teams.length !== 1) continue;
+    const club = byCode[player.teams[0][0]];
+    if (player.games > club.games || player.won > club.won || player.drawn > club.drawn || player.lost > club.lost) {
+      throw new Error(`${season}: ${player.name}'s ${player.games} games (${player.won}–${player.drawn}–${player.lost}) do not fit ${club.slug}'s `
+        + `${club.games} (${club.won}–${club.drawn}–${club.lost})`);
+    }
+  }
+}
+
+/**
+ * How a season before 1998 values a player (docs/design/rugby-league.md, "Computed seasons, 1960–1997"): his selections,
+ * club starts and representative games (Tests, State of Origin or the interstate series, NSW City v Country), and his tries
+ * at `tryWeight` selections each at `tryRate` tries a team game (about 2025's: 4.01), scaled to his season's rate.
+ */
+export const SELECTION = Object.freeze({ tryWeight: 2, tryRate: 4 });
+
+/**
+ * A season-before-1998 player's value: (selections + 2 tries at today's rate) per club game, the season before at half
+ * weight (PREVIOUS_WEIGHT) when he played in it. `season` and `previous`: `{ selections, tries, tryRate, clubGames }`.
+ */
+export function selectionValue(season, previous = null) {
+  const points = part => part.selections + SELECTION.tryWeight * part.tries * SELECTION.tryRate / part.tryRate;
+  return seasonValue({ points: points(season), clubGames: season.clubGames }, previous ? { points: points(previous), clubGames: previous.clubGames } : null);
+}
+
+/**
+ * The position a player started at most over one season's list or more (each his `positions` there, RLP's codes, or null
+ * where he is not listed), as the game's; of two as often, the one nearer fullback (the lists say no more of the order).
+ * Null if he started at none.
+ */
+export function mostStartedListed(...seasons) {
+  const ORDER_OF = ['FB', 'WG', 'CE', 'FE', 'HB', 'HK', 'PR', 'SR', 'LK'];
+  const starts = {};
+  for (const positions of seasons) {
+    for (const [code, n] of Object.entries(positions ?? {})) if (code !== 'B') starts[RLP_LIST_POSITION[code]] = (starts[RLP_LIST_POSITION[code]] ?? 0) + n;
+  }
+  return Object.keys(starts).sort((a, b) => starts[b] - starts[a] || ORDER_OF.indexOf(a) - ORDER_OF.indexOf(b))[0] ?? null;
 }
 
 // ---------- naming a database player ----------
@@ -518,13 +711,19 @@ export function areaUnderCurve(items, value, positive) {
 
 // ---------- the season's clubs and nations ----------
 
-/** The data set id of an NRL season: 'nrl-2008'. */
-export const seasonIdOf = year => `nrl-${year}`;
+/**
+ * The data set id of a season by its key in the manifest's `teams` and `maps`: a premiership season's year ('nrl-2008',
+ * 'nrl-1975', the NSWRFL's), or Super League's 1997, which ran beside the ARL's and is its own key ('nrl-sl-1997').
+ */
+export const seasonIdOf = key => (typeof key === 'number' ? `nrl-${key}` : key);
 
-/** The era map the season of `year` plays on (scripts/data/rugby-league-seasons.json `maps`). */
-export function mapOf(manifest, year) {
-  const map = manifest.maps.find(entry => entry.seasons.includes(year));
-  if (!map) throw new Error(`No NRL map for ${year}`);
+/** A manifest season's key in `teams` and `maps`: its year, but Super League's 1997, by its id. */
+export const seasonKeyOf = entry => (entry.id === seasonIdOf(entry.year) ? entry.year : entry.id);
+
+/** The era map the season of `key` (seasonKeyOf) plays on (scripts/data/rugby-league-seasons.json `maps`). */
+export function mapOf(manifest, key) {
+  const map = manifest.maps.find(entry => entry.seasons.includes(key));
+  if (!map) throw new Error(`No NRL map for ${key}`);
   return map.id;
 }
 

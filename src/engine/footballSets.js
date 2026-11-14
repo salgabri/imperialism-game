@@ -95,8 +95,10 @@ const SET_KINDS = Object.freeze({
   nhl: { prefix: 'nhl-', id: /^nhl-\d{4}$/, sport: 'hockey', mapped: true, clubsOnly: /^nhl-19(?:6\d|7[0-7])$/ },
   // `nrl-<season>`: an NRL season from a rugby league game's database (Rugby League 2: World Cup Edition rates 2008), the
   // NRL's clubs only. The game rates attributes, not players: each overall is converted (source.conversion). A season
-  // no game rated is computed from the players' match statistics (source.method 'computed', source.metric).
-  nrl: { prefix: 'nrl-', id: /^nrl-\d{4}$/, sport: 'rugby-league', nations: false, mapped: true, calendar: true },
+  // no game rated is computed from the players' match statistics (source.method 'computed', source.metric), or before
+  // 1998 from who started where and how often (the NSWRFL's, the NSWRL's and the ARL's premierships); `nrl-sl-<season>`
+  // Super League's of 1997, which ran beside the ARL's.
+  nrl: { prefix: 'nrl-', id: /^nrl-(?:sl-)?\d{4}$/, sport: 'rugby-league', nations: false, mapped: true, calendar: true },
   // `cm-<season>`: a Championship Manager edition's database before CM 01/02 (CM 97/98 → `cm-9798`, CM 99/00 →
   // `cm-9900`, CM 00/01 → `cm-0001`), its players CM 01/02's tuples.
   cm: { prefix: 'cm-', id: /^cm-\d{4}$/, sport: 'football' },
@@ -546,7 +548,7 @@ function validateFootballSet(data, id) {
   const rating = v => typeof v === 'number' && Number.isFinite(v) && v >= 1 && v <= 99;
   const nation = v => typeof v === 'string' && Object.hasOwn(NATIONS, v);
 
-  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "wc-<yyyy>", "nt-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "nba-2k<nn>", "nba-stats-<yyyy>", "mlb-the-show-<nn>", "mlb-war-<yyyy>", "madden-<yyyy>", "pfa-<yyyy>", "nhl-<yyyy>", "nrl-<yyyy>", "tennis-<yyyy>" or "wta-<yyyy>"');
+  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "wc-<yyyy>", "nt-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "nba-2k<nn>", "nba-stats-<yyyy>", "mlb-the-show-<nn>", "mlb-war-<yyyy>", "madden-<yyyy>", "pfa-<yyyy>", "nhl-<yyyy>", "nrl-<yyyy>", "nrl-sl-<yyyy>", "tennis-<yyyy>" or "wta-<yyyy>"');
   if (!isObject(data)) fail('file is not a JSON object');
   if (data.format !== FOOTBALL_SET_FORMAT) fail(`unsupported format ${JSON.stringify(data.format)} (expected ${FOOTBALL_SET_FORMAT})`);
   if (data.id !== id) fail(`file id ${JSON.stringify(data.id)} does not match the requested data set`);
