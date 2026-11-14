@@ -1175,7 +1175,12 @@ seasons with clubs (the built-in one and 31 earlier) and each of the two fields:
   borders), and the map lists Russia in `partial`: the game draws Russia's world shape
   beneath it, grey where no club holds it, and routes go around that as around any
   neighbour. The camera frames the clubs' land (`partShape`), and simplification keeps only
-  the world outline's vertices, not the regions' line across the country.
+  the world outline's vertices, not the regions' line across the country. Russia's ADM2
+  layer leaves out Moscow and St Petersburg, federal cities, so each is a missed piece too;
+  one holding clubs' grounds goes to the nearest of those clubs (`homes`, here only), so
+  CSKA holds Moscow on the EuroLeague's maps where Khimki's land lies nearer, and football's,
+  whose Moscow clubs all stand inside the city, are as they were (the nearest club's land
+  was already one of theirs: CSKA's, and Spartak's or Dinamo's grounds lie in it).
 - **Several clubs**: `COUNTRIES` names the country's finest geoBoundaries layer
   (ADM2 to ADM4) and the layers that group it into regions; Russia, Switzerland, Norway and
   Austria joined it for the earlier seasons (Switzerland and Austria by their districts, as
@@ -1259,7 +1264,11 @@ era's do. The victory names "Europe".
 **Basketball's EuroLeague** (2026-11-08) plays on a map built by the same script and rules,
 `public/domestic/euroleague.json` (`--only=euroleague`): its 20 clubs in 10 countries, with
 `sport: 'basketball'` and no football `theatre` in its file and index entry, so it is never one of
-football's two. `COUNTRIES` gained Serbia and Israel for it. See [euroleague.md](euroleague.md).
+football's two. `COUNTRIES` gained Serbia and Israel for it. Its earlier seasons (2026-11-14) have
+24 more, `el2001` to `el2026`, one for each run of seasons with the same clubs, each listing the NBA
+seasons it serves (`seasons`). `COUNTRIES` gained Croatia, Slovenia and Lithuania for them, and
+their Russian clubs hold European Russia only, as football's do (`within`, the map's `partial`).
+See [euroleague.md](euroleague.md#earlier-seasons-200001-to-202526).
 
 **Old games.** A world campaign saved before these maps (`clubScope` `all`, `elite` or a
 league) has no `domestic:` scope, so it restores on the world with its dealt land, under
