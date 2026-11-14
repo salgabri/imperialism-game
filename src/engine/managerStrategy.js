@@ -31,6 +31,8 @@ const SUPPORT = {
   // A Davis Cup (or Billie Jean King Cup) team's reserve can come in for any rubber, at either end of the risk.
   tennis: TENNIS_SUPPORT,
   'womens-tennis': TENNIS_SUPPORT,
+  // Rocket League's sixth man can sub in for any of the three, at either end of the risk.
+  'rocket-league': { PLR: [.5, .5] },
 };
 
 export function tacticalProfile(team) {

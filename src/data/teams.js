@@ -482,8 +482,9 @@ export const RUGBY_CROSSING_PENALTY = 15;
 export const TENNIS_SPORTS = Object.freeze(['tennis', 'womens-tennis']);
 /** Whether a sport id plays tennis's lineup, squad and match views: the men's game or the women's. */
 export const isTennisSport = sportId => TENNIS_SPORTS.includes(sportId);
-// Football's rule, in both of its games, and tennis's, in both of its: a team fields only the players its source rates.
-const REAL_PLAYERS_ONLY = new Set(['football', 'womens-football', ...TENNIS_SPORTS]);
+// Football's rule, in both of its games, tennis's, in both of its, and Rocket League's: a team fields only the players its
+// source rates.
+const REAL_PLAYERS_ONLY = new Set(['football', 'womens-football', ...TENNIS_SPORTS, 'rocket-league']);
 const FOOTBALL_PLAN = ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'FW', 'FW'];
 const TENNIS_PLAN = ['SGL', 'SGL', 'DBL', 'DBL'];
 const LINEUP_PLANS = {
@@ -504,6 +505,8 @@ const LINEUP_PLANS = {
   // The matchday 17: the thirteen (fullback, wings, centres, halves, the front row, the back row) and an interchange bench
   // of a utility hooker, two props and a lock.
   'rugby-league': ['FB', 'WG', 'WG', 'CE', 'CE', 'FE', 'HB', 'PR', 'HK', 'PR', 'SR', 'SR', 'LK', 'HK', 'PR', 'PR', 'LK'],
+  // Rocket League's three, who rotate through every place on the field: no positions, so nobody is ever out of one.
+  'rocket-league': ['PLR', 'PLR', 'PLR'],
 };
 const TENNIS_POSITIONS = new Set(TENNIS_PLAN);
 // What each lineup place weighs in a tennis team's strength: the No. 1 and the No. 2 each play two of the five rubbers,
@@ -538,6 +541,7 @@ function slotPenalty(sportId, player, position) {
 export function teamSportId(team) {
   if (LINEUP_PLANS[team?.sport]) return team.sport;
   if (team?.squad?.some(player => TENNIS_POSITIONS.has(player.pos))) return 'tennis';
+  if (team?.squad?.some(player => player.pos === 'PLR')) return 'rocket-league';
   if (team?.squad?.some(player => BASEBALL_POSITIONS.has(player.pos))) return 'baseball';
   // Rugby league's codes are its own.
   if (team?.squad?.some(player => RUGBY_POSITIONS.has(player.pos))) return 'rugby-league';

@@ -17,12 +17,12 @@ import { bundleApp, bundleComponents, forceResult, syncAppFixture, withDom } fro
 const App = await bundleApp();
 const { SetupOverlay } = await bundleComponents({ SetupOverlay: 'src/components/SetupOverlay.jsx' });
 const IDS = ['250', '276', '826'];
-const AS_ONE = ['basketball', 'baseball', 'hockey', 'tennis', 'womens-tennis'];
+const AS_ONE = ['basketball', 'baseball', 'hockey', 'tennis', 'womens-tennis', 'rocket-league'];
 const identityOf = team => [team.name, team.code, team.flagId];
 const GB = ['Great Britain', 'GBR', 'GBR'];
 const ENGLAND = ['England', 'ENG', '826'];
 
-test('basketball, baseball, ice hockey and tennis (both cups) play the United Kingdom as Great Britain, football as England', () => {
+test('basketball, baseball, ice hockey, tennis (both cups) and Rocket League play the United Kingdom as Great Britain, football as England', () => {
   for (const id of AS_ONE) {
     const team = buildTeam('826', makeRng(1), getSport(id));
     assert.deepEqual(identityOf(team), GB, id);
@@ -62,9 +62,10 @@ test('Great Britain flies the vendored Union Jack; England keeps the cross of St
 
 test('the setup wall lists Great Britain under the Union Jack where the sport plays it, England in football', async () => {
   // Great Britain fields a team where its own rated players hold half the lineup (fieldedNations): in basketball (its
-  // EuroBasket 2025 five) and both tennis games. Its baseball and hockey players are too few, and its land stays neutral there.
+  // EuroBasket 2025 five), both tennis games and Rocket League (England's, Scotland's and Wales's players as one). Its
+  // baseball and hockey players are too few, and its land stays neutral there.
   const playing = AS_ONE.filter(sport => fieldedNations(getSport(sport)).includes('826'));
-  assert.deepEqual(playing, ['basketball', 'tennis', 'womens-tennis']);
+  assert.deepEqual(playing, ['basketball', 'tennis', 'womens-tennis', 'rocket-league']);
   for (const sport of [...playing, 'football']) {
     const [name, code, flagId] = sport === 'football' ? ENGLAND : GB;
     const flag = sport === 'football' ? '/flags/gb-eng.svg' : '/flags/gb.svg';

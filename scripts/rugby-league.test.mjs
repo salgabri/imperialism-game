@@ -351,7 +351,7 @@ test('seeded duel campaigns on the NRL map reach a champion, across the Tasman t
 // ---------- setup and the squad screen ----------
 
 test('setup lists rugby league with nations and the NRL clubs, on its built-in 2025 season', () => {
-  assert.equal(SPORT_LIST.at(-1).id, 'rugby-league');
+  assert.equal(SPORT_LIST.at(-2).id, 'rugby-league', 'the last of the sports, before Rocket League, the first esport');
   assert.equal(sportNote(sport), 'Nations · 17 NRL clubs');
   const clubs = buildSetupModel({ sport: 'rugby-league', layer: 'clubs', clubScope: 'domestic:nrl' }, {});
   assert.equal(clubs.clubsOnly, null);

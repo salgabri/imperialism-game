@@ -11,10 +11,12 @@ import { hockey } from './hockey.js';
 import { tennis } from './tennis.js';
 import { womensTennis } from './womensTennis.js';
 import { rugbyLeague } from './rugbyLeague.js';
+import { rocketLeague } from './rocketLeague.js';
 
 export const SPORTS = { football, 'womens-football': womensFootball, basketball, 'american-football': americanFootball, baseball, hockey, tennis,
-  'womens-tennis': womensTennis, 'rugby-league': rugbyLeague };
-export const SPORT_LIST = [football, womensFootball, basketball, americanFootball, baseball, hockey, tennis, womensTennis, rugbyLeague];
+  'womens-tennis': womensTennis, 'rugby-league': rugbyLeague, 'rocket-league': rocketLeague };
+export const SPORT_LIST = [football, womensFootball, basketball, americanFootball, baseball, hockey, tennis, womensTennis, rugbyLeague,
+  rocketLeague];
 export const DEFAULT_SPORT = 'football';
 
 export const getSport = id => SPORTS[id] || SPORTS[DEFAULT_SPORT];

@@ -1,11 +1,12 @@
 // Owner: WP-SQUAD (see PLAN.md §4). Formation pitch (C§7, board C1), the basketball half court (C§17, DEC misc), the
-// American football field, the baseball diamond, the hockey rink, the tennis court and the rugby league field.
+// American football field, the baseball diamond, the hockey rink, the tennis court, the rugby league field and the Rocket
+// League arena.
 import React from 'react';
 import { ESTIMATE_TITLE } from '../../data/estimates.js';
 
 /**
  * `slots`: [{ key, x: '50%', y: '88%', name, fullName, rating, claimed, estimated }] positioned in % of the box.
- * `layout`: 'pitch' | 'court' | 'field' | 'diamond' | 'rink' | 'tennis' | 'rugby'. `size`: 'side' (430×330, wide 500×384) | 'large' (Pitch tab) | 'phone'.
+ * `layout`: 'pitch' | 'court' | 'field' | 'diamond' | 'rink' | 'tennis' | 'rugby' | 'arena'. `size`: 'side' (430×330, wide 500×384) | 'large' (Pitch tab) | 'phone'.
  */
 export default function SquadPitch({ slots = [], layout = 'pitch', size = 'side', label = 'Formation' }) {
   return (
@@ -47,6 +48,14 @@ export default function SquadPitch({ slots = [], layout = 'pitch', size = 'side'
           <path d="M0 6H100M0 84H100" />
           <path className="pitch__rugby-line" d="M0 26H100M0 54H100" />
           <path d="M45 6V0M55 6V0M45 2.5H55" />
+        </svg>
+      ) : layout === 'arena' ? (
+        // A Rocket League arena from above: its cut corners, a goal at each end, halfway and the centre circle. The
+        // drawing stretches with the box.
+        <svg className="pitch__arena" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <path d="M14 6H86L96 16V84L86 94H14L4 84V16Z" />
+          <path d="M37 6V1H63V6M37 94V99H63V94M4 50H96" />
+          <ellipse cx="50" cy="50" rx="10" ry="8" />
         </svg>
       ) : layout === 'rink' ? (
         // One end of the rink: the goal line and crease at the foot, the blue line and the centre line and circle

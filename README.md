@@ -17,18 +17,19 @@ Pick your sport at kick-off:
 | Ice hockey | four lines, three pairs and the goalie | 60 minutes | sudden-death overtime, then a shoot-out |
 | Tennis, and women's tennis | a Davis Cup (or Billie Jean King Cup) team: No. 1 and No. 2 in the singles, a doubles pair | five rubbers, first to three, each best of three sets; an earlier season plays its year's ([format by year](#tennis-seasons)) | none: a tie always has a winner |
 | Rugby league | the matchday 17: thirteen and four on the bench | 80 minutes | golden point |
+| Rocket League | three a side, a nation's best of its five | best of seven five-minute games | sudden-death overtime in a level game; a series always has a winner |
 
 And pick who fights:
 
 - **Nations** — 176 nations on the map, each team starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
-  Basketball, baseball, ice hockey and both tennis games field them as one team, Great Britain
-  (GBR), under the Union Jack. A sport fields 173 at most: those four play Great Britain
+  Basketball, baseball, ice hockey, both tennis games and Rocket League field them as one team, Great
+  Britain (GBR), under the Union Jack. A sport fields 173 at most: those four play Great Britain
   as one, and football leaves out Tonga, Samoa and the Cook Islands, whose players no
   source rates ([Pacific islands](docs/design/pacific-islands.md)). A nation fields a team
   only with a **real side**, its own rated players holding at least half the lineup, and
-  every other nation's land stays neutral: 173 nations play football, 52 tennis, 45
-  women's tennis, 47 basketball, 36 women's football, 12 baseball, 7 ice hockey and 6
+  every other nation's land stays neutral: 173 nations play football, 57 Rocket League, 52
+  tennis, 45 women's tennis, 47 basketball, 36 women's football, 12 baseball, 7 ice hockey and 6
   rugby league. No team is made up of generated players or nearly empty.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs (Europe's 68
@@ -38,8 +39,8 @@ And pick who fights:
   franchises on [theirs](#the-nfl-map) of the USA, all 30 MLB clubs on
   [theirs](#the-mlb-map) of the USA and Canada, all 32 NHL clubs on
   [theirs](#the-nhl-map), or all 17 NRL clubs on [theirs](#the-nrl-map) of Australia and New Zealand. Real Madrid annexes territory
-  exactly the way Spain does. American football is played by clubs only, tennis and
-  women's tennis by nations only.
+  exactly the way Spain does. American football is played by clubs only, tennis,
+  women's tennis and Rocket League by nations only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
   leagues, fewer for smaller ones) on that country's own map, split into 100
   sections ([domestic campaigns](#domestic-campaigns)).
@@ -56,7 +57,9 @@ under football's rulebook with its own players ([design notes](docs/design/women
 Rugby League 26's NRL in five-minute slices to golden point ([design notes](docs/design/rugby-league.md)).
 Tennis plays Davis Cup ties between nations, its players rated by their Elo
 ([design notes](docs/design/tennis.md)), and women's tennis the Billie Jean King Cup's, the WTA's players
-by their Elo, with the WTA's serve ([design notes](docs/design/womens-tennis.md)).
+by their Elo, with the WTA's serve ([design notes](docs/design/womens-tennis.md)). Rocket League, the first esport, plays
+the RLCS's best-of-seven series between nations, its players rated by an Elo built from every series Liquipedia
+records ([design notes](docs/design/rocket-league.md)).
 
 Originally implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
@@ -144,6 +147,8 @@ npm run sync:tennis      # snapshot Tennis Abstract's men's Elo ratings and coun
 npm run build-tennis     # rebuild the tennis nations from that snapshot (--check compares byte for byte)
 npm run sync:womens-tennis # snapshot Tennis Abstract's women's Elo ratings and countries into scripts/data/womens-tennis-elo.json (network, cached)
 npm run build-womens-tennis # rebuild the women's tennis nations from that snapshot (--check compares byte for byte)
+npm run sync:rocket-league # Rocket League's player Elo from a Liquipedia export saved by hand in data-src/liquipedia/ (no network) into scripts/data/rocket-league-elo.json
+npm run build-rocket-league # rebuild the Rocket League nations from that snapshot (--check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 npm run build:icons      # render favicon.ico, apple-touch-icon.png and the app icons from public/favicon.svg
 npm run build:fonts      # cut the Latin Extended + Vietnamese font files from the pinned Archivo sources (--check compares byte for byte)
@@ -228,6 +233,7 @@ committed outputs:
 | GeoNames dumps | `download.geonames.org/` (everything) | the cached copies only |
 | CommonCrawl records | `data.commoncrawl.org/` (everything) | the pinned cached copies only (ice hockey's NHL 22 pages) |
 | The NHL's API | never fetched | the cached answers only: `sync:nhl` cannot refresh, `sync:nhl-seasons` reads its pinned rosters |
+| Liquipedia | `liquipedia.net/` (everything, for ClaudeBot and Claude-Web), `/rocketleague/api.php` and `/rocketleague/index.php` (every agent); `api.liquipedia.net/` (everything) | never fetched: `sync:rocket-league` reads an export saved by hand from the wiki's Special:Export in a browser ([design notes](docs/design/rocket-league.md#the-liquipedia-export)) |
 
 ## Deployment
 
@@ -941,8 +947,8 @@ with martj42's international results (CC0).
 
 This project is not affiliated with, endorsed or sponsored by Electronic Arts
 (EA SPORTS FC, FIFA, Madden NFL, EA SPORTS NHL), Sports Interactive and SEGA (Football Manager),
-2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), Big Ant Studios (Rugby League 26), the NBA, the NFL, MLB, the NHL, the NRL,
-or the clubs, leagues and federations it names.
+2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), Big Ant Studios (Rugby League 26), Psyonix and Epic Games (Rocket
+League and the RLCS), Liquipedia, the NBA, the NFL, MLB, the NHL, the NRL, or the clubs, leagues and federations it names.
 All trademarks, names and ratings belong to their respective owners.
 
 **American football** — `src/data/clubs.american-football.js`, the 32 NFL
@@ -1004,6 +1010,16 @@ Australia, New Zealand, Samoa, Tonga, England, Fiji, Papua New Guinea and the Co
 a matchday 17 and field a team, while Papua New Guinea's six and the Cook Islands' five fall short and their land stays
 neutral. See the
 [design notes](docs/design/rugby-league.md).
+
+**Rocket League** — `src/data/rosters.rocket-league.js`, from every 3v3 series Liquipedia records (CC BY-SA 3.0),
+read from two exports of the wiki saved by hand on 2026-11-14 (no script fetches Liquipedia: its robots.txt shuts
+Anthropic's crawlers out) into `scripts/data/rocket-league-elo.json`: 943 events of S- and A-Tier, 81,534 games from 2015
+to November 2026. There is no game's rating list for an esport: each player's rating is an Elo built game by game, a
+team playing at its three players' mean, on the game's scale Elo / 25 − 2 (dralii's 2,470 is 97), so the match model
+plays Elo's own odds; held out on the last 180 days its predictions were calibrated (log loss 0.583). A player plays for
+the nation he last played for at the FIFAe World Cup or the Esports Nations Cup, else the flag Liquipedia files him
+under; 815 players have played within the year, and 57 nations have the three a series needs, from France, the United
+States and Saudi Arabia down. Nothing is estimated. See the [design notes](docs/design/rocket-league.md).
 
 **Women's football** — `src/data/clubs.womens-football.js` and
 `src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07

@@ -1,5 +1,5 @@
 // The build's chunks (vite.config.js chunkOf, README "Caching"): React and football's built-in players sit in a
-// 'stable' chunk and the seven smaller sports' players in one 'sports' chunk, and neither may import the first chunk,
+// 'stable' chunk and the eight smaller sports' players in one 'sports' chunk, and neither may import the first chunk,
 // which changes with every release, or every release would change them too and re-send them to every returning
 // player. Static: esbuild's import graph of the browser build, as Rollup sees it; no Vite build runs.
 import test from 'node:test';
@@ -47,10 +47,11 @@ test('the stable chunk imports nothing outside itself', () => {
   }
 });
 
-test('every sport but football loads later: the seven smaller ones in one chunk, women\'s football in its own', () => {
+test('every sport but football loads later: the eight smaller ones in one chunk, women\'s football in its own', () => {
   assert.deepEqual(lazyStarts.map(input => [path.basename(input), chunk(input) ?? 'own chunk']).sort(), [
     ['american-football.js', 'sports'], ['baseball.js', 'sports'], ['basketball.js', 'sports'], ['hockey.js', 'sports'],
-    ['rugby-league.js', 'sports'], ['tennis.js', 'sports'], ['womens-football.js', 'own chunk'], ['womens-tennis.js', 'sports'],
+    ['rocket-league.js', 'sports'], ['rugby-league.js', 'sports'], ['tennis.js', 'sports'], ['womens-football.js', 'own chunk'],
+    ['womens-tennis.js', 'sports'],
   ]);
   // Their players load only on demand (src/sports/sportData.lazy.js), never with the first download.
   for (const input of lazyStarts) assert.ok(!firstDownload.has(input), `${repo(input)} is in the first download`);
