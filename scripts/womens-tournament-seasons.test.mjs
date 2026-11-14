@@ -157,7 +157,13 @@ test('RSSSF\'s three layouts: starters, substitutes and their minutes, a chain o
   assert.throws(() => rsssfLineups('[Aug 6]\nIn Tianjin\nCAN: 1-A; 2-B, 3-C.', 'numbered', 2008), /3 starters/);
 });
 
-test('Wikipedia\'s pages: squads with their unenrolled alternates, and line-ups with every substitution\'s minute', () => {
+// The pages are downloads in data-src/, which CI does not have. node:test reads a test's options only before its
+// function: after it they are ignored, and the test runs and fails without the pages.
+const OLYMPIC_PAGES_HERE = ['2012-squads.html', '2012-knockout.html']
+  .every(page => existsSync(path.join(root, 'data-src/wikipedia-womens-olympics', page)));
+test('Wikipedia\'s pages: squads with their unenrolled alternates, and line-ups with every substitution\'s minute', {
+  skip: !OLYMPIC_PAGES_HERE && 'the pages are not in data-src/',
+}, () => {
   const html = read('data-src/wikipedia-womens-olympics/2012-squads.html');
   const britain = olympicSquads(html).find(squad => squad.team === 'Great Britain');
   assert.ok(britain.players.some(p => p.name === 'Kim Little' && p.shirt === 12 && p.position === 'FW' && !p.alternate));
@@ -167,7 +173,7 @@ test('Wikipedia\'s pages: squads with their unenrolled alternates, and line-ups 
   assert.equal(final.aet, false);
   assert.equal(final.sides[1].label, 'Japan');
   assert.deepEqual(final.sides[1].players.filter(p => !p.started).map(p => [p.token, p.on]), [['Asuna Tanaka', 59], ['Mana Iwabuchi', 77], ['Karina Maruyama', 86]]);
-}, { skip: !existsSync(path.join(root, 'data-src/wikipedia-womens-olympics/2012-squads.html')) && 'the pages are not in data-src/' });
+});
 
 test('a line-up\'s name is a squad player\'s by the same words, her surname or her initial; RSSSF\'s ASCII spellings too', () => {
   const squad = ['Caroline Jönsson', 'Malin Moström', 'Ann Kristin Aarønes', 'Bonny Madsen', 'Lene Madsen', 'Marlene Sandoval', 'Lisa De Vanna',
