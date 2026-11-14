@@ -8369,6 +8369,27 @@
     "f-1-fsv-mainz-05.2007"
    ]
   ],
+  "f-aalborg-bk": [
+   [
+    2009,
+    2009,
+    "d208-483"
+   ]
+  ],
+  "f-aalborg-boldspilklub": [
+   [
+    1999,
+    2004,
+    "d208-483"
+   ]
+  ],
+  "f-aarhus-gymnastik-forening": [
+   [
+    2000,
+    2000,
+    "d208-482"
+   ]
+  ],
   "f-ac-ajaccio": [
    [
     2012,
@@ -8395,11 +8416,46 @@
     "f-ac-milan.1994"
    ]
   ],
+  "f-ac-sparta-prague": [
+   [
+    1994,
+    2004,
+    "d203-476"
+   ]
+  ],
+  "f-ac-sparta-praha": [
+   [
+    2007,
+    2011,
+    "d203-476"
+   ]
+  ],
+  "f-adana-demirspor": [
+   [
+    2022,
+    2024,
+    "d792-450573"
+   ]
+  ],
   "f-afc-ajax-amsterdam": [
    [
     1998,
     1998,
     null
+   ]
+  ],
+  "f-aik": [
+   [
+    2002,
+    2004,
+    "d752-1780"
+   ]
+  ],
+  "f-aik-solna": [
+   [
+    1999,
+    2001,
+    "d752-1780"
    ]
   ],
   "f-aj-auxerre": [
@@ -8421,6 +8477,20 @@
     1994,
     2025,
     null
+   ]
+  ],
+  "f-akademikernes-boldklub": [
+   [
+    1999,
+    2001,
+    "d208-480"
+   ]
+  ],
+  "f-alanyaspor": [
+   [
+    2019,
+    2022,
+    "d792-458718"
    ]
   ],
   "f-albacete-balompie": [
@@ -8472,6 +8542,13 @@
     "f-ancona.2004"
    ]
   ],
+  "f-anderlecht": [
+   [
+    2015,
+    2024,
+    "d056-256"
+   ]
+  ],
   "f-angers-sco": [
    [
     2016,
@@ -8487,6 +8564,34 @@
     2021,
     2021,
     "f-angers-sco.2021"
+   ]
+  ],
+  "f-ankaragucu": [
+   [
+    2019,
+    2019,
+    "d792-1864"
+   ]
+  ],
+  "f-ankaraspor": [
+   [
+    2017,
+    2017,
+    "d792-130355"
+   ]
+  ],
+  "f-antalyaspor": [
+   [
+    2018,
+    2023,
+    "d792-1865"
+   ]
+  ],
+  "f-antwerp": [
+   [
+    2020,
+    2024,
+    "d056-262"
    ]
   ],
   "f-arminia-bielefeld": [
@@ -8660,6 +8765,13 @@
     null
    ]
   ],
+  "f-basel": [
+   [
+    2015,
+    2022,
+    "d756-1849"
+   ]
+  ],
   "f-bastia": [
    [
     2015,
@@ -8714,6 +8826,13 @@
     "d620-1487"
    ]
   ],
+  "f-besiktas": [
+   [
+    2015,
+    2024,
+    "d792-1866"
+   ]
+  ],
   "f-birmingham-city": [
    [
     2003,
@@ -8754,6 +8873,13 @@
     1994,
     2004,
     "f-boavista-futebol-clube.1994"
+   ]
+  ],
+  "f-bod-glimt": [
+   [
+    2024,
+    2024,
+    "d578-1293"
    ]
   ],
   "f-bologna-1909": [
@@ -8813,6 +8939,20 @@
     "f-borussia-monchengladbach.1994"
    ]
   ],
+  "f-br-ndby-if": [
+   [
+    2007,
+    2010,
+    "d208-496"
+   ]
+  ],
+  "f-br-ndbyernes-idr-ts-forening": [
+   [
+    1994,
+    2004,
+    "d208-496"
+   ]
+  ],
   "f-bradford-city": [
    [
     2000,
@@ -8842,6 +8982,13 @@
     2020,
     2024,
     "d250-2061"
+   ]
+  ],
+  "f-bursaspor": [
+   [
+    2010,
+    2018,
+    "d792-1867"
    ]
   ],
   "f-bv-09-borussia-dortmund": [
@@ -9067,6 +9214,13 @@
     "d724-1687"
    ]
   ],
+  "f-club-brugge": [
+   [
+    2015,
+    2024,
+    "d056-186"
+   ]
+  ],
   "f-club-deportivo-tenerife": [
    [
     1995,
@@ -9173,6 +9327,13 @@
     "f-de-graafschap.2007"
    ]
   ],
+  "f-demir-grup-sivasspor": [
+   [
+    2009,
+    2010,
+    "d792-130382"
+   ]
+  ],
   "f-deportivo-alaves": [
    [
     2017,
@@ -9230,6 +9391,20 @@
     2012,
     2012,
     "f-dijon.2012"
+   ]
+  ],
+  "f-dinamo-moscow": [
+   [
+    1999,
+    2016,
+    "d643-1520"
+   ]
+  ],
+  "f-djurgardens-if": [
+   [
+    2002,
+    2004,
+    "d752-1787"
    ]
   ],
   "f-dsc-arminia-bielefeld": [
@@ -9313,6 +9488,13 @@
     2001,
     2003,
     "f-estac-troyes.2001"
+   ]
+  ],
+  "f-esbjerg-forenede-boldklubber": [
+   [
+    2000,
+    2000,
+    "d208-502"
    ]
   ],
   "f-espanyol": [
@@ -9405,6 +9587,13 @@
     "f-fc-hansa-rostock.2001"
    ]
   ],
+  "f-f-c-k-benhavn": [
+   [
+    2007,
+    2013,
+    "d208-505"
+   ]
+  ],
   "f-famalicao": [
    [
     1994,
@@ -9424,6 +9613,13 @@
     "f-farense.2021"
    ]
   ],
+  "f-fatih-karagumruk": [
+   [
+    2022,
+    2022,
+    "d792-458631"
+   ]
+  ],
   "f-fc-arouca": [
    [
     2014,
@@ -9436,6 +9632,13 @@
     1995,
     2002,
     null
+   ]
+  ],
+  "f-fc-basel-1893": [
+   [
+    2007,
+    2026,
+    "d756-1849"
    ]
   ],
   "f-fc-bayern-munchen": [
@@ -9523,6 +9726,20 @@
     2015,
     2024,
     "d276-916"
+   ]
+  ],
+  "f-fc-krasnodar": [
+   [
+    2014,
+    2018,
+    "d643-58029064"
+   ]
+  ],
+  "f-fc-lokomotiv-moscow": [
+   [
+    2010,
+    2014,
+    "d643-1525"
    ]
   ],
   "f-fc-lorient": [
@@ -9614,6 +9831,20 @@
     "f-fc-penafiel.2015"
    ]
   ],
+  "f-fc-red-bull-salzburg": [
+   [
+    2007,
+    2025,
+    "d040-158"
+   ]
+  ],
+  "f-fc-rostov": [
+   [
+    2017,
+    2017,
+    "d643-1301104"
+   ]
+  ],
   "f-fc-schalke-04": [
    [
     1994,
@@ -9686,11 +9917,39 @@
     null
    ]
   ],
+  "f-fc-zurich": [
+   [
+    2007,
+    2009,
+    "d756-1854"
+   ]
+  ],
   "f-fc-zwolle": [
    [
     2003,
     2004,
     null
+   ]
+  ],
+  "f-fenerbahce": [
+   [
+    2015,
+    2024,
+    "d792-1870"
+   ]
+  ],
+  "f-ferencvaros": [
+   [
+    2024,
+    2024,
+    "d348-1055"
+   ]
+  ],
+  "f-ferencvarosi-torna-club": [
+   [
+    2025,
+    2026,
+    "d348-1055"
    ]
   ],
   "f-feyenoord": [
@@ -9729,11 +9988,25 @@
     null
    ]
   ],
+  "f-fk-austria-vienna": [
+   [
+    2003,
+    2004,
+    "d040-152"
+   ]
+  ],
   "f-foggia": [
    [
     1994,
     1995,
     null
+   ]
+  ],
+  "f-football-club-k-benhavn": [
+   [
+    1999,
+    2004,
+    "d208-505"
    ]
   ],
   "f-fortuna-dusseldorf": [
@@ -9807,6 +10080,27 @@
     "f-futebol-clube-pacos-de-ferreira.2004"
    ]
   ],
+  "f-galatasaray": [
+   [
+    2015,
+    2024,
+    "d792-1871"
+   ]
+  ],
+  "f-galatasaray-istanbul": [
+   [
+    1998,
+    1998,
+    "d792-1871"
+   ]
+  ],
+  "f-genk": [
+   [
+    2015,
+    2024,
+    "d056-258"
+   ]
+  ],
   "f-genoa": [
    [
     1994,
@@ -9817,6 +10111,13 @@
     1999,
     2022,
     "f-genoa.1999"
+   ]
+  ],
+  "f-gent": [
+   [
+    2016,
+    2024,
+    "d056-168"
    ]
   ],
   "f-getafe": [
@@ -9902,11 +10203,32 @@
     "f-fc-girondins-de-bordeaux.2007"
    ]
   ],
+  "f-glasgow-celtic": [
+   [
+    1994,
+    2004,
+    "f-celtic"
+   ]
+  ],
+  "f-glasgow-rangers": [
+   [
+    1994,
+    2004,
+    "f-rangers-fc"
+   ]
+  ],
   "f-go-ahead-eagles": [
    [
     1994,
     2016,
     null
+   ]
+  ],
+  "f-goztepe": [
+   [
+    2019,
+    2019,
+    "d792-130338"
    ]
   ],
   "f-granada": [
@@ -9959,6 +10281,20 @@
     "f-guingamp.2017"
    ]
   ],
+  "f-halmstad-bk": [
+   [
+    2001,
+    2004,
+    "d752-1796"
+   ]
+  ],
+  "f-hammarby-if": [
+   [
+    2002,
+    2004,
+    "d752-1797"
+   ]
+  ],
   "f-hannover-96": [
    [
     2003,
@@ -9998,6 +10334,20 @@
     2021,
     2024,
     "d380-2201"
+   ]
+  ],
+  "f-helsingborg-if": [
+   [
+    1998,
+    1998,
+    "d752-1798"
+   ]
+  ],
+  "f-helsingborgs-if": [
+   [
+    1994,
+    2004,
+    "d752-1798"
    ]
   ],
   "f-heracles-almelo": [
@@ -10066,6 +10416,34 @@
     "f-hull-city.2015"
    ]
   ],
+  "f-if-elfsborg": [
+   [
+    2002,
+    2004,
+    "d752-1802"
+   ]
+  ],
+  "f-ifk-goteborg": [
+   [
+    1994,
+    2004,
+    "d752-1803"
+   ]
+  ],
+  "f-ifk-gothenburg": [
+   [
+    1999,
+    1999,
+    "d752-1803"
+   ]
+  ],
+  "f-ifk-norrkoping": [
+   [
+    1998,
+    2002,
+    "d752-1806"
+   ]
+  ],
   "f-ingolstadt": [
    [
     2016,
@@ -10114,6 +10492,13 @@
     null
    ]
   ],
+  "f-istanbul-basaksehir": [
+   [
+    2017,
+    2023,
+    "d792-130343"
+   ]
+  ],
   "f-juventus": [
    [
     1994,
@@ -10124,6 +10509,20 @@
     2005,
     2017,
     "f-juventus.2005"
+   ]
+  ],
+  "f-k-benhavn": [
+   [
+    2023,
+    2024,
+    "d208-505"
+   ]
+  ],
+  "f-kaa-gent": [
+   [
+    2003,
+    2012,
+    "d056-168"
    ]
   ],
   "f-karlsruher-sc": [
@@ -10143,6 +10542,20 @@
     "f-karlsruher-sc.1994"
    ]
   ],
+  "f-kas-mpasa": [
+   [
+    2015,
+    2016,
+    "d792-130360"
+   ]
+  ],
+  "f-kayserispor": [
+   [
+    2018,
+    2018,
+    "d792-1875"
+   ]
+  ],
   "f-kfc-uerdingen-05": [
    [
     1995,
@@ -10153,6 +10566,20 @@
     1996,
     1996,
     "f-kfc-uerdingen-05.1996"
+   ]
+  ],
+  "f-konyaspor": [
+   [
+    2016,
+    2016,
+    "d792-130344"
+   ]
+  ],
+  "f-kuban-krasnodar": [
+   [
+    2013,
+    2016,
+    "d643-58148224"
    ]
   ],
   "f-la-berrichonne-de-chateauroux": [
@@ -10233,6 +10660,13 @@
     2017,
     2020,
     "f-leganes.2017"
+   ]
+  ],
+  "f-legia-warszawa": [
+   [
+    2007,
+    2007,
+    "d616-1456"
    ]
   ],
   "f-leicester-city": [
@@ -10336,6 +10770,13 @@
     "f-lille-osc.2025"
    ]
   ],
+  "f-lillestr-m-sk": [
+   [
+    2004,
+    2004,
+    "d578-1341"
+   ]
+  ],
   "f-liverpool": [
    [
     1994,
@@ -10353,6 +10794,20 @@
     2010,
     2014,
     "f-livorno.2010"
+   ]
+  ],
+  "f-lokomotiv-moscow": [
+   [
+    2001,
+    2004,
+    "d643-1525"
+   ]
+  ],
+  "f-lokomotiv-moskva": [
+   [
+    2015,
+    2022,
+    "d643-1525"
    ]
   ],
   "f-lorient": [
@@ -10381,6 +10836,13 @@
     "f-luton-town.2024"
    ]
   ],
+  "f-lyngby-football-club": [
+   [
+    2000,
+    2000,
+    "d208-533"
+   ]
+  ],
   "f-malaga": [
    [
     2015,
@@ -10400,6 +10862,13 @@
     2020,
     2024,
     "d724-1726"
+   ]
+  ],
+  "f-malmo-ff": [
+   [
+    2002,
+    2004,
+    "d752-1816"
    ]
   ],
   "f-manchester-city": [
@@ -10426,6 +10895,13 @@
     2023,
     2023,
     "f-maritimo.2023"
+   ]
+  ],
+  "f-medipol-basaksehir-fk": [
+   [
+    2025,
+    2026,
+    "d792-130343"
    ]
   ],
   "f-messina": [
@@ -10461,11 +10937,25 @@
     "d380-1099"
    ]
   ],
+  "f-mke-ankaragucu": [
+   [
+    2010,
+    2011,
+    "d792-1864"
+   ]
+  ],
   "f-modena": [
    [
     2003,
     2004,
     "f-modena.2003"
+   ]
+  ],
+  "f-molde-fk": [
+   [
+    1998,
+    1998,
+    "d578-1353"
    ]
   ],
   "f-monaco": [
@@ -10638,6 +11128,13 @@
     "f-nimes.2019"
    ]
   ],
+  "f-nk-dinamo": [
+   [
+    1999,
+    2001,
+    "d191-432"
+   ]
+  ],
   "f-norwich-city": [
    [
     2012,
@@ -10659,11 +11156,32 @@
     "f-1-fc-nurnberg.2012"
    ]
   ],
+  "f-odense-boldklub": [
+   [
+    2000,
+    2000,
+    "d208-545"
+   ]
+  ],
   "f-ogc-nice": [
    [
     1995,
     2013,
     "f-ogc-nice.1995"
+   ]
+  ],
+  "f-olympiacos-cfp": [
+   [
+    2007,
+    2014,
+    "d300-981"
+   ]
+  ],
+  "f-olympiakos-piraeus": [
+   [
+    1994,
+    2022,
+    "d300-981"
    ]
   ],
   "f-olympique-de-marseille": [
@@ -10727,6 +11245,13 @@
     "f-olympique-marseille.1994"
    ]
   ],
+  "f-orebro-sk": [
+   [
+    1998,
+    1998,
+    "d752-1842"
+   ]
+  ],
   "f-osasuna": [
    [
     2017,
@@ -10760,6 +11285,13 @@
     2007,
     2017,
     "f-palermo.2007"
+   ]
+  ],
+  "f-panathinaikos": [
+   [
+    1994,
+    2024,
+    "d300-983"
    ]
   ],
   "f-paris-saint-germain": [
@@ -10828,6 +11360,13 @@
     2008,
     2015,
     null
+   ]
+  ],
+  "f-partizan-belgrade": [
+   [
+    2002,
+    2004,
+    "d688-1952"
    ]
   ],
   "f-pec-zwolle": [
@@ -10924,6 +11463,20 @@
     "d724-1726"
    ]
   ],
+  "f-r-standard-de-liege": [
+   [
+    1994,
+    1999,
+    "d056-250"
+   ]
+  ],
+  "f-r-standard-liege": [
+   [
+    1998,
+    1998,
+    "d056-250"
+   ]
+  ],
   "f-racing-club-de-lens": [
    [
     2007,
@@ -10974,6 +11527,13 @@
     2004,
     2004,
     "f-racing-club-de-santander.2004"
+   ]
+  ],
+  "f-rangers": [
+   [
+    2020,
+    2024,
+    "f-rangers-fc"
    ]
   ],
   "f-rayo-vallecano": [
@@ -11194,6 +11754,13 @@
     "f-rc-recreativo-de-huelva.2007"
    ]
   ],
+  "f-red-star-belgrade": [
+   [
+    1994,
+    2002,
+    "d688-1955"
+   ]
+  ],
   "f-reggiana": [
    [
     1994,
@@ -11268,6 +11835,27 @@
     "f-roma.2014"
    ]
   ],
+  "f-rosenborg-bk": [
+   [
+    1994,
+    2010,
+    "d578-1376"
+   ]
+  ],
+  "f-royal-antwerp-fc": [
+   [
+    2025,
+    2025,
+    "d056-262"
+   ]
+  ],
+  "f-rubin-kazan": [
+   [
+    2010,
+    2018,
+    "d643-130509"
+   ]
+  ],
   "f-s-d-compostela": [
    [
     1995,
@@ -11294,11 +11882,25 @@
     "f-salernitana.2022"
    ]
   ],
+  "f-salzburg": [
+   [
+    2015,
+    2024,
+    "d040-158"
+   ]
+  ],
   "f-sampdoria": [
    [
     1994,
     2023,
     "f-sampdoria.1994"
+   ]
+  ],
+  "f-samsunspor": [
+   [
+    2001,
+    2001,
+    "d792-1878"
    ]
   ],
   "f-santa-clara": [
@@ -11379,6 +11981,13 @@
     "f-sd-eibar.2017"
    ]
   ],
+  "f-servette-fc": [
+   [
+    1994,
+    1994,
+    "d756-1858"
+   ]
+  ],
   "f-sevilla": [
    [
     2015,
@@ -11436,11 +12045,60 @@
     "f-siena.2011"
    ]
   ],
+  "f-silkeborg-idr-ts-forening": [
+   [
+    2000,
+    2001,
+    "d208-551"
+   ]
+  ],
+  "f-sivasspor": [
+   [
+    2015,
+    2015,
+    "d792-130382"
+   ]
+  ],
+  "f-sk-rapid-vienna": [
+   [
+    1994,
+    1994,
+    "d040-155"
+   ]
+  ],
+  "f-sk-rapid-wien": [
+   [
+    2007,
+    2007,
+    "d040-155"
+   ]
+  ],
+  "f-sk-slavia-prague": [
+   [
+    2001,
+    2001,
+    "d203-474"
+   ]
+  ],
+  "f-sk-sturm-graz": [
+   [
+    2004,
+    2004,
+    "d040-156"
+   ]
+  ],
   "f-sl-benfica": [
    [
     1994,
     1999,
     "f-sl-benfica.1994"
+   ]
+  ],
+  "f-slavia-praha": [
+   [
+    2020,
+    2024,
+    "d203-474"
    ]
   ],
   "f-southampton": [
@@ -11460,6 +12118,20 @@
     2018,
     2020,
     "f-spal.2018"
+   ]
+  ],
+  "f-spartak-moscow": [
+   [
+    1994,
+    2004,
+    "d643-1529"
+   ]
+  ],
+  "f-spartak-moskva": [
+   [
+    2010,
+    2022,
+    "d643-1529"
    ]
   ],
   "f-spezia": [
@@ -11648,6 +12320,20 @@
     1998,
     2003,
     "f-stade-rennais-fc.1998"
+   ]
+  ],
+  "f-standard-de-liege": [
+   [
+    2007,
+    2014,
+    "d056-250"
+   ]
+  ],
+  "f-standard-liege": [
+   [
+    2015,
+    2019,
+    "d056-250"
    ]
   ],
   "f-stoke-city": [
@@ -11934,6 +12620,13 @@
     "f-valenciennes-fc.2009"
    ]
   ],
+  "f-valerenga-fotball": [
+   [
+    2008,
+    2008,
+    "d578-1426"
+   ]
+  ],
   "f-vbv-de-graafschap": [
    [
     1996,
@@ -12013,6 +12706,13 @@
     2003,
     2025,
     "f-vfl-wolfsburg.2003"
+   ]
+  ],
+  "f-viborg-ff": [
+   [
+    2000,
+    2000,
+    "d208-569"
    ]
   ],
   "f-vicenza": [
@@ -12154,11 +12854,39 @@
     "f-wimbledon.1994"
    ]
   ],
+  "f-wisla-krakow": [
+   [
+    1994,
+    1999,
+    "d616-1300881"
+   ]
+  ],
   "f-xerez-club-deportivo": [
    [
     2010,
     2010,
     "f-xerez-club-deportivo.2010"
+   ]
+  ],
+  "f-young-boys": [
+   [
+    2021,
+    2022,
+    "d756-1847"
+   ]
+  ],
+  "f-yukatel-kayserispor": [
+   [
+    2008,
+    2008,
+    "d792-1875"
+   ]
+  ],
+  "f-zenit-st-petersburg": [
+   [
+    2010,
+    2018,
+    "d643-1301108"
    ]
   ],
   "mlb-anaheim-angels": [

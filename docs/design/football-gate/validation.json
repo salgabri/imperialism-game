@@ -439,7 +439,7 @@
       "sources": "EA FC 26",
       "ratingsDate": "2025-09-19",
       "informationDate": "2025-09-19",
-      "contentHash": "ea-fc-26-8ccd45ee",
+      "contentHash": "ea-fc-26-8120a891",
       "gate": "provisional",
       "verdict": "fail",
       "verdicts": {
@@ -554,7 +554,7 @@
         "badRatings": [],
         "badStrength": [],
         "badNationStatus": [],
-        "contentHash": "ea-fc-26-8ccd45ee",
+        "contentHash": "ea-fc-26-8120a891",
         "failures": []
       },
       "crossSectional": {

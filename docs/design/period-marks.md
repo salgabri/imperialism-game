@@ -168,6 +168,13 @@ the NBA's monograms are mostly logos of 1961-2005 that no allowed source still s
 Rugby league's rest (1%) are three clubs of 1998-1999 that no source dates a logo
 for (below); its one monogram is the Warriors' anniversary logo of 2015.
 
+1996/97's clubs came later the same day (football-years.md, "Sensible World of Soccer
+96/97"), so its club-seasons are not in the table above. 75 of its 134 clubs have an era
+covering it, and most of the rest wear today's crest through the seasons around it. Nine
+clubs the research never saw in 1996/97 show today's crest there, unverified: Bologna,
+Sunderland, Hércules, Hellas Verona, AZ and SC Espinho, and Marseille, Derby County and
+Arminia Bielefeld, whose eras start in 1997/98.
+
 A second round (13-14 November 2026) researched the 71 English, Dutch and Portuguese
 clubs the first had left, the Spanish, Italian, German, MLB and NFL seasons it had
 left undated, the 2003/04 football season and the NHL's 1960/61 to 1965/66, and

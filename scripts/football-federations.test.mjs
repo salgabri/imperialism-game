@@ -33,11 +33,12 @@ const identity = (name, code, flagId) => ({ name, code, flagId });
 const URS = identity('Soviet Union', 'URS', 'URS'), CIS = identity('CIS', 'CIS', 'CIS'), YUG = identity('Yugoslavia', 'YUG', 'YUG');
 const FRY = identity('FR Yugoslavia', 'YUG', 'FRY'), TCH = identity('Czechoslovakia', 'TCH', '203');
 const FRG = identity('West Germany', 'FRG', '276'), ZAI = identity('Zaire', 'ZAI', 'ZAI');
+const UAR = identity('United Arab Republic', 'UAR', 'UAR');
 
 // ---------- the table ----------
 
-test('every shape whose association joined FIFA after 30 June 1962 has FIFA\'s own date, read from its page', () => {
-  assert.equal(FIRST_YEAR, 1962);
+test('every shape whose association joined FIFA after 30 June 1961 has FIFA\'s own date, read from its page', () => {
+  assert.equal(FIRST_YEAR, 1961);
   const fifa = JSON.parse(read('scripts/data/fifa-member-associations.json')).associations;
   // East Germany's association (the DFV, a FIFA member until reunification) has no page of FIFA's today: it is a nation of the
   // map's earlier years only.
@@ -47,7 +48,7 @@ test('every shape whose association joined FIFA after 30 June 1962 has FIFA\'s o
     assert.ok(NATIONS[shape], shape);
     assert.equal(entry.fifa, fifa[shape].fifa, shape);
     assert.match(entry.member, /^\d{4}-\d{2}-\d{2}$/);
-    assert.ok(entry.member > '1962-06-30', `${shape} was a member by 1961/62's cutoff: it needs no entry`);
+    assert.ok(entry.member > '1961-06-30', `${shape} was a member by 1960/61's cutoff: it needs no entry`);
     assert.equal(entry.source, `https://inside.fifa.com/associations/${entry.fifa}`, shape);
     if (fifa[shape].unread) continue;
     // FIFA gives 1 January for a year alone; another source may give the day, in the same year.
@@ -58,19 +59,22 @@ test('every shape whose association joined FIFA after 30 June 1962 has FIFA\'s o
       assert.equal(entry.member, fifa[shape].member, shape);
     }
   }
-  // South Africa's association was a member before 1962: its absences are suspensions, readmitted in 1992 (FIFA gives
+  // South Africa's association was a member before 1961: its absences are suspensions, readmitted in 1992 (FIFA gives
   // the year of the new association alone).
-  const missing = Object.entries(fifa).filter(([shape, row]) => row.member > '1962-06-30' && !TABLE.shapes[shape]).map(([shape]) => shape);
+  const missing = Object.entries(fifa).filter(([shape, row]) => row.member > '1961-06-30' && !TABLE.shapes[shape]).map(([shape]) => shape);
   assert.deepEqual(missing, ['710']);
   assert.equal(fifa['710'].member, '1992-01-01');
   assert.ok(TABLE.suspensions.some(s => s.shape === '710' && s.until === '1992-07-03'));
-  assert.equal(Object.keys(TABLE.shapes).length, 79);
+  // Cameroon, Guinea, Jamaica and Somalia, whose associations FIFA dates from 1962, sit out 1960/61 only.
+  assert.deepEqual(Object.keys(TABLE.shapes).filter(shape => TABLE.shapes[shape].member.startsWith('1962')).sort(), ['120', '324', '388', '706']);
+  assert.equal(Object.keys(TABLE.shapes).length, 83);
 });
 
 test('the federations of the day: FIFA\'s codes of the day, the flags the game has, game nations, sourced', () => {
   assert.deepEqual(TABLE.federations.map(f => [f.id, f.holder, f.from ?? null, f.through ?? null, f.members.length]), [
     ['URS', '643', null, 1991, 14], ['CIS', '643', 1992, 1992, 11], ['YUG', '688', null, 1991, 6], ['FRY', '688', 1992, 1996, 0],
-    ['TCH', '203', null, 1993, 1], ['FRG', '276', null, 1990, 0], ['ZAI', '180', 1972, 1996, 0]]);
+    ['TCH', '203', null, 1993, 1], ['FRG', '276', null, 1990, 0], ['ZAI', '180', 1972, 1996, 0], ['UAR', '818', 1958, 1961, 1],
+    ['UAR-EGY', '818', 1962, 1971, 0]]);
   for (const federation of TABLE.federations) {
     assert.ok(Object.hasOwn(FLAG_CODES, federation.flagId), federation.id);
     assert.ok(existsSync(new URL(`../public/flags/${FLAG_CODES[federation.flagId]}.svg`, import.meta.url)), federation.id);
@@ -113,7 +117,7 @@ test('1969/70: the Soviet Union holds Ukraine and the Baltic states, Yugoslavia 
   assert.ok(['804', ...BALTIC].every(shape => at(1970).merged[shape] === '643'));
   assert.deepEqual(holds(1970, '688'), YUGOSLAV.slice().sort());
   assert.deepEqual(holds(1970, '203'), ['703']);
-  assert.deepEqual(identitiesFor(TABLE, 1970), { 203: TCH, 276: FRG, 643: URS, 688: YUG });
+  assert.deepEqual(identitiesFor(TABLE, 1970), { 203: TCH, 276: FRG, 643: URS, 688: YUG, 818: UAR });
   // China and South Africa are out of FIFA; DR Congo joined in 1964, but is Zaire only from 1971/72.
   assert.ok(neutral(1970, '156') && neutral(1970, '710') && plays(1970, '180'));
 });
@@ -169,7 +173,20 @@ test('suspensions: South Africa\'s two, China\'s absence', () => {
   assert.ok([1962, 1970, 1979, 1980].every(year => neutral(year, '156')) && plays(1981, '156'));
 });
 
-test('every season 1961/62 to 1995/96 holds together, and none from 1996/97 has a federation of the day', () => {
+test('1960/61: Syria is the United Arab Republic\'s, and the four associations FIFA dates from 1962 sit out', () => {
+  assert.equal(at(1961).merged['760'], '818');
+  assert.deepEqual(identitiesFor(TABLE, 1961)[818], UAR);
+  assert.ok(['120', '324', '388', '706'].every(shape => neutral(1961, shape) && plays(1962, shape)));
+  // Syria left on 28 September 1961: its own side from 1961/62, Egypt under the union's name to 1970/71.
+  assert.ok(plays(1962, '760') && !Object.hasOwn(at(1962).merged, '760'));
+  assert.ok([1962, 1971].every(year => identitiesFor(TABLE, year)[818]?.code === 'UAR') && !identitiesFor(TABLE, 1972)[818]);
+  // Where Egypt fields no team, Syria is neutral rather than held.
+  assert.ok(territoryFor(TABLE, 1961, { fields: id => id !== '818' }).inactive.includes('760'));
+  // South Africa was suspended on 26 September 1961, after the cutoff; China had left FIFA in 1958.
+  assert.ok(plays(1961, '710') && neutral(1961, '156'));
+});
+
+test('every season 1960/61 to 1995/96 holds together, and none from 1996/97 has a federation of the day', () => {
   for (let year = FIRST_YEAR; year <= 1996; year++) {
     const { merged, inactive } = at(year);
     for (const [shape, holder] of Object.entries(merged)) {

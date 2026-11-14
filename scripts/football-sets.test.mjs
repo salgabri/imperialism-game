@@ -159,7 +159,7 @@ test('anything the builder would not write is refused with a reason', () => {
     [doc => { doc.nations['250'][2][0][3] = 201; }, /Invalid CM current ability/],
     [doc => { doc.nations['250'][2][0][1] = ''; }, /Invalid CM tuple/],
     [doc => { doc.nations['250'][2][1][0] = doc.nations['250'][2][0][0]; }, /repeats player/],
-    [doc => { doc.clubs[0].league = 'Serie B'; }, /not a built-in league/],
+    [doc => { doc.clubs[0].league = 'Serie B'; }, /league "Serie B" is not one of Europe's first divisions/],
     [doc => { doc.clubs[0].country = 'ENG'; }, /not a nation id/],
     [doc => { doc.clubs[0].code = 'tfu'; }, /three capitals/],
     [doc => { doc.clubs[1].id = doc.clubs[0].id; }, /duplicated/],

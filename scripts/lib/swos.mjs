@@ -1,10 +1,9 @@
-// The football seasons from Sensible World of Soccer (docs/design/football-years.md, "SWOS 96/97" and "SWOS 94/95 and
-// 95/96"): each national team's own record of its sixteen players becomes that nation's squad, in the data set format
-// the game loads (src/engine/footballSets.js, kind 'swos'). SWOS 96/97 has nations only: at club level its database
-// names some players at two clubs, so its clubs are not one moment's. SWOS 94/95 and 95/96, read from the game's own
-// team files (scripts/lib/swos-files.mjs), also have the seven big leagues' top-division clubs, each with its own
-// sixteen. No I/O here: scripts/build-retro-seasons.mjs reads the sources and writes the files, and tests build seasons
-// from invented rows. Every rating is SWOS's own price step, converted by src/data/swosPlayers.js; nothing is generated.
+// The football seasons from Sensible World of Soccer (docs/design/football-years.md, "Sensible World of Soccer 96/97" and
+// "Sensible World of Soccer 94/95 and 95/96"): each national team's own record of its sixteen players becomes that nation's squad, in the data set
+// format the game loads (src/engine/footballSets.js, kind 'swos'), and each of the seven big leagues' top-division clubs
+// plays its own sixteen, all read from the game's own team files (scripts/lib/swos-files.mjs). No I/O here:
+// scripts/build-retro-seasons.mjs reads the sources and writes the files, and tests build seasons from invented rows.
+// Every rating is SWOS's own price step, converted by src/data/swosPlayers.js; nothing is generated.
 import { NATIONS, HISTORIC_NATIONS, PACIFIC_ISLANDS, selectLineup } from '../../src/data/teams.js';
 import { SWOS_ROLES, SWOS_SCALE, SWOS_SKILLS, expandSwosTuple, swosTupleOf } from '../../src/data/swosPlayers.js';
 import { FOOTBALL_FEDERATIONS } from '../../src/data/footballFederations.js';
@@ -13,7 +12,7 @@ import {
 } from '../../src/data/footballSetBuild.js';
 import { pickFootballSquad } from '../../src/data/footballSquad.js';
 
-/** The game's id of SWOS 96/97 (the default season) and how many players each team has. */
+/** The id a season built with no id of its own takes (SWOS 96/97's), and how many players each team has. */
 export const SWOS_ID = 'swos-9697';
 export const SWOS_SQUAD = 16;
 const CLUB_SIZE = 11;
@@ -25,60 +24,65 @@ export const SWOS_LEAGUES = Object.freeze({
 });
 
 /**
- * SWOS's top-division clubs of 1994/95 and 1995/96 (17-character names in capitals) by the name the game gives each.
- * Its id is that name's slug (presentClubs), and every one is a club scripts/data/europe-clubs.json already places, so
+ * SWOS's top-division clubs of 1994/95 to 1996/97 (17-character names in capitals) by the name the game gives each; SWOS
+ * 96/97 spells Espanyol ESPANYOL, the earlier editions ESPANOL, so two names give that one club. Its id is that name's slug (presentClubs), and every one is a club scripts/data/europe-clubs.json already places, so
  * a club keeps its id, colour and crest from season to season: where several of its rows are one club, the one whose
  * crest the game shows (src/data/clubLogos.js), unless that row carries a name the club took later (RC Strasbourg
  * Alsace, Estrela da Amadora's refounded club); else CM 97/98's name for it (cm-9798), else the CM3 port's, else CM
- * 01/02's or EA's. Thirteen clubs no season had before take a new name; each that plays on a Europe map has a new row
- * (Sporting Clube Campomaiorense, never among a season's strongest 124, needs none).
+ * 01/02's or EA's. Fourteen clubs no season had before take a new name, SC Espinho (1996/97) the last; each that plays
+ * on a Europe map has a new row (Sporting Clube Campomaiorense and SC Espinho, never among a season's strongest 124,
+ * need none).
  */
 export const SWOS_CLUBS = Object.freeze({
   // England
   ARSENAL: 'Arsenal', 'ASTON VILLA': 'Aston Villa', 'BLACKBURN ROVERS': 'Blackburn Rovers', 'BOLTON WANDERERS': 'Bolton Wanderers',
-  CHELSEA: 'Chelsea', 'COVENTRY CITY': 'Coventry City', 'CRYSTAL PALACE': 'Crystal Palace', EVERTON: 'Everton',
-  'IPSWICH TOWN': 'Ipswich Town', 'LEEDS UNITED': 'Leeds United', 'LEICESTER CITY': 'Leicester City', LIVERPOOL: 'Liverpool',
-  'MANCHESTER CITY': 'Manchester City', 'MANCHESTER UTD': 'Manchester United', MIDDLESBROUGH: 'Middlesbrough',
+  CHELSEA: 'Chelsea', 'COVENTRY CITY': 'Coventry City', 'CRYSTAL PALACE': 'Crystal Palace', 'DERBY COUNTY': 'Derby County',
+  EVERTON: 'Everton', 'IPSWICH TOWN': 'Ipswich Town', 'LEEDS UNITED': 'Leeds United', 'LEICESTER CITY': 'Leicester City',
+  LIVERPOOL: 'Liverpool', 'MANCHESTER CITY': 'Manchester City', 'MANCHESTER UTD': 'Manchester United', MIDDLESBROUGH: 'Middlesbrough',
   'NEWCASTLE UNITED': 'Newcastle United', 'NORWICH CITY': 'Norwich City', "NOTT'M FOREST": 'Nottingham Forest',
-  'Q.P.R.': 'Queens Park Rangers', 'SHEFFIELD WED.': 'Sheffield Wednesday', SOUTHAMPTON: 'Southampton', 'TOTTENHAM H.': 'Tottenham Hotspur',
-  'WEST HAM UNITED': 'West Ham United', WIMBLEDON: 'Wimbledon',
+  'Q.P.R.': 'Queens Park Rangers', 'SHEFFIELD WED.': 'Sheffield Wednesday', SOUTHAMPTON: 'Southampton', SUNDERLAND: 'Sunderland',
+  'TOTTENHAM H.': 'Tottenham Hotspur', 'WEST HAM UNITED': 'West Ham United', WIMBLEDON: 'Wimbledon',
   // Spain
   ALBACETE: 'Albacete Balompié', 'ATHLETIC BILBAO': 'Athletic Club', 'ATLETICO MADRID': 'Atlético Madrid', BARCELONA: 'FC Barcelona',
   BETIS: 'Real Betis Balompié', 'CELTA VIGO': 'RC Celta', COMPOSTELA: 'S.D. Compostela', 'DEP. LA CORUNA': 'RC Deportivo de La Coruña',
-  ESPANOL: 'RCD Espanyol', LOGRONES: 'CD Logroñés', MERIDA: 'CP Mérida', OVIEDO: 'Real Oviedo', 'RACING SANTANDER': 'Racing Santander',
-  'RAYO VALLECANO': 'Rayo Vallecano', 'REAL MADRID': 'Real Madrid', 'REAL SOCIEDAD': 'Real Sociedad', SALAMANCA: 'UD Salamanca',
-  SEVILLA: 'Sevilla FC', 'SPORTING GIJON': 'Real Sporting de Gijón', TENERIFE: 'Club Deportivo Tenerife', VALENCIA: 'Valencia CF',
-  VALLADOLID: 'Real Valladolid', ZARAGOZA: 'Real Zaragoza',
+  ESPANOL: 'RCD Espanyol', ESPANYOL: 'RCD Espanyol', EXTREMADURA: 'Extremadura C.F.', HERCULES: 'Hércules CF', LOGRONES: 'CD Logroñés',
+  MERIDA: 'CP Mérida', OVIEDO: 'Real Oviedo', 'RACING SANTANDER': 'Racing Santander', 'RAYO VALLECANO': 'Rayo Vallecano',
+  'REAL MADRID': 'Real Madrid', 'REAL SOCIEDAD': 'Real Sociedad', SALAMANCA: 'UD Salamanca', SEVILLA: 'Sevilla FC',
+  'SPORTING GIJON': 'Real Sporting de Gijón', TENERIFE: 'Club Deportivo Tenerife', VALENCIA: 'Valencia CF', VALLADOLID: 'Real Valladolid',
+  ZARAGOZA: 'Real Zaragoza',
   // Italy
-  'AC MILAN': 'AC Milan', ATALANTA: 'Atalanta', BARI: 'Bari', BRESCIA: 'Brescia', CAGLIARI: 'Cagliari', CREMONESE: 'Cremonese',
-  FIORENTINA: 'Fiorentina', FOGGIA: 'Foggia', GENOA: 'Genoa', 'INTER MILAN': 'Inter', JUVENTUS: 'Juventus', LAZIO: 'Lazio',
-  NAPOLI: 'Napoli', PADOVA: 'Padova', PARMA: 'Parma', PIACENZA: 'Piacenza', REGGIANA: 'Reggiana', ROMA: 'Roma', SAMPDORIA: 'Sampdoria',
-  TORINO: 'Torino', UDINESE: 'Udinese', VICENZA: 'Vicenza',
+  'AC MILAN': 'AC Milan', ATALANTA: 'Atalanta', BARI: 'Bari', BOLOGNA: 'Bologna', BRESCIA: 'Brescia', CAGLIARI: 'Cagliari',
+  CREMONESE: 'Cremonese', FIORENTINA: 'Fiorentina', FOGGIA: 'Foggia', GENOA: 'Genoa', 'INTER MILAN': 'Inter', JUVENTUS: 'Juventus',
+  LAZIO: 'Lazio', NAPOLI: 'Napoli', PADOVA: 'Padova', PARMA: 'Parma', PERUGIA: 'Perugia', PIACENZA: 'Piacenza', REGGIANA: 'Reggiana',
+  ROMA: 'Roma', SAMPDORIA: 'Sampdoria', TORINO: 'Torino', UDINESE: 'Udinese', VERONA: 'Hellas Verona FC', VICENZA: 'Vicenza',
   // Germany
-  '1860 MUNICH': 'TSV Munich 1860', 'BAYER LEVERKUSEN': 'Bayer 04 Leverkusen', 'BAYER UERDINGEN': 'Bayer 05 Uerdingen',
-  'BAYERN MUNICH': 'FC Bayern München', 'BOR. DORTMUND': 'Borussia Dortmund', COLOGNE: '1. FC Köln', 'DYNAMO DRESDEN': 'Dynamo Dresden',
-  'EINTR. FRANKFURT': 'Eintracht Frankfurt', 'FORT. DUSSELDORF': 'Fortuna Düsseldorf', FREIBURG: 'SC Freiburg', HAMBURG: 'Hamburger SV',
-  'HANSA ROSTOCK': 'FC Hansa Rostock', KAISERSLAUTERN: '1. FC Kaiserslautern', KARLSRUHE: 'Karlsruher SC', 'KFC UERDINGEN': 'KFC Uerdingen 05',
+  '1860 MUNICH': 'TSV Munich 1860', 'ARM. BIELEFELD': 'DSC Arminia Bielefeld', 'BAYER LEVERKUSEN': 'Bayer 04 Leverkusen',
+  'BAYER UERDINGEN': 'Bayer 05 Uerdingen', 'BAYERN MUNICH': 'FC Bayern München', 'BOR. DORTMUND': 'Borussia Dortmund',
+  COLOGNE: '1. FC Köln', 'DYNAMO DRESDEN': 'Dynamo Dresden', 'EINTR. FRANKFURT': 'Eintracht Frankfurt',
+  'FORT. DUSSELDORF': 'Fortuna Düsseldorf', FREIBURG: 'SC Freiburg', HAMBURG: 'Hamburger SV', 'HANSA ROSTOCK': 'FC Hansa Rostock',
+  KAISERSLAUTERN: '1. FC Kaiserslautern', KARLSRUHE: 'Karlsruher SC', 'KFC UERDINGEN': 'KFC Uerdingen 05',
   MONCHENGLADBACH: 'Borussia Mönchengladbach', 'MSV DUISBURG': 'MSV Duisburg', SCHALKE: 'FC Schalke 04', 'ST. PAULI': 'FC St. Pauli',
   'VFB STUTTGART': 'VfB Stuttgart', 'VFL BOCHUM': 'VfL Bochum', 'WERDER BREMEN': 'SV Werder Bremen',
   // France
   AUXERRE: 'AJ Auxerre', BASTIA: 'SC Bastia', BORDEAUX: 'Girondins de Bordeaux', CAEN: 'Stade Malherbe Caen', CANNES: 'AS Cannes',
   GUEUGNON: 'FC Gueugnon', GUINGAMP: 'En Avant Guingamp', 'LE HAVRE': 'Le Havre AC', LENS: 'RC Lens', LILLE: 'Lille OSC',
-  LYON: 'Olympique Lyonnais', MARTIGUES: 'FC Martigues', METZ: 'FC Metz', MONACO: 'AS Monaco', MONTPELLIER: 'Montpellier HSC',
-  NANTES: 'FC Nantes', NICE: 'OGC Nice', 'PARIS ST-GERMAIN': 'Paris Saint-Germain', RENNES: 'Stade Rennais FC',
-  'SAINT-ETIENNE': 'AS Saint-Étienne', SOCHAUX: 'FC Sochaux-Montbéliard', STRASBOURG: 'Racing Club de Strasbourg',
+  LYON: 'Olympique Lyonnais', MARSEILLE: 'Olympique de Marseille', MARTIGUES: 'FC Martigues', METZ: 'FC Metz', MONACO: 'AS Monaco',
+  MONTPELLIER: 'Montpellier HSC', NANCY: 'AS Nancy-Lorraine', NANTES: 'FC Nantes', NICE: 'OGC Nice',
+  'PARIS ST-GERMAIN': 'Paris Saint-Germain', RENNES: 'Stade Rennais FC', 'SAINT-ETIENNE': 'AS Saint-Étienne',
+  SOCHAUX: 'FC Sochaux-Montbéliard', STRASBOURG: 'Racing Club de Strasbourg',
   // The Netherlands
-  AJAX: 'Ajax', 'DE GRAAFSCHAP': 'vbv De Graafschap', DORDRECHT: 'FC Dordrecht', FEYENOORD: 'Feyenoord', 'FORTUNA SITTARD': 'Fortuna Sittard',
-  'GO AHEAD EAGLES': 'Go Ahead Eagles', GRONINGEN: 'FC Groningen', HEERENVEEN: 'SC Heerenveen', MVV: 'MVV Maastricht', NAC: 'NAC Breda',
-  NEC: 'NEC Nijmegen', PSV: 'PSV', RKC: 'RKC Waalwijk', 'RODA JC': 'Roda JC', 'SPARTA ROTTERDAM': 'Sparta Rotterdam', TWENTE: 'FC Twente',
-  UTRECHT: 'FC Utrecht', VITESSE: 'Vitesse Arnhem', VOLENDAM: 'FC Volendam', 'WILLEM II': 'Willem II',
+  AJAX: 'Ajax', AZ: 'AZ Alkmaar', 'DE GRAAFSCHAP': 'vbv De Graafschap', DORDRECHT: 'FC Dordrecht', FEYENOORD: 'Feyenoord',
+  'FORTUNA SITTARD': 'Fortuna Sittard', 'GO AHEAD EAGLES': 'Go Ahead Eagles', GRONINGEN: 'FC Groningen', HEERENVEEN: 'SC Heerenveen',
+  MVV: 'MVV Maastricht', NAC: 'NAC Breda', NEC: 'NEC Nijmegen', PSV: 'PSV', RKC: 'RKC Waalwijk', 'RODA JC': 'Roda JC',
+  'SPARTA ROTTERDAM': 'Sparta Rotterdam', TWENTE: 'FC Twente', UTRECHT: 'FC Utrecht', VITESSE: 'Vitesse Arnhem', VOLENDAM: 'FC Volendam',
+  'WILLEM II': 'Willem II',
   // Portugal
   'BEIRA MAR': 'Sport Clube Beira-Mar', BELENENSES: 'C.F. Os Belenenses', BENFICA: 'SL Benfica', BOAVISTA: 'Boavista FC',
-  BRAGA: 'Sporting Clube de Braga', CAMPOMAIORENSE: 'Sporting Clube Campomaiorense', CHAVES: 'GD Chaves', 'ESTRELA AMADORA': 'CF Estrela Amadora',
-  FARENSE: 'SC Farense', 'FC PORTO': 'FC Porto', FELGUEIRAS: 'FC Felgueiras', 'GIL VICENTE': 'Gil Vicente FC', LECA: 'Leça FC',
-  MARITIMO: 'CS Marítimo', SALGUEIROS: 'SC Salgueiros', 'SPORTING LISBON': 'Sporting CP', TIRSENSE: 'FC Tirsense',
-  'UNIAO LEIRIA': 'União Desportiva de Leiria', 'UNIAO MADEIRA': 'União da Madeira', 'VIT. GUIMARAES': 'Vitória SC',
-  'VITORIA SETUBAL': 'Vitória Futebol Clube',
+  BRAGA: 'Sporting Clube de Braga', CAMPOMAIORENSE: 'Sporting Clube Campomaiorense', CHAVES: 'GD Chaves', ESPINHO: 'SC Espinho',
+  'ESTRELA AMADORA': 'CF Estrela Amadora', FARENSE: 'SC Farense', 'FC PORTO': 'FC Porto', FELGUEIRAS: 'FC Felgueiras',
+  'GIL VICENTE': 'Gil Vicente FC', LECA: 'Leça FC', MARITIMO: 'CS Marítimo', 'RIO AVE': 'Rio Ave FC', SALGUEIROS: 'SC Salgueiros',
+  'SPORTING LISBON': 'Sporting CP', TIRSENSE: 'FC Tirsense', 'UNIAO LEIRIA': 'União Desportiva de Leiria',
+  'UNIAO MADEIRA': 'União da Madeira', 'VIT. GUIMARAES': 'Vitória SC', 'VITORIA SETUBAL': 'Vitória Futebol Clube',
 });
 
 /**

@@ -1,7 +1,7 @@
 // The 1997/98 football season from Sports Interactive's Championship Manager 97/98 database, as baskeyx extracted it to
-// JSON (github.com/baskeyx/cm9798): national squads by nationality and the clubs of the seven big leagues' top
-// divisions, in the data set format the game loads (src/engine/footballSets.js, kind 'cm', its players CM 01/02's
-// tuples, src/data/cmPlayers.js). No I/O here: scripts/build-retro-seasons.mjs reads the files and writes the season,
+// JSON (github.com/baskeyx/cm9798): national squads by nationality and Europe's strongest first-division clubs, in the
+// data set format the game loads (src/engine/footballSets.js, kind 'cm', its players CM 01/02's tuples,
+// src/data/cmPlayers.js). No I/O here: scripts/build-retro-seasons.mjs reads the files and writes the season,
 // and tests build seasons from invented records. Every rating is the database's current ability, converted as a CM
 // 01/02 database's is; a player it does not rate (ability 0) is left out, never guessed. Potential and the attributes
 // are not read, so the extraction's null ones change nothing. See docs/design/football-years.md.
@@ -9,17 +9,22 @@ import { NATIONS, HISTORIC_NATIONS, PACIFIC_ISLANDS, selectLineup } from '../../
 import { CM_SCALE, cmNaturalPositions, cmTupleOf, expandCmTuple } from '../../src/data/cmPlayers.js';
 import { CM0102_NATIONS } from '../../src/data/cm0102Nations.js';
 import { FOOTBALL_FEDERATIONS } from '../../src/data/footballFederations.js';
-import { FOOTBALL_SET_FORMAT, NO_TEAM, contentHash, nationResolver, presentClubs, serializeFootballSet, territoryFor } from '../../src/data/footballSetBuild.js';
+import { FOOTBALL_SET_FORMAT, NO_TEAM, contentHash, nationResolver, presentClubs, serializeFootballSet, strongestBuilt, territoryFor } from '../../src/data/footballSetBuild.js';
+import { BIG_LEAGUES, EUROPEAN_LEAGUES } from '../../src/data/footballLeagues.js';
+import { TOP_CLUBS } from '../../src/data/scopes.js';
 import { pickFootballSquad } from '../../src/data/footballSquad.js';
 
 export const CM9798_ID = 'cm-9798';
 const CLUB_SIZE = 11;
 
-/** The top divisions of the seven big leagues, by the database's division codes: game league, map shape. */
-export const CM9798_DIVISIONS = {
-  EPR: ['Premier League', '826'], SP1: ['La Liga', '724'], ISA: ['Serie A', '380'], GD1: ['Bundesliga', '276'],
-  FD1: ['Ligue 1', '250'], HD1: ['Eredivisie', '528'], PD1: ['Liga Portugal', '620'],
-};
+/**
+ * Europe's first divisions the database holds, by its division codes: game league, map shape (src/data/footballLeagues.js).
+ * The seven big leagues first; its Swedish Allsvenskan is WD1.
+ */
+export const CM9798_DIVISIONS = Object.freeze(Object.fromEntries(Object.entries({
+  EPR: 'Premier League', SP1: 'La Liga', ISA: 'Serie A', GD1: 'Bundesliga', FD1: 'Ligue 1', HD1: 'Eredivisie', PD1: 'Liga Portugal',
+  TR1: 'Süper Lig', BD1: 'Belgian Pro League', SPR: 'Scottish Premiership', DD1: 'Danish Superliga', ND1: 'Eliteserien', WD1: 'Allsvenskan',
+}).map(([division, league]) => [division, [league, EUROPEAN_LEAGUES[league]]])));
 
 /**
  * The database's nationality names as the game names its nations: CM 01/02's (src/data/cm0102Nations.js) plus CM 97/98's
@@ -140,7 +145,8 @@ export function buildCm9798Season({ players, teams }, { source, year, federation
   const built = [], leagueAudit = [];
   for (const [division, [league, country]] of Object.entries(CM9798_DIVISIONS)) {
     const members = teams.filter(team => team.division === division);
-    if (!members.length) throw new Error(`No ${division} teams`);
+    // The seven big leagues' divisions are in the database; the others too, but none is needed.
+    if (!members.length && BIG_LEAGUES.includes(league)) throw new Error(`No ${division} teams`);
     const short = [];
     for (const team of members) {
       if (![team.name, team.shortName].filter(Boolean).every(name => named.get(name) === team)) throw new Error(`${division} team ${team.name} shares a name with another record`);
@@ -148,9 +154,11 @@ export function buildCm9798Season({ players, teams }, { source, year, federation
       if (squad.length < CLUB_SIZE) { short.push({ name: team.name, players: squad.length }); continue; }
       built.push({ name: team.name, league, country, str: Math.round(mean(squad.map(p => p.rating))), squad });
     }
-    leagueAudit.push({ league, division, members: members.length, clubs: members.length - short.length, short });
+    leagueAudit.push({ league, division, members: members.length, clubs: members.length - short.length, kept: 0, short });
   }
-  const clubs = presentClubs(built, warn);
+  // Europe's strongest TOP_CLUBS, as every season keeps.
+  const clubs = presentClubs(strongestBuilt(built, TOP_CLUBS), warn);
+  for (const club of clubs) leagueAudit.find(entry => entry.league === club.league).kept++;
 
   const territory = territoryFor(federations, year);
   const written = new Set([...Object.values(nations).flatMap(([, , squad]) => squad), ...clubs.flatMap(club => club.squad)].map(tuple => tuple[0]));

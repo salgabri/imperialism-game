@@ -15,10 +15,18 @@ import { EA_ROLES, EA_SCALE } from '../../src/data/eaPlayers.js';
 import { EA_LEAGUES, SET_ID, assembleEaSeason } from './ea-seasons.mjs';
 import { parseCsv } from './football-data.mjs';
 
-/** The club layer's seven leagues as EA's website names them, by EA's competition id (EA_LEAGUES). */
+/**
+ * Europe's first divisions as EA's website names them, by EA's competition id (EA_LEAGUES). The website files the few
+ * clubs it has of a league it has no licence for under a name of its own (Hellas Liga: Olympiacos, Panathinaikos, AEK
+ * Athens, PAOK), so those are their leagues too.
+ */
 export const SITE_LEAGUES = Object.freeze({
   'Premier League': 13, 'LALIGA EA SPORTS': 53, 'Serie A Enilive': 31, Bundesliga: 19, "Ligue 1 McDonald's": 16,
   Eredivisie: 10, 'Liga Portugal': 308,
+  'Trendyol Süper Lig': 68, '1A Pro League': 4, 'Hellas Liga': 63, 'Česká Liga': 319, 'Scottish Prem': 50, '3F Superliga': 1,
+  Eliteserien: 41, 'Ukrayina Liha': 332, 'Liga Hrvatska': 317, 'PKO BP Ekstraklasa': 66, CSSL: 189, 'Ö. Bundesliga': 80,
+  'Liga Azerbaijan': 313, 'Magyar Liga': 64, SUPERLIGA: 330, 'Liga Cyprus': 318, Allsvenskan: 56, Finnliiga: 322,
+  'SSE Airtricity PD': 65,
 });
 /** The website export's columns the build reads. */
 export const SITE_COLUMNS = ['Name', 'OVR', 'Position', 'Alternative positions', 'Age', 'Nation', 'League', 'Team', 'url'];
