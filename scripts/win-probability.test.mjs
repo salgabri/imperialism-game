@@ -537,7 +537,8 @@ test('sport profile exports: the match model\'s positional ratings, without the 
   assert.deepEqual(Object.keys(footballModule).sort(), ['FOOTBALL_MODEL', 'football', 'footballIn', 'footballProfile', 'knockoutIn',
     'prepareFootballMatch', 'sampleFootballResult']);
   assert.deepEqual(Object.keys(basketballModule).sort(), ['BASKETBALL_MODEL', 'BENCH', 'EUROLEAGUE_MAP', 'EUROLEAGUE_SCOPE', 'basketball',
-    'basketballProfile', 'euroleagueBasketball', 'nbaBasketball', 'nbaBasketballIn', 'prepareMatch', 'sampleResult']);
+    'basketballProfile', 'euroleagueBasketball', 'euroleagueBasketballIn', 'isEuroleagueScope', 'nbaBasketball', 'nbaBasketballIn', 'prepareMatch',
+    'sampleResult']);
   assert.equal(football.prepareMatch, prepareFootballMatch);
   assert.equal(basketball.prepareMatch, basketballModule.prepareMatch);
 

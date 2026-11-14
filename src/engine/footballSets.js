@@ -238,6 +238,12 @@ export const BUILT_IN_SETS = listing([...BUILT_IN_SEASONS, ...BUILT_IN_WOMENS_SE
 /** The era map a basketball or baseball season's clubs play on (null for any other set). */
 export const seasonMapOf = id => BUILT_IN_SETS.find(set => set.id === id)?.map ?? null;
 
+/**
+ * Whether a map is one a season's clubs may play on: its era's (`seasonMapOf`), or for a basketball season from
+ * 2000/01 the EuroLeague's map of that season (src/data/europeMaps.js).
+ */
+export const isSeasonMap = (mapId, id) => mapId === seasonMapOf(id) || (setKindOf(id) === 'nba2k' && euroleagueMapOf(id, mapId) != null);
+
 // ---------- loading ----------
 
 // A decoded set holds every nation's and club's players. Keep the retained ones (the set the setup has chosen) plus
@@ -347,7 +353,9 @@ export function decodeFootballSet(data, id = data?.id) {
   if (data.identities !== undefined) data = { ...data, identities: frozenIdentities(data.identities) };
   if (['nba2k', 'madden', 'tecmo', 'pfa', 'nrl'].includes(setKindOf(data.id))) {
     const { clubs, ...meta } = data;
-    return { meta, rosters: null, clubs: clubs.map(club => ({ ...club, squad: club.squad.map(player => [...player]) })), territory: NO_TERRITORY };
+    // A basketball season's EuroLeague players are rated by estimate, and say so wherever they are shown (src/data/estimates.js).
+    const playerOf = club => (club.league === EUROLEAGUE && setKindOf(data.id) === 'nba2k' ? player => [...player, euroleagueEstimate()] : player => [...player]);
+    return { meta, rosters: null, clubs: clubs.map(club => ({ ...club, squad: club.squad.map(playerOf(club)) })), territory: NO_TERRITORY };
   }
   if (setKindOf(data.id) === 'elo' || setKindOf(data.id) === 'wta') {
     const { nations, clubs, territory, ...meta } = data;
@@ -536,8 +544,16 @@ KINDS.nrl = { size: 3,
 const NBA_SCALE = 99;
 const SHOW_SCALE = 99;
 const BASKETBALL_POSITIONS = ['PG', 'SG', 'SF', 'PF', 'C'];
-// The built-in basketball clubs' `b-<slug>` ids, with the same guard against Object.prototype names.
+// The built-in basketball clubs' `b-<slug>` ids, with the same guard against Object.prototype names; the EuroLeague's `el-<slug>`.
 const BASKETBALL_CLUB_ID = /^b-[a-z0-9-]{1,62}$/;
+const EUROLEAGUE_CLUB_ID = /^el-[a-z0-9-]{1,62}$/;
+const EUROLEAGUE = 'EuroLeague';
+/** A EuroLeague player's rating in a season's file is the game's estimate from his box scores, as the built-in ones are. */
+const euroleagueEstimate = () => ({ source: 'estimate', edition: 'Estimated', league: EUROLEAGUE });
+
+/** The EuroLeague's map of Europe that serves basketball season `id` (src/data/europeMaps.js), or null. */
+const euroleagueMapOf = (id, map) => EUROPE_MAPS.find(entry => entry.id === map && entry.sport === 'basketball' && !entry.theatre
+  && !!entry.seasons?.includes(id)) || null;
 
 function validateFootballSet(data, id) {
   const fail = message => { throw new Error(`Football data set ${id}: ${message}`); };
@@ -727,9 +743,10 @@ const frozenIdentities = identities => Object.freeze(Object.fromEntries(Object.e
   .map(([shape, { name, code, flagId }]) => [shape, Object.freeze({ name, code, flagId })])));
 
 /**
- * A basketball season's clubs: the NBA's of that season, one per section of its era's map (`map`), each with its best
- * five as `[name, 'PG' or 'PG/SG', rating]`. Saved names resolve against them, so ids, codes and leagues follow the
- * built-in clubs' rules.
+ * A basketball season's clubs: the NBA's of that season, one per section of its era's map (`map`), then from 2000/01 the
+ * EuroLeague's, one per section of its own map of Europe (`euroleague`), each with its best five as `[name, 'PG' or
+ * 'PG/SG', rating]`. Saved names resolve against them, so ids, codes and leagues follow the built-in clubs' rules: NBA
+ * franchises ('b-' ids) in the NBA, the EuroLeague's clubs ('el-' ids) in the EuroLeague, codes distinct in each league.
  */
 function validateBasketballClubs(data, id, fail) {
   const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
@@ -738,22 +755,33 @@ function validateBasketballClubs(data, id, fail) {
   if (data.nations !== undefined || data.territory !== undefined) fail('an NBA season has clubs only');
   const map = eraMapOf(id, data.map);
   if (!map) fail(`map ${JSON.stringify(data.map)} is not a basketball map listing this season`);
+  const europe = data.euroleague === undefined ? null : euroleagueMapOf(id, data.euroleague);
+  if (data.euroleague !== undefined && !europe) fail(`euroleague ${JSON.stringify(data.euroleague)} is not a EuroLeague map listing this season`);
   if (!Array.isArray(data.clubs)) fail('clubs must be a list');
-  if (data.clubs.length !== map.clubs) fail(`clubs must be the ${map.clubs} of map ${map.id}, found ${data.clubs.length}`);
-  // An NBA season's clubs are NBA franchises ('b-' ids): the EuroLeague's clubs are the built-in season's only.
+  const nba = data.clubs.filter(club => club?.league !== EUROLEAGUE).length;
+  if (nba !== map.clubs) fail(`clubs must be the ${map.clubs} of map ${map.id}, found ${nba}`);
+  const euroleague = data.clubs.length - nba;
+  if (euroleague !== (europe?.clubs ?? 0)) {
+    fail(europe ? `the EuroLeague's clubs must be the ${europe.clubs} of map ${europe.id}, found ${euroleague}` : 'EuroLeague clubs need their map (euroleague)');
+  }
+  // The NBA's franchises play in the NBA; the EuroLeague's clubs come after them.
   const leagues = new Set(basketball.clubs.filter(club => BASKETBALL_CLUB_ID.test(club.id)).map(club => club.league));
   const ids = new Set(), codes = new Set();
   data.clubs.forEach((club, i) => {
     const at = `clubs[${i}] (${JSON.stringify(club?.name ?? club?.id)})`;
     if (!isObject(club)) fail(`${at} is not an object`);
-    if (typeof club.id !== 'string' || !BASKETBALL_CLUB_ID.test(club.id)) fail(`${at} id ${JSON.stringify(club.id)} must look like "b-<name>"`);
+    const inEuroleague = club.league === EUROLEAGUE;
+    if (inEuroleague && i < nba) fail(`${at} is a EuroLeague club before the NBA's`);
+    if (typeof club.id !== 'string' || !(inEuroleague ? EUROLEAGUE_CLUB_ID : BASKETBALL_CLUB_ID).test(club.id)) {
+      fail(`${at} id ${JSON.stringify(club.id)} must look like "${inEuroleague ? 'el' : 'b'}-<name>"`);
+    }
     if (ids.has(club.id)) fail(`${at} id is duplicated`);
     ids.add(club.id);
     if (!text(club.name)) fail(`${at} has no name`);
     if (typeof club.code !== 'string' || !/^[A-Z0-9]{3}$/.test(club.code)) fail(`${at} code ${JSON.stringify(club.code)} must be three capitals`);
-    if (codes.has(club.code)) fail(`${at} code ${club.code} is duplicated`);
-    codes.add(club.code);
-    if (!leagues.has(club.league)) fail(`${at} league ${JSON.stringify(club.league)} is not a built-in league`);
+    if (codes.has(`${club.league}|${club.code}`)) fail(`${at} code ${club.code} is duplicated`);
+    codes.add(`${club.league}|${club.code}`);
+    if (!inEuroleague && !leagues.has(club.league)) fail(`${at} league ${JSON.stringify(club.league)} is not a built-in league`);
     if (typeof club.country !== 'string' || !Object.hasOwn(NATIONS, club.country)) fail(`${at} country ${JSON.stringify(club.country)} is not a nation id`);
     if (!text(club.col)) fail(`${at} has no colour`);
     if (!rating(club.str)) fail(`${at} str must be a rating 1-99`);

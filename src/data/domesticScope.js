@@ -3,6 +3,7 @@
 import { DOMESTIC } from './domestic.js';
 import { CLUB_MAPS } from './clubMaps.js';
 import { EUROPE_MAPS } from './europeMaps.js';
+import { BUILT_IN_BASKETBALL_SEASONS } from './basketballSeasons.js';
 import { domesticScope, domesticScopeId, isDomesticScope } from '../engine/domestic.js';
 
 export { isDomesticScope, domesticScopeId };
@@ -20,8 +21,15 @@ const THEATRE_SPORTS = new Set(EUROPE_MAPS.map(entry => entry.sport));
 /** Whether a sport's clubs choose between maps (`theatreMapsOf`) rather than always playing one (`clubMapOf`). */
 export const hasTheatreMaps = sportId => THEATRE_SPORTS.has(sportId);
 
-/** Whether a map is a season's (`dataSet`: an earlier season's id, or null for the built-in one). */
-const servesSeason = (entry, dataSet) => (dataSet == null ? entry.seasons == null : !!entry.seasons?.includes(dataSet));
+// The NBA map each earlier basketball season plays on: an era's, or today's for the seasons since 2014/15 (`seasons` null).
+const BASKETBALL_SEASON_MAPS = new Map(BUILT_IN_BASKETBALL_SEASONS.map(season => [season.id, season.map]));
+
+/**
+ * Whether a map is a season's (`dataSet`: an earlier season's id, or null for the built-in one): one that lists it, or
+ * the built-in map an earlier basketball season names as its own (the NBA's seasons since 2014/15 play on today's).
+ */
+const servesSeason = (entry, dataSet) => (dataSet == null ? entry.seasons == null
+  : !!entry.seasons?.includes(dataSet) || (entry.seasons == null && BASKETBALL_SEASON_MAPS.get(dataSet) === entry.id));
 
 /**
  * The map a sport's clubs always play on (basketball: the NBA's USA and Canada), or null. An earlier season names its
@@ -53,8 +61,8 @@ export const theatreOf = entry => entry?.theatre ?? entry?.league ?? null;
  * The maps a sport's clubs choose between in a season, in the setup's order: Europe's strongest clubs and its elite,
  * then a league on a map of its own (women's football: the NWSL's USA; basketball: the NBA's USA and Canada, or an
  * earlier season's map of its era), then a league on a map of Europe (basketball's EuroLeague: a Europe map with no
- * `theatre`, its theatre its league). Empty for a sport whose clubs always play one map (`clubMapOf`) or the world, and
- * for a season without maps (a CM 01/02 set built here).
+ * `theatre`, its theatre its league; an earlier season's from 2000/01 on, of that season's clubs). Empty for a sport whose
+ * clubs always play one map (`clubMapOf`) or the world, and for a season without maps (a CM 01/02 set built here).
  */
 export const theatreMapsOf = (sportId, dataSet = null) => (hasTheatreMaps(sportId)
   ? [...europeMapsOf(dataSet, sportId), ...CLUB_MAPS.filter(entry => entry.sport === sportId && servesSeason(entry, dataSet)),
