@@ -2221,7 +2221,7 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
   2026-11-14), and a local CM 01/02 database is the only way to clubs in 2005/06
   and 2004/05.
 - The period crests (`src/data/clubCrestEras.js`, [period-marks.md](period-marks.md))
-  were researched before 1996/97 had clubs. 57 of its 134 clubs have an era
+  were researched before 1996/97 had clubs. 75 of its 134 clubs have an era
   covering it; the clubs no neighbouring season has (Bologna, Sunderland, Hércules,
   Hellas Verona, AZ, SC Espinho) have none, and Marseille, Derby County and Arminia
   Bielefeld have eras only from 1997/98: in 1996/97 all of them show today's crest,
