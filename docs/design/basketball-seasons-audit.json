@@ -501,7 +501,7 @@
   "seasons": [
     {
       "id": "nba-2k26",
-      "version": "nba-2k26-ea2e3bfa",
+      "version": "nba-2k26-31c9d626",
       "edition": "NBA 2K26",
       "rows": 533,
       "map": "nba",
@@ -509,11 +509,15 @@
       "filledPositions": [],
       "droppedNoPosition": [],
       "narrowedPositions": 10,
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2026",
+        "clubs": 20
+      }
     },
     {
       "id": "nba-2k25",
-      "version": "nba-2k25-e963415e",
+      "version": "nba-2k25-ed00d321",
       "edition": "NBA 2K25",
       "rows": 534,
       "map": "nba",
@@ -521,11 +525,15 @@
       "filledPositions": [],
       "droppedNoPosition": [],
       "narrowedPositions": 10,
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2025",
+        "clubs": 18
+      }
     },
     {
       "id": "nba-2k24",
-      "version": "nba-2k24-6450daa7",
+      "version": "nba-2k24-a38fab56",
       "edition": "NBA 2K24",
       "rows": 464,
       "map": "nba",
@@ -533,11 +541,15 @@
       "filledPositions": [],
       "droppedNoPosition": [],
       "narrowedPositions": 3,
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2023",
+        "clubs": 18
+      }
     },
     {
       "id": "nba-2k23",
-      "version": "nba-2k23-bbf975ca",
+      "version": "nba-2k23-9cd04bde",
       "edition": "NBA 2K23",
       "rows": 466,
       "map": "nba",
@@ -545,11 +557,15 @@
       "filledPositions": [],
       "droppedNoPosition": [],
       "narrowedPositions": 5,
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2023",
+        "clubs": 18
+      }
     },
     {
       "id": "nba-2k22",
-      "version": "nba-2k22-7f7fdb2b",
+      "version": "nba-2k22-12f852ab",
       "edition": "NBA 2K22",
       "rows": 437,
       "map": "nba",
@@ -557,11 +573,15 @@
       "filledPositions": [],
       "droppedNoPosition": [],
       "narrowedPositions": 5,
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2022",
+        "clubs": 18
+      }
     },
     {
       "id": "nba-2k21",
-      "version": "nba-2k21-ee2b6579",
+      "version": "nba-2k21-bda6bbc8",
       "edition": "NBA 2K21",
       "rows": 509,
       "map": "nba",
@@ -569,11 +589,15 @@
       "filledPositions": [],
       "droppedNoPosition": [],
       "narrowedPositions": 9,
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2020",
+        "clubs": 18
+      }
     },
     {
       "id": "nba-2k20",
-      "version": "nba-2k20-2c85a99f",
+      "version": "nba-2k20-5dd80e63",
       "edition": "NBA 2K20",
       "rows": 441,
       "map": "nba",
@@ -584,11 +608,15 @@
       "outOfPosition": [
         "Golden State Warriors: D'Angelo Russell (PG) at SF"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2020",
+        "clubs": 18
+      }
     },
     {
       "id": "nba-2k19",
-      "version": "nba-2k19-832d3b50",
+      "version": "nba-2k19-99b92d6d",
       "edition": "NBA 2K19",
       "rows": 461,
       "map": "nba",
@@ -596,11 +624,15 @@
       "filledPositions": [],
       "droppedNoPosition": [],
       "narrowedPositions": 2,
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2019",
+        "clubs": 16
+      }
     },
     {
       "id": "nba-2k18",
-      "version": "nba-2k18-374618a1",
+      "version": "nba-2k18-12c48b6b",
       "edition": "NBA 2K18",
       "rows": 436,
       "map": "nba",
@@ -608,11 +640,15 @@
       "filledPositions": [],
       "droppedNoPosition": [],
       "narrowedPositions": 2,
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2018",
+        "clubs": 16
+      }
     },
     {
       "id": "nba-2k17",
-      "version": "nba-2k17-fe7827b8",
+      "version": "nba-2k17-31c8a1ba",
       "edition": "NBA 2K17",
       "rows": 437,
       "map": "nba",
@@ -620,11 +656,15 @@
       "filledPositions": [],
       "droppedNoPosition": [],
       "narrowedPositions": 2,
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2017",
+        "clubs": 16
+      }
     },
     {
       "id": "nba-2k16",
-      "version": "nba-2k16-ff9e1907",
+      "version": "nba-2k16-6111dea3",
       "edition": "NBA 2K16",
       "rows": 436,
       "map": "nba",
@@ -632,11 +672,15 @@
       "filledPositions": [],
       "droppedNoPosition": [],
       "narrowedPositions": 3,
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2016",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k15",
-      "version": "nba-2k15-1391efaa",
+      "version": "nba-2k15-304ac9d8",
       "edition": "NBA 2K15",
       "rows": 413,
       "map": "nba",
@@ -711,11 +755,15 @@
       "narrowedPositions": 0,
       "warnings": [
         "13 players with no position in any edition were left out"
-      ]
+      ],
+      "euroleague": {
+        "map": "el2015",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k14",
-      "version": "nba-2k14-53eaeae9",
+      "version": "nba-2k14-55b3bcf0",
       "edition": "NBA 2K14",
       "rows": 534,
       "map": "nba2014",
@@ -729,11 +777,15 @@
         "Houston Rockets: Jeremy Lin (PG) at PF",
         "Los Angeles Lakers: Nick Young (SG) at SF"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2014",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k13",
-      "version": "nba-2k13-4db4910a",
+      "version": "nba-2k13-ce99f133",
       "edition": "NBA 2K13",
       "rows": 390,
       "map": "nba2013",
@@ -750,11 +802,15 @@
         "Toronto Raptors: Jose Calderon (PG) at SF",
         "Washington Wizards: Nene (C) at PF"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2013",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k12",
-      "version": "nba-2k12-07cc3c73",
+      "version": "nba-2k12-ba4278d3",
       "edition": "NBA 2K12",
       "rows": 452,
       "map": "nba2009",
@@ -775,11 +831,15 @@
       "outOfPosition": [
         "Atlanta Hawks: Jamal Crawford (SG) at SF"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2012",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k11",
-      "version": "nba-2k11-c680fcbc",
+      "version": "nba-2k11-86b84068",
       "edition": "NBA 2K11",
       "rows": 392,
       "map": "nba2009",
@@ -792,11 +852,15 @@
         "Phoenix Suns: Josh Childress (SF) at C",
         "Washington Wizards: John Wall (PG) at C"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2011",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k10",
-      "version": "nba-2k10-fd74a4ba",
+      "version": "nba-2k10-25d61008",
       "edition": "NBA 2K10",
       "rows": 357,
       "map": "nba2009",
@@ -815,11 +879,15 @@
         "San Antonio Spurs: Roger Mason (SG) at C",
         "Toronto Raptors: Jarrett Jack (PG) at SF"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2010",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k09",
-      "version": "nba-2k09-e22ab174",
+      "version": "nba-2k09-c4dd90bb",
       "edition": "NBA 2K9",
       "rows": 401,
       "map": "nba2009",
@@ -833,11 +901,15 @@
         "Orlando Magic: Rashard Lewis (SF) at PF",
         "Toronto Raptors: Jermaine O'Neal (PF) at C"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2009",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k08",
-      "version": "nba-2k08-01c3a60a",
+      "version": "nba-2k08-2b8b9313",
       "edition": "NBA 2K8",
       "rows": 394,
       "map": "nba2008",
@@ -850,11 +922,15 @@
         "Miami Heat: Shaquille O'Neal (C) at SF",
         "Utah Jazz: Carlos Boozer (PF) at C"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2008",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k07",
-      "version": "nba-2k07-f99ef96f",
+      "version": "nba-2k07-d1901972",
       "edition": "NBA 2K7",
       "rows": 386,
       "map": "nba2006",
@@ -866,11 +942,15 @@
         "Minnesota Timberwolves: Randy Foye (SG) at SF",
         "Utah Jazz: Carlos Boozer (PF) at C"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2007",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k06",
-      "version": "nba-2k06-79397798",
+      "version": "nba-2k06-9c6e55b4",
       "edition": "NBA 2K6",
       "rows": 402,
       "map": "nba2006",
@@ -883,11 +963,15 @@
         "Orlando Magic: Jameer Nelson (PG) at SG",
         "Philadelphia 76ers: Andre Iguodala (SG) at PG"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2006",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k05",
-      "version": "nba-2k05-88905999",
+      "version": "nba-2k05-6305fa61",
       "edition": "NBA 2K5",
       "rows": 395,
       "map": "nba2005",
@@ -902,11 +986,15 @@
         "Phoenix Suns: Quentin Richardson (SG) at C",
         "Seattle SuperSonics: Flip Murray (SG) at C"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2005",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k04",
-      "version": "nba-2k04-6be3a07e",
+      "version": "nba-2k04-85b6d21b",
       "edition": "NBA 2K4",
       "rows": 382,
       "map": "nba2003",
@@ -917,11 +1005,15 @@
       "outOfPosition": [
         "Miami Heat: Brian Grant (PF) at C"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2004",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k03",
-      "version": "nba-2k03-1075a4d0",
+      "version": "nba-2k03-059e8266",
       "edition": "NBA 2K3",
       "rows": 362,
       "map": "nba2003",
@@ -938,11 +1030,15 @@
         "New York Knicks: Kurt Thomas (PF) at C",
         "Utah Jazz: Andrei Kirilenko (SF) at C"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2003",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k02",
-      "version": "nba-2k02-ce292ad9",
+      "version": "nba-2k02-b7025683",
       "edition": "NBA 2K2",
       "rows": 348,
       "map": "nba2002",
@@ -957,11 +1053,15 @@
         "New York Knicks: Kurt Thomas (PF) at C",
         "Portland Trail Blazers: Dale Davis (PF) at C"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2002",
+        "clubs": 32
+      }
     },
     {
       "id": "nba-2k01",
-      "version": "nba-2k01-02fc4ad1",
+      "version": "nba-2k01-6b4ba2c6",
       "edition": "NBA 2K1",
       "rows": 382,
       "map": "nba2000",
@@ -973,7 +1073,11 @@
         "Phoenix Suns: Rodney Rogers (SF) at C",
         "Portland Trail Blazers: Dale Davis (PF) at C"
       ],
-      "warnings": []
+      "warnings": [],
+      "euroleague": {
+        "map": "el2001",
+        "clubs": 24
+      }
     },
     {
       "id": "nba-2k00",

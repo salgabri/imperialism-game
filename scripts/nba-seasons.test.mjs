@@ -28,6 +28,8 @@ const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8'
 const MANIFEST = JSON.parse(read('scripts/data/nba-seasons.json'));
 const ARENAS = JSON.parse(read('scripts/data/nba-arenas.json')).clubs;
 const seasonFile = id => JSON.parse(read(`public/basketball/${id}.json`));
+// A season's NBA franchises: from 2000/01 its file carries the EuroLeague's clubs too (scripts/euroleague.test.mjs).
+const nbaClubs = doc => doc.clubs.filter(club => club.league === 'NBA');
 const mapFile = id => JSON.parse(read(`public/domestic/${id}.json`));
 
 // ---------- the builder, on invented players ----------
@@ -480,7 +482,7 @@ test('every season loads and fits its era\'s map: the same franchises, named and
     const map = decodeDomestic(mapFile(listed.map), listed.map);
     const entry = CLUB_MAPS.find(item => item.id === listed.map);
     assert.equal(map.meta.version, entry.version);
-    assert.deepEqual(set.clubs.map(club => club.id).sort(), map.clubs.map(club => club.id).sort(), `${listed.id} has ${listed.map}'s franchises`);
+    assert.deepEqual(nbaClubs(set).map(club => club.id).sort(), map.clubs.map(club => club.id).sort(), `${listed.id} has ${listed.map}'s franchises`);
     const teams = new Map(teamsOf(MANIFEST, doc.year, ARENAS).map(team => [team.id, team]));
     for (const row of map.clubs) {
       const team = teams.get(row.id), club = set.clubs.find(item => item.id === row.id);
@@ -493,7 +495,7 @@ test('every season loads and fits its era\'s map: the same franchises, named and
       assert.equal(club.str, Math.round(club.squad.reduce((sum, [, , rating]) => sum + rating, 0) / 5));
     }
     if (entry.seasons) assert.ok(entry.seasons.includes(listed.id));
-    else assert.deepEqual(new Set(set.clubs.map(club => club.id)), today, 'today\'s map serves seasons with today\'s franchises');
+    else assert.deepEqual(new Set(nbaClubs(set).map(club => club.id)), today,'today\'s map serves seasons with today\'s franchises');
   }
   // Every era map serves at least one season, and only seasons that name it, in the order they were played.
   for (const entry of ERA_MAPS) {
@@ -692,11 +694,18 @@ test('the loader refuses a basketball season that is not the builder\'s', () => 
   assert.throws(broken(d => { d.map = 'nba2000'; }), /map "nba2000" is not a basketball map listing this season/);
   assert.throws(broken(d => { d.map = '826'; }), /is not a basketball map/);
   assert.throws(broken(d => { d.nations = {}; }), /clubs only/);
-  assert.throws(broken(d => { d.clubs.pop(); }), /clubs must be the 30 of map nba2008, found 29/);
+  assert.throws(broken(d => { d.clubs.shift(); }), /clubs must be the 30 of map nba2008, found 29/);
+  // Its EuroLeague clubs, after the NBA's, are the 24 of its EuroLeague map.
+  assert.throws(broken(d => { d.clubs.pop(); }), /the EuroLeague's clubs must be the 24 of map el2008, found 23/);
+  assert.throws(broken(d => { delete d.euroleague; }), /EuroLeague clubs need their map/);
+  assert.throws(broken(d => { d.euroleague = 'el2010'; }), /euroleague "el2010" is not a EuroLeague map listing this season/);
+  assert.throws(broken(d => { d.clubs.at(-1).id = 'b-cska-moscow'; }), /must look like "el-<name>"/);
+  assert.throws(broken(d => { d.clubs.unshift(d.clubs.pop()); }), /is a EuroLeague club before the NBA's/);
   assert.throws(broken(d => { d.kind = 'ea'; }), /kind "ea" is not the kind its id names/);
   assert.throws(broken(d => { d.clubs[0].id = 'f-phoenix-suns'; }), /must look like "b-<name>"/);
   assert.throws(broken(d => { d.clubs[1].code = d.clubs[0].code; }), /is duplicated/);
-  assert.throws(broken(d => { d.clubs[0].league = 'EuroLeague'; }), /not a built-in league/);
+  assert.throws(broken(d => { d.clubs[0].league = 'EuroLeague'; }), /clubs must be the 30 of map nba2008, found 29/, 'an NBA franchise in the EuroLeague');
+  assert.throws(broken(d => { d.clubs[0].league = 'ABA'; }), /not a built-in league/);
   assert.throws(broken(d => { d.clubs[0].squad.pop(); }), /needs at least five players/);
   assert.throws(broken(d => { d.clubs[0].squad[0][1] = 'PG/SF'; }), /one position or two neighbouring ones/);
   assert.throws(broken(d => { d.clubs[0].squad[0][2] = 95.5; }), /whole number 1-99/);
@@ -777,7 +786,7 @@ async function chooseSeason(app, time, id) {
   assert.equal(app.domesticStatus().state, 'ready');
 }
 const modelOf = app => buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), domestic: app.domesticStatus(), season: app.seasonStatus() });
-const strongest = doc => doc.clubs.slice().sort((a, b) => b.str - a.str || a.name.localeCompare(b.name)).slice(0, 3).map(club => club.name);
+const strongest = doc => nbaClubs(doc).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name)).slice(0, 3).map(club => club.name);
 
 test('basketball\'s Season choice lists its own seasons; one takes the clubs onto its era\'s map, and Nations goes back', async () => {
   await withApp(async ({ app, time }) => {
@@ -791,13 +800,13 @@ test('basketball\'s Season choice lists its own seasons; one takes the clubs ont
     assert.equal(model.season.options.at(-1).name, '1960/61 · computed');
     assert.match(model.season.note, /NBA 2K ratings of that season, as compiled by 2K Archive/);
     assert.match(model.season.note, /seasons no game rated, back to 1960\/61, are computed from Basketball-Reference's statistics/);
-    assert.match(model.season.note, /NBA clubs only/);
+    assert.match(model.season.note, /They have clubs only: the NBA franchises of that season, on the map of their day, and from 2000\/01 the EuroLeague's clubs of that season/);
     assert.equal(model.season.id, null);
 
     app.pickSetup('dataSet', 'nba-2k08');
     assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:nba2008'], 'clubs only, on the 2007/08 map');
     const loading = modelOf(app);
-    assert.deepEqual(loading.scopes.map(scope => [scope.id, scope.label, scope.count]), [['domestic:nba2008', 'NBA', 30]]);
+    assert.deepEqual(loading.scopes.map(scope => [scope.id, scope.label, scope.count]), [['domestic:nba2008', 'NBA', 30], ['domestic:el2008', 'EuroLeague', 24]]);
     assert.equal(loading.canLaunch, false, 'Launch waits for the season and its map');
     assert.match(loading.countryNote, /^The strongest clubs lead the 30 NBA clubs/, 'no club named before the season loads');
 
@@ -834,8 +843,8 @@ test('a season launches its own fives on its era\'s map and resumes as it was pl
       ['nba-2k08', doc.version, 2008, '2007/08', 'domestic:nba2008']);
     assert.equal(st.settings.domesticVersion, CLUB_MAPS.find(entry => entry.id === 'nba2008').version);
     assert.equal(st.campaignName, 'Basketball 2007/08 · NBA · USA and Canada');
-    assert.deepEqual(Object.keys(st.teams).sort(), doc.clubs.map(club => club.id).sort());
-    for (const club of doc.clubs) {
+    assert.deepEqual(Object.keys(st.teams).sort(), nbaClubs(doc).map(club => club.id).sort());
+    for (const club of nbaClubs(doc)) {
       const team = st.teams[club.id];
       assert.deepEqual([team.name, team.code, team.str], [club.name, club.code, club.str]);
       assert.deepEqual(team.squad.map(p => [p.name, p.rating]), club.squad.map(([name, , rating]) => [name, rating]), `${club.name}'s 2K8 five`);
@@ -890,7 +899,7 @@ test('1983/84 launches its 23 franchises on their own map, the Kings in Kansas C
     app.startCampaign();
     const st = app.state;
     assert.deepEqual([st.settings.dataSet, st.settings.dataSeason, st.settings.clubScope], ['nba-eras-1984', '1983/84', 'domestic:nba1984']);
-    assert.deepEqual(Object.keys(st.teams).sort(), doc.clubs.map(club => club.id).sort());
+    assert.deepEqual(Object.keys(st.teams).sort(), nbaClubs(doc).map(club => club.id).sort());
     assert.equal(app.territoryName(st.teams['b-kansas-city-kings'].home), 'Kansas City');
     assert.equal(app.territoryName(st.teams['b-washington-bullets'].home), 'Landover');
     assert.deepEqual(st.teams['b-boston-celtics'].squad.map(p => [p.name, p.rating]), doc.clubs.find(club => club.id === 'b-boston-celtics').squad.map(([name, , rating]) => [name, rating]));
@@ -931,12 +940,12 @@ test('1960/61 launches its eight franchises on their own map, the Warriors in Ph
     app.startCampaign();
     const st = app.state;
     assert.deepEqual([st.settings.dataSet, st.settings.dataSeason, st.settings.clubScope], ['nba-stats-1961', '1960/61', 'domestic:nba1961']);
-    assert.deepEqual(Object.keys(st.teams).sort(), doc.clubs.map(club => club.id).sort());
+    assert.deepEqual(Object.keys(st.teams).sort(), nbaClubs(doc).map(club => club.id).sort());
     for (const [id, city] of [['b-los-angeles-lakers', 'Los Angeles'], ['b-philadelphia-warriors', 'Philadelphia'], ['b-cincinnati-royals', 'Cincinnati'],
       ['b-st-louis-hawks', 'St. Louis'], ['b-syracuse-nationals', 'Syracuse'], ['b-new-york-knicks', 'New York'], ['b-detroit-pistons', 'Detroit']]) {
       assert.equal(app.territoryName(st.teams[id].home), city);
     }
-    for (const club of doc.clubs) {
+    for (const club of nbaClubs(doc)) {
       assert.deepEqual(st.teams[club.id].squad.map(p => [p.name, p.rating]), club.squad.map(([name, , rating]) => [name, rating]), `${club.name}'s 1960/61 five`);
     }
     // Its save holds every player as played, and resumes as it was.

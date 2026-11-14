@@ -1,10 +1,11 @@
 // The maps Europe's football clubs play on (docs/design/domestic-campaigns.md, "The Europe maps"): one for the strongest
 // TOP_CLUBS and one for the strongest ELITE_CLUBS, for the built-in season and for each earlier season with clubs; and the
-// women's game's, one for every European club and one for its ELITE_CLUBS strongest, likewise; and the one the
-// EuroLeague's basketball clubs play on (docs/design/euroleague.md), all of its clubs, by the same rules. A club holds
-// land only in its own country. A country's only club holds all of it; several clubs share it along its regional
-// borders, a region going whole to one club unless it holds two or more (then its next level down is split between
-// them); a country with no club is not on the map at all, so it stays grey beneath it, like any neighbour of a country map.
+// women's game's, one for every European club and one for its ELITE_CLUBS strongest, likewise; and the ones the
+// EuroLeague's basketball clubs play on (docs/design/euroleague.md), all of its clubs, by the same rules: the built-in
+// season's, and one for each run of earlier seasons with the same clubs, 2000/01 to 2025/26. A club holds land only in
+// its own country. A country's only club holds all of it; several clubs share it along its regional borders, a region
+// going whole to one club unless it holds two or more (then its next level down is split between them); a country with
+// no club is not on the map at all, so it stays grey beneath it, like any neighbour of a country map.
 // Russia's clubs hold European Russia only (`within`), the rest of Russia lying grey beneath the map (`partial`). An
 // earlier season whose clubs come from all of Europe has maps of their own ids (eu124e2018); its seven-league maps of
 // before (eu124s2018) stay in the index, never rebuilt, for the campaigns saved on them (`replacedBy`).
@@ -18,12 +19,13 @@
 //
 // Inputs:  the clubs in src/data/clubs.football.js and the earlier seasons' public/football/<id>.json, the women's in
 //          src/data/clubs.womens-football.js and public/womens-football/<id>.json (their European clubs), the EuroLeague's in
-//          src/data/clubs.euroleague.js; where they stand, in
+//          src/data/clubs.euroleague.js and, for its earlier seasons, scripts/lib/euroleague-seasons.mjs (from
+//          scripts/data/euroleague-seasons/); where they stand, in
 //          scripts/data/europe-clubs.json; geoBoundaries gbOpen layers, cached under the gitignored data-src/boundaries/;
 //          the game's world map public/countries-50m.json, whose outlines every country keeps, so territories meet
 //          each other and the grey neighbours on the very borders the rest of the game draws.
-// Outputs: public/domestic/eu<clubs>[s<season year>].json, the women's weu[32][s<season year>].json, the EuroLeague's euroleague.json,
-//          public/domestic/ATTRIBUTION-europe.txt and src/data/europeMaps.js.
+// Outputs: public/domestic/eu<clubs>[s<season year>].json, the women's weu[32][s<season year>].json, the EuroLeague's
+//          euroleague.json and el<season year>.json, public/domestic/ATTRIBUTION-europe.txt and src/data/europeMaps.js.
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -36,7 +38,9 @@ import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
 import { CLUBS as EUROLEAGUE_CLUBS } from '../src/data/clubs.euroleague.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { BUILT_IN_WOMENS_SEASONS } from '../src/data/womensFootballSeasons.js';
+import { BUILT_IN_BASKETBALL_SEASONS } from '../src/data/basketballSeasons.js';
 import { BIG_LEAGUES } from '../src/data/footballLeagues.js';
+import { euroleagueSeasons, gameYearOf } from './lib/euroleague-seasons.mjs';
 import { ELITE_CLUBS, TOP_CLUBS, isEuropeanClub, strongestClubs } from '../src/data/scopes.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import { createBoundarySource, GB_CITATION } from './lib/domestic-boundaries.mjs';
@@ -80,11 +84,16 @@ const COUNTRIES = {
   // The EuroLeague's: Belgrade's two clubs and Tel Aviv's two. Each city is one unit, so it joins a neighbouring region.
   688: { iso3: 'SRB', units: 'ADM2', regions: ['ADM1'] },
   376: { iso3: 'ISR', units: 'ADM2', regions: ['ADM1'] },
-  // The earlier seasons': up to eight Russian clubs, two or three Norwegian ones, two Swiss or Austrian.
+  // The earlier seasons': up to eight Russian clubs, two or three Norwegian ones, two Swiss or Austrian. The EuroLeague's
+  // earlier seasons share Russia too (Moscow's, Khimki, Kazan, Krasnodar, St Petersburg…), and Croatia (Cibona and Zadar),
+  // Slovenia (Olimpija and Krka) and Lithuania (Žalgiris and Rytas or Neptūnas).
   643: { iso3: 'RUS', units: 'ADM2', regions: ['ADM1'], within: 'EUROPEAN_RUSSIA' },
   756: { iso3: 'CHE', units: 'ADM3', regions: ['ADM2'] },
   578: { iso3: 'NOR', units: 'ADM2', regions: ['ADM1'] },
   '040': { iso3: 'AUT', units: 'ADM3', regions: ['ADM2'] },
+  191: { iso3: 'HRV', units: 'ADM2', regions: ['ADM1'] },
+  705: { iso3: 'SVN', units: 'ADM2', regions: ['ADM1'] },
+  440: { iso3: 'LTU', units: 'ADM2', regions: ['ADM1'] },
 };
 /**
  * The land a country's clubs may hold where it is not the whole country (`within` in COUNTRIES): its ADM1 regions by ISO
@@ -355,7 +364,7 @@ function splitCountry(country, shape, clubs, log) {
   if (strays.length) log(`    ${shape.name}: ${strays.length} units went outside their region's clubs (${strays.slice(0, 4).map(u => u.name).join(', ')})`);
   const territories = dissolve(topo, owner, clubs.length).map(polysOf);
   const all = polysOf(feature(topo, mergeArcs(topo, topo.objects.units.geometries)).geometry);
-  return { land: fitToOutline(territories, all, shape.polys, shape.name, country.outside),
+  return { land: fitToOutline(territories, all, shape.polys, shape.name, country.outside, country.outside ? homes : null),
     unitCounts: clubs.map((_, c) => owner.filter(o => o === c).length) };
 }
 
@@ -390,16 +399,23 @@ function clipAgainst(operation, subject, outline, first) {
  * One list of polygons per club: its land, then the pieces it joins, merged on their shared arcs with the whole map. A
  * country its clubs hold only part of (`outside`: the regions they may not hold) leaves out each missed piece that lies
  * nearer those regions than its clubs' land: Asian Russia, and the slivers along its borders, stay beneath the map.
+ * There a missed piece holding clubs' grounds (`homes`, by club) goes to the nearest of those clubs: Russia's districts
+ * leave out its federal cities, so Moscow is one such piece, and CSKA's, not Khimki's next door.
  */
-function fitToOutline(territories, all, outline, name, outside = null) {
+function fitToOutline(territories, all, outline, name, outside = null, homes = null) {
   const land = territories.map(polys => clipAgainst(polygonClipping.intersection, polys, outline));
   const missed = clipAgainst(polygonClipping.difference, all, outline, 'outline');
   const extra = land.map(() => []);
   for (const piece of missed) {
     const at = interiorPoint([piece]);
-    if (outside && kmToPolys(at, outside) < Math.min(...land.filter(polys => polys.length).map(polys => kmToPolys(at, polys)))) continue;
+    const grounds = homes ? homes.flatMap((home, i) => (pointInPolys(home, [piece]) ? [i] : [])) : [];
+    if (!grounds.length && outside && kmToPolys(at, outside) < Math.min(...land.filter(polys => polys.length).map(polys => kmToPolys(at, polys)))) continue;
     let best = -1, bestKm = Infinity;
-    land.forEach((polys, i) => { if (polys.length) { const km = kmToPolys(at, polys); if (km < bestKm) { bestKm = km; best = i; } } });
+    land.forEach((polys, i) => {
+      if (!polys.length || (grounds.length && !grounds.includes(i))) return;
+      const km = kmToPolys(at, polys);
+      if (km < bestKm) { bestKm = km; best = i; }
+    });
     if (best < 0) throw new Error(`${name}: nothing to join a missed piece to`);
     extra[best].push(piece);
   }
@@ -518,9 +534,10 @@ async function buildMap({ source, spec, countries, splits, log }) {
     const list = members.map(i => `${names[i]} ${Math.round(areas[i] / 1000)}k`).join(', ');
     log(`    ${shapes.get(shapeId).name}: ${list}`);
   }
-  // A women's season's map serves that season alone, so it names its strongest clubs as the built-in maps do.
+  // A women's season's map serves that season alone, so it names its strongest clubs as the built-in maps do. An earlier
+  // EuroLeague's may serve two seasons, so setup names the loaded season's own strongest, as an NBA era's map does.
   const entry = { id: mapId, sport, league, name: 'Europe', ...(theatre ? { theatre } : {}), ...(seasons ? { seasons } : {}), clubs: n, sections: n, countries: hosts.length,
-    version: doc.version, ...(seasons && sport === 'football' ? {} : { top: clubs.slice(0, 3).map(club => club.name) }) };
+    version: doc.version, ...(seasons && sport !== 'womens-football' ? {} : { top: clubs.slice(0, 3).map(club => club.name) }) };
   return { entry, doc, file: outFile(mapId), text };
 }
 
@@ -574,7 +591,8 @@ function attributionText(entries, docs) {
  * strongest TOP_CLUBS and ELITE_CLUBS clubs. FIFA 05, FIFA 06, 1989/90 and the computed seasons have nations only, so no maps. Then the
  * women's game's (src/data/womensFootballSeasons.js), from FIFA 23 on: every European club ('Europe', the NWSL's play on
  * a map of their own, scripts/build-club-maps.mjs) and the ELITE_CLUBS strongest of them, where there are more. Last the
- * EuroLeague's, in the built-in season only.
+ * EuroLeague's: the built-in season's, then one for each run of earlier seasons with the same clubs (el<year>, named after
+ * the run's first season), serving the NBA seasons of those years.
  */
 async function mapSpecs() {
   const { clubs: places } = JSON.parse(await readFile(clubsFile, 'utf8'));
@@ -608,9 +626,19 @@ async function mapSpecs() {
       ...(clubs.length > ELITE_CLUBS ? [{ id: `weu${ELITE_CLUBS}${tag}`, sport: 'womens-football', league: `Elite ${ELITE_CLUBS}`, theatre: 'elite',
         seasons: set ? [set] : null, clubs: field(clubs, ELITE_CLUBS) }] : []),
     ]),
-    // The EuroLeague's whole league, strongest first, in the built-in season only.
+    // The EuroLeague's whole league, strongest first, in the built-in season, then in each run of earlier seasons with
+    // the same clubs (scripts/lib/euroleague-seasons.mjs), served with the NBA seasons of those years.
     { id: 'euroleague', sport: 'basketball', league: 'EuroLeague', seasons: null, clubs: field(EUROLEAGUE_CLUBS, EUROLEAGUE_CLUBS.length) },
+    ...euroleagueSeasons(root).maps.map(map => ({ id: map.id, sport: 'basketball', league: 'EuroLeague', seasons: map.years.map(nbaSeasonOf),
+      clubs: field(map.clubs, map.clubs.length) })),
   ];
+}
+
+/** The built-in NBA season a EuroLeague season is played beside (2009/10's: NBA 2K10). */
+function nbaSeasonOf(year) {
+  const season = BUILT_IN_BASKETBALL_SEASONS.find(entry => entry.year === gameYearOf(year));
+  if (!season) throw new Error(`No basketball season of ${gameYearOf(year)} for the EuroLeague of ${year}/${String(year + 1).slice(2)}`);
+  return season.id;
 }
 
 async function main() {

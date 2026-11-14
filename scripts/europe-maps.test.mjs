@@ -66,8 +66,12 @@ const TOWNS = {
 test('the index lists a built-in pair of maps and one for each earlier season with clubs, each file as its entry says', () => {
   const seasons = [null, ...CLUB_SEASONS.map(season => season.id)];
   assert.equal(FOOTBALL_MAPS.length, seasons.length * 2);
-  // Basketball's EuroLeague (scripts/euroleague.test.mjs) is the one map of Europe with no theatre of its own.
-  assert.deepEqual(EUROPE_MAPS.filter(entry => !entry.theatre).map(entry => [entry.id, entry.sport, entry.league]), [['euroleague', 'basketball', 'EuroLeague']]);
+  // Basketball's EuroLeague (scripts/euroleague.test.mjs) has the maps of Europe with no theatre of their own: the built-in
+  // season's and one for each run of earlier seasons with the same clubs.
+  const leagueMaps = EUROPE_MAPS.filter(entry => !entry.theatre);
+  assert.deepEqual(leagueMaps[0], EUROPE_MAPS.find(entry => entry.id === 'euroleague'));
+  assert.ok(leagueMaps.every(entry => entry.sport === 'basketball' && entry.league === 'EuroLeague' && /^(euroleague|el\d{4})$/.test(entry.id)));
+  assert.equal(leagueMaps.length, 25);
   for (const season of seasons) {
     assert.deepEqual(europeMapsOf(season).map(map => [map.league, map.clubs, map.theatre]),
       [[`Top ${TOP_CLUBS}`, TOP_CLUBS, 'all'], [`Elite ${ELITE_CLUBS}`, ELITE_CLUBS, 'elite']], String(season));
@@ -184,6 +188,28 @@ test('a club holds land only in its own country, and every country with a club i
       return sum + polysAreaKm2(polys.filter(poly => kmBetween(interiorPoint([poly]), interiorPoint([main])) <= 2500));
     }, 0);
     assert.ok(Math.abs(total - outline) / outline < 0.02, `${entry.id}: ${Math.round(total)} km² of land against ${Math.round(outline)} km² of outlines`);
+  }
+});
+
+test('Russia\'s EuroLeague clubs hold European Russia too: Moscow, Kazan and Perm, not Siberia', () => {
+  const doc = docOf('el2002');
+  const russian = doc.clubs.map((club, i) => (club.shape === '643' ? i : -1)).filter(i => i >= 0);
+  assert.deepEqual(russian.map(i => doc.clubs[i].id).sort(), ['el-cska-moscow', 'el-ural-great']);
+  const land = russian.flatMap(i => polysOfSection(doc, i));
+  // Moscow, Kazan, Perm, Syktyvkar (the Komi Republic, up to the Urals) and Rostov; not Yekaterinburg, Novosibirsk, Vladivostok or Omsk.
+  for (const town of [[37.62, 55.75], [49.11, 55.79], [56.25, 58.01], [50.84, 61.67], [39.72, 47.24]]) assert.ok(pointInPolys(town, land), String(town));
+  for (const town of [[60.6, 56.84], [82.92, 55.03], [131.89, 43.12], [73.37, 54.98]]) assert.ok(!pointInPolys(town, land), String(town));
+  assert.deepEqual(doc.partial, ['643']);
+  assert.ok(doc.boundaries.layers.some(layer => layer.iso3 === 'RUS' && layer.level === 'ADM1'));
+  assert.ok(doc.focus[2] < 75 && doc.focus[3] < 82, 'the camera frames Europe, not Siberia');
+  // Every earlier EuroLeague map with a Russian club holds European Russia the same way; the others hold none of it.
+  // Moscow, a gap in Russia's districts (a federal city), is the club's whose arena it holds: CSKA's, even where Khimki's
+  // land lies nearer (2009/10 to 2020/21).
+  for (const entry of EUROPE_MAPS.filter(item => item.sport === 'basketball')) {
+    const map = docOf(entry.id);
+    assert.deepEqual(map.partial, map.hosts.includes('643') ? ['643'] : undefined, entry.id);
+    const cska = map.clubs.find(club => club.id === 'el-cska-moscow');
+    if (cska) assert.equal(holder(map, cska.home), cska.id, `${entry.id}: CSKA holds its arena`);
   }
 });
 

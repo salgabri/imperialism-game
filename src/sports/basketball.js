@@ -3,6 +3,7 @@ import { defineSportData } from './sportData.js';
 import { clamp, createScorerSampler, gauss } from '../engine/random.js';
 import { GREAT_BRITAIN, HOME_NATIONS, selectLineup } from '../data/teams.js';
 import { LATEST_NBA_SEASON, NBA_LEAGUE_AVERAGES } from '../data/nbaLeagueAverages.js';
+import { EUROLEAGUE_LEAGUE_AVERAGES } from '../data/euroleagueLeagueAverages.js';
 
 // Two rulebooks, one model. Nations play FIBA's four ten-minute quarters at about 73 possessions a game. Clubs are
 // NBA franchises and play the NBA's four twelve-minute quarters at their season's league pace and scoring rate:
@@ -24,6 +25,13 @@ const nbaRules = ({ pace, rating }) => Object.freeze({ minutes: 48, quarter: 12,
 // BUZZER_LEVEL): about 4% of its games then go to overtime.
 const EUROLEAGUE = Object.freeze({ minutes: 40, quarter: 10, pace: 74.2, paceRange: [56, 95], scoring: 1.03, home: 0.06,
   buzzer: Object.freeze([0.1, 0.05]) });
+// An earlier season's EuroLeague (2000/01 on) plays at its own pace and scoring rate (src/data/euroleagueLeagueAverages.js:
+// 70 to 75 possessions, 74 to 86 points a team): its clubs' fives are rated on 2025/26's level, so its `scoring` is the
+// built-in's times its points per 100 possessions over 2025/26's (115.9). Home edge and buzzer stay the built-in's: its
+// home sides won 55–70% of their regular-season games, 63% on average.
+const EUROLEAGUE_REFERENCE_RATING = EUROLEAGUE_LEAGUE_AVERAGES['2025/26'].rating;
+const euroleagueRules = ({ pace, rating }) => Object.freeze({ ...EUROLEAGUE, pace, paceRange: [Math.round(pace - 18), Math.round(pace + 21)],
+  scoring: Number((EUROLEAGUE.scoring * rating / EUROLEAGUE_REFERENCE_RATING).toFixed(3)) });
 const PACE_SD = 4.5;
 const OVERTIME_PACE_SD = 0.7;
 const OVERTIME = 5;
@@ -295,10 +303,11 @@ const basketballRules = {
   playsAs: { '826': GREAT_BRITAIN },
   /**
    * The rules a campaign plays (matchSport): clubs are an NBA season's franchises, at that season's pace and scoring
-   * rate (`nbaBasketballIn`), or the EuroLeague's on its map; nations play FIBA's. Every rulebook below shares this.
+   * rate (`nbaBasketballIn`), or a season's EuroLeague clubs on its map, at that season's (`euroleagueBasketballIn`);
+   * nations play FIBA's. Every rulebook below shares this.
    */
   rulesFor: settings => (settings.layer !== 'clubs' ? basketball
-    : settings.clubScope === EUROLEAGUE_SCOPE ? euroleagueBasketball : nbaBasketballIn(settings.dataSeason)),
+    : isEuroleagueScope(settings.clubScope) ? euroleagueBasketballIn(settings.dataSeason) : nbaBasketballIn(settings.dataSeason)),
 
   squadSize: 5,
   formation: { PG: 1, SG: 1, SF: 1, PF: 1, C: 1 },
@@ -375,6 +384,12 @@ export const EUROLEAGUE_MAP = 'euroleague';
 export const EUROLEAGUE_SCOPE = `domestic:${EUROLEAGUE_MAP}`;
 
 /**
+ * Whether a club theatre is a EuroLeague map's: the built-in season's ('domestic:euroleague') or an earlier season's,
+ * named after the year its run of seasons began ('domestic:el2010' for 2009/10; scripts/lib/euroleague-seasons.mjs).
+ */
+export const isEuroleagueScope = scope => scope === EUROLEAGUE_SCOPE || /^domestic:el\d{4}$/.test(String(scope));
+
+/**
  * Basketball between EuroLeague clubs: FIBA's forty minutes, at the EuroLeague's pace and scoring rate and with its
  * home edge. Club campaigns on the EuroLeague's map play it (`matchSport` in src/sports/index.js). Version 6.
  */
@@ -389,6 +404,32 @@ export const euroleagueBasketball = defineSportData({
     return playMatch(rng, prepareMatch(attacker, defender, effA, effD, venue, EUROLEAGUE), attacker, defender, drama);
   },
 }, { id: 'basketball' });
+
+const euroleagueSeasons = new Map();
+
+/**
+ * Basketball between EuroLeague clubs in an earlier `season` ('2009/10'): the built-in's rules at that season's pace and
+ * scoring rate. The built-in season, and a season without league figures, plays `euroleagueBasketball`. Version 6, as
+ * the built-in's: the same model.
+ */
+export function euroleagueBasketballIn(season) {
+  if (!Object.hasOwn(EUROLEAGUE_LEAGUE_AVERAGES, String(season))) return euroleagueBasketball;
+  if (!euroleagueSeasons.has(season)) {
+    const rules = euroleagueRules(EUROLEAGUE_LEAGUE_AVERAGES[season]);
+    euroleagueSeasons.set(season, defineSportData({
+      ...basketballRules,
+      simulationVersion: 6,
+      clock: { length: rules.minutes, msPerUnit: basketballRules.clock.msPerUnit },
+      formatEvent: eventFormat(rules),
+      prepareMatch: (attacker, defender, effA, effD, venue) => prepareMatch(attacker, defender, effA, effD, venue, rules),
+
+      simulate(rng, attacker, defender, drama, effA, effD, venue) {
+        return playMatch(rng, prepareMatch(attacker, defender, effA, effD, venue, rules), attacker, defender, drama);
+      },
+    }, { id: 'basketball' }));
+  }
+  return euroleagueSeasons.get(season);
+}
 
 /** The constants the live win-probability model mirrors (src/engine/winProbability.js). */
 export const BASKETBALL_MODEL = Object.freeze({ PACE_SD, OVERTIME_PACE_SD, OVERTIME, MAX_OVERTIMES, SHOT_BASE,
