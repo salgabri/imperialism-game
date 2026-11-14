@@ -81,7 +81,8 @@ allow, as the NBA franchises', and a strength that is the five's mean. Their nam
 sponsors (`euroleague-teams.json` `clubs`: "Crvena Zvezda", not "Crvena Zvezda Meridianbet
 Belgrade"), with EuroLeague's broadcast codes. `docs/design/euroleague-audit.json` lists every
 rostered player as rated: PIR, games, rating, positions, and whether he starts. Basketball's club
-list is the NBA's and these (`basketball.clubs`); an earlier basketball season has NBA clubs only.
+list is the NBA's and these (`basketball.clubs`); an earlier basketball season has the NBA's of its
+year and, from 2000/01, the EuroLeague's (below, "Earlier seasons").
 
 | | Strength | |
 | --- | --- | --- |
@@ -156,9 +157,115 @@ Canada) and **EuroLeague** (its map of Europe), each with its own description; t
 reads "Nations · NBA and EuroLeague clubs". The EuroLeague's map is a Europe map with no
 `theatre` (src/data/europeMaps.js), so basketball is a theatre sport like football
 (`hasTheatreMaps`) and `theatreMapsOf` lists the NBA's map, then the EuroLeague's. `setClubScope`
-keeps the EuroLeague while the season is the built-in one, the only season its map serves; an
-earlier season goes to its era's NBA map, and another sport to its own. Challenge links carry `theatre=domestic:euroleague`; a save names the
-map and its version as any club map's does.
+keeps the EuroLeague from season to season: the built-in one's map, or an earlier season's own
+(below); a season before 2000/01 goes to its era's NBA map, and another sport to its own. Challenge
+links carry `theatre=domestic:euroleague`; a save names the map and its version as any club map's does.
+
+## Earlier seasons, 2000/01 to 2025/26
+
+Asked for on 2026-11-14 ("give earlier basketball seasons their EuroLeague"). Every earlier
+basketball season from 2000/01 on offers the EuroLeague beside the NBA: that season's clubs, rated
+by the built-in season's rule, on a map of Europe of their own, at that season's pace and scoring
+rate. The user chose the range (every season the API holds), the rating scale (each season put on
+2025/26's level) and the crests (code badges for clubs the game has none for).
+
+**Coverage.** The EuroLeague's API holds every season of its own competition from its first,
+2000/01 (`E2000`), to 2025/26 (`E2025`), and nothing before it: `E1999` lists no club, and its
+statistics answer HTTP 404. Every season has its clubs and their rosters, every player's box score
+with PIR, the clubs' team totals and every game with its score and venue. 2000/01 is the split
+year's ULEB EuroLeague, without Panathinaikos, Maccabi, CSKA and Efes, who played FIBA's
+SuproLeague; 2001/02 had 32 clubs, 2016/17 to 2018/19 16; 2021/22's Russian clubs, suspended in
+February 2022, play their whole season here.
+
+**Source.** `npm run sync:euroleague-seasons` (`scripts/sync-euroleague-seasons.mjs`, through
+`scripts/lib/euroleague-api.mjs` and polite-fetch, cached in `data-src/euroleague/`; about 800
+requests) writes `scripts/data/euroleague-seasons/E2000.json` … `E2025.json` (924 KB in all): each
+season's clubs, with their record in every game and in the regular season; its league figures, with
+the average team's PIR, assists, rebounds and three-point attempts a game; and every player with a
+game, 8,378 player-seasons in all, as `[code, name, club, position, height, nationality, line,
+extra]`.
+
+- **Every player.** EuroLeague's per-game leaderboard lists only the players it qualifies (155 of
+  343 in 2009/10), which would leave the clubs knocked out early with nobody; sorted by totals
+  (`statisticSortMode=accumulated`) the same list has every player with a game. The built-in
+  season's snapshot still reads the leaderboard (see Known limitations).
+- **Players who moved.** 102 player-seasons were for two clubs ("TEL;PAN"). Each counts once, for
+  the club he played the most minutes for (then the most games, then the club listed first), as an
+  NBA season's traded players do: his own season page (`/v2/people/{code}/stats`) splits his games
+  and minutes by club. Wenyen Gabriel's 2024/25 is Panathinaikos's (23 games), not Maccabi's (9).
+- **Positions** are his club's roster's that season, else another roster's, the nearest season
+  first. 62 players no roster lists (a game or two, mostly in the 2000s) are placed by their box
+  score per 36 minutes: a guard with 4 assists, a centre with 9 rebounds and few threes, else a
+  forward. 559 have no height, so they are placed by the box score alone.
+
+**The ratings** are the built-in season's (`scripts/lib/euroleague-seasons.mjs`, on
+`scripts/lib/euroleague.mjs`): a season's PIR a game counting one and a half times, the season
+before once and the one before that half, shrunk towards a bench player's, PIR 9 rating 73 and each
+point 1.3 more, between 60 and 88. Each season's box scores are first put on 2025/26's level,
+column by column, so its clubs spread as today's do: its PIR times 2025/26's average team PIR a game
+over its own (95.2 against 77.3 in 2010/11, a factor of 1.23), and its assists, rebounds and
+three-point attempts likewise (assists were counted far more sparingly then: 10.7 a team a game in
+2000/01, 18.8 in 2025/26). Unscaled, a 2010/11 starter would rate about 4 points below an equal one
+of today, and some 80 fives of the 2000s would have had nobody to play the point; scaled, every
+season's starters average 76.1 to 78.0 (the built-in's 76.3) and 8 fives play someone out of
+position (listed in the audit).
+
+Rated so, the clubs' strengths rank them against their real regular-season records at a Spearman
+correlation of 0.62 in the median season (0.33 in 2002/03 to 0.85 in 2015/16;
+`docs/design/euroleague-seasons-audit.json`, `clubsAgainstRecords`). PIR alone misreads some clubs:
+ASVEL is 2024/25's second strongest at 13–21. Rating each season on its own games alone does worse
+(median 0.53), so the blend stays.
+
+**The clubs.** 89 clubs played the EuroLeague from 2000/01 to 2025/26. Today's 20 keep their
+identity in every season (Baskonia, not Tau Cerámica; Anadolu Efes, not Efes Pilsen); the 69
+others (`scripts/data/euroleague-teams.json` `history`) are named by the EuroLeague's own
+sponsor-free name for the club (its `clubPermanentAlias`), with their accents: CSKA Moscow, Siena,
+Benetton Treviso, Unicaja, Arka Gdynia. One code was two clubs: EuroLeague files Ülkerspor (2001/02
+to 2005/06) under the code Fenerbahçe has played under since, so those seasons play Ülkerspor
+(`eras`). Each club's arena of those seasons is placed by hand (`scripts/data/europe-clubs.json`).
+The 69 have no crest in the game, so they show their code, as the NRL's defunct clubs do.
+
+**Where they live.** Each season's EuroLeague clubs ride in its NBA season's file
+(`public/basketball/nba-2k01.json` … `nba-2k26.json`), after the NBA's, `euroleague` naming their
+map: `npm run build:nba-seasons` builds both from the same snapshots, and the loader
+(`src/engine/footballSets.js`) checks them against their map and marks every EuroLeague rating as
+an estimate. So a season loads in one request, and its version covers both leagues (a save holds
+its teams, so it resumes whatever its file's version). `npm run build:euroleague` writes the
+seasons' league figures (`src/data/euroleagueLeagueAverages.js`) and the audit.
+
+**The rules.** A season's EuroLeague plays the built-in's rules at its own pace and scoring rate
+(`euroleagueBasketballIn`, `src/sports/basketball.js`): its possessions a game (69.9 to 75.3) and a
+scoring rate of 1.03 times its points per 100 possessions over 2025/26's 115.9, so its clubs, rated
+on 2025/26's level, score its own points (74.3 a team in 2010/11 to 86.2 in 2025/26; the simulated
+seasons come within 2.5, `scripts/basketball-simulation.test.mjs`). The home edge and the buzzer are
+the built-in's: home sides won 55% to 70% of a season's regular-season games, 63% on average.
+
+**The maps.** One map of Europe for each run of seasons with the same clubs, built by
+`scripts/build-europe-maps.mjs` with the same rules, named after the run's first season as the
+NBA's era maps are: 24 maps for 26 seasons, `el2001` to `el2026`, 2019/20 and 2020/21 sharing
+`el2020` and 2022/23 and 2023/24 `el2023` (143 to 163 KB each, loaded only when chosen). New
+countries share their land: Russia (Moscow's clubs, Khimki, Kazan, Krasnodar, Nizhny Novgorod,
+Perm and St Petersburg), Croatia (Cibona and Zadar), Slovenia (Olimpija and Krka) and Lithuania
+(Žalgiris with Rytas or Neptūnas); Poland, Montenegro, Ukraine, Switzerland, Portugal and England
+(the London Towers) each had one club at a time, and AS Monaco holds France's land, as in football.
+
+- **Russia's European part.** Its clubs hold Russia west of the Urals: the federal subjects whose
+  interior lies west of 60°E (`EUROPEAN_PART`), cut along the units its clubs share it by, so the
+  rest of Russia stays grey beneath (the map's `boundaries.mask`) and the camera frames Europe, not
+  Siberia. geoBoundaries' Russian districts leave out Moscow and St Petersburg, federal cities, so
+  each joins as one unit, the gap its absence leaves (`regionsLeftOut`).
+- **Crowded cities.** As Beşiktaş does today, a club crowded into Istanbul or Athens can start next
+  door: Galatasaray across the Bosphorus (103 km from its arena in 2011/12), Darüşşafaka in
+  2015/16 to 2018/19, Anadolu Efes in 2014/15; AEK Athens, Peristeri, Panionios and Maroussi a
+  suburb or two away (30 to 54 km). Each map's build log lists them.
+
+**Setup.** An earlier season's club theatres are its NBA era's map and its EuroLeague's; the
+EuroLeague carries over between seasons (2009/10's map, then 2019/20's), and a season before
+2000/01 has the NBA alone. Challenge links carry `season=nba-2k10&theatre=domestic:el2010`, and a
+link naming another season's EuroLeague map plays the season's own. A save of an earlier season may
+name its EuroLeague's map, and no other season's. In passing, the seasons 2014/15 to 2025/26, which
+play on today's NBA map, listed stray theatres (All, Elite and NBA) instead of the NBA's map; they
+now list the NBA's and their EuroLeague's.
 
 ## EuroBasket
 
@@ -191,11 +298,19 @@ the four in Iceland's small lineups, is its power forward.
   basketball as in both tennis games, as Great Britain under the Union Jack on the United
   Kingdom's shape (`playsAs`); football still plays England. Basketball fields 47 nations (40
   before).
-- Rosters are as of 8 November 2026; the EuroLeague's earlier seasons are not built (NBA 2K's
+- Rosters are as of 8 November 2026. The earlier seasons are built from box scores too (NBA 2K's
   EuroLeague teams of 2K14–2K17 are not on 2K Archive's page).
+- The built-in season's snapshot read EuroLeague's per-game leaderboard, which lists only the
+  players it qualifies: a rostered player below its line rates as one with no EuroLeague game. The
+  earlier seasons read every player; the built-in one will when it is next refreshed.
+- Earlier seasons' names are EuroLeague's, title-cased: its API spells most players without their
+  accents (Jasikevicius, Tomasevic), and only today's starters have spellings of their own.
+- The 69 clubs not in today's EuroLeague have no crest in the game yet, so they show their code.
 - Dubai, the frame's south-east corner, opens partly under the map's zoom buttons (about a third of
   its land at 1024×768); zooming or panning shows it whole. More room in the map's `focus` barely
   moves it, as the camera keeps to the map's backdrop.
 
 To refresh: `npm run sync:euroleague -- --refresh`, `npm run build:euroleague`,
-`node scripts/build-europe-maps.mjs --only=euroleague`, then `npm test`.
+`node scripts/build-europe-maps.mjs --only=euroleague`, then `npm test`. The earlier seasons:
+`npm run sync:euroleague-seasons`, `npm run build:euroleague`, `npm run build:nba-seasons` (it needs
+the NBA seasons' caches), `node scripts/build-europe-maps.mjs --only=el2001,…,el2026`, then `npm test`.

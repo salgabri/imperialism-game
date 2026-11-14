@@ -4,7 +4,8 @@ import { readFileSync } from 'node:fs';
 import { buildClub, makeRng } from '../src/data/teams.js';
 import { BUILT_IN_BASKETBALL_SEASONS } from '../src/data/basketballSeasons.js';
 import { LATEST_NBA_SEASON, NBA_LEAGUE_AVERAGES } from '../src/data/nbaLeagueAverages.js';
-import { BENCH, basketball, nbaBasketball, nbaBasketballIn } from '../src/sports/basketball.js';
+import { BENCH, basketball, euroleagueBasketball, euroleagueBasketballIn, nbaBasketball, nbaBasketballIn } from '../src/sports/basketball.js';
+import { EUROLEAGUE_LEAGUE_AVERAGES } from '../src/data/euroleagueLeagueAverages.js';
 import { matchSport } from '../src/sports/index.js';
 
 const side = (id, ratings = 74) => ({
@@ -227,10 +228,35 @@ test('every NBA season scores like its league: 93 a side in 2003/04, 114 in 2023
     const league = NBA_LEAGUE_AVERAGES[season.season];
     assert.ok(league, `${season.season} has league averages`);
     const set = JSON.parse(readFileSync(new URL(`public/basketball/${season.id}.json`, root), 'utf8'));
-    const clubs = set.clubs.map(club => buildClub(club, basketball));
+    // Its NBA franchises; the EuroLeague's clubs of the season (2000/01 on) are the next test's.
+    const clubs = set.clubs.filter(club => club.league === 'NBA').map(club => buildClub(club, basketball));
     const sport = matchSport({ sport: 'basketball', layer: 'clubs', dataSeason: season.season });
     assert.equal(sport.prepareMatch(clubs[0], clubs[1]).pace, league.pace);
     const points = clubScoring(sport, clubs);
     assert.ok(Math.abs(points - league.points) < 2.5, `${season.season}: ${points.toFixed(1)} against the league's ${league.points}`);
   }
+});
+
+test('every earlier EuroLeague season scores like its league: 74 a side in 2010/11, 86 in 2025/26', () => {
+  const root = new URL('../', import.meta.url);
+  let seasons = 0;
+  for (const season of BUILT_IN_BASKETBALL_SEASONS) {
+    const set = JSON.parse(readFileSync(new URL(`public/basketball/${season.id}.json`, root), 'utf8'));
+    if (!set.euroleague) continue;
+    seasons++;
+    const league = EUROLEAGUE_LEAGUE_AVERAGES[season.season];
+    assert.ok(league, `${season.season} has the EuroLeague's league figures`);
+    const clubs = set.clubs.filter(club => club.league === 'EuroLeague').map(club => buildClub(club, basketball));
+    const sport = matchSport({ sport: 'basketball', layer: 'clubs', clubScope: `domestic:${set.euroleague}`, dataSeason: season.season });
+    assert.equal(sport, euroleagueBasketballIn(season.season));
+    const pairing = sport.prepareMatch(clubs[0], clubs[1]);
+    assert.deepEqual([pairing.pace, pairing.rules.minutes], [league.pace, 40]);
+    const points = clubScoring(sport, clubs);
+    assert.ok(Math.abs(points - league.points) < 2.5, `${season.season}: ${points.toFixed(1)} against the league's ${league.points}`);
+  }
+  assert.equal(seasons, 26, 'the EuroLeague of every season from 2000/01 to 2025/26');
+  // 2025/26, the level the others are put on, plays the built-in season's rules.
+  const reference = euroleagueBasketballIn('2025/26').prepareMatch(...['A', 'D'].map(id => side(id)));
+  const builtIn = euroleagueBasketball.prepareMatch(...['A', 'D'].map(id => side(id)));
+  assert.deepEqual(reference.rules, builtIn.rules);
 });

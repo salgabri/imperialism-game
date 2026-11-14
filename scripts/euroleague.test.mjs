@@ -5,17 +5,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
 import { feature } from 'topojson-client';
 import { CLUBS } from '../src/data/clubs.euroleague.js';
 import { CLUBS as NBA_CLUBS } from '../src/data/clubs.basketball.js';
 import { ROSTERS } from '../src/data/rosters.basketball.js';
 import { EUROPE_MAPS } from '../src/data/europeMaps.js';
+import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { EUROBASKET_2025, NATIONS, SCOPES, buildClub, buildTeam, makeRng, selectLineup, teamEff } from '../src/data/teams.js';
 import { nationTheatres } from '../src/data/scopes.js';
 import { clubMapOf, domesticLabel, theatreMapsOf } from '../src/data/domesticScope.js';
 import { estimateReason, estimateTitle, isEstimated } from '../src/data/estimates.js';
-import { EUROLEAGUE_SCOPE, basketball, euroleagueBasketball, nbaBasketball } from '../src/sports/basketball.js';
+import { EUROLEAGUE_SCOPE, basketball, euroleagueBasketball, euroleagueBasketballIn, isEuroleagueScope, nbaBasketball, nbaBasketballIn } from '../src/sports/basketball.js';
 import { getSport, matchSport } from '../src/sports/index.js';
+import { loadSportData } from '../src/sports/sportData.js';
+import { BUILT_IN_BASKETBALL_SEASONS } from '../src/data/basketballSeasons.js';
+import { EUROLEAGUE_LEAGUE_AVERAGES } from '../src/data/euroleagueLeagueAverages.js';
+import { decodeFootballSet, seasonSport } from '../src/engine/footballSets.js';
+import { REFERENCE_SEASON, euroleagueSeasons, seasonScale, spearman } from './lib/euroleague-seasons.mjs';
 import { decodeDomestic, domesticSurroundings } from '../src/engine/domestic.js';
 import { territories, validateReachability } from '../src/engine/campaign.js';
 import { createDuelDraw } from '../src/engine/duelDraw.js';
@@ -295,12 +302,18 @@ test('basketball clubs choose the EuroLeague: its map loads, its 20 clubs launch
     assert.equal(app.territoryName(state.teams['el-real-madrid'].home), 'Madrid');
     assert.doesNotThrow(() => parseCampaign(JSON.stringify({ v: 2, ...checkpoint(state) })), 'a save of it passes the checks');
 
-    // An earlier season has NBA clubs only, on its era's map; the built-in season again offers both.
+    // An earlier season offers its NBA era's map and its own EuroLeague's, and keeps the EuroLeague; the built-in season
+    // again offers both, and a season before 2000/01 its NBA map alone.
     app.openSetup();
     app.pickSetup('dataSet', 'nba-2k08');
-    assert.equal(app.state.setup.clubScope, 'domestic:nba2008');
-    assert.deepEqual(buildSetupModel(app.state.setup, { season: app.seasonStatus() }).scopes.map(scope => scope.id), ['domestic:nba2008']);
+    assert.equal(app.state.setup.clubScope, 'domestic:el2008');
+    assert.deepEqual(buildSetupModel(app.state.setup, { season: app.seasonStatus() }).scopes.map(scope => scope.id), ['domestic:nba2008', 'domestic:el2008']);
     app.pickSetup('dataSet', null);
+    assert.equal(app.state.setup.clubScope, EUROLEAGUE_SCOPE);
+    app.pickSetup('dataSet', 'nba-live-99');
+    assert.equal(app.state.setup.clubScope, 'domestic:nba1999');
+    app.pickSetup('dataSet', null);
+    app.pickSetup('clubScope', 'domestic:nba');
     assert.equal(app.state.setup.clubScope, 'domestic:nba');
     // Another sport leaves the EuroLeague's map.
     app.pickSetup('clubScope', EUROLEAGUE_SCOPE);
@@ -313,10 +326,19 @@ test('the setup and a challenge link keep the EuroLeague; another sport has none
   const clubs = over => ({ sport: 'basketball', layer: 'clubs', dataSet: null, ...over });
   assert.equal(setClubScope(clubs({ clubScope: EUROLEAGUE_SCOPE })), EUROLEAGUE_SCOPE);
   assert.equal(setClubScope(clubs({ clubScope: 'all' })), 'domestic:nba');
-  assert.equal(setClubScope(clubs({ clubScope: EUROLEAGUE_SCOPE, dataSet: 'nba-2k20' })), 'domestic:nba', 'an earlier season is NBA clubs only');
+  // An earlier season keeps the EuroLeague, its own; the NBA, its era's; and before 2000/01 has the NBA alone.
+  assert.equal(setClubScope(clubs({ clubScope: EUROLEAGUE_SCOPE, dataSet: 'nba-2k20' })), 'domestic:el2020');
+  assert.equal(setClubScope(clubs({ clubScope: 'domestic:el2010', dataSet: 'nba-2k21' })), 'domestic:el2020', '2019/20 and 2020/21 share a map');
+  assert.equal(setClubScope(clubs({ clubScope: 'domestic:nba', dataSet: 'nba-2k20' })), 'domestic:nba');
+  assert.equal(setClubScope(clubs({ clubScope: 'domestic:el2010', dataSet: 'nba-2k10' })), 'domestic:el2010');
+  assert.equal(setClubScope(clubs({ clubScope: 'domestic:el2010', dataSet: null })), EUROLEAGUE_SCOPE, 'back to the built-in EuroLeague');
+  assert.equal(setClubScope(clubs({ clubScope: EUROLEAGUE_SCOPE, dataSet: 'nba-live-99' })), 'domestic:nba1999');
+  assert.equal(setClubScope(clubs({ clubScope: 'all', dataSet: 'nba-2k10' })), 'domestic:nba2009', 'no theatre chosen: the season\'s NBA map');
   assert.equal(setClubScope({ sport: 'hockey', layer: 'clubs', clubScope: EUROLEAGUE_SCOPE }), 'domestic:nhl');
   assert.deepEqual(theatreMapsOf('basketball').map(map => map.id), ['nba', 'euroleague']);
-  assert.deepEqual(theatreMapsOf('basketball', 'nba-2k08').map(map => map.id), ['nba2008'], 'an earlier season: its era\'s NBA map only');
+  assert.deepEqual(theatreMapsOf('basketball', 'nba-2k08').map(map => map.id), ['nba2008', 'el2008'], 'an earlier season: its era\'s NBA map and its EuroLeague');
+  assert.deepEqual(theatreMapsOf('basketball', 'nba-2k20').map(map => map.id), ['nba', 'el2020'], 'a season on today\'s NBA map');
+  assert.deepEqual(theatreMapsOf('basketball', 'nba-2k00').map(map => map.id), ['nba2000'], '1999/00: the NBA alone');
   assert.deepEqual([clubMapOf('hockey')?.id, theatreMapsOf('hockey')], ['nhl', []]);
   const query = challengeQuery(clubs({ clubScope: EUROLEAGUE_SCOPE, seed: '9' }), 9);
   assert.match(query, /theatre=domestic:euroleague/);
@@ -324,6 +346,203 @@ test('the setup and a challenge link keep the EuroLeague; another sport has none
   assert.deepEqual([back.setup.sport, back.setup.layer, back.setup.clubScope, back.ignored], ['basketball', 'clubs', EUROLEAGUE_SCOPE, []]);
   const hockey = readChallenge('?sport=hockey&teams=clubs&theatre=domestic:euroleague');
   assert.deepEqual([hockey.setup.clubScope, hockey.ignored], ['domestic:nhl', ['theatre']]);
+});
+
+// ---------- the earlier seasons ----------
+
+const EARLIER = euroleagueSeasons(fileURLToPath(new URL('..', import.meta.url)));
+const seasonOfYear = year => EARLIER.seasons.find(season => season.year === year);
+const nbaSeasonOf = year => BUILT_IN_BASKETBALL_SEASONS.find(set => set.year === year + 1);
+const mean = list => list.reduce((sum, value) => sum + value, 0) / list.length;
+const regularShare = club => club.regular[0] / club.regular[1];
+
+test('every season from 2000/01 to 2025/26 has its EuroLeague: the API\'s clubs, each with its best five of estimates', () => {
+  assert.deepEqual(EARLIER.seasons.map(season => season.season), Array.from({ length: 26 }, (_, i) => `${2000 + i}/${String(2001 + i).slice(2)}`));
+  assert.deepEqual(EARLIER.seasons.map(season => season.clubs.length),
+    [24, 32, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 16, 16, 16, 18, 18, 18, 18, 18, 18, 20]);
+  let stretched = 0;
+  for (const season of EARLIER.seasons) {
+    const snapshot = EARLIER.snapshots[season.year];
+    assert.deepEqual(season.clubs.map(club => club.source).sort(), snapshot.clubs.map(club => club.code).sort(), `${season.season}: the API's clubs`);
+    assert.equal(new Set(snapshot.players.map(row => row[0])).size, snapshot.players.length, `${season.season}: each player counts once`);
+    assert.ok(snapshot.players.length > 6 * season.clubs.length, `${season.season}: every player with a game, not the leaderboard's`);
+    for (const club of season.clubs) {
+      assert.match(club.id, /^el-[a-z0-9-]+$/);
+      assert.match(club.code, /^[A-Z]{3}$/);
+      assert.ok(NATIONS[club.country], `${club.name} plays in a game nation`);
+      assert.equal(club.squad.length, 5);
+      assert.equal(club.str, Math.round(club.squad.reduce((sum, p) => sum + p[2], 0) / 5));
+      for (const [name, positions, rating] of club.squad) {
+        assert.ok(name && !/[A-Z]{4}/.test(name), `${season.season} ${club.name}: ${name}`);
+        assert.match(positions, /^(PG|SG|SF|PF|C)(\/(PG|SG|SF|PF|C))?$/);
+        assert.ok(rating >= RATING_RANGE[0] && rating <= RATING_RANGE[1]);
+      }
+    }
+    stretched += season.warnings.filter(warning => /out of position/.test(warning)).length;
+    assert.deepEqual(season.warnings.filter(warning => !/out of position/.test(warning)), [], season.season);
+  }
+  // Assists counted sparingly in the 2000s would leave many fives with no point guard; on 2025/26's level, few do.
+  assert.ok(stretched <= 10, `${stretched} fives play someone out of position`);
+});
+
+test('earlier seasons are rated by the built-in season\'s rule, each season\'s box scores put on 2025/26\'s level', () => {
+  assert.equal(REFERENCE_SEASON, 2025);
+  assert.deepEqual(seasonScale(EARLIER.snapshots, 2025), { pir: 1, reb: 1, ast: 1, tpa: 1 });
+  // 2010/11: the average team's PIR 77.3 a game against 2025/26's 95.2, its assists 13.7 against 18.8.
+  const scale = seasonScale(EARLIER.snapshots, 2010);
+  assert.ok(Math.abs(scale.pir - 95.2 / 77.3) < 1e-9 && Math.abs(scale.ast - 18.8 / 13.7) < 1e-9);
+  const rhos = [];
+  for (const season of EARLIER.seasons) {
+    const starters = mean(season.clubs.flatMap(club => club.squad.map(p => p[2])));
+    assert.ok(starters > 75.5 && starters < 79, `${season.season}: starters rate ${starters.toFixed(1)} on average (the built-in's 76.3)`);
+    const strengths = season.clubs.map(club => club.str);
+    assert.ok(Math.max(...strengths) - Math.min(...strengths) >= 5 && Math.max(...strengths) - Math.min(...strengths) <= 13, season.season);
+    rhos.push(spearman(strengths, season.clubs.map(regularShare)));
+  }
+  // The box scores rank the clubs about as their regular seasons did, never the other way round.
+  rhos.sort((a, b) => a - b);
+  assert.ok(rhos[13] >= 0.55 && rhos[0] > 0.25, `Spearman against the regular seasons' records: median ${rhos[13].toFixed(2)}, lowest ${rhos[0].toFixed(2)}`);
+  // A player who played for two clubs counts for the one he played the most minutes for.
+  const gabriel = EARLIER.snapshots[2024].players.find(row => row[1] === 'GABRIEL, WENYEN');
+  assert.deepEqual([gabriel[2], gabriel[7].clubs], ['PAN', { TEL: [9, 136], PAN: [23, 393] }]);
+  // EuroLeague files Ülkerspor (2001/02 to 2005/06) under the code Fenerbahçe has played under since.
+  assert.ok(seasonOfYear(2005).clubs.some(club => club.id === 'el-ulkerspor' && club.name === 'Ülkerspor'));
+  assert.ok(seasonOfYear(2006).clubs.some(club => club.id === 'el-fenerbahce') && !seasonOfYear(2006).clubs.some(club => club.id === 'el-ulkerspor'));
+  // Today's clubs keep their identity in every season: Baskonia, never Tau Cerámica.
+  assert.ok(EARLIER.seasons.every(season => season.clubs.some(club => club.id === 'el-baskonia' && club.name === 'Baskonia')));
+});
+
+test('each season\'s file carries its EuroLeague clubs after the NBA\'s, every one of their ratings marked as an estimate', async () => {
+  await loadSportData('basketball');
+  for (const season of EARLIER.seasons) {
+    const listed = nbaSeasonOf(season.year);
+    const doc = JSON.parse(read(`public/basketball/${listed.id}.json`));
+    assert.equal(doc.version, listed.version);
+    assert.equal(doc.euroleague, season.map, `${listed.id} names its EuroLeague's map`);
+    const clubs = doc.clubs.filter(club => club.league === 'EuroLeague');
+    assert.deepEqual(clubs, season.clubs.map(({ id, name, code, league, country, col, str, squad }) => ({ id, name, code, league, country, col, str, squad })));
+    assert.ok(doc.clubs.slice(0, doc.clubs.length - clubs.length).every(club => club.league === 'NBA'), 'the NBA\'s first');
+  }
+  for (const set of BUILT_IN_BASKETBALL_SEASONS.filter(entry => entry.year <= 2000)) {
+    assert.equal(JSON.parse(read(`public/basketball/${set.id}.json`)).euroleague, undefined, `${set.season}: no EuroLeague before 2000/01`);
+  }
+  const sport = seasonSport(decodeFootballSet(JSON.parse(read('public/basketball/nba-2k10.json')), 'nba-2k10'));
+  const cska = buildClub(sport.clubs.find(club => club.id === 'el-cska-moscow'), sport);
+  assert.ok(cska.squad.every(isEstimated), 'the EuroLeague\'s players are estimates');
+  assert.match(estimateTitle(cska.squad[0]), /no game rates EuroLeague players/);
+  assert.ok(!buildClub(sport.clubs.find(club => club.id === 'b-los-angeles-lakers'), sport).squad.some(isEstimated), 'NBA 2K10\'s are not');
+});
+
+test('each run of seasons with the same clubs plays on a map of Europe of its own, Russia\'s clubs on its European part', () => {
+  assert.deepEqual(EARLIER.maps.map(map => [map.id, map.years.length]), [['el2001', 1], ['el2002', 1], ['el2003', 1], ['el2004', 1], ['el2005', 1],
+    ['el2006', 1], ['el2007', 1], ['el2008', 1], ['el2009', 1], ['el2010', 1], ['el2011', 1], ['el2012', 1], ['el2013', 1], ['el2014', 1],
+    ['el2015', 1], ['el2016', 1], ['el2017', 1], ['el2018', 1], ['el2019', 1], ['el2020', 2], ['el2022', 1], ['el2023', 2], ['el2025', 1], ['el2026', 1]]);
+  for (const map of EARLIER.maps) {
+    const entry = EUROPE_MAPS.find(item => item.id === map.id);
+    assert.ok(entry, `${map.id} is in the index`);
+    assert.deepEqual([entry.sport, entry.league, entry.theatre, entry.seasons], ['basketball', 'EuroLeague', undefined, map.years.map(year => nbaSeasonOf(year).id)]);
+    const text = read(`public/domestic/${map.id}.json`);
+    const doc = JSON.parse(text);
+    assert.equal(doc.version, entry.version);
+    assert.deepEqual(doc.clubs.map(club => [club.id, club.name]), map.clubs.map(club => [club.id, club.name]), `${map.id}: the clubs, strongest first`);
+    assert.deepEqual([...doc.hosts].sort(), [...new Set(map.clubs.map(club => club.country))].sort());
+    assert.equal(decodeDomestic(JSON.parse(text), map.id).clubs.length, map.clubs.length);
+    assert.equal(Boolean(doc.boundaries.mask), doc.hosts.includes('643'), `${map.id}: Russia cut to its European part, and said to be`);
+  }
+  // 2019/20 and 2020/21 had the same eighteen clubs, as had 2022/23 and 2023/24.
+  assert.deepEqual(EUROPE_MAPS.find(entry => entry.id === 'el2020').seasons, ['nba-2k20', 'nba-2k21']);
+  assert.deepEqual(EUROPE_MAPS.find(entry => entry.id === 'el2023').seasons, ['nba-2k23', 'nba-2k24']);
+  assert.equal(domesticLabel('domestic:el2010'), 'EuroLeague · Europe');
+});
+
+test('seeded duel campaigns on earlier EuroLeague maps reach a champion by land or sea', () => {
+  for (const [id, year] of [['el2002', 2001], ['el2001', 2000]]) {
+    const map = decodeDomestic(JSON.parse(read(`public/domestic/${id}.json`)), id);
+    const { geo } = map;
+    const { obstacles } = domesticSurroundings(ATLAS, map);
+    const sport = euroleagueBasketballIn(seasonOfYear(year).season);
+    const clubs = new Map(seasonOfYear(year).clubs.map(club => [club.id, club]));
+    const rng = makeRng(2000 + year);
+    const teams = Object.fromEntries(map.clubs.map(row => [row.id, buildClub(clubs.get(row.id), sport)]));
+    let own = { ...map.startOwners }, aliveIds = map.clubs.map(row => row.id);
+    assert.deepEqual(validateReachability({ geo, own, aliveIds }).unplacedIds, [], id);
+    while (aliveIds.length > 1) {
+      const draw = createDuelDraw(rng, { geo, routingPaths: geo.paths, own, aliveIds, obstacles, borderRoutes: true }, { speed: 80 });
+      assert.ok(draw && draw.attackerId !== draw.targetId, `${id}: every duel resolves`);
+      const { winner } = sport.simulate(rng, teams[draw.attackerId], teams[draw.targetId], 6, teamEff(teams[draw.attackerId]), teamEff(teams[draw.targetId]));
+      const loser = winner === draw.attackerId ? draw.targetId : draw.attackerId;
+      own = { ...own, ...Object.fromEntries(territories({ own }, loser).map(land => [land, winner])) };
+      aliveIds = aliveIds.filter(club => club !== loser);
+    }
+    assert.ok(Object.values(own).every(club => club === aliveIds[0]), `${id}: the champion holds every territory`);
+  }
+});
+
+test('an earlier season\'s EuroLeague plays FIBA\'s forty minutes at that season\'s pace and scoring rate', () => {
+  const settings = over => ({ sport: 'basketball', layer: 'clubs', ...over });
+  const sport = matchSport(settings({ clubScope: 'domestic:el2011', dataSeason: '2010/11' }));
+  assert.equal(sport, euroleagueBasketballIn('2010/11'));
+  assert.equal(matchSport(settings({ clubScope: 'domestic:nba2009', dataSeason: '2010/11' })), nbaBasketballIn('2010/11'));
+  assert.equal(matchSport(settings({ clubScope: EUROLEAGUE_SCOPE })), euroleagueBasketball, 'the built-in season plays its own');
+  assert.equal(euroleagueBasketballIn('1998/99'), euroleagueBasketball, 'a season without league figures plays the built-in\'s');
+  assert.ok(isEuroleagueScope('domestic:el2001') && isEuroleagueScope(EUROLEAGUE_SCOPE) && !isEuroleagueScope('domestic:nba2009') && !isEuroleagueScope('domestic:eu124'));
+  const [a, d] = seasonOfYear(2010).clubs.slice(0, 2).map(club => buildClub(club, sport));
+  const { pace, rules } = sport.prepareMatch(a, d);
+  const league = EUROLEAGUE_LEAGUE_AVERAGES['2010/11'];
+  assert.equal(pace, league.pace);
+  assert.equal(rules.scoring, Number((1.03 * league.rating / EUROLEAGUE_LEAGUE_AVERAGES['2025/26'].rating).toFixed(3)));
+  assert.deepEqual([rules.minutes, rules.home, rules.buzzer], [40, 0.06, [0.1, 0.05]]);
+  assert.equal(sport.clock.length, 40);
+});
+
+test('an earlier season offers its EuroLeague in setup: its map loads, its clubs launch under its rules, and a save passes the checks', async () => {
+  await withApp(async ({ app, time, calls }) => {
+    app.pickSetup('sport', 'basketball');
+    app.pickSetup('layer', 'clubs');
+    app.pickSetup('clubScope', EUROLEAGUE_SCOPE);
+    app.pickSetup('dataSet', 'nba-2k10');
+    assert.equal(app.state.setup.clubScope, 'domestic:el2010', 'the EuroLeague of 2009/10');
+    time.advance(200);
+    await Promise.all([app.loadCountry('el2010'), app.loadSet('nba-2k10')]);
+    await settle();
+    assert.ok(calls.includes('/domestic/el2010.json') && calls.includes('/basketball/nba-2k10.json'));
+    const model = buildSetupModel(app.state.setup, { domestic: app.domesticStatus(), season: app.seasonStatus() });
+    assert.equal(model.canLaunch, true);
+    assert.deepEqual(model.scopes.map(scope => [scope.id, scope.label, scope.count]), [['domestic:nba2009', 'NBA', 30], ['domestic:el2010', 'EuroLeague', 24]]);
+    const season = seasonOfYear(2009);
+    assert.match(model.countryNote, new RegExp(`^${season.clubs.slice(0, 3).map(club => club.name).join(', ').replace(/, ([^,]*)$/, ' and $1')} lead the 24 EuroLeague clubs`));
+
+    app.startCampaign();
+    const { state } = app;
+    assert.equal(state.phase, 'playing');
+    assert.deepEqual([state.settings.dataSet, state.settings.dataSeason, state.settings.clubScope], ['nba-2k10', '2009/10', 'domestic:el2010']);
+    assert.equal(state.settings.domesticVersion, EUROPE_MAPS.find(entry => entry.id === 'el2010').version);
+    assert.deepEqual(state.aliveIds.slice().sort(), season.clubs.map(club => club.id).sort());
+    assert.ok(Object.values(state.teams).every(team => state.own[team.home] === team.id && team.squad.every(isEstimated)));
+    assert.equal(state.campaignName, 'Basketball 2009/10 · EuroLeague · Europe');
+    assert.equal(app.territoryName(state.teams['el-cska-moscow'].home), 'Moscow');
+    // The App bundles its own copy of the sports, so the season's rulebook is checked by what it is.
+    const [a, d] = Object.values(state.teams);
+    assert.deepEqual([app.sport().clock.length, app.sport().prepareMatch(a, d).pace], [40, EUROLEAGUE_LEAGUE_AVERAGES['2009/10'].pace]);
+    const text = JSON.stringify({ v: 2, ...checkpoint(state) });
+    assert.doesNotThrow(() => parseCampaign(text), 'a save of it passes the checks');
+    const edited = edit => { const data = JSON.parse(text); edit(data.settings); edit(data.initialSettings); return JSON.stringify(data); };
+    const onMap = id => s => { s.clubScope = `domestic:${id}`; s.domesticVersion = EUROPE_MAPS.find(entry => entry.id === id).version; };
+    assert.throws(() => parseCampaign(edited(onMap('el2020'))), /Campaign data set is invalid/, 'another season\'s EuroLeague');
+    assert.throws(() => parseCampaign(edited(onMap('euroleague'))), /Campaign data set is invalid/, 'the built-in season\'s');
+    assert.doesNotThrow(() => parseCampaign(edited(s => { s.clubScope = 'domestic:nba2009'; s.domesticVersion = CLUB_MAPS.find(entry => entry.id === 'nba2009').version; })),
+      'its own NBA map');
+  });
+});
+
+test('a challenge link carries an earlier season\'s EuroLeague; another season\'s map becomes the season\'s own', () => {
+  const query = challengeQuery({ sport: 'basketball', layer: 'clubs', dataSet: 'nba-2k10', clubScope: 'domestic:el2010', seed: '9' }, 9);
+  assert.match(query, /season=nba-2k10/);
+  assert.match(query, /theatre=domestic:el2010/);
+  const back = readChallenge(`?${query}`);
+  assert.deepEqual([back.setup.dataSet, back.setup.layer, back.setup.clubScope, back.ignored], ['nba-2k10', 'clubs', 'domestic:el2010', []]);
+  assert.equal(readChallenge('?sport=basketball&teams=clubs&season=nba-2k20&theatre=domestic:el2010').setup.clubScope, 'domestic:el2020');
+  assert.equal(readChallenge('?sport=basketball&teams=clubs&season=nba-2k00&theatre=domestic:el2010').setup.clubScope, 'domestic:nba2000', '1999/00 has no EuroLeague');
 });
 
 // ---------- EuroBasket ----------

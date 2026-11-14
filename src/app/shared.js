@@ -64,19 +64,21 @@ export function mapYearOf(settings) {
 
 /**
  * The setup's club theatre. A sport with its own map plays only there (American football: the NFL's USA). An earlier
- * season with a map of its era plays there (basketball's NBA seasons). Football's clubs play on Europe's maps, the
- * season's own: its strongest clubs, or its elite; women's football's on Europe's (every club, or the elite) or on the
- * NWSL's USA; basketball's on the NBA's USA and Canada or the EuroLeague's Europe. The theatre carries over between
- * seasons and sports that have it; a league's theatre of before, or a map with no counterpart, falls back to Europe's
- * strongest clubs, or a sport's first map (the NBA's). One country's map stays chosen, with the built-in football data it
- * is built from; a data set brings its own clubs, so it leaves that map for the set's. A set with no maps (a CM 01/02
- * database built on this computer) plays football's two theatres on the world. Shared by App's setup and challenge links.
+ * season with a map of its era plays there (baseball's MLB seasons), or, where the season offers more than one map
+ * (basketball's from 2000/01: the NBA's of its era and the EuroLeague's of that season), on the one of the chosen
+ * theatre, else its era's. Football's clubs play on Europe's maps, the season's own: its strongest clubs, or its elite;
+ * women's football's on Europe's (every club, or the elite) or on the NWSL's USA; basketball's on the NBA's USA and
+ * Canada or the EuroLeague's Europe. The theatre carries over between seasons and sports that have it; a league's
+ * theatre of before, or a map with no counterpart, falls back to the season's era map, Europe's strongest clubs, or a
+ * sport's first map (the NBA's). One country's map stays chosen, with the built-in football data it is built from; a
+ * data set brings its own clubs, so it leaves that map for the set's. A set with no maps (a CM 01/02 database built on
+ * this computer) plays football's two theatres on the world. Shared by App's setup and challenge links.
  */
 export function setClubScope(setup) {
   const sportId = getSport(setup.sport).id;
   const dataSet = setup.dataSet != null && setSportOf(setup.dataSet) === sportId ? setup.dataSet : null;
   const era = dataSet != null ? seasonMapOf(dataSet) : null;
-  if (era) return domesticScope(era);
+  if (era && !hasTheatreMaps(sportId)) return domesticScope(era);
   const own = clubMapScope(sportId);
   if (own) return own;
   if (!hasTheatreMaps(sportId)) return domesticEntry(setup.clubScope)?.sport ? 'all' : setup.clubScope;
@@ -84,8 +86,9 @@ export function setClubScope(setup) {
   const chosen = domesticEntry(setup.clubScope);
   const theatre = chosen ? theatreOf(chosen) : setup.clubScope;
   const maps = theatreMapsOf(sportId, dataSet);
-  const map = maps.find(entry => theatreOf(entry) === theatre) || maps.find(entry => theatreOf(entry) === 'all') || maps[0];
-  return map ? domesticScope(map.id) : theatre === 'elite' ? 'elite' : 'all';
+  const map = maps.find(entry => theatreOf(entry) === theatre) || maps.find(entry => entry.id === era)
+    || maps.find(entry => theatreOf(entry) === 'all') || maps[0];
+  return map ? domesticScope(map.id) : era ? domesticScope(era) : theatre === 'elite' ? 'elite' : 'all';
 }
 
 /** A rating delta as an explicitly signed string, plus the colour to show it in. */

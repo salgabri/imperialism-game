@@ -1,10 +1,12 @@
 // The maps Europe's football clubs play on (docs/design/domestic-campaigns.md, "The Europe maps"): one for the strongest
 // TOP_CLUBS and one for the strongest ELITE_CLUBS, for the built-in season and for each earlier season with clubs; and the
-// women's game's, one for every European club and one for its ELITE_CLUBS strongest, likewise; and the one the
-// EuroLeague's basketball clubs play on (docs/design/euroleague.md), all of its clubs, by the same rules. A club holds
-// land only in its own country. A country's only club holds all of it; several clubs share it along its regional
-// borders, a region going whole to one club unless it holds two or more (then its next level down is split between
-// them); a country with no club is not on the map at all, so it stays grey beneath it, like any neighbour of a country map.
+// women's game's, one for every European club and one for its ELITE_CLUBS strongest, likewise; and the ones the
+// EuroLeague's basketball clubs play on (docs/design/euroleague.md), all of its clubs, by the same rules: the built-in
+// season's, and one for each run of earlier seasons with the same clubs, 2000/01 to 2025/26. A club holds land only in
+// its own country. A country's only club holds all of it; several clubs share it along its regional borders, a region
+// going whole to one club unless it holds two or more (then its next level down is split between them); a country with
+// no club is not on the map at all, so it stays grey beneath it, like any neighbour of a country map. Russia's clubs hold
+// its European part only (EUROPEAN_PART).
 //
 // Usage:
 //   node scripts/build-europe-maps.mjs [--only=eu124,eu32] [--check | --dry-run] [--boundaries=<dir>]
@@ -15,12 +17,13 @@
 //
 // Inputs:  the clubs in src/data/clubs.football.js and the earlier seasons' public/football/<id>.json, the women's in
 //          src/data/clubs.womens-football.js and public/womens-football/<id>.json (their European clubs), the EuroLeague's in
-//          src/data/clubs.euroleague.js; where they stand, in
+//          src/data/clubs.euroleague.js and, for its earlier seasons, scripts/lib/euroleague-seasons.mjs (from
+//          scripts/data/euroleague-seasons/); where they stand, in
 //          scripts/data/europe-clubs.json; geoBoundaries gbOpen layers, cached under the gitignored data-src/boundaries/;
 //          the game's world map public/countries-50m.json, whose outlines every country keeps, so territories meet
 //          each other and the grey neighbours on the very borders the rest of the game draws.
-// Outputs: public/domestic/eu<clubs>[s<season year>].json, the women's weu[32][s<season year>].json, the EuroLeague's euroleague.json,
-//          public/domestic/ATTRIBUTION-europe.txt and src/data/europeMaps.js.
+// Outputs: public/domestic/eu<clubs>[s<season year>].json, the women's weu[32][s<season year>].json, the EuroLeague's
+//          euroleague.json and el<season year>.json, public/domestic/ATTRIBUTION-europe.txt and src/data/europeMaps.js.
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -33,6 +36,8 @@ import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
 import { CLUBS as EUROLEAGUE_CLUBS } from '../src/data/clubs.euroleague.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { BUILT_IN_WOMENS_SEASONS } from '../src/data/womensFootballSeasons.js';
+import { BUILT_IN_BASKETBALL_SEASONS } from '../src/data/basketballSeasons.js';
+import { euroleagueSeasons, gameYearOf } from './lib/euroleague-seasons.mjs';
 import { ELITE_CLUBS, TOP_CLUBS, isEuropeanClub, strongestClubs } from '../src/data/scopes.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import { createBoundarySource, GB_CITATION } from './lib/domestic-boundaries.mjs';
@@ -76,7 +81,25 @@ const COUNTRIES = {
   // The EuroLeague's: Belgrade's two clubs and Tel Aviv's two. Each city is one unit, so it joins a neighbouring region.
   688: { iso3: 'SRB', units: 'ADM2', regions: ['ADM1'] },
   376: { iso3: 'ISR', units: 'ADM2', regions: ['ADM1'] },
+  // The EuroLeague's earlier seasons: Russia's clubs (Moscow's, Khimki, Kazan, Krasnodar, St Petersburg…, west of the
+  // Urals: EUROPEAN_PART), Croatia's (Cibona and Zadar), Slovenia's (Olimpija and Krka) and Lithuania's (Žalgiris and
+  // Rytas or Neptūnas).
+  643: { iso3: 'RUS', units: 'ADM2', regions: ['ADM1'] },
+  191: { iso3: 'HRV', units: 'ADM2', regions: ['ADM1'] },
+  705: { iso3: 'SVN', units: 'ADM2', regions: ['ADM1'] },
+  440: { iso3: 'LTU', units: 'ADM2', regions: ['ADM1'] },
 };
+/**
+ * The land a country's clubs hold on a map of Europe when the country reaches far beyond it: Russia's federal subjects
+ * west of the Urals (`regions` whose interior lies west of 60°E), its European part, cut along the very units its clubs
+ * share it by (COUNTRIES' `units`), so the cut and the units meet exactly. The rest of Russia stays grey beneath, as
+ * Kazakhstan does, and the opening camera frames Europe.
+ */
+const EUROPEAN_PART = {
+  643: { iso3: 'RUS', units: 'ADM2', regions: 'ADM1', maxLon: 60 },
+};
+// Pieces of such a cut outline its units miss under this are where the two meet, not land (fitToOutline): a thousand m².
+const CUT_NOISE_KM2 = 0.001;
 // A region whose clubs would each have under this share of the country's land per club is too small to hold them (a
 // city-state: Berlin, Bremen, Madrid), so it is shared with its largest neighbouring region. A top region with no club is
 // split where it is larger than FREE_TOP clubs' share, and anything below that where it is larger than FREE_LOWER, or
@@ -116,16 +139,56 @@ const layerOf = row => {
     year: clean(row.boundaryYearRepresented), url: row.simplifiedGeometryGeoJSON };
 };
 
-/** A country's world shape without its far overseas land (French Guiana, the Dutch Caribbean): `{ polys, near }`, `near` the land the camera frames. */
-async function worldShape(source, shapeId) {
+/**
+ * A country's world shape without its far overseas land (French Guiana, the Dutch Caribbean), and only its European
+ * part where EUROPEAN_PART names one (Russia's): `{ polys, near }`, `near` the land the camera frames. Memoised: the
+ * European part is cut once.
+ */
+const worldShapes = new Map();
+function worldShape(source, shapeId) {
+  if (!worldShapes.has(shapeId)) worldShapes.set(shapeId, readWorldShape(source, shapeId));
+  return worldShapes.get(shapeId);
+}
+
+async function readWorldShape(source, shapeId) {
   const shape = (await source.world()).find(s => s.key === shapeId);
   if (!shape) throw new Error(`No world shape ${shapeId}`);
-  const areas = shape.polys.map(polyAreaKm2);
-  const main = shape.polys[areas.indexOf(Math.max(...areas))];
+  const part = EUROPEAN_PART[shapeId] ? await europeanPart(source, shape.polys, EUROPEAN_PART[shapeId]) : null;
+  const whole = part?.polys ?? shape.polys;
+  const areas = whole.map(polyAreaKm2);
+  const main = whole[areas.indexOf(Math.max(...areas))];
   const at = centroidOf([main]);
-  const polys = shape.polys.filter(poly => kmBetween(centroidOf([poly]), at) <= OVERSEAS_KM);
+  const polys = whole.filter(poly => kmBetween(centroidOf([poly]), at) <= OVERSEAS_KM);
   const near = polys.filter(poly => poly === main || kmToPolys(centroidOf([poly]), [main]) <= FOCUS_KM);
-  return { name: shape.name, polys, near };
+  // A cut shape's outline (`outline`, whose vertices stay unsimplified) is its world shape's, not the cut's.
+  return { name: shape.name, polys, near, ...(part ? { layers: part.layers, cut: part.cut, outline: shape.polys } : {}) };
+}
+
+/**
+ * A world outline cut to `part.units` lying in the `part.regions` whose interior lies west of `part.maxLon`: `{ polys,
+ * layers, cut }`, `layers` the two layers it is cut by (cited) and `cut` what the map's `boundaries.mask` says of it.
+ */
+async function europeanPart(source, polys, part) {
+  const rows = await source.layers(part.iso3);
+  const rowAt = level => {
+    const row = rows.find(r => r.boundaryType === level);
+    if (!row) throw new Error(`No geoBoundaries ${part.iso3} ${level} layer`);
+    return row;
+  };
+  const shapesAt = async level => (await source.features(rowAt(level)))
+    .filter(f => f.geometry && (f.geometry.type === 'Polygon' || f.geometry.type === 'MultiPolygon'))
+    .map((f, i) => ({ id: `${level}-${i}`, iso: f.properties.shapeISO, name: f.properties.shapeName, polys: polysOf(f.geometry) }))
+    .filter(unit => unit.polys.length).map(unit => ({ ...unit, bbox: bboxOf(unit.polys) }));
+  const regions = (await shapesAt(part.regions)).map(region => ({ ...region, west: interiorPoint(region.polys)[0] < part.maxLon }));
+  // The units, with the regions they leave out (Russia's federal cities: regionsLeftOut), in the regions west of the line.
+  const all = await shapesAt(part.units);
+  const units = [...all, ...regionsLeftOut(all, regions)].filter(unit => memberOf(regions, interiorPoint(unit.polys)).west);
+  const topo = topology({ units: { type: 'FeatureCollection', features: units.map((unit, i) => ({ type: 'Feature', id: i, properties: {}, geometry: multi(unit.polys) })) } });
+  // Holes filled (lakes), as the world outline has them.
+  const west = polysOf(feature(topo, mergeArcs(topo, topo.objects.units.geometries)).geometry).map(poly => [poly[0]]);
+  return { polys: clipAgainst(polygonClipping.intersection, west, polys, 'outline'),
+    layers: [part.regions, part.units].map(level => ({ ...layerOf(rowAt(level)), use: 'europe' })),
+    cut: `${part.iso3} west of ${part.maxLon}°E: its ${part.units} units in the ${part.regions} regions whose interior lies there` };
 }
 
 const memberOf = (list, point) => {
@@ -190,6 +253,27 @@ async function loadCountry(source, shapeId, outline, log) {
   });
   log(`  ${shapeId} ${spec.iso3}${spec.part ? ` ${spec.part}` : ''}: ${units.length} ${spec.units} units in ${tree.children.size} top regions`);
   return { spec, units, geoms, topo, adjacency, tree, pathOf, layers };
+}
+
+/**
+ * The regions a unit layer leaves out (geoBoundaries' Russian ADM2 has no units for Moscow and St Petersburg, its federal
+ * cities), each as one unit: the largest piece of the region the units around it leave uncovered. Only the European cut
+ * takes them, so the outline has the cities; where clubs share Russia, each city is a piece of the outline its units
+ * miss and joins the nearest club's land (fitToOutline), as a country's coastal pieces do. As units they would meet their
+ * neighbours on borders a hair apart, which the partition cannot merge.
+ */
+function regionsLeftOut(units, regions) {
+  const inBox = (box, point) => point[0] >= box[0] && point[0] <= box[2] && point[1] >= box[1] && point[1] <= box[3];
+  const overlap = (a, b) => a[0] <= b[2] && b[0] <= a[2] && a[1] <= b[3] && b[1] <= a[3];
+  return regions.flatMap(region => {
+    const at = interiorPoint(region.polys);
+    if (units.some(u => inBox(u.bbox, at) && pointInPolys(at, u.polys))) return [];
+    const near = units.filter(u => overlap(u.bbox, region.bbox));
+    const topo = topology({ units: { type: 'FeatureCollection', features: near.map((u, i) => ({ type: 'Feature', id: i, properties: {}, geometry: multi(u.polys) })) } });
+    const around = polysOf(feature(topo, mergeArcs(topo, topo.objects.units.geometries)).geometry);
+    const piece = clipAgainst(polygonClipping.difference, region.polys, around).reduce((best, poly) => (!best || polyAreaKm2(poly) > polyAreaKm2(best) ? poly : best), null);
+    return piece ? [{ id: `${region.id}-fill`, iso: region.iso, name: region.name, polys: [piece], bbox: bboxOf([piece]) }] : [];
+  });
 }
 
 /**
@@ -302,7 +386,8 @@ function splitCountry(country, shape, clubs, log) {
   if (strays.length) log(`    ${shape.name}: ${strays.length} units went outside their region's clubs (${strays.slice(0, 4).map(u => u.name).join(', ')})`);
   const territories = dissolve(topo, owner, clubs.length).map(polysOf);
   const all = polysOf(feature(topo, mergeArcs(topo, topo.objects.units.geometries)).geometry);
-  return { land: fitToOutline(territories, all, shape.polys, shape.name), unitCounts: clubs.map((_, c) => owner.filter(o => o === c).length) };
+  return { land: fitToOutline(territories, all, shape.polys, shape.name, shape.cut ? { noiseKm2: CUT_NOISE_KM2, homes } : {}),
+    unitCounts: clubs.map((_, c) => owner.filter(o => o === c).length) };
 }
 
 const roundPolys = (polys, digits) => polys.map(poly => poly.map(ring => {
@@ -334,15 +419,19 @@ function clipAgainst(operation, subject, outline, first) {
  * Territories on a country's world outline: land outside it goes (the sources' coasts and borders differ), and each piece
  * of the outline they miss joins the nearest territory. So a country keeps the very borders the rest of the game draws.
  * One list of polygons per club: its land, then the pieces it joins, merged on their shared arcs with the whole map.
+ * An outline cut along the units themselves (Russia's European part) leaves thousands of pieces of no area where the
+ * cut and the units meet (15,336 of them under 0.1 km², and two real ones, for Russia's two clubs of 2001/02): pieces
+ * under `noiseKm2` go. There the cities its units leave out (regionsLeftOut) are such pieces, each its club's (`homes`).
  */
-function fitToOutline(territories, all, outline, name) {
+function fitToOutline(territories, all, outline, name, { noiseKm2 = 0, homes = null } = {}) {
   const land = territories.map(polys => clipAgainst(polygonClipping.intersection, polys, outline));
-  const missed = clipAgainst(polygonClipping.difference, all, outline, 'outline');
+  const missed = clipAgainst(polygonClipping.difference, all, outline, 'outline').filter(piece => !noiseKm2 || polyAreaKm2(piece) >= noiseKm2);
   const extra = land.map(() => []);
   for (const piece of missed) {
     const at = interiorPoint([piece]);
-    let best = -1, bestKm = Infinity;
-    land.forEach((polys, i) => { if (polys.length) { const km = kmToPolys(at, polys); if (km < bestKm) { bestKm = km; best = i; } } });
+    // A piece holding a club's ground is that club's (`homes`, strongest first: CSKA's Moscow), else the nearest's.
+    let best = homes ? homes.findIndex(home => home && pointInPolys(home, [piece])) : -1, bestKm = Infinity;
+    if (best < 0) land.forEach((polys, i) => { if (polys.length) { const km = kmToPolys(at, polys); if (km < bestKm) { bestKm = km; best = i; } } });
     if (best < 0) throw new Error(`${name}: nothing to join a missed piece to`);
     extra[best].push(piece);
   }
@@ -374,6 +463,7 @@ async function buildMap({ source, spec, countries, splits, log }) {
   for (const [shapeId, members] of byCountry) {
     const shape = await worldShape(source, shapeId);
     shapes.set(shapeId, shape);
+    layers.push(...shape.layers ?? []);
     if (members.length === 1) {
       land[members[0]] = shape.polys;
       unitCount[members[0]] = 1;
@@ -392,7 +482,7 @@ async function buildMap({ source, spec, countries, splits, log }) {
 
   // The world outlines' own vertices stay, so territories never part from the grey land beside them.
   const outlineVertices = new Set();
-  for (const shape of shapes.values()) for (const poly of shape.polys) for (const ring of poly) for (const [x, y] of ring) outlineVertices.add(`${x},${y}`);
+  for (const shape of shapes.values()) for (const poly of shape.outline ?? shape.polys) for (const ring of poly) for (const [x, y] of ring) outlineVertices.add(`${x},${y}`);
   // One polygon a piece: nodeRings gives every ring the vertices its neighbours cut it at, and a club's pieces then merge on shared arcs.
   const pieces = land.flatMap((polys, club) => polys.map(poly => ({ club, polys: [poly] })));
   nodeRings(pieces);
@@ -411,11 +501,15 @@ async function buildMap({ source, spec, countries, splits, log }) {
     Math.ceil((nearBox[2] + pad[0]) * 10) / 10, Math.ceil((nearBox[3] + pad[1]) * 10) / 10].map(v => fixed(v));
   const projection = { lon0: fixed(round(circularMeanLon(nearPolys.map(poly => [centroidOf([poly])[0], polyAreaKm2(poly)])))), lat0: fixed(round((nearBox[1] + nearBox[3]) / 2)) };
   const sourceAreaKm2 = [...shapes.values()].reduce((sum, shape) => sum + polysAreaKm2(shape.polys), 0);
+  // A host its clubs hold only part of (Russia's European part) is masked: the game draws its world shape beneath the
+  // sections, so the rest of it shows as grey land (src/engine/domestic.js domesticSurroundings).
+  const cuts = [...shapes.values()].filter(shape => shape.cut).map(shape => shape.cut);
   const meta = {
     format: 1, id: mapId, name: 'Europe', sport, league, ...(theatre ? { theatre } : {}),
     ...(seasons ? { seasons } : {}),
     hosts, version: '', projection, focus,
-    boundaries: { provider: 'geoBoundaries', layers: dedupeLayers(layers), units: n, areaKm2: Math.round(sourceAreaKm2) },
+    boundaries: { provider: 'geoBoundaries', layers: dedupeLayers(layers), units: n, areaKm2: Math.round(sourceAreaKm2),
+      ...(cuts.length ? { mask: cuts.join('; ') } : {}) },
   };
   const rows = clubs.map((club, i) => ({ id: club.id, ...(seasons ? { name: club.name } : {}), col: '', section: ids[i], home: club.home, shape: club.shape }));
 
@@ -456,9 +550,10 @@ async function buildMap({ source, spec, countries, splits, log }) {
     const list = members.map(i => `${names[i]} ${Math.round(areas[i] / 1000)}k`).join(', ');
     log(`    ${shapes.get(shapeId).name}: ${list}`);
   }
-  // A women's season's map serves that season alone, so it names its strongest clubs as the built-in maps do.
+  // A women's season's map serves that season alone, so it names its strongest clubs as the built-in maps do. An earlier
+  // EuroLeague's may serve two seasons, so setup names the loaded season's own strongest, as an NBA era's map does.
   const entry = { id: mapId, sport, league, name: 'Europe', ...(theatre ? { theatre } : {}), ...(seasons ? { seasons } : {}), clubs: n, sections: n, countries: hosts.length,
-    version: doc.version, ...(seasons && sport === 'football' ? {} : { top: clubs.slice(0, 3).map(club => club.name) }) };
+    version: doc.version, ...(seasons && sport !== 'womens-football' ? {} : { top: clubs.slice(0, 3).map(club => club.name) }) };
   return { entry, doc, file: outFile(mapId), text };
 }
 
@@ -498,7 +593,8 @@ function attributionText(entries, docs) {
     'Club grounds: scripts/data/europe-clubs.json (from the country maps, public/domestic/ATTRIBUTION.txt, and by hand).',
   ];
   for (const layer of dedupeLayers(docs.flatMap(doc => doc.boundaries.layers))) {
-    lines.push('', `${layer.iso3} ${layer.level}${layer.use === 'grouping' ? ' (only groups the units into regions)' : ''}`);
+    lines.push('', `${layer.iso3} ${layer.level}${layer.use === 'grouping' ? ' (only groups the units into regions)'
+      : layer.use === 'europe' ? ' (only cuts the country to its European part)' : ''}`);
     lines.push(`  Source: ${layer.source}${layer.year ? ` (${layer.year})` : ''}`);
     lines.push(`  Licence: ${layer.license}`);
     lines.push(`  File: ${layer.url}`);
@@ -511,7 +607,8 @@ function attributionText(entries, docs) {
  * strongest TOP_CLUBS and ELITE_CLUBS clubs. FIFA 05, FIFA 06 and SWOS 96/97 have nations only, so no maps. Then the
  * women's game's (src/data/womensFootballSeasons.js), from FIFA 23 on: every European club ('Europe', the NWSL's play on
  * a map of their own, scripts/build-club-maps.mjs) and the ELITE_CLUBS strongest of them, where there are more. Last the
- * EuroLeague's, in the built-in season only.
+ * EuroLeague's: the built-in season's, then one for each run of earlier seasons with the same clubs (el<year>, named after
+ * the run's first season), serving the NBA seasons of those years.
  */
 async function mapSpecs() {
   const { clubs: places } = JSON.parse(await readFile(clubsFile, 'utf8'));
@@ -541,9 +638,19 @@ async function mapSpecs() {
       ...(clubs.length > ELITE_CLUBS ? [{ id: `weu${ELITE_CLUBS}${tag}`, sport: 'womens-football', league: `Elite ${ELITE_CLUBS}`, theatre: 'elite',
         seasons: set ? [set] : null, clubs: field(clubs, ELITE_CLUBS) }] : []),
     ]),
-    // The EuroLeague's whole league, strongest first, in the built-in season only.
+    // The EuroLeague's whole league, strongest first, in the built-in season, then in each run of earlier seasons with
+    // the same clubs (scripts/lib/euroleague-seasons.mjs), served with the NBA seasons of those years.
     { id: 'euroleague', sport: 'basketball', league: 'EuroLeague', seasons: null, clubs: field(EUROLEAGUE_CLUBS, EUROLEAGUE_CLUBS.length) },
+    ...euroleagueSeasons(root).maps.map(map => ({ id: map.id, sport: 'basketball', league: 'EuroLeague', seasons: map.years.map(nbaSeasonOf),
+      clubs: field(map.clubs, map.clubs.length) })),
   ];
+}
+
+/** The built-in NBA season a EuroLeague season is played beside (2009/10's: NBA 2K10). */
+function nbaSeasonOf(year) {
+  const season = BUILT_IN_BASKETBALL_SEASONS.find(entry => entry.year === gameYearOf(year));
+  if (!season) throw new Error(`No basketball season of ${gameYearOf(year)} for the EuroLeague of ${year}/${String(year + 1).slice(2)}`);
+  return season.id;
 }
 
 async function main() {

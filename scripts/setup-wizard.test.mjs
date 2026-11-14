@@ -161,6 +161,8 @@ test('the smallest country is nine matches, a retired one leaves the list, and a
   // An NBA season (clubs only) holds that season's NBA franchises.
   const nbaSeason = { ...getSport('basketball'), clubs: getSport('basketball').clubs.filter(club => club.league === 'NBA') };
   assert.equal(sportNote(nbaSeason, { clubsOnly: true }), '30 NBA clubs', 'an NBA season has no nations');
+  // From 2000/01 a season has the EuroLeague's clubs too.
+  assert.equal(sportNote(getSport('basketball'), { clubsOnly: true }), 'NBA and EuroLeague clubs');
 });
 
 test('static markup keeps the whole DOM contract on every step', t => {

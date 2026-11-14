@@ -119,9 +119,10 @@ npm run build:world-cup-seasons # rebuild the computed World Cup seasons 1961/62
 npm run sync:national-team-seasons # read the pinned Wikidata answers (via QLever), results and Ballon d'Or pages in data-src/ into scripts/data/national-team-seasons/ (--fetch downloads what is missing)
 npm run build:national-team-seasons # rebuild the computed seasons between those World Cups, 1962/63 to 1992/93, from those facts (offline; --check to verify)
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
-npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page and sources in data-src/
+npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page and sources in data-src/, with each season's EuroLeague from 2000/01
 npm run sync:euroleague  # snapshot the EuroLeague's rosters and box scores from its public API into scripts/data/euroleague-2026-27.json (network, cached)
-npm run build:euroleague # rebuild the EuroLeague's clubs, every rating an estimate from that snapshot (--check compares byte for byte)
+npm run sync:euroleague-seasons # snapshot its seasons 2000/01 to 2025/26 (clubs, every player's box score) into scripts/data/euroleague-seasons/ (network, cached)
+npm run build:euroleague # rebuild the EuroLeague's clubs, every rating an estimate from that snapshot, and the earlier seasons' league figures and audit (--check compares byte for byte)
 npm run sync:madden      # snapshot Madden NFL ratings from EA's site into scripts/data/madden-nfl-27.json (network, cached)
 npm run build-nfl        # rebuild the NFL clubs from that snapshot (--check compares byte for byte)
 npm run build:nfl-scoring # the NFL's and AFL's scoring season by season, 1960–2024, from Pro Football Archives' pages (--fetch saves missing pages politely; --check compares byte for byte)
@@ -797,7 +798,7 @@ Each key names a setup choice, and a key left at its default is left out:
 | --- | --- | --- | --- |
 | `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey`, `tennis`, `womens-tennis`, `rugby-league` | football |
 | `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season); tennis and women's tennis are nations only |
-| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite` where the sport offers it, and `eurobasket` in basketball; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), women's football's maps (`domestic:weu32`, `domestic:nwsl`; `all`, `elite` and `NWSL` still open on them), or the EuroLeague's (`domestic:euroleague`) | Europe for nations, the Top 124 for football clubs, Europe for women's football clubs, the NBA's for basketball clubs, a sport's own map (NFL, MLB, NHL) |
+| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite` where the sport offers it, and `eurobasket` in basketball; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), women's football's maps (`domestic:weu32`, `domestic:nwsl`; `all`, `elite` and `NWSL` still open on them), or the EuroLeague's (`domestic:euroleague`; an earlier season's, `domestic:el2010`, which with another season becomes that season's own) | Europe for nations, the Top 124 for football clubs, Europe for women's football clubs, the NBA's for basketball clubs, a sport's own map (NFL, MLB, NHL) |
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`, `mlb-the-show-24`) | the built-in season |
 | `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
 | `opponent` | Who picks your opponent | `player` (You choose), `compass` | Compass, and whenever launch would drop it (a spectator, a pairing draw) |
@@ -1035,7 +1036,9 @@ for them there, so all 24 of the **EuroBasket** theatre field real fives
 with its best five. No game or dataset rates EuroLeague players, so every rating is
 an estimate on NBA 2K's scale from the player's EuroLeague box scores (his PIR a
 game over three seasons), marked as one wherever it is shown; the rosters and box
-scores come from the EuroLeague's public API (`npm run sync:euroleague`). See the
+scores come from the EuroLeague's public API (`npm run sync:euroleague`). Its earlier
+seasons, 2000/01 to 2025/26, are rated the same way, each season's box scores put on
+2025/26's level ([Basketball seasons](#basketball-seasons)). See the
 [design notes](docs/design/euroleague.md).
 
 Basketball positions are fluid, so most players list two neighbouring positions,
@@ -1325,9 +1328,11 @@ the United Arab Emirates); clubs that share a country split it along its regiona
 (Spain's four, Istanbul's three, two each in Italy, France, Greece, Serbia and Israel), and a
 country with no club stays grey. Its games are FIBA's forty minutes at the EuroLeague's pace and
 scoring rate, with its larger home edge. The map is `public/domestic/euroleague.json`
-(`node scripts/build-europe-maps.mjs --only=euroleague`), offered with the built-in season
-only: an earlier basketball season has NBA clubs alone. See the
-[design notes](docs/design/euroleague.md).
+(`node scripts/build-europe-maps.mjs --only=euroleague`), the built-in season's. Each earlier
+season from 2000/01 has the EuroLeague of its own year on a map of its own (`el2001` to `el2026`,
+one for each run of seasons with the same clubs, 24 in all): CSKA Moscow and Russia's other clubs
+hold Russia west of the Urals, the rest of it grey, and Croatia, Slovenia and Lithuania are shared
+when two of their clubs played. See the [design notes](docs/design/euroleague.md#earlier-seasons-200001-to-202526).
 
 ### The Europe maps
 
@@ -1715,9 +1720,20 @@ NBA 2K26), three before them from other games (below: 1998/99 from NBA Live 99,
 1991/92 and 1983/84 from NBA 2K27's MyNBA Eras), and the 36 others back to
 1960/61, which no game rated, computed from Basketball-Reference's statistics
 (below). Pick
-one under **Season** in setup; it plays NBA clubs only, so it switches Teams to
-clubs. Each season is a file in `public/basketball/` (3 to 12 KB) that loads
-only when chosen, with the map of its era.
+one under **Season** in setup; it plays clubs only, so it switches Teams to
+clubs: the NBA's of that season and, from 2000/01, the EuroLeague's. Each season
+is a file in `public/basketball/` (3 to 20 KB) that loads only when chosen, with
+the map of its era.
+
+- **The EuroLeague, 2000/01 to 2025/26:** each season's clubs as the EuroLeague's
+  API lists them (16 to 32), every player who played for them that season, each
+  club with its best five, on a map of Europe of its own. No game rates EuroLeague
+  players, so every rating is an estimate from the box scores, by the built-in
+  season's rule, each season's PIR, assists, rebounds and threes first put on
+  2025/26's level (league scoring rose from 74 to 86 points a team). Each season
+  plays at its own pace and scoring rate. The 69 clubs not in today's EuroLeague
+  (CSKA Moscow, Siena, Benetton Treviso…) show their code for a crest. See the
+  [design notes](docs/design/euroleague.md#earlier-seasons-200001-to-202526).
 
 - **What a season holds:** the franchises of that season, each with the best
   five its players' positions allow. Ratings are 2K's overalls, unchanged.

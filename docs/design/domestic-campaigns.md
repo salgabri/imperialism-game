@@ -1204,7 +1204,11 @@ era's do. The victory names "Europe".
 **Basketball's EuroLeague** (2026-11-08) plays on a map built by the same script and rules,
 `public/domestic/euroleague.json` (`--only=euroleague`): its 20 clubs in 10 countries, with
 `sport: 'basketball'` and no football `theatre` in its file and index entry, so it is never one of
-football's two. `COUNTRIES` gained Serbia and Israel for it. See [euroleague.md](euroleague.md).
+football's two. `COUNTRIES` gained Serbia and Israel for it. Its earlier seasons (2026-11-14) have
+24 more, `el2001` to `el2026`, one for each run of seasons with the same clubs, each listing the NBA
+seasons it serves (`seasons`). `COUNTRIES` gained Russia, Croatia, Slovenia and Lithuania for them,
+and Russia is cut to its European part (`EUROPEAN_PART`: its federal subjects west of 60°E, the map's
+`boundaries.mask` drawing the rest of it grey beneath). See [euroleague.md](euroleague.md#earlier-seasons-200001-to-202526).
 
 **Old games.** A world campaign saved before these maps (`clubScope` `all`, `elite` or a
 league) has no `domestic:` scope, so it restores on the world with its dealt land, under

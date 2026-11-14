@@ -366,8 +366,9 @@ export const SEASON_NOTES = Object.freeze({
     + 'Real 2K Insider; 1991/92 and 1983/84 from NBA 2K27\'s MyNBA Eras; 1998/99 from NBA Live 99, put on 2K\'s scale). '
     + 'The seasons no game rated, back to 1960/61, are computed from Basketball-Reference\'s statistics, fitted to '
     + 'NBA 2K and put on NBA 2K27\'s scale. '
-    + 'They have NBA clubs only: the franchises of that season, on the map of their day. No game rates EuroLeague '
-    + 'players, so the EuroLeague\'s ratings are estimates from its box scores, marked as such.',
+    + 'They have clubs only: the NBA franchises of that season, on the map of their day, and from 2000/01 the '
+    + 'EuroLeague\'s clubs of that season, on a map of Europe of theirs. No game rates EuroLeague players, so the '
+    + 'EuroLeague\'s ratings are estimates from its box scores, each season\'s put on 2025/26\'s level, marked as such.',
   'american-football': 'Madden NFL ratings of each season at its launch (2026: Madden NFL 27, as of the week 7 update), '
     + 'from EA SPORTS and the fan archives that kept them; 1995–1992 and 1990 from Tecmo Super Bowl\'s attributes, the '
     + 'overall ours. 2000 back to 1996, 1991 and 1989 back to 1960 are computed from Pro Football Archives\' records of '
@@ -418,8 +419,14 @@ function seasonOptions(sets, dataSet, sport) {
   return rows.map(option => ({ ...option, name: optionName(option) }));
 }
 
-/** A sport's three strongest clubs' names, as a club map's index lists them. */
-const strongestClubs = sport => sport.clubs.slice().sort((a, b) => b.str - a.str || a.name.localeCompare(b.name)).slice(0, 3).map(club => club.name);
+/**
+ * A sport's three strongest clubs' names on a map (`entry`), as a club map's index lists them: the clubs of its league
+ * when the sport has others (a basketball season's NBA map leaves out its EuroLeague's clubs).
+ */
+const strongestClubs = (sport, entry = null) => {
+  const own = sport.clubs.filter(club => club.league === entry?.league);
+  return (own.length ? own : sport.clubs).slice().sort((a, b) => b.str - a.str || a.name.localeCompare(b.name)).slice(0, 3).map(club => club.name);
+};
 
 /** "Arsenal, Chelsea and Liverpool lead 100 clubs fighting over England, …" */
 export function domesticDescription(entry) {
@@ -529,15 +536,18 @@ export function theatreMapPreview({ countries, paths = null, basePaths, own, fra
 
 /**
  * Sport card subtitle, derived from the sport's own club data so it never overstates the leagues. `clubsOnly`: the
- * chosen season has no nations (a basketball season's NBA clubs).
+ * chosen season has no nations (a basketball season's clubs: the NBA's, and from 2000/01 the EuroLeague's).
  */
 export function sportNote(sport, { clubsOnly = false } = {}) {
   // Football fields only its strongest clubs, whatever a season holds.
   const clubs = sport.id === 'football' ? topClubs(sport.clubs || [], TOP_CLUBS) : sport.clubs || [];
   const leagues = [...new Set(clubs.map(club => club.league))];
   if (!clubs.length) return 'Nations';
-  // A sport with clubs only (American football) has no nations to offer.
-  if (sport.clubsOnly || clubsOnly) return leagues.length === 1 ? `${clubs.length} ${leagues[0]} clubs` : `${clubs.length} clubs`;
+  // A sport with clubs only (American football) has no nations to offer; basketball names its two leagues.
+  if (sport.clubsOnly || clubsOnly) {
+    return leagues.length === 1 ? `${clubs.length} ${leagues[0]} clubs`
+      : sport.id === 'basketball' && leagues.length === 2 ? `${leagues[0]} and ${leagues[1]} clubs` : `${clubs.length} clubs`;
+  }
   if (leagues.length === 1) return `Nations · ${clubs.length} ${leagues[0]} clubs`;
   // Basketball names its two leagues, each on its own map: the NBA and the EuroLeague.
   if (sport.id === 'basketball' && leagues.length === 2) return `Nations · ${leagues[0]} and ${leagues[1]} clubs`;
@@ -797,7 +807,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     // A basketball season's own strongest clubs lead its map, named once it has loaded. A season's map with only some of
     // its clubs (women's football's: Europe's, the NWSL's) names its own.
     countryNote: !country ? '' : domesticDescription(dataSet == null || (country.top && country.seasons?.includes(dataSet)) ? country
-      : { ...country, top: pending ? [] : strongestClubs(sport) }),
+      : { ...country, top: pending ? [] : strongestClubs(sport, country) }),
     countryState, countryMessage: countryState === 'error' ? (ctx.domestic?.message || mapFailed) : '',
     mapLoading, launching,
     // Step 3's team list is empty until a country's map decodes.

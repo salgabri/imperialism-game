@@ -21,8 +21,31 @@ import path from 'node:path';
 import { CLUBS } from '../src/data/clubs.basketball.js';
 import { NBA_LEAGUE_AVERAGES } from '../src/data/nbaLeagueAverages.js';
 import { buildNbaSeason, readArchive, readComputedSources, readSeasonSources } from './lib/nba-seasons.mjs';
+import { euroleagueSeasons, gameYearOf } from './lib/euroleague-seasons.mjs';
+import { contentHash, serializeFootballSet } from '../src/data/footballSetBuild.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
+
+/**
+ * A season with the EuroLeague's clubs of its year (2000/01 on) after the NBA's, `euroleague` naming the map they play on
+ * (src/data/europeMaps.js), as basketball's built-in clubs are the NBA's and the EuroLeague's. Their players are
+ * `[name, positions, rating]` as the NBA's; every rating an estimate from EuroLeague box scores, which the loader marks
+ * (src/engine/footballSets.js). The version covers both leagues.
+ */
+function withEuroleague(result, season) {
+  if (!season) return result;
+  const clubs = season.clubs.map(({ id, name, code, league, country, col, str, squad }) => ({ id, name, code, league, country, col, str, squad }));
+  const doc = {};
+  for (const [key, value] of Object.entries(result.doc)) {
+    if (key === 'version') doc.version = '';
+    else if (key === 'clubs') Object.assign(doc, { euroleague: season.map, clubs: [...value, ...clubs] });
+    else if (key === 'coverage') doc.coverage = { players: value.players + clubs.length * 5, clubs: value.clubs + clubs.length };
+    else doc[key] = value;
+  }
+  doc.version = `${doc.id}-${contentHash(doc)}`;
+  const audit = { ...result.audit, version: doc.version, euroleague: { map: season.map, clubs: clubs.length } };
+  return { ...result, doc, text: serializeFootballSet(doc), audit };
+}
 
 function listingModule(docs, manifest) {
   const quoted = text => {
@@ -39,8 +62,10 @@ function listingModule(docs, manifest) {
   `\n// ${Number(year) - 1}/${year.slice(2)}: ${source.label}, from ${source.name}, SHA-256 ${(source.sha256 ?? source.files.players.sha256).slice(0, 12)}…`).join('')}${computed ? `
 // ${computed.seasons.length} seasons from ${season(computed.seasons[0])} to ${season(computed.seasons.at(-1))}: ${computed.label}, from ${computed.name},
 // Advanced.csv SHA-256 ${computed.files.advanced.sha256.slice(0, 12)}…` : ''}
-// The built-in earlier basketball seasons, newest first: NBA clubs only. Each is public/basketball/<id>.json, loaded
-// when a setup chooses it (src/engine/footballSets.js), and plays on its era's map (\`map\`, public/domestic/<map>.json).
+// The built-in earlier basketball seasons, newest first: clubs only, the NBA's and, from 2000/01, the EuroLeague's of
+// that season too. Each is public/basketball/<id>.json, loaded when a setup chooses it (src/engine/footballSets.js); its
+// NBA clubs play on its era's map (\`map\`, public/domestic/<map>.json), its EuroLeague clubs on theirs (the file's
+// \`euroleague\`, src/data/europeMaps.js).
 export const BUILT_IN_BASKETBALL_SEASONS = Object.freeze([
 ${rows.join('\n')}
 ]);
@@ -55,10 +80,13 @@ async function main() {
   const sources = await readSeasonSources(root, manifest, years);
   // The score is fitted on 2K Archive's own table, its NBA 2K12 included.
   const computed = await readComputedSources(root, manifest, { ...years, ...archived }, { arenas, sources, leagueAverages: NBA_LEAGUE_AVERAGES });
+  // Each season from 2000/01 carries the EuroLeague's clubs of that season too (scripts/lib/euroleague-seasons.mjs).
+  const euroleague = new Map(euroleagueSeasons(root).seasons.map(season => [gameYearOf(season.year), season]));
   const results = manifest.seasons.map(year => {
     const source = sources[String(year)] ?? computed?.seasons[String(year)];
     // A season from another source is built from its own players alone; the NBA 2K editions from 2K Archive's table.
-    return buildNbaSeason(source ? { [year]: source.players } : years, year, manifest, { arenas, builtIn: CLUBS, archived, source });
+    return withEuroleague(buildNbaSeason(source ? { [year]: source.players } : years, year, manifest, { arenas, builtIn: CLUBS, archived, source }),
+      euroleague.get(year));
   }).sort((a, b) => b.doc.year - a.doc.year);
   for (const { doc, text, audit } of results) {
     console.log(`${doc.id} ${doc.season} ${doc.label} on ${doc.map}: ${doc.clubs.length} clubs from ${audit.rows} players, `

@@ -84,6 +84,7 @@
     "sync:rugby-league-seasons": "node scripts/sync-rugby-league-seasons.mjs",
     "build:rugby-league-seasons": "node scripts/build-rugby-league-seasons.mjs",
     "sync:euroleague": "node scripts/sync-euroleague.mjs",
+    "sync:euroleague-seasons": "node scripts/sync-euroleague-seasons.mjs",
     "build:euroleague": "node scripts/build-euroleague.mjs",
     "sync:ea-fc-women": "node scripts/sync-ea-fc-women.mjs",
     "build-womens-football": "node scripts/build-womens-football.mjs",
