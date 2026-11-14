@@ -63,8 +63,9 @@ function playersOf(snapshot, manifest, report) {
       source: { id: `ta:${current(key)}`, source: 'tennis-abstract', edition: 'Tennis Abstract Elo', snapshotDate: report.updated, rawRating: elo,
         rawScale: 'Elo', eloRank, ...(tourRank != null ? { [tour.rankKey]: tourRank } : {}), url: PLAYER_PAGE(current(key)) } }));
   }
+  // A woman of the women's pages before 1968 who is not the player file's keeps her own id (`wp:<key>`).
   return snapshot.players.map(([id, name, code, , , elo], i) => ({ name, elo, code, nation: nationIdOf(code, snapshot.season, rules),
-    source: { id: tour.idOf(id), source: 'sackmann-elo', edition: 'Elo from match results', snapshotDate: snapshot.date, rawRating: elo, rawScale: 'Elo', eloRank: i + 1 } }));
+    source: { id: /^\d+$/.test(id) ? tour.idOf(id) : id, source: 'sackmann-elo', edition: 'Elo from match results', snapshotDate: snapshot.date, rawRating: elo, rawScale: 'Elo', eloRank: i + 1 } }));
 }
 
 /** Season `year`: its data set document and its audit row. */
@@ -88,16 +89,20 @@ function buildSeason(snapshot, manifest) {
   const label = report ? report.label ?? `Tennis Abstract Elo, ${MONTHS[Number(report.updated.slice(5, 7)) - 1]} ${report.updated.slice(0, 4)}`
     : `${amateurs ? 'Amateur Elo' : 'Elo from match results'}, end of ${year}${rough ? ' (rough)' : ''}`;
   const licence = manifest.licence.name;
-  // The seasons before 1973 say which run made them: the method warmed up on the amateur file, the amateurs' alone to 1967.
+  // The seasons before 1973 say which run made them: the men's warmed up on the amateur file, the amateurs' alone to
+  // 1967; the women's warmed up on Wikipedia's pages of the majors and the cup, which alone make 1963-1967.
   const method = snapshot.run === 'early'
-    ? `Tennis Abstract's published Elo method, warmed up on Jeff Sackmann's majors and Davis Cup results of 1877-1967 (docs/design/tennis.md, "Before 1973")`
+    ? manifest.method.early.method ?? `Tennis Abstract's published Elo method, warmed up on Jeff Sackmann's majors and Davis Cup results of 1877-1967 (docs/design/tennis.md, "Before 1973")`
     : `Tennis Abstract's published Elo method (docs/design/${tourId === 'wta' ? 'womens-tennis' : 'tennis'}.md, "Earlier seasons")`;
+  // A season of Wikipedia's pages alone cites its year's Federation Cup page, at its pinned revision.
+  const cupPage = amateurs && manifest.wikipedia ? manifest.wikipedia.cups.find(([title]) => title.startsWith(`${year} `)) : null;
   const source = report
     ? { edition: 'Tennis Abstract Elo', name: 'Tennis Abstract (Jeff Sackmann)', snapshotDate: report.updated, retrieved: manifest.archive.retrieved,
       url: `https://web.archive.org/web/${report.capture}/${report.original}`, rawScale: 'Elo', method: report.method ?? 'current', licence,
       listed: snapshot.listed, rated: snapshot.rated, ...(shift ? { shift } : {}) }
-    : { edition: 'Elo from match results', name: tour.results, snapshotDate: snapshot.date,
-      retrieved: manifest.archive.retrieved, url: `${manifest.archive.repository}/tree/${manifest.archive.commit}`, rawScale: 'Elo', computed: true,
+    : { edition: 'Elo from match results', name: cupPage ? manifest.method.early.results : tour.results, snapshotDate: snapshot.date,
+      retrieved: cupPage ? manifest.wikipedia.read : manifest.archive.retrieved,
+      url: cupPage ? `https://en.wikipedia.org/w/index.php?oldid=${cupPage[1]}` : `${manifest.archive.repository}/tree/${manifest.archive.commit}`, rawScale: 'Elo', computed: true,
       method, licence, rated: snapshot.rated,
       ...(shift ? { shift } : {}), ...(rough ? { rough: true } : {}), ...(amateurs ? { amateurs: true } : {}) };
   const doc = {
@@ -160,7 +165,8 @@ function attributionText(manifest) {
   return tourId === 'wta' ? `Women's tennis seasons ${first}-2025 (wta-<year>.json): attribution and licence
 ===========================================================================
 
-The ratings in these files are Jeff Sackmann's (Tennis Abstract), or are derived from his data.
+The ratings in these files are Jeff Sackmann's (Tennis Abstract), or are derived from his data${seasons.early ? ` and, before
+1973, from the results English Wikipedia records` : ''}.
 
 - 2016-2025: Tennis Abstract's own year-end WTA Elo reports (https://tennisabstract.com/reports/wta_elo_ratings.html),
   read from the Internet Archive's Wayback Machine captures named in each file's source; each woman's country from
@@ -168,9 +174,14 @@ The ratings in these files are Jeff Sackmann's (Tennis Abstract), or are derived
 - ${seasons.computed[0]}-2015: Elo computed by this project from Jeff Sackmann's WTA match results
   (${archive.upstream}, as archived at ${archive.repository}, commit ${archive.commit})
   by the method Tennis Abstract has published; see docs/design/womens-tennis.md, "Earlier seasons". These are not
-  Tennis Abstract's own numbers.
+  Tennis Abstract's own numbers.${seasons.early ? `
+- ${seasons.early[0]}-${seasons.early[1]}: Elo computed the same way, warmed up on the results of the four majors' women's singles of
+  1960-1967 and the Federation Cup of 1963-1967 as English Wikipedia's articles record them (the pages and their
+  revisions are pinned in scripts/data/womens-tennis-seasons.json; text CC BY-SA 4.0,
+  https://creativecommons.org/licenses/by-sa/4.0/, by Wikipedia's contributors, and nothing of it is in these files);
+  ${seasons.amateur[0]}-${seasons.amateur[1]} from those results alone. See docs/design/womens-tennis.md, "1963-1967".` : ''}
 
-Credit: ${licence.credit}.
+Credit: ${licence.credit}${seasons.early ? '; the results of 1960-1967, English Wikipedia\'s contributors' : ''}.
 Licence: ${licence.name} (${licence.url}). ${licence.terms}
 Non-commercial: these files may not be used for commercial purposes.
 ` : `Tennis seasons ${first}-2025 (tennis-<year>.json): attribution and licence
@@ -216,9 +227,10 @@ async function main() {
   }
   const audit = {
     generatedBy: `scripts/build-tennis-seasons.mjs${tourId === 'atp' ? '' : ` --tour=${tourId}`}`, licence: manifest.licence,
-    // The method without its fit targets, and the early run's without its alias list (the manifest keeps both).
+    // The method without its fit targets, and the early run's without its alias list and joins (the manifest keeps them).
     method: { ...manifest.method, targets: undefined,
-      ...(manifest.method.early ? { early: { ...manifest.method.early, aliases: { note: manifest.method.early.aliases.note, pairs: manifest.method.early.aliases.items.length } } } : {}) },
+      ...(manifest.method.early ? { early: { ...manifest.method.early, aliases: { note: manifest.method.early.aliases.note, pairs: manifest.method.early.aliases.items.length },
+        ...(manifest.method.early.joins ? { joins: { note: manifest.method.early.joins.note, pairs: manifest.method.early.joins.items.length } } : {}) } } : {}) },
     validation,
     shifted: results.filter(result => result.audit.shift).map(result => `${result.doc.season}: ${result.audit.shift} (${result.audit.over99.join(', ')})`),
     seasons: results.map(result => result.audit),

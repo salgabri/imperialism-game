@@ -379,7 +379,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'the map of their day, the Athletics in '
     + 'Oakland until 2024.',
   'womens-tennis': 'Elo ratings of the WTA\'s women: Tennis Abstract\'s own as of 2 November 2026 and at the end of 2016–2025; '
-    + 'before 2016 computed from Jeff Sackmann\'s match results by its method (1968–1979 rough). Each nation names its five '
+    + 'before 2016 computed from Jeff Sackmann\'s match results by its method (1963–1979 rough; before 1968 the majors and the '
+    + 'Federation Cup only, as Wikipedia records them). Each nation names its five '
     + 'best; one with fewer than two rated players fields no team.',
   tennis: 'Elo ratings of the ATP\'s men: Tennis Abstract\'s own as of 2 November 2026 and at the end of 2016–2025; before '
     + '2016 computed from Jeff Sackmann\'s match results by its method (1960–1979 rough; before 1968 the amateurs\' majors and '

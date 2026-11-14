@@ -61,6 +61,36 @@
       "layoff": null,
       "files": "tour",
       "note": "Tennis Abstract's method before May 2018, for the check against its 2016 and 2017 reports: tour-level matches only, everyone starting at 1500, no layoff penalty."
+    },
+    "early": {
+      "about": "The women's seasons before 1973 (docs/design/womens-tennis.md, \"1963-1967\"): a second run of this method, kept apart from the first so that 1973-2025 rebuild byte for byte. It reads the four majors' women's singles and the Federation Cup of 1960-1967 from English Wikipedia's pages (wikipedia, above) before the open era's files, its newcomers of the pages starting at their own level and its layoffs before the open era charged only from amateurWeeks, and snapshots 1963-1972 (seasons.early). The rest is the method above.",
+      "results": "English Wikipedia: the majors' women's singles draws and the Federation Cup",
+      "method": "Tennis Abstract's published Elo method, warmed up on the majors' and the Federation Cup's results of 1960-1967 from English Wikipedia (docs/design/womens-tennis.md, \"1963-1967\")",
+      "counted": "Every played singles match of the pages: the majors' draws and the cup's singles rubbers (rubbers 1 and 2; the doubles, rubber 3, rate nobody), never a walkover, a retirement or a default (the scores' w/o, ret., def. and a retirement's superscript r). A match that the finals bracket and a section both show is counted once. Rounds are numbered back from each bracket's last (scripts/lib/tennis-wikipedia.mjs); the cup's by its days, its last day the final. A major's matches are dated the first day of its women's singles, a cup rubber its tie's day.",
+      "start": {
+        "amateur": 1325,
+        "fit": "Not published: a newcomer whose first counted match is on the pages starts at 1325, fitted to five points so that the run carries on as the shipped one. Over the shipped run's top 50 of each season 1973-1980 its Elo of the same women differs from the shipped run's by +0.1 on average (at most 0.5 in a season); on Tennis Abstract's 17 targets for 1973-2000 (targets above) it comes out -0.3 Elo on average, root mean square 42.8 (the shipped run: -0.4 and 42.7). 1320 puts the seam at -0.4, 1330 at +1.4, 1280 at -9.5 and 1380 at +14.8 (with the layoffs below); Tingay's tens agree as well with any of them."
+      },
+      "layoff": {
+        "from": 19680101,
+        "amateurWeeks": 13,
+        "note": "The open era's rule (layoff above) for every gap that begins on or after 1 January 1968. A gap that begins and ends before it is charged on the same scale only when it lasts 13 weeks or more: the pages hold the majors and the cup alone, so the eight-week rule charges most gaps between them. Against Tingay's tens of 1963-1967 (checks below) the mean rank correlation is 0.72 with eight weeks, 0.76 with 13, 0.72 with 26, 0.72 with 39 and 0.72 with no charge (start 1325): one season, 1967, makes the difference. A gap across the start (Court's of 1967, her year away) is never charged."
+      },
+      "activity": {
+        "amateur": 3,
+        "cup": true,
+        "open": 10,
+        "note": "1963-1967 (seasons.amateur) list the women with three counted matches in the season, or a played singles rubber in that year's Federation Cup, the user's choice of 2026-11-14 so that every cup nation fields the women who played it; 1968-1972 ten, as from 1973. The pages hold the majors and the cup alone: at three matches alone, 41 of the 82 cup nations of 1963-1967 had two rated cup players, with the cup's rubbers all 82."
+      },
+      "nations": "A woman of 1963-1967 plays for her fix, else her cup nation of the nearest season (the first run's rule, the pages' cups and the match files' together), else the country her draws' flags give her in the nearest season of the pages (within cupWindow), else the player file's; from 1968 the first run's rule.",
+      "aliases": {
+        "note": "Keys of one woman, reviewed by hand on 2026-11-14, the merged key's matches counted under the kept one. A key is a linked article (a redirect followed), a red link's title, or a name written without a link and its country (Name|CODE). Rule 'name': the same plain name in one country, checked by scripts/lib/tennis-wikipedia.mjs; 'spelling': a spelling of the same name, why given. Not merged: Margot Anne Smith (New Zealand) and Margaret Smith Court; Pauline and Pat Roberts, who played each other; Alison Martin (Australia) and Andrée Martin (Canada); Irène and Isabelle de Lansalut, Madonna and Maree Schacht, María Tort de Ayala and Maria Ayala, with nothing to show either pair is one woman.",
+        "pairs": 45
+      },
+      "joins": {
+        "note": "Women of the pages who are the player file's, so that they carry on into the open era's files under its id, reviewed by hand on 2026-11-14; a woman whose article's Wikidata item is a player's wikidata_id needs no row. Rule 'name': her key's name or a name her cells show is the player file's, plainly, in one country (sameCodes), checked by scripts/lib/tennis-wikipedia.mjs. Not joined: Maria Ayala (Chile, 1960) and the player file's Maria Ayala (Puerto Rico), Mary Habicht (the United States) and its Mary Habicht (Brazil): one name, two countries.",
+        "pairs": 120
+      }
     }
   },
   "validation": {
@@ -648,49 +678,239 @@
         }
       }
     },
+    "early": {
+      "seasons": [
+        1963,
+        1972
+      ],
+      "matches": {
+        "counted": 286413,
+        "unplayed": 23440,
+        "no score": 611,
+        "placeholder": 0,
+        "skipped": 467914
+      },
+      "fedCupRubbersUnresolved": 349,
+      "wikipedia": {
+        "pages": 37,
+        "matches": 1991,
+        "counted": 1882,
+        "unplayed": 109,
+        "women": 547,
+        "playerFile": 278,
+        "byWikidata": 158,
+        "byReview": 120,
+        "aliases": 45
+      },
+      "fit": {
+        "years": [
+          1973,
+          2000
+        ],
+        "n": 17,
+        "meanDiff": -0.3,
+        "rms": 42.8,
+        "byDecade": {
+          "1970s": 6.9,
+          "1980s": 30,
+          "1990s": -18.1
+        },
+        "after": {
+          "n": 14,
+          "meanDiff": -4.6
+        }
+      },
+      "seam": {
+        "1973": {
+          "n": 50,
+          "meanDiff": -0.2,
+          "meanAbsDiff": 1.2,
+          "maxAbsDiff": 7.8
+        },
+        "1974": {
+          "n": 50,
+          "meanDiff": -0.2,
+          "meanAbsDiff": 1.2,
+          "maxAbsDiff": 6.3
+        },
+        "1975": {
+          "n": 50,
+          "meanDiff": -0.2,
+          "meanAbsDiff": 0.8,
+          "maxAbsDiff": 4.9
+        },
+        "1976": {
+          "n": 50,
+          "meanDiff": 0.2,
+          "meanAbsDiff": 0.5,
+          "maxAbsDiff": 4
+        },
+        "1977": {
+          "n": 50,
+          "meanDiff": 0.2,
+          "meanAbsDiff": 0.5,
+          "maxAbsDiff": 3.1
+        },
+        "1978": {
+          "n": 50,
+          "meanDiff": 0.4,
+          "meanAbsDiff": 0.5,
+          "maxAbsDiff": 4.8
+        },
+        "1979": {
+          "n": 50,
+          "meanDiff": 0.4,
+          "meanAbsDiff": 0.4,
+          "maxAbsDiff": 2.5
+        },
+        "1980": {
+          "n": 50,
+          "meanDiff": 0.5,
+          "meanAbsDiff": 0.5,
+          "maxAbsDiff": 2.4
+        }
+      }
+    },
     "checks": {
       "topTens": {
         "authority": "Lance Tingay (The Daily Telegraph), every year",
         "periods": {
-          "all": {
+          "amateur": {
             "seasons": 5,
-            "shared": 8.2,
-            "rho": 0.68
+            "shared": 7.2,
+            "rho": 0.76
+          },
+          "open": {
+            "seasons": 5,
+            "shared": 8.4,
+            "rho": 0.71
           }
         },
         "seasons": {
-          "1968": {
-            "shared": 7,
-            "listed": 10,
-            "rho": 0.66,
+          "1963": {
+            "shared": 9,
+            "listed": 9,
+            "rho": 0.57,
             "ranks": [
+              1,
               7,
+              3,
+              2,
+              4,
+              8,
+              6,
+              9,
+              null,
+              5
+            ],
+            "notListed": [
+              "Nancy Richey: 1 counted matches"
+            ]
+          },
+          "1964": {
+            "shared": 6,
+            "listed": 10,
+            "rho": 0.45,
+            "ranks": [
+              1,
+              2,
+              3,
+              16,
+              17,
+              11,
+              4,
+              7,
+              13,
+              5
+            ],
+            "notListed": []
+          },
+          "1965": {
+            "shared": 8,
+            "listed": 10,
+            "rho": 0.88,
+            "ranks": [
+              1,
+              4,
+              3,
+              2,
+              8,
+              5,
+              6,
+              7,
+              11,
+              12
+            ],
+            "notListed": []
+          },
+          "1966": {
+            "shared": 6,
+            "listed": 10,
+            "rho": 0.95,
+            "ranks": [
+              3,
+              1,
               2,
               5,
+              6,
+              7,
+              14,
+              13,
+              17,
+              19
+            ],
+            "notListed": []
+          },
+          "1967": {
+            "shared": 7,
+            "listed": 10,
+            "rho": 0.93,
+            "ranks": [
+              1,
+              2,
+              5,
+              3,
               4,
+              6,
+              7,
+              15,
+              16,
+              12
+            ],
+            "notListed": []
+          },
+          "1968": {
+            "shared": 8,
+            "listed": 10,
+            "rho": 0.76,
+            "ranks": [
+              2,
+              4,
+              5,
+              6,
               1,
               3,
-              9,
-              11,
-              30,
-              18
+              8,
+              10,
+              26,
+              14
             ],
             "notListed": []
           },
           "1969": {
             "shared": 9,
             "listed": 10,
-            "rho": 0.58,
+            "rho": 0.66,
             "ranks": [
               1,
               5,
-              3,
+              2,
               4,
               6,
-              10,
               9,
+              10,
               7,
-              2,
+              3,
               12
             ],
             "notListed": []
@@ -698,17 +918,17 @@
           "1970": {
             "shared": 8,
             "listed": 10,
-            "rho": 0.73,
+            "rho": 0.67,
             "ranks": [
               1,
               2,
               7,
-              10,
+              12,
               5,
               4,
               8,
-              19,
-              11,
+              18,
+              10,
               9
             ],
             "notListed": []
@@ -723,7 +943,7 @@
               1,
               3,
               5,
-              14,
+              13,
               7,
               4,
               11,
@@ -734,12 +954,12 @@
           "1972": {
             "shared": 9,
             "listed": 10,
-            "rho": 0.81,
+            "rho": 0.84,
             "ranks": [
-              2,
+              1,
               4,
               3,
-              1,
+              2,
               8,
               6,
               7,
@@ -758,9 +978,9 @@
             "name": "Margaret Court",
             "year": 1971,
             "published": 2389,
-            "computed": 2402.9,
+            "computed": 2393.9,
             "date": "1973-12-10",
-            "endOfYear": 2261.8
+            "endOfYear": 2256.3
           }
         ]
       }
@@ -5353,19 +5573,21 @@
     },
     {
       "id": "wta-1972",
-      "version": "wta-1972-bbaa9ba2",
+      "version": "wta-1972-3d4efafc",
       "label": "Elo from match results, end of 1972 (rough)",
       "kind": "computed",
+      "run": "early",
+      "activity": 10,
       "date": "1972-12-31",
       "rated": 167,
       "shift": 0,
       "over99": [],
       "top": [
-        "Margaret Court AUS 2297.8 → 96",
-        "Billie Jean King USA 2297.4 → 96",
-        "Chris Evert USA 2269.7 → 95",
-        "Evonne Goolagong AUS 2148.9 → 90",
-        "Nancy Richey USA 2125.4 → 89"
+        "Billie Jean King USA 2293.7 → 96",
+        "Margaret Court AUS 2290.3 → 96",
+        "Chris Evert USA 2268.9 → 95",
+        "Evonne Goolagong AUS 2148.8 → 90",
+        "Nancy Richey USA 2119.9 → 89"
       ],
       "nations": [
         "United States 93.9 (Billie Jean King 96, Chris Evert 95, Nancy Richey 89, Rosie Casals 86, Julie Heldman 78; +51)",
@@ -5374,12 +5596,12 @@
         "France 76.2 (Francoise Durr 83, Gail Sherriff 75, Nathalie Fuchs 67, Odile De Roubin 63)",
         "West Germany (Germany) 75.8 (Helga Masthoff 80, Katja Ebbinghaus 75, Heide Orth 72, Kora Schediwy 66, Edith Winkens 66; +2)",
         "Netherlands 75.4 (Betty Stove 80, Marijke Jansen 71, Trudy Groenman 70)",
-        "South Africa 73.3 (Patricia Walkden 77, Brenda Kirk 72, Laura Rossouw 69, Esme Emmanuel 68, Alison Mcmillan 65; +3)",
+        "South Africa 73.4 (Patricia Walkden 77, Brenda Kirk 72, Laura Rossouw 69, Esme Emmanuel 69, Alison Mcmillan 65; +3)",
         "Soviet Union (Russia) 72.4 (Olga Morozova 80, Eugenia Birioukova 68, Marina Kroschina 67, Anna Yeremeyeva 65, Marina Chuvirina 62; +1)",
         "Czechoslovakia (Czechia) 70.5 (Vlasta Kodesova 73, Alena Palmeova West 68)",
         "Sweden 68 (Christina Sandberg 71, Ingrid Bentzer 70, Margareta Strandberg 60, Mimi Wikstedt 56, Madeleine Pegel 54)",
         "Hungary 65.2 (Judith Szorenyi 66, Erzsebet Szell 65, Marie Pinterova 65, Katalin Borka 63)",
-        "Ireland 62.5 (Geraldine Barniville 63, Susan Minford 62)",
+        "Ireland 62 (Susan Minford 62, Geraldine Barniville 62)",
         "Indonesia 61.5 (Lita Liem 64, Lany Kaligis 59)",
         "Canada 60.3 (Vicky Berner 63, Jane Ohara 58, Andree Martin 56)",
         "New Zealand 60 (Marilyn Pryde 65, Robyn Legge 55)",
@@ -5406,8 +5628,8 @@
         "Azerbaijan → Soviet Union (Russia)"
       ],
       "nationFrom": {
-        "fed-cup": 73,
-        "player-file": 94
+        "fed-cup": 77,
+        "player-file": 90
       },
       "leftOut": {
         "barred": [],
@@ -5425,30 +5647,32 @@
     },
     {
       "id": "wta-1971",
-      "version": "wta-1971-f8c8ab32",
+      "version": "wta-1971-4bed5d8f",
       "label": "Elo from match results, end of 1971 (rough)",
       "kind": "computed",
+      "run": "early",
+      "activity": 10,
       "date": "1971-12-31",
       "rated": 132,
       "shift": 0,
       "over99": [],
       "top": [
-        "Billie Jean King USA 2280.9 → 95",
-        "Margaret Court AUS 2261.8 → 94",
-        "Rosie Casals USA 2077.6 → 87",
-        "Virginia Wade GBR 2074.3 → 87",
-        "Kerry Reid AUS 2051.2 → 86"
+        "Billie Jean King USA 2277.5 → 95",
+        "Margaret Court AUS 2256.3 → 94",
+        "Rosie Casals USA 2076.7 → 87",
+        "Virginia Wade GBR 2073.1 → 87",
+        "Kerry Reid AUS 2048 → 86"
       ],
       "nations": [
         "United States 89.4 (Billie Jean King 95, Rosie Casals 87, Nancy Richey 83, Chris Evert 83, Julie Heldman 82; +31)",
         "Australia 88.6 (Margaret Court 94, Kerry Reid 86, Evonne Goolagong 86, Judy Tegart 80, Lesley Turner 77; +15)",
-        "Great Britain 83.8 (Virginia Wade 87, Ann Jones 84, Joyce Williams 78, Christine Truman 76, Winnie Shaw 75; +18)",
-        "West Germany (Germany) 78.9 (Helga Masthoff 83, Helga Schultze 80, Heide Orth 70, Kora Schediwy 67, Katja Ebbinghaus 65; +1)",
-        "France 78.8 (Francoise Durr 85, Gail Sherriff 79, Odile De Roubin 66, Daniele Bouteleux 66, Nathalie Fuchs 61)",
+        "Great Britain 83.7 (Virginia Wade 87, Ann Jones 84, Joyce Williams 78, Christine Truman 75, Winnie Shaw 75; +18)",
+        "France 78.7 (Francoise Durr 85, Gail Sherriff 79, Odile De Roubin 66, Daniele Bouteleux 65, Nathalie Fuchs 61)",
+        "West Germany (Germany) 78.5 (Helga Masthoff 82, Helga Schultze 80, Heide Orth 70, Kora Schediwy 67, Edda Buding 65; +1)",
         "South Africa 72.8 (Patricia Walkden 77, Laura Rossouw 71, Brenda Kirk 68, Esme Emmanuel 68, Joan Wilshere 64; +1)",
         "Netherlands 72.5 (Betty Stove 73, Marijke Jansen 73, Trudy Groenman 68)",
         "Soviet Union (Russia) 71 (Olga Morozova 77, Elena Granaturovna 67, Marina Kroschina 57)",
-        "Sweden 70.5 (Christina Sandberg 74, Ingrid Bentzer 67)",
+        "Sweden 70 (Christina Sandberg 74, Ingrid Bentzer 66)",
         "Italy 67.5 (Lea Pericoli 73, Maria Teresa Nasuelli 63, Daniela Marzano 58)",
         "Japan 65 (Kazuko Sawamatsu 76, Junko Sawamatsu 54)",
         "Czechoslovakia (Czechia) 64 (Alena Palmeova West 67, Miroslava Holubova 61)",
@@ -5477,8 +5701,8 @@
         "Azerbaijan → Soviet Union (Russia)"
       ],
       "nationFrom": {
-        "fed-cup": 64,
-        "player-file": 68
+        "fed-cup": 68,
+        "player-file": 64
       },
       "leftOut": {
         "barred": [],
@@ -5496,38 +5720,40 @@
     },
     {
       "id": "wta-1970",
-      "version": "wta-1970-0fa27477",
+      "version": "wta-1970-756a810c",
       "label": "Elo from match results, end of 1970 (rough)",
       "kind": "computed",
+      "run": "early",
+      "activity": 10,
       "date": "1970-12-31",
       "rated": 158,
       "shift": 0,
       "over99": [],
       "top": [
-        "Margaret Court AUS 2230.7 → 93",
-        "Billie Jean King USA 2155.6 → 90",
-        "Nancy Richey USA 2074.9 → 87",
-        "Ann Jones GBR 2049.3 → 86",
-        "Virginia Wade GBR 2023.9 → 85"
+        "Margaret Court AUS 2225.4 → 93",
+        "Billie Jean King USA 2164.2 → 91",
+        "Nancy Richey USA 2078.9 → 87",
+        "Ann Jones GBR 2052.1 → 86",
+        "Virginia Wade GBR 2027.3 → 85"
       ],
       "nations": [
-        "United States 87.1 (Billie Jean King 90, Nancy Richey 87, Rosie Casals 84, Julie Heldman 79, Peaches Bartkowicz 79; +43)",
-        "Australia 86.9 (Margaret Court 93, Evonne Goolagong 84, Kerry Reid 82, Judy Tegart 79, Lesley Hunt 78; +17)",
+        "United States 87.6 (Billie Jean King 91, Nancy Richey 87, Rosie Casals 84, Julie Heldman 80, Peaches Bartkowicz 80; +43)",
+        "Australia 87 (Margaret Court 93, Evonne Goolagong 84, Kerry Reid 83, Judy Tegart 79, Lesley Hunt 78; +17)",
         "Great Britain 83.8 (Ann Jones 86, Virginia Wade 85, Winnie Shaw 79, Joyce Williams 75, Corinne Molesworth 69; +18)",
-        "West Germany (Germany) 76.7 (Helga Masthoff 80, Helga Schultze 79, Heide Orth 67, Kora Schediwy 64, Almut Sturm 62; +1)",
-        "France 76.4 (Francoise Durr 81, Gail Sherriff 77, Odile De Roubin 69, Daniele Bouteleux 63, Christiane Spinoza 60; +1)",
+        "France 76.2 (Francoise Durr 81, Gail Sherriff 77, Odile De Roubin 68, Daniele Bouteleux 62, Christiane Spinoza 60; +1)",
         "South Africa 75.5 (Patricia Walkden 78, Annette Van Zyl 75, Laura Rossouw 72, Esme Emmanuel 71, Brenda Kirk 65; +3)",
+        "West Germany (Germany) 75.4 (Helga Masthoff 79, Helga Schultze 77, Heide Orth 66, Kora Schediwy 64, Almut Sturm 61; +1)",
         "Soviet Union (Russia) 72.8 (Olga Morozova 79, Tiiu Kivi 68, Yevgenia Izopaitis 61)",
         "Netherlands 70.6 (Marijke Jansen 73, Betty Stove 72, Trudy Groenman 65, Ada Bakker 61, Judith Salome 61)",
         "Sweden 67.7 (Christina Sandberg 74, Eva Lundquist 62, Ingrid Bentzer 59)",
         "Czechoslovakia (Czechia) 67.3 (Vlasta Kodesova 72, Alena Palmeova West 64, Lenka Kodesova 57)",
         "Japan 66.3 (Kazuko Sawamatsu 74, Kimiyo Hatanaka 59, Junko Sawamatsu 57)",
-        "Italy 66.2 (Lea Pericoli 75, Maria Teresa Nasuelli 62, Monica Giorgi 61, Daniela Marzano 53)",
-        "Hungary 62.6 (Katalin Borka 64, Erzsebet Polgar 63, Marie Pinterova 60, Eva Szabo 58, Judith Szorenyi 57)",
-        "Indonesia 60 (Lita Liem 62, Lany Kaligis 58)",
+        "Italy 65.7 (Lea Pericoli 74, Maria Teresa Nasuelli 62, Monica Giorgi 60, Daniela Marzano 53)",
+        "Hungary 62.1 (Katalin Borka 64, Erzsebet Polgar 62, Marie Pinterova 60, Eva Szabo 57, Judith Szorenyi 57)",
+        "Indonesia 60.5 (Lita Liem 63, Lany Kaligis 58)",
         "New Zealand 58 (Marilyn Pryde 59, Robyn Legge 57)",
         "Canada 57.5 (Jane Ohara 61, Andree Martin 54)",
-        "Chile 56 (Ana Maria Arias 60, Michelle Rodriguez 52)"
+        "Chile 55.5 (Ana Maria Arias 59, Michelle Rodriguez 52)"
       ],
       "merged": [
         "Belarus → Soviet Union (Russia)",
@@ -5547,8 +5773,8 @@
         "Azerbaijan → Soviet Union (Russia)"
       ],
       "nationFrom": {
-        "fed-cup": 68,
-        "player-file": 90
+        "fed-cup": 72,
+        "player-file": 86
       },
       "leftOut": {
         "barred": [],
@@ -5557,8 +5783,8 @@
           "Isabel Fernandez De Soto (COL)",
           "Beatriz Araujo (ARG)",
           "Maria Eugenia Guzman (ECU)",
-          "Judith Dibar (ROU)",
           "Monique Van Haver (BEL)",
+          "Judith Dibar (ROU)",
           "Suzana Gesteira (BRA)",
           "Anne Marie Studer (SUI)",
           "Daphne Pattison (RHO)",
@@ -5570,37 +5796,39 @@
     },
     {
       "id": "wta-1969",
-      "version": "wta-1969-342ca796",
+      "version": "wta-1969-a3233e9a",
       "label": "Elo from match results, end of 1969 (rough)",
       "kind": "computed",
+      "run": "early",
+      "activity": 10,
       "date": "1969-12-31",
       "rated": 152,
       "shift": 0,
       "over99": [],
       "top": [
-        "Margaret Court AUS 2231.7 → 93",
-        "Virginia Wade GBR 2082.6 → 87",
-        "Billie Jean King USA 2080 → 87",
-        "Nancy Richey USA 2057.1 → 86",
-        "Ann Jones GBR 2000.7 → 84"
+        "Margaret Court AUS 2229.7 → 93",
+        "Billie Jean King USA 2095.8 → 88",
+        "Virginia Wade GBR 2087.7 → 88",
+        "Nancy Richey USA 2060.6 → 86",
+        "Ann Jones GBR 2014.5 → 85"
       ],
       "nations": [
-        "United States 85.9 (Billie Jean King 87, Nancy Richey 86, Julie Heldman 84, Peaches Bartkowicz 83, Rosie Casals 79; +35)",
-        "Australia 84.2 (Margaret Court 93, Kerry Reid 79, Lesley Turner 78, Karen Krantzcke 76, Judy Tegart 76; +12)",
-        "Great Britain 83.8 (Virginia Wade 87, Ann Jones 84, Winnie Shaw 78, Christine Truman 76, Joyce Williams 74; +20)",
-        "South Africa 75.4 (Patricia Walkden 77, Annette Van Zyl 77, Maryna Godwin 69, Esme Emmanuel 69, Anita Van Deventer 66; +5)",
-        "West Germany (Germany) 75.1 (Helga Masthoff 80, Helga Schultze 74, Edda Buding 70, Heide Orth 65, Kora Schediwy 65; +3)",
-        "France 72.4 (Gail Sherriff 75, Francoise Durr 74, Rosie Reyes 64, Odile De Roubin 64, Evelyne Terras 60; +6)",
-        "Soviet Union (Russia) 68.1 (Olga Morozova 73, Tiiu Kivi 64, Marina Chuvirina 60)",
-        "Italy 67.3 (Lea Pericoli 72, Maria Teresa Riedl 66, Maria Teresa Nasuelli 61, Monica Giorgi 60)",
-        "Czechoslovakia (Czechia) 67 (Vlasta Kodesova 69, Alena Palmeova West 65)",
-        "Hungary 66 (Marie Pinterova 69, Erzsebet Polgar 63)",
+        "United States 86.3 (Billie Jean King 88, Nancy Richey 86, Julie Heldman 84, Peaches Bartkowicz 83, Rosie Casals 79; +35)",
+        "Great Britain 84.5 (Virginia Wade 88, Ann Jones 85, Winnie Shaw 78, Christine Truman 75, Joyce Williams 74; +20)",
+        "Australia 84.2 (Margaret Court 93, Kerry Reid 79, Lesley Turner 77, Karen Krantzcke 77, Judy Tegart 76; +12)",
+        "West Germany (Germany) 75 (Helga Masthoff 80, Helga Schultze 74, Edda Buding 70, Kora Schediwy 64, Almut Sturm 64; +3)",
+        "France 72.8 (Francoise Durr 75, Gail Sherriff 75, Rosie Reyes 64, Odile De Roubin 64, Evelyne Terras 60; +6)",
+        "South Africa 72 (Annette Van Zyl 77, Maryna Godwin 69, Esme Emmanuel 69, Anita Van Deventer 67, Joan Wilshere 65; +4)",
+        "Soviet Union (Russia) 68.2 (Olga Morozova 73, Tiiu Kivi 64, Marina Chuvirina 61)",
+        "Italy 66.9 (Lea Pericoli 72, Maria Teresa Riedl 65, Maria Teresa Nasuelli 61, Monica Giorgi 60)",
+        "Czechoslovakia (Czechia) 66.5 (Vlasta Kodesova 68, Alena Palmeova West 65)",
         "Netherlands 65.8 (Marijke Jansen 68, Betty Stove 67, Ada Bakker 61, Astrid Suurbeek 57, Judith Salome 55)",
         "Sweden 65.7 (Christina Sandberg 71, Eva Lundquist 61, Margareta Strandberg 58)",
-        "Canada 62.5 (Faye Urban 67, Andree Martin 58)",
-        "Japan 62.5 (Kazuko Sawamatsu 69, Kimiyo Hatanaka 57, Junko Sawamatsu 52)",
-        "Indonesia 60 (Lita Liem 63, Lany Kaligis 57)",
-        "Argentina 59.3 (Graciela Moran 60, Raquel Giscafre 60, Mabel Vrancovich 59, Ana Cavadini 54)"
+        "Hungary 65.5 (Marie Pinterova 69, Erzsebet Polgar 62)",
+        "Japan 63 (Kazuko Sawamatsu 70, Kimiyo Hatanaka 57, Junko Sawamatsu 52)",
+        "Canada 62 (Faye Urban 67, Andree Martin 57)",
+        "Indonesia 60.5 (Lita Liem 64, Lany Kaligis 57)",
+        "Argentina 58.9 (Graciela Moran 60, Raquel Giscafre 59, Mabel Vrancovich 59, Ana Cavadini 54)"
       ],
       "merged": [
         "Belarus → Soviet Union (Russia)",
@@ -5620,20 +5848,21 @@
         "Azerbaijan → Soviet Union (Russia)"
       ],
       "nationFrom": {
-        "fed-cup": 64,
-        "player-file": 88
+        "fed-cup": 73,
+        "player-file": 79
       },
       "leftOut": {
         "barred": [],
         "aloneInTheirNation": [
+          "Patricia Walkden (RHO)",
           "Fiorella Bonicelli (URU)",
           "Maria Eugenia Guzman (ECU)",
           "Suzana Gesteira (BRA)",
           "Judith Dibar (ROU)",
           "Ana Maria Arias (CHI)",
           "Anne Marie Studer (SUI)",
-          "Ingrid Loeys (BEL)",
           "Beverley Vercoe (NZL)",
+          "Ingrid Loeys (BEL)",
           "Irena Skulj (YUG)",
           "Patricia Montano (MEX)",
           "Carol Ann Kalogeropoulos (GRE)"
@@ -5643,37 +5872,39 @@
     },
     {
       "id": "wta-1968",
-      "version": "wta-1968-0a2f4817",
+      "version": "wta-1968-5e4d140a",
       "label": "Elo from match results, end of 1968 (rough)",
       "kind": "computed",
+      "run": "early",
+      "activity": 10,
       "date": "1968-12-31",
       "rated": 160,
       "shift": 0,
       "over99": [],
       "top": [
-        "Margaret Court AUS 2077.7 → 87",
-        "Virginia Wade GBR 1963.7 → 83",
-        "Ann Jones GBR 1941 → 82",
-        "Maria Bueno BRA 1901.2 → 80",
-        "Nancy Richey USA 1876 → 79"
+        "Margaret Court AUS 2091.7 → 88",
+        "Billie Jean King USA 2031.9 → 85",
+        "Ann Jones GBR 1990.2 → 84",
+        "Virginia Wade GBR 1976.3 → 83",
+        "Nancy Richey USA 1921.3 → 81"
       ],
       "nations": [
-        "Great Britain 80.3 (Virginia Wade 83, Ann Jones 82, Winnie Shaw 75, Shirley Bloomer 68, Joyce Williams 67; +21)",
-        "Australia 80.1 (Margaret Court 87, Judy Tegart 77, Karen Krantzcke 75, Kerry Reid 70, Fay Toyne 70; +11)",
-        "United States 78 (Nancy Richey 79, Billie Jean King 78, Peaches Bartkowicz 77, Julie Heldman 75, Mary Ann Eisel 75; +42)",
-        "France 72.6 (Gail Sherriff 78, Francoise Durr 71, Rosie Reyes 67, Odile De Roubin 63, Monique Salfati 59; +6)",
-        "South Africa 72.6 (Annette Van Zyl 76, Maryna Godwin 72, Patricia Walkden 69, Laura Rossouw 65, Anita Van Deventer 63; +1)",
-        "Brazil 70.9 (Maria Bueno 80, Vera Lucia Giugni 62, Suzana Gesteira 61)",
-        "West Germany (Germany) 70.9 (Helga Masthoff 76, Helga Schultze 68, Edda Buding 67, Almut Sturm 66, Kerstin Seelbach 61; +4)",
-        "Soviet Union (Russia) 66.4 (Galina Baksheeva 67, Anna Dmitrieva 66, Olga Morozova 65)",
-        "Czechoslovakia (Czechia) 65.7 (Vlasta Kodesova 67, Alena Palmeova West 66, Jitka Horcickova 58)",
-        "Italy 64.4 (Lea Pericoli 66, Maria Teresa Riedl 65, Roberta Beltrame 63, Francesca Gordigiani 57, Monica Giorgi 55; +2)",
-        "Netherlands 63.5 (Marijke Jansen 69, Astrid Suurbeek 61, Ada Bakker 59, Lidy Venneboer 56, Judith Salome 53)",
-        "Canada 63 (Faye Urban 66, Vicky Berner 60)",
-        "Hungary 61.5 (Erzsebet Polgar 66, Eva Szabo 57)",
-        "Mexico 61.4 (Elena Subirats 63, Lucia Gongora 61, Patricia Montano 55)",
-        "Sweden 59.6 (Christina Sandberg 67, Ingrid Bentzer 56, Eva Lundquist 54, Ulla Sandulf 50)",
-        "Argentina 57.5 (Raquel Giscafre 58, Mabel Vrancovich 57)"
+        "United States 81.7 (Billie Jean King 85, Nancy Richey 81, Peaches Bartkowicz 77, Julie Heldman 76, Rosie Casals 75; +42)",
+        "Great Britain 81.3 (Ann Jones 84, Virginia Wade 83, Winnie Shaw 76, Christine Truman 69, Shirley Bloomer 68; +21)",
+        "Australia 81 (Margaret Court 88, Judy Tegart 78, Karen Krantzcke 75, Kerry Reid 71, Lesley Turner 70; +11)",
+        "France 73.6 (Gail Sherriff 78, Francoise Durr 74, Rosie Reyes 66, Odile De Roubin 62, Monique Salfati 58; +6)",
+        "South Africa 72.2 (Annette Van Zyl 76, Maryna Godwin 72, Laura Rossouw 65, Anita Van Deventer 65, Esme Emmanuel 60)",
+        "West Germany (Germany) 71.7 (Helga Masthoff 76, Helga Schultze 70, Edda Buding 68, Almut Sturm 65, Kerstin Seelbach 61; +4)",
+        "Brazil 70.5 (Maria Bueno 81, Vera Lucia Giugni 60, Suzana Gesteira 60)",
+        "Soviet Union (Russia) 67.4 (Galina Baksheeva 69, Anna Dmitrieva 66, Olga Morozova 65)",
+        "Czechoslovakia (Czechia) 65.8 (Vlasta Kodesova 67, Alena Palmeova West 66, Jitka Horcickova 59)",
+        "Italy 64.3 (Lea Pericoli 67, Maria Teresa Riedl 64, Roberta Beltrame 62, Francesca Gordigiani 57, Monica Giorgi 56; +2)",
+        "Netherlands 63.6 (Marijke Jansen 69, Astrid Suurbeek 61, Ada Bakker 60, Lidy Venneboer 56, Judith Salome 54)",
+        "Canada 62.5 (Faye Urban 67, Vicky Berner 58)",
+        "Mexico 61.8 (Elena Subirats 63, Lucia Gongora 62, Patricia Montano 55)",
+        "Hungary 61 (Erzsebet Polgar 65, Eva Szabo 57)",
+        "Sweden 59.3 (Christina Sandberg 66, Ingrid Bentzer 57, Eva Lundquist 53, Ulla Sandulf 48)",
+        "Argentina 57 (Raquel Giscafre 57, Mabel Vrancovich 57)"
       ],
       "merged": [
         "Belarus → Soviet Union (Russia)",
@@ -5693,23 +5924,311 @@
         "Azerbaijan → Soviet Union (Russia)"
       ],
       "nationFrom": {
-        "fed-cup": 64,
-        "player-file": 96
+        "fed-cup": 76,
+        "player-file": 84
       },
       "leftOut": {
         "barred": [],
         "aloneInTheirNation": [
+          "Patricia Walkden (RHO)",
           "Birgitta Lindstrom (FIN)",
           "Kazuko Sawamatsu (JPN)",
           "Maria Eugenia Guzman (ECU)",
           "Judith Dibar (ROU)",
           "Ingrid Loeys (BEL)",
-          "Anne Marie Studer (SUI)",
           "Michelle Rodriguez (CHI)",
           "Virginia Caceres (PER)",
+          "Anne Marie Studer (SUI)",
           "Cecilie Fleming (NZL)",
           "Carmen Coronado (ESP)",
           "Carol Ann Kalogeropoulos (GRE)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "wta-1967",
+      "version": "wta-1967-aa313726",
+      "label": "Amateur Elo, end of 1967 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 3,
+      "date": "1967-12-31",
+      "rated": 72,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Billie Jean King USA 1967.3 → 83",
+        "Ann Jones GBR 1831.1 → 77",
+        "Nancy Richey USA 1810.2 → 76",
+        "Lesley Turner AUS 1771.6 → 75",
+        "Francoise Durr FRA 1764.2 → 75"
+      ],
+      "nations": [
+        "United States 78.1 (Billie Jean King 83, Nancy Richey 76, Rosie Casals 74, Kathleen Harter 71, Stephanie Defina 64; +6)",
+        "Great Britain 72 (Ann Jones 77, Christine Truman 71, Virginia Wade 68, Winnie Shaw 60, Lorna Cornell 59; +1)",
+        "Australia 71.6 (Lesley Turner 75, Jan Lehane 70, Judy Tegart 69, Kerry Reid 67, Gail Sherriff 64; +7)",
+        "West Germany (Germany) 66.7 (Helga Schultze 68, Edda Buding 67, Helga Masthoff 59)",
+        "Soviet Union (Russia) 66.5 (Galina Baksheeva 69, Anna Dmitrieva 64)",
+        "South Africa 65.1 (Annette Van Zyl 73, Maryna Godwin 60, Esme Emmanuel 60, Glenda Swan 59, Greta Delport 56)",
+        "France 64.7 (Francoise Durr 75, Maylis Burel 59, Evelyne Terras 56, Rosie Reyes 55, Monique Salfati 54)",
+        "Czechoslovakia (Czechia) 61 (Vlasta Kodesova 61, Jitka Horcickova 61)",
+        "Netherlands 60.7 (Trudy Groenman 62, Betty Stove 60, Lidy Venneboer 57)",
+        "Italy 60.5 (Lea Pericoli 66, Monica Giorgi 57, Francesca Gordigiani 57, Maria Teresa Riedl 56, Roberta Beltrame 55)",
+        "Zimbabwe 60 (Patricia Walkden 64, Fiona Morris 56)",
+        "Sweden 55.2 (Christina Sandberg 57, Eva Lundquist 54, Ingrid Bentzer 51)",
+        "Belgium 55 (Christiane Mercelis 57, Ingrid Loeys 53)",
+        "Denmark 55 (Milly Vagn Nielsen 56, Pia Balling 54)",
+        "Switzerland 55 (Silvia Gubler 59, Anne Marie Studer 51)",
+        "Norway 54 (Ellen Grindvold 55, Kirsten Robsahm 53)",
+        "Canada 53.4 (Vicky Berner 54, Susan Butt 53, Faye Urban 52)"
+      ],
+      "merged": [
+        "Belarus → Soviet Union (Russia)",
+        "Estonia → Soviet Union (Russia)",
+        "Georgia → Soviet Union (Russia)",
+        "Kazakhstan → Soviet Union (Russia)",
+        "Kyrgyzstan → Soviet Union (Russia)",
+        "Latvia → Soviet Union (Russia)",
+        "Lithuania → Soviet Union (Russia)",
+        "Moldova → Soviet Union (Russia)",
+        "Slovakia → Czechoslovakia (Czechia)",
+        "Tajikistan → Soviet Union (Russia)",
+        "Turkmenistan → Soviet Union (Russia)",
+        "Ukraine → Soviet Union (Russia)",
+        "Uzbekistan → Soviet Union (Russia)",
+        "Armenia → Soviet Union (Russia)",
+        "Azerbaijan → Soviet Union (Russia)"
+      ],
+      "nationFrom": {
+        "fed-cup": 56,
+        "flag": 16
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Maria Bueno (BRA)",
+          "Maria Jose Aubet (ESP)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "wta-1966",
+      "version": "wta-1966-f836665d",
+      "label": "Amateur Elo, end of 1966 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 3,
+      "date": "1966-12-31",
+      "rated": 78,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Margaret Court AUS 1967.9 → 83",
+        "Maria Bueno BRA 1900.7 → 80",
+        "Billie Jean King USA 1827.1 → 77",
+        "Lesley Turner AUS 1825.1 → 77",
+        "Ann Jones GBR 1799.1 → 76"
+      ],
+      "nations": [
+        "Australia 77.6 (Margaret Court 83, Lesley Turner 77, Robyn Ebbern 68, Judy Tegart 68, Karen Krantzcke 65; +9)",
+        "United States 75.1 (Billie Jean King 77, Nancy Richey 76, Carole Graebner 71, Julie Heldman 68, Rosie Casals 65; +6)",
+        "Great Britain 67.8 (Ann Jones 76, Rita Bentley 63, Frances Maclennan 61, Shirley Bloomer 61, Winnie Shaw 60)",
+        "West Germany (Germany) 66.6 (Edda Buding 69, Helga Schultze 66, Helga Masthoff 57)",
+        "South Africa 66.2 (Annette Van Zyl 74, Glenda Swan 62, Heather Nicholls 59, Esme Emmanuel 59, Laura Rossouw 58; +1)",
+        "Netherlands 63.1 (Trudy Groenman 66, Betty Stove 62, Elsie Spruyt 53)",
+        "France 62.5 (Francoise Durr 68, Janine Lieffrig 60, Christiane Spinoza 58, Anne-Marie Rouchon 55, Evelyne Terras 54; +1)",
+        "Argentina 60 (Norma Baylon 68, Graciela Moran 52)",
+        "Czechoslovakia (Czechia) 60 (Vlasta Kodesova 60, Jitka Horcickova 60)",
+        "Zimbabwe 59 (Patricia Walkden 62, Joan Walker 56)",
+        "Italy 58.3 (Lea Pericoli 64, Francesca Gordigiani 55, Roberta Beltrame 54, Maria Teresa Riedl 53)",
+        "Hungary 58 (Erzsebet Szell 61, Klara Bardoczy 55)",
+        "Bulgaria 57 (Maria Chakarova 59, Lubka Radkova 55)",
+        "Canada 56.5 (Faye Urban 57, Vicky Berner 56)",
+        "Sweden 56.5 (Christina Sandberg 60, Eva Lundquist 53)",
+        "Austria 56 (Sonja Pachta 57, Monika Hassmann 55)",
+        "Belgium 56 (Christiane Mercelis 57, Michele Kahn 55)",
+        "Poland 55 (Danula Rylska 55, Barbara Olszewska 55)",
+        "Switzerland 55 (Sonja Fetz 56, Anne Marie Studer 54)",
+        "Morocco 52.5 (Francoise Repoux 53, Jacqueline Morales 52)"
+      ],
+      "merged": [
+        "Slovakia → Czechoslovakia (Czechia)"
+      ],
+      "nationFrom": {
+        "fed-cup": 60,
+        "flag": 18
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Maria Bueno (BRA)",
+          "Galina Baksheeva (URS)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "wta-1965",
+      "version": "wta-1965-bf97b77f",
+      "label": "Amateur Elo, end of 1965 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 3,
+      "date": "1965-12-31",
+      "rated": 69,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Margaret Court AUS 2027 → 85",
+        "Billie Jean King USA 1870.9 → 79",
+        "Lesley Turner AUS 1860.4 → 78",
+        "Maria Bueno BRA 1856.7 → 78",
+        "Annette Van Zyl RSA 1719.8 → 73"
+      ],
+      "nations": [
+        "Australia 78.8 (Margaret Court 85, Lesley Turner 78, Robyn Ebbern 69, Judy Tegart 67, Jill Emmerson 65; +9)",
+        "United States 73.6 (Billie Jean King 79, Nancy Richey 72, Carole Graebner 67, Justina Bricka 65, Jane Albert 63; +4)",
+        "Great Britain 69.4 (Christine Truman 73, Ann Jones 69, Elizabeth Starkie 66, Virginia Wade 60, Joyce Williams 60; +5)",
+        "Brazil 65 (Maria Bueno 78, Maureen Schwartz 52)",
+        "South Africa 64.2 (Annette Van Zyl 73, Glenda Swan 60, Esme Emmanuel 56, Bernice Carr 54)",
+        "France 62.7 (Francoise Durr 67, Jacqueline Rees Lewis 60, Johanne Venturino 60, Janine Lieffrig 59, Nicole Seghers 58; +2)",
+        "West Germany (Germany) 62.3 (Edda Buding 65, Helga Schultze 64, Almut Sturm 54, Helga Masthoff 53, Heide Orth 52)",
+        "Argentina 62 (Norma Baylon 69, Nora Somoza 55)",
+        "Czechoslovakia (Czechia) 61.5 (Vlasta Kodesova 62, Jitka Horcickova 61)",
+        "New Zealand 60.5 (Ruia Morrison 61, Elizabeth Terry 60)",
+        "Italy 59.4 (Lea Pericoli 64, Francesca Gordigiani 55, Maria Teresa Riedl 54)",
+        "Netherlands 58 (Trudy Groenman 59, Betty Stove 57)",
+        "Japan 53 (Kazuko Kuromatsu 53, Yohko Obata 53)"
+      ],
+      "merged": [
+        "Slovakia → Czechoslovakia (Czechia)"
+      ],
+      "nationFrom": {
+        "fed-cup": 47,
+        "flag": 22
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Anna Dmitrieva (URS)",
+          "Christiane Mercelis (BEL)",
+          "Patricia Walkden (RHO)",
+          "Ingrid Bentzer (SWE)",
+          "Michelle Rodriguez (CHI)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "wta-1964",
+      "version": "wta-1964-70120c98",
+      "label": "Amateur Elo, end of 1964 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 3,
+      "date": "1964-12-31",
+      "rated": 67,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Margaret Court AUS 1951.6 → 82",
+        "Maria Bueno BRA 1925.4 → 81",
+        "Lesley Turner AUS 1804.8 → 76",
+        "Billie Jean King USA 1801.5 → 76",
+        "Jan Lehane AUS 1709.8 → 72"
+      ],
+      "nations": [
+        "Australia 77.1 (Margaret Court 82, Lesley Turner 76, Jan Lehane 72, Robyn Ebbern 67, Judy Tegart 66; +5)",
+        "United States 72.7 (Billie Jean King 76, Karen Susman 72, Nancy Richey 69, Carole Graebner 66, Carol Aucamp 63; +3)",
+        "Great Britain 69.8 (Christine Truman 71, Ann Jones 71, Deidre Catt 66, Elizabeth Starkie 64, Rita Bentley 60; +1)",
+        "Czechoslovakia (Czechia) 66.6 (Vera Sukova 72, Vlasta Kodesova 62, Jitka Horcickova 58)",
+        "Argentina 64 (Norma Baylon 70, Ana-Maria Bocio 58)",
+        "South Africa 64 (Annette Van Zyl 68, Glenda Swan 60)",
+        "France 61.1 (Francoise Durr 63, Jacqueline Rees Lewis 60, Janine Lieffrig 56)",
+        "West Germany (Germany) 61 (Helga Schultze 65, Helga Masthoff 59, Heide Orth 58, Almut Sturm 56)",
+        "Netherlands 59.5 (Trudy Groenman 60, Betty Stove 59)",
+        "Italy 58.2 (Lea Pericoli 61, Francesca Gordigiani 56, Maria Teresa Riedl 53)",
+        "Belgium 57.5 (Christiane Mercelis 60, Monique Bedoret 55)",
+        "Canada 56.5 (Vicky Berner 59, Benita Senn 54)",
+        "Denmark 56.5 (Ulla Pontoppidan 57, Pia Balling 56)",
+        "Austria 56 (Monika Hassmann 60, Andrea Winkler 52)",
+        "Mexico 55 (Patricia Reyes 55, Antonia Prado 55)",
+        "Japan 54 (Kazuko Kuromatsu 55, Reiko Miyagi 53)",
+        "Sweden 54 (Katarina Bartholdson 56, Ulla Sandulf 52)",
+        "Norway 53.5 (Kirsten Robsahm 56, Liv Paldan 51)",
+        "Switzerland 53 (Anne Marie Studer 55, Alice Wavre 51)",
+        "Ireland 52.5 (Eleanor McFadden 53, Geraldine Barniville 52)"
+      ],
+      "merged": [
+        "Slovakia → Czechoslovakia (Czechia)"
+      ],
+      "nationFrom": {
+        "fed-cup": 53,
+        "flag": 14
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Maria Bueno (BRA)",
+          "Zsuzsa Kormoczy (HUN)",
+          "Carmen Coronado (ESP)",
+          "Carol Ann Kalogeropoulos (GRE)"
+        ],
+        "noNationOnTheMap": []
+      }
+    },
+    {
+      "id": "wta-1963",
+      "version": "wta-1963-ea8558a3",
+      "label": "Amateur Elo, end of 1963 (rough)",
+      "kind": "computed",
+      "run": "early",
+      "activity": 3,
+      "date": "1963-12-31",
+      "rated": 65,
+      "shift": 0,
+      "over99": [],
+      "top": [
+        "Margaret Court AUS 1910.5 → 80",
+        "Billie Jean King USA 1794.6 → 76",
+        "Maria Bueno BRA 1793 → 76",
+        "Ann Jones GBR 1759.3 → 74",
+        "Vera Sukova TCH 1752 → 74"
+      ],
+      "nations": [
+        "Australia 75.3 (Margaret Court 80, Jan Lehane 74, Lesley Turner 73, Robyn Ebbern 64, Jill Emmerson 64; +6)",
+        "United States 72 (Billie Jean King 76, Darlene Hard 73, Donna Floyd 64, Dorothy Knode 60, Mary Habicht 59; +3)",
+        "Great Britain 70.3 (Ann Jones 74, Christine Truman 70, Elizabeth Starkie 65, Deidre Catt 62, Rita Bentley 60; +2)",
+        "South Africa 66.3 (Renee Schuurman 70, Margaret Hunt 65, Annette Van Zyl 62, Heather Nicholls 61)",
+        "Czechoslovakia (Czechia) 64.5 (Vera Sukova 74, Markéta Prochová 55)",
+        "West Germany (Germany) 63.5 (Edda Buding 66, Helga Schultze 64, Renata Ostermann 59, Margot Dittmeyer 56)",
+        "Hungary 60 (Zsuzsa Kormoczy 64, Zsófia Broszmann 56)",
+        "France 59.4 (Christiane Spinoza 60, Francoise Durr 60, Janine Lieffrig 57, Jacqueline Rees Lewis 57)",
+        "Italy 58.2 (Francesca Gordigiani 59, Lea Pericoli 58, Silvana Lazzarino 58, Lucia Bassi 56)",
+        "Belgium 57.5 (Christiane Mercelis 59, Elza Bellens 56)",
+        "Canada 57.4 (Hana Sládková-Koželuhová 59, Louise Brown 56, Ann Barclay 55)",
+        "Norway 57 (Ruth Hauknes 59, Liv Paldan 55)",
+        "Austria 56 (Sonja Pachta 59, Andrea Winkler 53)",
+        "Netherlands 56 (Eva Duldig 59, Jenny Ridderhof 53)",
+        "Denmark 55.5 (Pia Balling 56, Vera Johansen 55)",
+        "Switzerland 54 (Janine Bourgnon 56, Alice Wavre 52)"
+      ],
+      "merged": [
+        "Slovakia → Czechoslovakia (Czechia)"
+      ],
+      "nationFrom": {
+        "fed-cup": 42,
+        "flag": 23
+      },
+      "leftOut": {
+        "barred": [],
+        "aloneInTheirNation": [
+          "Maria Bueno (BRA)",
+          "Norma Baylon (ARG)",
+          "Carmen Coronado (ESP)",
+          "Francoise Repoux (MAR)"
         ],
         "noNationOnTheMap": []
       }
