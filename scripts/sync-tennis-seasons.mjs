@@ -20,15 +20,19 @@
 // `method.early`: the amateur file (the majors and the Davis Cup, 1877-1967) read before the open era's files, with
 // its duplicate ids merged. It is kept apart from the first, so the seasons from 1973 are as they were.
 // validation.json's `early` holds its fit and its seam with the first run, and `checks` the agreement of the seasons
-// before 1973 with the published top tens and Tennis Abstract's statements (the manifest's `checks`).
+// before 1973 with the published top tens and Tennis Abstract's statements (the manifest's `checks`). The women's
+// second run (docs/design/womens-tennis.md, "1963-1967") reads the majors' and the Federation Cup's results of
+// 1960-1967 from English Wikipedia's pages instead (the manifest's `wikipedia`, scripts/lib/tennis-wikipedia.mjs).
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { agreement, applyAliases, atpLevelOf, davisCupNations, earlyLevelOf, orderMatches, parseMatchFile, rateMatches, wtaLevelOf } from './lib/tennis-elo.mjs';
+import { agreement, applyAliases, atpLevelOf, davisCupNations, earlyLevelOf, orderMatches, parseMatchFile, rateMatches, ROUND_ORDER, wtaLevelOf } from './lib/tennis-elo.mjs';
 import { codeOfDay, nationOfDay } from './lib/tennis-seasons.mjs';
+import { articlesQuery, pinnedPages, wikiFile, wikipediaMatches } from './lib/tennis-wikipedia.mjs';
 import { politeFetch } from './lib/polite-fetch.mjs';
+import { askWikidata } from './lib/wikidata-sparql.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 // Each tour's manifest, cache, snapshots and match files, its rankings' rank column and its rule of counted matches.
@@ -53,6 +57,7 @@ const manifest = JSON.parse(await readFile(path.join(root, tour.manifest), 'utf8
 const PAUSE_MS = 1500;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const sha256 = data => createHash('sha256').update(data).digest('hex');
+const sha1 = data => createHash('sha1').update(data).digest('hex');
 
 /** A pinned input's text: from the cache unless `refresh`, else downloaded; either way it must match its SHA-256. */
 async function pinned(folder, file, url, expected) {
@@ -116,7 +121,8 @@ function playerFile(text) {
     const c = split(line);
     const dob = c[at('dob')];
     players.set(c[at('player_id')], { name: `${c[at('name_first')]} ${c[at('name_last')]}`.trim(), ioc: c[at('ioc')] || null,
-      born: /^\d{8}$/.test(dob) ? `${dob.slice(0, 4)}-${dob.slice(4, 6)}-${dob.slice(6)}` : null });
+      born: /^\d{8}$/.test(dob) ? `${dob.slice(0, 4)}-${dob.slice(4, 6)}-${dob.slice(6)}` : null,
+      wikidata: /^Q\d+$/.test(c[at('wikidata_id')] ?? '') ? c[at('wikidata_id')] : null });
   }
   return players;
 }
@@ -177,12 +183,16 @@ const isoDate = yyyymmdd => `${String(yyyymmdd).slice(0, 4)}-${String(yyyymmdd).
 const row = cells => JSON.stringify(cells);
 const documentText = (head, rows) => `{\n${Object.entries(head).map(([key, value]) => `${JSON.stringify(key)}: ${JSON.stringify(value)}`).join(',\n')},\n"players": [\n${rows.map(row).join(',\n')}\n]\n}\n`;
 
-/** A computed season's rows, strongest first: every player of `players` with `activity` counted matches in it. */
-function computedRows(players, season, activity, cup) {
-  return players.filter(player => player.season >= activity).map(player => {
-    const person = people.get(player.id);
+/**
+ * A computed season's rows, strongest first: every player of `players` with `activity` counted matches in it (or whom
+ * `listed` lists), each with the nation of the day (`nation`, by default nationOfDay's rule) and the record `personOf`
+ * finds for her or his id (by default the player file's).
+ */
+function computedRows(players, season, activity, cup, { personOf = id => people.get(id), listed = player => player.season >= activity, nation = null } = {}) {
+  return players.filter(listed).map(player => {
+    const person = personOf(player.id);
     if (!person) throw new Error(`${season}: ${player.name} (${player.id}) is not in the player file`);
-    const { code, how } = nationOfDay({ id: player.id, ioc: person.ioc, davisCup: cup.get(player.id) }, season, nationRules);
+    const { code, how } = nation ? nation(player.id, person, season) : nationOfDay({ id: player.id, ioc: person.ioc, davisCup: cup.get(player.id) }, season, nationRules);
     return [player.id, person.name, code, how, person.born, player.elo, player.season];
   });
 }
@@ -255,7 +265,75 @@ async function earlyRun() {
   }
   return { run, cupUnresolved, aliases: E.aliases.items, moved, seam };
 }
-const early = manifest.seasons.early ? await earlyRun() : null;
+
+// ---------- the women's seasons before 1973 ----------
+
+/**
+ * The women's second run (`method.early`): the majors' and the Federation Cup's results of 1960-1967 on English
+ * Wikipedia's pinned pages (the manifest's `wikipedia`) before the open era's files, every woman of the pages under the
+ * player file's id where she is its player (by her article's Wikidata item or a reviewed join), its newcomers at
+ * `start.amateur`, its layoffs before 1968 charged only from `layoff.amateurWeeks`. Its seasons list `activity.amateur`
+ * counted matches before 1968, or a singles rubber of that year's cup (`activity.cup`), and `activity.open` after; a
+ * woman of 1963-1967 with no cup row near takes the flag her draws give her (`how` 'flag') before the player file's.
+ */
+async function wikipediaEarlyRun() {
+  const E = manifest.method.early, W = manifest.wikipedia;
+  // Each page from the cache, or fetched under /wiki/ when missing (then the current revision: it must match its pin).
+  const { draws, cups, redirects } = await pinnedPages(W, (title, sha) => pinned('wikipedia', wikiFile(title, sha1),
+    W.page.replace('{title}', encodeURIComponent(title.replace(/ /g, '_')).replace(/%2F/g, '/')), sha));
+  // The articles' Wikidata items: QLever's pinned answer, asked again only when the cache lacks it.
+  const at = path.join(cacheDir, 'wikidata', W.wikidata.file);
+  let answer;
+  if (!refresh && existsSync(at)) answer = await readFile(at);
+  else {
+    answer = Buffer.from(JSON.stringify(await askWikidata(articlesQuery(W.wikidata.articles))));
+    await mkdir(path.dirname(at), { recursive: true });
+    await writeFile(at, answer);
+  }
+  if (sha256(answer) !== W.wikidata.sha256 || answer.length !== W.wikidata.bytes) throw new Error(`${path.relative(root, at)} does not match its pin; delete it to ask again`);
+  const qids = new Map(JSON.parse(answer.toString('utf8')).results.bindings.map(row => [row.title.value, row.item.value.replace(/^.*\//, '')]));
+  const wiki = wikipediaMatches({ draws, cups, redirects, qids, people, roundOrder: ROUND_ORDER,
+    rules: { flags: W.flags, teams: W.teams, sameCodes: W.sameCodes, aliases: E.aliases.items, joins: E.joins.items } });
+  // The answer covers exactly the pages' articles.
+  if (JSON.stringify([...wiki.articles].sort()) !== JSON.stringify(W.wikidata.articles)) throw new Error('The pages\' articles are not wikipedia.wikidata.articles: ask Wikidata again');
+  const personOf = id => people.get(id) ?? wiki.women.get(id);
+  const earlyMatches = orderMatches([...wiki.matches, ...matches]);
+  const method = { ...manifest.method, start: { ...manifest.method.start, amateur: E.start.amateur },
+    layoff: { ...manifest.method.layoff, from: E.layoff.from, amateurWeeks: E.layoff.amateurWeeks } };
+  const levelOf = (m, how) => (m.file === 2 ? 'amateur' : wtaLevelOf(m, how));
+  const [from, to] = manifest.seasons.early;
+  const [, lastAmateur] = manifest.seasons.amateur;
+  const seam = { from: firstComputed, to: 1980 };
+  const seasons = [];
+  for (let season = from; season <= seam.to; season++) seasons.push(season);
+  const run = rateMatches(earlyMatches, method, { seasons, yElo: true, levelOf });
+  const { nations: cup, unresolved: cupUnresolved } = davisCupNations(earlyMatches, (ioc, season) => (ioc ? codeOfDay(ioc, season, ioc, nationRules) : null));
+  const flagRules = { ...nationRules, fixes: [], cupHow: 'flag' };
+  for (let season = from; season <= to; season++) {
+    const amateur = season <= lastAmateur;
+    const activity = amateur ? E.activity.amateur : E.activity.open;
+    const cupSingles = amateur && E.activity.cup ? wiki.cupSingles.get(season) ?? new Set() : new Set();
+    const nation = (id, person, year) => {
+      const day = nationOfDay({ id, ioc: person.ioc, davisCup: cup.get(id) }, year, nationRules);
+      if (!amateur || day.how !== 'player-file') return day;
+      const flagged = nationOfDay({ id, ioc: person.ioc, davisCup: wiki.flags.get(id) }, year, flagRules);
+      return flagged.how === 'flag' ? flagged : day;
+    };
+    const { last, date, players } = run.snapshots[season];
+    const rows = computedRows(players, season, activity, cup, { personOf, nation, listed: player => player.season >= activity || cupSingles.has(player.id) });
+    const head = { season, kind: 'computed', run: 'early', activity, ...(cupSingles.size ? { cup: true } : {}), lastEvent: isoDate(last), date: isoDate(date),
+      rated: rows.length, columns: COLUMNS };
+    outputs.push([path.join(outDir, `${season}.json`), documentText(head, rows)]);
+    seasonLists[season] = { rows, players, run };
+  }
+  const women = [...wiki.women.keys()];
+  const counted = wiki.matches.filter(m => !m.why);
+  return { run, cupUnresolved, seam, personOf,
+    wikipedia: { pages: W.draws.length + W.cups.length, matches: wiki.matches.length, counted: counted.length, unplayed: wiki.unplayed,
+      women: women.length, playerFile: women.filter(id => !id.startsWith('wp:')).length, byWikidata: women.filter(id => !id.startsWith('wp:')).length - E.joins.items.length,
+      byReview: E.joins.items.length, aliases: E.aliases.items.length } };
+}
+const early = !manifest.seasons.early ? null : manifest.wikipedia ? await wikipediaEarlyRun() : await earlyRun();
 
 // ---------- the published seasons ----------
 
@@ -381,10 +459,10 @@ if (early) {
     seam[season] = { n: diffs.length, meanDiff: mean(diffs), meanAbsDiff: mean(diffs.map(Math.abs)), maxAbsDiff: round(Math.max(...diffs.map(Math.abs))) };
   }
   const kinds = {};
-  for (const [, , , rule, kind] of early.aliases) kinds[kind] = (kinds[kind] || 0) + 1;
+  for (const [, , , rule, kind] of early.aliases ?? []) kinds[kind] = (kinds[kind] || 0) + 1;
   validation.early = {
     seasons: manifest.seasons.early, matches: early.run.counts, [tour.unresolved]: early.cupUnresolved,
-    aliases: { pairs: early.aliases.length, kinds, matchesMoved: early.moved },
+    ...(early.wikipedia ? { wikipedia: early.wikipedia } : { aliases: { pairs: early.aliases.length, kinds, matchesMoved: early.moved } }),
     fit: fitOf(early.run).fit, seam,
   };
 }
@@ -406,7 +484,7 @@ function spearman(xs, ys) {
 // statements (where we rank its men at the end of a season; our Elo against its peak).
 if (manifest.checks) {
   const { topTens, statements } = manifest.checks;
-  const nameOf = id => people.get(id)?.name ?? id;
+  const nameOf = id => (early?.personOf ?? (key => people.get(key)))(id)?.name ?? id;
   const why = (season, id) => {
     const entry = seasonLists[season].players.find(player => player.id === id);
     return `${nameOf(id)}: ${entry ? `${entry.season} counted matches` : 'no counted match'}`;
@@ -470,7 +548,7 @@ if (check) {
   }
   if (validation.early) {
     const { early: e } = validation;
-    console.log(`  before 1973: ${JSON.stringify(e.matches)}; aliases ${JSON.stringify(e.aliases)}; fit mean ${e.fit.meanDiff}, rms ${e.fit.rms}; seam ${Object.entries(e.seam).map(([season, s]) => `${season} ${s.meanDiff}/${s.meanAbsDiff}`).join(', ')}`);
+    console.log(`  before 1973: ${JSON.stringify(e.matches)}; ${e.wikipedia ? `Wikipedia ${JSON.stringify(e.wikipedia)}` : `aliases ${JSON.stringify(e.aliases)}`}; fit mean ${e.fit.meanDiff}, rms ${e.fit.rms}; seam ${Object.entries(e.seam).map(([season, s]) => `${season} ${s.meanDiff}/${s.meanAbsDiff}`).join(', ')}`);
   }
   if (validation.checks) {
     const { topTens, statements } = validation.checks;

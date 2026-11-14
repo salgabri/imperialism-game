@@ -220,7 +220,7 @@ committed outputs:
 
 | Source | Disallowed path | Now |
 | --- | --- | --- |
-| Wikidata Query Service | `query.wikidata.org/sparql` | QLever's Wikidata endpoint, `qlever.dev/api/wikidata` (`scripts/lib/wikidata-sparql.mjs`), for the crests, home towns and FIFA 05/06 nationalities |
+| Wikidata Query Service | `query.wikidata.org/sparql` | QLever's Wikidata endpoint, `qlever.dev/api/wikidata` (`scripts/lib/wikidata-sparql.mjs`), for the crests, home towns, FIFA 05/06 nationalities and the women's tennis seasons' joins of Wikipedia's players to Sackmann's |
 | Wikidata's search API | `www.wikidata.org/w/api.php` | its answers pinned in `scripts/data/ea-early-search.json` |
 | English Wikipedia's API | `en.wikipedia.org/w/api.php` | its cached answers only, once pinned in `scripts/data/club-logos-wikipedia.json`; none is yet, so the committed crests stay ([crests](#club-crests)) |
 | geoBoundaries files on GitHub | `github.com/*/raw/` | `raw.githubusercontent.com`, and `media.githubusercontent.com` for Git LFS objects, checked against the pointer's SHA-256 |
@@ -368,7 +368,7 @@ manager of the theatre's favourite, with decisions from the first match.
    edition published them, else converted or computed from the players'
    statistics), nations or clubs on the map of their day, tennis its 2026 (Elo of 2 November) then its
    [earlier seasons](#tennis-seasons) 2025 back to 1960, women's tennis its 2026 (Elo of
-   2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1968, rugby league its built-in 2025
+   2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1963, rugby league its built-in 2025
    (Rugby League 26) then [its earlier seasons](#rugby-league-seasons) 2024 back to 1998 (computed from
    NRL.com's match statistics, but 2008: Rugby League 2, the overall ours), NRL clubs on the map of their day.
    The Season list names a season by its years, adding "· computed", "· converted"
@@ -2055,24 +2055,33 @@ file in `public/tennis/` (13–56 KB) that loads only when chosen.
 
 ## Women's tennis seasons
 
-Women's tennis can be played on 58 earlier seasons as well as the built-in 2026: the
-end of every year from 1968 to 2025, the WTA's women by Elo, the Fed Cup's nations
-only. Pick one under **Season** in setup. Each season is a file in
-`public/womens-tennis/` (11–53 KB) that loads only when chosen. They are built as the
-men's are, by the same scripts with `--tour=wta`
+Women's tennis can be played on 63 earlier seasons as well as the built-in 2026: the
+end of every year from 1963, the Federation Cup's first, to 2025, the WTA's women by
+Elo (before 1968 the amateurs), the Fed Cup's nations only. Pick one under **Season** in
+setup. Each season is a file in `public/womens-tennis/` (10–53 KB) that loads only when
+chosen. They are built as the men's are, by the same scripts with `--tour=wta`
 ([design notes](docs/design/womens-tennis.md#earlier-seasons)).
 
 - **2016 to 2025** are Tennis Abstract's own year-end WTA Elo reports, as the Wayback
   Machine kept them. No capture holds the last 2020 update, so that list stops a week
   before the season's end, and says so.
-- **1968 to 2015** are Elo computed from Jeff Sackmann's WTA match results by Tennis
+- **1973 to 2015** are Elo computed from Jeff Sackmann's WTA match results by Tennis
   Abstract's published method, counting what its report counts: tour-level matches with
   the Fed Cup, tour-level qualifying, WTA 125s and ITF events of $50K or more (none
   before 1994, when the files start naming an event's prize). A newcomer's start at
   tour level is fitted on the career peaks of Tennis Abstract's Tennis 128 (1330, the
   men's 1450). On 2022–2025 the computed lists agree with Tennis Abstract's to within
-  five points; 1968 to 1979 are marked rough (the files start in 1968, so 1968 and
-  1969 are the roughest; 1968–1972 share about eight of Lance Tingay's year-end ten).
+  five points; to 1979 they are marked rough.
+- **1963 to 1972** come from a second run of the same method, warmed up on the results
+  English Wikipedia records for the four majors' women's singles of 1960–1967 and the
+  Federation Cup of 1963–1967 (37 article pages, read once under `/wiki/` and pinned;
+  [1963–1967](docs/design/womens-tennis.md#19631967)). 1963–1967 are those results
+  alone, labelled "Amateur Elo" and rough; each lists the women with three matches in
+  the season or a singles rubber in that year's cup, so every cup nation fields the
+  women who played it. From 1973 the second run agrees with the first within a point
+  and a half, and those seasons are unchanged. Margaret Court leads 1963–1966 and is
+  away in 1967; Maria Bueno, Brazil's only rated woman most years, plays only in 1965,
+  when Brazil had two. 1963–1972 share seven to eight of Lance Tingay's year-end ten.
 - **Ratings** are Elo / 25 + 4; a season whose best would pass 99 (Navratilova in 1985,
   Graf in 1989) is shifted down as a whole. The raw Elo stays with each player.
 - **Nations of the day:** a player plays for the nation she played the Fed Cup for
@@ -2088,9 +2097,12 @@ men's are, by the same scripts with `--tour=wta`
   last. Sets have no tie-break until 1975 and in 1977–1979, and the third set none until
   2017 ([design notes](docs/design/womens-tennis.md#format-by-year)).
 - **Licence:** as the men's: `public/womens-tennis/ATTRIBUTION.txt` credits Jeff
-  Sackmann / Tennis Abstract (CC BY-NC-SA 4.0). `scripts/data/womens-tennis-seasons.json`
-  pins the 117 archive files (Aneeshers/tennis-sackmann-archive at 8373358) and the
-  20 captures by SHA-256. To rebuild:
+  Sackmann / Tennis Abstract (CC BY-NC-SA 4.0), and Wikipedia's contributors for the
+  results of 1960–1967 (the pages' text CC BY-SA 4.0; none of it is in the files).
+  `scripts/data/womens-tennis-seasons.json` pins the 117 archive files
+  (Aneeshers/tennis-sackmann-archive at 8373358), the 20 captures and the 165 Wikipedia
+  pages by SHA-256 (with each page's revision), and Wikidata's answer that joins the
+  pages' women to Sackmann's players. To rebuild:
 
   ```bash
   npm run sync:womens-tennis-seasons    # the year-end lists in scripts/data/womens-tennis-seasons/ (--check)
