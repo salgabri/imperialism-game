@@ -83,6 +83,14 @@
 //   its last half a field goal decides (goldenRate, deciderOdds). A lead in golden point has already won. Match-day
 //   form, which moves both try rates, is integrated over its normal spread with seven-point Gauss–Hermite quadrature.
 //
+// Rocket League — exact, from the model's own games (src/sports/rocketLeague.js): a series is best of seven, each game won
+//   with Elo's odds for the gap (gameOdds) and played in ten thirty-second slices at the rates that make it so (gameRates),
+//   with the sport's late game (sliceMeans) and sudden-death overtime, whose first goal wins (overtimeOdds). The clock gives
+//   each game twelve units, its ten slices and two for its overtime; the events are its goals (`pts` 0) and its end (`pts`
+//   1), so the chart knows the games won and the score of the one in play: P(A wins) is that game's chance from its slice and
+//   margin (gameTable), then the games left, exactly. Match-day form, one draw on every game's gap, is integrated over its
+//   normal spread with seven-point Gauss–Hermite quadrature, each node weighed by how likely it made the games already won.
+//
 // Constants mirror the private values in src/sports/football.js (BASE_GOALS, MAX_LOG_EDGE; extra time's FOOTBALL_MODEL); basketball's,
 // American football's, baseball's, ice hockey's, tennis's and rugby league's come from their own modules (BASKETBALL_MODEL;
 // DRIVE_MODEL, driveOdds, lateCall; INNING_MODEL, inningOdds, runMasses; PERIOD_MODEL, sliceMeans, overtimeMeans,
@@ -97,6 +105,7 @@ import { INNING_MODEL, inningOdds, runMasses } from '../sports/baseball.js';
 import { lateOf, overtimeMeans, PERIOD_MODEL, shootoutOdds, sliceMeans } from '../sports/hockey.js';
 import { deciderOdds, goldenRate, POINTS, SLICE_MODEL, sliceMeans as rugbySliceMeans } from '../sports/rugbyLeague.js';
 import { bestOfFive, bestOfThree, daySetChances, matchOdds, RUBBER_MODEL } from '../sports/tennis.js';
+import { chanceFrom, gameOdds, gameRates, gameTable, overtimeOdds, SERIES_MODEL } from '../sports/rocketLeague.js';
 
 const BASE_GOALS = 1.28;
 const MAX_LOG_EDGE = 1.5;
@@ -162,6 +171,9 @@ export function footballRate(log) {
  * | { kind:'tries', triesA, triesD, golden, formSd, length:80, ot:5, maxOt:4 } (rugby league; tries a side in eighty
  *     minutes, `golden` the attacker's edge when a golden point's last field goal decides, formSd the spread of
  *     match-day form in log rate, and the "overtime periods" golden point's five-minute halves)
+ * | { kind:'series', gap, formSd, length:48, ot:12, maxOt:3, toWin:4, regulation:10 } (Rocket League; gap is the attacker's
+ *     rating points ahead in every game, formSd the spread of match-day form in rating points; the clock gives each game
+ *     twelve units, ten of regulation, the fifth to seventh games extending the shortest series as overtime periods do)
  * | null (no teams, unknown sport, or a model the approximation does not cover).
  * `sport` is a sport object or id; effA/effD are the match's effective strengths (tactics included); `drama`
  * is the match's uncertainty (football ignores it, as the README formula does); `home`, that the defender plays at
@@ -180,6 +192,14 @@ export function liveModelFor(sport, attacker, defender, effA, effD, drama, home 
   }
   if (!prepared) return null;
   const length = positive(model.clock?.length);
+  if (prepared.series && isNum(prepared.gap)) {
+    const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
+    return {
+      kind: 'series', gap: num(prepared.gap), formSd: SERIES_MODEL.FORM_AT_BALANCED * (variation / 6) ** 2,
+      length: SERIES_MODEL.LENGTH, ot: SERIES_MODEL.BLOCK, maxOt: SERIES_MODEL.GAMES - SERIES_MODEL.TO_WIN,
+      toWin: SERIES_MODEL.TO_WIN, regulation: SERIES_MODEL.SLICES,
+    };
+  }
   if (Array.isArray(prepared.rubbers) && TIE_RUBBERS.has(prepared.rubbers.length)) {
     const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
     const toWin = (prepared.rubbers.length + 1) / 2;
@@ -389,6 +409,11 @@ export function isLiveModel(model) {
   if (model.kind === 'tries') {
     return ['triesA', 'triesD', 'golden', 'formSd', 'length', 'ot'].every(finite) && model.triesA > 0 && model.triesD > 0
       && model.formSd >= 0 && model.length > 0 && model.ot > 0 && Number.isInteger(model.maxOt) && model.maxOt >= 1;
+  }
+  if (model.kind === 'series') {
+    return ['gap', 'formSd', 'length', 'ot'].every(finite) && model.formSd >= 0 && model.length > 0 && model.ot > 0
+      && Number.isInteger(model.maxOt) && model.maxOt >= 0 && Number.isInteger(model.toWin) && model.toWin >= 1
+      && Number.isInteger(model.regulation) && model.regulation >= 1 && model.regulation < model.ot;
   }
   if (model.kind === 'rubbers') {
     return ['formSd', 'length', 'ot'].every(finite) && model.formSd >= 0 && model.length > 0 && model.ot > 0
@@ -997,6 +1022,78 @@ function rubbersAt(model, a, d, sa = 0, sd = 0) {
   return chance;
 }
 
+const seriesCache = new WeakMap();
+
+/**
+ * A Rocket League model's tables, built once per model: for each form node, the attacker's odds in every game (`p`), the
+ * game's table of chances by slice and margin and its overtime's odds. Also a cache of computed values by state.
+ */
+function seriesTables(model) {
+  if (seriesCache.has(model)) return seriesCache.get(model);
+  const nodes = HERMITE.map(([t, weight]) => {
+    const p = gameOdds(model.gap + t * model.formSd);
+    const [rateA, rateD] = gameRates(p);
+    return { weight, p, table: gameTable(rateA, rateD), level: overtimeOdds(rateA, rateD) };
+  });
+  const tables = { nodes, cache: new Map() };
+  seriesCache.set(model, tables);
+  return tables;
+}
+
+/** A's chance to take the series from games `a`–`d`, winning each with `p`: the x games he needs before D takes y. */
+function seriesFrom(p, a, d, toWin) {
+  if (a >= toWin) return 1;
+  if (d >= toWin) return 0;
+  const x = toWin - a, y = toWin - d;
+  let chance = 0, ways = 1;
+  for (let j = 0; j < y; j++) {
+    chance += ways * p ** x * (1 - p) ** j;
+    ways = ways * (x + j) / (j + 1);
+  }
+  return chance;
+}
+
+/**
+ * Rocket League: P(side A wins) with games `a`–`d` won and the game in play `margin` goals apart, `unit` clock units
+ * into it (its slices played; from `regulation` on, overtime), averaged over the form nodes, each weighed by its prior and
+ * by how likely it made the games already won.
+ */
+function seriesAt(model, a, d, margin = 0, unit = 0) {
+  if (a >= model.toWin) return 1;
+  if (d >= model.toWin) return 0;
+  const { nodes, cache } = seriesTables(model);
+  const at = clamp(Math.floor(unit), 0, model.regulation);
+  const key = `${a}|${d}|${margin}|${at}`;
+  if (cache.has(key)) return cache.get(key);
+  let chance = 0, total = 0;
+  for (const node of nodes) {
+    const likely = node.weight * node.p ** a * (1 - node.p) ** d;
+    const q = at >= model.regulation ? step(margin, node.level) : chanceFrom(node.table, at, margin);
+    chance += likely * (q * seriesFrom(node.p, a + 1, d, model.toWin) + (1 - q) * seriesFrom(node.p, a, d + 1, model.toWin));
+    total += likely;
+  }
+  const value = clamp01(total > 0 ? chance / total : 0.5);
+  cache.set(key, value);
+  return value;
+}
+
+/**
+ * The series' state after the revealed events up to minute `t` → { a, d, margin, unit }: a `pts` 1 event ends a game for
+ * its side, a goal (`pts` 0) moves the margin of the game in play, and `unit` is how far into that game's block `t` is.
+ */
+function seriesState(events, aId, t, block) {
+  let a = 0, d = 0, margin = 0;
+  for (const event of events) {
+    if (Math.ceil(num(event.m)) > t) continue;
+    const own = event.tid === aId;
+    if ((isNum(event.pts) ? num(event.pts) : 1) > 0) {
+      if (own) a++; else d++;
+      margin = 0;
+    } else margin += own ? 1 : -1;
+  }
+  return { a, d, margin, unit: Math.max(0, t - (a + d) * block) };
+}
+
 /**
  * The tie's state after the revealed events up to minute `t` → { a, d, sa, sd }: every event is a set won by its side,
  * `pts` 1 the set that also wins the rubber.
@@ -1019,7 +1116,7 @@ function rubberState(events, aId, t) {
  * tennis's fourth and fifth rubbers, rugby league's golden point and football's extra time (not a model saved before it).
  */
 const hasOvertime = model => model.kind === 'normal' || model.kind === 'drives' || model.kind === 'innings' || model.kind === 'periods'
-  || model.kind === 'rubbers' || model.kind === 'tries' || (model.kind === 'poisson' && model.ot > 0);
+  || model.kind === 'rubbers' || model.kind === 'series' || model.kind === 'tries' || (model.kind === 'poisson' && model.ot > 0);
 
 /**
  * The last minute a model can reach: 90 + 15·2 for football (90 for a model saved before extra time), 40 + 5·4 for
@@ -1071,6 +1168,12 @@ export function winProbabilityAt(model, minute, diff = 0) {
   if (model.kind === 'innings') return inningsAt(model, t, lead);
   if (model.kind === 'periods') return periodsAt(model, t, lead);
   if (model.kind === 'tries') return triesAt(model, t, lead);
+  if (model.kind === 'series') {
+    // Only the score is known here: the games finished by minute t, none of the goals of the one in play.
+    const played = Math.min(model.toWin + model.maxOt, Math.floor(clamp(t, 0, lastMinute(model)) / model.ot));
+    const a = clamp(Math.round((played + lead) / 2), 0, played), d = played - a;
+    return seriesAt(model, a, d);
+  }
   if (model.kind === 'rubbers') {
     // Only the score is known here: the rubbers finished by minute t, none of the sets of the one in play.
     const played = Math.min(model.gaps.length, Math.floor(clamp(t, 0, lastMinute(model)) / model.ot));
@@ -1122,7 +1225,9 @@ function revealedEvents(goals) {
 function endMinute(model, events) {
   const latest = events.reduce((max, event) => Math.max(max, num(event.m)), 0);
   if (!hasOvertime(model) || latest <= model.length) return model.length;
-  if (model.kind === 'drives' || model.kind === 'periods' || model.kind === 'rubbers' || model.kind === 'tries') return Math.min(lastMinute(model), Math.ceil(latest));
+  if (model.kind === 'drives' || model.kind === 'periods' || model.kind === 'rubbers' || model.kind === 'series' || model.kind === 'tries') {
+    return Math.min(lastMinute(model), Math.ceil(latest));
+  }
   // Football's extra time ends at a golden goal, plays its whole thirty minutes without one (the silver goal's ends at a
   // half-time; the match's own end is in the minute the chart is given).
   if (model.kind === 'poisson' && model.sudden === 'golden') return Math.min(lastMinute(model), Math.ceil(latest));
@@ -1147,6 +1252,19 @@ export function winSeries({ model, goals = [], aId, dId, minute = 0, perspective
   let upTo = Math.max(isNum(minute) ? num(minute) : 0, latest);
   if (final) upTo = Math.max(upTo, end);
   upTo = Math.floor(clamp(upTo, 0, lastMinute(model)));
+
+  if (model.kind === 'series') {
+    const ordered = events.slice().sort((x, y) => num(x.m) - num(y.m));
+    const series = [];
+    for (let t = 0; t <= upTo; t++) {
+      const { a, d, margin, unit } = seriesState(ordered, aId, t, model.ot);
+      series.push({ t, p: seriesAt(model, a, d, margin, unit) });
+    }
+    const winner = winnerSideOf(final, aId, dId);
+    if (winner && series.length) series[series.length - 1].p = winner === 'A' ? 1 : 0;
+    if (sideOf(perspective, aId, dId) === 'D') for (const point of series) point.p = 1 - point.p;
+    return series;
+  }
 
   if (model.kind === 'rubbers') {
     const ordered = events.slice().sort((x, y) => num(x.m) - num(y.m));
@@ -1214,7 +1332,8 @@ export function winMarkers(series, goals = [], { aId, model = null, includeRuns 
  * quarters every 12'). American football the same over 0'…60' and its ten-minute overtimes. Baseball: 54 outs, a tick
  * at the end of every inning, extra innings included, and a guide after the third and the sixth. Ice hockey: 0'…60', a
  * tick and a guide at the end of each period, then the overtime and the shoot-out once reached. Tennis: the three
- * rubbers of the shortest tie, then the fourth and the fifth once reached, a tick and a guide at the end of each. Rugby
+ * rubbers of the shortest tie, then the fourth and the fifth once reached, a tick and a guide at the end of each; Rocket
+ * League the same with the four games of the shortest series, then the fifth to seventh. Rugby
  * league: 0'…80', ticks every 20', half-time at 40', then each half of golden point reached.
  */
 export function chartDomain(model, minute = 0) {
@@ -1226,7 +1345,7 @@ export function chartDomain(model, minute = 0) {
     return { length: model.length + extra * model.ot, half: model.length / 2, ticks,
       guides: extra ? [model.length / 2, model.length] : [model.length / 2] };
   }
-  if (isLiveModel(model) && model.kind === 'rubbers') {
+  if (isLiveModel(model) && (model.kind === 'rubbers' || model.kind === 'series')) {
     const t = isNum(minute) ? num(minute) : 0;
     const extra = t > model.length ? Math.min(model.maxOt, Math.ceil((t - model.length) / model.ot)) : 0;
     const length = model.length + extra * model.ot;
