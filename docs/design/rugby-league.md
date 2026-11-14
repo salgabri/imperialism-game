@@ -841,8 +841,9 @@ recompute every value, overall and shift.
   Coast Seagulls to 1995 (`nrl-gold-coast-tweed-giants`, GCT; `nrl-gold-coast-seagulls`, GCS), the Chargers after; the
   Western Reds as the Perth Reds in Super League (`nrl-perth-reds`). Each is an era of its club, in its colour.
 - **The clubs gone** (`defunct`, four more): the Newtown Jets (NTN), the South Queensland Crushers (SQC), the Western Reds
-  (WRD) and the Hunter Mariners (HUN), each under its own id, in a colour of its own and with no crest; their codes are
-  ours. Balmain, North Sydney, Western Suburbs, Illawarra, the Gold Coast and Adelaide were already among them.
+  (WRD) and the Hunter Mariners (HUN), each under its own id, in a colour of its own; their codes are ours. Balmain,
+  North Sydney, Western Suburbs, Illawarra, the Gold Coast and Adelaide were already among them. None has a crest of
+  today; each wears the crest of its day where a source shows and dates one ([period-marks.md](period-marks.md)).
 - **Names** come from RLP's lists, which print a surname in capitals: each is written as a name is (Beetson, McArthur,
   O'Connor, Addo-Carr; a particle in lower case, "de", stays so).
 
@@ -926,8 +927,13 @@ Super League's David Peachey, Ian Roberts and Stacey Jones.
 - **Today's scoring.** Every season plays today's rules: a try was three points until 1983 and a field goal two until
   1971, so the model scores more than the 1960s did (12–16 points a team a game then, 23 in the model); there was no golden
   point before 2003.
-- **No crests.** The clubs of 1960–1997 under today's ids wear today's crest; the eras and the clubs gone show their code
-  until their crests of the day are researched ([period-marks.md](period-marks.md)).
+- **Crests of the day where a source dates them** ([period-marks.md](period-marks.md)): the clubs' articles and their
+  copies on the Wayback Machine date most logos (Cronulla's four from 1967, the Roosters' "Easts to Win" and Eastern
+  Suburbs shield, Canterbury's CB shield and snarling bulldog, Souths' oval of 1959, Manly's and Penrith's, the first
+  logos of the clubs of 1982-1997). Eastern Suburbs had no logo before 1967, and Parramatta's crests to 1979, Penrith's
+  mark before 1978 and Wests' before 1978 survive in no usable picture: those seasons show the club's monogram, as do
+  Balmain (and the Sydney Tigers), Norths, St. George, Newtown, Wests after 1989 and the Perth Reds, whose logos of the
+  time no source dates. Souths' seasons of 1980-1997, undated, wear today's crest.
 - **Clubs only**, as every earlier season: a nations game plays the built-in nations.
 - **The setup says "NRL".** The theatre and its club count name the map's league, NRL, in every season (the AFL's
   seasons have a league of their own on the NFL's maps); the Season list's label names the premiership of the day.

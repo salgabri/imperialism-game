@@ -168,10 +168,11 @@ test('rugby league 1998 to 2007: every club wears the crest of its day, the era 
   }
   const today = id => clubLogoFile(id);
   for (const [id, year, file] of [
-    ['nrl-brisbane-broncos', 1999, 'nrl-brisbane-broncos.1998'], ['nrl-brisbane-broncos', 2000, 'nrl-brisbane-broncos.2000'],
-    ['nrl-sydney-city-roosters', 1999, 'nrl-sydney-city-roosters.1998'], ['nrl-sydney-roosters', 2000, today('nrl-sydney-roosters')],
+    // Crests worn since before 1998 carry their first year (nrl-brisbane-broncos.1988: the bronco of 1988-1999).
+    ['nrl-brisbane-broncos', 1999, 'nrl-brisbane-broncos.1988'], ['nrl-brisbane-broncos', 2000, 'nrl-brisbane-broncos.2000'],
+    ['nrl-sydney-city-roosters', 1999, 'nrl-sydney-city-roosters.1995'], ['nrl-sydney-roosters', 2000, today('nrl-sydney-roosters')],
     ['nrl-st-george-dragons', 1998, 'nrl-st-george-dragons.1998'], ['nrl-st-george-illawarra-dragons', 1999, today('nrl-st-george-illawarra-dragons')],
-    ['nrl-auckland-warriors', 2000, 'nrl-auckland-warriors.1998'], ['nrl-new-zealand-warriors', 2001, today('nrl-new-zealand-warriors')],
+    ['nrl-auckland-warriors', 2000, 'nrl-auckland-warriors.1995'], ['nrl-new-zealand-warriors', 2001, today('nrl-new-zealand-warriors')],
     ['nrl-north-queensland-cowboys', 2002, 'nrl-north-queensland-cowboys.1998'], ['nrl-north-queensland-cowboys', 2003, today('nrl-north-queensland-cowboys')],
     // Aliases share their club's picture: the Sharks of 1999-2002, the Bulldogs of 2000-2009.
     ['nrl-sharks', 2001, 'nrl-cronulla-sutherland-sharks.1998'], ['nrl-bulldogs', 2005, 'nrl-canterbury-bulldogs.1998'],
@@ -180,6 +181,72 @@ test('rugby league 1998 to 2007: every club wears the crest of its day, the era 
     ['nrl-parramatta-eels', 2003, 'nrl-parramatta-eels.2000'], ['nrl-parramatta-eels', 2009, 'nrl-parramatta-eels.2004'],
     ['nrl-parramatta-eels', 2011, today('nrl-parramatta-eels')],
     ['nrl-south-sydney-rabbitohs', 2007, 'nrl-south-sydney-rabbitohs.1998'], ['nrl-south-sydney-rabbitohs', 2008, today('nrl-south-sydney-rabbitohs')],
+  ]) assert.equal(crestFile(id, year), file, `${id} ${year}`);
+});
+
+test('rugby league 1960 to 1997: every club wears the crest of its day, the era and gone clubs too', () => {
+  const files = new Set(readdirSync(new URL('public/club-logos/', root)).filter(name => name.endsWith('.webp')).map(name => name.slice(0, -5)));
+  // The seasons that show a monogram (docs/design/period-marks.md, "Coverage"). A logo known to differ with no picture:
+  // Eastern Suburbs had none before 1967; Parramatta's crests after Parramatta City's (to 1979), Penrith's mark before
+  // its panther of 1978 and Wests' magpie of 1960 survive in no usable picture. Logos no source dates: Wests after 1989,
+  // Balmain (the Sydney Tigers of 1995-1996), Norths, St. George before 1998, Newtown and the Perth Reds.
+  const monogram = {
+    'nrl-eastern-suburbs-roosters': [[1960, 1966]],
+    'nrl-parramatta-eels': [[1960, 1979]],
+    'nrl-penrith-panthers': [[1967, 1977]],
+    'nrl-western-suburbs-magpies': [[1960, 1977], [1990, 1997]],
+    'nrl-balmain-tigers': [[1960, 1997]],
+    'nrl-sydney-tigers': [[1995, 1996]],
+    'nrl-north-sydney-bears': [[1960, 1997]],
+    'nrl-st-george-dragons': [[1960, 1997]],
+    'nrl-newtown-bluebags': [[1960, 1972]],
+    'nrl-newtown-jets': [[1973, 1983]],
+    'nrl-perth-reds': [[1997, 1997]],
+  };
+  const seasons = readdirSync(new URL('public/rugby-league/', root)).filter(name => /^nrl-(?:sl-)?(?:19[6-8]\d|199[0-7])\.json$/.test(name));
+  assert.equal(seasons.length, 39, 'nrl-1960 ... nrl-1997 and nrl-sl-1997');
+  for (const name of seasons) {
+    const { year, clubs } = JSON.parse(read(`public/rugby-league/${name}`));
+    for (const { id } of clubs) {
+      const file = crestFile(id, year);
+      if ((monogram[id] ?? []).some(([from, through]) => from <= year && year <= through)) assert.equal(file, null, `${id} ${year}: its monogram`);
+      else assert.ok(file && files.has(file), `${id} ${year}: a crest the game ships`);
+    }
+  }
+  const today = id => clubLogoFile(id);
+  for (const [id, year, file] of [
+    // Cronulla's four logos before the star of 1998, from Captain Cook's Endeavour in its first season.
+    ['nrl-cronulla-sutherland-sharks', 1967, 'nrl-cronulla-sutherland-sharks.1967'], ['nrl-cronulla-sutherland-sharks', 1969, 'nrl-cronulla-sutherland-sharks.1968'],
+    ['nrl-cronulla-sutherland-sharks', 1977, 'nrl-cronulla-sutherland-sharks.1970'], ['nrl-cronulla-sutherland-sharks', 1997, 'nrl-cronulla-sutherland-sharks.1978'],
+    ['nrl-cronulla-sutherland-sharks', 1998, 'nrl-cronulla-sutherland-sharks.1998'],
+    // Eastern Suburbs: "Easts to Win" to 1977 (the article's text over its gallery), the Eastern Suburbs shield to 1994.
+    ['nrl-eastern-suburbs-roosters', 1977, 'nrl-eastern-suburbs-roosters.1967'], ['nrl-eastern-suburbs-roosters', 1978, 'nrl-eastern-suburbs-roosters.1978'],
+    ['nrl-eastern-suburbs-roosters', 1994, 'nrl-eastern-suburbs-roosters.1978'], ['nrl-sydney-city-roosters', 1995, 'nrl-sydney-city-roosters.1995'],
+    ['nrl-canterbury-bankstown-berries', 1960, 'nrl-canterbury-bankstown-berries.1960'], ['nrl-canterbury-bankstown-berries', 1977, 'nrl-canterbury-bankstown-berries.1960'],
+    // First logos from the clubs' first seasons, and the clubs of 1995-1997.
+    ['nrl-brisbane-broncos', 1988, 'nrl-brisbane-broncos.1988'], ['nrl-canberra-raiders', 1982, 'nrl-canberra-raiders.1982'],
+    ['nrl-newcastle-knights', 1997, 'nrl-newcastle-knights.1988'], ['nrl-newcastle-knights', 1998, 'nrl-newcastle-knights.1998'],
+    ['nrl-gold-coast-seagulls', 1990, 'nrl-gold-coast-seagulls.1990'], ['nrl-gold-coast-chargers', 1996, 'nrl-gold-coast-chargers.1996'],
+    ['nrl-north-queensland-cowboys', 1997, 'nrl-north-queensland-cowboys.1995'], ['nrl-north-queensland-cowboys', 1998, 'nrl-north-queensland-cowboys.1998'],
+    ['nrl-auckland-warriors', 1995, 'nrl-auckland-warriors.1995'], ['nrl-adelaide-rams', 1997, 'nrl-adelaide-rams.1997'],
+    ['nrl-south-queensland-crushers', 1995, 'nrl-south-queensland-crushers.1995'], ['nrl-western-reds', 1996, 'nrl-western-reds.1995'],
+    ['nrl-hunter-mariners', 1997, 'nrl-hunter-mariners.1997'], ['nrl-gold-coast-tweed-giants', 1989, 'nrl-gold-coast-tweed-giants.1988'],
+    // Illawarra's logo of its NSWRL years to 1997 (the article over a file page that says 1997), its last from 1998.
+    ['nrl-illawarra-steelers', 1982, 'nrl-illawarra-steelers.1982'], ['nrl-illawarra-steelers', 1997, 'nrl-illawarra-steelers.1982'],
+    ['nrl-illawarra-steelers', 1998, 'nrl-illawarra-steelers.1998'],
+    // Canterbury's snarling bulldog of 1978-1997 under its three names; the cartoon head from 1998.
+    ['nrl-canterbury-bankstown-bulldogs', 1978, 'nrl-canterbury-bankstown-bulldogs.1978'], ['nrl-sydney-bulldogs', 1995, 'nrl-canterbury-bankstown-bulldogs.1978'],
+    ['nrl-canterbury-bulldogs', 1997, 'nrl-canterbury-bankstown-bulldogs.1978'], ['nrl-canterbury-bulldogs', 1998, 'nrl-canterbury-bulldogs.1998'],
+    // Penrith's panther of 1978 and its 1991 logo; Manly's MW sea eagle to 1979 and its circle of the 1980s.
+    ['nrl-penrith-panthers', 1978, 'nrl-penrith-panthers.1978'], ['nrl-penrith-panthers', 1991, 'nrl-penrith-panthers.1991'],
+    ['nrl-manly-warringah-sea-eagles', 1960, 'nrl-manly-warringah-sea-eagles.1960'], ['nrl-manly-warringah-sea-eagles', 1979, 'nrl-manly-warringah-sea-eagles.1960'],
+    ['nrl-manly-warringah-sea-eagles', 1980, 'nrl-manly-warringah-sea-eagles.1980'], ['nrl-manly-warringah-sea-eagles', 1997, 'nrl-manly-warringah-sea-eagles.1980'],
+    // Souths' emblem of 1959 to 1979, then undated (today's crest) until the red and green oval of 1998-2007.
+    ['nrl-south-sydney-rabbitohs', 1960, 'nrl-south-sydney-rabbitohs.1960'], ['nrl-south-sydney-rabbitohs', 1979, 'nrl-south-sydney-rabbitohs.1960'],
+    ['nrl-south-sydney-rabbitohs', 1980, today('nrl-south-sydney-rabbitohs')], ['nrl-south-sydney-rabbitohs', 1997, today('nrl-south-sydney-rabbitohs')],
+    // Wests' shield of 1978, through the 1980s; Parramatta's eel (today's crest) from 1980.
+    ['nrl-western-suburbs-magpies', 1978, 'nrl-western-suburbs-magpies.1978'], ['nrl-western-suburbs-magpies', 1989, 'nrl-western-suburbs-magpies.1978'],
+    ['nrl-parramatta-eels', 1980, today('nrl-parramatta-eels')], ['nrl-parramatta-eels', 1997, today('nrl-parramatta-eels')],
   ]) assert.equal(crestFile(id, year), file, `${id} ${year}`);
 });
 

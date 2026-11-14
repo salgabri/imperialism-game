@@ -2,7 +2,7 @@
 
 Status: implemented 2026-11-10 to 2026-11-13, when the user asked: "as we go back in
 time make sure the logos and flag match those years versions!"; rugby league's
-computed seasons of 1998-2007 added 2026-11-14.
+computed seasons of 1998-2007 and of 1960-1997 added 2026-11-14.
 
 A season of another day shows every nation under the flag it flew then, and every
 club under the crest it wore then. Before this, every season flew today's flags and
@@ -147,7 +147,7 @@ is present. `sync:club-logos` leaves period crests alone.
 
 ### Coverage
 
-As of 14 November 2026: 557 period crests for 637 club ids, every club the game has
+As of 14 November 2026: 578 period crests for 750 club ids, every club the game has
 researched. Of the club-seasons before today's season (each club id in each season
 year it plays):
 
@@ -158,15 +158,18 @@ year it plays):
 | Basketball (NBA) | 29% | 37% | 0% | 34% |
 | Baseball | 25% | 57% | 0% | 18% |
 | Ice hockey | 29% | 56% | 4% | 11% |
-| Rugby league | 63% | 36% | 0% | 0% |
+| Rugby league | 57% | 18% | 2% | 6% |
 | Women's football | 5% | 73% | 0% | 22% |
 
 The rest of men's football (4%) are club ids with no crest today and no dated one: a
 monogram. The unverified seasons are those no source dates, mostly Dutch and
 Portuguese ones before 2005, when Wikipedia's articles began to show their crests;
 the NBA's monograms are mostly logos of 1961-2005 that no allowed source still shows.
-Rugby league's rest (1%) are three clubs of 1998-1999 that no source dates a logo
-for (below); its one monogram is the Warriors' anniversary logo of 2015.
+Rugby league's (1960-2024) rest (16%) are clubs gone or under a name of the day with no
+crest today and no logo any source dates (below), which show their monogram too; its
+unverified seasons are Souths' of 1980-1997, and its monograms are logos of 1960-1979
+that no usable picture shows (Parramatta's, Penrith's, Wests'), Eastern Suburbs before
+its first logo of 1967, and the Warriors' anniversary logo of 2015.
 
 1996/97's clubs came later the same day (football-years.md, "Sensible World of Soccer
 96/97"), so its club-seasons are not in the table above. 75 of its 134 clubs have an era
@@ -199,13 +202,51 @@ Gold Coast Chargers, the Illawarra Steelers, the Northern Eagles); the Balmain T
 the North Sydney Bears and the Western Suburbs Magpies, whose logos of 1998-1999 no
 source dates, keep their monogram.
 
+Rugby league's computed seasons of 1960-1997 came last (14 November 2026), with their
+names of the day (the Canterbury-Bankstown Berries, the Eastern Suburbs Roosters, the
+Newtown Bluebags and Jets, the Sydney Tigers and Bulldogs, the Gold Coast-Tweed Giants
+and Seagulls, the Perth Reds) and the clubs gone since. Today's club articles date many
+logos of those years in their galleries and captions: Cronulla's four from its first
+season (Captain Cook's Endeavour in 1967, a shark in an oval in 1968-1969, a black shark
+in a ring to 1977, the blue shark of 1978-1997), the Roosters' "Easts to Win" rooster
+of 1967 and its Eastern Suburbs shield of 1978-1994 (the club had no logo before 1967,
+and shows its monogram), Canterbury-Bankstown's CB shield to 1977, Penrith's panther of
+1978-1990, Manly's circle of 1980-1997, the first logos of Canberra (1982), Brisbane,
+Newcastle and the Gold Coast Seagulls, North Queensland's steer head of 1995-1997, and
+the clubs of 1995-1997 that had one name and one logo (the South Queensland Crushers, the
+Western Reds, the Hunter Mariners). The Wayback Machine's copies of the clubs' articles
+of 2006-2016 show the rest, in files Wikipedia has deleted since: Canterbury's snarling
+bulldog of 1978-1997 (the 1995 Sydney Bulldogs' and 1996-1997 Canterbury Bulldogs' too),
+Souths' green oval of 1959 ("throughout the 1960s and 1970s"), Manly's sea eagle over an
+MW football of 1960-1979 (a gallery of 2016), the Gold Coast-Tweed Giants' giant of
+1988-1989, Illawarra's logo of its years to 1997, and Wests' magpie shield of 1978,
+shown in its article's section on the 1980s. Seven crests of the 1998 research begin
+earlier and carry their new first year (`nrl-brisbane-broncos.1988`).
+
+Where an article's text and its gallery or file description disagree, the text is used:
+the "Easts to Win" logo is captioned 1967 and described as 1967-1975, but the text keeps
+the mantra until the shield of 1978 (and the article of 2009-2013 called it "The original
+Eastern Suburbs logo"). Where today's article is silent, an older version is used:
+Illawarra's last logo began in 1998 by its gallery of 2012-2016, though its file page of
+2006 said 1997. A year in a file's name dates nothing on its own; Souths' red and green
+oval, worn to 2007, is named 1988 but no source dates it, so Souths' seasons of 1980-1997
+keep today's crest. Parramatta's crests after Parramatta City's, before its eel of 1980
+(today's crest), Penrith's mark before 1978 (today's crest is its 60th-anniversary logo
+of 2026) and Wests' magpie on a branch of 1960 (a 43 px thumbnail) are known but shown by
+no usable picture: those seasons show the monogram. Balmain (the Sydney Tigers of 1995
+and 1996 too), Norths, St. George before 1998, Wests after 1989, Newtown and the Perth
+Reds have logos of the time that no source dates, so they keep their monogram: most of
+these clubs still play under those names, and their articles show today's logos.
+
 Crests are the clubs' trademarks; as with today's crests (the user's choice of
 Wikipedia crests, 2026-10-25), many are non-free files that Wikipedia hosts under
 its non-free content policy, and `SOURCES-eras.tsv` records each one's licence as
-its file page states. Three rugby league logos (Souths' oval, Parramatta's two eels)
-were deleted from Wikipedia with file pages no archive holds: they are recorded as
-non-free English Wikipedia uploads, and for two of them an earlier upload of the same
-logo states fair use.
+its file page states. Five rugby league logos (Souths' oval, Parramatta's two eels,
+Manly's sea eagle of 1960-1979, Wests' shield of 1978) were deleted from Wikipedia with
+file pages no archive holds: they are recorded as non-free English Wikipedia uploads,
+and for two of them an earlier upload of the same logo states fair use. Three survive
+only as the articles' thumbnails (Souths' oval at 150 px, Illawarra's logo to 1997 and
+Wests' shield at 125 px).
 
 ## Checks
 
@@ -217,6 +258,8 @@ flying the flag of the day while a federation keeps its own; tennis 1975
 1993 (Russia, Czechia); football 1996/97 to 2005/06 (FR Yugoslavia, then Serbia and
 Montenegro); rugby league's 1998 to 2007 (every club of each season under a crest
 the game ships, era names and gone clubs too, except the three undated ones; the
-logos of the day and the first round's two corrections by name); and TeamMark and
-SquadFlag drawing the crest of the season on screen.
+logos of the day and the first round's two corrections by name); rugby league's 1960
+to 1997, the ARL's and Super League's 1997 both (every club under a crest the game
+ships but the seasons listed to show the monogram; the logos of the day by name); and
+TeamMark and SquadFlag drawing the crest of the season on screen.
 `npm run test:flag-symbols` runs `build-historic-flags --check`.
