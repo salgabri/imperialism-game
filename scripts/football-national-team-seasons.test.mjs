@@ -1,8 +1,8 @@
-// The computed national-team seasons between the computed World Cups, 1962/63 to 1992/93 (docs/design/football-years.md,
-// "Computed national-team seasons"): the Wikidata reader on hand-made answers, the pools, the XI and its order, the
-// Ballon d'Or matching, the committed facts and seasons rebuilt byte for byte, every year of football filled, history's
-// spot checks, the federations of the day, the theatres, the loader's refusals, and a 1971/72 campaign saved and
-// resumed without the season's file.
+// The computed national-team seasons before and between the computed World Cups, 1960/61 and 1962/63 to 1992/93
+// (docs/design/football-years.md, "Computed national-team seasons"): the Wikidata reader on hand-made answers, the
+// pools, the XI and its order, the Ballon d'Or matching, the committed facts and seasons rebuilt byte for byte, every
+// year of football filled, history's spot checks, the federations of the day, the theatres, the loader's refusals, and
+// a 1971/72 campaign saved and resumed without the season's file.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
@@ -47,13 +47,13 @@ const RANK = 'http://wikiba.se/ontology#';
 
 // ---------- the rule ----------
 
-test('the seasons fill every year between the World Cups, and share their constants', () => {
+test('the seasons fill the year before the World Cups and every year between them, and share their constants', () => {
   const worldCupYears = WORLD_CUP.seasons.map(season => season.year);
   const years = MANIFEST.seasons.map(season => season.year);
   const between = [];
   for (let year = worldCupYears[0] + 1; year < worldCupYears.at(-1); year++) if (!worldCupYears.includes(year)) between.push(year);
-  assert.deepEqual(years, between, 'every season-end year from 1963 to 1993 that ends no World Cup');
-  assert.equal(years.length, 24);
+  assert.deepEqual(years, [worldCupYears[0] - 1, ...between], '1960/61, and every season-end year from 1963 to 1993 that ends no World Cup');
+  assert.equal(years.length, 25);
   for (const key of ['elo', 'strength', 'xi', 'profile', 'profileSource']) assert.deepEqual(MANIFEST[key], WORLD_CUP[key], key);
   assert.deepEqual(MANIFEST.sources.results, WORLD_CUP.sources.results, 'the same pinned results');
   assert.deepEqual(MANIFEST.names.ballonDorNationalities, WORLD_CUP.names.ballonDorNationalities);
@@ -152,9 +152,10 @@ test('Ballon d\'Or votes match Wikidata players by article, a pinned redirect, o
   assert.deepEqual(ballonDorPoints(votes, { year: 1972, players, stints, teams, pinned }),
     { points: [['Q1', 116], ['Q2', 12], ['Q3', 2]], unmatched: [['Nobody', 'Spain', 1]], pinned: ['Harald Schumacher'] });
   assert.throws(() => ballonDorPoints(votes, { year: 1972, players, stints, teams, pinned: [{ ...pinned[0], name: 'Harald' }] }), /whom Wikidata calls/);
-  // On the pinned pages every vote but two finds its man: Peiró's last stint ended in 1959, Bjerregaard has none.
+  // On the pinned pages every vote but three finds its man: Morlock's last stint ended in 1958, Peiró's in 1959, and
+  // Bjerregaard has none.
   const unmatched = Object.entries(VOTES).flatMap(([year, { unmatched: missed }]) => missed.map(([name]) => `${year} ${name}`));
-  assert.deepEqual(unmatched, ['1962 Joaquín Peiró', '1967 Johnny Bjerregaard']);
+  assert.deepEqual(unmatched, ['1961 Max Morlock', '1962 Joaquín Peiró', '1967 Johnny Bjerregaard']);
 });
 
 test('the facts rebuild byte for byte from the pinned sources (when they are in data-src/)', t => {
@@ -170,11 +171,12 @@ test('the facts rebuild byte for byte from the pinned sources (when they are in 
 
 // ---------- the seasons ----------
 
-test('the 24 seasons are built in beside the World Cups, labelled computed, and football has a season every year', () => {
+test('the 25 seasons are built in beside the World Cups, labelled computed, and football has a season every year', () => {
   const listed = BUILT_IN_SEASONS.filter(set => setKindOf(set.id) === 'nt');
   assert.deepEqual(listed.map(set => set.id), IDS.slice().reverse(), 'newest first');
   const years = new Set(BUILT_IN_SEASONS.map(set => set.year));
-  for (let year = 1962; year <= 2026; year++) assert.ok(years.has(year), `a football season ends in ${year}`);
+  for (let year = 1961; year <= 2026; year++) assert.ok(years.has(year), `a football season ends in ${year}`);
+  assert.equal(Math.min(...years), 1961, '1960/61 is the first');
   for (const set of listed) {
     const doc = committed(set.id);
     assert.deepEqual([doc.id, doc.version, doc.year, doc.season, doc.label], [set.id, set.version, set.year, set.season, set.label]);

@@ -1,7 +1,8 @@
-// Sensible World of Soccer's own team files (docs/design/football-years.md, "SWOS 94/95 and 95/96"): the game's
-// TEAM.nnn files of one edition, as the SWOS United server keeps them for its tools (https://cern.swos.eu/data/amiga/),
-// read into the rows scripts/lib/swos.mjs builds a season from. No I/O here: scripts/build-retro-seasons.mjs reads the
-// pinned files, and tests read invented ones. Nothing is generated: every name, position, skill and price is the file's.
+// Sensible World of Soccer's own team files (docs/design/football-years.md, "Sensible World of Soccer 94/95 and
+// 95/96"): the game's TEAM.nnn files of one edition, as the SWOS United server keeps them for its tools
+// (https://cern.swos.eu/data/amiga/), read into the rows scripts/lib/swos.mjs builds a season from. No I/O here:
+// scripts/build-retro-seasons.mjs reads the pinned files, and tests read invented ones. Nothing is generated: every
+// name, position, skill and price is the file's.
 //
 // The layout, as codemeyer/SwosPlayerFinder (MIT, Fredrik Meyer) reads it and as the files bear out: two header bytes
 // (0, then the number of teams), then 684 bytes a team. A team is 76 header bytes (byte 0 the file's number, 1 the
@@ -18,12 +19,13 @@ export const SWOS_POSITIONS = Object.freeze(['G', 'RB', 'LB', 'D', 'RW', 'LW', '
 export const SWOS_NATIONAL_FILES = Object.freeze(['080', '081', '082', '083', '084', '085']);
 
 /**
- * SWOS's nationality byte as the game shows it, a three-letter code: the code the shipped SWOS 96/97 database
- * (Whiteulver's, scripts/data/retro-seasons.json swos-9697) records for the players whose record in SWOS 96/97's own
- * national and seven league files carries that byte (7,650 players matched by team and name; two disagree, a Welshman
- * at Cardiff and an Argentine at Pisa whom the files give the byte of England and of Italy). Bytes 95 and 128, which
- * no 96/97 player carries, are named as SwosPlayerFinder's table names them (Chad, Iran). The code only sets a name's
- * case (properCase) and is kept as a club player's nationality; a national squad's players take their team's name.
+ * SWOS's nationality byte as the game shows it, a three-letter code: the code Whiteulver's SWOS 96/97 database (as
+ * keyser1884's SWOS-MCP holds it, swos_database.db at commit ac15d74; 1996/97 was read from it until 2026-11-13)
+ * records for the players whose record in SWOS 96/97's own national and seven league files carries that byte (7,650
+ * players matched by team and name; two disagree, a Welshman at Cardiff and an Argentine at Pisa whom the files give
+ * the byte of England and of Italy). Bytes 95 and 128, which no 96/97 player carries, are named as SwosPlayerFinder's
+ * table names them (Chad, Iran). The code only sets a name's case (properCase) and is kept as a club player's
+ * nationality; a national squad's players take their team's name.
  */
 export const SWOS_NATIONALITIES = Object.freeze({
   0: 'ALB', 1: 'AUT', 2: 'BEL', 3: 'BUL', 4: 'CRO', 5: 'CYP', 6: 'TCH', 7: 'DEN', 8: 'ENG', 9: 'EST', 10: 'FAR', 11: 'FIN', 12: 'FRA',

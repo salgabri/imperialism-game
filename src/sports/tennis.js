@@ -24,7 +24,9 @@ const ORDER = [[0, 1], [1, 0], null, [0, 0], [1, 1]];
 // files number the singles 1 to 4 in all 357 World Group and play-off ties of 1995–2022).
 const DOUBLES_LAST = [[0, 1], [1, 0], [0, 0], [1, 1], null];
 // A three-rubber tie, first to two: the No. 2s' singles, the No. 1s', then the doubles. The match files' first singles is
-// the weaker pair's in 560 of the 571 Fed Cup ties of 1975–1994 whose four players have a ranking.
+// the weaker pair's in 560 of the 571 Fed Cup ties of 1975–1994 whose four players have a ranking. Wikipedia's pages of
+// the Federation Cup's first years list the No. 1s' singles first in most ties of 1963–1965 and the No. 2s' in 1967
+// (scripts/tennis-formats-real.mjs): an order that changes no tie's odds, both singles being played in every tie.
 const THREE_RUBBERS = [[1, 1], [0, 0], null];
 
 /**
@@ -77,7 +79,9 @@ const FED_CUP_FIVE = format('fed-cup-five', DOUBLES_LAST, 3, 'final', 2,
  * one-week event at one venue ("Billie Jean King Cup", https://en.wikipedia.org/w/index.php?oldid=1380349265, read
  * 2026-11-10) whose ties were two singles and a doubles ("Two singles rubbers were added to the ties" in 1995: "1995 Fed
  * Cup", https://en.wikipedia.org/w/index.php?oldid=1369040089). The tie-break was first used in 1976 ("1976 Federation
- * Cup", https://en.wikipedia.org/w/index.php?oldid=1368553932); Jeff Sackmann's match files show the rest
+ * Cup", https://en.wikipedia.org/w/index.php?oldid=1368553932); the cup's first years, 1963–1967, played the same ties
+ * (Wikipedia's pages of each year, pinned in scripts/data/womens-tennis-seasons.json: two singles and the doubles third in
+ * all 77 ties, none of their 520 sets ended 7–6 and 42 went past 7–5), and Jeff Sackmann's match files show the rest
  * (scripts/tennis-formats-real.mjs): none of the 1,124 sets of 1968–1975 ended 7–6 and 68 went past 7–5; 12 of 1976's
  * 158 ended 7–6 and none went past it; in 1977–1979, 31 of 547 went past 7–5 and two ended 7–6; from 1980 to 2017 the
  * World Group's first two sets ended 7–6 and never went past it, while 70 of its 761 deciding sets went past 7–5 and the

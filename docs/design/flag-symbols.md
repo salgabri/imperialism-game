@@ -45,7 +45,7 @@ Slovakia, Turkey and Kosovo. So, since 2026-11-09, are four historic flags that
 football's seasons of 1961/62 to 1995/96 fly (the Soviet Union, SFR Yugoslavia,
 Zaire and the CIS; public-domain Commons artwork redrawn by
 `scripts/build-historic-flags.mjs`, which also measures their emblems, see
-[football-years.md](football-years.md#federations-of-the-day-196162-to-199596)).
+[football-years.md](football-years.md#federations-of-the-day-196061-to-199596)).
 Other flags retain their original full artwork.
 Nordic crosses and US cantons are structural flag layouts, not guessed isolated
 emblems. Adding a profile requires inspecting that source, not applying a

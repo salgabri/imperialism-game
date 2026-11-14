@@ -17,7 +17,9 @@ import { BUILT_IN_SETS, decodeFootballSet, setHasClubs, setHasNations, setKindOf
 import { dataSetOf } from '../src/app/shared.js';
 import { parseCampaign, serializeCampaign } from '../src/engine/storage.js';
 import { sourceLabel, sourceTitle, sourceUrl } from '../src/viewModels/squad.js';
-import { EA_LEAGUES, EA_NATION_ALIASES, EA_NO_TEAM, buildEaSeason } from './lib/ea-seasons.mjs';
+import { EA_LEAGUES, EA_NATION_ALIASES, EA_NO_TEAM, REST_OF_WORLD, buildEaSeason, restOfWorldLeague } from './lib/ea-seasons.mjs';
+import { BIG_LEAGUES, EUROPEAN_LEAGUES } from '../src/data/footballLeagues.js';
+import { TOP_CLUBS } from '../src/data/scopes.js';
 import {
   EARLY_EXTRA_FIELDS, WIKIDATA_COUNTRIES, buildEarlyEaSeason, eaCountryName, inLaterEdition, knownNationality, laterFromExport, laterFromScrape,
   nameWords, namesAgree, nationalityEntries, samePerson, teamCountry, wikidataNationality,
@@ -126,7 +128,7 @@ test('a season is one edition\'s roster: nations by nationality, clubs by EA\'s 
   assert.deepEqual(doc.clubs.map(club => [club.id, club.name, club.code, club.league, club.country]),
     [['f-testford-united', 'Testford United', 'TUN', 'Premier League', '826']]);
   assert.equal(doc.clubs[0].squad.length, 11);
-  assert.deepEqual(audit.leagues['La Liga'], { clubs: 0, short: [{ name: 'Real Ficticio', players: 5 }] });
+  assert.deepEqual(audit.leagues['La Liga'], { clubs: 0, kept: 0, short: [{ name: 'Real Ficticio', players: 5 }] });
   assert.ok(warnings.includes('No La Liga clubs in FIFA 18'));
   assert.deepEqual(doc.coverage, { players: 23, nations: 5, completeXIs: 1, clubs: 1, leagues: 1 });
   assert.deepEqual(doc.territory, { merged: {}, inactive: [] }, 'every federation of the map was a FIFA member by mid-2018');
@@ -172,9 +174,10 @@ test('the nation map names only game nations, and keeps every name EA spells dif
   const names = new Set(Object.values(NATIONS).map(nation => nation[0]));
   for (const [ea, game] of Object.entries(EA_NATION_ALIASES)) assert.ok(names.has(game), `${ea} → ${game} is a game nation`);
   for (const name of EA_NO_TEAM) assert.ok(!names.has(EA_NATION_ALIASES[name] || name), `${name} has no shape`);
-  // Built-in leagues, so a club reads the same in every season.
-  const leagues = new Set(getSport('football').clubs.map(club => club.league));
-  for (const [league] of Object.values(EA_LEAGUES)) assert.ok(leagues.has(league), league);
+  // Europe's first divisions (src/data/footballLeagues.js), so a club reads the same in every season.
+  for (const [league, country] of Object.values(EA_LEAGUES)) assert.equal(EUROPEAN_LEAGUES[league], country, league);
+  for (const league of BIG_LEAGUES) assert.ok(Object.values(EA_LEAGUES).some(([name]) => name === league), league);
+  for (const club of getSport('football').clubs) assert.equal(EUROPEAN_LEAGUES[club.league], club.country, club.id);
 });
 
 // ---------- the FIFA 07 – FIFA 14 builder, on invented rows ----------
@@ -274,9 +277,9 @@ test('an old season joins its two files by EA id: EA\'s rating, positions and bi
   assert.deepEqual(audit.namesFromRatings, [`806 "A. Inv${GARBLED} nted" → "Aleksejs Invented"`]);
 
   // Clubs by the edition's league table, both of Liga Portugal's names accepted; a league outside the table holds no club.
-  assert.deepEqual(doc.clubs.map(club => club.league).sort(), Object.values(EA_LEAGUES).map(([league]) => league).sort());
+  assert.deepEqual(doc.clubs.map(club => club.league).sort(), [...BIG_LEAGUES].sort());
   assert.deepEqual(doc.clubs.find(club => club.name === 'Inventado FC').country, '620');
-  assert.deepEqual(audit.leagues['Liga Portugal'], { clubs: 1, short: [{ name: 'Sagres Club', players: 1 }] });
+  assert.deepEqual(audit.leagues['Liga Portugal'], { clubs: 1, kept: 1, short: [{ name: 'Sagres Club', players: 1 }] });
   assert.ok(!doc.clubs.some(club => club.name === 'Elsewhere FC'));
   assert.deepEqual(doc.territory, { merged: { 728: '729' }, inactive: ['KOS'] }, 'South Sudan and Kosovo were not FIFA members by mid-2009');
   assert.deepEqual([audit.ratingsRoster, audit.ratingsDate, audit.roster, audit.snapshotDate], ['090001', '2008-08-30', '090002', '2009-02-22']);
@@ -311,7 +314,7 @@ test('an old season stops rather than guess', () => {
   assert.throws(() => buildLegacy({ ...input, clubs: input.clubs.map((row, i) => (i ? row : { ...row, player_url: '/player/2/invented-player-2/090002/' })) }), /player 1 links to/);
   // The league table: every league named, every name found in the clubs file, and each league with a club of eleven.
   const { 'Serie A': _serieA, ...six } = LEGACY_EDITION.leagues;
-  assert.throws(() => buildLegacy(input, { ...LEGACY_EDITION, leagues: six }), /the league table names .*, not the seven game leagues/);
+  assert.throws(() => buildLegacy(input, { ...LEGACY_EDITION, leagues: six }), /the league table names .*, not Serie A/);
   assert.throws(() => buildLegacy(input, { ...LEGACY_EDITION, leagues: { ...LEGACY_EDITION.leagues, 'Serie A': ['Missing League'] } }),
     /no player of the clubs file is in "Missing League" \(Serie A\)/);
   const withoutKeeper = players().filter(p => !(p.club?.club_name === 'Inventado FC' && p.rating.preferred_positions === 'GK'));
@@ -674,7 +677,9 @@ const FC25 = { id: 'ea-fc-25', fifaVersion: 25, edition: 'EA FC 25', update: 2, 
 function siteSeason() {
   let id = 100;
   const ratings = [], rows = new Map();
-  for (const [n, league] of Object.keys(SITE_LEAGUES).entries()) {
+  // The seven big leagues' website names (the others are Europe's other first divisions).
+  const seven = Object.keys(SITE_LEAGUES).filter(name => BIG_LEAGUES.includes(EA_LEAGUES[SITE_LEAGUES[name]][0]));
+  for (const [n, league] of seven.entries()) {
     for (const [i, position] of XI.entries()) {
       const eaId = String(++id);
       ratings.push({ Name: `P${eaId}`, OVR: String(60 + i), Position: position, 'Alternative positions': '', Age: '28', Nation: 'England',
@@ -777,7 +782,7 @@ test('an EA FC 25 season stops rather than guess', () => {
 // Coverage the setup note promises: most strong nations, and all seven leagues. EA rated fewer nations' players before
 // FIFA 11 and the FIFA 07–14 sources join two scrapes, so those seasons have their own lower floors.
 const FLOORS = {
-  default: { completeXIs: 65, nations: 125, clubs: 125 },
+  default: { completeXIs: 65, nations: 125, clubs: TOP_CLUBS },
   'ea-fifa-14': { completeXIs: 60 }, 'ea-fifa-11': { completeXIs: 60 }, 'ea-fifa-10': { completeXIs: 60 },
   'ea-fifa-09': { completeXIs: 45, nations: 120 }, 'ea-fifa-08': { completeXIs: 50, nations: 115 }, 'ea-fifa-07': { completeXIs: 50, nations: 110 },
   // Nations only (no source here has their clubs).
@@ -785,6 +790,21 @@ const FLOORS = {
 };
 const committed = id => JSON.parse(readFileSync(new URL(`../public/football/${id}.json`, import.meta.url), 'utf8'));
 const tuplesOf = doc => [...Object.values(doc.nations).flatMap(([, , squad]) => squad), ...doc.clubs.flatMap(club => club.squad)];
+
+test('a club EA files under Rest of World plays in the first division its id is in, in the nearest other edition', () => {
+  const row = (version, club, league) => ({ fifa_version: `${version}.0`, fifa_update: '2.0', club_team_id: `${club}.0`, league_id: `${league}.0` });
+  const rows = [row(19, 280, 63), row(20, 280, REST_OF_WORLD), row(21, 280, 63), row(18, 1, 67), row(20, 1, REST_OF_WORLD), row(23, 1, 67),
+    row(20, 9, REST_OF_WORLD), row(21, 9, 347)];
+  assert.deepEqual(restOfWorldLeague(rows, 280, 20, 2), { league: EA_LEAGUES[63], from: 'FIFA 21' }, 'the later of two as near');
+  assert.deepEqual(restOfWorldLeague(rows, 1, 20, 2), { league: EA_LEAGUES[67], from: 'FIFA 18' }, 'the nearer');
+  assert.deepEqual(restOfWorldLeague(rows, 9, 20, 2), { league: null, from: null }, "a club of no European first division plays in none");
+  // FIFA 20 filed Greece's, Russia's and Ukraine's clubs, and Dinamo Zagreb, under Rest of World.
+  const fifa20 = committed('ea-fifa-20');
+  for (const [name, league] of [['Olympiakos Piraeus', 'Greek Super League'], ['Spartak Moskva', 'Russian Premier League'],
+    ['Shakhtar Donetsk', 'Ukrainian Premier League'], ['Dinamo Zagreb', 'Croatian HNL']]) {
+    assert.equal(fifa20.clubs.find(club => club.name === name)?.league, league, name);
+  }
+});
 
 test('every built-in earlier season is committed, matches its listing and its own hash, and decodes', () => {
   const editions = [...MANIFEST.snapshots, ...MANIFEST.site.editions, ...MANIFEST.editions, ...MANIFEST.legacy.editions, ...MANIFEST.early.editions];
@@ -827,9 +847,11 @@ test('every built-in earlier season is committed, matches its listing and its ow
     const set = decodeFootballSet(doc);
     const floor = { ...FLOORS.default, ...FLOORS[doc.id] };
     assert.ok(doc.coverage.completeXIs >= floor.completeXIs && doc.coverage.nations >= floor.nations, `${doc.id} coverage ${JSON.stringify(doc.coverage)}`);
-    assert.deepEqual([...new Set(set.clubs.map(club => club.league))].sort(),
-      setHasClubs(doc.id) ? Object.values(EA_LEAGUES).map(([league]) => league).sort() : []);
-    assert.ok(set.clubs.length >= floor.clubs, `${doc.id} has ${set.clubs.length} clubs`);
+    // Europe's strongest TOP_CLUBS first-division clubs, the seven big leagues' among them.
+    const leagues = new Set(set.clubs.map(club => club.league));
+    assert.ok([...leagues].every(league => EUROPEAN_LEAGUES[league]), doc.id);
+    assert.ok(setHasClubs(doc.id) ? BIG_LEAGUES.every(league => leagues.has(league)) : !leagues.size, doc.id);
+    assert.equal(set.clubs.length, floor.clubs, `${doc.id} has ${set.clubs.length} clubs`);
   }
 });
 
@@ -915,7 +937,9 @@ test('the FIFA 07–14 seasons name every input by its SHA-256, and none writes 
     assert.ok(hex.test(edition.ratings.sha256) && hex.test(edition.clubs.sha256), `${edition.edition} pins both files`);
     assert.ok([edition.ratings.roster, edition.clubs.roster].every(roster => new RegExp(`^${version}\\d{4}$`).test(roster)));
     assert.ok(edition.evidence?.trim(), `${edition.edition} says how its rosters are known`);
-    assert.deepEqual(Object.keys(edition.leagues).sort(), Object.values(EA_LEAGUES).map(([league]) => league).sort());
+    // The seven big leagues, and every other European first division its clubs file holds.
+    assert.ok(BIG_LEAGUES.every(league => edition.leagues[league]?.length), `${edition.edition} names the seven big leagues`);
+    assert.ok(Object.keys(edition.leagues).every(league => Object.values(EA_LEAGUES).some(([name]) => name === league)), edition.edition);
   }
   const exclusions = legacyExclusions(legacy.exclusions);
   assert.ok(exclusions.length > 0);

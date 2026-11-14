@@ -20,6 +20,7 @@ import {
   seasonOfRelease, seasonYear, territoryFor,
 } from '../src/data/footballSetBuild.js';
 import { decodeFootballSet } from '../src/engine/footballSets.js';
+import { BIG_LEAGUES, EUROPEAN_LEAGUES } from '../src/data/footballLeagues.js';
 import { sampleDatabase, writeCm0102Files } from './lib/cm0102-fixture.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -235,18 +236,18 @@ test('the builder defaults to the src manifests, so the CLI and the browser buil
     /Fictionland \(2 players\)\. Add them to src\/data\/cm0102Nations\.js/);
 });
 
-test('seasons ending before 1962 are refused; from 1961/62 each has the federations of its day', () => {
-  assert.throws(() => build(undefined, { identity: { ...identity, released: '1960-05', season: '1960/61' } }), /ends in 1961: seasons ending before 1962 are refused.*football-years\.md/);
+test('seasons ending before 1961 are refused; from 1960/61 each has the federations of its day', () => {
+  assert.throws(() => build(undefined, { identity: { ...identity, released: '1959-05', season: '1959/60' } }), /ends in 1960: seasons ending before 1961 are refused.*football-years\.md/);
   const files = writeCm0102Files(sampleDatabase());
   const { clubSize, staffSize } = fileSignature(files);
-  const old = { id: 'cm0102-1960-10', label: 'Old', provider: 'Fixture makers', season: '1960/61', year: 1961, released: '1960-10',
+  const old = { id: 'cm0102-1959-10', label: 'Old', provider: 'Fixture makers', season: '1959/60', year: 1960, released: '1959-10',
     url: 'https://example.test/old', shifts: { birth: 0 }, signatures: [{ club: clubSize, staff: staffSize }] };
-  assert.throws(() => buildFootballSet(files, { databases: [old], nationMap, federations }), /before 1962/);
-  // 1961/62, the first World Cup season, is the first accepted, with the federations of its day: the fixture's
-  // Germans play as West Germany and its Yugoslav as Yugoslavia, on Serbia's shape; the Soviet Union and
-  // Czechoslovakia, with no players, have no identity.
-  const first = build(undefined, { identity: { ...identity, released: '1961-09', id: 'cm0102-1961-09-custom', dobShift: 0 } }).doc;
-  assert.deepEqual([first.year, first.season, first.territory], [1962, '1961/62', territoryFor(federations, 1962)]);
+  assert.throws(() => buildFootballSet(files, { databases: [old], nationMap, federations }), /before 1961/);
+  // 1960/61, the first computed national-team season, is the first accepted, with the federations of its day: the
+  // fixture's Germans play as West Germany and its Yugoslav as Yugoslavia, on Serbia's shape; the Soviet Union,
+  // Czechoslovakia and the United Arab Republic, with no players, have no identity.
+  const first = build(undefined, { identity: { ...identity, released: '1960-09', id: 'cm0102-1960-09-custom', dobShift: 0 } }).doc;
+  assert.deepEqual([first.year, first.season, first.territory], [1961, '1960/61', territoryFor(federations, 1961)]);
   assert.deepEqual(first.identities, { 276: { name: 'West Germany', code: 'FRG', flagId: '276' }, 688: { name: 'Yugoslavia', code: 'YUG', flagId: 'YUG' } });
   assert.equal(decodeFootballSet(first).meta.identities[688].name, 'Yugoslavia', 'the loader takes it');
   // 1996/97, the earliest season the game shipped before, and every later one, carry no identities.
@@ -458,9 +459,20 @@ test('federations follow the set year: Montenegro with Serbia in 2005, its own i
   assert.deepEqual(at('2007-10'), { merged: { 728: '729' }, inactive: ['KOS'] });
 });
 
-test('clubs: the seven leagues by stored name or patcher alias, members by division, eleven players or none', () => {
+test('clubs: Europe\'s first divisions by stored name or patcher alias, members by division, eleven players or none', () => {
   const { doc, audit } = build();
-  assert.deepEqual(doc.clubs.map(c => [c.league, c.country]).sort(), Object.entries(LEAGUES).map(([league, { country }]) => [league, country]).sort());
+  // The sample database holds the seven big leagues, so its clubs are theirs; LEAGUES names every other first division too.
+  assert.deepEqual(doc.clubs.map(c => [c.league, c.country]).sort(), BIG_LEAGUES.map(league => [league, LEAGUES[league].country]).sort());
+  for (const [league, { country, names }] of Object.entries(LEAGUES)) {
+    assert.equal(EUROPEAN_LEAGUES[league], country, league);
+    assert.ok(names.length, league);
+  }
+  // The seven big leagues are always audited; another first division where the database holds it (the sample's Scottish one).
+  assert.deepEqual(audit.leagues.map(l => l.league), [...BIG_LEAGUES, 'Scottish Premiership']);
+  assert.ok(audit.leagues.every(l => l.kept === l.clubs), 'every club kept: no cut asked for');
+  // A season keeps Europe's strongest `topClubs`, in the order it writes them.
+  const cut = build(undefined, { topClubs: 3 }).doc;
+  assert.deepEqual(cut.clubs.map(c => c.id), doc.clubs.slice(0, 3).map(c => c.id));
   assert.equal(audit.leagues.find(l => l.league === 'La Liga').competition, 'Spanish La Liga');
   // Thinford Town has six players and the extinct Gone Athletic none: neither is a club of the set.
   assert.deepEqual(audit.leagues.find(l => l.league === 'Premier League').short, [{ name: 'Thinford Town', players: 6 }]);
@@ -597,9 +609,9 @@ test('the CLI writes nothing with --check, and stops on what it cannot build', (
     const unknown = run(`--cm0102=${game}`, `--out=${out}`);
     assert.equal(unknown.status, 1);
     assert.match(unknown.stderr, /Unknown CM 01\/02 database .* --label=\.\.\./);
-    const early = run(`--cm0102=${game}`, `--out=${out}`, ...flags, '--season=1960/61');
+    const early = run(`--cm0102=${game}`, `--out=${out}`, ...flags, '--season=1959/60');
     assert.equal(early.status, 1);
-    assert.match(early.stderr, /seasons ending before 1962 are refused/);
+    assert.match(early.stderr, /seasons ending before 1961 are refused/);
     const blank = run(`--cm0102=${game}`, `--out=${out}`, ...flags, '--label=  ');
     assert.equal(blank.status, 1);
     assert.match(blank.stderr, /Name it with --label=\.\.\. \(/);

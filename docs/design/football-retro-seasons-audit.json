@@ -94,18 +94,18 @@
           "sha256": "b705168377f9e9ae0014b7976093fc358b1d83da639bd5130f88644730154216"
         }
       ],
-      "version": "cm0102-2003-10-df2c38bf",
+      "version": "cm0102-2003-10-ee19ed8f",
       "coverage": {
-        "players": 2614,
+        "players": 2511,
         "nations": 162,
         "completeXIs": 109,
-        "clubs": 129,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 18
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2003-10",
-        "version": "cm0102-2003-10-df2c38bf",
+        "version": "cm0102-2003-10-ee19ed8f",
         "database": {
           "known": true,
           "label": "October 2003 by Alex Sawczuk, fan-made",
@@ -261,7 +261,7 @@
         "players": {
           "read": 140223,
           "eligible": 79803,
-          "written": 2614,
+          "written": 2511,
           "dropped": {
             "nameless": 0,
             "noAbility": 36145,
@@ -306,6 +306,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
+            "kept": 20,
             "short": []
           },
           {
@@ -314,6 +315,7 @@
             "competition": "Spanish First Division",
             "members": 20,
             "clubs": 20,
+            "kept": 16,
             "short": []
           },
           {
@@ -322,6 +324,7 @@
             "competition": "Italian Serie A",
             "members": 18,
             "clubs": 18,
+            "kept": 14,
             "short": []
           },
           {
@@ -330,6 +333,7 @@
             "competition": "German First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 18,
             "short": []
           },
           {
@@ -338,6 +342,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 9,
             "short": []
           },
           {
@@ -346,6 +351,7 @@
             "competition": "Dutch Premier Division",
             "members": 18,
             "clubs": 17,
+            "kept": 12,
             "short": [
               {
                 "name": "Excelsior",
@@ -359,7 +365,284 @@
             "competition": "Portuguese Premier League",
             "members": 18,
             "clubs": 18,
+            "kept": 4,
             "short": []
+          },
+          {
+            "league": "Süper Lig",
+            "country": "792",
+            "competition": "Turkish Premier Division",
+            "members": 18,
+            "clubs": 18,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Belgian Pro League",
+            "country": "056",
+            "competition": "Belgian First Division",
+            "members": 18,
+            "clubs": 18,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Greek Super League",
+            "country": "300",
+            "competition": "Greek National A Division",
+            "members": 16,
+            "clubs": 16,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Czech First League",
+            "country": "203",
+            "competition": "Czech First Division",
+            "members": 16,
+            "clubs": 16,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Scottish Premiership",
+            "country": "SCO",
+            "competition": "Scottish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Danish Superliga",
+            "country": "208",
+            "competition": "Danish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Eliteserien",
+            "country": "578",
+            "competition": "Norwegian Premier Division",
+            "members": 14,
+            "clubs": 14,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Croatian HNL",
+            "country": "191",
+            "competition": "Croatian First Division",
+            "members": 16,
+            "clubs": 12,
+            "kept": 0,
+            "short": [
+              {
+                "name": "NK Belisce",
+                "players": 0
+              },
+              {
+                "name": "HNK Cibalia",
+                "players": 10
+              },
+              {
+                "name": "NK Pomorac",
+                "players": 6
+              },
+              {
+                "name": "NK Uljanik",
+                "players": 1
+              }
+            ]
+          },
+          {
+            "league": "Ekstraklasa",
+            "country": "616",
+            "competition": "Polish First Division",
+            "members": 16,
+            "clubs": 16,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Swiss Super League",
+            "country": "756",
+            "competition": "Swiss National Division A",
+            "members": 12,
+            "clubs": 6,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Grasshopper Club Zurich",
+                "players": 8
+              },
+              {
+                "name": "FC Lucerne",
+                "players": 5
+              },
+              {
+                "name": "FC St. Gallen",
+                "players": 4
+              },
+              {
+                "name": "FC Thun",
+                "players": 1
+              },
+              {
+                "name": "FC Wil 1900",
+                "players": 4
+              },
+              {
+                "name": "FC Zürich",
+                "players": 8
+              }
+            ]
+          },
+          {
+            "league": "Austrian Bundesliga",
+            "country": "040",
+            "competition": "Austrian Premier Division",
+            "members": 10,
+            "clubs": 10,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Allsvenskan",
+            "country": "752",
+            "competition": "Swedish Premier Division",
+            "members": 14,
+            "clubs": 14,
+            "kept": 8,
+            "short": []
+          },
+          {
+            "league": "Veikkausliiga",
+            "country": "246",
+            "competition": "Finnish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "League of Ireland",
+            "country": "372",
+            "competition": "Irish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Russian Premier League",
+            "country": "643",
+            "competition": "Russian Premier Division",
+            "members": 16,
+            "clubs": 15,
+            "kept": 3,
+            "short": [
+              {
+                "name": "Terek Grozny",
+                "players": 8
+              }
+            ]
+          },
+          {
+            "league": "Yugoslav First League",
+            "country": "688",
+            "competition": "Yugoslav First Division",
+            "members": 18,
+            "clubs": 18,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Irish League",
+            "country": "NIR",
+            "competition": "Northern Irish League Premier Division",
+            "members": 10,
+            "clubs": 10,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Welsh Premier League",
+            "country": "WAL",
+            "competition": "Welsh Premier Division",
+            "members": 18,
+            "clubs": 12,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Bangor City",
+                "players": 10
+              },
+              {
+                "name": "Caersws",
+                "players": 9
+              },
+              {
+                "name": "Flexsys Cefn Druids",
+                "players": 4
+              },
+              {
+                "name": "Haverfordwest County",
+                "players": 10
+              },
+              {
+                "name": "Llandudno",
+                "players": 0
+              },
+              {
+                "name": "CPD Porthmadog",
+                "players": 2
+              }
+            ]
+          },
+          {
+            "league": "Luxembourg National Division",
+            "country": "442",
+            "competition": "Luxembourg National Division",
+            "members": 12,
+            "clubs": 4,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Avenir Beggen",
+                "players": 6
+              },
+              {
+                "name": "CS Hobscheid",
+                "players": 3
+              },
+              {
+                "name": "FC Etzella Ettelbruck",
+                "players": 9
+              },
+              {
+                "name": "FC Mondercange",
+                "players": 7
+              },
+              {
+                "name": "Progrès Niedercom",
+                "players": 1
+              },
+              {
+                "name": "Sporting Mertzig",
+                "players": 6
+              },
+              {
+                "name": "Swift Hesperange",
+                "players": 6
+              },
+              {
+                "name": "US Rumelange",
+                "players": 2
+              }
+            ]
           }
         ],
         "territory": {
@@ -1976,18 +2259,18 @@
         "sha256": "1ec5e59d438e026c86bc9af4e34e57fa85299ad8ea1b84a51be4f41b6ca7ec83",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/patched_data.zip"
       },
-      "version": "cm0102-2002-11-12b13a69",
+      "version": "cm0102-2002-11-193b951c",
       "coverage": {
-        "players": 2599,
+        "players": 2500,
         "nations": 162,
         "completeXIs": 108,
-        "clubs": 129,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 17
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2002-11",
-        "version": "cm0102-2002-11-12b13a69",
+        "version": "cm0102-2002-11-193b951c",
         "database": {
           "known": true,
           "label": "3.9.68",
@@ -2141,7 +2424,7 @@
         "players": {
           "read": 139769,
           "eligible": 79444,
-          "written": 2599,
+          "written": 2500,
           "dropped": {
             "nameless": 0,
             "noAbility": 36218,
@@ -2186,6 +2469,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
+            "kept": 19,
             "short": []
           },
           {
@@ -2194,6 +2478,7 @@
             "competition": "Spanish First Division",
             "members": 20,
             "clubs": 20,
+            "kept": 17,
             "short": []
           },
           {
@@ -2202,6 +2487,7 @@
             "competition": "Italian Serie A",
             "members": 18,
             "clubs": 18,
+            "kept": 14,
             "short": []
           },
           {
@@ -2210,6 +2496,7 @@
             "competition": "German First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 18,
             "short": []
           },
           {
@@ -2218,6 +2505,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 13,
             "short": []
           },
           {
@@ -2226,6 +2514,7 @@
             "competition": "Dutch Premier Division",
             "members": 18,
             "clubs": 17,
+            "kept": 12,
             "short": [
               {
                 "name": "Excelsior",
@@ -2239,7 +2528,307 @@
             "competition": "Portuguese Premier League",
             "members": 18,
             "clubs": 18,
+            "kept": 4,
             "short": []
+          },
+          {
+            "league": "Süper Lig",
+            "country": "792",
+            "competition": "Turkish Premier Division",
+            "members": 18,
+            "clubs": 18,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Belgian Pro League",
+            "country": "056",
+            "competition": "Belgian First Division",
+            "members": 18,
+            "clubs": 18,
+            "kept": 4,
+            "short": []
+          },
+          {
+            "league": "Greek Super League",
+            "country": "300",
+            "competition": "Greek National A Division",
+            "members": 16,
+            "clubs": 16,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Czech First League",
+            "country": "203",
+            "competition": "Czech First Division",
+            "members": 16,
+            "clubs": 16,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Scottish Premiership",
+            "country": "SCO",
+            "competition": "Scottish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Danish Superliga",
+            "country": "208",
+            "competition": "Danish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Eliteserien",
+            "country": "578",
+            "competition": "Norwegian Premier Division",
+            "members": 14,
+            "clubs": 14,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Croatian HNL",
+            "country": "191",
+            "competition": "Croatian First Division",
+            "members": 16,
+            "clubs": 8,
+            "kept": 0,
+            "short": [
+              {
+                "name": "NK Cakovec",
+                "players": 4
+              },
+              {
+                "name": "HNK Cibalia",
+                "players": 7
+              },
+              {
+                "name": "NK Hrvatski Dragovoljac",
+                "players": 9
+              },
+              {
+                "name": "NK Kamen Ingrad",
+                "players": 10
+              },
+              {
+                "name": "NK Marsonia",
+                "players": 10
+              },
+              {
+                "name": "NK Pomorac",
+                "players": 7
+              },
+              {
+                "name": "HNK Rijeka",
+                "players": 9
+              },
+              {
+                "name": "NK TSK",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "Ekstraklasa",
+            "country": "616",
+            "competition": "Polish First Division",
+            "members": 16,
+            "clubs": 16,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Swiss Super League",
+            "country": "756",
+            "competition": "Swiss National Division A",
+            "members": 12,
+            "clubs": 6,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Grasshopper Club Zurich",
+                "players": 7
+              },
+              {
+                "name": "FC Lucerne",
+                "players": 2
+              },
+              {
+                "name": "FC St. Gallen",
+                "players": 5
+              },
+              {
+                "name": "FC Thun",
+                "players": 1
+              },
+              {
+                "name": "FC Wil 1900",
+                "players": 6
+              },
+              {
+                "name": "FC Zürich",
+                "players": 8
+              }
+            ]
+          },
+          {
+            "league": "Austrian Bundesliga",
+            "country": "040",
+            "competition": "Austrian Premier Division",
+            "members": 10,
+            "clubs": 10,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Allsvenskan",
+            "country": "752",
+            "competition": "Swedish Premier Division",
+            "members": 14,
+            "clubs": 14,
+            "kept": 8,
+            "short": []
+          },
+          {
+            "league": "Veikkausliiga",
+            "country": "246",
+            "competition": "Finnish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "League of Ireland",
+            "country": "372",
+            "competition": "Irish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Russian Premier League",
+            "country": "643",
+            "competition": "Russian Premier Division",
+            "members": 16,
+            "clubs": 16,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Yugoslav First League",
+            "country": "688",
+            "competition": "Yugoslav First Division",
+            "members": 18,
+            "clubs": 18,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Irish League",
+            "country": "NIR",
+            "competition": "Northern Irish League Premier Division",
+            "members": 10,
+            "clubs": 10,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Welsh Premier League",
+            "country": "WAL",
+            "competition": "Welsh Premier Division",
+            "members": 18,
+            "clubs": 9,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Bangor City",
+                "players": 10
+              },
+              {
+                "name": "Caernarfon Town",
+                "players": 9
+              },
+              {
+                "name": "Caersws",
+                "players": 8
+              },
+              {
+                "name": "Cwmbran Town",
+                "players": 10
+              },
+              {
+                "name": "Flexsys Cefn Druids",
+                "players": 4
+              },
+              {
+                "name": "Haverfordwest County",
+                "players": 10
+              },
+              {
+                "name": "Llanelli AFC",
+                "players": 8
+              },
+              {
+                "name": "Oswestry Town FC",
+                "players": 10
+              },
+              {
+                "name": "Welshpool Town AFC",
+                "players": 4
+              }
+            ]
+          },
+          {
+            "league": "Luxembourg National Division",
+            "country": "442",
+            "competition": "Luxembourg National Division",
+            "members": 12,
+            "clubs": 4,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Avenir Beggen",
+                "players": 6
+              },
+              {
+                "name": "CS Hobscheid",
+                "players": 3
+              },
+              {
+                "name": "FC Etzella Ettelbruck",
+                "players": 9
+              },
+              {
+                "name": "FC Mondercange",
+                "players": 7
+              },
+              {
+                "name": "Progrès Niedercom",
+                "players": 1
+              },
+              {
+                "name": "Sporting Mertzig",
+                "players": 6
+              },
+              {
+                "name": "Swift Hesperange",
+                "players": 6
+              },
+              {
+                "name": "US Rumelange",
+                "players": 2
+              }
+            ]
           }
         ],
         "territory": {
@@ -3857,18 +4446,18 @@
         "sha256": "f3a5a9097e7e8d959b75550b4775c1ce4687d004187836ce095ce25e4ff0235c",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/original_data.zip"
       },
-      "version": "cm0102-2001-09-58d3ed4f",
+      "version": "cm0102-2001-09-8fa30968",
       "coverage": {
-        "players": 2458,
+        "players": 2349,
         "nations": 143,
         "completeXIs": 96,
-        "clubs": 130,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 18
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2001-09",
-        "version": "cm0102-2001-09-58d3ed4f",
+        "version": "cm0102-2001-09-8fa30968",
         "database": {
           "known": true,
           "label": "3.9.60",
@@ -4016,7 +4605,7 @@
         "players": {
           "read": 109940,
           "eligible": 64487,
-          "written": 2458,
+          "written": 2349,
           "dropped": {
             "nameless": 0,
             "noAbility": 28049,
@@ -4057,6 +4646,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
+            "kept": 20,
             "short": []
           },
           {
@@ -4065,6 +4655,7 @@
             "competition": "Spanish First Division",
             "members": 20,
             "clubs": 20,
+            "kept": 17,
             "short": []
           },
           {
@@ -4073,6 +4664,7 @@
             "competition": "Italian Serie A",
             "members": 18,
             "clubs": 18,
+            "kept": 14,
             "short": []
           },
           {
@@ -4081,6 +4673,7 @@
             "competition": "German First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 16,
             "short": []
           },
           {
@@ -4089,6 +4682,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 8,
             "short": []
           },
           {
@@ -4097,6 +4691,7 @@
             "competition": "Dutch Premier Division",
             "members": 18,
             "clubs": 18,
+            "kept": 14,
             "short": []
           },
           {
@@ -4105,7 +4700,319 @@
             "competition": "Portuguese Premier League",
             "members": 18,
             "clubs": 18,
+            "kept": 4,
             "short": []
+          },
+          {
+            "league": "Süper Lig",
+            "country": "792",
+            "competition": "Turkish Premier Division",
+            "members": 18,
+            "clubs": 18,
+            "kept": 4,
+            "short": []
+          },
+          {
+            "league": "Belgian Pro League",
+            "country": "056",
+            "competition": "Belgian First Division",
+            "members": 18,
+            "clubs": 18,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Greek Super League",
+            "country": "300",
+            "competition": "Greek National A Division",
+            "members": 14,
+            "clubs": 14,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Czech First League",
+            "country": "203",
+            "competition": "Czech First Division",
+            "members": 16,
+            "clubs": 16,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Scottish Premiership",
+            "country": "SCO",
+            "competition": "Scottish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Danish Superliga",
+            "country": "208",
+            "competition": "Danish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Eliteserien",
+            "country": "578",
+            "competition": "Norwegian Premier Division",
+            "members": 14,
+            "clubs": 14,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Croatian HNL",
+            "country": "191",
+            "competition": "Croatian First Division",
+            "members": 16,
+            "clubs": 11,
+            "kept": 0,
+            "short": [
+              {
+                "name": "NK Cakovec",
+                "players": 6
+              },
+              {
+                "name": "HNK Cibalia",
+                "players": 2
+              },
+              {
+                "name": "NK Kamen Ingrad",
+                "players": 6
+              },
+              {
+                "name": "NK Pomorac",
+                "players": 4
+              },
+              {
+                "name": "NK TSK",
+                "players": 2
+              }
+            ]
+          },
+          {
+            "league": "Ekstraklasa",
+            "country": "616",
+            "competition": "Polish First Division",
+            "members": 16,
+            "clubs": 16,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Swiss Super League",
+            "country": "756",
+            "competition": "Swiss National Division A",
+            "members": 12,
+            "clubs": 0,
+            "kept": 0,
+            "short": [
+              {
+                "name": "FC Aarau",
+                "players": 4
+              },
+              {
+                "name": "FC Basel",
+                "players": 6
+              },
+              {
+                "name": "Grasshopper Club Zurich",
+                "players": 5
+              },
+              {
+                "name": "Lausanne-Sports",
+                "players": 6
+              },
+              {
+                "name": "FC Lucerne",
+                "players": 5
+              },
+              {
+                "name": "FC Lugano",
+                "players": 3
+              },
+              {
+                "name": "FC Neuchâtel Xamax",
+                "players": 1
+              },
+              {
+                "name": "Servette FC",
+                "players": 2
+              },
+              {
+                "name": "FC Sion",
+                "players": 3
+              },
+              {
+                "name": "FC St. Gallen",
+                "players": 5
+              },
+              {
+                "name": "BSC Young Boys Bern",
+                "players": 0
+              },
+              {
+                "name": "FC Zürich",
+                "players": 2
+              }
+            ]
+          },
+          {
+            "league": "Austrian Bundesliga",
+            "country": "040",
+            "competition": "Austrian Premier Division",
+            "members": 10,
+            "clubs": 10,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Allsvenskan",
+            "country": "752",
+            "competition": "Swedish Premier Division",
+            "members": 14,
+            "clubs": 14,
+            "kept": 9,
+            "short": []
+          },
+          {
+            "league": "Veikkausliiga",
+            "country": "246",
+            "competition": "Finnish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "League of Ireland",
+            "country": "372",
+            "competition": "Irish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Russian Premier League",
+            "country": "643",
+            "competition": "Russian Premier Division",
+            "members": 16,
+            "clubs": 16,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Yugoslav First League",
+            "country": "688",
+            "competition": "Yugoslav First Division",
+            "members": 18,
+            "clubs": 18,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Irish League",
+            "country": "NIR",
+            "competition": "Northern Irish League Premier Division",
+            "members": 10,
+            "clubs": 10,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Welsh Premier League",
+            "country": "WAL",
+            "competition": "Welsh Premier Division",
+            "members": 18,
+            "clubs": 9,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Aberystwyth Town",
+                "players": 10
+              },
+              {
+                "name": "Caernarfon Town",
+                "players": 7
+              },
+              {
+                "name": "Caersws",
+                "players": 7
+              },
+              {
+                "name": "Connah's Quay Nomads",
+                "players": 10
+              },
+              {
+                "name": "Cwmbran Town",
+                "players": 10
+              },
+              {
+                "name": "Flexsys Cefn Druids",
+                "players": 4
+              },
+              {
+                "name": "Haverfordwest County",
+                "players": 9
+              },
+              {
+                "name": "Llanelli AFC",
+                "players": 9
+              },
+              {
+                "name": "Rhayader Town",
+                "players": 5
+              }
+            ]
+          },
+          {
+            "league": "Luxembourg National Division",
+            "country": "442",
+            "competition": "Luxembourg National Division",
+            "members": 12,
+            "clubs": 4,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Avenir Beggen",
+                "players": 8
+              },
+              {
+                "name": "CS Hobscheid",
+                "players": 3
+              },
+              {
+                "name": "FC Etzella Ettelbruck",
+                "players": 10
+              },
+              {
+                "name": "FC Mondercange",
+                "players": 8
+              },
+              {
+                "name": "Progrès Niedercom",
+                "players": 2
+              },
+              {
+                "name": "Sporting Mertzig",
+                "players": 7
+              },
+              {
+                "name": "Swift Hesperange",
+                "players": 6
+              },
+              {
+                "name": "US Rumelange",
+                "players": 2
+              }
+            ]
           }
         ],
         "territory": {
@@ -5816,18 +6723,18 @@
           "md5": "a79d766a3869490bc2ec4e60b1e01b58"
         }
       ],
-      "version": "cm-0001-e6e6a2f0",
+      "version": "cm-0001-c934e384",
       "coverage": {
-        "players": 2284,
+        "players": 2182,
         "nations": 134,
         "completeXIs": 82,
-        "clubs": 130,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 18
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm-0001",
-        "version": "cm-0001-e6e6a2f0",
+        "version": "cm-0001-c934e384",
         "database": {
           "known": true,
           "label": "3.81",
@@ -5971,7 +6878,7 @@
         "players": {
           "read": 71641,
           "eligible": 40728,
-          "written": 2284,
+          "written": 2182,
           "dropped": {
             "nameless": 0,
             "noAbility": 23024,
@@ -6007,6 +6914,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
+            "kept": 20,
             "short": []
           },
           {
@@ -6015,6 +6923,7 @@
             "competition": "Spanish First Division",
             "members": 20,
             "clubs": 20,
+            "kept": 18,
             "short": []
           },
           {
@@ -6023,6 +6932,7 @@
             "competition": "Italian Serie A",
             "members": 18,
             "clubs": 18,
+            "kept": 16,
             "short": []
           },
           {
@@ -6031,6 +6941,7 @@
             "competition": "German First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 15,
             "short": []
           },
           {
@@ -6039,6 +6950,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 10,
             "short": []
           },
           {
@@ -6047,6 +6959,7 @@
             "competition": "Dutch Premier Division",
             "members": 18,
             "clubs": 18,
+            "kept": 13,
             "short": []
           },
           {
@@ -6055,7 +6968,289 @@
             "competition": "Portuguese Premier League",
             "members": 18,
             "clubs": 18,
+            "kept": 4,
             "short": []
+          },
+          {
+            "league": "Süper Lig",
+            "country": "792",
+            "competition": "Turkish First Division",
+            "members": 18,
+            "clubs": 13,
+            "kept": 4,
+            "short": [
+              {
+                "name": "Bursaspor",
+                "players": 8
+              },
+              {
+                "name": "Çaykur Rizespor",
+                "players": 7
+              },
+              {
+                "name": "Erzurumspor",
+                "players": 5
+              },
+              {
+                "name": "Gaziantepspor",
+                "players": 9
+              },
+              {
+                "name": "Gençlerbirligi",
+                "players": 8
+              }
+            ]
+          },
+          {
+            "league": "Belgian Pro League",
+            "country": "056",
+            "competition": "Belgian First Division",
+            "members": 18,
+            "clubs": 18,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Greek Super League",
+            "country": "300",
+            "competition": "Greek Premier Division",
+            "members": 16,
+            "clubs": 16,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Czech First League",
+            "country": "203",
+            "competition": "Czech First Division",
+            "members": 16,
+            "clubs": 10,
+            "kept": 2,
+            "short": [
+              {
+                "name": "1.FC Synot",
+                "players": 1
+              },
+              {
+                "name": "CU Bohemians Prague",
+                "players": 8
+              },
+              {
+                "name": "FK Chmel Blsany",
+                "players": 7
+              },
+              {
+                "name": "FC Stavo Artikel Brno",
+                "players": 10
+              },
+              {
+                "name": "FC Viktoria Plzen",
+                "players": 4
+              },
+              {
+                "name": "FK Viktoria Zizkov",
+                "players": 10
+              }
+            ]
+          },
+          {
+            "league": "Scottish Premiership",
+            "country": "SCO",
+            "competition": "Scottish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Danish Superliga",
+            "country": "208",
+            "competition": "Danish Premier Division",
+            "members": 12,
+            "clubs": 11,
+            "kept": 6,
+            "short": [
+              {
+                "name": "Haderslev Fodboldklub",
+                "players": 4
+              }
+            ]
+          },
+          {
+            "league": "Eliteserien",
+            "country": "578",
+            "competition": "Norwegian Premier Division",
+            "members": 14,
+            "clubs": 14,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Croatian HNL",
+            "country": "191",
+            "competition": "Croatian First Division",
+            "members": 12,
+            "clubs": 6,
+            "kept": 1,
+            "short": [
+              {
+                "name": "NK Cakovec",
+                "players": 4
+              },
+              {
+                "name": "HNK Cibalia",
+                "players": 0
+              },
+              {
+                "name": "NK Hrvatski Dragovoljac",
+                "players": 6
+              },
+              {
+                "name": "NK Marsonia",
+                "players": 2
+              },
+              {
+                "name": "HNK Rijeka",
+                "players": 9
+              },
+              {
+                "name": "NK Slaven Belupo",
+                "players": 7
+              }
+            ]
+          },
+          {
+            "league": "Ekstraklasa",
+            "country": "616",
+            "competition": "Polish First Division",
+            "members": 16,
+            "clubs": 16,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Allsvenskan",
+            "country": "752",
+            "competition": "Swedish Premier Division",
+            "members": 14,
+            "clubs": 14,
+            "kept": 4,
+            "short": []
+          },
+          {
+            "league": "Veikkausliiga",
+            "country": "246",
+            "competition": "Finnish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "League of Ireland",
+            "country": "372",
+            "competition": "Irish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Russian Premier League",
+            "country": "643",
+            "competition": "Russian Premier Division",
+            "members": 16,
+            "clubs": 16,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Yugoslav First League",
+            "country": "688",
+            "competition": "Yugoslavian Premier Division",
+            "members": 18,
+            "clubs": 18,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Irish League",
+            "country": "NIR",
+            "competition": "Northern Irish League Premier Division",
+            "members": 10,
+            "clubs": 10,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Welsh Premier League",
+            "country": "WAL",
+            "competition": "Welsh Premier Division",
+            "members": 18,
+            "clubs": 3,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Aberystwyth Town",
+                "players": 10
+              },
+              {
+                "name": "Bangor City",
+                "players": 10
+              },
+              {
+                "name": "Caersws",
+                "players": 6
+              },
+              {
+                "name": "Carmarthen Town",
+                "players": 9
+              },
+              {
+                "name": "Flexsys Cefn Druids",
+                "players": 4
+              },
+              {
+                "name": "Connah's Quay Nomads",
+                "players": 9
+              },
+              {
+                "name": "Cwmbran Town",
+                "players": 9
+              },
+              {
+                "name": "Haverfordwest County",
+                "players": 10
+              },
+              {
+                "name": "Llanelli AFC",
+                "players": 9
+              },
+              {
+                "name": "Newtown AFC",
+                "players": 8
+              },
+              {
+                "name": "Oswestry Town FC",
+                "players": 8
+              },
+              {
+                "name": "Port Talbot Athletic",
+                "players": 7
+              },
+              {
+                "name": "Rhayader Town",
+                "players": 3
+              },
+              {
+                "name": "Rhyl",
+                "players": 5
+              },
+              {
+                "name": "UWIC Inter Cardiff",
+                "players": 4
+              }
+            ]
           }
         ],
         "territory": {
@@ -7766,18 +8961,18 @@
           "md5": "a59c383419664cbd4e236936a7532979"
         }
       ],
-      "version": "cm-9900-e4639df6",
+      "version": "cm-9900-b683bc9d",
       "coverage": {
-        "players": 2178,
+        "players": 2101,
         "nations": 123,
         "completeXIs": 74,
-        "clubs": 130,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 12
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm-9900",
-        "version": "cm-9900-e4639df6",
+        "version": "cm-9900-b683bc9d",
         "database": {
           "known": true,
           "label": "3.70",
@@ -7919,7 +9114,7 @@
         "players": {
           "read": 46460,
           "eligible": 22939,
-          "written": 2178,
+          "written": 2101,
           "dropped": {
             "nameless": 0,
             "noAbility": 18440,
@@ -7954,6 +9149,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
+            "kept": 20,
             "short": []
           },
           {
@@ -7962,6 +9158,7 @@
             "competition": "Spanish First Division",
             "members": 20,
             "clubs": 20,
+            "kept": 18,
             "short": []
           },
           {
@@ -7970,6 +9167,7 @@
             "competition": "Italian Serie A",
             "members": 18,
             "clubs": 18,
+            "kept": 15,
             "short": []
           },
           {
@@ -7978,6 +9176,7 @@
             "competition": "German First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 16,
             "short": []
           },
           {
@@ -7986,6 +9185,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 13,
             "short": []
           },
           {
@@ -7994,6 +9194,7 @@
             "competition": "Dutch KPN-Telecompetition",
             "members": 18,
             "clubs": 18,
+            "kept": 16,
             "short": []
           },
           {
@@ -8002,6 +9203,52 @@
             "competition": "Portuguese Premier League",
             "members": 18,
             "clubs": 18,
+            "kept": 5,
+            "short": []
+          },
+          {
+            "league": "Belgian Pro League",
+            "country": "056",
+            "competition": "Belgian First Division",
+            "members": 18,
+            "clubs": 18,
+            "kept": 4,
+            "short": []
+          },
+          {
+            "league": "Scottish Premiership",
+            "country": "SCO",
+            "competition": "Scottish Premier Division",
+            "members": 10,
+            "clubs": 10,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Danish Superliga",
+            "country": "208",
+            "competition": "Danish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 11,
+            "short": []
+          },
+          {
+            "league": "Eliteserien",
+            "country": "578",
+            "competition": "Norwegian Premier Division",
+            "members": 14,
+            "clubs": 14,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Allsvenskan",
+            "country": "752",
+            "competition": "Swedish Premier Division",
+            "members": 14,
+            "clubs": 14,
+            "kept": 3,
             "short": []
           }
         ],
@@ -9594,18 +10841,18 @@
         "sha256": "702c85d69c1b806f3980c9dd8a864800e51ad8058421311edf2fe9eeb04e0c26",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/cm3_data.zip"
       },
-      "version": "cm0102-2020-11-cm3-5b8d03bc",
+      "version": "cm0102-2020-11-cm3-6b812ea2",
       "coverage": {
-        "players": 2066,
+        "players": 1964,
         "nations": 113,
         "completeXIs": 64,
-        "clubs": 130,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 18
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2020-11-cm3",
-        "version": "cm0102-2020-11-cm3-5b8d03bc",
+        "version": "cm0102-2020-11-cm3-6b812ea2",
         "database": {
           "known": true,
           "label": "98/99 for CM 01/02",
@@ -9743,7 +10990,7 @@
         "players": {
           "read": 28511,
           "eligible": 15245,
-          "written": 2066,
+          "written": 1964,
           "dropped": {
             "nameless": 0,
             "noAbility": 10535,
@@ -9776,6 +11023,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
+            "kept": 20,
             "short": []
           },
           {
@@ -9784,6 +11032,7 @@
             "competition": "Spanish First Division",
             "members": 20,
             "clubs": 20,
+            "kept": 20,
             "short": []
           },
           {
@@ -9792,6 +11041,7 @@
             "competition": "Italian Serie A",
             "members": 18,
             "clubs": 18,
+            "kept": 13,
             "short": []
           },
           {
@@ -9800,6 +11050,7 @@
             "competition": "German First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 18,
             "short": []
           },
           {
@@ -9808,6 +11059,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 8,
             "short": []
           },
           {
@@ -9816,6 +11068,7 @@
             "competition": "Dutch Premier Division",
             "members": 18,
             "clubs": 18,
+            "kept": 15,
             "short": []
           },
           {
@@ -9824,7 +11077,1012 @@
             "competition": "Portuguese Premier League",
             "members": 18,
             "clubs": 18,
+            "kept": 6,
             "short": []
+          },
+          {
+            "league": "Süper Lig",
+            "country": "792",
+            "competition": "Turkish Premier Division",
+            "members": 18,
+            "clubs": 2,
+            "kept": 2,
+            "short": [
+              {
+                "name": "MKE Ankaragücü",
+                "players": 1
+              },
+              {
+                "name": "Antalyaspor A.S.",
+                "players": 0
+              },
+              {
+                "name": "Bursaspor",
+                "players": 4
+              },
+              {
+                "name": "Çaykur Rizespor",
+                "players": 0
+              },
+              {
+                "name": "Diyarbakirspor",
+                "players": 0
+              },
+              {
+                "name": "Denizlispor",
+                "players": 0
+              },
+              {
+                "name": "Fenerbahçe SK",
+                "players": 10
+              },
+              {
+                "name": "Gaziantepspor",
+                "players": 3
+              },
+              {
+                "name": "Gençlerbirligi",
+                "players": 1
+              },
+              {
+                "name": "Göztepe A.S.",
+                "players": 0
+              },
+              {
+                "name": "Istanbulspor A.S.",
+                "players": 8
+              },
+              {
+                "name": "Kocaelispor",
+                "players": 1
+              },
+              {
+                "name": "Malatyaspor",
+                "players": 0
+              },
+              {
+                "name": "Samsunspor",
+                "players": 2
+              },
+              {
+                "name": "Trabzonspor",
+                "players": 6
+              },
+              {
+                "name": "Yimpas Yozgatspor A.S.",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "Belgian Pro League",
+            "country": "056",
+            "competition": "Belgian First Division",
+            "members": 18,
+            "clubs": 16,
+            "kept": 4,
+            "short": [
+              {
+                "name": "RAA La Louvieroise",
+                "players": 3
+              },
+              {
+                "name": "RWD Molenbeek",
+                "players": 4
+              }
+            ]
+          },
+          {
+            "league": "Greek Super League",
+            "country": "300",
+            "competition": "Greek National A Division",
+            "members": 14,
+            "clubs": 3,
+            "kept": 3,
+            "short": [
+              {
+                "name": "Aigaleo City",
+                "players": 0
+              },
+              {
+                "name": "Akratitos",
+                "players": 0
+              },
+              {
+                "name": "Aris Salonika",
+                "players": 0
+              },
+              {
+                "name": "Ethnikos Asteras",
+                "players": 0
+              },
+              {
+                "name": "Ionikos Nikeas",
+                "players": 2
+              },
+              {
+                "name": "Iraklis Salonika",
+                "players": 3
+              },
+              {
+                "name": "OFI Crete",
+                "players": 3
+              },
+              {
+                "name": "PAOK Salonika",
+                "players": 4
+              },
+              {
+                "name": "Panachaiki",
+                "players": 0
+              },
+              {
+                "name": "Panionios",
+                "players": 5
+              },
+              {
+                "name": "Skoda Xanthi",
+                "players": 1
+              }
+            ]
+          },
+          {
+            "league": "Czech First League",
+            "country": "203",
+            "competition": "Czech First Division",
+            "members": 16,
+            "clubs": 0,
+            "kept": 0,
+            "short": [
+              {
+                "name": "1.FC Synot",
+                "players": 0
+              },
+              {
+                "name": "FC Banik Ostrava",
+                "players": 1
+              },
+              {
+                "name": "CU Bohemians Prague",
+                "players": 0
+              },
+              {
+                "name": "FC Stavo Artikel Brno",
+                "players": 0
+              },
+              {
+                "name": "FK Chmel Blsany",
+                "players": 0
+              },
+              {
+                "name": "FK Drnovice",
+                "players": 1
+              },
+              {
+                "name": "SK Hradec Kralove",
+                "players": 0
+              },
+              {
+                "name": "FK Jablonec 97",
+                "players": 0
+              },
+              {
+                "name": "Slezsky FC Opava",
+                "players": 0
+              },
+              {
+                "name": "FC Marila Pribram",
+                "players": 0
+              },
+              {
+                "name": "SK Sigma Olomouc",
+                "players": 1
+              },
+              {
+                "name": "SK Slavia Prague",
+                "players": 0
+              },
+              {
+                "name": "FC Slovan Liberec",
+                "players": 0
+              },
+              {
+                "name": "AC Sparta Prague",
+                "players": 4
+              },
+              {
+                "name": "FK Teplice",
+                "players": 0
+              },
+              {
+                "name": "FK Viktoria Zizkov",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "Scottish Premiership",
+            "country": "SCO",
+            "competition": "Scottish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Danish Superliga",
+            "country": "208",
+            "competition": "Danish Premier Division",
+            "members": 12,
+            "clubs": 4,
+            "kept": 4,
+            "short": [
+              {
+                "name": "Aarhus Gymnastik Forening",
+                "players": 9
+              },
+              {
+                "name": "Esbjerg Forenede Boldklubber",
+                "players": 0
+              },
+              {
+                "name": "Football Club Midtjylland 1999",
+                "players": 0
+              },
+              {
+                "name": "Lyngby Football Club",
+                "players": 6
+              },
+              {
+                "name": "Odense Boldklub",
+                "players": 3
+              },
+              {
+                "name": "Silkeborg Idræts Forening",
+                "players": 9
+              },
+              {
+                "name": "Vejle Boldklub",
+                "players": 6
+              },
+              {
+                "name": "Viborg Fodsports Forening",
+                "players": 7
+              }
+            ]
+          },
+          {
+            "league": "Eliteserien",
+            "country": "578",
+            "competition": "Norwegian Premier Division",
+            "members": 14,
+            "clubs": 5,
+            "kept": 1,
+            "short": [
+              {
+                "name": "Bryne FK",
+                "players": 5
+              },
+              {
+                "name": "Lillestrøm SK",
+                "players": 3
+              },
+              {
+                "name": "Lyn Fotball",
+                "players": 2
+              },
+              {
+                "name": "Molde FK",
+                "players": 7
+              },
+              {
+                "name": "Odd Grenland",
+                "players": 10
+              },
+              {
+                "name": "Sogndal IL",
+                "players": 4
+              },
+              {
+                "name": "Stabæk IF",
+                "players": 9
+              },
+              {
+                "name": "Strømsgodset IF",
+                "players": 10
+              },
+              {
+                "name": "Viking FK",
+                "players": 6
+              }
+            ]
+          },
+          {
+            "league": "Croatian HNL",
+            "country": "191",
+            "competition": "Croatian First Division",
+            "members": 16,
+            "clubs": 3,
+            "kept": 1,
+            "short": [
+              {
+                "name": "NK Cakovec",
+                "players": 0
+              },
+              {
+                "name": "HNK Cibalia",
+                "players": 1
+              },
+              {
+                "name": "NK Hrvatski Dragovoljac",
+                "players": 0
+              },
+              {
+                "name": "NK Kamen Ingrad",
+                "players": 0
+              },
+              {
+                "name": "NK Marsonia",
+                "players": 0
+              },
+              {
+                "name": "NK Pomorac",
+                "players": 0
+              },
+              {
+                "name": "HNK Rijeka",
+                "players": 8
+              },
+              {
+                "name": "HNK Sibenik",
+                "players": 9
+              },
+              {
+                "name": "NK Slaven Belupo",
+                "players": 4
+              },
+              {
+                "name": "NK TSK",
+                "players": 0
+              },
+              {
+                "name": "NK Varteks",
+                "players": 7
+              },
+              {
+                "name": "NK Zadar",
+                "players": 9
+              },
+              {
+                "name": "NK Zagreb",
+                "players": 9
+              }
+            ]
+          },
+          {
+            "league": "Ekstraklasa",
+            "country": "616",
+            "competition": "Polish First Division",
+            "members": 16,
+            "clubs": 1,
+            "kept": 1,
+            "short": [
+              {
+                "name": "Amica Wronki",
+                "players": 6
+              },
+              {
+                "name": "GKS Katowice",
+                "players": 0
+              },
+              {
+                "name": "Gornik Zabrze",
+                "players": 6
+              },
+              {
+                "name": "Groclin Grodzisk",
+                "players": 0
+              },
+              {
+                "name": "KSZO Ostrowiec Swietokrzyski",
+                "players": 0
+              },
+              {
+                "name": "Legia Warszawa",
+                "players": 8
+              },
+              {
+                "name": "Odra Wodzislaw",
+                "players": 0
+              },
+              {
+                "name": "Pogon Szczecin",
+                "players": 0
+              },
+              {
+                "name": "Polonia Warszawa",
+                "players": 7
+              },
+              {
+                "name": "RKS Fameg Radomsko",
+                "players": 0
+              },
+              {
+                "name": "Ruch Chorzow",
+                "players": 5
+              },
+              {
+                "name": "Slask Wroclaw",
+                "players": 0
+              },
+              {
+                "name": "Stomil Olsztyn",
+                "players": 1
+              },
+              {
+                "name": "Widzew Lodz",
+                "players": 10
+              },
+              {
+                "name": "Zaglebie Lubin",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "Swiss Super League",
+            "country": "756",
+            "competition": "Swiss National Division A",
+            "members": 12,
+            "clubs": 0,
+            "kept": 0,
+            "short": [
+              {
+                "name": "FC Aarau",
+                "players": 1
+              },
+              {
+                "name": "FC Basel",
+                "players": 4
+              },
+              {
+                "name": "Grasshopper Club Zurich",
+                "players": 7
+              },
+              {
+                "name": "Lausanne-Sports",
+                "players": 5
+              },
+              {
+                "name": "FC Lucerne",
+                "players": 5
+              },
+              {
+                "name": "FC Lugano",
+                "players": 4
+              },
+              {
+                "name": "FC Neuchâtel Xamax",
+                "players": 5
+              },
+              {
+                "name": "Servette FC",
+                "players": 5
+              },
+              {
+                "name": "FC Sion",
+                "players": 9
+              },
+              {
+                "name": "FC St. Gallen",
+                "players": 1
+              },
+              {
+                "name": "BSC Young Boys Bern",
+                "players": 0
+              },
+              {
+                "name": "FC Zürich",
+                "players": 4
+              }
+            ]
+          },
+          {
+            "league": "Austrian Bundesliga",
+            "country": "040",
+            "competition": "Austrian Premier Division",
+            "members": 10,
+            "clubs": 0,
+            "kept": 0,
+            "short": [
+              {
+                "name": "VfB Admira Wacker Mödling",
+                "players": 7
+              },
+              {
+                "name": "FK Austria Vienna",
+                "players": 2
+              },
+              {
+                "name": "SW Bregenz",
+                "players": 0
+              },
+              {
+                "name": "FC Austria Kärnten",
+                "players": 0
+              },
+              {
+                "name": "Grazer AK",
+                "players": 3
+              },
+              {
+                "name": "SK Rapid Vienna",
+                "players": 8
+              },
+              {
+                "name": "SV Ried",
+                "players": 1
+              },
+              {
+                "name": "SV Salzburg",
+                "players": 7
+              },
+              {
+                "name": "SK Sturm Graz",
+                "players": 6
+              },
+              {
+                "name": "FC Tirol Innsbruck",
+                "players": 4
+              }
+            ]
+          },
+          {
+            "league": "Allsvenskan",
+            "country": "752",
+            "competition": "Swedish Premier Division",
+            "members": 14,
+            "clubs": 14,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Veikkausliiga",
+            "country": "246",
+            "competition": "Finnish Premier Division",
+            "members": 12,
+            "clubs": 3,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Atlantis FC",
+                "players": 0
+              },
+              {
+                "name": "FC Haka Valkeakoski",
+                "players": 3
+              },
+              {
+                "name": "FC Jokerit",
+                "players": 0
+              },
+              {
+                "name": "FC Lahti",
+                "players": 0
+              },
+              {
+                "name": "FC Inter",
+                "players": 0
+              },
+              {
+                "name": "Kuopion Palloseura",
+                "players": 0
+              },
+              {
+                "name": "Myllykosken Pallo-47",
+                "players": 3
+              },
+              {
+                "name": "Rovaniemen Palloseura",
+                "players": 0
+              },
+              {
+                "name": "Tampere United",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "League of Ireland",
+            "country": "372",
+            "competition": "Irish Premier Division",
+            "members": 12,
+            "clubs": 0,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Bohemian F.C.",
+                "players": 0
+              },
+              {
+                "name": "Bray Wanderers A.F.C.",
+                "players": 0
+              },
+              {
+                "name": "Cork City",
+                "players": 1
+              },
+              {
+                "name": "Derry City",
+                "players": 0
+              },
+              {
+                "name": "Dundalk F.C.",
+                "players": 1
+              },
+              {
+                "name": "Galway United",
+                "players": 0
+              },
+              {
+                "name": "Longford Town",
+                "players": 0
+              },
+              {
+                "name": "Monaghan United",
+                "players": 0
+              },
+              {
+                "name": "Shamrock Rovers",
+                "players": 0
+              },
+              {
+                "name": "Shelbourne F.C.",
+                "players": 0
+              },
+              {
+                "name": "Saint Patrick's Athletic",
+                "players": 0
+              },
+              {
+                "name": "University College Dublin",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "Russian Premier League",
+            "country": "643",
+            "competition": "Russian Premier Division",
+            "members": 16,
+            "clubs": 2,
+            "kept": 2,
+            "short": [
+              {
+                "name": "Alania Vladikavkaz",
+                "players": 2
+              },
+              {
+                "name": "Anzhi Makhachkala",
+                "players": 0
+              },
+              {
+                "name": "CSKA Moscow",
+                "players": 7
+              },
+              {
+                "name": "Chernomorets Novorossiysk",
+                "players": 0
+              },
+              {
+                "name": "Fakel Voronezh",
+                "players": 0
+              },
+              {
+                "name": "Krylja Sovetov Samara",
+                "players": 0
+              },
+              {
+                "name": "Lokomotiv Moscow",
+                "players": 4
+              },
+              {
+                "name": "Rostselmash Rostov-na-Donu",
+                "players": 0
+              },
+              {
+                "name": "SC Rotor Volgograd",
+                "players": 2
+              },
+              {
+                "name": "Saturn Ramenskoye",
+                "players": 0
+              },
+              {
+                "name": "Sokol Saratov",
+                "players": 0
+              },
+              {
+                "name": "Torpedo Moscow",
+                "players": 1
+              },
+              {
+                "name": "FC Torpedo-ZiL Moscow",
+                "players": 0
+              },
+              {
+                "name": "Zenith St. Petersburg",
+                "players": 1
+              }
+            ]
+          },
+          {
+            "league": "Yugoslav First League",
+            "country": "688",
+            "competition": "Yugoslav First Division",
+            "members": 18,
+            "clubs": 1,
+            "kept": 1,
+            "short": [
+              {
+                "name": "Cukaricki Stankom Belgrade",
+                "players": 0
+              },
+              {
+                "name": "Hajduk Rodic MB Kula",
+                "players": 0
+              },
+              {
+                "name": "Mladost Apatin",
+                "players": 0
+              },
+              {
+                "name": "Mladost Lucani",
+                "players": 0
+              },
+              {
+                "name": "OFK Belgrade",
+                "players": 0
+              },
+              {
+                "name": "Obilic Belgrade",
+                "players": 0
+              },
+              {
+                "name": "Partizan Belgrade",
+                "players": 4
+              },
+              {
+                "name": "Rad Belgrade",
+                "players": 0
+              },
+              {
+                "name": "Radnicki Kragujevac",
+                "players": 0
+              },
+              {
+                "name": "Rudar Pljevlja",
+                "players": 0
+              },
+              {
+                "name": "Sartid Smederevo",
+                "players": 0
+              },
+              {
+                "name": "Sutjeska Niksic",
+                "players": 0
+              },
+              {
+                "name": "Vojvodina Novi Sad",
+                "players": 0
+              },
+              {
+                "name": "Zeleznik Belgrade",
+                "players": 0
+              },
+              {
+                "name": "Zemun",
+                "players": 0
+              },
+              {
+                "name": "Zeta Golubovci",
+                "players": 0
+              },
+              {
+                "name": "OFK Zvezdara Belgrade",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "Irish League",
+            "country": "NIR",
+            "competition": "Northern Irish League Premier Division",
+            "members": 10,
+            "clubs": 0,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Ards",
+                "players": 0
+              },
+              {
+                "name": "Cliftonville",
+                "players": 1
+              },
+              {
+                "name": "Coleraine",
+                "players": 0
+              },
+              {
+                "name": "Crusaders",
+                "players": 1
+              },
+              {
+                "name": "Glenavon",
+                "players": 0
+              },
+              {
+                "name": "Glentoran",
+                "players": 1
+              },
+              {
+                "name": "Linfield",
+                "players": 0
+              },
+              {
+                "name": "Newry Town",
+                "players": 0
+              },
+              {
+                "name": "Omagh Town",
+                "players": 0
+              },
+              {
+                "name": "Portadown",
+                "players": 2
+              }
+            ]
+          },
+          {
+            "league": "Welsh Premier League",
+            "country": "WAL",
+            "competition": "Welsh Premier Division",
+            "members": 18,
+            "clubs": 0,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Aberystwyth Town",
+                "players": 0
+              },
+              {
+                "name": "Afan Lido",
+                "players": 0
+              },
+              {
+                "name": "Bangor City",
+                "players": 0
+              },
+              {
+                "name": "Barry Town",
+                "players": 6
+              },
+              {
+                "name": "Caernarfon Town",
+                "players": 1
+              },
+              {
+                "name": "Caersws",
+                "players": 0
+              },
+              {
+                "name": "Carmarthen Town",
+                "players": 1
+              },
+              {
+                "name": "Connah's Quay Nomads",
+                "players": 0
+              },
+              {
+                "name": "Cwmbran Town",
+                "players": 0
+              },
+              {
+                "name": "Flexsys Cefn Druids",
+                "players": 0
+              },
+              {
+                "name": "Haverfordwest County",
+                "players": 0
+              },
+              {
+                "name": "Llanelli AFC",
+                "players": 0
+              },
+              {
+                "name": "Newtown AFC",
+                "players": 0
+              },
+              {
+                "name": "Oswestry Town FC",
+                "players": 0
+              },
+              {
+                "name": "Port Talbot Town",
+                "players": 0
+              },
+              {
+                "name": "Rhayader Town",
+                "players": 0
+              },
+              {
+                "name": "Rhyl",
+                "players": 1
+              },
+              {
+                "name": "Total Network Solutions",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "Luxembourg National Division",
+            "country": "442",
+            "competition": "Luxembourg National Division",
+            "members": 12,
+            "clubs": 0,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Avenir Beggen",
+                "players": 3
+              },
+              {
+                "name": "CS Hobscheid",
+                "players": 0
+              },
+              {
+                "name": "F91 Dudelange",
+                "players": 2
+              },
+              {
+                "name": "FC Etzella Ettelbruck",
+                "players": 0
+              },
+              {
+                "name": "CS Grevenmacher",
+                "players": 3
+              },
+              {
+                "name": "AS La Jeunesse d'Esch-Alzette",
+                "players": 0
+              },
+              {
+                "name": "FC Mondercange",
+                "players": 0
+              },
+              {
+                "name": "Progrès Niedercom",
+                "players": 1
+              },
+              {
+                "name": "Sporting Mertzig",
+                "players": 1
+              },
+              {
+                "name": "Swift Hesperange",
+                "players": 0
+              },
+              {
+                "name": "US Rumelange",
+                "players": 0
+              },
+              {
+                "name": "US Luxembourg",
+                "players": 0
+              }
+            ]
           }
         ],
         "territory": {
@@ -11410,7 +13668,7 @@
       "listing": "SI's Championship Manager 97/98 database as baskeyx extracted it to JSON (github.com/baskeyx/cm9798)",
       "maker": "Sports Interactive",
       "edition": "CM 97/98",
-      "version": "cm-9798-cb9596fd",
+      "version": "cm-9798-14115d7e",
       "snapshotDate": "1997-10",
       "url": "https://github.com/baskeyx/cm9798",
       "compiler": "baskeyx (Dan Baskey): the cm9798 package, extracted to JSON (commit 06bdd2b, 5 October 2026)",
@@ -11433,15 +13691,15 @@
         }
       ],
       "coverage": {
-        "players": 1899,
+        "players": 1870,
         "nations": 102,
         "completeXIs": 52,
         "clubs": 124,
-        "leagues": 7
+        "leagues": 12
       },
       "audit": {
         "id": "cm-9798",
-        "version": "cm-9798-cb9596fd",
+        "version": "cm-9798-14115d7e",
         "records": 19359,
         "teams": 2085,
         "eligible": 12941,
@@ -11465,11 +13723,11 @@
           "Liechtenstein": 13
         },
         "coverage": {
-          "players": 1899,
+          "players": 1870,
           "nations": 102,
           "completeXIs": 52,
           "clubs": 124,
-          "leagues": 7
+          "leagues": 12
         },
         "leagues": [
           {
@@ -11477,6 +13735,7 @@
             "division": "EPR",
             "members": 20,
             "clubs": 20,
+            "kept": 19,
             "short": []
           },
           {
@@ -11484,6 +13743,7 @@
             "division": "SP1",
             "members": 20,
             "clubs": 20,
+            "kept": 19,
             "short": []
           },
           {
@@ -11491,6 +13751,7 @@
             "division": "ISA",
             "members": 18,
             "clubs": 18,
+            "kept": 17,
             "short": []
           },
           {
@@ -11498,6 +13759,7 @@
             "division": "GD1",
             "members": 18,
             "clubs": 18,
+            "kept": 17,
             "short": []
           },
           {
@@ -11505,6 +13767,7 @@
             "division": "FD1",
             "members": 18,
             "clubs": 18,
+            "kept": 18,
             "short": []
           },
           {
@@ -11512,6 +13775,7 @@
             "division": "HD1",
             "members": 18,
             "clubs": 17,
+            "kept": 8,
             "short": [
               {
                 "name": "Sparta Rotterdam",
@@ -11524,6 +13788,7 @@
             "division": "PD1",
             "members": 18,
             "clubs": 13,
+            "kept": 13,
             "short": [
               {
                 "name": "Académica Coimbra",
@@ -11546,6 +13811,133 @@
                 "players": 10
               }
             ]
+          },
+          {
+            "league": "Süper Lig",
+            "division": "TR1",
+            "members": 17,
+            "clubs": 1,
+            "kept": 1,
+            "short": [
+              {
+                "name": "Altay Izmir",
+                "players": 0
+              },
+              {
+                "name": "Antalyaspor",
+                "players": 0
+              },
+              {
+                "name": "Besiktas Istanbul",
+                "players": 7
+              },
+              {
+                "name": "Bursaspor",
+                "players": 1
+              },
+              {
+                "name": "Canakkale Dardanelspor",
+                "players": 1
+              },
+              {
+                "name": "Demircelik Karabükspor",
+                "players": 0
+              },
+              {
+                "name": "Fenerbahce Istanbul",
+                "players": 5
+              },
+              {
+                "name": "Gaziantepspor",
+                "players": 2
+              },
+              {
+                "name": "Genclerbirligi Ankara",
+                "players": 0
+              },
+              {
+                "name": "Istanbulspor",
+                "players": 7
+              },
+              {
+                "name": "Kayserispor",
+                "players": 0
+              },
+              {
+                "name": "Kocaelispor",
+                "players": 2
+              },
+              {
+                "name": "MKE Ankaragücü",
+                "players": 0
+              },
+              {
+                "name": "Samsunspor",
+                "players": 0
+              },
+              {
+                "name": "Trabzonspor",
+                "players": 4
+              },
+              {
+                "name": "Vanspor",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "Belgian Pro League",
+            "division": "BD1",
+            "members": 18,
+            "clubs": 17,
+            "kept": 3,
+            "short": [
+              {
+                "name": "K. Sint-Truidense VV",
+                "players": 10
+              }
+            ]
+          },
+          {
+            "league": "Scottish Premiership",
+            "division": "SPR",
+            "members": 10,
+            "clubs": 8,
+            "kept": 3,
+            "short": [
+              {
+                "name": "Heart Of Midlothian",
+                "players": 7
+              },
+              {
+                "name": "Hibernian",
+                "players": 7
+              }
+            ]
+          },
+          {
+            "league": "Danish Superliga",
+            "division": "DD1",
+            "members": 12,
+            "clubs": 12,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Eliteserien",
+            "division": "ND1",
+            "members": 14,
+            "clubs": 14,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Allsvenskan",
+            "division": "WD1",
+            "members": 14,
+            "clubs": 14,
+            "kept": 4,
+            "short": []
           }
         ],
         "territory": {
@@ -11692,55 +14084,141 @@
     {
       "id": "swos-9697",
       "kind": "swos",
+      "reader": "swos-files",
+      "retrieved": "2026-11-13",
       "season": "1996/97",
-      "listing": "Sensible Software's Sensible World of Soccer 96/97 national squads (Whiteulver's database, as keyser1884's SWOS-MCP holds it)",
+      "listing": "Sensible Software's Sensible World of Soccer 96/97, its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)",
       "maker": "Sensible Software",
       "edition": "SWOS 96/97",
-      "version": "swos-9697-189aa2ca",
+      "version": "swos-9697-5e7af2be",
       "snapshotDate": "1996",
-      "url": "https://github.com/keyser1884/SWOS-MCP",
-      "compiler": "Whiteulver's database of the game's teams, xflea's spreadsheet of it (v1.1, December 2018), as keyser1884's SWOS-MCP holds it (swos_database.db, commit ac15d74, 9 July 2025)",
-      "provenance": "Row for row the spreadsheet; its Swedish club records equal the game's own team file (304 of 304 players), and its national squads gazchap's database (64 of 64 checked). A SWOS United thread (2021) says some minor nations' squads and nationalities in the game predate 1996.",
-      "rights": "Sensible World of Soccer is Sensible Software's, published by Renegade and GT Interactive and now Codemasters'; the database's code is MIT, the game's data is not.",
+      "url": "https://cern.swos.eu/data/amiga/9697/",
+      "compiler": "The game's own team files: the six national team files (TEAM.080 to 085) and the seven league files (TEAM.008 England, 013 France, 014 Germany, 020 Italy, 025 Holland, 029 Portugal, 035 Spain), as the SWOS United community server keeps them for its tools (cern.swos.eu/data/amiga/9697), read by scripts/lib/swos-files.mjs",
+      "provenance": "SWOS 96/97 as released in 1996, the server's only 96/97 edition (9697). Until 2026-11-13 this season was read from Whiteulver's database of the game (xflea's spreadsheet v1.1, as keyser1884's SWOS-MCP holds it: swos_database.db, commit ac15d74), nations only, because that database names 688 full names at two clubs across all its divisions (Bierhoff at Ascoli and Udinese); the game's seven league files name 20 at two top-division clubs, mostly namesakes (Emerson at Middlesbrough, St. Pauli and Belenenses), and Thomas Wolter twice at Werder Bremen, as SWOS 94/95's and 95/96's files do, and each club keeps its own sixteen. Read from these files, every nation keeps the database build's strength and squad size, and 127 of the 133 with players the same eleven: two names keep the apostrophe the database dropped (D'Silva of India, Shar'aa of Jordan), and four ties between players of one price step fall to the files' order (Brazil fields Leonardo, not Dunga). Steps 0 and 49 are read as that database stores them (0 as 1, 49 as 48): 51 players, Shearer and Maldini at 49, listed in the audit. A SWOS United thread (2021) says some minor nations' squads and nationalities in the game predate 1996.",
+      "rights": "Sensible World of Soccer is Sensible Software's, published by Renegade and GT Interactive; its rights are now Codemasters'. The SWOS United server, which keeps the game's files for its tools, states no licence or terms (it has no robots.txt), and the data's rights are reserved.",
       "files": [
         {
           "folder": "swos-9697",
-          "name": "swos_database.db",
-          "bytes": 2392064,
-          "sha256": "7104eaa893a138b2fb7344d67f1bbe61f5f9a2514fbfe12d51e2214071d6807f",
-          "download": "https://raw.githubusercontent.com/keyser1884/SWOS-MCP/ac15d74d4a47a6dc0325398bb6c2781ea3f7d322/swos_database.db"
+          "name": "TEAM.008",
+          "bytes": 63614,
+          "sha256": "305475c4c084a8c625da0d1ddb3a8a274db2c4c30fea9da251a1aeb4a53d316e",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.008"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.013",
+          "bytes": 28730,
+          "sha256": "9eef542dbf431175d9a0cd556796e76554e2b62763f1a773faffaf20a0676e5b",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.013"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.014",
+          "bytes": 31466,
+          "sha256": "37a68fcf81db70ab794be651722b7a9dbfd51cdb4619754509971aba4505a08a",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.014"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.020",
+          "bytes": 34886,
+          "sha256": "9848bcd65f103db67db30f95e7f0aeec2584ddd34850e924b730a694ad5f0bfe",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.020"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.025",
+          "bytes": 24626,
+          "sha256": "3cf54395e187ff355d01e3221890c6283461abb9a890359e6114ec37e793b7f8",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.025"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.029",
+          "bytes": 17786,
+          "sha256": "a365ba143c44aa0e2b19f2f5f01caa17b0aeea6f1a4979d0f6d34c8f4bf99350",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.029"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.035",
+          "bytes": 32834,
+          "sha256": "a6b660d9ee55b213c21799ff833fb3802e9674e8b56ae90ab8e2a375589e3cfe",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.035"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.080",
+          "bytes": 33518,
+          "sha256": "8b758bb18c0707720bc294d60905534b27eaa514f4bd9592218979f0da4f7692",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.080"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.081",
+          "bytes": 23258,
+          "sha256": "989765edb40021a9b60ebb6bbb22dc6ed1c4cc3716fea52a6573a4dcdb06401c",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.081"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.082",
+          "bytes": 6842,
+          "sha256": "7414fc18337de79f602dd9e2480d169011a303cb161db3837efa16102230ea92",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.082"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.083",
+          "bytes": 10262,
+          "sha256": "7acdfbbfdc74568643b76ab0f4b889bbb7084c81c0c8c28107a3618f65e7bf53",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.083"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.084",
+          "bytes": 21206,
+          "sha256": "4fac0912ea62370d9aeacf6903bea859886facd2dd441f7f8fc484a56cc85284",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.084"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.085",
+          "bytes": 2738,
+          "sha256": "bb2761537fb9a07279eab33f5b672a517b80e017f3fce29c28424958a539badc",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.085"
         }
       ],
       "coverage": {
-        "players": 1463,
+        "players": 2937,
         "nations": 133,
         "completeXIs": 133,
-        "clubs": 0,
-        "leagues": 0
+        "clubs": 134,
+        "leagues": 7
       },
       "audit": {
         "id": "swos-9697",
-        "version": "swos-9697-189aa2ca",
+        "version": "swos-9697-5e7af2be",
         "rows": 2288,
         "teams": 143,
         "noTeam": {
-          "Bahrain": 16,
-          "Hong Kong": 16,
-          "Mauritius": 16,
-          "Singapore": 16,
           "Faroe Isles": 16,
           "Liechtenstein": 16,
           "Malta": 16,
           "San Marino": 16,
           "Bermuda": 16,
-          "St. Vincent": 16
+          "St. Vincent": 16,
+          "Bahrain": 16,
+          "Hong Kong": 16,
+          "Mauritius": 16,
+          "Singapore": 16
         },
         "coverage": {
-          "players": 1463,
+          "players": 2937,
           "nations": 133,
           "completeXIs": 133,
-          "clubs": 0,
-          "leagues": 0
+          "clubs": 134,
+          "leagues": 7
         },
         "territory": {
           "merged": {
@@ -11757,15 +14235,136 @@
             "626"
           ]
         },
+        "clubRows": 2144,
+        "leagues": [
+          {
+            "league": "Premier League",
+            "file": "008",
+            "clubs": 20,
+            "short": []
+          },
+          {
+            "league": "La Liga",
+            "file": "035",
+            "clubs": 22,
+            "short": []
+          },
+          {
+            "league": "Serie A",
+            "file": "020",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Bundesliga",
+            "file": "014",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Ligue 1",
+            "file": "013",
+            "clubs": 20,
+            "short": []
+          },
+          {
+            "league": "Eredivisie",
+            "file": "025",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Liga Portugal",
+            "file": "029",
+            "clubs": 18,
+            "short": []
+          }
+        ],
+        "collisions": [
+          "EMERSON (Middlesbrough, FC St. Pauli, C.F. Os Belenenses)",
+          "TONI (Atlético Madrid, RCD Espanyol)",
+          "RONALDO (FC Barcelona, Vitória Futebol Clube)",
+          "FRANCISCO VILLARROYA (RC Deportivo de La Coruña, Real Sporting de Gijón)",
+          "DMITRI RADCHENKO (RC Deportivo de La Coruña, Rayo Vallecano)",
+          "ALBERTO LOPEZ (Racing Santander, Real Sociedad)",
+          "PAULO SOUSA (Borussia Dortmund, Boavista FC)",
+          "THOMAS WOLTER (SV Werder Bremen, SV Werder Bremen)",
+          "MARCELO (Olympique Lyonnais, PSV)",
+          "JOAO PINTO (SL Benfica, Sporting Clube de Braga)",
+          "QUIM (Sporting Clube de Braga, Vitória Futebol Clube)",
+          "ARTUR JORGE (Sporting Clube de Braga, SC Espinho)",
+          "TONI (Sporting Clube de Braga, SC Salgueiros)",
+          "LUIS MANUEL (SC Espinho, SC Salgueiros)",
+          "EMANUEL (SC Espinho, Rio Ave FC)",
+          "JOSE CARLOS (CF Estrela Amadora, Gil Vicente FC)",
+          "REBELO (CF Estrela Amadora, Leça FC)",
+          "RENATO (CF Estrela Amadora, SC Salgueiros)",
+          "TOZE (SC Farense, Leça FC)",
+          "JOSE CARLOS (CS Marítimo, Vitória SC)"
+        ],
         "names": [
+          "EDWIN VAN DER SAR -> Edwin van der Sar",
+          "ED DE GOEY -> Ed de Goey",
+          "FRANK DE BOER -> Frank de Boer",
+          "JOHAN DE KOCK -> Johan de Kock",
+          "RONALD DE BOER -> Ronald de Boer",
+          "PIERRE VAN HOOIJDONK -> Pierre van Hooijdonk",
+          "JOSE DEL SOLAR -> Jose del Solar",
+          "JOAQUIN DEL OLMO -> Joaquin del Olmo",
+          "RAIMOND VAN DER GOUW -> Raimond van der Gouw",
+          "IVAN DE LA PENA -> Ivan de la Pena",
+          "JOSE DEL SOLAR -> Jose del Solar",
+          "RAMON DE QUINTANA -> Ramon de Quintana",
+          "FRANCISCO DE PEDRO -> Francisco de Pedro",
+          "THOMAS VON HEESEN -> Thomas von Heesen",
+          "JOHAN DE KOCK -> Johan de Kock",
+          "ANDERSON DA SILVA -> Anderson da Silva",
           "EDWIN VAN DER SAR -> Edwin van der Sar",
           "FRANK DE BOER -> Frank de Boer",
           "RONALD DE BOER -> Ronald de Boer",
+          "DENNIS DEN TURK -> Dennis den Turk",
           "ED DE GOEY -> Ed de Goey",
-          "JOHAN DE KOCK -> Johan de Kock",
-          "PIERRE VAN HOOIJDONK -> Pierre van Hooijdonk",
-          "JOAQUIN DEL OLMO -> Joaquin del Olmo",
-          "JOSE DEL SOLAR -> Jose del Solar"
+          "KEES VAN WONDEREN -> Kees van Wonderen",
+          "ARNO VAN ZWAM -> Arno van Zwam",
+          "MARTIN VAN OPHUIZEN -> Martin van Ophuizen",
+          "MARK VAN BOMMEL -> Mark van Bommel",
+          "WARRY VAN WATTUM -> Warry van Wattum",
+          "EDWIN DE KRUYFF -> Edwin de Kruyff",
+          "JAN DE VISSER -> Jan de Visser",
+          "BARRY VAN GALEN -> Barry van Galen",
+          "EMIEL VAN EIJKEREN -> Emiel van Eijkeren",
+          "JAN WILLEM VAN EDE -> Jan Willem van Ede",
+          "CHRIS VAN DER WEERDEN -> Chris van der Weerden",
+          "ROB VAN DIJK -> Rob van Dijk",
+          "PATRICK VAN DIEMEN -> Patrick van Diemen",
+          "ROMEO VAN AERDE -> Romeo van Aerde",
+          "RAMON VAN HAAREN -> Ramon van Haaren",
+          "MARCO VAN HOOGDALEM -> Marco van Hoogdalem",
+          "STEPHANE VAN DER HEYDN -> Stephane Van der Heydn",
+          "ERIC VAN DE LUER -> Eric van de Luer",
+          "FRANK VAN DER GEEST -> Frank van der Geest",
+          "DAVE VAN DER MEER -> Dave van der Meer",
+          "GERARD DE NOOIJER -> Gerard de Nooijer",
+          "JOCHEM VAN DER HOENEN -> Jochem van der Hoenen",
+          "ARJAN VAN DER LAAN -> Arjan van der Laan",
+          "DENNIS DE NOOIJER -> Dennis de Nooijer",
+          "THEO TEN CAAT -> Theo ten Caat",
+          "BERTIL TER AVEST -> Bertil ter Avest",
+          "JAN VAN HALST -> Jan van Halst",
+          "DICK VAN BURIK -> Dick van Burik",
+          "MARCEL VAN DER NET -> Marcel van der Net",
+          "JEAN-PAUL DE JONG -> Jean-Paul de Jong",
+          "RENE VAN DE BRINK -> Rene van de Brink",
+          "JOHN VAN LOEN -> John van Loen",
+          "CARLOS VAN WANROOY -> Carlos van Wanrooy",
+          "ERWIN VAN DE LOOI -> Erwin van de Looi",
+          "JOHN VAN DEN BROM -> John van den Brom",
+          "ASCHWIN DE BRUIJN -> Aschwin de Bruijn",
+          "JIMMY VAN FESSEM -> Jimmy van Fessem",
+          "MARK VAN HINTUM -> Mark van Hintum",
+          "HARRY VAN DER VEGT -> Harry van der Vegt",
+          "ARNE VAN DE BERG -> Arne van de Berg",
+          "JACK DE GIER -> Jack de Gier"
         ],
         "shortNations": [
           "116 Cambodia (0)",
@@ -11809,7 +14408,60 @@
           "064 Bhutan (0)",
           "004 Afghanistan (0)"
         ],
-        "warnings": []
+        "warnings": [],
+        "clamped": [
+          "ENGLAND ALAN SHEARER 49 -> 48",
+          "ITALY PAOLO MALDINI 49 -> 48",
+          "BENIN L SOSSA 0 -> 1",
+          "BOTSWANA ASIKA 0 -> 1",
+          "BURKINA FASO COMPOARE HAROUNA 0 -> 1",
+          "BURKINA FASO DIARRA IBRAHIMA 0 -> 1",
+          "BURKINA FASO BAMBARA ALBERT 0 -> 1",
+          "BURKINA FASO WILLIAM MEVI JOSUE 0 -> 1",
+          "BURKINA FASO BRAHIMA TRAORE 0 -> 1",
+          "NIGER YAY 0 -> 1",
+          "TUNISIA MOUNIR BOUKADIDA 0 -> 1",
+          "TUNISIA ABDEL SELLIMI 0 -> 1",
+          "TUNISIA SAMIR SELLIMI 0 -> 1",
+          "BERMUDA PAINTER 0 -> 1",
+          "BERMUDA STEVENS 0 -> 1",
+          "BERMUDA GOATER 0 -> 1",
+          "BERMUDA SWAN 0 -> 1",
+          "GUYANA DONALD JOSEPH 0 -> 1",
+          "GUYANA NEIL BUTTERS 0 -> 1",
+          "GUYANA GERMAN NIXON 0 -> 1",
+          "HONDURAS MILTON FLORES 0 -> 1",
+          "HONDURAS CHRISTIAN SANTAMARIA 0 -> 1",
+          "HONDURAS MILTON NUNEZ 0 -> 1",
+          "JAMAICA DAVID SMITH 0 -> 1",
+          "JAMAICA ANTHONY CORBETT 0 -> 1",
+          "JAMAICA EVERALD PEDDLE 0 -> 1",
+          "JAMAICA WALTER BOYD 0 -> 1",
+          "NICARAGUA ANDRES GONZALES 0 -> 1",
+          "NICARAGUA ZAMBRANO 0 -> 1",
+          "NICARAGUA MAYORGA 0 -> 1",
+          "NICARAGUA ROSTRAN 0 -> 1",
+          "BANGLADESH S.M. ASLAM 0 -> 1",
+          "LAOS XUVAN 0 -> 1",
+          "LAOS VATTHANA 0 -> 1",
+          "LAOS KHANXAMAY 0 -> 1",
+          "LAOS COXON 0 -> 1",
+          "PAPUA NEW GUINEA ADAM WANGU 0 -> 1",
+          "PAPUA NEW GUINEA ADAM LEMA 0 -> 1",
+          "PAPUA NEW GUINEA LUDWIG PEKA 0 -> 1",
+          "SRI LANKA SUJITH HEMANTHA 0 -> 1",
+          "FIJI MARITINO NEMANI 0 -> 1",
+          "FIJI RAVUAMA MADIGI 0 -> 1",
+          "FIJI POASA TUBUNA 0 -> 1",
+          "SOLOMON ISLANDS SOLOMON VEVOA 0 -> 1",
+          "SOLOMON ISLANDS JOHN TANISPAPA 0 -> 1",
+          "SOLOMON ISLANDS ALFRED WALA 0 -> 1",
+          "SOLOMON ISLANDS IAN PWAHOLO 0 -> 1",
+          "SOLOMON ISLANDS ROBINSON BOE 0 -> 1",
+          "SOLOMON ISLANDS GEORGE KIRIAU 0 -> 1",
+          "AC MILAN GEORGE WEAH 49 -> 48",
+          "JUVENTUS ALESSANDRO DEL PIERO 49 -> 48"
+        ]
       }
     },
     {
@@ -12631,18 +15283,18 @@
         "sha256": "91632a6f626789ac3471892bd965956e4b9ae41b0168c2008c91028ad4251a26",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/cm93_data.zip"
       },
-      "version": "cm0102-2020-11-cm93-1c31e5ae",
+      "version": "cm0102-2020-11-cm93-73e1baa4",
       "coverage": {
-        "players": 2266,
+        "players": 2148,
         "nations": 124,
         "completeXIs": 77,
-        "clubs": 130,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 20
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2020-11-cm93",
-        "version": "cm0102-2020-11-cm93-1c31e5ae",
+        "version": "cm0102-2020-11-cm93-73e1baa4",
         "database": {
           "known": true,
           "label": "93/94 by Cam F, fan-made",
@@ -12781,7 +15433,7 @@
         "players": {
           "read": 39781,
           "eligible": 24541,
-          "written": 2266,
+          "written": 2148,
           "dropped": {
             "nameless": 0,
             "noAbility": 11697,
@@ -12814,6 +15466,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
+            "kept": 19,
             "short": []
           },
           {
@@ -12822,6 +15475,7 @@
             "competition": "Spanish First Division",
             "members": 20,
             "clubs": 20,
+            "kept": 18,
             "short": []
           },
           {
@@ -12830,6 +15484,7 @@
             "competition": "Italian Serie A",
             "members": 18,
             "clubs": 18,
+            "kept": 17,
             "short": []
           },
           {
@@ -12838,6 +15493,7 @@
             "competition": "German First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 16,
             "short": []
           },
           {
@@ -12846,6 +15502,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 12,
             "short": []
           },
           {
@@ -12854,6 +15511,7 @@
             "competition": "Dutch Premier Division",
             "members": 18,
             "clubs": 18,
+            "kept": 6,
             "short": []
           },
           {
@@ -12862,7 +15520,814 @@
             "competition": "Portuguese Premier League",
             "members": 18,
             "clubs": 18,
+            "kept": 10,
             "short": []
+          },
+          {
+            "league": "Süper Lig",
+            "country": "792",
+            "competition": "Turkish Premier Division",
+            "members": 18,
+            "clubs": 3,
+            "kept": 3,
+            "short": [
+              {
+                "name": "MKE Ankaragücü",
+                "players": 2
+              },
+              {
+                "name": "Antalyaspor A.S.",
+                "players": 1
+              },
+              {
+                "name": "Bursaspor",
+                "players": 5
+              },
+              {
+                "name": "Çaykur Rizespor",
+                "players": 0
+              },
+              {
+                "name": "Diyarbakirspor",
+                "players": 0
+              },
+              {
+                "name": "Denizlispor",
+                "players": 0
+              },
+              {
+                "name": "Gaziantepspor",
+                "players": 5
+              },
+              {
+                "name": "Gençlerbirligi",
+                "players": 3
+              },
+              {
+                "name": "Göztepe A.S.",
+                "players": 1
+              },
+              {
+                "name": "Istanbulspor A.S.",
+                "players": 6
+              },
+              {
+                "name": "Kocaelispor",
+                "players": 4
+              },
+              {
+                "name": "Malatyaspor",
+                "players": 0
+              },
+              {
+                "name": "Samsunspor",
+                "players": 3
+              },
+              {
+                "name": "Trabzonspor",
+                "players": 8
+              },
+              {
+                "name": "Yimpas Yozgatspor A.S.",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "Belgian Pro League",
+            "country": "056",
+            "competition": "Belgian First Division",
+            "members": 18,
+            "clubs": 18,
+            "kept": 5,
+            "short": []
+          },
+          {
+            "league": "Greek Super League",
+            "country": "300",
+            "competition": "Greek National A Division",
+            "members": 14,
+            "clubs": 7,
+            "kept": 3,
+            "short": [
+              {
+                "name": "Aigaleo City",
+                "players": 0
+              },
+              {
+                "name": "Akratitos",
+                "players": 0
+              },
+              {
+                "name": "Ethnikos Asteras",
+                "players": 0
+              },
+              {
+                "name": "Ionikos Nikeas",
+                "players": 7
+              },
+              {
+                "name": "Panachaiki",
+                "players": 6
+              },
+              {
+                "name": "Panionios",
+                "players": 0
+              },
+              {
+                "name": "Skoda Xanthi",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "Czech First League",
+            "country": "203",
+            "competition": "Czech First Division",
+            "members": 16,
+            "clubs": 1,
+            "kept": 1,
+            "short": [
+              {
+                "name": "1.FC Synot",
+                "players": 0
+              },
+              {
+                "name": "FC Banik Ostrava",
+                "players": 3
+              },
+              {
+                "name": "CU Bohemians Prague",
+                "players": 1
+              },
+              {
+                "name": "FC Stavo Artikel Brno",
+                "players": 2
+              },
+              {
+                "name": "FK Chmel Blsany",
+                "players": 0
+              },
+              {
+                "name": "FK Drnovice",
+                "players": 0
+              },
+              {
+                "name": "SK Hradec Kralove",
+                "players": 0
+              },
+              {
+                "name": "FK Jablonec 97",
+                "players": 0
+              },
+              {
+                "name": "Slezsky FC Opava",
+                "players": 0
+              },
+              {
+                "name": "FC Marila Pribram",
+                "players": 0
+              },
+              {
+                "name": "SK Sigma Olomouc",
+                "players": 3
+              },
+              {
+                "name": "SK Slavia Prague",
+                "players": 7
+              },
+              {
+                "name": "FC Slovan Liberec",
+                "players": 1
+              },
+              {
+                "name": "FK Teplice",
+                "players": 0
+              },
+              {
+                "name": "FK Viktoria Zizkov",
+                "players": 1
+              }
+            ]
+          },
+          {
+            "league": "Scottish Premiership",
+            "country": "SCO",
+            "competition": "Scottish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Danish Superliga",
+            "country": "208",
+            "competition": "Danish Premier Division",
+            "members": 12,
+            "clubs": 10,
+            "kept": 1,
+            "short": [
+              {
+                "name": "Herfølge Boldklub",
+                "players": 7
+              },
+              {
+                "name": "Viborg Fodsports Forening",
+                "players": 8
+              }
+            ]
+          },
+          {
+            "league": "Eliteserien",
+            "country": "578",
+            "competition": "Norwegian Premier Division",
+            "members": 14,
+            "clubs": 8,
+            "kept": 2,
+            "short": [
+              {
+                "name": "Bryne FK",
+                "players": 5
+              },
+              {
+                "name": "Fyllingen Fotball",
+                "players": 0
+              },
+              {
+                "name": "Kongsvinger IL",
+                "players": 9
+              },
+              {
+                "name": "Lillestrøm SK",
+                "players": 7
+              },
+              {
+                "name": "Lyn Fotball",
+                "players": 5
+              },
+              {
+                "name": "Odd Grenland",
+                "players": 9
+              }
+            ]
+          },
+          {
+            "league": "Croatian HNL",
+            "country": "191",
+            "competition": "Croatian First Division",
+            "members": 16,
+            "clubs": 5,
+            "kept": 0,
+            "short": [
+              {
+                "name": "NK Cakovec",
+                "players": 0
+              },
+              {
+                "name": "HNK Cibalia",
+                "players": 2
+              },
+              {
+                "name": "NK Hrvatski Dragovoljac",
+                "players": 0
+              },
+              {
+                "name": "NK Kamen Ingrad",
+                "players": 0
+              },
+              {
+                "name": "NK Marsonia",
+                "players": 4
+              },
+              {
+                "name": "NK Pomorac",
+                "players": 0
+              },
+              {
+                "name": "HNK Sibenik",
+                "players": 10
+              },
+              {
+                "name": "NK Slaven Belupo",
+                "players": 3
+              },
+              {
+                "name": "NK TSK",
+                "players": 0
+              },
+              {
+                "name": "NK Zadar",
+                "players": 9
+              },
+              {
+                "name": "NK Zagreb",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "Ekstraklasa",
+            "country": "616",
+            "competition": "Polish First Division",
+            "members": 16,
+            "clubs": 3,
+            "kept": 1,
+            "short": [
+              {
+                "name": "Amica Wronki",
+                "players": 6
+              },
+              {
+                "name": "GKS Katowice",
+                "players": 1
+              },
+              {
+                "name": "Groclin Grodzisk",
+                "players": 0
+              },
+              {
+                "name": "KSZO Ostrowiec Swietokrzyski",
+                "players": 0
+              },
+              {
+                "name": "Legia Warszawa",
+                "players": 9
+              },
+              {
+                "name": "Odra Wodzislaw",
+                "players": 0
+              },
+              {
+                "name": "Pogon Szczecin",
+                "players": 2
+              },
+              {
+                "name": "RKS Fameg Radomsko",
+                "players": 0
+              },
+              {
+                "name": "Ruch Chorzow",
+                "players": 8
+              },
+              {
+                "name": "Slask Wroclaw",
+                "players": 1
+              },
+              {
+                "name": "Stomil Olsztyn",
+                "players": 2
+              },
+              {
+                "name": "Widzew Lodz",
+                "players": 6
+              },
+              {
+                "name": "Zaglebie Lubin",
+                "players": 1
+              }
+            ]
+          },
+          {
+            "league": "Swiss Super League",
+            "country": "756",
+            "competition": "Swiss National Division A",
+            "members": 12,
+            "clubs": 12,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Austrian Bundesliga",
+            "country": "040",
+            "competition": "Austrian Premier Division",
+            "members": 10,
+            "clubs": 2,
+            "kept": 2,
+            "short": [
+              {
+                "name": "VfB Admira Wacker Mödling",
+                "players": 6
+              },
+              {
+                "name": "FK Austria Vienna",
+                "players": 7
+              },
+              {
+                "name": "SW Bregenz",
+                "players": 0
+              },
+              {
+                "name": "FC Austria Kärnten",
+                "players": 0
+              },
+              {
+                "name": "Grazer AK",
+                "players": 3
+              },
+              {
+                "name": "SV Ried",
+                "players": 0
+              },
+              {
+                "name": "SK Sturm Graz",
+                "players": 5
+              },
+              {
+                "name": "FC Tirol Innsbruck",
+                "players": 5
+              }
+            ]
+          },
+          {
+            "league": "Allsvenskan",
+            "country": "752",
+            "competition": "Swedish Premier Division",
+            "members": 14,
+            "clubs": 14,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Veikkausliiga",
+            "country": "246",
+            "competition": "Finnish Premier Division",
+            "members": 12,
+            "clubs": 3,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Atlantis FC",
+                "players": 0
+              },
+              {
+                "name": "FC Haka Valkeakoski",
+                "players": 4
+              },
+              {
+                "name": "FC Jokerit",
+                "players": 0
+              },
+              {
+                "name": "FC Lahti",
+                "players": 4
+              },
+              {
+                "name": "FC Inter",
+                "players": 0
+              },
+              {
+                "name": "Kuopion Palloseura",
+                "players": 2
+              },
+              {
+                "name": "Myllykosken Pallo-47",
+                "players": 10
+              },
+              {
+                "name": "Rovaniemen Palloseura",
+                "players": 1
+              },
+              {
+                "name": "Tampere United",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "League of Ireland",
+            "country": "372",
+            "competition": "Irish Premier Division",
+            "members": 12,
+            "clubs": 3,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Bray Wanderers A.F.C.",
+                "players": 0
+              },
+              {
+                "name": "Derry City",
+                "players": 9
+              },
+              {
+                "name": "Dundalk F.C.",
+                "players": 8
+              },
+              {
+                "name": "Galway United",
+                "players": 0
+              },
+              {
+                "name": "Longford Town",
+                "players": 1
+              },
+              {
+                "name": "Monaghan United",
+                "players": 7
+              },
+              {
+                "name": "Shamrock Rovers",
+                "players": 10
+              },
+              {
+                "name": "Saint Patrick's Athletic",
+                "players": 7
+              },
+              {
+                "name": "University College Dublin",
+                "players": 2
+              }
+            ]
+          },
+          {
+            "league": "Russian Premier League",
+            "country": "643",
+            "competition": "Russian Premier Division",
+            "members": 16,
+            "clubs": 6,
+            "kept": 1,
+            "short": [
+              {
+                "name": "Alania Vladikavkaz",
+                "players": 10
+              },
+              {
+                "name": "Anzhi Makhachkala",
+                "players": 7
+              },
+              {
+                "name": "Chernomorets Novorossiysk",
+                "players": 6
+              },
+              {
+                "name": "Fakel Voronezh",
+                "players": 6
+              },
+              {
+                "name": "Krylja Sovetov Samara",
+                "players": 5
+              },
+              {
+                "name": "SC Rotor Volgograd",
+                "players": 10
+              },
+              {
+                "name": "Saturn Ramenskoye",
+                "players": 3
+              },
+              {
+                "name": "Sokol Saratov",
+                "players": 0
+              },
+              {
+                "name": "FC Torpedo-ZiL Moscow",
+                "players": 0
+              },
+              {
+                "name": "Zenith St. Petersburg",
+                "players": 10
+              }
+            ]
+          },
+          {
+            "league": "Yugoslav First League",
+            "country": "688",
+            "competition": "Yugoslav First Division",
+            "members": 18,
+            "clubs": 2,
+            "kept": 1,
+            "short": [
+              {
+                "name": "Cukaricki Stankom Belgrade",
+                "players": 0
+              },
+              {
+                "name": "Hajduk Rodic MB Kula",
+                "players": 2
+              },
+              {
+                "name": "Mladost Apatin",
+                "players": 0
+              },
+              {
+                "name": "Mladost Lucani",
+                "players": 0
+              },
+              {
+                "name": "OFK Belgrade",
+                "players": 2
+              },
+              {
+                "name": "Obilic Belgrade",
+                "players": 4
+              },
+              {
+                "name": "Rad Belgrade",
+                "players": 7
+              },
+              {
+                "name": "Radnicki Kragujevac",
+                "players": 0
+              },
+              {
+                "name": "Rudar Pljevlja",
+                "players": 0
+              },
+              {
+                "name": "Sartid Smederevo",
+                "players": 0
+              },
+              {
+                "name": "Sutjeska Niksic",
+                "players": 0
+              },
+              {
+                "name": "Vojvodina Novi Sad",
+                "players": 10
+              },
+              {
+                "name": "Zeleznik Belgrade",
+                "players": 0
+              },
+              {
+                "name": "Zemun",
+                "players": 5
+              },
+              {
+                "name": "Zeta Golubovci",
+                "players": 0
+              },
+              {
+                "name": "OFK Zvezdara Belgrade",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "Irish League",
+            "country": "NIR",
+            "competition": "Northern Irish League Premier Division",
+            "members": 10,
+            "clubs": 5,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Ards",
+                "players": 8
+              },
+              {
+                "name": "Cliftonville",
+                "players": 6
+              },
+              {
+                "name": "Coleraine",
+                "players": 6
+              },
+              {
+                "name": "Newry Town",
+                "players": 2
+              },
+              {
+                "name": "Omagh Town",
+                "players": 6
+              }
+            ]
+          },
+          {
+            "league": "Welsh Premier League",
+            "country": "WAL",
+            "competition": "Welsh Premier Division",
+            "members": 18,
+            "clubs": 1,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Aberystwyth Town",
+                "players": 3
+              },
+              {
+                "name": "Afan Lido",
+                "players": 1
+              },
+              {
+                "name": "Bangor City",
+                "players": 5
+              },
+              {
+                "name": "Barry Town",
+                "players": 5
+              },
+              {
+                "name": "Caernarfon Town",
+                "players": 0
+              },
+              {
+                "name": "Caersws",
+                "players": 3
+              },
+              {
+                "name": "Carmarthen Town",
+                "players": 0
+              },
+              {
+                "name": "Connah's Quay Nomads",
+                "players": 2
+              },
+              {
+                "name": "Flexsys Cefn Druids",
+                "players": 0
+              },
+              {
+                "name": "Haverfordwest County",
+                "players": 2
+              },
+              {
+                "name": "Llanelli AFC",
+                "players": 1
+              },
+              {
+                "name": "Newtown AFC",
+                "players": 4
+              },
+              {
+                "name": "Oswestry Town FC",
+                "players": 0
+              },
+              {
+                "name": "Port Talbot Town",
+                "players": 0
+              },
+              {
+                "name": "Rhayader Town",
+                "players": 0
+              },
+              {
+                "name": "Rhyl",
+                "players": 3
+              },
+              {
+                "name": "Total Network Solutions",
+                "players": 1
+              }
+            ]
+          },
+          {
+            "league": "Luxembourg National Division",
+            "country": "442",
+            "competition": "Luxembourg National Division",
+            "members": 12,
+            "clubs": 0,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Avenir Beggen",
+                "players": 5
+              },
+              {
+                "name": "CS Hobscheid",
+                "players": 0
+              },
+              {
+                "name": "F91 Dudelange",
+                "players": 2
+              },
+              {
+                "name": "FC Etzella Ettelbruck",
+                "players": 0
+              },
+              {
+                "name": "CS Grevenmacher",
+                "players": 3
+              },
+              {
+                "name": "AS La Jeunesse d'Esch-Alzette",
+                "players": 1
+              },
+              {
+                "name": "FC Mondercange",
+                "players": 0
+              },
+              {
+                "name": "Progrès Niedercom",
+                "players": 1
+              },
+              {
+                "name": "Sporting Mertzig",
+                "players": 0
+              },
+              {
+                "name": "Swift Hesperange",
+                "players": 0
+              },
+              {
+                "name": "US Rumelange",
+                "players": 0
+              },
+              {
+                "name": "US Luxembourg",
+                "players": 2
+              }
+            ]
           }
         ],
         "territory": {
@@ -14815,6 +18280,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
+            "kept": 0,
             "short": []
           },
           {
@@ -14823,6 +18289,7 @@
             "competition": "Spanish First Division",
             "members": 20,
             "clubs": 17,
+            "kept": 0,
             "short": [
               {
                 "name": "C.D. Castellón",
@@ -14844,6 +18311,7 @@
             "competition": "Italian Serie A",
             "members": 18,
             "clubs": 18,
+            "kept": 0,
             "short": []
           },
           {
@@ -14852,6 +18320,7 @@
             "competition": "German First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 0,
             "short": []
           },
           {
@@ -14860,6 +18329,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
+            "kept": 0,
             "short": []
           },
           {
@@ -14868,6 +18338,7 @@
             "competition": "Dutch Premier Division",
             "members": 18,
             "clubs": 18,
+            "kept": 0,
             "short": []
           },
           {
@@ -14876,6 +18347,7 @@
             "competition": "Portuguese Premier League",
             "members": 18,
             "clubs": 10,
+            "kept": 0,
             "short": [
               {
                 "name": "Grupo Desportivo de Chaves",
@@ -14908,6 +18380,703 @@
               {
                 "name": "Clube Futebol União Madeira",
                 "players": 5
+              }
+            ]
+          },
+          {
+            "league": "Süper Lig",
+            "country": "792",
+            "competition": "Turkish Premier Division",
+            "members": 18,
+            "clubs": 4,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Adana Demirspor",
+                "players": 2
+              },
+              {
+                "name": "Adanaspor A.S.",
+                "players": 1
+              },
+              {
+                "name": "Altay",
+                "players": 5
+              },
+              {
+                "name": "MKE Ankaragücü",
+                "players": 6
+              },
+              {
+                "name": "Boluspor",
+                "players": 3
+              },
+              {
+                "name": "Bursaspor",
+                "players": 4
+              },
+              {
+                "name": "Gençlerbirligi",
+                "players": 9
+              },
+              {
+                "name": "Göztepe A.S.",
+                "players": 3
+              },
+              {
+                "name": "Kombassan Konyaspor",
+                "players": 4
+              },
+              {
+                "name": "Malatyaspor",
+                "players": 5
+              },
+              {
+                "name": "Sakaryaspor A.S.",
+                "players": 5
+              },
+              {
+                "name": "Samsunspor",
+                "players": 8
+              },
+              {
+                "name": "Sariyer Spor Kulübü",
+                "players": 5
+              },
+              {
+                "name": "Zeytinburnuspor",
+                "players": 4
+              }
+            ]
+          },
+          {
+            "league": "Belgian Pro League",
+            "country": "056",
+            "competition": "Belgian First Division",
+            "members": 18,
+            "clubs": 16,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Beerschot VAC",
+                "players": 10
+              },
+              {
+                "name": "KSV Zulte Waregem",
+                "players": 9
+              }
+            ]
+          },
+          {
+            "league": "Greek Super League",
+            "country": "300",
+            "competition": "Greek National A Division",
+            "members": 16,
+            "clubs": 8,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Akratitos",
+                "players": 0
+              },
+              {
+                "name": "Aris Salonika",
+                "players": 8
+              },
+              {
+                "name": "Iraklis Salonika",
+                "players": 8
+              },
+              {
+                "name": "Larisa",
+                "players": 10
+              },
+              {
+                "name": "Levadiakos",
+                "players": 2
+              },
+              {
+                "name": "PAOK Salonika",
+                "players": 10
+              },
+              {
+                "name": "Panionios",
+                "players": 10
+              },
+              {
+                "name": "Skoda Xanthi",
+                "players": 8
+              }
+            ]
+          },
+          {
+            "league": "Czech First League",
+            "country": "203",
+            "competition": "Czech First Division",
+            "members": 16,
+            "clubs": 11,
+            "kept": 0,
+            "short": [
+              {
+                "name": "CU Bohemians Prague",
+                "players": 10
+              },
+              {
+                "name": "FK VP Frydek-Mistek",
+                "players": 0
+              },
+              {
+                "name": "RH Cheb",
+                "players": 7
+              },
+              {
+                "name": "FK Teplice",
+                "players": 2
+              },
+              {
+                "name": "FC Vitkovice",
+                "players": 6
+              }
+            ]
+          },
+          {
+            "league": "Scottish Premiership",
+            "country": "SCO",
+            "competition": "Scottish Premier Division",
+            "members": 12,
+            "clubs": 12,
+            "kept": 0,
+            "short": []
+          },
+          {
+            "league": "Danish Superliga",
+            "country": "208",
+            "competition": "Danish Premier Division",
+            "members": 12,
+            "clubs": 8,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Boldklubben af 1903",
+                "players": 9
+              },
+              {
+                "name": "Herfølge Boldklub",
+                "players": 10
+              },
+              {
+                "name": "Næstved Boldklub",
+                "players": 9
+              },
+              {
+                "name": "Silkeborg Idræts Forening",
+                "players": 5
+              }
+            ]
+          },
+          {
+            "league": "Eliteserien",
+            "country": "578",
+            "competition": "Norwegian Premier Division",
+            "members": 14,
+            "clubs": 9,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Molde FK",
+                "players": 7
+              },
+              {
+                "name": "Moss FK",
+                "players": 9
+              },
+              {
+                "name": "Odd Grenland",
+                "players": 2
+              },
+              {
+                "name": "Sogndal IL",
+                "players": 6
+              },
+              {
+                "name": "Vålerenga Fotball",
+                "players": 6
+              }
+            ]
+          },
+          {
+            "league": "Croatian HNL",
+            "country": "191",
+            "competition": "Croatian First Division",
+            "members": 16,
+            "clubs": 9,
+            "kept": 0,
+            "short": [
+              {
+                "name": "NK Belisce",
+                "players": 0
+              },
+              {
+                "name": "HNK Dubrovnik",
+                "players": 2
+              },
+              {
+                "name": "NK INKER",
+                "players": 7
+              },
+              {
+                "name": "NK Istra",
+                "players": 0
+              },
+              {
+                "name": "NK Pazinka",
+                "players": 2
+              },
+              {
+                "name": "NK Radnik",
+                "players": 1
+              },
+              {
+                "name": "HNK Segesta",
+                "players": 3
+              }
+            ]
+          },
+          {
+            "league": "Ekstraklasa",
+            "country": "616",
+            "competition": "Polish First Division",
+            "members": 16,
+            "clubs": 6,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Jagiellonia Bialystok",
+                "players": 7
+              },
+              {
+                "name": "Lodzki Klub Sportowy",
+                "players": 7
+              },
+              {
+                "name": "Motor Lublin",
+                "players": 5
+              },
+              {
+                "name": "Olimpia Poznan",
+                "players": 6
+              },
+              {
+                "name": "Slask Wroclaw",
+                "players": 9
+              },
+              {
+                "name": "Stal Mielec",
+                "players": 7
+              },
+              {
+                "name": "Widzew Lodz",
+                "players": 9
+              },
+              {
+                "name": "Wisla Krakow",
+                "players": 6
+              },
+              {
+                "name": "Zaglebie Sosnowiec",
+                "players": 7
+              },
+              {
+                "name": "Zawisza Bydgoszcz",
+                "players": 4
+              }
+            ]
+          },
+          {
+            "league": "Swiss Super League",
+            "country": "756",
+            "competition": "Swiss National Division A",
+            "members": 12,
+            "clubs": 9,
+            "kept": 0,
+            "short": [
+              {
+                "name": "AC Bellinzona",
+                "players": 4
+              },
+              {
+                "name": "FC Lugano",
+                "players": 9
+              },
+              {
+                "name": "FC St. Gallen",
+                "players": 7
+              }
+            ]
+          },
+          {
+            "league": "Austrian Bundesliga",
+            "country": "040",
+            "competition": "Austrian Premier Division",
+            "members": 10,
+            "clubs": 8,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Grazer AK",
+                "players": 10
+              },
+              {
+                "name": "SK Vorwärts Steyr",
+                "players": 1
+              }
+            ]
+          },
+          {
+            "league": "Allsvenskan",
+            "country": "752",
+            "competition": "Swedish Premier Division",
+            "members": 14,
+            "clubs": 7,
+            "kept": 0,
+            "short": [
+              {
+                "name": "IK Brage",
+                "players": 6
+              },
+              {
+                "name": "Göteborgs AIS",
+                "players": 6
+              },
+              {
+                "name": "GIF Sundsvall",
+                "players": 6
+              },
+              {
+                "name": "Hammarby IF",
+                "players": 9
+              },
+              {
+                "name": "IFK Norrköping",
+                "players": 7
+              },
+              {
+                "name": "Örebro SK",
+                "players": 10
+              },
+              {
+                "name": "Västra Frölunda IF",
+                "players": 8
+              }
+            ]
+          },
+          {
+            "league": "Veikkausliiga",
+            "country": "246",
+            "competition": "Finnish Premier Division",
+            "members": 12,
+            "clubs": 6,
+            "kept": 0,
+            "short": [
+              {
+                "name": "FC Haka Valkeakoski",
+                "players": 10
+              },
+              {
+                "name": "FC Ilves Tampere",
+                "players": 9
+              },
+              {
+                "name": "FC Jazz",
+                "players": 5
+              },
+              {
+                "name": "FF Jaro",
+                "players": 4
+              },
+              {
+                "name": "Oulun Työväen Palloilijat",
+                "players": 1
+              },
+              {
+                "name": "Jalkapallo TPS",
+                "players": 10
+              }
+            ]
+          },
+          {
+            "league": "League of Ireland",
+            "country": "372",
+            "competition": "Irish Premier Division",
+            "members": 12,
+            "clubs": 6,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Drogheda United",
+                "players": 9
+              },
+              {
+                "name": "Dundalk F.C.",
+                "players": 10
+              },
+              {
+                "name": "Galway United",
+                "players": 7
+              },
+              {
+                "name": "Limerick F.C.",
+                "players": 6
+              },
+              {
+                "name": "Shelbourne F.C.",
+                "players": 10
+              },
+              {
+                "name": "University College Dublin",
+                "players": 7
+              }
+            ]
+          },
+          {
+            "league": "Russian Premier League",
+            "country": "643",
+            "competition": "Russian Premier Division",
+            "members": 16,
+            "clubs": 6,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Alania Vladikavkaz",
+                "players": 9
+              },
+              {
+                "name": "Krylja Sovetov Samara",
+                "players": 4
+              },
+              {
+                "name": "Luch Vladivostok",
+                "players": 6
+              },
+              {
+                "name": "Rostselmash Rostov-na-Donu",
+                "players": 9
+              },
+              {
+                "name": "SC Rotor Volgograd",
+                "players": 5
+              },
+              {
+                "name": "Saturn Ramenskoye",
+                "players": 0
+              },
+              {
+                "name": "Shinnik Yaroslavl",
+                "players": 3
+              },
+              {
+                "name": "Sokol Saratov",
+                "players": 3
+              },
+              {
+                "name": "Uralan Elista",
+                "players": 1
+              },
+              {
+                "name": "Zvezda Moscow",
+                "players": 4
+              }
+            ]
+          },
+          {
+            "league": "Yugoslav First League",
+            "country": "688",
+            "competition": "Yugoslav First Division",
+            "members": 18,
+            "clubs": 8,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Borac Cacak",
+                "players": 3
+              },
+              {
+                "name": "Macva Sabac",
+                "players": 2
+              },
+              {
+                "name": "Mladost Lucani",
+                "players": 1
+              },
+              {
+                "name": "Napredak Krusevac",
+                "players": 9
+              },
+              {
+                "name": "Pristina",
+                "players": 5
+              },
+              {
+                "name": "Radnicki Kragujevac",
+                "players": 4
+              },
+              {
+                "name": "Sloboda Uzice",
+                "players": 3
+              },
+              {
+                "name": "Spartak Subotica",
+                "players": 9
+              },
+              {
+                "name": "Zemun",
+                "players": 10
+              },
+              {
+                "name": "KF Liria",
+                "players": 0
+              }
+            ]
+          },
+          {
+            "league": "Irish League",
+            "country": "NIR",
+            "competition": "Northern Irish League Premier Division",
+            "members": 10,
+            "clubs": 9,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Linfield",
+                "players": 10
+              }
+            ]
+          },
+          {
+            "league": "Welsh Premier League",
+            "country": "WAL",
+            "competition": "Welsh Premier Division",
+            "members": 18,
+            "clubs": 2,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Aberystwyth Town",
+                "players": 0
+              },
+              {
+                "name": "Afan Lido",
+                "players": 2
+              },
+              {
+                "name": "Barry Town",
+                "players": 6
+              },
+              {
+                "name": "Caernarfon Town",
+                "players": 2
+              },
+              {
+                "name": "Caersws",
+                "players": 1
+              },
+              {
+                "name": "Carmarthen Town",
+                "players": 0
+              },
+              {
+                "name": "Connah's Quay Nomads",
+                "players": 0
+              },
+              {
+                "name": "Cwmbran Town",
+                "players": 1
+              },
+              {
+                "name": "Flexsys Cefn Druids",
+                "players": 4
+              },
+              {
+                "name": "Haverfordwest County",
+                "players": 0
+              },
+              {
+                "name": "Llanelli AFC",
+                "players": 3
+              },
+              {
+                "name": "Oswestry Town FC",
+                "players": 6
+              },
+              {
+                "name": "Port Talbot Town",
+                "players": 9
+              },
+              {
+                "name": "Rhyl",
+                "players": 6
+              },
+              {
+                "name": "Llansantffraid",
+                "players": 0
+              },
+              {
+                "name": "Welshpool Town AFC",
+                "players": 2
+              }
+            ]
+          },
+          {
+            "league": "Luxembourg National Division",
+            "country": "442",
+            "competition": "Luxembourg National Division",
+            "members": 12,
+            "clubs": 1,
+            "kept": 0,
+            "short": [
+              {
+                "name": "Aris Bonnevoie",
+                "players": 1
+              },
+              {
+                "name": "Avenir Beggen",
+                "players": 6
+              },
+              {
+                "name": "F91 Dudelange",
+                "players": 1
+              },
+              {
+                "name": "CS Fola Esch-Alzette",
+                "players": 0
+              },
+              {
+                "name": "CS Grevenmacher",
+                "players": 3
+              },
+              {
+                "name": "Progrès Niedercorn",
+                "players": 0
+              },
+              {
+                "name": "Red Boys Differdange",
+                "players": 3
+              },
+              {
+                "name": "Spora Luxembourg",
+                "players": 3
+              },
+              {
+                "name": "Sporting Mertzig",
+                "players": 0
+              },
+              {
+                "name": "Swift Hesperange",
+                "players": 4
+              },
+              {
+                "name": "US Luxembourg",
+                "players": 8
               }
             ]
           }
