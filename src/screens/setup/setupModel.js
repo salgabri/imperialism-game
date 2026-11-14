@@ -90,10 +90,11 @@ export const FINALE_HELP = {
 };
 export const RECRUITMENT_OPTIONS = Object.freeze([['highest-rated', 'Best-rated player'], ['best-fit', 'Best lineup fit']]);
 /**
- * Whether Computer signings is a choice in a sport (an id). In tennis any player plays any place, so the best-rated
- * player is always the best fit and the two settings sign the same player: the choice is left out there.
+ * Whether Computer signings is a choice in a sport (an id). In tennis, and in Rocket League (`signings` false), any player
+ * plays any place, so the best-rated player is always the best fit and the two settings sign the same player: the choice
+ * is left out there.
  */
-export const signingsOffered = sportId => !isTennisSport(sportId);
+export const signingsOffered = sportId => !isTennisSport(sportId) && getSport(sportId).signings !== false;
 export const RECRUITMENT_HELP = {
   'highest-rated': "After a win, a team you don't manage signs the loser's highest-rated player.",
   'best-fit': "After a win, a team you don't manage signs the loser's player who most improves its starting lineup.",
@@ -104,6 +105,11 @@ export const ROSTER_HELP = {
   competitive: 'The gaps between strong and weak teams shrink; each roster keeps its own stars.',
 };
 export const HOME_OPTIONS = Object.freeze([['off', 'Off'], ['on', 'On']]);
+/**
+ * Whether Home advantage is a choice in a sport (an id): not in one whose data shows no home edge (`homeAdvantage` false:
+ * Rocket League, whose LANs' host nations did as Elo expected), where both settings play the same matches.
+ */
+export const homeOffered = sportId => getSport(sportId).homeAdvantage !== false;
 export const HOME_HELP = {
   off: 'Every match is played on neutral ground.',
   on: 'The defending team plays at home and wins a little more often, as home teams do, so conquests are harder.',
@@ -158,7 +164,7 @@ export function moreRulesSummary(setup = {}) {
   if (setup.acquisitionPolicy === 'best-fit' && signingsOffered(getSport(setup.sport).id)) {
     parts.push(`Computer signings: ${nameOf(RECRUITMENT_OPTIONS, 'best-fit')}`);
   }
-  if (setup.homeAdvantage === 'on') parts.push(`Home advantage: ${nameOf(HOME_OPTIONS, 'on')}`);
+  if (setup.homeAdvantage === 'on' && homeOffered(getSport(setup.sport).id)) parts.push(`Home advantage: ${nameOf(HOME_OPTIONS, 'on')}`);
   if (setup.rosterPreset === 'competitive' && getSport(setup.sport).id === 'basketball') {
     parts.push(`Team strengths: ${nameOf(ROSTER_OPTIONS, 'competitive')}`);
   }
@@ -170,8 +176,8 @@ export function moreRulesSummary(setup = {}) {
 /**
  * The in-game settings' read-only "This campaign" rows, from the launched settings. Missing or unknown values read as
  * their defaults, so old saves and partial fixtures never show `undefined`. `stored` is the value behind the text.
- * Home advantage has a row only when it is on, as team strengths has one only in basketball and computer signings
- * none in tennis.
+ * Home advantage has a row only when it is on (and none in Rocket League), as team strengths has one only in basketball
+ * and computer signings none in tennis.
  * → [{ id, label, value, stored, inner?: { id, stored }, num? }]
  */
 export function campaignFacts(settings = {}, { seed = null, managementEnded = false, managedName = null } = {}) {
@@ -204,7 +210,9 @@ export function campaignFacts(settings = {}, { seed = null, managementEnded = fa
   if (signingsOffered(getSport(s.sport).id)) {
     rows.push({ id: 'recruitment', label: 'Computer signings', value: nameOf(RECRUITMENT_OPTIONS, recruitment), stored: recruitment });
   }
-  if (s.homeAdvantage === 'on') rows.push({ id: 'home-advantage', label: 'Home advantage', value: nameOf(HOME_OPTIONS, 'on'), stored: 'on' });
+  if (s.homeAdvantage === 'on' && homeOffered(getSport(s.sport).id)) {
+    rows.push({ id: 'home-advantage', label: 'Home advantage', value: nameOf(HOME_OPTIONS, 'on'), stored: 'on' });
+  }
   if (s.sport === 'basketball') rows.push({ id: 'roster-preset', label: 'Team strengths', value: nameOf(ROSTER_OPTIONS, roster), stored: roster });
   if (seed != null && String(seed) !== '') rows.push({ id: 'seed', label: 'Seed', value: String(seed), stored: String(seed), num: true });
   return rows;
@@ -339,14 +347,16 @@ export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer
 export const SEASON_NOTES = Object.freeze({
   football: 'Earlier seasons use EA FIFA ratings of that season, before 2004/05 SI\'s Championship Manager ratings (2003/04: '
     + 'Alex Sawczuk\'s fan update of them; 1994/95 to 1996/97: Sensible World of Soccer\'s; 1993/94 and 1989/90: fans\' ratings, '
-    + 'Cam F\'s and Simon Treanor\'s), with clubs from the seven biggest leagues. A nation with fewer than six rated players '
+    + 'Cam F\'s and Simon Treanor\'s), with Europe\'s 124 strongest clubs (SWOS\'s from the seven biggest leagues). A nation with fewer than six rated players '
     + 'fields no team, and one without eleven starts short-handed. 2005/06, 2004/05 and 1989/90 have nations only. '
     + '1960/61, the World Cups of 1961/62 to 1993/94 and the seasons between them are computed and have nations only: each '
     + 'nation rated from its Elo, its eleven from its World Cup squad or, in the other seasons, from its players\' caps on '
     + 'Wikidata.',
   'womens-football': 'EA SPORTS FC ratings of the women\'s game in each season (2026/27: EA FC 27, as of 7 November 2026). '
     + 'EA rated national teams only until 2021/22. A nation with fewer than six rated players fields no team, and one '
-    + 'without eleven starts short-handed.',
+    + 'without eleven starts short-handed. Before EA, the World Cups of 1991, 1995 and 2003 to 2015 and the Olympic '
+    + 'tournaments of 1996 and 2004 to 2012 are computed and have their finalists only: each rated from its Elo, its eleven '
+    + 'those of its squad who played most.',
   hockey: 'EA publishes NHL 27 ratings for its top 300 players only. Everyone else\'s is an estimate from ice time and '
     + 'scoring, marked as one. Rosters as of 7 November 2026. Five earlier seasons use EA\'s ratings of that season, nothing '
     + 'estimated: NHL 22 as NHLRatings.net lists them, NHL 07 from IGN\'s pages, NHL 95, NHL \'94 and NHLPA \'93 from the '
@@ -357,12 +367,14 @@ export const SEASON_NOTES = Object.freeze({
     + 'the lineup, and none before 1977/78.',
   'rugby-league': 'Rugby League 26 ratings from Big Ant Studios, as Zero Tackle listed them at the game\'s release in '
     + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace, and only where they hold at '
-    + 'least half a matchday 17. No game rated 1998–2007 or 2009–2024: they are computed, each player\'s NRL.com match '
-    + 'stats (fewer before 2003) ranked at his position onto Rugby League 26\'s ratings, each club then moved by its results '
-    + 'that season. 2008 comes from Rugby League 2: World Cup Edition\'s database, every player checked against the Rugby '
-    + 'League Project. The game rates attributes, not players, so the overall is ours, each club then moved by the game\'s '
-    + 'own team rating. Earlier seasons have NRL clubs only, on the map of their day, with the clubs since gone: the '
-    + 'Adelaide Rams, the North Sydney Bears, Balmain, Western Suburbs, the Northern Eagles and more.',
+    + 'least half a matchday 17. No game rated 1960–2007 or 2009–2024: they are computed, each player\'s NRL.com match '
+    + 'stats (fewer before 2003), or before 1998 the Rugby League Project\'s record of who started, where and how often, '
+    + 'his Test and state selections and his tries, ranked at his position onto Rugby League 26\'s ratings, each club then '
+    + 'moved by its results that season. 2008 comes from Rugby League 2: World Cup Edition\'s database, every player checked '
+    + 'against the Rugby League Project. The game rates attributes, not players, so the overall is ours, each club then moved '
+    + 'by the game\'s own team rating. Earlier seasons have their premiership\'s clubs only (the NSWRFL\'s from 1960, Super '
+    + 'League\'s beside the ARL\'s in 1997), on the map of their day, with the clubs since gone: Newtown, Balmain, Western '
+    + 'Suburbs, the North Sydney Bears, the Adelaide Rams and more.',
   basketball: 'Earlier seasons use the NBA 2K ratings of that season, as compiled by 2K Archive (2011/12 by The '
     + 'Real 2K Insider; 1991/92 and 1983/84 from NBA 2K27\'s MyNBA Eras; 1998/99 from NBA Live 99, put on 2K\'s scale). '
     + 'The seasons no game rated, back to 1960/61, are computed from Basketball-Reference\'s statistics, fitted to '
@@ -384,6 +396,10 @@ export const SEASON_NOTES = Object.freeze({
     + 'before 2016 computed from Jeff Sackmann\'s match results by its method (1963–1979 rough; before 1968 the majors and the '
     + 'Federation Cup only, as Wikipedia records them). Each nation names its five '
     + 'best; one with fewer than two rated players fields no team.',
+  'rocket-league': 'Elo ratings computed from every 3v3 series Liquipedia records (CC BY-SA 3.0), to November 2026. A '
+    + 'player plays for the nation he last played for at the FIFAe World Cup or the Esports Nations Cup, else the flag '
+    + 'Liquipedia files him under, and only if he has played within the year. Each nation fields its best three; one with '
+    + 'fewer fields no team.',
   tennis: 'Elo ratings of the ATP\'s men: Tennis Abstract\'s own as of 2 November 2026 and at the end of 2016–2025; before '
     + '2016 computed from Jeff Sackmann\'s match results by its method (1960–1979 rough; before 1968 the amateurs\' majors and '
     + 'Davis Cup only). Each nation names its five best; '
@@ -571,6 +587,7 @@ export const SPORT_NOTES = Object.freeze({
   tennis: 'Nations',
   'womens-tennis': 'Nations',
   'rugby-league': 'Nations · 17 NRL clubs',
+  'rocket-league': 'Nations',
 });
 
 /**

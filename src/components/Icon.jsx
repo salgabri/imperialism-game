@@ -39,6 +39,8 @@ const PATHS = {
   'womens-tennis': <><ellipse cx="9.5" cy="9.5" rx="5.2" ry="6.4" transform="rotate(-45 9.5 9.5)" /><path d="M13.2 13.2 20 20M6.6 9.5h5.8M9.5 6.6v5.8" /><circle cx="18.5" cy="5.5" r="2" /></>,
   // The H of the posts, and a ball going over the crossbar.
   'rugby-league': <><path d="M7 3v18M17 3v18M7 14h10" /><ellipse cx="12" cy="8" rx="3.6" ry="2.3" transform="rotate(-30 12 8)" /></>,
+  // A car side on, nose to the right, and the ball above it.
+  'rocket-league': <><path d="M2.5 16v-2.2l4-1.2 3.1-2.4h5l2.8 2.4 3.6.8V16" /><path d="M8.7 16h6.4" /><circle cx="6.8" cy="16.3" r="1.9" /><circle cx="17" cy="16.3" r="1.9" /><circle cx="18.5" cy="5.5" r="2.6" /></>,
   folder: <path d="M3 7a1 1 0 0 1 1-1h5l2 2.5h9a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" />,
   upload: <path d="M12 16V5m-4.5 4.5L12 5l4.5 4.5M4 19h16" />,
   download: <path d="M12 5v11m-4.5-4.5L12 16l4.5-4.5M4 19h16" />,

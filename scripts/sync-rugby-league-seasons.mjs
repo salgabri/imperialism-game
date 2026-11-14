@@ -26,10 +26,12 @@ import { CLUBS as BUILT_IN_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { playerOf } from './lib/nrl.mjs';
 import { politeFetch } from './lib/polite-fetch.mjs';
 import {
-  ATTRIBUTE_ORDER, CORE, CORE_REASONS, DEFAULTS, KEPT, PREVIOUS_WEIGHT, REASONS, TEAM_RATING_PARTS, WEIGHTS, areaUnderCurve, bornAlike, clubGamesOf,
-  clubOf, clubShiftOf, corePoints, drawGames, drawRounds, findListed, fold, gridPart, matchRecord, mostStarted, overallOf, playerPart,
-  positionScore, readOff, readRl2Database, referenceOf, resultsPart, rlpGrid, rlpPlayer, rlpPositions, rlpResults, rlpSquads, rlpTestPlayers,
-  seasonFigures, seasonPlayers, seasonValue, spearman, squadsPart, srsOf, statCensus, teamRatingOf, teamsOf, testsPart,
+  ATTRIBUTE_ORDER, CORE, CORE_REASONS, DEFAULTS, KEPT, PREVIOUS_WEIGHT, REASONS, SELECTION, TEAM_RATING_PARTS, WEIGHTS, areaUnderCurve, bornAlike,
+  checkListAgainstResults, clubGamesOf, clubOf, clubShiftOf, clubsByCode, corePoints, drawGames, drawRounds, findListed, fold, gridPart, listPart,
+  matchRecord, mostStarted, mostStartedListed, overallOf, playerPart, positionScore, readOff, readRl2Database, referenceOf, representativePart,
+  resultsPart, rlpGrid, rlpPlayer, rlpPositions, rlpRepresentative, rlpResults, rlpSeasonList, rlpSquadGames, rlpSquads, rlpTestPlayers, seasonFigures,
+  seasonKeyOf, seasonPlayers, seasonValue,
+  selectionValue, spearman, squadsPart, srsOf, statCensus, teamRatingOf, teamsOf, testsPart,
 } from './lib/rugby-league-seasons.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -54,9 +56,11 @@ const pinned = new Map();
 
 // What an input's pin covers: the whole file, or for an RLP page the part read (its markup around that part carries
 // build and render times, and a player's current age, which change from one request to the next).
-const PARTS = { grid: gridPart, squads: squadsPart, tests: testsPart, results: resultsPart, player: playerPart };
+// A competition's players page (`tests`): its players table, or a one-match competition's team lists (2008's Tests have the table).
+const PARTS = { grid: gridPart, squads: squadsPart, tests: representativePart, results: resultsPart, player: playerPart, list: listPart };
 const partOf = file => (!file.startsWith('rlp/') ? 'file' : file.startsWith('rlp/players/') ? 'player'
-  : /\/squads\.html$/.test(file) ? 'squads' : file.startsWith('rlp/competitions/') ? 'tests' : /\/results\.html$/.test(file) ? 'results' : 'grid');
+  : /\/squads\.html$/.test(file) ? 'squads' : file.startsWith('rlp/competitions/') ? 'tests' : /\/results(-league)?\.html$/.test(file) ? 'results'
+    : /^rlp\/seasons\/[^/]+\/players\.html$/.test(file) ? 'list' : 'grid');
 const urlOf = file => (file.startsWith('rlp/') ? `${RLP}${file.slice('rlp/'.length).replace(/^players\/(\d+)\.html$/, 'players/$1')}` : null);
 
 let lastFetch = 0;
@@ -657,6 +661,172 @@ async function computedSnapshotOf(season) {
   };
 }
 
+// ---------- the seasons before 1998, from the Rugby League Project's season lists ----------
+
+// Each season's list, results and representative sides, read once (scripts/data/rugby-league-seasons.json `rlpSelection`).
+const rlpLists = new Map(), rlpResultsOf = new Map();
+const seasonListOf = slug => {
+  if (!rlpLists.has(slug)) rlpLists.set(slug, page(`seasons/${slug}/players.html`).then(rlpSeasonList));
+  return rlpLists.get(slug);
+};
+const seasonResultsOf = slug => {
+  if (!rlpResultsOf.has(slug)) rlpResultsOf.set(slug, page(`seasons/${slug}/${manifest.rlpSelection.results?.[slug] ?? 'results.html'}`).then(rlpResults));
+  return rlpResultsOf.get(slug);
+};
+/** The premiership seasons RLP lists for a year (two in 1997, the ARL's and Super League's). */
+const listsOfYear = year => manifest.rlpSelection.lists[year] ?? [];
+/** Each player's representative games in a year: Tests, State of Origin or the interstate series, NSW City v Country. */
+async function representativeGames(year) {
+  const games = new Map();
+  // Each entry a competition's page: its players (a table, or a one-match competition's team lists) or its squads.
+  for (const file of manifest.rlpSelection.representative[year] ?? []) {
+    const html = await page(`competitions/${file}`);
+    for (const [id, n] of (/\/squads\.html$/.test(file) ? rlpSquadGames : rlpRepresentative)(html)) games.set(id, (games.get(id) ?? 0) + n);
+  }
+  return games;
+}
+/** A season's tries a team game: every try its list records over two sides a game. */
+const tryRateOf = (players, games) => Math.round(players.reduce((sum, p) => sum + p.tries, 0) / games.length / 2 * 1e4) / 1e4;
+const averageOf = values => values.reduce((s, v) => s + v, 0) / values.length;
+
+function selectionFormula(season) {
+  return `Players: everyone the Rugby League Project lists as taking the field in the ${season.competition}'s ${season.year} premiership, its finals `
+    + 'included; his club the one he played most games for (of two as many, the first RLP lists). Position: the one he started at most '
+    + 'that season (RLP\'s starts by position; the bench is no start), else in the seasons either side, then two either side; else he '
+    + 'is left out. Value: his selections, the games he started for his club and his representative games (Tests, State of Origin or '
+    + `the interstate series, NSW City v Country), plus ${SELECTION.tryWeight} for each try at today's ${SELECTION.tryRate} tries a team game, scaled to `
+    + 'his season\'s rate (`tryRate`), per club game, the season before at half weight when he played in it. Overall: the value\'s mid-rank '
+    + 'percentile among the season\'s players at his position, read off Rugby League 26\'s overalls at that position by as many of each 2025 '
+    + 'club\'s best as the season\'s clubs carry per club (`quota`), by linear interpolation; rounded and held to 1-99. Club shift: the '
+    + 'season\'s results set each club\'s target: its Simple Rating System, the regular season\'s points margin a game adjusted for its '
+    + 'opponents and a home edge by least squares, ranked among the season\'s clubs (mid-rank percentiles) and read off '
+    + '`clubShift.reference`, the built-in 2025 NRL clubs\' strengths. Every player of the club moves by the one whole number that brings its '
+    + 'matchday 17\'s strength closest to the target (of two as close, the smaller move), held to 1-99.';
+}
+
+async function selectionSnapshotOf(season) {
+  const { year } = season;
+  const key = seasonKeyOf(season);
+  const slug = season.rlp.season;
+  const clubs = teamsOf(manifest, key);
+  const players = await seasonListOf(slug);
+  const games = await seasonResultsOf(slug);
+  const byCode = clubsByCode(games);
+  checkListAgainstResults(players, byCode, season.id);
+  // The manifest's clubs are the results' clubs, code by code.
+  const clubOfCode = new Map();
+  for (const club of clubs) {
+    const found = byCode[club.rlpCode];
+    if (!found || found.slug !== club.rlp) throw new Error(`${season.id}: ${club.name} is ${club.rlpCode} ${club.rlp} in the manifest, ${found ? found.slug : 'no club'} in RLP's results`);
+    clubOfCode.set(club.rlpCode, club);
+  }
+  if (clubOfCode.size !== Object.keys(byCode).length) throw new Error(`${season.id}: RLP's results have ${Object.keys(byCode).length} clubs, the manifest ${clubs.length}`);
+  const clubGames = Object.fromEntries(clubs.map(club => [club.id, byCode[club.rlpCode].games]));
+  const tryRate = tryRateOf(players, games);
+
+  // The season before, at half weight: its lists, each club's games by code, its try rate.
+  const before = new Map();
+  const previousClubGames = {}, tryRateBefore = {};
+  for (const beforeSlug of listsOfYear(year - 1)) {
+    const list = await seasonListOf(beforeSlug), beforeGames = await seasonResultsOf(beforeSlug), codes = clubsByCode(beforeGames);
+    checkListAgainstResults(list, codes, beforeSlug);
+    const rate = tryRateBefore[beforeSlug] = tryRateOf(list, beforeGames);
+    for (const [code, club] of Object.entries(codes)) previousClubGames[`${beforeSlug}/${code}`] = club.games;
+    for (const p of list) before.set(p.id, { player: p, slug: beforeSlug, rate });
+  }
+  const representative = await representativeGames(year), representativeBefore = await representativeGames(year - 1);
+  // A player's starts by position in the seasons around, for one who never started in his own.
+  const around = new Map();
+  for (const at of [year - 2, year - 1, year + 1, year + 2]) {
+    const listed = new Map();
+    for (const aroundSlug of listsOfYear(at)) for (const p of await seasonListOf(aroundSlug)) listed.set(p.id, p.positions);
+    around.set(at, listed);
+  }
+
+  const placed = [], left = [];
+  for (const player of players) {
+    const [code] = player.teams.slice().sort((a, b) => b[1] - a[1])[0];
+    const club = clubOfCode.get(code);
+    const rings = [['S', [player.positions]], ['S±1', [year - 1, year + 1].map(at => around.get(at).get(player.id))],
+      ['S±2', [year - 2, year + 2].map(at => around.get(at).get(player.id))]];
+    const found = rings.map(([how, seasons]) => [how, mostStartedListed(...seasons)]).find(([, pos]) => pos);
+    if (!found) {
+      left.push([player.id, player.name, club.id, player.games, `never started in ${year - 2}–${year + 2} (RLP's lists)`]);
+      continue;
+    }
+    const prior = before.get(player.id);
+    const selections = player.starts + (representative.get(player.id) ?? 0);
+    const previous = prior ? {
+      selections: prior.player.starts + (representativeBefore.get(player.id) ?? 0), tries: prior.player.tries, tryRate: prior.rate,
+      clubGames: averageOf(prior.player.teams.map(([c]) => previousClubGames[`${prior.slug}/${c}`])),
+    } : null;
+    const value = selectionValue({ selections, tries: player.tries, tryRate, clubGames: averageOf(player.teams.map(([c]) => byCode[c].games)) }, previous);
+    placed.push({ player, club: club.id, pos: found[1], how: found[0], value,
+      clubs: player.teams.map(([c, n]) => [clubOfCode.get(c).id, n]).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])),
+      stats: [player.starts, representative.get(player.id) ?? 0, player.tries],
+      previous: prior ? [prior.player.games, prior.player.teams.map(([c, n]) => [`${prior.slug}/${c}`, n]),
+        [prior.player.starts, representativeBefore.get(player.id) ?? 0, prior.player.tries]] : null });
+  }
+
+  // The overall: the value's mid-rank percentile at the position, read off Rugby League 26's overalls there.
+  const builtIn = JSON.parse(await readFile(builtInFile, 'utf8')).players.map(playerOf)
+    .map(p => ({ name: p.name, club: p.club, pos: p.pos, rating: p.rating }));
+  const values = {}, quota = {}, reference = {};
+  for (const pos of ORDER) {
+    const at = placed.filter(entry => entry.pos === pos);
+    if (!at.length) throw new Error(`${season.id}: nobody at ${pos}`);
+    values[pos] = at.map(entry => entry.value).sort((a, b) => a - b);
+    quota[pos] = Math.round(at.length / clubs.length * 1e4) / 1e4;
+    reference[pos] = referenceOf(builtIn, pos, quota[pos]);
+  }
+  for (const entry of placed) entry.overall = overallOf(entry.value, values[entry.pos], reference[entry.pos]);
+
+  // The club shift: the regular season's Simple Rating System, read off the built-in clubs' strengths.
+  const idOfSlug = new Map(clubs.map(club => [club.rlp, club.id]));
+  const regular = games.filter(game => /^Round \d+$/.test(game.round)).map(game => ({ round: game.round, home: idOfSlug.get(game.home), away: idOfSlug.get(game.away),
+    homeScore: game.homeScore, awayScore: game.awayScore }));
+  const { ratings, homeEdge } = srsOf(regular);
+  const clubStrengths = BUILT_IN_CLUBS.map(club => club.str).sort((a, b) => a - b);
+  const clubRows = clubs.map(club => {
+    const pool = placed.filter(entry => entry.club === club.id).map(entry => ({ name: entry.player.name, pos: entry.pos, rating: entry.overall }));
+    const target = Math.round(readOff(ratings[club.id], Object.values(ratings), clubStrengths) * 100) / 100;
+    const { shift, before: strength, after } = clubShiftOf(pool, target);
+    for (const entry of placed) if (entry.club === club.id) entry.shift = shift;
+    return { id: club.id, list: club.list, games: clubGames[club.id], team: { srs: ratings[club.id], target, strength, shift, shifted: after } };
+  });
+
+  const { records: results, ...figures } = seasonFigures(regular);
+  const ladder = Object.entries(results).map(([id, r]) => [id, r.won, r.drawn, r.lost, r.for, r.against])
+    .sort((a, b) => (2 * b[1] + b[2]) - (2 * a[1] + a[2]) || (b[4] - b[5]) - (a[4] - a[5]) || a[0].localeCompare(b[0]));
+  const clubOrder = new Map(clubs.map((club, i) => [club.id, i]));
+  placed.sort((a, b) => clubOrder.get(a.club) - clubOrder.get(b.club) || ORDER.indexOf(a.pos) - ORDER.indexOf(b.pos) || b.value - a.value
+    || a.player.id - b.player.id);
+  return {
+    source: { id: season.id, method: 'computed', basis: 'selection', edition: season.edition, label: season.label, retrieved: season.retrieved, url: season.url,
+      window: [year - 2, year + 2], games: games.length, regular: regular.length, teamLists: games.length },
+    conversion: {
+      formula: selectionFormula(season),
+      metric: 'selections (club starts and representative games) and tries a club game, the previous season at half weight',
+      selection: { ...SELECTION, tryRate, tryRateBefore,
+        representative: manifest.rlpSelection.representative[year] ?? [], representativeBefore: manifest.rlpSelection.representative[year - 1] ?? [] },
+      previous: PREVIOUS_WEIGHT, quota, reference, values,
+      clubShift: { reference: clubStrengths, homeEdge,
+        note: 'Each club\'s `team`: its regular season\'s Simple Rating System (`srs`, points a game, home edge `homeEdge`), its '
+          + 'target, its lineup\'s strength unshifted (`strength`) and shifted (`shifted`), and the shift.' },
+      columns: ['rlpId', 'name', 'club', 'position', 'placedBy', 'games', 'clubs', '[starts, representative games, tries]',
+        'previous season [games, clubs (season/code), [starts, representative games, tries]]', 'value', 'overall', 'shift'],
+    },
+    clubs: clubRows,
+    previousClubGames: Object.fromEntries(Object.entries(previousClubGames).sort((a, b) => a[0].localeCompare(b[0]))),
+    players: placed.map(entry => [entry.player.id, entry.player.name, entry.club, entry.pos, entry.how, entry.player.games, entry.clubs,
+      entry.stats, entry.previous, entry.value, entry.overall, entry.shift]),
+    rlp: {},
+    left: left.sort((a, b) => a[2].localeCompare(b[2]) || a[1].localeCompare(b[1])),
+    real: { source: `${RLP}seasons/${slug}/${manifest.rlpSelection.results?.[slug] ?? 'results.html'}`, figures, ladder,
+      games: regular.map(game => [game.round, game.home, game.away, game.homeScore, game.awayScore]) },
+  };
+}
+
 /** A computed season's snapshot as text: one row per club, player, left-out player or game. */
 function serializeComputed(snapshot) {
   const rows = (list, indent = '    ') => (list.length ? `[\n${list.map(item => `${indent}${JSON.stringify(item)}`).join(',\n')}\n  ]` : '[]');
@@ -713,7 +883,7 @@ function serialize(snapshot) {
 const outputs = [];
 for (const season of manifest.seasons) {
   if (season.method === 'computed') {
-    const snapshot = await computedSnapshotOf(season);
+    const snapshot = await (season.basis === 'selection' ? selectionSnapshotOf : computedSnapshotOf)(season);
     outputs.push([path.join(snapshotDir, `${season.id}.json`), serializeComputed(snapshot)]);
     const by = how => snapshot.players.filter(row => row[4] === how).length;
     const shifts = snapshot.clubs.map(club => club.team.shift);

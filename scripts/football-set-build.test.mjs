@@ -20,6 +20,7 @@ import {
   seasonOfRelease, seasonYear, territoryFor,
 } from '../src/data/footballSetBuild.js';
 import { decodeFootballSet } from '../src/engine/footballSets.js';
+import { BIG_LEAGUES, EUROPEAN_LEAGUES } from '../src/data/footballLeagues.js';
 import { sampleDatabase, writeCm0102Files } from './lib/cm0102-fixture.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -458,9 +459,20 @@ test('federations follow the set year: Montenegro with Serbia in 2005, its own i
   assert.deepEqual(at('2007-10'), { merged: { 728: '729' }, inactive: ['KOS'] });
 });
 
-test('clubs: the seven leagues by stored name or patcher alias, members by division, eleven players or none', () => {
+test('clubs: Europe\'s first divisions by stored name or patcher alias, members by division, eleven players or none', () => {
   const { doc, audit } = build();
-  assert.deepEqual(doc.clubs.map(c => [c.league, c.country]).sort(), Object.entries(LEAGUES).map(([league, { country }]) => [league, country]).sort());
+  // The sample database holds the seven big leagues, so its clubs are theirs; LEAGUES names every other first division too.
+  assert.deepEqual(doc.clubs.map(c => [c.league, c.country]).sort(), BIG_LEAGUES.map(league => [league, LEAGUES[league].country]).sort());
+  for (const [league, { country, names }] of Object.entries(LEAGUES)) {
+    assert.equal(EUROPEAN_LEAGUES[league], country, league);
+    assert.ok(names.length, league);
+  }
+  // The seven big leagues are always audited; another first division where the database holds it (the sample's Scottish one).
+  assert.deepEqual(audit.leagues.map(l => l.league), [...BIG_LEAGUES, 'Scottish Premiership']);
+  assert.ok(audit.leagues.every(l => l.kept === l.clubs), 'every club kept: no cut asked for');
+  // A season keeps Europe's strongest `topClubs`, in the order it writes them.
+  const cut = build(undefined, { topClubs: 3 }).doc;
+  assert.deepEqual(cut.clubs.map(c => c.id), doc.clubs.slice(0, 3).map(c => c.id));
   assert.equal(audit.leagues.find(l => l.league === 'La Liga').competition, 'Spanish La Liga');
   // Thinford Town has six players and the extinct Gone Athletic none: neither is a club of the set.
   assert.deepEqual(audit.leagues.find(l => l.league === 'Premier League').short, [{ name: 'Thinford Town', players: 6 }]);

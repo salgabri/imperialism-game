@@ -25,12 +25,13 @@ import { womensFootball } from '../src/sports/womensFootball.js';
 import { HOME_EDGE, tennis } from '../src/sports/tennis.js';
 import { womensTennis } from '../src/sports/womensTennis.js';
 import { rugbyLeague } from '../src/sports/rugbyLeague.js';
+import { HOME_EDGE as ROCKET_LEAGUE_HOME_EDGE, rocketLeague } from '../src/sports/rocketLeague.js';
 import { estimateWinProbability } from '../src/engine/odds.js';
 import { liveModelFor, winProbabilityAt } from '../src/engine/winProbability.js';
 import { tacticalMatchParameters } from '../src/engine/managerStrategy.js';
 import { campaignSnapshot, createCampaignId, parseCampaign } from '../src/engine/storage.js';
 import { matchupOdds } from '../src/viewModels/odds.js';
-import { campaignFacts, moreRulesSummary } from '../src/screens/setup/setupModel.js';
+import { campaignFacts, homeOffered, moreRulesSummary } from '../src/screens/setup/setupModel.js';
 import { challengeQuery, readChallenge } from '../src/screens/setup/challenge.js';
 import { DEFAULT_SETUP } from '../src/app/shared.js';
 import { runProductionCampaign } from './production-balance.mjs';
@@ -73,6 +74,20 @@ const SPORTS = [
   { label: 'rugby league', sport: rugbyLeague, clubs: NRL_CLUBS, range: REAL.nrl.homeWins },
 ];
 const scoreFields = ({ ga, gd, tie, winner }) => ({ ga, gd, tie, winner });
+
+test('Rocket League has no home edge, so the rule is no choice there: its LANs\' host nations did as Elo expected', () => {
+  // The Liquipedia snapshot's LAN games with one side of the host nation (REAL.rocketLeague.homeEdge): +9.9 ± 7.7 Elo
+  // over 1,853 games.
+  assert.equal(ROCKET_LEAGUE_HOME_EDGE, 0);
+  if (REAL.rocketLeague?.homeEdge) assert.ok(Math.abs(REAL.rocketLeague.homeEdge.elo) < 2 * REAL.rocketLeague.homeEdge.se, 'no edge to measure');
+  const [a, d] = equalSides(rocketLeague, null);
+  assert.deepEqual(rocketLeague.prepareMatch(a, d, 75, 75, HOME), rocketLeague.prepareMatch(a, d, 75, 75), 'a home venue changes nothing');
+  assert.deepEqual([homeOffered('rocket-league'), homeOffered('football'), homeOffered('tennis')], [false, true, true]);
+  assert.doesNotMatch(moreRulesSummary({ sport: 'rocket-league', homeAdvantage: 'on' }), /Home advantage/);
+  assert.ok(!campaignFacts({ sport: 'rocket-league', homeAdvantage: 'on' }).some(row => row.id === 'home-advantage'));
+  assert.deepEqual(readChallenge('?sport=rocket-league&home=on').ignored, ['home']);
+  assert.doesNotMatch(challengeQuery({ ...DEFAULT_SETUP, sport: 'rocket-league', layer: 'nations', homeAdvantage: 'on' }, 3), /home=/);
+});
 
 test('a neutral venue is the default, and plays exactly as before', () => {
   for (const { label, sport, clubs } of SPORTS) {

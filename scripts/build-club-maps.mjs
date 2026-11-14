@@ -130,7 +130,10 @@ const LEAGUES = {
     venues: 'Ground locations: scripts/data/nrl-teams.json (the Rabbitohs and the Bulldogs, who share Accor Stadium, and the Wests Tigers, who play at three grounds, grow from their training bases).',
     eraVenues: 'Ground locations: scripts/data/rugby-league-seasons.json, every club of each season at the ground it played at (a club that shared its ground, or played at several, grows from where it trained).',
     // The seasons 1998–2007, whose defunct clubs and grounds of the day are placed and named from English Wikipedia.
-    earlyVenues: 'Ground locations: scripts/data/rugby-league-seasons.json, every club of each season at the ground it played most of its home games at (a club that shared its ground, or played at several, grows from where it trained), each ground placed and named as it was then from English Wikipedia\'s articles (CC BY-SA 4.0) at the revisions the manifest\'s `wikipedia` pins; home games counted from NRL.com\'s draw.' },
+    earlyVenues: 'Ground locations: scripts/data/rugby-league-seasons.json, every club of each season at the ground it played most of its home games at (a club that shared its ground, or played at several, grows from where it trained), each ground placed and named as it was then from English Wikipedia\'s articles (CC BY-SA 4.0) at the revisions the manifest\'s `wikipedia` pins; home games counted from NRL.com\'s draw.',
+    // The seasons before 1998 (the NSWRFL's, the NSWRL's, the ARL's and Super League's 1997): home games counted from the
+    // Rugby League Project's results.
+    rlpVenues: 'Ground locations: scripts/data/rugby-league-seasons.json, every club of each season at the ground it played most of its home games at (a club that shared its ground grows from where it trained; one whose ground was being rebuilt keeps it), each ground placed and named as it was then from English Wikipedia\'s articles (CC BY-SA 4.0) at the revisions the manifest\'s `wikipedia` pins; home games counted from the Rugby League Project\'s results, leaving out those the league staged at the SCG and the Sydney Sports Ground before 1988 (Eastern Suburbs\' own ground but for them).' },
   // Women's football's NWSL (src/data/clubs.womens-football.js): its European clubs play the Europe maps
   // (scripts/build-europe-maps.mjs). Centreville Bank Stadium is in Rhode Island, but Boston Legacy FC is Boston's: it
   // plays there only until White Stadium opens in 2028.
@@ -452,7 +455,9 @@ async function nrlSpecs() {
       if (places(teams) !== today) throw new Error(`${map.id}: the seasons ${map.seasons.join(', ')} are not today's clubs and grounds`);
       continue;
     }
-    specs.push({ id: map.id, seasons: map.seasons.map(nrlSeasonIdOf), ...(first < 2008 ? { venues: LEAGUES.nrl.earlyVenues } : {}),
+    const firstYear = typeof first === 'number' ? first : Number(first.match(/\d{4}$/)[0]);
+    const venues = firstYear < 1998 ? LEAGUES.nrl.rlpVenues : firstYear < 2008 ? LEAGUES.nrl.earlyVenues : null;
+    specs.push({ id: map.id, seasons: map.seasons.map(nrlSeasonIdOf), ...(venues ? { venues } : {}),
       clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.ground, home: t.home })) });
   }
   return specs;

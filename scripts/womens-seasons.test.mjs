@@ -25,6 +25,8 @@ const TABLE = JSON.parse(read('scripts/data/ea-women-leagues.json'));
 const seasonFile = id => JSON.parse(read(`public/womens-football/${id}.json`));
 const WOMENS_LEAGUES = new Set([...Object.values(TABLE.leagues).filter(league => league.main).map(league => league.name), TABLE.rest]);
 const NATIONS_ONLY = ['eaw-fifa-22', 'eaw-fifa-21', 'eaw-fifa-20', 'eaw-fifa-19', 'eaw-fifa-18', 'eaw-fifa-17', 'eaw-fifa-16'];
+// EA's seasons; the computed ones before them are scripts/womens-tournament-seasons.test.mjs's.
+const EA_SEASONS = BUILT_IN_WOMENS_SEASONS.filter(set => set.id.startsWith('eaw-'));
 
 // ---------- building ----------
 
@@ -42,13 +44,15 @@ test('every season rebuilds byte for byte from the committed snapshots', () => {
 });
 
 test('the seasons run from EA FC 26 back to FIFA 16, newest first, beside the built-in 2026/27', () => {
-  assert.deepEqual(BUILT_IN_WOMENS_SEASONS.map(set => [set.id, set.season, set.label]), [
+  assert.deepEqual(EA_SEASONS.map(set => [set.id, set.season, set.label]), [
     ['eaw-fc-26', '2025/26', 'EA FC 26'], ['eaw-fc-25', '2024/25', 'EA FC 25'], ['eaw-fc-24', '2023/24', 'EA FC 24'],
     ['eaw-fifa-23', '2022/23', 'FIFA 23'], ['eaw-fifa-22', '2021/22', 'FIFA 22'], ['eaw-fifa-21', '2020/21', 'FIFA 21'],
     ['eaw-fifa-20', '2019/20', 'FIFA 20'], ['eaw-fifa-19', '2018/19', 'FIFA 19'], ['eaw-fifa-18', '2017/18', 'FIFA 18'],
     ['eaw-fifa-17', '2016/17', 'FIFA 17'], ['eaw-fifa-16', '2015/16', 'FIFA 16']]);
+  // They come first: every computed season before them is of an earlier season.
+  assert.deepEqual(BUILT_IN_WOMENS_SEASONS.slice(0, EA_SEASONS.length), EA_SEASONS);
   assert.equal(builtInSeasonOf('womens-football').season, '2026/27', 'the built-in season stays the current one');
-  for (const listed of BUILT_IN_WOMENS_SEASONS) {
+  for (const listed of EA_SEASONS) {
     assert.deepEqual(BUILT_IN_SETS.find(set => set.id === listed.id), listed, `${listed.id} is listed as built`);
     assert.equal(setSportOf(listed.id), 'womens-football');
     assert.ok(setHasNations(listed.id));
@@ -63,7 +67,7 @@ test('the seasons run from EA FC 26 back to FIFA 16, newest first, beside the bu
 // ---------- the seasons ----------
 
 test('every season is EA\'s women of that edition: its rated nations and, from FIFA 23, its clubs', () => {
-  for (const listed of BUILT_IN_WOMENS_SEASONS) {
+  for (const listed of EA_SEASONS) {
     const doc = seasonFile(listed.id);
     const set = decodeFootballSet(doc, listed.id);
     assert.equal(doc.kind, 'eaw');

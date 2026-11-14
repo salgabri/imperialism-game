@@ -1,0 +1,1355 @@
+{
+  "about": "The computed Elo against FIFA's Women's World Ranking, release by release to the end of 2015: a cross-check only, never an input; no FIFA figure is kept here but these summaries (scripts/sync-womens-tournament-seasons.mjs). FIFA's ranking is a modified Elo over every women's full international since 1971, so it also measures how much the friendlies missing from the results matter.",
+  "seasons": {
+    "wwc-2003": {
+      "release": "2003-10-24",
+      "pearson": 0.777,
+      "spearmanTop48": 0.856,
+      "spearmanTop20": 0.941
+    },
+    "wwc-2007": {
+      "release": "2007-10-05",
+      "pearson": 0.742,
+      "spearmanTop48": 0.883,
+      "spearmanTop20": 0.97
+    },
+    "wwc-2011": {
+      "release": "2011-07-22",
+      "pearson": 0.806,
+      "spearmanTop48": 0.899,
+      "spearmanTop20": 0.973
+    },
+    "wwc-2015": {
+      "release": "2015-07-10",
+      "pearson": 0.822,
+      "spearmanTop48": 0.922,
+      "spearmanTop20": 0.97
+    },
+    "wol-2004": {
+      "release": "2004-08-30",
+      "pearson": 0.754,
+      "spearmanTop48": 0.859,
+      "spearmanTop20": 0.949
+    },
+    "wol-2008": {
+      "release": "2008-09-05",
+      "pearson": 0.782,
+      "spearmanTop48": 0.886,
+      "spearmanTop20": 0.974
+    },
+    "wol-2012": {
+      "release": "2012-08-17",
+      "pearson": 0.819,
+      "spearmanTop48": 0.912,
+      "spearmanTop20": 0.977
+    }
+  },
+  "mean": {
+    "pearson": 0.788,
+    "spearmanTop48": 0.878,
+    "spearmanTop20": 0.961,
+    "slope": 0.633
+  },
+  "releases": [
+    {
+      "date": "2003-07-16",
+      "published": 108,
+      "matched": 103,
+      "pearson": 0.769,
+      "spearmanTop48": 0.838,
+      "spearmanTop20": 0.94,
+      "slope": 0.592,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Norway",
+          "Germany",
+          "China",
+          "Sweden"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Norway",
+          "China",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2003-08-29",
+      "published": 113,
+      "matched": 108,
+      "pearson": 0.768,
+      "spearmanTop48": 0.839,
+      "spearmanTop20": 0.928,
+      "slope": 0.583,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Norway",
+          "Germany",
+          "China",
+          "Sweden"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Norway",
+          "China",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2003-10-24",
+      "published": 113,
+      "matched": 108,
+      "pearson": 0.777,
+      "spearmanTop48": 0.856,
+      "spearmanTop20": 0.941,
+      "slope": 0.598,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Norway",
+          "Sweden",
+          "China"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Sweden",
+          "Brazil",
+          "Norway"
+        ]
+      }
+    },
+    {
+      "date": "2003-12-15",
+      "published": 115,
+      "matched": 110,
+      "pearson": 0.769,
+      "spearmanTop48": 0.827,
+      "spearmanTop20": 0.946,
+      "slope": 0.573,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Norway",
+          "Sweden",
+          "China"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Sweden",
+          "Norway",
+          "Brazil"
+        ]
+      }
+    },
+    {
+      "date": "2004-03-15",
+      "published": 115,
+      "matched": 110,
+      "pearson": 0.769,
+      "spearmanTop48": 0.84,
+      "spearmanTop20": 0.949,
+      "slope": 0.578,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Norway",
+          "Sweden",
+          "China"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Sweden",
+          "Norway",
+          "Brazil"
+        ]
+      }
+    },
+    {
+      "date": "2004-06-07",
+      "published": 115,
+      "matched": 110,
+      "pearson": 0.772,
+      "spearmanTop48": 0.855,
+      "spearmanTop20": 0.943,
+      "slope": 0.587,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Norway",
+          "Sweden",
+          "China"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Sweden",
+          "Brazil",
+          "Norway"
+        ]
+      }
+    },
+    {
+      "date": "2004-08-30",
+      "published": 117,
+      "matched": 113,
+      "pearson": 0.754,
+      "spearmanTop48": 0.859,
+      "spearmanTop20": 0.949,
+      "slope": 0.558,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Norway",
+          "Brazil",
+          "Sweden"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Brazil",
+          "Norway",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2004-12-20",
+      "published": 121,
+      "matched": 118,
+      "pearson": 0.753,
+      "spearmanTop48": 0.831,
+      "spearmanTop20": 0.961,
+      "slope": 0.568,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Norway",
+          "Brazil",
+          "Sweden"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Brazil",
+          "Norway",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2005-03-25",
+      "published": 121,
+      "matched": 118,
+      "pearson": 0.754,
+      "spearmanTop48": 0.836,
+      "spearmanTop20": 0.947,
+      "slope": 0.57,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Norway",
+          "Brazil",
+          "France"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Brazil",
+          "Norway",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2005-06-24",
+      "published": 123,
+      "matched": 120,
+      "pearson": 0.76,
+      "spearmanTop48": 0.822,
+      "spearmanTop20": 0.968,
+      "slope": 0.578,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Norway",
+          "Brazil",
+          "France"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Brazil",
+          "Norway",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2005-09-16",
+      "published": 124,
+      "matched": 120,
+      "pearson": 0.749,
+      "spearmanTop48": 0.816,
+      "spearmanTop20": 0.956,
+      "slope": 0.565,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Norway",
+          "Brazil",
+          "France"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Brazil",
+          "Norway",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2005-12-16",
+      "published": 123,
+      "matched": 119,
+      "pearson": 0.746,
+      "spearmanTop48": 0.871,
+      "spearmanTop20": 0.946,
+      "slope": 0.564,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Norway",
+          "Brazil",
+          "Sweden"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Brazil",
+          "Norway",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2006-03-17",
+      "published": 125,
+      "matched": 122,
+      "pearson": 0.735,
+      "spearmanTop48": 0.874,
+      "spearmanTop20": 0.938,
+      "slope": 0.546,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Norway",
+          "Brazil",
+          "France"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Brazil",
+          "Norway",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2006-05-19",
+      "published": 129,
+      "matched": 127,
+      "pearson": 0.711,
+      "spearmanTop48": 0.894,
+      "spearmanTop20": 0.956,
+      "slope": 0.508,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Norway",
+          "Brazil",
+          "Sweden"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Brazil",
+          "Norway",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2006-09-15",
+      "published": 134,
+      "matched": 131,
+      "pearson": 0.711,
+      "spearmanTop48": 0.887,
+      "spearmanTop20": 0.946,
+      "slope": 0.5,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Norway",
+          "Brazil",
+          "Sweden"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Brazil",
+          "Norway",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2006-12-22",
+      "published": 139,
+      "matched": 137,
+      "pearson": 0.729,
+      "spearmanTop48": 0.859,
+      "spearmanTop20": 0.964,
+      "slope": 0.519,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Norway",
+          "Sweden",
+          "North Korea"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "North Korea",
+          "Norway",
+          "Brazil"
+        ]
+      }
+    },
+    {
+      "date": "2007-03-16",
+      "published": 141,
+      "matched": 138,
+      "pearson": 0.728,
+      "spearmanTop48": 0.845,
+      "spearmanTop20": 0.964,
+      "slope": 0.514,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Norway",
+          "Sweden",
+          "North Korea"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Sweden",
+          "North Korea",
+          "Brazil"
+        ]
+      }
+    },
+    {
+      "date": "2007-06-15",
+      "published": 141,
+      "matched": 138,
+      "pearson": 0.732,
+      "spearmanTop48": 0.88,
+      "spearmanTop20": 0.962,
+      "slope": 0.525,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Sweden",
+          "Norway",
+          "North Korea"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "North Korea",
+          "Sweden",
+          "Brazil"
+        ]
+      }
+    },
+    {
+      "date": "2007-10-05",
+      "published": 146,
+      "matched": 142,
+      "pearson": 0.742,
+      "spearmanTop48": 0.883,
+      "spearmanTop20": 0.97,
+      "slope": 0.541,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Brazil",
+          "Sweden",
+          "Norway"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Brazil",
+          "Sweden",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2007-12-21",
+      "published": 150,
+      "matched": 145,
+      "pearson": 0.725,
+      "spearmanTop48": 0.857,
+      "spearmanTop20": 0.965,
+      "slope": 0.512,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "Sweden",
+          "Brazil",
+          "Norway"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "Brazil",
+          "Sweden",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2008-03-21",
+      "published": 120,
+      "matched": 120,
+      "pearson": 0.781,
+      "spearmanTop48": 0.859,
+      "spearmanTop20": 0.973,
+      "slope": 0.637,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Sweden",
+          "Brazil",
+          "Norway"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Sweden",
+          "Norway"
+        ]
+      }
+    },
+    {
+      "date": "2008-06-06",
+      "published": 117,
+      "matched": 117,
+      "pearson": 0.781,
+      "spearmanTop48": 0.895,
+      "spearmanTop20": 0.986,
+      "slope": 0.635,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Sweden",
+          "Brazil",
+          "Norway"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Sweden",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2008-09-05",
+      "published": 116,
+      "matched": 116,
+      "pearson": 0.782,
+      "spearmanTop48": 0.886,
+      "spearmanTop20": 0.974,
+      "slope": 0.64,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Sweden",
+          "North Korea"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "North Korea",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2008-12-19",
+      "published": 116,
+      "matched": 116,
+      "pearson": 0.778,
+      "spearmanTop48": 0.873,
+      "spearmanTop20": 0.964,
+      "slope": 0.643,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Sweden",
+          "North Korea"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "North Korea",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2009-03-27",
+      "published": 109,
+      "matched": 109,
+      "pearson": 0.786,
+      "spearmanTop48": 0.867,
+      "spearmanTop20": 0.98,
+      "slope": 0.649,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Brazil",
+          "Germany",
+          "Sweden",
+          "North Korea"
+        ],
+        "computed": [
+          "United States",
+          "Brazil",
+          "Germany",
+          "Sweden",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2009-06-26",
+      "published": 98,
+      "matched": 98,
+      "pearson": 0.793,
+      "spearmanTop48": 0.874,
+      "spearmanTop20": 0.974,
+      "slope": 0.697,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Brazil",
+          "Germany",
+          "Sweden",
+          "North Korea"
+        ],
+        "computed": [
+          "United States",
+          "Brazil",
+          "Germany",
+          "Sweden",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2009-09-25",
+      "published": 99,
+      "matched": 99,
+      "pearson": 0.799,
+      "spearmanTop48": 0.861,
+      "spearmanTop20": 0.967,
+      "slope": 0.706,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Sweden",
+          "North Korea"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "North Korea",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2009-12-18",
+      "published": 91,
+      "matched": 91,
+      "pearson": 0.863,
+      "spearmanTop48": 0.897,
+      "spearmanTop20": 0.982,
+      "slope": 0.863,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Sweden",
+          "North Korea"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "North Korea",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2010-03-12",
+      "published": 105,
+      "matched": 105,
+      "pearson": 0.82,
+      "spearmanTop48": 0.899,
+      "spearmanTop20": 0.986,
+      "slope": 0.732,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Sweden",
+          "North Korea"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Sweden",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2010-05-28",
+      "published": 116,
+      "matched": 116,
+      "pearson": 0.818,
+      "spearmanTop48": 0.866,
+      "spearmanTop20": 0.961,
+      "slope": 0.69,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Sweden",
+          "Japan"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Sweden",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2010-08-13",
+      "published": 117,
+      "matched": 117,
+      "pearson": 0.819,
+      "spearmanTop48": 0.865,
+      "spearmanTop20": 0.962,
+      "slope": 0.693,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Sweden",
+          "Japan"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Japan",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2010-11-19",
+      "published": 127,
+      "matched": 127,
+      "pearson": 0.821,
+      "spearmanTop48": 0.903,
+      "spearmanTop20": 0.958,
+      "slope": 0.69,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Sweden",
+          "Japan"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Japan",
+          "North Korea"
+        ]
+      }
+    },
+    {
+      "date": "2011-03-18",
+      "published": 126,
+      "matched": 126,
+      "pearson": 0.818,
+      "spearmanTop48": 0.911,
+      "spearmanTop20": 0.967,
+      "slope": 0.669,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Japan",
+          "Sweden"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Canada",
+          "Japan"
+        ]
+      }
+    },
+    {
+      "date": "2011-07-22",
+      "published": 129,
+      "matched": 129,
+      "pearson": 0.806,
+      "spearmanTop48": 0.899,
+      "spearmanTop20": 0.973,
+      "slope": 0.639,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Japan",
+          "Sweden"
+        ],
+        "computed": [
+          "United States",
+          "Brazil",
+          "Germany",
+          "Japan",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2011-09-23",
+      "published": 132,
+      "matched": 132,
+      "pearson": 0.811,
+      "spearmanTop48": 0.894,
+      "spearmanTop20": 0.98,
+      "slope": 0.645,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Japan",
+          "Sweden"
+        ],
+        "computed": [
+          "United States",
+          "Brazil",
+          "Germany",
+          "Japan",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2011-12-23",
+      "published": 135,
+      "matched": 135,
+      "pearson": 0.806,
+      "spearmanTop48": 0.913,
+      "spearmanTop20": 0.989,
+      "slope": 0.673,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Japan",
+          "Brazil",
+          "Sweden"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Japan",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2012-03-16",
+      "published": 134,
+      "matched": 134,
+      "pearson": 0.811,
+      "spearmanTop48": 0.907,
+      "spearmanTop20": 0.985,
+      "slope": 0.685,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Japan",
+          "Brazil",
+          "Sweden"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Brazil",
+          "Japan",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2012-06-01",
+      "published": 129,
+      "matched": 129,
+      "pearson": 0.816,
+      "spearmanTop48": 0.903,
+      "spearmanTop20": 0.986,
+      "slope": 0.691,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Japan",
+          "Sweden",
+          "Brazil"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Japan",
+          "Brazil",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2012-08-17",
+      "published": 127,
+      "matched": 127,
+      "pearson": 0.819,
+      "spearmanTop48": 0.912,
+      "spearmanTop20": 0.977,
+      "slope": 0.697,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Japan",
+          "Brazil",
+          "France"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Japan",
+          "Brazil",
+          "France"
+        ]
+      }
+    },
+    {
+      "date": "2012-12-07",
+      "published": 130,
+      "matched": 130,
+      "pearson": 0.81,
+      "spearmanTop48": 0.903,
+      "spearmanTop20": 0.988,
+      "slope": 0.671,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Japan",
+          "Brazil",
+          "France"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Japan",
+          "France",
+          "Brazil"
+        ]
+      }
+    },
+    {
+      "date": "2013-03-22",
+      "published": 124,
+      "matched": 123,
+      "pearson": 0.816,
+      "spearmanTop48": 0.897,
+      "spearmanTop20": 0.976,
+      "slope": 0.676,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Japan",
+          "Brazil",
+          "France"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Japan",
+          "France",
+          "Brazil"
+        ]
+      }
+    },
+    {
+      "date": "2013-06-21",
+      "published": 124,
+      "matched": 123,
+      "pearson": 0.833,
+      "spearmanTop48": 0.859,
+      "spearmanTop20": 0.974,
+      "slope": 0.691,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Japan",
+          "Brazil",
+          "Sweden"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Japan",
+          "France",
+          "Brazil"
+        ]
+      }
+    },
+    {
+      "date": "2013-08-02",
+      "published": 119,
+      "matched": 117,
+      "pearson": 0.834,
+      "spearmanTop48": 0.86,
+      "spearmanTop20": 0.959,
+      "slope": 0.695,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Japan",
+          "Brazil",
+          "Sweden"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Japan",
+          "France",
+          "Brazil"
+        ]
+      }
+    },
+    {
+      "date": "2013-12-13",
+      "published": 117,
+      "matched": 115,
+      "pearson": 0.829,
+      "spearmanTop48": 0.868,
+      "spearmanTop20": 0.964,
+      "slope": 0.695,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Japan",
+          "Brazil",
+          "France"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Japan",
+          "France",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2014-03-28",
+      "published": 122,
+      "matched": 120,
+      "pearson": 0.831,
+      "spearmanTop48": 0.903,
+      "spearmanTop20": 0.92,
+      "slope": 0.706,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Japan",
+          "France",
+          "Sweden"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Japan",
+          "France",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2014-06-20",
+      "published": 124,
+      "matched": 123,
+      "pearson": 0.818,
+      "spearmanTop48": 0.892,
+      "spearmanTop20": 0.959,
+      "slope": 0.679,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Japan",
+          "France",
+          "Sweden"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Japan",
+          "France",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2014-09-19",
+      "published": 132,
+      "matched": 131,
+      "pearson": 0.811,
+      "spearmanTop48": 0.913,
+      "spearmanTop20": 0.941,
+      "slope": 0.674,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "Japan",
+          "France",
+          "Sweden"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "Japan",
+          "France",
+          "Sweden"
+        ]
+      }
+    },
+    {
+      "date": "2014-12-19",
+      "published": 132,
+      "matched": 131,
+      "pearson": 0.814,
+      "spearmanTop48": 0.919,
+      "spearmanTop20": 0.953,
+      "slope": 0.679,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "France",
+          "Japan",
+          "Sweden"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "France",
+          "Japan",
+          "Brazil"
+        ]
+      }
+    },
+    {
+      "date": "2015-03-27",
+      "published": 137,
+      "matched": 137,
+      "pearson": 0.828,
+      "spearmanTop48": 0.92,
+      "spearmanTop20": 0.947,
+      "slope": 0.675,
+      "leaders": {
+        "fifa": [
+          "Germany",
+          "United States",
+          "France",
+          "Japan",
+          "Sweden"
+        ],
+        "computed": [
+          "Germany",
+          "United States",
+          "France",
+          "Japan",
+          "Brazil"
+        ]
+      }
+    },
+    {
+      "date": "2015-07-10",
+      "published": 141,
+      "matched": 141,
+      "pearson": 0.822,
+      "spearmanTop48": 0.922,
+      "spearmanTop20": 0.97,
+      "slope": 0.669,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "France",
+          "Japan",
+          "England"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "France",
+          "Japan",
+          "England"
+        ]
+      }
+    },
+    {
+      "date": "2015-09-25",
+      "published": 147,
+      "matched": 147,
+      "pearson": 0.824,
+      "spearmanTop48": 0.91,
+      "spearmanTop20": 0.952,
+      "slope": 0.672,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "France",
+          "Japan",
+          "England"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "France",
+          "Brazil",
+          "England"
+        ]
+      }
+    },
+    {
+      "date": "2015-12-18",
+      "published": 140,
+      "matched": 140,
+      "pearson": 0.826,
+      "spearmanTop48": 0.915,
+      "spearmanTop20": 0.923,
+      "slope": 0.688,
+      "leaders": {
+        "fifa": [
+          "United States",
+          "Germany",
+          "France",
+          "Japan",
+          "England"
+        ],
+        "computed": [
+          "United States",
+          "Germany",
+          "France",
+          "Brazil",
+          "England"
+        ]
+      }
+    }
+  ]
+}

@@ -90,7 +90,7 @@ test('the four seasons are built in, newest first, each its committed file, cred
 const COVERAGE = {
   'swos-9596': { players: 2926, nations: 132, completeXIs: 132, clubs: 134, leagues: 7 },
   'swos-9495': { players: 2915, nations: 131, completeXIs: 131, clubs: 134, leagues: 7 },
-  'cm0102-2020-11-cm93': { players: 2266, nations: 124, completeXIs: 77, clubs: 130, leagues: 7 },
+  'cm0102-2020-11-cm93': { players: 2148, nations: 124, completeXIs: 77, clubs: 124, leagues: 20 },
   'cm0102-2017-04-cm89': { players: 1216, nations: 138, completeXIs: 89, clubs: 0, leagues: 0 },
 };
 
@@ -154,8 +154,10 @@ test('each season with clubs plays on its own two Europe maps', () => {
   for (const id of ['swos-9596', 'swos-9495', 'cm0102-2020-11-cm93']) {
     const doc = committed(id);
     const maps = europeMapsOf(id);
+    // Cam F's 1993/94 holds all of Europe's first divisions, so its maps have ids of their own; SWOS's seven leagues keep theirs.
+    const tag = `${id.startsWith('swos-') ? 's' : 'e'}${doc.year}`;
     assert.deepEqual(maps.map(map => [map.id, map.clubs, map.theatre, map.seasons]),
-      [[`eu124s${doc.year}`, TOP_CLUBS, 'all', [id]], [`eu32s${doc.year}`, ELITE_CLUBS, 'elite', [id]]], id);
+      [[`eu124${tag}`, TOP_CLUBS, 'all', [id]], [`eu32${tag}`, ELITE_CLUBS, 'elite', [id]]], id);
     for (const [count, map] of [[TOP_CLUBS, maps[0]], [ELITE_CLUBS, maps[1]]]) {
       const file = JSON.parse(read(`public/domestic/${map.id}.json`));
       assert.equal(file.version, map.version);

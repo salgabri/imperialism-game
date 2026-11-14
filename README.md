@@ -10,25 +10,27 @@ Pick your sport at kick-off:
 
 | Sport | Lineup | Clock | Level game |
 | --- | --- | --- | --- |
-| Football, and women's football | XI in a 4-4-2 | 90 minutes | extra time, then a penalty shootout (in earlier seasons the rules of their day: the drawing of lots to 1969/70, the golden goal 1995/96–2001/02, the silver goal 2002/03–2003/04) |
+| Football, and women's football | XI in a 4-4-2 | 90 minutes | extra time, then a penalty shootout (in earlier seasons the rules of their day: the drawing of lots to 1969/70, the golden goal 1995/96–2001/02, the silver goal 2002/03–2003/04; women's football's golden goal 1996/97–2003/04) |
 | Basketball | starting five | 40 minutes for nations and EuroLeague clubs (FIBA), 48 for NBA clubs | overtime periods |
 | American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
 | Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings (each half from 2020 with a runner on second) |
 | Ice hockey | four lines, three pairs and the goalie | 60 minutes | sudden-death overtime, then a shoot-out |
 | Tennis, and women's tennis | a Davis Cup (or Billie Jean King Cup) team: No. 1 and No. 2 in the singles, a doubles pair | five rubbers, first to three, each best of three sets; an earlier season plays its year's ([format by year](#tennis-seasons)) | none: a tie always has a winner |
 | Rugby league | the matchday 17: thirteen and four on the bench | 80 minutes | golden point |
+| Rocket League | three a side, a nation's best of its five | best of seven five-minute games | sudden-death overtime in a level game; a series always has a winner |
 
 And pick who fights:
 
 - **Nations** — 176 nations on the map, each team starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
-  Basketball, baseball, ice hockey and both tennis games field them as one team, Great Britain
-  (GBR), under the Union Jack. A sport fields 173 at most: those four play Great Britain
+  Basketball, baseball, ice hockey, both tennis games and Rocket League field them as one team, Great
+  Britain (GBR), under the Union Jack, and so does women's football's 2012 Olympic tournament
+  ([its season](#the-world-cups-and-olympic-tournaments-1991-to-2015-computed)). A sport fields 173 at most: those four play Great Britain
   as one, and football leaves out Tonga, Samoa and the Cook Islands, whose players no
   source rates ([Pacific islands](docs/design/pacific-islands.md)). A nation fields a team
   only with a **real side**, its own rated players holding at least half the lineup, and
-  every other nation's land stays neutral: 173 nations play football, 52 tennis, 45
-  women's tennis, 47 basketball, 36 women's football, 12 baseball, 7 ice hockey and 6
+  every other nation's land stays neutral: 173 nations play football, 57 Rocket League, 52
+  tennis, 45 women's tennis, 47 basketball, 36 women's football, 12 baseball, 7 ice hockey and 6
   rugby league. No team is made up of generated players or nearly empty.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs (Europe's 68
@@ -38,8 +40,8 @@ And pick who fights:
   franchises on [theirs](#the-nfl-map) of the USA, all 30 MLB clubs on
   [theirs](#the-mlb-map) of the USA and Canada, all 32 NHL clubs on
   [theirs](#the-nhl-map), or all 17 NRL clubs on [theirs](#the-nrl-map) of Australia and New Zealand. Real Madrid annexes territory
-  exactly the way Spain does. American football is played by clubs only, tennis and
-  women's tennis by nations only.
+  exactly the way Spain does. American football is played by clubs only, tennis,
+  women's tennis and Rocket League by nations only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
   leagues, fewer for smaller ones) on that country's own map, split into 100
   sections ([domestic campaigns](#domestic-campaigns)).
@@ -56,7 +58,9 @@ under football's rulebook with its own players ([design notes](docs/design/women
 Rugby League 26's NRL in five-minute slices to golden point ([design notes](docs/design/rugby-league.md)).
 Tennis plays Davis Cup ties between nations, its players rated by their Elo
 ([design notes](docs/design/tennis.md)), and women's tennis the Billie Jean King Cup's, the WTA's players
-by their Elo, with the WTA's serve ([design notes](docs/design/womens-tennis.md)).
+by their Elo, with the WTA's serve ([design notes](docs/design/womens-tennis.md)). Rocket League, the first esport, plays
+the RLCS's best-of-seven series between nations, its players rated by an Elo built from every series Liquipedia
+records ([design notes](docs/design/rocket-league.md)).
 
 Originally implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
@@ -140,10 +144,14 @@ npm run build-rugby-league # rebuild the NRL clubs and the rugby league nations 
 npm run build:nrl-map    # rebuild the NRL's map of Australia and New Zealand (seconds; --check compares byte for byte)
 npm run sync:ea-fc-women # snapshot EA FC's women's players from its public API into scripts/data/ea-fc27-women.csv (network, cached)
 npm run build-womens-football # rebuild the women's nations and clubs from that snapshot (--check compares byte for byte)
+npm run sync:womens-tournament-seasons # read the pinned World Cup database, women's results, Wikipedia and RSSSF pages in data-src/ into scripts/data/womens-tournament-seasons/ (--fetch downloads what is missing)
+npm run build:womens-tournament-seasons # rebuild the computed women's World Cups and Olympic tournaments, 1991/92 to 2014/15, from those facts (offline; --check to verify)
 npm run sync:tennis      # snapshot Tennis Abstract's men's Elo ratings and countries into scripts/data/tennis-elo.json (network, cached)
 npm run build-tennis     # rebuild the tennis nations from that snapshot (--check compares byte for byte)
 npm run sync:womens-tennis # snapshot Tennis Abstract's women's Elo ratings and countries into scripts/data/womens-tennis-elo.json (network, cached)
 npm run build-womens-tennis # rebuild the women's tennis nations from that snapshot (--check compares byte for byte)
+npm run sync:rocket-league # Rocket League's player Elo from a Liquipedia export saved by hand in data-src/liquipedia/ (no network) into scripts/data/rocket-league-elo.json
+npm run build-rocket-league # rebuild the Rocket League nations from that snapshot (--check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 npm run build:icons      # render favicon.ico, apple-touch-icon.png and the app icons from public/favicon.svg
 npm run build:fonts      # cut the Latin Extended + Vietnamese font files from the pinned Archivo sources (--check compares byte for byte)
@@ -228,6 +236,7 @@ committed outputs:
 | GeoNames dumps | `download.geonames.org/` (everything) | the cached copies only |
 | CommonCrawl records | `data.commoncrawl.org/` (everything) | the pinned cached copies only (ice hockey's NHL 22 pages) |
 | The NHL's API | never fetched | the cached answers only: `sync:nhl` cannot refresh, `sync:nhl-seasons` reads its pinned rosters |
+| Liquipedia | `liquipedia.net/` (everything, for ClaudeBot and Claude-Web), `/rocketleague/api.php` and `/rocketleague/index.php` (every agent); `api.liquipedia.net/` (everything) | never fetched: `sync:rocket-league` reads an export saved by hand from the wiki's Special:Export in a browser ([design notes](docs/design/rocket-league.md#the-liquipedia-export)) |
 
 ## Deployment
 
@@ -363,19 +372,23 @@ manager of the theatre's favourite, with decisions from the first match.
    2025 back to 2018 (MLB The Show of each), then 2017 back to 1960 (computed from
    WAR), with nations or with clubs on the map of their day. Women's football lists its
    built-in 2026/27, then its [earlier seasons](#womens-football-seasons) 2025/26
-   back to 2015/16 (EA ratings of each; national teams only before 2022/23), ice
+   back to 2015/16 (EA ratings of each; national teams only before 2022/23), then the
+   World Cups and Olympic tournaments of 2014/15 back to 1991/92 (computed from each
+   finalist's Elo and its squad's minutes, finalists only), ice
    hockey its built-in 2026/27, then its [earlier seasons](#ice-hockey-seasons)
    2025/26 back to 1960/61 but the cancelled 2004/05 (EA's NHL ratings where an
    edition published them, else converted or computed from the players'
    statistics), nations or clubs on the map of their day, tennis its 2026 (Elo of 2 November) then its
    [earlier seasons](#tennis-seasons) 2025 back to 1960, women's tennis its 2026 (Elo of
    2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1963, rugby league its built-in 2025
-   (Rugby League 26) then [its earlier seasons](#rugby-league-seasons) 2024 back to 1998 (computed from
-   NRL.com's match statistics, but 2008: Rugby League 2, the overall ours), NRL clubs on the map of their day.
+   (Rugby League 26) then [its earlier seasons](#rugby-league-seasons) 2024 back to 1960 (computed from
+   NRL.com's match statistics, but 2008: Rugby League 2, the overall ours; before 1998 from the Rugby League
+   Project's team lists), the premiership's clubs on the map of their day.
    The Season list names a season by its years, adding "· computed", "· converted"
    or "· fan-made" where its label calls its ratings so ("1969/70 · computed"); a
    year with two seasons (football's 1993/94 and 1989/90, the NFL's and AFL's of
-   the 1960s) names each by its whole label instead. Only ice hockey's seasons
+   the 1960s, rugby league's ARL and Super League of 1997) names each by its whole
+   label instead. Only ice hockey's seasons
    carry a credit, the Hockey Databank's and MoneyPuck.com's as their sources ask,
    shown whole as small text under the Season choice. A one-line quick-resume
    strip (**Resume**, the save, ✕) appears when a save exists, and a page opened
@@ -941,8 +954,8 @@ with martj42's international results (CC0).
 
 This project is not affiliated with, endorsed or sponsored by Electronic Arts
 (EA SPORTS FC, FIFA, Madden NFL, EA SPORTS NHL), Sports Interactive and SEGA (Football Manager),
-2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), Big Ant Studios (Rugby League 26), the NBA, the NFL, MLB, the NHL, the NRL,
-or the clubs, leagues and federations it names.
+2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), Big Ant Studios (Rugby League 26), Psyonix and Epic Games (Rocket
+League and the RLCS), Liquipedia, the NBA, the NFL, MLB, the NHL, the NRL, or the clubs, leagues and federations it names.
 All trademarks, names and ratings belong to their respective owners.
 
 **American football** — `src/data/clubs.american-football.js`, the 32 NFL
@@ -1004,6 +1017,16 @@ Australia, New Zealand, Samoa, Tonga, England, Fiji, Papua New Guinea and the Co
 a matchday 17 and field a team, while Papua New Guinea's six and the Cook Islands' five fall short and their land stays
 neutral. See the
 [design notes](docs/design/rugby-league.md).
+
+**Rocket League** — `src/data/rosters.rocket-league.js`, from every 3v3 series Liquipedia records (CC BY-SA 3.0),
+read from two exports of the wiki saved by hand on 2026-11-14 (no script fetches Liquipedia: its robots.txt shuts
+Anthropic's crawlers out) into `scripts/data/rocket-league-elo.json`: 943 events of S- and A-Tier, 81,534 games from 2015
+to November 2026. There is no game's rating list for an esport: each player's rating is an Elo built game by game, a
+team playing at its three players' mean, on the game's scale Elo / 25 − 2 (dralii's 2,470 is 97), so the match model
+plays Elo's own odds; held out on the last 180 days its predictions were calibrated (log loss 0.583). A player plays for
+the nation he last played for at the FIFAe World Cup or the Esports Nations Cup, else the flag Liquipedia files him
+under; 815 players have played within the year, and 57 nations have the three a series needs, from France, the United
+States and Saudi Arabia down. Nothing is estimated. See the [design notes](docs/design/rocket-league.md).
 
 **Women's football** — `src/data/clubs.womens-football.js` and
 `src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07
@@ -1331,7 +1354,7 @@ scoring rate, with its larger home edge. The map is `public/domestic/euroleague.
 (`node scripts/build-europe-maps.mjs --only=euroleague`), the built-in season's. Each earlier
 season from 2000/01 has the EuroLeague of its own year on a map of its own (`el2001` to `el2026`,
 one for each run of seasons with the same clubs, 24 in all): CSKA Moscow and Russia's other clubs
-hold Russia west of the Urals, the rest of it grey, and Croatia, Slovenia and Lithuania are shared
+hold European Russia, the rest of it grey, and Croatia, Slovenia and Lithuania are shared
 when two of their clubs played. See the [design notes](docs/design/euroleague.md#earlier-seasons-200001-to-202526).
 
 ### The Europe maps
@@ -1357,22 +1380,37 @@ own country.
 
 Welsh clubs of the Premier League (Swansea, Cardiff, in earlier seasons) hold Wales,
 not England. AS Monaco, a Ligue 1 club, holds the land around Monaco in France.
+**Russia's clubs hold European Russia only**, the regions of its five federal districts
+west of the Urals; the rest of Russia lies grey beneath the map, as a country with no
+club does, so a Moscow club never stretches to the Pacific.
 
-The earlier [football seasons](#football-seasons) hold the seven big leagues only, so
-their maps draw on those: the strongest 124 and 32 of that season's 124–134 clubs,
-one pair of maps per season. 2005/06, 2004/05, 1989/90 and the nine World
-Cups have nations only, so no maps. Football's "One country · top clubs" campaigns are
-unchanged. A world campaign saved before these maps stays on the world, and resumes
+The earlier [football seasons](#football-seasons) play Europe's strongest clubs of
+their own year, each season's pair of maps drawn from all of Europe's first divisions
+as today's are: 11 to 31 of each season's 124 come from beyond the seven big leagues
+(Turkey, Belgium, Greece, Scotland, Russia, Denmark, Sweden, Norway, Czechia, Ukraine,
+Austria, Switzerland, Croatia, Serbia, Poland and Hungary), and up to five of its elite
+(Galatasaray and Fenerbahçe, Zenit and CSKA Moscow in FIFA 15 and 16, Celtic and
+Rangers in the Championship Manager seasons). The three SWOS seasons, 1996/97, 1995/96
+and 1994/95, hold their seven leagues' team files only, so their maps are those leagues'
+strongest. 2005/06, 2004/05, 1989/90 and the computed seasons have nations only, so no
+maps. A campaign saved on an earlier season's map of before (when its 124 came from
+the seven leagues) still resumes there; a new one plays the season's map of all of
+Europe. Football's "One country · top clubs" campaigns are unchanged, and play today's
+clubs only. A world campaign saved before these maps stays on the world, and resumes
 as it was; a CM 01/02 set built on your own computer has no map of Europe, so it
 deals its clubs onto the world.
 
-Each map is `public/domestic/eu<clubs>[s<season year>].json` (60 files, 150–190 KB,
-fetched when chosen), with the index `src/data/europeMaps.js`. They follow the clubs, so
-rebuild them after `npm run build-clubs`, `npm run build:ea-seasons`, `npm run build:retro-seasons`,
+Each map is `public/domestic/eu<clubs>[<e or s><season year>].json`, fetched when chosen,
+with the index `src/data/europeMaps.js`: `eu124` and `eu32` today's, `eu124e2018` an earlier
+season's from all of Europe, `eu124s1995` a SWOS season's from its seven leagues (64 maps in
+play, 149–204 KB, 10.9 MB). The 56 seven-league maps the EA and Championship Manager seasons
+had before 14 November 2026 (`eu124s2018`, 9.3 MB) stay as they were, never rebuilt and never
+offered, for the campaigns saved on them. They follow the clubs, so rebuild them after
+`npm run build-clubs`, `npm run build:ea-seasons`, `npm run build:retro-seasons`,
 `npm run build-womens-football` or `npm run build:womens-seasons`:
 
 ```bash
-npm run build:europe-maps                  # about 8 minutes; --only=eu124,eu32 builds just those
+npm run build:europe-maps                  # about 30 minutes, most of it the maps with Russian clubs; --only=eu124,eu32 builds just those
 npm run build:europe-maps -- --check       # offline rebuild must match the committed files byte for byte
 ```
 
@@ -1455,7 +1493,8 @@ territory or region its ground stands in and nothing else. New South Wales (ten 
 Queensland (four) are divided between their clubs; the Storm hold Victoria, the Raiders the Australian Capital Territory
 and the Warriors the Auckland Region, and every other state and region stays empty. The map is `public/domestic/nrl.json`
 (134 KB); grounds are in `scripts/data/nrl-teams.json`. The [earlier seasons](#rugby-league-seasons) play on maps of
-their day, `nrl1998` to `nrl2020`, built by the same command (the Adelaide Rams hold South Australia in 1998).
+their day, `nrl1960` to `nrl2020` and Super League's `sl1997`, built by the same command (Sydney's clubs alone in the
+1960s; the Adelaide Rams hold South Australia in 1997 and 1998).
 
 ```bash
 npm run build:nrl-map                      # boundaries + grounds → public/domestic/nrl.json and its index entry (seconds)
@@ -1491,9 +1530,12 @@ the game: pick one under **Season** in setup. Each is a file in
 `public/football/` (52–340 KB) that loads only when chosen.
 
 - **What a season holds:** every nation's best natural XI by EA nationality,
-  and the clubs of the seven biggest European leagues (132–134 clubs a season,
-  of which the strongest 124 play, on [the season's own maps](#the-europe-maps);
-  2005/06 and 2004/05 have nations only). Ratings are EA's overalls, unchanged.
+  and Europe's 124 strongest clubs of that edition, from every European first
+  division it rates (130–177 clubs beyond the seven big leagues a season, of which
+  18–27 make the 124), each with its best XI, on [the season's own maps](#the-europe-maps);
+  2005/06 and 2004/05 have nations only. A club EA filed under Rest of World for want of
+  a licence (FIFA 20's Olympiacos, Spartak Moscow and Shakhtar Donetsk) plays in the league
+  the same club is in in the nearest other edition. Ratings are EA's overalls, unchanged.
   EA rates only part of the world, so 49–82 nations field a full XI each season (fewer in the older
   editions). A nation with at least six rated players, half an XI, fields the players it has, short-handed
   below eleven; one with fewer fields no team, and its land stays neutral. Scotland, Wales and Northern Ireland field their own
@@ -1548,19 +1590,19 @@ twelve earlier seasons come from Sports Interactive's Championship Manager, a
 fan's update of it, Sensible World of Soccer and two fans' Championship Manager
 databases, one source each:
 
-| Season | Source | Nations with a full XI | Clubs |
+| Season | Source | Nations with a full XI | Clubs (beyond the seven big leagues) |
 | --- | --- | --- | --- |
-| 2003/04 | Alex Sawczuk's October 2003 update of SI's Championship Manager 01/02 (fan-made) | 109 | 129 |
-| 2002/03 | SI's Championship Manager 01/02, 3.9.68 | 108 | 129 |
-| 2001/02 | SI's Championship Manager 01/02, 3.9.60 | 96 | 130 |
-| 2000/01 | SI's Championship Manager 00/01, 3.81 | 82 | 130 |
-| 1999/00 | SI's Championship Manager 99/00, 3.70 | 74 | 130 |
-| 1998/99 | SI's Championship Manager 3, ported to CM 01/02 | 64 | 130 |
-| 1997/98 | SI's Championship Manager 97/98 | 52 | 124 |
-| 1996/97 | Sensible World of Soccer 96/97, the game's own team files | 133 | 134 |
-| 1995/96 | Sensible World of Soccer 95/96, the game's own team files | 132 | 134 |
-| 1994/95 | Sensible World of Soccer (the original, 1994), the game's own team files | 131 | 134 |
-| 1993/94 | Cam F's 93/94 for CM 01/02, fan-made | 77 | 130 |
+| 2003/04 | Alex Sawczuk's October 2003 update of SI's Championship Manager 01/02 (fan-made) | 109 | 124 (31) |
+| 2002/03 | SI's Championship Manager 01/02, 3.9.68 | 108 | 124 (27) |
+| 2001/02 | SI's Championship Manager 01/02, 3.9.60 | 96 | 124 (31) |
+| 2000/01 | SI's Championship Manager 00/01, 3.81 | 82 | 124 (28) |
+| 1999/00 | SI's Championship Manager 99/00, 3.70 | 74 | 124 (21) |
+| 1998/99 | SI's Championship Manager 3, ported to CM 01/02 | 64 | 124 (24) |
+| 1997/98 | SI's Championship Manager 97/98 | 52 | 124 (13) |
+| 1996/97 | Sensible World of Soccer 96/97, the game's own team files | 133 | 134 (none) |
+| 1995/96 | Sensible World of Soccer 95/96, the game's own team files | 132 | 134 (none) |
+| 1994/95 | Sensible World of Soccer (the original, 1994), the game's own team files | 131 | 134 (none) |
+| 1993/94 | Cam F's 93/94 for CM 01/02, fan-made | 77 | 124 (26) |
 | 1989/90 | Simon Treanor's 89/90 for CM 01/02, fan-made (Beta 5) | 88 | nations only |
 
 1993/94 and 1989/90 are rated by fans, not by a game's makers, and say so in the
@@ -1574,8 +1616,12 @@ as West Germany, and a German at an East German club plays for no nation.
   outfield player's seven skills summed, a keeper's price alone) becomes
   `round(40 + value * 59 / 49)`, from an empty shirt's 40 to 99. The raw values
   stay with each player.
-- **Clubs:** the seven biggest leagues' top divisions, on the season's own
-  [Europe maps](#the-europe-maps).
+- **Clubs:** Europe's 124 strongest of every first division the database holds
+  (CM 01/02 holds 26, CM 99/00 twelve), on the season's own
+  [Europe maps](#the-europe-maps). CM 99/00 rates Denmark's clubs like mid-table
+  Serie A ones, so eleven of them make 1999/00's 124; CM 01/02 puts eight or nine
+  Swedish clubs in. SWOS's team files are cached for the seven biggest leagues
+  only, so 1996/97, 1995/96 and 1994/95 hold those leagues' top divisions whole.
 - **Credits and rights:** Championship Manager is Sports Interactive's; Eidos
   made CM 01/02 free to download in December 2008 for personal, non-commercial
   use, the data's rights reserved. 3.9.60 and 3.9.68 are SI's own files as
@@ -1627,8 +1673,8 @@ considered, back to 1872, and their terms.
     (`FIRST_YEAR`).
   - It reads the binary files with the game's own parser (`src/data/cm0102.js`,
     format in [cm0102-format.md](docs/design/cm0102-format.md)).
-  - Every one of the 176 nations gets an entry, and clubs come from the seven
-    leagues the club layer already uses. Tonga, Samoa and the Cook Islands are
+  - Every one of the 176 nations gets an entry, and clubs come from every European
+    first division the database holds (`LEAGUES`, by CM's stored names). Tonga, Samoa and the Cook Islands are
     left out when the database rates none of their players: a season without them
     fields no team of theirs, as in every built-in EA season (none rates one).
   - Ratings are CM's current ability (1–200) converted once with
@@ -2127,9 +2173,10 @@ chosen. They are built as the men's are, by the same scripts with `--tour=wta`
 
 ## Women's football seasons
 
-Women's football can be played on eleven earlier seasons as well as the built-in
+Women's football can be played on twenty-one earlier seasons as well as the built-in
 2026/27: every season from 2015/16 to 2025/26, each from that season's EA game
-(FIFA 16 to EA FC 26), the first of which was the first to rate women. Pick one
+(FIFA 16 to EA FC 26), the first of which was the first to rate women, and ten
+[computed](#the-world-cups-and-olympic-tournaments-1991-to-2015-computed) before them. Pick one
 under **Season** in setup. Each season is a file in `public/womens-football/`
 (15–150 KB) that loads only when chosen.
 
@@ -2157,22 +2204,76 @@ under **Season** in setup. Each season is a file in `public/womens-football/`
   npm run build:womens-seasons  # the season files, src/data/womensFootballSeasons.js and the audit (--check compares byte for byte)
   ```
 
+### The World Cups and Olympic tournaments, 1991 to 2015 (computed)
+
+No game rated women before FIFA 16, so ten more seasons are **computed**, as the
+men's [World Cups of 1962 to 1994](#the-world-cups-1962-to-1994-computed) are: each
+women's World Cup or Olympic tournament before 2015/16 whose line-ups an allowed
+source gives, its finalists only. Each finalist's strength comes from its Elo the day
+after the final, by the men's seasons' line; its eleven are the players of its squad
+who played the most, ordered by their World Cup awards, goals a minute and minutes.
+The Season list names them "1991/92 · computed".
+
+| Season | Tournament | Finalists | Strongest |
+| --- | --- | --- | --- |
+| 1991/92 | 1991 World Cup, China | 12 | United States, Sweden, China |
+| 1994/95 | 1995 World Cup, Sweden | 12 | Norway, United States, Germany |
+| 1996/97 | 1996 Olympic tournament, Atlanta | 8 | United States, Norway, China |
+| 2003/04 | 2003 World Cup, United States | 16 | Germany, United States, Sweden |
+| 2004/05 | 2004 Olympic tournament, Athens | 10 | Germany, United States, Brazil |
+| 2007/08 | 2007 World Cup, China | 16 | Germany, United States, Brazil |
+| 2008/09 | 2008 Olympic tournament, Beijing | 12 | United States, Germany, Brazil |
+| 2010/11 | 2011 World Cup, Germany | 16 | United States, Brazil, Germany |
+| 2012/13 | 2012 Olympic tournament, London | 12 | United States, Japan, Brazil |
+| 2014/15 | 2015 World Cup, Canada | 24 | United States, Germany, France |
+
+- **Sources:** the World Cups' squads, minutes, goals and awards from the Fjelstul World
+  Cup Database (the men's seasons' pinned copy, CC BY-SA 4.0); the Olympic tournaments'
+  squads and goals from Wikipedia's pages, their line-ups from RSSSF's match details
+  (1996, 2004, 2008; 1996's give no minutes, so its eleven are those who started most)
+  and Wikipedia's (2012); the Elo from martj42's women's results (public domain). Those
+  results lack most friendlies, so the Elo is checked against FIFA's women's ranking
+  at each of its 52 releases from 2003 to 2015: rank correlation 0.88 over FIFA's top 48
+  and 0.96 over its top 20 on average.
+- **Rules and names of their day:** a level game goes to the golden goal in 1996/97 and
+  2003/04, as those tournaments played it. The 2012 Olympic tournament's Great Britain
+  plays on the United Kingdom's land, the home nations' too, under its own name and the
+  Union Jack, rated from England's Elo (its side was England's but for two Scots).
+- **Not covered:** the 1999 World Cup and the 2000 Olympic tournament, whose line-ups no
+  allowed source gives (the one site that has 1999's forbids automated reading), and
+  the years between tournaments, for which Wikidata records too few women's caps.
+
+```bash
+npm run sync:womens-tournament-seasons   # the facts, from the pinned sources in data-src/ (--fetch downloads what is missing)
+npm run build:womens-tournament-seasons  # the season files, the listing and the audit (offline; --check compares byte for byte)
+```
+
+The credits CC BY-SA asks for are in `public/womens-football/ATTRIBUTION-computed.txt`,
+and [the design notes](docs/design/womens-football.md#computed-seasons) describe the method.
+
 ## Rugby league seasons
 
-Rugby league can be played on twenty-seven earlier seasons, every NRL season
-from 1998, as well as the built-in 2025: 2008, from Rugby League 2: World Cup
-Edition's own database (Sidhe, 2008), extracted by Wouldubeinta and kept by the
-Wayback Machine's copy of rugbyleaguemods.net, and 1998 to 2007 and 2009 to
-2024, which no game rated, computed from NRL.com's match centre (below). Pick one
-under **Season** in setup; it plays the NRL clubs of that season, clubs only, on
-the map of their day: the twenty of 1998 (St. George and Illawarra apart, the
-Adelaide Rams, the Gold Coast Chargers, the North Sydney Bears, Balmain and
-Western Suburbs), the seventeen of 1999, the fourteen of 2000 and 2001 (the Wests
-Tigers and the Northern Eagles, no South Sydney), the fifteen of 2002 to 2006,
-the sixteen of 2007 to 2022 (no Dolphins) and the seventeen of 2023 and 2024,
-each under its name of that season (the Canterbury Bulldogs, the Bulldogs, the
-Sydney City Roosters, the Auckland Warriors, the Sharks). Each season is a file
-in `public/rugby-league/` (13–18 KB) that loads only when chosen.
+Rugby league can be played on sixty-six earlier seasons, every premiership
+season from 1960, as well as the built-in 2025: 2008, from Rugby League 2: World
+Cup Edition's own database (Sidhe, 2008), extracted by Wouldubeinta and kept by
+the Wayback Machine's copy of rugbyleaguemods.net; 1998 to 2007 and 2009 to 2024,
+which no game rated, computed from NRL.com's match centre (below); and before
+1998, the NSWRFL's premierships from 1960, the NSWRL's from 1984 and the ARL's
+from 1995, with Super League's beside the ARL's in 1997, computed from the Rugby
+League Project's record of who started, where and how often (below). Pick one
+under **Season** in setup; it plays the clubs of that season, clubs only, on the
+map of their day: Sydney's ten of the 1960s, twelve from 1967 (Cronulla-Sutherland,
+Penrith), Canberra and Illawarra from 1982, Brisbane, the Gold Coast and Newcastle
+from 1988, the ARL's twenty of 1995 and 1996, the ARL's twelve and Super League's
+ten of 1997, the twenty of 1998 (St. George and Illawarra apart, the Adelaide Rams,
+the Gold Coast Chargers, the North Sydney Bears, Balmain and Western Suburbs), the
+seventeen of 1999, the fourteen of 2000 and 2001 (the Wests Tigers and the Northern
+Eagles, no South Sydney), the fifteen of 2002 to 2006, the sixteen of 2007 to 2022
+(no Dolphins) and the seventeen of 2023 and 2024, each under its name of that
+season (the Newtown Bluebags, the Canterbury-Bankstown Berries, the Eastern Suburbs
+Roosters, the Sydney Tigers, the Gold Coast Seagulls, the Canterbury Bulldogs, the
+Bulldogs, the Sydney City Roosters, the Auckland Warriors, the Sharks). Each season
+is a file in `public/rugby-league/` (9–18 KB) that loads only when chosen.
 
 - **2008's players:** every one is checked against the Rugby League Project's 2008
   records, so 414 of the database's 462 NRL players are kept and the game's
@@ -2205,16 +2306,30 @@ in `public/rugby-league/` (13–18 KB) that loads only when chosen.
   seasons either side, else from the Rugby League Project. Run on 2025, the
   method agrees with Rugby League 26 at a rank correlation of 0.76 within
   position.
+- **1960 to 1997 are computed from selection** (labelled "NSWRFL (computed)",
+  "NSWRL (computed)", "ARL (computed)" or "Super League (computed)"): NRL.com keeps
+  nothing before 1998, and the Rugby League Project keeps every game's team lists
+  but no tackles or metres. A player's value is his selections, the games he
+  started for his club and his representative games (Tests, State of Origin or
+  the interstate series, NSW City v Country), with two for each try at today's
+  rate of four tries a team game, scaled to his season's, per club game, the
+  season before at half weight; then the overall and the club shift as above. Run
+  on 2025, it agrees with Rugby League 26 at 0.73 within position, against the
+  stats method's 0.76. Every season plays today's scoring, so the seasons before
+  1983, when a try was worth three, score above their record.
 - **Maps:** each club grows from its ground, or from its training base where it
   shares one, and three rules keep the maps few: a ground being rebuilt stays its
   club's (R1), COVID-19 relocations are ignored (R2), and a rename on the same
-  site does not split a map (R3). From 1998 to 2007 the clubs changed nearly
-  every season: 1998, 1999, 2000, 2001, 2002, 2006 and 2007 each have a map of
-  their own (`nrl1998` …), 2003 to 2005 share `nrl2003`, and the clubs since gone
-  (the Adelaide Rams, the North Sydney Bears, the Northern Eagles …) hold their
-  own territory there. 2008 and 2009 play on `nrl2008`, 2010 and 2011 on
-  `nrl2010`, 2012 to 2019 on `nrl2012`, 2020 to 2022 on `nrl2020`, and 2023 and
-  2024, with the Dolphins, on today's `nrl`.
+  site does not split a map (R3). Before 1998, eighteen maps (`nrl1960` to
+  `nrl1997`, and Super League's `sl1997`): Sydney's clubs alone until 1982, and the
+  games the league staged at the SCG and the Sydney Sports Ground before 1988 count
+  for no club's ground but Eastern Suburbs'. From 1998 to 2007 the clubs changed
+  nearly every season: 1998, 1999, 2000, 2001, 2002, 2006 and 2007 each have a map
+  of their own (`nrl1998` …), 2003 to 2005 share `nrl2003`, and the clubs since
+  gone (the Newtown Jets, the Adelaide Rams, the North Sydney Bears, the Western
+  Reds, the Northern Eagles …) hold their own territory there. 2008 and 2009 play
+  on `nrl2008`, 2010 and 2011 on `nrl2010`, 2012 to 2019 on `nrl2012`, 2020 to
+  2022 on `nrl2020`, and 2023 and 2024, with the Dolphins, on today's `nrl`.
 - **No nations:** 2008's World Cup squads mix Super League players rated on a
   more generous scale, and the computed seasons rate club games only, so a
   nations game plays the built-in season's.
@@ -2225,13 +2340,14 @@ in `public/rugby-league/` (13–18 KB) that loads only when chosen.
   ```bash
   npm run sync:rugby-league-seasons -- --fetch   # missing inputs into data-src/ (the database, RLP pages, NRL.com's games), then scripts/data/rugby-league-seasons/nrl-<year>.json (--check)
   npm run build:rugby-league-seasons             # the season files, their listing and the audit (--check; --realism plays them)
-  npm run build:nrl-map                          # today's map and the era maps nrl1998 … nrl2007, nrl2008, nrl2010, nrl2012 and nrl2020
+  npm run build:nrl-map                          # today's map and the era maps nrl1960 … nrl1997, sl1997, nrl1998 … nrl2007, nrl2008, nrl2010, nrl2012 and nrl2020
   ```
 
 The [design notes](docs/design/rugby-league.md#earlier-seasons) give the
 weights and their reasons, the club shift, the computed seasons
 ([2009–2024](docs/design/rugby-league.md#computed-seasons-20092024),
-[1998–2007](docs/design/rugby-league.md#computed-seasons-19982007)) and the
+[1998–2007](docs/design/rugby-league.md#computed-seasons-19982007),
+[1960–1997](docs/design/rugby-league.md#computed-seasons-19601997)) and the
 known limits.
 
 ## Squad economics

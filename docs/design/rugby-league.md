@@ -160,6 +160,9 @@ ratings. The user chose this on 2026-11-08 ("Build 2008", then "Adjust by team r
 which no game rated, are computed from NRL.com's match stats ([Computed seasons](#computed-seasons-20092024), built
 2026-11-09), and so are 1998 to 2007, the NRL's first ten seasons, with the clubs of their day
 ([Computed seasons, 1998–2007](#computed-seasons-19982007), built 2026-11-13): every NRL season from 1998 is playable.
+Before it, the premierships of 1960–1997 (the NSWRFL's, the NSWRL's, the ARL's and Super League's of 1997) are computed
+from the Rugby League Project's record of who started, where and how often
+([Computed seasons, 1960–1997](#computed-seasons-19601997), built 2026-11-14): every premiership season from 1960.
 
 - **The database.** `RLDatabase.xml`, the game's own database, extracted from its data pak by Wouldubeinta and posted on
   rugbyleaguemods.net (thread "Data pak File", post 570, 30 March 2012, attachment 56), read from the Wayback Machine's raw
@@ -739,6 +742,196 @@ Darren Lockyer (2000), Stacey Jones (1999, 2001), Nathan Hindmarsh (2000, 2001, 
 - **Today's rules:** golden point came in 2003 (a level regular-season game was a draw before), but a campaign needs a
   winner, so every season plays it, as every season since 2008 does.
 
+## Computed seasons, 1960–1997
+
+Status: built 2026-11-14. The premierships before the NRL, **1960 to 1997**: the NSWRFL's to 1983, the NSWRL's from 1984
+to 1994, the ARL's from 1995, and in 1997 Super League's beside the ARL's, both kept as two seasons of one year, as the
+NFL's and the AFL's of the 1960s are. Each is computed from the Rugby League Project's record of who started, where and
+how often, labelled "NSWRFL (computed)", "NSWRL (computed)", "ARL (computed)" or "Super League (computed)", and plays on a
+map of its day with the clubs of its day: rugby league now has every premiership season from 1960 to 2025. The user asked
+on 2026-11-13 to cover every sport's year gaps, and approved computed ratings where they are documented and labelled; the
+sessions on it took this one last, once 1998–2007 were done.
+
+### Can the record rate players?
+
+NRL.com keeps nothing before 1998. The Rugby League Project (RLP) keeps every premiership game's team lists by position,
+its scorers and its ground, and each season's list of its players: the games each started at each position, came off the
+bench, won, lost and drew, and his tries and goals. Tackles, metres and line breaks were never recorded, so the stats
+method above cannot be run, and the question was whether selection, who started and how often, rates players as well.
+It was measured on 2025 against Rugby League 26, the yardstick the stats method meets: RLP's own lists of 2025 and 2024,
+465 players matched by name to the game's, pooled Spearman within Rugby League 26's positions.
+
+| A player's value | Spearman against RL26 |
+| --- | --- |
+| starts a club game, 2025 alone | 0.682 |
+| starts a club game, 2024 at half weight | 0.742 |
+| and 2 for each try (0.766 at ½ a try, 0.774 at 1, 0.778 at 2, flat to 4) | 0.778 |
+| and representative games counted as starts (State of Origin, Tests) | 0.785 |
+| NRL.com's core points, the stats method's value (the research pass's measure) | 0.797 |
+
+Through the whole method (percentile at the position read off Rugby League 26 by the quota, then the club shift), on
+the 426 players RLP places at a position: Spearman 0.743 within position before the shift and 0.731 after, mean error 2.72
+and 2.83 points; the stats method's finished overall meets the game at 0.761, mean error 2.72 (449 players, "Calibration"
+above). The research pass of 2026-11-09 had estimated 0.77. So the record supports a computed rating, a little looser than
+the stats method's: it ranks a club's regulars above its fringe and the try-scorers among its backs, and leans on the
+selectors for the best.
+
+Two choices the measure guided. **Representative games count as selections**, because Test and interstate players of
+the 1960s and 1970s missed club rounds for them: counted as starts, they give back what the club lost (+0.007 on 2025,
+when Origin players miss few). **A try weighs two starts at today's rate of four tries a team game** (2025's: 4.01),
+scaled to the season's own rate, so that a try keeps its weight against a start in every era: the seasons ran from 2.06
+tries a team game (1967) to 3.64 (1995). Goals count nowhere, as in every other season: the overall says nothing of a
+kicker's boot.
+
+### The source
+
+- **The Rugby League Project**, 446 requests on 2026-11-14, every reply 200, through `scripts/lib/polite-fetch.mjs` (its
+  robots.txt allows the season, competition and calendar pages; it disallows only some `/matches/` searches and query
+  strings), one every three seconds: each season's players list and results, 1958 to 1999 (the season before and the two
+  either side of each), Super League's league games alone (`results-league.html`: its season also held the World Club
+  Challenge), the calendar of each year for its competitions, and each representative competition's players: a table
+  (the Tests), a one-match competition's team lists (NSW City v Country, the 1980 and 1981 State of Origin), or a series'
+  squads with each player's appearances (the interstate series to 1981, State of Origin from 1982). RLP states no data
+  licence; it is read for facts only, who played, where and how often, as for 1998–2007 (`rlpTerms`). The World Cups are
+  left out, their games being Tests already, and so are Super League's two Test series of 1997 (every player in them is
+  in 1997's Test Matches with as many games).
+- **English Wikipedia**, 53 articles more, read as `/wiki/` pages and pinned by revision (`wikipedia`): the 38 season
+  articles of 1960–1997 and Super League's, whose Teams sections name each club's ground; the grounds no club plays at
+  today (Henson Park, the Sydney Sports Ground, Pratten Park, Lidcombe Oval, Sutherland Oval, Seiffert Oval, Seagulls
+  Stadium, Topper Stadium, under its article today, the WACA Ground, the SCG); and the clubs gone (Newtown, the
+  Crushers, the Western Reds, under WA Reds today, the Hunter Mariners).
+- **Pins**: 202 inputs more in `scripts/data/rugby-league-seasons-sources.json`, each RLP page by the part read (a
+  season's or competition's players table, `list` and `tests`; a series' squads; the results table).
+
+### The method
+
+The 1998–2024 method with selection for its value (`scripts/lib/rugby-league-seasons.mjs`: `rlpSeasonList`,
+`clubsByCode`, `selectionValue`; the sync's `selectionSnapshotOf`):
+
+1. **Players.** Everyone RLP lists as taking the field in the season, its finals included; his club the one he played
+   most games for (of two as many, the first RLP lists). The list and the results must agree: every code the list names
+   is a club of the results (`RLP_CLUB_CODES`: a code keeps its club throughout, but NEW is Newtown's to 1983 and
+   Newcastle's from 1988), and no player of one club played, won, drew or lost more than his club did.
+2. **Position.** The one he started at most that season (the bench is no start), else in the seasons either side, then two
+   either side; else he is left out (682 of 15,622 across the 39 seasons, fringe players of a game or two).
+3. **Value.** (Starts + representative games + 2 × tries × 4 ÷ the season's tries a team game) per club game, the season
+   before at half weight when he played in it (its own try rate; 1960's is 1959's NSWRFL, 1997's both the ARL's of 1996).
+4. **Overall** and **club shift**: as 1998–2024, the season's Simple Rating System from its regular rounds' scores.
+
+Each snapshot keeps every player's starts, representative games and tries, and his season before, so the tests
+recompute every value, overall and shift.
+
+### The clubs
+
+| Seasons | Clubs |
+| --- | --- |
+| 1960–1966 | ten, all Sydney's: Balmain, Canterbury-Bankstown, Eastern Suburbs, Manly-Warringah, Newtown, North Sydney, Parramatta, South Sydney, St. George, Western Suburbs |
+| 1967–1981 | twelve: Cronulla-Sutherland and Penrith join |
+| 1982, 1983 | fourteen: Canberra and Illawarra |
+| 1984–1987 | thirteen: Newtown gone |
+| 1988–1994 | sixteen: Brisbane, the Gold Coast and Newcastle |
+| 1995, 1996 | twenty in the ARL: the Auckland Warriors, the North Queensland Cowboys, the South Queensland Crushers and the Western Reds |
+| 1997 | the ARL's twelve, and Super League's ten: Brisbane, Canberra, Canterbury, Cronulla, Penrith, Auckland and North Queensland with the Adelaide Rams, the Hunter Mariners and the Perth Reds |
+
+- **Names of the day**, from the clubs' articles: the Canterbury-Bankstown Berries to 1977
+  (`nrl-canterbury-bankstown-berries`; the Bulldogs from 1978), the Sydney Bulldogs of 1995 (`nrl-sydney-bulldogs`), the
+  Canterbury Bulldogs of 1996 and 1997; the Eastern Suburbs Roosters to 1994 (`nrl-eastern-suburbs-roosters`, EAS), the
+  Sydney City Roosters after; the Newtown Bluebags to 1972 (`nrl-newtown-bluebags`; the Jets from 1973); Balmain as the
+  Sydney Tigers in 1995 and 1996 (`nrl-sydney-tigers`, SYT); the Gold Coast-Tweed Giants of 1988 and 1989 and the Gold
+  Coast Seagulls to 1995 (`nrl-gold-coast-tweed-giants`, GCT; `nrl-gold-coast-seagulls`, GCS), the Chargers after; the
+  Western Reds as the Perth Reds in Super League (`nrl-perth-reds`). Each is an era of its club, in its colour.
+- **The clubs gone** (`defunct`, four more): the Newtown Jets (NTN), the South Queensland Crushers (SQC), the Western Reds
+  (WRD) and the Hunter Mariners (HUN), each under its own id, in a colour of its own and with no crest; their codes are
+  ours. Balmain, North Sydney, Western Suburbs, Illawarra, the Gold Coast and Adelaide were already among them.
+- **Names** come from RLP's lists, which print a surname in capitals: each is written as a name is (Beetson, McArthur,
+  O'Connor, Addo-Carr; a particle in lower case, "de", stays so).
+
+### Grounds and maps
+
+A club grows from the ground of most of its regular-season home games by RLP's results, as from 1998, with what that era
+needs on top:
+
+- **The league's showpiece grounds.** Until the Sydney Football Stadium opened in 1988 the league staged its match of
+  the round at the SCG or the Sydney Sports Ground, whoever was at home (St. George played 6 of 9 home games at the SCG in
+  1962): those games count for no club's ground, but Eastern Suburbs' at the Sports Ground, its own, and a club that
+  played every home game at them (Eastern Suburbs at the SCG in 1977).
+- **A ground being rebuilt stays its club's (R1)**: Parramatta at Belmore from 1982 to 1985 while Cumberland Oval was
+  rebuilt as Parramatta Stadium (named so throughout); St. George at the SCG and Belmore from 1986 to 1988 while Kogarah
+  had its new grandstand; Eastern Suburbs at Henson Park in 1987 while the Sports Ground became the Sydney Football Stadium.
+- **A club on another's ground grows from its own**: Balmain at Eastern Suburbs' Sports Ground in 1971 and 1972 (from
+  Leichhardt), South Sydney at the Sydney Football Stadium from 1988 (from Redfern, as after 1998; alone there in 1990,
+  when Eastern Suburbs played most home games at Henson Park, as the ground's article records), the Sydney Bulldogs and the
+  Sydney Tigers at Parramatta Stadium in 1995 (from Belmore and Leichhardt), the Tigers again in 1996.
+- **Canberra played at Seiffert Oval, in Queanbeyan, until 1989**: over the border in New South Wales, so the Raiders
+  hold a corner of New South Wales and the Australian Capital Territory is nobody's until Bruce Stadium in 1990. The Gold
+  Coast's club began at Seagulls Stadium, Tweed Heads, in New South Wales too, and holds the Tweed until Carrara in 1996.
+
+| Map | Seasons | What sets it apart |
+| --- | --- | --- |
+| `nrl1960` | 1960–1966 | ten clubs, all in Sydney; Western Suburbs at Pratten Park, Parramatta at Cumberland Oval |
+| `nrl1967` | 1967 | twelve: Cronulla-Sutherland at Sutherland Oval, Penrith; Western Suburbs at Lidcombe |
+| `nrl1968` | 1968–1970 | Cronulla-Sutherland at Endeavour Field |
+| `nrl1971` | 1971–1972 | Balmain at the Sports Ground, from Leichhardt |
+| `nrl1973` | 1973–1976 | the Newtown Jets; Balmain back at Leichhardt |
+| `nrl1977` | 1977 | Eastern Suburbs at the SCG |
+| `nrl1978` | 1978–1981 | the Canterbury-Bankstown Bulldogs |
+| `nrl1982` | 1982–1983 | fourteen: Canberra (Queanbeyan), Illawarra (Wollongong); Parramatta keeps its ground (R1) |
+| `nrl1984` | 1984–1986 | thirteen, without Newtown; St. George keeps Kogarah (R1) |
+| `nrl1987` | 1987 | Western Suburbs at Campbelltown; Eastern Suburbs keeps its ground (R1) |
+| `nrl1988` | 1988–1989 | sixteen: the Broncos at Lang Park, the Giants at Tweed Heads, the Knights; the Rabbitohs from Redfern |
+| `nrl1990` | 1990 | Eastern Suburbs at Henson Park; Canberra at Bruce Stadium; the Seagulls |
+| `nrl1991` | 1991–1992 | Eastern Suburbs back at the Sydney Football Stadium |
+| `nrl1993` | 1993–1994 | the Broncos at ANZ Stadium |
+| `nrl1995` | 1995 | the ARL's twenty: Auckland, Townsville, Lang Park for the Crushers, Perth; Parramatta Stadium three clubs' |
+| `nrl1996` | 1996 | the Canterbury Bulldogs at Belmore, the Chargers at Carrara |
+| `nrl1997` | 1997 | the ARL's twelve |
+| `sl1997` | Super League 1997 | ten: Adelaide holds South Australia, the Perth Reds Western Australia, the Mariners the Hunter |
+
+Ground names follow the rule of 1998–2007 (a ground no club plays at today keeps its name of the day: Henson Park, the
+Sydney Sports Ground, Cumberland Oval, Seiffert Oval, Stockland Stadium; one still played at, its name today: Ocean
+Protect Stadium for Endeavour Field, GIO Stadium for Bruce, Suncorp Stadium for Lang Park, 4 Pines Park for Brookvale).
+
+### The seasons
+
+| Seasons | Clubs | Players a season | Left out | Shifts | Clubs against wins: selections → shifted | Tries a team game | Real points a team |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1960–1966 | 10 | 254–272 | 0–6 | −2 to +2 | 0.30–0.83 → 0.84–0.95 | 2.11–2.87 | 12.3–15.7 |
+| 1967–1981 | 12 | 308–364 | 3–22 | −2 to +2 | 0.21–0.91 → 0.67–0.96 | 2.06–3.26 | 14.2–17.3 |
+| 1982–1987 | 13–14 | 421–452 | 22–36 | −1 to +2 | 0.43–0.89 → 0.65–0.96 | 2.52–3.16 | 15.9–19.3 |
+| 1988–1994 | 16 | 490–509 | 28–39 | −2 to +2 | 0.20–0.86 → 0.79–0.94 | 2.51–3.56 | 14.9–20.5 |
+| 1995–1997, ARL | 12–20 | 344–622 | 17–40 | −1 to +2 | 0.80–0.93 → 0.85–0.92 | 3.28–3.64 | 19.0–21.1 |
+| 1997, Super League | 10 | 274 | 11 | −1 to +2 | 0.77 → 0.86 | 3.60 | 21.3 |
+
+14,940 players placed over the 39 seasons: 13,684 by their own season, 1,049 by a season either side, 207 by two. Clubs
+against wins, as for 1998–2024, is a check only: the selections alone rank the clubs loosely (median 0.60), as the value
+says who a club picked, not how good it was; the shift by the season's results brings them to a median of 0.90.
+
+**Realism** (40 seeded seasons of each, `--realism`, 24 games at a neutral venue): the model's wins rank against the real
+season's at 0.60–0.96, median 0.86 (under 0.7 in 1962, 1966, 1986 and 1992); the win% spread is 0.146–0.194 (real
+0.125–0.247), best and worst records 17.6–20.7 and 4.3–6.3 wins of 24 (real 16–21.8 and 0–7). The model scores as today's
+game does, 22.8–23.5 points a team, where the real seasons scored 12.3–21.3 (12–16 in the 1960s, a try worth three), and
+its mean margin of 15.3–17.1 points runs above the real 8.6–17.9: the first limit below.
+
+**Spot checks.** The best-rated of each season (the audit's `best`) are its stars: Reg Gasnier, Kevin Ryan and Eddie
+Lumsden of St. George in its run of eleven premierships (1962), Gasnier again in 1964; Kevin Junee (from 1967), Ron Coote
+(1969, 1975), Johnny Mayes and Bob Fulton (1973–1976); Ray Price (1978, 1979); Steve Roach (1984, 1985), Greg Alexander
+(1986, 1989, 1991) and Sam Backo (1987, 1988); Paul Harragon (1994), Gary Freeman (1995) and Allan Langer (1996); and
+Super League's David Peachey, Ian Roberts and Stacey Jones.
+
+### Limits
+
+- **Selection, not play.** A player rates by how often he was picked and scored, read onto 2025's ratings at his
+  position: a regular of a weak club meets a regular of a strong one until the club shift, and a forward who never
+  scores rates by his starts and his representative games alone.
+- **Today's scoring.** Every season plays today's rules: a try was three points until 1983 and a field goal two until
+  1971, so the model scores more than the 1960s did (12–16 points a team a game then, 23 in the model); there was no golden
+  point before 2003.
+- **No crests.** The clubs of 1960–1997 under today's ids wear today's crest; the eras and the clubs gone show their code
+  until their crests of the day are researched ([period-marks.md](period-marks.md)).
+- **Clubs only**, as every earlier season: a nations game plays the built-in nations.
+- **The setup says "NRL".** The theatre and its club count name the map's league, NRL, in every season (the AFL's
+  seasons have a league of their own on the NFL's maps); the Season list's label names the premiership of the day.
+
 ## Tests
 
 `scripts/rugby-league.test.mjs`: the data rebuilds byte for byte; every rating and position is the snapshot's; the
@@ -750,7 +943,7 @@ and its home sides, `scripts/home-advantage.test.mjs` the edge and the live char
 the map's state rule with Australian and New Zealand towns. `npm run smoke` adds an NRL duel with the live ticker and a
 rugby league nations blitz of Asia and Oceania.
 
-`scripts/rugby-league-seasons.test.mjs` covers the earlier seasons: all twenty-seven rebuild byte for byte, and their
+`scripts/rugby-league-seasons.test.mjs` covers the earlier seasons: all sixty-six rebuild byte for byte, and their
 snapshots from the pinned inputs when `data-src/rugby-league-seasons/` is present. For 2008, the reader, the naming
 check, the weights and every overall, the club shift and the map. For the computed seasons: NRL Fantasy's eleven
 weights with a reason each and the season before at half weight; the stats each season counts, NRL.com's census of
@@ -763,7 +956,14 @@ behind them pinned; each era's grounds and map, and on the maps of 1998–2007 e
 from; the City of Parramatta cut only while the Bulldogs trained at Olympic Park or played at Homebush; six seasons
 played 40 times with the model's wins ranking against the real ones at 0.6 or better; the loader's rules; and the App
 launching a 2015 campaign on `nrl2012` and a 1998 one with its twenty clubs on `nrl1998`, saving and resuming each, and
-a 2023 one on today's map.
+a 2023 one on today's map. For the seasons before 1998: the 39 of them, their labels, kind and RLP seasons, Super League's
+1997 under its own id and map; the reading of RLP's lists (starts by position, the bench no start, surnames as written, a
+list checked against its results, every club code's slugs); every value recomputed from starts, representative games
+and tries at the season's try rate, every overall and shift; the names of the day, the clubs gone, every ground rule (the
+showpiece grounds, R1, the bases) and every cited article pinned; the eighteen maps, each club holding the point it grows
+from (or, its ground on an estuary, the section of its town), Sydney's clubs alone until 1982 and the Territory empty
+until Canberra moved to Bruce; and the App launching a 1975 campaign on `nrl1973` and saving and resuming it, and
+Super League's 1997 on `sl1997`.
 
 ## Known limits
 
@@ -781,7 +981,8 @@ a 2023 one on today's map.
   two, smaller even than Washington's District of Columbia; Parramatta and Penrith take the west of the state.
 - **One conversion rate.** Every kicker converts 75.5%: the game's overall says nothing of goal-kicking.
 - **No two-point field goals, sin bins or penalty counts:** a try, a goal and a field goal are all there is.
-- **Nothing before 1998.** NRL.com's replies before 1998 carry scores only (no team lists, no player stats), and 1997
-  had two competitions, the ARL's and Super League's. Earlier seasons would need the Rugby League Project's team lists
-  and scorers and a selection-based rating (the research pass's estimate: 0.77 against Rugby League 26 in 2025's
-  conditions), with all-Sydney maps of the NSWRL.
+- **Nothing before 1960**, the floor the other sports keep: the Rugby League Project's record goes back to 1908, and the
+  selection method of 1960–1997 would run on it.
+- **Today's scoring in every season.** Before 2003 there was no golden point, before 1983 a try was worth three, and
+  before 1971 a field goal two; the model plays today's rules, so the seasons before 1983 score well above their record
+  (see "Computed seasons, 1960–1997").

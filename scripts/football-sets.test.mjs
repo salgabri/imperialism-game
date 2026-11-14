@@ -159,7 +159,7 @@ test('anything the builder would not write is refused with a reason', () => {
     [doc => { doc.nations['250'][2][0][3] = 201; }, /Invalid CM current ability/],
     [doc => { doc.nations['250'][2][0][1] = ''; }, /Invalid CM tuple/],
     [doc => { doc.nations['250'][2][1][0] = doc.nations['250'][2][0][0]; }, /repeats player/],
-    [doc => { doc.clubs[0].league = 'Serie B'; }, /not a built-in league/],
+    [doc => { doc.clubs[0].league = 'Serie B'; }, /league "Serie B" is not one of Europe's first divisions/],
     [doc => { doc.clubs[0].country = 'ENG'; }, /not a nation id/],
     [doc => { doc.clubs[0].code = 'tfu'; }, /three capitals/],
     [doc => { doc.clubs[1].id = doc.clubs[0].id; }, /duplicated/],
@@ -236,7 +236,7 @@ test('the index lists the built-in seasons and the local sets newest first; a mi
   assert.equal(await loadFootballSetIndex({ fetch: none.fetch }), BUILT_IN_SETS, 'the answer is kept');
   assert.equal(none.calls.length, 1, 'read once');
   const builtInId = new RegExp('^(?:(?:eaw?-(?:fifa|fc)-|nba-2k|nba-live-|mlb-the-show-)\\d{2}'
-    + '|(?:madden|tecmo|pfa|pfa-afl|tennis|wta|nhl|nrl|nba-eras|nba-classic|nba-stats|cm|swos|mlb-war|wc|nt)-\\d{4}|cm0102-\\d{4}-\\d{2}(?:-[a-z0-9]+)?)$');
+    + '|(?:madden|tecmo|pfa|pfa-afl|tennis|wta|nhl|nrl|nrl-sl|nba-eras|nba-classic|nba-stats|cm|swos|mlb-war|wc|nt|wwc|wol)-\\d{4}|cm0102-\\d{4}-\\d{2}(?:-[a-z0-9]+)?)$');
   assert.ok(BUILT_IN_SETS.length > 0, 'seasons are built in');
   assert.deepEqual(BUILT_IN_SETS.map(set => set.id).filter(id => !builtInId.test(id)), [], 'every built-in id has a known shape');
 

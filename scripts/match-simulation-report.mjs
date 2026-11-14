@@ -1,7 +1,8 @@
 // Headless statistical probes of the game's model, not real-world match forecasts.
 // Run: node scripts/match-simulation-report.mjs --samples=30000 --full=1000
-// JSON goes to stdout; optionally save it with --out=<path>.
-import { writeFileSync } from 'node:fs';
+// JSON goes to stdout; optionally save it with --out=<path>. With --sport=<id> only that sport is sampled, and an --out
+// report that exists keeps every other sport as it was (a new sport joins without resampling the rest).
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { performance } from 'node:perf_hooks';
 import { buildTeam, hashStr, makeRng, teamEff } from '../src/data/teams.js';
@@ -35,12 +36,15 @@ const SCORE_SCALES = Object.freeze({
   'womens-tennis': Object.freeze({ largeTotal: 5, blowout: 3, bar: 1 }),
   // Rugby league in points: sixty between the sides is a high-scoring game, a 25-point margin a rout, a bar a try.
   'rugby-league': Object.freeze({ largeTotal: 60, blowout: 25, bar: 4 }),
+  // Rocket League in games: a series that goes to a seventh, and a 4–0 sweep.
+  'rocket-league': Object.freeze({ largeTotal: 7, blowout: 4, bar: 1 }),
 });
 const POINTS_SCALE = Object.freeze({ largeTotal: 220, blowout: 20, bar: 10 });
 
 // Four national pairings a sport. Women's football's, ice hockey's and rugby league's are nations that field their own
 // players: a nation without any plays no women's football, and a hockey or rugby league minnow's lineup is generated.
-// Tennis's are Davis Cup nations, women's tennis's Billie Jean King Cup nations.
+// Tennis's are Davis Cup nations, women's tennis's Billie Jean King Cup nations, Rocket League's nations with three
+// players rated from Liquipedia's results.
 const PAIRINGS = Object.freeze({
   football: [['250', '076'], ['032', '276'], ['724', '756'], ['076', '356']],
   'womens-football': [['724', '826'], ['840', '276'], ['076', '392'], ['724', '834']],
@@ -48,6 +52,7 @@ const PAIRINGS = Object.freeze({
   tennis: [['380', '724'], ['840', '276'], ['250', '643'], ['032', '036']],
   'womens-tennis': [['840', '643'], ['203', '804'], ['616', '112'], ['826', '036']],
   'rugby-league': [['036', '554'], ['826', '242'], ['036', '826'], ['554', '598']],
+  'rocket-league': [['250', '840'], ['682', '826'], ['724', '076'], ['250', '682']],
 });
 const OTHER_PAIRINGS = [['840', '124'], ['276', '688'], ['250', '724'], ['840', '356']];
 
@@ -157,9 +162,9 @@ function benchmark(sport, attacker, defender, fullSamples) {
   };
 }
 
-export function createSimulationReport({ samples = 30000, fullSamples = 1000, seed = 20261002 } = {}) {
+export function createSimulationReport({ samples = 30000, fullSamples = 1000, seed = 20261002, only = null } = {}) {
   const sports = {};
-  for (const sport of SPORT_LIST) {
+  for (const sport of SPORT_LIST.filter(item => !only || item.id === only)) {
     const defender = syntheticTeam(sport, 55, 'D');
     const gaps = [];
     for (const [preset, setting] of Object.entries(UNCERTAINTY_PRESETS)) {
@@ -189,7 +194,15 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     const separator = arg.indexOf('='); return [arg.slice(2, separator < 0 ? undefined : separator), separator < 0 ? true : arg.slice(separator + 1)];
   }));
   const positive = (value, fallback, max) => { const number = Number(value); return Number.isFinite(number) && number > 0 ? Math.min(max, Math.round(number)) : fallback; };
-  const report = createSimulationReport({ samples: positive(options.samples, 30000, 1000000), fullSamples: positive(options.full, 1000, 100000), seed: positive(options.seed, 20261002, 0xffffffff) });
+  const only = typeof options.sport === 'string' ? options.sport : null;
+  if (only && !SPORT_LIST.some(sport => sport.id === only)) throw new Error(`Unknown sport ${only}`);
+  let report = createSimulationReport({ samples: positive(options.samples, 30000, 1000000), fullSamples: positive(options.full, 1000, 100000),
+    seed: positive(options.seed, 20261002, 0xffffffff), only });
+  if (only && typeof options.out === 'string' && existsSync(options.out)) {
+    const kept = JSON.parse(readFileSync(options.out, 'utf8'));
+    report = { ...kept, sports: Object.fromEntries(SPORT_LIST.map(sport => sport.id).filter(id => id === only || kept.sports[id])
+      .map(id => [id, id === only ? report.sports[id] : kept.sports[id]])) };
+  }
   const json = `${JSON.stringify(report, null, 2)}\n`;
   if (typeof options.out === 'string') writeFileSync(options.out, json);
   process.stdout.write(json);

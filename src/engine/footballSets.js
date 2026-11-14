@@ -9,7 +9,7 @@
 // bound to the season. The built-in data (src/data/rosters.js, clubs.football.js, the basketball and baseball modules)
 // never changes.
 
-import { DEPENDENCIES, HISTORIC_NATIONS, HISTORIC_THROUGH, HOME_NATIONS, NATIONS, PACIFIC_ISLANDS, fieldsRealSide } from '../data/teams.js';
+import { DEPENDENCIES, GREAT_BRITAIN, HISTORIC_NATIONS, HISTORIC_THROUGH, HOME_NATIONS, NATIONS, PACIFIC_ISLANDS, fieldsRealSide } from '../data/teams.js';
 import { namesOfTheDay } from '../data/namesOfTheDay.js';
 import { CM_CONVERSION, CM_ROLES, CM_SCALE, cmTupleOf, expandCmTuple } from '../data/cmPlayers.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../data/eaPlayers.js';
@@ -25,6 +25,7 @@ import { BUILT_IN_HOCKEY_SEASONS } from '../data/hockeySeasons.js';
 import { BUILT_IN_RUGBY_LEAGUE_SEASONS } from '../data/rugbyLeagueSeasons.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
 import { EUROPE_MAPS } from '../data/europeMaps.js';
+import { EUROPEAN_LEAGUES } from '../data/footballLeagues.js';
 import { FLAG_CODES } from '../data/flags.js';
 import { basketball } from '../sports/basketball.js';
 import { americanFootball } from '../sports/americanFootball.js';
@@ -50,7 +51,9 @@ const BUILT_IN_SEASONS_OF = Object.freeze({ football: BUILT_IN_SEASON, 'womens-f
   'american-football': Object.freeze({ year: 2026, season: '2026' }), baseball: Object.freeze({ year: 2026, season: '2026' }),
   tennis: Object.freeze({ year: 2026, season: '2026' }), 'womens-tennis': Object.freeze({ year: 2026, season: '2026' }),
   // Rugby League 26 rates the 2025 NRL season, a calendar year.
-  'rugby-league': Object.freeze({ year: 2025, season: '2025' }) });
+  'rugby-league': Object.freeze({ year: 2025, season: '2025' }),
+  // Rocket League's is the RLCS's 2026 season, a calendar year: Liquipedia's results up to its world championship and after.
+  'rocket-league': Object.freeze({ year: 2026, season: '2026' }) });
 /** The season a sport's built-in data plays. */
 export const builtInSeasonOf = sportId => BUILT_IN_SEASONS_OF[getSport(sportId).id];
 
@@ -66,6 +69,11 @@ const SET_KINDS = Object.freeze({
   // `eaw-fifa-<nn>` / `eaw-fc-<nn>`: an EA edition's women. EA rated national teams alone until FIFA 22, and the women's
   // clubs from FIFA 23 on.
   eaw: { prefix: 'eaw-', id: /^eaw-(?:fifa|fc)-\d{2}$/, sport: 'womens-football', nationsOnly: /^eaw-fifa-(?:1\d|2[0-2])$/ },
+  // `wwc-<tournament year>` / `wol-<tournament year>`: a women's World Cup or Olympic tournament before EA rated women,
+  // its finalists' squads computed from the nations' Elo and the players' records (source.conversion), nations only. The
+  // id names the tournament's year, the file its season's (`wwc-1991` is 1991/92, `wwc-1995` 1994/95).
+  wwc: { prefix: 'wwc-', id: /^wwc-\d{4}$/, sport: 'womens-football', nationsOnly: /^wwc-/ },
+  wol: { prefix: 'wol-', id: /^wol-\d{4}$/, sport: 'womens-football', nationsOnly: /^wol-/ },
   // `nba-2k<nn>`: an NBA 2K edition, the NBA's clubs only.
   // Also, by the season they rate: NBA 2K's MyNBA Eras leagues (`nba-eras-<season end year>`), NBA 2K's classic teams
   // of one season (`nba-classic-<season end year>`), EA's NBA Live editions (`nba-live-<nn>`) and the seasons no game
@@ -95,8 +103,10 @@ const SET_KINDS = Object.freeze({
   nhl: { prefix: 'nhl-', id: /^nhl-\d{4}$/, sport: 'hockey', mapped: true, clubsOnly: /^nhl-19(?:6\d|7[0-7])$/ },
   // `nrl-<season>`: an NRL season from a rugby league game's database (Rugby League 2: World Cup Edition rates 2008), the
   // NRL's clubs only. The game rates attributes, not players: each overall is converted (source.conversion). A season
-  // no game rated is computed from the players' match statistics (source.method 'computed', source.metric).
-  nrl: { prefix: 'nrl-', id: /^nrl-\d{4}$/, sport: 'rugby-league', nations: false, mapped: true, calendar: true },
+  // no game rated is computed from the players' match statistics (source.method 'computed', source.metric), or before
+  // 1998 from who started where and how often (the NSWRFL's, the NSWRL's and the ARL's premierships); `nrl-sl-<season>`
+  // Super League's of 1997, which ran beside the ARL's.
+  nrl: { prefix: 'nrl-', id: /^nrl-(?:sl-)?\d{4}$/, sport: 'rugby-league', nations: false, mapped: true, calendar: true },
   // `cm-<season>`: a Championship Manager edition's database before CM 01/02 (CM 97/98 → `cm-9798`, CM 99/00 →
   // `cm-9900`, CM 00/01 → `cm-0001`), its players CM 01/02's tuples.
   cm: { prefix: 'cm-', id: /^cm-\d{4}$/, sport: 'football' },
@@ -142,6 +152,9 @@ const CLUB_ID = /^f-[a-z0-9-]{0,62}$/;
 const WOMENS_CLUB_ID = /^w-[a-z0-9-]{1,62}$/;
 // Kinds whose players are EA's tuples (src/data/eaPlayers.js).
 const EA_KINDS = new Set(['ea', 'eaw']);
+// Kinds of computed nations-only seasons, each nation its XI of `[name, position, rating, source]`: men's football's
+// World Cups and the seasons between them, women's football's World Cups and Olympic tournaments.
+const COMPUTED_NATION_KINDS = new Set(['wc', 'nt', 'wwc', 'wol']);
 
 // What build-rosters writes for a nation with no players.
 const EMPTY_STRENGTH = 40;
@@ -368,8 +381,8 @@ export function decodeFootballSet(data, id = data?.id) {
   }
   // A computed World Cup season lists only its finalists, and a computed national-team season the nations its Wikidata
   // records field, each with its XI as the built-in rosters hold players: every other nation fields no team, and its
-  // land stays neutral. Its identities stay in `meta`.
-  if (setKindOf(data.id) === 'wc' || setKindOf(data.id) === 'nt') {
+  // land stays neutral. Its identities stay in `meta`. A computed women's World Cup or Olympic season is the same shape.
+  if (COMPUTED_NATION_KINDS.has(setKindOf(data.id))) {
     const { nations, clubs, territory, ...meta } = data;
     const record = source => ({ ...source, ...(source.awards ? { awards: [...source.awards] } : {}),
       ...(source.ballonDor ? { ballonDor: { ...source.ballonDor } } : {}) });
@@ -497,8 +510,11 @@ KINDS.wc = { size: 4,
     ? 'source must name the edition, the day its Elo is of, when it was read, how the ratings were computed and their licence'
     : src.method !== 'computed' || src.computed !== true ? 'source must say the ratings are computed (method "computed")'
       : src.rawScale !== 'Elo' ? 'source rawScale must be "Elo"' : '') };
-// A computed national-team season: the same shape and source rule as a computed World Cup season's.
+// A computed national-team season: the same shape and source rule as a computed World Cup season's; so are a computed
+// women's World Cup's and Olympic tournament's.
 KINDS.nt = KINDS.wc;
+KINDS.wwc = KINDS.wc;
+KINDS.wol = KINDS.wc;
 // Nations and clubs, each player `[name, position, rating]`. A season no edition rated says how its ratings were made
 // (source.method 'computed' from the NHL's statistics, or 'converted' from an edition's attributes) and the rule
 // (source.conversion).
@@ -562,7 +578,7 @@ function validateFootballSet(data, id) {
   const rating = v => typeof v === 'number' && Number.isFinite(v) && v >= 1 && v <= 99;
   const nation = v => typeof v === 'string' && Object.hasOwn(NATIONS, v);
 
-  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "wc-<yyyy>", "nt-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "nba-2k<nn>", "nba-stats-<yyyy>", "mlb-the-show-<nn>", "mlb-war-<yyyy>", "madden-<yyyy>", "pfa-<yyyy>", "nhl-<yyyy>", "nrl-<yyyy>", "tennis-<yyyy>" or "wta-<yyyy>"');
+  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "wc-<yyyy>", "nt-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "wwc-<yyyy>", "wol-<yyyy>", "nba-2k<nn>", "nba-stats-<yyyy>", "mlb-the-show-<nn>", "mlb-war-<yyyy>", "madden-<yyyy>", "pfa-<yyyy>", "nhl-<yyyy>", "nrl-<yyyy>", "nrl-sl-<yyyy>", "tennis-<yyyy>" or "wta-<yyyy>"');
   if (!isObject(data)) fail('file is not a JSON object');
   if (data.format !== FOOTBALL_SET_FORMAT) fail(`unsupported format ${JSON.stringify(data.format)} (expected ${FOOTBALL_SET_FORMAT})`);
   if (data.id !== id) fail(`file id ${JSON.stringify(data.id)} does not match the requested data set`);
@@ -591,6 +607,7 @@ function validateFootballSet(data, id) {
   if (setKindOf(id) === 'elo' || setKindOf(id) === 'wta') return validateTennisSeason(data, id, fail);
   if (setKindOf(id) === 'wc') return validateWorldCupSeason(data, id, fail);
   if (setKindOf(id) === 'nt') return validateNationalTeamSeason(data, id, fail);
+  if (setKindOf(id) === 'wwc' || setKindOf(id) === 'wol') return validateWomensTournamentSeason(data, id, fail);
   if (setKindOf(id) === 'nhl') return validateNationsAndClubsOnMap(data, id, fail, { sport: hockey, clubId: NHL_CLUB_ID,
     positions: new Set(Object.keys(hockey.formation)), clubLeast: 12, noun: 'an NHL season', clubsOnlyNoun: 'an NHL season before 1977/78' });
   if (setKindOf(id) === 'nrl') return validateClubsOnMap(data, id, fail, { sport: rugbyLeague, clubId: NRL_CLUB_ID,
@@ -651,8 +668,9 @@ function validateFootballSet(data, id) {
     }
   }
 
-  // League names are the built-in ones, so a club reads the same in every data set.
-  const leagues = new Set((women ? womensFootball : football).clubs.map(club => club.league));
+  // A men's club plays in one of Europe's first divisions (src/data/footballLeagues.js), named as in every other season; a
+  // women's club in a league of the built-in women's clubs.
+  const leagues = new Set(women ? womensFootball.clubs.map(club => club.league) : Object.keys(EUROPEAN_LEAGUES));
   if (!Array.isArray(data.clubs)) fail('clubs must be a list');
   if (!setHasClubs(id) && data.clubs.length) fail('this season has nations only');
   const clubIds = new Set();
@@ -664,7 +682,7 @@ function validateFootballSet(data, id) {
     clubIds.add(club.id);
     if (!text(club.name)) fail(`${at} has no name`);
     if (typeof club.code !== 'string' || !/^[A-Z0-9]{3}$/.test(club.code)) fail(`${at} code ${JSON.stringify(club.code)} must be three capitals`);
-    if (!leagues.has(club.league)) fail(`${at} league ${JSON.stringify(club.league)} is not a built-in league`);
+    if (!leagues.has(club.league)) fail(`${at} league ${JSON.stringify(club.league)} is not ${women ? 'a built-in league' : "one of Europe's first divisions"}`);
     if (!nation(club.country)) fail(`${at} country ${JSON.stringify(club.country)} is not a nation id`);
     if (!text(club.col)) fail(`${at} has no colour`);
     if (!rating(club.str)) fail(`${at} str must be a rating 1-99`);
@@ -708,7 +726,8 @@ const foldName = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLower
  */
 function validateIdentities(data, id, fail) {
   const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
-  if (setSportOf(id) !== 'football') fail('only a men\'s football season plays nations under identities of their day');
+  // A women's Olympic season may play Great Britain, on the United Kingdom's shape, and nothing else (validateWomensTournamentSeason).
+  if (setSportOf(id) !== 'football' && setKindOf(id) !== 'wol') fail('only a men\'s football season plays nations under identities of their day');
   const identities = data.identities;
   if (!isObject(identities) || !Object.keys(identities).length) fail('identities must name at least one nation');
   const nations = isObject(data.nations) ? data.nations : {};
@@ -903,6 +922,67 @@ function validateWorldCupSeason(data, id, fail) {
       if (source.dateOfBirth !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(source.dateOfBirth)) fail(`${where} date of birth ${JSON.stringify(source.dateOfBirth)} is not YYYY-MM-DD`);
       if (ids.has(source.id)) fail(`${where} repeats player ${source.id}`);
       ids.add(source.id);
+    });
+  }
+  validateFieldedTerritory(data, nations, fail);
+}
+
+// A computed women's player's id: the Fjelstul World Cup Database's player id at a World Cup; at an Olympic tournament,
+// the tournament's year, her team's FIFA code and her shirt number (the squad lists no other id).
+const WOMENS_PLAYER_IDS = { wwc: { source: 'world-cup', id: WORLD_CUP_PLAYER_ID }, wol: { source: 'olympics', id: /^ol:\d{4}-[A-Z]{3}-\d{1,2}$/ } };
+
+/**
+ * A computed women's World Cup or Olympic season: as a computed World Cup season (validateWorldCupSeason), the finalists
+ * that field a team, each with the eleven of its squad strongest first, `source` naming the player, her team's Elo, her
+ * place in the XI and her record: minutes where the line-ups give them, else her appearances (`apps`); no Ballon d'Or,
+ * no clubs, and no names of the day of its own (src/data/namesOfTheDay.js gives women's football's).
+ */
+function validateWomensTournamentSeason(data, id, fail) {
+  const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
+  const text = v => typeof v === 'string' && v.trim().length > 0;
+  const count = v => Number.isInteger(v) && v >= 0;
+  const ids = WOMENS_PLAYER_IDS[setKindOf(id)];
+  const nations = data.nations;
+  if (!isObject(nations)) fail('nations is missing');
+  if (!Array.isArray(data.clubs) || data.clubs.length) fail('a women\'s tournament season has nations only');
+  // Its only identity: Great Britain at an Olympic tournament, on the United Kingdom's shape, holding the home nations' land.
+  if (data.identities !== undefined && (setKindOf(id) !== 'wol' || JSON.stringify(data.identities) !== JSON.stringify({ 826: GREAT_BRITAIN })
+    || HOME_NATIONS.some(home => data.territory?.merged?.[home] !== '826'))) {
+    fail('a women\'s tournament season plays no identity but Great Britain\'s at an Olympic tournament, holding the home nations');
+  }
+  if (Object.keys(nations).length < 2) fail('a women\'s tournament season needs at least two nations');
+  const seen = new Set();
+  for (const [key, entry] of Object.entries(nations)) {
+    const at = `nations[${key}]`;
+    if (!Object.hasOwn(NATIONS, key)) fail(`${at} is not a nation id`);
+    if (HISTORIC_NATIONS.includes(key)) fail(`${at} is a nation of the map's earlier years only`);
+    if (!Array.isArray(entry) || entry.length !== 3) fail(`${at} must be [strength, squad size, eleven]`);
+    const [str, size, eleven] = entry;
+    if (typeof str !== 'number' || !(str >= 1 && str <= 99)) fail(`${at} strength must be a rating 1-99`);
+    if (!Array.isArray(eleven) || eleven.length !== 11) fail(`${at} must name its eleven`);
+    if (!Number.isInteger(size) || size < eleven.length) fail(`${at} squad of ${size} cannot hold its ${eleven.length}`);
+    const names = new Set();
+    eleven.forEach((player, j) => {
+      const where = `${at}[${j}]`;
+      if (!Array.isArray(player) || player.length !== KINDS.wc.size) fail(`${where} is not [name, position, rating, source]`);
+      const [name, position, rating, source] = player;
+      if (!text(name) || name !== name.trim() || names.has(name)) fail(`${where} has no name, or repeats one`);
+      names.add(name);
+      if (!WORLD_CUP_POSITIONS.has(position)) fail(`${where} position ${JSON.stringify(position)} must be GK, DF, MF or FW`);
+      if (!Number.isInteger(rating) || rating < 1 || rating > 99) fail(`${where} rating must be a whole number 1-99`);
+      if (j && rating > eleven[j - 1][2]) fail(`${at} must run strongest first`);
+      if (!isObject(source) || source.source !== ids.source || typeof source.id !== 'string' || !ids.id.test(source.id)
+        || !text(source.edition) || source.snapshotDate !== data.source.snapshotDate || !text(source.team) || typeof source.teamElo !== 'number'
+        || source.xiRank !== j + 1 || ![source.shirt, source.starts, source.goals].every(count)
+        || !(source.minutes === undefined ? count(source.apps) : count(source.minutes) && source.apps === undefined)) {
+        fail(`${where} source must name the player, her team, its Elo, her place in the XI and her record`);
+      }
+      if (source.ballonDor !== undefined) fail(`${where} has Ballon d'Or points, which no women's season has`);
+      if (source.awards !== undefined && !(Array.isArray(source.awards) && source.awards.length && source.awards.every(text))) fail(`${where} awards must name them`);
+      if (source.url !== undefined && !/^https:\/\/en\.wikipedia\.org\/wiki\/\S+$/.test(source.url)) fail(`${where} source url must be her Wikipedia article`);
+      if (source.dateOfBirth !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(source.dateOfBirth)) fail(`${where} date of birth ${JSON.stringify(source.dateOfBirth)} is not YYYY-MM-DD`);
+      if (seen.has(source.id)) fail(`${where} repeats player ${source.id}`);
+      seen.add(source.id);
     });
   }
   validateFieldedTerritory(data, nations, fail);
@@ -1220,8 +1300,9 @@ export function seasonSport(set) {
       : setKindOf(meta.id) === 'wta' ? { ...womensTennis, rosters, territory, ...identity }
       : setKindOf(meta.id) === 'nhl' ? { ...hockey, rosters, clubs, territory, clubMap: meta.map, ...identity }
       : setKindOf(meta.id) === 'nrl' ? { ...rugbyLeague, clubs, clubMap: meta.map, ...identity }
-      // A women's season's unlisted nations are inactive, so nothing reads their strength in play.
-      : setKindOf(meta.id) === 'eaw' ? { ...womensFootball, rosters, clubs, territory, fallbackStrength: () => EMPTY_STRENGTH, ...identity }
+      // A women's season's unlisted nations are inactive, so nothing reads their strength in play; a computed one's
+      // ('wwc', 'wol') field no team, as a computed men's season's do.
+      : ['eaw', 'wwc', 'wol'].includes(setKindOf(meta.id)) ? { ...womensFootball, rosters, clubs, territory, fallbackStrength: () => EMPTY_STRENGTH, ...identity }
       // Every other football season, a computed World Cup or national-team one ('wc', 'nt') too, whose unlisted nations field
       // no team.
       : { ...football, rosters, clubs, territory,
@@ -1231,7 +1312,8 @@ export function seasonSport(set) {
     // Union on Russia's shape), as Great Britain plays on England's: teams.js nationIdentity reads `playsAs`. A file's
     // own (men's football's to 1995/96) win over the names of the day the game knows for its sport and year
     // (src/data/namesOfTheDay.js: tennis's federations, FR Yugoslavia, Swaziland, Macedonia).
-    const identities = { ...namesOfTheDay(sport.id, meta.year), ...(sport.id === 'football' ? meta.identities : null) };
+    // A women's Olympic season's own is Great Britain's (2012).
+    const identities = { ...namesOfTheDay(sport.id, meta.year), ...(sport.id === 'football' || setKindOf(meta.id) === 'wol' ? meta.identities : null) };
     if (Object.keys(identities).length) sport = { ...sport, playsAs: { ...sport.playsAs, ...identities } };
     sports.set(set, sport);
   }

@@ -243,17 +243,23 @@ the built-in's: home sides won 55% to 70% of a season's regular-season games, 63
 **The maps.** One map of Europe for each run of seasons with the same clubs, built by
 `scripts/build-europe-maps.mjs` with the same rules, named after the run's first season as the
 NBA's era maps are: 24 maps for 26 seasons, `el2001` to `el2026`, 2019/20 and 2020/21 sharing
-`el2020` and 2022/23 and 2023/24 `el2023` (143 to 163 KB each, loaded only when chosen). New
+`el2020` and 2022/23 and 2023/24 `el2023` (143 to 159 KB each, loaded only when chosen). New
 countries share their land: Russia (Moscow's clubs, Khimki, Kazan, Krasnodar, Nizhny Novgorod,
 Perm and St Petersburg), Croatia (Cibona and Zadar), Slovenia (Olimpija and Krka) and Lithuania
 (Žalgiris with Rytas or Neptūnas); Poland, Montenegro, Ukraine, Switzerland, Portugal and England
 (the London Towers) each had one club at a time, and AS Monaco holds France's land, as in football.
 
-- **Russia's European part.** Its clubs hold Russia west of the Urals: the federal subjects whose
-  interior lies west of 60°E (`EUROPEAN_PART`), cut along the units its clubs share it by, so the
-  rest of Russia stays grey beneath (the map's `boundaries.mask`) and the camera frames Europe, not
-  Siberia. geoBoundaries' Russian districts leave out Moscow and St Petersburg, federal cities, so
-  each joins as one unit, the gap its absence leaves (`regionsLeftOut`).
+- **European Russia.** Its clubs hold European Russia only, as football's earlier seasons' do
+  (`within: 'EUROPEAN_RUSSIA'` in `COUNTRIES`: the federal subjects of its five federal districts
+  west of the Urals), so the rest of Russia lies grey beneath, an obstacle no club claims (the map's
+  `partial`), and the camera frames Europe, not Siberia. geoBoundaries' Russian districts leave out
+  Moscow and St Petersburg, federal cities, so each is a gap in them; a gap holding clubs' grounds
+  goes to the nearest of those clubs (`fitToOutline`'s `homes`, in European Russia only), so Moscow
+  is CSKA's even where Khimki's land lies nearer (seven maps, 2009/10 to 2020/21), and football's
+  maps are unchanged by it. In 2006/07 Dynamo Moscow's arena lies in that gap too, so it starts in
+  CSKA's Moscow, 4 km from its own land, as football's other Moscow clubs do. (This branch first cut Russia its own way, west of 60°E; on merging
+  main, whose football maps shipped European Russia first, its maps moved onto main's, so both
+  sports draw the same Russia.)
 - **Crowded cities.** As Beşiktaş does today, a club crowded into Istanbul or Athens can start next
   door: Galatasaray across the Bosphorus (103 km from its arena in 2011/12), Darüşşafaka in
   2015/16 to 2018/19, Anadolu Efes in 2014/15; AEK Athens, Peristeri, Panionios and Maroussi a

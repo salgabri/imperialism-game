@@ -346,20 +346,26 @@ export const football = {
   },
 };
 
-/** Football under the knockout rules `id` (a KNOCKOUTS key): today's are `football` itself. */
-const footballUnder = rulesMemo(id => {
-  if (id === KNOCKOUTS.penalties.id) return football;
+/**
+ * A sport on football's rulebook (`base`: football, or women's football) whose level games are settled by the knockout
+ * rules `id` (a KNOCKOUTS key): every other key as `base` has it, a getter still a getter (women's football reads its
+ * players when they have loaded), the match prepared and played under those rules.
+ */
+export function footballUnderRules(base, id) {
   const rules = KNOCKOUTS[id];
-  return {
-    ...football,
+  if (!rules) throw new Error(`No knockout rules "${id}"`);
+  return Object.assign(Object.defineProperties({}, Object.getOwnPropertyDescriptors(base)), {
     prepareMatch: (attacker, defender, effA, effD, venue) => prepareFootballMatch(attacker, defender, effA, effD, venue, rules),
     simulate(rng, attacker, defender, drama, effA, effD, venue) {
       const prepared = prepareFootballMatch(attacker, defender, effA, effD, venue, rules);
       const result = sampleFootballResult(rng, prepared, drama);
       return { ...result, ev: goalEvents(rng, result, prepared) };
     },
-  };
-});
+  });
+}
+
+/** Football under the knockout rules `id` (a KNOCKOUTS key): today's are `football` itself. */
+const footballUnder = rulesMemo(id => (id === KNOCKOUTS.penalties.id ? football : footballUnderRules(football, id)));
 
 /**
  * Football as a season ending in `year` played it (1970 for 1969/70; null for the built-in season, today's rules):

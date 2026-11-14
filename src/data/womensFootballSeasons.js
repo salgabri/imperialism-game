@@ -3,8 +3,11 @@
 // EA FC 25: EA Sports FC 25 database, ratings and stats (nyagami), female_players.csv, from EA's ratings website
 // EA Sports FC 24 complete player dataset (stefanoleone992), female_players.csv, SHA-256 cec084ecebbf…
 // FIFA 23 complete player dataset (stefanoleone992), female_players.csv: every roster update of FIFA 16 to FIFA 23, SHA-256 f5f63c6790ff…
+// and by npm run build:womens-tournament-seasons, computed (scripts/data/womens-tournament-seasons.json):
+// 1991, 1995, 2003, 2007, 2011, 2015: each women's World Cup's finalists, rated from their Elo and their players' records
+// 1996, 2004, 2008, 2012: each women's Olympic tournament's alike
 // The built-in earlier women's football seasons, newest first. Each is public/womens-football/<id>.json, loaded when a
-// setup chooses it (src/engine/footballSets.js). FIFA 16 to FIFA 22 have national teams only.
+// setup chooses it (src/engine/footballSets.js). FIFA 16 to FIFA 22 and the computed seasons have national teams only.
 export const BUILT_IN_WOMENS_SEASONS = Object.freeze([
   Object.freeze({ id: 'eaw-fc-26', version: 'eaw-fc-26-b82528a0', year: 2026, season: '2025/26', label: 'EA FC 26' }),
   Object.freeze({ id: 'eaw-fc-25', version: 'eaw-fc-25-e47206d2', year: 2025, season: '2024/25', label: 'EA FC 25' }),
@@ -17,4 +20,14 @@ export const BUILT_IN_WOMENS_SEASONS = Object.freeze([
   Object.freeze({ id: 'eaw-fifa-18', version: 'eaw-fifa-18-403f942b', year: 2018, season: '2017/18', label: 'FIFA 18' }),
   Object.freeze({ id: 'eaw-fifa-17', version: 'eaw-fifa-17-3d24a767', year: 2017, season: '2016/17', label: 'FIFA 17' }),
   Object.freeze({ id: 'eaw-fifa-16', version: 'eaw-fifa-16-7bc4dc72', year: 2016, season: '2015/16', label: 'FIFA 16' }),
+  Object.freeze({ id: 'wwc-2015', version: 'wwc-2015-aae3c630', year: 2015, season: '2014/15', label: 'Computed · 2015 World Cup' }),
+  Object.freeze({ id: 'wol-2012', version: 'wol-2012-2ae3af1f', year: 2013, season: '2012/13', label: 'Computed · 2012 Olympics' }),
+  Object.freeze({ id: 'wwc-2011', version: 'wwc-2011-a261443f', year: 2011, season: '2010/11', label: 'Computed · 2011 World Cup' }),
+  Object.freeze({ id: 'wol-2008', version: 'wol-2008-6008fb15', year: 2009, season: '2008/09', label: 'Computed · 2008 Olympics' }),
+  Object.freeze({ id: 'wwc-2007', version: 'wwc-2007-6c4971a1', year: 2008, season: '2007/08', label: 'Computed · 2007 World Cup' }),
+  Object.freeze({ id: 'wol-2004', version: 'wol-2004-860494fa', year: 2005, season: '2004/05', label: 'Computed · 2004 Olympics' }),
+  Object.freeze({ id: 'wwc-2003', version: 'wwc-2003-7b94f8e5', year: 2004, season: '2003/04', label: 'Computed · 2003 World Cup' }),
+  Object.freeze({ id: 'wol-1996', version: 'wol-1996-ddfeaf52', year: 1997, season: '1996/97', label: 'Computed · 1996 Olympics' }),
+  Object.freeze({ id: 'wwc-1995', version: 'wwc-1995-66d85a90', year: 1995, season: '1994/95', label: 'Computed · 1995 World Cup' }),
+  Object.freeze({ id: 'wwc-1991', version: 'wwc-1991-eeb5c42b', year: 1992, season: '1991/92', label: 'Computed · 1991 World Cup' }),
 ]);

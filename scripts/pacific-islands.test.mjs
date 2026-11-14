@@ -72,7 +72,7 @@ test('each sport fields them only with a real side: rugby league Tonga and Samoa
   const fields = Object.fromEntries(SPORT_LIST.filter(sport => !sport.clubsOnly)
     .map(sport => [sport.id, PACIFIC_ISLANDS.filter(id => fieldedNations(sport).includes(id))]));
   assert.deepEqual(fields, { football: [], 'womens-football': [], basketball: [], baseball: [], hockey: [], tennis: [],
-    'womens-tennis': [], 'rugby-league': ['776', '882'] });
+    'womens-tennis': [], 'rugby-league': ['776', '882'], 'rocket-league': [] });
   // Rugby league's are the NRL players of their 2025 Test sides (docs/design/rugby-league.md). The Cook Islands' five
   // fall short of half a matchday 17.
   for (const [id, real] of [['776', 17], ['882', 17], ['184', 5]]) {

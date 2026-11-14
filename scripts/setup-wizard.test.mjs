@@ -645,18 +645,24 @@ test('setup.css keeps the reviewed token and hit-target rules', () => {
   assert.match(narrow, /^\s*\.setup-foot \.setup-foot__back \{ padding:0 14px; \}\s*\.setup-foot \.setup-foot__next \{ padding:0 12px; \}\s*\.setup-theatre \{ padding:0 8px; \}\s*\}/);
 });
 
-test('nine sports sit in three rows of three, compact tiles that stay 44px targets, and step 1\'s heading gives way at 360×640', t => {
+test('ten sports sit in three rows of four, compact tiles that stay 44px targets, and step 1\'s heading gives way at 360×640', t => {
   const sink = consoleSink(t);
   t.after(() => sink.release());
   const markup = renderToStaticMarkup(React.createElement(SetupOverlay, { setup: { ...BASE, sport: 'womens-tennis' }, managerTeams: TEAMS,
     hasSave: true, savedText: 'Round 4 · 20 nations remaining · Europe', onResume() {}, onCancel() {} }));
   const grid = new JSDOM(markup).window.document.querySelector('.setup-sports');
-  assert.equal(grid.children.length, 9);
+  assert.equal(grid.children.length, 10);
   assert.equal(grid.getAttribute('data-rows'), '3');
-  assert.match(grid.getAttribute('style'), /--sport-cols:\s*3/, 'five across would squeeze "Basketball" out of its tile');
-  assert.deepEqual([...grid.querySelectorAll('.setup-card__button')].map(button => button.textContent).slice(6, 8), ['Tennis', 'Women\'s tennis']);
+  assert.match(grid.getAttribute('style'), /--sport-cols:\s*4/, 'five across would squeeze "Basketball" out of its tile');
+  assert.equal(grid.getAttribute('data-cols'), '4');
+  assert.deepEqual([...grid.querySelectorAll('.setup-card__button')].map(button => button.textContent).slice(6, 10),
+    ['Tennis', 'Women\'s tennis', 'Rugby league', 'Rocket League']);
   const css = readFileSync(new URL('../src/components/setup.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   assert.match(css, /\.setup-sports\[data-rows="3"\] \.setup-card \{ min-height:44px;/);
+  // Four across on a phone, the long names take two lines: a smaller icon and snug lines keep 390×664 from scrolling
+  // (measured in Chrome: tiles 60px → 53px, step 1 520px of content in 510px → 510px).
+  assert.match(css, /\.setup-sports\[data-rows="3"\]\[data-cols="4"\] \.setup-card__icon \{ width:18px; height:18px; \}/);
+  assert.match(css, /\.setup-sports\[data-rows="3"\]\[data-cols="4"\] \.setup-card__button \{ line-height:1; \}/);
   assert.match(css, /@media \(max-width:699\.98px\) and \(max-height:660px\) \{\s*\.setup-step\[data-step="1"\]:has\(\.setup-notices\):has\(\.setup-sports\[data-rows="3"\]\) \.setup-heading \{ display:none; \}/);
 });
 

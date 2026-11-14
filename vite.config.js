@@ -82,7 +82,7 @@ const STABLE_MODULES = [
   /\/node_modules\/(?:react|react-dom|scheduler)\//,
   /\/src\/data\/(?:rosters|clubs\.football|sourceTable)\.js$/,
 ];
-// The players of every sport but football (first download) and women's football (about as big as these seven together).
+// The players of every sport but football (first download) and women's football (about as big as these eight together).
 const SPORT_PLAYERS = /\/src\/data\/players\/(?!womens-football\.js$)[^/]+\.js$/;
 
 /**

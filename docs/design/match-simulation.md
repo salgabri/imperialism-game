@@ -247,38 +247,42 @@ players, never the bench.
 ## Statistical verification
 
 The checked-in [report](match-simulation-report.json) samples 200,000 outcomes per
-pairing, thirty-six million outcomes over the nine sports, plus 10,000 complete
+pairing, forty million outcomes over the ten sports, plus 10,000 complete
 timelines a sport for timing. It covers three uncertainty settings, five rating
 gaps, equal teams and four pairings a sport built from national rosters, so its
 basketball figures are FIBA's. These equal-team results use 75-rated starters and
 Balanced uncertainty. The NBA rules are checked in
 `scripts/basketball-simulation.test.mjs` and `scripts/win-probability.test.mjs`.
 Football's and women's football's figures were sampled again with extra time on
-2026-11-10 (the same seeds; the timings stay the first run's).
+2026-11-10 (the same seeds; the timings stay the first run's). Rocket League joined on 2026-11-14, sampled alone
+(`--sport=rocket-league`, the same seed scheme) with its second Liquipedia export, the other sports' figures kept as
+they were.
 
-| Measure | Football | Basketball | Ice hockey | Tennis | Rugby league |
-| --- | --- | --- | --- | --- | --- |
-| Combined regulation score | 2.66 goals | 162.76 points | 6.30 goals | 4.11 rubbers | 43.74 points |
-| Regulation tie rate | 27.46% | 7.05% | 23.43% | none: a tie is never level | 3.20% |
-| Attacking side wins | 50.02% | 50.04% | 50.07% | 50.05% | 50.11% |
-| Attacking side wins after a tie | 50.21% | 49.67% | 50.21% | — | 50.18% |
+| Measure | Football | Basketball | Ice hockey | Tennis | Rugby league | Rocket League |
+| --- | --- | --- | --- | --- | --- | --- |
+| Combined regulation score | 2.66 goals | 162.76 points | 6.30 goals | 4.11 rubbers | 43.74 points | 5.58 games |
+| Regulation tie rate | 27.46% | 7.05% | 23.43% | none: a tie is never level | 3.20% | none: a series is never level |
+| Attacking side wins | 50.02% | 50.04% | 50.07% | 50.05% | 50.11% | 49.90% |
+| Attacking side wins after a tie | 50.21% | 49.67% | 50.21% | — | 50.18% | — |
 
 Synthetic stronger-team win rates against a 55-rated lineup with Balanced
 uncertainty were:
 
-| Rating advantage | Football | Basketball | Ice hockey | Tennis | Rugby league |
-| --- | --- | --- | --- | --- | --- |
-| 5 | 71.53% | 74.40% | 76.30% | 79.05% | 94.07% |
-| 10 | 86.63% | 90.48% | 91.48% | 94.44% | 99.54% |
-| 20 | 97.67% | 99.57% | 98.97% | 99.83% | 99.96% |
-| 40 | 99.69% | 100.00% | 99.89% | 100.00% | 99.97% |
+| Rating advantage | Football | Basketball | Ice hockey | Tennis | Rugby league | Rocket League |
+| --- | --- | --- | --- | --- | --- | --- |
+| 5 | 71.53% | 74.40% | 76.30% | 79.05% | 94.07% | 76.65% |
+| 10 | 86.63% | 90.48% | 91.48% | 94.44% | 99.54% | 92.70% |
+| 20 | 97.67% | 99.57% | 98.97% | 99.83% | 99.96% | 99.78% |
+| 40 | 99.69% | 100.00% | 99.89% | 100.00% | 99.97% | 100.00% |
 
 Extra time, where the stronger side scores more of the goals, lifts football's
 favourites about a point over a straight shoot-out (85.63% at ten points).
 At a ten-point advantage, Predictable and Wild produced 88.72% and 72.67%
 football win rates, 93.94% and 83.15% basketball win rates, 92.05% and 83.82%
 in ice hockey, 94.85% and 87.89% in tennis, where every one of a team's players carries the advantage into
-each of its rubbers, and 99.87% and 88.71% in rugby league. Rugby league is the steepest: Rugby League 26 rates the 17
+each of its rubbers, 99.87% and 88.71% in rugby league, and 97.07% and 70.40% in Rocket League, whose match-day form is
+the widest of any sport: its real series are less predictable than their games, so Wild swings it hardest
+([rocket-league.md](rocket-league.md#calibration)). Rugby league is the steepest: Rugby League 26 rates the 17
 NRL clubs within 3.3 points of each other, while the NRL's standings spread as widely as the NFL's, so each rating point
 must count for more ([rugby-league.md](rugby-league.md#the-match-model)). Increasing uncertainty raises upset chances while retaining a
 meaningful strength advantage. Women's football plays football's model, so on the
@@ -448,6 +452,20 @@ from every game in NRL.com's draw and match centre; [rugby-league.md](rugby-leag
 | Spread of winning percentages | 0.162 | 0.154–0.223 |
 | Best and worst records (of 24) | 19.6 wins, 5.5 wins | 18–21 wins, 3–6 wins |
 
+Rocket League came in on 2026-11-14, calibrated against the games of Liquipedia's exports
+([rocket-league.md](rocket-league.md#calibration)): its goals and late game on the 20,072 games of the three years to
+November 2026 whose six players had each played 20 games, as a rated player has, each played through the model at its
+own pre-game Elo odds, and its match-day form on those years' best-of-sevens. The harness plays the sixteen strongest
+nations against each other twice a season; the real games are RLCS events', a different mix of matchups, which moves the
+margins a little and the goals hardly at all.
+
+| Rocket League | Now (nations) | Real (2023–2026) |
+| --- | --- | --- |
+| Goals a game / to overtime | 4.22 / 20.2% | 4.25 / 19.7% |
+| Won by one / two / three or more | 52.5% / 22.2% / 25.2% | 52.1% / 21.6% / 26.3% |
+| Best of seven won 4–0 / 4–1 / 4–2 / 4–3 | 29.0% / 29.0% / 22.7% / 19.3% | 30.5% / 26.6% / 22.9% / 20.0% |
+| Home sides win | 49.5% (no edge) | as Elo expected |
+
 Known gaps, reported but not tested:
 
 - **No home advantage by default.** Every sport plays at a neutral venue unless a
@@ -504,6 +522,7 @@ sides win at home about as often as home sides do in the sport's league:
 | Women's football | Football's | 2 | 45–46% in 90 minutes over each league's pairings, 57–58% after extra time and the shoot-out | 41.7–47.7% in 90 minutes (four leagues, one season each) |
 | Tennis | 1.8 rating points (45 Elo) in a singles rubber, 0.7 in the doubles | 1.6 | 60% of ties | Davis Cup hosts won 60.9% of World Group ties where Elo expected 53.1% |
 | Women's tennis | Tennis's | 1.6 | 60% of ties | none found for the Billie Jean King Cup: the Davis Cup's |
+| Rocket League | none, and the rule is not offered | 0 | 50% | the LANs' host nations did as Elo expected: +10 ± 8 Elo over 1,853 games of Liquipedia's exports |
 
 "Worth" is the rating advantage an attacker needs for an even match against a home
 defender; a manager's Attack approach adds 0.6 rating points, plus up to 1.2 for
