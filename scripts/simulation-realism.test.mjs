@@ -188,9 +188,21 @@ test('NRL: points, tries, goals, margins, golden point, the standings and who sc
   for (const position of Object.keys(real.tryShares)) within(nrl.tryShares[position] || 0, real.tryShares[position], `tries by ${position}`, 0.006);
 });
 
+test('Rocket League: goals a game and overtime as in the real games Liquipedia records', t => {
+  const rl = report.rocketLeague, real = REAL.rocketLeague;
+  if (!rl || !real) {
+    t.skip('no Liquipedia snapshot yet (npm run sync:rocket-league)');
+    return;
+  }
+  within(rl.goalsPerGame, real.goalsPerGame, 'goals a game');
+  within(rl.overtime, real.overtime, 'games to overtime');
+  assert.ok(rl.favourite.wins > 0.55, `the stronger nation wins most series: ${rl.favourite.wins}`);
+});
+
 test('home sides: half the decided games at a neutral venue, their league\'s share with Home advantage on', () => {
   for (const [label, share] of [['NBA', report.nba.homeWins], ['EuroLeague', report.euroleague.homeWins], ['NFL', report.nfl.homeWins], ['MLB', report.mlb.homeWins], ['NHL', report.nhl.homeWins],
-    ['Davis Cup', report.davisCup.homeWins], ['Billie Jean King Cup', report.billieJeanKingCup.homeWins], ['NRL', report.nrl.homeWins]]) {
+    ['Davis Cup', report.davisCup.homeWins], ['Billie Jean King Cup', report.billieJeanKingCup.homeWins], ['NRL', report.nrl.homeWins],
+    ...(report.rocketLeague ? [['Rocket League', report.rocketLeague.homeWins]] : [])]) {
     assert.ok(Math.abs(share - 0.5) < 0.015, `${label} neutral: the defender won ${share}`);
   }
   for (const league of report.football) {
@@ -209,4 +221,5 @@ test('home sides: half the decided games at a neutral venue, their league\'s sha
   within(home.davisCup.homeWins, REAL.davisCup.homeWins, 'Davis Cup host wins');
   within(home.billieJeanKingCup.homeWins, REAL.billieJeanKingCup.homeWins, 'Billie Jean King Cup host wins');
   within(home.nrl.homeWins, REAL.nrl.homeWins, 'NRL home wins');
+  if (home.rocketLeague && REAL.rocketLeague?.homeWins) within(home.rocketLeague.homeWins, REAL.rocketLeague.homeWins, 'Rocket League home wins');
 });

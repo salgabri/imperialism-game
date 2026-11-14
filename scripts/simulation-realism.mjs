@@ -5,12 +5,13 @@
 // strongest each meeting every other once a season; and a season of each earlier format the cups played, under its
 // year's rules (formatsReport: best of five sets, advantage sets, three-rubber ties). Football's extra time is a
 // knockout game's, so its strongest 32 nations also meet once a season to measure it against the World Cups' knockout
-// games.
+// games. Rocket League's sixteen strongest nations play each other once a season in best-of-seven series, beside every
+// real game of the Liquipedia snapshot (rocketLeagueReal).
 // Each measure sits beside the real league's figure (REAL below, with its seasons). The defender of each fixture is
 // its home side: at a neutral venue, as campaigns play by default, or at home with `--home` (the Home advantage
 // launch rule).
 // Run: node scripts/simulation-realism.mjs [--seasons=40] [--home] [--json]
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseEaPlayers } from './lib/football-data.mjs';
 import { EA_CLUB_SNAPSHOT, firstDivisionClubs, squadTuples } from './lib/first-divisions.mjs';
@@ -34,6 +35,7 @@ import { baseball } from '../src/sports/baseball.js';
 import { hockey, PERIOD_MODEL } from '../src/sports/hockey.js';
 import { tennis } from '../src/sports/tennis.js';
 import { womensTennis } from '../src/sports/womensTennis.js';
+import { gameOdds, rocketLeague, TO_WIN } from '../src/sports/rocketLeague.js';
 import { decodeFootballSet, seasonSport } from '../src/engine/footballSets.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { onField, rugbyLeague, scoreKind, SLICE_MODEL } from '../src/sports/rugbyLeague.js';
@@ -543,6 +545,82 @@ function davisCup(seasons, seed, venue, sport = tennis) {
   };
 }
 
+// ---- Rocket League (best-of-seven series) ------------------------------------------------------------------------
+
+/** The field: the sixteen strongest nations of Rocket League, about a world championship's worth. */
+export function rlcsField(count = 16) {
+  const rng = makeRng(1);
+  return Object.keys(rocketLeague.rosters).map(id => buildTeam(id, rng, rocketLeague)).sort((a, b) => b.str - a.str).slice(0, count);
+}
+
+/** The game's margin from a game's end event, its winner's side first ("3–1" → 2). */
+const gameMargin = e => { const [w, l] = String(e.score).split('–').map(Number); return w - l; };
+
+/**
+ * The field's series, each meeting every other twice a season, once at each end (a single round would leave the home
+ * share's sampling error near the test's own width): the games' goals, overtime and margins, the series' scores.
+ */
+function rlcs(seasons, seed, venue) {
+  const nations = rlcsField(16);
+  if (nations.length < 4) return null;
+  const { played } = playSeasons({ sport: rocketLeague, teams: nations, games: 2 * (nations.length - 1), seasons, seed, venue });
+  const ends = played.flatMap(g => g.ev.filter(e => e.pts > 0));
+  const goals = played.reduce((sum, g) => sum + g.ev.filter(e => !(e.pts > 0)).length, 0);
+  const score = (w, l) => share(played, g => Math.max(g.ga, g.gd) === w && Math.min(g.ga, g.gd) === l);
+  return {
+    nations: nations.length, series: played.length, games: ends.length,
+    goalsPerGame: goals / Math.max(1, ends.length),
+    overtime: share(ends, e => !!e.ot),
+    byOne: share(ends, e => gameMargin(e) === 1), byTwo: share(ends, e => gameMargin(e) === 2),
+    byThreePlus: share(ends, e => gameMargin(e) >= 3),
+    sweep: score(4, 0), fourOne: score(4, 1), fourTwo: score(4, 2), fourThree: score(4, 3),
+    favourite: favouriteRecord(played),
+    homeWins: share(played, g => g.winner === g.j),
+  };
+}
+
+/** A best-of-seven won by the side that wins each game with `p`. */
+const bestOfSeven = p => {
+  let chance = 0, ways = 1;
+  for (let j = 0; j < TO_WIN; j++) {
+    chance += ways * p ** TO_WIN * (1 - p) ** j;
+    ways = ways * (TO_WIN + j) / (j + 1);
+  }
+  return chance;
+};
+
+/**
+ * Rocket League's real figures, from the committed Liquipedia snapshot (scripts/data/rocket-league-elo.json): the last
+ * three years' 3v3 games of the export's S-, A- and B-Tier events whose six players had each played 20 games before, as
+ * every rated player has, with their goals (`play`), and the home crowd's edge measured at the LANs
+ * (`source.home`, Elo points ± one standard error), as an equal side's best-of-seven at home, two errors each way (the
+ * game's own Elo odds, no form). Null until the first export is synced.
+ */
+function rocketLeagueReal() {
+  const file = new URL('./data/rocket-league-elo.json', import.meta.url);
+  if (!existsSync(file)) return null;
+  const { source, play } = JSON.parse(readFileSync(file, 'utf8'));
+  const total = Object.values(play.margins).reduce((sum, n) => sum + n, 0);
+  const marginShare = test => Object.entries(play.margins).filter(([m]) => test(Number(m))).reduce((sum, [, n]) => sum + n, 0) / total;
+  const near = (value, width) => [Math.round((value - width) * 1000) / 1000, Math.round((value + width) * 1000) / 1000];
+  const bo7 = play.series.bo7 ?? {};
+  const seriesCount = Object.values(bo7).reduce((sum, n) => sum + n, 0);
+  const home = source.home;
+  return {
+    note: `the ${play.games} games of the S-, A- and B-Tier events of ${play.from ?? source.from} to ${source.to} whose six players`
+      + ` had each played ${play.minGames ?? source.minGames} games, as Liquipedia records them (CC BY-SA 3.0)`,
+    goalsPerGame: near(play.goals, 0.3),
+    overtime: near(play.ot, 0.035),
+    // The real games' margins are a mix of matchups unlike the field's, so reported only.
+    byOne: marginShare(m => m === 1), byTwo: marginShare(m => m === 2), byThreePlus: marginShare(m => m >= 3),
+    bestOfSeven: seriesCount ? { series: seriesCount, sweep: (bo7['4-0'] ?? 0) / seriesCount, fourOne: (bo7['4-1'] ?? 0) / seriesCount,
+      fourTwo: (bo7['4-2'] ?? 0) / seriesCount, fourThree: (bo7['4-3'] ?? 0) / seriesCount } : null,
+    homeWins: home ? [bestOfSeven(gameOdds((home.elo - 2 * home.se) / 25)), bestOfSeven(gameOdds((home.elo + 2 * home.se) / 25))]
+      .map(x => Math.round(x * 1000) / 1000) : null,
+    homeEdge: home,
+  };
+}
+
 /**
  * The cups of an earlier year (docs/design/tennis.md and womens-tennis.md, "Format by year"): `seasonId`'s sixteen
  * strongest nations from its season file, playing each other once a season under that year's format (matchSport). How
@@ -636,6 +714,7 @@ export function nrlSeason(seasons, seed, venue) {
  * figure no source gave has no range and is reported only.
  */
 export const REAL = Object.freeze({
+  rocketLeague: rocketLeagueReal(),
   football: {
     note: 'Premier League, La Liga, Serie A, Bundesliga and Ligue 1, 2021/22–2024/25',
     goalsPerGame: [2.5, 3.28], drawRate: [0.203, 0.295], goallessRate: [0.029, 0.096],
@@ -820,6 +899,7 @@ export function realismReport({ seasons = 40, seed = 20261101, home = false } = 
     davisCup: davisCup(seasons, hashStr(`${seed}:davis-cup`), venue),
     billieJeanKingCup: davisCup(seasons, hashStr(`${seed}:billie-jean-king-cup`), venue, womensTennis),
     nrl: nrlSeason(seasons, hashStr(`${seed}:nrl`), venue),
+    rocketLeague: rlcs(seasons, hashStr(`${seed}:rocket-league`), venue),
   };
 }
 
@@ -1034,6 +1114,24 @@ EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
     lines.push(`      (the ${tour} tour's sets: ${pct(rt.tourBagels)})`);
     lines.push(row('favourite wins', t.favourite.wins, null, pct));
     lines.push(row('host (defending) side wins', t.homeWins, rt.homeWins, pct));
+  }
+  const rl = report.rocketLeague, rlReal = REAL.rocketLeague;
+  if (rl && rlReal) {
+    lines.push(`\nRocket League — the ${rl.nations} strongest nations, ${rl.series} series of best of seven, ${rl.games} games (real: ${rlReal.note})`);
+    lines.push(row('goals a game', rl.goalsPerGame, rlReal.goalsPerGame, x => num(x, 2)));
+    lines.push(row('games to overtime', rl.overtime, rlReal.overtime, pct));
+    lines.push(row('games won by one', rl.byOne, null, pct));
+    lines.push(`      (the real games: ${pct(rlReal.byOne)}, a different mix of matchups)`);
+    lines.push(row('games won by two', rl.byTwo, null, pct));
+    lines.push(`      (the real games: ${pct(rlReal.byTwo)})`);
+    lines.push(row('games won by three or more', rl.byThreePlus, null, pct));
+    lines.push(`      (the real games: ${pct(rlReal.byThreePlus)})`);
+    for (const [label, key] of [['series won 4–0', 'sweep'], ['series won 4–1', 'fourOne'], ['series won 4–2', 'fourTwo'], ['series won 4–3', 'fourThree']]) {
+      lines.push(row(label, rl[key], null, pct));
+      if (rlReal.bestOfSeven) lines.push(`      (the real best-of-sevens, ${rlReal.bestOfSeven.series}: ${pct(rlReal.bestOfSeven[key])})`);
+    }
+    lines.push(row('favourite wins', rl.favourite.wins, null, pct));
+    lines.push(row('home (defending) side wins', rl.homeWins, report.home ? rlReal.homeWins : null, pct));
   }
   const r = report.nrl, rr = REAL.nrl;
   lines.push(`\nNRL — ${r.clubs} clubs, ${NRL_GAMES} games (real: ${rr.note})`);

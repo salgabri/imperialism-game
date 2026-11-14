@@ -90,10 +90,11 @@ export const FINALE_HELP = {
 };
 export const RECRUITMENT_OPTIONS = Object.freeze([['highest-rated', 'Best-rated player'], ['best-fit', 'Best lineup fit']]);
 /**
- * Whether Computer signings is a choice in a sport (an id). In tennis any player plays any place, so the best-rated
- * player is always the best fit and the two settings sign the same player: the choice is left out there.
+ * Whether Computer signings is a choice in a sport (an id). In tennis, and in Rocket League (`signings` false), any player
+ * plays any place, so the best-rated player is always the best fit and the two settings sign the same player: the choice
+ * is left out there.
  */
-export const signingsOffered = sportId => !isTennisSport(sportId);
+export const signingsOffered = sportId => !isTennisSport(sportId) && getSport(sportId).signings !== false;
 export const RECRUITMENT_HELP = {
   'highest-rated': "After a win, a team you don't manage signs the loser's highest-rated player.",
   'best-fit': "After a win, a team you don't manage signs the loser's player who most improves its starting lineup.",
@@ -104,6 +105,11 @@ export const ROSTER_HELP = {
   competitive: 'The gaps between strong and weak teams shrink; each roster keeps its own stars.',
 };
 export const HOME_OPTIONS = Object.freeze([['off', 'Off'], ['on', 'On']]);
+/**
+ * Whether Home advantage is a choice in a sport (an id): not in one whose data shows no home edge (`homeAdvantage` false:
+ * Rocket League, whose LANs' host nations did as Elo expected), where both settings play the same matches.
+ */
+export const homeOffered = sportId => getSport(sportId).homeAdvantage !== false;
 export const HOME_HELP = {
   off: 'Every match is played on neutral ground.',
   on: 'The defending team plays at home and wins a little more often, as home teams do, so conquests are harder.',
@@ -158,7 +164,7 @@ export function moreRulesSummary(setup = {}) {
   if (setup.acquisitionPolicy === 'best-fit' && signingsOffered(getSport(setup.sport).id)) {
     parts.push(`Computer signings: ${nameOf(RECRUITMENT_OPTIONS, 'best-fit')}`);
   }
-  if (setup.homeAdvantage === 'on') parts.push(`Home advantage: ${nameOf(HOME_OPTIONS, 'on')}`);
+  if (setup.homeAdvantage === 'on' && homeOffered(getSport(setup.sport).id)) parts.push(`Home advantage: ${nameOf(HOME_OPTIONS, 'on')}`);
   if (setup.rosterPreset === 'competitive' && getSport(setup.sport).id === 'basketball') {
     parts.push(`Team strengths: ${nameOf(ROSTER_OPTIONS, 'competitive')}`);
   }
@@ -170,8 +176,8 @@ export function moreRulesSummary(setup = {}) {
 /**
  * The in-game settings' read-only "This campaign" rows, from the launched settings. Missing or unknown values read as
  * their defaults, so old saves and partial fixtures never show `undefined`. `stored` is the value behind the text.
- * Home advantage has a row only when it is on, as team strengths has one only in basketball and computer signings
- * none in tennis.
+ * Home advantage has a row only when it is on (and none in Rocket League), as team strengths has one only in basketball
+ * and computer signings none in tennis.
  * → [{ id, label, value, stored, inner?: { id, stored }, num? }]
  */
 export function campaignFacts(settings = {}, { seed = null, managementEnded = false, managedName = null } = {}) {
@@ -204,7 +210,9 @@ export function campaignFacts(settings = {}, { seed = null, managementEnded = fa
   if (signingsOffered(getSport(s.sport).id)) {
     rows.push({ id: 'recruitment', label: 'Computer signings', value: nameOf(RECRUITMENT_OPTIONS, recruitment), stored: recruitment });
   }
-  if (s.homeAdvantage === 'on') rows.push({ id: 'home-advantage', label: 'Home advantage', value: nameOf(HOME_OPTIONS, 'on'), stored: 'on' });
+  if (s.homeAdvantage === 'on' && homeOffered(getSport(s.sport).id)) {
+    rows.push({ id: 'home-advantage', label: 'Home advantage', value: nameOf(HOME_OPTIONS, 'on'), stored: 'on' });
+  }
   if (s.sport === 'basketball') rows.push({ id: 'roster-preset', label: 'Team strengths', value: nameOf(ROSTER_OPTIONS, roster), stored: roster });
   if (seed != null && String(seed) !== '') rows.push({ id: 'seed', label: 'Seed', value: String(seed), stored: String(seed), num: true });
   return rows;
@@ -383,6 +391,10 @@ export const SEASON_NOTES = Object.freeze({
     + 'before 2016 computed from Jeff Sackmann\'s match results by its method (1963–1979 rough; before 1968 the majors and the '
     + 'Federation Cup only, as Wikipedia records them). Each nation names its five '
     + 'best; one with fewer than two rated players fields no team.',
+  'rocket-league': 'Elo ratings computed from every 3v3 series Liquipedia records (CC BY-SA 3.0), to November 2026. A '
+    + 'player plays for the nation he last played for at the FIFAe World Cup or the Esports Nations Cup, else the flag '
+    + 'Liquipedia files him under, and only if he has played within the year. Each nation fields its best three; one with '
+    + 'fewer fields no team.',
   tennis: 'Elo ratings of the ATP\'s men: Tennis Abstract\'s own as of 2 November 2026 and at the end of 2016–2025; before '
     + '2016 computed from Jeff Sackmann\'s match results by its method (1960–1979 rough; before 1968 the amateurs\' majors and '
     + 'Davis Cup only). Each nation names its five best; '
@@ -561,6 +573,7 @@ export const SPORT_NOTES = Object.freeze({
   tennis: 'Nations',
   'womens-tennis': 'Nations',
   'rugby-league': 'Nations · 17 NRL clubs',
+  'rocket-league': 'Nations',
 });
 
 /**

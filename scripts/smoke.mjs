@@ -66,6 +66,7 @@ const SCENARIOS = [
   { name: "WOMEN'S TENNIS · World · blitz · instant", sport: 'womens-tennis', scope: 'world', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · NRL · duel · ticker', ...NRL, pacing: 'duel', resolution: 'ticker' },
   { name: 'RUGBY LEAGUE · Asia & Oceania · blitz · instant', sport: 'rugby-league', scope: 'AFC', pacing: 'blitz', resolution: 'instant' },
+  { name: 'ROCKET LEAGUE · Europe · duel · ticker', sport: 'rocket-league', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
 ];
 
 const RESUME_SCENARIOS = [
@@ -99,7 +100,7 @@ const MANAGER_SCENARIOS = [
 // (England blitz), `=9` (Fiji duel) and `--resume-only=4` (England), `=5` (Fiji); the NFL's are `=10` and `=6`, MLB's `=11` and `=7`,
 // baseball's nations `=12`, the NHL's `=13`, hockey's nations `=14`, the women's nations `=15` and clubs `=16`, tennis's Davis Cup nations
 // `=17`, the NRL's `=18` and rugby league's nations `=19` (counted before Europe's two club maps came in at `=5` and `=6`: add two
-// to each). `--scenarios=<text>` composes with
+// to each), and Rocket League's nations the last, `=25`. `--scenarios=<text>` composes with
 // these: it narrows whatever they leave.
 function onlyIndex(name, list) {
   const arg = process.argv.find(value => value.startsWith(`--${name}=`));
@@ -663,7 +664,9 @@ if (!filtered && fixedChecks) {
     baseball: ['United States', 'Dominican Rep.', 'Venezuela', 'Cuba'], hockey: ['Canada', 'United States', 'Sweden', 'Russia'],
     'womens-football': ['Spain', 'England', 'France', 'Germany'], tennis: ['Spain', 'Italy', 'United States', 'Germany'],
     'womens-tennis': ['United States', 'Russia', 'Czechia', 'Ukraine'],
-    'rugby-league': ['Australia', 'New Zealand', 'England', 'Fiji'] };
+    'rugby-league': ['Australia', 'New Zealand', 'England', 'Fiji'],
+    // Rocket League's, by the Liquipedia snapshot's Elo: France, the United States, Saudi Arabia and Canada lead it.
+    'rocket-league': ['France', 'United States', 'Saudi Arabia', 'Canada'] };
 
   for (const sport of SPORT_LIST) {
     // A sport with clubs only (American football) fields no nations: its clubs are checked below.
@@ -691,9 +694,10 @@ if (!filtered && fixedChecks) {
       const natural = slot => slot.player && (sport.id === 'hockey' ? slot.penalty <= 4 : sport.id === 'rugby-league' ? slot.penalty <= 8 : !slot.outOfPosition);
       // Tennis invents nobody either: a nation needs two rated players, and a team of two or three plays its singles
       // players in the doubles too.
+      // Rocket League invents nobody: a nation needs three rated players and fields its best three of up to five.
       const fielded = sport.id === 'womens-football' ? teams.filter(t => t.real >= size)
-        : isTennisSport(sport.id) ? teams.filter(t => t.real >= 2) : teams;
-      const full = t => (isTennisSport(sport.id) ? lineupOf(t).slots.every(slot => slot.player)
+        : isTennisSport(sport.id) ? teams.filter(t => t.real >= 2) : sport.id === 'rocket-league' ? teams.filter(t => t.real >= 3) : teams;
+      const full = t => (isTennisSport(sport.id) || sport.id === 'rocket-league' ? lineupOf(t).slots.every(slot => slot.player)
         : t.squad.length > size ? lineupOf(t).slots.every(natural) : t.squad.length === size);
       // A sport fields at least a continent's worth of real sides (src/data/scopes.js): rugby league fields six.
       check('every nation fields a full lineup', fielded.length >= MIN_REAL_SIDES && fielded.every(full),
@@ -802,7 +806,9 @@ if (!filtered && fixedChecks) {
       check('the feed adds up to the final score', evTotals, 'event totals mismatch');
       const [low, high] = { football: [0.6, 3.5], basketball: [60, 110], 'american-football': [15, 30], baseball: [2, 10], 'womens-football': [0.6, 3.5], hockey: [1.5, 5.5],
         // Rubbers: the winner's three and the loser's none to two.
-        tennis: [1.5, 2.5], 'womens-tennis': [1.5, 2.5], 'rugby-league': [12, 35] }[sport.id];
+        tennis: [1.5, 2.5], 'womens-tennis': [1.5, 2.5], 'rugby-league': [12, 35],
+        // Games: the winner's four and the loser's none to three.
+        'rocket-league': [2, 3.5] }[sport.id];
       check('scoring is in the right range for the sport', mean > low && mean < high, `mean ${mean.toFixed(1)}`);
       console.log(`    400 matches · mean score ${mean.toFixed(1)} · ${results.filter(r => r.tie).length} needed ${sport.labels.tie.toLowerCase()}`);
     } catch (e) {

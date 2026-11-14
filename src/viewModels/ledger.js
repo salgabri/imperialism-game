@@ -12,6 +12,7 @@ import { baseballProfile } from '../sports/baseball.js';
 import { hockeyProfile } from '../sports/hockey.js';
 import { tennisProfile } from '../sports/tennis.js';
 import { rugbyLeagueProfile } from '../sports/rugbyLeague.js';
+import { rocketLeagueProfile } from '../sports/rocketLeague.js';
 import { campaignRecap, estimateSession } from '../engine/campaignExperience.js';
 import { empireNeighbors } from '../engine/campaign.js';
 import { FEED_CAP, domesticIdOf } from '../app/shared.js';
@@ -487,7 +488,8 @@ function tapeRow(key, label, a, b) {
 /**
  * Board 07 tale of the tape: the positional profile (football Attack / Defence / Goalkeeping, basketball Offence /
  * Defence, American football Offence / Defence / Kicking, baseball Batting / Pitching / Fielding, ice hockey Attack /
- * Defence / Goaltending, tennis Singles / Doubles, rugby league Backs / Halves / Forwards) from the sports engines' frozen
+ * Defence / Goaltending, tennis Singles / Doubles, rugby league Backs / Halves / Forwards, Rocket League's best player) from
+ * the sports engines' frozen
  * profile exports, then the lineup rating.
  */
 function tapeRows(sportId, lineupA, lineupD, copy) {
@@ -516,6 +518,9 @@ function tapeRows(sportId, lineupA, lineupD, copy) {
       const pA = rugbyLeagueProfile(lineupA), pD = rugbyLeagueProfile(lineupD);
       rows = [['backs', 'Backs', pA.backs, pD.backs], ['halves', 'Halves', pA.halves, pD.halves],
         ['forwards', 'Forwards', pA.forwards, pD.forwards]];
+    } else if (sportId === 'rocket-league') {
+      const pA = rocketLeagueProfile(lineupA), pD = rocketLeagueProfile(lineupD);
+      rows = [['best', 'Best player', pA.best, pD.best]];
     } else {
       const pA = footballProfile(lineupA), pD = footballProfile(lineupD);
       rows = [['attack', 'Attack', pA.attack, pD.attack], ['defence', 'Defence', pA.defence, pD.defence],

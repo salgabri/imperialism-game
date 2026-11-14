@@ -27,7 +27,7 @@ export const domesticDescription = setupModel.domesticDescription;
 const {
   SETUP_STEPS, DRAW_CARDS, TARGETING_CARDS, ROLE_CARDS, UNCERTAINTY_OPTIONS, UNCERTAINTY_HELP, FINALE_OPTIONS,
   FINALE_HELP, RECRUITMENT_OPTIONS, RECRUITMENT_HELP, ROSTER_OPTIONS, ROSTER_HELP, HOME_OPTIONS, HOME_HELP, SHOW_MATCH_OPTIONS,
-  showMatchesWrites, signingsOffered,
+  showMatchesWrites, signingsOffered, homeOffered,
 } = setupModel;
 
 /** Focus inside one of these keeps Space for itself (A-8). */
@@ -45,7 +45,8 @@ const WALL = { ratio: 4 / 3, gap: 6, minCell: 34, maxCell: 104, touch: { ratio: 
 
 /**
  * The sport tiles' columns: up to four share a row, up to eight split into two even rows, and more into three (nine
- * sports: three rows of three). Five across would squeeze "Basketball" out of its tile on a desktop's setup column.
+ * sports: three rows of three; ten: three rows of four, the last half full). Five across would squeeze "Basketball" out
+ * of its tile on a desktop's setup column.
  */
 const sportColumns = count => (count <= 4 ? count : count <= 8 ? Math.ceil(count / 2) : Math.ceil(count / 3));
 
@@ -459,12 +460,14 @@ export default function SetupOverlay({
             <small className="control-help sr-only">{RECRUITMENT_HELP[model.acquisitionPolicy]}</small>
           </label>
         ) : null}
-        <label className="control-field" htmlFor="setup-home-advantage" title={HOME_HELP[model.homeAdvantage]}><span>Home advantage</span>
-          <select id="setup-home-advantage" value={model.homeAdvantage} onChange={event => pick('homeAdvantage', event.target.value)}>
-            {HOME_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
-          </select>
-          <small className="control-help sr-only">{HOME_HELP[model.homeAdvantage]}</small>
-        </label>
+        {homeOffered(model.sport.id) ? (
+          <label className="control-field" htmlFor="setup-home-advantage" title={HOME_HELP[model.homeAdvantage]}><span>Home advantage</span>
+            <select id="setup-home-advantage" value={model.homeAdvantage} onChange={event => pick('homeAdvantage', event.target.value)}>
+              {HOME_OPTIONS.map(([id, label]) => <option key={id} value={id}>{label}</option>)}
+            </select>
+            <small className="control-help sr-only">{HOME_HELP[model.homeAdvantage]}</small>
+          </label>
+        ) : null}
         {model.sport.id === 'basketball' ? (
           <label className="control-field" htmlFor="setup-roster-preset" title={ROSTER_HELP[model.rosterPreset]}><span>Team strengths</span>
             <select id="setup-roster-preset" value={model.rosterPreset} onChange={event => pick('rosterPreset', event.target.value)}>
@@ -569,6 +572,7 @@ export default function SetupOverlay({
 
               <div className="setup-sports" role="radiogroup" aria-label="Sport"
                 data-rows={Math.ceil(model.sports.length / sportColumns(model.sports.length))}
+                data-cols={sportColumns(model.sports.length)}
                 style={{ '--sport-cols': sportColumns(model.sports.length) }}>
                 {model.sports.map(item => (
                   <div className="setup-card" data-checked={item.selected} data-busy={item.busy || undefined} key={item.id} title={item.note}>
