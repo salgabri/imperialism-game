@@ -684,11 +684,11 @@ export function seasonFigures(games) {
 
 // ---------- the computed seasons: NRL.com's match centre ----------
 //
-// No game rated the NRL's seasons from 2009 to 2024. Each is computed from what NRL.com's match centre recorded of it
-// (its team lists and player stats): a player's season is scored at NRL Fantasy's points for the stats NRL.com has kept
-// since 2003, ranked within his position and read off Rugby League 26's overalls there, as 2008's attribute overall is
-// read; then each club moves by its results that season (its Simple Rating System), as 2008's moves by the game's own
-// team rating.
+// No game rated the NRL's seasons from 1998 to 2007 or from 2009 to 2024. Each is computed from what NRL.com's match
+// centre recorded of it (its team lists and player stats): a player's season is scored at NRL Fantasy's points for the
+// stats NRL.com kept that season (all eleven from 2003), ranked within his position and read off Rugby League 26's
+// overalls there, as 2008's attribute overall is read; then each club moves by its results that season (its Simple
+// Rating System), as 2008's moves by the game's own team rating.
 
 /** NRL.com's team-list positions, as the game's. A player listed at one started there, whatever his jersey number. */
 export const NRLCOM_POSITION = Object.freeze({ Fullback: 'FB', Winger: 'WG', Centre: 'CE', 'Five-Eighth': 'FE', Halfback: 'HB',
@@ -731,15 +731,48 @@ export const PREVIOUS_WEIGHT = 0.5;
 // CORE in thirtieths of a point, whole numbers, so that a season's points add up exactly.
 const CORE_30 = Object.values(CORE).map(points => Math.round(points * 30));
 
-/** A season's core points from its stats' sums (`sums`, CORE's order first): exact, four decimals. */
-export function corePoints(sums) {
+/**
+ * A season's core points from its stats' sums (`sums`, CORE's order first): exact, four decimals. `counted`, the stats
+ * that count (statCensus's `recorded`), all of CORE's unless named: a stat NRL.com did not record that season scores
+ * nothing.
+ */
+export function corePoints(sums, counted = null) {
   if (!Array.isArray(sums) || sums.length < CORE_30.length) throw new Error('No stats to count');
+  const stats = Object.keys(CORE);
+  if (counted && counted.some(stat => !stats.includes(stat))) throw new Error(`${counted.join(', ')}: not CORE's stats`);
   let thirtieths = 0;
   CORE_30.forEach((points, i) => {
-    if (!Number.isInteger(sums[i])) throw new Error(`${Object.keys(CORE)[i]} ${sums[i]} is not a whole number`);
-    thirtieths += points * sums[i];
+    if (!Number.isInteger(sums[i])) throw new Error(`${stats[i]} ${sums[i]} is not a whole number`);
+    if (!counted || counted.includes(stats[i])) thirtieths += points * sums[i];
   });
   return Math.round(thirtieths / 30 * 1e4) / 1e4 + 0;
+}
+
+/**
+ * The share of a season's games with team lists a stat must appear in (non-zero for at least one player) for NRL.com
+ * to have recorded it that season. NRL.com did not keep all eleven of CORE's stats from 1998: try assists from 1999, line
+ * breaks' assists, tackle breaks and kick metres from 2003 (a few finals before carry them all). From 2003 every stat
+ * appears in 96% of games or more.
+ */
+export const RECORDED_SHARE = 0.95;
+
+/**
+ * Which of CORE's stats NRL.com recorded throughout a season (`games`, its games with team lists or without, as
+ * nrlcomSeason gives them): those that appear in at least RECORDED_SHARE of its games with team lists, less any the
+ * manifest marks as recorded only in part (`partial`: 1998's run metres, which cover some runs only). →
+ * `{ games, given: { stat: games it appears in }, recorded: [stat …] }` in CORE's order.
+ */
+export function statCensus(games, partial = []) {
+  const stats = Object.keys(CORE);
+  if (partial.some(stat => !stats.includes(stat))) throw new Error(`${partial.join(', ')}: not CORE's stats`);
+  const listed = games.filter(game => game.home.players && game.away.players);
+  const given = Object.fromEntries(stats.map(stat => [stat, 0]));
+  for (const game of listed) {
+    const rows = [...game.home.players, ...game.away.players];
+    stats.forEach((stat, i) => { if (rows.some(row => row[4 + i] !== 0)) given[stat]++; });
+  }
+  const recorded = stats.filter(stat => listed.length && given[stat] >= RECORDED_SHARE * listed.length && !partial.includes(stat));
+  return { games: listed.length, given, recorded };
 }
 
 /**

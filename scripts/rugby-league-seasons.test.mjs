@@ -24,12 +24,13 @@ import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { kmToPolys, pointInPolys } from './lib/domestic-partition.mjs';
 import { playerOf } from './lib/nrl.mjs';
 import {
-  ATTRIBUTE_ORDER, CORE, CORE_REASONS, DEFAULTS, KEPT, NRLCOM_BENCH, NRLCOM_POSITION, PREVIOUS_WEIGHT, PRIMARY_POSITION, REASONS, RLP_POSITION,
+  ATTRIBUTE_ORDER, CORE, CORE_REASONS, DEFAULTS, KEPT, NRLCOM_BENCH, NRLCOM_POSITION, PREVIOUS_WEIGHT, PRIMARY_POSITION, REASONS, RECORDED_SHARE, RLP_POSITION,
   TEAM_RATING_PARTS, WEIGHTS, bornAlike, clubGamesOf, clubOf, clubShiftOf, corePoints, drawGames, findListed, fold, mapOf, matchRecord, mostStarted,
   nameParts, overallOf, playSeasons, positionScore, readOff, readRl2Database, referenceOf, rlpGrid, rlpName, rlpPlayer, rlpPositions, rlpResults,
-  seasonFigures, seasonIdOf, seasonPlayers, seasonValue, shifted, spearman, srsOf, teamRatingOf, teamsOf, tookField,
+  seasonFigures, seasonIdOf, seasonPlayers, seasonValue, shifted, spearman, srsOf, statCensus, teamRatingOf, teamsOf, tookField,
 } from './lib/rugby-league-seasons.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
+import { colourFor } from './lib/club-identity.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
@@ -56,7 +57,7 @@ const getBuiltIn = () => sportOf({ sport: 'rugby-league', layer: 'nations' });
 
 test('every season rebuilds byte for byte from its snapshot; the built-in season and its map are untouched', () => {
   assert.match(execFileSync(process.execPath, ['scripts/build-rugby-league-seasons.mjs', '--check'], { cwd: root, encoding: 'utf8' }),
-    /Verified the 17 rugby league seasons, the listing and the audit byte for byte/);
+    /Verified the 27 rugby league seasons, the listing and the audit byte for byte/);
   assert.match(execFileSync(process.execPath, ['scripts/build-rugby-league.mjs', '--check'], { cwd: root, encoding: 'utf8' }),
     /Verified the NRL clubs and the rugby league nations byte for byte/);
   // Every input is pinned by SHA-256: the database's zip, of each Rugby League Project page the part read, and of NRL.com's
@@ -66,11 +67,13 @@ test('every season rebuilds byte for byte from its snapshot; the built-in season
   assert.deepEqual(Object.entries(SOURCES).filter(([, source]) => !source.pin).map(([file]) => file), ['rl2/aid56-RLDatabase.zip']);
   const nrlcom = Object.entries(SOURCES).filter(([key]) => key.startsWith('nrlcom/'));
   assert.deepEqual([...new Set(nrlcom.map(([key]) => Number(key.split('/')[1])))].sort((a, b) => a - b),
-    Array.from({ length: 20 }, (_, i) => 2007 + i), 'NRL.com 2007–2026: each computed season and the two either side');
+    Array.from({ length: 29 }, (_, i) => 1998 + i), 'NRL.com 1998–2026: each computed season and the two either side, none before 1998');
+  assert.equal(MANIFEST.nrlcom.from, 1998, 'NRL.com\'s first season with team lists');
   assert.ok(nrlcom.every(([key, source]) => (key.split('/').length === 2 ? source.pin === 'rounds'
     : source.pin === 'round' && Number.isInteger(source.games) && source.url.startsWith('https://www.nrl.com/draw/data?competition=111&season='))));
-  assert.equal(MANIFEST.seasons[0].database.sha256, '4891f3deab5caeddc276af68d24aca65c867d533db96d1f8edb6812d5b6ef9c8', 'RLDatabase.xml itself');
-  assert.deepEqual(SNAPSHOT.source.database, MANIFEST.seasons[0].database);
+  const rl2 = MANIFEST.seasons.find(season => season.id === 'nrl-2008');
+  assert.equal(rl2.database.sha256, '4891f3deab5caeddc276af68d24aca65c867d533db96d1f8edb6812d5b6ef9c8', 'RLDatabase.xml itself');
+  assert.deepEqual(SNAPSHOT.source.database, rl2.database);
 });
 
 const cached = existsSync(new URL('../data-src/rugby-league-seasons', import.meta.url));
@@ -79,16 +82,18 @@ test('the snapshot rebuilds from its pinned inputs', { skip: !cached && 'the inp
     /Verified the rugby league season snapshots byte for byte/);
 });
 
-test('the built-in season list has 2024 to 2008, newest first: clubs only, calendar years, each on the map of its day', () => {
-  const computed = Array.from({ length: 16 }, (_, i) => 2024 - i)
-    .map(year => [`nrl-${year}`, year, String(year), 'Computed from NRL.com match stats', mapOf(MANIFEST, year)]);
+test('the built-in season list has 2024 to 1998, newest first: clubs only, calendar years, each on the map of its day', () => {
+  const computed = years => years.map(year => [`nrl-${year}`, year, String(year), 'Computed from NRL.com match stats', mapOf(MANIFEST, year)]);
+  const after = computed(Array.from({ length: 16 }, (_, i) => 2024 - i)), before = computed(Array.from({ length: 10 }, (_, i) => 2007 - i));
   assert.deepEqual(BUILT_IN_RUGBY_LEAGUE_SEASONS.map(set => [set.id, set.year, set.season, set.label, set.map]),
-    [...computed, ['nrl-2008', 2008, '2008', 'Rugby League 2: World Cup Edition', 'nrl2008']]);
-  assert.deepEqual(computed.map(([, year, , , map]) => `${year} ${map}`), ['2024 nrl', '2023 nrl', '2022 nrl2020', '2021 nrl2020', '2020 nrl2020',
+    [...after, ['nrl-2008', 2008, '2008', 'Rugby League 2: World Cup Edition', 'nrl2008'], ...before]);
+  assert.deepEqual([...after, ...before].map(([, year, , , map]) => `${year} ${map}`), ['2024 nrl', '2023 nrl', '2022 nrl2020', '2021 nrl2020', '2020 nrl2020',
     '2019 nrl2012', '2018 nrl2012', '2017 nrl2012', '2016 nrl2012', '2015 nrl2012', '2014 nrl2012', '2013 nrl2012', '2012 nrl2012', '2011 nrl2010',
-    '2010 nrl2010', '2009 nrl2008']);
+    '2010 nrl2010', '2009 nrl2008', '2007 nrl2007', '2006 nrl2006', '2005 nrl2003', '2004 nrl2003', '2003 nrl2003', '2002 nrl2002', '2001 nrl2001',
+    '2000 nrl2000', '1999 nrl1999', '1998 nrl1998']);
+  assert.deepEqual(BUILT_IN_RUGBY_LEAGUE_SEASONS.map(set => set.year).sort((a, b) => a - b), Array.from({ length: 27 }, (_, i) => 1998 + i), 'no gap from 1998');
   assert.deepEqual(builtInSeasonOf('rugby-league'), { year: 2025, season: '2025' }, 'the built-in season stays 2025');
-  const listed = BUILT_IN_RUGBY_LEAGUE_SEASONS.at(-1);
+  const listed = BUILT_IN_RUGBY_LEAGUE_SEASONS.find(set => set.id === 'nrl-2008');
   for (const set of BUILT_IN_RUGBY_LEAGUE_SEASONS) {
     assert.deepEqual(BUILT_IN_SETS.find(other => other.id === set.id), set);
     assert.deepEqual([setKindOf(set.id), setSportOf(set.id), setHasNations(set.id), setHasClubs(set.id), setIsMapped(set.id)],
@@ -414,19 +419,37 @@ const round = (x, digits) => Math.round(x * 10 ** digits) / 10 ** digits;
 /** A team-list row as matchRecord keeps it: [id, name, position, jersey, ...KEPT]. */
 const listed = (id, position, jersey, stats = {}) => [id, `Player ${id}`, position, jersey, ...KEPT.map(stat => stats[stat] ?? 0)];
 
-test('the computed seasons are 2009 to 2024: one method, clubs only, the method stated in the source', () => {
-  assert.deepEqual(COMPUTED.map(season => season.year), Array.from({ length: 16 }, (_, i) => 2009 + i));
+// What each computed season's value counts, as its source.metric names it: every season from 2004 counts all eleven
+// stats with the season before; NRL.com recorded six in 1998 and eight from 1999 to 2002, and 1998, 1999 and 2003 stand
+// alone (no season before on NRL.com, or one that recorded fewer stats).
+const ELEVEN = 'core points a club game: NRL Fantasy\'s points for eleven NRL.com stats, the season before at half weight';
+const METRIC = {
+  1998: 'core points a club game: NRL Fantasy\'s points for the six NRL.com stats recorded in 1998, the season alone',
+  1999: 'core points a club game: NRL Fantasy\'s points for the eight NRL.com stats recorded in 1999, the season alone',
+  2000: 'core points a club game: NRL Fantasy\'s points for the eight NRL.com stats recorded in 1999 and 2000, the season before at half weight',
+  2001: 'core points a club game: NRL Fantasy\'s points for the eight NRL.com stats recorded in 2000 and 2001, the season before at half weight',
+  2002: 'core points a club game: NRL Fantasy\'s points for the eight NRL.com stats recorded in 2001 and 2002, the season before at half weight',
+  2003: 'core points a club game: NRL Fantasy\'s points for eleven NRL.com stats, the season alone',
+};
+
+test('the computed seasons are 1998 to 2007 and 2009 to 2024: one method, clubs only, the method stated in the source', () => {
+  assert.deepEqual(COMPUTED.map(season => season.year), [...Array.from({ length: 10 }, (_, i) => 1998 + i), ...Array.from({ length: 16 }, (_, i) => 2009 + i)]);
   for (const season of COMPUTED) {
     const doc = DOCS.get(season.id);
     const { meta } = decodeFootballSet(doc, season.id);
     assert.deepEqual([meta.kind, meta.year, meta.season, meta.label, meta.source.provider, meta.source.method],
       ['nrl', season.year, String(season.year), 'Computed from NRL.com match stats', 'NRL.com', 'computed']);
     assert.equal(meta.source.rawScale, undefined, 'no game\'s scale');
-    assert.match(meta.source.metric, /^core points a club game: NRL Fantasy's points for eleven NRL\.com stats, the season before at half weight$/);
+    assert.equal(meta.source.metric, METRIC[season.year] ?? ELEVEN, season.id);
     assert.match(meta.source.conversion, new RegExp(`^No game rated the ${season.year} season`));
     assert.match(meta.source.conversion, /the season's results set each club's level, while its players keep their order/);
     assert.equal(setHasNations(season.id), false, 'clubs only: a nations game plays the built-in nations');
   }
+  // The seasons 2009–2024 read as they did before 1998–2007 joined: their formula names no stat NRL.com did not record.
+  for (const year of [2004, 2009, 2024]) assert.doesNotMatch(DOCS.get(`nrl-${year}`).source.conversion, /NRL\.com recorded|the season's alone/);
+  assert.match(DOCS.get('nrl-1998').source.conversion, /NRL\.com recorded six of the eleven in 1998 \(`stats`: tries, line breaks, tackles, missed tackles, offloads and errors; its run metres cover only some runs/);
+  assert.match(DOCS.get('nrl-1998').source.conversion, /NRL\.com has no team lists before 1998: 1998's values are the season's alone/);
+  assert.match(DOCS.get('nrl-2003').source.conversion, /it recorded fewer in 2002: 2003's values are the season's alone/);
 });
 
 test("a game counts NRL Fantasy's points for eleven stats and goals nowhere; the season before at half weight, when he played", () => {
@@ -449,6 +472,44 @@ test("a game counts NRL Fantasy's points for eleven stats and goals nowhere; the
     assert.deepEqual(snapshot.conversion.core.reasons, CORE_REASONS);
     assert.equal(snapshot.conversion.previous, PREVIOUS_WEIGHT);
     assert.deepEqual(snapshot.conversion.kept, KEPT);
+  }
+  // A stat NRL.com did not record scores nothing: only the stats counted add up.
+  assert.equal(corePoints([1, 1, 1, 1, 30, 2, 3, 2, 1, 105, 95], ['tries', 'tacklesMade', 'missedTackles', 'offloads', 'errors']), 8 + 30 - 4 + 8 - 2);
+  assert.equal(corePoints([1, 1, 1, 1, 30, 2, 3, 2, 1, 105, 95], Object.keys(CORE)), 70.6667, 'all eleven: as before');
+  assert.throws(() => corePoints([1, 1, 1, 1, 30, 2, 3, 2, 1, 105, 95], ['goals']), /not CORE's stats/);
+});
+
+test('a value counts the stats NRL.com recorded that season, and the season before only when it recorded the same', () => {
+  // A stat is recorded when it appears in 95% of a season's games with team lists; the manifest marks one recorded in part.
+  const game = (...rows) => ({ home: { players: rows }, away: { players: [] } });
+  const twenty = Array.from({ length: 20 }, (_, i) => game(listed(i, 'Prop', 8, { tacklesMade: 30, tries: i < 19 ? 1 : 0, allRunMetres: i < 18 ? 90 : 0 })));
+  const census = statCensus([...twenty, { home: { players: null }, away: { players: null } }]);
+  assert.equal(census.games, 20, 'a game without team lists is not counted');
+  assert.deepEqual(census.recorded, ['tries', 'tacklesMade'], 'tries in 19 of 20 games (95%), run metres in 18 (90%)');
+  assert.deepEqual(statCensus(twenty, ['tries']).recorded, ['tacklesMade'], 'a stat recorded in part');
+  assert.equal(RECORDED_SHARE, 0.95);
+  assert.deepEqual(Object.keys(MANIFEST.nrlcom.partial), ['1998']);
+  assert.match(MANIFEST.nrlcom.partial['1998'].allRunMetres, /^cover only some runs/);
+  const counts = { 1998: 6, 1999: 8, 2000: 8, 2001: 8, 2002: 8 };
+  for (const [id, snapshot] of SNAPSHOTS) {
+    const year = Number(id.slice(4)), { stats } = snapshot.conversion;
+    assert.equal(stats.counted.length, counts[year] ?? 11, `${id} counts ${stats.counted.join(', ')}`);
+    assert.deepEqual(stats.counted, stats.census[year].recorded, id);
+    for (const [at, entry] of Object.entries(stats.census)) {
+      const recorded = Object.keys(CORE).filter((stat, i) => entry.given[i] >= RECORDED_SHARE * entry.games && !(entry.partial ?? []).includes(stat));
+      assert.deepEqual(entry.recorded, recorded, `${id}: what NRL.com recorded in ${at}`);
+      assert.deepEqual(entry.partial ?? [], Object.keys(MANIFEST.nrlcom.partial[at] ?? {}));
+    }
+    assert.equal(stats.seasonBefore, ![1998, 1999, 2003].includes(year), `${id}: the season before counts when NRL.com recorded the same stats`);
+    assert.equal(stats.seasonBefore, Boolean(stats.census[year - 1]) && stats.census[year - 1].recorded.join() === stats.counted.join());
+    assert.equal(Boolean(stats.census[year - 1]), year > 1998, 'no season before 1998 on NRL.com');
+    if (!stats.seasonBefore) assert.ok(snapshot.players.every(row => row[8] === null), `${id}: the season alone`);
+    else assert.ok(snapshot.players.filter(row => row[8]).length > 0.5 * snapshot.players.length, `${id}: most played the season before`);
+  }
+  // From 2003 NRL.com recorded every stat in nearly every game: 2003–2024's census at 96% or more each (2004's line-break assists).
+  for (const [id, snapshot] of SNAPSHOTS) {
+    const year = Number(id.slice(4)), { census } = snapshot.conversion.stats;
+    if (year >= 2003) assert.ok(census[year].given.every(n => n >= 0.96 * census[year].games), `${id}: ${census[year].given.join(' ')} of ${census[year].games}`);
   }
 });
 
@@ -546,8 +607,9 @@ test('every computed overall recomputes from its snapshot: value, percentile at 
       assert.equal(row.clubs.find(([club]) => club === row.club)?.[1], Math.max(...row.clubs.map(([, n]) => n)),
         `${id}: ${row.name} plays for a club he played most for (of two as many, the last: clubOf)`);
       assert.equal(row.sums.length, KEPT.length);
-      const previous = row.previous && { points: corePoints(row.previous[2]), clubGames: clubGamesOf(row.previous[1], snapshot.previousClubGames) };
-      assert.equal(row.value, seasonValue({ points: corePoints(row.sums), clubGames: clubGamesOf(row.clubs, clubGames) }, previous), `${id}: ${row.name}'s value`);
+      const { counted } = conversion.stats;
+      const previous = row.previous && { points: corePoints(row.previous[2], counted), clubGames: clubGamesOf(row.previous[1], snapshot.previousClubGames) };
+      assert.equal(row.value, seasonValue({ points: corePoints(row.sums, counted), clubGames: clubGamesOf(row.clubs, clubGames) }, previous), `${id}: ${row.name}'s value`);
       assert.equal(row.overall, overallOf(row.value, conversion.values[row.pos], conversion.reference[row.pos]), `${id}: ${row.name}'s overall`);
     }
     for (const pos of ORDER) {
@@ -595,24 +657,31 @@ test("each computed club moves by its season's Simple Rating System, read off th
   assert.ok(fit.ratings.a > fit.ratings.b && fit.ratings.b > fit.ratings.c && fit.homeEdge > 0, JSON.stringify(fit));
 });
 
-test("the computed seasons' clubs: sixteen to 2022, the Dolphins from 2023, the Bulldogs as named in 2009, each era at its grounds", () => {
+// The clubs of each computed season: twenty in 1998, seventeen in 1999, fourteen in 2000 and 2001, fifteen from 2002,
+// sixteen from 2007, seventeen with the Dolphins from 2023.
+const CLUB_COUNT = year => (year === 1998 ? 20 : year === 1999 ? 17 : year <= 2001 ? 14 : year <= 2006 ? 15 : year <= 2022 ? 16 : 17);
+
+test("the computed seasons' clubs: twenty in 1998 down to fourteen, the Dolphins from 2023, each club as named that season, each era at its grounds", () => {
   for (const season of COMPUTED) {
     const doc = DOCS.get(season.id), teams = teamsOf(MANIFEST, season.year);
-    assert.equal(doc.clubs.length, season.year >= 2023 ? 17 : 16, season.id);
+    assert.equal(doc.clubs.length, CLUB_COUNT(season.year), season.id);
     assert.equal(doc.clubs.some(club => club.id === 'nrl-dolphins'), season.year >= 2023, `${season.id}: the Dolphins from 2023`);
     for (const club of doc.clubs) {
       const team = teams.find(t => t.id === club.id);
-      assert.deepEqual([club.name, club.code, club.league, club.country, club.col], [team.name, team.code, 'NRL', team.country,
-        CLUBS.find(c => c.id === team.franchise).col], `${season.id}: ${club.name}`);
+      // A club of today's franchise in its colour, a defunct one in a colour of its own.
+      const col = MANIFEST.defunct.includes(team.franchise) ? colourFor(team.id) : CLUBS.find(c => c.id === team.franchise).col;
+      assert.deepEqual([club.name, club.code, club.league, club.country, club.col], [team.name, team.code, 'NRL', team.country, col], `${season.id}: ${club.name}`);
       assert.ok(club.squad.length >= 17 && club.squad.length <= 24);
     }
     assert.equal(doc.map, mapOf(MANIFEST, season.year));
     const bulldogs = doc.clubs.find(club => club.id.includes('bulldogs'));
-    assert.deepEqual([bulldogs.id, bulldogs.code], season.year === 2009 ? ['nrl-bulldogs', 'BUL'] : ['nrl-canterbury-bankstown-bulldogs', 'CBY']);
+    assert.deepEqual([bulldogs.id, bulldogs.name, bulldogs.code], season.year <= 1999 ? ['nrl-canterbury-bulldogs', 'Canterbury Bulldogs', 'CBY']
+      : season.year <= 2009 ? ['nrl-bulldogs', 'Bulldogs', 'BUL'] : ['nrl-canterbury-bankstown-bulldogs', 'Canterbury-Bankstown Bulldogs', 'CBY'], season.id);
   }
   const at = (year, franchise) => teamsOf(MANIFEST, year).find(team => team.franchise === franchise);
-  assert.deepEqual([2009, 2010, 2011, 2012, 2024].map(year => at(year, 'nrl-canterbury-bankstown-bulldogs').base),
-    ['Sydney Olympic Park', 'Sydney Olympic Park', 'Sydney Olympic Park', 'Belmore Sports Ground', 'Belmore Sports Ground'], 'back at Belmore from 2012');
+  assert.deepEqual([1998, 1999, 2001, 2005, 2006, 2007, 2009, 2010, 2011, 2012, 2024].map(year => at(year, 'nrl-canterbury-bankstown-bulldogs').base ?? at(year, 'nrl-canterbury-bankstown-bulldogs').city),
+    ['Canterbury', 'Homebush', 'Homebush', 'Homebush', 'Belmore Sports Ground', 'Belmore Sports Ground', 'Sydney Olympic Park', 'Sydney Olympic Park',
+      'Sydney Olympic Park', 'Belmore Sports Ground', 'Belmore Sports Ground'], 'at Belmore in 1998, at Homebush 1999-2005, from Belmore while it shared Stadium Australia with the Rabbitohs');
   assert.deepEqual([2009, 2010].map(year => at(year, 'nrl-melbourne-storm').ground), ['Olympic Park Stadium', 'AAMI Park']);
   assert.deepEqual([2019, 2020].map(year => at(year, 'nrl-north-queensland-cowboys').ground), ['Dairy Farmers Stadium', 'Queensland Country Bank Stadium']);
   assert.deepEqual([2022, 2023].map(year => at(year, 'nrl-south-sydney-rabbitohs').base), ['Redfern Oval', 'Heffron Centre']);
@@ -621,14 +690,63 @@ test("the computed seasons' clubs: sixteen to 2022, the Dolphins from 2023, the 
   assert.deepEqual([2017, 2019, 2020].map(year => at(year, 'nrl-parramatta-eels').ground), ['Parramatta Stadium', 'Parramatta Stadium', 'CommBank Stadium'],
     'ANZ Stadium in 2017–18 and the new stadium on the site from 2019 keep the Eels at home (rules R1, R3)');
   // An era's seasons share their clubs and grounds, and 2023–2024 are today's: today's map serves them, built once.
-  assert.deepEqual(MANIFEST.maps.map(map => [map.id, map.seasons]), [['nrl2008', [2008, 2009]], ['nrl2010', [2010, 2011]],
+  assert.deepEqual(MANIFEST.maps.map(map => [map.id, map.seasons]), [['nrl1998', [1998]], ['nrl1999', [1999]], ['nrl2000', [2000]], ['nrl2001', [2001]],
+    ['nrl2002', [2002]], ['nrl2003', [2003, 2004, 2005]], ['nrl2006', [2006]], ['nrl2007', [2007]], ['nrl2008', [2008, 2009]], ['nrl2010', [2010, 2011]],
     ['nrl2012', [2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019]], ['nrl2020', [2020, 2021, 2022]], ['nrl', [2023, 2024]]]);
   assert.ok(!CLUB_MAPS.some(entry => /^nrl20(2[3-9])/.test(entry.id)), 'no copy of today\'s map');
-  for (const id of ['nrl2010', 'nrl2012', 'nrl2020']) {
-    const entry = CLUB_MAPS.find(e => e.id === id);
-    assert.deepEqual([entry.sport, entry.league, entry.clubs, entry.venue, entry.lines], ['rugby-league', 'NRL', 16, 'ground', 'state or region']);
-    assert.deepEqual(entry.seasons, MANIFEST.maps.find(map => map.id === id).seasons.map(seasonIdOf));
+  for (const map of MANIFEST.maps.filter(entry => entry.id !== 'nrl' && entry.id !== 'nrl2008')) {
+    const entry = CLUB_MAPS.find(e => e.id === map.id);
+    assert.deepEqual([entry.sport, entry.league, entry.clubs, entry.venue, entry.lines], ['rugby-league', 'NRL', CLUB_COUNT(map.seasons[0]), 'ground', 'state or region']);
+    assert.deepEqual(entry.seasons, map.seasons.map(seasonIdOf));
   }
+});
+
+test('the clubs of 1998–2007: the defunct by their own ids, the renamed by their names of the day, each placed from a pinned article', () => {
+  const ids = year => teamsOf(MANIFEST, year).map(team => team.id);
+  const has = (year, id) => ids(year).includes(id);
+  // Twenty in 1998: St. George and Illawarra apart, Adelaide, the Gold Coast Chargers, North Sydney, Balmain and Western Suburbs.
+  for (const id of ['nrl-adelaide-rams', 'nrl-gold-coast-chargers', 'nrl-illawarra-steelers', 'nrl-st-george-dragons']) {
+    assert.deepEqual([1998, 1999].map(year => has(year, id)), [true, false], `${id}: 1998 only`);
+  }
+  for (const id of ['nrl-north-sydney-bears', 'nrl-balmain-tigers', 'nrl-western-suburbs-magpies', 'nrl-sydney-city-roosters', 'nrl-canterbury-bulldogs']) {
+    assert.deepEqual([1998, 1999, 2000].map(year => has(year, id)), [true, true, false], `${id}: 1998 and 1999`);
+  }
+  assert.deepEqual([1999, 2000, 2001].map(year => [has(year, 'nrl-wests-tigers'), has(year, 'nrl-northern-eagles')]), [[false, false], [true, true], [true, true]]);
+  assert.deepEqual([2002, 2003].map(year => [has(year, 'nrl-northern-eagles'), has(year, 'nrl-manly-warringah-sea-eagles')]), [[true, false], [false, true]]);
+  assert.deepEqual([1999, 2000, 2001, 2002].map(year => has(year, 'nrl-south-sydney-rabbitohs')), [true, false, false, true], 'South Sydney out in 2000 and 2001');
+  assert.deepEqual([2000, 2001].map(year => has(year, 'nrl-auckland-warriors')), [true, false], 'the New Zealand Warriors from 2001');
+  assert.deepEqual([1998, 1999, 2002, 2003].map(year => has(year, 'nrl-sharks')), [false, true, true, false], 'the Sharks, 1999-2002');
+  assert.deepEqual([2006, 2007].map(year => has(year, 'nrl-gold-coast-titans')), [false, true]);
+  // Every defunct club is its own franchise, named by NRL.com's team id, and on no map of today's.
+  assert.deepEqual(MANIFEST.defunct, ['nrl-adelaide-rams', 'nrl-balmain-tigers', 'nrl-gold-coast-chargers', 'nrl-illawarra-steelers', 'nrl-north-sydney-bears',
+    'nrl-northern-eagles', 'nrl-western-suburbs-magpies']);
+  for (const id of MANIFEST.defunct) {
+    assert.ok(!CLUBS.some(club => club.id === id), `${id} is no club of today's`);
+    assert.equal(Object.values(MANIFEST.nrlcom.teams).filter(club => club === id).length, 1, `${id}: one NRL.com team`);
+    const seasons = Object.keys(MANIFEST.teams).filter(year => MANIFEST.teams[year].some(team => team.franchise === id));
+    assert.ok(seasons.length && seasons.every(year => year <= 2002), `${id} plays ${seasons.join(', ')}`);
+  }
+  assert.equal(MANIFEST.nrlcom.teams['500022'], 'nrl-st-george-illawarra-dragons', 'NRL.com files St. George\'s 1998 under the joint venture\'s team');
+  assert.equal(teamsOf(MANIFEST, 1998).find(team => team.id === 'nrl-st-george-dragons').franchise, 'nrl-st-george-illawarra-dragons');
+  // English Wikipedia names and places the clubs and grounds of 1998–2007, every article pinned to the revision read: each
+  // defunct club's own, the grounds no club plays at today, and the season articles.
+  assert.ok(Object.values(MANIFEST.wikipedia).every(revision => Number.isInteger(revision) && revision > 1e9));
+  for (const id of MANIFEST.defunct) {
+    const team = Object.values(MANIFEST.teams).flat().find(t => t.franchise === id);
+    assert.ok(Object.hasOwn(MANIFEST.wikipedia, team.name), `${team.name}'s article is pinned`);
+    assert.match(team.era, new RegExp(`\\(English Wikipedia, ${team.name}\\)`), `${team.name} cites it`);
+  }
+  for (const title of ['Queensland Sport and Athletics Centre', 'Willows Sports Complex', 'Sydney Football Stadium (1988)', 'Docklands Stadium', 'Central Coast Stadium',
+    'Sydney Showground Stadium', 'Carrara Stadium', 'Adelaide Oval', 'North Sydney Oval', 'Jubilee Stadium', 'Leichhardt Oval', 'Campbelltown Sports Stadium',
+    ...Array.from({ length: 10 }, (_, i) => `${1998 + i} NRL season`)]) assert.ok(Object.hasOwn(MANIFEST.wikipedia, title), `${title} is pinned`);
+  // Grounds of the day: a ground no club plays at today keeps its name of the era's first season, one still played at its present name.
+  const ground = (year, franchise) => teamsOf(MANIFEST, year).find(team => team.franchise === franchise).ground;
+  assert.deepEqual([1998, 1999, 2000, 2007].map(year => ground(year, 'nrl-north-queensland-cowboys')), ['Malanda Stadium', 'Malanda Stadium', 'Dairy Farmers Stadium', 'Dairy Farmers Stadium']);
+  assert.deepEqual([2001, 2002, 2007].map(year => ground(year, 'nrl-sydney-roosters')), ['Sydney Football Stadium', 'Aussie Stadium', 'Aussie Stadium']);
+  assert.deepEqual([2002, 2003].map(year => ground(year, 'nrl-brisbane-broncos')), ['ANZ Stadium', 'Suncorp Stadium']);
+  assert.deepEqual([2000, 2001, 2002].map(year => ground(year, 'nrl-melbourne-storm')), ['Olympic Park Stadium', 'Colonial Stadium', 'Olympic Park Stadium']);
+  assert.deepEqual([2000, 2001, 2002].map(year => ground(year, 'nrl-northern-eagles')), ['NorthPower Stadium', 'NorthPower Stadium', '4 Pines Park']);
+  assert.equal(ground(2007, 'nrl-gold-coast-titans'), 'Carrara Stadium', 'before Robina opened in 2008');
 });
 
 test('the era maps: the Bulldogs share the City of Parramatta while at Olympic Park, the Dolphins hold Redcliffe from 2023', () => {
@@ -649,8 +767,46 @@ test('the era maps: the Bulldogs share the City of Parramatta while at Olympic P
   }
 });
 
+test('the maps of 1998–2007: every club holds its own state from its ground of the day, the defunct clubs too', () => {
+  const at = { adelaideOval: [138.5961, -34.9156], whyalla: [137.58, -33.03], carrara: [153.3672, -28.0064], wollongong: [150.9025, -34.4278],
+    kogarah: [151.1292, -33.9719], northSydney: [151.2094, -33.8319], leichhardt: [151.1547, -33.8686], campbelltown: [150.8336, -34.0503],
+    belmore: [151.0947, -33.9167], homebush: [151.0631, -33.8472], gosford: [151.3381, -33.4283], brookvale: [151.2733, -33.76],
+    concord: [151.1094, -33.8683], redfern: [151.2061, -33.8953], nathan: [153.0622, -27.5583], docklands: [144.9475, -37.8164] };
+  const maps = new Map(MANIFEST.maps.filter(map => map.seasons[0] < 2008).map(map => [map.id, decodeDomestic(JSON.parse(read(`public/domestic/${map.id}.json`)), map.id)]));
+  const owner = (id, point) => {
+    const map = maps.get(id), section = map.geo.countries.find(s => pointInPolys(point, s.polys))?.id ?? null;
+    return section && map.clubs.find(club => club.homeSection === section).id;
+  };
+  for (const [id, map] of maps) {
+    const year = MANIFEST.maps.find(entry => entry.id === id).seasons[0];
+    assert.deepEqual(map.clubs.map(club => club.id).sort(), teamsOf(MANIFEST, year).map(team => team.id).sort(), `${id}: the season's clubs`);
+    for (const team of teamsOf(MANIFEST, year)) assert.equal(owner(id, team.home), team.id, `${id}: ${team.name} holds where it grows from`);
+    assert.equal(owner(id, at.nathan), 'nrl-brisbane-broncos', `${id}: Brisbane`);
+  }
+  assert.deepEqual([owner('nrl1998', at.adelaideOval), owner('nrl1998', at.whyalla), owner('nrl1999', at.adelaideOval)], ['nrl-adelaide-rams', 'nrl-adelaide-rams', null],
+    'South Australia is the Rams\' in 1998, nobody\'s after');
+  assert.deepEqual(['nrl1998', 'nrl2003', 'nrl2007'].map(id => owner(id, at.carrara)), ['nrl-gold-coast-chargers', 'nrl-brisbane-broncos', 'nrl-gold-coast-titans']);
+  assert.deepEqual(['nrl1998', 'nrl1999'].map(id => [owner(id, at.wollongong), owner(id, at.kogarah) === 'nrl-st-george-dragons']),
+    [['nrl-illawarra-steelers', true], ['nrl-st-george-illawarra-dragons', false]], 'St. George and Illawarra apart in 1998 only');
+  assert.deepEqual(['nrl1998', 'nrl1999'].map(id => [owner(id, at.northSydney), owner(id, at.leichhardt), owner(id, at.campbelltown)]),
+    Array(2).fill(['nrl-north-sydney-bears', 'nrl-balmain-tigers', 'nrl-western-suburbs-magpies']), 'North Sydney, Balmain and Western Suburbs to 1999');
+  assert.deepEqual(['nrl2000', 'nrl2001', 'nrl2002', 'nrl2003'].map(id => owner(id, at.gosford) === 'nrl-northern-eagles'), [true, true, false, false]);
+  assert.deepEqual(['nrl2002', 'nrl2003'].map(id => owner(id, at.brookvale)), ['nrl-northern-eagles', 'nrl-manly-warringah-sea-eagles'],
+    'the Northern Eagles at Gosford in 2000 and 2001, at Brookvale in 2002, Manly from 2003');
+  assert.deepEqual(['nrl2000', 'nrl2001', 'nrl2002'].map(id => maps.get(id).clubs.some(club => club.id === 'nrl-south-sydney-rabbitohs')), [false, false, true]);
+  assert.equal(owner('nrl2000', at.concord), 'nrl-wests-tigers');
+  // The Bulldogs at Belmore in 1998, at Homebush from 1999 (the City of Parramatta cut with the Eels), back at Belmore while
+  // they shared Stadium Australia with the Rabbitohs.
+  assert.deepEqual(['nrl1998', 'nrl1999', 'nrl2001', 'nrl2003', 'nrl2006', 'nrl2007'].map(id => owner(id, at.homebush).slice(4)),
+    ['parramatta-eels', 'canterbury-bulldogs', 'bulldogs', 'bulldogs', 'parramatta-eels', 'parramatta-eels']);
+  assert.deepEqual(['nrl1998', 'nrl2006'].map(id => owner(id, at.belmore).slice(4)), ['canterbury-bulldogs', 'bulldogs']);
+  assert.deepEqual(['nrl1998', 'nrl2002', 'nrl2006'].map(id => owner(id, at.redfern)), Array(3).fill('nrl-south-sydney-rabbitohs'), 'the Rabbitohs from Redfern');
+  assert.equal(owner('nrl2001', at.docklands), 'nrl-melbourne-storm');
+  assert.equal(CLUB_MAPS.find(entry => entry.id === 'nrl1998').clubs, 20);
+});
+
 test('the computed seasons play NRL-like seasons whose order, set by the season\'s results, is the real one', () => {
-  for (const year of [2010, 2016, 2020, 2023]) {
+  for (const year of [1998, 2002, 2010, 2016, 2020, 2023]) {
     const id = `nrl-${year}`, snapshot = SNAPSHOTS.get(id), doc = DOCS.get(id);
     const report = playSeasons(doc.clubs, { seasons: 40, seed: 20261108 });
     assert.ok(report.pointsPerTeam > 19 && report.pointsPerTeam < 26, `${id}: points a team ${report.pointsPerTeam}`);
@@ -660,10 +816,14 @@ test('the computed seasons play NRL-like seasons whose order, set by the season\
     const rho = spearman(report.clubs.map(club => club.wins), report.clubs.map(club => wins.get(club.id)));
     assert.ok(rho >= 0.6, `${id}: the model's wins rank against the real season's at ${rho.toFixed(2)}`);
   }
-  // Every season: the clubs' strengths rank against the real wins far better shifted than from the stats alone.
-  for (const [id, audit] of AUDITS) {
-    if (audit.method !== 'computed') continue;
-    assert.ok(audit.strengthAndResults.shifted >= 0.6 && audit.strengthAndResults.shifted > audit.strengthAndResults.stats, `${id}: ${JSON.stringify(audit.strengthAndResults)}`);
+  // Every season: the shifted strengths follow the season's Simple Rating System, which the shift reads, at 0.9 or better,
+  // far closer than the stats alone, and rank against the real wins at 0.6 or better. Margins and wins part most in 2007
+  // (the Cowboys won 15 of 24 and conceded more than they scored): there the SRS itself ranks against the wins at 0.73.
+  for (const [id, snapshot] of SNAPSHOTS) {
+    const bySrs = key => spearman(snapshot.clubs.map(club => club.team[key]), snapshot.clubs.map(club => club.team.srs));
+    assert.ok(bySrs('shifted') >= 0.9 && bySrs('shifted') > bySrs('strength'), `${id}: shifted ${bySrs('shifted')}, stats ${bySrs('strength')} against the SRS`);
+    const audit = AUDITS.get(id);
+    assert.ok(audit.strengthAndResults.shifted >= 0.6, `${id}: ${JSON.stringify(audit.strengthAndResults)}`);
   }
 });
 
@@ -716,12 +876,14 @@ async function withApp(fn) {
 }
 const modelOf = app => buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), domestic: app.domesticStatus(), season: app.seasonStatus() });
 
-test('rugby league\'s Season choice lists 2024 to 2008, and 2008 takes the clubs onto the map of 2008', async () => {
+test('rugby league\'s Season choice lists 2024 to 1998, and 2008 takes the clubs onto the map of 2008', async () => {
   await withApp(async ({ app }) => {
     app.pickSetup('sport', 'rugby-league');
     const model = modelOf(app);
     assert.deepEqual(model.season.options.map(option => option.label), ['2025 · built in',
-      ...Array.from({ length: 16 }, (_, i) => `${2024 - i} · Computed from NRL.com match stats`), '2008 · Rugby League 2: World Cup Edition']);
+      ...Array.from({ length: 16 }, (_, i) => `${2024 - i} · Computed from NRL.com match stats`), '2008 · Rugby League 2: World Cup Edition',
+      ...Array.from({ length: 10 }, (_, i) => `${2007 - i} · Computed from NRL.com match stats`)]);
+    assert.match(model.season.note, /No game rated 1998–2007 or 2009–2024/);
     app.pickSetup('dataSet', 'nrl-2008');
     assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet, app.state.setup.clubScope], ['clubs', 'nrl-2008', 'domestic:nrl2008']);
     assert.equal(modelOf(app).canLaunch, false, 'Launch waits for the season and its map');
@@ -792,6 +954,42 @@ test('a computed 2015 clubs campaign launches on the map of 2012–2019, saves, 
     }
     assert.equal(app.territoryName(st.teams['nrl-canterbury-bankstown-bulldogs'].home), 'Canterbury', 'back at Belmore');
     assert.ok(calls.includes('/rugby-league/nrl-2015.json') && calls.includes('/domestic/nrl2012.json'));
+    const saved = parseCampaign(items.get(SAVE_KEY));
+    B.clearFootballSetCache();
+    app.continueSaved(saved);
+    assert.equal(app.state.phase, 'playing');
+    assert.equal(JSON.stringify(app.state.teams), JSON.stringify(st.teams));
+  });
+});
+
+test('a computed 1998 clubs campaign launches on the map of 1998 with its twenty clubs, saves, and resumes without the season file', async () => {
+  const doc = DOCS.get('nrl-1998');
+  await withApp(async ({ app, time, items, calls }) => {
+    app.pickSetup('sport', 'rugby-league');
+    app.pickSetup('dataSet', 'nrl-1998');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:nrl1998']);
+    time.advance(200);
+    await Promise.all([app.loadCountry('nrl1998'), app.loadSet('nrl-1998')]);
+    await settle();
+    assert.equal(app.seasonStatus().state, 'ready');
+    assert.equal(app.domesticStatus().state, 'ready');
+    app.startCampaign();
+    const st = app.state;
+    assert.equal(st.phase, 'playing');
+    assert.deepEqual([st.settings.dataSet, st.settings.dataVersion, st.settings.dataYear, st.settings.clubScope, st.settings.domesticVersion],
+      ['nrl-1998', doc.version, 1998, 'domestic:nrl1998', CLUB_MAPS.find(entry => entry.id === 'nrl1998').version]);
+    assert.deepEqual(Object.keys(st.teams).sort(), doc.clubs.map(club => club.id).sort());
+    assert.equal(Object.keys(st.teams).length, 20);
+    for (const club of doc.clubs) {
+      const team = st.teams[club.id];
+      assert.deepEqual([team.name, team.code, team.str], [club.name, club.code, club.str]);
+      assert.equal(st.own[team.home], team.id);
+    }
+    assert.deepEqual(['nrl-adelaide-rams', 'nrl-north-sydney-bears', 'nrl-st-george-dragons', 'nrl-canterbury-bulldogs', 'nrl-auckland-warriors']
+      .map(id => [st.teams[id].name, app.territoryName(st.teams[id].home)]),
+    [['Adelaide Rams', 'Adelaide'], ['North Sydney Bears', 'North Sydney'], ['St. George Dragons', 'St George'], ['Canterbury Bulldogs', 'Canterbury'],
+      ['Auckland Warriors', 'Auckland']]);
+    assert.ok(calls.includes('/rugby-league/nrl-1998.json') && calls.includes('/domestic/nrl1998.json'));
     const saved = parseCampaign(items.get(SAVE_KEY));
     B.clearFootballSetCache();
     app.continueSaved(saved);

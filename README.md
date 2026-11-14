@@ -369,8 +369,8 @@ manager of the theatre's favourite, with decisions from the first match.
    statistics), nations or clubs on the map of their day, tennis its 2026 (Elo of 2 November) then its
    [earlier seasons](#tennis-seasons) 2025 back to 1960, women's tennis its 2026 (Elo of
    2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1968, rugby league its built-in 2025
-   (Rugby League 26) then [its earlier seasons](#rugby-league-seasons) 2024 back to 2009 (computed from
-   NRL.com's match statistics) and 2008 (Rugby League 2, the overall ours), NRL clubs on the map of their day.
+   (Rugby League 26) then [its earlier seasons](#rugby-league-seasons) 2024 back to 1998 (computed from
+   NRL.com's match statistics, but 2008: Rugby League 2, the overall ours), NRL clubs on the map of their day.
    The Season list names a season by its years, adding "· computed", "· converted"
    or "· fan-made" where its label calls its ratings so ("1969/70 · computed"); a
    year with two seasons (football's 1993/94 and 1989/90, the NFL's and AFL's of
@@ -1449,7 +1449,8 @@ Rugby league clubs have one theatre, **NRL**: the 17 clubs fight over Australia 
 territory or region its ground stands in and nothing else. New South Wales (ten clubs, eight of them in Sydney) and
 Queensland (four) are divided between their clubs; the Storm hold Victoria, the Raiders the Australian Capital Territory
 and the Warriors the Auckland Region, and every other state and region stays empty. The map is `public/domestic/nrl.json`
-(134 KB); grounds are in `scripts/data/nrl-teams.json`.
+(134 KB); grounds are in `scripts/data/nrl-teams.json`. The [earlier seasons](#rugby-league-seasons) play on maps of
+their day, `nrl1998` to `nrl2020`, built by the same command (the Adelaide Rams hold South Australia in 1998).
 
 ```bash
 npm run build:nrl-map                      # boundaries + grounds → public/domestic/nrl.json and its index entry (seconds)
@@ -2130,15 +2131,20 @@ under **Season** in setup. Each season is a file in `public/womens-football/`
 
 ## Rugby league seasons
 
-Rugby league can be played on seventeen earlier seasons as well as the built-in
-2025: 2008, from Rugby League 2: World Cup Edition's own database (Sidhe, 2008),
-extracted by Wouldubeinta and kept by the Wayback Machine's copy of
-rugbyleaguemods.net, and 2009 to 2024, which no game rated, computed from
-NRL.com's match centre (below). Pick one under **Season** in setup; it plays the
-NRL clubs of that season, clubs only, on the map of their day: the sixteen of
-2008 to 2022 (no Dolphins; the Bulldogs under their 2008 name in 2008 and 2009),
-the seventeen of 2023 and 2024. Each season is a file in `public/rugby-league/`
-(14–16 KB) that loads only when chosen.
+Rugby league can be played on twenty-seven earlier seasons, every NRL season
+from 1998, as well as the built-in 2025: 2008, from Rugby League 2: World Cup
+Edition's own database (Sidhe, 2008), extracted by Wouldubeinta and kept by the
+Wayback Machine's copy of rugbyleaguemods.net, and 1998 to 2007 and 2009 to
+2024, which no game rated, computed from NRL.com's match centre (below). Pick one
+under **Season** in setup; it plays the NRL clubs of that season, clubs only, on
+the map of their day: the twenty of 1998 (St. George and Illawarra apart, the
+Adelaide Rams, the Gold Coast Chargers, the North Sydney Bears, Balmain and
+Western Suburbs), the seventeen of 1999, the fourteen of 2000 and 2001 (the Wests
+Tigers and the Northern Eagles, no South Sydney), the fifteen of 2002 to 2006,
+the sixteen of 2007 to 2022 (no Dolphins) and the seventeen of 2023 and 2024,
+each under its name of that season (the Canterbury Bulldogs, the Bulldogs, the
+Sydney City Roosters, the Auckland Warriors, the Sharks). Each season is a file
+in `public/rugby-league/` (13–18 KB) that loads only when chosen.
 
 - **2008's players:** every one is checked against the Rugby League Project's 2008
   records, so 414 of the database's 462 NRL players are kept and the game's
@@ -2153,11 +2159,14 @@ the seventeen of 2023 and 2024. Each season is a file in `public/rugby-league/`
   follows 2008's only loosely (rank correlation 0.33 in simulated seasons), as
   the game rated some sides well above their year (the Cowboys and Bulldogs
   won 5 games each).
-- **2009 to 2024 are computed** (labelled "Computed from NRL.com match stats"):
-  NRL.com's match centre keeps every game's team lists and player stats. A
-  player's value is NRL Fantasy's points for eleven of those stats (tries, try
-  assists, line breaks, tackles, metres and the rest; goals count nowhere) per
-  club game, the season before at half weight; his overall is that value's
+- **1998 to 2007 and 2009 to 2024 are computed** (labelled "Computed from NRL.com
+  match stats"): NRL.com's match centre keeps every game's team lists and player
+  stats from 1998. A player's value is NRL Fantasy's points for eleven of those
+  stats (tries, try assists, line breaks, tackles, metres and the rest; goals
+  count nowhere) per club game, the season before at half weight. NRL.com kept
+  fewer before 2003 (six in 1998, eight from 1999 to 2002): a season counts only
+  the stats it recorded, and the season before only when it recorded the same
+  ones. His overall is that value's
   percentile at the position he started at most, read off Rugby League 26's
   ratings there, as 2008's score is. Then every player of a club moves by one
   whole number so the club lands where its Simple Rating System, fitted to the
@@ -2171,9 +2180,13 @@ the seventeen of 2023 and 2024. Each season is a file in `public/rugby-league/`
 - **Maps:** each club grows from its ground, or from its training base where it
   shares one, and three rules keep the maps few: a ground being rebuilt stays its
   club's (R1), COVID-19 relocations are ignored (R2), and a rename on the same
-  site does not split a map (R3). 2008 and 2009 play on `nrl2008`, 2010 and 2011
-  on `nrl2010`, 2012 to 2019 on `nrl2012`, 2020 to 2022 on `nrl2020`, and 2023
-  and 2024, with the Dolphins, on today's `nrl`.
+  site does not split a map (R3). From 1998 to 2007 the clubs changed nearly
+  every season: 1998, 1999, 2000, 2001, 2002, 2006 and 2007 each have a map of
+  their own (`nrl1998` …), 2003 to 2005 share `nrl2003`, and the clubs since gone
+  (the Adelaide Rams, the North Sydney Bears, the Northern Eagles …) hold their
+  own territory there. 2008 and 2009 play on `nrl2008`, 2010 and 2011 on
+  `nrl2010`, 2012 to 2019 on `nrl2012`, 2020 to 2022 on `nrl2020`, and 2023 and
+  2024, with the Dolphins, on today's `nrl`.
 - **No nations:** 2008's World Cup squads mix Super League players rated on a
   more generous scale, and the computed seasons rate club games only, so a
   nations game plays the built-in season's.
@@ -2184,12 +2197,13 @@ the seventeen of 2023 and 2024. Each season is a file in `public/rugby-league/`
   ```bash
   npm run sync:rugby-league-seasons -- --fetch   # missing inputs into data-src/ (the database, RLP pages, NRL.com's games), then scripts/data/rugby-league-seasons/nrl-<year>.json (--check)
   npm run build:rugby-league-seasons             # the season files, their listing and the audit (--check; --realism plays them)
-  npm run build:nrl-map                          # today's map and the era maps nrl2008, nrl2010, nrl2012 and nrl2020
+  npm run build:nrl-map                          # today's map and the era maps nrl1998 … nrl2007, nrl2008, nrl2010, nrl2012 and nrl2020
   ```
 
 The [design notes](docs/design/rugby-league.md#earlier-seasons) give the
-weights and their reasons, the club shift, the
-[computed seasons](docs/design/rugby-league.md#computed-seasons-20092024) and the
+weights and their reasons, the club shift, the computed seasons
+([2009–2024](docs/design/rugby-league.md#computed-seasons-20092024),
+[1998–2007](docs/design/rugby-league.md#computed-seasons-19982007)) and the
 known limits.
 
 ## Squad economics
@@ -2304,7 +2318,7 @@ draws them (from the originals cached in the ignored `data-src/crest-eras/`) int
 `public/club-logos/SOURCES-eras.tsv` and writes `src/data/clubCrestEras.js`. Where
 the game knows a club wore another crest but has no picture of it, the club shows its
 monogram in those seasons rather than a crest it did not have yet; seasons no source
-dates, and clubs not yet researched, keep today's crest. Period crests come
+dates keep today's crest. Period crests come
 only from sources whose robots.txt allows it: Wikipedia articles and file pages in
 any language, Wikimedia Commons, and the Wayback Machine's copies of them.
 
