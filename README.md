@@ -10,7 +10,7 @@ Pick your sport at kick-off:
 
 | Sport | Lineup | Clock | Level game |
 | --- | --- | --- | --- |
-| Football, and women's football | XI in a 4-4-2 | 90 minutes | extra time, then a penalty shootout (in earlier seasons the rules of their day: the drawing of lots to 1969/70, the golden goal 1995/96–2001/02, the silver goal 2002/03–2003/04) |
+| Football, and women's football | XI in a 4-4-2 | 90 minutes | extra time, then a penalty shootout (in earlier seasons the rules of their day: the drawing of lots to 1969/70, the golden goal 1995/96–2001/02, the silver goal 2002/03–2003/04; women's football's golden goal 1996/97–2003/04) |
 | Basketball | starting five | 40 minutes for nations and EuroLeague clubs (FIBA), 48 for NBA clubs | overtime periods |
 | American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
 | Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings (each half from 2020 with a runner on second) |
@@ -24,7 +24,8 @@ And pick who fights:
 - **Nations** — 176 nations on the map, each team starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
   Basketball, baseball, ice hockey, both tennis games and Rocket League field them as one team, Great
-  Britain (GBR), under the Union Jack. A sport fields 173 at most: those four play Great Britain
+  Britain (GBR), under the Union Jack, and so does women's football's 2012 Olympic tournament
+  ([its season](#the-world-cups-and-olympic-tournaments-1991-to-2015-computed)). A sport fields 173 at most: those four play Great Britain
   as one, and football leaves out Tonga, Samoa and the Cook Islands, whose players no
   source rates ([Pacific islands](docs/design/pacific-islands.md)). A nation fields a team
   only with a **real side**, its own rated players holding at least half the lineup, and
@@ -143,6 +144,8 @@ npm run build-rugby-league # rebuild the NRL clubs and the rugby league nations 
 npm run build:nrl-map    # rebuild the NRL's map of Australia and New Zealand (seconds; --check compares byte for byte)
 npm run sync:ea-fc-women # snapshot EA FC's women's players from its public API into scripts/data/ea-fc27-women.csv (network, cached)
 npm run build-womens-football # rebuild the women's nations and clubs from that snapshot (--check compares byte for byte)
+npm run sync:womens-tournament-seasons # read the pinned World Cup database, women's results, Wikipedia and RSSSF pages in data-src/ into scripts/data/womens-tournament-seasons/ (--fetch downloads what is missing)
+npm run build:womens-tournament-seasons # rebuild the computed women's World Cups and Olympic tournaments, 1991/92 to 2014/15, from those facts (offline; --check to verify)
 npm run sync:tennis      # snapshot Tennis Abstract's men's Elo ratings and countries into scripts/data/tennis-elo.json (network, cached)
 npm run build-tennis     # rebuild the tennis nations from that snapshot (--check compares byte for byte)
 npm run sync:womens-tennis # snapshot Tennis Abstract's women's Elo ratings and countries into scripts/data/womens-tennis-elo.json (network, cached)
@@ -369,7 +372,9 @@ manager of the theatre's favourite, with decisions from the first match.
    2025 back to 2018 (MLB The Show of each), then 2017 back to 1960 (computed from
    WAR), with nations or with clubs on the map of their day. Women's football lists its
    built-in 2026/27, then its [earlier seasons](#womens-football-seasons) 2025/26
-   back to 2015/16 (EA ratings of each; national teams only before 2022/23), ice
+   back to 2015/16 (EA ratings of each; national teams only before 2022/23), then the
+   World Cups and Olympic tournaments of 2014/15 back to 1991/92 (computed from each
+   finalist's Elo and its squad's minutes, finalists only), ice
    hockey its built-in 2026/27, then its [earlier seasons](#ice-hockey-seasons)
    2025/26 back to 1960/61 but the cancelled 2004/05 (EA's NHL ratings where an
    edition published them, else converted or computed from the players'
@@ -2168,9 +2173,10 @@ chosen. They are built as the men's are, by the same scripts with `--tour=wta`
 
 ## Women's football seasons
 
-Women's football can be played on eleven earlier seasons as well as the built-in
+Women's football can be played on twenty-one earlier seasons as well as the built-in
 2026/27: every season from 2015/16 to 2025/26, each from that season's EA game
-(FIFA 16 to EA FC 26), the first of which was the first to rate women. Pick one
+(FIFA 16 to EA FC 26), the first of which was the first to rate women, and ten
+[computed](#the-world-cups-and-olympic-tournaments-1991-to-2015-computed) before them. Pick one
 under **Season** in setup. Each season is a file in `public/womens-football/`
 (15–150 KB) that loads only when chosen.
 
@@ -2197,6 +2203,53 @@ under **Season** in setup. Each season is a file in `public/womens-football/`
   npm run sync:womens-seasons   # the snapshots, from the pinned downloads in data-src/ and EA's API
   npm run build:womens-seasons  # the season files, src/data/womensFootballSeasons.js and the audit (--check compares byte for byte)
   ```
+
+### The World Cups and Olympic tournaments, 1991 to 2015 (computed)
+
+No game rated women before FIFA 16, so ten more seasons are **computed**, as the
+men's [World Cups of 1962 to 1994](#the-world-cups-1962-to-1994-computed) are: each
+women's World Cup or Olympic tournament before 2015/16 whose line-ups an allowed
+source gives, its finalists only. Each finalist's strength comes from its Elo the day
+after the final, by the men's seasons' line; its eleven are the players of its squad
+who played the most, ordered by their World Cup awards, goals a minute and minutes.
+The Season list names them "1991/92 · computed".
+
+| Season | Tournament | Finalists | Strongest |
+| --- | --- | --- | --- |
+| 1991/92 | 1991 World Cup, China | 12 | United States, Sweden, China |
+| 1994/95 | 1995 World Cup, Sweden | 12 | Norway, United States, Germany |
+| 1996/97 | 1996 Olympic tournament, Atlanta | 8 | United States, Norway, China |
+| 2003/04 | 2003 World Cup, United States | 16 | Germany, United States, Sweden |
+| 2004/05 | 2004 Olympic tournament, Athens | 10 | Germany, United States, Brazil |
+| 2007/08 | 2007 World Cup, China | 16 | Germany, United States, Brazil |
+| 2008/09 | 2008 Olympic tournament, Beijing | 12 | United States, Germany, Brazil |
+| 2010/11 | 2011 World Cup, Germany | 16 | United States, Brazil, Germany |
+| 2012/13 | 2012 Olympic tournament, London | 12 | United States, Japan, Brazil |
+| 2014/15 | 2015 World Cup, Canada | 24 | United States, Germany, France |
+
+- **Sources:** the World Cups' squads, minutes, goals and awards from the Fjelstul World
+  Cup Database (the men's seasons' pinned copy, CC BY-SA 4.0); the Olympic tournaments'
+  squads and goals from Wikipedia's pages, their line-ups from RSSSF's match details
+  (1996, 2004, 2008; 1996's give no minutes, so its eleven are those who started most)
+  and Wikipedia's (2012); the Elo from martj42's women's results (public domain). Those
+  results lack most friendlies, so the Elo is checked against FIFA's women's ranking
+  at each of its 52 releases from 2003 to 2015: rank correlation 0.88 over FIFA's top 48
+  and 0.96 over its top 20 on average.
+- **Rules and names of their day:** a level game goes to the golden goal in 1996/97 and
+  2003/04, as those tournaments played it. The 2012 Olympic tournament's Great Britain
+  plays on the United Kingdom's land, the home nations' too, under its own name and the
+  Union Jack, rated from England's Elo (its side was England's but for two Scots).
+- **Not covered:** the 1999 World Cup and the 2000 Olympic tournament, whose line-ups no
+  allowed source gives (the one site that has 1999's forbids automated reading), and
+  the years between tournaments, for which Wikidata records too few women's caps.
+
+```bash
+npm run sync:womens-tournament-seasons   # the facts, from the pinned sources in data-src/ (--fetch downloads what is missing)
+npm run build:womens-tournament-seasons  # the season files, the listing and the audit (offline; --check compares byte for byte)
+```
+
+The credits CC BY-SA asks for are in `public/womens-football/ATTRIBUTION-computed.txt`,
+and [the design notes](docs/design/womens-football.md#computed-seasons) describe the method.
 
 ## Rugby league seasons
 

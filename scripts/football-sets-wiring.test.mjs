@@ -315,13 +315,14 @@ test('the Season choice names a season by its years, and says on screen when its
   assert.deepEqual(options.map(option => option.label), ['2026/27 · built in', ...sets.map(set => `${set.season} · ${set.label}`)]);
 
   // Every sport's built-in seasons: exactly the ones no game rated say so, as their labels do (the computed World Cups
-  // and national-team seasons; the NBA's, NFL's, AFL's, MLB's, NHL's and NRL's computed seasons; NHL 08 and NHL 09, converted; the three fans'
+  // and national-team seasons; the women's computed World Cups and Olympic tournaments; the NBA's, NFL's, AFL's, MLB's,
+  // NHL's and NRL's computed seasons; NHL 08 and NHL 09, converted; the three fans'
   // databases). Tecmo's and Rugby League 2's overalls are ours and tennis's Elo before 2016 computed, but their labels
   // do not say so, so they are named by their years.
   const NHL_EDITIONS = ['nhl-2022', 'nhl-2007', 'nhl-1995', 'nhl-1994', 'nhl-1993'], NHL_CONVERTED = ['nhl-2008', 'nhl-2009'];
   const FAN_MADE = ['cm0102-2003-10', 'cm0102-2020-11-cm93', 'cm0102-2017-04-cm89'];
   const tagOf = id => (FAN_MADE.includes(id) ? 'fan-made' : NHL_CONVERTED.includes(id) ? 'converted'
-    : /^(?:wc|nt|nba-stats|pfa|mlb-war)-/.test(id) || (/^nrl-/.test(id) && id !== 'nrl-2008') || (/^nhl-/.test(id) && !NHL_EDITIONS.includes(id))
+    : /^(?:wc|nt|wwc|wol|nba-stats|pfa|mlb-war)-/.test(id) || (/^nrl-/.test(id) && id !== 'nrl-2008') || (/^nhl-/.test(id) && !NHL_EDITIONS.includes(id))
       ? 'computed' : null);
   for (const sport of new Set(BUILT_IN_SETS.map(set => setSportOf(set.id)))) {
     const own = BUILT_IN_SETS.filter(set => setSportOf(set.id) === sport);

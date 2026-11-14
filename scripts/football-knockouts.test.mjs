@@ -8,7 +8,7 @@ import { makeRng } from '../src/data/teams.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { BUILT_IN_WOMENS_SEASONS } from '../src/data/womensFootballSeasons.js';
 import { football, footballIn, knockoutIn } from '../src/sports/football.js';
-import { womensFootball } from '../src/sports/womensFootball.js';
+import { womensFootball, womensKnockoutIn } from '../src/sports/womensFootball.js';
 import { basketball } from '../src/sports/basketball.js';
 import { finishLabel, matchSport, settledShort, settledText, shootoutOf } from '../src/sports/index.js';
 import { estimateWinProbability } from '../src/engine/odds.js';
@@ -42,13 +42,23 @@ test('each season plays the knockout rules of its day', () => {
   assert.deepEqual(BUILT_IN_SEASONS.filter(season => expected(season.year) === 'silver').map(season => season.id), ['cm0102-2003-10', 'cm0102-2002-11']);
   assert.equal(matchSport({ sport: 'football' }), football, 'the built-in season plays today\'s rules');
   assert.equal(matchSport({ sport: 'football', dataYear: 1966 }), football, 'a year without its data set is not a season');
-  // Women's football: every season, 2015/16 on, extra time then penalties.
+  // Women's football: the golden goal in the computed seasons of 1996/97 to 2003/04 (the 1996 Olympic tournament and the
+  // 2003 World Cup, src/sports/womensFootball.js), extra time then penalties in every other, EA's from 2015/16 among them.
+  const golden = [];
   for (const season of BUILT_IN_WOMENS_SEASONS) {
-    const sport = matchSport({ sport: 'womens-football', dataSet: season.id, dataYear: season.year, dataSeason: season.season });
-    assert.equal(sport, womensFootball, season.id);
+    const settings = { sport: 'womens-football', dataSet: season.id, dataYear: season.year, dataSeason: season.season };
+    const sport = matchSport(settings);
+    assert.equal(matchSport({ ...settings }), sport, 'one object per set of rules');
+    assert.equal(sport.id, 'womens-football');
+    if (rulesOf(sport) === 'golden') golden.push(season.id);
+    else assert.equal(sport, womensFootball, season.id);
   }
+  assert.deepEqual(golden, ['wwc-2003', 'wol-1996']);
   assert.equal(rulesOf(womensFootball), 'penalties');
-  assert.equal(womensFootball.rulesFor, undefined);
+  assert.equal(matchSport({ sport: 'womens-football' }), womensFootball, 'the built-in season plays today\'s rules');
+  assert.equal(womensKnockoutIn(2004), 'golden', 'the 2003 World Cup\'s season, not the men\'s silver goal');
+  assert.equal(womensKnockoutIn(1995), 'penalties', 'the 1995 World Cup played both halves of extra time');
+  assert.equal(womensKnockoutIn(2005), 'penalties', 'the 2004 Olympic tournament, after the IFAB dropped it');
 });
 
 /** `count` full matches between sides rated `ratingA` and `ratingD` under `sport`, the level ones only. */
