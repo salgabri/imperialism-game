@@ -345,7 +345,9 @@ export const SEASON_NOTES = Object.freeze({
     + 'rated from its Elo, its eleven from its World Cup squad or, between World Cups, from its players\' caps on Wikidata.',
   'womens-football': 'EA SPORTS FC ratings of the women\'s game in each season (2026/27: EA FC 27, as of 7 November 2026). '
     + 'EA rated national teams only until 2021/22. A nation with fewer than six rated players fields no team, and one '
-    + 'without eleven starts short-handed.',
+    + 'without eleven starts short-handed. Before EA, the World Cups of 1991, 1995 and 2003 to 2015 and the Olympic '
+    + 'tournaments of 1996 and 2004 to 2012 are computed and have their finalists only: each rated from its Elo, its eleven '
+    + 'those of its squad who played most.',
   hockey: 'EA publishes NHL 27 ratings for its top 300 players only. Everyone else\'s is an estimate from ice time and '
     + 'scoring, marked as one. Rosters as of 7 November 2026. Five earlier seasons use EA\'s ratings of that season, nothing '
     + 'estimated: NHL 22 as NHLRatings.net lists them, NHL 07 from IGN\'s pages, NHL 95, NHL \'94 and NHLPA \'93 from the '

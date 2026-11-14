@@ -14,9 +14,12 @@ import {
 export const WORLD_CUP_SOURCE = 'world-cup';
 export const seasonOfYear = year => `${year - 1}/${String(year % 100).padStart(2, '0')}`;
 
-const byMinutes = (a, b) => b.minutes - a.minutes || b.starts - a.starts || a.shirt - b.shirt || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
-/** Whether a squad player played: minutes, or a start (1962's and 1966's minutes are the line-ups' starts). */
-const played = player => player.minutes > 0 || player.starts > 0;
+// A player's appearances count where the line-ups give no minutes (the women's 1996 Olympic tournament, whose records
+// have `apps` and no `minutes`); a men's World Cup player has minutes, and no `apps`.
+const byMinutes = (a, b) => (b.minutes ?? 0) - (a.minutes ?? 0) || b.starts - a.starts || (b.apps ?? 0) - (a.apps ?? 0) || a.shirt - b.shirt
+  || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+/** Whether a squad player played: minutes, a start (1962's and 1966's minutes are the line-ups' starts) or an appearance. */
+const played = player => player.minutes > 0 || player.starts > 0 || player.apps > 0;
 
 /**
  * The XI: for each role of `xi` ({ GK: 1, DF: 4, MF: 4, FW: 2 }) the squad's players of that position who played, the
@@ -36,19 +39,22 @@ export function pickEleven(squad, xi) {
   return { eleven: [...picked, ...filled], filled };
 }
 
-/** A player's Ballon d'Or points over the season's two years, and his World Cup awards' points (`weights`). */
-export const ballonDorPoints = player => Object.values(player.ballonDor).reduce((sum, points) => sum + points, 0);
+/**
+ * A player's Ballon d'Or points over the season's two years (none for a women's World Cup player, who has no votes),
+ * and his World Cup awards' points (`weights`).
+ */
+export const ballonDorPoints = player => Object.values(player.ballonDor ?? {}).reduce((sum, points) => sum + points, 0);
 export const awardPoints = (player, weights) => player.awards.reduce((sum, award) => {
   if (!Object.hasOwn(weights, award)) throw new Error(`No weight for the award ${award}`);
   return sum + weights[award];
 }, 0);
 
 /**
- * The XI strongest first: by Ballon d'Or points, then World Cup awards, then goals a minute (none without minutes),
- * then minutes, then the lower shirt number.
+ * The XI strongest first: by Ballon d'Or points, then World Cup awards, then goals a minute (none without minutes;
+ * goals an appearance where the line-ups give no minutes), then minutes, then the lower shirt number.
  */
 export function orderEleven(eleven, weights) {
-  const rate = player => (player.minutes ? [player.goals, player.minutes] : [0, 1]);
+  const rate = player => (player.minutes ? [player.goals, player.minutes] : player.minutes == null && player.apps ? [player.goals, player.apps] : [0, 1]);
   const goalsAMinute = (a, b) => { const [ga, ma] = rate(a), [gb, mb] = rate(b); return gb * ma - ga * mb; };
   return eleven.slice().sort((a, b) => ballonDorPoints(b) - ballonDorPoints(a) || awardPoints(b, weights) - awardPoints(a, weights)
     || goalsAMinute(a, b) || byMinutes(a, b));

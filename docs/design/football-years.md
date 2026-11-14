@@ -1455,6 +1455,11 @@ Brazil and Gerd Müller for West Germany in 1969/70, Cruyff in 1973/74, Kempes i
 1977/78, Paolo Rossi in 1981/82, Maradona in 1985/86, Matthäus (93) in 1989/90
 and Roberto Baggio in 1993/94.
 
+Women's football's computed World Cups and Olympic tournaments, 1991/92 to 2014/15,
+follow this method on the same code (`worldCupFacts` takes a match's length, and the XI
+rule appearances where line-ups give no minutes): see
+[womens-football.md](womens-football.md#computed-seasons).
+
 ## Computed national-team seasons
 
 Built 2026-11-13. The World Cup seasons left three years in four empty between

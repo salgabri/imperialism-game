@@ -149,6 +149,9 @@ export const AWARDS = ['Golden Ball', 'Silver Ball', 'Bronze Ball', 'Golden Boot
 export const fold = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 const round1 = x => Math.round(x * 10) / 10;
 
+/** The facts' licence line of the men's computed World Cup seasons. */
+export const WORLD_CUP_LICENCE = 'CC BY-SA 4.0: derived from the Fjelstul World Cup Database and Wikipedia (public/football/ATTRIBUTION-world-cup.txt)';
+
 /**
  * One World Cup's facts: each finalist's squad with every player's minutes, starts, goals, awards, Ballon d'Or points of
  * the two calendar years the season spans, date of birth and Wikipedia article, and the teams' Elo the day after the
@@ -157,12 +160,19 @@ const round1 = x => Math.round(x * 10) / 10;
  * Elo block and `snapshot` the Elo on the day after the final (eloOn's); `names` the manifest's names. Returns
  * `{ facts, audit }`: the audit lists the line-up names that differ from the database's (`spellings`), which pinned
  * Ballon d'Or names were used (`pinned`), and every vote matched to no squad player (`unmatched`).
+ *
+ * The women's World Cups (docs/design/womens-football.md, "Computed seasons") read the same tables: their season names
+ * its tournament's year (`tournamentYear`, when the season ends in another), its matches' length (`regulation`, 90
+ * unless given, and `extraTime`, 30: the 1991 World Cup's were 80 and 20) and no Ballon d'Or years (its players then
+ * carry no `ballonDor`); `licence` is the facts' licence line.
  */
-export function worldCupFacts({ wc, lineups = null, votes, season, elo, snapshot, names }) {
+export function worldCupFacts({ wc, lineups = null, votes, season, elo, snapshot, names, licence = WORLD_CUP_LICENCE }) {
   const tid = season.tournament;
   const tournament = wc.tournaments.find(t => t.tournament_id === tid);
   if (!tournament) throw new Error(`${tid} is not in tournaments.csv`);
-  if (Number(tournament.year) !== season.year) throw new Error(`${tid} is the ${tournament.year} World Cup, not ${season.year}'s`);
+  const tournamentYear = season.tournamentYear ?? season.year;
+  if (Number(tournament.year) !== tournamentYear) throw new Error(`${tid} is the ${tournament.year} World Cup, not ${tournamentYear}'s`);
+  const regulation = season.regulation ?? 90, longest = regulation + (season.extraTime ?? 30);
   const date = dayAfter(tournament.end_date);
   if (!snapshot) throw new Error(`${tid}: no Elo on ${date}`);
   const since = yearsBefore(date, elo.activeYears);
@@ -174,7 +184,7 @@ export function worldCupFacts({ wc, lineups = null, votes, season, elo, snapshot
   const audit = { spellings: [], pinned: [], unmatched: [] };
 
   // Minutes and starts: from the appearances from 1970, else from the line-ups (no substitutes then, so every starter
-  // plays the whole match, 120 minutes with extra time).
+  // plays the whole match, 120 minutes with extra time). A match lasts `regulation` minutes, `longest` with extra time.
   const minutes = new Map(), starts = new Map();
   const add = (player, mins, started) => {
     minutes.set(player, (minutes.get(player) || 0) + mins);
@@ -188,7 +198,7 @@ export function worldCupFacts({ wc, lineups = null, votes, season, elo, snapshot
     const minuteOf = row => {
       const minute = Number(row.minute_regulation);
       if (!Number.isInteger(minute) || minute < 0) throw new Error(`${tid}: minute ${row.minute_regulation} for ${row.family_name}`);
-      return Math.min(120, minute);
+      return Math.min(longest, minute);
     };
     const key = row => `${row.match_id}|${row.player_id}`;
     const once = (rows, what) => {
@@ -204,7 +214,7 @@ export function worldCupFacts({ wc, lineups = null, votes, season, elo, snapshot
     for (const app of apps) {
       const game = gameOf.get(app.match_id);
       if (!game) throw new Error(`Appearance ${app.key_id} is in no ${tid} match`);
-      const end = game.extra_time === '1' ? 120 : 90;
+      const end = game.extra_time === '1' ? longest : regulation;
       const on = app.starter === '1' ? 0 : cameOn.has(key(app)) ? minuteOf(cameOn.get(key(app))) : end;
       let off = end;
       if (wentOff.has(key(app))) off = minuteOf(wentOff.get(key(app)));
@@ -219,7 +229,7 @@ export function worldCupFacts({ wc, lineups = null, votes, season, elo, snapshot
       if (!game) throw new Error(`${tid}: no match ${box.home} v ${box.away} on ${box.date}`);
       if (used.has(game.match_id)) throw new Error(`${tid}: ${game.match_name} has two line-up boxes`);
       used.add(game.match_id);
-      const end = game.extra_time === '1' ? 120 : 90;
+      const end = game.extra_time === '1' ? longest : regulation;
       box.lineups.forEach((eleven, side) => {
         const team = side ? box.away : box.home;
         const shirts = new Set();
@@ -268,7 +278,7 @@ export function worldCupFacts({ wc, lineups = null, votes, season, elo, snapshot
   }
   const pins = new Map((names.ballonDorPlayers || []).filter(pin => squadIds.has(pin.player)).map(pin => [pin.name, pin.player]));
   const ballonDor = new Map();
-  for (const year of season.ballonDor) {
+  for (const year of season.ballonDor ?? []) {
     if (!votes[year]) throw new Error(`${tid}: no Ballon d'Or votes of ${year}`);
     for (const vote of votes[year]) {
       const team = names.ballonDorNationalities?.[vote.nationality] ?? vote.nationality;
@@ -302,7 +312,7 @@ export function worldCupFacts({ wc, lineups = null, votes, season, elo, snapshot
           id: r.player_id, name: nameOf(r), shirt: Number(r.shirt_number), position: r.position_code,
           minutes: minutes.get(r.player_id) || 0, starts: starts.get(r.player_id) || 0, goals: goals.get(r.player_id) || 0,
           awards: (awards.get(r.player_id) || []).slice().sort((a, b) => AWARDS.indexOf(a) - AWARDS.indexOf(b)),
-          ballonDor: Object.fromEntries(Object.entries(ballonDor.get(r.player_id) || {}).sort()),
+          ...(season.ballonDor ? { ballonDor: Object.fromEntries(Object.entries(ballonDor.get(r.player_id) || {}).sort()) } : {}),
           born: /^\d{4}-\d{2}-\d{2}$/.test(person.birth_date) ? person.birth_date : '',
           wikipedia: /^https:\/\/en\.wikipedia\.org\/wiki\/\S+$/.test(person.player_wikipedia_link) ? person.player_wikipedia_link : '',
         };
@@ -313,11 +323,11 @@ export function worldCupFacts({ wc, lineups = null, votes, season, elo, snapshot
 
   const facts = {
     id: season.id, year: season.year,
-    licence: 'CC BY-SA 4.0: derived from the Fjelstul World Cup Database and Wikipedia (public/football/ATTRIBUTION-world-cup.txt)',
+    licence,
     tournament: { id: tid, name: tournament.tournament_name, start: tournament.start_date, final: tournament.end_date, host: tournament.host_country, winner: tournament.winner },
-    minutes: season.minutes, ballonDor: season.ballonDor,
+    minutes: season.minutes, ...(season.ballonDor ? { ballonDor: season.ballonDor } : { regulation, extraTime: longest - regulation }),
     elo: { date, activeSince: since, active: active.length, best: { team: active[0][0], elo: round1(active[0][1]) } },
-    unmatchedVotes: audit.unmatched,
+    ...(season.ballonDor ? { unmatchedVotes: audit.unmatched } : {}),
     nations,
   };
   return { facts, audit };
