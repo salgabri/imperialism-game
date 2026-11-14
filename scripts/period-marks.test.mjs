@@ -154,6 +154,35 @@ test('a club wears today\'s crest in a season of today and outside its eras, its
   assert.equal(crestFile(id, 2026), clubLogoFile(id), 'today\'s season year');
 });
 
+test('rugby league 1998 to 2007: every club wears the crest of its day, the era and gone clubs too', () => {
+  const files = new Set(readdirSync(new URL('public/club-logos/', root)).filter(name => name.endsWith('.webp')).map(name => name.slice(0, -5)));
+  // Gone clubs whose logo of 1998-1999 no source dates keep their monogram (docs/design/period-marks.md, "Coverage").
+  const undated = new Set(['nrl-balmain-tigers', 'nrl-north-sydney-bears', 'nrl-western-suburbs-magpies']);
+  for (let year = 1998; year <= 2007; year++) {
+    const { clubs } = JSON.parse(read(`public/rugby-league/nrl-${year}.json`));
+    for (const { id } of clubs) {
+      const file = crestFile(id, year);
+      if (undated.has(id)) assert.equal(file, null, `${id} ${year}: its monogram`);
+      else assert.ok(file && files.has(file), `${id} ${year}: a crest the game ships`);
+    }
+  }
+  const today = id => clubLogoFile(id);
+  for (const [id, year, file] of [
+    ['nrl-brisbane-broncos', 1999, 'nrl-brisbane-broncos.1998'], ['nrl-brisbane-broncos', 2000, 'nrl-brisbane-broncos.2000'],
+    ['nrl-sydney-city-roosters', 1999, 'nrl-sydney-city-roosters.1998'], ['nrl-sydney-roosters', 2000, today('nrl-sydney-roosters')],
+    ['nrl-st-george-dragons', 1998, 'nrl-st-george-dragons.1998'], ['nrl-st-george-illawarra-dragons', 1999, today('nrl-st-george-illawarra-dragons')],
+    ['nrl-auckland-warriors', 2000, 'nrl-auckland-warriors.1998'], ['nrl-new-zealand-warriors', 2001, today('nrl-new-zealand-warriors')],
+    ['nrl-north-queensland-cowboys', 2002, 'nrl-north-queensland-cowboys.1998'], ['nrl-north-queensland-cowboys', 2003, today('nrl-north-queensland-cowboys')],
+    // Aliases share their club's picture: the Sharks of 1999-2002, the Bulldogs of 2000-2009.
+    ['nrl-sharks', 2001, 'nrl-cronulla-sutherland-sharks.1998'], ['nrl-bulldogs', 2005, 'nrl-canterbury-bulldogs.1998'],
+    // The first round's two corrections: the Bulldogs' head in 2008-2009, Parramatta's yellow eel to 2010.
+    ['nrl-bulldogs', 2009, 'nrl-canterbury-bulldogs.1998'], ['nrl-parramatta-eels', 1999, today('nrl-parramatta-eels')],
+    ['nrl-parramatta-eels', 2003, 'nrl-parramatta-eels.2000'], ['nrl-parramatta-eels', 2009, 'nrl-parramatta-eels.2004'],
+    ['nrl-parramatta-eels', 2011, today('nrl-parramatta-eels')],
+    ['nrl-south-sydney-rabbitohs', 2007, 'nrl-south-sydney-rabbitohs.1998'], ['nrl-south-sydney-rabbitohs', 2008, today('nrl-south-sydney-rabbitohs')],
+  ]) assert.equal(crestFile(id, year), file, `${id} ${year}`);
+});
+
 test('TeamMark and SquadFlag draw the crest of the season on screen', () => {
   const entry = Object.entries(CREST_ERAS).find(([id, eras]) => clubLogoFile(id) && eras.some(([, , file]) => file));
   const [id, eras] = entry ?? ['b-boston-celtics', [[1961, 1961, null]]];

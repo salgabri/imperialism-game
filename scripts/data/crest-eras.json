@@ -7295,9 +7295,51 @@
    "verified": "roundel with WINNIPEG JETS lettering, hockey stick, red/white/blue",
    "league": "nhl"
   },
-  "nrl-brisbane-broncos.2008": {
+  "nrl-adelaide-rams.1998": {
+   "club": "Adelaide Rams",
+   "years": "1998–1998",
+   "kind": "wayback",
+   "title": "File:Adelaide_1998.jpg",
+   "page": "https://web.archive.org/web/20060203212428/http://en.wikipedia.org/wiki/Image:Adelaide_1998.jpg",
+   "wayback": "https://web.archive.org/web/20190330185529id_/http://upload.wikimedia.org/wikipedia/en/1/13/Adelaide_1998.jpg",
+   "licence": "non-free logo, as the file page states (Wikipedia's non-free content)",
+   "sha256": "2f10ca9e0e1750daf4113adaccfae0fb25f351bd1b662750bef9bcb97997a888",
+   "cache": "data-src/crest-eras/files/nrl/nrl-adelaide-rams/1998-Adelaide_1998.jpg",
+   "evidence": "English Wikipedia Adelaide Rams (revision 1383994897): formed for Super League in 1997 and excluded after 1998; \"The emblem of the team was a ram\", with yellow for South Australia. the National Rugby League article as captured on 25 Jun 2006 shows this file (uploaded 14 Aug 2005) for the Adelaide Rams, \"Years in NRL: 1998\". The original as captured on 30 Mar 2019; the file is deleted from Wikipedia now",
+   "verified": "blue and yellow ram horns under red \"RAMS\" and blue \"ADELAIDE\", white ground",
+   "league": "nrl"
+  },
+  "nrl-auckland-warriors.1998": {
+   "club": "Auckland Warriors",
+   "years": "1998–2000",
+   "kind": "wikipedia",
+   "title": "File:Auckland_Warriors_logo_1995.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Auckland_Warriors_logo_1995.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/0/0d/Auckland_Warriors_logo_1995.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "f4167e8b7d2da05b83fd556449d00f9c771afa6eb7204fdd30e7e3e984c5935b",
+   "cache": "data-src/crest-eras/files/nrl/nrl-auckland-warriors/1998-Auckland_Warriors_logo_1995.jpg",
+   "evidence": "English Wikipedia New Zealand Warriors (revision 1384729746), \"Logos\": this file, captioned \"Original logo for the Auckland Warriors\": \"a tekoteko in white, blue, and green, with a curved tongue. In 1999, the tongue was straightened\" (a detail that looks the same at 20-60 px, so 1999-2000 keep this crest); the club was the Auckland Warriors to 2000, the New Zealand Warriors from 2001",
+   "verified": "blue, green and white tekoteko mask on a white shield under a blue \"AUCKLAND\" band, blue \"WARRIORS\" below",
+   "league": "nrl"
+  },
+  "nrl-brisbane-broncos.1998": {
    "club": "Brisbane Broncos",
-   "years": "2008–2025",
+   "years": "1998–1999",
+   "kind": "wikipedia",
+   "title": "File:Brisbane_Broncos_Logo_1988.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Brisbane_Broncos_Logo_1988.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/f/f4/Brisbane_Broncos_Logo_1988.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "863d05ddd23e38c91706109150aec7dfd320894f3c9b264795921cf06b83ee03",
+   "cache": "data-src/crest-eras/files/nrl/nrl-brisbane-broncos/1998-Brisbane_Broncos_Logo_1988.jpg",
+   "evidence": "English Wikipedia Brisbane Broncos (revision 1384508393), \"Emblem and colours\": \"The original club logo was first featured in the Broncos' inaugural season in the premiership in 1988 and was used until 1999\"; gallery caption 1988-1999; file description \"Logo used by the Brisbane Broncos from 1988 to 1999\"",
+   "verified": "gold bucking bronco over \"BRISBANE\" and gold script \"Broncos\" on a white shield edged in maroon",
+   "league": "nrl"
+  },
+  "nrl-brisbane-broncos.2000": {
+   "club": "Brisbane Broncos",
+   "years": "2000–2025",
    "kind": "wikipedia",
    "title": "File:Brisbane_Broncos_logo.svg",
    "page": "https://en.wikipedia.org/wiki/File:Brisbane_Broncos_logo.svg",
@@ -7305,13 +7347,27 @@
    "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
    "sha256": "7617025c2d78db891004360895bd3e99d7ffd2cc013ce53186c348a1774ce830",
    "cache": "data-src/crest-eras/files/nrl/nrl-brisbane-broncos/2008-Brisbane_Broncos_logo.svg",
-   "evidence": "English Wikipedia article Brisbane Broncos, \"Emblem and colours\" gallery: logos 1988-1999, 2000-2005, 2006-2025, 2026-; file Brisbane_Broncos_logo.svg is the 2006-2025 logo",
+   "evidence": "English Wikipedia article Brisbane Broncos, \"Emblem and colours\" gallery: logos 1988-1999, 2000-2005, 2006-2025, 2026-; file Brisbane_Broncos_logo.svg is the 2006-2025 logo. The same article: \"In 2000, the club adopted a new logo with a more maroon design ... This design continued to be used until 2025\"; the gallery's 2000-2005 file (Brisbane_Broncos_Logo_2000.jpg) and this 2006-2025 file, side by side, are the same crest at 20-60 px (the redraw sets BRISBANE in a band); the SVG is the cleaner copy",
    "verified": "maroon horse head with gold mane over \"BRONCOS BRISBANE\", no shield",
    "league": "nrl"
   },
-  "nrl-canberra-raiders.2008": {
+  "nrl-canberra-raiders.1998": {
    "club": "Canberra Raiders",
-   "years": "2008–2019",
+   "years": "1998–1999",
+   "kind": "wikipedia",
+   "title": "File:Old_Canberra_Raiders_logo.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Old_Canberra_Raiders_logo.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/b/be/Old_Canberra_Raiders_logo.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "28151bd91fac33fc5c1b6463146f16997054a66d321044c435370d73112454df",
+   "cache": "data-src/crest-eras/files/nrl/nrl-canberra-raiders/1998-Old_Canberra_Raiders_logo.jpg",
+   "evidence": "English Wikipedia Canberra Raiders (revision 1384038262), \"Emblem and colours\" gallery: 1981-1999 (this file, \"Past logo of the Canberra Raiders rugby league football club\"), 2000-2019, 2020-2023",
+   "verified": "Viking head in a horned helmet on a lime disc in a yellow ring lettered \"CANBERRA\" and \"RAIDERS\"",
+   "league": "nrl"
+  },
+  "nrl-canberra-raiders.2000": {
+   "club": "Canberra Raiders",
+   "years": "2000–2019",
    "kind": "wikipedia",
    "title": "File:Canberra_Raiders_logo_(used_2000-2019).svg",
    "page": "https://en.wikipedia.org/wiki/File:Canberra_Raiders_logo_(used_2000-2019).svg",
@@ -7319,7 +7375,7 @@
    "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
    "sha256": "82c16df6ba0bf66b0b28a47233747d1a5a906836f857878416a7079629e84fe0",
    "cache": "data-src/crest-eras/files/nrl/nrl-canberra-raiders/2008-Canberra_Raiders_logo_(used_2000-2019).svg",
-   "evidence": "English Wikipedia article Canberra Raiders, \"Emblem and colours\" gallery: logos 1981-1999, 2000-2019, 2020-2023; file name \"Canberra Raiders logo (used 2000-2019)\"",
+   "evidence": "English Wikipedia article Canberra Raiders, \"Emblem and colours\" gallery: logos 1981-1999, 2000-2019, 2020-2023; file name \"Canberra Raiders logo (used 2000-2019)\". Worn from 2000, the gallery's 2000-2019 (revision 1384038262)",
    "verified": "green-bearded Viking face in horned helmet, lime \"RAIDERS\" lettering above",
    "league": "nrl"
   },
@@ -7351,9 +7407,51 @@
    "verified": "grey bulldog standing on a blue-and-white V shield, BULLDOGS banner above, C-B and 1935",
    "league": "nrl"
   },
-  "nrl-gold-coast-titans.2008": {
+  "nrl-canterbury-bulldogs.1998": {
+   "club": "Canterbury Bulldogs",
+   "years": "1998–1999",
+   "kind": "wayback",
+   "title": "File:BullDogs.svg",
+   "page": "https://web.archive.org/web/20160201102532/https://en.wikipedia.org/wiki/File:BullDogs.svg",
+   "wayback": "https://web.archive.org/web/20090531174059id_/http://upload.wikimedia.org/wikipedia/en/9/9e/BullDogs.svg",
+   "licence": "non-free logo, as the file page states (Wikipedia's non-free content)",
+   "sha256": "493f6b9409300a61a42536442fdf23a0d3b654d5ad4d619d5aaeb8a91de9cb9e",
+   "cache": "data-src/crest-eras/files/nrl/nrl-canterbury-bulldogs/1998-BullDogs.svg",
+   "evidence": "English Wikipedia Canterbury-Bankstown Bulldogs (revision 1385128812), \"Name and emblem\": the snarling bulldog inside a circle \"was replaced in 1998 by a more 'cartoonish' logo of a bulldog's head\", until \"the official change of logo taking place in November 2009\". The Wayback Machine's captures of the club's article (then Canterbury Bulldogs) show that head: Bulldogs_Logo_-_1998.gif (\"Bulldogs latest Logo\", uploaded May 2007) on 31 Mar 2008, this SVG on 23 Apr 2009. The original SVG as captured on 31 May 2009; the file was renamed and deleted since",
+   "verified": "white cartoon bulldog head over a blue V and a grey swoosh, black \"BULLDOGS\" banner",
+   "league": "nrl"
+  },
+  "nrl-cronulla-sutherland-sharks.1998": {
+   "club": "Cronulla-Sutherland Sharks",
+   "years": "1998–2003",
+   "kind": "wikipedia",
+   "title": "File:Cronulla-Sutherland_Sharks_Logo_1998.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Cronulla-Sutherland_Sharks_Logo_1998.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/0/0e/Cronulla-Sutherland_Sharks_Logo_1998.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "dd57123d60dae3ffd826a442bf08bb34082433a0823d582c768c5188489fc1e0",
+   "cache": "data-src/crest-eras/files/nrl/nrl-cronulla-sutherland-sharks/1998-Cronulla-Sutherland_Sharks_Logo_1998.jpg",
+   "evidence": "English Wikipedia Cronulla-Sutherland Sharks (revision 1384038921), \"Logo\": the black circular crest \"was changed after Super League in 1997 to a blue-and-white star-shaped design\", and the club \"changed their logo again in 2004, which is currently in use\"; gallery caption 1998-2003; file description \"Logo used by the Cronulla-Sutherland Sharks from 1998 to 2003\"",
+   "verified": "blue star with a white shark across it, black \"SHARKS\" lettering, white ground",
+   "league": "nrl"
+  },
+  "nrl-gold-coast-chargers.1998": {
+   "club": "Gold Coast Chargers",
+   "years": "1998–1998",
+   "kind": "wikipedia",
+   "title": "File:Gold_Coast_Chargers.png",
+   "page": "https://en.wikipedia.org/wiki/File:Gold_Coast_Chargers.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/e/e8/Gold_Coast_Chargers.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "abf227000e39f5346aaf50e6ce4e2f52eab2b6b3c4bb3e3d40da53146be65151",
+   "cache": "data-src/crest-eras/files/nrl/nrl-gold-coast-chargers/1998-Gold_Coast_Chargers.png",
+   "evidence": "English Wikipedia Gold Coast Chargers (revision 1363422831): the club played as the Gold Coast Chargers \"in jade, black, purple and gold uniforms\" from 1996 to 1998; infobox file \"Logo of Gold Coast Chargers rugby league club\"; the National Rugby League article as captured on 25 Jun 2006 shows the same logo (Goldcoast_1988.jpg) for the Gold Coast's NRL year, 1998",
+   "verified": "\"Gold Coast\" over teal \"Chargers\" on a black and purple shield, a football and gold lightning below",
+   "league": "nrl"
+  },
+  "nrl-gold-coast-titans.2007": {
    "club": "Gold Coast Titans",
-   "years": "2008–2021",
+   "years": "2007–2021",
    "kind": "wayback",
    "title": "File:Gold_Coast_Titans.png",
    "page": "https://en.wikipedia.org/wiki/File:Gold_Coast_Titans.png",
@@ -7361,13 +7459,41 @@
    "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
    "sha256": "cf7474646edfdee7bd3121e06cffd50ba280e8ba5f5c091b670f634309724f6c",
    "cache": "data-src/crest-eras/files/nrl/nrl-gold-coast-titans/2008-Gold_Coast_Titans.png",
-   "evidence": "English Wikipedia Gold Coast Titans, Emblem and colours: October 2021 launch of a re-designed logo was the club's first rebrand since admittance. Wayback capture of the article, 1 Jun 2012, shows Gold_Coast_Titans.png",
+   "evidence": "English Wikipedia Gold Coast Titans, Emblem and colours: October 2021 launch of a re-designed logo was the club's first rebrand since admittance. Wayback capture of the article, 1 Jun 2012, shows Gold_Coast_Titans.png. Worn from the club's first season, 2007 (revision 1384935395: the 2021 logo \"was the club's first rebrand since admittance into the competition in 2007\")",
    "verified": "yellow-and-blue helmeted knight over crossed swords, GOLD COAST TITANS lettering",
    "league": "nrl"
   },
-  "nrl-manly-warringah-sea-eagles.2008": {
+  "nrl-illawarra-steelers.1998": {
+   "club": "Illawarra Steelers",
+   "years": "1998–1998",
+   "kind": "wikipedia",
+   "title": "File:Illawarra_Steelers_logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Illawarra_Steelers_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/8/8b/Illawarra_Steelers_logo.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "0b09fbb06ca18deb687cf4a5a8ad00fa6b3a8f5badc596312ac62cd19f6fd24c",
+   "cache": "data-src/crest-eras/files/nrl/nrl-illawarra-steelers/1998-Illawarra_Steelers_logo.png",
+   "evidence": "English Wikipedia Illawarra Steelers (revision 1381977379) infobox logo (this file, uploaded 2020 from the club's site). The same logo's earlier upload, ISteelers2.jpg, as captured on 15 Feb 2006: \"the logo of the Illawarra Steelers, which has existed as the Football Club's logo from 1997 to present\"; its thumbnail in the National Rugby League article as captured on 25 Jun 2006, side by side with this file, is the same design",
+   "verified": "red and yellow \"STEELERS\" lettering under \"ILLAWARRA\" over a steelworker with a crowbar before a red cog",
+   "league": "nrl"
+  },
+  "nrl-manly-warringah-sea-eagles.1998": {
    "club": "Manly Warringah Sea Eagles",
-   "years": "2008–2023",
+   "years": "1998–1999",
+   "kind": "wikipedia",
+   "title": "File:Manly_Warringah_Sea_Eagles98.png",
+   "page": "https://en.wikipedia.org/wiki/File:Manly_Warringah_Sea_Eagles98.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/f/f1/Manly_Warringah_Sea_Eagles98.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "0c18622fac29d78c829ebca2b33e949a229df8e4ed08b3f8a219b81b4c587195",
+   "cache": "data-src/crest-eras/files/nrl/nrl-manly-warringah-sea-eagles/1998-Manly_Warringah_Sea_Eagles98.png",
+   "evidence": "English Wikipedia Manly Warringah Sea Eagles (revision 1384045064), \"Emblem and colours\": \"In conjunction with the new competition, the National Rugby League, Manly would change their logo in 1998 ... This logo would not last however when the ill-fated merger with North Sydney Bears in 2000 saw them take on the Northern Eagles moniker\"; gallery caption 1998-1999; file description \"Manly Sea Eagles logo from 1998\"",
+   "verified": "maroon sea eagle under red and yellow \"SEA EAGLES\" lettering in a maroon ring, small on white",
+   "league": "nrl"
+  },
+  "nrl-manly-warringah-sea-eagles.2003": {
+   "club": "Manly Warringah Sea Eagles",
+   "years": "2003–2023",
    "kind": "wikipedia",
    "title": "File:Manly-Warringah_Sea_Eagles_logo.svg",
    "page": "https://en.wikipedia.org/wiki/File:Manly-Warringah_Sea_Eagles_logo.svg",
@@ -7375,13 +7501,13 @@
    "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
    "sha256": "5397dd960fede8ecff131c8230196254bf3aeecec97d0f93493182c16d5dbeed",
    "cache": "data-src/crest-eras/files/nrl/nrl-manly-warringah-sea-eagles/2008-Manly-Warringah_Sea_Eagles_logo.svg",
-   "evidence": "English Wikipedia article Manly Warringah Sea Eagles, \"Emblem and colours\" gallery: logos 1947-1955, 1980-1997, 1998-1999, 2003-2023, 2024-present; file Manly-Warringah_Sea_Eagles_logo.svg",
+   "evidence": "English Wikipedia article Manly Warringah Sea Eagles, \"Emblem and colours\" gallery: logos 1947-1955, 1980-1997, 1998-1999, 2003-2023, 2024-present; file Manly-Warringah_Sea_Eagles_logo.svg. The same article: \"Upon their return in 2003, Manly opted to revert to the previous logo but slightly updated\" (the gallery's 2003-2023). the National Rugby League article as captured on 25 Jun 2006 shows a 60th-anniversary version (Manly_2006.png, \"1947 2006\"), which the club's article does not mention: the primary logo is kept",
    "verified": "maroon sea eagle in a roundel with \"MANLY WARRINGAH SEA EAGLES\" ring",
    "league": "nrl"
   },
-  "nrl-melbourne-storm.2008": {
+  "nrl-melbourne-storm.1998": {
    "club": "Melbourne Storm",
-   "years": "2008–2017",
+   "years": "1998–2017",
    "kind": "wikipedia",
    "title": "File:Melbourne_Storm_logo_(used_1998-2017).svg",
    "page": "https://en.wikipedia.org/wiki/File:Melbourne_Storm_logo_(used_1998-2017).svg",
@@ -7389,7 +7515,7 @@
    "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
    "sha256": "618463e1246de55475750524407bbb877249d226f046e80349ac51bbe0df3ed7",
    "cache": "data-src/crest-eras/files/nrl/nrl-melbourne-storm/2008-Melbourne_Storm_logo_(used_1998-2017).svg",
-   "evidence": "English Wikipedia article Melbourne Storm, \"Logo\": original Storm Man logo \"in place from the club's inception through to the end of the 2017 season\" (file name used 1998-2017)",
+   "evidence": "English Wikipedia article Melbourne Storm, \"Logo\": original Storm Man logo \"in place from the club's inception through to the end of the 2017 season\" (file name used 1998-2017). The 10th-anniversary logo of 2007 \"was only featured on supporter merchandise and not in an official capacity on the jersey\" (revision 1384045665)",
    "verified": "Storm Man hurling lightning over storm clouds, yellow and purple \"STORM\"",
    "league": "nrl"
   },
@@ -7407,9 +7533,9 @@
    "verified": "navy shield, Storm Man above \"MELBOURNE STORM 20 YEARS\"",
    "league": "nrl"
   },
-  "nrl-new-zealand-warriors.2008": {
+  "nrl-new-zealand-warriors.2002": {
    "club": "New Zealand Warriors",
-   "years": "2008–2014",
+   "years": "2002–2014",
    "kind": "wayback",
    "title": "File:New_Zealand_Warriors_logo.svg",
    "page": "https://en.wikipedia.org/wiki/File:New_Zealand_Warriors_logo.svg",
@@ -7417,8 +7543,22 @@
    "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
    "sha256": "ef795d2a816ed270c91f0b0dd98d6b7ca687bba5dfa2d0db713e4b8eb90df6df",
    "cache": "data-src/crest-eras/files/nrl/nrl-new-zealand-warriors/2008-150px-New_Zealand_Warriors_logo.svg.png",
-   "evidence": "English Wikipedia New Zealand Warriors, 'Logos': 'In 2002, the logo's colour scheme was changed to silver and black'; the article as captured by the Wayback Machine on 1 Jun 2010 shows New_Zealand_Warriors_logo.svg (the file was later overwritten by the 2020 logo)",
+   "evidence": "English Wikipedia New Zealand Warriors, 'Logos': 'In 2002, the logo's colour scheme was changed to silver and black'; the article as captured by the Wayback Machine on 1 Jun 2010 shows New_Zealand_Warriors_logo.svg (the file was later overwritten by the 2020 logo). Worn from 2002, the year of the silver and black (same article)",
    "verified": "silver-and-black tekoteko mask above grey WARRIORS lettering",
+   "league": "nrl"
+  },
+  "nrl-newcastle-knights.1998": {
+   "club": "Newcastle Knights",
+   "years": "1998–2007",
+   "kind": "wikipedia",
+   "title": "File:Newcastle_Logo_1997.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Newcastle_Logo_1997.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/3/31/Newcastle_Logo_1997.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "7d094696daf56922c91cd503b0f0f1ef32c65190b3dc1f4e21c9f28d9b5c79b6",
+   "cache": "data-src/crest-eras/files/nrl/nrl-newcastle-knights/1998-Newcastle_Logo_1997.jpg",
+   "evidence": "English Wikipedia Newcastle Knights (revision 1384046965), \"Emblem and colours\" gallery: 1988-1997, 1998-2007 (this file), 2008-2019, 2020-present; the National Rugby League article as captured on 25 Jun 2006 shows it",
+   "verified": "helmeted knight with a red plume on a blue panel, \"NEWCASTLE\" above, blue script \"Knights\" below, white ground",
    "league": "nrl"
   },
   "nrl-newcastle-knights.2008": {
@@ -7435,9 +7575,93 @@
    "verified": "blue script \"Knights\" over \"NEWCASTLE\" under a helmeted knight head, on a white tile",
    "league": "nrl"
   },
-  "nrl-penrith-panthers.2008": {
+  "nrl-north-queensland-cowboys.1998": {
+   "club": "North Queensland Cowboys",
+   "years": "1998–2002",
+   "kind": "wikipedia",
+   "title": "File:NQCowboys_logo.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:NQCowboys_logo.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/7/72/NQCowboys_logo.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "0ed5684e12a0f3463b6b5047c18f73db60dae7ba3a16844080e96773b6c8f63b",
+   "cache": "data-src/crest-eras/files/nrl/nrl-north-queensland-cowboys/1998-NQCowboys_logo.jpg",
+   "evidence": "English Wikipedia North Queensland Cowboys (revision 1384650438), \"Logos\": \"In the early years the logo was on a white rectangular background, before being backed with a yellow oval. In 2003 the font was changed and a yellow star added, which remain to this day\"; the gallery captions this file 1998-2003. Gallery and text disagree on 2003: the text's year of the change is used",
+   "verified": "navy steer horns over navy \"COWBOYS\" on a yellow oval with a dark rim",
+   "league": "nrl"
+  },
+  "nrl-northern-eagles.2000": {
+   "club": "Northern Eagles",
+   "years": "2000–2000",
+   "kind": "wikipedia",
+   "title": "File:Northern_Eagles_logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Northern_Eagles_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/5/51/Northern_Eagles_logo.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "6954cab4743541f441aba88fa708166d47ccd4997a47c30a479252e66fc067b7",
+   "cache": "data-src/crest-eras/files/nrl/nrl-northern-eagles/2000-Northern_Eagles_logo.png",
+   "evidence": "English Wikipedia Northern Eagles (revision 1367327458), \"Emblem and colours\", gallery \"Northern Eagles – Logos\": 2000 (this file), 2001-2002; the club shared its home games between Brookvale Oval and Gosford, the Central Coast its ring names. (the National Rugby League article as captured on 25 Jun 2006 shows the 2001-2002 design under the file name Northern_2000.jpg; the club's own gallery is used)",
+   "verified": "brown eagle with spread wings over an \"NE\" shield, ring lettered \"CENTRAL COAST\", \"NORTH SYDNEY\", \"MANLY WARRINGAH\"",
+   "league": "nrl"
+  },
+  "nrl-northern-eagles.2001": {
+   "club": "Northern Eagles",
+   "years": "2001–2002",
+   "kind": "wikipedia",
+   "title": "File:Northern_Eagles_Logo_2001-.webp",
+   "page": "https://en.wikipedia.org/wiki/File:Northern_Eagles_Logo_2001-.webp",
+   "download": "https://upload.wikimedia.org/wikipedia/en/5/5b/Northern_Eagles_Logo_2001-.webp",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "b83cd02dbaa9a19474c991c221cdb3c2a0ec8aea219b9760672cfcf2814d2cf0",
+   "cache": "data-src/crest-eras/files/nrl/nrl-northern-eagles/2001-Northern_Eagles_Logo_2001-.webp",
+   "evidence": "English Wikipedia Northern Eagles, \"Emblem and colours\" gallery caption 2001-2002 (this file; its uploader names Logopedia as the source, fetched here from Wikipedia only)",
+   "verified": "brown eagle with spread wings over a maroon and gold \"NE\" shield, black \"NORTHERN EAGLES\" below",
+   "league": "nrl"
+  },
+  "nrl-parramatta-eels.2000": {
+   "club": "Parramatta Eels",
+   "years": "2000–2003",
+   "kind": "wayback",
+   "title": "File:1999-2004_Parramatta_Eels_logo.jpg",
+   "page": "https://web.archive.org/web/20090303110704/http://en.wikipedia.org/wiki/Parramatta_Eels",
+   "wayback": "https://web.archive.org/web/20090418151304id_/http://upload.wikimedia.org/wikipedia/en/f/fd/1999-2004_Parramatta_Eels_logo.jpg",
+   "licence": "non-free logo: an English Wikipedia upload, deleted since; its file page was not archived",
+   "sha256": "92cfce69c744f1c159d642dc110a9bd5b5572c4571459cc6a3583824b9cf51c7",
+   "cache": "data-src/crest-eras/files/nrl/nrl-parramatta-eels/2000-1999-2004_Parramatta_Eels_logo.jpg",
+   "evidence": "English Wikipedia Parramatta Eels (revision 1384063480): \"a new eel logo was introduced in 2000. In 2004, the club mascot featured on the crest reverted to an eel drawing similar to that featured on the original crest\". The article as captured on 3 Mar 2009 shows this file, named 1999-2004, and said 1999 and 2005: the sources disagree by a year at both ends, and today's article is used. The original (116 x 82 px) as captured on 18 Apr 2009",
+   "verified": "teal eel lunging through gold and blue \"EELS\" lettering under \"PARRAMATTA\"",
+   "league": "nrl"
+  },
+  "nrl-parramatta-eels.2004": {
+   "club": "Parramatta Eels",
+   "years": "2004–2010",
+   "kind": "wayback",
+   "title": "File:Parramatta_Eels_logo.jpg",
+   "page": "https://web.archive.org/web/20090303110704/http://en.wikipedia.org/wiki/Parramatta_Eels",
+   "wayback": "https://web.archive.org/web/20130919072022id_/http://upload.wikimedia.org/wikipedia/en/c/c6/Parramatta_Eels_logo.jpg",
+   "licence": "non-free logo: an English Wikipedia upload, deleted since; its file page was not archived (an earlier upload of this logo states fair use)",
+   "sha256": "1ef177e1eb23337f62263b9ef0a27055eab9c09bcd180d85f07099bcdab04a70",
+   "cache": "data-src/crest-eras/files/nrl/nrl-parramatta-eels/2004-Parramatta_Eels_logo.jpg",
+   "evidence": "English Wikipedia Parramatta Eels: the eel drawing of 2004 (see 2000) until the 1980s emblem returned in 2011. The article's infobox shows this yellow eel in the Wayback Machine's captures of 15 Dec 2005 and 3 Jul 2007 (Parraeels.jpg, uploaded 13 Aug 2005) and of 3 Mar 2009 (this file, the same design); the National Rugby League article as captured on 25 Jun 2006 shows it too. Round 1 took 2008-2010 for today's crest; these captures show the yellow eel. The original as captured on 19 Sep 2013",
+   "verified": "yellow eel with a dotted body arching over blue italic \"PARRAMATTA EELS\", no circle, white ground",
+   "league": "nrl"
+  },
+  "nrl-penrith-panthers.1998": {
    "club": "Penrith Panthers",
-   "years": "2008–2012",
+   "years": "1998–1999",
+   "kind": "wikipedia",
+   "title": "File:Penrith_Panthers_Logo_1991.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Penrith_Panthers_Logo_1991.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/f/fc/Penrith_Panthers_Logo_1991.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "18f95fb17edba3b6d246dc0d4d69b99926614b1d85795a6a1b0e62c2b8c72670",
+   "cache": "data-src/crest-eras/files/nrl/nrl-penrith-panthers/1998-Penrith_Panthers_Logo_1991.jpg",
+   "evidence": "English Wikipedia Penrith Panthers (revision 1384048051), \"Emblem and colours\" gallery: 1978-1990, 1991-1999 (this file), 2000-2012, 2013-2018, 2019-Present",
+   "verified": "black prowling panther on a white disc in a black ring lettered \"PENRITH\" and \"PANTHERS\", red, yellow and green bands",
+   "league": "nrl"
+  },
+  "nrl-penrith-panthers.2000": {
+   "club": "Penrith Panthers",
+   "years": "2000–2012",
    "kind": "wikipedia",
    "title": "File:Penrith_Panthers_logo_(2000-2012).svg",
    "page": "https://en.wikipedia.org/wiki/File:Penrith_Panthers_logo_(2000-2012).svg",
@@ -7445,7 +7669,7 @@
    "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
    "sha256": "7dbf0c5799cd1c3c1926ddfba6bf55752c2ade254eba43e508bd221d75aec196",
    "cache": "data-src/crest-eras/files/nrl/nrl-penrith-panthers/2008-Penrith_Panthers_logo_(2000-2012).svg",
-   "evidence": "English Wikipedia article Penrith Panthers, \"Emblem and colours\" gallery: logos 1978-1990, 1991-1999, 2000-2012, 2013-2018, 2019-Present, 60th Anniversary 2026",
+   "evidence": "English Wikipedia article Penrith Panthers, \"Emblem and colours\" gallery: logos 1978-1990, 1991-1999, 2000-2012, 2013-2018, 2019-Present, 60th Anniversary 2026. Worn from 2000, the gallery's 2000-2012 (revision 1384048051)",
    "verified": "drippy white-black \"PENRITH PANTHERS\" lettering over a snarling panther face, teal and rust",
    "league": "nrl"
   },
@@ -7477,9 +7701,51 @@
    "verified": "black prowling panther silhouette, no wordmark",
    "league": "nrl"
   },
-  "nrl-wests-tigers.2008": {
+  "nrl-south-sydney-rabbitohs.1998": {
+   "club": "South Sydney Rabbitohs",
+   "years": "1998–2007",
+   "kind": "wayback",
+   "title": "File:South_sydney_rabbitohs_logo_1988.jpg",
+   "page": "https://web.archive.org/web/20120605141630/https://en.wikipedia.org/wiki/South_Sydney_Rabbitohs",
+   "wayback": "https://web.archive.org/web/20120605141630id_/https://upload.wikimedia.org/wikipedia/en/thumb/f/fc/South_sydney_rabbitohs_logo_1988.jpg/150px-South_sydney_rabbitohs_logo_1988.jpg",
+   "licence": "non-free logo: an English Wikipedia upload, deleted since; its file page was not archived (an earlier upload of this logo states fair use)",
+   "sha256": "8f946181d5e85e3c7c24612ec448ccfdf4465eefe4817867322c6b3d97eb78fb",
+   "cache": "data-src/crest-eras/files/nrl/nrl-south-sydney-rabbitohs/1998-150px-South_sydney_rabbitohs_logo_1988.jpg",
+   "evidence": "English Wikipedia South Sydney Rabbitohs (revision 1384517706), \"Emblem\": for the 2008 centenary \"Souths opted to alter the logo by removing the red and green oval from the emblem\". The oval is the infobox logo in the Wayback Machine's captures of 15 Dec 2005 (Southslogo.jpg) and 3 Jul 2007 (South_Sydney_Rabbitohs_logo.jpg, a RABBITOHS Est.1908 wordmark below it); the article as captured on 5 Jun 2012 shows this file, named 1988, captioned \"A later version of the Rabbitohs' logo\" (after the emblem of 1959). Only its 150 px thumbnail survives, as captured on 5 Jun 2012",
+   "verified": "white running rabbit on a red oval with a green rim lettered \"SOUTH SYDNEY\" and \"RABBITOHS\"",
+   "league": "nrl"
+  },
+  "nrl-st-george-dragons.1998": {
+   "club": "St. George Dragons",
+   "years": "1998–1998",
+   "kind": "wayback",
+   "title": "File:Stgeorge_1988.jpg",
+   "page": "https://web.archive.org/web/20060625013333/http://en.wikipedia.org/wiki/Image:Stgeorge_1988.jpg",
+   "wayback": "https://web.archive.org/web/20060912074612id_/http://upload.wikimedia.org/wikipedia/en/a/a6/Stgeorge_1988.jpg",
+   "licence": "non-free logo, as the file page states (Wikipedia's non-free content)",
+   "sha256": "ce51a727ebba3cbf97e93a6444c1932f0c19807e3967ee177164fa8b9e81f542",
+   "cache": "data-src/crest-eras/files/nrl/nrl-st-george-dragons/1998-Stgeorge_1988.jpg",
+   "evidence": "English Wikipedia St. George Illawarra Dragons (revision 1384049765), \"Name and emblem\": \"The merged entity's logo was taken directly from that of St George, with the addition of 'Illawarra' to the bottom of the emblem\" (the Illawarra Steelers article likewise), so St George's logo of 1998 is the merged club's shield without \"ILLAWARRA\". This file (uploaded 16 Aug 2005, named 1988) is that shield, shown for St. George \"1921 - 1998\" in the National Rugby League article as captured on 25 Jun 2006. The original as captured on 12 Sep 2006",
+   "verified": "red shield with a black St George on a rearing horse spearing a white dragon, \"ST.GEORGE\" above, no \"ILLAWARRA\"",
+   "league": "nrl"
+  },
+  "nrl-sydney-city-roosters.1998": {
+   "club": "Sydney City Roosters",
+   "years": "1998–1999",
+   "kind": "wikipedia",
+   "title": "File:Sydney_Roosters_Logo_1995.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Sydney_Roosters_Logo_1995.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/3/3b/Sydney_Roosters_Logo_1995.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "b84b54478ee70b3df61fbfcd3aab13ee72ab2f35f148b90936033b93ba9adef9",
+   "cache": "data-src/crest-eras/files/nrl/nrl-sydney-city-roosters/1998-Sydney_Roosters_Logo_1995.jpg",
+   "evidence": "English Wikipedia Sydney Roosters (revision 1384856442), \"Emblem and colours\": the club became the \"Sydney City Roosters\" for 1995 and the \"Sydney Roosters\" in 2000; gallery caption 1995-1999; file description \"Logo use by the Sydney Roosters from 1995-1999\"",
+   "verified": "cartoon rooster in red, white and blue under \"SYDNEY CITY\", blue script \"Roosters\", on a white shield",
+   "league": "nrl"
+  },
+  "nrl-wests-tigers.2000": {
    "club": "Wests Tigers",
-   "years": "2008–2021",
+   "years": "2000–2021",
    "kind": "wayback",
    "title": "File:Wests_Tigers_logo.svg",
    "page": "https://en.wikipedia.org/wiki/File:Wests_Tigers_logo.svg",
@@ -7487,7 +7753,7 @@
    "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
    "sha256": "79ee6fc4250b693e14963055bce45269f1aef18fb399f03d6f798ba4e5ce561d",
    "cache": "data-src/crest-eras/files/nrl/nrl-wests-tigers/2013-240px-Wests_Tigers_logo.svg.png",
-   "evidence": "English Wikipedia Wests Tigers, 'Emblems and jerseys': 'Since formation, the Wests Tigers have mostly retained the same logo with subtle changes' until the simplified logo of October 2021 (2022 season). Wayback captures of the article: 1 Jun 2012 shows WestsTigersLogo.jpg, 1 Jun 2021 shows Wests_Tigers_logo.svg; the two are the same design (checked side by side), the svg capture is the cleaner copy used here",
+   "evidence": "English Wikipedia Wests Tigers, 'Emblems and jerseys': 'Since formation, the Wests Tigers have mostly retained the same logo with subtle changes' until the simplified logo of October 2021 (2022 season). Wayback captures of the article: 1 Jun 2012 shows WestsTigersLogo.jpg, 1 Jun 2021 shows Wests_Tigers_logo.svg; the two are the same design (checked side by side), the svg capture is the cleaner copy used here. the National Rugby League article as captured on 25 Jun 2006 shows the logo of 2000 (Wests_2000.jpg) and that of 2005-2006 (Westsigers.jpg): the same tiger's head with claws over WESTS TIGERS at 20-60 px",
    "verified": "orange-and-black tiger head with claws and WESTS TIGERS lettering over a V, transparent background",
    "league": "nrl"
   },
@@ -13139,25 +13405,49 @@
     "nhl-winnipeg-jets-1979.1980"
    ]
   ],
+  "nrl-adelaide-rams": [
+   [
+    1998,
+    1998,
+    "nrl-adelaide-rams.1998"
+   ]
+  ],
+  "nrl-auckland-warriors": [
+   [
+    1998,
+    2000,
+    "nrl-auckland-warriors.1998"
+   ]
+  ],
   "nrl-brisbane-broncos": [
    [
-    2008,
+    1998,
+    1999,
+    "nrl-brisbane-broncos.1998"
+   ],
+   [
+    2000,
     2025,
-    "nrl-brisbane-broncos.2008"
+    "nrl-brisbane-broncos.2000"
    ]
   ],
   "nrl-bulldogs": [
    [
-    2008,
+    2000,
     2009,
-    null
+    "nrl-canterbury-bulldogs.1998"
    ]
   ],
   "nrl-canberra-raiders": [
    [
-    2008,
+    1998,
+    1999,
+    "nrl-canberra-raiders.1998"
+   ],
+   [
+    2000,
     2019,
-    "nrl-canberra-raiders.2008"
+    "nrl-canberra-raiders.2000"
    ],
    [
     2020,
@@ -13172,25 +13462,58 @@
     "nrl-canterbury-bankstown-bulldogs.2010"
    ]
   ],
+  "nrl-canterbury-bulldogs": [
+   [
+    1998,
+    1999,
+    "nrl-canterbury-bulldogs.1998"
+   ]
+  ],
+  "nrl-cronulla-sutherland-sharks": [
+   [
+    1998,
+    2003,
+    "nrl-cronulla-sutherland-sharks.1998"
+   ]
+  ],
+  "nrl-gold-coast-chargers": [
+   [
+    1998,
+    1998,
+    "nrl-gold-coast-chargers.1998"
+   ]
+  ],
   "nrl-gold-coast-titans": [
    [
-    2008,
+    2007,
     2021,
-    "nrl-gold-coast-titans.2008"
+    "nrl-gold-coast-titans.2007"
+   ]
+  ],
+  "nrl-illawarra-steelers": [
+   [
+    1998,
+    1998,
+    "nrl-illawarra-steelers.1998"
    ]
   ],
   "nrl-manly-warringah-sea-eagles": [
    [
-    2008,
+    1998,
+    1999,
+    "nrl-manly-warringah-sea-eagles.1998"
+   ],
+   [
+    2003,
     2023,
-    "nrl-manly-warringah-sea-eagles.2008"
+    "nrl-manly-warringah-sea-eagles.2003"
    ]
   ],
   "nrl-melbourne-storm": [
    [
-    2008,
+    1998,
     2017,
-    "nrl-melbourne-storm.2008"
+    "nrl-melbourne-storm.1998"
    ],
    [
     2018,
@@ -13200,9 +13523,9 @@
   ],
   "nrl-new-zealand-warriors": [
    [
-    2008,
+    2002,
     2014,
-    "nrl-new-zealand-warriors.2008"
+    "nrl-new-zealand-warriors.2002"
    ],
    [
     2015,
@@ -13212,21 +13535,62 @@
    [
     2016,
     2019,
-    "nrl-new-zealand-warriors.2008"
+    "nrl-new-zealand-warriors.2002"
    ]
   ],
   "nrl-newcastle-knights": [
+   [
+    1998,
+    2007,
+    "nrl-newcastle-knights.1998"
+   ],
    [
     2008,
     2019,
     "nrl-newcastle-knights.2008"
    ]
   ],
+  "nrl-north-queensland-cowboys": [
+   [
+    1998,
+    2002,
+    "nrl-north-queensland-cowboys.1998"
+   ]
+  ],
+  "nrl-northern-eagles": [
+   [
+    2000,
+    2000,
+    "nrl-northern-eagles.2000"
+   ],
+   [
+    2001,
+    2002,
+    "nrl-northern-eagles.2001"
+   ]
+  ],
+  "nrl-parramatta-eels": [
+   [
+    2000,
+    2003,
+    "nrl-parramatta-eels.2000"
+   ],
+   [
+    2004,
+    2010,
+    "nrl-parramatta-eels.2004"
+   ]
+  ],
   "nrl-penrith-panthers": [
    [
-    2008,
+    1998,
+    1999,
+    "nrl-penrith-panthers.1998"
+   ],
+   [
+    2000,
     2012,
-    "nrl-penrith-panthers.2008"
+    "nrl-penrith-panthers.2000"
    ],
    [
     2013,
@@ -13239,11 +13603,39 @@
     "nrl-penrith-panthers.2019"
    ]
   ],
+  "nrl-sharks": [
+   [
+    1999,
+    2002,
+    "nrl-cronulla-sutherland-sharks.1998"
+   ]
+  ],
+  "nrl-south-sydney-rabbitohs": [
+   [
+    1998,
+    2007,
+    "nrl-south-sydney-rabbitohs.1998"
+   ]
+  ],
+  "nrl-st-george-dragons": [
+   [
+    1998,
+    1998,
+    "nrl-st-george-dragons.1998"
+   ]
+  ],
+  "nrl-sydney-city-roosters": [
+   [
+    1998,
+    1999,
+    "nrl-sydney-city-roosters.1998"
+   ]
+  ],
   "nrl-wests-tigers": [
    [
-    2008,
+    2000,
     2021,
-    "nrl-wests-tigers.2008"
+    "nrl-wests-tigers.2000"
    ]
   ],
   "w-ajax": [

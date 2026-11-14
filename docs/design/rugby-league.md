@@ -252,8 +252,10 @@ which no game rated, are computed from NRL.com's match stats ([Computed seasons]
   does not explain. It is a cross-check only: it ranks with the overall (Spearman 0.50; 0.31 for hookers to 0.78 for
   fullbacks), and picks out the clubs' 76 players of 2008's Origin and Australia and New Zealand Tests a little better
   (area under the curve 0.753 against the overall's 0.734; any 2008 Test, 0.656 against 0.616). Nothing reads it.
-- **Clubs of their day.** The sixteen of 2008, no Dolphins. Each keeps today's id, code, colour and crest except the
-  **Bulldogs**, as the club was named from 2000 to 2009 (`nrl-bulldogs`, code BUL, the game's own; no crest). Grounds are
+- **Clubs of their day.** The sixteen of 2008, no Dolphins. Each keeps today's id, code and colour, and wears its crest
+  of the day ([period-marks.md](period-marks.md)), except the **Bulldogs**, as the club was named from 2000 to 2009
+  (`nrl-bulldogs`, code BUL, the game's own; no crest of today, the cartoon bulldog head of 1998-2009 as its crest of the
+  day). Grounds are
   RLP's 2008 home venues: Olympic Park Stadium (the Storm, until 2010), Dairy Farmers Stadium (the Cowboys, until 2020),
   Parramatta Stadium and the Sydney Football Stadium of 1988 (both rebuilt since, on their sites); a ground still played at
   keeps its present name. Clubs that shared a ground grow from where they trained: the Bulldogs moved theirs to Sydney
@@ -499,7 +501,8 @@ sees his kicking as metres and his goals not at all.
 ### Clubs and maps
 
 The sixteen clubs of 2008 play every season to 2022, the Dolphins join in 2023 (seventeen). Every club keeps today's id,
-name, code, colour and crest, except the Bulldogs in 2009, still "Bulldogs" (`nrl-bulldogs`, BUL, no crest) as in 2008;
+name, code and colour (its crest is the one of its day: [period-marks.md](period-marks.md)), except the Bulldogs in
+2009, still "Bulldogs" (`nrl-bulldogs`, BUL) as in 2008;
 from 2010 they are Canterbury-Bankstown again. `teams` in `scripts/data/rugby-league-seasons.json` lists each season's
 clubs with its NRL.com nickname (`list`), its Rugby League Project slug that season (`rlp`) and its ground; `nrlcom`
 names each NRL.com team id's club, the same in every season. A club grows from its own ground, or from its training base
@@ -640,7 +643,10 @@ eight of 1999–2002 at 0.99 (the research pass's 0.987–0.991). Each snapshot 
 - **The defunct clubs** (`defunct`): the Adelaide Rams (ADE), the Balmain Tigers (BAL), the Gold Coast Chargers (GCC),
   the Illawarra Steelers (ILL), the North Sydney Bears (NSB), the Northern Eagles (NEA) and the Western Suburbs Magpies
   (WSM), no club of today's continuing them, each under its own id (which is its `franchise` too). The codes are ours; the
-  colour is the club's own hashed hue, as every built-in club's and the NHL's Seals' (`colourFor`); none has a crest.
+  colour is the club's own hashed hue, as every built-in club's and the NHL's Seals' (`colourFor`). None has a crest of
+  today; four wear the crest of their day (the Rams, the Chargers, the Steelers, the Northern Eagles:
+  [period-marks.md](period-marks.md)), and Balmain, Norths and Wests, whose logos of 1998-1999 no source dates, show
+  their code.
 
 ### Grounds and maps
 
@@ -726,7 +732,8 @@ Darren Lockyer (2000), Stacey Jones (1999, 2001), Nathan Hindmarsh (2000, 2001, 
 - **Fewer stats before 2003**, and a different season before: 1998 ranks its players on six stats, run metres among the
   missing, so a forward's carries count only through his line breaks and offloads; 1999–2002 on eight, without
   tackle breaks or kick metres (a half's kicking counts nowhere). 1998, 1999 and 2003 stand on their own season.
-- **The clubs since gone keep no crest** and play in a colour of their own; their codes are ours.
+- **Three clubs since gone have no crest** (Balmain, Norths and Wests: no source dates their logos of 1998-1999), and
+  every gone club plays in a colour of its own; their codes are ours.
 - **Grounds by the majority of home games**: a club that moved during a season (the Rams from Adelaide Oval to
   Hindmarsh, the Broncos to Suncorp in 2003) plays the whole season at the ground of most of them.
 - **Today's rules:** golden point came in 2003 (a level regular-season game was a draw before), but a campaign needs a
