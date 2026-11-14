@@ -53,8 +53,9 @@ test('each year plays its own cup\'s format, and the built-in season today\'s', 
   assert.equal(formatOf(DAVIS_CUP_FORMATS, null), TODAY, 'the built-in season');
   assert.deepEqual([1960, 1988, 1989, 2015, 2016, 2018, 2019, 2025].map(year => davis(year).id), ['davis-cup-advantage', 'davis-cup-advantage',
     'davis-cup-tiebreaks', 'davis-cup-tiebreaks', 'davis-cup-fifth-set-tiebreak', 'davis-cup-fifth-set-tiebreak', 'today', 'today']);
-  assert.deepEqual([1968, 1975, 1976, 1977, 1979, 1980, 1994, 1995, 1999, 2000, 2001, 2002, 2017, 2018, 2024, 2025, 2026].map(year => fed(year).id), [
-    'fed-cup-three-advantage', 'fed-cup-three-advantage', 'fed-cup-three-tiebreaks', 'fed-cup-three-advantage', 'fed-cup-three-advantage',
+  // The cup's first year, 1963, played the ties of 1968-1975 (Wikipedia's pages: two singles and the doubles, advantage sets).
+  assert.deepEqual([1963, 1968, 1975, 1976, 1977, 1979, 1980, 1994, 1995, 1999, 2000, 2001, 2002, 2017, 2018, 2024, 2025, 2026].map(year => fed(year).id), [
+    'fed-cup-three-advantage', 'fed-cup-three-advantage', 'fed-cup-three-advantage', 'fed-cup-three-tiebreaks', 'fed-cup-three-advantage', 'fed-cup-three-advantage',
     'fed-cup-three', 'fed-cup-three', 'fed-cup-five', 'fed-cup-five', 'fed-cup-three', 'fed-cup-three', 'fed-cup-five', 'fed-cup-five',
     'fed-cup-five-tiebreaks', 'fed-cup-five-tiebreaks', 'fed-cup-three-tiebreaks', 'today']);
   // Rubbers, sets and tie-breaks.
@@ -80,6 +81,7 @@ test('matchSport gives an earlier season its year\'s format, one sport a format,
   assert.notEqual(of('tennis', 1985), of('tennis', 1989));
   assert.equal(of('womens-tennis', 1976), of('womens-tennis', 2025), 'the Fed Cup of 1976 and the cup of 2025: three rubbers of tie-break sets');
   assert.equal(of('womens-tennis', 1972), of('womens-tennis', 1978));
+  assert.equal(of('womens-tennis', 1963), of('womens-tennis', 1972), 'the Federation Cup\'s first years: the ties of 1968-1975');
   const old = of('tennis', 1985), three = of('womens-tennis', 1985);
   assert.deepEqual([old.id, old.nationsOnly, old.tour, old.rules.id, old.simulationVersion, old.clock], ['tennis', true, ATP, 'davis-cup-advantage', 2,
     { length: 60, msPerUnit: 113, ot: BLOCK, tick: BLOCK }]);

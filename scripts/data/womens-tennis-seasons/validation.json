@@ -583,49 +583,239 @@
    }
   }
  },
+ "early": {
+  "seasons": [
+   1963,
+   1972
+  ],
+  "matches": {
+   "counted": 286413,
+   "unplayed": 23440,
+   "no score": 611,
+   "placeholder": 0,
+   "skipped": 467914
+  },
+  "fedCupRubbersUnresolved": 349,
+  "wikipedia": {
+   "pages": 37,
+   "matches": 1991,
+   "counted": 1882,
+   "unplayed": 109,
+   "women": 547,
+   "playerFile": 278,
+   "byWikidata": 158,
+   "byReview": 120,
+   "aliases": 45
+  },
+  "fit": {
+   "years": [
+    1973,
+    2000
+   ],
+   "n": 17,
+   "meanDiff": -0.3,
+   "rms": 42.8,
+   "byDecade": {
+    "1970s": 6.9,
+    "1980s": 30,
+    "1990s": -18.1
+   },
+   "after": {
+    "n": 14,
+    "meanDiff": -4.6
+   }
+  },
+  "seam": {
+   "1973": {
+    "n": 50,
+    "meanDiff": -0.2,
+    "meanAbsDiff": 1.2,
+    "maxAbsDiff": 7.8
+   },
+   "1974": {
+    "n": 50,
+    "meanDiff": -0.2,
+    "meanAbsDiff": 1.2,
+    "maxAbsDiff": 6.3
+   },
+   "1975": {
+    "n": 50,
+    "meanDiff": -0.2,
+    "meanAbsDiff": 0.8,
+    "maxAbsDiff": 4.9
+   },
+   "1976": {
+    "n": 50,
+    "meanDiff": 0.2,
+    "meanAbsDiff": 0.5,
+    "maxAbsDiff": 4
+   },
+   "1977": {
+    "n": 50,
+    "meanDiff": 0.2,
+    "meanAbsDiff": 0.5,
+    "maxAbsDiff": 3.1
+   },
+   "1978": {
+    "n": 50,
+    "meanDiff": 0.4,
+    "meanAbsDiff": 0.5,
+    "maxAbsDiff": 4.8
+   },
+   "1979": {
+    "n": 50,
+    "meanDiff": 0.4,
+    "meanAbsDiff": 0.4,
+    "maxAbsDiff": 2.5
+   },
+   "1980": {
+    "n": 50,
+    "meanDiff": 0.5,
+    "meanAbsDiff": 0.5,
+    "maxAbsDiff": 2.4
+   }
+  }
+ },
  "checks": {
   "topTens": {
    "authority": "Lance Tingay (The Daily Telegraph), every year",
    "periods": {
-    "all": {
+    "amateur": {
      "seasons": 5,
-     "shared": 8.2,
-     "rho": 0.68
+     "shared": 7.2,
+     "rho": 0.76
+    },
+    "open": {
+     "seasons": 5,
+     "shared": 8.4,
+     "rho": 0.71
     }
    },
    "seasons": {
-    "1968": {
-     "shared": 7,
-     "listed": 10,
-     "rho": 0.66,
+    "1963": {
+     "shared": 9,
+     "listed": 9,
+     "rho": 0.57,
      "ranks": [
+      1,
       7,
+      3,
+      2,
+      4,
+      8,
+      6,
+      9,
+      null,
+      5
+     ],
+     "notListed": [
+      "Nancy Richey: 1 counted matches"
+     ]
+    },
+    "1964": {
+     "shared": 6,
+     "listed": 10,
+     "rho": 0.45,
+     "ranks": [
+      1,
+      2,
+      3,
+      16,
+      17,
+      11,
+      4,
+      7,
+      13,
+      5
+     ],
+     "notListed": []
+    },
+    "1965": {
+     "shared": 8,
+     "listed": 10,
+     "rho": 0.88,
+     "ranks": [
+      1,
+      4,
+      3,
+      2,
+      8,
+      5,
+      6,
+      7,
+      11,
+      12
+     ],
+     "notListed": []
+    },
+    "1966": {
+     "shared": 6,
+     "listed": 10,
+     "rho": 0.95,
+     "ranks": [
+      3,
+      1,
       2,
       5,
+      6,
+      7,
+      14,
+      13,
+      17,
+      19
+     ],
+     "notListed": []
+    },
+    "1967": {
+     "shared": 7,
+     "listed": 10,
+     "rho": 0.93,
+     "ranks": [
+      1,
+      2,
+      5,
+      3,
       4,
+      6,
+      7,
+      15,
+      16,
+      12
+     ],
+     "notListed": []
+    },
+    "1968": {
+     "shared": 8,
+     "listed": 10,
+     "rho": 0.76,
+     "ranks": [
+      2,
+      4,
+      5,
+      6,
       1,
       3,
-      9,
-      11,
-      30,
-      18
+      8,
+      10,
+      26,
+      14
      ],
      "notListed": []
     },
     "1969": {
      "shared": 9,
      "listed": 10,
-     "rho": 0.58,
+     "rho": 0.66,
      "ranks": [
       1,
       5,
-      3,
+      2,
       4,
       6,
-      10,
       9,
+      10,
       7,
-      2,
+      3,
       12
      ],
      "notListed": []
@@ -633,17 +823,17 @@
     "1970": {
      "shared": 8,
      "listed": 10,
-     "rho": 0.73,
+     "rho": 0.67,
      "ranks": [
       1,
       2,
       7,
-      10,
+      12,
       5,
       4,
       8,
-      19,
-      11,
+      18,
+      10,
       9
      ],
      "notListed": []
@@ -658,7 +848,7 @@
       1,
       3,
       5,
-      14,
+      13,
       7,
       4,
       11,
@@ -669,12 +859,12 @@
     "1972": {
      "shared": 9,
      "listed": 10,
-     "rho": 0.81,
+     "rho": 0.84,
      "ranks": [
-      2,
+      1,
       4,
       3,
-      1,
+      2,
       8,
       6,
       7,
@@ -693,9 +883,9 @@
      "name": "Margaret Court",
      "year": 1971,
      "published": 2389,
-     "computed": 2402.9,
+     "computed": 2393.9,
      "date": "1973-12-10",
-     "endOfYear": 2261.8
+     "endOfYear": 2256.3
     }
    ]
   }

@@ -3,13 +3,17 @@
 // sync:womens-tennis-seasons cache them in data-src/): how each era's sets ended (when the tie-breaks came), the order
 // the cups' rubbers were played in, the World Group's rubbers and ties by era, and how often an Elo favourite won a
 // best-of-five match against Elo's odds over five sets (each player's Elo before the match by Tennis Abstract's method,
-// scripts/lib/tennis-elo.mjs). The files hold the singles of every tie and none of the doubles. Reads; writes nothing.
-// Run: node scripts/tennis-formats-real.mjs [--men=<folder>] [--women=<folder>] (the pinned files; data-src's by default)
+// scripts/lib/tennis-elo.mjs). The files hold the singles of every tie and none of the doubles; the Federation Cup's
+// first years, 1963-1967, come from English Wikipedia's pages as the women's seasons' sync pins them (singles and
+// doubles). Reads; writes nothing.
+// Run: node scripts/tennis-formats-real.mjs [--men=<folder>] [--women=<folder>] [--wikipedia=<folder>] (the pinned files;
+// data-src's by default)
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { orderMatches, parseMatchFile, rateMatches } from './lib/tennis-elo.mjs';
+import { orderMatches, parseMatchFile, rateMatches, ROUND_ORDER } from './lib/tennis-elo.mjs';
+import { cupTies, pinnedPages, wikiFile, wikipediaMatches } from './lib/tennis-wikipedia.mjs';
 import { bestOfFive, bestOfThree, daySetChances } from '../src/sports/tennis.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -216,6 +220,59 @@ for (const [from, to, pattern, three] of [[1968, 1975, /Fed Cup WG/, true], [198
 }
 say(`  Fed Cup 1968–1975 and 1977–1979, every set: ${pastText([...fedYears(1968, 1975), ...fedYears(1977, 1979)].flatMap(r => setsOf(r.score) ?? []))}`);
 say(`  Fed Cup World Group 1980–2017, deciding sets: ${pastText(worldGroup(1980, 2017).map(r => setsOf(r.score)?.[2]).filter(Boolean))}`);
+
+// ---------- the Federation Cup's first years ----------
+
+// Every tie of 1963-1967 from Wikipedia's pinned pages: its rubbers' sets (singles and doubles), its order of play by
+// each player's Elo before the tie (the women's second run of the pages' results, scripts/sync-tennis-seasons.mjs), and
+// whether its third rubber was played once the tie was decided.
+say('\nThe Federation Cup 1963–1967 (English Wikipedia\'s pages, as npm run sync:womens-tennis-seasons pins them)');
+const wta = JSON.parse(readFileSync(path.join(root, TOURS.wta.manifest), 'utf8'));
+const wikiDir = option('wikipedia') || path.join(root, 'data-src/womens-tennis-seasons/wikipedia');
+const hash = (algorithm, data) => createHash(algorithm).update(data).digest('hex');
+const pageAt = title => path.join(wikiDir, wikiFile(title, data => hash('sha1', data)));
+const pagesCached = [...wta.wikipedia.draws.flatMap(row => [row[0], row[4]]), ...wta.wikipedia.cups.map(row => row[0]),
+  ...wta.wikipedia.redirects.items.map(row => row[0])].every(title => existsSync(pageAt(title)));
+if (pagesCached) await firstCups();
+else say(`  skipped: the pinned pages are not in ${wikiDir} (npm run sync:womens-tennis-seasons caches them)`);
+
+async function firstCups() {
+  const pages = await pinnedPages(wta.wikipedia, (title, sha) => {
+    const bytes = readFileSync(pageAt(title));
+    if (hash('sha256', bytes) !== sha) throw new Error(`${pageAt(title)} does not match its pin`);
+    return bytes.toString('utf8');
+  });
+  const tiesOf = pages.cups.flatMap(cupPage => cupTies(cupPage.html, cupPage.year).map((tie, t) => ({ ...tie, event: `${cupPage.event}-${String(t + 1).padStart(2, '0')}` })));
+  const scoreSets = score => score.split(' ').map(set => set.split('-').map(Number)).filter(([a, b]) => Number.isFinite(a) && Number.isFinite(b));
+  const rubbers = tiesOf.flatMap(tie => tie.rubbers.filter(r => !r.unplayed));
+  const cupSets = rubbers.flatMap(r => scoreSets(r.score));
+  say(`  ${tiesOf.length} ties, ${rubbers.length} rubbers (${rubbers.filter(r => r.doubles).length} doubles): ${cupSets.length} sets, ${cupSets.filter(isTiebreakSet).length} ended 7–6, `
+    + `${cupSets.filter(isPast).length} went past 7–5; ${pastText(cupSets)}`);
+  const decided = tiesOf.filter(tie => tie.rubbers.length >= 2 && !tie.rubbers[0].doubles && !tie.rubbers[1].doubles && tie.rubbers[0].winner === tie.rubbers[1].winner);
+  say(`  The doubles third in ${tiesOf.filter(tie => tie.rubbers[2]?.doubles && !tie.rubbers[0].doubles && !tie.rubbers[1].doubles).length} of the `
+    + `${tiesOf.filter(tie => tie.rubbers.length === 3).length} ties that list three rubbers; played, though the singles had decided the tie, in `
+    + `${decided.filter(tie => tie.rubbers[2] && !tie.rubbers[2].unplayed).length} of the ${decided.length} ties they decided`);
+  const answer = readFileSync(path.join(root, 'data-src/womens-tennis-seasons/wikidata', wta.wikipedia.wikidata.file));
+  if (hash('sha256', answer) !== wta.wikipedia.wikidata.sha256) throw new Error('The pinned Wikidata answer does not match its pin');
+  const playerLines = pinned('wta', 'wta_players.csv').replace(/\r/g, '').split('\n').filter(Boolean);
+  const people = new Map(playerLines.slice(1).map(line => { const c = line.split(','); return [c[0], { name: `${c[1]} ${c[2]}`.trim(), ioc: c[5] || null, wikidata: /^Q\d+$/.test(c[7] ?? '') ? c[7] : null }]; }));
+  const W = wta.wikipedia, E = wta.method.early;
+  const wiki = wikipediaMatches({ ...pages, people, roundOrder: ROUND_ORDER,
+    qids: new Map(JSON.parse(answer.toString('utf8')).results.bindings.map(row => [row.title.value, row.item.value.replace(/^.*\//, '')])),
+    rules: { flags: W.flags, teams: W.teams, sameCodes: W.sameCodes, aliases: E.aliases.items, joins: E.joins.items } });
+  const before = new Map();
+  rateMatches(orderMatches(wiki.matches), { ...wta.method, start: { ...wta.method.start, amateur: E.start.amateur },
+    layoff: { ...wta.method.layoff, from: E.layoff.from, amateurWeeks: E.layoff.amateurWeeks } }, {
+    levelOf: () => 'amateur',
+    before: (m, w, l) => { if (m.level === 'D') before.set(`${m.event}|${m.num}`, [w, l]); },
+  });
+  // A tie whose four singles players have three rated matches behind them: was the first singles the weaker pair's (its
+  // better player's Elo below the second's)?
+  const ordered = tiesOf.map(tie => [1, 2].map(num => before.get(`${tie.event}|${num}`))).filter(pair => pair.every(r => r && r.every(p => p.n >= 3)));
+  say(`  The first singles the weaker pair's (its better player's Elo below the second's) in ${ordered.filter(([r1, r2]) => Math.max(...r1.map(p => p.elo)) < Math.max(...r2.map(p => p.elo))).length} `
+    + `of ${ordered.length} ties whose four singles players have three rated matches behind them`);
+
+}
 
 // ---------- best of five against Elo ----------
 
