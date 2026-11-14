@@ -25,10 +25,12 @@ export const hasTheatreMaps = sportId => THEATRE_SPORTS.has(sportId);
 const BASKETBALL_SEASON_MAPS = new Map(BUILT_IN_BASKETBALL_SEASONS.map(season => [season.id, season.map]));
 
 /**
- * Whether a map is a season's (`dataSet`: an earlier season's id, or null for the built-in one): one that lists it, or
- * the built-in map an earlier basketball season names as its own (the NBA's seasons since 2014/15 play on today's).
+ * Whether a map is a season's (`dataSet`: an earlier season's id, or null for the built-in one) for a new campaign: one
+ * that lists it, or the built-in map an earlier basketball season names as its own (the NBA's seasons since 2014/15 play
+ * on today's). One another has replaced (`replacedBy`: a season's seven-league map of before its clubs came from all of
+ * Europe) serves only the campaigns saved on it (src/engine/footballSets.js isSeasonTheatreMap).
  */
-const servesSeason = (entry, dataSet) => (dataSet == null ? entry.seasons == null
+const servesSeason = (entry, dataSet) => !entry.replacedBy && (dataSet == null ? entry.seasons == null
   : !!entry.seasons?.includes(dataSet) || (entry.seasons == null && BASKETBALL_SEASON_MAPS.get(dataSet) === entry.id));
 
 /**

@@ -1,7 +1,7 @@
 # Women's tennis
 
-Status: implemented 2026-11-08, with 53 earlier seasons back to 1973 the same day and five more, 1968–1972, on
-2026-11-09 (Earlier seasons, below). The ninth
+Status: implemented 2026-11-08, with 53 earlier seasons back to 1973 the same day, five more, 1968–1972, on
+2026-11-09, and five more, 1963–1967, the Federation Cup's first years, on 2026-11-14 (Earlier seasons, below). The ninth
 sport: the women's game by the rules of the Billie Jean King Cup, with the WTA's players rated by their Elo. Nations
 only, on the world map. It is a sport card of its own beside Tennis, as women's
 football is beside football, and it plays [tennis](tennis.md)'s rules and match model, changed only where the women's
@@ -31,7 +31,7 @@ a format. Every rubber is best of three sets in every year; what changed is the 
 
 | Seasons | Tie | Sets | Source |
 | --- | --- | --- | --- |
-| 1968–1975 | Three rubbers, first to two, at one venue in one week: the No. 2s' singles, the No. 1s', the doubles | Advantage sets | [Billie Jean King Cup](https://en.wikipedia.org/w/index.php?oldid=1380349265): "a team championship played over one week"; [1995 Fed Cup](https://en.wikipedia.org/w/index.php?oldid=1369040089): "Two singles rubbers were added to the ties" in 1995 |
+| 1963–1975 | Three rubbers, first to two, at one venue in one week: the No. 2s' singles, the No. 1s', the doubles | Advantage sets | [Billie Jean King Cup](https://en.wikipedia.org/w/index.php?oldid=1380349265): "a team championship played over one week"; [1995 Fed Cup](https://en.wikipedia.org/w/index.php?oldid=1369040089): "Two singles rubbers were added to the ties" in 1995; for 1963–1967 the cup's pages of each year ([1963–1967](#19631967)) |
 | 1976 | The same | Tie-break sets | [1976 Federation Cup](https://en.wikipedia.org/w/index.php?oldid=1368553932): "The tiebreaker also was used for the first time" |
 | 1977–1979 | The same | Advantage sets | The match files |
 | 1980–1994 | The same | A tie-break in the first two sets, the third an advantage set | The match files |
@@ -55,6 +55,15 @@ scripts/tennis-formats-real.mjs` counts them (2026-11-10):
   ended 7–6 and none went past it. In 1977–1979, 31 of 547 went past 7–5 and two ended 7–6. From 1980 to 2017 the World
   Group's first two sets ended 7–6 (459 of 5,600) and never went past it, while 70 of its 761 deciding sets went past
   7–5 and the six that ended 7–6 were all dead rubbers. From 2018 none of 1,715 sets went past 7–5.
+- **The first cups, 1963–1967** (Wikipedia's pages of each year, singles and doubles, as `node
+  scripts/tennis-formats-real.mjs` counts them, 2026-11-14): 77 ties, each two singles and the doubles third; none of
+  their 520 sets ended 7–6 and 42 went past 7–5 (57% of them 8–6, the longest 13–11). The doubles was played even
+  where the singles had decided the tie, in all 57 such ties; the game, as for 1968–1975, plays no dead rubber, which
+  changes no tie's result. Which singles came first is not clear: by the players' Elo at the season's end, the pages
+  list both sides' No. 1s first in 33 ties, both No. 2s first in 15 (29 mixed), the No. 1s mostly in 1963–1965 (23 to
+  2) and the No. 2s in 1967 (8 to 3). By the same measure the match files number the No. 1s' singles first in 1973–1975
+  too (28 ties to 1, 10 mixed; those ties have no rankings) and the No. 2s' from 1976. Both singles are played in every
+  tie, so the order changes no tie's odds, and every three-rubber year keeps the No. 2s first.
 
 **The model.** The men's ([tennis.md](tennis.md#format-by-year)), at the WTA's serve:
 
@@ -190,7 +199,7 @@ nations win a title in each 200. The men's, by the same probe the same day, are 
 
 - **Setup.** A Women's tennis card after Tennis, with Tennis's racket, as women's football has football's ball. It is
   nations only (`nationsOnly`): the Clubs choice is off and a challenge link's `teams=clubs` is ignored. Its Season
-  choice lists the built-in 2026, then the 58 earlier seasons back to 1968. Nine sports no longer split into two even rows, and five across would squeeze
+  choice lists the built-in 2026, then the 63 earlier seasons back to 1963. Nine sports no longer split into two even rows, and five across would squeeze
   "Basketball" out of its tile on a desktop's setup column (a 74px word in a 62px tile), so the tiles sit in three rows
   of three (`sportColumns` in `SetupOverlay.jsx`), trimmed to what the icon and name need and still 44px targets. On a
   360×640 phone with a notice line (Resume, a challenge link) step 1's heading then gives way, as step 2's does for
@@ -236,8 +245,8 @@ ticks, and the running App playing a 1985 season in three-rubber ties.
 ## Earlier seasons
 
 Status: built 2026-11-08, when the user asked for them after the sport shipped; 1968–1972 added 2026-11-09 (1968–1972,
-below). The Season choice lists 58 earlier seasons, 2025 back to 1968, each the WTA's women at the end of a year and the
-Fed Cup nations of that day, nations only
+below) and 1963–1967 on 2026-11-14 (1963–1967, below). The Season choice lists 63 earlier seasons, 2025 back to 1963,
+each the WTA's women (before 1968 the amateurs) at the end of a year and the Fed Cup nations of that day, nations only
 (set ids `wta-<year>`, kind `wta`, `public/womens-tennis/wta-<year>.json`). They follow the men's seasons
 ([tennis.md](tennis.md), "Earlier seasons") and the user's choices for them: Tennis Abstract's own published lists where
 they exist, earlier years computed from Jeff Sackmann's match results by Tennis Abstract's published method, on today's
@@ -258,20 +267,26 @@ byte. Since 2026-11-10 each season plays its year's cup format ([Format by year]
   `KaterynaBaindl`): `keyAliases` joins each to the current one, which also finds the player in the match files and links
   her page. Its own report gives Megan Mccray the country "rc=" in 2016–2018 (`garbled`, skipped). One woman of its 2023
   list, Tatiana Barkova, is in no match file and plays for nobody.
-- **1968–2015: Elo computed** from Jeff Sackmann's WTA match results, 1968 to 2025: the tour-level files (with the Fed
+- **1973–2015: Elo computed** from Jeff Sackmann's WTA match results, 1968 to 2025: the tour-level files (with the Fed
   Cup) and the ITF and qualifying files. The original repository is gone and no fork of it was found; the archive
   [Aneeshers/tennis-sackmann-archive](https://github.com/Aneeshers/tennis-sackmann-archive) at commit `8373358` holds its
   files (`wta/`), pinned, and its Hugging Face mirror the same. Labels read "Elo from match results, end of 1985"; the
   player's source is "Elo from match results", with her Elo in its title.
-- **Pins.** `scripts/data/womens-tennis-seasons.json` holds the SHA-256 of all 117 archive files and the 20 captures.
+- **1963–1972: a second run** of the same method on the same files, warmed up on the four majors' women's singles of
+  1960–1967 and the Federation Cup of 1963–1967 as English Wikipedia's article pages record them (1963–1967, below).
+  1963–1967 are those results alone, labelled "Amateur Elo, end of 1965 (rough)".
+- **Pins.** `scripts/data/womens-tennis-seasons.json` holds the SHA-256 of all 117 archive files and the 20 captures, and
+  (`wikipedia`) the revision, SHA-256 and size of each of the 165 Wikipedia pages and of Wikidata's answer.
 - **Licence.** As the men's: CC BY-NC-SA 4.0, the computed ratings derived data under the same terms;
-  `public/womens-tennis/ATTRIBUTION.txt` credits both.
+  `public/womens-tennis/ATTRIBUTION.txt` credits both, and Wikipedia's contributors for the results of 1960–1967 (the
+  pages' text is CC BY-SA 4.0; only the results, which are facts, are used, and none of the text is in a file).
 
 `npm run sync:womens-tennis-seasons` reads the pinned inputs from the ignored `data-src/womens-tennis-seasons/`
-(downloading any that are missing) and writes one snapshot a season to `scripts/data/womens-tennis-seasons/<year>.json`
-(1.3 MB in all, committed) and `validation.json`. `npm run build:womens-tennis-seasons` builds the season files,
-`src/data/womensTennisSeasons.js`, the attribution and `docs/design/womens-tennis-seasons-audit.json`. Both have `--check`
-and rebuild byte for byte.
+(downloading any that are missing; a Wikipedia page fetched again is its current revision and will not match its pin,
+so that cache, `wikipedia/` and `wikidata/`, is the record) and writes one snapshot a season to
+`scripts/data/womens-tennis-seasons/<year>.json` (1.4 MB in all, committed) and `validation.json`. `npm run
+build:womens-tennis-seasons` builds the season files, `src/data/womensTennisSeasons.js`, the attribution and
+`docs/design/womens-tennis-seasons-audit.json`. Both have `--check` and rebuild byte for byte.
 
 ### The method
 
@@ -344,20 +359,28 @@ rows say (Manuela Maleeva to Switzerland in 1991, Patricia Hy to Canada, Sesil K
 
 ### 1968–1972
 
-Added 2026-11-09, when the user asked for every sport's missing years and the 1960s and 1970s. The archive holds nothing
-of the women's game before 1968 (no amateur file, as the men's has; the Fed Cup of 1963–1967 is in no public file), so
-the women go back to 1968 and no further. The seasons are the same run's (`seasons.computed` now starts in 1968): it
-always began in January 1968, every woman new then at 1330, and its seasons from 1973 are unchanged byte for byte. They
-are labelled rough, as 1973–1979 are, and 1968 and 1969 are the roughest: a list that starts from nothing a year
-earlier.
+Added 2026-11-09, when the user asked for every sport's missing years and the 1960s and 1970s; since 2026-11-14 made by
+the second run of 1963–1967 (below). Sackmann's archive holds nothing of the women's game before 1968 (no amateur file,
+as the men's has), so on 2026-11-09 these seasons came from the first run, which began in January 1968 with every woman
+new at 1330: 1968 and 1969 were the roughest, a list that starts from nothing a year earlier, and King, Tingay's first of
+1968, was seventh. The second run reads the same files after the pages' results of 1960–1967, so its women of 1968 bring
+their ratings with them; its seasons from 1973 are within a point and a half of the first run's (the seam, below), and
+1973–2025 stay the first run's, unchanged byte for byte. They are labelled rough, as 1973–1979 are.
 
 | Season | Rated | Nations | Best (rating) | Strongest three | Tingay's ten shared | Rank correlation |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1968 | 160 | 16 | Margaret Court (87) | Great Britain, Australia, United States | 7 | 0.66 |
-| 1969 | 152 | 16 | Margaret Court (93) | United States, Australia, Great Britain | 9 | 0.58 |
-| 1970 | 158 | 17 | Margaret Court (93) | United States, Australia, Great Britain | 8 | 0.73 |
-| 1971 | 132 | 18 | Billie Jean King (95) | United States, Australia, Great Britain | 8 | 0.60 |
-| 1972 | 167 | 19 | Margaret Court (96) | United States, Australia, Great Britain | 9 | 0.81 |
+| 1968 | 160 | 16 | Margaret Court (88) | United States, Great Britain, Australia | 8 (7 before) | 0.76 (0.66) |
+| 1969 | 152 | 16 | Margaret Court (93) | United States, Great Britain, Australia | 9 (9) | 0.66 (0.58) |
+| 1970 | 158 | 17 | Margaret Court (93) | United States, Australia, Great Britain | 8 (8) | 0.67 (0.73) |
+| 1971 | 132 | 18 | Billie Jean King (95) | United States, Australia, Great Britain | 8 (8) | 0.60 (0.60) |
+| 1972 | 167 | 19 | Billie Jean King (96) | United States, Australia, Great Britain | 9 (9) | 0.84 (0.81) |
+
+**What moved.** The warm-up moves 1968 most and fades by 1971: over each season's top eight, the second run's Elo less the
+first's is −11 to +194 in 1968 (King +194, now second behind Court where she was seventh), −6 to +16 in 1969, −5 to +9
+in 1970 and −8 to 0 in 1971 and 1972, where King now edges Court as 1972's best (both 96). The five seasons share 8.4 of
+Tingay's ten (8.2 before), rank correlation 0.71 (0.68). Court ends 1971 at 2,256 (2,262 before) and peaks at 2,394 in
+December 1973 (2,403): Tennis Abstract puts her peak at 2,389 in 1971 (The Tennis 128, from a database that reaches back
+to the 1920s), and the open era's many matches, not the warm-up, set her 1971.
 
 **Validation** (`validation.json`'s `checks`, inputs in the manifest's `checks`; nothing from them is in a season file):
 Lance Tingay's year-end tens from Wikipedia's "Top ten ranked female tennis players (1921–1974)", revision 1376153875
@@ -366,37 +389,135 @@ Lance Tingay's year-end tens from Wikipedia's "Top ten ranked female tennis play
 wikitext through `/w/index.php`, a path robots.txt disallows, and nothing here uses that copy or fetches `/w/`. Each
 name is kept with its match-file id, married
 names joined by hand: Kerry Melville is Kerry Reid in the player file, Nancy Richey Gunter Nancy Richey, Lesley Turner
-Bowrey Lesley Turner, Annette Van Zyl duPlooy Annette Van Zyl. Every one of the fifty is rated in her season; the
-seasons share 8.2 of the ten on average, rank correlation 0.68. 1968 is the weakest: King, Tingay's first, is seventh,
-Court first. Tennis Abstract puts Court's peak at 2,389 in 1971 (The Tennis 128, from a database that reaches back to
-the 1920s); here she is 2,262 at the end of 1971 and peaks at 2,403 in December 1973. The Fed Cup bears the nations
-out: Australia and the United States lead every season but 1968, and won every cup of these years but 1972's, South
-Africa's, which plays all five seasons (it is barred only from 1978).
+Bowrey Lesley Turner, Annette Van Zyl duPlooy Annette Van Zyl. Every one of the fifty is rated in her season. The Fed Cup
+bears the nations out: Australia and the United States lead every season, and won every cup of these years but 1972's,
+South Africa's, which plays all five seasons (it is barred only from 1978).
 
-- **Nations.** The rule of the later seasons, unchanged. The 1971 cup is all but missing from the files (five rubbers,
-  without tie names): its players take the nation of the cups around it, within six seasons. The player file decides
-  for the rest (96 of 160 women in 1968).
+- **Nations.** The rule of the later seasons, unchanged; the second run's cup rows include the pages' cups of 1963–1967,
+  within six seasons of 1968–1972. The 1971 cup is all but missing from the files (five rubbers, without tie names): its
+  players take the nation of the cups around it. The player file decides for the rest (84 of 160 women in 1968; 96 in
+  the first run).
+
+### 1963–1967
+
+Added 2026-11-14, when the user's session asked for every year from each sport's first season, the Federation Cup's first
+year being 1963. No public file holds the women's game before 1968, so these seasons read English Wikipedia's article
+pages: the four majors' women's singles draws of 1960–1967 (from 1960 so that the ratings warm up) and the Federation Cup
+of 1963–1967. Each page was fetched once under `/wiki/`, which Wikipedia's robots.txt allows (`/w/` and its API are
+disallowed), through `scripts/lib/polite-fetch.mjs`, and is pinned (the manifest's `wikipedia`). They are the second run's
+seasons (`method.early`), labelled "Amateur Elo, end of 1965 (rough)": every woman of the 1960s was an amateur.
+
+**The measure first.** Before building, the pages were measured against the stop line the work was given (fewer than two
+rated players for most cup nations): counting three matches a season, as the men's amateurs, 41 of the 82 cup nations of
+1963–1967 had two rated cup players, half; with two matches 58, with one all 82. The user chose (2026-11-14) to list the
+women with three counted matches in the season or a singles rubber in that year's cup, so that every cup nation fields
+the women who played it.
+
+**What the pages hold** (`scripts/lib/tennis-wikipedia.mjs`). Wikipedia serves an article as Parsoid HTML, where each
+bracket (`16TeamBracket-Compact-Tennis3-Byes`, the finals' `8TeamBracket-Tennis3`) and each tie (`FedCupbox3`, its
+rubbers `TennisMatch3`) is a template whose wikitext sits in a `data-mw` attribute: the draws are read from the
+templates' parameters, not from the rendered table.
+
+- **The draws.** Wimbledon's and Paris's in full, Melbourne's of 32 or 64 lines; the U.S. Championships' pages show only
+  their last eight, but 1966's a quarter of its draw too. A section's rounds are numbered back from its last (a
+  "Fourth round" is the round before the finals' quarter-finals, a "Quarterfinals" label its own), and a match that a
+  section and the finals bracket both show is counted once (they must agree on its winner). The winner is the bold
+  name, else the side with more sets. A walkover, a retirement (a score's `ret.` or superscript r) or a default is not
+  counted, as in the open era's files.
+- **The dates.** Each major's matches are dated the first day of its women's singles, from its tournament's own article
+  (`TennisEventInfo`, Wimbledon's `Infobox tennis tournament year`; the U.S. Championships of 1960 played the singles
+  from 2 September, after the doubles' week), and each cup rubber its tie's day. A cup's rounds follow its days.
+- **The cup.** Rubbers 1 and 2 are the singles and count; the doubles, rubber 3, rates nobody (the files hold no
+  doubles either). 77 ties: 16 nations in 1963, 20 in 1964, 11 in 1965 (in Melbourne), 20 in 1966 and 15 in 1967.
+- **In all** 1,991 singles, 1,882 counted (109 walkovers, retirements and defaults), from 37 pages.
+
+**Who is who.** A player cell is a link (to an article, a redirect, or a missing article: a red link) or a name written
+without one. A woman is her article, a redirect followed to it (96 redirects, each fetched under `/wiki/` once: its page
+is the article, with `wgRedirectedFrom`), a red link's title, or a name with its flag (`Name|CODE`): 592 keys. Reviewed
+by hand on 2026-11-14 (`method.early.aliases`, 45 rows): 39 keys of one woman written once with a link and once without,
+or with and without diacritics (`name`, checked by the script: one plain name, one country), and six of spellings
+(`spelling`, each explained: Carol and Carole Newman; Lyn and Lynn Bellamy; María José Aubet, whose red link garbles é
+as ú, and her initials; Mimi Henreid with her middle initial; Patsy Belton, misspelt Pasty). Never merged: two women
+who played each other, and pairs with nothing but a surname in common (Margot Anne Smith of New Zealand and Margaret
+Court; Irène and Isabelle de Lansalut; Madonna and Maree Schacht). 547 women remain. A woman is Sackmann's player, under his id, so that
+she carries on into the open era, when her article's Wikidata item is the player file's `wikidata_id` (158: QLever's
+answer for the 248 articles, pinned), or when a reviewed row says so (`method.early.joins`, 120, all `name`: her name or
+a name her cells show is the player file's, in one country, as Carmen Mandarino is the player file's Carmen Coronado and
+Janice Wainwright its Janice Townsend). Not joined: Maria Ayala (Chile, 1960) and Mary Habicht (the United States), whose
+namesakes in the player file are of other countries. 278 of the 547 are Sackmann's; the rest keep an id of their own
+(`wp:<key>`), with the name of their article or link and the country their flags give most often.
+
+**The method.** The first run's, with the men's two changes for a warm-up. Newcomers of the pages start at 1325, fitted
+to five points so that the run carries on as the shipped one: over the first run's top 50 of each season 1973–1980 the
+second run's Elo of the same women differs by +0.1 on average (the mean absolute difference 1.2 at most a season), and on
+Tennis Abstract's 17 targets of 1973–2000 it is −0.3 Elo on average, root mean square 42.8, where the first run is −0.4
+and 42.7; 1320 puts the seam at −0.4, 1330 at +1.4, 1280 at −9.5 and 1380 at +14.8. A layoff that begins before 1968 is
+charged only when it ends before 1968 and lasts 13 weeks or more (the pages hold the majors and the cup alone). Against
+Tingay's tens of 1963–1967 the layoff barely matters: rank correlation 0.72 with eight weeks, 0.76 with 13, 0.72 with
+26, 39 or no charge. A gap across 1968 (Court's year away, 1967) is never charged.
+
+| Season | Rated | Nations | Best (rating) | Strongest three | Tingay's ten shared | Rank correlation |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1963 | 65 | 16 | Margaret Court (80) | Australia, United States, Great Britain | 9 | 0.57 |
+| 1964 | 67 | 20 | Margaret Court (82) | Australia, United States, Great Britain | 6 | 0.45 |
+| 1965 | 69 | 13 | Margaret Court (85) | Australia, United States, Great Britain | 8 | 0.88 |
+| 1966 | 78 | 20 | Margaret Court (83) | Australia, United States, Great Britain | 6 | 0.95 |
+| 1967 | 72 | 17 | Billie Jean King (83) | United States, Great Britain, Australia | 7 | 0.93 |
+
+**Validation.** Tingay's tens of 1963–1967, read from the same saved page of his lists (the manifest's `checks`): 7.2 of
+his ten shared a season, rank correlation 0.76. Every one of his women is rated in her season but Nancy Richey, his
+ninth of 1963: the pages give her one match (the U.S. Championships' pages show their last eight only). 1964 agrees least
+(six shared, 0.45): Carole Caldwell Graebner, his fourth, is 16th and Helga Schultze, his fifth, 17th, each on the few
+matches the pages give her. Court leads Australia in 1963–1966 and is away in 1967, as she was; King leads 1967.
+
+**Nations of the day.** Every cup nation of every year fields a team, and every woman who played a cup singles rubber
+plays for the nation she played it for, in its five but one: in 1966 Australia fields its five best, Court, Turner,
+Ebbern, Tegart and Krantzcke, and Gail Sherriff, who played the cup with Tegart and Krantzcke, is sixth. A woman of
+1963–1967 plays for her fix, else her cup nation of the nearest season (the pages' cups and the files' together, within
+six), else the country her draws' flags give her in the nearest season of the pages (`how` 'flag': the pages flag a
+woman by her country of the day, where the player file gives her latest), else the player file's; 93 of the 351 rows
+take their flag. A nation needs two: Maria Bueno, Brazil's only rated woman in 1963, 1964,
+1966 and 1967, plays only in 1965, when Maureen Schwartz played the cup with her (as Seles sits out 1991–1992). Two
+nations field a team without a cup of that year: Czechoslovakia and the Netherlands in 1965, Czechoslovakia and the
+Soviet Union in 1967 (Galina Baksheeva and Anna Dmitrieva, before the Soviet Union's first cup in 1968, holding the other
+republics). Rhodesia plays its cups of 1966 and 1967 on Zimbabwe's land, under its name of the day; Czechoslovakia holds
+Slovakia, West Germany plays under its own name.
+
+**The format.** The cup of 1968–1975: three rubbers, the doubles third, advantage sets ([Format by year](#format-by-year)).
 
 ### Tests
 
 `scripts/womens-tennis-seasons.test.mjs`: the build and (with the inputs cached) the sync rebuild byte for byte, the
-men's too; every input pinned; the counted levels; the listing, 2025 back to 1968, and its labels; every season decodes,
-two to five women a nation, each rating her Elo on the game's scale less the season's shift, the best at 99 where
-shifted; Graf and Navratilova shifted; 1985's Czechoslovakia holding Slovakia with Mandlikova, West Germany with
-Kohde-Kilsch and Graf, South Africa barred from 1978 and back in 1992; the Soviet Union, the CIS and Serbia and
-Montenegro; the fixes and Seles's seasons; Tennis Abstract's own lists and renamed keys; the validation thresholds;
-1968–1972 with Court and King leading Australia and the United States, South Africa playing, the 1971 nations from the
-cups around it, Tingay's tens and Court's peak; the loader refusing damaged files; a season binding the women's sport
-and serve; the running App listing the seasons, loading one, launching 1985 with Slovakia in Czechoslovakia's empire and
-1968 with South Africa playing, and resuming the saves; and a challenge link to a season.
+men's too; every input pinned, the Wikipedia pages and Wikidata's answer among them; the counted levels; the listing,
+2025 back to 1963, and its labels; every season decodes, two to five women a nation, each rating her Elo on the game's
+scale less the season's shift, the best at 99 where shifted, the seasons before 1968 citing their cup's page; Graf and
+Navratilova shifted; 1985's Czechoslovakia holding Slovakia with Mandlikova, West Germany with Kohde-Kilsch and Graf,
+South Africa barred from 1978 and back in 1992; the Soviet Union, the CIS and Serbia and Montenegro; the fixes and
+Seles's seasons, and the flags' rule only before 1968; Tennis Abstract's own lists and renamed keys; the validation
+thresholds; 1963–1972 with Court and King leading Australia and the United States, Court away in 1967, South Africa
+playing, the 1971 nations from the cups around it, Tingay's tens (Richey's 1963 the one woman unrated), King second in
+1968, Court's peak, the seam and fit of the second run and its counts; the pages read (a draw's rounds numbered back,
+the finals' repeat counted once, walkovers and retirements, the dates, the links' kinds; a cup's singles and doubles; the
+women: redirects, Wikidata's and the reviewed joins, the checks of a reviewed row, opponents never one woman); every cup
+nation of 1963–1967 fielding a team, the Soviet Union of 1967, Bueno only in 1965, Rhodesia, and (with the pages cached)
+every cup singles player listed, for her cup's nation, in its five but Gail Sherriff in 1966; the loader refusing damaged
+files; a season binding the women's sport and serve; the running App listing the seasons, loading one, launching 1985 with
+Slovakia in Czechoslovakia's empire, 1968 with South Africa playing and 1963 with the first cup's sixteen, and resuming
+the saves; and a challenge link to a season. `scripts/tennis-formats.test.mjs` holds the cup of 1963 to the ties of 1968.
 
 ### Limits
 
-- **1968–1979 are rough**, as the men's 1960–1979: the ratings start from nothing in 1968, while Tennis Abstract's reach
-  back to the 1920s. 1968 and 1969 are the roughest (King seventh at the end of 1968, Tingay's first), and Court's 1971
-  is 127 points under Tennis Abstract's.
-- **Nothing before 1968**: the archive has no women's match before the open era, and no public file holds the Fed Cup of
-  1963–1967.
+- **1963–1979 are rough**, as the men's 1960–1979: the ratings start from nothing in 1960, while Tennis Abstract's reach
+  back to the 1920s, and Court's 1971 is 133 points under Tennis Abstract's.
+- **1963–1967 hold the majors and the cup alone**, as Wikipedia records them: no other event of the women's amateur
+  circuit, and of the U.S. Championships only the last eight (but 1966's quarter). A woman of a few matches keeps an
+  uncertain rating (Carole Caldwell Graebner, Tingay's fourth of 1964, is 16th), Nancy Richey is unrated in 1963, and a
+  cup nation's women who played the cup alone are rated on their one to four rubbers, near a newcomer's start.
+- **Who is who** before 1968 is the pages' links and names, joined by Wikipedia's redirects, Wikidata and a review by
+  hand: a woman written under two names the review did not find (a maiden name and a married one, neither linked) counts
+  as two, and a red link's title is her name where no article gives a better one.
+- **The order of the cup's two singles** of 1963–1967 is not the pages' to settle ([Format by year](#format-by-year)).
+- **Nothing before 1963**, the cup's first year; 1960–1962 only warm the ratings up.
 - **No ITF events before 1994**, whose prize the files do not name: a player who played only those is not rated then.
 - **Names** are the player file's, the latest a woman used (Manuela Maleeva Fragniere in 1985), and the published lists'
   as Tennis Abstract wrote them that year (Cori Gauff in 2023).

@@ -8,6 +8,7 @@
 import { EA_ROLES, EA_SCALE } from '../../src/data/eaPlayers.js';
 import { FOOTBALL_FEDERATIONS } from '../../src/data/footballFederations.js';
 import { EA_LEAGUES, SET_ID, assembleEaSeason } from './ea-seasons.mjs';
+import { BIG_LEAGUES } from '../../src/data/footballLeagues.js';
 import { parseCsv } from './football-data.mjs';
 
 /**
@@ -161,7 +162,8 @@ export function legacyExclusions(groups = []) {
 /**
  * Build one FIFA 07–14 season. `ratings` are readRatingsRows' rows, `clubs` readClubRows' rows (`clubDuplicates` the
  * exact duplicates it dropped); `edition` is the manifest's `{ id, fifaVersion, edition, ratings: { roster },
- * clubs: { roster }, leagues: { game league: [SoFIFA names] } }`. Options: `ratingsUrl` and `clubsUrl` (the sources'
+ * clubs: { roster }, leagues: { game league: [SoFIFA names] } }` (the seven big leagues and every other European first
+ * division the clubs file holds). Options: `ratingsUrl` and `clubsUrl` (the sources'
  * pages), `dates` (rosterDates), `exclusions` (legacyExclusions) and `federations`. Returns assembleEaSeason's
  * `{ doc, text, audit, warnings }`. Throws on an unknown position code, a malformed or damaged row, rows from another
  * roster, a league name the clubs file does not hold, a league left with no club, a nationality with no game nation
@@ -205,15 +207,18 @@ export function buildLegacyEaSeason({ ratings, clubs, clubDuplicates = 0 }, edit
   }
   if (rosters.size !== 1 || !rosters.has(clubsRoster)) throw new Error(`${label}: the clubs file holds rosters ${[...rosters].join(', ')}, not ${clubsRoster}`);
 
-  // The seven leagues by SoFIFA's names in this edition: each name must be one the clubs file uses.
-  const gameLeagues = Object.values(EA_LEAGUES);
+  // Europe's first divisions by SoFIFA's names in this edition, the seven big leagues among them: each name must be one
+  // the clubs file uses. The scrape names a club's league as it was later (FIFA 10's Olympiacos, in EA's Rest of World,
+  // sits in "Greek Super League"), so those clubs play in it.
   const named = Object.keys(leagues || {});
-  if (named.length !== gameLeagues.length || gameLeagues.some(([league]) => !named.includes(league))) {
-    throw new Error(`${label}: the league table names ${named.join(', ') || 'no league'}, not the seven game leagues`);
-  }
+  const missing = BIG_LEAGUES.filter(league => !named.includes(league));
+  if (missing.length) throw new Error(`${label}: the league table names ${named.join(', ') || 'no league'}, not ${missing.join(', ')}`);
+  const entryOf = new Map(Object.values(EA_LEAGUES).map(entry => [entry[0], entry]));
+  const unknown = named.filter(league => !entryOf.has(league));
+  if (unknown.length) throw new Error(`${label}: the league table names ${unknown.join(', ')}, which EA_LEAGUES does not list`);
   const used = new Set([...placed.values()].map(row => row.league_name));
   const leagueOf = new Map();
-  for (const entry of gameLeagues) {
+  for (const entry of named.map(league => entryOf.get(league))) {
     const names = leagues[entry[0]];
     if (!Array.isArray(names) || !names.length) throw new Error(`${label}: the league table gives ${entry[0]} no SoFIFA name`);
     for (const name of names) {

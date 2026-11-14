@@ -34,9 +34,10 @@ test('each season plays the knockout rules of its day', () => {
     if (expected(season.year) === 'penalties') assert.equal(sport, football);
     assert.equal(sport.id, 'football');
   }
-  // The World Cups to 1970 and the computed national-team seasons between them (scripts/football-national-team-seasons.test.mjs).
+  // The World Cups to 1970 and the computed national-team seasons before and between them
+  // (scripts/football-national-team-seasons.test.mjs).
   assert.deepEqual(BUILT_IN_SEASONS.filter(season => expected(season.year) === 'lots').map(season => season.id),
-    ['wc-1970', 'nt-1969', 'nt-1968', 'nt-1967', 'wc-1966', 'nt-1965', 'nt-1964', 'nt-1963', 'wc-1962']);
+    ['wc-1970', 'nt-1969', 'nt-1968', 'nt-1967', 'wc-1966', 'nt-1965', 'nt-1964', 'nt-1963', 'wc-1962', 'nt-1961']);
   // 2003/04 (Sawczuk's database) and 2002/03: UEFA's silver goal.
   assert.deepEqual(BUILT_IN_SEASONS.filter(season => expected(season.year) === 'silver').map(season => season.id), ['cm0102-2003-10', 'cm0102-2002-11']);
   assert.equal(matchSport({ sport: 'football' }), football, 'the built-in season plays today\'s rules');

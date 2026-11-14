@@ -12,7 +12,7 @@
 // 1999/00: SI's Championship Manager 99/00 database, original release 3.70 (the UK retail CD's data files, archive.org championship-manager-season-9900)
 // 1998/99: SI's Championship Manager 3 data in the CM 01/02 format, Cam F's port (the CM0102 Starter Kit's cm3_data.zip)
 // 1997/98: SI's Championship Manager 97/98 database as baskeyx extracted it to JSON (github.com/baskeyx/cm9798)
-// 1996/97: Sensible Software's Sensible World of Soccer 96/97 national squads (Whiteulver's database, as keyser1884's SWOS-MCP holds it)
+// 1996/97: Sensible Software's Sensible World of Soccer 96/97, its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)
 // 1995/96: Sensible Software's Sensible World of Soccer 95/96, its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)
 // 1994/95: Sensible Software's original Sensible World of Soccer (1994), its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)
 // 1993/94: Cam F's fan-made 1993/94 database for CM 01/02, its ratings Cam F's (the CM0102 Starter Kit's cm93_data.zip)
@@ -20,44 +20,44 @@
 // and by npm run build:world-cup-seasons, computed (scripts/data/world-cup-seasons.json):
 // 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994: each World Cup's finalists, rated from their Elo and their players' records
 // and by npm run build:national-team-seasons, computed (scripts/data/national-team-seasons.json):
-// 1963, 1964, 1965, 1967, 1968, 1969, 1971, 1972, 1973, 1975, 1976, 1977, 1979, 1980, 1981, 1983, 1984, 1985, 1987, 1988, 1989, 1991, 1992, 1993: the seasons between them, each nation rated from its Elo and its players' Wikidata caps
+// 1961, 1963, 1964, 1965, 1967, 1968, 1969, 1971, 1972, 1973, 1975, 1976, 1977, 1979, 1980, 1981, 1983, 1984, 1985, 1987, 1988, 1989, 1991, 1992, 1993: the seasons between them, each nation rated from its Elo and its players' Wikidata caps
 // The built-in earlier seasons, newest first. Each is public/football/<id>.json, loaded when a setup chooses it
 // (src/engine/footballSets.js); docs/design/football-years.md describes them.
 export const BUILT_IN_SEASONS = Object.freeze([
-  Object.freeze({ id: 'ea-fc-26', version: 'ea-fc-26-8ccd45ee', year: 2026, season: '2025/26', label: 'EA FC 26' }),
-  Object.freeze({ id: 'ea-fc-25', version: 'ea-fc-25-799d82b7', year: 2025, season: '2024/25', label: 'EA FC 25' }),
-  Object.freeze({ id: 'ea-fc-24', version: 'ea-fc-24-698e9225', year: 2024, season: '2023/24', label: 'EA FC 24' }),
-  Object.freeze({ id: 'ea-fifa-23', version: 'ea-fifa-23-11260815', year: 2023, season: '2022/23', label: 'FIFA 23' }),
-  Object.freeze({ id: 'ea-fifa-22', version: 'ea-fifa-22-c17c871b', year: 2022, season: '2021/22', label: 'FIFA 22' }),
-  Object.freeze({ id: 'ea-fifa-21', version: 'ea-fifa-21-b294312b', year: 2021, season: '2020/21', label: 'FIFA 21' }),
-  Object.freeze({ id: 'ea-fifa-20', version: 'ea-fifa-20-a635a7ac', year: 2020, season: '2019/20', label: 'FIFA 20' }),
-  Object.freeze({ id: 'ea-fifa-19', version: 'ea-fifa-19-0ebd8d6d', year: 2019, season: '2018/19', label: 'FIFA 19' }),
-  Object.freeze({ id: 'ea-fifa-18', version: 'ea-fifa-18-018a1734', year: 2018, season: '2017/18', label: 'FIFA 18' }),
-  Object.freeze({ id: 'ea-fifa-17', version: 'ea-fifa-17-c5adb9ec', year: 2017, season: '2016/17', label: 'FIFA 17' }),
-  Object.freeze({ id: 'ea-fifa-16', version: 'ea-fifa-16-db213566', year: 2016, season: '2015/16', label: 'FIFA 16' }),
-  Object.freeze({ id: 'ea-fifa-15', version: 'ea-fifa-15-6de54fe6', year: 2015, season: '2014/15', label: 'FIFA 15' }),
-  Object.freeze({ id: 'ea-fifa-14', version: 'ea-fifa-14-a4af7d4c', year: 2014, season: '2013/14', label: 'FIFA 14' }),
-  Object.freeze({ id: 'ea-fifa-13', version: 'ea-fifa-13-f9810843', year: 2013, season: '2012/13', label: 'FIFA 13' }),
-  Object.freeze({ id: 'ea-fifa-12', version: 'ea-fifa-12-48c86de3', year: 2012, season: '2011/12', label: 'FIFA 12' }),
-  Object.freeze({ id: 'ea-fifa-11', version: 'ea-fifa-11-a14ca4f5', year: 2011, season: '2010/11', label: 'FIFA 11' }),
-  Object.freeze({ id: 'ea-fifa-10', version: 'ea-fifa-10-ab6df036', year: 2010, season: '2009/10', label: 'FIFA 10' }),
-  Object.freeze({ id: 'ea-fifa-09', version: 'ea-fifa-09-2cff6600', year: 2009, season: '2008/09', label: 'FIFA 09' }),
-  Object.freeze({ id: 'ea-fifa-08', version: 'ea-fifa-08-e7c7f73e', year: 2008, season: '2007/08', label: 'FIFA 08' }),
-  Object.freeze({ id: 'ea-fifa-07', version: 'ea-fifa-07-ac742262', year: 2007, season: '2006/07', label: 'FIFA 07' }),
+  Object.freeze({ id: 'ea-fc-26', version: 'ea-fc-26-8120a891', year: 2026, season: '2025/26', label: 'EA FC 26' }),
+  Object.freeze({ id: 'ea-fc-25', version: 'ea-fc-25-2a2f0a99', year: 2025, season: '2024/25', label: 'EA FC 25' }),
+  Object.freeze({ id: 'ea-fc-24', version: 'ea-fc-24-8bc5bd87', year: 2024, season: '2023/24', label: 'EA FC 24' }),
+  Object.freeze({ id: 'ea-fifa-23', version: 'ea-fifa-23-91f7591d', year: 2023, season: '2022/23', label: 'FIFA 23' }),
+  Object.freeze({ id: 'ea-fifa-22', version: 'ea-fifa-22-905133fa', year: 2022, season: '2021/22', label: 'FIFA 22' }),
+  Object.freeze({ id: 'ea-fifa-21', version: 'ea-fifa-21-602c3b51', year: 2021, season: '2020/21', label: 'FIFA 21' }),
+  Object.freeze({ id: 'ea-fifa-20', version: 'ea-fifa-20-65462c55', year: 2020, season: '2019/20', label: 'FIFA 20' }),
+  Object.freeze({ id: 'ea-fifa-19', version: 'ea-fifa-19-9f43256d', year: 2019, season: '2018/19', label: 'FIFA 19' }),
+  Object.freeze({ id: 'ea-fifa-18', version: 'ea-fifa-18-4f5904b7', year: 2018, season: '2017/18', label: 'FIFA 18' }),
+  Object.freeze({ id: 'ea-fifa-17', version: 'ea-fifa-17-dfb3422a', year: 2017, season: '2016/17', label: 'FIFA 17' }),
+  Object.freeze({ id: 'ea-fifa-16', version: 'ea-fifa-16-5798a9b7', year: 2016, season: '2015/16', label: 'FIFA 16' }),
+  Object.freeze({ id: 'ea-fifa-15', version: 'ea-fifa-15-0ff2349a', year: 2015, season: '2014/15', label: 'FIFA 15' }),
+  Object.freeze({ id: 'ea-fifa-14', version: 'ea-fifa-14-e3aeb087', year: 2014, season: '2013/14', label: 'FIFA 14' }),
+  Object.freeze({ id: 'ea-fifa-13', version: 'ea-fifa-13-e91bb9cb', year: 2013, season: '2012/13', label: 'FIFA 13' }),
+  Object.freeze({ id: 'ea-fifa-12', version: 'ea-fifa-12-f824d22f', year: 2012, season: '2011/12', label: 'FIFA 12' }),
+  Object.freeze({ id: 'ea-fifa-11', version: 'ea-fifa-11-1895f294', year: 2011, season: '2010/11', label: 'FIFA 11' }),
+  Object.freeze({ id: 'ea-fifa-10', version: 'ea-fifa-10-2e7ff937', year: 2010, season: '2009/10', label: 'FIFA 10' }),
+  Object.freeze({ id: 'ea-fifa-09', version: 'ea-fifa-09-d4e5c275', year: 2009, season: '2008/09', label: 'FIFA 09' }),
+  Object.freeze({ id: 'ea-fifa-08', version: 'ea-fifa-08-393b67ea', year: 2008, season: '2007/08', label: 'FIFA 08' }),
+  Object.freeze({ id: 'ea-fifa-07', version: 'ea-fifa-07-169ee69b', year: 2007, season: '2006/07', label: 'FIFA 07' }),
   Object.freeze({ id: 'ea-fifa-06', version: 'ea-fifa-06-35251773', year: 2006, season: '2005/06', label: 'FIFA 06' }),
   Object.freeze({ id: 'ea-fifa-05', version: 'ea-fifa-05-f16bdf47', year: 2005, season: '2004/05', label: 'FIFA 05' }),
-  Object.freeze({ id: 'cm0102-2003-10', version: 'cm0102-2003-10-df2c38bf', year: 2004, season: '2003/04', label: 'CM 01/02 · October 2003 by Alex Sawczuk, fan-made' }),
-  Object.freeze({ id: 'cm0102-2002-11', version: 'cm0102-2002-11-12b13a69', year: 2003, season: '2002/03', label: 'CM 01/02 · 3.9.68' }),
-  Object.freeze({ id: 'cm0102-2001-09', version: 'cm0102-2001-09-58d3ed4f', year: 2002, season: '2001/02', label: 'CM 01/02 · 3.9.60' }),
-  Object.freeze({ id: 'cm-0001', version: 'cm-0001-e6e6a2f0', year: 2001, season: '2000/01', label: 'CM 00/01 · 3.81' }),
-  Object.freeze({ id: 'cm-9900', version: 'cm-9900-e4639df6', year: 2000, season: '1999/00', label: 'CM 99/00 · 3.70' }),
-  Object.freeze({ id: 'cm0102-2020-11-cm3', version: 'cm0102-2020-11-cm3-5b8d03bc', year: 1999, season: '1998/99', label: 'CM3 · 98/99 for CM 01/02' }),
-  Object.freeze({ id: 'cm-9798', version: 'cm-9798-cb9596fd', year: 1998, season: '1997/98', label: 'CM 97/98' }),
-  Object.freeze({ id: 'swos-9697', version: 'swos-9697-189aa2ca', year: 1997, season: '1996/97', label: 'SWOS 96/97' }),
+  Object.freeze({ id: 'cm0102-2003-10', version: 'cm0102-2003-10-ee19ed8f', year: 2004, season: '2003/04', label: 'CM 01/02 · October 2003 by Alex Sawczuk, fan-made' }),
+  Object.freeze({ id: 'cm0102-2002-11', version: 'cm0102-2002-11-193b951c', year: 2003, season: '2002/03', label: 'CM 01/02 · 3.9.68' }),
+  Object.freeze({ id: 'cm0102-2001-09', version: 'cm0102-2001-09-8fa30968', year: 2002, season: '2001/02', label: 'CM 01/02 · 3.9.60' }),
+  Object.freeze({ id: 'cm-0001', version: 'cm-0001-c934e384', year: 2001, season: '2000/01', label: 'CM 00/01 · 3.81' }),
+  Object.freeze({ id: 'cm-9900', version: 'cm-9900-b683bc9d', year: 2000, season: '1999/00', label: 'CM 99/00 · 3.70' }),
+  Object.freeze({ id: 'cm0102-2020-11-cm3', version: 'cm0102-2020-11-cm3-6b812ea2', year: 1999, season: '1998/99', label: 'CM3 · 98/99 for CM 01/02' }),
+  Object.freeze({ id: 'cm-9798', version: 'cm-9798-14115d7e', year: 1998, season: '1997/98', label: 'CM 97/98' }),
+  Object.freeze({ id: 'swos-9697', version: 'swos-9697-5e7af2be', year: 1997, season: '1996/97', label: 'SWOS 96/97' }),
   Object.freeze({ id: 'swos-9596', version: 'swos-9596-ef95edc8', year: 1996, season: '1995/96', label: 'SWOS 95/96' }),
   Object.freeze({ id: 'swos-9495', version: 'swos-9495-3d369a28', year: 1995, season: '1994/95', label: 'SWOS 94/95' }),
   Object.freeze({ id: 'wc-1994', version: 'wc-1994-7f151aae', year: 1994, season: '1993/94', label: 'Computed · 1994 World Cup' }),
-  Object.freeze({ id: 'cm0102-2020-11-cm93', version: 'cm0102-2020-11-cm93-1c31e5ae', year: 1994, season: '1993/94', label: 'CM 01/02 · 93/94 by Cam F, fan-made' }),
+  Object.freeze({ id: 'cm0102-2020-11-cm93', version: 'cm0102-2020-11-cm93-73e1baa4', year: 1994, season: '1993/94', label: 'CM 01/02 · 93/94 by Cam F, fan-made' }),
   Object.freeze({ id: 'nt-1993', version: 'nt-1993-80393f50', year: 1993, season: '1992/93', label: 'Computed · national teams' }),
   Object.freeze({ id: 'nt-1992', version: 'nt-1992-9ae86e07', year: 1992, season: '1991/92', label: 'Computed · national teams' }),
   Object.freeze({ id: 'nt-1991', version: 'nt-1991-a6f949b2', year: 1991, season: '1990/91', label: 'Computed · national teams' }),
@@ -91,4 +91,5 @@ export const BUILT_IN_SEASONS = Object.freeze([
   Object.freeze({ id: 'nt-1964', version: 'nt-1964-d35f1858', year: 1964, season: '1963/64', label: 'Computed · national teams' }),
   Object.freeze({ id: 'nt-1963', version: 'nt-1963-7fdddb9b', year: 1963, season: '1962/63', label: 'Computed · national teams' }),
   Object.freeze({ id: 'wc-1962', version: 'wc-1962-9241b337', year: 1962, season: '1961/62', label: 'Computed · 1962 World Cup' }),
+  Object.freeze({ id: 'nt-1961', version: 'nt-1961-e8cee68a', year: 1961, season: '1960/61', label: 'Computed · national teams' }),
 ]);

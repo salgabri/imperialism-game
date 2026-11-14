@@ -24,8 +24,8 @@ const CASES = [
     targeting: 'player', express: true, role: 'manager', managedTeamId: 'f-real-madrid', seed: '3051207313' }),
   'teams=clubs&theatre=domestic:eu32&draw=round-robin&opponent=player&show=express&role=manager&team=f-real-madrid&seed=3051207313'],
   ['the strongest clubs, the theatre clubs open on', setupOf({ layer: 'clubs', clubScope: 'domestic:eu124', seed: '8' }), 'teams=clubs&seed=8'],
-  ['an earlier season’s elite clubs', setupOf({ layer: 'clubs', clubScope: 'domestic:eu32s2018', dataSet: 'ea-fifa-18', seed: '12' }),
-    'teams=clubs&theatre=domestic:eu32s2018&season=ea-fifa-18&seed=12'],
+  ['an earlier season’s elite clubs', setupOf({ layer: 'clubs', clubScope: 'domestic:eu32e2018', dataSet: 'ea-fifa-18', seed: '12' }),
+    'teams=clubs&theatre=domestic:eu32e2018&season=ea-fifa-18&seed=12'],
   ['one country’s top clubs, chaos', setupOf({ layer: 'clubs', clubScope: 'domestic:826', pacing: 'chaos', seed: '9' }),
     'teams=clubs&theatre=domestic:826&draw=chaos&seed=9'],
   ['an earlier football season', setupOf({ scope: 'AFC', dataSet: 'ea-fifa-18', seed: '11' }), 'theatre=AFC&season=ea-fifa-18&seed=11'],
@@ -98,7 +98,9 @@ test('values are written readably and read in any encoding', () => {
   // Links from before the Europe maps: their two theatres open on the maps that replaced them.
   assert.equal(readChallenge('teams=clubs&theatre=all').setup.clubScope, 'domestic:eu124');
   assert.equal(readChallenge('teams=clubs&theatre=elite').setup.clubScope, 'domestic:eu32');
-  assert.equal(readChallenge('teams=clubs&theatre=elite&season=ea-fifa-18').setup.clubScope, 'domestic:eu32s2018');
+  assert.equal(readChallenge('teams=clubs&theatre=elite&season=ea-fifa-18').setup.clubScope, 'domestic:eu32e2018');
+  // A link to an earlier season's map of before its clubs came from all of Europe opens the map that replaced it.
+  assert.equal(readChallenge('teams=clubs&theatre=domestic:eu32s2018&season=ea-fifa-18').setup.clubScope, 'domestic:eu32e2018');
   assert.equal(readChallenge('teams=clubs&theatre=domestic%3A826').setup.clubScope, 'domestic:826');
   assert.equal(readChallenge('?seed=+42+').setup.seed, '42', 'surrounding spaces are trimmed');
 });
@@ -142,7 +144,7 @@ test('stale values fall back: seasons, theatres and teams this build no longer o
     ['theatre=OFC', {}, ['theatre']],
     ['sport=basketball&teams=clubs&theatre=Premier+League', { sport: 'basketball', layer: 'clubs', clubScope: 'domestic:nba' }, ['theatre']],
     // Country maps are built from the built-in clubs: with an earlier season its clubs play on its own Europe map.
-    ['teams=clubs&theatre=domestic:826&season=ea-fifa-18', { layer: 'clubs', clubScope: 'domestic:eu124s2018', dataSet: 'ea-fifa-18' }, ['theatre']],
+    ['teams=clubs&theatre=domestic:826&season=ea-fifa-18', { layer: 'clubs', clubScope: 'domestic:eu124e2018', dataSet: 'ea-fifa-18' }, ['theatre']],
     // FIFA 05 and FIFA 06 have nations only; there is no earlier season than FIFA 05.
     ['teams=clubs&season=ea-fifa-06', { dataSet: 'ea-fifa-06' }, ['teams']],
     ['teams=nations&theatre=AFC&season=ea-fifa-05', { scope: 'AFC', dataSet: 'ea-fifa-05' }, []],

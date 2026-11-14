@@ -117,7 +117,7 @@ npm run sync:early-nationalities # ask Wikidata (via QLever) for the FIFA 05 and
 npm run sync:world-cup-seasons # read the pinned World Cup, results and Wikipedia sources in data-src/ into scripts/data/world-cup-seasons/
 npm run build:world-cup-seasons # rebuild the computed World Cup seasons 1961/62 to 1993/94 from those facts (offline; --check to verify)
 npm run sync:national-team-seasons # read the pinned Wikidata answers (via QLever), results and Ballon d'Or pages in data-src/ into scripts/data/national-team-seasons/ (--fetch downloads what is missing)
-npm run build:national-team-seasons # rebuild the computed seasons between those World Cups, 1962/63 to 1992/93, from those facts (offline; --check to verify)
+npm run build:national-team-seasons # rebuild the computed seasons before and between those World Cups, 1960/61 and 1962/63 to 1992/93, from those facts (offline; --check to verify)
 npm run build:football-set -- --cm0102=data-src/cm0102/<folder> # local season from your own CM 01/02 database
 npm run build:nba-seasons # rebuild the earlier basketball seasons from the pinned 2K Archive page and sources in data-src/, with each season's EuroLeague from 2000/01
 npm run sync:euroleague  # snapshot the EuroLeague's rosters and box scores from its public API into scripts/data/euroleague-2026-27.json (network, cached)
@@ -221,7 +221,7 @@ committed outputs:
 
 | Source | Disallowed path | Now |
 | --- | --- | --- |
-| Wikidata Query Service | `query.wikidata.org/sparql` | QLever's Wikidata endpoint, `qlever.dev/api/wikidata` (`scripts/lib/wikidata-sparql.mjs`), for the crests, home towns and FIFA 05/06 nationalities |
+| Wikidata Query Service | `query.wikidata.org/sparql` | QLever's Wikidata endpoint, `qlever.dev/api/wikidata` (`scripts/lib/wikidata-sparql.mjs`), for the crests, home towns, FIFA 05/06 nationalities and the women's tennis seasons' joins of Wikipedia's players to Sackmann's |
 | Wikidata's search API | `www.wikidata.org/w/api.php` | its answers pinned in `scripts/data/ea-early-search.json` |
 | English Wikipedia's API | `en.wikipedia.org/w/api.php` | its cached answers only, once pinned in `scripts/data/club-logos-wikipedia.json`; none is yet, so the committed crests stay ([crests](#club-crests)) |
 | geoBoundaries files on GitHub | `github.com/*/raw/` | `raw.githubusercontent.com`, and `media.githubusercontent.com` for Git LFS objects, checked against the pointer's SHA-256 |
@@ -343,11 +343,11 @@ manager of the theatre's favourite, with decisions from the first match.
    to 1989/90 (EA FIFA and FC ratings of each to 2004/05, then SI's
    Championship Manager, for 2003/04 as Alex Sawczuk's fan update of it,
    Sensible World of Soccer for 1996/97 to 1994/95, and fans' databases for
-   1993/94 and 1989/90; 2005/06, 2004/05, 1996/97 and 1989/90 have nations
+   1993/94 and 1989/90; 2005/06, 2004/05 and 1989/90 have nations
    only), the World Cups of 1961/62 to 1993/94 (computed from each
    finalist's Elo and its players' records, nations only) and every season
-   between them (computed from each nation's Elo and its players' Wikidata
-   caps, nations only), so every year has a season, and any local
+   between them and 1960/61 (computed from each nation's Elo and its players'
+   Wikidata caps, nations only), so every year has a season, and any local
    CM 01/02 season built on this computer. Basketball's lists the built-in
    2026/27, then its [earlier seasons](#basketball-seasons) 2025/26 back to
    1999/00 (NBA 2K ratings of each), then 1998/99 (NBA Live 99), 1991/92 and
@@ -369,7 +369,7 @@ manager of the theatre's favourite, with decisions from the first match.
    edition published them, else converted or computed from the players'
    statistics), nations or clubs on the map of their day, tennis its 2026 (Elo of 2 November) then its
    [earlier seasons](#tennis-seasons) 2025 back to 1960, women's tennis its 2026 (Elo of
-   2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1968, rugby league its built-in 2025
+   2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1963, rugby league its built-in 2025
    (Rugby League 26) then [its earlier seasons](#rugby-league-seasons) 2024 back to 1998 (computed from
    NRL.com's match statistics, but 2008: Rugby League 2, the overall ours), NRL clubs on the map of their day.
    The Season list names a season by its years, adding "· computed", "· converted"
@@ -1331,7 +1331,7 @@ scoring rate, with its larger home edge. The map is `public/domestic/euroleague.
 (`node scripts/build-europe-maps.mjs --only=euroleague`), the built-in season's. Each earlier
 season from 2000/01 has the EuroLeague of its own year on a map of its own (`el2001` to `el2026`,
 one for each run of seasons with the same clubs, 24 in all): CSKA Moscow and Russia's other clubs
-hold Russia west of the Urals, the rest of it grey, and Croatia, Slovenia and Lithuania are shared
+hold European Russia, the rest of it grey, and Croatia, Slovenia and Lithuania are shared
 when two of their clubs played. See the [design notes](docs/design/euroleague.md#earlier-seasons-200001-to-202526).
 
 ### The Europe maps
@@ -1357,22 +1357,37 @@ own country.
 
 Welsh clubs of the Premier League (Swansea, Cardiff, in earlier seasons) hold Wales,
 not England. AS Monaco, a Ligue 1 club, holds the land around Monaco in France.
+**Russia's clubs hold European Russia only**, the regions of its five federal districts
+west of the Urals; the rest of Russia lies grey beneath the map, as a country with no
+club does, so a Moscow club never stretches to the Pacific.
 
-The earlier [football seasons](#football-seasons) hold the seven big leagues only, so
-their maps draw on those: the strongest 124 and 32 of that season's 124–134 clubs,
-one pair of maps per season. 2005/06, 2004/05, 1996/97, 1989/90 and the nine World
-Cups have nations only, so no maps. Football's "One country · top clubs" campaigns are
-unchanged. A world campaign saved before these maps stays on the world, and resumes
+The earlier [football seasons](#football-seasons) play Europe's strongest clubs of
+their own year, each season's pair of maps drawn from all of Europe's first divisions
+as today's are: 11 to 31 of each season's 124 come from beyond the seven big leagues
+(Turkey, Belgium, Greece, Scotland, Russia, Denmark, Sweden, Norway, Czechia, Ukraine,
+Austria, Switzerland, Croatia, Serbia, Poland and Hungary), and up to five of its elite
+(Galatasaray and Fenerbahçe, Zenit and CSKA Moscow in FIFA 15 and 16, Celtic and
+Rangers in the Championship Manager seasons). The three SWOS seasons, 1996/97, 1995/96
+and 1994/95, hold their seven leagues' team files only, so their maps are those leagues'
+strongest. 2005/06, 2004/05, 1989/90 and the computed seasons have nations only, so no
+maps. A campaign saved on an earlier season's map of before (when its 124 came from
+the seven leagues) still resumes there; a new one plays the season's map of all of
+Europe. Football's "One country · top clubs" campaigns are unchanged, and play today's
+clubs only. A world campaign saved before these maps stays on the world, and resumes
 as it was; a CM 01/02 set built on your own computer has no map of Europe, so it
 deals its clubs onto the world.
 
-Each map is `public/domestic/eu<clubs>[s<season year>].json` (60 files, 150–190 KB,
-fetched when chosen), with the index `src/data/europeMaps.js`. They follow the clubs, so
-rebuild them after `npm run build-clubs`, `npm run build:ea-seasons`, `npm run build:retro-seasons`,
+Each map is `public/domestic/eu<clubs>[<e or s><season year>].json`, fetched when chosen,
+with the index `src/data/europeMaps.js`: `eu124` and `eu32` today's, `eu124e2018` an earlier
+season's from all of Europe, `eu124s1995` a SWOS season's from its seven leagues (64 maps in
+play, 149–204 KB, 10.9 MB). The 56 seven-league maps the EA and Championship Manager seasons
+had before 14 November 2026 (`eu124s2018`, 9.3 MB) stay as they were, never rebuilt and never
+offered, for the campaigns saved on them. They follow the clubs, so rebuild them after
+`npm run build-clubs`, `npm run build:ea-seasons`, `npm run build:retro-seasons`,
 `npm run build-womens-football` or `npm run build:womens-seasons`:
 
 ```bash
-npm run build:europe-maps                  # about 8 minutes; --only=eu124,eu32 builds just those
+npm run build:europe-maps                  # about 30 minutes, most of it the maps with Russian clubs; --only=eu124,eu32 builds just those
 npm run build:europe-maps -- --check       # offline rebuild must match the committed files byte for byte
 ```
 
@@ -1491,9 +1506,12 @@ the game: pick one under **Season** in setup. Each is a file in
 `public/football/` (52–340 KB) that loads only when chosen.
 
 - **What a season holds:** every nation's best natural XI by EA nationality,
-  and the clubs of the seven biggest European leagues (132–134 clubs a season,
-  of which the strongest 124 play, on [the season's own maps](#the-europe-maps);
-  2005/06 and 2004/05 have nations only). Ratings are EA's overalls, unchanged.
+  and Europe's 124 strongest clubs of that edition, from every European first
+  division it rates (130–177 clubs beyond the seven big leagues a season, of which
+  18–27 make the 124), each with its best XI, on [the season's own maps](#the-europe-maps);
+  2005/06 and 2004/05 have nations only. A club EA filed under Rest of World for want of
+  a licence (FIFA 20's Olympiacos, Spartak Moscow and Shakhtar Donetsk) plays in the league
+  the same club is in in the nearest other edition. Ratings are EA's overalls, unchanged.
   EA rates only part of the world, so 49–82 nations field a full XI each season (fewer in the older
   editions). A nation with at least six rated players, half an XI, fields the players it has, short-handed
   below eleven; one with fewer fields no team, and its land stays neutral. Scotland, Wales and Northern Ireland field their own
@@ -1548,19 +1566,19 @@ twelve earlier seasons come from Sports Interactive's Championship Manager, a
 fan's update of it, Sensible World of Soccer and two fans' Championship Manager
 databases, one source each:
 
-| Season | Source | Nations with a full XI | Clubs |
+| Season | Source | Nations with a full XI | Clubs (beyond the seven big leagues) |
 | --- | --- | --- | --- |
-| 2003/04 | Alex Sawczuk's October 2003 update of SI's Championship Manager 01/02 (fan-made) | 109 | 129 |
-| 2002/03 | SI's Championship Manager 01/02, 3.9.68 | 108 | 129 |
-| 2001/02 | SI's Championship Manager 01/02, 3.9.60 | 96 | 130 |
-| 2000/01 | SI's Championship Manager 00/01, 3.81 | 82 | 130 |
-| 1999/00 | SI's Championship Manager 99/00, 3.70 | 74 | 130 |
-| 1998/99 | SI's Championship Manager 3, ported to CM 01/02 | 64 | 130 |
-| 1997/98 | SI's Championship Manager 97/98 | 52 | 124 |
-| 1996/97 | Sensible World of Soccer 96/97, its national squads | 133 | nations only |
-| 1995/96 | Sensible World of Soccer 95/96, the game's own team files | 132 | 134 |
-| 1994/95 | Sensible World of Soccer (the original, 1994), the game's own team files | 131 | 134 |
-| 1993/94 | Cam F's 93/94 for CM 01/02, fan-made | 77 | 130 |
+| 2003/04 | Alex Sawczuk's October 2003 update of SI's Championship Manager 01/02 (fan-made) | 109 | 124 (31) |
+| 2002/03 | SI's Championship Manager 01/02, 3.9.68 | 108 | 124 (27) |
+| 2001/02 | SI's Championship Manager 01/02, 3.9.60 | 96 | 124 (31) |
+| 2000/01 | SI's Championship Manager 00/01, 3.81 | 82 | 124 (28) |
+| 1999/00 | SI's Championship Manager 99/00, 3.70 | 74 | 124 (21) |
+| 1998/99 | SI's Championship Manager 3, ported to CM 01/02 | 64 | 124 (24) |
+| 1997/98 | SI's Championship Manager 97/98 | 52 | 124 (13) |
+| 1996/97 | Sensible World of Soccer 96/97, the game's own team files | 133 | 134 (none) |
+| 1995/96 | Sensible World of Soccer 95/96, the game's own team files | 132 | 134 (none) |
+| 1994/95 | Sensible World of Soccer (the original, 1994), the game's own team files | 131 | 134 (none) |
+| 1993/94 | Cam F's 93/94 for CM 01/02, fan-made | 77 | 124 (26) |
 | 1989/90 | Simon Treanor's 89/90 for CM 01/02, fan-made (Beta 5) | 88 | nations only |
 
 1993/94 and 1989/90 are rated by fans, not by a game's makers, and say so in the
@@ -1574,8 +1592,12 @@ as West Germany, and a German at an East German club plays for no nation.
   outfield player's seven skills summed, a keeper's price alone) becomes
   `round(40 + value * 59 / 49)`, from an empty shirt's 40 to 99. The raw values
   stay with each player.
-- **Clubs:** the seven biggest leagues' top divisions, on the season's own
-  [Europe maps](#the-europe-maps).
+- **Clubs:** Europe's 124 strongest of every first division the database holds
+  (CM 01/02 holds 26, CM 99/00 twelve), on the season's own
+  [Europe maps](#the-europe-maps). CM 99/00 rates Denmark's clubs like mid-table
+  Serie A ones, so eleven of them make 1999/00's 124; CM 01/02 puts eight or nine
+  Swedish clubs in. SWOS's team files are cached for the seven biggest leagues
+  only, so 1996/97, 1995/96 and 1994/95 hold those leagues' top divisions whole.
 - **Credits and rights:** Championship Manager is Sports Interactive's; Eidos
   made CM 01/02 free to download in December 2008 for personal, non-commercial
   use, the data's rights reserved. 3.9.60 and 3.9.68 are SI's own files as
@@ -1586,9 +1608,9 @@ as West Germany, and a German at an East German club plays for no nation.
   Manager Magazine's issue 5 cover CD carries it (archive.org), shipped only if
   the user chooses; CM3's data was ported to CM 01/02 by
   Gio and released by Cam F on champman0102.co.uk; CM 97/98's database is as
-  baskeyx extracted it. SWOS 96/97 is Sensible Software's (now Codemasters'),
-  from Whiteulver's database and xflea's spreadsheet as keyser1884's SWOS-MCP
-  holds them; SWOS 94/95 and 95/96 are the game's own team files as the SWOS
+  baskeyx extracted it. SWOS is Sensible Software's (now Codemasters'):
+  SWOS 96/97 (read until 2026-11-14 from Whiteulver's database and xflea's
+  spreadsheet as keyser1884's SWOS-MCP holds them), 94/95 and 95/96 are the game's own team files as the SWOS
   United server keeps them. The fan-made 1993/94 is Cam F's ("Season 93/94 For
   0102") and 1989/90 Simon Treanor's ("Championship Manager 1989/90 update for CM
   01/02", cm8990.wordpress.com), both as the CM0102 Starter Kit ships them. None
@@ -1627,8 +1649,8 @@ considered, back to 1872, and their terms.
     (`FIRST_YEAR`).
   - It reads the binary files with the game's own parser (`src/data/cm0102.js`,
     format in [cm0102-format.md](docs/design/cm0102-format.md)).
-  - Every one of the 176 nations gets an entry, and clubs come from the seven
-    leagues the club layer already uses. Tonga, Samoa and the Cook Islands are
+  - Every one of the 176 nations gets an entry, and clubs come from every European
+    first division the database holds (`LEAGUES`, by CM's stored names). Tonga, Samoa and the Cook Islands are
     left out when the database rates none of their players: a season without them
     fields no team of theirs, as in every built-in EA season (none rates one).
   - Ratings are CM's current ability (1–200) converted once with
@@ -1641,11 +1663,12 @@ considered, back to 1872, and their terms.
   Serbia's until June 1999 (1996/97 and 1997/98), then stays neutral until 2015,
   as Timor-Leste does until 2005. Bosnia and Herzegovina plays from 1996/97,
   Eritrea and Palestine from 1997/98, Mongolia from 1998/99 and Bhutan from
-  2000/01. The table goes back to 1961/62: a season of then plays the federations
+  2000/01. The table goes back to 1960/61: a season of then plays the federations
   of its day under their own names and flags (the Soviet Union on Russia's shape,
   holding the other republics, to 1990/91; the CIS in 1991/92; Yugoslavia to
   1990/91; FR Yugoslavia in 1994/95 and 1995/96; Czechoslovakia to 1992/93; West
-  Germany to 1989/90; Zaire from 1971/72), and leaves suspended associations out (South
+  Germany to 1989/90; the United Arab Republic, Egypt holding Syria in 1960/61 and
+  alone to 1970/71; Zaire from 1971/72), and leaves suspended associations out (South
   Africa, FR Yugoslavia, China PR). Seasons from 1996/97 play FR Yugoslavia and Serbia
   and Montenegro, Swaziland and Macedonia under their names of the day
   (src/data/namesOfTheDay.js). Up to 1989/90 the map has **East Germany**, cut from
@@ -1684,17 +1707,18 @@ nations only, 15 to 24 of them.
   `data-src/` into the committed facts; `npm run build:world-cup-seasons` turns
   them into the season files, offline, and `--check` compares byte for byte.
 
-### The seasons between the World Cups, 1962/63 to 1992/93 (computed)
+### The seasons before and between the World Cups, 1960/61 to 1992/93 (computed)
 
-The 24 seasons between those World Cups are computed the same way, so football
-has a season ending in every year from 1962 on ("1971/72 · computed"). Their
+The 24 seasons between those World Cups, and 1960/61 before the first, are
+computed the same way, so football has a season ending in every year from 1961
+on ("1971/72 · computed"). Their
 players come from Wikidata's national-team records (CC0, read through QLever):
 each player's stints for his national team with their years, caps and goals.
 
 - **Who plays:** every nation whose players' stints cover the season name eleven
   with a position, one a goalkeeper, and that played a full international in the
-  four years before: 37 nations in 1963/64, 81 in 1992/93. Each plays under the
-  federation of its day, as in the World Cup seasons (the CIS in 1991/92;
+  four years before: 39 nations in 1960/61, 37 in 1963/64, 81 in 1992/93. Each plays under the
+  federation of its day, as in the World Cup seasons (Syria the United Arab Republic's in 1960/61; the CIS in 1991/92;
   Yugoslavia sits out its suspension of 1992).
 - **Ratings:** the World Cup seasons' line from the nation's Elo on 1 July of the
   season's end year; its eleven the players of each role with the most caps a
@@ -2069,24 +2093,33 @@ file in `public/tennis/` (13–56 KB) that loads only when chosen.
 
 ## Women's tennis seasons
 
-Women's tennis can be played on 58 earlier seasons as well as the built-in 2026: the
-end of every year from 1968 to 2025, the WTA's women by Elo, the Fed Cup's nations
-only. Pick one under **Season** in setup. Each season is a file in
-`public/womens-tennis/` (11–53 KB) that loads only when chosen. They are built as the
-men's are, by the same scripts with `--tour=wta`
+Women's tennis can be played on 63 earlier seasons as well as the built-in 2026: the
+end of every year from 1963, the Federation Cup's first, to 2025, the WTA's women by
+Elo (before 1968 the amateurs), the Fed Cup's nations only. Pick one under **Season** in
+setup. Each season is a file in `public/womens-tennis/` (10–53 KB) that loads only when
+chosen. They are built as the men's are, by the same scripts with `--tour=wta`
 ([design notes](docs/design/womens-tennis.md#earlier-seasons)).
 
 - **2016 to 2025** are Tennis Abstract's own year-end WTA Elo reports, as the Wayback
   Machine kept them. No capture holds the last 2020 update, so that list stops a week
   before the season's end, and says so.
-- **1968 to 2015** are Elo computed from Jeff Sackmann's WTA match results by Tennis
+- **1973 to 2015** are Elo computed from Jeff Sackmann's WTA match results by Tennis
   Abstract's published method, counting what its report counts: tour-level matches with
   the Fed Cup, tour-level qualifying, WTA 125s and ITF events of $50K or more (none
   before 1994, when the files start naming an event's prize). A newcomer's start at
   tour level is fitted on the career peaks of Tennis Abstract's Tennis 128 (1330, the
   men's 1450). On 2022–2025 the computed lists agree with Tennis Abstract's to within
-  five points; 1968 to 1979 are marked rough (the files start in 1968, so 1968 and
-  1969 are the roughest; 1968–1972 share about eight of Lance Tingay's year-end ten).
+  five points; to 1979 they are marked rough.
+- **1963 to 1972** come from a second run of the same method, warmed up on the results
+  English Wikipedia records for the four majors' women's singles of 1960–1967 and the
+  Federation Cup of 1963–1967 (37 article pages, read once under `/wiki/` and pinned;
+  [1963–1967](docs/design/womens-tennis.md#19631967)). 1963–1967 are those results
+  alone, labelled "Amateur Elo" and rough; each lists the women with three matches in
+  the season or a singles rubber in that year's cup, so every cup nation fields the
+  women who played it. From 1973 the second run agrees with the first within a point
+  and a half, and those seasons are unchanged. Margaret Court leads 1963–1966 and is
+  away in 1967; Maria Bueno, Brazil's only rated woman most years, plays only in 1965,
+  when Brazil had two. 1963–1972 share seven to eight of Lance Tingay's year-end ten.
 - **Ratings** are Elo / 25 + 4; a season whose best would pass 99 (Navratilova in 1985,
   Graf in 1989) is shifted down as a whole. The raw Elo stays with each player.
 - **Nations of the day:** a player plays for the nation she played the Fed Cup for
@@ -2102,9 +2135,12 @@ men's are, by the same scripts with `--tour=wta`
   last. Sets have no tie-break until 1975 and in 1977–1979, and the third set none until
   2017 ([design notes](docs/design/womens-tennis.md#format-by-year)).
 - **Licence:** as the men's: `public/womens-tennis/ATTRIBUTION.txt` credits Jeff
-  Sackmann / Tennis Abstract (CC BY-NC-SA 4.0). `scripts/data/womens-tennis-seasons.json`
-  pins the 117 archive files (Aneeshers/tennis-sackmann-archive at 8373358) and the
-  20 captures by SHA-256. To rebuild:
+  Sackmann / Tennis Abstract (CC BY-NC-SA 4.0), and Wikipedia's contributors for the
+  results of 1960–1967 (the pages' text CC BY-SA 4.0; none of it is in the files).
+  `scripts/data/womens-tennis-seasons.json` pins the 117 archive files
+  (Aneeshers/tennis-sackmann-archive at 8373358), the 20 captures and the 165 Wikipedia
+  pages by SHA-256 (with each page's revision), and Wikidata's answer that joins the
+  pages' women to Sackmann's players. To rebuild:
 
   ```bash
   npm run sync:womens-tennis-seasons    # the year-end lists in scripts/data/womens-tennis-seasons/ (--check)

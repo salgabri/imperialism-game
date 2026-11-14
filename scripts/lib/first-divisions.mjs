@@ -4,43 +4,50 @@
 import { fileURLToPath } from 'node:url';
 import { pickFootballSquad, playerTuple } from './football-data.mjs';
 import { slug } from './club-identity.mjs';
+import { EUROPEAN_LEAGUES } from '../../src/data/footballLeagues.js';
 
 /** The EA FC snapshot the built-in clubs come from. */
 export const EA_CLUB_SNAPSHOT = fileURLToPath(new URL('../data/ea-fc27.csv', import.meta.url));
 
-// Europe's first divisions (UEFA's, as the nations' Europe theatre counts them) in the EA snapshot, by EA competition
-// id, with each league's name in the game and the map shape its clubs hold land in. By id because names collide
-// internationally: Austria also has a Bundesliga, Ukraine a Premier League, Greece and Switzerland a Super League.
-export const FOOTBALL_LEAGUES = {
-  13: { league: 'Premier League', country: '826' },
-  53: { league: 'La Liga', country: '724' },
-  31: { league: 'Serie A', country: '380' },
-  19: { league: 'Bundesliga', country: '276' },
-  16: { league: 'Ligue 1', country: '250' },
-  10: { league: 'Eredivisie', country: '528' },
-  308: { league: 'Liga Portugal', country: '620' },
-  68: { league: 'Süper Lig', country: '792' },
-  4: { league: 'Belgian Pro League', country: '056' },
-  63: { league: 'Greek Super League', country: '300' },
-  319: { league: 'Czech First League', country: '203' },
-  50: { league: 'Scottish Premiership', country: 'SCO' },
-  1: { league: 'Danish Superliga', country: '208' },
-  41: { league: 'Eliteserien', country: '578' },
-  332: { league: 'Ukrainian Premier League', country: '804' },
-  317: { league: 'Croatian HNL', country: '191' },
-  66: { league: 'Ekstraklasa', country: '616' },
-  189: { league: 'Swiss Super League', country: '756' },
-  80: { league: 'Austrian Bundesliga', country: '040' },
-  313: { league: 'Azerbaijan Premier League', country: '031' },
-  64: { league: 'Hungarian NB I', country: '348' },
-  330: { league: 'Romanian Liga I', country: '642' },
-  318: { league: 'Cypriot First Division', country: '196' },
-  56: { league: 'Allsvenskan', country: '752' },
-  322: { league: 'Veikkausliiga', country: '246' },
-  65: { league: 'League of Ireland', country: '372' },
+// Europe's first divisions (UEFA's, as the nations' Europe theatre counts them) in EA's data, by EA competition id, with
+// each league's name in the game (src/data/footballLeagues.js, which gives the map shape its clubs hold land in). By id
+// because names collide internationally: Austria also has a Bundesliga, Ukraine a Premier League, Greece and Switzerland
+// a Super League. The earlier seasons' EA editions use the same ids (scripts/lib/ea-seasons.mjs), Russia's among them.
+const EA_COMPETITIONS = {
+  13: 'Premier League',
+  53: 'La Liga',
+  31: 'Serie A',
+  19: 'Bundesliga',
+  16: 'Ligue 1',
+  10: 'Eredivisie',
+  308: 'Liga Portugal',
+  68: 'Süper Lig',
+  4: 'Belgian Pro League',
+  63: 'Greek Super League',
+  319: 'Czech First League',
+  50: 'Scottish Premiership',
+  1: 'Danish Superliga',
+  41: 'Eliteserien',
+  332: 'Ukrainian Premier League',
+  317: 'Croatian HNL',
+  66: 'Ekstraklasa',
+  189: 'Swiss Super League',
+  80: 'Austrian Bundesliga',
+  313: 'Azerbaijan Premier League',
+  64: 'Hungarian NB I',
+  330: 'Romanian Liga I',
+  318: 'Cypriot First Division',
+  56: 'Allsvenskan',
+  322: 'Veikkausliiga',
+  65: 'League of Ireland',
+  67: 'Russian Premier League',
 };
+export const FOOTBALL_LEAGUES = Object.freeze(Object.fromEntries(Object.entries(EA_COMPETITIONS).map(([id, league]) => {
+  if (!EUROPEAN_LEAGUES[league]) throw new Error(`EA competition ${id} names ${league}, which src/data/footballLeagues.js does not list`);
+  return [id, Object.freeze({ league, country: EUROPEAN_LEAGUES[league] })];
+})));
 // European first-division clubs EA lists under no competition.
-export const LEAGUELESS_CLUBS = { 'PFC Ludogorets': { league: 'Bulgarian First League', country: '100' } };
+export const LEAGUELESS_CLUBS = { 'PFC Ludogorets': { league: 'Bulgarian First League', country: EUROPEAN_LEAGUES['Bulgarian First League'] } };
 
 const FOOTBALL_SIZE = 11;
 const mean = xs => (xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : 0);

@@ -1119,29 +1119,72 @@ whole leagues from): 309 clubs with a natural XI. The strongest `TOP_CLUBS` (124
 strongest first: 20 clubs each from England and Spain, 19 Italy, 16 Germany, 15 France,
 6 the Netherlands, 4 each from Portugal, Turkey, Belgium and Greece, 3 Czechia, 2 each
 from Denmark, Ukraine and Scotland, and one each from Norway, Croatia and Bulgaria.
-The strongest `ELITE_CLUBS` (32) are the elite. An earlier season's file holds the
-seven big leagues only, and its two fields are the strongest of those. FIFA 06, FIFA 05,
-SWOS 96/97 and Simon Treanor's fan-made 1989/90 (2005/06, 2004/05, 1996/97, 1989/90) and
-the nine computed World Cups (1961/62 to 1993/94) have nations only, so they have no maps.
+The strongest `ELITE_CLUBS` (32) are the elite. The league names and the map shape each
+league's clubs hold land in are `src/data/footballLeagues.js` (`EUROPEAN_LEAGUES`).
 
-**Build** (`npm run build:europe-maps`, `scripts/build-europe-maps.mjs`, about 8 minutes;
+**An earlier season's field** (since 14 November 2026) is drawn the same way from its own
+source: every European first division the source rates, its clubs with eleven rated players,
+and the strongest `TOP_CLUBS` kept in the season's file (`strongestBuilt` in
+`src/data/footballSetBuild.js`, by strength then name, as the file lists them). The EA
+editions (`scripts/lib/ea-seasons.mjs` `EA_LEAGUES`, by competition id, Russia's 67 among
+them; FIFA 07–14 by SoFIFA's league names, FC 25 by its website's) rate 130–177 clubs beyond
+the seven big leagues a season, of which 18–27 make the 124; the Championship Manager
+databases (`LEAGUES`, by stored competition names; CM 97/98 by division codes) 66–247, of
+which 13–31 make it. The elite takes 0–5 of them: Galatasaray, Fenerbahçe and Beşiktaş, Zenit,
+CSKA Moscow and Anzhi in FIFA 11–16, Celtic and Rangers in the CM seasons, Spartak Moscow in
+1993/94 and 1998/99. A club EA files under Rest of World for want of a licence plays in the
+league its id is in in the nearest other edition (FIFA 20's Greek, Russian and Ukrainian
+clubs, Dinamo Zagreb, HJK). Two data quirks show: CM 99/00 rates Denmark's clubs like
+mid-table Serie A ones (11 make 1999/00's 124), CM 01/02 puts eight or nine Swedish clubs in.
+SWOS 96/97, 95/96 and 94/95 come from the game's team files, of which the seven big leagues' are
+cached: they keep those leagues' top divisions whole (134 clubs) and their maps their old ids.
+Until then an earlier season's file held the seven big leagues only, and its two fields were
+the strongest of those; those maps stay for the campaigns saved on them (below). FIFA 06,
+FIFA 05 and Simon Treanor's fan-made 1989/90 (2005/06, 2004/05, 1989/90) and the computed
+seasons (1960/61 to 1993/94) have nations only, so they have no maps.
+
+**Build** (`npm run build:europe-maps`, `scripts/build-europe-maps.mjs`, about 30 minutes, most
+of it the earlier seasons' maps with Russian clubs, whose 1,557 districts the partition grows over;
 `--only=eu124,eu32`, `--check`, `--dry-run`, `--boundaries=<dir>` for another boundary cache).
 The maps follow the clubs, so they are rebuilt after `npm run build-clubs`,
 `npm run build:ea-seasons` or `npm run build:retro-seasons`; the build stops on a club with
-no row in the table below, and the test on a field that has changed. For each of the 31
-seasons with clubs (the built-in one and 30 earlier) and each of the two fields:
+no row in the table below, and the test on a field that has changed. For each of the 32
+seasons with clubs (the built-in one and 31 earlier) and each of the two fields:
 
 - **Homes**: `scripts/data/europe-clubs.json`, one row per club of any season: a
   `city` that names its land (repeats take the club: "Rome (Lazio)"), `home`, and
   `shape` where the land is not its league's: the Welsh clubs of the Premier League
   hold `WAL`. Coordinates come from the club's row in a country map (`source`: its
   `d<nation>-<FM id>`, by the crest twin or by name) or by hand. AS Monaco stays in
-  France: Monaco's own world shape is a few pixels.
+  France: Monaco's own world shape is a few pixels. The earlier seasons' fields from all of
+  Europe added 120 rows (14 November 2026): 22 copy the same club's row under another name
+  (CM's Glasgow Celtic is EA's Celtic), 91 take a country map's club by name (a club gone
+  since stands at its successor's ground: FC Tirol at Wacker Innsbruck's Tivoli, Herfølge at
+  HB Køge's, Lierse SK at Lierse Kempenzonen's), and seven are by hand: Aberdeen, Hearts and
+  Hibernian at their grounds, as Scotland has no country map, and Anzhi Makhachkala, Akhisar
+  Belediyespor, Gaziantepspor and Manisaspor, on no country map today, at their towns (GeoNames).
 - **One club in a country**: the section is the country's world shape, without land
   beyond `OVERSEAS_KM` of its main landmass (French Guiana, the Dutch Caribbean). The
   Azores, Canaries and Svalbard stay; the opening camera leaves them out.
+- **Part of a country** (`within`): Russia's clubs hold European Russia only, the 56
+  federal subjects of its Central, Northwestern, Southern, North Caucasian and Volga federal
+  districts (`WITHIN.EUROPEAN_RUSSIA`, by ISO code, about 4.0 million km²), even a lone club.
+  Its whole would give a Moscow club the Pacific and frame Eurasia. Its units are those of
+  the regions named; `fitToOutline` leaves out every missed piece of the world outline that
+  lies nearer the other regions than the clubs' land (Asian Russia, the slivers along its
+  borders), and the map lists Russia in `partial`: the game draws Russia's world shape
+  beneath it, grey where no club holds it, and routes go around that as around any
+  neighbour. The camera frames the clubs' land (`partShape`), and simplification keeps only
+  the world outline's vertices, not the regions' line across the country. Russia's ADM2
+  layer leaves out Moscow and St Petersburg, federal cities, so each is a missed piece too;
+  one holding clubs' grounds goes to the nearest of those clubs (`homes`, here only), so
+  CSKA holds Moscow on the EuroLeague's maps where Khimki's land lies nearer, and football's,
+  whose Moscow clubs all stand inside the city, are as they were (the nearest club's land
+  was already one of theirs: CSKA's, and Spartak's or Dinamo's grounds lie in it).
 - **Several clubs**: `COUNTRIES` names the country's finest geoBoundaries layer
-  (ADM2 to ADM4) and the layers that group it into regions. All geometry comes from the
+  (ADM2 to ADM4) and the layers that group it into regions; Russia, Switzerland, Norway and
+  Austria joined it for the earlier seasons (Switzerland and Austria by their districts, as
+  their cantons and states are not in the cache). All geometry comes from the
   finest layer, merged on its shared arcs, so a coarse unit and its neighbour's fine
   ones share every vertex; the coarser layers only group (`regionalUnits`):
     - A region holding one club stays whole, for that club.
@@ -1176,9 +1219,10 @@ seasons with clubs (the built-in one and 30 earlier) and each of the two fields:
 - **Output** as the sport maps: 16,000 arc points, quantized at 1e5, colours that differ
   across borders and water. Sections are in rank order, `eu124-001` the strongest. The
   file adds `theatre` (`all` or `elite`), `seasons` for an earlier season's map, and a
-  club row's `shape`. The 60 files hold 150–192 KB each, 10.0 MB in all, with
+  club row's `shape`, and `partial` for a country it holds only part of (Russia). The 64 maps
+  in play hold 149–204 KB each, 10.9 MB in all, and the 56 maps of before (below) 9.3 MB, with
   `public/domestic/ATTRIBUTION-europe.txt` and the index `src/data/europeMaps.js`
-  (`{ id, sport, league, name, theatre, seasons?, clubs, sections, countries, version, top? }`).
+  (`{ id, sport, league, name, theatre, seasons?, clubs, sections, countries, version, top?, replacedBy? }`).
 
 **Result** (built-in season). Elite 32: Paris Saint-Germain holds France; the Netherlands
 and Belgium stay grey; Bayern Munich Bavaria and RB Leipzig the east. Top 124: 17 countries
@@ -1189,9 +1233,25 @@ whose land starts next door: at most about 100 km away, for the Istanbul club th
 across the Bosphorus in Anatolia (Beşiktaş in the Top 124, Galatasaray in the Elite 32,
 which splits Turkey about evenly), since Thrace is a thirtieth of the country. Earlier
 seasons have smaller lands where a league crowds into one place: Madeira's three clubs in
-2015/16 share their island, the smallest with about 200 km².
+2015/16 share their island, the smallest with about 200 km². Their fields from all of Europe
+(6 to 20 countries a map) crowd Istanbul with up to four clubs, so one may start up to about
+145 km out (Kasımpaşa in 2015/16, Başakşehir in 2025/26), and Copenhagen with three, one
+starting up to about 120 km away. Russia's clubs share European Russia's 4.0 million km²: in
+2015/16's Elite 32 Zenit holds about 1.9 million and CSKA Moscow 2.1, in its Top 124 eight
+clubs 0.2 to 1.1 million each.
 
-**Runtime.** Scopes are `domestic:eu124`, `domestic:eu32` and `domestic:eu124s2018`.
+**Maps of before** (`replacedBy`). A saved campaign resumes only on a map with exactly its
+clubs (`fitDomesticCampaign` in `src/engine/storage.js` moves one club by club onto a rebuild,
+but refuses a map that lost or gained a club). So when the earlier seasons' fields came from
+all of Europe, their maps took new ids, `eu124e<year>` and `eu32e<year>`, and the 56 maps of
+before, `eu124s<year>` and `eu32s<year>` with the seven leagues' fields, stay as they were:
+never rebuilt (the build carries their index entries and reads their files for the
+attribution), each entry naming the map that replaced it. The setup never offers one
+(`servesSeason` in `src/data/domesticScope.js`), a setup or link that names one moves on to
+its replacement (`setClubScope`), and a campaign saved on one still passes the save checks
+(`isSeasonTheatreMap`) and resumes there. SWOS's seasons keep their `s` maps, unchanged.
+
+**Runtime.** Scopes are `domestic:eu124`, `domestic:eu32` and `domestic:eu124e2018`.
 `setClubScope` keeps a setup on the map of its theatre and season: `all`, `elite`, an old
 link's league and another sport's map all land there, and one country's map stays
 until a season leaves it. The setup lists the season's two rows ("Europe") above the
@@ -1206,9 +1266,9 @@ era's do. The victory names "Europe".
 `sport: 'basketball'` and no football `theatre` in its file and index entry, so it is never one of
 football's two. `COUNTRIES` gained Serbia and Israel for it. Its earlier seasons (2026-11-14) have
 24 more, `el2001` to `el2026`, one for each run of seasons with the same clubs, each listing the NBA
-seasons it serves (`seasons`). `COUNTRIES` gained Russia, Croatia, Slovenia and Lithuania for them,
-and Russia is cut to its European part (`EUROPEAN_PART`: its federal subjects west of 60°E, the map's
-`boundaries.mask` drawing the rest of it grey beneath). See [euroleague.md](euroleague.md#earlier-seasons-200001-to-202526).
+seasons it serves (`seasons`). `COUNTRIES` gained Croatia, Slovenia and Lithuania for them, and
+their Russian clubs hold European Russia only, as football's do (`within`, the map's `partial`).
+See [euroleague.md](euroleague.md#earlier-seasons-200001-to-202526).
 
 **Old games.** A world campaign saved before these maps (`clubScope` `all`, `elite` or a
 league) has no `domestic:` scope, so it restores on the world with its dealt land, under
@@ -1216,7 +1276,7 @@ its old name ("All Leagues"). "Another team" after a defeat there opens on the m
 replaced it. An old link's `theatre=Premier+League` is reported as not offered.
 A CM 01/02 set built on this computer has no maps, so it plays the two theatres on the
 world, dealt by `seedClubs` as all clubs once were. A season with nations only (FIFA 05,
-FIFA 06, SWOS 96/97, 1989/90, the World Cups) has no clubs to play: it keeps the plain
+FIFA 06, 1989/90, the computed seasons) has no clubs to play: it keeps the plain
 theatre, `all` or `elite`, and choosing clubs goes back to the built-in season and its map.
 
 **Checks**: `scripts/europe-maps.test.mjs`: index, files, fields and hashes; each club's
@@ -1225,8 +1285,12 @@ country; a region with one club goes whole to it; every club holds a fair piece;
 country with no club has no section and is drawn beneath as an obstacle; neighbour
 colours; seeded duel campaigns on both built-in maps reach a champion without treaties;
 `setClubScope` and `dataSetOf`; the App sets up and launches both a built-in and a season
-map, and keeps an old campaign on the world. The smoke runs Elite 32 and Top 124
-campaigns and an Elite 32 resume.
+map, and keeps an old campaign on the world. Each earlier season's field is its file's
+strongest, with clubs from beyond the seven big leagues but in SWOS's; each map of before
+names its replacement and is never offered; on every map with Russian clubs they hold
+Moscow, Kazan and Ufa and nothing east of the Urals, Russia is `partial`, drawn beneath and
+an obstacle but never claimed. The smoke runs Elite 32 and Top 124 campaigns and an Elite 32
+resume.
 
 **Women's football** (2026-11-09). The same build makes women's football's maps
 (`sport: 'womens-football'`), which replaced its single-league theatres and its clubs'

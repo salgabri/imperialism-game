@@ -447,7 +447,7 @@ test('each run of seasons with the same clubs plays on a map of Europe of its ow
     assert.deepEqual(doc.clubs.map(club => [club.id, club.name]), map.clubs.map(club => [club.id, club.name]), `${map.id}: the clubs, strongest first`);
     assert.deepEqual([...doc.hosts].sort(), [...new Set(map.clubs.map(club => club.country))].sort());
     assert.equal(decodeDomestic(JSON.parse(text), map.id).clubs.length, map.clubs.length);
-    assert.equal(Boolean(doc.boundaries.mask), doc.hosts.includes('643'), `${map.id}: Russia cut to its European part, and said to be`);
+    assert.deepEqual(doc.partial, doc.hosts.includes('643') ? ['643'] : undefined, `${map.id}: European Russia only, the rest of Russia beneath`);
   }
   // 2019/20 and 2020/21 had the same eighteen clubs, as had 2022/23 and 2023/24.
   assert.deepEqual(EUROPE_MAPS.find(entry => entry.id === 'el2020').seasons, ['nba-2k20', 'nba-2k21']);

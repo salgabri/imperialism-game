@@ -151,7 +151,7 @@ async function main() {
 
   const outputs = new Map([
     [path.join(OUT, 'wikidata.json'), factsText({
-      about: 'Wikidata\'s men\'s national teams that have a player stint of 1962 to 1993, those stints and their players, from QLever\'s answers '
+      about: `Wikidata's men's national teams that have a player stint of ${years[0]} to ${years[1]}, those stints and their players, from QLever's answers `
         + 'pinned in scripts/data/national-team-seasons.json (CC0). Rows: teams [qid, country]; players [qid, name, born, English Wikipedia article, '
         + 'positions]; stints [player, team, from, to, caps, goals, ended], ended 1 where Wikidata gives no end and the manifest\'s rule does '
         + '(selection.openCapsPerYear). Written by scripts/sync-national-team-seasons.mjs.',

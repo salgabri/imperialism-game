@@ -1,7 +1,7 @@
 // Data sets: one dated database's nations and clubs, played instead of a sport's built-in season. A football set is
 // one of the built-in earlier seasons (src/data/footballSeasons.js: an EA FIFA / FC roster, FIFA 05 and FIFA 06 with
-// nations only; before them SI's Championship Manager databases, Sensible World of Soccer's, two fans' and, for the
-// World Cups of 1962 to 1994, nations computed from their Elo and squads) or a CM 01/02 database built on this
+// nations only; before them SI's Championship Manager databases, Sensible World of Soccer's, two fans' and, from
+// 1960/61 to 1993/94, nations computed from their Elo and squads) or a CM 01/02 database built on this
 // computer; a basketball set is a built-in earlier NBA season (an NBA 2K edition, or computed from the season's
 // statistics), clubs only, on its era's map; a baseball set a built-in earlier MLB season (an MLB The Show edition,
 // or computed from WAR), its nations by birthplace and its clubs on its era's map; the other sports' alike. Each is a
@@ -25,6 +25,7 @@ import { BUILT_IN_HOCKEY_SEASONS } from '../data/hockeySeasons.js';
 import { BUILT_IN_RUGBY_LEAGUE_SEASONS } from '../data/rugbyLeagueSeasons.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
 import { EUROPE_MAPS } from '../data/europeMaps.js';
+import { EUROPEAN_LEAGUES } from '../data/footballLeagues.js';
 import { FLAG_CODES } from '../data/flags.js';
 import { basketball } from '../sports/basketball.js';
 import { americanFootball } from '../sports/americanFootball.js';
@@ -106,9 +107,9 @@ const SET_KINDS = Object.freeze({
   // `nt-<season end year>`: a season between two computed World Cups, every nation whose Wikidata records name eleven
   // players of it, rated from its Elo and their caps (source.conversion), nations only.
   nt: { prefix: 'nt-', id: /^nt-\d{4}$/, sport: 'football', nationsOnly: /^nt-/ },
-  // `swos-<season>`: a Sensible World of Soccer edition (SWOS 96/97 → `swos-9697`): its national squads, and its clubs
-  // where the edition's own team files give them (SWOS 96/97 is nations only).
-  swos: { prefix: 'swos-', id: /^swos-\d{4}$/, sport: 'football', nationsOnly: /^swos-9697$/ },
+  // `swos-<season>`: a Sensible World of Soccer edition (SWOS 96/97 → `swos-9697`): its national squads and the seven
+  // big leagues' top-division clubs, from the edition's own team files.
+  swos: { prefix: 'swos-', id: /^swos-\d{4}$/, sport: 'football' },
   // Simon Treanor's fan-made 1989/90 database has nations only: its clubs cannot field 1989/90's top divisions.
   cm0102: { prefix: '', id: /^cm0102-\d{4}-\d{2}(-[a-z0-9]+)?$/, sport: 'football', nationsOnly: /^cm0102-2017-04-cm89$/ },
 });
@@ -124,8 +125,8 @@ export const setSportOf = id => kindRecord(id).sport;
 /** Whether a set fields national teams: every one but the clubs-only kinds' (the NBA's, the NFL's, the NRL's) and the
  * early NHL seasons, when fewer than three nations fielded a real side. */
 export const setHasNations = id => kindRecord(id).nations !== false && !kindRecord(id).clubsOnly?.test(String(id));
-/** Whether a set has clubs: every one but those with nations only (the EA editions before FIFA 07, SWOS 96/97, the computed
- * World Cup seasons, tennis's). */
+/** Whether a set has clubs: every one but those with nations only (the EA editions before FIFA 07, the 1989/90 fan database,
+ * the computed World Cup and national-team seasons, tennis's). */
 export const setHasClubs = id => !kindRecord(id).nationsOnly?.test(String(id));
 /** Whether a set's clubs play on a map of their era (src/data/clubMaps.js) rather than on the world. */
 export const setIsMapped = id => !!kindRecord(id).mapped;
@@ -651,8 +652,9 @@ function validateFootballSet(data, id) {
     }
   }
 
-  // League names are the built-in ones, so a club reads the same in every data set.
-  const leagues = new Set((women ? womensFootball : football).clubs.map(club => club.league));
+  // A men's club plays in one of Europe's first divisions (src/data/footballLeagues.js), named as in every other season; a
+  // women's club in a league of the built-in women's clubs.
+  const leagues = new Set(women ? womensFootball.clubs.map(club => club.league) : Object.keys(EUROPEAN_LEAGUES));
   if (!Array.isArray(data.clubs)) fail('clubs must be a list');
   if (!setHasClubs(id) && data.clubs.length) fail('this season has nations only');
   const clubIds = new Set();
@@ -664,7 +666,7 @@ function validateFootballSet(data, id) {
     clubIds.add(club.id);
     if (!text(club.name)) fail(`${at} has no name`);
     if (typeof club.code !== 'string' || !/^[A-Z0-9]{3}$/.test(club.code)) fail(`${at} code ${JSON.stringify(club.code)} must be three capitals`);
-    if (!leagues.has(club.league)) fail(`${at} league ${JSON.stringify(club.league)} is not a built-in league`);
+    if (!leagues.has(club.league)) fail(`${at} league ${JSON.stringify(club.league)} is not ${women ? 'a built-in league' : "one of Europe's first divisions"}`);
     if (!nation(club.country)) fail(`${at} country ${JSON.stringify(club.country)} is not a nation id`);
     if (!text(club.col)) fail(`${at} has no colour`);
     if (!rating(club.str)) fail(`${at} str must be a rating 1-99`);

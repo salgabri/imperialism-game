@@ -225,7 +225,7 @@ test('the nine seasons are built in, after the games\' seasons, labelled compute
     assert.equal(source.results.commit, MANIFEST.sources.results.commit);
     assert.deepEqual(Object.keys(source.wikipedia.ballonDor).map(Number), [doc.year - 1, doc.year]);
   }
-  assert.ok(SEASON_NOTES.football.includes('The World Cups of 1961/62 to 1993/94 and the seasons between them are computed'), 'the setup note says so');
+  assert.ok(SEASON_NOTES.football.includes('the World Cups of 1961/62 to 1993/94 and the seasons between them are computed'), 'the setup note says so');
   assert.ok(read('src/data/footballSeasons.js').includes('by npm run build:world-cup-seasons, computed'));
 });
 

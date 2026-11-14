@@ -1,7 +1,7 @@
 {
   "generatedBy": "scripts/build-national-team-seasons.mjs",
   "retrieved": "2026-11-13",
-  "decided": "2026-11-13: the user asked to cover the year gaps in every sport (\"there are many year gaps in the various sports can you cover them\"). The seasons between the World Cups are computed like them: the user approved computed football ratings for the 1960s to 1980s on 2026-11-09 (national-team Elo adjusted per player, labelled as computed), and the World Cup seasons shipped on 2026-11-10. Claude chose the rest: each nation's players from Wikidata's national-team records (their stints and caps), which the World Cup seasons left out; its strength from its Elo on 1 July of the season's end year, by the World Cup seasons' line; the XI by caps a year and its order by Ballon d'Or votes and caps.",
+  "decided": "2026-11-13: the user asked to cover the year gaps in every sport (\"there are many year gaps in the various sports can you cover them\"). The seasons between the World Cups are computed like them: the user approved computed football ratings for the 1960s to 1980s on 2026-11-09 (national-team Elo adjusted per player, labelled as computed), and the World Cup seasons shipped on 2026-11-10. Claude chose the rest: each nation's players from Wikidata's national-team records (their stints and caps), which the World Cup seasons left out; its strength from its Elo on 1 July of the season's end year, by the World Cup seasons' line; the XI by caps a year and its order by Ballon d'Or votes and caps. 2026-11-14: asked whether to fill 1960/61 too, the season before the first computed World Cup, the user answered \"Yes, both\" (with 1996/97's clubs): it is computed the same way.",
   "elo": {
     "formula": "R' = R + K × G × (W − We), We = 1 / (1 + 10^(−dr / 400)), dr = R_home − R_away + home (none at a neutral venue); W is 1, ½ or 0, a match level after extra time a draw",
     "home": 100,
@@ -82,16 +82,17 @@
     "noEnd": 71,
     "ended": 6,
     "reversed": 2,
-    "noCaps": 1060,
+    "noCaps": 1091,
     "conceded": 2,
     "ignoredTeams": 6,
     "otherPositions": {
       "Q5508224": 1,
       "Q2445218": 1,
       "Q526301": 1,
-      "Q2827965": 1,
+      "Q2827965": 2,
       "Q41583": 2,
       "Q1124183": 1,
+      "Q2304909": 1,
       "Q543457": 1,
       "Q179789": 1,
       "Q1142885": 1,
@@ -100,6 +101,1367 @@
     }
   },
   "seasons": [
+    {
+      "id": "nt-1961",
+      "version": "nt-1961-e8cee68a",
+      "season": "1960/61",
+      "elo": {
+        "date": "1961-07-01",
+        "activeSince": "1957-07-01",
+        "active": 128,
+        "best": {
+          "team": "Brazil",
+          "elo": 1909.8
+        }
+      },
+      "teamShare": 0.8,
+      "dropped": [
+        {
+          "team": "Malta",
+          "qid": "Q188782",
+          "players": 14,
+          "why": "no shape on the map"
+        },
+        {
+          "team": "Egypt",
+          "qid": "Q28089",
+          "players": 10,
+          "why": "10 players with a position"
+        },
+        {
+          "team": "Greece",
+          "qid": "Q134925",
+          "players": 10,
+          "why": "10 players with a position"
+        },
+        {
+          "team": "United States",
+          "qid": "Q164134",
+          "players": 9,
+          "why": "9 players with a position"
+        },
+        {
+          "team": "Finland",
+          "qid": "Q186532",
+          "players": 8,
+          "why": "8 players with a position"
+        },
+        {
+          "team": "Tunisia",
+          "qid": "Q27971",
+          "players": 7,
+          "why": "7 players with a position"
+        },
+        {
+          "team": "Ecuador",
+          "qid": "Q987584",
+          "players": 6,
+          "why": "6 players with a position"
+        },
+        {
+          "team": "El Salvador",
+          "qid": "Q188228",
+          "players": 6,
+          "why": "6 players with a position"
+        },
+        {
+          "team": "Ghana",
+          "qid": "Q172014",
+          "players": 6,
+          "why": "6 players with a position"
+        },
+        {
+          "team": "Morocco",
+          "qid": "Q207337",
+          "players": 6,
+          "why": "6 players with a position"
+        },
+        {
+          "team": "Suriname",
+          "qid": "Q327769",
+          "players": 6,
+          "why": "6 players with a position"
+        },
+        {
+          "team": "Iceland",
+          "qid": "Q189198",
+          "players": 5,
+          "why": "5 players with a position"
+        },
+        {
+          "team": "India",
+          "qid": "Q212206",
+          "players": 5,
+          "why": "5 players with a position"
+        },
+        {
+          "team": "Albania",
+          "qid": "Q186262",
+          "players": 4,
+          "why": "4 players with a position"
+        },
+        {
+          "team": "Bolivia",
+          "qid": "Q193386",
+          "players": 4,
+          "why": "4 players with a position"
+        },
+        {
+          "team": "Nigeria",
+          "qid": "Q181930",
+          "players": 4,
+          "why": "4 players with a position"
+        },
+        {
+          "team": "Peru",
+          "qid": "Q212166",
+          "players": 4,
+          "why": "4 players with a position"
+        },
+        {
+          "team": "South Korea",
+          "qid": "Q543842",
+          "players": 4,
+          "why": "4 players with a position"
+        },
+        {
+          "team": "Pakistan",
+          "qid": "Q390989",
+          "players": 3,
+          "why": "3 players with a position"
+        },
+        {
+          "team": "Australia",
+          "qid": "Q268208",
+          "players": 2,
+          "why": "takes no part that season"
+        },
+        {
+          "team": "Ethiopia",
+          "qid": "Q257411",
+          "players": 2,
+          "why": "2 players with a position"
+        },
+        {
+          "team": "Honduras",
+          "qid": "Q180187",
+          "players": 2,
+          "why": "2 players with a position"
+        },
+        {
+          "team": "Iraq",
+          "qid": "Q186243",
+          "players": 2,
+          "why": "2 players with a position"
+        },
+        {
+          "team": "Lebanon",
+          "qid": "Q318928",
+          "players": 2,
+          "why": "2 players with a position"
+        },
+        {
+          "team": "Trinidad and Tobago",
+          "qid": "Q192149",
+          "players": 2,
+          "why": "takes no part that season"
+        },
+        {
+          "team": "Algeria",
+          "qid": "Q181903",
+          "players": 1,
+          "why": "takes no part that season"
+        },
+        {
+          "team": "Cameroon",
+          "qid": "Q175309",
+          "players": 1,
+          "why": "takes no part that season"
+        },
+        {
+          "team": "China",
+          "qid": "Q130582",
+          "players": 1,
+          "why": "takes no part that season"
+        },
+        {
+          "team": "Chinese Taipei",
+          "qid": "Q459119",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Cyprus",
+          "qid": "Q188791",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Guatemala",
+          "qid": "Q270168",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Guinea",
+          "qid": "Q235411",
+          "players": 1,
+          "why": "takes no part that season"
+        },
+        {
+          "team": "Haiti",
+          "qid": "Q236006",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Indonesia",
+          "qid": "Q657451",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Jamaica",
+          "qid": "Q235399",
+          "players": 1,
+          "why": "takes no part that season"
+        },
+        {
+          "team": "Jordan",
+          "qid": "Q275940",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Malaysia",
+          "qid": "Q318922",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Mongolia",
+          "qid": "Q241353",
+          "players": 1,
+          "why": "takes no part that season"
+        },
+        {
+          "team": "Myanmar",
+          "qid": "Q271753",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Nicaragua",
+          "qid": "Q327924",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Singapore",
+          "qid": "Q239528",
+          "players": 1,
+          "why": "no shape on the map"
+        },
+        {
+          "team": "Sudan",
+          "qid": "Q270682",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Thailand",
+          "qid": "Q239549",
+          "players": 1,
+          "why": "1 players with a position"
+        }
+      ],
+      "identities": {
+        "203": {
+          "name": "Czechoslovakia",
+          "code": "TCH",
+          "flagId": "203"
+        },
+        "276": {
+          "name": "West Germany",
+          "code": "FRG",
+          "flagId": "276"
+        },
+        "643": {
+          "name": "Soviet Union",
+          "code": "URS",
+          "flagId": "URS"
+        },
+        "688": {
+          "name": "Yugoslavia",
+          "code": "YUG",
+          "flagId": "YUG"
+        }
+      },
+      "merged": 22,
+      "inactive": 66,
+      "nations": [
+        {
+          "id": "076",
+          "name": "Brazil",
+          "team": "Brazil",
+          "qid": "Q83459",
+          "elo": 1909.8,
+          "rank": 1,
+          "T": 87,
+          "strength": 87,
+          "pool": 34,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Nílton Santos DF 93 75 caps 1949–1962 (5.36)",
+            "Didi MF 90 68 caps 1952–1962 (6.18)",
+            "Djalma Santos DF 89 98 caps 1952–1968 (5.76)",
+            "Gilmar GK 88 94 caps 1953–1969 (5.53)",
+            "Zito MF 87 52 caps 1955–1964 (5.2)",
+            "Pelé MF/FW 87 92 caps 1957–1971 (6.13)",
+            "Zózimo DF 86 35 caps 1955–1962 (4.38)",
+            "Garrincha FW/MF 85 50 caps 1955–1966 (4.17)",
+            "Pepe FW 85 41 caps 1955–1965 (3.73)",
+            "Hilderaldo Bellini DF 84 51 caps 1957–1966 (5.1)",
+            "Mário Zagallo MF/FW 83 33 caps 1958–1964 (4.71)"
+          ]
+        },
+        {
+          "id": "348",
+          "name": "Hungary",
+          "team": "Hungary",
+          "qid": "Q170561",
+          "elo": 1811.2,
+          "rank": 2,
+          "T": 83.84,
+          "strength": 84,
+          "pool": 29,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Gyula Grosics GK 89 BdO 5 86 caps 1947–1962 (5.38)",
+            "Lajos Tichy FW 87 BdO 2 72 caps 1955–1971 (4.24)",
+            "János Göröcs MF 86 BdO 2 62 caps 1958–1970 (4.77)",
+            "József Bozsik MF 85 101 caps 1947–1962 (6.31)",
+            "Máté Fenyvesi MF 84 76 caps 1954–1966 (5.85)",
+            "Sándor Mátrai DF 83 81 caps 1956–1967 (6.75)",
+            "Ferenc Sipos MF 83 77 caps 1957–1966 (7.7)",
+            "László Sárosi DF 82 46 caps 1956–1965 (4.6)",
+            "Flórián Albert FW 82 75 caps 1959–1974 (4.69)",
+            "Kálmán Mészöly DF 81 61 caps 1961–1971 (2.77)",
+            "Kálmán Sóvári DF 80 17 caps 1960–1966 (2.43)"
+          ]
+        },
+        {
+          "id": "032",
+          "name": "Argentina",
+          "team": "Argentina",
+          "qid": "Q79800",
+          "elo": 1799.1,
+          "rank": 3,
+          "T": 83.46,
+          "strength": 84,
+          "pool": 39,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Rogelio Domínguez GK 89 58 caps 1951–1963 (4.46)",
+            "Juan Héctor Guidi MF 87 37 caps 1956–1961 (6.17)",
+            "Oreste Corbatta MF 86 43 caps 1956–1962 (6.14)",
+            "José Sanfilippo FW 84 29 caps 1957–1962 (4.83)",
+            "Raúl Belén FW 83 31 caps 1959–1963 (6.2)",
+            "Rubén Marino Navarro DF 83 32 caps 1960–1963 (8)",
+            "José Ramos Delgado DF 82 25 caps 1958–1965 (3.13)",
+            "Antonio Rattín MF 82 34 caps 1959–1969 (3.09)",
+            "Martín Pando MF 81 11 caps 1960–1962 (3.67)",
+            "Miguel Ángel Vidal DF 81 16 caps 1960–1964 (3.2)",
+            "Silvio Marzolini DF 80 28 caps 1960–1969 (2.8)"
+          ]
+        },
+        {
+          "id": "643",
+          "name": "Soviet Union",
+          "team": "Soviet Union",
+          "qid": "Q189275",
+          "elo": 1783.2,
+          "rank": 4,
+          "T": 82.95,
+          "strength": 83,
+          "pool": 33,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Lev Yashin GK 88 BdO 49 78 caps 1954–1970 (4.59)",
+            "Mikheil Meskhi MF 86 BdO 4 35 caps 1959–1966 (4.38)",
+            "Viktor Ponedelnik FW 85 BdO 4 29 caps 1960–1964 (5.8)",
+            "Igor Netto DF/MF 84 54 caps 1952–1965 (3.86)",
+            "Valentin Ivanov FW 83 60 caps 1955–1965 (5.45)",
+            "Anatoli Maslyonkin DF 83 33 caps 1955–1962 (4.13)",
+            "Valery Voronin MF 82 63 caps 1960–1968 (7)",
+            "Givi Chokheli DF 81 19 caps 1960–1962 (6.33)",
+            "Albert Shesternyov DF 81 90 caps 1961–1971 (4.09)",
+            "Nikolai Manoshin MF 80 8 caps 1960–1961 (4)",
+            "Viktor Tsarev MF/DF 79 12 caps 1958–1963 (2)"
+          ]
+        },
+        {
+          "id": "858",
+          "name": "Uruguay",
+          "team": "Uruguay",
+          "qid": "Q134916",
+          "elo": 1761,
+          "rank": 5,
+          "T": 82.24,
+          "strength": 82,
+          "pool": 29,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "William Martínez DF 88 54 caps 1950–1965 (3.38)",
+            "Roberto Eliseo Sosa Echartea GK 86 67 caps 1954–1967 (4.79)",
+            "José Sasía FW 84 42 caps 1956–1966 (3.82)",
+            "Néstor Gonçalves MF 83 50 caps 1957–1968 (4.17)",
+            "Vladas Douksas FW 82 33 caps 1959–1966 (4.13)",
+            "Edgardo González MF 82 22 caps 1957–1965 (2.44)",
+            "Horacio Troche DF 81 28 caps 1959–1966 (3.5)",
+            "Domingo Pérez MF/FW 81 29 caps 1959–1967 (3.22)",
+            "Rubén González DF 80 11 caps 1959–1962 (2.75)",
+            "Luis Cubilla MF 80 38 caps 1959–1974 (2.38)",
+            "Emilio Álvarez DF 78 18 caps 1960–1967 (2.25)"
+          ]
+        },
+        {
+          "id": "724",
+          "name": "Spain",
+          "team": "Spain",
+          "qid": "Q42267",
+          "elo": 1757.3,
+          "rank": 6,
+          "T": 82.12,
+          "strength": 82,
+          "pool": 42,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Alfredo Di Stéfano FW 88 BdO 45 31 caps 1957–1961 (6.2)",
+            "Paco Gento MF/FW 86 BdO 16 43 caps 1955–1969 (2.87)",
+            "José Santamaría DF 84 BdO 5 16 caps 1958–1962 (3.2)",
+            "Luis del Sol MF 83 BdO 3 16 caps 1960–1966 (2.29)",
+            "Antoni Ramallets GK 82 35 caps 1950–1961 (2.92)",
+            "Joan Segarra DF 82 25 caps 1951–1962 (2.08)",
+            "László Kubala MF 81 19 caps 1953–1961 (2.11)",
+            "Feliciano Rivilla DF 80 26 caps 1960–1965 (4.33)",
+            "Sígfrid Gràcia DF 80 10 caps 1959–1962 (2.5)",
+            "Eulogio Martínez FW 79 8 caps 1959–1962 (2)",
+            "Manuel Ruiz Sosa MF 78 5 caps 1960–1961 (2.5)"
+          ]
+        },
+        {
+          "id": "826",
+          "name": "England",
+          "team": "England",
+          "qid": "Q47762",
+          "elo": 1749.3,
+          "rank": 7,
+          "T": 81.86,
+          "strength": 82,
+          "pool": 30,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Johnny Haynes FW 87 BdO 22 56 caps 1954–1962 (6.22)",
+            "Bobby Charlton MF/FW 85 BdO 16 106 caps 1958–1970 (8.15)",
+            "Jimmy Greaves FW 84 BdO 5 57 caps 1959–1967 (6.33)",
+            "Ronnie Clayton MF 83 35 caps 1955–1960 (2.92)",
+            "Ron Flowers MF 82 49 caps 1955–1966 (4.08)",
+            "Bryan Douglas MF 82 36 caps 1957–1963 (5.14)",
+            "Jimmy Armfield DF 81 43 caps 1959–1966 (5.38)",
+            "Ray Wilson DF 80 63 caps 1960–1968 (7)",
+            "Peter Swan DF 80 19 caps 1960–1962 (6.33)",
+            "Ron Springett GK 79 33 caps 1959–1966 (4.13)",
+            "Mick McNeil DF 78 9 caps 1960–1961 (4.5)"
+          ]
+        },
+        {
+          "id": "203",
+          "name": "Czechoslovakia",
+          "team": "Czechoslovakia",
+          "qid": "Q182072",
+          "elo": 1747.4,
+          "rank": 8,
+          "T": 81.8,
+          "strength": 82,
+          "pool": 32,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Josef Masopust MF 87 BdO 5 63 caps 1954–1966 (4.85)",
+            "Ladislav Novák DF 85 75 caps 1952–1966 (5)",
+            "Svatopluk Pluskal MF 84 56 caps 1952–1965 (4)",
+            "Viliam Schrojf GK 83 39 caps 1953–1965 (3)",
+            "Anton Moravčík MF 82 25 caps 1952–1960 (1.39)",
+            "Ján Popluhár DF 81 62 caps 1958–1967 (6.2)",
+            "Adolf Scherer FW 81 36 caps 1958–1964 (5.14)",
+            "Titus Buberník DF 80 23 caps 1958–1963 (3.83)",
+            "Anton Urban DF 80 20 caps 1959–1964 (3.33)",
+            "Andrej Kvašňák MF 79 47 caps 1960–1970 (4.27)",
+            "Jozef Adamec FW 78 44 caps 1960–1974 (2.93)"
+          ]
+        },
+        {
+          "id": "752",
+          "name": "Sweden",
+          "team": "Sweden",
+          "qid": "Q160826",
+          "elo": 1734.8,
+          "rank": 9,
+          "T": 81.4,
+          "strength": 81,
+          "pool": 27,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Agne Simonsson FW 87 BdO 2 51 caps 1957–1967 (4.64)",
+            "Orvar Bergmark DF 85 94 caps 1951–1965 (6.27)",
+            "Gösta Sandberg FW 84 52 caps 1951–1961 (4.73)",
+            "Bengt Gustavsson DF 82 57 caps 1951–1963 (4.38)",
+            "Gösta Löfgren DF/FW 81 40 caps 1951–1961 (3.64)",
+            "Sigge Parling MF 81 37 caps 1954–1960 (2.64)",
+            "Åke Johansson DF 80 53 caps 1955–1965 (4.82)",
+            "Rune Börjesson MF 80 20 caps 1958–1961 (5)",
+            "Bengt Nyholm GK 79 30 caps 1959–1964 (5)",
+            "Lennart Backman MF 79 31 caps 1958–1966 (3.44)",
+            "Lennart Wing MF 77 36 caps 1961–1965 (3.6)"
+          ]
+        },
+        {
+          "id": "688",
+          "name": "Yugoslavia",
+          "team": "Yugoslavia",
+          "qid": "Q188363",
+          "elo": 1714.7,
+          "rank": 10,
+          "T": 80.76,
+          "strength": 81,
+          "pool": 46,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Dragoslav Šekularac MF 86 BdO 7 41 caps 1956–1962 (5.86)",
+            "Branko Zebec MF 84 65 caps 1951–1961 (5.91)",
+            "Milan Galić FW 83 51 caps 1959–1965 (7.29)",
+            "Milutin Šoškić GK 82 50 caps 1959–1966 (6.25)",
+            "Vladimir Durković DF 81 50 caps 1959–1966 (6.25)",
+            "Fahrudin Jusufi DF 80 55 caps 1959–1967 (6.11)",
+            "Tomislav Knez FW 80 14 caps 1960–1961 (7)",
+            "Željko Perušić MF 79 27 caps 1959–1964 (4.5)",
+            "Aleksandar Kozlina MF 78 9 caps 1960–1961 (4.5)",
+            "Željko Matuš DF 78 13 caps 1960–1962 (4.33)",
+            "Vlatko Marković DF 77 16 caps 1961–1962 (4)"
+          ]
+        },
+        {
+          "id": "040",
+          "name": "Austria",
+          "team": "Austria",
+          "qid": "Q163534",
+          "elo": 1692,
+          "rank": 12,
+          "T": 80.03,
+          "strength": 80,
+          "pool": 33,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Gerhard Hanappi MF 86 BdO 6 93 caps 1948–1962 (6.2)",
+            "Horst Nemec FW 83 BdO 3 29 caps 1959–1966 (3.63)",
+            "Karl Koller MF 82 BdO 1 86 caps 1952–1965 (6.14)",
+            "Karl Stotz DF 81 BdO 1 42 caps 1950–1962 (3.23)",
+            "Ernst Ocwirk MF 80 62 caps 1945–1962 (3.44)",
+            "Kurt Schmied GK 80 38 caps 1954–1960 (2.71)",
+            "Paul Halla DF 79 34 caps 1952–1965 (2.43)",
+            "Erich Hasenkopf DF 78 31 caps 1956–1964 (3.44)",
+            "Rudi Flögel FW 78 40 caps 1960–1969 (4)",
+            "Rudolf Oslansky MF 77 12 caps 1958–1963 (2)",
+            "Walter Glechner DF 76 35 caps 1960–1968 (3.89)"
+          ]
+        },
+        {
+          "id": "276",
+          "name": "West Germany",
+          "team": "Germany",
+          "qid": "Q43310",
+          "elo": 1675.7,
+          "rank": 13,
+          "T": 79.51,
+          "strength": 80,
+          "pool": 36,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Uwe Seeler FW 85 BdO 46 72 caps 1954–1970 (4.24)",
+            "Horst Szymaniak MF 83 BdO 13 43 caps 1956–1966 (3.91)",
+            "Gert Dörfel FW 82 BdO 2 11 caps 1960–1964 (2.2)",
+            "Herbert Erhard DF 81 50 caps 1953–1962 (5)",
+            "Hans Schäfer MF 79 39 caps 1952–1962 (3.55)",
+            "Hans Tilkowski GK 79 39 caps 1957–1967 (3.55)",
+            "Willi Schulz DF 78 66 caps 1959–1970 (5.5)",
+            "Alfred Schmidt MF 78 25 caps 1957–1964 (3.13)",
+            "Karl-Heinz Schnellinger DF 77 47 caps 1958–1971 (3.36)",
+            "Albert Brülls MF 77 25 caps 1959–1966 (3.13)",
+            "Leo Wilden DF 76 15 caps 1960–1964 (3)"
+          ]
+        },
+        {
+          "id": "250",
+          "name": "France",
+          "team": "France",
+          "qid": "Q47774",
+          "elo": 1652,
+          "rank": 14,
+          "T": 78.75,
+          "strength": 79,
+          "pool": 49,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Raymond Kopa MF 84 BdO 14 45 caps 1952–1962 (4.09)",
+            "Pierre Bernard GK 82 BdO 2 21 caps 1960–1965 (3.5)",
+            "Jean Vincent MF 81 46 caps 1953–1961 (5.11)",
+            "Jean-Jacques Marcel DF 80 44 caps 1953–1961 (4.89)",
+            "Roger Piantoni FW 79 37 caps 1952–1961 (3.7)",
+            "Maryan Wisniewski FW 78 33 caps 1955–1963 (3.67)",
+            "André Lerond DF 78 31 caps 1957–1963 (4.43)",
+            "Jean Wendling DF 77 26 caps 1959–1963 (5.2)",
+            "René Ferrier MF 76 24 caps 1958–1964 (3.43)",
+            "Bruno Rodzik DF 76 21 caps 1960–1963 (5.25)",
+            "Yvon Goujon MF 75 11 caps 1960–1963 (2.75)"
+          ]
+        },
+        {
+          "id": "484",
+          "name": "Mexico",
+          "team": "Mexico",
+          "qid": "Q164089",
+          "elo": 1635.8,
+          "rank": 16,
+          "T": 78.23,
+          "strength": 78,
+          "pool": 29,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Antonio Carbajal GK 84 48 caps 1950–1966 (2.82)",
+            "Salvador Reyes Monteón FW 82 49 caps 1956–1966 (4.45)",
+            "Pedro Nájera MF 80 27 caps 1956–1962 (3.86)",
+            "Alphonso Portugal DF 79 18 caps 1956–1961 (3)",
+            "Alfredo del Águila MF 78 31 caps 1956–1967 (2.58)",
+            "Jesús del Muro DF 78 40 caps 1958–1968 (3.64)",
+            "Guillermo Sepúlveda MF 77 29 caps 1957–1966 (2.9)",
+            "Francisco Flores MF 77 13 caps 1958–1961 (3.25)",
+            "Isidoro Díaz FW 76 64 caps 1960–1970 (5.82)",
+            "Ignacio Jáuregui DF 76 32 caps 1959–1967 (3.56)",
+            "Gustavo Peña DF 74 82 caps 1961–1974 (2.93)"
+          ]
+        },
+        {
+          "id": "380",
+          "name": "Italy",
+          "team": "Italy",
+          "qid": "Q676899",
+          "elo": 1632,
+          "rank": 17,
+          "T": 78.11,
+          "strength": 78,
+          "pool": 39,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Omar Sívori FW 84 BdO 55 9 caps 1961–1962 (2.25)",
+            "Lorenzo Buffon GK 82 15 caps 1958–1962 (3)",
+            "Sergio Brighenti FW 80 9 caps 1959–1961 (3)",
+            "Bruno Mora MF 79 21 caps 1959–1965 (3)",
+            "Enzo Robotti DF 78 15 caps 1958–1965 (1.88)",
+            "Giacomo Losi DF 78 11 caps 1960–1962 (3.67)",
+            "Cesare Maldini DF 77 14 caps 1960–1963 (3.5)",
+            "Giovanni Trapattoni MF 76 17 caps 1960–1964 (3.4)",
+            "Sandro Salvadore DF 76 36 caps 1960–1970 (3.27)",
+            "Gino Stacchini MF 75 6 caps 1958–1961 (1.5)",
+            "Bruno Bolchi MF 74 4 caps 1961–1961 (2)"
+          ]
+        },
+        {
+          "id": "SCO",
+          "name": "Scotland",
+          "team": "Scotland",
+          "qid": "Q34044",
+          "elo": 1630.7,
+          "rank": 18,
+          "T": 78.07,
+          "strength": 78,
+          "pool": 39,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Denis Law FW 84 BdO 3 55 caps 1958–1974 (3.24)",
+            "Eric Caldow DF 82 40 caps 1957–1963 (5.71)",
+            "Duncan MacKay DF 80 14 caps 1959–1961 (4.67)",
+            "Bill Brown GK 79 28 caps 1958–1965 (3.5)",
+            "Dave Mackay DF 78 22 caps 1957–1965 (2.44)",
+            "John White MF/FW 78 22 caps 1959–1964 (3.67)",
+            "Ian St John FW 77 21 caps 1959–1965 (3)",
+            "Jim Baxter MF 76 34 caps 1960–1967 (4.25)",
+            "Davie Wilson MF 76 22 caps 1960–1965 (3.67)",
+            "Alex Hamilton DF 75 24 caps 1961–1965 (2.4)",
+            "Johnny MacLeod MF 74 4 caps 1961–1961 (2)"
+          ]
+        },
+        {
+          "id": "188",
+          "name": "Costa Rica",
+          "team": "Costa Rica",
+          "qid": "Q194387",
+          "elo": 1621.9,
+          "rank": 19,
+          "T": 77.79,
+          "strength": 75,
+          "pool": 15,
+          "outOfPosition": [
+            "Alex Sánchez Cruz (FW as DF)",
+            "Álvaro Murillo (FW as DF)",
+            "Jorge Hernan Monge (FW as MF)"
+          ],
+          "filled": [
+            "Alex Sánchez Cruz (FW as DF)",
+            "Danilo Montero Campos (FW as DF)",
+            "Álvaro Murillo (FW as MF)"
+          ],
+          "eleven": [
+            "Marvin Rodríguez MF 83 43 caps 1955–1961 (6.14)",
+            "Álvaro Murillo FW 81 36 caps 1950–1960 (1.64)",
+            "Mario Cordero DF 80 41 caps 1950–1963 (2.93)",
+            "Alex Sánchez Cruz FW 79 32 caps 1950–1963 (2.29)",
+            "Jorge Hernan Monge FW 78 27 caps 1955–1961 (3.86)",
+            "Hernán Alvarado GK 77 27 caps 1953–1961 (3)",
+            "Juan Ulloa FW 77 27 caps 1955–1962 (3.38)",
+            "Danilo Montero Campos FW 76 16 caps 1955–1961 (2.29)",
+            "Álvaro Grant McDonald DF 76 46 caps 1959–1969 (4.18)",
+            "Juan José Gámez MF 75 45 caps 1959–1970 (3.75)",
+            "Edgar Quesada MF 74 ? caps 1951–1963 (0)"
+          ]
+        },
+        {
+          "id": "WAL",
+          "name": "Wales",
+          "team": "Wales",
+          "qid": "Q180857",
+          "elo": 1599.7,
+          "rank": 20,
+          "T": 77.08,
+          "strength": 77,
+          "pool": 21,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Ivor Allchurch FW 83 68 caps 1950–1966 (4)",
+            "Jack Kelsey GK 81 41 caps 1954–1962 (4.56)",
+            "Cliff Jones MF 79 59 caps 1954–1969 (3.69)",
+            "Stuart Williams DF 78 43 caps 1954–1965 (3.58)",
+            "Mel Hopkins DF 77 34 caps 1956–1963 (4.25)",
+            "Terry Medwin MF 77 30 caps 1953–1963 (2.73)",
+            "Mel Nurse DF 76 12 caps 1960–1961 (6)",
+            "Vic Crowe MF 75 16 caps 1958–1963 (2.67)",
+            "Phil Woosnam FW 75 17 caps 1959–1963 (3.4)",
+            "Graham Williams (1938) DF 74 26 caps 1960–1968 (2.89)",
+            "Graham Williams (1936) MF 73 5 caps 1961–1961 (2.5)"
+          ]
+        },
+        {
+          "id": "152",
+          "name": "Chile",
+          "team": "Chile",
+          "qid": "Q172025",
+          "elo": 1552.9,
+          "rank": 24,
+          "T": 75.58,
+          "strength": 76,
+          "pool": 27,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Leonel Sánchez MF 81 85 caps 1955–1968 (6.07)",
+            "Jaime Ramírez MF 79 46 caps 1954–1966 (3.54)",
+            "Sergio Navarro DF 78 31 caps 1957–1962 (5.17)",
+            "Juan Soto Mura FW 77 22 caps 1957–1961 (4.4)",
+            "Hernán Rodríguez MF 75 22 caps 1955–1961 (3.14)",
+            "Luis Eyzaguirre DF 75 54 caps 1959–1966 (6.75)",
+            "Raúl Sánchez DF 74 33 caps 1959–1964 (5.5)",
+            "Mario Moreno FW 74 26 caps 1959–1964 (4.33)",
+            "Carlos Contreras DF 73 30 caps 1959–1966 (3.75)",
+            "Alberto Fouilloux MF 73 70 caps 1960–1972 (5.38)",
+            "Manuel Astorga GK 72 30 caps 1960–1970 (2.73)"
+          ]
+        },
+        {
+          "id": "792",
+          "name": "Turkey",
+          "team": "Turkey",
+          "qid": "Q483856",
+          "elo": 1548.2,
+          "rank": 25,
+          "T": 75.43,
+          "strength": 76,
+          "pool": 32,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Lefter Küçükandonyadis FW 81 50 caps 1948–1963 (3.13)",
+            "Turgay Şeren GK 79 46 caps 1950–1966 (2.71)",
+            "Mustafa Ertan DF 78 29 caps 1949–1961 (2.23)",
+            "Basri Dirimlili DF 76 26 caps 1953–1961 (2.89)",
+            "Ahmet Berman FW 75 29 caps 1955–1962 (3.63)",
+            "Naci Erdem DF 75 34 caps 1954–1965 (2.83)",
+            "Kadri Aytaç MF 74 25 caps 1953–1962 (2.5)",
+            "Suat Mamat MF/FW 74 27 caps 1954–1963 (2.7)",
+            "Şeref Has MF 73 39 caps 1956–1967 (3.25)",
+            "Can Bartu MF 73 26 caps 1956–1968 (2)",
+            "İsmail Kurt DF 72 16 caps 1958–1965 (2)"
+          ]
+        },
+        {
+          "id": "528",
+          "name": "Netherlands",
+          "team": "Netherlands",
+          "qid": "Q47050",
+          "elo": 1532.7,
+          "rank": 28,
+          "T": 74.93,
+          "strength": 75,
+          "pool": 31,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Roel Wiersma DF 80 53 caps 1954–1962 (5.89)",
+            "Jan Klaassens MF 78 57 caps 1953–1963 (5.18)",
+            "Cor van der Hart DF 77 44 caps 1955–1961 (6.29)",
+            "Piet van der Kuil FW 76 40 caps 1952–1962 (3.64)",
+            "Eddy Pieters Graafland GK 75 47 caps 1957–1967 (4.27)",
+            "Fons van Wissen MF 75 30 caps 1957–1964 (3.75)",
+            "Coen Moulijn MF 74 38 caps 1956–1969 (2.71)",
+            "Bennie Muller MF 73 43 caps 1960–1968 (4.78)",
+            "Henk Groot FW 73 39 caps 1960–1969 (3.9)",
+            "Cor Veldhoen DF 72 27 caps 1961–1967 (1.93)",
+            "Humphrey Mijnals DF 71 3 caps 1960–1960 (1.5)"
+          ]
+        },
+        {
+          "id": "620",
+          "name": "Portugal",
+          "team": "Portugal",
+          "qid": "Q267245",
+          "elo": 1527.7,
+          "rank": 29,
+          "T": 74.77,
+          "strength": 75,
+          "pool": 28,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "José Águas FW 80 BdO 5 25 caps 1952–1962 (2.27)",
+            "José Augusto MF 78 BdO 3 45 caps 1958–1968 (4.09)",
+            "Alberto da Costa Pereira GK 77 BdO 2 22 caps 1955–1965 (2)",
+            "Mário Coluna MF 76 BdO 1 57 caps 1955–1968 (4.07)",
+            "Eusébio FW 75 BdO 1 64 caps 1961–1973 (2.46)",
+            "Hernâni Ferreira da Silva MF 74 28 caps 1953–1964 (2.33)",
+            "Ângelo Martins DF 74 20 caps 1953–1962 (2)",
+            "Domiciano Cavém DF 73 18 caps 1956–1965 (1.8)",
+            "Hilário da Conceição DF 73 40 caps 1959–1971 (3.08)",
+            "Fernando Mendes MF 72 21 caps 1959–1965 (3)",
+            "Vicente Lucas DF 71 20 caps 1959–1966 (2.5)"
+          ]
+        },
+        {
+          "id": "372",
+          "name": "Ireland",
+          "team": "Republic of Ireland",
+          "qid": "Q163547",
+          "elo": 1523.3,
+          "rank": 30,
+          "T": 74.63,
+          "strength": 75,
+          "pool": 25,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Noel Cantwell DF 80 36 caps 1953–1967 (2.4)",
+            "Joe Haverty MF 78 32 caps 1955–1966 (2.67)",
+            "Alan Kelly GK 77 47 caps 1956–1973 (2.61)",
+            "Charlie Hurley DF 76 40 caps 1957–1969 (3.08)",
+            "Dermot Curtis FW 75 17 caps 1956–1963 (2.13)",
+            "Johnny Fullam DF 74 11 caps 1960–1960 (5.5)",
+            "Amby Fogarty MF 73 11 caps 1960–1960 (5.5)",
+            "Mick McGrath MF 73 22 caps 1958–1967 (2.2)",
+            "Johnny Giles MF 72 59 caps 1959–1979 (2.81)",
+            "Peter Fitzgerald FW 72 5 caps 1960–1961 (2.5)",
+            "Phil Kelly DF 71 5 caps 1960–1961 (2.5)"
+          ]
+        },
+        {
+          "id": "100",
+          "name": "Bulgaria",
+          "team": "Bulgaria",
+          "qid": "Q180845",
+          "elo": 1519.7,
+          "rank": 32,
+          "T": 74.52,
+          "strength": 75,
+          "pool": 31,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Ivan Kolev FW 80 BdO 3 75 caps 1950–1966 (4.41)",
+            "Manol Manolov DF 78 57 caps 1950–1961 (4.75)",
+            "Kiril Rakarov DF 77 58 caps 1953–1962 (5.8)",
+            "Todor Diev FW 76 55 caps 1955–1965 (5)",
+            "Nikola Kovachev DF 74 46 caps 1956–1963 (5.75)",
+            "Georgi Naydenov GK 74 51 caps 1955–1966 (4.25)",
+            "Ivan Dimitrov DF 73 72 caps 1957–1970 (5.14)",
+            "Stefan Abadzhiev MF 73 27 caps 1958–1966 (3)",
+            "Stoyan Kitov MF 72 21 caps 1959–1966 (2.63)",
+            "Vasil Metodiev MF 72 17 caps 1960–1965 (2.83)",
+            "Stefan Bozhkov MF 71 ? caps 1960–1960 (0)"
+          ]
+        },
+        {
+          "id": "600",
+          "name": "Paraguay",
+          "team": "Paraguay",
+          "qid": "Q172020",
+          "elo": 1494.1,
+          "rank": 37,
+          "T": 73.7,
+          "strength": 74,
+          "pool": 19,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Salvador Villalba MF 79 41 caps 1955–1960 (3.42)",
+            "Eligio Echagüe DF 77 35 caps 1955–1961 (5)",
+            "Edelmiro Arévalo DF 76 29 caps 1955–1961 (4.14)",
+            "Silvio Parodi Ramos MF 75 21 caps 1951–1961 (1.91)",
+            "Juan Vicente Lezcano DF 74 27 caps 1957–1963 (3.86)",
+            "Samuel Aguilar GK 73 18 caps 1958–1962 (3.6)",
+            "Claudio Lezcano FW 73 21 caps 1958–1963 (3.5)",
+            "Gilberto Penayo FW 72 10 caps 1958–1961 (2.5)",
+            "Vicente Bobadilla DF 71 45 caps 1960–1971 (3.75)",
+            "Francisco Santiago Reyes MF 71 13 caps 1961–1966 (1.08)",
+            "Ángel Jara Saguier MF 70 ? caps 1956–1966 (0)"
+          ]
+        },
+        {
+          "id": "756",
+          "name": "Switzerland",
+          "team": "Switzerland",
+          "qid": "Q165141",
+          "elo": 1492.5,
+          "rank": 38,
+          "T": 73.65,
+          "strength": 74,
+          "pool": 25,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Norbert Eschmann MF 79 BdO 2 15 caps 1956–1964 (1.67)",
+            "Charles Antenen FW 77 BdO 1 56 caps 1948–1962 (3.73)",
+            "Robert Ballaman FW 76 50 caps 1948–1961 (3.57)",
+            "Willy Kernen DF 75 41 caps 1950–1960 (1.86)",
+            "Eugen Meier MF 74 42 caps 1953–1962 (4.2)",
+            "Heinz Schneiter DF 73 44 caps 1957–1966 (4.4)",
+            "Hans Weber MF 72 24 caps 1956–1964 (2.67)",
+            "Karl Elsener GK 72 34 caps 1958–1966 (3.78)",
+            "Heinz Bigler DF 71 10 caps 1953–1961 (1.11)",
+            "Philippe Pottier MF 71 16 caps 1958–1966 (1.78)",
+            "Fritz Morf DF 70 7 caps 1957–1962 (1.17)"
+          ]
+        },
+        {
+          "id": "642",
+          "name": "Romania",
+          "team": "Romania",
+          "qid": "Q168397",
+          "elo": 1481.9,
+          "rank": 40,
+          "T": 73.31,
+          "strength": 73,
+          "pool": 23,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Nicolae Tătaru FW 79 24 caps 1954–1962 (2.67)",
+            "Ion Voinescu GK 77 22 caps 1949–1962 (1.57)",
+            "Gheorghe Constantin FW 75 39 caps 1956–1967 (3.25)",
+            "Vasile Zavoda DF 74 20 caps 1951–1962 (1.67)",
+            "Ion Nunweiller DF 73 40 caps 1958–1967 (4)",
+            "Tiberiu Bone MF 73 12 caps 1951–1961 (1.09)",
+            "Nicolae Georgescu MF 72 18 caps 1955–1965 (1.64)",
+            "Cornel Popa DF 72 27 caps 1958–1967 (2.7)",
+            "Vasile Alexandru MF 71 8 caps 1958–1965 (1)",
+            "Ilie Greavu DF 71 22 caps 1961–1966 (1.83)",
+            "Emerich Jenei MF 69 6 caps 1959–1963 (1.2)"
+          ]
+        },
+        {
+          "id": "616",
+          "name": "Poland",
+          "team": "Poland",
+          "qid": "Q166196",
+          "elo": 1456.9,
+          "rank": 46,
+          "T": 72.51,
+          "strength": 73,
+          "pool": 17,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Edmund Zientara MF 78 40 caps 1951–1960 (2)",
+            "Jerzy Woźniak DF 76 35 caps 1955–1962 (4.38)",
+            "Edward Szymkowiak GK 75 53 caps 1952–1969 (2.94)",
+            "Ernest Pohl FW 74 46 caps 1955–1965 (4.18)",
+            "Jan Liberda FW 72 35 caps 1959–1967 (3.89)",
+            "Henryk Grzybowski DF 72 10 caps 1957–1960 (1.25)",
+            "Ryszard Grzegorczyk MF 71 23 caps 1960–1966 (3.29)",
+            "Bernard Blaut MF 71 36 caps 1960–1971 (3)",
+            "Antoni Nieroba MF 70 17 caps 1959–1967 (1.89)",
+            "Stanisław Oślizło DF 70 57 caps 1961–1971 (2.59)",
+            "Władysław Kawula DF 69 5 caps 1960–1962 (1.67)"
+          ]
+        },
+        {
+          "id": "554",
+          "name": "New Zealand",
+          "team": "New Zealand",
+          "qid": "Q175315",
+          "elo": 1456.3,
+          "rank": 47,
+          "T": 72.49,
+          "strength": 70,
+          "pool": 11,
+          "outOfPosition": [
+            "Tony Moynihan (FW as DF)",
+            "John Raat (FW as DF)"
+          ],
+          "filled": [
+            "John Wrathall (FW as DF)",
+            "Ted Charlton (FW as DF)"
+          ],
+          "eleven": [
+            "Ken Armstrong MF 78 9 caps 1958–1962 (1.8)",
+            "Paddy McFarlane MF 76 7 caps 1958–1960 (1.17)",
+            "Tony Moynihan FW 75 4 caps 1960–1960 (2)",
+            "John Kemp DF 73 4 caps 1960–1962 (1.33)",
+            "Jim Bell MF 72 2 caps 1960–1960 (1)",
+            "Jim Middleton DF 72 2 caps 1960–1960 (1)",
+            "Jim Warrender MF 71 2 caps 1960–1960 (1)",
+            "Joe Callaghan GK 71 2 caps 1960–1960 (1)",
+            "John Raat FW 70 2 caps 1960–1960 (1)",
+            "John Wrathall FW 70 2 caps 1960–1960 (1)",
+            "Ted Charlton FW 69 2 caps 1960–1960 (1)"
+          ]
+        },
+        {
+          "id": "376",
+          "name": "Israel",
+          "team": "Israel",
+          "qid": "Q191406",
+          "elo": 1430.4,
+          "rank": 52,
+          "T": 71.66,
+          "strength": 70,
+          "pool": 12,
+          "outOfPosition": [
+            "Yehoshua Glazer (FW as DF)",
+            "Nahum Stelmach (FW as MF)"
+          ],
+          "filled": [
+            "Yehoshua Glazer (FW as DF)",
+            "Dani Shmulevich-Rom (FW as MF)"
+          ],
+          "eleven": [
+            "Yehoshua Glazer FW 77 35 caps 1949–1961 (2.69)",
+            "Ya'akov Hodorov GK 75 31 caps 1949–1964 (1.94)",
+            "Nahum Stelmach FW 74 45 caps 1956–1968 (3.46)",
+            "Avraham Menchel MF 73 30 caps 1959–1963 (6)",
+            "Tzvi Moisesko DF 72 8 caps 1960–1960 (4)",
+            "Shlomo Levi FW 71 14 caps 1960–1964 (2.8)",
+            "Roby Young DF 70 50 caps 1961–1969 (2.78)",
+            "Dani Shmulevich-Rom FW 70 25 caps 1960–1970 (2.27)",
+            "Ya'akov Grundman MF 69 8 caps 1961–1964 (1)",
+            "Avraham Kalmi MF 69 ? caps 1958–1964 (0)",
+            "Aharon Levi DF 68 ? caps 1961–1964 (0)"
+          ]
+        },
+        {
+          "id": "208",
+          "name": "Denmark",
+          "team": "Denmark",
+          "qid": "Q131785",
+          "elo": 1420.9,
+          "rank": 53,
+          "T": 71.36,
+          "strength": 71,
+          "pool": 21,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Poul Pedersen FW 77 50 caps 1953–1964 (4.17)",
+            "Jørn Sørensen MF 75 31 caps 1958–1961 (7.75)",
+            "Henry From GK 74 31 caps 1957–1961 (6.2)",
+            "Bent Hansen DF 72 58 caps 1958–1965 (7.25)",
+            "Flemming Nielsen MF 71 26 caps 1954–1960 (1.86)",
+            "Poul Jensen DF 71 32 caps 1959–1962 (8)",
+            "Henning Enoksen FW 70 54 caps 1958–1966 (6)",
+            "John Amdisen DF 70 9 caps 1955–1961 (1.29)",
+            "John Madsen DF 69 20 caps 1961–1963 (3.33)",
+            "Ole Sørensen MF 69 25 caps 1961–1969 (1.39)",
+            "Erling Nielsen MF 67 3 caps 1958–1964 (0.43)"
+          ]
+        },
+        {
+          "id": "056",
+          "name": "Belgium",
+          "team": "Belgium",
+          "qid": "Q166776",
+          "elo": 1417.2,
+          "rank": 54,
+          "T": 71.24,
+          "strength": 71,
+          "pool": 35,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Armand Jurion MF 77 64 caps 1955–1967 (4.92)",
+            "Martin Lippens MF 75 33 caps 1957–1963 (4.71)",
+            "André Piters FW 73 23 caps 1955–1961 (3.29)",
+            "Paul van den Berg MF 72 38 caps 1957–1967 (3.45)",
+            "Pierre Hanon MF 71 48 caps 1958–1969 (4)",
+            "Henri Thellin DF 71 16 caps 1958–1961 (4)",
+            "Paul Van Himst FW 70 81 caps 1960–1974 (5.4)",
+            "Jean Nicolay GK 70 39 caps 1959–1969 (3.55)",
+            "Roland Storme DF 69 10 caps 1958–1962 (2)",
+            "Laurent Verbiest DF 69 23 caps 1960–1965 (3.83)",
+            "Georges Heylens DF 67 67 caps 1961–1973 (2.58)"
+          ]
+        },
+        {
+          "id": "NIR",
+          "name": "Northern Ireland",
+          "team": "Northern Ireland",
+          "qid": "Q190978",
+          "elo": 1415.9,
+          "rank": 55,
+          "T": 71.2,
+          "strength": 71,
+          "pool": 25,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Danny Blanchflower MF 77 BdO 4 56 caps 1949–1963 (3.73)",
+            "Jimmy McIlroy MF 75 BdO 1 55 caps 1951–1965 (3.67)",
+            "Billy Bingham FW 73 56 caps 1951–1963 (4.31)",
+            "Bertie Peacock DF 72 32 caps 1949–1961 (2.46)",
+            "Peter McParland FW 71 34 caps 1954–1962 (3.78)",
+            "Wilbur Cush MF 71 26 caps 1950–1961 (2.17)",
+            "Dick Keith DF 70 23 caps 1957–1962 (3.83)",
+            "Harry Gregg GK 70 25 caps 1954–1964 (2.27)",
+            "Alex Elder DF 69 40 caps 1960–1969 (4)",
+            "Jimmy Nicholson MF 68 41 caps 1960–1971 (3.42)",
+            "Terry Neill DF 67 59 caps 1961–1973 (2.27)"
+          ]
+        },
+        {
+          "id": "578",
+          "name": "Norway",
+          "team": "Norway",
+          "qid": "Q184387",
+          "elo": 1363.2,
+          "rank": 63,
+          "T": 69.51,
+          "strength": 70,
+          "pool": 35,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Thorbjørn Svenssen DF 75 104 caps 1947–1962 (6.5)",
+            "Asbjørn Hansen GK 73 52 caps 1952–1961 (5.2)",
+            "Arne Bakker DF 72 54 caps 1953–1962 (5.4)",
+            "Arne Legernes MF 71 41 caps 1955–1961 (5.86)",
+            "Roar Johansen DF 69 61 caps 1958–1967 (6.1)",
+            "Arne Pedersen FW 69 40 caps 1957–1966 (4)",
+            "Bjørn Borgen MF 68 35 caps 1957–1966 (3.5)",
+            "Trygve Andersen MF 68 27 caps 1957–1965 (3)",
+            "Rolf Bjørn Backe FW 67 18 caps 1959–1962 (4.5)",
+            "Tom Johannessen DF 67 4 caps 1961–1961 (2)",
+            "Bjørn Odmar Andersen MF 66 10 caps 1961–1963 (1.67)"
+          ]
+        },
+        {
+          "id": "278",
+          "name": "East Germany",
+          "team": "East Germany",
+          "qid": "Q152424",
+          "elo": 1343.7,
+          "rank": 68,
+          "T": 68.88,
+          "strength": 69,
+          "pool": 32,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Günter Schröter FW 74 39 caps 1952–1962 (3.55)",
+            "Karl-Heinz Spickenagel GK 72 29 caps 1954–1962 (3.22)",
+            "Manfred Kaiser MF 71 31 caps 1955–1964 (3.1)",
+            "Werner Heine DF 70 29 caps 1958–1964 (4.14)",
+            "Hans-Dieter Krampe DF 69 28 caps 1957–1965 (3.11)",
+            "Roland Ducke MF 69 37 caps 1958–1967 (3.7)",
+            "Dieter Erler MF 68 47 caps 1959–1968 (4.7)",
+            "Peter Ducke FW 67 67 caps 1960–1975 (4.19)",
+            "Peter Kalinke DF 67 7 caps 1960–1961 (3.5)",
+            "Jürgen Nöldner MF 66 30 caps 1960–1969 (3)",
+            "Klaus Urbanczyk DF 65 34 caps 1961–1969 (1.89)"
+          ]
+        },
+        {
+          "id": "364",
+          "name": "Iran",
+          "team": "Iran",
+          "qid": "Q184602",
+          "elo": 1323.7,
+          "rank": 77,
+          "T": 68.24,
+          "strength": 65,
+          "pool": 11,
+          "outOfPosition": [
+            "Parviz Dehdari (FW as MF)",
+            "Büyük Jeddikar (FW as MF)",
+            "Mansour Amirasefi (FW as MF)"
+          ],
+          "filled": [
+            "Büyük Jeddikar (FW as MF)",
+            "Hamid Shirzadegan (FW as MF)",
+            "Parviz Koozehkanani (FW as MF)"
+          ],
+          "eleven": [
+            "Parviz Dehdari FW 74 50 caps 1955–1965 (4.55)",
+            "Büyük Jeddikar FW 72 29 caps 1950–1965 (1.81)",
+            "Mostafa Arab DF 70 48 caps 1959–1972 (3.43)",
+            "Hassan Habibi DF 69 31 caps 1958–1970 (2.38)",
+            "Aref Gholizadeh DF 68 9 caps 1951–1962 (0.75)",
+            "Mohammad Ranjbar DF 68 23 caps 1959–1967 (2.56)",
+            "Mansour Amirasefi FW 67 15 caps 1959–1964 (2.5)",
+            "Parviz Koozehkanani FW 67 7 caps 1951–1962 (0.58)",
+            "Hamid Shirzadegan FW 66 14 caps 1959–1966 (1.75)",
+            "Mohammad Bayati GK 66 ? caps 1958–1964 (0)",
+            "Kambozia Jamali MF 64 ? caps 1959–1964 (0)"
+          ]
+        },
+        {
+          "id": "170",
+          "name": "Colombia",
+          "team": "Colombia",
+          "qid": "Q212564",
+          "elo": 1296.4,
+          "rank": 87,
+          "T": 67.37,
+          "strength": 67,
+          "pool": 14,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Efraín Sánchez GK 73 30 caps 1947–1962 (1.88)",
+            "Carlos Arango Medina FW 71 22 caps 1946–1965 (1.1)",
+            "Delio Gamboa MF/FW 69 23 caps 1957–1966 (2.3)",
+            "Marcos Coll MF 68 11 caps 1956–1962 (1.57)",
+            "Jaime Silva Gómez MF 67 11 caps 1957–1963 (1.57)",
+            "Francisco Zuluaga DF 67 9 caps 1957–1962 (1.5)",
+            "Ignacio Calle DF 66 5 caps 1954–1962 (0.56)",
+            "Héctor González Garzón FW 66 11 caps 1961–1963 (1.83)",
+            "Rolando Serrano MF 65 7 caps 1961–1962 (1.75)",
+            "Óscar López DF 65 28 caps 1961–1972 (1.17)",
+            "Aníbal Alzate DF 64 5 caps 1961–1963 (0.83)"
+          ]
+        },
+        {
+          "id": "392",
+          "name": "Japan",
+          "team": "Japan",
+          "qid": "Q170566",
+          "elo": 1290,
+          "rank": 91,
+          "T": 67.17,
+          "strength": 67,
+          "pool": 24,
+          "outOfPosition": [],
+          "filled": [],
+          "eleven": [
+            "Ryuzo Hiraki DF 73 30 caps 1954–1962 (3.33)",
+            "Michihiro Ozawa MF 71 36 caps 1956–1964 (4)",
+            "Yasuo Takamori DF 69 30 caps 1955–1963 (3.33)",
+            "Shigeo Yaegashi MF 68 45 caps 1956–1968 (3.46)",
+            "Mitsuo Kamata DF 67 44 caps 1958–1969 (3.67)",
+            "Koji Sasaki FW 67 14 caps 1958–1961 (3.5)",
+            "Masashi Watanabe FW 66 39 caps 1958–1969 (3.25)",
+            "Masakatsu Miyamoto DF 66 44 caps 1958–1971 (3.14)",
+            "Tsukasa Hosaka GK 65 19 caps 1960–1964 (3.8)",
+            "Takehiko Kawanishi MF 64 8 caps 1959–1962 (2)",
+            "Teruki Miyamoto MF 63 58 caps 1961–1971 (2.64)"
+          ]
+        },
+        {
+          "id": "442",
+          "name": "Luxembourg",
+          "team": "Luxembourg",
+          "qid": "Q184266",
+          "elo": 1171.7,
+          "rank": 123,
+          "T": 63.38,
+          "strength": 60,
+          "pool": 11,
+          "outOfPosition": [
+            "Léon Letsch (FW as DF)",
+            "Louis Pilot (FW as MF)",
+            "Antoine Kohn (FW as MF)"
+          ],
+          "filled": [
+            "Antoine Kohn (FW as DF)",
+            "Jacques Bach (FW as MF)",
+            "Victor Nurenberg (FW as MF)"
+          ],
+          "eleven": [
+            "Léon Letsch FW 69 53 caps 1947–1961 (3.53)",
+            "François Konter DF 67 77 caps 1955–1969 (5.13)",
+            "Ernest Jann MF 65 13 caps 1957–1961 (2.6)",
+            "Louis Pilot FW 64 49 caps 1959–1971 (3.77)",
+            "Fernand Brosius DF 63 15 caps 1956–1965 (1.5)",
+            "Ady Schmit MF 63 49 caps 1960–1970 (4.45)",
+            "Erny Brenner DF 62 14 caps 1955–1965 (1.27)",
+            "Antoine Kohn FW 62 7 caps 1953–1965 (0.54)",
+            "Victor Nurenberg FW 61 5 caps 1951–1964 (0.36)",
+            "René Hoffmann GK 61 35 caps 1961–1975 (1.17)",
+            "Jacques Bach FW 60 1 caps 1961–1961 (0.5)"
+          ]
+        }
+      ],
+      "unmatchedVotes": {
+        "1960": [],
+        "1961": [
+          [
+            "Max Morlock",
+            "West Germany",
+            3
+          ]
+        ]
+      }
+    },
     {
       "id": "nt-1963",
       "version": "nt-1963-7fdddb9b",

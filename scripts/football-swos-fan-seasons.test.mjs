@@ -1,7 +1,7 @@
-// The built-in football seasons of 1995/96 and 1994/95 from Sensible World of Soccer's own team files, with their clubs,
-// and the two fan-made Championship Manager databases the user chose to ship, 1993/94 (Cam F) and 1989/90 (Simon
-// Treanor, nations only) (docs/design/football-years.md, "SWOS 94/95 and 95/96" and "The fan-made databases"): the
-// committed files against their manifest, listing, maps and federations; the team file reader and the club builder on
+// The built-in football seasons of 1995/96 and 1994/95 from Sensible World of Soccer's own team files, with their clubs
+// (and what every SWOS team-file season shares, 1996/97's included), and the two fan-made Championship Manager databases
+// the user chose to ship, 1993/94 (Cam F) and 1989/90 (Simon Treanor, nations only) (docs/design/football-years.md,
+// "Sensible World of Soccer 94/95 and 95/96" and "The fan-made databases"): the committed files against their manifest, listing, maps and federations; the team file reader and the club builder on
 // invented records; the East German clubs rebuilt from their sources when they are in data-src/; and the running App
 // launching and resuming a 1995/96 clubs campaign and a 1989/90 nations campaign as the Soviet Union.
 import test from 'node:test';
@@ -34,7 +34,9 @@ const read = file => readFileSync(path.join(root, file), 'utf8');
 const MANIFEST = JSON.parse(read('scripts/data/retro-seasons.json'));
 const committed = id => JSON.parse(read(`public/football/${id}.json`));
 const IDS = ['swos-9596', 'swos-9495', 'cm0102-2020-11-cm93', 'cm0102-2017-04-cm89'];
-const SWOS = ['swos-9596', 'swos-9495'];
+// SWOS's team-file seasons, by the server's name for each edition.
+const SWOS = ['swos-9697', 'swos-9596', 'swos-9495'];
+const EDITIONS = { 'swos-9697': '9697', 'swos-9596': '9596', 'swos-9495': 'v1.0' };
 const FAN = { 'cm0102-2020-11-cm93': 'Cam F', 'cm0102-2017-04-cm89': 'Simon Treanor' };
 const entry = id => MANIFEST.seasons.find(season => season.id === id);
 const slug = name => name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -70,8 +72,7 @@ test('the four seasons are built in, newest first, each its committed file, cred
     const season = entry(id);
     assert.equal(season.reader, 'swos-files');
     assert.deepEqual(season.files.map(file => file.name), ['008', '013', '014', '020', '025', '029', '035', '080', '081', '082', '083', '084', '085'].map(n => `TEAM.${n}`));
-    const edition = id === 'swos-9495' ? 'v1.0' : '9596';
-    assert.ok(season.files.every(file => file.download === `https://cern.swos.eu/data/amiga/${edition}/${file.name}` && file.folder === id));
+    assert.ok(season.files.every(file => file.download === `https://cern.swos.eu/data/amiga/${EDITIONS[id]}/${file.name}` && file.folder === id));
   }
   // The fan databases are the Starter Kit's zips at its pinned commit, their makers and fans' ratings named.
   for (const [id, maker] of Object.entries(FAN)) {
@@ -89,7 +90,7 @@ test('the four seasons are built in, newest first, each its committed file, cred
 const COVERAGE = {
   'swos-9596': { players: 2926, nations: 132, completeXIs: 132, clubs: 134, leagues: 7 },
   'swos-9495': { players: 2915, nations: 131, completeXIs: 131, clubs: 134, leagues: 7 },
-  'cm0102-2020-11-cm93': { players: 2266, nations: 124, completeXIs: 77, clubs: 130, leagues: 7 },
+  'cm0102-2020-11-cm93': { players: 2148, nations: 124, completeXIs: 77, clubs: 124, leagues: 20 },
   'cm0102-2017-04-cm89': { players: 1216, nations: 138, completeXIs: 89, clubs: 0, leagues: 0 },
 };
 
@@ -130,7 +131,9 @@ test('SWOS\'s ratings are its price steps, converted as 96/97\'s; its clubs keep
     const onMap = SWOS.some(season => strongestClubs(committed(season).clubs, TOP_CLUBS).some(club => club.id === id));
     if (onMap) assert.ok(places[id], `${id} has a ground row`);
   }
-  assert.equal(new Set(Object.values(SWOS_CLUBS)).size, Object.keys(SWOS_CLUBS).length, 'one name a club');
+  // One name a club, but Espanyol's two spellings: ESPANYOL in SWOS 96/97, ESPANOL before.
+  assert.deepEqual(Object.values(SWOS_CLUBS).filter((name, i, names) => names.indexOf(name) !== i), ['RCD Espanyol']);
+  assert.deepEqual([SWOS_CLUBS.ESPANOL, SWOS_CLUBS.ESPANYOL], ['RCD Espanyol', 'RCD Espanyol']);
   // Known squads of the day: Klinsmann at Tottenham in 1994/95, then at Bayern; Romário and Baggio at SWOS's top step.
   const at = (id, who) => committed(id).clubs.filter(club => club.squad.some(tuple => tuple[1] === who)).map(club => club.name);
   assert.deepEqual(at('swos-9495', 'Jurgen Klinsmann'), ['Tottenham Hotspur']);
@@ -142,7 +145,7 @@ test('SWOS\'s ratings are its price steps, converted as 96/97\'s; its clubs keep
   // Players SWOS files at two top-division clubs (mostly namesakes): each club keeps its own sixteen.
   const audits = JSON.parse(read('docs/design/football-retro-seasons-audit.json')).seasons;
   const collisions = id => audits.find(season => season.id === id).audit.collisions;
-  assert.deepEqual([collisions('swos-9495').length, collisions('swos-9596').length], [18, 20]);
+  assert.deepEqual(SWOS.map(id => collisions(id).length), [20, 20, 18]);
   assert.ok(collisions('swos-9495').includes('MARTIN KREE (Bayer 04 Leverkusen, Borussia Dortmund)'));
 });
 
@@ -151,8 +154,10 @@ test('each season with clubs plays on its own two Europe maps', () => {
   for (const id of ['swos-9596', 'swos-9495', 'cm0102-2020-11-cm93']) {
     const doc = committed(id);
     const maps = europeMapsOf(id);
+    // Cam F's 1993/94 holds all of Europe's first divisions, so its maps have ids of their own; SWOS's seven leagues keep theirs.
+    const tag = `${id.startsWith('swos-') ? 's' : 'e'}${doc.year}`;
     assert.deepEqual(maps.map(map => [map.id, map.clubs, map.theatre, map.seasons]),
-      [[`eu124s${doc.year}`, TOP_CLUBS, 'all', [id]], [`eu32s${doc.year}`, ELITE_CLUBS, 'elite', [id]]], id);
+      [[`eu124${tag}`, TOP_CLUBS, 'all', [id]], [`eu32${tag}`, ELITE_CLUBS, 'elite', [id]]], id);
     for (const [count, map] of [[TOP_CLUBS, maps[0]], [ELITE_CLUBS, maps[1]]]) {
       const file = JSON.parse(read(`public/domestic/${map.id}.json`));
       assert.equal(file.version, map.version);
@@ -177,8 +182,8 @@ test('the federations of each season\'s day, as far as its source fields them', 
   // 1995/96: FR Yugoslavia plays under its own name and flag, holding Montenegro and Kosovo.
   assert.deepEqual(committed('swos-9596').identities, { 688: { name: 'FR Yugoslavia', code: 'YUG', flagId: 'FRY' } });
   assert.deepEqual([territory('swos-9596').merged['499'], territory('swos-9596').merged.KOS], ['688', '688']);
-  // Bosnia joined FIFA on 3 July 1996: neutral in both.
-  assert.ok(SWOS.every(id => inactive(id, '070')));
+  // Bosnia joined FIFA on 3 July 1996: neutral in both, a member in 1996/97.
+  assert.ok(['swos-9596', 'swos-9495'].every(id => inactive(id, '070')) && !inactive('swos-9697', '070'));
   // 1993/94: Zaire alone has an identity; FR Yugoslavia is barred, the Czech Republic and Slovakia play apart, North
   // Macedonia (16 June 1994) and the seven FIFA joiners of 1994 play.
   const cm93 = committed('cm0102-2020-11-cm93');

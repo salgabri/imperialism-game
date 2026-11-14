@@ -439,7 +439,7 @@
   "seasons": [
     {
       "id": "ea-fc-26",
-      "version": "ea-fc-26-8ccd45ee",
+      "version": "ea-fc-26-8120a891",
       "edition": "EA FC 26",
       "update": 4,
       "roster": "260004",
@@ -464,39 +464,141 @@
         "Andorra": 1
       },
       "coverage": {
-        "players": 2336,
+        "players": 2196,
         "nations": 144,
         "completeXIs": 80,
-        "clubs": 132,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 17
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 18,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 18,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 18,
+          "kept": 14,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 6,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 18,
+          "kept": 4,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Azerbaijan Premier League": {
+          "clubs": 1,
+          "kept": 0,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 16,
+          "kept": 4,
+          "short": []
+        },
+        "Croatian HNL": {
+          "clubs": 2,
+          "kept": 1,
+          "short": []
+        },
+        "Cypriot First Division": {
+          "clubs": 1,
+          "kept": 0,
+          "short": []
+        },
+        "Czech First League": {
+          "clubs": 3,
+          "kept": 2,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 18,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 4,
+          "kept": 4,
+          "short": []
+        },
+        "Hungarian NB I": {
+          "clubs": 1,
+          "kept": 1,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Romanian Liga I": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 18,
+          "kept": 5,
+          "short": []
+        },
+        "Ukrainian Premier League": {
+          "clubs": 2,
+          "kept": 1,
+          "short": []
+        },
+        "Veikkausliiga": {
+          "clubs": 1,
+          "kept": 0,
           "short": []
         }
       },
@@ -603,7 +705,7 @@
     },
     {
       "id": "ea-fc-25",
-      "version": "ea-fc-25-799d82b7",
+      "version": "ea-fc-25-2a2f0a99",
       "edition": "EA FC 25",
       "update": 2,
       "roster": "250002",
@@ -619,49 +721,113 @@
         "fullNamesTrimmed": 1359
       },
       "clubNames": {
+        "AGF": "Aarhus Gymnastikforening",
         "AS Roma": "Roma",
         "AZ": "AZ Alkmaar",
+        "AaB": "Aalborg Boldspilklub",
         "Arouca": "FC Arouca",
         "Atlético de Madrid": "Atlético Madrid",
+        "Austria Klagenfurt": "SK Austria Klagenfurt",
+        "Başakşehir": "Medipol Başakşehir FK",
         "Bergamo Calcio": "Atalanta",
+        "Beşiktaş": "Beşiktaş JK",
+        "Blau-Weiss Linz": "Blau-Weiß Linz",
+        "Bodrum FK": "Bodrumspor",
+        "Bohemians": "Bohemian FC",
         "Brighton": "Brighton & Hove Albion",
+        "Brommapojkarna": "IF Brommapojkarna",
+        "CFR 1907 Cluj": "CFR Cluj",
         "Casa Pia AC": "Casa Pia",
+        "Cercle Brugge": "Cercle Brugge KSV",
+        "Club Brugge": "Club Brugge KV",
         "D. Alavés": "Deportivo Alavés",
+        "Dundee United": "Dundee United FC",
         "Estoril Praia": "GD Estoril Praia",
         "Estrela Amadora": "Estrela da Amadora",
+        "F.C. København": "FC København",
+        "FC Botoșani": "FC Botoşani",
+        "FC Dinamo 1948": "Dinamo Bucureşti",
         "FC Famalicão": "Famalicão",
+        "FC Gloria Buzău": "AS FC Buzău",
+        "FC Petrolul": "Asociația Clubul Sportiv Petrolul 52",
+        "FC Rapid 1923": "Rapid Bucuresti",
+        "FC St. Gallen": "FC St.Gallen 1879",
+        "FC Univ. Cluj": "Universitatea Cluj",
+        "Farul Constanța": "FCV Farul Constanța",
+        "Fenerbahçe": "Fenerbahçe SK",
+        "Ferencvárosi TC": "Ferencvárosi Torna Club",
         "Frankfurt": "Eintracht Frankfurt",
         "Fulham": "Fulham FC",
+        "GC Zürich": "Grasshopper Club Zürich",
+        "Galatasaray": "Galatasaray SK",
+        "Gaziantep": "Gaziantep FK",
         "Gil Vicente": "Gil Vicente FC",
+        "Grazer AK": "Grazer AK 1902",
+        "Göztepe": "Göztepe SK",
+        "HamKam Fotball": "Hamarkameratene",
+        "Hammarby IF": "Hammarby Fotboll",
         "Havre AC": "Le Havre AC",
         "Heidenheim": "1. FC Heidenheim 1846",
         "Hellas Verona": "Hellas Verona FC",
         "Ipswich": "Ipswich Town",
+        "Jagiellonia": "Jagiellonia Białystok",
+        "K. Beerschot VA": "K Beerschot VA",
+        "KFUM-Kameratene": "KFUM-Kameratene Oslo",
+        "Kasımpaşa": "Kasımpaşa SK",
+        "LASK": "LASK Linz",
         "LOSC Lille": "Lille OSC",
         "Latium": "Lazio",
+        "Lausanne-Sport": "FC Lausanne-Sport",
         "Leverkusen": "Bayer 04 Leverkusen",
         "Lombardia FC": "Inter",
+        "Lyngby BK": "Lyngby Boldklub",
         "M'gladbach": "Borussia Mönchengladbach",
         "Man Utd": "Manchester United",
         "Milano FC": "AC Milan",
         "Montpellier": "Montpellier HSC",
+        "Motherwell": "Motherwell FC",
         "N.E.C. Nijmegen": "NEC Nijmegen",
         "Nacional": "CD Nacional",
         "Newcastle Utd": "Newcastle United",
         "Nott'm Forest": "Nottingham Forest",
+        "OH Leuven": "Oud-Heverlee Leuven",
         "OL": "Olympique Lyonnais",
         "OM": "Olympique de Marseille",
+        "Odds BK": "Odds Ballklubb",
+        "PAOK FC": "PAOK",
+        "Panathinaikos": "Panathinaikos FC",
         "Paris SG": "Paris Saint-Germain",
+        "Politehnica Iași": "CSM Politehnica Iași",
+        "Puszcza": "Puszcza Niepołomice",
+        "R. Union St.-G.": "Union Saint-Gilloise",
         "R. Valladolid CF": "Real Valladolid CF",
+        "RB Salzburg": "FC Red Bull Salzburg",
+        "Raków": "Raków Częstochowa",
+        "Rangers": "Rangers FC",
         "Real Betis": "Real Betis Balompié",
+        "Ross County": "Ross County FC",
         "SC Braga": "Sporting Clube de Braga",
+        "SCR Altach": "SC Rheindorf Altach",
         "SSC Napoli": "Napoli",
+        "STVV": "Sint-Truidense VV",
+        "Sandefjord": "Sandefjord Fotball",
+        "Sarpsborg 08": "Sarpsborg 08 FF",
+        "Shelbourne": "Shelbourne FC",
+        "Slavia Praha": "SK Slavia Praha",
+        "Sp. Charleroi": "Royal Charleroi Sporting Club",
         "Spurs": "Tottenham Hotspur",
+        "St. Johnstone": "St Johnstone FC",
+        "St. Pats": "St Patrick's Athletic FC",
+        "Standard Liège": "Standard de Liège",
         "Strasbourg": "RC Strasbourg Alsace",
+        "Sønderjyske": "Sønderjyske Fodbold",
         "TSG Hoffenheim": "TSG 1899 Hoffenheim",
         "Union Berlin": "1. FC Union Berlin",
+        "Univ. Craiova": "Universitatea Craiova",
+        "Waterford": "Waterford FC",
         "West Ham": "West Ham United",
         "Wolves": "Wolverhampton Wanderers",
+        "Yverdon Sport FC": "Yverdon Sport",
         "sc Heerenveen": "SC Heerenveen"
       },
       "rows": 16161,
@@ -682,39 +848,146 @@
         "Liechtenstein": 1
       },
       "coverage": {
-        "players": 2306,
+        "players": 2160,
         "nations": 139,
         "completeXIs": 75,
-        "clubs": 132,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 17
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 18,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 19,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 16,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 18,
+          "kept": 15,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 4,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 18,
+          "kept": 5,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Azerbaijan Premier League": {
+          "clubs": 1,
+          "kept": 0,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 16,
+          "kept": 4,
+          "short": []
+        },
+        "Croatian HNL": {
+          "clubs": 2,
+          "kept": 1,
+          "short": []
+        },
+        "Cypriot First Division": {
+          "clubs": 1,
+          "kept": 0,
+          "short": []
+        },
+        "Czech First League": {
+          "clubs": 3,
+          "kept": 3,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 18,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 4,
+          "kept": 4,
+          "short": []
+        },
+        "Hungarian NB I": {
+          "clubs": 1,
+          "kept": 1,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Romanian Liga I": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 18,
+          "kept": 5,
+          "short": [
+            {
+              "name": "Bodrumspor",
+              "players": 9
+            }
+          ]
+        },
+        "Ukrainian Premier League": {
+          "clubs": 2,
+          "kept": 2,
+          "short": []
+        },
+        "Veikkausliiga": {
+          "clubs": 1,
+          "kept": 0,
           "short": []
         }
       },
@@ -826,7 +1099,7 @@
     },
     {
       "id": "ea-fc-24",
-      "version": "ea-fc-24-698e9225",
+      "version": "ea-fc-24-8bc5bd87",
       "edition": "EA FC 24",
       "update": 2,
       "roster": "240002",
@@ -852,39 +1125,136 @@
         "Gibraltar": 2
       },
       "coverage": {
-        "players": 2322,
+        "players": 2175,
         "nations": 143,
         "completeXIs": 75,
-        "clubs": 132,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 18
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 18,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 19,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 16,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 18,
+          "kept": 15,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 5,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 18,
+          "kept": 4,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 16,
+          "kept": 5,
+          "short": []
+        },
+        "Croatian HNL": {
+          "clubs": 2,
+          "kept": 1,
+          "short": []
+        },
+        "Cypriot First Division": {
+          "clubs": 1,
+          "kept": 0,
+          "short": []
+        },
+        "Czech First League": {
+          "clubs": 3,
+          "kept": 3,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 11,
+          "kept": 1,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 18,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 1,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 3,
+          "kept": 3,
+          "short": []
+        },
+        "Hungarian NB I": {
+          "clubs": 1,
+          "kept": 1,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Romanian Liga I": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 20,
+          "kept": 5,
+          "short": []
+        },
+        "Ukrainian Premier League": {
+          "clubs": 2,
+          "kept": 2,
+          "short": []
+        },
+        "Veikkausliiga": {
+          "clubs": 1,
+          "kept": 0,
           "short": []
         }
       },
@@ -996,7 +1366,7 @@
     },
     {
       "id": "ea-fifa-23",
-      "version": "ea-fifa-23-11260815",
+      "version": "ea-fifa-23-91f7591d",
       "edition": "FIFA 23",
       "update": 2,
       "roster": "230002",
@@ -1025,39 +1395,136 @@
         "Barbados": 1
       },
       "coverage": {
-        "players": 2353,
+        "players": 2214,
         "nations": 140,
         "completeXIs": 82,
-        "clubs": 134,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 16
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 19,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 18,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 14,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 5,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 18,
+          "kept": 4,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 18,
+          "kept": 5,
+          "short": []
+        },
+        "Croatian HNL": {
+          "clubs": 2,
+          "kept": 1,
+          "short": []
+        },
+        "Cypriot First Division": {
+          "clubs": 1,
+          "kept": 0,
+          "short": []
+        },
+        "Czech First League": {
+          "clubs": 3,
+          "kept": 3,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 18,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 3,
+          "kept": 3,
+          "short": []
+        },
+        "Hungarian NB I": {
+          "clubs": 1,
+          "kept": 0,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Romanian Liga I": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 19,
+          "kept": 7,
+          "short": []
+        },
+        "Ukrainian Premier League": {
+          "clubs": 2,
+          "kept": 1,
+          "short": []
+        },
+        "Veikkausliiga": {
+          "clubs": 1,
+          "kept": 0,
           "short": []
         }
       },
@@ -1162,7 +1629,7 @@
     },
     {
       "id": "ea-fifa-22",
-      "version": "ea-fifa-22-c17c871b",
+      "version": "ea-fifa-22-905133fa",
       "edition": "FIFA 22",
       "update": 2,
       "roster": "220002",
@@ -1188,39 +1655,141 @@
         "Hong Kong": 2
       },
       "coverage": {
-        "players": 2324,
+        "players": 2163,
         "nations": 146,
         "completeXIs": 78,
-        "clubs": 134,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 16
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 16,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 16,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 17,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 4,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 18,
+          "kept": 4,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 18,
+          "kept": 4,
+          "short": []
+        },
+        "Croatian HNL": {
+          "clubs": 2,
+          "kept": 1,
+          "short": []
+        },
+        "Cypriot First Division": {
+          "clubs": 1,
+          "kept": 0,
+          "short": []
+        },
+        "Czech First League": {
+          "clubs": 3,
+          "kept": 2,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 18,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 4,
+          "kept": 3,
+          "short": []
+        },
+        "Hungarian NB I": {
+          "clubs": 1,
+          "kept": 0,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Romanian Liga I": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Russian Premier League": {
+          "clubs": 3,
+          "kept": 3,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 2,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 20,
+          "kept": 8,
+          "short": []
+        },
+        "Ukrainian Premier League": {
+          "clubs": 2,
+          "kept": 2,
+          "short": []
+        },
+        "Veikkausliiga": {
+          "clubs": 1,
+          "kept": 0,
           "short": []
         }
       },
@@ -1329,7 +1898,7 @@
     },
     {
       "id": "ea-fifa-21",
-      "version": "ea-fifa-21-b294312b",
+      "version": "ea-fifa-21-602c3b51",
       "edition": "FIFA 21",
       "update": 2,
       "roster": "210002",
@@ -1357,39 +1926,131 @@
         "Hong Kong": 2
       },
       "coverage": {
-        "players": 2312,
+        "players": 2175,
         "nations": 143,
         "completeXIs": 77,
-        "clubs": 132,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 17
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 18,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 18,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 18,
+          "kept": 17,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 17,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 16,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 4,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 18,
+          "kept": 7,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 18,
+          "kept": 5,
+          "short": []
+        },
+        "Croatian HNL": {
+          "clubs": 1,
+          "kept": 1,
+          "short": []
+        },
+        "Czech First League": {
+          "clubs": 3,
+          "kept": 2,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 4,
+          "kept": 2,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Romanian Liga I": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Russian Premier League": {
+          "clubs": 3,
+          "kept": 3,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 2,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 21,
+          "kept": 6,
+          "short": []
+        },
+        "Ukrainian Premier League": {
+          "clubs": 2,
+          "kept": 2,
+          "short": []
+        },
+        "Veikkausliiga": {
+          "clubs": 1,
+          "kept": 0,
           "short": []
         }
       },
@@ -1499,11 +2160,27 @@
     },
     {
       "id": "ea-fifa-20",
-      "version": "ea-fifa-20-a635a7ac",
+      "version": "ea-fifa-20-65462c55",
       "edition": "FIFA 20",
       "update": 2,
       "roster": "200002",
       "snapshotDate": "2019-09-19",
+      "restOfWorld": [
+        "AEK Athens: Greek Super League, as in FIFA 21",
+        "Al Ain: in no European first division in any edition",
+        "CSKA Moskva: Russian Premier League, as in FIFA 21",
+        "Dinamo Zagreb: Croatian HNL, as in FIFA 21",
+        "Dynamo Kyiv: Ukrainian Premier League, as in FIFA 21",
+        "HJK: Veikkausliiga, as in FIFA 21",
+        "Kaizer Chiefs: in no European first division in any edition",
+        "Lokomotiv Moskva: Russian Premier League, as in FIFA 21",
+        "Olympiakos Piraeus: Greek Super League, as in FIFA 21",
+        "Orlando Pirates: in no European first division in any edition",
+        "PAOK: Greek Super League, as in FIFA 21",
+        "Panathinaikos: Greek Super League, as in FIFA 21",
+        "Shakhtar Donetsk: Ukrainian Premier League, as in FIFA 21",
+        "Spartak Moskva: Russian Premier League, as in FIFA 21"
+      ],
       "rows": 18483,
       "noTeam": {
         "Cape Verde Islands": 20,
@@ -1528,39 +2205,131 @@
         "Macau": 1
       },
       "coverage": {
-        "players": 2308,
+        "players": 2139,
         "nations": 142,
         "completeXIs": 78,
-        "clubs": 134,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 16
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 19,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 18,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 16,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 16,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 4,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 18,
+          "kept": 5,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 16,
+          "kept": 5,
+          "short": []
+        },
+        "Croatian HNL": {
+          "clubs": 1,
+          "kept": 1,
+          "short": []
+        },
+        "Czech First League": {
+          "clubs": 3,
+          "kept": 3,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 14,
+          "kept": 0,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 4,
+          "kept": 3,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Romanian Liga I": {
+          "clubs": 14,
+          "kept": 0,
+          "short": []
+        },
+        "Russian Premier League": {
+          "clubs": 3,
+          "kept": 3,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 18,
+          "kept": 6,
+          "short": []
+        },
+        "Ukrainian Premier League": {
+          "clubs": 2,
+          "kept": 2,
+          "short": []
+        },
+        "Veikkausliiga": {
+          "clubs": 1,
+          "kept": 0,
           "short": []
         }
       },
@@ -1669,7 +2438,7 @@
     },
     {
       "id": "ea-fifa-19",
-      "version": "ea-fifa-19-0ebd8d6d",
+      "version": "ea-fifa-19-9f43256d",
       "edition": "FIFA 19",
       "update": 2,
       "roster": "190002",
@@ -1697,39 +2466,126 @@
         "Bahrain": 1
       },
       "coverage": {
-        "players": 2290,
+        "players": 2116,
         "nations": 142,
         "completeXIs": 78,
-        "clubs": 134,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 15
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 19,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 18,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 16,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 17,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 4,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 18,
+          "kept": 6,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 16,
+          "kept": 4,
+          "short": []
+        },
+        "Croatian HNL": {
+          "clubs": 1,
+          "kept": 0,
+          "short": []
+        },
+        "Czech First League": {
+          "clubs": 3,
+          "kept": 0,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 14,
+          "kept": 0,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 4,
+          "kept": 3,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Russian Premier League": {
+          "clubs": 3,
+          "kept": 3,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 1,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 18,
+          "kept": 9,
+          "short": []
+        },
+        "Ukrainian Premier League": {
+          "clubs": 2,
+          "kept": 2,
+          "short": []
+        },
+        "Veikkausliiga": {
+          "clubs": 1,
+          "kept": 0,
           "short": []
         }
       },
@@ -1838,7 +2694,7 @@
     },
     {
       "id": "ea-fifa-18",
-      "version": "ea-fifa-18-018a1734",
+      "version": "ea-fifa-18-4f5904b7",
       "edition": "FIFA 18",
       "update": 2,
       "roster": "180002",
@@ -1866,39 +2722,121 @@
         "San Marino": 1
       },
       "coverage": {
-        "players": 2310,
+        "players": 2146,
         "nations": 146,
         "completeXIs": 77,
-        "clubs": 134,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 14
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 18,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 18,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 16,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 4,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 18,
+          "kept": 5,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 16,
+          "kept": 4,
+          "short": []
+        },
+        "Czech First League": {
+          "clubs": 1,
+          "kept": 0,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 14,
+          "kept": 0,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 4,
+          "kept": 2,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Russian Premier League": {
+          "clubs": 16,
+          "kept": 6,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 1,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 18,
+          "kept": 8,
+          "short": []
+        },
+        "Ukrainian Premier League": {
+          "clubs": 1,
+          "kept": 1,
+          "short": []
+        },
+        "Veikkausliiga": {
+          "clubs": 1,
+          "kept": 0,
           "short": []
         }
       },
@@ -2008,7 +2946,7 @@
     },
     {
       "id": "ea-fifa-17",
-      "version": "ea-fifa-17-c5adb9ec",
+      "version": "ea-fifa-17-dfb3422a",
       "edition": "FIFA 17",
       "update": 2,
       "roster": "170002",
@@ -2036,39 +2974,116 @@
         "Saint Lucia": 1
       },
       "coverage": {
-        "players": 2286,
+        "players": 2117,
         "nations": 143,
         "completeXIs": 77,
-        "clubs": 134,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 14
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 17,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 18,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 16,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 3,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 18,
+          "kept": 5,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 16,
+          "kept": 4,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 14,
+          "kept": 0,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 3,
+          "kept": 3,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Russian Premier League": {
+          "clubs": 16,
+          "kept": 7,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 1,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 18,
+          "kept": 8,
+          "short": []
+        },
+        "Ukrainian Premier League": {
+          "clubs": 1,
+          "kept": 1,
+          "short": []
+        },
+        "Veikkausliiga": {
+          "clubs": 1,
+          "kept": 0,
           "short": []
         }
       },
@@ -2178,7 +3193,7 @@
     },
     {
       "id": "ea-fifa-16",
-      "version": "ea-fifa-16-db213566",
+      "version": "ea-fifa-16-5798a9b7",
       "edition": "FIFA 16",
       "update": 2,
       "roster": "160002",
@@ -2205,39 +3220,111 @@
         "Faroe Islands": 2
       },
       "coverage": {
-        "players": 2271,
+        "players": 2108,
         "nations": 137,
         "completeXIs": 76,
-        "clubs": 134,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 14
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 19,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 16,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 16,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 3,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 18,
+          "kept": 6,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 16,
+          "kept": 3,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 3,
+          "kept": 3,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Russian Premier League": {
+          "clubs": 16,
+          "kept": 8,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 1,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 18,
+          "kept": 7,
+          "short": []
+        },
+        "Ukrainian Premier League": {
+          "clubs": 1,
+          "kept": 1,
           "short": []
         }
       },
@@ -2348,7 +3435,7 @@
     },
     {
       "id": "ea-fifa-15",
-      "version": "ea-fifa-15-6de54fe6",
+      "version": "ea-fifa-15-0ff2349a",
       "edition": "FIFA 15",
       "update": 2,
       "roster": "150002",
@@ -2373,39 +3460,111 @@
         "Montserrat": 1
       },
       "coverage": {
-        "players": 2241,
+        "players": 2071,
         "nations": 133,
         "completeXIs": 73,
-        "clubs": 134,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 15
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 17,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 17,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 14,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 6,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 18,
+          "kept": 5,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 10,
+          "kept": 1,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 16,
+          "kept": 4,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 3,
+          "kept": 2,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Russian Premier League": {
+          "clubs": 16,
+          "kept": 8,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 1,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 18,
+          "kept": 7,
+          "short": []
+        },
+        "Ukrainian Premier League": {
+          "clubs": 1,
+          "kept": 1,
           "short": []
         }
       },
@@ -2521,7 +3680,7 @@
     },
     {
       "id": "ea-fifa-14",
-      "version": "ea-fifa-14-a4af7d4c",
+      "version": "ea-fifa-14-e3aeb087",
       "edition": "FIFA 14",
       "update": 52,
       "roster": "140052",
@@ -2559,39 +3718,111 @@
         "Bahrain": 1
       },
       "coverage": {
-        "players": 2159,
+        "players": 2017,
         "nations": 130,
         "completeXIs": 64,
-        "clubs": 132,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 14
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 18,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 17,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 6,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 16,
+          "kept": 5,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 16,
+          "kept": 4,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 4,
+          "kept": 2,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Russian Premier League": {
+          "clubs": 16,
+          "kept": 8,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 1,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 1,
+          "kept": 1,
+          "short": []
+        },
+        "Ukrainian Premier League": {
+          "clubs": 1,
+          "kept": 1,
           "short": []
         }
       },
@@ -2716,7 +3947,7 @@
     },
     {
       "id": "ea-fifa-13",
-      "version": "ea-fifa-13-f9810843",
+      "version": "ea-fifa-13-e91bb9cb",
       "edition": "FIFA 13",
       "update": 34,
       "roster": "130034",
@@ -2758,39 +3989,106 @@
         "Gibraltar": 1
       },
       "coverage": {
-        "players": 2156,
+        "players": 2010,
         "nations": 135,
         "completeXIs": 67,
-        "clubs": 132,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 14
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 17,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 15,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 7,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 16,
+          "kept": 7,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 16,
+          "kept": 3,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 4,
+          "kept": 3,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 11,
+          "kept": 0,
+          "short": []
+        },
+        "Russian Premier League": {
+          "clubs": 16,
+          "kept": 8,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 1,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 1,
+          "kept": 1,
           "short": []
         }
       },
@@ -2912,7 +4210,7 @@
     },
     {
       "id": "ea-fifa-12",
-      "version": "ea-fifa-12-48c86de3",
+      "version": "ea-fifa-12-f824d22f",
       "edition": "FIFA 12",
       "update": 2,
       "roster": "120002",
@@ -2954,39 +4252,106 @@
         "São Tomé e Príncipe": 1
       },
       "coverage": {
-        "players": 2105,
+        "players": 1968,
         "nations": 130,
         "completeXIs": 69,
-        "clubs": 132,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 14
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 19,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 19,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 18,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 18,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 6,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 16,
+          "kept": 5,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 16,
+          "kept": 3,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 4,
+          "kept": 4,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Russian Premier League": {
+          "clubs": 16,
+          "kept": 7,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 1,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 1,
+          "kept": 1,
           "short": []
         }
       },
@@ -3106,7 +4471,7 @@
     },
     {
       "id": "ea-fifa-11",
-      "version": "ea-fifa-11-a14ca4f5",
+      "version": "ea-fifa-11-1895f294",
       "edition": "FIFA 11",
       "update": 2,
       "roster": "110002",
@@ -3149,39 +4514,111 @@
         "Bermuda": 1
       },
       "coverage": {
-        "players": 2096,
+        "players": 1941,
         "nations": 130,
         "completeXIs": 64,
-        "clubs": 132,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 15
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 19,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 16,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 15,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 6,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 16,
+          "kept": 5,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 16,
+          "kept": 2,
+          "short": []
+        },
+        "Czech First League": {
+          "clubs": 16,
+          "kept": 1,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 1,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 4,
+          "kept": 4,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Russian Premier League": {
+          "clubs": 16,
+          "kept": 6,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 1,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 18,
+          "kept": 6,
           "short": []
         }
       },
@@ -3308,7 +4745,7 @@
     },
     {
       "id": "ea-fifa-10",
-      "version": "ea-fifa-10-ab6df036",
+      "version": "ea-fifa-10-2e7ff937",
       "edition": "FIFA 10",
       "update": 2,
       "roster": "100002",
@@ -3357,39 +4794,116 @@
         "Bermuda": 1
       },
       "coverage": {
-        "players": 2105,
+        "players": 1966,
         "nations": 127,
         "completeXIs": 60,
-        "clubs": 132,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 14
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 17,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 14,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 5,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 16,
+          "kept": 4,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 16,
+          "kept": 2,
+          "short": []
+        },
+        "Czech First League": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 16,
+          "kept": 1,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 4,
+          "kept": 4,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 9,
+          "kept": 0,
+          "short": [
+            {
+              "name": "Bray Wanderers",
+              "players": 10
+            }
+          ]
+        },
+        "Russian Premier League": {
+          "clubs": 16,
+          "kept": 6,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 0,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 17,
+          "kept": 7,
           "short": []
         }
       },
@@ -3520,7 +5034,7 @@
     },
     {
       "id": "ea-fifa-09",
-      "version": "ea-fifa-09-2cff6600",
+      "version": "ea-fifa-09-d4e5c275",
       "edition": "FIFA 09",
       "update": 2,
       "roster": "090002",
@@ -3570,39 +5084,106 @@
         "Bahrain": 1
       },
       "coverage": {
-        "players": 2082,
+        "players": 1944,
         "nations": 122,
         "completeXIs": 49,
-        "clubs": 132,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 15
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 19,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 18,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 18,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 6,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 16,
+          "kept": 4,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 10,
+          "kept": 1,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 18,
+          "kept": 2,
+          "short": []
+        },
+        "Czech First League": {
+          "clubs": 16,
+          "kept": 0,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 17,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 14,
+          "kept": 1,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 4,
+          "kept": 4,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 10,
+          "kept": 2,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 18,
+          "kept": 5,
           "short": []
         }
       },
@@ -3744,7 +5325,7 @@
     },
     {
       "id": "ea-fifa-08",
-      "version": "ea-fifa-08-e7c7f73e",
+      "version": "ea-fifa-08-393b67ea",
       "edition": "FIFA 08",
       "update": 2,
       "roster": "080002",
@@ -3795,39 +5376,106 @@
         "Bermuda": 1
       },
       "coverage": {
-        "players": 2059,
+        "players": 1915,
         "nations": 119,
         "completeXIs": 50,
-        "clubs": 132,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 16
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 20,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 19,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 17,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 19,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 4,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 16,
+          "kept": 4,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 14,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 10,
+          "kept": 1,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 18,
+          "kept": 2,
+          "short": []
+        },
+        "Czech First League": {
+          "clubs": 16,
+          "kept": 1,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 17,
+          "kept": 0,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 14,
+          "kept": 3,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 3,
+          "kept": 2,
+          "short": []
+        },
+        "League of Ireland": {
+          "clubs": 12,
+          "kept": 0,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 4,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 11,
+          "kept": 1,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 18,
+          "kept": 5,
           "short": []
         }
       },
@@ -3968,7 +5616,7 @@
     },
     {
       "id": "ea-fifa-07",
-      "version": "ea-fifa-07-ac742262",
+      "version": "ea-fifa-07-169ee69b",
       "edition": "FIFA 07",
       "update": 2,
       "roster": "070002",
@@ -4018,39 +5666,101 @@
         "Saint Kitts and Nevis": 1
       },
       "coverage": {
-        "players": 2001,
+        "players": 1874,
         "nations": 113,
         "completeXIs": 52,
-        "clubs": 132,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 17
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 18,
-          "short": []
-        },
         "Premier League": {
           "clubs": 20,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 20,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 18,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 20,
+          "kept": 19,
           "short": []
         },
         "La Liga": {
           "clubs": 20,
+          "kept": 20,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 20,
+          "kept": 19,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 18,
+          "kept": 17,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 20,
+          "kept": 19,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 18,
+          "kept": 4,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 16,
+          "kept": 4,
+          "short": []
+        },
+        "Allsvenskan": {
+          "clubs": 14,
+          "kept": 0,
+          "short": []
+        },
+        "Austrian Bundesliga": {
+          "clubs": 10,
+          "kept": 2,
+          "short": []
+        },
+        "Belgian Pro League": {
+          "clubs": 18,
+          "kept": 3,
+          "short": []
+        },
+        "Czech First League": {
+          "clubs": 1,
+          "kept": 1,
+          "short": []
+        },
+        "Danish Superliga": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Ekstraklasa": {
+          "clubs": 16,
+          "kept": 1,
+          "short": []
+        },
+        "Eliteserien": {
+          "clubs": 14,
+          "kept": 1,
+          "short": []
+        },
+        "Greek Super League": {
+          "clubs": 4,
+          "kept": 3,
+          "short": []
+        },
+        "Scottish Premiership": {
+          "clubs": 12,
+          "kept": 2,
+          "short": []
+        },
+        "Swiss Super League": {
+          "clubs": 11,
+          "kept": 2,
+          "short": []
+        },
+        "Süper Lig": {
+          "clubs": 18,
+          "kept": 5,
           "short": []
         }
       },
@@ -4309,32 +6019,39 @@
         "leagues": 0
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 0,
-          "short": []
-        },
         "Premier League": {
           "clubs": 0,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 0,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 0,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 0,
+          "kept": 0,
           "short": []
         },
         "La Liga": {
           "clubs": 0,
+          "kept": 0,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 0,
+          "kept": 0,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 0,
+          "kept": 0,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 0,
+          "kept": 0,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 0,
+          "kept": 0,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 0,
+          "kept": 0,
           "short": []
         }
       },
@@ -4625,32 +6342,39 @@
         "leagues": 0
       },
       "leagues": {
-        "Eredivisie": {
-          "clubs": 0,
-          "short": []
-        },
         "Premier League": {
           "clubs": 0,
-          "short": []
-        },
-        "Ligue 1": {
-          "clubs": 0,
-          "short": []
-        },
-        "Bundesliga": {
-          "clubs": 0,
-          "short": []
-        },
-        "Serie A": {
-          "clubs": 0,
+          "kept": 0,
           "short": []
         },
         "La Liga": {
           "clubs": 0,
+          "kept": 0,
+          "short": []
+        },
+        "Serie A": {
+          "clubs": 0,
+          "kept": 0,
+          "short": []
+        },
+        "Bundesliga": {
+          "clubs": 0,
+          "kept": 0,
+          "short": []
+        },
+        "Ligue 1": {
+          "clubs": 0,
+          "kept": 0,
+          "short": []
+        },
+        "Eredivisie": {
+          "clubs": 0,
+          "kept": 0,
           "short": []
         },
         "Liga Portugal": {
           "clubs": 0,
+          "kept": 0,
           "short": []
         }
       },

@@ -243,6 +243,10 @@ function validateDomestic(data, id) {
   }
   if (!isObject(data.boundaries)) fail('boundaries attribution is missing');
   if (data.hosts != null && (!Array.isArray(data.hosts) || !data.hosts.length || !data.hosts.every(text))) fail('hosts must list world shape ids');
+  // A host the map holds only part of (European Russia on a map of Europe) lies beneath it too: grey where no club holds it.
+  if (data.partial != null && (!Array.isArray(data.partial) || !data.partial.length || !data.partial.every(id => data.hosts?.includes(id)))) {
+    fail('partial must list some of its hosts');
+  }
   if (data.sport != null && !SPORTS[data.sport]?.clubs) fail(`unknown sport ${JSON.stringify(data.sport)}`);
   // A sport's own map (the NBA's) lists the game's clubs of that sport; a country map carries its FM clubs. An earlier
   // era's map of a sport (`seasons`) names its own clubs, whose squads come from those built-in seasons at kickoff.
@@ -426,11 +430,12 @@ const surroundings = new WeakMap();
  * `shapes` are `[{ id, d, rings }]` to draw (rings in fitted SVG units, rounded
  * like the painted sections, only those reaching within `margin` of the
  * 960×540 frame); the host's own world shape is drawn only for a masked map
- * (England keeps its own shape beneath it). A map's empty land (the NBA's empty
+ * (England keeps its own shape beneath it) and for a host the map holds only part
+ * of (`partial`, European Russia). A map's empty land (the NBA's empty
  * states) comes first, drawn like its neighbours. `obstacles` is the world land minus the
  * host shape, ready for board.obstacles: never territory, it blocks routes as
- * neutral land would. Empty land is no obstacle, like the host shape beneath
- * England: it lies inside the hosts. Repeated calls for one map and fit return
+ * neutral land would; a partial host is one too, beyond its sections. Empty land is no obstacle, like the host shape beneath
+ * England: it lies inside the hosts. `partial` is the set of those hosts. Repeated calls for one map and fit return
  * the same objects, so route indexes built from them stay cached.
  */
 export function domesticSurroundings(atlas, domestic, margin = { x: 480, y: 800 }) {
@@ -482,12 +487,15 @@ export function domesticSurroundings(atlas, domestic, margin = { x: 480, y: 800 
   // The empty land is a few shapes: its full paths are cheap.
   const emptyPaths = empty ? empty.buildPaths(s, tx, ty) : null;
   const emptyShapes = empty ? shapesOf(empty.countries, id => (emptyPaths[id]?.labelRings || []).filter(near)) : [];
-  const worldShapes = shapesOf(world.countries.filter(country => !hosts.has(country.id) || meta.boundaries?.mask), nearRings);
+  // A host the map holds only part of (`partial`: European Russia's clubs on a map of Europe) is drawn beneath like a
+  // neighbour, and the rest of it blocks routes as a neighbour does.
+  const partial = new Set(meta.partial || []);
+  const worldShapes = shapesOf(world.countries.filter(country => !hosts.has(country.id) || meta.boundaries?.mask || partial.has(country.id)), nearRings);
   // The masked host shape covers its own sections; overlaps elsewhere are
   // harmless (sections take precedence over obstacles in routing). `empty` and the
   // atlas's land borders (`atlasNeighbours`) are what domesticLand claims from.
-  const value = Object.freeze({ shapes: [...emptyShapes, ...worldShapes], obstacles: worldShapes.filter(shape => !hosts.has(shape.id)),
-    empty: emptyShapes, atlasNeighbours: world.adj });
+  const value = Object.freeze({ shapes: [...emptyShapes, ...worldShapes], obstacles: worldShapes.filter(shape => !hosts.has(shape.id) || partial.has(shape.id)),
+    empty: emptyShapes, atlasNeighbours: world.adj, partial });
   surroundings.set(domestic, { atlas, key, value });
   return value;
 }
@@ -512,7 +520,8 @@ export function domesticLand(domestic, around) {
     land = createLand({ ids: Object.keys(borders), neighbours: id => borders[id], edge: id => edges[id],
       paths: pathsOf(around.empty || []), names: id => names[id] ?? null });
   } else if (domestic.meta?.theatre) {
-    const shapes = (around.obstacles || []).filter(shape => NATIONS[shape.id]?.[2] === 'UEFA');
+    // A host the map holds only part of is never claimed: its clubs' land is on the map, and the rest of it is not Europe's.
+    const shapes = (around.obstacles || []).filter(shape => NATIONS[shape.id]?.[2] === 'UEFA' && !around.partial?.has(shape.id));
     // The sections come from other boundaries than the atlas's countries, so each country's neighbours are found by
     // looking just outside its edges: sections first, then the atlas (the two overlap along every border). The atlas's
     // own land borders are exact: a short one the probes miss still joins its countries.
