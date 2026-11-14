@@ -10,6 +10,11 @@
 // colour is the mean of the winning bin's pixels. A crest with almost no coloured pixels
 // is white or black, and its colour is the grey of its mean lightness.
 //
+// A club's colour is one for all its seasons, read from today's crest. A EuroLeague club of the earlier seasons with
+// no crest today (scripts/data/euroleague-teams.json `history` and `eras`) reads it from the crest of its day
+// (scripts/sync-crest-eras.mjs) that it wears in the most seasons, the latest on a tie. Other period crests
+// ('<club id>.<year>.webp') give no colour.
+//
 // Writes:
 //   src/data/clubColours.js   clubColour(id): a club's colour, or null
 import { readdir, readFile, writeFile } from 'node:fs/promises';
@@ -25,11 +30,14 @@ import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
 import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { clubLogoFile } from '../src/data/clubLogos.js';
+import { CREST_ERAS } from '../src/data/clubCrestEras.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const logoDir = path.join(root, 'public/club-logos');
 const moduleFile = path.join(root, 'src/data/clubColours.js');
 const overridesFile = path.join(root, 'scripts/data/club-colours.json');
+const euroleagueFile = path.join(root, 'scripts/data/euroleague-teams.json');
+const PERIOD_CREST = /\.\d{4}\.webp$/;
 
 const SAMPLE = 64; // crests are read at this size: plenty for a colour census
 const OPAQUE = 160; // alpha below this is the crest's transparent surround or its anti-aliased edge
@@ -83,16 +91,30 @@ async function crestColour(file) {
 }
 
 // ---- Crests ----
-const files = (await readdir(logoDir)).filter(name => name.endsWith('.webp')).sort();
+// Today's crests: a period crest ('<club id>.<year>.webp') is no club's colour of today.
+const files = (await readdir(logoDir)).filter(name => name.endsWith('.webp') && !PERIOD_CREST.test(name)).sort();
 const colours = new Map();
 for (const name of files) {
   const colour = await crestColour(path.join(logoDir, name));
   if (colour) colours.set(name.slice(0, -'.webp'.length), colour);
 }
 
+// ---- The EuroLeague's clubs of the past ----
+// No crest today, so the crest of their day they wear longest (src/data/clubCrestEras.js), the latest on a tie.
+const euroleague = JSON.parse(await readFile(euroleagueFile, 'utf8'));
+const pastIds = [...new Set([...Object.values(euroleague.history ?? {}), ...Object.values(euroleague.eras ?? {}).flat()].map(club => club.id))].sort();
+for (const id of pastIds) {
+  if (clubLogoFile(id)) continue;
+  const worn = (CREST_ERAS[id] ?? []).filter(([, , file]) => file);
+  if (!worn.length) continue;
+  const [, , file] = worn.reduce((best, era) => (era[1] - era[0] >= best[1] - best[0] ? era : best));
+  const colour = await crestColour(path.join(logoDir, `${file}.webp`));
+  if (colour) colours.set(id, colour);
+}
+
 // ---- Corrections ----
 const { colours: overrides } = JSON.parse(await readFile(overridesFile, 'utf8'));
-const knownIds = new Set([...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...EUROLEAGUE_CLUBS, ...NFL_CLUBS, ...MLB_CLUBS, ...NHL_CLUBS, ...NRL_CLUBS, ...WOMENS_CLUBS].map(club => club.id));
+const knownIds = new Set([...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...EUROLEAGUE_CLUBS, ...NFL_CLUBS, ...MLB_CLUBS, ...NHL_CLUBS, ...NRL_CLUBS, ...WOMENS_CLUBS].map(club => club.id).concat(pastIds));
 for (const [id, colour] of Object.entries(overrides)) {
   // A club that has left the built-in leagues keeps its crest for the earlier seasons it played, so its correction too.
   if (!knownIds.has(id) && !DOMESTIC_ID.test(id) && !clubLogoFile(id)) throw new Error(`club-colours.json: no club ${id}`);

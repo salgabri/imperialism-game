@@ -137,9 +137,12 @@ test('clubs use their crest colour, with corrections where the crest misleads', 
 
 test('every correction names a club the game ships', () => {
   const { colours } = JSON.parse(readFileSync(new URL('./data/club-colours.json', import.meta.url), 'utf8'));
-  // A club the built-in leagues have lost still plays in the earlier seasons the game ships (public/football/).
+  // A club the built-in leagues have lost still plays in the earlier seasons the game ships (public/football/), and
+  // the EuroLeague's clubs of the past in basketball's (scripts/data/euroleague-teams.json).
   const seasonClubs = BUILT_IN_SEASONS.flatMap(set => JSON.parse(readFileSync(new URL(`../public/football/${set.id}.json`, import.meta.url), 'utf8')).clubs);
-  const ids = new Set([...CLUBS, ...NBA, ...EUROLEAGUE, ...NFL, ...MLB, ...NHL, ...NRL, ...seasonClubs].map(club => club.id));
+  const euroleague = JSON.parse(readFileSync(new URL('./data/euroleague-teams.json', import.meta.url), 'utf8'));
+  const pastEuroleague = [...Object.values(euroleague.history), ...Object.values(euroleague.eras).flat()];
+  const ids = new Set([...CLUBS, ...NBA, ...EUROLEAGUE, ...NFL, ...MLB, ...NHL, ...NRL, ...seasonClubs, ...pastEuroleague].map(club => club.id));
   for (const [id, colour] of Object.entries(colours)) {
     assert.ok(ids.has(id) || /^d[0-9A-Za-z]+-\d+$/.test(id), id);
     assert.equal(clubColour(id), colour.toLowerCase(), `${id} applied`);
