@@ -675,7 +675,7 @@ test('a season with nations only takes the nations, and choosing clubs goes back
     app.pickSetup('dataSet', 'ea-fifa-07');
     assert.equal(setup().layer, 'nations', 'the player chooses clubs again if they want them');
     app.pickSetup('layer', 'clubs');
-    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['clubs', 'ea-fifa-07', 'domestic:eu32s2007']);
+    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['clubs', 'ea-fifa-07', 'domestic:eu32e2007']);
   });
 });
 

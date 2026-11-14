@@ -117,13 +117,17 @@ else 15 and up). A player with neither plays nowhere and is left out.
 
 ## Leagues
 
-The seven built-in leagues are found by their stored names, or by
-CM0102Patcher's renames, in a competition whose nation is the right country:
-English Premier Division, Spanish First Division, Italian Serie A, German
-First Division, French First Division, Dutch Premier Division (nation
-"Holland") and Portuguese Premier League. Members are the clubs whose division
-is that competition, not the clubs of that nation, because cross-border clubs
-exist.
+Europe's first divisions (`LEAGUES` in `src/data/footballSetBuild.js`) are found
+by their stored names, or by CM0102Patcher's renames, in a competition whose nation
+is the right country: the seven big leagues' English Premier Division, Spanish
+First Division, Italian Serie A, German First Division, French First Division,
+Dutch Premier Division (nation "Holland") and Portuguese Premier League, which
+every database has, and the others where it has them (Scottish Premier Division,
+Turkish Premier Division, Belgian First Division, Russian Premier Division,
+Yugoslav First Division and so on). Members are the clubs whose division is that
+competition, not the clubs of that nation, because cross-border clubs exist. A
+built-in season keeps Europe's strongest 124 of them (`topClubs`); a local set
+keeps every one.
 
 ## SI's CD databases (CM 99/00 and CM 00/01)
 

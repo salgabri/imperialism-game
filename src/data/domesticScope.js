@@ -20,8 +20,12 @@ const THEATRE_SPORTS = new Set(EUROPE_MAPS.map(entry => entry.sport));
 /** Whether a sport's clubs choose between maps (`theatreMapsOf`) rather than always playing one (`clubMapOf`). */
 export const hasTheatreMaps = sportId => THEATRE_SPORTS.has(sportId);
 
-/** Whether a map is a season's (`dataSet`: an earlier season's id, or null for the built-in one). */
-const servesSeason = (entry, dataSet) => (dataSet == null ? entry.seasons == null : !!entry.seasons?.includes(dataSet));
+/**
+ * Whether a map is a season's (`dataSet`: an earlier season's id, or null for the built-in one) for a new campaign. One
+ * another has replaced (`replacedBy`: a season's seven-league map of before its clubs came from all of Europe) serves
+ * only the campaigns saved on it (src/engine/footballSets.js isSeasonTheatreMap).
+ */
+const servesSeason = (entry, dataSet) => !entry.replacedBy && (dataSet == null ? entry.seasons == null : !!entry.seasons?.includes(dataSet));
 
 /**
  * The map a sport's clubs always play on (basketball: the NBA's USA and Canada), or null. An earlier season names its

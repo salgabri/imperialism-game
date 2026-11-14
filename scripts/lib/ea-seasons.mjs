@@ -10,15 +10,21 @@
 import { NATIONS, HISTORIC_NATIONS, PACIFIC_ISLANDS, selectLineup } from '../../src/data/teams.js';
 import { EA_ROLES, EA_SCALE, eaTupleOf, expandEaTuple } from '../../src/data/eaPlayers.js';
 import { FOOTBALL_FEDERATIONS } from '../../src/data/footballFederations.js';
-import { FOOTBALL_SET_FORMAT, contentHash, presentClubs, serializeFootballSet, territoryFor } from '../../src/data/footballSetBuild.js';
+import { FOOTBALL_SET_FORMAT, contentHash, presentClubs, serializeFootballSet, strongestBuilt, territoryFor } from '../../src/data/footballSetBuild.js';
+import { BIG_LEAGUES } from '../../src/data/footballLeagues.js';
+import { TOP_CLUBS } from '../../src/data/scopes.js';
 import { pickFootballSquad } from '../../src/data/footballSquad.js';
 import { NATION_ALIASES } from './football-data.mjs';
+import { FOOTBALL_LEAGUES } from './first-divisions.mjs';
 
-/** EA's competition ids of the club layer's seven leagues (build-clubs keys them the same way): game league, map shape. */
-export const EA_LEAGUES = {
-  13: ['Premier League', '826'], 53: ['La Liga', '724'], 31: ['Serie A', '380'], 19: ['Bundesliga', '276'],
-  16: ['Ligue 1', '250'], 10: ['Eredivisie', '528'], 308: ['Liga Portugal', '620'],
-};
+/**
+ * EA's competition ids of Europe's first divisions, as the built-in club layer keys them (scripts/lib/first-divisions.mjs):
+ * game league, map shape. A season takes its clubs from all of them and keeps the strongest TOP_CLUBS, as the built-in
+ * season does.
+ */
+export const EA_LEAGUES = Object.freeze(Object.fromEntries(Object.entries(FOOTBALL_LEAGUES).map(([id, { league, country }]) => [id, [league, country]])));
+/** EA's Rest of World: clubs of leagues an edition had no licence for (FIFA 20's Olympiacos, Shakhtar Donetsk, Spartak Moscow). */
+export const REST_OF_WORLD = 76;
 
 /** EA's nationality names as the game names its nations: the built-in rosters' aliases, plus older spellings. */
 export const EA_NATION_ALIASES = {
@@ -51,6 +57,8 @@ const CLUB_SIZE = 11;
 // A SoFIFA link, absolute in older rows of the export and relative in newer ones.
 const PLAYER_LINK = /^(?:https:\/\/sofifa\.com)?\/player\/(\d{1,10})\/([a-z0-9-]+)\/(\d{6})\/?$/;
 
+// The audit lists the seven big leagues first, in their order, then the rest by name.
+const leagueOrder = league => (BIG_LEAGUES.includes(league) ? BIG_LEAGUES.indexOf(league) : BIG_LEAGUES.length);
 const mean = xs => (xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : 0);
 const seasonOf = year => `${year - 1}/${String(year % 100).padStart(2, '0')}`;
 const count = (map, key) => { map[key] = (map[key] || 0) + 1; };
@@ -75,15 +83,51 @@ export function buildEaSeason(rows, { id, fifaVersion, edition, update }, { data
   }
   if (rosters.size !== 1) throw new Error(`${edition}: rows from rosters ${[...rosters].join(', ')}, not one`);
   const source = { provider: 'EA Sports', edition, update, roster: [...rosters][0], snapshotDate: dates[0], url: dataset, rawScale: EA_SCALE };
+  const restOfWorld = new Map();
+  const leagueOf = row => {
+    const league = Number(row.league_id), club = Number(row.club_team_id);
+    if (league !== REST_OF_WORLD || !club) return EA_LEAGUES[league] || null;
+    if (!restOfWorld.has(club)) restOfWorld.set(club, { name: row.club_name, ...restOfWorldLeague(rows, club, fifaVersion, update) });
+    return restOfWorld.get(club).league;
+  };
   const records = mine.map(row => ({
     eaId: row.player_id, name: row.short_name, fullName: row.long_name, overall: row.overall, positions: row.player_positions,
     keys: row.player_positions.split(',').map(key => key.trim()), dob: row.dob, nationality: row.nationality_name,
     club: row.club_name, slug: PLAYER_LINK.exec(row.player_url)[2],
     // Clubs by EA's competition id: the export names each club's league as it is in a later edition (FIFA 15's
     // Burnley sits in "Championship"), but its id is the edition's own.
-    clubKey: Number(row.club_team_id) || null, league: EA_LEAGUES[Number(row.league_id)] || null,
+    clubKey: Number(row.club_team_id) || null, league: leagueOf(row),
   }));
-  return assembleEaSeason(records, { id, year: 2000 + fifaVersion, edition, update, source, federations });
+  // The audit names each Rest of World club and the league it plays in, or why it plays in none.
+  const placed = [...restOfWorld.values()].map(({ name, league, from }) => `${name}: ${league ? `${league[0]}, as in ${from}` : 'in no European first division in any edition'}`).sort();
+  return assembleEaSeason(records, { id, year: 2000 + fifaVersion, edition, update, source, federations, ...(placed.length ? { auditExtra: { restOfWorld: placed } } : {}) });
+}
+
+// Each export's clubs by EA club id: the first division each is in, edition by edition (a WeakMap, so one export is read once).
+const clubLeagues = new WeakMap();
+
+/**
+ * The first division a Rest of World club plays in: the one EA puts the same club id in, in the export's nearest other
+ * edition (launch rosters, roster update `update`), the later of two as near: FIFA 20's Olympiacos is FIFA 21's Greek
+ * Super League club. `{ league: EA_LEAGUES entry or null, from: 'FIFA 21' }`.
+ */
+export function restOfWorldLeague(rows, club, fifaVersion, update) {
+  let byClub = clubLeagues.get(rows);
+  if (!byClub) {
+    byClub = new Map();
+    for (const row of rows) {
+      const league = Number(row.league_id), id = Number(row.club_team_id);
+      if (!id || !EA_LEAGUES[league] || Number(row.fifa_update) !== update) continue;
+      const versions = byClub.get(id) || byClub.set(id, new Map()).get(id);
+      versions.set(Number(row.fifa_version), league);
+    }
+    clubLeagues.set(rows, byClub);
+  }
+  const versions = [...(byClub.get(club) || new Map())].filter(([version]) => version !== fifaVersion)
+    .sort(([a], [b]) => Math.abs(a - fifaVersion) - Math.abs(b - fifaVersion) || b - a);
+  if (!versions.length) return { league: null, from: null };
+  const [version, league] = versions[0];
+  return { league: EA_LEAGUES[league], from: version >= 24 ? `EA FC ${version}` : `FIFA ${version}` };
 }
 
 /**
@@ -116,9 +160,10 @@ export function buildSnapshotEaSeason(players, { id, fifaVersion, edition, updat
  * `{ eaId, name, fullName, overall, positions, keys, dob, nationality, club, slug, clubKey, league }`, where `keys`
  * are EA position codes, `positions` the source's own text of them (for messages), `dob` is YYYY-MM-DD or empty,
  * `clubKey` groups a club's players and `league` is an EA_LEAGUES entry `[game league, map shape]` or null (not one of
- * the seven). The season is `{ id, year, edition, update, source, federations }`, plus `auditExtra` (fields the audit
- * adds after the snapshot date), `everyLeague` (stop, not warn, on a league left with no club) and `noClubs` (a season
- * with nations only, so a league with no club is no news). Returns `{ doc, text, audit, warnings }`.
+ * Europe's first divisions). The season is `{ id, year, edition, update, source, federations }`, plus `auditExtra` (fields
+ * the audit adds after the snapshot date), `everyLeague` (stop, not warn, on one of the seven big leagues left with no
+ * club) and `noClubs` (a season with nations only, so a league with no club is no news). The season keeps Europe's
+ * strongest TOP_CLUBS clubs. Returns `{ doc, text, audit, warnings }`.
  */
 export function assembleEaSeason(records, { id, year, edition, update, source, federations = FOOTBALL_FEDERATIONS, auditExtra = {}, everyLeague = false, noClubs = false }) {
   const warnings = [];
@@ -180,22 +225,26 @@ export function assembleEaSeason(records, { id, year, edition, update, source, f
     if (club.name !== player.sourceInfo.club || club.league !== league[0]) throw new Error(`${edition}: club ${player.clubKey} has two names or leagues`);
     club.pool.push(player);
   }
-  const built = [], leagueAudit = Object.fromEntries(Object.values(EA_LEAGUES).map(([league]) => [league, { clubs: 0, short: [] }]));
+  // Every first division's clubs with eleven players; the season keeps Europe's strongest TOP_CLUBS of them. The audit
+  // lists the seven big leagues and every other league the edition has, each with its clubs, those kept and those short.
+  const built = [], leagueAudit = new Map(BIG_LEAGUES.map(league => [league, { clubs: 0, kept: 0, short: [] }]));
+  const auditOf = league => leagueAudit.get(league) || leagueAudit.set(league, { clubs: 0, kept: 0, short: [] }).get(league);
   for (const club of byClub.values()) {
     const squad = pickFootballSquad(club.pool);
     if (squad.length < CLUB_SIZE) {
-      leagueAudit[club.league].short.push({ name: club.name, players: squad.length });
+      auditOf(club.league).short.push({ name: club.name, players: squad.length });
       continue;
     }
-    leagueAudit[club.league].clubs++;
+    auditOf(club.league).clubs++;
     built.push({ name: club.name, league: club.league, country: club.country, str: Math.round(mean(squad.map(p => p.rating))), squad });
   }
-  for (const [league, { clubs }] of Object.entries(leagueAudit)) {
-    if (clubs || noClubs) continue;
+  for (const league of BIG_LEAGUES) {
+    if (leagueAudit.get(league).clubs || noClubs) continue;
     if (everyLeague) throw new Error(`${edition}: no ${league} club has eleven players`);
     warn(`No ${league} clubs in ${edition}`);
   }
-  const clubs = presentClubs(built, warn);
+  const clubs = presentClubs(strongestBuilt(built, TOP_CLUBS), warn);
+  for (const club of clubs) leagueAudit.get(club.league).kept++;
 
   const territory = territoryFor(federations, year);
   const written = new Set([...Object.values(nations).flatMap(([, , squad]) => squad), ...clubs.flatMap(club => club.squad)].map(tuple => tuple[0]));
@@ -209,6 +258,7 @@ export function assembleEaSeason(records, { id, year, edition, update, source, f
   // The nations short of a natural XI, as "id name (players)": the rest is in the season file itself.
   const shortNations = nationAudit.filter(n => !n.naturalLineup).map(n => `${n.id} ${n.name} (${n.players})`);
   const audit = { id, version: doc.version, edition, update, roster: source.roster, snapshotDate: source.snapshotDate, ...auditExtra,
-    rows: records.length, noTeam, coverage, leagues: leagueAudit, territory, shortNations, warnings };
+    rows: records.length, noTeam, coverage, leagues: Object.fromEntries([...leagueAudit].sort(([a], [b]) => leagueOrder(a) - leagueOrder(b) || (a < b ? -1 : 1))),
+    territory, shortNations, warnings };
   return { doc, text: serializeFootballSet(doc), audit, warnings };
 }

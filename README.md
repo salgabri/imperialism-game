@@ -1352,22 +1352,37 @@ own country.
 
 Welsh clubs of the Premier League (Swansea, Cardiff, in earlier seasons) hold Wales,
 not England. AS Monaco, a Ligue 1 club, holds the land around Monaco in France.
+**Russia's clubs hold European Russia only**, the regions of its five federal districts
+west of the Urals; the rest of Russia lies grey beneath the map, as a country with no
+club does, so a Moscow club never stretches to the Pacific.
 
-The earlier [football seasons](#football-seasons) hold the seven big leagues only, so
-their maps draw on those: the strongest 124 and 32 of that season's 124–134 clubs,
-one pair of maps per season. 2005/06, 2004/05, 1989/90 and the nine World
-Cups have nations only, so no maps. Football's "One country · top clubs" campaigns are
-unchanged. A world campaign saved before these maps stays on the world, and resumes
+The earlier [football seasons](#football-seasons) play Europe's strongest clubs of
+their own year, each season's pair of maps drawn from all of Europe's first divisions
+as today's are: 11 to 31 of each season's 124 come from beyond the seven big leagues
+(Turkey, Belgium, Greece, Scotland, Russia, Denmark, Sweden, Norway, Czechia, Ukraine,
+Austria, Switzerland, Croatia, Serbia, Poland and Hungary), and up to five of its elite
+(Galatasaray and Fenerbahçe, Zenit and CSKA Moscow in FIFA 15 and 16, Celtic and
+Rangers in the Championship Manager seasons). The three SWOS seasons, 1996/97, 1995/96
+and 1994/95, hold their seven leagues' team files only, so their maps are those leagues'
+strongest. 2005/06, 2004/05, 1989/90 and the computed seasons have nations only, so no
+maps. A campaign saved on an earlier season's map of before (when its 124 came from
+the seven leagues) still resumes there; a new one plays the season's map of all of
+Europe. Football's "One country · top clubs" campaigns are unchanged, and play today's
+clubs only. A world campaign saved before these maps stays on the world, and resumes
 as it was; a CM 01/02 set built on your own computer has no map of Europe, so it
 deals its clubs onto the world.
 
-Each map is `public/domestic/eu<clubs>[s<season year>].json` (60 files, 150–190 KB,
-fetched when chosen), with the index `src/data/europeMaps.js`. They follow the clubs, so
-rebuild them after `npm run build-clubs`, `npm run build:ea-seasons`, `npm run build:retro-seasons`,
+Each map is `public/domestic/eu<clubs>[<e or s><season year>].json`, fetched when chosen,
+with the index `src/data/europeMaps.js`: `eu124` and `eu32` today's, `eu124e2018` an earlier
+season's from all of Europe, `eu124s1995` a SWOS season's from its seven leagues (64 maps in
+play, 149–204 KB, 10.9 MB). The 56 seven-league maps the EA and Championship Manager seasons
+had before 14 November 2026 (`eu124s2018`, 9.3 MB) stay as they were, never rebuilt and never
+offered, for the campaigns saved on them. They follow the clubs, so rebuild them after
+`npm run build-clubs`, `npm run build:ea-seasons`, `npm run build:retro-seasons`,
 `npm run build-womens-football` or `npm run build:womens-seasons`:
 
 ```bash
-npm run build:europe-maps                  # about 8 minutes; --only=eu124,eu32 builds just those
+npm run build:europe-maps                  # about 30 minutes, most of it the maps with Russian clubs; --only=eu124,eu32 builds just those
 npm run build:europe-maps -- --check       # offline rebuild must match the committed files byte for byte
 ```
 
@@ -1486,9 +1501,12 @@ the game: pick one under **Season** in setup. Each is a file in
 `public/football/` (52–340 KB) that loads only when chosen.
 
 - **What a season holds:** every nation's best natural XI by EA nationality,
-  and the clubs of the seven biggest European leagues (132–134 clubs a season,
-  of which the strongest 124 play, on [the season's own maps](#the-europe-maps);
-  2005/06 and 2004/05 have nations only). Ratings are EA's overalls, unchanged.
+  and Europe's 124 strongest clubs of that edition, from every European first
+  division it rates (130–177 clubs beyond the seven big leagues a season, of which
+  18–27 make the 124), each with its best XI, on [the season's own maps](#the-europe-maps);
+  2005/06 and 2004/05 have nations only. A club EA filed under Rest of World for want of
+  a licence (FIFA 20's Olympiacos, Spartak Moscow and Shakhtar Donetsk) plays in the league
+  the same club is in in the nearest other edition. Ratings are EA's overalls, unchanged.
   EA rates only part of the world, so 49–82 nations field a full XI each season (fewer in the older
   editions). A nation with at least six rated players, half an XI, fields the players it has, short-handed
   below eleven; one with fewer fields no team, and its land stays neutral. Scotland, Wales and Northern Ireland field their own
@@ -1543,19 +1561,19 @@ twelve earlier seasons come from Sports Interactive's Championship Manager, a
 fan's update of it, Sensible World of Soccer and two fans' Championship Manager
 databases, one source each:
 
-| Season | Source | Nations with a full XI | Clubs |
+| Season | Source | Nations with a full XI | Clubs (beyond the seven big leagues) |
 | --- | --- | --- | --- |
-| 2003/04 | Alex Sawczuk's October 2003 update of SI's Championship Manager 01/02 (fan-made) | 109 | 129 |
-| 2002/03 | SI's Championship Manager 01/02, 3.9.68 | 108 | 129 |
-| 2001/02 | SI's Championship Manager 01/02, 3.9.60 | 96 | 130 |
-| 2000/01 | SI's Championship Manager 00/01, 3.81 | 82 | 130 |
-| 1999/00 | SI's Championship Manager 99/00, 3.70 | 74 | 130 |
-| 1998/99 | SI's Championship Manager 3, ported to CM 01/02 | 64 | 130 |
-| 1997/98 | SI's Championship Manager 97/98 | 52 | 124 |
-| 1996/97 | Sensible World of Soccer 96/97, the game's own team files | 133 | 134 |
-| 1995/96 | Sensible World of Soccer 95/96, the game's own team files | 132 | 134 |
-| 1994/95 | Sensible World of Soccer (the original, 1994), the game's own team files | 131 | 134 |
-| 1993/94 | Cam F's 93/94 for CM 01/02, fan-made | 77 | 130 |
+| 2003/04 | Alex Sawczuk's October 2003 update of SI's Championship Manager 01/02 (fan-made) | 109 | 124 (31) |
+| 2002/03 | SI's Championship Manager 01/02, 3.9.68 | 108 | 124 (27) |
+| 2001/02 | SI's Championship Manager 01/02, 3.9.60 | 96 | 124 (31) |
+| 2000/01 | SI's Championship Manager 00/01, 3.81 | 82 | 124 (28) |
+| 1999/00 | SI's Championship Manager 99/00, 3.70 | 74 | 124 (21) |
+| 1998/99 | SI's Championship Manager 3, ported to CM 01/02 | 64 | 124 (24) |
+| 1997/98 | SI's Championship Manager 97/98 | 52 | 124 (13) |
+| 1996/97 | Sensible World of Soccer 96/97, the game's own team files | 133 | 134 (none) |
+| 1995/96 | Sensible World of Soccer 95/96, the game's own team files | 132 | 134 (none) |
+| 1994/95 | Sensible World of Soccer (the original, 1994), the game's own team files | 131 | 134 (none) |
+| 1993/94 | Cam F's 93/94 for CM 01/02, fan-made | 77 | 124 (26) |
 | 1989/90 | Simon Treanor's 89/90 for CM 01/02, fan-made (Beta 5) | 88 | nations only |
 
 1993/94 and 1989/90 are rated by fans, not by a game's makers, and say so in the
@@ -1569,8 +1587,12 @@ as West Germany, and a German at an East German club plays for no nation.
   outfield player's seven skills summed, a keeper's price alone) becomes
   `round(40 + value * 59 / 49)`, from an empty shirt's 40 to 99. The raw values
   stay with each player.
-- **Clubs:** the seven biggest leagues' top divisions, on the season's own
-  [Europe maps](#the-europe-maps).
+- **Clubs:** Europe's 124 strongest of every first division the database holds
+  (CM 01/02 holds 26, CM 99/00 twelve), on the season's own
+  [Europe maps](#the-europe-maps). CM 99/00 rates Denmark's clubs like mid-table
+  Serie A ones, so eleven of them make 1999/00's 124; CM 01/02 puts eight or nine
+  Swedish clubs in. SWOS's team files are cached for the seven biggest leagues
+  only, so 1996/97, 1995/96 and 1994/95 hold those leagues' top divisions whole.
 - **Credits and rights:** Championship Manager is Sports Interactive's; Eidos
   made CM 01/02 free to download in December 2008 for personal, non-commercial
   use, the data's rights reserved. 3.9.60 and 3.9.68 are SI's own files as
@@ -1622,8 +1644,8 @@ considered, back to 1872, and their terms.
     (`FIRST_YEAR`).
   - It reads the binary files with the game's own parser (`src/data/cm0102.js`,
     format in [cm0102-format.md](docs/design/cm0102-format.md)).
-  - Every one of the 176 nations gets an entry, and clubs come from the seven
-    leagues the club layer already uses. Tonga, Samoa and the Cook Islands are
+  - Every one of the 176 nations gets an entry, and clubs come from every European
+    first division the database holds (`LEAGUES`, by CM's stored names). Tonga, Samoa and the Cook Islands are
     left out when the database rates none of their players: a season without them
     fields no team of theirs, as in every built-in EA season (none rates one).
   - Ratings are CM's current ability (1–200) converted once with

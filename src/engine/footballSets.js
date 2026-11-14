@@ -25,6 +25,7 @@ import { BUILT_IN_HOCKEY_SEASONS } from '../data/hockeySeasons.js';
 import { BUILT_IN_RUGBY_LEAGUE_SEASONS } from '../data/rugbyLeagueSeasons.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
 import { EUROPE_MAPS } from '../data/europeMaps.js';
+import { EUROPEAN_LEAGUES } from '../data/footballLeagues.js';
 import { FLAG_CODES } from '../data/flags.js';
 import { basketball } from '../sports/basketball.js';
 import { americanFootball } from '../sports/americanFootball.js';
@@ -635,8 +636,9 @@ function validateFootballSet(data, id) {
     }
   }
 
-  // League names are the built-in ones, so a club reads the same in every data set.
-  const leagues = new Set((women ? womensFootball : football).clubs.map(club => club.league));
+  // A men's club plays in one of Europe's first divisions (src/data/footballLeagues.js), named as in every other season; a
+  // women's club in a league of the built-in women's clubs.
+  const leagues = new Set(women ? womensFootball.clubs.map(club => club.league) : Object.keys(EUROPEAN_LEAGUES));
   if (!Array.isArray(data.clubs)) fail('clubs must be a list');
   if (!setHasClubs(id) && data.clubs.length) fail('this season has nations only');
   const clubIds = new Set();
@@ -648,7 +650,7 @@ function validateFootballSet(data, id) {
     clubIds.add(club.id);
     if (!text(club.name)) fail(`${at} has no name`);
     if (typeof club.code !== 'string' || !/^[A-Z0-9]{3}$/.test(club.code)) fail(`${at} code ${JSON.stringify(club.code)} must be three capitals`);
-    if (!leagues.has(club.league)) fail(`${at} league ${JSON.stringify(club.league)} is not a built-in league`);
+    if (!leagues.has(club.league)) fail(`${at} league ${JSON.stringify(club.league)} is not ${women ? 'a built-in league' : "one of Europe's first divisions"}`);
     if (!nation(club.country)) fail(`${at} country ${JSON.stringify(club.country)} is not a nation id`);
     if (!text(club.col)) fail(`${at} has no colour`);
     if (!rating(club.str)) fail(`${at} str must be a rating 1-99`);

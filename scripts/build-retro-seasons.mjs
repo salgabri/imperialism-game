@@ -26,6 +26,7 @@ import { CM_CONVERSION, CM_SCALE } from '../src/data/cmPlayers.js';
 import { SWOS_CONVERSION, SWOS_PRICES, SWOS_SCALE } from '../src/data/swosPlayers.js';
 import { buildFootballSet, seasonYear } from '../src/data/footballSetBuild.js';
 import { setHasClubs } from '../src/engine/footballSets.js';
+import { TOP_CLUBS } from '../src/data/scopes.js';
 import { buildCm9798Season } from './lib/cm9798.mjs';
 import { SWOS_LEAGUES, buildSwosSeason } from './lib/swos.mjs';
 import { SWOS_NATIONAL_FILES, readTeamFile, swosRows } from './lib/swos-files.mjs';
@@ -76,14 +77,14 @@ async function buildCmZip(season, dataDir, retrieved) {
   // Only the Data folder's tables: the language and picture files are not read.
   const files = unzipSync(zip, { filter: entry => /^[^/]+\.dat$/i.test(entry.name) });
   return buildFootballSet(files, { local: false, sourceExtra: credits(season, retrieved), ...(season.birthdays ? { famous: season.birthdays } : {}),
-    ...(season.noNationAt ? { noNationAt: season.noNationAt } : {}), ...(setHasClubs(season.id) ? {} : { clubs: false }) });
+    ...(season.noNationAt ? { noNationAt: season.noNationAt } : {}), ...(setHasClubs(season.id) ? { topClubs: TOP_CLUBS } : { clubs: false }) });
 }
 
 /** A Data folder's tables, each pinned on its own (taken from a CD, scripts/sync-retro-cds.mjs), read by the CM 01/02 builder as a known release. */
 async function buildCmTables(season, dataDir, retrieved) {
   const files = {};
   for (const file of season.files) files[file.name] = new Uint8Array(await pinned(dataDir, file));
-  return buildFootballSet(files, { local: false, kind: season.kind, sourceExtra: credits(season, retrieved) });
+  return buildFootballSet(files, { local: false, kind: season.kind, sourceExtra: credits(season, retrieved), topClubs: TOP_CLUBS });
 }
 
 async function buildCm9798(season, dataDir, retrieved) {

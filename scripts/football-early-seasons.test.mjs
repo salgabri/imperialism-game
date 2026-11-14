@@ -32,11 +32,16 @@ import { CM9798_CLUB_ALIASES, buildCm9798Season, cm9798Ratings } from './lib/cm9
 import { SWOS_SQUAD, buildSwosSeason, properCase } from './lib/swos.mjs';
 import { sampleDatabase, writeCm0102Files } from './lib/cm0102-fixture.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
+import { BIG_LEAGUES, EUROPEAN_LEAGUES } from '../src/data/footballLeagues.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const read = file => readFileSync(path.join(root, file), 'utf8');
 const MANIFEST = JSON.parse(read('scripts/data/retro-seasons.json'));
 const committed = id => JSON.parse(read(`public/football/${id}.json`));
+// A season's first division as its database holds it: every club, with eleven rated players or short (the build's audit),
+// of which the season keeps those among Europe's strongest 124.
+const AUDIT = JSON.parse(read('docs/design/football-retro-seasons-audit.json'));
+const leagueOf = (id, league) => AUDIT.seasons.find(season => season.id === id).audit.leagues.find(entry => entry.league === league);
 const tuplesOf = doc => [...Object.values(doc.nations).flatMap(([, , squad]) => squad), ...doc.clubs.flatMap(club => club.squad)];
 const IDS = ['cm0102-2003-10', 'cm0102-2002-11', 'cm0102-2001-09', 'cm-0001', 'cm-9900', 'cm0102-2020-11-cm3', 'cm-9798', 'swos-9697'];
 
@@ -114,15 +119,16 @@ test('every season rebuilds byte for byte from its pinned sources (when they are
   assert.match(run.stdout, new RegExp(`${MANIFEST.seasons.length + 2} files rebuild byte for byte`), 'every season, the listing and the audit');
 });
 
-// Each season's coverage: what its source rates, written exactly.
+// Each season's coverage: what its source rates, written exactly. Its clubs are Europe's strongest 124 (TOP_CLUBS) of every first
+// division the database holds.
 const COVERAGE = {
-  'cm0102-2003-10': { players: 2614, nations: 162, completeXIs: 109, clubs: 129, leagues: 7 },
-  'cm0102-2002-11': { players: 2599, nations: 162, completeXIs: 108, clubs: 129, leagues: 7 },
-  'cm0102-2001-09': { players: 2458, nations: 143, completeXIs: 96, clubs: 130, leagues: 7 },
-  'cm-0001': { players: 2284, nations: 134, completeXIs: 82, clubs: 130, leagues: 7 },
-  'cm-9900': { players: 2178, nations: 123, completeXIs: 74, clubs: 130, leagues: 7 },
-  'cm0102-2020-11-cm3': { players: 2066, nations: 113, completeXIs: 64, clubs: 130, leagues: 7 },
-  'cm-9798': { players: 1899, nations: 102, completeXIs: 52, clubs: 124, leagues: 7 },
+  'cm0102-2003-10': { players: 2511, nations: 162, completeXIs: 109, clubs: 124, leagues: 18 },
+  'cm0102-2002-11': { players: 2500, nations: 162, completeXIs: 108, clubs: 124, leagues: 17 },
+  'cm0102-2001-09': { players: 2349, nations: 143, completeXIs: 96, clubs: 124, leagues: 18 },
+  'cm-0001': { players: 2182, nations: 134, completeXIs: 82, clubs: 124, leagues: 18 },
+  'cm-9900': { players: 2101, nations: 123, completeXIs: 74, clubs: 124, leagues: 12 },
+  'cm0102-2020-11-cm3': { players: 1964, nations: 113, completeXIs: 64, clubs: 124, leagues: 18 },
+  'cm-9798': { players: 1870, nations: 102, completeXIs: 52, clubs: 124, leagues: 12 },
   'swos-9697': { players: 2937, nations: 133, completeXIs: 133, clubs: 134, leagues: 7 },
 };
 
@@ -132,8 +138,12 @@ test('each season decodes, and fields the nations and clubs its source rates', (
     const set = decodeFootballSet(doc);
     assert.deepEqual(doc.coverage, COVERAGE[id], id);
     assert.equal(Object.keys(set.rosters).length, Object.keys(NATIONS).length, `${id}: every nation has a roster`);
-    assert.deepEqual([...new Set(set.clubs.map(club => club.league))].sort(), setHasClubs(id)
-      ? ['Bundesliga', 'Eredivisie', 'La Liga', 'Liga Portugal', 'Ligue 1', 'Premier League', 'Serie A'] : [], id);
+    // Europe's strongest 124 of every first division the database holds, the seven big leagues' among them; SWOS's
+    // team files hold the seven big leagues alone.
+    const leagues = new Set(set.clubs.map(club => club.league));
+    const beyond = id.startsWith('swos-') ? leagues.size === BIG_LEAGUES.length : leagues.size > BIG_LEAGUES.length;
+    assert.ok(setHasClubs(id) ? BIG_LEAGUES.every(league => leagues.has(league)) && beyond : !leagues.size, id);
+    assert.ok([...leagues].every(league => EUROPEAN_LEAGUES[league]), id);
     assert.ok(set.clubs.every(club => club.squad.length >= 11), `${id}: a club fields eleven`);
     const ids = tuplesOf(doc).map(tuple => tuple[0]);
     assert.equal(new Set(ids).size, new Set(ids.map(String)).size, `${id}: one id per player`);
@@ -157,8 +167,10 @@ test('each season with clubs plays on its own two Europe maps: its strongest 124
       assert.ok(!EUROPE_MAPS.some(entry => entry.seasons?.includes(id)));
       continue;
     }
+    // A season whose clubs come from all of Europe has maps of its own ids; SWOS's, from its seven leagues' team files, keeps its first.
+    const tag = `${id.startsWith('swos-') ? 's' : 'e'}${doc.year}`;
     assert.deepEqual(maps.map(map => [map.id, map.clubs, map.theatre, map.seasons]),
-      [[`eu124s${doc.year}`, TOP_CLUBS, 'all', [id]], [`eu32s${doc.year}`, ELITE_CLUBS, 'elite', [id]]], id);
+      [[`eu124${tag}`, TOP_CLUBS, 'all', [id]], [`eu32${tag}`, ELITE_CLUBS, 'elite', [id]]], id);
     for (const [count, map] of [[TOP_CLUBS, maps[0]], [ELITE_CLUBS, maps[1]]]) {
       const file = JSON.parse(read(`public/domestic/${map.id}.json`));
       assert.equal(file.version, map.version);
@@ -262,15 +274,17 @@ test('the CM 01/02 seasons are SI\'s own databases, the CM3 port with its birth 
   assert.match(MANIFEST.seasons[0].rights, /The user chose to ship it on 2026-11-10/);
   assert.deepEqual(sawczuk.nations['826'][2].find(tuple => tuple[1] === 'David Beckham').slice(3), [187, 'rm', 'England', 'Real Madrid C.F.', '1975-05-02']);
   assert.deepEqual(sawczuk.nations['372'][2].find(tuple => tuple[1] === 'Damien Duff').slice(3, 7), [179, 'lm,lw', 'Republic of Ireland', 'Chelsea']);
-  assert.equal(sawczuk.clubs.filter(club => club.league === 'Eredivisie').length, 17);
-  // Its La Liga lists Real Oviedo, relegated in 2001, rather than Málaga, and its Ligue 1 keeps CM 01/02's 18 clubs.
-  const laLiga = sawczuk.clubs.filter(club => club.league === 'La Liga').map(club => club.name);
-  assert.ok(laLiga.includes('Real Oviedo C.F.') && !laLiga.includes('Málaga C.F.'), 'as the update stores them');
-  assert.equal(sawczuk.clubs.filter(club => club.league === 'Ligue 1').length, 18);
+  assert.equal(leagueOf('cm0102-2003-10', 'Eredivisie').clubs, 17);
+  // Its La Liga lists Real Oviedo, relegated in 2001, rather than Málaga, and its Ligue 1 keeps CM 01/02's 18 clubs. The
+  // season keeps Europe's strongest 124 of them: Oviedo is not among them, and only nine of Ligue 1's.
+  assert.deepEqual([leagueOf('cm0102-2003-10', 'La Liga').clubs, leagueOf('cm0102-2003-10', 'Ligue 1').clubs], [20, 18]);
+  assert.ok(!sawczuk.clubs.some(club => club.name === 'Málaga C.F.'), 'as the update stores them');
+  assert.deepEqual(['La Liga', 'Ligue 1'].map(league => sawczuk.clubs.filter(club => club.league === league).length),
+    ['La Liga', 'Ligue 1'].map(league => leagueOf('cm0102-2003-10', league).kept));
   assert.match(MANIFEST.seasons[0].provenance, /Real Oviedo.*Málaga.*18 clubs/);
   // CM 99/00 names the Eredivisie after its sponsor and misspells Burkina Faso; both are read.
   const cm9900 = committed('cm-9900');
-  assert.equal(cm9900.clubs.filter(club => club.league === 'Eredivisie').length, 18);
+  assert.deepEqual([leagueOf('cm-9900', 'Eredivisie').competition, leagueOf('cm-9900', 'Eredivisie').clubs], ['Dutch KPN-Telecompetition', 18]);
   assert.ok(cm9900.nations['854'][2].length && cm9900.nations['854'][2].every(tuple => tuple[5] === 'Burkino Faso'));
   const cm3 = CM0102_RELEASES.find(entry => entry.id === 'cm0102-2020-11-cm3');
   assert.deepEqual([cm3.season, cm3.shifts.birth, cm3.snapshotDate, cm3.signatures[0].staffTrailing], ['1998/99', -3, '1999-03', 230]);
@@ -372,7 +386,7 @@ test('CM 97/98 stops rather than guess', () => {
   assert.throws(build([record({ ability: 250 })]), /ability 250/);
   assert.throws(build([record()], [...TEAMS, { name: 'Other', shortName: 'Testford', nation: 'England', division: 'ED1' }]), /EPR team Testford United shares a name/);
   assert.throws(build([record()], TEAMS.filter(team => team.division !== 'PD1')), /No PD1 teams/);
-  // The committed season: the clubs of the seven top divisions with eleven rated players, and its provenance stated.
+  // The committed season: Europe's strongest 124 clubs of its first divisions with eleven rated players, and its provenance stated.
   const doc = committed('cm-9798');
   assert.equal(doc.clubs.length, 124);
   assert.match(doc.source.provenance, /names neither the tool .* nor the game's version/);
@@ -543,16 +557,16 @@ test('the running App launches a 2001/02 clubs campaign on its own map of Europe
     app.pickSetup('layer', 'clubs');
     app.pickSetup('clubScope', 'domestic:eu32');
     app.pickSetup('dataSet', 'cm0102-2001-09');
-    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32s2002'], 'the theatre follows the season');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32e2002'], 'the theatre follows the season');
     time.advance(200);
     await app.loadSet('cm0102-2001-09');
-    await app.loadCountry('eu32s2002');
+    await app.loadCountry('eu32e2002');
     await settle();
     app.startCampaign();
     const st = app.state;
     assert.equal(st.phase, 'playing');
     assert.deepEqual([st.settings.dataSet, st.settings.dataSeason, st.settings.domesticVersion],
-      ['cm0102-2001-09', '2001/02', EUROPE_MAPS.find(entry => entry.id === 'eu32s2002').version]);
+      ['cm0102-2001-09', '2001/02', EUROPE_MAPS.find(entry => entry.id === 'eu32e2002').version]);
     const elite = strongestClubs(doc.clubs, ELITE_CLUBS);
     assert.deepEqual(Object.keys(st.teams).sort(), elite.map(club => club.id).sort(), 'the season\'s elite');
     const top = elite[0];
@@ -577,16 +591,16 @@ test('the running App offers 2000/01 and 1999/00 with clubs and nations, and pla
     app.pickSetup('layer', 'clubs');
     app.pickSetup('clubScope', 'domestic:eu32');
     app.pickSetup('dataSet', 'cm-9900');
-    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32s2000'], 'the theatre follows the season');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32e2000'], 'the theatre follows the season');
     time.advance(200);
     await app.loadSet('cm-9900');
-    await app.loadCountry('eu32s2000');
+    await app.loadCountry('eu32e2000');
     await settle();
     app.startCampaign();
     const st = app.state;
     assert.equal(st.phase, 'playing');
     assert.deepEqual([st.settings.dataSet, st.settings.dataSeason, st.settings.domesticVersion],
-      ['cm-9900', '1999/00', EUROPE_MAPS.find(entry => entry.id === 'eu32s2000').version]);
+      ['cm-9900', '1999/00', EUROPE_MAPS.find(entry => entry.id === 'eu32e2000').version]);
     const elite = strongestClubs(doc.clubs, ELITE_CLUBS);
     assert.deepEqual(Object.keys(st.teams).sort(), elite.map(club => club.id).sort(), 'the season\'s elite');
     assert.equal(elite[0].name, 'Juventus');

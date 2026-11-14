@@ -11,6 +11,7 @@ import { cmMonthDay, decodeCmDate, fileSignature, readCm0102 } from './cm0102.js
 import { CM0102_RELEASES } from './cm0102Releases.js';
 import { CM0102_NATIONS } from './cm0102Nations.js';
 import { FOOTBALL_FEDERATIONS } from './footballFederations.js';
+import { BIG_LEAGUES, EUROPEAN_LEAGUES } from './footballLeagues.js';
 import { pickFootballSquad } from './footballSquad.js';
 import { sha256 } from './sha256.js';
 
@@ -32,18 +33,43 @@ export const NO_TEAM = 'noTeam';
 const DEFAULT_PROVIDER = 'CM 01/02 Update Team';
 const CLUB_SIZE = 11;
 
-// The built-in league ids and map shapes (scripts/build-clubs.mjs FOOTBALL_LEAGUES), so a club theatre means the same
-// in every set. Each is found by its stored CM name or CM0102Patcher's rename, in a competition of that nation. SI's
-// CM 99/00 stores the Eredivisie under its sponsor's name of 1999/00, 'Dutch KPN-Telecompetition'.
-export const LEAGUES = {
-  'Premier League': { country: '826', names: ['English Premier Division', 'English Premier League'] },
-  'La Liga': { country: '724', names: ['Spanish First Division', 'Spanish La Liga'] },
-  'Serie A': { country: '380', names: ['Italian Serie A'] },
-  Bundesliga: { country: '276', names: ['German First Division', 'German Bundesliga'] },
-  'Ligue 1': { country: '250', names: ['French First Division', 'French Ligue 1'] },
-  Eredivisie: { country: '528', names: ['Dutch Premier Division', 'Dutch Eredivisie', 'Dutch KPN-Telecompetition'] },
-  'Liga Portugal': { country: '620', names: ['Portuguese Premier League', 'Liga Portugal 1'] },
+// Europe's first divisions as the game names them (src/data/footballLeagues.js), with their map shapes, so a club theatre
+// means the same in every set: the seven big leagues, then every other one a CM database holds. Each is found by its
+// stored CM name or CM0102Patcher's rename, in a competition of that nation. SI's CM 99/00 stores the Eredivisie under its
+// sponsor's name of 1999/00, 'Dutch KPN-Telecompetition'; CM 00/01 names the Süper Lig and FR Yugoslavia's first league
+// in its own way.
+const CM_LEAGUE_NAMES = {
+  'Premier League': ['English Premier Division', 'English Premier League'],
+  'La Liga': ['Spanish First Division', 'Spanish La Liga'],
+  'Serie A': ['Italian Serie A'],
+  Bundesliga: ['German First Division', 'German Bundesliga'],
+  'Ligue 1': ['French First Division', 'French Ligue 1'],
+  Eredivisie: ['Dutch Premier Division', 'Dutch Eredivisie', 'Dutch KPN-Telecompetition'],
+  'Liga Portugal': ['Portuguese Premier League', 'Liga Portugal 1'],
+  'Süper Lig': ['Turkish Premier Division', 'Turkish First Division'],
+  'Belgian Pro League': ['Belgian First Division'],
+  'Greek Super League': ['Greek National A Division', 'Greek Premier Division'],
+  'Czech First League': ['Czech First Division'],
+  'Scottish Premiership': ['Scottish Premier Division'],
+  'Danish Superliga': ['Danish Premier Division'],
+  Eliteserien: ['Norwegian Premier Division'],
+  'Croatian HNL': ['Croatian First Division'],
+  Ekstraklasa: ['Polish First Division'],
+  'Swiss Super League': ['Swiss National Division A'],
+  'Austrian Bundesliga': ['Austrian Premier Division'],
+  Allsvenskan: ['Swedish Premier Division'],
+  Veikkausliiga: ['Finnish Premier Division'],
+  'League of Ireland': ['Irish Premier Division'],
+  'Russian Premier League': ['Russian Premier Division'],
+  'Yugoslav First League': ['Yugoslav First Division', 'Yugoslavian Premier Division'],
+  'Irish League': ['Northern Irish League Premier Division'],
+  'Welsh Premier League': ['Welsh Premier Division'],
+  'Luxembourg National Division': ['Luxembourg National Division'],
 };
+export const LEAGUES = Object.freeze(Object.fromEntries(Object.entries(CM_LEAGUE_NAMES).map(([league, names]) => {
+  if (!EUROPEAN_LEAGUES[league]) throw new Error(`CM league ${league} is not one of src/data/footballLeagues.js's`);
+  return [league, Object.freeze({ country: EUROPEAN_LEAGUES[league], names })];
+})));
 
 // Real birthdays of players spread across the database era, to check the stored birth-year shift. Players only,
 // because the reader returns players (so no managers such as Alex Ferguson).
@@ -96,6 +122,17 @@ function hashStr(s) {
 /** A club's colour from its id, as build-clubs gives it. */
 export const colourFor = id => `oklch(0.72 0.16 ${hashStr(id) % 360})`;
 
+// A set's clubs, strongest first (equals by name): the order its rows are written in and the order its Europe maps' fields
+// are taken in (src/data/scopes.js strongestClubs keeps the file's order among equals).
+const strongestFirst = (a, b) => b.str - a.str || byText(a.name, b.name);
+
+/**
+ * The `count` strongest of a season's clubs (`built`, as presentClubs takes them), in the order presentClubs writes
+ * them: a season keeps Europe's strongest first-division clubs, as the built-in club layer does (TOP_CLUBS,
+ * src/data/scopes.js). With no count, every one.
+ */
+export const strongestBuilt = (built, count = null) => (count == null ? built.slice() : built.slice().sort(strongestFirst).slice(0, count));
+
 /**
  * A set's club rows, strongest first, from `built` ([{ name, league, country, str, squad }], each squad player
  * carrying its `tuple`): `f-<slug>` ids (a clash gets a suffix, and a warning), three-capital codes and colours, as
@@ -103,7 +140,7 @@ export const colourFor = id => `oklch(0.72 0.16 ${hashStr(id) % 360})`;
  */
 export function presentClubs(built, warn) {
   const codes = new Set(), ids = new Set();
-  return built.slice().sort((a, b) => b.str - a.str || byText(a.name, b.name)).map(club => {
+  return built.slice().sort(strongestFirst).map(club => {
     const base = `f-${slug(club.name)}`;
     let id = base;
     for (let n = 2; ids.has(id); n++) id = `${base}-${n}`;
@@ -394,13 +431,15 @@ function withoutTrailingBytes(files, trailing) {
  * compiled it, when it was read), and `kind`, the set kind its manifest names, checked against the one its id makes.
  * `noNationAt` (`{ nationality, clubs, label, playsFor }`) makes the players of that stored nationality at those clubs (by
  * name) play for nation `playsFor` instead, or with none for no nation, though still for their clubs: a 1989/90 database
- * that files East Germans as 'Germany' names its East German clubs, whose Germans play for East Germany (278). `clubs: false` builds the nations alone (a season whose clubs are not its year's). Returns
+ * that files East Germans as 'Germany' names its East German clubs, whose Germans play for East Germany (278). `clubs: false` builds the nations alone (a season whose clubs are not its year's).
+ * Clubs come from every European first division the database holds (LEAGUES); `topClubs` keeps only that many of the
+ * strongest (a built-in season keeps TOP_CLUBS, src/data/scopes.js), and with none every one stays. Returns
  * `{ doc, text, audit, summary, warnings }`; throws on an unknown layout, an unmapped nation (unless allowed) or an
  * unnamed database.
  */
 export function buildFootballSet(files, {
   databases = CM0102_RELEASES, nationMap = CM0102_NATIONS, federations = FOOTBALL_FEDERATIONS, identity = {}, allowUnmapped = false,
-  famous = FAMOUS_BIRTHDAYS, verifyFiles = true, local = true, sourceExtra = {}, kind, noNationAt = null, clubs: withClubs = true,
+  famous = FAMOUS_BIRTHDAYS, verifyFiles = true, local = true, sourceExtra = {}, kind, noNationAt = null, clubs: withClubs = true, topClubs = null,
 } = {}) {
   const warnings = [];
   const warn = message => warnings.push(message);
@@ -553,9 +592,11 @@ export function buildFootballSet(files, {
     const membersOf = comp => parsed.clubs.filter(club => club.division === comp.row && club.nation != null);
     const comps = parsed.competitions.filter(c => wanted.has(fold(c.name)) && c.nation != null && nationRows[c.nation].id === country)
       .map(comp => ({ comp, members: membersOf(comp) }));
+    // Every database has the seven big leagues; most have only some of the others.
     if (!comps.length) {
+      if (!BIG_LEAGUES.includes(league)) continue;
       warn(`No ${league} in this database: no ${names.join(' or ')} of ${NATIONS[country][0]}`);
-      leagueAudit.push({ league, country, competition: null, members: 0, clubs: 0, short: [] });
+      leagueAudit.push({ league, country, competition: null, members: 0, clubs: 0, kept: 0, short: [] });
       continue;
     }
     const { comp, members } = comps.reduce((best, c) => (c.members.length > best.members.length ? c : best));
@@ -566,10 +607,12 @@ export function buildFootballSet(files, {
       if (squad.length < CLUB_SIZE) { short.push({ name: club.name, players: squad.length }); continue; }
       built.push({ name: club.name, league, country, str: Math.round(mean(squad.map(p => p.rating))), squad });
     }
-    leagueAudit.push({ league, country, competition: comp.name, members: members.length, clubs: members.length - short.length, short });
+    leagueAudit.push({ league, country, competition: comp.name, members: members.length, clubs: members.length - short.length, kept: 0, short });
   }
-  // A season with nations only keeps its leagues in the audit, as the reason it has no clubs.
-  const clubs = withClubs ? presentClubs(built, warn) : [];
+  // A season keeps Europe's strongest clubs (`topClubs`); one with nations only keeps its leagues in the audit, as the
+  // reason it has no clubs.
+  const clubs = withClubs ? presentClubs(strongestBuilt(built, topClubs), warn) : [];
+  for (const club of clubs) leagueAudit.find(entry => entry.league === club.league).kept++;
 
   // The names, codes and flags of the federations of the day that field players (none from 1996/97 on).
   const identities = identitiesFor(federations, database.year, { fields: id => nations[id]?.[2].length > 0 });

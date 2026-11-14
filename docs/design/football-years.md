@@ -492,11 +492,19 @@ How a season is made:
   keep the players they have (an empty nation plays at 40).
 - **Clubs by competition id.** The export names each club's league as it is in a
   later edition (FIFA 15's Burnley is in "Championship"), but its `league_id` is
-  the edition's own, so clubs are taken from ids 13, 53, 31, 19, 16, 10 and 308,
-  the seven big leagues. A club needs a natural XI, as build-clubs
-  requires: 132–134 clubs a season, of which the strongest 124 and 32 play on the
-  season's own [Europe maps](domestic-campaigns.md#the-europe-maps). Ids, codes and colours come from the same
-  `presentClubs` as the CM builder.
+  the edition's own, so clubs are taken by id from every European first division the
+  edition rates (`EA_LEAGUES`: the built-in club layer's 26 and Russia's, 67). A club needs
+  eleven rated players, as build-clubs requires, and a season keeps Europe's strongest
+  `TOP_CLUBS` (124) of them, as the built-in season does (until 14 November 2026 the seven
+  big leagues' 132–134 clubs): they and their strongest 32 play on the season's own
+  [Europe maps](domestic-campaigns.md#the-europe-maps). The seven big leagues must each have
+  a club; the audit lists every league's clubs, those kept and those short. Ids, codes and
+  colours come from the same `presentClubs` as the CM builder.
+- **Rest of World.** An edition files the clubs of a league it has no licence for under
+  Rest of World (league 76): FIFA 20's Greek, Russian and Ukrainian clubs, Dinamo Zagreb
+  and HJK. Such a club plays in the first division its `club_team_id` is in in the export's
+  nearest other edition, the later of two as near (`restOfWorldLeague`: FIFA 20's Olympiacos
+  is FIFA 21's Greek Super League club), and the audit names each (`restOfWorld`).
 - **Territory** is `territoryFor(FOOTBALL_FEDERATIONS, year)`, as for CM sets:
   Kosovo has no team before 2015/16, and Sudan holds South Sudan in the older seasons.
 - **Ratings** are EA's overall, 1–99, unchanged.
@@ -540,12 +548,14 @@ How they are joined:
   no Latin part of its own is not used.
 - **Club names.** EA's website names some clubs its own way, among them the clubs
   it had no licence for: Inter is "Lombardia FC", Atalanta "Bergamo Calcio", Lazio
-  "Latium", Paris Saint-Germain "Paris SG". Each club in the seven leagues takes the
+  "Latium", Paris Saint-Germain "Paris SG". Each club of Europe's first divisions takes the
   June name most of its launch players carry, more than half of them (Rennes is
   closest, at 15 of 25), so the club ids match the other seasons' and a winter
   transfer moves nobody. 44 clubs are renamed (`clubNames` in the audit). The build
   stops on a club the June file cannot name, and on two clubs that would share one
-  name. A player of a club outside the seven leagues keeps EA's club name.
+  name. A player of a club outside them keeps EA's club name. The website files a league's
+  few licensed clubs under a name of its own ("Hellas Liga": Olympiacos, Panathinaikos,
+  AEK Athens, PAOK), which `SITE_LEAGUES` reads as that league.
 - **Spellings.** EA's website writes `Holland`, `Curaçao`, `St. Kitts and Nevis`
   and `St. Lucia`; the first is the Netherlands, the others have no team.
 - **Roster.** Players link to SoFIFA's release roster of the edition, 250002
@@ -554,8 +564,9 @@ How they are joined:
   so on), like FIFA 15 – EA FC 24's update 2. The season's date is the export's.
   EA's own website only ever shows the current edition, so its links would not.
 
-Result: 75 nations field a full XI, 139 have players, and all 132 clubs of the
-seven leagues are there, the strongest 124 and 32 on the season's two Europe maps.
+Result: 75 nations field a full XI, 139 have players, and Europe's strongest 124 clubs
+are there (25 of them from beyond the seven big leagues), all of them and the strongest 32
+on the season's two Europe maps.
 Four of its Top 124 clubs had no ground in `scripts/data/europe-clubs.json` under
 these names (UD Las Palmas, CD Leganés, Montpellier HSC, Holstein Kiel); each takes
 the row its country map gives, as the same clubs' rows under other names already do.
@@ -581,8 +592,11 @@ through the same `assembleEaSeason`):
 `scripts/data/ea-seasons.json` (`legacy`) pins every file by SHA-256 and names,
 per edition, the roster each file holds and the evidence for it. A player
 missing from either file is left out, and nothing is borrowed from another
-edition. Clubs come from each edition's seven SoFIFA league names (the same
-seven every year, such as `Portuguese Liga ZON SAGRES`): 132 clubs a season.
+edition. Clubs come from each edition's SoFIFA league names of Europe's first divisions
+(`leagues` per edition: the seven big leagues every year, such as `Portuguese Liga ZON
+SAGRES`, and the 11–13 others its clubs file holds), and the season keeps Europe's
+strongest 124 of them. The scrape names a club's league as it was later, so FIFA 07–14's
+Rest of World clubs (Olympiacos, Galatasaray in FIFA 12–14) sit in their own leagues.
 `Turks and Caicos Islands` joins `EA_NO_TEAM`.
 
 - **Two rosters for FIFA 07 to FIFA 11.** The ratings file holds the August
@@ -730,19 +744,19 @@ where a kind is read from two kinds of source (CM: a zip, or a CD's tables) or
 from a source of its own (SWOS: the game's team files, for all three editions
 since 2026-11-14, when 1996/97 left its database for them and gained its clubs).
 
-| Season | Id | Source | Nations with players (full XIs) | Clubs |
+| Season | Id | Source | Nations with players (full XIs) | Clubs (beyond the seven big leagues) |
 | --- | --- | --- | --- | --- |
-| 2003/04 | `cm0102-2003-10` | Alex Sawczuk's October 2003 update of SI's CM 01/02, from a magazine cover CD (fan-made) | 162 (109) | 129 |
-| 2002/03 | `cm0102-2002-11` | SI's CM 01/02 3.9.68 | 162 (108) | 129 |
-| 2001/02 | `cm0102-2001-09` | SI's CM 01/02 3.9.60 | 143 (96) | 130 |
-| 2000/01 | `cm-0001` | SI's CM 00/01 3.81, from its UK retail CD | 134 (82) | 130 |
-| 1999/00 | `cm-9900` | SI's CM 99/00 3.70, from its UK retail CD | 123 (74) | 130 |
-| 1998/99 | `cm0102-2020-11-cm3` | SI's CM3 data, ported to CM 01/02 | 113 (64) | 130 |
-| 1997/98 | `cm-9798` | SI's CM 97/98, extracted to JSON | 102 (52) | 124 |
-| 1996/97 | `swos-9697` | Sensible World of Soccer 96/97's team files | 133 (133) | 134 |
-| 1995/96 | `swos-9596` | Sensible World of Soccer 95/96's team files | 132 (132) | 134 |
-| 1994/95 | `swos-9495` | Sensible World of Soccer's team files (the original, v1.0) | 131 (131) | 134 |
-| 1993/94 | `cm0102-2020-11-cm93` | Cam F's fan-made 93/94 for CM 01/02 | 124 (77) | 130 |
+| 2003/04 | `cm0102-2003-10` | Alex Sawczuk's October 2003 update of SI's CM 01/02, from a magazine cover CD (fan-made) | 162 (109) | 124 (31) |
+| 2002/03 | `cm0102-2002-11` | SI's CM 01/02 3.9.68 | 162 (108) | 124 (27) |
+| 2001/02 | `cm0102-2001-09` | SI's CM 01/02 3.9.60 | 143 (96) | 124 (31) |
+| 2000/01 | `cm-0001` | SI's CM 00/01 3.81, from its UK retail CD | 134 (82) | 124 (28) |
+| 1999/00 | `cm-9900` | SI's CM 99/00 3.70, from its UK retail CD | 123 (74) | 124 (21) |
+| 1998/99 | `cm0102-2020-11-cm3` | SI's CM3 data, ported to CM 01/02 | 113 (64) | 124 (24) |
+| 1997/98 | `cm-9798` | SI's CM 97/98, extracted to JSON | 102 (52) | 124 (13) |
+| 1996/97 | `swos-9697` | Sensible World of Soccer 96/97's team files | 133 (133) | 134 (none) |
+| 1995/96 | `swos-9596` | Sensible World of Soccer 95/96's team files | 132 (132) | 134 (none) |
+| 1994/95 | `swos-9495` | Sensible World of Soccer's team files (the original, v1.0) | 131 (131) | 134 (none) |
+| 1993/94 | `cm0102-2020-11-cm93` | Cam F's fan-made 93/94 for CM 01/02 | 124 (77) | 124 (26) |
 | 1989/90 | `cm0102-2017-04-cm89` | Simon Treanor's fan-made 89/90 for CM 01/02 | 137 (88) | nations only |
 
 The ten seasons with clubs play on their own Europe maps (`eu124s2004`,
@@ -780,8 +794,8 @@ worktree's boundary cache.
   commit `e658af1`, 9 June 2021). Their `club.dat` and `staff.dat` are byte for
   byte SI's untouched files, whose sizes and SHA-256 `cm0102Releases.js` lists.
 - **Built** by the CM 01/02 builder as known releases, exactly as a local
-  database is (above): `round(ca * 99 / 200)`, natural positions, the seven
-  leagues' top divisions with eleven rated players. They are `local: false`, and
+  database is (above): `round(ca * 99 / 200)`, natural positions, Europe's strongest
+  124 clubs of every first division the database holds with eleven rated players. They are `local: false`, and
   the builder adds `compiler` and `retrieved` to their source. `.gitignore`
   keeps every other `public/football/cm0102-*` local, and
   `npm run build:football-set` neither writes nor lists a built-in id.
@@ -853,8 +867,8 @@ worktree's boundary cache.
   `Dutch KPN-Telecompetition` (one more stored name in the builder's `LEAGUES`),
   and spells Burkina Faso `Burkino Faso` (an alias in `cm0102Nations.js`). Its
   `Zaire` placeholder (two players) fields no team, as in SI's later databases.
-- **Clubs**: the seven leagues whole, 130 clubs in each season (Premier League
-  and La Liga 20, the others 18). CM 00/01 rates one player of the Cook Islands,
+- **Clubs**: Europe's strongest 124 of every first division with eleven rated players
+  (until 14 November 2026 the seven leagues whole, 130 clubs in each season). CM 00/01 rates one player of the Cook Islands,
   so Tonga, Samoa and the Cook Islands are listed (176 nations); CM 99/00 rates
   none of theirs (173).
 - **Checked against history**: 1999/00's strongest clubs are Juventus (86), Lazio
@@ -1010,10 +1024,10 @@ without it ([football-year-permissions.md](football-year-permissions.md)).
   (`CM9798_NATIONS`). Its "Republic of Congo" is the former Zaire, DR Congo today
   (Roger Lukaku, Nzelo Lembi and Jean-Claude Mukanya are its players); its
   "Congo" and "The Congo" are Congo-Brazzaville.
-- **Clubs**: the seven leagues' top divisions (EPR, SP1, ISA, GD1, FD1, HD1,
-  PD1), each club needing eleven rated players: 124, exactly the Top 124
-  (Premier League 20, La Liga 20, Serie A 18, Bundesliga 18, Ligue 1 18,
-  Eredivisie 17, Liga Portugal 13). A player whose club text is neither of a
+- **Clubs**: Europe's first divisions the database holds (the seven big leagues' EPR,
+  SP1, ISA, GD1, FD1, HD1 and PD1, and TR1, BD1, SPR, DD1, ND1 and WD1, its Allsvenskan),
+  each club needing eleven rated players, Europe's strongest 124 kept: 13 of them from
+  beyond the seven (until 14 November 2026 the seven leagues' 124, exactly the Top 124). A player whose club text is neither of a
   team's two names in the extraction resolves through three aliases
   (`Newcastle U`, `Sheff W`, `Schalke`), the game's other names for those
   teams, which the extraction dropped; any other keeps the text as his club.
@@ -1216,9 +1230,10 @@ non-commercial use) that name no licence; the data's rights are reserved.
   Cam F's run 19 lower on average. One rating is wild: Olympiakos's defender
   Vassilis Ioannidis has the database's highest ability, 200 (rated 99, above
   Roberto Baggio's 198), so he leads Greece's XI; it ships as Cam F set it. 124
-  nations with players (77 full XIs) and 130 clubs (Premier League 20, La Liga 20,
-  Serie A 18, Bundesliga 18, Ligue 1 18, Eredivisie 18, Liga Portugal 18), on
-  `eu124s1994` and `eu32s1994`. It keeps CM 01/02's league sizes, not 1993/94's,
+  nations with players (77 full XIs) and Europe's 124 strongest clubs, 26 of them from
+  beyond the seven big leagues (Rangers and Spartak Moscow in its elite), on `eu124e1994`
+  and `eu32e1994` (until 14 November 2026 the seven leagues' 130, on `eu124s1994` and
+  `eu32s1994`, which stay for the campaigns saved on them). It keeps CM 01/02's league sizes, not 1993/94's,
   and the builder takes a database's own top divisions: its Premier Division has
   20 clubs (Oldham Athletic and Swindon Town, of the real 22, are in its First
   Division) and its French First Division 18 (Angers and Martigues are in its
