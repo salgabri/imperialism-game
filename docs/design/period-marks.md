@@ -223,6 +223,12 @@ in August and September 2006), Dynamo Moscow 2006/07 (July 2007), AEK's 1997 emb
 first seasons whose logo no source shows or dates (Zadar, PAOK, Pesaro, the London
 Towers, the Skyliners as Opel Skyliners…).
 
+Barcelona's basketball section wore the club's crest, and its F.C.B. crest of
+1975-2002 is one the football research had found no picture of. Football's Barcelona
+(FC Barcelona, and F.C. Barcelona in most Championship Manager seasons) now wears it
+from 1993/94 to 2001/02 instead of its monogram: eight club-seasons of the table and
+1996/97, too few to move its rounded figures.
+
 Crests are the clubs' trademarks; as with today's crests (the user's choice of
 Wikipedia crests, 2026-10-25), many are non-free files that Wikipedia hosts under
 its non-free content policy, and `SOURCES-eras.tsv` records each one's licence as
@@ -244,6 +250,7 @@ the game ships, era names and gone clubs too, except the three undated ones; the
 logos of the day and the first round's two corrections by name); the EuroLeague's
 2000/01 to 2025/26 (every club of each season under a crest the game ships, except
 the 44 club-seasons named with their code; Ülkerspor, Real Madrid's plain crest,
-Valencia's and Efes's last seasons and others by name); and TeamMark and
+Valencia's and Efes's last seasons, football Barcelona's F.C.B. crest of 1993/94 to
+2001/02 and others by name); and TeamMark and
 SquadFlag drawing the crest of the season on screen.
 `npm run test:flag-symbols` runs `build-historic-flags --check`.

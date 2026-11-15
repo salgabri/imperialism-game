@@ -213,6 +213,9 @@ test('the EuroLeague of 2000/01 to 2025/26: every club wears the crest of its da
     // Ülkerspor, whose code EuroLeague files Fenerbahçe under since, wears its own badge.
     ['el-ulkerspor', 2002, 'el-ulkerspor.2002'], ['el-ulkerspor', 2006, 'el-ulkerspor.2002'], ['el-fenerbahce', 2007, today('el-fenerbahce')],
     ['el-fc-barcelona', 2002, 'el-fc-barcelona.2001'], ['el-fc-barcelona', 2003, today('el-fc-barcelona')],
+    // The football club wore the same crest, as FC Barcelona and (in most CM seasons) F.C. Barcelona, to 2001/02.
+    ['f-f-c-barcelona', 1994, 'el-fc-barcelona.2001'], ['f-fc-barcelona', 1997, 'el-fc-barcelona.2001'],
+    ['f-f-c-barcelona', 2002, 'el-fc-barcelona.2001'], ['f-f-c-barcelona', 2003, today('f-fc-barcelona')],
     // Real Madrid's plain club crest (the football club's of today) to 2008/09, today's lockup after.
     ['el-real-madrid', 2009, today('f-real-madrid')], ['el-real-madrid', 2010, today('el-real-madrid')],
     // Valencia's 2017 badge through 2025/26 (its 40th-year crest is 2026/27's); Efes's 50th-year logo in 2025/26.
