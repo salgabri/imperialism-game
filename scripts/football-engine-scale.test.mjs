@@ -12,7 +12,7 @@ import { ENGINE_SCALE, ENGINE_SCALE_FILE, ROSTERS_FILE, builtInIdentity, describ
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const committed = JSON.parse(await readFile(path.join(root, ENGINE_SCALE_FILE), 'utf8'));
-const stale = `${ENGINE_SCALE_FILE} is stale; run npm run engine-scale:football (then npm run validate:football)`;
+const stale = `${ENGINE_SCALE_FILE} is stale; run npm run engine-scale:football (then npm run validate:football -- --engine-scale-only)`;
 const close = (actual, expected, label = '') => assert.ok(Math.abs(actual - expected) < 1e-9, `${label} ${actual} ≠ ${expected}`);
 
 test('quantiles interpolate linearly and the description uses the population SD', () => {

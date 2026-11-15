@@ -11,8 +11,15 @@ here the verdicts are a report. A failing built-in is the signal to look before 
 ```bash
 npm run validate:football       # score the seasons and write docs/design/football-gate/validation.json
 npm run engine-scale:football   # measure the built-in squads and write docs/design/football-gate/engine-scale.json (about a minute)
+npm run validate:football -- --engine-scale-only   # then carry engine-scale.json into validation.json, without Elo
 npm run test:football-gate      # the gate's tests (also part of npm test)
 ```
+
+validation.json carries the engine-scale figures. An engine change that re-measures engine-scale.json leaves them
+stale, and `npm test` fails until `--engine-scale-only` has rewritten what that file feeds: the built-in's engine-scale
+check, ship verdicts and implication. It works from the committed report, so it needs neither the Elo cache nor
+results.csv, and on a report current in all else it writes what a full run would. New squads or seasons need the full
+run; the option refuses them.
 
 ## Seasons and dates
 

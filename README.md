@@ -109,7 +109,7 @@ npm run sync:ea-fc       # snapshot EA FC 27 from EA's ratings API into scripts/
 npm run build-rosters   # regenerate football squads from an EA FC player CSV
 npm run sync:reep-bridge # reduce the pinned Reep register in data-src/reep/ to the football person keys, scripts/data/reep-bridge.json (--check to verify)
 npm run validate:football # score the football squads against World Football Elo and real results (docs/design/football-gate/; fetches eloratings.net's tables once)
-npm run engine-scale:football # measure the built-in football squads' scale, odds and campaign length against the squads they replaced (about a minute)
+npm run engine-scale:football # measure the built-in football squads' scale, odds and campaign length against the squads they replaced (about a minute); then validate:football -- --engine-scale-only carries it into the report without Elo
 npm run build-basketball # regenerate the basketball fives, rated by the built-in NBA 2K (pinned 2K Archive page)
 npm run build-clubs      # regenerate the club layer for both sports
 npm run sync:domestic-clubs # country club snapshots from the cache (EFEM requests need permission)

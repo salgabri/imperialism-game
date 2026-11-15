@@ -19,7 +19,8 @@
 // meanMatches within ±10%. Shares are gated pooled over the football campaigns (one Wilson interval on all completed
 // runs) because per-campaign intervals of RUNS runs would fail sound squads by chance; per-campaign intervals are listed
 // as diagnostics. effectiveChampionCount has no tolerance and is reported only. The output is deterministic (no
-// timestamps); scripts/football-validate.mjs reads it and checks the hash. Each campaign records a fingerprint of its
+// timestamps); scripts/football-validate.mjs checks the hash and carries the figures into validation.json (npm run
+// validate:football -- --engine-scale-only after a re-measure). Each campaign records a fingerprint of its
 // first seed's run, so the tests can spot a stale file from one run per campaign.
 //
 //   npm run engine-scale:football                      measures the built-in and writes the report
@@ -251,5 +252,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     await mkdir(path.dirname(output), { recursive: true });
     await writeFile(output, text);
     console.log(`Wrote ${shown}`);
+    if (output === committedPath && committedText !== text)
+      console.log('docs/design/football-gate/validation.json carries these figures: run npm run validate:football -- --engine-scale-only (no Elo needed), or the full npm run validate:football when the squads changed.');
   }
 }

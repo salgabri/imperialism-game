@@ -23,8 +23,8 @@ import { FORECAST, clusterBootstrapSe, clusterJackknifeSe, clusteredSe, critical
   studentTCentral, studentTQuantile, windowCoverage } from './lib/forecast.mjs';
 import { ENGINE_SCALE_FILE, GATE, MANIFEST_FILE, NOT_APPLICABLE, SHIP_GATE, VALIDATION_FILE, auditXIsCheck, bootstrapSpearman,
   buildReport, crossSectional, eloAtInformationDate, eloAtRatingsDate, engineScaleCheck, gateSet, implicationOf, loadEloFiles, loadResults,
-  mapNationIds, nextNewerSeason, parseEloResults, parseEloTable, pearson, ranks, replayElo, replayFiles, runValidation, sameSnapshot,
-  seasonInputs, serializeReport, shipVerdictOf, spearman, validateManifest } from './football-validate.mjs';
+  mapNationIds, nextNewerSeason, parseEloResults, parseEloTable, pearson, ranks, refreshEngineScale, replayElo, replayFiles, runEngineScaleRefresh,
+  runValidation, sameSnapshot, seasonInputs, serializeReport, shipVerdictOf, spearman, validateManifest } from './football-validate.mjs';
 import { USER_AGENT } from './lib/polite-fetch.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -572,6 +572,37 @@ test('the gate\'s seasons play today\'s map: no historic nation in their lists, 
   }
 });
 
+test('the committed validation.json carries engine-scale.json: a refresh, which needs no Elo or results, leaves it as it is', async () => {
+  const text = await readFile(committedPath, 'utf8');
+  const refreshed = serializeReport(await runEngineScaleRefresh({ root, report: JSON.parse(text) }));
+  assert.equal(refreshed, text, `${VALIDATION_FILE} does not carry ${ENGINE_SCALE_FILE}'s figures; run npm run validate:football -- --engine-scale-only`);
+  // A report of other squads or other seasons needs the full rescore instead.
+  const otherSquads = JSON.parse(text), [newest] = otherSquads.seasons;
+  newest.contentHash = '000000000000';
+  await assert.rejects(runEngineScaleRefresh({ root, report: otherSquads }),
+    new RegExp(`scored ${newest.id}'s squads at 000000000000, but they are now [0-9a-f]{12}; run npm run validate:football to rescore`));
+  const fewerSeasons = JSON.parse(text);
+  fewerSeasons.seasons.pop();
+  await assert.rejects(runEngineScaleRefresh({ root, report: fewerSeasons }), /seasons are not the ones scripts\/data\/football-gate\.json lists/);
+});
+
+test('--engine-scale-only rewrites a report that does not carry engine-scale.json, and --check exits 1 on it', async () => withTemp(async dir => {
+  const text = await readFile(committedPath, 'utf8'), copy = path.join(dir, 'validation.json');
+  // The figure the built-in kept after engine-scale.json was measured again on 13 November 2026 (02350c7).
+  const stale = JSON.parse(text);
+  stale.seasons.find(season => season.squads === 'built-in').engineScale.probe.favouriteWinRate = 0.7633;
+  await writeFile(copy, serializeReport(stale));
+  const check = runCli('--engine-scale-only', '--check', `--output=${copy}`);
+  assert.equal(check.status, 1, check.stderr);
+  assert.match(check.stderr, /does not carry docs\/design\/football-gate\/engine-scale\.json; run npm run validate:football -- --engine-scale-only/);
+  const refresh = runCli('--engine-scale-only', `--output=${copy}`);
+  assert.equal(refresh.status, 0, refresh.stderr);
+  assert.equal(await readFile(copy, 'utf8'), text, 'the refresh writes the committed report back');
+  const missing = runCli('--engine-scale-only', `--output=${path.join(dir, 'absent.json')}`);
+  assert.equal(missing.status, 1);
+  assert.match(missing.stderr, /absent\.json is not there to refresh; run npm run validate:football/);
+}));
+
 test('the gate reads the same martj42 results.csv as the computed World Cup seasons', async () => {
   const worldCup = JSON.parse(await readFile(path.join(root, 'scripts/data/world-cup-seasons.json'), 'utf8')).sources.results;
   assert.equal(manifest.results.commit, worldCup.commit);
@@ -947,6 +978,28 @@ test('Reep linking, engine-scale and audit XI checks', () => {
   assert.deepEqual([wrong.verdict, wrong.reasons], ['fail', ['public/football/x.json counts 1 complete natural XIs, its squads 2']]);
 });
 const reepLinkingCheckOf = audit => buildReport({ nations: FIXTURE_NATIONS, codes: FIXTURE_CODES, files: fixtureFiles(), inputs: [fixtureInput({ audit })] }).seasons[0].reepLinking;
+
+test('a refresh carries a new engine-scale.json into a scored report byte for byte as a full run would', () => {
+  const entry = (contentHash, verdict) => ({ contentHash, label: 'Fixture', verdict, failed: verdict === 'pass' ? [] : ['T_n SD'],
+    starters: { sd: 10, quantiles: { q10: 54, q50: 69, q90: 81 } }, strength: { sd: 9.5 }, probe: { favouriteWinRate: 0.74, upsetRate: 0.09, pairs: 3462 },
+    production: { pooled: { runs: 440, completed: 440, completion: 1 } } });
+  const engineScale = (verdict, contentHash = fixtureInput().contentHash, reference = 'aaaaaaaaaaaa') => ({
+    reference: { contentHash: reference, label: 'Before' }, builtIn: entry(contentHash, verdict) });
+  // The built-in and an older season file, whose closed window has no results: its forecast is incomplete.
+  const older = { ...fixtureSeason, id: '2029-30', label: '2029/30', squads: 'ea-fc-30' };
+  const run = es => serializeReport(buildReport({ nations: FIXTURE_NATIONS, codes: FIXTURE_CODES, files: fixtureFiles(), seasons: [fixtureSeason, older],
+    engineScale: es, inputs: [fixtureInput(), fixtureInput({ season: older, builtIn: false, hasFm: false, audit: null })] }));
+  const scored = JSON.parse(run(engineScale('pass')));
+  const measuredAgain = { ...engineScale('pass'), builtIn: { ...entry(fixtureInput().contentHash, 'pass'), probe: { favouriteWinRate: 0.77, upsetRate: 0.07, pairs: 3462 } } };
+  for (const [label, es] of [['measured again', measuredAgain], ['failing', engineScale('fail')], ['another reference', engineScale('pass', undefined, 'dddddddddddd')],
+    ['other squads', engineScale('pass', 'cccccccccccc')], ['no file', null], ['the same file', engineScale('pass')]])
+    assert.equal(serializeReport(refreshEngineScale(scored, es)), run(es), label);
+  const [builtIn, seasonFile] = refreshEngineScale(scored, engineScale('fail')).seasons;
+  assert.deepEqual([builtIn.engineScale.verdict, builtIn.shipVerdicts.engineScale, builtIn.shipVerdict], ['fail', 'fail', 'fail']);
+  assert.match(builtIn.implication, /^The full gate is fail \(.*engineScale fail/);
+  assert.deepEqual(seasonFile, scored.seasons[1], 'a season file has no engine-scale gate');
+  assert.equal(scored.seasons[0].shipVerdict, 'not scored', 'the fixture\'s open window waits');
+});
 
 test('the report adds the ship gate beside the unchanged provisional gate', () => {
   const [season] = report().seasons;

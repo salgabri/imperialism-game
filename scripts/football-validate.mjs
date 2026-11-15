@@ -6,6 +6,8 @@
 //   npm run validate:football -- --offline          never fetches; uses the cached Elo files only
 //   npm run validate:football -- --output=<file>    writes elsewhere (the committed report stays)
 //   npm run validate:football -- --allow-incomplete writes a report although inputs are missing
+//   npm run validate:football -- --engine-scale-only carries engine-scale.json into the committed report, no Elo needed
+//                                                   (after npm run engine-scale:football; with --check, only checks it)
 //
 // Seasons: the built-in one (src/data/rosters.js, EA FC 27 + FM 26) and the 2025/26 season file (EA FC 26). For each
 // season, over the nations that field a side in it (footballSets.js fieldedNations):
@@ -18,6 +20,9 @@
 //   Elo frozen at R_Y, log loss no worse than Elo's by more than 2 clustered SE; the newest season's window is open, so
 //   it is 'not scored'), the engine-scale gate (docs/design/football-gate/engine-scale.json, npm run
 //   engine-scale:football, the built-in only) and the incomplete XIs listed in the audit.
+// What engine-scale.json feeds (each season's engineScale check, ship verdicts and implication, and the report's
+// engineScale record) depends on nothing else that needs a cache, so --engine-scale-only rewrites it from the committed
+// report (refreshEngineScale) and the tests check it that way without the ignored caches.
 // Only the nations on the season's map count (mapNationIds): East Germany and South Vietnam (teams.js HISTORIC_NATIONS)
 // are on the maps of their years only, so a modern season's coverage check and noTeam list leave them out.
 // On main every season ships by choice, so the verdicts are a report, not a gate on shipping: a built-in that fails the
@@ -466,6 +471,21 @@ export function implicationOf({ builtIn, provisionalVerdict, shipVerdict, shipVe
     + `so it is re-scored when a results.csv that covers ${partial.window.to} is pinned.`;
 }
 
+/**
+ * The full gate over a season's checks: its ship verdicts, ship verdict and what they mean. A forecast on a window
+ * results.csv does not cover yet keeps its verdict, marked partial until it is re-scored.
+ */
+function shipOf({ builtIn, provisional, reepLinking, forecast, engine, auditXIs }) {
+  const shipVerdicts = { provisional, reepLinking: reepLinking.verdict, forecast: forecast.verdict, engineScale: engine.verdict, auditXIs: auditXIs.verdict };
+  const shipVerdict = shipVerdictOf(shipVerdicts), shipPartial = forecast.partial === true;
+  return { shipVerdict, shipPartial, shipVerdicts, implication: implicationOf({ builtIn, provisionalVerdict: provisional, shipVerdict, shipVerdicts,
+    partial: shipPartial ? { window: forecast.window, covered: forecast.coverage.covered } : null }) };
+}
+
+/** The report's record of engine-scale.json: the file, and the reference its built-in is compared with. */
+const engineScaleRecord = engineScale => ({ file: ENGINE_SCALE_FILE,
+  reference: engineScale?.reference ? { contentHash: engineScale.reference.contentHash, label: engineScale.reference.label } : null });
+
 /** The next newer season (by id) of the manifest, which closes this season's forecast window. */
 export const nextNewerSeason = (season, seasons) => seasons.filter(row => row.id > season.id).sort((a, b) => (a.id < b.id ? -1 : 1))[0] ?? null;
 
@@ -507,18 +527,14 @@ export function buildReport({ inputs, nations, files, generatedAt = null, codes 
     const reepLinking = reepLinkingCheck(audit, auditPath, { hasFm });
     const engine = engineScaleCheck({ engineScale, season: scoredSeason, builtIn });
     const auditXIs = auditXIsCheck({ audit, auditPath, rosters, nations, fielded, setCoverage, mapNations });
-    const shipVerdicts = { provisional: verdict, reepLinking: reepLinking.verdict, forecast: forecast.verdict, engineScale: engine.verdict, auditXIs: auditXIs.verdict };
-    const shipVerdict = shipVerdictOf(shipVerdicts);
-    // A verdict on a window results.csv does not cover yet stands, marked partial until it is re-scored.
-    const shipPartial = forecast.partial === true;
+    const ship = shipOf({ builtIn, provisional: verdict, reepLinking, forecast, engine, auditXIs });
     return {
       id: season.id, label: season.label, squads: season.squads, sources: season.sources,
       ratingsDate: season.ratingsDate, informationDate: season.informationDate, contentHash,
       gate: 'provisional', verdict,
       verdicts: { build: build.verdict, crossSectional: cross.verdict, linking: linking.verdict },
-      provisionalVerdict: verdict, shipVerdict, shipPartial, shipVerdicts,
-      implication: implicationOf({ builtIn, provisionalVerdict: verdict, shipVerdict, shipVerdicts,
-        partial: shipPartial ? { window: forecast.window, covered: forecast.coverage.covered } : null }),
+      provisionalVerdict: verdict, shipVerdict: ship.shipVerdict, shipPartial: ship.shipPartial, shipVerdicts: ship.shipVerdicts,
+      implication: ship.implication,
       elo: eloRecord, build, crossSectional: cross, linking,
       reepLinking, forecast, engineScale: engine, auditXIs,
     };
@@ -557,10 +573,44 @@ export function buildReport({ inputs, nations, files, generatedAt = null, codes 
     results: results ? { source: results.source, url: results.url, license: results.license, file: results.file, commit: results.commit,
       sha256: results.sha256, rows: results.matches.length, lastMatchDate: results.lastMatchDate }
       : { cached: false },
-    engineScale: { file: ENGINE_SCALE_FILE, reference: engineScale?.reference ? { contentHash: engineScale.reference.contentHash, label: engineScale.reference.label } : null },
+    engineScale: engineScaleRecord(engineScale),
     seasons: report,
   });
   return out;
+}
+
+/**
+ * The report with what engine-scale.json feeds rewritten: each season's engineScale check, ship verdicts, ship verdict
+ * and implication, and the report's engineScale record. Everything else stays as scored, so this needs no Elo or
+ * results, and a report current in all else comes out byte for byte as a full run writes it. engineScale: the parsed
+ * engine-scale.json or null.
+ */
+export function refreshEngineScale(report, engineScale) {
+  const seasons = report.seasons.map(record => {
+    const builtIn = record.squads === 'built-in';
+    const engine = engineScaleCheck({ engineScale, season: { contentHash: record.contentHash }, builtIn });
+    return { ...record, ...shipOf({ builtIn, provisional: record.provisionalVerdict, reepLinking: record.reepLinking, forecast: record.forecast, engine,
+      auditXIs: record.auditXIs }), engineScale: engine };
+  });
+  return { ...report, engineScale: engineScaleRecord(engineScale), seasons };
+}
+
+/**
+ * --engine-scale-only: the report with engine-scale.json carried in (refreshEngineScale), for after npm run
+ * engine-scale:football. It refuses a report whose seasons or squads are not the manifest's and the shipped ones:
+ * those need a full npm run validate:football.
+ */
+export async function runEngineScaleRefresh({ root = ROOT, report, engineScalePath = path.join(root, ENGINE_SCALE_FILE) }) {
+  const manifest = JSON.parse(await readFile(path.join(root, MANIFEST_FILE), 'utf8'));
+  const rescore = `run npm run validate:football to rescore ${VALIDATION_FILE}`;
+  const fields = season => ['id', 'label', 'squads', 'sources', 'ratingsDate', 'informationDate'].map(field => season[field]);
+  if (JSON.stringify(report.seasons.map(fields)) !== JSON.stringify(manifest.seasons.map(fields)))
+    throw new Error(`The report's seasons are not the ones ${MANIFEST_FILE} lists; ${rescore}`);
+  for (const [i, season] of manifest.seasons.entries()) {
+    const { contentHash } = await seasonInputs({ root, season }), scored = report.seasons[i].contentHash;
+    if (scored !== contentHash) throw new Error(`The report scored ${season.id}'s squads at ${scored}, but they are now ${contentHash}; ${rescore}`);
+  }
+  return refreshEngineScale(report, await readJson(engineScalePath));
 }
 
 // ---- inputs ----
@@ -785,7 +835,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const args = Object.fromEntries(process.argv.slice(2).filter(argument => argument.startsWith('--')).map(argument => {
     const [key, ...parts] = argument.slice(2).split('='); return [key, parts.length ? parts.join('=') : true];
   }));
-  const known = ['check', 'offline', 'output', 'generated-at', 'elo-dir', 'elo-seed', TRUST_FLAG.slice(2), 'data', 'engine-scale', 'allow-incomplete', 'root'];
+  const known = ['check', 'offline', 'output', 'generated-at', 'elo-dir', 'elo-seed', TRUST_FLAG.slice(2), 'data', 'engine-scale', 'allow-incomplete', 'root',
+    'engine-scale-only'];
   const unknown = Object.keys(args).filter(key => !known.includes(key));
   if (unknown.length) throw new Error(`Unknown option(s) ${unknown.map(key => `--${key}`).join(', ')}`);
   const root = args.root ? path.resolve(args.root) : ROOT;
@@ -793,14 +844,18 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const eloDir = typeof args['elo-dir'] === 'string' ? path.resolve(args['elo-dir']) : path.join(root, 'data-src/validation/elo');
   let generatedAt = typeof args['generated-at'] === 'string' ? args['generated-at'] : null;
   if (generatedAt && !validDate(generatedAt)) throw new Error('--generated-at takes YYYY-MM-DD');
-  const committed = args.check ? await readFile(output, 'utf8').catch(() => null) : null;
+  // --engine-scale-only rewrites the report at the output path in place, so it reads that report as --check does.
+  const refreshOnly = !!args['engine-scale-only'];
+  const committed = args.check || refreshOnly ? await readFile(output, 'utf8').catch(() => null) : null;
+  if (refreshOnly && committed === null) throw new Error(`${output} is not there to refresh; run npm run validate:football`);
   // --check keeps the committed generatedAt so only real changes differ.
   if (committed && !generatedAt) generatedAt = JSON.parse(committed).generatedAt ?? null;
-  const report = await runValidation({ root, generatedAt, offline: !!args.offline || !!args.check, eloDir, trustSeedDates: !!args[TRUST_FLAG.slice(2)],
-    seedDirs: typeof args['elo-seed'] === 'string' ? args['elo-seed'].split(',').map(dir => path.resolve(dir)) : [],
-    dataDir: typeof args.data === 'string' ? path.resolve(args.data) : path.join(root, 'data-src'),
-    ...(typeof args['engine-scale'] === 'string' ? { engineScalePath: path.resolve(args['engine-scale']) } : {}),
-    log: message => console.error(message) });
+  const engineScaleOption = typeof args['engine-scale'] === 'string' ? { engineScalePath: path.resolve(args['engine-scale']) } : {};
+  const report = refreshOnly ? await runEngineScaleRefresh({ root, report: JSON.parse(committed), ...engineScaleOption })
+    : await runValidation({ root, generatedAt, offline: !!args.offline || !!args.check, eloDir, trustSeedDates: !!args[TRUST_FLAG.slice(2)],
+      seedDirs: typeof args['elo-seed'] === 'string' ? args['elo-seed'].split(',').map(dir => path.resolve(dir)) : [],
+      dataDir: typeof args.data === 'string' ? path.resolve(args.data) : path.join(root, 'data-src'),
+      ...engineScaleOption, log: message => console.error(message) });
   const text = serializeReport(report);
   for (const season of report.seasons) {
     const cs = season.crossSectional, gate = cs.gateSet, fc = season.forecast, rve = fc.rosterVsElo, es = season.engineScale;
@@ -844,7 +899,11 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       + `ends ${coverage.lastMatchDate || 'before the window'}. Its verdict rests on (${coverage.covered.from}, ${coverage.covered.to}]; re-score it once a later results.csv is pinned.`);
   }
   if (args.check) {
-    if (committed !== text) { console.error(`${shown} is stale; run npm run validate:football`); process.exitCode = 1; }
+    if (committed !== text) {
+      console.error(refreshOnly ? `${shown} does not carry ${ENGINE_SCALE_FILE}; run npm run validate:football -- --engine-scale-only`
+        : `${shown} is stale; run npm run validate:football`);
+      process.exitCode = 1;
+    }
     else console.log(`${shown} is current.`);
   } else if (blocked.length && !allowIncomplete) {
     console.error(`Not writing ${shown}, so its verdicts stay; pass --allow-incomplete to write an incomplete report.`);
