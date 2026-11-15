@@ -17,6 +17,7 @@ import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
 import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
 import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
+import { CLUBS as CFB_CLUBS } from '../src/data/clubs.college-football.js';
 import { DOMESTIC } from '../src/data/domestic.js';
 import { withDom } from './lib/app-harness.mjs';
 
@@ -47,7 +48,8 @@ const files = new Set(readdirSync(new URL('public/club-logos/', root)).filter(na
 const sources = readFileSync(new URL('public/club-logos/SOURCES.tsv', root), 'utf8').split('\n')
   .filter(line => line && !line.startsWith('#')).slice(1).map(line => line.split('\t'));
 const domesticIds = DOMESTIC.flatMap(entry => JSON.parse(readFileSync(new URL(`public/domestic/${entry.id}.json`, root), 'utf8')).clubs.map(club => club.id));
-const allClubIds = [...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...EUROLEAGUE_CLUBS, ...NFL_CLUBS, ...MLB_CLUBS, ...NHL_CLUBS, ...NRL_CLUBS, ...WOMENS_CLUBS].map(club => club.id).concat(domesticIds);
+const allClubIds = [...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...EUROLEAGUE_CLUBS, ...NFL_CLUBS, ...CFB_CLUBS, ...MLB_CLUBS, ...NHL_CLUBS, ...NRL_CLUBS,
+  ...WOMENS_CLUBS].map(club => club.id).concat(domesticIds);
 const withCrest = allClubIds.filter(id => clubLogoFile(id));
 
 test('every club the list gives a crest has its file, a source row, and nothing else ships', () => {
@@ -73,6 +75,8 @@ test('the big clubs carry crests, and an all-leagues club shares its domestic tw
   assert.ok(MLB_CLUBS.every(club => clubLogoFile(club.id)), 'every MLB club has a crest');
   assert.ok(NHL_CLUBS.every(club => clubLogoFile(club.id)), 'every NHL club has a crest');
   assert.ok(NRL_CLUBS.every(club => clubLogoFile(club.id)), 'every NRL club has a crest');
+  // A college football school wears its athletics logo, a file of its own.
+  assert.ok(CFB_CLUBS.every(club => clubLogoFile(club.id) === club.id), 'every FBS school has a crest of its own');
   // A EuroLeague club wears its basketball club's crest, its own file, never its football club's.
   assert.ok(EUROLEAGUE_CLUBS.every(club => clubLogoFile(club.id) === club.id), 'every EuroLeague club has a crest of its own');
   const madrid = clubLogoFile('f-real-madrid');

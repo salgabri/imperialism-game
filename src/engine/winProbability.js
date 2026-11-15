@@ -44,7 +44,10 @@
 //   chart (each side's last three possessions follow the score) are left out: they shape the final margin far more
 //   than they move who wins. An earlier season plays its own day's drive odds, tries and overtime (its prepared match's
 //   `rules`): sudden death to 2009, where a lead in overtime has won, and from 2010 to 2021 modified sudden death, where
-//   only a first possession's field goal leaves an answer; both chains are exact too.
+//   only a first possession's field goal leaves an answer; both chains are exact too. College football
+//   (src/sports/collegeFootball.js) plays the same chart under its own rules: its possessions, tries and edge scale, and
+//   college overtime, whose chain is exact too (one toss, the first possession alternating; possessions from the 25 in
+//   the first two periods, two-point plays from the third, a decisive two-point play after the last).
 //
 // Baseball — the model's own distributions (src/sports/baseball.js): the clock counts outs (three a half-inning, 54 in
 //   nine innings), and each half-inning's runs follow the model's distribution for the batting side's edge
@@ -110,7 +113,7 @@
 import { getSport } from '../sports/index.js';
 import { FOOTBALL_MODEL } from '../sports/football.js';
 import { BASKETBALL_MODEL } from '../sports/basketball.js';
-import { DRIVE_MODEL, driveMoments, driveOdds, lateCall } from '../sports/americanFootball.js';
+import { collegeAnswer, collegeOvertimeOdds, DRIVE_MODEL, driveMoments, driveOdds, lateCall } from '../sports/americanFootball.js';
 import { INNING_MODEL, inningOdds, runMasses } from '../sports/baseball.js';
 import { lateOf, overtimeMeans, PERIOD_MODEL, shootoutOdds, sliceMeans } from '../sports/hockey.js';
 import { deciderOdds, goldenRate, POINTS, SLICE_MODEL, sliceMeans as rugbySliceMeans } from '../sports/rugbyLeague.js';
@@ -128,9 +131,9 @@ const {
 } = BASKETBALL_MODEL;
 const ROUNDING_VARIANCE = 1 / 6; // two independently rounded period scores, 1/12 each
 const DEFAULT_DRAMA = 6;
-const DECISIVE_FIELD_GOAL = 0.08;
-// American football's overtime rules by season ('both' today's, a model without one's): src/sports/americanFootball.js.
-const OVERTIME_RULES = Object.freeze(['both', 'modified', 'sudden']);
+// American football's overtime rules by season ('both' today's, a model without one's) and college football's:
+// src/sports/americanFootball.js.
+const OVERTIME_RULES = Object.freeze(['both', 'modified', 'sudden', 'college']);
 // A tennis rubber conceded by an empty place: as good as won (or lost) on the chart's scale.
 const WALKOVER_GAP = 999;
 // A tennis tie's rubbers: five (first to three), or three (first to two) in an earlier season's Fed Cup.
@@ -355,14 +358,62 @@ function modifiedPeriodChance(a, d, first) {
 }
 
 /**
+ * College overtime's chain, exact for its rules before form (src/sports/americanFootball.js collegeOvertime) → otChain:
+ * [0] the decisive two-point play, [k] A's chance from level with k periods still to play. Each side's possession from the
+ * 25 (`td`, `fg`, `none`, its tries `xp` and `two`) and its answers `behind` points down (`answer`: collegeAnswer's
+ * odds). A period's first possession is the toss loser's in the first period, then alternates, so from level at a
+ * period's start the chain takes either side first, each half the time: exactly so at full time, where the toss decides.
+ */
+function collegeChain(sideA, sideD, maxOt, decisive) {
+  const chance = (period, first) => {
+    const [x, y] = first === 'A' ? [sideA, sideD] : [sideD, sideA];
+    let xWins, yWins, open;
+    if (period >= 3) {
+      xWins = x.two * (1 - y.two);
+      yWins = (1 - x.two) * y.two;
+      open = 1 - xWins - yWins;
+    } else {
+      const [level, fieldGoal, touchdown] = [0, 3, 6].map(behind => y.answer[behind]);
+      // The first side's field goal (a touchdown wins the answer, a field goal draws level), or nothing (any score wins).
+      xWins = x.fg * fieldGoal.none;
+      yWins = x.fg * fieldGoal.td + x.none * (level.td + level.fg);
+      open = x.fg * fieldGoal.fg + x.none * level.none;
+      // Its touchdown: kicked in the first period (7, or 6 when missed), two-point in the second (8, or 6). The answer's
+      // touchdown is kicked, or goes for two, to win against a 6 and to draw level against a 7 or an 8.
+      const conversion = period === 1 ? 'xp' : 'two';
+      const made = x.td * x[conversion], missed = x.td * (1 - x[conversion]), answered = y[conversion];
+      xWins += made * (1 - touchdown.td * answered) + missed * (1 - touchdown.td);
+      yWins += missed * touchdown.td * answered;
+      open += made * touchdown.td * answered + missed * touchdown.td * (1 - answered);
+    }
+    return [first === 'A' ? xWins : yWins, open];
+  };
+  const chain = [decisive];
+  let after = { A: decisive, D: decisive };
+  for (let period = maxOt; period >= 1; period--) {
+    const here = {};
+    for (const first of ['A', 'D']) {
+      const [win, open] = chance(period, first);
+      here[first] = win + open * after[first === 'A' ? 'D' : 'A'];
+    }
+    after = here;
+    chain.push((here.A + here.D) / 2);
+  }
+  return chain;
+}
+
+/**
  * The live model of an American football match: a possession's mean and variance per side, how fast both move with
  * form, and the overtime chain, under the prepared match's rules (its season's: their safeties, tries, overtime and its
- * periods' length). A season whose overtime is not today's carries it (`overtime`).
+ * periods' length). A season whose overtime is not today's carries it (`overtime`). College football's rules (`overtime`
+ * 'college') chart its own possessions, tries and edge scale, and college overtime (collegeChain): the model then carries
+ * each side's overtime possession from the 25 (`tdA`, `fgA`) and its touchdown going for it a touchdown down (`tdLateA`).
  */
 function drivesModel(prepared, variation, length) {
-  const { DRIVES, DRIVE_SD, OVERTIME, MAX_OVERTIMES, FORM_PER_DRAMA, SAFETY } = DRIVE_MODEL;
+  const { DRIVES, DRIVE_SD, OVERTIME, MAX_OVERTIMES, FORM_PER_DRAMA, SAFETY, DECISIVE_SLOPE } = DRIVE_MODEL;
   const { rules } = prepared;
   const safety = rules?.safety ?? SAFETY, overtime = rules?.overtime ?? 'both';
+  if (overtime === 'college') return collegeDrivesModel(prepared, variation, length);
   const outcomes = odds => {
     const fg = (1 - odds.td) * odds.fgTry * odds.make;
     return { td: odds.td, fg, sf: safety, none: 1 - odds.td - fg - safety, xp: odds.xp, two: odds.two };
@@ -381,13 +432,44 @@ function drivesModel(prepared, variation, length) {
   const [winSecond, openSecond] = period(sideA, sideD, 'D');
   const win = (winFirst + winSecond) / 2, open = (openFirst + openSecond) / 2;
   // otChain[0]: the decisive field goal; otChain[k]: k periods still to play.
-  const otChain = [1 / (1 + Math.exp(-DECISIVE_FIELD_GOAL * (prepared.edgeA - prepared.edgeD)))];
+  const otChain = [1 / (1 + Math.exp(-DECISIVE_SLOPE * (prepared.edgeA - prepared.edgeD)))];
   for (let k = 1; k <= MAX_OVERTIMES; k++) otChain.push(win + open * otChain[k - 1]);
   return {
     kind: 'drives', drives: num(prepared.drives) || DRIVES, muA: a.mean, muD: d.mean, varA: a.variance, varD: d.variance, slope,
     formSd: variation * FORM_PER_DRAMA, driveSd: DRIVE_SD, length, ot: rules?.ot ?? OVERTIME, maxOt: MAX_OVERTIMES, otChain,
     tdA: sideA.td, fgA: sideA.fg, xpA: sideA.xp, twoA: sideA.two, tdD: sideD.td, fgD: sideD.fg, xpD: sideD.xp, twoD: sideD.two,
     ...(overtime === 'both' ? {} : { overtime }),
+  };
+}
+
+/**
+ * The live model of a college football match (drivesModel under `rules.overtime` 'college'): regulation as American
+ * football's, under the college rules' possessions, tries, safeties and edge scale; overtime by collegeChain, before
+ * form, with `maxOvertimes` periods of `ot` minutes and the decisive two-point play's odds (logistic of the edge gap
+ * times DECISIVE_SLOPE and the rules' scale).
+ */
+function collegeDrivesModel(prepared, variation, length) {
+  const { DRIVE_SD, FORM_PER_DRAMA, DECISIVE_SLOPE } = DRIVE_MODEL;
+  const { rules } = prepared;
+  const outcomes = odds => {
+    const fg = (1 - odds.td) * odds.fgTry * odds.make;
+    return { td: odds.td, fg, none: 1 - odds.td - fg, xp: odds.xp, two: odds.two };
+  };
+  const side = odds => ({ ...outcomes(odds), answer: Object.fromEntries([0, 3, 6].map(behind => [behind, outcomes(collegeAnswer(odds, behind))])) });
+  const meanAt = (edge, kicking) => driveMoments(driveOdds(edge, kicking, rules), rules).mean;
+  const a = driveMoments(driveOdds(prepared.edgeA, prepared.kickingA, rules), rules);
+  const d = driveMoments(driveOdds(prepared.edgeD, prepared.kickingD, rules), rules);
+  const slope = (meanAt(prepared.edgeA + 1, prepared.kickingA) - meanAt(prepared.edgeA - 1, prepared.kickingA)) / 2
+    + (meanAt(prepared.edgeD + 1, prepared.kickingD) - meanAt(prepared.edgeD - 1, prepared.kickingD)) / 2;
+  const sideA = side(collegeOvertimeOdds(prepared.edgeA, prepared.kickingA, rules));
+  const sideD = side(collegeOvertimeOdds(prepared.edgeD, prepared.kickingD, rules));
+  const decisive = 1 / (1 + Math.exp(-DECISIVE_SLOPE * (rules.scale ?? 1) * (prepared.edgeA - prepared.edgeD)));
+  return {
+    kind: 'drives', drives: num(prepared.drives), muA: a.mean, muD: d.mean, varA: a.variance, varD: d.variance, slope,
+    formSd: variation * FORM_PER_DRAMA, driveSd: DRIVE_SD, length, ot: rules.ot, maxOt: rules.maxOvertimes,
+    otChain: collegeChain(sideA, sideD, rules.maxOvertimes, decisive),
+    tdA: sideA.td, fgA: sideA.fg, xpA: sideA.xp, twoA: sideA.two, tdD: sideD.td, fgD: sideD.fg, xpD: sideD.xp, twoD: sideD.two,
+    tdLateA: sideA.answer[6].td, tdLateD: sideD.answer[6].td, overtime: 'college',
   };
 }
 
@@ -408,7 +490,7 @@ export function isLiveModel(model) {
       && (model.buzzer === undefined || (Array.isArray(model.buzzer) && model.buzzer.every(p => typeof p === 'number' && p >= 0 && p <= 1)));
   }
   if (model.kind === 'drives') {
-    const tries = ['xpA', 'twoA', 'xpD', 'twoD'].filter(key => model[key] !== undefined);
+    const tries = ['xpA', 'twoA', 'xpD', 'twoD', 'tdLateA', 'tdLateD'].filter(key => model[key] !== undefined);
     return ['drives', 'muA', 'muD', 'varA', 'varD', 'slope', 'formSd', 'driveSd', 'length', 'ot', 'tdA', 'fgA', 'tdD', 'fgD', ...tries].every(finite)
       && ['tdA', 'fgA', 'tdD', 'fgD', ...tries].every(key => model[key] >= 0 && model[key] <= 1)
       && model.drives > 0 && model.muA >= 0 && model.muD >= 0 && model.varA >= 0 && model.varD >= 0 && model.formSd >= 0
@@ -628,12 +710,33 @@ function drivesAt(model, t, margin) {
   const level = otChain[maxOt - period];
   if (minute >= length + ot * maxOt) return step(margin, otChain[0]);
   if (margin === 0) return level;
+  if (model.overtime === 'college') return collegeLeadAt(model, period, margin);
   if (model.overtime === 'sudden' || (model.overtime === 'modified' && Math.abs(margin) !== 3)) return step(margin, level);
   const [td, fg, xp = 1, two = 0] = margin > 0 ? [model.tdD, model.fgD, model.xpD, model.twoD] : [model.tdA, model.fgA, model.xpA, model.twoA];
   const lead = Math.abs(margin);
   const levelled = margin > 0 ? 1 - level : level;
   const trailer = lead > 8 ? 0 : lead === 8 ? td * two * levelled : lead === 7 ? td * xp * levelled
     : lead === 6 ? td * (xp + (1 - xp) * levelled) : lead > 3 ? td : lead === 3 ? td + fg * levelled : td + fg;
+  return margin > 0 ? clamp01(1 - trailer) : clamp01(trailer);
+}
+
+/**
+ * A lead in college overtime's period `period` (0 the first), charted as the trailing side's one answer in it, which
+ * levelled leaves the next period's chain (the decisive play after the last). In the first two periods: a touchdown wins
+ * against up to 5 and, kicked (first period) or with two points (second), against 6; kicked, it levels 7, with two
+ * points 8 (going for it a touchdown down, `tdLate`); a field goal wins against 1 or 2 and levels 3. From the third, a
+ * two-point play levels 2.
+ */
+function collegeLeadAt(model, period, margin) {
+  const lead = Math.abs(margin);
+  const [td, fg, xp, two, tdLate] = margin > 0 ? [model.tdD, model.fgD, model.xpD, model.twoD, model.tdLateD]
+    : [model.tdA, model.fgA, model.xpA, model.twoA, model.tdLateA];
+  const next = model.otChain[model.maxOt - period - 1];
+  const levelled = margin > 0 ? 1 - next : next;
+  const conversion = period === 0 ? xp : two;
+  const trailer = period >= 2 ? (lead === 2 ? two * levelled : 0)
+    : lead > 8 ? 0 : lead === 8 ? tdLate * two * levelled : lead === 7 ? tdLate * xp * levelled
+      : lead === 6 ? tdLate * (conversion + (1 - conversion) * levelled) : lead > 3 ? tdLate : lead === 3 ? td + fg * levelled : td + fg;
   return margin > 0 ? clamp01(1 - trailer) : clamp01(trailer);
 }
 

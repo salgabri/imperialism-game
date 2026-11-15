@@ -1,7 +1,7 @@
 // Owner: WP-LEDGER (see PLAN.md §4). Ledger, Chronicle and Match-preview view-models (PLAN §3.6).
 // Pure: (state, ctx) in, plain data out. No window/document/timers/RNG. Tolerates loading/setup state
 // (teams {}, aliveIds [], board null), `stats: {}`, teams without baseEff and history entries without odds.
-import { DEPENDENCIES, isTennisSport, NATIONS, selectLineup, SCOPES } from '../data/teams.js';
+import { DEPENDENCIES, isGridironSport, isTennisSport, NATIONS, selectLineup, SCOPES } from '../data/teams.js';
 import { worldClubTheatreName } from '../data/scopes.js';
 import { domesticLabel } from '../data/domesticScope.js';
 import { getSport } from '../sports/index.js';
@@ -500,7 +500,7 @@ function tapeRows(sportId, lineupA, lineupD, copy) {
     if (sportId === 'basketball') {
       const pA = basketballProfile(lineupA), pD = basketballProfile(lineupD);
       rows = [['offence', 'Offence', pA.offence, pD.offence], ['defence', 'Defence', pA.defence, pD.defence]];
-    } else if (sportId === 'american-football') {
+    } else if (isGridironSport(sportId)) {
       const pA = americanFootballProfile(lineupA), pD = americanFootballProfile(lineupD);
       rows = [['offence', 'Offence', pA.offence, pD.offence], ['defence', 'Defence', pA.defence, pD.defence],
         ['kicking', 'Kicking', pA.kicking, pD.kicking]];

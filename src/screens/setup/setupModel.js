@@ -398,6 +398,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'They have clubs only: the NBA franchises of that season, on the map of their day, and from 2000/01 the '
     + 'EuroLeague\'s clubs of that season, on a map of Europe of theirs. No game rates EuroLeague players, so the '
     + 'EuroLeague\'s ratings are estimates from its box scores, each season\'s put on 2025/26\'s level, marked as such.',
+  'college-football': 'EA SPORTS College Football 27 ratings, as of the week 10 update (15 November 2026): the 2026 '
+    + 'season\'s 138 FBS schools, each in its conference. One season only.',
   'american-football': 'Madden NFL ratings of each season at its launch (2026: Madden NFL 27, as of the week 7 update), '
     + 'from EA SPORTS and the fan archives that kept them; 1995–1992 and 1990 from Tecmo Super Bowl\'s attributes, the '
     + 'overall ours. 2000 back to 1996, 1991 and 1989 back to 1960 are computed from Pro Football Archives\' records of '
@@ -582,8 +584,10 @@ export function sportNote(sport, { clubsOnly = false } = {}) {
   const clubs = sport.id === 'football' ? topClubs(sport.clubs || [], TOP_CLUBS) : sport.clubs || [];
   const leagues = [...new Set(clubs.map(club => club.league))];
   if (!clubs.length) return 'Nations';
-  // A sport with clubs only (American football) has no nations to offer; basketball names its two leagues.
+  // A sport with clubs only (American football) has no nations to offer; basketball names its two leagues. College
+  // football names its division and its word for its clubs (`clubLeague`, `clubNoun`): "138 FBS schools".
   if (sport.clubsOnly || clubsOnly) {
+    if (sport.clubLeague && sport.clubNoun) return `${clubs.length} ${sport.clubLeague} ${sport.clubNoun}`;
     return leagues.length === 1 ? `${clubs.length} ${leagues[0]} clubs`
       : sport.id === 'basketball' && leagues.length === 2 ? `${leagues[0]} and ${leagues[1]} clubs` : `${clubs.length} clubs`;
   }
@@ -603,6 +607,7 @@ export const SPORT_NOTES = Object.freeze({
   'womens-football': 'Nations · 84 clubs from 6 leagues',
   basketball: 'Nations · NBA and EuroLeague clubs',
   'american-football': '32 NFL clubs',
+  'college-football': '138 FBS schools',
   baseball: 'Nations · 30 MLB clubs',
   hockey: 'Nations · 32 NHL clubs',
   tennis: 'Nations',
@@ -837,7 +842,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     },
     layer: clubLayer ? 'clubs' : 'nations', clubLayer, noun, nouns,
     // A sport with clubs only names its league ('NFL'): the Nations choice is off.
-    clubsOnly: sport.clubsOnly ? [...new Set(sport.clubs.map(club => club.league))].join(' and ') : null,
+    clubsOnly: sport.clubsOnly ? sport.clubLeague ?? [...new Set(sport.clubs.map(club => club.league))].join(' and ') : null,
+    clubsNoun: sport.clubNoun ?? 'clubs',
     // A sport with nations only (tennis) has no clubs: the Clubs choice is off.
     nationsOnly: !!sport.nationsOnly,
     // `scopes` stays the league / region rows; countries are their own group (`domesticScopes`) after them.

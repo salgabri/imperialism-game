@@ -58,9 +58,11 @@ const describe = places => Object.entries(places).map(([pos, n]) => (n > 1 ? `${
  * of position, preferring him (less the penalty) to a weak natural one, as a thin roster of the early 2000s makes it
  * (a linebacker before a 48-rated kicker), the natural players it passed over stay in the squad as well. A roster too
  * short of natural players for a place is refused unless `gaps` documents exactly that shortfall (`{ DL: 1, CB: 1 }`:
- * a 3-4 Tecmo club of 1990); the game then fills the place out of position, and no player is added.
+ * a 3-4 Tecmo club of 1990); the game then fills the place out of position, and no player is added. `sport` is the
+ * sport whose lineup picks the squad: American football's, or college football's (scripts/build-college-football.mjs),
+ * which fields the same places by the same rules.
  */
-export function squadOf(players, label, { gaps = {} } = {}) {
+export function squadOf(players, label, { gaps = {}, sport = SPORT } = {}) {
   const pool = players.slice().sort(byRating);
   const stray = Object.keys(gaps).filter(pos => !FORMATION[pos]);
   if (stray.length) throw new Error(`${label}: no place ${stray.join(', ')} in the lineup`);
@@ -70,7 +72,7 @@ export function squadOf(players, label, { gaps = {} } = {}) {
     throw new Error(Object.keys(gaps).length ? `${label} is short of ${describe(short)}, not the documented ${describe(documented)}`
       : `${label} cannot field every position: ${Object.keys(short).join(', ')}`);
   }
-  const lineup = selectLineup({ sport: SPORT, squad: pool });
+  const lineup = selectLineup({ sport, squad: pool });
   const chosen = new Set(lineup.starters.map(player => player.originalIndex));
   const passedOver = [];
   for (const [pos, count] of Object.entries(FORMATION)) {
@@ -83,7 +85,7 @@ export function squadOf(players, label, { gaps = {} } = {}) {
   const backups = pool.filter((player, i) => !chosen.has(i) && left[player.pos] > 0 && left[player.pos]--);
   const squad = [...lineup.starters.map(player => pool[player.originalIndex]), ...passedOver, ...backups]
     .sort((a, b) => ORDER.indexOf(a.pos) - ORDER.indexOf(b.pos) || byRating(a, b));
-  return { squad, str: selectLineup({ sport: SPORT, squad }).rating };
+  return { squad, str: selectLineup({ sport, squad }).rating };
 }
 
 /** Clubs strongest first, then by name. */

@@ -48,6 +48,9 @@ const HOST_OF = { US: '840', CA: '124', AU: '036', NZ: '554' };
 const UNTOWNED = { '124': ['US-AK'], '036': ['AUS-Other Territories'], '554': ['NZ-NLS'] };
 // Off every map; Alaska only reaches the two that hold Canada.
 const OFF_THE_MAP = { 'US-HI': [[-157.86, 21.31]] };
+// Overseas land a league's club holds, which its map keeps (an island state is dropped unless a club plays there):
+// college football's Hawaii, the Rainbow Warriors' (scripts/data/cfb-teams.json).
+const HELD_OVERSEAS = { FBS: { 'US-HI': [[-157.86, 21.31]] } };
 const ALASKA = [[-149.9, 61.22]];
 // A league may join a state to another's clubs (LEAGUES in scripts/build-club-maps.mjs): those clubs hold both.
 const JOINED = { NFL: { 'nfl-new-york-giants': ['US-NJ', 'US-NY'], 'nfl-new-york-jets': ['US-NJ', 'US-NY'],
@@ -66,7 +69,8 @@ for (const entry of CLUB_MAPS) {
     const empties = new Map(doc.topology.objects.empty.geometries.map(g => [g.id, polysOf(feature(doc.topology, g).geometry)]));
     const sectionAt = point => map.geo.countries.find(section => pointInPolys(point, section.polys))?.id ?? null;
     const canada = doc.hosts.includes('124'), america = doc.hosts.includes('840');
-    const towns = Object.entries(TOWNS).filter(([region]) => doc.hosts.includes(HOST_OF[region.slice(0, 2)]));
+    const overseas = HELD_OVERSEAS[entry.league] || {};
+    const towns = [...Object.entries(TOWNS), ...Object.entries(overseas)].filter(([region]) => doc.hosts.includes(HOST_OF[region.slice(0, 2)]));
     const untowned = doc.hosts.flatMap(host => UNTOWNED[host] || []);
 
     const regionsOf = new Map();
@@ -99,7 +103,7 @@ for (const entry of CLUB_MAPS) {
       'every empty region is a state or province');
     assert.equal(played.size + empties.size, known.size + untowned.length, 'a state has a club or is empty, and never both');
     if (!america) return;
-    for (const [where, points] of Object.entries(OFF_THE_MAP)) {
+    for (const [where, points] of Object.entries(OFF_THE_MAP).filter(([region]) => !overseas[region])) {
       for (const point of points) assert.equal(sectionAt(point), null, `${where} is off the map`);
       assert.ok(!empties.has(where), `${where} is not drawn`);
     }

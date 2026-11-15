@@ -13,6 +13,8 @@ export const TACTICS = [
 // The best useful reserve matters; hoarding dozens of players cannot stack it.
 const FOOTBALL_SUPPORT = { FW: [1, 0], MF: [.65, .65], DF: [0, 1], GK: [0, 1] };
 const TENNIS_SUPPORT = { SGL: [.5, .5], DBL: [.5, .5] };
+const GRIDIRON_SUPPORT = { QB: [1, 0], RB: [1, 0], WR: [1, 0], TE: [.8, .2], OL: [.65, .35], DL: [0, 1], LB: [0, 1], CB: [0, 1],
+  S: [0, 1], K: [.3, .3] };
 const SUPPORT = {
   football: FOOTBALL_SUPPORT,
   'womens-football': FOOTBALL_SUPPORT,
@@ -22,8 +24,9 @@ const SUPPORT = {
   'rugby-league': { FB: [1, .4], WG: [1, .2], CE: [.65, .65], FE: [1, .3], HB: [1, .3], HK: [.5, .6], PR: [.2, 1], SR: [.4, 1],
     LK: [.3, 1] },
   basketball: { PG: [.75, .25], SG: [1, 0], SF: [1, .4], PF: [0, 1], C: [0, 1] },
-  'american-football': { QB: [1, 0], RB: [1, 0], WR: [1, 0], TE: [.8, .2], OL: [.65, .35], DL: [0, 1], LB: [0, 1], CB: [0, 1],
-    S: [0, 1], K: [.3, .3] },
+  'american-football': GRIDIRON_SUPPORT,
+  // College football's squads are the NFL's shape.
+  'college-football': GRIDIRON_SUPPORT,
   // Hitters help a lineup score (the corners and the designated hitter most), up the middle they also field; the
   // pitchers keep runs off the board.
   baseball: { C: [.6, .6], '1B': [1, .3], '2B': [.8, .5], '3B': [.9, .4], SS: [.7, .6], LF: [1, .3], CF: [.8, .5], RF: [1, .3],

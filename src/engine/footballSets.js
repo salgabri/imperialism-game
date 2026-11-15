@@ -51,6 +51,8 @@ export const BUILT_IN_SEASON = Object.freeze({ year: 2027, season: '2026/27' });
 const BUILT_IN_SEASONS_OF = Object.freeze({ football: BUILT_IN_SEASON, 'womens-football': BUILT_IN_SEASON,
   basketball: Object.freeze({ year: 2027, season: '2026/27' }), hockey: Object.freeze({ year: 2027, season: '2026/27' }),
   'american-football': Object.freeze({ year: 2026, season: '2026' }), baseball: Object.freeze({ year: 2026, season: '2026' }),
+  // College Football 27 rates the 2026 college season, played in the autumn of one calendar year.
+  'college-football': Object.freeze({ year: 2026, season: '2026' }),
   tennis: Object.freeze({ year: 2026, season: '2026' }), 'womens-tennis': Object.freeze({ year: 2026, season: '2026' }),
   // Rugby League 26 rates the 2025 NRL season, a calendar year.
   'rugby-league': Object.freeze({ year: 2025, season: '2025' }),

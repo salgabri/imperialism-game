@@ -1,6 +1,6 @@
 // Owner: WP-SQUAD (see PLAN.md §4). Squad view-models (PLAN §3.6, C§16, DEC D8/D9).
 // Pure: no window/document/timers/RNG; tolerates missing teams, history, stats and baseEff.
-import { isTennisSport, selectLineup, teamSportId } from '../data/teams.js';
+import { isGridironSport, isTennisSport, selectLineup, teamSportId } from '../data/teams.js';
 import { estimateReason, estimateTitle, isEstimated } from '../data/estimates.js';
 import { footballProfile } from '../sports/football.js';
 import { basketballProfile } from '../sports/basketball.js';
@@ -103,12 +103,15 @@ const SLOTS = {
   // player first.
   'counter-strike': { PLR: [[50, 44], [20, 22], [80, 22], [31, 40], [69, 40]] },
 };
+// College football fields the NFL's lineup on the same field.
+SLOTS['college-football'] = SLOTS['american-football'];
 /** Squad-screen copy per sport: the box the lineup is drawn on and its names. */
 const LAYOUTS = {
   football: { layout: 'pitch', viewLabel: 'Pitch' },
   'womens-football': { layout: 'pitch', viewLabel: 'Pitch' },
   basketball: { layout: 'court', viewLabel: 'Court' },
   'american-football': { layout: 'field', viewLabel: 'Field' },
+  'college-football': { layout: 'field', viewLabel: 'Field' },
   baseball: { layout: 'diamond', viewLabel: 'Diamond' },
   hockey: { layout: 'rink', viewLabel: 'Rink' },
   tennis: { layout: 'tennis', viewLabel: 'Court' },
@@ -196,7 +199,7 @@ export function profileSegments(value) {
 export function strengthProfile(lineup, sportId) {
   const rows = sportId === 'basketball'
     ? (({ offence, defence }) => [['offence', 'Offence', offence], ['defence', 'Defence', defence]])(basketballProfile(lineup))
-    : sportId === 'american-football'
+    : isGridironSport(sportId)
       ? (({ offence, defence, kicking }) => [['offence', 'Offence', offence], ['defence', 'Defence', defence], ['kicking', 'Kicking', kicking]])(americanFootballProfile(lineup))
       : sportId === 'baseball'
         ? (({ batting, pitching, fielding }) => [['batting', 'Batting', batting], ['pitching', 'Pitching', pitching], ['fielding', 'Fielding', fielding]])(baseballProfile(lineup))

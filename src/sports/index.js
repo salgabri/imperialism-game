@@ -6,6 +6,7 @@ import { football } from './football.js';
 import { womensFootball } from './womensFootball.js';
 import { basketball } from './basketball.js';
 import { americanFootball } from './americanFootball.js';
+import { collegeFootball } from './collegeFootball.js';
 import { baseball } from './baseball.js';
 import { hockey } from './hockey.js';
 import { tennis } from './tennis.js';
@@ -14,11 +15,11 @@ import { rugbyLeague } from './rugbyLeague.js';
 import { rocketLeague } from './rocketLeague.js';
 import { counterStrike } from './counterStrike.js';
 
-export const SPORTS = { football, 'womens-football': womensFootball, basketball, 'american-football': americanFootball, baseball, hockey, tennis,
-  'womens-tennis': womensTennis, 'rugby-league': rugbyLeague, 'rocket-league': rocketLeague,
-  'counter-strike': counterStrike };
-export const SPORT_LIST = [football, womensFootball, basketball, americanFootball, baseball, hockey, tennis, womensTennis, rugbyLeague,
-  rocketLeague, counterStrike];
+export const SPORTS = { football, 'womens-football': womensFootball, basketball, 'american-football': americanFootball,
+  'college-football': collegeFootball, baseball, hockey, tennis, 'womens-tennis': womensTennis, 'rugby-league': rugbyLeague,
+  'rocket-league': rocketLeague, 'counter-strike': counterStrike };
+export const SPORT_LIST = [football, womensFootball, basketball, americanFootball, collegeFootball, baseball, hockey, tennis, womensTennis,
+  rugbyLeague, rocketLeague, counterStrike];
 export const DEFAULT_SPORT = 'football';
 
 export const getSport = id => SPORTS[id] || SPORTS[DEFAULT_SPORT];

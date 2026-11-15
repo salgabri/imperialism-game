@@ -29,6 +29,8 @@ const NBA = { sport: 'basketball', layer: 'clubs', clubScope: 'domestic:nba' };
 const EUROLEAGUE = { sport: 'basketball', layer: 'clubs', clubScope: 'domestic:euroleague' };
 // American football: the 32 NFL franchises on their own map of the USA, clubs only.
 const NFL = { sport: 'american-football', layer: 'clubs', clubScope: 'domestic:nfl' };
+// College football: the 138 FBS schools on their own map of the USA, schools only.
+const FBS = { sport: 'college-football', layer: 'clubs', clubScope: 'domestic:cfb' };
 // Baseball clubs: the 30 MLB clubs on their own map of the USA and Canada.
 const MLB = { sport: 'baseball', layer: 'clubs', clubScope: 'domestic:mlb' };
 // Ice hockey clubs: the 32 NHL clubs on their own map of the USA and Canada.
@@ -68,6 +70,7 @@ const SCENARIOS = [
   { name: 'RUGBY LEAGUE · Asia & Oceania · blitz · instant', sport: 'rugby-league', scope: 'AFC', pacing: 'blitz', resolution: 'instant' },
   { name: 'ROCKET LEAGUE · Europe · duel · ticker', sport: 'rocket-league', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
   { name: 'COUNTER-STRIKE · World · blitz · instant', sport: 'counter-strike', scope: 'world', pacing: 'blitz', resolution: 'instant' },
+  { name: 'CLUBS · FBS · duel · ticker', ...FBS, pacing: 'duel', resolution: 'ticker' },
 ];
 
 const RESUME_SCENARIOS = [
@@ -80,6 +83,7 @@ const RESUME_SCENARIOS = [
   { name: 'DOMESTIC · Fiji top clubs · chaos · instant', ...FIJI, pacing: 'chaos', resolution: 'instant', finish: true },
   { name: 'CLUBS · NFL · blitz · instant', ...NFL, pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · MLB · chaos · instant', ...MLB, pacing: 'chaos', resolution: 'instant' },
+  { name: 'CLUBS · FBS · blitz · instant', ...FBS, pacing: 'blitz', resolution: 'instant' },
 ];
 
 const LABEL_SCENARIOS = [
@@ -101,7 +105,9 @@ const MANAGER_SCENARIOS = [
 // (England blitz), `=9` (Fiji duel) and `--resume-only=4` (England), `=5` (Fiji); the NFL's are `=10` and `=6`, MLB's `=11` and `=7`,
 // baseball's nations `=12`, the NHL's `=13`, hockey's nations `=14`, the women's nations `=15` and clubs `=16`, tennis's Davis Cup nations
 // `=17`, the NRL's `=18` and rugby league's nations `=19` (counted before Europe's two club maps came in at `=5` and `=6`: add two
-// to each), and Rocket League's nations the last, `=25`. `--scenarios=<text>` composes with
+// to each), Rocket League's nations `=25`, Counter-Strike's `=26`, and college football's FBS schools the last, `=27` and
+// `--resume-only=9`.
+// `--scenarios=<text>` composes with
 // these: it narrows whatever they leave.
 function onlyIndex(name, list) {
   const arg = process.argv.find(value => value.startsWith(`--${name}=`));
@@ -272,7 +278,8 @@ function checkMapScope(label, snapshot, options) {
 
 /**
  * Football clubs offer every shipped country, grouped apart from the leagues; women's football clubs Europe's two maps
- * and the NWSL's; basketball clubs the NBA's map and the EuroLeague's, American football (clubs only) the NFL's, baseball clubs MLB's,
+ * and the NWSL's; basketball clubs the NBA's map and the EuroLeague's, American football (clubs only) the NFL's, college football
+ * (its schools only) the FBS's, baseball clubs MLB's,
  * hockey clubs the NHL's and rugby league clubs the NRL's.
  */
 function checkTheatres(scenario, theatre) {
@@ -295,6 +302,11 @@ function checkTheatres(scenario, theatre) {
   }
   if (scenario.layer === 'clubs' && scenario.sport === 'rugby-league') {
     check('rugby league clubs play only the NRL’s own map', JSON.stringify(theatre.options) === JSON.stringify([{ value: 'domestic:nrl', text: 'NRL · 17 clubs' }]),
+      JSON.stringify(theatre.options));
+    return;
+  }
+  if (scenario.sport === 'college-football') {
+    check('college football plays only the FBS’s own map', JSON.stringify(theatre.options) === JSON.stringify([{ value: 'domestic:cfb', text: 'FBS · 138 clubs' }]),
       JSON.stringify(theatre.options));
     return;
   }
@@ -809,7 +821,8 @@ if (!filtered && fixedChecks) {
       check('every match has a winner', results.every(r => r.winner === a.id || r.winner === b.id), 'no winner');
       check('a level score always triggers a tie-break', unresolved === 0, `${unresolved} left level`);
       check('the feed adds up to the final score', evTotals, 'event totals mismatch');
-      const [low, high] = { football: [0.6, 3.5], basketball: [60, 110], 'american-football': [15, 30], baseball: [2, 10], 'womens-football': [0.6, 3.5], hockey: [1.5, 5.5],
+      const [low, high] = { football: [0.6, 3.5], basketball: [60, 110], 'american-football': [15, 30], 'college-football': [15, 40], baseball: [2, 10],
+        'womens-football': [0.6, 3.5], hockey: [1.5, 5.5],
         // Rubbers: the winner's three and the loser's none to two.
         tennis: [1.5, 2.5], 'womens-tennis': [1.5, 2.5], 'rugby-league': [12, 35],
         // Games: the winner's four and the loser's none to three.
