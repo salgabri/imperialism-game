@@ -1,12 +1,12 @@
 // Owner: WP-SQUAD (see PLAN.md §4). Formation pitch (C§7, board C1), the basketball half court (C§17, DEC misc), the
-// American football field, the baseball diamond, the hockey rink, the tennis court, the rugby league field and the Rocket
-// League arena.
+// American football field, the baseball diamond, the hockey rink, the tennis court, the rugby league field, the Rocket
+// League arena and a Counter-Strike map.
 import React from 'react';
 import { ESTIMATE_TITLE } from '../../data/estimates.js';
 
 /**
  * `slots`: [{ key, x: '50%', y: '88%', name, fullName, rating, claimed, estimated }] positioned in % of the box.
- * `layout`: 'pitch' | 'court' | 'field' | 'diamond' | 'rink' | 'tennis' | 'rugby' | 'arena'. `size`: 'side' (430×330, wide 500×384) | 'large' (Pitch tab) | 'phone'.
+ * `layout`: 'pitch' | 'court' | 'field' | 'diamond' | 'rink' | 'tennis' | 'rugby' | 'arena' | 'site'. `size`: 'side' (430×330, wide 500×384) | 'large' (Pitch tab) | 'phone'.
  */
 export default function SquadPitch({ slots = [], layout = 'pitch', size = 'side', label = 'Formation' }) {
   return (
@@ -56,6 +56,18 @@ export default function SquadPitch({ slots = [], layout = 'pitch', size = 'side'
           <path d="M14 6H86L96 16V84L86 94H14L4 84V16Z" />
           <path d="M37 6V1H63V6M37 94V99H63V94M4 50H96" />
           <ellipse cx="50" cy="50" rx="10" ry="8" />
+        </svg>
+      ) : layout === 'site' ? (
+        // A Counter-Strike map from above, as its defenders hold it: the A and B bomb sites at the top, each with its plant
+        // spot, the rotation between them, the lanes down from each and mid to the attackers' spawn at the foot. The
+        // drawing stretches with the box.
+        <svg className="pitch__site" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <rect x="0" y="0" width="100" height="100" />
+          <rect x="7" y="8" width="27" height="26" />
+          <rect x="66" y="8" width="27" height="26" />
+          <path d="M34 21H66M20.5 34V66H79.5V34M50 66V100M50 34V66" />
+          <ellipse cx="20.5" cy="21" rx="3.5" ry="3" />
+          <ellipse cx="79.5" cy="21" rx="3.5" ry="3" />
         </svg>
       ) : layout === 'rink' ? (
         // One end of the rink: the goal line and crease at the foot, the blue line and the centre line and circle

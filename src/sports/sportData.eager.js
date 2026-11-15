@@ -16,6 +16,7 @@ import { ROSTERS as WOMENS_TENNIS } from '../data/rosters.womens-tennis.js';
 import { ROSTERS as RUGBY_LEAGUE } from '../data/rosters.rugby-league.js';
 import { CLUBS as NRL_CLUBS } from '../data/clubs.rugby-league.js';
 import { ROSTERS as ROCKET_LEAGUE } from '../data/rosters.rocket-league.js';
+import { ROSTERS as COUNTER_STRIKE } from '../data/rosters.counter-strike.js';
 
 /** Sport id → its players: `rosters` and `clubs`, each only where the sport reads them from its players. */
 export const EAGER = {
@@ -29,6 +30,7 @@ export const EAGER = {
   'womens-tennis': { rosters: WOMENS_TENNIS },
   'rugby-league': { rosters: RUGBY_LEAGUE, clubs: NRL_CLUBS },
   'rocket-league': { rosters: ROCKET_LEAGUE },
+  'counter-strike': { rosters: COUNTER_STRIKE },
 };
 
 /** Nothing to load: every sport is here. */

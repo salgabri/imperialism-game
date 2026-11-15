@@ -82,7 +82,7 @@ const STABLE_MODULES = [
   /\/node_modules\/(?:react|react-dom|scheduler)\//,
   /\/src\/data\/(?:rosters|clubs\.football|sourceTable)\.js$/,
 ];
-// The players of every sport but football (first download) and women's football (about as big as these eight together).
+// The players of every sport but football (first download) and women's football (about as big as these nine together).
 const SPORT_PLAYERS = /\/src\/data\/players\/(?!womens-football\.js$)[^/]+\.js$/;
 
 /**
@@ -90,7 +90,7 @@ const SPORT_PLAYERS = /\/src\/data\/players\/(?!womens-football\.js$)[^/]+\.js$/
  * changed to every returning player, and a first visit's worker fetches every chunk:
  * - 'stable': STABLE_MODULES, out of the first chunk, which changes with every release. When only the game's code
  *   changes, a release re-sends about 290 KB compressed, not 500.
- * - 'sports': the seven smaller sports' players, one file instead of seven (4 to 11 KB compressed each), loaded the
+ * - 'sports': the nine smaller sports' players, one file instead of nine (4 to 11 KB compressed each), loaded the
  *   first time any of them is played (src/sports/sportData.lazy.js). Women's football's stay a chunk of their own.
  * Neither may import the first chunk, or every release would change them too: scripts/chunks.test.mjs checks the
  * import graph. Rollup adds a module's dependencies to its chunk, so a sport's own data files go with it.

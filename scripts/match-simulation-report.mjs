@@ -38,13 +38,15 @@ const SCORE_SCALES = Object.freeze({
   'rugby-league': Object.freeze({ largeTotal: 60, blowout: 25, bar: 4 }),
   // Rocket League in games: a series that goes to a seventh, and a 4–0 sweep.
   'rocket-league': Object.freeze({ largeTotal: 7, blowout: 4, bar: 1 }),
+  // Counter-Strike in maps: a series that goes to a third, and a 2–0 sweep.
+  'counter-strike': Object.freeze({ largeTotal: 3, blowout: 2, bar: 1 }),
 });
 const POINTS_SCALE = Object.freeze({ largeTotal: 220, blowout: 20, bar: 10 });
 
 // Four national pairings a sport. Women's football's, ice hockey's and rugby league's are nations that field their own
 // players: a nation without any plays no women's football, and a hockey or rugby league minnow's lineup is generated.
 // Tennis's are Davis Cup nations, women's tennis's Billie Jean King Cup nations, Rocket League's nations with three
-// players rated from Liquipedia's results.
+// players rated from Liquipedia's results, Counter-Strike's nations with five.
 const PAIRINGS = Object.freeze({
   football: [['250', '076'], ['032', '276'], ['724', '756'], ['076', '356']],
   'womens-football': [['724', '826'], ['840', '276'], ['076', '392'], ['724', '834']],
@@ -53,6 +55,7 @@ const PAIRINGS = Object.freeze({
   'womens-tennis': [['840', '643'], ['203', '804'], ['616', '112'], ['826', '036']],
   'rugby-league': [['036', '554'], ['826', '242'], ['036', '826'], ['554', '598']],
   'rocket-league': [['250', '840'], ['682', '826'], ['724', '076'], ['250', '682']],
+  'counter-strike': [['643', '076'], ['250', '208'], ['804', '792'], ['643', '250']],
 });
 const OTHER_PAIRINGS = [['840', '124'], ['276', '688'], ['250', '724'], ['840', '356']];
 

@@ -67,6 +67,7 @@ const SCENARIOS = [
   { name: 'CLUBS · NRL · duel · ticker', ...NRL, pacing: 'duel', resolution: 'ticker' },
   { name: 'RUGBY LEAGUE · Asia & Oceania · blitz · instant', sport: 'rugby-league', scope: 'AFC', pacing: 'blitz', resolution: 'instant' },
   { name: 'ROCKET LEAGUE · Europe · duel · ticker', sport: 'rocket-league', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
+  { name: 'COUNTER-STRIKE · World · blitz · instant', sport: 'counter-strike', scope: 'world', pacing: 'blitz', resolution: 'instant' },
 ];
 
 const RESUME_SCENARIOS = [
@@ -666,7 +667,9 @@ if (!filtered && fixedChecks) {
     'womens-tennis': ['United States', 'Russia', 'Czechia', 'Ukraine'],
     'rugby-league': ['Australia', 'New Zealand', 'England', 'Fiji'],
     // Rocket League's, by the Liquipedia snapshot's Elo: the United States, France, Saudi Arabia and Brazil lead it.
-    'rocket-league': ['United States', 'France', 'Saudi Arabia', 'Brazil'] };
+    'rocket-league': ['United States', 'France', 'Saudi Arabia', 'Brazil'],
+    // Counter-Strike's, by its Liquipedia snapshot's Elo.
+    'counter-strike': ['Russia', 'Ukraine', 'Brazil', 'France'] };
 
   for (const sport of SPORT_LIST) {
     // A sport with clubs only (American football) fields no nations: its clubs are checked below.
@@ -694,10 +697,12 @@ if (!filtered && fixedChecks) {
       const natural = slot => slot.player && (sport.id === 'hockey' ? slot.penalty <= 4 : sport.id === 'rugby-league' ? slot.penalty <= 8 : !slot.outOfPosition);
       // Tennis invents nobody either: a nation needs two rated players, and a team of two or three plays its singles
       // players in the doubles too.
-      // Rocket League invents nobody: a nation needs three rated players and fields its best three of up to five.
+      // Rocket League invents nobody: a nation needs three rated players and fields its best three of up to five; Counter-
+      // Strike's needs five and fields its best five of up to seven.
+      const esportLineup = { 'rocket-league': 3, 'counter-strike': 5 }[sport.id];
       const fielded = sport.id === 'womens-football' ? teams.filter(t => t.real >= size)
-        : isTennisSport(sport.id) ? teams.filter(t => t.real >= 2) : sport.id === 'rocket-league' ? teams.filter(t => t.real >= 3) : teams;
-      const full = t => (isTennisSport(sport.id) || sport.id === 'rocket-league' ? lineupOf(t).slots.every(slot => slot.player)
+        : isTennisSport(sport.id) ? teams.filter(t => t.real >= 2) : esportLineup ? teams.filter(t => t.real >= esportLineup) : teams;
+      const full = t => (isTennisSport(sport.id) || esportLineup ? lineupOf(t).slots.every(slot => slot.player)
         : t.squad.length > size ? lineupOf(t).slots.every(natural) : t.squad.length === size);
       // A sport fields at least a continent's worth of real sides (src/data/scopes.js): rugby league fields six.
       check('every nation fields a full lineup', fielded.length >= MIN_REAL_SIDES && fielded.every(full),
@@ -808,7 +813,9 @@ if (!filtered && fixedChecks) {
         // Rubbers: the winner's three and the loser's none to two.
         tennis: [1.5, 2.5], 'womens-tennis': [1.5, 2.5], 'rugby-league': [12, 35],
         // Games: the winner's four and the loser's none to three.
-        'rocket-league': [2, 3.5] }[sport.id];
+        'rocket-league': [2, 3.5],
+        // Maps: the winner's two and the loser's none or one.
+        'counter-strike': [1, 1.5] }[sport.id];
       check('scoring is in the right range for the sport', mean > low && mean < high, `mean ${mean.toFixed(1)}`);
       console.log(`    400 matches · mean score ${mean.toFixed(1)} · ${results.filter(r => r.tie).length} needed ${sport.labels.tie.toLowerCase()}`);
     } catch (e) {

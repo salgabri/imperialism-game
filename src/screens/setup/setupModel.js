@@ -417,6 +417,10 @@ export const SEASON_NOTES = Object.freeze({
     + 'player plays for the nation he last played for at the FIFAe World Cup or the Esports Nations Cup, else the flag '
     + 'Liquipedia files him under, and only if he has played within the year. Each nation fields its best three; one with '
     + 'fewer fields no team.',
+  'counter-strike': 'Elo ratings computed from every 5v5 series of CS:GO and CS2 that Liquipedia records (CC BY-SA 3.0), to '
+    + 'November 2026, map by map. A player plays for the nation he last played for at a national-team event (the Esports '
+    + 'Nations Cup, WESG), else the country of his Liquipedia page, and only if he has played within the year. Each nation '
+    + 'fields its best five; one with fewer fields no team.',
   tennis: 'Elo ratings of the ATP\'s men: Tennis Abstract\'s own as of 2 November 2026 and at the end of 2016–2025; before '
     + '2016 computed from Jeff Sackmann\'s match results by its method (1960–1979 rough; before 1968 the amateurs\' majors and '
     + 'Davis Cup only). Each nation names its five best; '
@@ -605,6 +609,7 @@ export const SPORT_NOTES = Object.freeze({
   'womens-tennis': 'Nations',
   'rugby-league': 'Nations · 17 NRL clubs',
   'rocket-league': 'Nations',
+  'counter-strike': 'Nations',
 });
 
 /**

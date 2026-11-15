@@ -482,9 +482,9 @@ export const RUGBY_CROSSING_PENALTY = 15;
 export const TENNIS_SPORTS = Object.freeze(['tennis', 'womens-tennis']);
 /** Whether a sport id plays tennis's lineup, squad and match views: the men's game or the women's. */
 export const isTennisSport = sportId => TENNIS_SPORTS.includes(sportId);
-// Football's rule, in both of its games, tennis's, in both of its, and Rocket League's: a team fields only the players its
+// Football's rule, in both of its games, tennis's, in both of its, and the esports': a team fields only the players its
 // source rates.
-const REAL_PLAYERS_ONLY = new Set(['football', 'womens-football', ...TENNIS_SPORTS, 'rocket-league']);
+const REAL_PLAYERS_ONLY = new Set(['football', 'womens-football', ...TENNIS_SPORTS, 'rocket-league', 'counter-strike']);
 const FOOTBALL_PLAN = ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'FW', 'FW'];
 const TENNIS_PLAN = ['SGL', 'SGL', 'DBL', 'DBL'];
 const LINEUP_PLANS = {
@@ -507,6 +507,8 @@ const LINEUP_PLANS = {
   'rugby-league': ['FB', 'WG', 'WG', 'CE', 'CE', 'FE', 'HB', 'PR', 'HK', 'PR', 'SR', 'SR', 'LK', 'HK', 'PR', 'PR', 'LK'],
   // Rocket League's three, who rotate through every place on the field: no positions, so nobody is ever out of one.
   'rocket-league': ['PLR', 'PLR', 'PLR'],
+  // Counter-Strike's five, each of whom plays every role a round asks of him: no positions either.
+  'counter-strike': ['PLR', 'PLR', 'PLR', 'PLR', 'PLR'],
 };
 const TENNIS_POSITIONS = new Set(TENNIS_PLAN);
 // What each lineup place weighs in a tennis team's strength: the No. 1 and the No. 2 each play two of the five rubbers,

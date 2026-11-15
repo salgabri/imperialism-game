@@ -41,6 +41,8 @@ const PATHS = {
   'rugby-league': <><path d="M7 3v18M17 3v18M7 14h10" /><ellipse cx="12" cy="8" rx="3.6" ry="2.3" transform="rotate(-30 12 8)" /></>,
   // A car side on, nose to the right, and the ball above it.
   'rocket-league': <><path d="M2.5 16v-2.2l4-1.2 3.1-2.4h5l2.8 2.4 3.6.8V16" /><path d="M8.7 16h6.4" /><circle cx="6.8" cy="16.3" r="1.9" /><circle cx="17" cy="16.3" r="1.9" /><circle cx="18.5" cy="5.5" r="2.6" /></>,
+  // A crosshair: its ring, the four lines in to the gap at its centre, and the dot.
+  'counter-strike': <><circle cx="12" cy="12" r="7.5" /><path d="M12 2.5v6M12 15.5v6M2.5 12h6M15.5 12h6" /><circle cx="12" cy="12" r="0.9" /></>,
   folder: <path d="M3 7a1 1 0 0 1 1-1h5l2 2.5h9a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" />,
   upload: <path d="M12 16V5m-4.5 4.5L12 5l4.5 4.5M4 19h16" />,
   download: <path d="M12 5v11m-4.5-4.5L12 16l4.5-4.5M4 19h16" />,

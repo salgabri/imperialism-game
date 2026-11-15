@@ -13,6 +13,7 @@ import { hockeyProfile } from '../sports/hockey.js';
 import { tennisProfile } from '../sports/tennis.js';
 import { rugbyLeagueProfile } from '../sports/rugbyLeague.js';
 import { rocketLeagueProfile } from '../sports/rocketLeague.js';
+import { counterStrikeProfile } from '../sports/counterStrike.js';
 import { campaignRecap, estimateSession } from '../engine/campaignExperience.js';
 import { empireNeighbors } from '../engine/campaign.js';
 import { FEED_CAP, domesticIdOf } from '../app/shared.js';
@@ -520,6 +521,9 @@ function tapeRows(sportId, lineupA, lineupD, copy) {
         ['forwards', 'Forwards', pA.forwards, pD.forwards]];
     } else if (sportId === 'rocket-league') {
       const pA = rocketLeagueProfile(lineupA), pD = rocketLeagueProfile(lineupD);
+      rows = [['best', 'Best player', pA.best, pD.best]];
+    } else if (sportId === 'counter-strike') {
+      const pA = counterStrikeProfile(lineupA), pD = counterStrikeProfile(lineupD);
       rows = [['best', 'Best player', pA.best, pD.best]];
     } else {
       const pA = footballProfile(lineupA), pD = footballProfile(lineupD);

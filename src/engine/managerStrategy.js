@@ -33,6 +33,8 @@ const SUPPORT = {
   'womens-tennis': TENNIS_SUPPORT,
   // Rocket League's sixth man can sub in for any of the three, at either end of the risk.
   'rocket-league': { PLR: [.5, .5] },
+  // Counter-Strike's reserves the same, for any of the five.
+  'counter-strike': { PLR: [.5, .5] },
 };
 
 export function tacticalProfile(team) {

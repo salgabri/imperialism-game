@@ -92,6 +92,15 @@
 //   margin (gameTable), then the games left, exactly. Match-day form, one draw on every game's gap, is integrated over its
 //   normal spread with seven-point Gauss–Hermite quadrature, each node weighed by how likely it made the games already won.
 //
+// Counter-Strike — exact, from the model's own maps (src/sports/counterStrike.js): a series is best of three, each map won
+//   with Elo's odds for the gap (mapOdds) and played round by round at the strength that makes it so (strengthFor), each
+//   round's odds moved toward the side that won the one before in its half (roundOdds), to 13 with overtimes of six from
+//   12–12 (mapTable). The events are its rounds (`pts` 0) and each map's end (`pts` 1), so the chart knows every round
+//   played: P(A wins) is the map in play's chance from its state (mapChance), then the maps left, exactly. Match-day form,
+//   one draw on every map's gap, is integrated over its normal spread with seven-point Gauss–Hermite quadrature, each node
+//   weighed by how likely it made every round played so far (roundsChance; a finished map with no rounds known, by its
+//   winner alone).
+//
 // Constants mirror the private values in src/sports/football.js (BASE_GOALS, MAX_LOG_EDGE; extra time's FOOTBALL_MODEL); basketball's,
 // American football's, baseball's, ice hockey's, tennis's and rugby league's come from their own modules (BASKETBALL_MODEL;
 // DRIVE_MODEL, driveOdds, lateCall; INNING_MODEL, inningOdds, runMasses; PERIOD_MODEL, sliceMeans, overtimeMeans,
@@ -107,6 +116,7 @@ import { lateOf, overtimeMeans, PERIOD_MODEL, shootoutOdds, sliceMeans } from '.
 import { deciderOdds, goldenRate, POINTS, SLICE_MODEL, sliceMeans as rugbySliceMeans } from '../sports/rugbyLeague.js';
 import { bestOfFive, bestOfThree, daySetChances, matchOdds, RUBBER_MODEL } from '../sports/tennis.js';
 import { chanceFrom, gameOdds, gameRates, gameTable, overtimeOdds, SERIES_MODEL } from '../sports/rocketLeague.js';
+import { mapChance, mapOdds, mapState, mapTable, MAPS_MODEL, roundsChance, strengthFor } from '../sports/counterStrike.js';
 
 const BASE_GOALS = 1.28;
 const MAX_LOG_EDGE = 1.5;
@@ -176,6 +186,10 @@ export function footballRate(log) {
  *     attacker's rating points ahead in every game, formSd the spread of match-day form in rating points; the clock gives
  *     each game twelve units, ten of regulation, the fifth to seventh games extending the shortest series as overtime
  *     periods do; `goals` an earlier season's goal rate between equals, today's when absent)
+ * | { kind:'maps', gap, formSd, length:52, ot:26, maxOt:1, toWin:2 } (Counter-Strike; gap is the attacker's rating points
+ *     ahead in every map, formSd the spread of match-day form in rating points; the clock gives each map twenty-six units,
+ *     a round each in regulation and two for its overtime, the third map extending the shortest series as an overtime
+ *     period does)
  * | null (no teams, unknown sport, or a model the approximation does not cover).
  * `sport` is a sport object or id; effA/effD are the match's effective strengths (tactics included); `drama`
  * is the match's uncertainty (football ignores it, as the README formula does); `home`, that the defender plays at
@@ -202,6 +216,13 @@ export function liveModelFor(sport, attacker, defender, effA, effD, drama, home 
       toWin: SERIES_MODEL.TO_WIN, regulation: SERIES_MODEL.SLICES,
       // An earlier season's goal rate; today's model names none.
       ...(isNum(prepared.goals) && num(prepared.goals) !== SERIES_MODEL.GOALS ? { goals: num(prepared.goals) } : {}),
+    };
+  }
+  if (prepared.maps && isNum(prepared.gap)) {
+    const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
+    return {
+      kind: 'maps', gap: num(prepared.gap), formSd: MAPS_MODEL.FORM_AT_BALANCED * (variation / 6) ** 2,
+      length: MAPS_MODEL.LENGTH, ot: MAPS_MODEL.BLOCK, maxOt: MAPS_MODEL.MAPS - MAPS_MODEL.TO_WIN, toWin: MAPS_MODEL.TO_WIN,
     };
   }
   if (Array.isArray(prepared.rubbers) && TIE_RUBBERS.has(prepared.rubbers.length)) {
@@ -419,6 +440,10 @@ export function isLiveModel(model) {
       && Number.isInteger(model.maxOt) && model.maxOt >= 0 && Number.isInteger(model.toWin) && model.toWin >= 1
       && Number.isInteger(model.regulation) && model.regulation >= 1 && model.regulation < model.ot
       && (model.goals === undefined || (finite('goals') && model.goals > 0));
+  }
+  if (model.kind === 'maps') {
+    return ['gap', 'formSd', 'length', 'ot'].every(finite) && model.formSd >= 0 && model.length > 0 && model.ot > 0
+      && Number.isInteger(model.maxOt) && model.maxOt >= 0 && Number.isInteger(model.toWin) && model.toWin >= 1;
   }
   if (model.kind === 'rubbers') {
     return ['formSd', 'length', 'ot'].every(finite) && model.formSd >= 0 && model.length > 0 && model.ot > 0
@@ -1099,6 +1124,67 @@ function seriesState(events, aId, t, block) {
   return { a, d, margin, unit: Math.max(0, t - (a + d) * block) };
 }
 
+const mapsCache = new WeakMap();
+
+/**
+ * A Counter-Strike model's tables, built once per model: for each form node, the attacker's odds in every map (`p`) and the
+ * map's table of chances by state at the round strength that gives them. Also a cache of computed values by state.
+ */
+function mapsTables(model) {
+  if (mapsCache.has(model)) return mapsCache.get(model);
+  const nodes = HERMITE.map(([t, weight]) => {
+    const p = mapOdds(model.gap + t * model.formSd);
+    return { weight, p, table: mapTable(strengthFor(p)) };
+  });
+  const tables = { nodes, cache: new Map() };
+  mapsCache.set(model, tables);
+  return tables;
+}
+
+/**
+ * Counter-Strike: P(side A wins) with maps `a`–`d` won (`done`: each finished map's { rounds, winner }, its rounds 'A' or
+ * 'D' in order, none when only its winner is known) and the map in play at `current` (its rounds so far), averaged over
+ * the form nodes, each weighed by its prior and by how likely it made everything played so far.
+ */
+function mapsAt(model, a, d, done = [], current = []) {
+  if (a >= model.toWin) return 1;
+  if (d >= model.toWin) return 0;
+  const { nodes, cache } = mapsTables(model);
+  const key = `${a}|${d}|${done.map(map => map.rounds.length ? map.rounds.join('') : map.winner.toLowerCase()).join('/')}|${current.join('')}`;
+  if (cache.has(key)) return cache.get(key);
+  const state = mapState(current);
+  let chance = 0, total = 0;
+  for (const node of nodes) {
+    let likely = node.weight * roundsChance(node.table, current);
+    for (const map of done) likely *= map.rounds.length ? roundsChance(node.table, map.rounds) : map.winner === 'A' ? node.p : 1 - node.p;
+    const q = mapChance(node.table, state);
+    chance += likely * (q * seriesFrom(node.p, a + 1, d, model.toWin) + (1 - q) * seriesFrom(node.p, a, d + 1, model.toWin));
+    total += likely;
+  }
+  const value = clamp01(total > 0 ? chance / total : 0.5);
+  cache.set(key, value);
+  return value;
+}
+
+/**
+ * The series' state after the revealed events up to minute `t` → { a, d, done, current }: a `pts` 1 event ends a map for
+ * its side, and a round (`pts` 0) is its side's, in the map in play.
+ */
+function mapsProgress(events, aId, t) {
+  let a = 0, d = 0, current = [];
+  const done = [];
+  for (const event of events) {
+    if (Math.ceil(num(event.m)) > t) continue;
+    const side = event.tid === aId ? 'A' : 'D';
+    if ((isNum(event.pts) ? num(event.pts) : 1) > 0) {
+      if (side === 'A') a++; else d++;
+      done.push({ rounds: current, winner: side });
+      current = [];
+    } else current.push(side);
+  }
+  return { a, d, done, current };
+}
+
 /**
  * The tie's state after the revealed events up to minute `t` → { a, d, sa, sd }: every event is a set won by its side,
  * `pts` 1 the set that also wins the rubber.
@@ -1121,7 +1207,8 @@ function rubberState(events, aId, t) {
  * tennis's fourth and fifth rubbers, rugby league's golden point and football's extra time (not a model saved before it).
  */
 const hasOvertime = model => model.kind === 'normal' || model.kind === 'drives' || model.kind === 'innings' || model.kind === 'periods'
-  || model.kind === 'rubbers' || model.kind === 'series' || model.kind === 'tries' || (model.kind === 'poisson' && model.ot > 0);
+  || model.kind === 'rubbers' || model.kind === 'series' || model.kind === 'maps' || model.kind === 'tries'
+  || (model.kind === 'poisson' && model.ot > 0);
 
 /**
  * The last minute a model can reach: 90 + 15·2 for football (90 for a model saved before extra time), 40 + 5·4 for
@@ -1179,6 +1266,13 @@ export function winProbabilityAt(model, minute, diff = 0) {
     const a = clamp(Math.round((played + lead) / 2), 0, played), d = played - a;
     return seriesAt(model, a, d);
   }
+  if (model.kind === 'maps') {
+    // Only the score is known here: the maps finished by minute t, none of the rounds of the one in play.
+    const played = Math.min(model.toWin + model.maxOt, Math.floor(clamp(t, 0, lastMinute(model)) / model.ot));
+    const a = clamp(Math.round((played + lead) / 2), 0, played), d = played - a;
+    const done = [...Array(a).fill({ rounds: [], winner: 'A' }), ...Array(d).fill({ rounds: [], winner: 'D' })];
+    return mapsAt(model, a, d, done);
+  }
   if (model.kind === 'rubbers') {
     // Only the score is known here: the rubbers finished by minute t, none of the sets of the one in play.
     const played = Math.min(model.gaps.length, Math.floor(clamp(t, 0, lastMinute(model)) / model.ot));
@@ -1230,7 +1324,8 @@ function revealedEvents(goals) {
 function endMinute(model, events) {
   const latest = events.reduce((max, event) => Math.max(max, num(event.m)), 0);
   if (!hasOvertime(model) || latest <= model.length) return model.length;
-  if (model.kind === 'drives' || model.kind === 'periods' || model.kind === 'rubbers' || model.kind === 'series' || model.kind === 'tries') {
+  if (model.kind === 'drives' || model.kind === 'periods' || model.kind === 'rubbers' || model.kind === 'series'
+    || model.kind === 'maps' || model.kind === 'tries') {
     return Math.min(lastMinute(model), Math.ceil(latest));
   }
   // Football's extra time ends at a golden goal, plays its whole thirty minutes without one (the silver goal's ends at a
@@ -1264,6 +1359,19 @@ export function winSeries({ model, goals = [], aId, dId, minute = 0, perspective
     for (let t = 0; t <= upTo; t++) {
       const { a, d, margin, unit } = seriesState(ordered, aId, t, model.ot);
       series.push({ t, p: seriesAt(model, a, d, margin, unit) });
+    }
+    const winner = winnerSideOf(final, aId, dId);
+    if (winner && series.length) series[series.length - 1].p = winner === 'A' ? 1 : 0;
+    if (sideOf(perspective, aId, dId) === 'D') for (const point of series) point.p = 1 - point.p;
+    return series;
+  }
+
+  if (model.kind === 'maps') {
+    const ordered = events.slice().sort((x, y) => num(x.m) - num(y.m));
+    const series = [];
+    for (let t = 0; t <= upTo; t++) {
+      const { a, d, done, current } = mapsProgress(ordered, aId, t);
+      series.push({ t, p: mapsAt(model, a, d, done, current) });
     }
     const winner = winnerSideOf(final, aId, dId);
     if (winner && series.length) series[series.length - 1].p = winner === 'A' ? 1 : 0;
@@ -1350,7 +1458,7 @@ export function chartDomain(model, minute = 0) {
     return { length: model.length + extra * model.ot, half: model.length / 2, ticks,
       guides: extra ? [model.length / 2, model.length] : [model.length / 2] };
   }
-  if (isLiveModel(model) && (model.kind === 'rubbers' || model.kind === 'series')) {
+  if (isLiveModel(model) && (model.kind === 'rubbers' || model.kind === 'series' || model.kind === 'maps')) {
     const t = isNum(minute) ? num(minute) : 0;
     const extra = t > model.length ? Math.min(model.maxOt, Math.ceil((t - model.length) / model.ot)) : 0;
     const length = model.length + extra * model.ot;

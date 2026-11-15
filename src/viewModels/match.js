@@ -21,6 +21,7 @@ const GROUPS = {
   'womens-tennis': ['SGL', 'DBL'],
   'rugby-league': ['FB', 'WG', 'CE', 'FE', 'HB', 'PR', 'HK', 'SR', 'LK'],
   'rocket-league': ['PLR'],
+  'counter-strike': ['PLR'],
 };
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
@@ -46,7 +47,8 @@ function oddsOf(odds) {
  * side's rubbers, in order; a set that does not win its rubber counts nothing) or "Walsh 2 tries · Cleary 3 PG" (rugby
  * league: the two who scored most, a try ranked as its four points, a penalty goal as two and a field goal as one; a
  * conversion is the try's, nobody's own) or "Zen 5 G · Alpha54 3 G" (Rocket League: the two who scored most over the series;
- * a game's end scores nothing of its own). `sport` is a sport id or a season's rules (matchSport): an ice hockey season
+ * a game's end scores nothing of its own) or "ZywOo 12 MVP · apEX 7 MVP" (Counter-Strike: the two who were their side's MVP
+ * of the most rounds; a map's end counts nothing of its own). `sport` is a sport id or a season's rules (matchSport): an ice hockey season
  * before the shoot-out has none to leave out.
  */
 export function scorersLine(shown, teamId, teams, sport = 'football') {
@@ -59,6 +61,12 @@ export function scorersLine(shown, teamId, teams, sport = 'football') {
     const totals = new Map();
     for (const e of own) if (!(Number(e.pts) > 0)) totals.set(e.name, (totals.get(e.name) || 0) + 1);
     return [...totals.entries()].sort((x, y) => y[1] - x[1]).slice(0, 2).map(([name, goals]) => `${shortName(name)} ${goals} G`).join(' · ');
+  }
+  if (sportId === 'counter-strike') {
+    // Rounds' MVPs only: a map's end (`pts` 1) is the team's, named for its MVP of the map, already counted.
+    const totals = new Map();
+    for (const e of own) if (!(Number(e.pts) > 0)) totals.set(e.name, (totals.get(e.name) || 0) + 1);
+    return [...totals.entries()].sort((x, y) => y[1] - x[1]).slice(0, 2).map(([name, mvps]) => `${shortName(name)} ${mvps} MVP`).join(' · ');
   }
   if (sportId === 'hockey') {
     const rules = typeof sport === 'object' && sport ? sport : getSport(sportId);
@@ -209,11 +217,13 @@ const EVENT_COPY = /^(?:(?:GOLDEN )?GOAL|\+(\d+)|(TD|FG|SAFETY)|(\d+) RBI)\s+—
 const TENNIS_COPY = /^(SINGLES|DOUBLES|SET \d+)\s+—\s+(.+?)\s+\(([A-Z]{3})\)\s/;
 const SCORE_POINTS = { TD: 6, FG: 3, SAFETY: 2 };
 // Rocket League's goal line, "GOAL — Zen (FRA) 2–1" or "OVERTIME GOAL — Zen (FRA) 3–2 +0:42": the game's score follows.
-const ROCKET_GOAL_COPY = /^(?:OVERTIME )?GOALs+—s+(.+?)s+(([A-Z]{3}))s+d+–d+/;
+const ROCKET_GOAL_COPY = /^(?:OVERTIME )?GOAL\s+—\s+(.+?)\s+\(([A-Z]{3})\)\s+\d+–\d+/;
+// Counter-Strike's round line, "R14 — ZywOo (FRA) 8–6" or "R27 OT — ZywOo (FRA) 14–13": the round's MVP, then the map's score.
+const ROUND_COPY = /^R\d+(?: OT)?\s+—\s+(.+?)\s+\(([A-Z]{3})\)\s+\d+–\d+$/;
 function historyShown(entry, aId, dId, aCode, dCode) {
   const shown = [];
   for (const e of Array.isArray(entry?.events) ? entry.events : []) {
-    const rocket = ROCKET_GOAL_COPY.exec(String(e?.text || '').trim());
+    const rocket = ROCKET_GOAL_COPY.exec(String(e?.text || '').trim()) ?? ROUND_COPY.exec(String(e?.text || '').trim());
     if (rocket) {
       const tid = rocket[2] === aCode ? aId : rocket[2] === dCode ? dId : null;
       if (tid != null) shown.push({ tid, name: rocket[1], m: 0, pts: 0 });

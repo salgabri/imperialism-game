@@ -18,20 +18,21 @@ Pick your sport at kick-off:
 | Tennis, and women's tennis | a Davis Cup (or Billie Jean King Cup) team: No. 1 and No. 2 in the singles, a doubles pair | five rubbers, first to three, each best of three sets; an earlier season plays its year's ([format by year](#tennis-seasons)) | none: a tie always has a winner |
 | Rugby league | the matchday 17: thirteen and four on the bench | 80 minutes | golden point |
 | Rocket League | three a side, a nation's best of its five | best of seven five-minute games | sudden-death overtime in a level game; a series always has a winner |
+| Counter-Strike | five a side, a nation's best of its seven | best of three maps, each first to 13 rounds | overtimes of six rounds from 12–12; a series always has a winner |
 
 And pick who fights:
 
 - **Nations** — 176 nations on the map, each team starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
-  Basketball, baseball, ice hockey, both tennis games and Rocket League field them as one team, Great
+  Basketball, baseball, ice hockey, both tennis games and both esports field them as one team, Great
   Britain (GBR), under the Union Jack, and so does women's football's 2012 Olympic tournament
   ([its season](#the-world-cups-and-olympic-tournaments-1991-to-2015-computed)). A sport fields 173 at most: those four play Great Britain
   as one, and football leaves out Tonga, Samoa and the Cook Islands, whose players no
   source rates ([Pacific islands](docs/design/pacific-islands.md)). A nation fields a team
   only with a **real side**, its own rated players holding at least half the lineup, and
   every other nation's land stays neutral: 173 nations play football, 57 Rocket League, 52
-  tennis, 45 women's tennis, 47 basketball, 36 women's football, 12 baseball, 7 ice hockey and 6
-  rugby league. No team is made up of generated players or nearly empty.
+  tennis, 45 women's tennis, 47 basketball, 36 women's football, 35 Counter-Strike, 12 baseball, 7 ice
+  hockey and 6 rugby league. No team is made up of generated players or nearly empty.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs (Europe's 68
   on [their maps of Europe](#womens-football-on-the-europe-maps), the NWSL's 16 on [theirs](#the-nwsl-map) of the USA), all 30 NBA
@@ -41,7 +42,7 @@ And pick who fights:
   [theirs](#the-mlb-map) of the USA and Canada, all 32 NHL clubs on
   [theirs](#the-nhl-map), or all 17 NRL clubs on [theirs](#the-nrl-map) of Australia and New Zealand. Real Madrid annexes territory
   exactly the way Spain does. American football is played by clubs only, tennis,
-  women's tennis and Rocket League by nations only.
+  women's tennis and both esports by nations only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
   leagues, fewer for smaller ones) on that country's own map, split into 100
   sections ([domestic campaigns](#domestic-campaigns)).
@@ -60,7 +61,8 @@ Tennis plays Davis Cup ties between nations, its players rated by their Elo
 ([design notes](docs/design/tennis.md)), and women's tennis the Billie Jean King Cup's, the WTA's players
 by their Elo, with the WTA's serve ([design notes](docs/design/womens-tennis.md)). Rocket League, the first esport, plays
 the RLCS's best-of-seven series between nations, its players rated by an Elo built from every series Liquipedia
-records ([design notes](docs/design/rocket-league.md)).
+records ([design notes](docs/design/rocket-league.md)). Counter-Strike, the second, plays best-of-three series of maps
+round by round, its players rated by the same Elo, map by map ([design notes](docs/design/counter-strike.md)).
 
 Originally implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
@@ -154,6 +156,8 @@ npm run build-womens-tennis # rebuild the women's tennis nations from that snaps
 npm run sync:rocket-league # Rocket League's player Elo from a Liquipedia export saved by hand in data-src/liquipedia/ (no network) into scripts/data/rocket-league-elo.json
 npm run build-rocket-league # rebuild the Rocket League nations from that snapshot (--check compares byte for byte)
 npm run build:rocket-league-seasons # rebuild Rocket League's earlier seasons, 2016-2025, from the sync's year-end snapshots (--check)
+npm run sync:counter-strike # Counter-Strike's player Elo from Liquipedia exports saved by hand in data-src/liquipedia-counterstrike/ (no network) into scripts/data/counter-strike-elo.json
+npm run build-counter-strike # rebuild the Counter-Strike nations from that snapshot (--check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 npm run build:icons      # render favicon.ico, apple-touch-icon.png and the app icons from public/favicon.svg
 npm run build:fonts      # cut the Latin Extended + Vietnamese font files from the pinned Archivo sources (--check compares byte for byte)
@@ -238,7 +242,7 @@ committed outputs:
 | GeoNames dumps | `download.geonames.org/` (everything) | the cached copies only |
 | CommonCrawl records | `data.commoncrawl.org/` (everything) | the pinned cached copies only (ice hockey's NHL 22 pages) |
 | The NHL's API | never fetched | the cached answers only: `sync:nhl` cannot refresh, `sync:nhl-seasons` reads its pinned rosters |
-| Liquipedia | `liquipedia.net/` (everything, for ClaudeBot and Claude-Web), `/rocketleague/api.php` and `/rocketleague/index.php` (every agent); `api.liquipedia.net/` (everything) | never fetched: `sync:rocket-league` reads an export saved by hand from the wiki's Special:Export in a browser ([design notes](docs/design/rocket-league.md#the-liquipedia-export)) |
+| Liquipedia | `liquipedia.net/` (everything, for ClaudeBot and Claude-Web), `/rocketleague/api.php` and `/rocketleague/index.php` (every agent); `api.liquipedia.net/` (everything) | never fetched: `sync:rocket-league` and `sync:counter-strike` read exports saved by hand from each wiki's Special:Export in a browser ([design notes](docs/design/rocket-league.md#the-liquipedia-export), [Counter-Strike's](docs/design/counter-strike.md#the-liquipedia-export)) |
 
 ## Deployment
 
@@ -385,8 +389,9 @@ manager of the theatre's favourite, with decisions from the first match.
    2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1963, rugby league its built-in 2025
    (Rugby League 26) then [its earlier seasons](#rugby-league-seasons) 2024 back to 1960 (computed from
    NRL.com's match statistics, but 2008: Rugby League 2, the overall ours; before 1998 from the Rugby League
-   Project's team lists), the premiership's clubs on the map of their day, and Rocket League its 2026 then its
-   [earlier seasons](#rocket-league-seasons) 2025 back to 2016 (the Elo of Liquipedia's results at each year's end).
+   Project's team lists), the premiership's clubs on the map of their day, Rocket League its 2026 then its
+   [earlier seasons](#rocket-league-seasons) 2025 back to 2016 (the Elo of Liquipedia's results at each year's end),
+   and Counter-Strike its 2026 (the Elo of Liquipedia's results to November).
    The Season list names a season by its years, adding "· computed", "· converted"
    or "· fan-made" where its label calls its ratings so ("1969/70 · computed"); a
    year with two seasons (football's 1993/94 and 1989/90, the NFL's and AFL's of
@@ -978,7 +983,8 @@ with martj42's international results (CC0).
 This project is not affiliated with, endorsed or sponsored by Electronic Arts
 (EA SPORTS FC, FIFA, Madden NFL, EA SPORTS NHL), Sports Interactive and SEGA (Football Manager),
 2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), Big Ant Studios (Rugby League 26), Psyonix and Epic Games (Rocket
-League and the RLCS), Liquipedia, the NBA, the NFL, MLB, the NHL, the NRL, or the clubs, leagues and federations it names.
+League and the RLCS), Valve (Counter-Strike), Liquipedia, the NBA, the NFL, MLB, the NHL, the NRL, or the clubs, leagues,
+organisers and federations it names.
 All trademarks, names and ratings belong to their respective owners.
 
 **American football** — `src/data/clubs.american-football.js`, the 32 NFL
@@ -1051,6 +1057,15 @@ plays for the nation he last played for at the FIFAe World Cup or the Esports Na
 files him under; 817 players have played within the year, and 57 nations have the three a series needs, from the United
 States, France and Saudi Arabia down. Nothing is estimated. Each year from 2016 is an
 [earlier season](#rocket-league-seasons). See the [design notes](docs/design/rocket-league.md).
+
+**Counter-Strike** — `src/data/rosters.counter-strike.js`, from every 5v5 series of CS:GO and CS2 Liquipedia records
+(CC BY-SA 3.0), read from three exports of the wiki saved by hand on 2026-11-15 (no script fetches Liquipedia) into
+`scripts/data/counter-strike-elo.json`: 1,439 events of S-, A- and B-Tier, 52,015 maps from 2012 to November 2026. Each
+player's rating is Rocket League's Elo, built map by map, a team playing at its five players' mean, on the same scale
+(apEX's 2,160 is 84); held out on the last 180 days its predictions were calibrated (log loss 0.667). A player plays for
+the nation he last played for at a national-team event (the Esports Nations Cup, WESG), else his Liquipedia page's
+country; 881 players have played within the year, and 35 nations have the five a map needs, from Russia, France,
+Ukraine and Brazil down. Nothing is estimated. See the [design notes](docs/design/counter-strike.md).
 
 **Women's football** — `src/data/clubs.womens-football.js` and
 `src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07
@@ -2968,16 +2983,16 @@ vercel.json            cache headers for the deployed site
 
 ## Verification
 
-`npm run smoke` boots the real component tree under jsdom and plays **twenty-two full
-campaigns** across all three pacings, both resolution modes, all nine sports, and
+`npm run smoke` boots the real component tree under jsdom and plays **twenty-seven full
+campaigns** across all three pacings, both resolution modes, all eleven sports, and
 national, club and domestic teams; two of them are England's top 100 clubs on
 their own map, one is Fiji's 16 clubs, each starting on a group of its 100
 sections, one the NFL's 32 franchises on theirs, with the live ticker, one MLB's 30
 clubs on theirs, also live, one baseball's nations of North and Central America, one the NHL's 32 clubs on
 their map, live, one hockey's nations of Europe, one the women's nations of Europe, live, one the NWSL's clubs, one
 tennis's Davis Cup nations of Europe, live, one women's tennis's Billie Jean King Cup nations of the world, one the NRL's 17
-clubs on their map, live, and one rugby league's nations of
-Asia and Oceania. A **manager campaign** (Italy, Europe, round robin × *You
+clubs on their map, live, one rugby league's nations of
+Asia and Oceania, one Rocket League's nations of Europe, live, and one Counter-Strike's nations of the world. A **manager campaign** (Italy, Europe, round robin × *You
 choose*, live ticker) is driven only through the primary action. It covers
 target choices, tactical gates, Finish match, signings on the conquest screen,
 the automatic switch to Match and back, and Continue as spectator after

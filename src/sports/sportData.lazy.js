@@ -24,4 +24,5 @@ export const LOADERS = {
   'womens-tennis': players(() => import('../data/players/womens-tennis.js')),
   'rugby-league': players(() => import('../data/players/rugby-league.js')),
   'rocket-league': players(() => import('../data/players/rocket-league.js')),
+  'counter-strike': players(() => import('../data/players/counter-strike.js')),
 };
