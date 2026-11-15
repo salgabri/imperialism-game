@@ -2,14 +2,14 @@
 // The built-in earlier Rocket League seasons, newest first: each year's players by the Elo of Liquipedia's results at its
 // end, nations only. Each is public/rocket-league/<id>.json, loaded when a setup chooses it (src/engine/footballSets.js).
 export const BUILT_IN_ROCKET_LEAGUE_SEASONS = Object.freeze([
-  Object.freeze({ id: 'rl-2025', version: 'rl-2025-bc222583', year: 2025, season: '2025', label: 'Liquipedia Elo, end of 2025' }),
-  Object.freeze({ id: 'rl-2024', version: 'rl-2024-4c13e8a7', year: 2024, season: '2024', label: 'Liquipedia Elo, end of 2024' }),
-  Object.freeze({ id: 'rl-2023', version: 'rl-2023-f2e60e66', year: 2023, season: '2023', label: 'Liquipedia Elo, end of 2023' }),
-  Object.freeze({ id: 'rl-2022', version: 'rl-2022-625e75ff', year: 2022, season: '2022', label: 'Liquipedia Elo, end of 2022' }),
-  Object.freeze({ id: 'rl-2021', version: 'rl-2021-b0f98508', year: 2021, season: '2021', label: 'Liquipedia Elo, end of 2021' }),
-  Object.freeze({ id: 'rl-2020', version: 'rl-2020-aee1f797', year: 2020, season: '2020', label: 'Liquipedia Elo, end of 2020' }),
+  Object.freeze({ id: 'rl-2025', version: 'rl-2025-09c4b51d', year: 2025, season: '2025', label: 'Liquipedia Elo, end of 2025' }),
+  Object.freeze({ id: 'rl-2024', version: 'rl-2024-2544cba6', year: 2024, season: '2024', label: 'Liquipedia Elo, end of 2024' }),
+  Object.freeze({ id: 'rl-2023', version: 'rl-2023-08e60505', year: 2023, season: '2023', label: 'Liquipedia Elo, end of 2023' }),
+  Object.freeze({ id: 'rl-2022', version: 'rl-2022-23a59cc8', year: 2022, season: '2022', label: 'Liquipedia Elo, end of 2022' }),
+  Object.freeze({ id: 'rl-2021', version: 'rl-2021-780da1c1', year: 2021, season: '2021', label: 'Liquipedia Elo, end of 2021' }),
+  Object.freeze({ id: 'rl-2020', version: 'rl-2020-3e482aa1', year: 2020, season: '2020', label: 'Liquipedia Elo, end of 2020' }),
   Object.freeze({ id: 'rl-2019', version: 'rl-2019-42c6e403', year: 2019, season: '2019', label: 'Liquipedia Elo, end of 2019' }),
-  Object.freeze({ id: 'rl-2018', version: 'rl-2018-503186f9', year: 2018, season: '2018', label: 'Liquipedia Elo, end of 2018' }),
+  Object.freeze({ id: 'rl-2018', version: 'rl-2018-9bd1c193', year: 2018, season: '2018', label: 'Liquipedia Elo, end of 2018' }),
   Object.freeze({ id: 'rl-2017', version: 'rl-2017-04c92486', year: 2017, season: '2017', label: 'Liquipedia Elo, end of 2017 (rough)' }),
   Object.freeze({ id: 'rl-2016', version: 'rl-2016-8e580954', year: 2016, season: '2016', label: 'Liquipedia Elo, end of 2016 (rough)' }),
 ]);

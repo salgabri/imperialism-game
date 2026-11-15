@@ -42,8 +42,8 @@ export const expected = gap => 1 / (1 + 10 ** (-gap / 400));
 
 // K per game: K_SCALE / (games + 5) ^ 0.4, FiveThirtyEight's shape, never below K_FLOOR. A newcomer's first game moves
 // him about 5.2 times a 300-game veteran's. K_SCALE is the one that best foresaw the last 180 days of the exports of
-// 2026-11-14 and 15 (2,462 games, each scored before it was played; regional starts on): log loss 0.5811 at 320, 0.5995
-// at 110, 0.5834 at 240, 0.5818 at 400, 0.5851 at 500; at 320 the games it gave 75% went 78%, those at 94.6% went 92.3%.
+// 2026-11-14 and 15 (2,462 games, each scored before it was played; regional starts on): log loss 0.5811 at 320, 0.5996
+// at 110, 0.5834 at 240, 0.5817 at 400, 0.5850 at 500; at 320 the games it gave 75% went 78%, those at 94.6% went 92.3%.
 // Rocket League's form moves fast: rosters change and a team's level with them.
 export const K_SCALE = 320;
 export const K_FLOOR = 8;

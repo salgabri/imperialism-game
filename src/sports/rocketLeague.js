@@ -54,7 +54,7 @@ const OVERTIME_PACE = 0.83;
 const FORM_AT_BALANCED = 4.5;
 const formSpread = variation => FORM_AT_BALANCED * (variation / 6) ** 2;
 // No home advantage: in the 1,933 games of the exports' LANs where one side was the host nation's, that side did as Elo
-// expected, within the error (+11.8 ± 7.5 Elo), so the campaign's Home advantage rule is not offered (`homeAdvantage`
+// expected, within the error (+11.8 ± 7.6 Elo), so the campaign's Home advantage rule is not offered (`homeAdvantage`
 // false) and a home venue changes nothing.
 export const HOME_EDGE = 0;
 

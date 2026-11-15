@@ -1022,7 +1022,7 @@ neutral. See the
 [design notes](docs/design/rugby-league.md).
 
 **Rocket League** — `src/data/rosters.rocket-league.js`, from every 3v3 series Liquipedia records (CC BY-SA 3.0),
-read from four exports of the wiki saved by hand on 2026-11-14 and 15 (no script fetches Liquipedia: its robots.txt
+read from five exports of the wiki saved by hand on 2026-11-14 and 15 (no script fetches Liquipedia: its robots.txt
 shuts Anthropic's crawlers out) into `scripts/data/rocket-league-elo.json`: 1,009 events of S- and A-Tier, 90,966 games
 from 2015 to November 2026. There is no game's rating list for an esport: each player's rating is an Elo built game by
 game, a team playing at its three players' mean, on the game's scale Elo / 25 − 2 (dralii's 2,506 is 98), so the match
@@ -2360,7 +2360,7 @@ known limits.
 
 Rocket League can be played on ten earlier seasons as well as the built-in 2026: the end of every
 year from 2016 to 2025, nations only. Pick one under **Season** in setup. Each season is a file in
-`public/rocket-league/` (12–64 KB) that loads only when chosen.
+`public/rocket-league/` (12–65 KB) that loads only when chosen.
 
 - **Ratings** are the same Elo as the built-in season's, run over Liquipedia's results up to 31
   December of that year: who was rated then (20 games behind him, one within the year), on the

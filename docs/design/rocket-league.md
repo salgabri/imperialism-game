@@ -9,8 +9,8 @@ match (territory, the draw, targeting, conquest, signings, saves) is the game's 
 The player chose (2026-11-13): ratings built from Liquipedia's results; the export made by hand
 in a browser (Liquipedia shuts the project's fetcher out, below); nations first, the orgs later;
 a tile of its own beside the nine sports; best of seven. Then (2026-11-15): the rosters of every
-year since the game began ("Earlier seasons", below), a fourth export for the players those years
-rate with no country, and each year at its own scoring.
+year since the game began ("Earlier seasons", below), a fourth export and a fifth for the players
+those years rate with no country, and each year at its own scoring.
 
 ## The Liquipedia export
 
@@ -41,13 +41,14 @@ the pages are saved by a person, in a browser, with the wiki's own export.
 The first export, of 2026-11-14, held 1,135 pages: 935 3v3 events of S- and A-Tier (125 school
 leagues left out) with 18,365 series and 74,770 games from 2015-09-10 to 2026-11-13. The second,
 the same day, held 428 pages of its list's 438 titles (325 stage pages, then the players'), the
-third, that night, 65 of its 76 (14 stage pages and all 51 players' titles), and the fourth, the
-next morning, 327 of its 348 (135 of 149 stage pages, back to 2016, and 192 of the 199 titles of
-the players the earlier seasons rated with no country): the four make 1,009 events, 22,854 series
-and 90,966 games. The players' own pages leave 3 of today's rated players with no country, where
-the first export alone left 102 and the first two 32, and 0 to 13 of an earlier season's, where
-the first three left up to 95. The list the fourth leaves holds 56 titles: 14 stage pages and 6
-players' pages it asked for that the wiki does not have, and 36 of players its games newly rate.
+third, that night, 65 of its 76 (14 stage pages and all 51 players' titles), the fourth, the next
+morning, 327 of its 348 (135 of 149 stage pages, back to 2016, and 192 of the 199 titles of the
+players the earlier seasons rated with no country), and the fifth 35 of its 56 (players' pages,
+six of them redirects: Laxxiin is New Zealand's Laxin): the five make 1,009 events, 22,854 series
+and 90,966 games. The players' own pages leave none of today's rated players with no country,
+where the first export alone left 102 and the first two 32, and at most 4 of an earlier season's,
+where the first three left up to 95. The list the fifth leaves holds 22 titles: the 14 stage
+pages and 6 players' pages the wiki does not have, and the 2 pages its redirects point to.
 
 What the reader expects was checked against Liquipedia's own modules, which are open source
 (github.com/Liquipedia/Lua-Modules, read through GitHub's API and raw.githubusercontent.com,
@@ -82,7 +83,7 @@ turns them into what the ratings play:
   "Acronic"), so spellings that differ only in case and punctuation fold into the one the rosters
   use most, unless their nations clash; a page the wiki disambiguates ("Dead (Israeli Player)")
   never meets a namesake, and a redirect page in an export is followed (Scrzbbles, who renamed
-himself zach, is one player). 823 spellings folded.
+himself zach, is one player). 828 spellings folded.
   Two of a nation's five who still go by one name are each shown by his page ("Abdullah" and
   "Abdullahrll" for Oman, not two Abdullahs).
 - **Nations.** A player plays for the nation he last played for in a national-team event (the
@@ -102,15 +103,15 @@ The regions meet only at the majors and the world championship, too rarely for E
 a whole region's players to its level, so a newcomer starts at his region's level, each region's
 start solved so that its teams win as often at the international events as Elo expects
 (`regionalStarts`: North America 1,580, Europe 1,578, MENA 1,525, Asia-Pacific 1,507, South
-America 1,476, Oceania 1,447, Sub-Saharan Africa 1,167).
+America 1,476, Oceania 1,447, Sub-Saharan Africa 1,168).
 
 K was chosen by scoring the exports' last 180 days (2,462 games), each game before it was
-played (`npm run sync:rocket-league -- --tune`): log loss 0.5995 at K 110, 0.5834 at 240, 0.5811
-at 320, 0.5818 at 400, 0.5851 at 500, regional starts on (they lower it at every K). At 320 the
+played (`npm run sync:rocket-league -- --tune`): log loss 0.5996 at K 110, 0.5834 at 240, 0.5811
+at 320, 0.5817 at 400, 0.5850 at 500, regional starts on (they lower it at every K). At 320 the
 predictions are calibrated: games it gave 75% went 78%, 84% went 85%, 94.6% went 92.3%.
 
 A player is rated once he has 20 games behind him and has played within a year of the export's
-last game: 817 of 4,907. On the game's scale a rating is Elo / 25 − 2: a rating point is 25 Elo
+last game: 817 of 4,903. On the game's scale a rating is Elo / 25 − 2: a rating point is 25 Elo
 points, as in tennis, so the match model plays Elo's own odds; the best player, dralii (Morocco),
 is 98, a newcomer at 1,500 is 58. Each nation names its five best; it needs three for a team, so
 a nation with fewer fields none and its land stays neutral. 57 nations field a team, from the
@@ -164,7 +165,7 @@ favourite, its odds 0.685 a game before the first, the favourite won 79.0%, wher
 games at those odds would win 81.3%; it swept 27.5% (25.5%), the underdog 3.1% (1.7%). The
 scorelines of all 1,205 are likeliest with match-day form of 4.5 rating points (112 Elo) at
 Balanced, which gives 76.6%, 27.6% and 3.4% (the favourite's share alone would ask for 3); the
-best-of-fives ask for more (6: the favourite won 74.6% of 3,434). Form grows with the square of
+best-of-fives ask for more (6: the favourite won 74.7% of 3,431). Form grows with the square of
 the drama, as in every sport, so Wild swings Rocket League hardest of all.
 
 The harness (`npm run simulation:realism`) plays the sixteen strongest nations twice a season:
@@ -172,7 +173,7 @@ The harness (`npm run simulation:realism`) plays the sixteen strongest nations t
 23.1% / 18.5% (real 30.4% / 26.7% / 22.9% / 20.0%), the favourite 74.5%.
 
 **No home advantage.** At the exports' LANs, 1,933 games had one side of the host nation (two of
-its three players); those sides did as Elo expected, within two standard errors (+11.8 ± 7.5 Elo:
+its three players); those sides did as Elo expected, within two standard errors (+11.8 ± 7.6 Elo:
 were it real, 51.7% a game, and the first export alone gave +6.1 ± 8.3). So Rocket League offers no
 Home advantage rule: the setup leaves it out, as tennis leaves out Computer signings, and a home
 venue changes nothing. Computer signings is left out too, as in tennis: any player plays any place,
@@ -199,16 +200,16 @@ of games.
 | 2017 (rough) | 142 | 11 | Netherlands 76, France 73.7, United States 73.3 | 886 | 3.96 | 3.60 | 22.1% (14.4%) |
 | 2018 | 185 | 13 | United States 76, Netherlands 75, France 73.7 | 1,631 | 4.07 | 3.70 | 21.5% (19.7%) |
 | 2019 | 375 | 18 | United States 83, Brazil 79.3, France 79 | 3,168 | 3.86 | 3.50 | 22.5% (20.1%) |
-| 2020 | 575 | 24 | Brazil 84, United States 83, France 81.3 | 5,401 | 3.90 | 3.52 | 21.9% (21.0%) |
-| 2021 | 757 | 29 | Saudi Arabia 89.3, Great Britain 83.7, United States 83.3 | 8,589 | 4.01 | 3.62 | 21.4% (20.9%) |
+| 2020 | 575 | 24 | Brazil 84, United States 83, France 81.3 | 5,413 | 3.90 | 3.52 | 21.9% (21.0%) |
+| 2021 | 758 | 29 | Saudi Arabia 89.3, Great Britain 83.7, United States 83.3 | 8,607 | 4.00 | 3.62 | 21.4% (20.9%) |
 | 2022 | 1,061 | 30 | United States 87.7, Japan 87, Great Britain 86.7 | 14,619 | 4.21 | 3.82 | 20.7% (19.0%) |
-| 2023 | 863 | 31 | France 92, Brazil 89, Saudi Arabia 89 | 9,147 | 4.22 | 3.82 | 20.6% (17.9%) |
+| 2023 | 863 | 33 | France 92, Saudi Arabia 89.3, Brazil 89 | 9,147 | 4.22 | 3.82 | 20.6% (17.9%) |
 | 2024 | 619 | 27 | France 91.3, Saudi Arabia 90, United States 90 | 5,962 | 4.28 | 3.85 | 19.7% (20.0%) |
-| 2025 | 851 | 50 | United States 94.3, France 92.7, Saudi Arabia 90.7 | 9,044 | 4.32 | 3.88 | 19.5% (18.5%) |
+| 2025 | 851 | 50 | United States 94.3, France 92.3, Saudi Arabia 90.7 | 9,044 | 4.32 | 3.88 | 19.5% (18.5%) |
 
 The early years are thin, as the S-, A- and B-Tier events of their time were: North America,
 Europe and Oceania, nine nations in 2016 and thirteen by 2018. The fourth export's stage pages
-filled 2020 most: 5,401 games between seasoned players where the first three exports held 2,031,
+filled 2020 most: 5,413 games between seasoned players where the first three exports held 2,031,
 and 575 rated where they rated 425. 2021's rise to 29 is the RLCS's new regions (Saudi Arabia
 leads it), and 2025's to 50 the national-team events, which brought many smaller nations' players
 into the record.
@@ -234,13 +235,12 @@ format 1, kind `rl`), `public/rocket-league/ATTRIBUTION.txt` (Liquipedia, CC BY-
 
 - Nations only: the orgs (Vitality, Karmine Corp, Falcons…) need a map of their own.
 - A season counts only the S-, A- and B-Tier events the exports hold, and a player only if his
-  country is known: the earlier years' players with none play for nobody (at most 13 in a
-  season, 2020's, of 575 rated).
-- Three rated players have no country yet (Chronomia, Patty and Evample, rated 46 to 59:
-  `next-export.txt` lists their pages), 14 stage pages are missing (none of them has a page on the
-  wiki yet), and 104 recent series name a team with no roster.
+  country is known: the earlier years' players with none play for nobody (at most 4 in a season,
+  2018's, of 185 rated, whose pages the wiki does not have).
+- Every rated player of today has a country; 14 stage pages are missing (none of them has a page
+  on the wiki yet), and 104 recent series name a team with no roster.
 - A player who changed his name (not only its punctuation) is two players to the reader, unless
-  an export holds his old name's redirect (Scrzbbles to zach). Côte
-  d'Ivoire's "Aidenrll" and "Luchibald" (the FIFAe Nations League, to 2026-07-15) and "Aiden"
-  and "Luchi" (its later events, from 2026-07-18) never play in the same series and look like
-  two such, so its team of three may be two players and one of them again.
+  an export holds his old name's redirect (Scrzbbles to zach). Côte d'Ivoire's "Aidenrll" and
+  "Luchibald" (the FIFAe Nations League, to 2026-07-15) and "Aiden" and "Luchi" (its later events,
+  from 2026-07-18) never play in the same series and look like two such, so its team of three may
+  be two players and one of them again.

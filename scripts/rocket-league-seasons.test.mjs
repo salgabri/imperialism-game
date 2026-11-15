@@ -92,7 +92,7 @@ test('every season decodes: three to five players a nation, each his Elo of that
     assert.deepEqual([doc.source.edition, doc.source.licence, doc.source.computed, !!doc.source.rough], ['Liquipedia Elo', 'CC BY-SA 3.0', true, year < 2018]);
   }
   // The nations grow with the game: nine at the end of 2016, fifty by 2025 (the national-team events of 2025).
-  assert.deepEqual(YEARS.map(year => seasonFile(year).coverage.nations), [50, 27, 31, 30, 29, 24, 18, 13, 11, 9]);
+  assert.deepEqual(YEARS.map(year => seasonFile(year).coverage.nations), [50, 27, 33, 30, 29, 24, 18, 13, 11, 9]);
 });
 
 test('each season is its day\'s: Kaydop\'s France and mist\'s United States in 2019, Saudi Arabia ahead in 2021', () => {
