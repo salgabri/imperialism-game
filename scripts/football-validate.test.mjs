@@ -11,7 +11,7 @@ import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { HISTORIC_NATIONS, NATIONS } from '../src/data/teams.js';
+import { HISTORIC_NATIONS, HISTORIC_THROUGH, NATIONS } from '../src/data/teams.js';
 
 // The nations of today's map: East Germany and South Vietnam (HISTORIC_NATIONS) are on the maps of their years only, and
 // the squad gate measures the built-in season.
@@ -23,8 +23,8 @@ import { FORECAST, clusterBootstrapSe, clusterJackknifeSe, clusteredSe, critical
   studentTCentral, studentTQuantile, windowCoverage } from './lib/forecast.mjs';
 import { ENGINE_SCALE_FILE, GATE, MANIFEST_FILE, NOT_APPLICABLE, SHIP_GATE, VALIDATION_FILE, auditXIsCheck, bootstrapSpearman,
   buildReport, crossSectional, eloAtInformationDate, eloAtRatingsDate, engineScaleCheck, gateSet, implicationOf, loadEloFiles, loadResults,
-  nextNewerSeason, parseEloResults, parseEloTable, pearson, ranks, replayElo, replayFiles, runValidation, sameSnapshot,
-  serializeReport, shipVerdictOf, spearman, validateManifest } from './football-validate.mjs';
+  mapNationIds, nextNewerSeason, parseEloResults, parseEloTable, pearson, ranks, replayElo, replayFiles, runValidation, sameSnapshot,
+  seasonInputs, serializeReport, shipVerdictOf, spearman, validateManifest } from './football-validate.mjs';
 import { USER_AGENT } from './lib/polite-fetch.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -389,6 +389,26 @@ test('only the nations fielding a side are scored', () => {
   assert.deepEqual([season.build.fielded, season.build.noTeam], [7, ['O2']]);
 });
 
+test('a nation the map has only in earlier years is in no later season\'s noTeam or coverage list', () => {
+  // H1 stands on the map up to the 1990 season only, as East Germany does.
+  const nations = { ...FIXTURE_NATIONS, H1: ['Historic', 'HIS', 'UEFA'] }, today = Object.keys(FIXTURE_NATIONS).sort();
+  const map = { historic: ['H1'], through: { H1: 1990 } };
+  assert.deepEqual(mapNationIds(nations, map), today, 'no dataYear: today\'s map, the built-in\'s');
+  assert.deepEqual(mapNationIds(nations, { ...map, dataYear: 1990 }), [...today, 'H1'].sort(), 'on the map up to its last year');
+  assert.deepEqual(mapNationIds(nations, { ...map, dataYear: 1991 }), today);
+  assert.deepEqual(mapNationIds(nations, { ...map, dataYear: 2026 }), today);
+  // The built-in audit covers today's map, as scripts/build-rosters.mjs writes it; O2 fields no side.
+  const coverage = today.map(id => ({ id, players: 11, goalkeeper: true, naturalLineup: true }));
+  const run = mapNations => buildReport({ nations, codes: FIXTURE_CODES, files: fixtureFiles(), inputs: [fixtureInput({
+    fielded: today.filter(id => id !== 'O2'), mapNations, audit: { ...fixtureInput().audit, coverage } })] }).seasons[0];
+  const season = run(mapNationIds(nations, map));
+  assert.deepEqual([season.build.noTeam, season.auditXIs.verdict, season.auditXIs.unlisted], [['O2'], 'pass', []]);
+  assert.equal(season.shipVerdicts.auditXIs, 'pass');
+  // Counting every NATIONS id instead failed the coverage check on a nation the season's map does not have.
+  const everyId = run(undefined);
+  assert.deepEqual([everyId.build.noTeam, everyId.auditXIs.verdict, everyId.auditXIs.unlisted], [['H1', 'O2'], 'fail', ['H1']]);
+});
+
 test('missing linking is incomplete, failed checks fail, and a season without FM has nothing to link', () => {
   const missing = report({ audit: null }).seasons[0];
   assert.equal(missing.linking.verdict, 'not available');
@@ -530,6 +550,26 @@ test('the committed validation.json scores every manifest season at the shipped 
   }
   assert.deepEqual([committed.results.commit.sha, committed.results.commit.date, committed.results.sha256],
     [manifest.results.commit, manifest.results.committed, manifest.results.sha256], 'results.csv is the pinned martj42 file');
+});
+
+test('the gate\'s seasons play today\'s map: no historic nation in their lists, and the built-in\'s audit covers the map', async () => {
+  // The game's years (footballSets.js fieldedNations): East Germany stands to 1990, South Vietnam to 1975.
+  const historicIn = dataYear => mapNationIds(NATIONS, { historic: HISTORIC_NATIONS, through: HISTORIC_THROUGH, dataYear })
+    .filter(id => HISTORIC_NATIONS.includes(id));
+  assert.deepEqual([historicIn(1974), historicIn(1990), historicIn(1991), historicIn(null)], [['278', 'RVN'], ['278'], [], []]);
+  const committed = JSON.parse(await readFile(committedPath, 'utf8'));
+  const inputs = [];
+  for (const season of manifest.seasons) inputs.push(await seasonInputs({ root, season }));
+  // No Elo or results: only the checks that need no cache are read.
+  const fresh = buildReport({ inputs, nations: NATIONS, files: new Map(), seasons: manifest.seasons });
+  for (const [i, season] of fresh.seasons.entries()) {
+    assert.deepEqual(inputs[i].mapNations, [...TODAY_NATIONS].sort(), `${season.id}: no historic nation is on a modern season's map`);
+    assert.ok(inputs[i].fielded.every(id => inputs[i].mapNations.includes(id)), `${season.id}: a fielded nation is off the map`);
+    assert.deepEqual([season.auditXIs.verdict, season.auditXIs.reasons], ['pass', []], season.id);
+    const record = committed.seasons.find(row => row.id === season.id), stale = `${VALIDATION_FILE} is stale; run npm run validate:football`;
+    assert.deepEqual(record.build.noTeam, season.build.noTeam, `${stale}: ${season.id}'s noTeam list`);
+    assert.deepEqual(record.auditXIs, season.auditXIs, `${stale}: ${season.id}'s audit XIs`);
+  }
 });
 
 test('the gate reads the same martj42 results.csv as the computed World Cup seasons', async () => {

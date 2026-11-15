@@ -18,6 +18,8 @@
 //   Elo frozen at R_Y, log loss no worse than Elo's by more than 2 clustered SE; the newest season's window is open, so
 //   it is 'not scored'), the engine-scale gate (docs/design/football-gate/engine-scale.json, npm run
 //   engine-scale:football, the built-in only) and the incomplete XIs listed in the audit.
+// Only the nations on the season's map count (mapNationIds): East Germany and South Vietnam (teams.js HISTORIC_NATIONS)
+// are on the maps of their years only, so a modern season's coverage check and noTeam list leave them out.
 // On main every season ships by choice, so the verdicts are a report, not a gate on shipping: a built-in that fails the
 // provisional gate is the signal to look before a rollover ships it (the run exits 1).
 //
@@ -260,11 +262,22 @@ export function gateSet(ids, nationStatus = {}) {
 }
 
 /**
+ * The nations on a season's map, the ones its noTeam and coverage lists speak of: every NATIONS id except a nation the
+ * map has only in earlier years (`historic`, teams.js HISTORIC_NATIONS) after its last season-end year (`through`,
+ * HISTORIC_THROUGH), as footballSets.js fieldedNations rules. A season without a dataYear, the built-in, plays today's
+ * map. East Germany and South Vietnam have no modern squad, so no season the gate scores lists them.
+ */
+export function mapNationIds(nations, { historic = [], through = {}, dataYear = null } = {}) {
+  return Object.keys(nations).filter(id => !historic.includes(id) || (Number.isInteger(dataYear) && dataYear <= through[id])).sort();
+}
+
+/**
  * Build gates verifiable from the shipped data alone, over the nations fielding a side (`fielded`). The built-in's XIs
  * are all 11 strong (FM fills what EA lacks); a season file keeps thin XIs as they are, so its short XIs are listed,
- * not failed. `nations` is NATIONS.
+ * not failed. `nations` is NATIONS; `mapNations` the ids on the season's map (mapNationIds), of which noTeam lists
+ * those fielding no side.
  */
-export function buildChecks({ season, rosters, nations, fielded, builtIn, contentHash = null }) {
+export function buildChecks({ season, rosters, nations, fielded, builtIn, contentHash = null, mapNations = Object.keys(nations) }) {
   const ids = fielded.slice().sort(), failures = [];
   const missing = rosters ? ids.filter(id => !rosters[id]) : ids;
   const unknownIds = rosters ? Object.keys(rosters).filter(id => !nations[id]).sort() : [];
@@ -292,7 +305,7 @@ export function buildChecks({ season, rosters, nations, fielded, builtIn, conten
   if (badNationStatus.length) failures.push(`${badNationStatus.length} nationStatus entries are unknown ids or statuses`);
   if (!contentHash) failures.push('The squads have no content hash');
   return { verdict: failures.length ? 'fail' : 'pass', nations: ids.length - missing.length, fielded: ids.length,
-    noTeam: Object.keys(nations).filter(id => !ids.includes(id)).sort(),
+    noTeam: mapNations.filter(id => !ids.includes(id)).sort(),
     missing, unknownIds, wrongShirtCount, shortXIs: shortXIs.length, badRatings: badRatings.slice(0, 20), badStrength, badNationStatus,
     contentHash, failures };
 }
@@ -381,12 +394,13 @@ export function reepLinkingCheck(audit, auditPath, { hasFm = true } = {}) {
 }
 
 /**
- * Incomplete XIs are listed in the audit. The built-in: one coverage row per NATIONS id in its audit, each with the
- * shipped XI's player count. A season file: its own coverage (nations with players, complete natural XIs) agrees with
- * its squads (`setCoverage`: { listed: the file's coverage, withPlayers, naturalXIs }).
+ * Incomplete XIs are listed in the audit. The built-in: one coverage row per nation on its map (`mapNations`, today's:
+ * scripts/build-rosters.mjs lists no historic nation) in its audit, each with the shipped XI's player count. A season
+ * file: its own coverage (nations with players, complete natural XIs) agrees with its squads (`setCoverage`:
+ * { listed: the file's coverage, withPlayers, naturalXIs }).
  */
-export function auditXIsCheck({ audit, auditPath, rosters, nations, fielded, setCoverage = null }) {
-  const ids = Object.keys(nations).sort();
+export function auditXIsCheck({ audit, auditPath, rosters, nations, fielded, setCoverage = null, mapNations = Object.keys(nations) }) {
+  const ids = mapNations.slice().sort();
   if (setCoverage) {
     const { listed, withPlayers, naturalXIs } = setCoverage, reasons = [];
     if (listed?.nations !== withPlayers) reasons.push(`${auditPath} counts ${listed?.nations} nations with players, its squads ${withPlayers}`);
@@ -456,16 +470,17 @@ export function implicationOf({ builtIn, provisionalVerdict, shipVerdict, shipVe
 export const nextNewerSeason = (season, seasons) => seasons.filter(row => row.id > season.id).sort((a, b) => (a.id < b.id ? -1 : 1))[0] ?? null;
 
 /**
- * Pure report over loaded inputs. inputs: [{ season, builtIn, hasFm, rosters, fielded, strength, contentHash, audit,
- * auditPath, setCoverage }]; strength (nation id → unrounded T_n) over the fielded nations. seasons: every manifest
- * season (closes windows). results: loadResults() or null; engineScale: parsed engine-scale.json or null.
+ * Pure report over loaded inputs. inputs: [{ season, builtIn, hasFm, rosters, fielded, mapNations, strength, contentHash,
+ * audit, auditPath, setCoverage }]; mapNations: the ids on the season's map (mapNationIds; every NATIONS id when
+ * omitted); strength (nation id → unrounded T_n) over the fielded nations. seasons: every manifest season (closes
+ * windows). results: loadResults() or null; engineScale: parsed engine-scale.json or null.
  */
 export function buildReport({ inputs, nations, files, generatedAt = null, codes = ELO_CODES, seasons = inputs.map(input => input.season),
   results = null, engineScale = null, resolveName = nationForResultsName }) {
   const usedFiles = new Set();
-  const report = inputs.map(({ season, builtIn, hasFm, rosters, fielded, strength, contentHash, audit, auditPath, setCoverage }) => {
+  const report = inputs.map(({ season, builtIn, hasFm, rosters, fielded, mapNations = Object.keys(nations), strength, contentHash, audit, auditPath, setCoverage }) => {
     const scoredSeason = { ...season, contentHash };
-    const build = buildChecks({ season, rosters, nations, fielded, builtIn, contentHash });
+    const build = buildChecks({ season, rosters, nations, fielded, builtIn, contentHash, mapNations });
     const elo = eloAtRatingsDate(season.ratingsDate, files);
     elo.files.forEach(name => usedFiles.add(name));
     const cross = rosters ? crossSectional({ season, rosters, nations, fielded, elo, codes })
@@ -491,7 +506,7 @@ export function buildReport({ inputs, nations, files, generatedAt = null, codes 
     }
     const reepLinking = reepLinkingCheck(audit, auditPath, { hasFm });
     const engine = engineScaleCheck({ engineScale, season: scoredSeason, builtIn });
-    const auditXIs = auditXIsCheck({ audit, auditPath, rosters, nations, fielded, setCoverage });
+    const auditXIs = auditXIsCheck({ audit, auditPath, rosters, nations, fielded, setCoverage, mapNations });
     const shipVerdicts = { provisional: verdict, reepLinking: reepLinking.verdict, forecast: forecast.verdict, engineScale: engine.verdict, auditXIs: auditXIs.verdict };
     const shipVerdict = shipVerdictOf(shipVerdicts);
     // A verdict on a window results.csv does not cover yet stands, marked partial until it is re-scored.
@@ -514,7 +529,7 @@ export function buildReport({ inputs, nations, files, generatedAt = null, codes 
   if (generatedAt) out.generatedAt = generatedAt;
   Object.assign(out, {
     gate: { spearmanMin: GATE.spearmanMin, linkingMaxAbsMean: GATE.linkingMaxAbsMean,
-      nations: 'The nations that field a side in the season (footballSets.js fieldedNations): a nation with no squad of its own plays no part.',
+      nations: 'The nations that field a side in the season (footballSets.js fieldedNations): a nation with no squad of its own plays no part. build.noTeam and the audit\'s coverage take the nations on the season\'s map, so a nation the map has only in earlier years (teams.js HISTORIC_NATIONS) counts only in a season of its years.',
       gateSet: 'Every fielded nation except nations whose nationStatus is suspended or non-member; OFC stays in and is also reported alone.',
       truth: 'World Football Elo at ratingsDate (after matches dated on or before it), from a snapshot taken on ratingsDate or later',
       eloDates: `Replay of {Y}_results.tsv over {Y-1}.tsv when the results file has a match dated on or after ratingsDate or a trusted fetch date on or after it, checked against {Y}.tsv from the same snapshot; otherwise World.tsv with a trusted fetch date 0 to ${GATE.worldMaxDays} days after ratingsDate. A date is trusted when dateFrom is fetch or ends "vouched by ${TRUST_FLAG}". `
@@ -709,13 +724,14 @@ async function readJson(file) {
 }
 
 /**
- * One season's inputs: its sport and rosters, the nations fielding a side, their unrounded strengths, the content hash
- * that identifies the squads, and its audit. The manifest's dates must be the data's: the built-in's EA snapshot and FM
- * database (from its audit), a season file's EA snapshot.
+ * One season's inputs: its sport and rosters, the nations on its map and those fielding a side, their unrounded
+ * strengths, the content hash that identifies the squads, and its audit. The manifest's dates must be the data's: the
+ * built-in's EA snapshot and FM database (from its audit), a season file's EA snapshot.
  */
 export async function seasonInputs({ root, season }) {
   const teams = await import(pathToFileURL(path.join(root, 'src/data/teams.js')).href);
   const sets = await import(pathToFileURL(path.join(root, 'src/engine/footballSets.js')).href);
+  const mapNationsOf = sport => mapNationIds(teams.NATIONS, { historic: teams.HISTORIC_NATIONS, through: teams.HISTORIC_THROUGH, dataYear: sport.dataYear });
   if (season.squads === 'built-in') {
     const { football } = await import(pathToFileURL(path.join(root, 'src/sports/football.js')).href);
     const audit = await readJson(path.join(root, BUILT_IN_AUDIT));
@@ -725,7 +741,7 @@ export async function seasonInputs({ root, season }) {
     const newest = [eaDates[0], fmDate].sort().at(-1);
     if (season.informationDate !== newest) throw new Error(`${MANIFEST_FILE}: ${season.id} informationDate ${season.informationDate} is not the newest input ${newest}`);
     const fielded = [...sets.fieldedNations(football)];
-    return { season, builtIn: true, hasFm: true, rosters: football.rosters, fielded, strength: lineupStrengths(teams, football, fielded),
+    return { season, builtIn: true, hasFm: true, rosters: football.rosters, fielded, mapNations: mapNationsOf(football), strength: lineupStrengths(teams, football, fielded),
       contentHash: sha256(await readFile(path.join(root, BUILT_IN_ROSTERS))).slice(0, 12), audit, auditPath: BUILT_IN_AUDIT, setCoverage: null };
   }
   const file = `public/football/${season.squads}.json`;
@@ -740,7 +756,7 @@ export async function seasonInputs({ root, season }) {
     const lineup = teams.selectLineup(teams.buildTeam(id, null, sport));
     return set.rosters[id][2].length === 11 && lineup.slots.every(slot => slot.player && !slot.outOfPosition);
   }).length;
-  return { season, builtIn: false, hasFm: false, rosters: set.rosters, fielded, strength: lineupStrengths(teams, sport, fielded),
+  return { season, builtIn: false, hasFm: false, rosters: set.rosters, fielded, mapNations: mapNationsOf(sport), strength: lineupStrengths(teams, sport, fielded),
     contentHash: data.version, audit: null, auditPath: file, setCoverage: { listed: data.coverage, withPlayers: listedIds.length, naturalXIs } };
 }
 

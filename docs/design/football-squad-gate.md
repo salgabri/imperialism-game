@@ -27,7 +27,9 @@ dates, which the validator checks against the data:
 A season's forecast window is (R_Y, R_next], up to the next newer season's information date, so every match is scored
 by the newest squads whose inputs were all released before it, and the newest season's window is open. Only nations
 that field a side in the season count (`fieldedNations`): all 173 for the built-in, 112 for EA FC 26, whose thin
-nations field no team. Russia is marked suspended (since February 2022) and stays out of the statistics.
+nations field no team. Russia is marked suspended (since February 2022) and stays out of the statistics. East Germany
+and South Vietnam, which the map has only in their own years (`HISTORIC_NATIONS`, to 1990 and 1975), are on neither
+season's map, so no season's no-team list or coverage check names them.
 
 ## Provisional gate
 
@@ -61,8 +63,8 @@ The provisional gate, plus:
   top-five-champion shares inside the reference's intervals. The reference is the built-in these squads replaced: when
   `src/data/rosters.js` changes, its committed measurement becomes the reference, so a rebuild or a rollover is
   measured against what shipped before it although the old rosters leave the repo.
-- **Audit XIs**: the incomplete XIs are listed (the built-in audit's coverage row per nation, a season file's own
-  coverage counts) and agree with the squads.
+- **Audit XIs**: the incomplete XIs are listed (the built-in audit's coverage row per nation on today's map, a season
+  file's own coverage counts) and agree with the squads.
 
 ## Results, 10 November 2026
 
@@ -95,7 +97,10 @@ pinned.
 The engine-scale reference is the built-in of 1 November 2026 before person keys (`e411dece2451`); the current one
 (`1ffd9fd55538`) measures starter SD 10.279 (10.276), quantiles 54/69/81 (unchanged), XI-strength SD 9.566 (9.563),
 favourite win rate 0.763 (0.762) and upset rate 0.078 (0.078) over 3,603 pairs, and completes every campaign with a
-top-five champion share of 0.559 (0.541).
+top-five champion share of 0.559 (0.541). Measured again on 13 November 2026 with that day's engine (02350c7), the
+same squads score a favourite win rate of 0.774, an upset rate of 0.071 and a top-five champion share of 0.550, the
+rest unchanged: still a pass, the win rate near the top of the reference's interval (0.748–0.776). The report was
+rescored on 15 November 2026 from the same Elo and results files; only these figures moved.
 
 ## Inputs and terms
 
