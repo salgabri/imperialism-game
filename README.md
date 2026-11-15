@@ -114,6 +114,7 @@ npm run build-basketball # regenerate the basketball fives, rated by the built-i
 npm run build-clubs      # regenerate the club layer for both sports
 npm run sync:domestic-clubs # country club snapshots from the cache (EFEM requests need permission)
 npm run sync:club-logos  # club crests: Wikidata via QLever (network, cached), Wikipedia's answers from the pinned cache only
+npm run sync:club-logos -- --pages # only the crests club-logos.json "pages" names, from their file pages (network, cached)
 npm run build:domestic   # rebuild country maps from snapshots and boundaries (about 5 minutes)
 npm run test:domestic    # country maps, sections and seeded country campaigns
 npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned EA export in data-src/ea-leone/
@@ -231,7 +232,7 @@ committed outputs:
 | --- | --- | --- |
 | Wikidata Query Service | `query.wikidata.org/sparql` | QLever's Wikidata endpoint, `qlever.dev/api/wikidata` (`scripts/lib/wikidata-sparql.mjs`), for the crests, home towns, FIFA 05/06 nationalities and the women's tennis seasons' joins of Wikipedia's players to Sackmann's |
 | Wikidata's search API | `www.wikidata.org/w/api.php` | its answers pinned in `scripts/data/ea-early-search.json` |
-| English Wikipedia's API | `en.wikipedia.org/w/api.php` | its cached answers only, once pinned in `scripts/data/club-logos-wikipedia.json`; none is yet, so the committed crests stay ([crests](#club-crests)) |
+| English Wikipedia's API | `en.wikipedia.org/w/api.php` | its cached answers only, once pinned in `scripts/data/club-logos-wikipedia.json`; none is yet, so the committed crests stay, and a crest that changes is read from its file page under `/wiki/` instead (`pages`, [crests](#club-crests)) |
 | geoBoundaries files on GitHub | `github.com/*/raw/` | `raw.githubusercontent.com`, and `media.githubusercontent.com` for Git LFS objects, checked against the pointer's SHA-256 |
 | GeoNames dumps | `download.geonames.org/` (everything) | the cached copies only |
 | CommonCrawl records | `data.commoncrawl.org/` (everything) | the pinned cached copies only (ice hockey's NHL 22 pages) |
@@ -2492,13 +2493,14 @@ those of the earlier seasons no older than the FM26 squads (EA FC 26), so a club
 relegated since 2025/26 keeps its crest there. NBA and NFL franchises are matched
 by name. Overrides go in `scripts/data/club-logos.json`: `items` maps a club id
 to a Wikidata item, `files` maps it to a file name, or to `null` for no crest,
-and `twins` names a domestic twin the lineups miss (Venezia, promoted for 2026/27,
-shares only three players with its 2025/26 squad). Responses and
+`pages` to a file read from its file page (below), and `twins` names a domestic
+twin the lineups miss (Venezia, promoted for 2026/27, shares only three players
+with its 2025/26 squad). Responses and
 images are cached in the ignored `data-src/club-logos/`, so reruns are offline;
 `--refresh` asks Wikidata again. The lead images and the files' licences are
 answers of English Wikipedia's API (`en.wikipedia.org/w/api.php`), which its
-robots.txt disallows for every agent, and no allowed source gives the same facts.
-So the sync never asks it again: it reads those answers only from its cache, and
+robots.txt disallows for every agent, and no allowed source gives the same facts in
+bulk. So the sync never asks it again: it reads those answers only from its cache, and
 only those pinned by SHA-256 in `scripts/data/club-logos-wikipedia.json`; a run that
 needs one the cache lacks (a new club, or an article that Wikidata names after
 `--refresh`) or one not pinned stops before writing anything, leaving the committed
@@ -2507,6 +2509,18 @@ crests as they are. None is pinned yet: a run from the newest cache on hand
 stay until someone pins a cache on purpose (`--pin` records the answers the run
 reads, and the run rewrites the crests from them). The thumbnails come from
 `upload.wikimedia.org`, which allows them.
+
+A crest that changes comes from its file page instead. `pages` maps a club id to
+an English Wikipedia file and the SHA-256 of its original, and
+`npm run sync:club-logos -- --pages` reads the file page (under `/wiki/`, which
+robots.txt allows) for the original's address on `upload.wikimedia.org` and the
+licence its template states, checks the original against its hash, and draws it
+as the period crests are drawn; every other crest, its `SOURCES.tsv` row and
+`src/data/clubLogos.js` stay as committed. It asks Wikidata nothing and reads no
+API answer, so it runs while the full sync cannot. ASVEL's LDLC ASVEL logo, worn
+since 2018/19, replaced its 2011–2018 logo this way (15 November 2026). That took
+its file out of one of the API requests the full sync makes (fifty files each), so
+a full run would now need an answer no cache holds: crests change only this way.
 
 Crests are the clubs' trademarks, and most are non-free files that Wikipedia
 hosts under its non-free content policy. `public/club-logos/SOURCES.tsv` records

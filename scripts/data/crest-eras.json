@@ -869,20 +869,6 @@
    "verified": "green shield, white 'ASVEL' banner with a long V, orange ball on top, 'LYON VILLEURBANNE', gold '60 ANS 1948-2008' ribbon and star (531x492 JPEG on white)",
    "league": "euroleague"
   },
-  "el-asvel.2019": {
-   "club": "ASVEL",
-   "years": "2019–2026",
-   "kind": "wikipedia",
-   "title": "Fichier:Logo_ASVEL_Lyon_Villeurbanne_-_2018.svg",
-   "page": "https://fr.wikipedia.org/wiki/Fichier:Logo_ASVEL_Lyon_Villeurbanne_-_2018.svg",
-   "download": "https://upload.wikimedia.org/wikipedia/fr/b/bf/Logo_ASVEL_Lyon_Villeurbanne_-_2018.svg",
-   "licence": "non-free logo, as the file page states (fr.wikipedia's non-free content)",
-   "sha256": "ad79a374889c0fdbec177ec598c101e09e6edf7710372c068f66ff2364ae93f2",
-   "cache": "data-src/crest-eras/files/euroleague/el-asvel/2019-Logo_ASVEL_Lyon_Villeurbanne_-_2018.svg",
-   "evidence": "en 'Logos and branding': on 11 September 2018 the club became LDLC ASVEL (sponsorship) and 'The new logo, used since 2018, consists of the number four ... keeping the V'; en gallery 'The official logo of the club, 2018–present'; fr gallery 'Logo depuis 2018'. Seasons 2018-19 on. Still the logo in 2025: en infobox file LDLC_ASVEL_Basket.svg, uploaded 10 July 2025 from EuroLeague's media hub, is the same design. The club's own mark is the 4/V figure, but the logo as a whole reads 'LDLC ASVEL' and no sponsor-free crest is recorded.",
-   "verified": "black lightning-like 4 whose lower half forms a V, 'LDLC' in grey and 'ASVEL' in bold black under it; the 2025 en SVG and the 2018 en PNG look the same",
-   "league": "euroleague"
-  },
   "el-avellino.2009": {
    "club": "Avellino",
    "years": "2009–2009",
@@ -9699,11 +9685,6 @@
     2008,
     2011,
     "el-asvel.2008"
-   ],
-   [
-    2019,
-    2026,
-    "el-asvel.2019"
    ]
   ],
   "el-avellino": [

@@ -95,8 +95,8 @@ year and, from 2000/01, the EuroLeague's (below, "Earlier seasons").
 | Baskonia, Virtus Bologna | 73 | |
 
 **Crests** come from each basketball club's own Wikipedia article, by its Wikidata item
-(`scripts/data/club-logos.json` `items`; ASVEL's names its file): Real Madrid Baloncesto's, not
-Real Madrid CF's.
+(`scripts/data/club-logos.json` `items`; ASVEL's is read from its file page, `pages`): Real Madrid
+Baloncesto's, not Real Madrid CF's.
 
 ## The EuroLeague's rules
 
@@ -224,12 +224,13 @@ sponsor-free name for the club (its `clubPermanentAlias`), with their accents: C
 Benetton Treviso, Unicaja, Arka Gdynia. One code was two clubs: EuroLeague files Ülkerspor (2001/02
 to 2005/06) under the code Fenerbahçe has played under since, so those seasons play Ülkerspor
 (`eras`). Each club's arena of those seasons is placed by hand (`scripts/data/europe-clubs.json`).
-Every club wears its crest of the day ([period-marks.md](period-marks.md), "Coverage"): 92 period
+Every club wears its crest of the day ([period-marks.md](period-marks.md), "Coverage"): 91 period
 crests from Wikipedia, Commons and the Wayback Machine's copies of them, for the 69 and for today's
 20 where theirs differed (Barcelona's F.C.B. crest of 1975 to 2002, Efes's four logos, Valencia's
-2017 badge before 2026/27's). Where no allowed source pictures or dates a club's crest of a season,
-it shows its code, as the NRL's gone clubs do: 44 of the 568 club-seasons, among them CSKA Moscow
-2001/02 to 2005/06, Olimpija 2000/01 to 2005/06 and Siena 2002/03 to 2005/06.
+2017 badge before 2026/27's). ASVEL's seasons since 2019/20 wear its crest of today, the LDLC
+ASVEL logo. Where no allowed source pictures or dates a club's crest of a season, it shows its
+code, as the NRL's gone clubs do: 44 of the 568 club-seasons, among them CSKA Moscow 2001/02 to
+2005/06, Olimpija 2000/01 to 2005/06 and Siena 2002/03 to 2005/06.
 
 **Where they live.** Each season's EuroLeague clubs ride in its NBA season's file
 (`public/basketball/nba-2k01.json` … `nba-2k26.json`), after the NBA's, `euroleague` naming their
@@ -319,9 +320,12 @@ the four in Iceland's small lineups, is its power forward.
   accents (Jasikevicius, Tomasevic), and only today's starters have spellings of their own.
 - 44 of the earlier seasons' 568 club-seasons show the club's code: no allowed source pictures or
   dates its crest of that season.
-- ASVEL's crest of today (the built-in season's) is its 2011–2018 logo, which none of its
-  EuroLeague seasons wore; it has played under the LDLC ASVEL logo since 2018/19, as the earlier
-  seasons show it. Today's crest wants that logo when `sync:club-logos` next runs for it.
+- ASVEL's crest of today (the built-in season's) is read from its file page, not from Wikipedia's
+  API like the other clubs' (`pages` in `scripts/data/club-logos.json`,
+  `npm run sync:club-logos -- --pages`): the sync may no longer ask that API, and its cached
+  answers name the club's 2011–2018 logo, which none of its EuroLeague seasons wore. It is the LDLC
+  ASVEL logo the club has worn since 2018/19, which its seasons from 2019/20 wear too. Another
+  club's new crest of today would come the same way.
 - Dubai, the frame's south-east corner, opens partly under the map's zoom buttons (about a third of
   its land at 1024×768); zooming or panning shows it whole. More room in the map's `focus` barely
   moves it, as the camera keeps to the map's backdrop.

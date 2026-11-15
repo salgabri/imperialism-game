@@ -148,7 +148,7 @@ is present. `sync:club-logos` leaves period crests alone.
 
 ### Coverage
 
-As of 15 November 2026: 649 period crests for 813 club ids, every club the game has
+As of 15 November 2026: 648 period crests for 813 club ids, every club the game has
 researched. Of the club-seasons before today's season (each club id in each season
 year it plays):
 
@@ -157,7 +157,7 @@ year it plays):
 | Football (men's) | 41% | 45% | 1% | 9% |
 | American football | 36% | 52% | 0% | 12% |
 | Basketball (NBA) | 29% | 37% | 0% | 34% |
-| Basketball (EuroLeague) | 59% | 32% | 1% | 8% |
+| Basketball (EuroLeague) | 58% | 34% | 1% | 8% |
 | Baseball | 25% | 57% | 0% | 18% |
 | Ice hockey | 29% | 56% | 4% | 11% |
 | Rugby league | 63% | 36% | 0% | 0% |
@@ -205,7 +205,8 @@ The EuroLeague's seasons of 2000/01 to 2025/26 came next (15 November 2026): the
 clubs not in today's EuroLeague, which until then showed their code, and today's 20
 where their crest of those seasons was another. Each club's articles in its own
 language and English, their galleries and the Wayback Machine's captures of them gave
-92 period crests. Real Madrid wore the club's plain crest (the football club's of
+92 period crests; 91 ship, as ASVEL's LDLC ASVEL logo of 2018/19 on became its crest of
+today the same day (read from its file page, README "Club crests"). Real Madrid wore the club's plain crest (the football club's of
 today) to 2008/09, Galatasaray and Zenit their sports club's emblem; Valencia's 40th-year
 crest and Virtus Bologna's centenary crest are 2026/27's, so 2025/26 shows the badges
 they replaced, and Efes's 50th-year logo is 2025/26's. Where a club's primary logo was a

@@ -9,8 +9,8 @@
 // No network: the originals come from the cache, where the research put them (data-src/crest-eras/BRIEF.md).
 //
 // Writes:
-//   public/club-logos/<key>.webp         each period crest, trimmed and fitting 128x128, as scripts/sync-club-logos.mjs
-//                                         draws today's crests
+//   public/club-logos/<key>.webp         each period crest, trimmed and fitting 128x128 as scripts/sync-club-logos.mjs
+//                                         draws today's crests (scripts/lib/crest-image.mjs)
 //   public/club-logos/SOURCES-eras.tsv   each period crest's club, years, source file, licence and page
 //   src/data/clubCrestEras.js            CREST_ERAS for src/data/crests.js
 // --check rebuilds all three in memory and fails on any difference (and on a cached original whose hash moved).
@@ -20,30 +20,16 @@ import { existsSync } from 'node:fs';
 import { readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import sharp from 'sharp';
+import { crestWebp } from './lib/crest-image.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const check = process.argv.includes('--check');
 assert(process.argv.slice(2).every(argument => argument === '--check'), 'Only --check is supported');
 const outDir = path.join(root, 'public/club-logos');
 const manifest = JSON.parse(await readFile(path.join(root, 'scripts/data/crest-eras.json'), 'utf8'));
-const BOX = 128; // as scripts/sync-club-logos.mjs: twice the largest mark the game draws
 const KEY = /^[a-z0-9-]+\.\d{4}$/;
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const byId = (a, b) => a.localeCompare(b, 'en', { numeric: true });
-
-/** A crest as the game draws them: trimmed, fitting 128x128, WebP (an SVG drawn large enough first). */
-async function crestWebp(bytes, isSvg) {
-  let input = bytes;
-  if (isSvg) {
-    const { width = 100, height = 100 } = await sharp(bytes).metadata();
-    const density = Math.min(2400, Math.max(72, Math.ceil(72 * 512 / Math.max(1, Math.min(width, height)))));
-    input = await sharp(bytes, { density }).png().toBuffer();
-  }
-  const trimmed = await sharp(input).ensureAlpha().trim({ threshold: 8 }).toBuffer().catch(() => input);
-  return sharp(trimmed).resize(BOX, BOX, { fit: 'inside', withoutEnlargement: true })
-    .webp({ quality: 86, alphaQuality: 100, effort: 6 }).toBuffer();
-}
 
 // ---- validate ----
 const crests = manifest.crests || {};
@@ -83,7 +69,7 @@ for (const key of Object.keys(crests).sort(byId)) {
   const bytes = await readFile(cache);
   assert.equal(sha256(bytes), crest.sha256, `${key}: ${crest.cache} is not the pinned original`);
   const isSvg = /\.svg$/i.test(crest.cache) || bytes.subarray(0, 512).toString('utf8').includes('<svg');
-  outputs.set(path.join(outDir, `${key}.webp`), await crestWebp(bytes, isSvg));
+  outputs.set(path.join(outDir, `${key}.webp`), await crestWebp(bytes, { svg: isSvg }));
 }
 
 const tsv = [

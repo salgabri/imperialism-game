@@ -57,7 +57,7 @@ export const CREST_ERAS = Object.freeze({
   "el-aris": [[2007,2008,"el-aris.2007"]],
   "el-arka-gdynia": [[2005,2008,"el-arka-gdynia.2005"],[2009,2013,"el-arka-gdynia.2009"]],
   "el-as-monaco": [[2022,2026,"el-as-monaco.2022"]],
-  "el-asvel": [[2002,2007,"el-asvel.2002"],[2008,2011,"el-asvel.2008"],[2019,2026,"el-asvel.2019"]],
+  "el-asvel": [[2002,2007,"el-asvel.2002"],[2008,2011,"el-asvel.2008"]],
   "el-avellino": [[2009,2009,"el-avellino.2009"]],
   "el-bamberg": [[2006,2006,"el-bamberg.2006"],[2007,2016,"el-bamberg.2007"],[2017,2018,"el-bamberg.2017"]],
   "el-baskonia": [[2001,2009,"el-baskonia.2001"],[2010,2016,"el-baskonia.2010"]],

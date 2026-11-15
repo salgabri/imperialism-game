@@ -222,7 +222,12 @@ test('the EuroLeague of 2000/01 to 2025/26: every club wears the crest of its da
     ['el-arka-gdynia', 2008, 'el-arka-gdynia.2005'], ['el-arka-gdynia', 2009, 'el-arka-gdynia.2009'],
     // Galatasaray under the sports club's emblem; AEK's 1997 emblem has no picture, its 2004 redraw has.
     ['el-galatasaray', 2014, today('f-galatasaray-sk')], ['el-aek-athens', 2004, null], ['el-aek-athens', 2005, 'el-aek-athens.2005'],
+    // ASVEL's 60th-year shield in 2009/10; the LDLC ASVEL logo since 2018/19 is its crest of today.
+    ['el-asvel', 2010, 'el-asvel.2008'], ['el-asvel', 2020, today('el-asvel')], ['el-asvel', 2026, today('el-asvel')],
   ]) assert.equal(crestFile(id, year), file, `${id} ${year}`);
+  assert.equal(today('el-asvel'), 'el-asvel');
+  const asvel = read('public/club-logos/SOURCES.tsv').split('\n').find(line => line.startsWith('el-asvel\t'));
+  assert.equal(asvel.split('\t')[6], 'https://en.wikipedia.org/wiki/File:LDLC_ASVEL_Basket.svg', 'ASVEL\'s crest of today is the LDLC ASVEL logo');
 });
 
 test('TeamMark and SquadFlag draw the crest of the season on screen', () => {

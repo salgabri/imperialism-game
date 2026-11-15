@@ -6,6 +6,10 @@
 //   node scripts/sync-club-logos.mjs [--refresh] [--pin]
 //     --refresh  ask Wikidata again (downloaded images stay cached; Wikipedia's answers are never asked again)
 //     --pin      record the SHA-256 of every Wikipedia answer the run reads in scripts/data/club-logos-wikipedia.json
+//   node scripts/sync-club-logos.mjs --pages
+//     rewrite only the crests scripts/data/club-logos.json "pages" names (below), from their file pages; every other
+//     crest, its SOURCES.tsv row and src/data/clubLogos.js stay as committed. It reads no Wikipedia API answer and asks
+//     Wikidata nothing, so it runs while the full sync cannot (no API answer is pinned).
 //
 // Sources (cached under the gitignored data-src/club-logos/, so reruns are offline). Every request goes through
 // scripts/lib/polite-fetch.mjs (one generic User-Agent, robots.txt read first and obeyed):
@@ -26,7 +30,7 @@
 //     The lead images and the files' details (thumbnail, licence) are English Wikipedia API
 //     answers, and en.wikipedia.org/w/api.php is disallowed by its robots.txt for every agent
 //     (Wikimedia's REST API under /api/ too; read 2026-11-10), with no allowed source of the
-//     same facts. So they are read only from the cache, and only answers pinned by their SHA-256
+//     same facts in bulk. So they are read only from the cache, and only answers pinned by their SHA-256
 //     in scripts/data/club-logos-wikipedia.json: a run that needs an answer the cache lacks (a
 //     new club, or an article Wikidata now names after --refresh), or one not pinned, stops
 //     before writing anything, and the committed crests stay as they are. None is pinned yet:
@@ -35,6 +39,14 @@
 //     purpose, with --pin.
 //   - The file's 250px thumbnail from upload.wikimedia.org (allowed by its robots.txt), trimmed
 //     and saved as WebP fitting 128x128.
+//   - A crest named in scripts/data/club-logos.json "pages" (club id -> { file, sha256 }) needs none of those answers:
+//     its English Wikipedia file page (/wiki/File:…, which robots.txt allows) gives the facts the API's answers gave,
+//     the address of the file's original on upload.wikimedia.org and the licence its licence template states (the
+//     licensetpl data the API's LicenseShortName and NonFree are read from). The original must have the SHA-256 pinned
+//     there, and is drawn as the period crests are (scripts/lib/crest-image.mjs). So a club's crest of today can change
+//     though the API is never asked again: ASVEL's LDLC ASVEL logo (since 2018/19) came this way. Its file then drops
+//     out of the API's file requests (fifty files each), which changes one of them: a full run needs an answer no
+//     cache holds, and stops.
 //
 // Writes:
 //   public/club-logos/<club id>.webp   one per club with a crest (an all-leagues club with a
@@ -47,6 +59,8 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import sharp from 'sharp';
+import { crestWebp } from './lib/crest-image.mjs';
+import { filePageFacts, filePageUrl } from './lib/wiki-file-page.mjs';
 import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
 import { CLUBS as BASKETBALL_CLUBS } from '../src/data/clubs.basketball.js';
 import { CLUBS as EUROLEAGUE_CLUBS } from '../src/data/clubs.euroleague.js';
@@ -67,10 +81,13 @@ const outDir = path.join(root, 'public/club-logos');
 const moduleFile = path.join(root, 'src/data/clubLogos.js');
 const overridesFile = path.join(root, 'scripts/data/club-logos.json');
 const pinsFile = path.join(root, 'scripts/data/club-logos-wikipedia.json');
-const unknown = process.argv.slice(2).filter(arg => arg !== '--refresh' && arg !== '--pin');
+const unknown = process.argv.slice(2).filter(arg => !['--refresh', '--pin', '--pages'].includes(arg));
 if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
 const refresh = process.argv.includes('--refresh');
 const pinning = process.argv.includes('--pin');
+// Only the "pages" crests (see the top of this file).
+const pagesOnly = process.argv.includes('--pages');
+if (pagesOnly && (refresh || pinning)) throw new Error('--pages asks Wikidata nothing and reads no Wikipedia API answer: pass it alone');
 
 // The API the cached Wikipedia answers came from: their cache keys are its request URLs. Never requested now.
 const ENWIKI = 'https://en.wikipedia.org/w/api.php';
@@ -80,7 +97,6 @@ const MLB = 'Q1163715', BASEBALL_TEAM = 'Q13027888';
 const NHL = 'Q1215892', HOCKEY_TEAM = 'Q4498974';
 const NRL = 'Q1140630', RUGBY_LEAGUE_TEAM = 'Q15221215';
 const THUMB_WIDTH = 250; // one of Wikimedia's standard thumbnail steps
-const BOX = 128; // a crest fits this square: twice the largest mark the game draws (60px)
 // The fewest lineup players an all-leagues club must share with a domestic club to be its twin.
 const MIN_SHARED = 4;
 const LOGO_NAME = /logo|crest|badge|escudo|emblem|wappen|stemma|scudo|blason|herb|insignia|s[ií]mbolo|embleem|logotip/i;
@@ -258,6 +274,21 @@ async function fileInfo(names) {
   return info;
 }
 
+/**
+ * A "pages" file's details from its English Wikipedia file page (scripts/lib/wiki-file-page.mjs), the page cached as it
+ * came: { original, page, licence, nonFree }.
+ */
+async function pageInfo(name) {
+  const url = filePageUrl(name);
+  const { html } = await cachedGz(path.join(cacheDir, `page-${sha1(url)}.json.gz`), false,
+    async () => ({ url, html: await (await limit(() => fetchOk(url))).text() }));
+  try {
+    return filePageFacts(html, name);
+  } catch (error) {
+    throw new Error(`${url}: ${error.message}. Nothing was written.`);
+  }
+}
+
 // ---- Images ----
 
 async function download(url) {
@@ -292,24 +323,30 @@ async function crestReason(name, from, info, bytes) {
   return null;
 }
 
-async function crestWebp(bytes) {
-  const trimmed = await sharp(bytes).ensureAlpha().trim({ threshold: 8 }).toBuffer().catch(() => bytes);
-  return sharp(trimmed).resize(BOX, BOX, { fit: 'inside', withoutEnlargement: true })
-    .webp({ quality: 86, alphaQuality: 100, effort: 6 }).toBuffer();
+/** The crests SOURCES.tsv lists, as the last run wrote them: club id -> { file, name, info, from, label }. */
+async function committedCrests() {
+  const rows = (await readFile(path.join(outDir, 'SOURCES.tsv'), 'utf8')).split(/\r?\n/).filter(line => line && !line.startsWith('#')).slice(1);
+  return new Map(rows.map(line => {
+    const [id, label, image, name, licence, nonFree, page] = line.split('\t');
+    return [id, { file: image.replace(/\.webp$/, ''), name, info: { licence, nonFree: nonFree === 'yes', page }, from: 'committed', label }];
+  }));
 }
 
 // ---- Main ----
 
 const overrides = existsSync(overridesFile) ? JSON.parse(await readFile(overridesFile, 'utf8')) : {};
 const itemOverrides = overrides.items || {}, fileOverrides = overrides.files || {}, twinOverrides = overrides.twins || {};
+const pageOverrides = overrides.pages || {};
 
 const domestic = await domesticClubs();
 const domesticById = new Map(domestic.map(club => [club.id, club]));
-const nba = await leagueItems();
-const nfl = await leagueItems(NFL, AMERICAN_FOOTBALL_TEAM);
-const mlb = await leagueItems(MLB, BASEBALL_TEAM);
-const nhl = await leagueItems(NHL, HOCKEY_TEAM);
-const nrl = await leagueItems(NRL, RUGBY_LEAGUE_TEAM);
+// --pages asks Wikidata nothing: its crests name their files, and the clubs' items find none of them.
+const itemsOf = (league, kind) => (pagesOnly ? new Map() : leagueItems(league, kind));
+const nba = await itemsOf(NBA, BASKETBALL_TEAM);
+const nfl = await itemsOf(NFL, AMERICAN_FOOTBALL_TEAM);
+const mlb = await itemsOf(MLB, BASEBALL_TEAM);
+const nhl = await itemsOf(NHL, HOCKEY_TEAM);
+const nrl = await itemsOf(NRL, RUGBY_LEAGUE_TEAM);
 const clubs = []; // { id, name, qid, twin? }
 const problems = [];
 
@@ -361,10 +398,28 @@ for (const [id, qid] of Object.entries(itemOverrides)) {
   club.twin = null;
 }
 
-const qids = [...new Set(clubs.map(club => club.qid).filter(Boolean))].sort();
+// The "pages" crests: each file page read, its original checked against its pin and drawn before anything is written,
+// so a page or an original that has changed stops the run.
+const pageCrests = new Map(); // club id -> { webp, crest }
+for (const [id, record] of Object.entries(pageOverrides)) {
+  const club = clubs.find(entry => entry.id === id);
+  if (!club) throw new Error(`club-logos.json "pages" names unknown club ${id}`);
+  if (!record?.file || !/^[0-9a-f]{64}$/.test(record.sha256 ?? '')) throw new Error(`club-logos.json "pages" ${id}: give its file and its original's SHA-256`);
+  const name = fileName(record.file);
+  const info = await pageInfo(name);
+  const bytes = await download(info.original);
+  if (sha256(bytes) !== record.sha256) {
+    throw new Error(`${id}: ${info.original} (SHA-256 ${sha256(bytes)}) is not the original pinned in ${path.relative(root, overridesFile)} "pages". Nothing was written.`);
+  }
+  club.twin = null; // a file of its own
+  pageCrests.set(id, { webp: await crestWebp(bytes, { svg: /\.svg$/i.test(info.original) }), crest: { file: id, name, info, from: 'page' } });
+}
+
+const qids = pagesOnly ? [] : [...new Set(clubs.map(club => club.qid).filter(Boolean))].sort();
 const facts = await itemFacts(qids);
 const leads = await leadImages([...facts.values()].map(fact => fact.article).filter(Boolean));
 const candidatesOf = club => {
+  if (pageCrests.has(club.id)) return [];
   if (club.id in fileOverrides) return fileOverrides[club.id] ? [{ name: fileName(fileOverrides[club.id]), from: 'override' }] : [];
   const fact = club.qid ? facts.get(club.qid) : null;
   return [
@@ -372,16 +427,21 @@ const candidatesOf = club => {
     fact?.p154 ? { name: fact.p154, from: 'p154' } : null,
   ].filter(Boolean).filter((c, i, all) => all.findIndex(other => other.name === c.name) === i);
 };
-const infos = await fileInfo(clubs.filter(club => !club.twin).flatMap(club => candidatesOf(club).map(c => c.name)));
+const infos = await fileInfo(pagesOnly ? [] : clubs.filter(club => !club.twin).flatMap(club => candidatesOf(club).map(c => c.name)));
 
 await mkdir(outDir, { recursive: true });
-const crests = new Map(); // club id -> { file id, name, info, from }
+const writeCrest = async (id, webp) => {
+  const target = path.join(outDir, `${id}.webp`);
+  if (!existsSync(target) || !webp.equals(await readFile(target))) await writeFile(target, webp);
+};
+// --pages starts from the crests the last run wrote, and changes only its own.
+const crests = pagesOnly ? await committedCrests() : new Map(); // club id -> { file id, name, info, from, label? }
 const rejected = {};
 let done = 0;
 // Eight clubs at a time: thousands of file reads and sharp jobs at once fill libuv's thread pool, and a download's
 // DNS lookup, which needs that pool too, then waits behind them until it times out.
 const work = createLimiter(8, 0);
-await Promise.all(clubs.filter(club => !club.twin).map(club => work(async () => {
+await Promise.all(clubs.filter(club => !pagesOnly && !club.twin && !pageCrests.has(club.id)).map(club => work(async () => {
   for (const candidate of candidatesOf(club)) {
     const info = infos.get(candidate.name);
     if (!info) { (rejected['missing file'] ||= []).push(`${club.id} ${candidate.name}`); continue; }
@@ -394,17 +454,24 @@ await Promise.all(clubs.filter(club => !club.twin).map(club => work(async () => 
       reason = bytes ? `unreadable image (${error.message.split('\n')[0]})` : 'download failed (rerun to retry)';
     }
     if (reason) { (rejected[reason] ||= []).push(`${club.id} ${candidate.name}`); continue; }
-    const target = path.join(outDir, `${club.id}.webp`);
-    if (!existsSync(target) || !webp.equals(await readFile(target))) await writeFile(target, webp);
+    await writeCrest(club.id, webp);
     crests.set(club.id, { file: club.id, name: candidate.name, info, from: candidate.from });
     break;
   }
   if (++done % 500 === 0) console.log(`  ${done} clubs checked`);
 })));
-for (const club of clubs.filter(entry => entry.twin && crests.has(entry.twin))) crests.set(club.id, { ...crests.get(club.twin), file: club.twin });
+for (const [id, { webp, crest }] of pageCrests) {
+  await writeCrest(id, webp);
+  // In --pages every row keeps the club name it had, and a club sharing the file (an all-leagues club, its domestic
+  // twin's) lists the new source too.
+  if (pagesOnly) for (const [other, entry] of crests) if (other !== id && entry.file === id) crests.set(other, { ...crest, label: entry.label });
+  crests.set(id, { ...crest, label: crests.get(id)?.label });
+}
+if (!pagesOnly) for (const club of clubs.filter(entry => entry.twin && crests.has(entry.twin))) crests.set(club.id, { ...crests.get(club.twin), file: club.twin });
 
-// Files of clubs that no longer have a crest go. A period crest ('<club id>.<year>.webp') is scripts/sync-crest-eras.mjs's.
-for (const name of await readdir(outDir)) {
+// Files of clubs that no longer have a crest go (--pages leaves every other club's as it is). A period crest
+// ('<club id>.<year>.webp') is scripts/sync-crest-eras.mjs's.
+if (!pagesOnly) for (const name of await readdir(outDir)) {
   if (name.endsWith('.webp') && !/\.\d{4}\.webp$/.test(name) && ![...crests.values()].some(crest => `${crest.file}.webp` === name)) {
     await rm(path.join(outDir, name));
   }
@@ -419,7 +486,7 @@ const tsv = [
   '# Crests are the clubs\' trademarks. Most are non-free files that Wikipedia hosts under its non-free content policy;',
   '# each row names the file, its licence as Wikipedia records it, and its file page. A club sharing another\'s file says so.',
   ['club', 'name', 'image', 'file', 'licence', 'non-free', 'file page'].join('\t'),
-  ...[...crests].sort(([a], [b]) => byId(a, b)).map(([id, crest]) => [id, nameOf.get(id), `${crest.file}.webp`, crest.name,
+  ...[...crests].sort(([a], [b]) => byId(a, b)).map(([id, crest]) => [id, crest.label ?? nameOf.get(id), `${crest.file}.webp`, crest.name,
     crest.info.licence, crest.info.nonFree ? 'yes' : 'no', crest.info.page].join('\t')),
 ];
 await writeFile(path.join(outDir, 'SOURCES.tsv'), tsv.join('\n') + '\n');
@@ -490,6 +557,8 @@ console.log(`  domestic clubs with a Wikidata item: ${domestic.filter(club => cl
 for (const [reason, list] of Object.entries(rejected)) console.log(`  rejected (${reason}): ${list.length}${list.length <= 12 ? '\n    ' + list.join('\n    ') : ''}`);
 const missing = [...worldClubs, ...nbaClubs, ...nflClubs, ...mlbClubs, ...nhlClubs, ...nrlClubs, ...euroleagueClubs, ...womensClubs].filter(club => !crests.has(club.id));
 if (missing.length) console.log(`  all-leagues, NBA, NFL, MLB, NHL, NRL, EuroLeague and women's clubs without a crest:\n    ${missing.map(club => `${club.id} (${club.qid || 'no item'})`).join('\n    ')}`);
-for (const problem of problems) console.log(`  ${problem}`);
+// (--pages looks up no item, so it has no problems of its own to report.)
+if (!pagesOnly) for (const problem of problems) console.log(`  ${problem}`);
+for (const [id, { crest }] of pageCrests) console.log(`  ${id}: ${crest.name} (${crest.info.licence}${crest.info.nonFree ? ', non-free' : ''}), from its file page ${crest.info.page}`);
 const sizes = await Promise.all([...new Set([...crests.values()].map(crest => crest.file))].map(async file => (await readFile(path.join(outDir, `${file}.webp`))).length));
 console.log(`  ${sizes.length} files, ${(sizes.reduce((a, b) => a + b, 0) / 1048576).toFixed(1)} MB, module ${(Buffer.byteLength(await readFile(moduleFile, 'utf8')) / 1024).toFixed(1)} KB`);

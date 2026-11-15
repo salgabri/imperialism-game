@@ -52,8 +52,13 @@
   },
   "files": {
     "d250-826": "LogoASMonacoFC2021.svg",
-    "d528-1011": "FC Volendam logoo.svg",
-    "el-asvel": "ASVEL Basket logo.svg"
+    "d528-1011": "FC Volendam logoo.svg"
+  },
+  "pages": {
+    "el-asvel": {
+      "file": "LDLC ASVEL Basket.svg",
+      "sha256": "689e86edfefa0c00bc0d86b052eb4c497d04401e58dd80c648da114c12720c20"
+    }
   },
   "twins": {
     "f-venezia": "d380-1179",
