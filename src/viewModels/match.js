@@ -272,13 +272,17 @@ function kickCounts(tieShown) {
 
 function nextFixtureText(st, ctx) {
   const teams = st?.teams || {};
-  const pair = st?.tacticalChoice ? [st.tacticalChoice.aId, st.tacticalChoice.dId]
+  const gate = st?.tacticalChoice || st?.resultEntry;
+  const pair = gate ? [gate.aId, gate.dId]
     : st?.spin?.stage === 'locked' ? [st.spin.attackerId, st.spin.targetId] : null;
   if (pair && teams[pair[0]] && teams[pair[1]]) return `Next fixture: ${teams[pair[0]].name} v ${teams[pair[1]].name}`;
   if (!(st?.aliveIds || []).length) return '';
   const copy = idleTurnCopy(st, ctx) || {};
   return [copy.title, copy.route].filter(Boolean).join(' · ');
 }
+
+/** The chart's note for a score typed in (scores entered by you): the match was played somewhere else. */
+const ENTERED_NOTE = 'You entered this result: it was played away from here, so there is no live chart.';
 
 const EMPTY = Object.freeze({
   empty: null, source: null, state: null, sport: 'football', statusLabel: '', statusDetail: null, live: false,
@@ -316,7 +320,8 @@ function fromMatch(st, ctx, sport, m) {
   const statusLabel = state === 'live' ? labels.live : state === 'penalties' ? labels.tie : labels.end;
   const statusDetail = state === 'penalties' ? `${kicks?.a ?? 0}–${kicks?.b ?? 0}` : tieDetail;
   let model = m.live ?? null;
-  if (!model && !m.applied) {
+  // A score typed in (scores entered by you) had no model behind it: no chart to draw.
+  if (!model && !m.applied && !m.entered) {
     model = memo(ctx?.cache, 'match:live', [A, D, m.effA, m.effD, sport.id, !!ctx?.homeAdvantage], () => {
       try { return liveModelFor(sport, A, D, m.effA, m.effD, m.matchDrama ?? ctx?.drama, !!ctx?.homeAdvantage) ?? null; } catch { return null; }
     });
@@ -337,7 +342,7 @@ function fromMatch(st, ctx, sport, m) {
     model,
     goals: shown.map(e => ({ m: Number(e.m) || 0, tid: e.tid, pts: ptsOf(e) })),
     final: state === 'full-time' && winnerSide ? { winnerSide } : null,
-    chartNote: model ? null : 'Live win probability is not available for this match.',
+    chartNote: model ? null : m.entered ? ENTERED_NOTE : 'Live win probability is not available for this match.',
     // A settled conquest already moved the claimed player: the XIs show the kickoff squads, not today's.
     lineups: lineups(st, ctx, m.aId, m.dId, sport.id, m.applied && m.playerTaken
       ? { player: m.playerTaken, winnerId: m.winner, loserId: m.winner === m.aId ? m.dId : m.aId } : null),
@@ -345,7 +350,7 @@ function fromMatch(st, ctx, sport, m) {
       sport: sport.id, state, aCode: A.code || A.name, bCode: D.code || D.name, aName: A.name, bName: D.name,
       aId: m.aId, dId: m.dId, length, half: halfOf(sport, length), finalMinute, scoreA, scoreB,
       kickoff: getSport(sport.id).words.kickoff, endLabel: getSport(sport.id).words.end, overtime: playsOn(sport),
-      kicks: kicks ? { a: kicks.a, b: kicks.b } : null, tieDetail,
+      kicks: kicks ? { a: kicks.a, b: kicks.b } : null, tieDetail, entered: !!m.entered,
       events: shown.map((e, i) => ({ key: `e${i}`, m: Number(e.m) || 0, label: clockLabel(sport, e.m), tid: e.tid,
         pts: ptsOf(e), text: sport.formatEvent(e, codeOf(e.tid)).text })),
     },
@@ -388,13 +393,13 @@ function fromHistory(st, ctx, sport, entry) {
     minuteFallback: finalMinute, minuteFloor: finalMinute, length, ot: otOf(sport),
     perspective: perspectiveOf(ctx, A, D, aId, dId), model: null, goals: [],
     final: winnerId === aId ? { winnerSide: 'A' } : winnerId === dId ? { winnerSide: 'D' } : null,
-    chartNote: 'The win-probability chart is drawn while a match is live.',
+    chartNote: entry.entered ? ENTERED_NOTE : 'The win-probability chart is drawn while a match is live.',
     lineups: lineups(st, ctx, aId, dId, sport.id, moved),
     feedBase: {
       sport: sport.id, state: 'full-time', aCode: A.code || A.name, bCode: D.code || D.name, aName: A.name, bName: D.name,
       aId, dId, length, half: halfOf(sport, length), finalMinute, scoreA, scoreB,
       kickoff: getSport(sport.id).words.kickoff, endLabel: getSport(sport.id).words.end, overtime: playsOn(sport),
-      kicks: null, tieDetail, events, roundLabel: historyRound(entry) ? `Round ${roman(historyRound(entry))}` : null,
+      kicks: null, tieDetail, entered: !!entry.entered, events, roundLabel: historyRound(entry) ? `Round ${roman(historyRound(entry))}` : null,
     },
     kicks: null,
     preMatch: preMatchOf(entry.odds, A, D, entry.a?.eff, entry.b?.eff),
@@ -429,7 +434,7 @@ export function buildFeedRows(model, minute) {
   const clock = m => clockLabel(sport, m);
   const rows = events.map((e, i) => ({ key: e.key || `e${i}`, n: e.m ?? i, i, minute: e.label || clock(e.m), text: e.text, weight: 700 }));
   const scored = (tid, limit) => events.reduce((n, e) => n + (e.tid === tid && e.m != null && e.m <= limit ? ptsOf(e) : 0), 0);
-  const known = events.every(e => e.tid != null && e.m != null);
+  const known = !base.entered && events.every(e => e.tid != null && e.m != null);
   const reached = state !== 'live' || now >= base.half;
   if (known && reached && base.half > 0) {
     rows.push({ key: 'half', n: base.half + .5, i: -1, minute: clock(base.half), weight: 500,
@@ -440,7 +445,10 @@ export function buildFeedRows(model, minute) {
     rows.push({ key: 'overtime', n: base.length + .5, i: -1, minute: clock(base.length), weight: 500,
       text: `${sport.words.overtime || 'Overtime'} — ${scoreText(base, ra, rb)}` });
   }
-  rows.push({ key: 'kickoff', n: -1, i: -1, minute: clock(0), weight: 500, text: `${base.kickoff} — ${base.aName} attack ${base.bName}` });
+  rows.push(base.entered
+    // A score typed in: no clock, events or half-time score of its own to show, only where it came from.
+    ? { key: 'entered', n: -1, i: -1, minute: '', weight: 500, text: `Result entered by you — ${base.aName} attacked ${base.bName}` }
+    : { key: 'kickoff', n: -1, i: -1, minute: clock(0), weight: 500, text: `${base.kickoff} — ${base.aName} attack ${base.bName}` });
   rows.sort((x, y) => y.n - x.n || y.i - x.i);
   let top;
   if (state === 'live') {
@@ -454,7 +462,7 @@ export function buildFeedRows(model, minute) {
     top = { key: 'status', minute: clock(base.finalMinute), weight: 600, live: false,
       text: `Penalties — ${scoreText(base, base.scoreA, base.scoreB)} · ${base.kicks?.a ?? 0}–${base.kicks?.b ?? 0}` };
   } else {
-    top = { key: 'status', minute: clock(base.finalMinute), weight: 600, live: false,
+    top = { key: 'status', minute: base.entered ? '' : clock(base.finalMinute), weight: 600, live: false,
       text: `${base.endLabel} — ${scoreText(base, base.scoreA, base.scoreB)}${base.tieDetail ? ` · ${base.tieDetail}` : ''}` };
   }
   return [{ ...top, status: true }, ...rows.map(({ key, minute: label, text, weight }) => ({ key, minute: label, text, weight, status: false, live: false }))];

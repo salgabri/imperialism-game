@@ -98,6 +98,8 @@ export function readChallenge(search = '', { sets = BUILT_IN_SETS } = {}) {
   });
   take('opponent', value => TARGETING_CARDS.some(card => card.value === value), value => { setup.targeting = value; });
   take('show', value => offers(SHOW_MATCH_OPTIONS, value), value => {
+    // Scores entered by you (scores entered by you) keep the default way of showing a match the game plays.
+    if (value === 'entered') { setup.results = 'entered'; return; }
     setup.express = value === 'express';
     if (value !== 'express') setup.resolution = value;
   });

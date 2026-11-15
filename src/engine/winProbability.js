@@ -84,8 +84,9 @@
 //   form, which moves both try rates, is integrated over its normal spread with seven-point Gauss–Hermite quadrature.
 //
 // Rocket League — exact, from the model's own games (src/sports/rocketLeague.js): a series is best of seven, each game won
-//   with Elo's odds for the gap (gameOdds) and played in ten thirty-second slices at the rates that make it so (gameRates),
-//   with the sport's late game (sliceMeans) and sudden-death overtime, whose first goal wins (overtimeOdds). The clock gives
+//   with Elo's odds for the gap (gameOdds) and played in ten thirty-second slices at the rates that make it so (gameRates,
+//   at an earlier season's goal rate where the model names one), with the sport's late game (sliceMeans) and sudden-death
+//   overtime, whose first goal wins (overtimeOdds). The clock gives
 //   each game twelve units, its ten slices and two for its overtime; the events are its goals (`pts` 0) and its end (`pts`
 //   1), so the chart knows the games won and the score of the one in play: P(A wins) is that game's chance from its slice and
 //   margin (gameTable), then the games left, exactly. Match-day form, one draw on every game's gap, is integrated over its
@@ -171,9 +172,10 @@ export function footballRate(log) {
  * | { kind:'tries', triesA, triesD, golden, formSd, length:80, ot:5, maxOt:4 } (rugby league; tries a side in eighty
  *     minutes, `golden` the attacker's edge when a golden point's last field goal decides, formSd the spread of
  *     match-day form in log rate, and the "overtime periods" golden point's five-minute halves)
- * | { kind:'series', gap, formSd, length:48, ot:12, maxOt:3, toWin:4, regulation:10 } (Rocket League; gap is the attacker's
- *     rating points ahead in every game, formSd the spread of match-day form in rating points; the clock gives each game
- *     twelve units, ten of regulation, the fifth to seventh games extending the shortest series as overtime periods do)
+ * | { kind:'series', gap, formSd, length:48, ot:12, maxOt:3, toWin:4, regulation:10, goals? } (Rocket League; gap is the
+ *     attacker's rating points ahead in every game, formSd the spread of match-day form in rating points; the clock gives
+ *     each game twelve units, ten of regulation, the fifth to seventh games extending the shortest series as overtime
+ *     periods do; `goals` an earlier season's goal rate between equals, today's when absent)
  * | null (no teams, unknown sport, or a model the approximation does not cover).
  * `sport` is a sport object or id; effA/effD are the match's effective strengths (tactics included); `drama`
  * is the match's uncertainty (football ignores it, as the README formula does); `home`, that the defender plays at
@@ -198,6 +200,8 @@ export function liveModelFor(sport, attacker, defender, effA, effD, drama, home 
       kind: 'series', gap: num(prepared.gap), formSd: SERIES_MODEL.FORM_AT_BALANCED * (variation / 6) ** 2,
       length: SERIES_MODEL.LENGTH, ot: SERIES_MODEL.BLOCK, maxOt: SERIES_MODEL.GAMES - SERIES_MODEL.TO_WIN,
       toWin: SERIES_MODEL.TO_WIN, regulation: SERIES_MODEL.SLICES,
+      // An earlier season's goal rate; today's model names none.
+      ...(isNum(prepared.goals) && num(prepared.goals) !== SERIES_MODEL.GOALS ? { goals: num(prepared.goals) } : {}),
     };
   }
   if (Array.isArray(prepared.rubbers) && TIE_RUBBERS.has(prepared.rubbers.length)) {
@@ -413,7 +417,8 @@ export function isLiveModel(model) {
   if (model.kind === 'series') {
     return ['gap', 'formSd', 'length', 'ot'].every(finite) && model.formSd >= 0 && model.length > 0 && model.ot > 0
       && Number.isInteger(model.maxOt) && model.maxOt >= 0 && Number.isInteger(model.toWin) && model.toWin >= 1
-      && Number.isInteger(model.regulation) && model.regulation >= 1 && model.regulation < model.ot;
+      && Number.isInteger(model.regulation) && model.regulation >= 1 && model.regulation < model.ot
+      && (model.goals === undefined || (finite('goals') && model.goals > 0));
   }
   if (model.kind === 'rubbers') {
     return ['formSd', 'length', 'ot'].every(finite) && model.formSd >= 0 && model.length > 0 && model.ot > 0
@@ -1032,7 +1037,7 @@ function seriesTables(model) {
   if (seriesCache.has(model)) return seriesCache.get(model);
   const nodes = HERMITE.map(([t, weight]) => {
     const p = gameOdds(model.gap + t * model.formSd);
-    const [rateA, rateD] = gameRates(p);
+    const [rateA, rateD] = gameRates(p, model.goals ?? SERIES_MODEL.GOALS);
     return { weight, p, table: gameTable(rateA, rateD), level: overtimeOdds(rateA, rateD) };
   });
   const tables = { nodes, cache: new Map() };

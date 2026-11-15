@@ -1,0 +1,10 @@
+Rocket League seasons 2016-2025 (rl-<year>.json): attribution and licence
+=============================================================
+
+The ratings in these files are computed by this project from the results of Liquipedia's Rocket League wiki
+(https://liquipedia.net/rocketleague/): an Elo of every player, built game by game from every 3v3 series of its S-, A- and B-Tier events
+from September 2015, as it stood on the last day of each year; each player's country is the one the whole record gives
+him. Liquipedia publishes no ratings: these are not its numbers. See docs/design/rocket-league.md, "Earlier seasons".
+
+Credit: Liquipedia (https://liquipedia.net/rocketleague/) and its contributors; each player's source links his page there.
+Licence: CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/). These files are shared under the same licence.

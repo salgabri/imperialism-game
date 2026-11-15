@@ -134,7 +134,7 @@ export function displayRound(st) {
   if (!st) return 0;
   const round = Number(st.round) || 0;
   if (round > 0 && Array.isArray(st.aliveIds) && st.aliveIds.length === 1) return round;
-  const busy = (st.match && !st.match.applied) || !!st.spin || !!st.pendingTarget || !!st.tacticalChoice || !!st.choice
+  const busy = (st.match && !st.match.applied) || !!st.spin || !!st.pendingTarget || !!st.tacticalChoice || !!st.resultEntry || !!st.choice
     || (Array.isArray(st.queue) && st.queue.length > 0);
   if (busy) return round;
   // Every best-of-three finale game opens a round of its own (App.nextAction), whatever the round-robin queue holds.

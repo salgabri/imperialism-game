@@ -13,6 +13,9 @@ export const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'U
   managedTeamId: '', acquisitionPolicy: 'highest-rated', rosterPreset: 'authentic',
   // Home advantage: 'on' plays every match at the defender's home; 'off' (the default) at a neutral venue.
   homeAdvantage: 'off',
+  // Results: 'simulated' (the default) plays every match on the sport's model; 'entered' waits for each match's score,
+  // typed in by the player who played it somewhere else (src/engine/enteredResult.js).
+  results: 'simulated',
   // Turn modes (DEC D1): the defaults reproduce the original random draw with compass targets.
   turnOrder: 'random', targeting: 'compass',
   // An earlier season's data set id (docs/design/football-years.md); null plays the built-in season.

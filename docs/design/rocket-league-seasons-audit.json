@@ -1,0 +1,633 @@
+{
+  "generatedBy": "scripts/build-rocket-league-seasons.mjs",
+  "licence": {
+    "name": "CC BY-SA 3.0",
+    "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  "teamSize": 5,
+  "minPlayers": 3,
+  "roughBefore": 2018,
+  "todaysGoals": 3.8,
+  "seasons": [
+    {
+      "id": "rl-2025",
+      "version": "rl-2025-09c4b51d",
+      "label": "Liquipedia Elo, end of 2025",
+      "date": "2025-12-31",
+      "to": "2025-12-19",
+      "series": 20758,
+      "games": 82551,
+      "rated": 851,
+      "top": [
+        "Vatira 2486.8 → 97",
+        "trk511 2486.3 → 97",
+        "BeastMode 2428.5 → 95",
+        "dralii 2419.7 → 95",
+        "Daniel 2410.3 → 94"
+      ],
+      "nations": [
+        "United States 94.3 (BeastMode 95, Daniel 94, Scrzbbles 94, Firstkiller 88, Lj 85; +75)",
+        "France 92.3 (Vatira 97, M0nkey M00n 90, Seikoo 90, zen 90, Radosin 89; +44)",
+        "Saudi Arabia 90.7 (trk511 97, Ghaazi 89, Kiileerrz 86, Rw9 86, Mesho 83; +89)",
+        "Brazil 87.3 (swiftt. 89, Lostt. 88, DRUFINHO 85, Sad 83, Aztrø 79; +50)",
+        "Great Britain 85 (Joyo 87, Scrub Killa 85, Archie 83, rise. 82, ApparentlyJack 81; +50)",
+        "Netherlands 84 (Joreuz 87, oaly. 83, Oscillon 82, nass 79, Mittaen 78; +11)",
+        "Morocco 83.3 (dralii 95, itachi 86, skyrix 69, AnoriQ 62)",
+        "Australia 81.3 (bananahead 82, Fiberr 81, Fever 81, Torsos 79, Kaka 77; +97)",
+        "Belgium 81.3 (Atow. 90, AztraL 82, JWeyts 72, Compact 70, rysfox. 68; +1)",
+        "Spain 81.3 (stizzy 83, Leoro 81, LuiisP 80, crr 79, AtomiK 79; +24)",
+        "Germany 80.7 (Tox 82, Rezears 81, dayyshift 79, Catalysm 79, Jazii 69; +18)",
+        "Canada 80 (reveal 83, JKnaps 80, sosa 77, Tawk 74, Squishy 70; +6)",
+        "Japan 78.7 (nai 81, ReaLize 78, Burn 77, jB0X 74, popo 74; +18)",
+        "Poland 77.3 (Oski 83, virtuoso 79, Aero 70, Kito 61, Vesh 60; +3)",
+        "Italy 76.7 (davoof 78, Hyderr 77, arju 75, mala7 74, dead 70; +5)",
+        "Denmark 76.3 (ejby 79, Nico 75, TempoH 75, Nym 68, Madssssss. 63; +5)",
+        "Kuwait 76 (M7md 91, Naizak 69, lynx 68, BxRw 63, hmane. 55)",
+        "Malaysia 74.3 (Sphinx 85, Madhin 72, Blue 66, Misty 60, Steaky 51)",
+        "Chile 74 (Reysbull 83, pan 70, Davitrox 69, syzz 66, nachosky 64; +7)",
+        "Ireland 73 (Maxeew 84, Shark. 68, Smokez 67, shallow 54, Kiernan 50)",
+        "Puerto Rico 71.7 (Milio 74, Kiro 73, OwlTG1 68, Noxes 66)",
+        "Argentina 71 (shad 75, LagLy 69, Rmn 69, misery 68, ajg 68; +13)",
+        "Finland 71 (Dansku 72, Tossis. 71, regser 70, Porsas 70, Renshiro 67; +2)",
+        "Indonesia 71 (LCT 73, ripoopi 72, Gon 68, SyCho 68, Ficeo 62; +7)",
+        "South Africa 70 (2Die4 77, Snowyy 68, Sweaty 65, Friction 64, Werty ^^ 63; +48)",
+        "Portugal 69.3 (AcroniK 82, arafar 67, zeko 59, vadyy 59, QwaaZar 59; +5)",
+        "New Zealand 68.7 (caleb 72, Laxin 71, Vis 63, aadne 63, theothekind 63; +8)",
+        "Norway 68.3 (wozyen 77, Jup. 65, Seeb. 63, bruhkay 63, TrickStarz 55; +1)",
+        "Mexico 67.7 (CHEESE. 79, kofyr 70, S5-Cosmic 54)",
+        "Thailand 67.7 (Kevin 78, peachyy. 63, Kylo 62)",
+        "Austria 67 (ivn 70, Yukeo 69, pzy 62)",
+        "India 67 (Abscrazy 70, Våv. 69, DeluxeWiz 62, Karviń 61, Orjanguse 57; +2)",
+        "Czechia 66 (Den1s 75, šedou 62, syracks 61, Com 55, 9hunta 49)",
+        "Senegal 66 (ESP_Bouba 66, ITheShadow 66, MOUMSI 66)",
+        "Russia 65.7 (hxll0. 66, Sozya 66, bihan 65, xeelfine 65, nerm1k 64; +3)",
+        "Yemen 65 (Mohanned 70, BunnyDummy 66, o0vvl 59)",
+        "Turkey 64.7 (Lorely 65, jzmmm. 65, dyna 64, Kemals 64, HUSOO 61)",
+        "Egypt 63 (IslamDunk 67, Nine 67, AbuLba 55)",
+        "Greece 61.7 (Apo2k 63, WolfRider 63, Wizz 59)",
+        "United Arab Emirates 60.3 (Jushu 65, Rigorous 63, Alameri 53)",
+        "Bangladesh 59.7 (Dark 62, kabbo 61, Battaash 56, Hexa 52)",
+        "Pakistan 59.7 (Taha 70, Hashir. 59, Rayy14 50)",
+        "Philippines 59.7 (Hireo 67, Tank 61, melumii 51)",
+        "Luxembourg 59 (0verload 59, Awkwax 59, cloudy 59)",
+        "Oman 56.7 (! Sultan. 61, Lumber 60, Abdullah 49)",
+        "Venezuela 56.7 (DAHDOR 60, diego 60, zDaze 50)",
+        "Cyprus 55 (Pucky 55, Soup. 55, Zac 55)",
+        "Latvia 49 (bee771 49, BigV 49, Casavito 49)",
+        "Algeria 48 (Akai 56, Mass 55, ramzy 33)",
+        "Brunei 45 (AzFtsRL 45, Luqmi 45, Sw1rd 45)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 20,
+        "fewerThanThree": 26
+      },
+      "play": {
+        "games": 9044,
+        "goals": 4.322,
+        "overtime": 0.185
+      },
+      "scoring": {
+        "goals": 3.88,
+        "model": {
+          "goals": 4.321,
+          "overtime": 0.195
+        }
+      }
+    },
+    {
+      "id": "rl-2024",
+      "version": "rl-2024-2544cba6",
+      "label": "Liquipedia Elo, end of 2024",
+      "date": "2024-12-31",
+      "to": "2024-12-31",
+      "series": 17410,
+      "games": 69833,
+      "rated": 619,
+      "top": [
+        "trk511 2454.5 → 96",
+        "dralii 2450 → 96",
+        "BeastMode 2352.9 → 92",
+        "Radosin 2350.3 → 92",
+        "Daniel 2327.7 → 91"
+      ],
+      "nations": [
+        "France 91.3 (Radosin 92, Vatira 91, M0nkey M00n 91, Seikoo 90, ExoTiiK 88; +22)",
+        "Saudi Arabia 90 (trk511 96, Kiileerrz 87, Rw9 87, Mesho 86, Nwpo 85; +76)",
+        "United States 90 (BeastMode 92, Daniel 91, Firstkiller 87, AYYJAYY 85, Chicago 85; +61)",
+        "Great Britain 85.7 (rise. 87, Scrub Killa 85, Joyo 85, rehzzy 84, Kash 82; +34)",
+        "Japan 85.7 (ReaLize 89, mikan 85, furlashh 83, nai 79, Burn 75; +28)",
+        "Brazil 85.3 (DRUFINHO 90, Lostt. 87, Sad 79, Aztrø 79, wisty 79; +42)",
+        "Belgium 82.3 (Atow. 85, Alpha54 82, AztraL 80, Compact 77, Reevo 61; +2)",
+        "Spain 82 (LuiisP 85, AtomiK 81, crr 80, Dorito 79, stizzy 78; +18)",
+        "Netherlands 81.3 (Joreuz 82, Mittaen 81, noly 81, oaly. 78, Mikeboy 76; +11)",
+        "Australia 78.3 (bananahead 79, Prompt 78, Fever 78, kaka 78, Torsos 77; +71)",
+        "Canada 78 (JKnaps 83, sosa 76, Squishy 75, Taroco 68, Nibra 63; +2)",
+        "Germany 76.7 (Tox 79, Rezears 76, Catalysm 75, Jazii 73, Rizex 72; +7)",
+        "Chile 75 (Reysbull 82, Davitrox 74, pan 69, Bnj 68, stray 67; +6)",
+        "Malaysia 75 (Sphinx 86, Blue 71, Misty 68, Madhin 65, Steaky 58)",
+        "Poland 74 (Oski 80, virtuoso 77, Azza 65, Kito 64, niseron 58; +2)",
+        "South Africa 73 (2Die4 77, Werty 72, Gyzow 70, kamz 70, Snowyy 68; +49)",
+        "Argentina 72.7 (shad 77, ajg. 73, Rmnn. 68, Lexim 66, LagLy 66; +9)",
+        "Italy 72.7 (mala7 76, davoof 72, dead 70, Toli 67, arju 65; +8)",
+        "Indonesia 72 (ripoopi 74, LCT 74, Ficeo 68, SeaDog 65, Tornado_62 53; +3)",
+        "Portugal 71.3 (AcroniK 85, FoxY 66, Fusion77 63, beyond 63, rafa. 63; +2)",
+        "Kuwait 69.7 (lynx 70, M7md 70, Naizak 69, Night 59)",
+        "Denmark 67 (ejby 70, TempoH 68, matsgrey 63, Tr3bla 59, Rexo 56)",
+        "Thailand 65.3 (Kevin 87, peachyy. 55, Kylo 54)",
+        "New Zealand 64.7 (Laxin 70, vis 62, caleb. 62, RemiK 57, Net 40)",
+        "Philippines 64 (Hireo 74, Tank 62, vinnc 56)",
+        "Algeria 55.7 (Mass 62, Akai 53, ramzzy 52)",
+        "Turkey 53 (Lorely 57, Jzmmm 51, zgocBrayt 51)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 15,
+        "fewerThanThree": 25
+      },
+      "play": {
+        "games": 5962,
+        "goals": 4.283,
+        "overtime": 0.2
+      },
+      "scoring": {
+        "goals": 3.85,
+        "model": {
+          "goals": 4.278,
+          "overtime": 0.197
+        }
+      }
+    },
+    {
+      "id": "rl-2023",
+      "version": "rl-2023-08e60505",
+      "label": "Liquipedia Elo, end of 2023",
+      "date": "2023-12-31",
+      "to": "2023-11-11",
+      "series": 15417,
+      "games": 62097,
+      "rated": 863,
+      "top": [
+        "trk511 2388.7 → 94",
+        "Vatira 2379.6 → 93",
+        "Seikoo 2338.9 → 92",
+        "DRUFINHO 2334.4 → 91",
+        "Radosin 2330.6 → 91"
+      ],
+      "nations": [
+        "France 92 (Vatira 93, Seikoo 92, Radosin 91, zen 90, M0nkey M00n 84; +44)",
+        "Saudi Arabia 89.3 (trk511 94, Ahmad 89, Kiileerrz 85, Rw9 85, Hisoka 83; +91)",
+        "Brazil 89 (DRUFINHO 91, Lostt 89, snipjz. 87, Sadness 85, CAiOTG1 84; +57)",
+        "Great Britain 88.3 (rise. 89, Joyo 89, rehzzy 87, Scrub Killa 86, archie 84; +31)",
+        "United States 87.3 (BeastMode 89, Firstkiller 87, Aech 86, Daniel 86, Arsenal 86; +116)",
+        "Japan 85.3 (furlashh 88, mikan 87, ReaLize 81, popo^-^ 79, aki 77; +47)",
+        "Spain 83.7 (LuiisP 86, DORITO 83, crr 82, Stizzy 76, LTK_AtomiK 76; +13)",
+        "Canada 81.7 (JKnaps 88, sosa 80, Squishy 77, Freshness 68, Taroco. 67; +10)",
+        "Netherlands 81.3 (noly 86, Mittaen 81, oaly. 77, Joreuz 74, Oscillon 73; +8)",
+        "Australia 80.3 (Fever 81, bananahead 80, Torsos 80, Fibérr 78, finn 77; +102)",
+        "Belgium 79.3 (Atow. 82, Alpha54 81, AztraL 75, Compact. 66, Reevo 59; +1)",
+        "South Africa 78.3 (Happymeal 81, 2Die4 78, Werty ^^ 76, SkillSteal 72, Darth. 69; +98)",
+        "Germany 78 (Catalysm 81, Tox 77, Rezears 76, Rizex45 76, Jazii 67; +5)",
+        "Chile 74.3 (Reysbull 86, pan. 72, Deathxplotion 65, Davitrox 64, Bnj 61; +7)",
+        "Argentina 74 (shad 75, ajg 75, UmBroken 72, Lexim 68, LagLy 67; +12)",
+        "Indonesia 74 (LCT 75, Ficeo 74, Gon 73, ripoopi 72, SeaDog 66; +3)",
+        "Ireland 73 (Maxeew 84, Smokez 80, Kiernan 55)",
+        "Austria 70.7 (pzy 72, ivn. 70, Yukeo 70)",
+        "New Zealand 69.7 (Kamii 75, caleb. 70, Laxin 64, Vis 64, Granny 63; +8)",
+        "Poland 69.3 (Oski 81, virtuoso 74, Vesh 53)",
+        "Italy 68.7 (kuxir97 71, davoof 70, arju 65, tepra 65, dead 64; +3)",
+        "India 68 (Abscrazy 76, Asphyx 66, DeluxeWiz 62, AryaNeil 61, ky. 56; +5)",
+        "Denmark 67.7 (TempoH 70, Madssssss. 69, matsgrey 64, ejby 63, Tr3bla 58; +1)",
+        "Kuwait 67.3 (lynx 68, Naizak 68, Night. 66)",
+        "Mexico 67 (CHEESE. 70, Falss 68, Mazo 63, aZapatos 62, Cokita 60; +3)",
+        "Philippines 66 (Hireo 76, Tank 63, Derk 59, tomatodot 57, Logic 55; +3)",
+        "Sweden 65.3 (LED 67, Turbopolsa 66, Zamberg 63, Meaty 58)",
+        "Malaysia 65 (Misty 73, Blue 63, Quboyd 59, sanyo 57, vapour 57; +2)",
+        "Norway 62.7 (FiremanJonas 72, Seeb. 59, Inferno 57)",
+        "Uruguay 59 (Mathz 63, Navarro 61, matzhvj 53, Tripode 52)",
+        "Yemen 57.7 (BunnyDummy 71, Faisal 52, Mohanned 50)",
+        "Jordan 54.7 (Humble 65, Onyx 51, i8hw2 48, Bustanji 46)",
+        "Bangladesh 51.7 (Battaash 56, Hexa 55, NaifH5 44)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "boom"
+        ],
+        "offTheMap": 13,
+        "fewerThanThree": 31
+      },
+      "play": {
+        "games": 9147,
+        "goals": 4.216,
+        "overtime": 0.179
+      },
+      "scoring": {
+        "goals": 3.82,
+        "model": {
+          "goals": 4.214,
+          "overtime": 0.206
+        }
+      }
+    },
+    {
+      "id": "rl-2022",
+      "version": "rl-2022-23a59cc8",
+      "label": "Liquipedia Elo, end of 2022",
+      "date": "2022-12-31",
+      "to": "2022-12-11",
+      "series": 12591,
+      "games": 50615,
+      "rated": 1061,
+      "top": [
+        "vatira. 2324.3 → 91",
+        "noly 2319.1 → 91",
+        "Firstkiller 2292.4 → 90",
+        "archie 2272.7 → 89",
+        "mikan 2253.5 → 88"
+      ],
+      "nations": [
+        "United States 87.7 (Firstkiller 90, Chronic 88, BeastMode 85, Chicago 84, Aech 83; +114)",
+        "Japan 87 (mikan 88, ReaLize 88, furlashh 85, Kanra 78, Burn 77; +114)",
+        "Great Britain 86.7 (archie 89, Joyo 86, ApparentlyJack 85, Scrub Killa 81, eekso 80; +31)",
+        "Saudi Arabia 85.3 (trk511 86, Smw 85, Ali. 85, impressive 83, Kiileerrz. 81; +117)",
+        "Brazil 84.3 (CaioTG1 85, Lostt. 84, kv1 84, drufinho. 82, snipjz. 81; +71)",
+        "France 83 (vatira. 91, Kaydop 79, Pisky 79, Radosin 79, ExoTiiK 78; +49)",
+        "Netherlands 83 (noly 91, Mittaen 79, Joreuz 79, oaly. 79, Oscillon 72; +7)",
+        "Australia 82 (Fever 85, Torsos 83, bananahead 78, Fiberr 77, Express 76; +108)",
+        "Canada 81.7 (JKnaps 87, sosa 81, Squishy 77, Allushin 70, Freshness 69; +10)",
+        "Spain 79.3 (DORITO 83, crr 78, AtomiK 77, Stizzy 76, MaRc_By_8. 76; +15)",
+        "Germany 79 (Catalysm 83, Rizex45 77, Tox 77, FreaKii. 72, Kryptos 69; +8)",
+        "Belgium 77 (Atow. 82, AztraL 80, Alpha54 69, Compact 65, Bilbo 51)",
+        "South Africa 75.3 (2Die4 80, Yujn 73, SkillSteal 73, Happymeal 73, Darth. 71; +114)",
+        "Thailand 74.3 (M3L0DY 77, Kevin 77, never 69, Kylo 54)",
+        "Indonesia 74 (LCT 77, Ficeo 73, Gon 72, Ripoopi 71, SeaDog 66; +14)",
+        "Argentina 72 (shad 76, ajg. 71, UmBroken 69, Lex 68, Wais 67; +15)",
+        "Chile 71.7 (Reysbull 83, pan. 69, D7ITy 63, Danielito 63, Davitrox 62; +14)",
+        "Malaysia 71.7 (Broski 78, Misty 70, FY 67, Blue 64, sanyo 62; +5)",
+        "Italy 70.7 (kuxir97 72, Hyderr 70, dead. 70, arju 69, Dead-Monster 62; +2)",
+        "New Zealand 70.3 (Kamii 80, Kenny Salmon 67, caleb. 64, Viictus 64, Joryx 63; +10)",
+        "Mexico 70 (CHEESE. 72, Falss 69, Cokita. 69)",
+        "Kuwait 68.7 (Naizak 71, lynx 70, Night. 65, ScoB 57, hmane 56)",
+        "Philippines 68.3 (Hireo 77, Derk 65, tomatodot 63, Cypso 60, Tank 58; +11)",
+        "India 68 (Abscrazy 71, jocse 68, Friizy 65, AryaNeil 64, DeluxeWiz 63; +21)",
+        "Denmark 65 (Madssssss. 66, Pwndx 65, creamyy 64, fruity 61, TempoH 61; +4)",
+        "Yemen 62.7 (BunnyDummy 73, D7oom615 58, Faisal 57, Mohanned 54)",
+        "Bangladesh 61.7 (Dark 63, Hexa 61, kabbo 61, Battaash 58, walhann 54; +1)",
+        "Norway 61 (FiremanJonas 70, Seeb. 58, Inferno 55)",
+        "Oman 60.3 (BuZayed 64, LumberJ4Ck 64, F2hadiv 53)",
+        "Pakistan 56.3 (FeelsLikeZak 61, Marshmello. 61, Anas 47)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "boom",
+          "hencovid"
+        ],
+        "offTheMap": 23,
+        "fewerThanThree": 41
+      },
+      "play": {
+        "games": 14619,
+        "goals": 4.205,
+        "overtime": 0.19
+      },
+      "scoring": {
+        "goals": 3.82,
+        "model": {
+          "goals": 4.208,
+          "overtime": 0.207
+        }
+      }
+    },
+    {
+      "id": "rl-2021",
+      "version": "rl-2021-780da1c1",
+      "label": "Liquipedia Elo, end of 2021",
+      "date": "2021-12-31",
+      "to": "2021-12-12",
+      "series": 7685,
+      "games": 30718,
+      "rated": 758,
+      "top": [
+        "trk511 2381.3 → 93",
+        "Ahmad 2249 → 88",
+        "Smw. 2228.3 → 87",
+        "Maxeew 2221 → 87",
+        "archie 2208.1 → 86"
+      ],
+      "nations": [
+        "Saudi Arabia 89.3 (trk511 93, Ahmad 88, Smw. 87, oKhaliD 86, Venom 82; +56)",
+        "Great Britain 83.7 (archie 86, Scrub Killa 86, ApparentlyJack 79, Joyo 77, eekso 74; +19)",
+        "United States 83.3 (Firstkiller 86, Chicago 82, jstn. 82, GarrettG 81, mist 80; +88)",
+        "Brazil 82.3 (Sadness 84, CaioTG1 83, bmendesantos 80, snipjz 80, repi 79; +61)",
+        "Japan 82.3 (mikan 83, ReaLize 83, Nemoto Putti 81, popo 81, akikansu 78; +74)",
+        "France 81.3 (Kaydop 83, Extra 81, Kaotik 80, Vatira 79, Ferra 79; +28)",
+        "Canada 80.3 (JKnaps 82, SquishyMuffinz 82, sosa 77, Freshness 72, Allushin 71; +7)",
+        "Australia 80 (Torsos 82, Express 80, Fever 78, Bananahead 78, Spratt 77; +105)",
+        "Netherlands 78 (oaly. 78, Joreuz 78, Mittaen 78, ViolentPanda 73, noly 72; +6)",
+        "Indonesia 77.7 (Gon 81, LCT 78, ripoopi 74, Ficeo 71, Rafdoang13 65; +7)",
+        "Argentina 76.7 (SHADDD 81, ajg 75, Lexim 74, SrNaniiTou 74, Shad 70; +9)",
+        "Germany 75.3 (Rizex45 77, Catalysm 77, Kryptos 72, FreaKii. 69, Tox 68; +12)",
+        "Spain 75 (LuiisP 76, MaRc_By_8. 75, Stake 74, Zamué 74, AtomiK 70; +8)",
+        "South Africa 74 (SkillSteal 78, Darth 72, Snowyy 72, 2Die4 71, Happymeal 68; +60)",
+        "Chile 71.7 (Reysbull 85, Davitrox 66, GaTox 64, ZhearX 64, Tgex 63; +10)",
+        "New Zealand 71 (Kamii 75, RemiK 70, Kenny Salmon 68, Laxin 66, CJM 63; +7)",
+        "Mexico 70.3 (Cokita 72, sebs 71, Falss 68, Cheese 65, Ozmo 65; +5)",
+        "Italy 69 (kuxir97 74, arju 67, Dead-Monster 66, Barist 59, Hyder 57)",
+        "India 68.3 (Abscrazy 79, Joyy 64, DeluxeWiz 62, Dizzo 62, Friizy 62; +12)",
+        "Malaysia 68 (Blue 70, Misty 67, Broski 67, Panjut 57)",
+        "Philippines 67 (Hireo 70, Derk 68, Acrox88 63, cypso 63, tomatodot 60; +2)",
+        "Denmark 65.7 (Madssssss. 70, matsgrey 64, fruity 63, creamyy 61, Rexo 51)",
+        "Norway 65.7 (FiremanJonas 74, Inferno 62, Seeb 61)",
+        "Uruguay 63.7 (mathz 69, Navarro 63, Critic 59, Crs 59, Lane 54)",
+        "Czechia 63 (Nalmon 65, Syracks 64, Lauty 60)",
+        "Bangladesh 60 (ReV. 66, DarkElimination 57, Kabbo 57, Akara 53, Battaash 53)",
+        "Kuwait 58 (Night. 63, Naizak 57, Winters 54, xLynxXX721 53, RL3bood 44)",
+        "Egypt 56 (AbuLba 56, K-Nine 56, rustycolt 56)",
+        "South Korea 49 (Fettic 49, KOR_La 49, Vital 49)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "bramdeswaggerd",
+          "PoRRa07"
+        ],
+        "offTheMap": 12,
+        "fewerThanThree": 32
+      },
+      "play": {
+        "games": 8607,
+        "goals": 4.005,
+        "overtime": 0.209
+      },
+      "scoring": {
+        "goals": 3.62,
+        "model": {
+          "goals": 4.003,
+          "overtime": 0.214
+        }
+      }
+    },
+    {
+      "id": "rl-2020",
+      "version": "rl-2020-3e482aa1",
+      "label": "Liquipedia Elo, end of 2020",
+      "date": "2020-12-31",
+      "to": "2020-12-20",
+      "series": 4792,
+      "games": 18789,
+      "rated": 575,
+      "top": [
+        "Reysbull 2250.9 → 88",
+        "Math 2205.2 → 86",
+        "Kaydop 2200.7 → 86",
+        "firstkiller 2153.1 → 84",
+        "snipjz 2152.8 → 84"
+      ],
+      "nations": [
+        "Brazil 84 (Math 86, snipjz 84, CaioTG1 82, repi 82, Drufinho 78; +74)",
+        "United States 83 (firstkiller 84, Mist 84, jstn. 81, Arsenal 80, Sypical 79; +102)",
+        "France 81.3 (Kaydop 86, Fairy Peak! 80, Extra 78, Ferra 77, M0nkey M00n 72; +16)",
+        "Spain 80 (AtomiK 83, DmentZa 80, VK-Sailen 77, Zamué 77, Stake 74; +5)",
+        "Great Britain 79.3 (archie 84, FlamE 77, Blurry 77, Speed 77, ApparentlyJack 77; +25)",
+        "Australia 78.7 (Torsos 81, Express 79, Cavemanben 76, Julz 75, Fever 73; +109)",
+        "Argentina 78.3 (ajgAnotherGuy_ 82, SHADDD 81, DisLike 72, Sempa 71, ajg 70; +13)",
+        "Netherlands 77.3 (ViolentPanda 78, Mittaen 77, noly 77, Joreuz 75, Oscillon 72; +10)",
+        "Canada 76.3 (sosa 80, SquishyMuffinz 75, JKnaps 74, Freshness 72, radoko 71; +11)",
+        "Chile 76 (Reysbull 88, PansitoFrances 72, Gonk 68, PAN 65, Davi 63; +12)",
+        "Japan 74.3 (Mikan 79, Kanra 72, ReaLize 72, Burn 70, OLPiX 70; +17)",
+        "Saudi Arabia 73 (ams 73, M7sn 73, Zez0nix 73, crespor 70, Silent 70; +25)",
+        "Germany 71 (Rizex45 75, FreaKii. 71, Toxtraptonized 67, Catalysm 66, Kryptos 66; +13)",
+        "Mexico 70.7 (Falss 74, Pringle 69, Santhino. 69, AbsorbentKarma 65, ayLucky 62; +9)",
+        "New Zealand 70.7 (Kamii 76, Kenny Salmon 69, Moss 67, Laxxiin 64, CJM 64; +2)",
+        "Belgium 68 (AztraL 73, Alpha54 72, Compact 59, PeaKy! 59)",
+        "Italy 67 (kuxir97 72, arju 67, Barist 62, Hyder 61, Dead-Monster 61; +1)",
+        "Indonesia 66.7 (Gon 74, revoir 63, LCT 63, Jassen 59, Sycho13 59)",
+        "Denmark 65.7 (Madssssss 68, fruity 65, Matsgrey 64, Al Dente 61)",
+        "Sweden 64.7 (Turbopolsa 72, al0t 62, Cheerio 60)",
+        "Norway 61.3 (Reganam 68, Jwols 58, gReazymeister 58)",
+        "Puerto Rico 59.7 (Noxes 61, ciralyc 59, Ian 59, Mojito. 59)",
+        "Costa Rica 56 (alebe 56, Ouryuk 56, Rade 56)",
+        "Switzerland 54.3 (MirrorWing 58, Zaphare 54, Yagi 51)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "Boom",
+          "bramdeswaggerd"
+        ],
+        "offTheMap": 4,
+        "fewerThanThree": 16
+      },
+      "play": {
+        "games": 5413,
+        "goals": 3.899,
+        "overtime": 0.21
+      },
+      "scoring": {
+        "goals": 3.52,
+        "model": {
+          "goals": 3.898,
+          "overtime": 0.219
+        }
+      }
+    },
+    {
+      "id": "rl-2019",
+      "version": "rl-2019-42c6e403",
+      "label": "Liquipedia Elo, end of 2019",
+      "date": "2019-12-31",
+      "to": "2019-12-15",
+      "series": 2601,
+      "games": 10317,
+      "rated": 375,
+      "top": [
+        "mist 2179.2 → 85",
+        "jstn. 2144.1 → 84",
+        "Ferra 2106.8 → 82",
+        "Yukeo 2085.4 → 81",
+        "math 2066.5 → 81"
+      ],
+      "nations": [
+        "United States 83 (mist 85, jstn. 84, GarrettG 80, Arsenal 79, Shock 79; +87)",
+        "Brazil 79.3 (math 81, CaioTG1 79, Haberkamper 78, matix 77, renaN 77; +51)",
+        "France 79 (Ferra 82, Kaydop 80, Extra 75, Monkey Moon 75, Fairy Peak 72; +9)",
+        "Great Britain 77.3 (Nolystic 78, Bluey 78, Deevo 76, Speed 75, Blurry 75; +15)",
+        "Netherlands 76.3 (noly 79, remkoe 76, ViolentPanda 74, Flakes 73, ThO. 68; +8)",
+        "Australia 74.7 (cavemanben 77, Torsos 76, Julz 71, Express 70, delusioN 68; +64)",
+        "Germany 73 (FreaKii. 76, Tigreee 73, Rizex45 70, Ronaky 68, ghostfire 66; +10)",
+        "Canada 71.7 (sosa 73, zol 72, JKnaps 70, SquishyMuffinz 70, AxB 69; +12)",
+        "Argentina 70.7 (ajgAnotherGuy_ 71, Sempa 71, DisLike 70, FenoSiicK 68, Lexim 65; +14)",
+        "Spain 70.3 (ClayX 74, MaRc_By_8. 70, Wolfsonthemoon 67, Nachitow 67, Zamué 61; +4)",
+        "Chile 70 (Gonk 72, PansitoFrances 70, Reysbull 68, GaTox 68, VeroN 63)",
+        "Sweden 69.3 (Turbopolsa 77, al0t 68, Cheerio 63, Data 57, Zensuz 56; +2)",
+        "Belgium 67.7 (AztraL 76, ImpacT 64, Alpha54 63, Faykow 58, Bilbo 53)",
+        "Denmark 67.7 (fruity 75, Al Dente 64, Maestro 64, Pwndx 62, Snaski 61; +2)",
+        "New Zealand 66.7 (Kamii 71, KennySalmon 67, blu3y 62)",
+        "Switzerland 63.7 (stocki 65, MirrorWing 63, Zaphare 63, Skyline 60)",
+        "Norway 58.7 (Jwols 62, Maadzz 59, gReazymeister 55, Seeb 53)",
+        "Peru 58.3 (FreevoG 60, HeadCrusherx2 60, Albert 55, Freevo 50, HeadCrusher 50)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 0,
+        "fewerThanThree": 11
+      },
+      "play": {
+        "games": 3168,
+        "goals": 3.861,
+        "overtime": 0.201
+      },
+      "scoring": {
+        "goals": 3.5,
+        "model": {
+          "goals": 3.856,
+          "overtime": 0.225
+        }
+      }
+    },
+    {
+      "id": "rl-2018",
+      "version": "rl-2018-9bd1c193",
+      "label": "Liquipedia Elo, end of 2018",
+      "date": "2018-12-31",
+      "to": "2018-12-16",
+      "series": 1165,
+      "games": 4970,
+      "rated": 185,
+      "top": [
+        "remkoe 2178.1 → 85",
+        "Yukeo 2016.2 → 79",
+        "Metsanauris 2005.4 → 78",
+        "Kaydop 1991.5 → 78",
+        "Karma 1978.6 → 77"
+      ],
+      "nations": [
+        "United States 76 (Karma 77, Torment 76, Gimmick 75, Sypical 74, jstn. 73; +40)",
+        "Netherlands 75 (remkoe 85, ViolentPanda 73, Borito B 67, Rix Ronday 67, Oscillon 59; +2)",
+        "France 73.7 (Kaydop 78, Ferra 74, Fairy Peak! 69, Kassio 67, D7. 62; +3)",
+        "Great Britain 72.7 (Speed 75, Bluey 72, Tinny 71, Deevo 70, Mccluvin 70; +10)",
+        "Australia 71.3 (Jake 74, Drippay 70, Torsos 70, Express 69, Julz 67; +43)",
+        "Canada 69.3 (SquishyMuffinz 75, DudeWithTheNose 67, zol 66, JKnaps 66, Lethamyr 65; +9)",
+        "Finland 68.7 (Metsanauris 78, Mognus 70, Andom 58)",
+        "Germany 68.7 (Ronaky 71, FreaKii. 68, paschy90 67, MummiSnow 65, Frag 65; +6)",
+        "Norway 68.7 (Reganam 72, etreX 67, Jwols 67, gReazymeister 53, Didris 53)",
+        "Sweden 66.3 (Turbopolsa 70, Cheerio 65, al0t 64, Data 59, Flarke 53; +1)",
+        "Denmark 64.7 (Al Dente 66, fruity 64, Pwndx 64, Maestro 63, Waffle 62; +2)",
+        "New Zealand 59.7 (Kamii 65, CJM 58, Montyconnor 56)",
+        "Belgium 59.3 (Bilbo 61, Alpha54 59, FaykoW 58)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "BoyPlots",
+          "brax",
+          "Aus_Jad",
+          "Griefx"
+        ],
+        "offTheMap": 0,
+        "fewerThanThree": 6
+      },
+      "play": {
+        "games": 1631,
+        "goals": 4.065,
+        "overtime": 0.197
+      },
+      "scoring": {
+        "goals": 3.7,
+        "model": {
+          "goals": 4.068,
+          "overtime": 0.215
+        }
+      }
+    },
+    {
+      "id": "rl-2017",
+      "version": "rl-2017-04c92486",
+      "label": "Liquipedia Elo, end of 2017 (rough)",
+      "date": "2017-12-31",
+      "to": "2017-12-09",
+      "series": 587,
+      "games": 2595,
+      "rated": 142,
+      "top": [
+        "remkoe 2091.8 → 82",
+        "Kaydop 2007.9 → 78",
+        "Rizzo 1928.5 → 75",
+        "Jake 1906 → 74",
+        "ViolentPanda 1901.4 → 74"
+      ],
+      "nations": [
+        "Netherlands 76 (remkoe 82, ViolentPanda 74, Borito B 72, Rix_Ronday 72, Flakes 64; +3)",
+        "France 73.7 (Kaydop 78, Fairy Peak! 72, Ferra 71, Tequilaz 60, Dadooh 60; +1)",
+        "United States 73.3 (Rizzo 75, Jacob 73, Kronovi 72, Gimmick 69, Turtle 69; +36)",
+        "Great Britain 71.3 (Deevo 73, Bluey 72, Shakahron 69, Tinny 69, Markydooda 64; +7)",
+        "Canada 70.7 (JKnaps 74, Lachinio 69, SquishyMuffinz 69, Lethamyr 69, Sadjunior 64; +7)",
+        "Germany 70.3 (Tigreee 72, paschy90 70, MummiSnow 69, Frag 67, Sikii 64; +3)",
+        "Denmark 68.3 (Maestro 70, Snaski 69, Pwndx 66, Waffle 61)",
+        "Australia 66.7 (Jake 74, Kia 63, Drippay 63, Torsos 63, Express 61; +23)",
+        "Sweden 66.7 (Turbopolsa 71, Data 67, Cheerio 62, al0t 60, Radioo 57; +2)",
+        "Switzerland 59.7 (stocki 61, Skyline 60, Continuum 58, killerno7 49)",
+        "Spain 52.3 (Wolfsonthemoon 61, dani_ana 48, GCR710 48, Kontrol 48)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 0,
+        "fewerThanThree": 8
+      },
+      "play": {
+        "games": 886,
+        "goals": 3.958,
+        "overtime": 0.144
+      },
+      "scoring": {
+        "goals": 3.6,
+        "model": {
+          "goals": 3.958,
+          "overtime": 0.221
+        }
+      }
+    },
+    {
+      "id": "rl-2016",
+      "version": "rl-2016-8e580954",
+      "label": "Liquipedia Elo, end of 2016 (rough)",
+      "date": "2016-12-31",
+      "to": "2016-12-04",
+      "series": 232,
+      "games": 1067,
+      "rated": 71,
+      "top": [
+        "kuxir97 2011.3 → 78",
+        "Markydooda 2011.3 → 78",
+        "remkoe 1961 → 76",
+        "Jacob 1854 → 72",
+        "gReazymeister 1845.8 → 72"
+      ],
+      "nations": [
+        "United States 69.3 (Jacob 72, Insolences 68, Rizzo 68, Moses 66, Espeon 66; +25)",
+        "Great Britain 69 (Markydooda 78, Deevo 67, Doomsee 62, miztik 58, Sebadam 56; +3)",
+        "Netherlands 69 (remkoe 76, ViolentPanda 66, Dogu 65, Jessie 61, Vogan 56)",
+        "Norway 65 (gReazymeister 72, gReazy 66, Sniperkid 57)",
+        "Denmark 64.7 (Maestro 68, Snaski 64, Piksel 62)",
+        "France 64 (Dadooh 64, Tequilaz 64, Kaydop 64, Chausette45 53, FaNaTiz 49)",
+        "Canada 63.7 (Lachinio 68, Sadjunior 66, CorruptedG 57, HotWheelsSid 54)",
+        "Germany 63.3 (paschy90 71, Sikii 60, Yeezy 59, ELMP 56)",
+        "Sweden 59 (Turbop0lsa 61, al0t 60, Flarke 56, Turbopolsa 51)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 0,
+        "fewerThanThree": 5
+      },
+      "play": {
+        "games": 516,
+        "goals": 4.345,
+        "overtime": 0.18
+      },
+      "scoring": {
+        "goals": 3.97,
+        "model": {
+          "goals": 4.345,
+          "overtime": 0.205
+        }
+      }
+    }
+  ]
+}

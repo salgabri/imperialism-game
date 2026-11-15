@@ -73,9 +73,9 @@ function mark(team, teamId = team?.id) {
   };
 }
 
-/** A turn is in progress: live match, spin, target choice, tactical gate or signing (displayRound's rule). */
+/** A turn is in progress: live match, spin, target choice, tactical gate, result entry or signing (displayRound's rule). */
 function turnBusy(st) {
-  return !!((st.match && !st.match.applied) || st.spin || st.pendingTarget || st.tacticalChoice || st.choice);
+  return !!((st.match && !st.match.applied) || st.spin || st.pendingTarget || st.tacticalChoice || st.resultEntry || st.choice);
 }
 
 /** The attacker of the turn in progress, or null when idle. */
@@ -83,6 +83,7 @@ function turnAttackerId(st) {
   if (st.pendingTarget?.attackerId) return st.pendingTarget.attackerId;
   if (st.spin?.attackerId) return st.spin.attackerId;
   if (st.tacticalChoice?.aId) return st.tacticalChoice.aId;
+  if (st.resultEntry?.aId) return st.resultEntry.aId;
   if (st.match && !st.match.applied) return st.match.aId ?? null;
   return null;
 }

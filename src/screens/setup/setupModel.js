@@ -29,6 +29,8 @@ export function campaignPreview(count, sport, setup) {
   // carries the season's identity), else today's.
   const { clock } = matchSport({ sport: sport.id, layer: setup.layer, clubScope: setup.clubScope, dataSet: sport.dataSet,
     dataYear: sport.dataYear, dataSeason: sport.dataSeason });
+  // Matches whose scores you type in last as long as you take to play them.
+  if (setup.results === 'entered') return { matches: range, duration: 'at your pace' };
   const seconds = setup.express ? 2.5 : setup.resolution === 'instant' ? 5 : clock.length * clock.msPerUnit / 1000 + 7;
   const minutes = Math.max(1, Math.ceil(matches * seconds / 60));
   return { matches: range, duration: `about ${minutes}–${Math.ceil(minutes * 1.35)} min at 1× autoplay` };
@@ -116,42 +118,55 @@ export const HOME_HELP = {
 };
 
 /**
- * "Show matches": `resolution` and `express` as one choice that can change any time. Express reveals every match at
- * once except your team's, which plays live (matchMethods `presentMatch`), so Fast-forward is the third mode. Read:
- * express wins over resolution.
+ * "Show matches": `resolution` and `express` as one choice that can change any time, and scores entered by you
+ * (`results`, src/engine/enteredResult.js) as its fourth mode. Express reveals every match at once except your team's,
+ * which plays live (matchMethods `presentMatch`), so Fast-forward is the third mode. Scores entered by you plays no match
+ * at all: each one is played somewhere else, in another game or for real, and waits for the score the player types in.
+ * Read: entered scores win over express, and express over resolution.
  */
-export const SHOW_MATCH_OPTIONS = Object.freeze([['ticker', 'Live, minute by minute'], ['instant', 'Final score only'], ['express', 'Fast-forward']]);
+export const SHOW_MATCH_OPTIONS = Object.freeze([['ticker', 'Live, minute by minute'], ['instant', 'Final score only'], ['express', 'Fast-forward'],
+  ['entered', 'Scores entered by you']]);
 export const SHOW_MATCH_HELP = {
   ticker: 'Scores and events appear as the match clock runs. Your team’s matches play at 1× whatever the speed.',
   instant: 'Each match skips straight to its final score.',
   express: 'Routine matches flash past; upsets and the final pause on their score. Your team’s matches still play live. Your decisions still wait.',
+  entered: 'Play each match yourself, in another game or for real, and type in its score: the campaign waits for every result. Simulate lets the game play one.',
 };
 export const SHOW_MATCH_BUSY = 'You can switch between Live and Final score only after this draw or match.';
 
 const nameOf = (options, id, fallback) => (options.find(([key]) => key === id) || options.find(([key]) => key === fallback))[1];
 const valid = (options, id, fallback) => (options.some(([key]) => key === id) ? id : fallback);
 
-export const showMatchesOf = (settings = {}) => (settings?.express ? 'express' : settings?.resolution === 'instant' ? 'instant' : 'ticker');
+export const showMatchesOf = (settings = {}) => (settings?.results === 'entered' ? 'entered' : settings?.express ? 'express'
+  : settings?.resolution === 'instant' ? 'instant' : 'ticker');
 
 /**
  * The [key, value] writes that select Show matches `mode`, only for keys that change. Fast-forward writes `express`
- * only, so it never needs the `resolution` write `setSetting` refuses during a draw or a live match.
+ * only, so it never needs the `resolution` write `setSetting` refuses during a draw or a live match; nor do entered
+ * scores, which also leave Fast-forward (the draws and notices keep their pace). Leaving entered scores writes
+ * `results` last, after the mode the game then shows its matches in: a match waiting for its score kicks off in it.
  */
 export function showMatchesWrites(mode, settings = {}) {
+  const entered = settings?.results === 'entered';
   const express = !!settings?.express;
   const resolution = settings?.resolution === 'instant' ? 'instant' : 'ticker';
-  if (mode === 'express') return express ? [] : [['express', true]];
+  if (mode === 'entered') return [...(express ? [['express', false]] : []), ...(entered ? [] : [['results', 'entered']])];
+  const back = entered && ['ticker', 'instant', 'express'].includes(mode) ? [['results', 'simulated']] : [];
+  if (mode === 'express') return [...(express ? [] : [['express', true]]), ...back];
   const writes = express ? [['express', false]] : [];
   if ((mode === 'ticker' || mode === 'instant') && mode !== resolution) writes.push(['resolution', mode]);
-  return writes;
+  return [...writes, ...back];
 }
 
-/** Show matches options; while `busy` (a draw or live match), the modes that need a `resolution` write are disabled. */
+/**
+ * Show matches options; while `busy` (a draw or live match), the modes that need a `resolution` write are disabled.
+ * Entered scores never are: they start at the next kick-off.
+ */
 export function showMatchOptions(settings = {}, { busy = false } = {}) {
   const current = showMatchesOf(settings);
   const resolution = settings?.resolution === 'instant' ? 'instant' : 'ticker';
   return SHOW_MATCH_OPTIONS.map(([value, label]) => ({
-    value, label, disabled: busy && value !== current && value !== 'express' && value !== resolution,
+    value, label, disabled: busy && value !== current && value !== 'express' && value !== 'entered' && value !== resolution,
   }));
 }
 
@@ -220,6 +235,7 @@ export function campaignFacts(settings = {}, { seed = null, managementEnded = fa
 
 /** Step 1's estimate footnote: which Show matches mode the length assumes, and what adds time. */
 export function estimateNote(showMatches, role) {
+  if (showMatches === 'entered') return 'Every match waits for the score you type in.';
   const mode = { ticker: 'live matches', instant: 'final scores only', express: 'Fast-forward' }[showMatches] || 'live matches';
   const extra = role === 'manager'
     ? (showMatches === 'ticker' ? ' Ties and your decisions add time.' : ' Your decisions add time.')
@@ -396,7 +412,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'before 2016 computed from Jeff Sackmann\'s match results by its method (1963–1979 rough; before 1968 the majors and the '
     + 'Federation Cup only, as Wikipedia records them). Each nation names its five '
     + 'best; one with fewer than two rated players fields no team.',
-  'rocket-league': 'Elo ratings computed from every 3v3 series Liquipedia records (CC BY-SA 3.0), to November 2026. A '
+  'rocket-league': 'Elo ratings computed from every 3v3 series Liquipedia records (CC BY-SA 3.0): to November 2026, and '
+    + 'at the end of each year from 2016 (2016–2017 rough), each year at its own scoring. A '
     + 'player plays for the nation he last played for at the FIFAe World Cup or the Esports Nations Cup, else the flag '
     + 'Liquipedia files him under, and only if he has played within the year. Each nation fields its best three; one with '
     + 'fewer fields no team.',

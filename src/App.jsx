@@ -25,6 +25,7 @@ import { tacticalMatchParameters, tacticalOptions, recommendedTactic, competitiv
 import { SessionEngagement, engagementMode } from './engine/sessionEngagement.js';
 import { estimateWinProbability, UNCERTAINTY_PRESETS } from './engine/odds.js';
 import { createMinuteStore } from './engine/liveMinute.js';
+import { EMPTY_DRAFT, entersResults, readResult, scoreText } from './engine/enteredResult.js';
 import { applyUpdate, keepCampaignMarks, settleFirstBoot } from './serviceWorker.js';
 import { displayRound, plainScopeName, roman, signedDelta } from './viewModels/format.js';
 import { buildMasthead } from './viewModels/masthead.js';
@@ -61,6 +62,8 @@ import { Toast } from './components/Popups.jsx';
 import { PhoneBar, PhoneTabBar, PhoneMoreSheet } from './components/PhoneChrome.jsx';
 import TurnStrip from './screens/turns/TurnStrip.jsx';
 import TargetPanel from './screens/turns/TargetPanel.jsx';
+import ResultEntry from './screens/campaign/ResultEntry.jsx';
+import { buildResultEntry } from './viewModels/resultEntry.js';
 import SpectatorPanel from './screens/turns/SpectatorPanel.jsx';
 import CampaignColumn from './screens/campaign/CampaignColumn.jsx';
 import MapOverlays from './screens/campaign/MapOverlays.jsx';
@@ -202,6 +205,9 @@ export default class App extends React.Component {
     campaignId: null, revision: 0, campaignName: '', storageDialog: null, storageConflict: false,
     // Saved turn-mode state (DEC D3, D8; WP-TURN adds it to campaignSnapshot and validation).
     turnQueue: [], turnIndex: 0, pendingTarget: null,
+    // A match waiting for the score the player types in (scores entered by you, src/engine/enteredResult.js): saved,
+    // like the tactical gate. Its typed scores (`resultDraft`, text by field) are UI-only.
+    resultEntry: null, resultDraft: null,
     // UI-only state (never saved, PLAN §3.1).
     view: 'map', viewSource: 'user', squadReturn: null, tacticalPreview: false, phoneSheet: 'collapsed', setupStep: 1,
     // Step 1's map card: Political or Flags (crests for clubs), its own choice; the campaign map keeps `mapMode`.
@@ -366,7 +372,8 @@ export default class App extends React.Component {
       else if (match || spin) this.unsavedProgress = true;
     }
     // The signing screen and the target panel hold focus while they show; confirming unmounts them.
-    if (previous && ((previous.choice && !this.state.choice) || (previous.pendingTarget && !this.state.pendingTarget))) this.focusRescue = true;
+    if (previous && ((previous.choice && !this.state.choice) || (previous.pendingTarget && !this.state.pendingTarget)
+      || (previous.resultEntry && !this.state.resultEntry))) this.focusRescue = true;
     if (this.focusRescue) this.rescueFocus();
     if (this.challengeTeam != null && this.state.phase === 'setup') this.settleChallengeTeam();
     // Flags mode's first view, made ahead while the map shows another mode (mapMethods.jsx).
@@ -1092,7 +1099,7 @@ export default class App extends React.Component {
     const st = this.state;
     // A decision gate (signing, approach, target, elimination) already holds the campaign with no timers armed, and
     // the decision writes `paused: false` without touching the clock: pausing here would leave the clock frozen.
-    const gated = !!(st.choice || st.tacticalChoice || st.pendingTarget || st.managerElimination);
+    const gated = !!(st.choice || st.tacticalChoice || st.pendingTarget || st.managerElimination || st.resultEntry);
     const pending = !gated && (st.autoplay || !!st.spin || (st.match && !st.match.done));
     if (pending) this.clock.pause();
     // The export pauses as Pause does, which also ends a skip ahead at the speed it started from.
@@ -1552,7 +1559,7 @@ export default class App extends React.Component {
         turnQueue: [], turnIndex: 0, pendingTarget: null, view: 'map', viewSource: 'user', tacticalPreview: false,
         phoneMore: false, focusLayout: null, targetHoverId: null,
         managedTeamId: su.role === 'manager' ? su.managedTeamId : null, managementEnded: false,
-        managerElimination: null, tacticalChoice: null, decisionLedger: [], historyFilter: '',
+        managerElimination: null, tacticalChoice: null, resultEntry: null, resultDraft: null, decisionLedger: [], historyFilter: '',
         campaignId: createCampaignId(), revision: 0,
         campaignName: `${campaignLabel(settings, scopeName)}${su.role === 'manager' ? ' · ' + included.find(team => team.id === su.managedTeamId).name : ''}`,
         storageDialog: null, storageConflict: false,
@@ -1636,6 +1643,8 @@ export default class App extends React.Component {
       managedTeamId: s.managedTeamId || (s.settings.role === 'manager' && !s.managementEnded ? s.followedId : null),
       managementEnded: !!s.managementEnded, managerElimination: s.managerElimination || null,
       tacticalChoice: s.tacticalChoice || null, decisionLedger: s.decisionLedger || [],
+      // A match that was waiting for its score waits again, with blank fields.
+      resultEntry: s.resultEntry || null, resultDraft: s.resultEntry ? { ...EMPTY_DRAFT } : null,
       historyFilter: s.historyFilter || '', selectedHistoryId: s.selectedHistoryId || null,
       campaignId: s.campaignId || createCampaignId(), revision: s.revision || 0, campaignName: s.campaignName || campaignLabel(s.settings, this.scopeName(s.settings)),
       storageDialog: null, storageConflict: false,
@@ -1672,7 +1681,7 @@ export default class App extends React.Component {
       view: 'map', viewSource: 'user', tacticalPreview: false, phoneMore: false, focusLayout: null, targetHoverId: null,
       skipAhead: null, ...this.handBackSpeed(),
     };
-    const gated = s.choice || s.tacticalChoice || s.managerElimination || s.pendingTarget;
+    const gated = s.choice || s.tacticalChoice || s.managerElimination || s.pendingTarget || s.resultEntry;
     // A restored unapplied match is presented again: the same auto-switch rule as a kickoff (DEC D11).
     const autoView = !gated && s.match && !s.match.applied
       ? this.autoMatchView({ ...this.state, ...restored }, s.match.aId, s.match.dId, { express: !!s.match.express, instant: !!s.match.instant }) : {};
@@ -1749,7 +1758,7 @@ export default class App extends React.Component {
       pu: null,
       toast: null,
       paused: false,
-      tacticalChoice: null, choice: null, managerElimination: null,
+      tacticalChoice: null, choice: null, managerElimination: null, resultEntry: null, resultDraft: null,
       turnQueue: [], turnIndex: 0, pendingTarget: null, view: 'map', viewSource: 'user', tacticalPreview: false,
       phoneMore: false, focusLayout: null, targetHoverId: null,
     });
@@ -1841,7 +1850,8 @@ export default class App extends React.Component {
 
   nextAction() {
     const st = this.state;
-    if (st.phase !== 'playing' || st.aliveIds.length <= 1 || st.paused || st.choice || st.tacticalChoice || st.managerElimination || st.storageDialog || st.storageConflict || st.pendingTarget) return;
+    if (st.phase !== 'playing' || st.aliveIds.length <= 1 || st.paused || st.choice || st.tacticalChoice || st.managerElimination || st.storageDialog || st.storageConflict || st.pendingTarget
+      || st.resultEntry) return;
     if (st.match && !st.match.applied) return;
     if (st.spin) return;
     // A turn is already under way. React 18 commits a timer task's updates in a later task, so until then this.state
@@ -1946,17 +1956,30 @@ export default class App extends React.Component {
     const baseDrama = UNCERTAINTY_PRESETS[st.settings.uncertainty]?.drama ?? Number(CONFIG.matchDrama);
     // Home advantage (a launch rule, off by default): the defender plays at home.
     const home = st.settings.homeAdvantage === 'on';
-    if ([attackerId, defenderId].includes(managedId) && !tactic) {
+    // Scores entered by you (Show matches, src/engine/enteredResult.js): the match waits for the score the player
+    // types in, and no tactical gate comes first, since an approach plays no part in a match played elsewhere.
+    // `options.result` is that score (submitResult); `options.simulate` plays this match on the model after all
+    // (simulateEntry). The turn in `decided` commits with the wait, as with the tactical gate.
+    const entered = options.result || null;
+    if (!entered && !options.simulate && entersResults(st.settings)) {
+      if (st.resultEntry) { if (decided) this.setState(decided); return; }
+      this.clearTimers();
+      // A skip ahead stops here, as at any decision: its speed comes back, and its autoplay resumes after the result.
+      const skip = st.skipAhead;
+      this.setState({ ...decided, resultEntry: { aId: attackerId, dId: defenderId, route,
+        resumeAutoplay: skip ? skip.autoplay : st.autoplay, openedAt: Date.now() }, resultDraft: { ...EMPTY_DRAFT },
+        ...(skip ? { skipAhead: null, speed: skip.speed } : {}),
+        // clearTimers() above also dropped applyConquest's hatch reset: clear the flash with the notice and toast.
+        match: null, spin: null, pu: null, toast: null, flash: {}, autoplay: false, paused: false }, () => this.persist());
+      return;
+    }
+    if ([attackerId, defenderId].includes(managedId) && !tactic && !entered) {
       // Fast-forward's shortcut reaches the gate for a manager who follows another team, with the turn in `decided`:
       // it commits with the gate, or alone when a gate is already open.
       if (st.tacticalChoice) { if (decided) this.setState(decided); return; }
       this.clearTimers();
       const manager = st.teams[managedId], opponent = managedId === attackerId ? d : a;
-      const options = tacticalOptions(manager, opponent, baseDrama).map(option => {
-        const params = tacticalMatchParameters({ attacker: a, defender: d, managedId, tactic: option.id, drama: baseDrama, home });
-        const odds = estimateWinProbability({ sport, attacker: a, defender: d, ...params, samples: 512 });
-        return { ...option, winProbability: managedId === attackerId ? odds.attacker : odds.defender };
-      });
+      const options = this.approachOptions(st, attackerId, defenderId);
       // A skip ahead stops here, your next decision: it hands back its speed, and the autoplay it started from is what
       // resumes after the kick-off.
       const skip = st.skipAhead;
@@ -1969,7 +1992,9 @@ export default class App extends React.Component {
     }
     const params = tacticalMatchParameters({ attacker: a, defender: d, managedId, tactic, drama: baseDrama, home });
     const { effA, effD, drama } = params;
-    const sim = sport.simulate(this.rng, a, d, drama, effA, effD, { home });
+    // An entered score has no events: who scored, and when, happened in the game it was played in.
+    const sim = entered ? { ga: entered.ga, gd: entered.gd, tie: entered.tie, winner: entered.winner, ev: [] }
+      : sport.simulate(this.rng, a, d, drama, effA, effD, { home });
     const probabilities = estimateWinProbability({ sport, attacker: a, defender: d, drama, effA, effD, home, samples: 512 });
     const important = [attackerId, defenderId].includes(st.followedId) || [attackerId, defenderId].includes(managedId) || st.aliveIds.length === 2
       || (sim.winner === attackerId ? effA + CONFIG.upsetThreshold <= effD : effD + CONFIG.upsetThreshold <= effA);
@@ -1977,7 +2002,7 @@ export default class App extends React.Component {
       ? st.series || { teamIds: [attackerId, defenderId], wins: { [attackerId]: 0, [defenderId]: 0 }, games: 0 } : null;
     // Your match plays live at 1× whatever speed skims the rest (Fast-forward included); finishMatch hands the chosen
     // speed back, unless you change the speed during the match.
-    const watch = !options.instant && (st.settings.express || st.settings.resolution === 'ticker') && this.ownMatch(st, attackerId, defenderId);
+    const watch = !options.instant && !entered && (st.settings.express || st.settings.resolution === 'ticker') && this.ownMatch(st, attackerId, defenderId);
     if (watch && st.speed !== 1 && this.speedRestore == null) this.speedRestore = st.speed;
     this.setState({
       ...decided,
@@ -2005,17 +2030,21 @@ export default class App extends React.Component {
         routeLabel: route.routeLabel || '', routeKind: route.routeKind || 'straight',
         // Empty land on the line of attack: its winner claims it (applyConquest).
         crossed: this.matchCrossings(st, attackerId, defenderId, route),
-        tactic: [attackerId, defenderId].includes(managedId) ? params.tactic : null,
+        tactic: [attackerId, defenderId].includes(managedId) && !entered ? params.tactic : null,
         tacticalBonus: params.bonus, matchDrama: drama,
-        express: this.fastPlayback(st) && !important,
-        instant: !!options.instant,
-        live: this.matchLiveModel(sport, a, d, effA, effD, drama, home),
+        express: !entered && this.fastPlayback(st) && !important,
+        instant: !!options.instant || !!entered,
+        // A typed-in score: shown at once, with no live chart (the model played no part in it).
+        ...(entered ? { entered: true } : {}),
+        live: entered ? null : this.matchLiveModel(sport, a, d, effA, effD, drama, home),
       },
       spin: null,
-      ...this.autoMatchView(st, attackerId, defenderId, { express: this.fastPlayback(st) && !important, instant: !!options.instant }),
+      ...this.autoMatchView(st, attackerId, defenderId, { express: !entered && this.fastPlayback(st) && !important,
+        instant: !!options.instant || !!entered }),
     }, () => {
       this.presentMatch();
-      if (this.state.autoplay && this.state.pauseFollow && [attackerId, defenderId].includes(this.state.followedId)) this.pausePlayback();
+      // A score you just typed in is shown at once: pausing for the followed team's kick-off would only hide it.
+      if (this.state.autoplay && this.state.pauseFollow && !entered && [attackerId, defenderId].includes(this.state.followedId)) this.pausePlayback();
     });
     // The match's samples, committed with its kickoff.
     this.markDraw();
@@ -2032,6 +2061,78 @@ export default class App extends React.Component {
     // One commit: a separate gate-less, match-less commit was never painted.
     this.startMatch(choice.aId, choice.dId, choice.route, id, options, { tacticalChoice: null, tacticalPreview: false,
       autoplay: choice.resumeAutoplay, decisionLedger: [...this.state.decisionLedger, entry] });
+  }
+
+  /**
+   * The tactical gate's three approaches for the manager's match `attackerId` v `defenderId`, each with the manager's
+   * win chance (the estimator's own seeded sample: no campaign random state).
+   */
+  approachOptions(st, attackerId, defenderId) {
+    const a = st.teams[attackerId], d = st.teams[defenderId], managedId = this.managedId(st);
+    const sport = this.sport();
+    const baseDrama = UNCERTAINTY_PRESETS[st.settings.uncertainty]?.drama ?? Number(CONFIG.matchDrama);
+    const home = st.settings.homeAdvantage === 'on';
+    const manager = st.teams[managedId], opponent = managedId === attackerId ? d : a;
+    return tacticalOptions(manager, opponent, baseDrama).map(option => {
+      const params = tacticalMatchParameters({ attacker: a, defender: d, managedId, tactic: option.id, drama: baseDrama, home });
+      const odds = estimateWinProbability({ sport, attacker: a, defender: d, ...params, samples: 512 });
+      return { ...option, winProbability: managedId === attackerId ? odds.attacker : odds.defender };
+    });
+  }
+
+  // ---------- scores entered by you (Show matches) ----------
+
+  /** Type into the waiting match's score fields: `patch` is { a | b | pa | pb: text }, kept as digits. UI-only. */
+  setResultDraft(patch) {
+    this.setState(state => {
+      if (!state.resultEntry) return null;
+      const draft = { ...EMPTY_DRAFT, ...state.resultDraft };
+      for (const [key, value] of Object.entries(patch || {})) if (Object.hasOwn(EMPTY_DRAFT, key)) draft[key] = scoreText(value);
+      return { resultDraft: draft };
+    });
+  }
+
+  /** What the typed scores read as for the match waiting for them (src/engine/enteredResult.js), else null. Pure. */
+  enteredResult(st = this.state) {
+    const entry = st.resultEntry;
+    return entry ? readResult(matchSport(st.settings), st.resultDraft || EMPTY_DRAFT, entry.aId, entry.dId) : null;
+  }
+
+  /**
+   * Confirm result: the typed score settles the waiting match. It shows at once (no kick-off notice, no live clock), and
+   * the campaign goes on as after any match: the conquest, a manager's signing, then the next draw under autoplay.
+   */
+  submitResult() {
+    const st = this.state, entry = st.resultEntry, result = this.enteredResult(st);
+    if (!entry || result?.state !== 'ready') return;
+    this.engagement.count('decisions');
+    this.startMatch(entry.aId, entry.dId, entry.route || {}, undefined, { result, instant: true },
+      { resultEntry: null, resultDraft: null, autoplay: !!entry.resumeAutoplay });
+  }
+
+  /**
+   * Simulate: the waiting match plays on the sport's model after all. From the result form (`instant`) it is decided at
+   * once, a manager's own match with the recommended approach, as the fixture's Simulate does. When Show matches
+   * leaves entered scores it kicks off as any match would, a manager's own at its tactical gate.
+   */
+  simulateEntry({ instant = true } = {}) {
+    const st = this.state, entry = st.resultEntry;
+    if (!entry || !st.teams[entry.aId] || !st.teams[entry.dId]) return;
+    const own = [entry.aId, entry.dId].includes(this.managedId(st));
+    const tactic = own && instant ? recommendedTactic(this.approachOptions(st, entry.aId, entry.dId)) : undefined;
+    this.startMatch(entry.aId, entry.dId, entry.route || {}, tactic, { simulate: true, instant },
+      { resultEntry: null, resultDraft: null, autoplay: !!entry.resumeAutoplay });
+  }
+
+  /** "Enter result" (the primary while the scores are incomplete): the form on the Map, its first empty field focused. */
+  focusResultEntry() {
+    if (!this.state.resultEntry) return;
+    const focus = () => {
+      if (typeof document === 'undefined') return;
+      const fields = [...document.querySelectorAll('#result-entry input:not([disabled])')];
+      (fields.find(field => !field.value) || fields[0])?.focus?.();
+    };
+    if (this.currentView() === 'map') focus(); else this.setView('map', focus);
   }
 
   presentMatch(...args) { return matchM.presentMatch.apply(this, args); }
@@ -2125,7 +2226,8 @@ export default class App extends React.Component {
 
   step() {
     const st = this.state;
-    if (st.phase !== 'playing' || st.choice || st.tacticalChoice || st.managerElimination || st.storageDialog || st.storageConflict || st.paused || st.pendingTarget) return;
+    if (st.phase !== 'playing' || st.choice || st.tacticalChoice || st.managerElimination || st.storageDialog || st.storageConflict || st.paused || st.pendingTarget
+      || st.resultEntry) return;
     if (st.match && !st.match.applied) {
       this.fastForward();
       return;
@@ -2135,7 +2237,8 @@ export default class App extends React.Component {
   }
 
   togglePlay() {
-    if (this.state.choice || this.state.tacticalChoice || this.state.managerElimination || this.state.storageDialog || this.state.storageConflict || this.state.pendingTarget) return;
+    if (this.state.choice || this.state.tacticalChoice || this.state.managerElimination || this.state.storageDialog || this.state.storageConflict || this.state.pendingTarget
+      || this.state.resultEntry) return;
     if (this.state.autoplay) { this.pausePlayback(); return; }
     this.clock.resume();
     this.setState({ autoplay: true, paused: false }, () => {
@@ -2147,7 +2250,8 @@ export default class App extends React.Component {
   }
 
   pausePlayback() {
-    if (this.state.choice || this.state.tacticalChoice || this.state.managerElimination || this.state.storageDialog || this.state.storageConflict || this.state.pendingTarget) return;
+    if (this.state.choice || this.state.tacticalChoice || this.state.managerElimination || this.state.storageDialog || this.state.storageConflict || this.state.pendingTarget
+      || this.state.resultEntry) return;
     if (this.state.paused) {
       this.clock.resume();
       this.setState({ paused: false }, () => this.persist());
@@ -2253,9 +2357,15 @@ export default class App extends React.Component {
 
   setSetting(key, value) {
     if (this.state.phase !== 'playing') return;
-    if (!['resolution', 'express'].includes(key)) return;
+    if (!['resolution', 'express', 'results'].includes(key)) return;
     if (key === 'resolution' && (this.state.spin || (this.state.match && !this.state.match.applied))) return;
-    this.setState(state => ({ settings: { ...state.settings, [key]: value } }), () => this.persist());
+    // Scores entered by you change any time (Show matches): they start at the next kick-off, and leaving them plays a
+    // match waiting for its score on the model at once.
+    if (key === 'results' && !['simulated', 'entered'].includes(value)) return;
+    this.setState(state => ({ settings: { ...state.settings, [key]: value } }), () => {
+      this.persist();
+      if (key === 'results' && value === 'simulated' && this.state.resultEntry) this.simulateEntry({ instant: false });
+    });
   }
 
   selectCountry(...args) { return turnM.selectCountry.apply(this, args); }
@@ -2361,6 +2471,12 @@ export default class App extends React.Component {
       return { id: 'sign', label: `Sign ${candidate?.name || 'player'}`, mastLabel: 'Sign player', disabled: !candidate,
         run: () => this.chooseAcquisition(this.selectedCandidate()?.index) };
     }
+    if (st.resultEntry) {
+      // Confirm once the typed score is a result; until then the primary takes you to the form.
+      return this.enteredResult(st)?.state === 'ready'
+        ? { id: 'submit-result', label: 'Confirm result', mastLabel: 'Confirm', run: () => this.submitResult() }
+        : { id: 'enter-result', label: 'Enter result', run: () => this.focusResultEntry() };
+    }
     if (st.tacticalChoice) return { id: 'kickoff', label: 'Continue', run: () => this.chooseTactic(recommendedTactic(st.tacticalChoice.options)) };
     if (st.autoplay) return { id: 'pause', label: 'Pause', run: () => this.togglePlay() };
     // DEC D13: a spectator's primary is Pause / Play campaign. Play also resumes a paused clock (togglePlay), so
@@ -2413,7 +2529,7 @@ export default class App extends React.Component {
   phonePlaybackModel() {
     const st = this.state;
     if (st.phase !== 'playing' || st.aliveIds.length <= 1) return null;
-    if (st.choice || st.tacticalChoice || st.pendingTarget || st.managerElimination) return null;
+    if (st.choice || st.tacticalChoice || st.pendingTarget || st.managerElimination || st.resultEntry) return null;
     return { autoplay: !!st.autoplay, speed: st.speed || 1, showAutoplay: !!this.managedId(st) };
   }
 
@@ -2571,7 +2687,7 @@ export default class App extends React.Component {
     const liveMatch = !!st.match && !st.match.applied;
     const mapVisible = view === 'setup' || view === 'map' || view === 'conquest';
     const playbackState = completed ? 'Completed' : st.pendingTarget ? 'Choose a target'
-      : st.tacticalChoice ? 'Choose an approach' : st.choice ? 'Choose a signing' : st.managerElimination ? 'Your campaign ended'
+      : st.resultEntry ? 'Enter the result' : st.tacticalChoice ? 'Choose an approach' : st.choice ? 'Choose a signing' : st.managerElimination ? 'Your campaign ended'
       : st.paused ? st.spin ? 'Draw paused' : liveMatch ? 'Match paused' : 'Paused'
       : st.spin ? 'Drawing' : st.match && !st.match.done ? 'Live' : st.match?.done ? 'Full time' : 'Ready';
     const currentCard = this.matchCard();
@@ -2585,7 +2701,7 @@ export default class App extends React.Component {
       return { text, x: x * s + tx, y: y * s + ty };
     }) : [];
     const playback = { speed: st.speed, autoplay: st.autoplay, completed, paused: st.paused, live: liveMatch || !!st.spin,
-      busy: !!st.spin || !!st.choice || !!st.tacticalChoice || !!st.managerElimination || !!st.storageDialog || !!st.pendingTarget,
+      busy: !!st.spin || !!st.choice || !!st.tacticalChoice || !!st.managerElimination || !!st.storageDialog || !!st.pendingTarget || !!st.resultEntry,
       stepLabel: st.spin ? 'Drawing match…' : liveMatch ? 'Finish match' : 'Next match', stateLabel: playbackState,
       summary: currentCard ? { text: `${currentCard.a.code} ${currentCard.a.score}–${currentCard.b.score} ${currentCard.b.code}`,
         label: `${currentCard.a.name} ${currentCard.a.score}, ${currentCard.b.name} ${currentCard.b.score}` } : null,
@@ -2650,6 +2766,8 @@ export default class App extends React.Component {
             spectatorPanel={!ctx.managedId ? <SpectatorPanel {...this.spectatorPanelModel()} matchCard={matchCardNode}
               onFollow={id => this.followTeam(id)} onPauseFollow={value => this.setPauseFollow(value)}
               onToggleAutoplay={() => this.togglePlay()} onSpeed={n => this.setSpeed(n)} /> : null}
+            resultPanel={st.resultEntry ? <ResultEntry {...buildResultEntry(st, ctx)} onDraft={patch => this.setResultDraft(patch)}
+              onSubmit={() => this.submitResult()} onSimulate={() => this.simulateEntry()} /> : null}
             onPreview={() => this.openMatchPreview()} onSimulate={() => this.simulateResult()}
             onSkip={() => this.skipToNextMatch()} onStopSkip={() => this.stopSkip()}
             onToggleSheet={() => this.togglePhoneSheet()} onOpenChronicle={st.choice || st.pendingTarget ? undefined : () => this.setView('chronicle')}

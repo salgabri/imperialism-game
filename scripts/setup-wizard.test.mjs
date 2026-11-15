@@ -196,7 +196,7 @@ test('static markup keeps the whole DOM contract on every step', t => {
     const resolution = doc.querySelector('#setup-resolution');
     assert.equal(resolution.closest('details'), null);
     assert.ok(resolution.closest('section[data-step="2"] .setup-playback'));
-    assert.deepEqual([...resolution.options].map(option => option.value), ['ticker', 'instant', 'express']);
+    assert.deepEqual([...resolution.options].map(option => option.value), ['ticker', 'instant', 'express', 'entered']);
     // The manager's opponent choice sits under the role cards on step 3, before the team list.
     const opponents = doc.querySelector('section[data-step="3"] .setup-main #rule-target-label');
     assert.ok(opponents);
@@ -850,9 +850,9 @@ test('view model: rules normalisation, summaries, tiers and pure inputs', () => 
   assert.deepEqual(showMatchesWrites('bogus', { resolution: 'ticker' }), []);
   // While a draw or match is live, only the modes that need a refused `resolution` write are locked.
   const locked = settings => showMatchOptions(settings, { busy: true }).map(option => option.disabled);
-  assert.deepEqual(locked({ resolution: 'ticker' }), [false, true, false]);
-  assert.deepEqual(locked({ resolution: 'instant', express: true }), [true, false, false]);
-  assert.deepEqual(showMatchOptions({ resolution: 'ticker' }).map(option => option.disabled), [false, false, false]);
+  assert.deepEqual(locked({ resolution: 'ticker' }), [false, true, false, false]);
+  assert.deepEqual(locked({ resolution: 'instant', express: true }), [true, false, false, false]);
+  assert.deepEqual(showMatchOptions({ resolution: 'ticker' }).map(option => option.disabled), [false, false, false, false]);
   // Step 1's estimate footnote names the mode it assumes.
   assert.deepEqual(['ticker', 'instant', 'express'].flatMap(mode => ['spectator', 'manager'].map(role => estimateNote(mode, role))), [
     'Estimated with live matches at 1× speed. Ties add time.',

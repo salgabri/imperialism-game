@@ -105,6 +105,9 @@ function pendingFixture(st) {
   if (m && !m.applied && !m.done && teams[m.aId] && teams[m.dId]) return { kind: 'live', aId: m.aId, dId: m.dId, match: m };
   const tc = st?.tacticalChoice;
   if (tc && teams[tc.aId] && teams[tc.dId]) return { kind: 'tactical', aId: tc.aId, dId: tc.dId, route: tc.route || null };
+  // A match waiting for the score you type in (scores entered by you): known, not yet played.
+  const entry = st?.resultEntry;
+  if (entry && teams[entry.aId] && teams[entry.dId]) return { kind: 'entry', aId: entry.aId, dId: entry.dId, route: entry.route || null };
   const spin = st?.spin;
   if (spin && teams[spin.attackerId] && teams[spin.targetId]) {
     return { kind: spin.stage === 'locked' ? 'locked' : 'drawing', aId: spin.attackerId, dId: spin.targetId, route: spin };
@@ -175,6 +178,8 @@ export function skipAheadModel(st, managedId) {
   if (alive.length <= 1 || !alive.includes(managedId)) return null;
   if (st.skipAhead) return { active: true, played: Math.max(0, (Number(st.matches) || 0) - (Number(st.skipAhead.from) || 0)) };
   if (st.choice || st.tacticalChoice || st.pendingTarget || st.managerElimination || st.storageDialog || st.storageConflict) return null;
+  // Every match waits for its score when its scores are entered by you, so there is nothing to skip past.
+  if (st.resultEntry || st.settings?.results === 'entered') return null;
   const m = st.match;
   if (m && !m.applied && (m.aId === managedId || m.dId === managedId)) return null;
   return { active: false };
@@ -526,7 +531,7 @@ function mapStateCopy(st, current) {
   if (R && history.length && historyRound(history[history.length - 1]) === current) {
     const queued = Array.isArray(st.queue) && st.queue.length > 0;
     if (st.settings?.turnOrder === 'round-robin' && !queued && !st.series) {
-      const inProgress = (st.match && !st.match.applied) || !!st.spin || !!st.pendingTarget || !!st.tacticalChoice;
+      const inProgress = (st.match && !st.match.applied) || !!st.spin || !!st.pendingTarget || !!st.tacticalChoice || !!st.resultEntry;
       const turn = Math.floor(Number(st.turnIndex) || 0) - (inProgress ? 1 : 0);
       const total = Array.isArray(st.turnQueue) ? st.turnQueue.length : 0;
       if (turn >= 1 && (!total || turn <= total)) return `Map after turn ${turn} of Round ${R}`;

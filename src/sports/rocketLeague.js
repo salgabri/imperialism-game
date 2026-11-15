@@ -1,6 +1,8 @@
 import { C } from '../theme.js';
 import { defineSportData } from './sportData.js';
+import { rulesMemo, rulesYear } from './eras.js';
 import { GREAT_BRITAIN, HISTORIC_NATIONS, HOME_NATIONS, NATIONS, selectLineup } from '../data/teams.js';
+import { ROCKET_LEAGUE_SCORING } from '../data/rocketLeagueScoring.js';
 import { clamp, createScorerSampler, gauss, poisson } from '../engine/random.js';
 
 // Rocket League as the RLCS plays its playoffs (docs/design/rocket-league.md): two teams of three, a series of games, best
@@ -27,11 +29,12 @@ export const gameOdds = gap => 1 / (1 + 10 ** (-gap * ELO_PER_POINT / 400));
 
 // Goals in a game's five minutes, both sides together, between equal teams, and the last minute (two slices): a side a goal
 // down pushes up (its rate × TRAILING_LATE) and the leader sits back (× LEADING_LATE); level, both go for the winner (×
-// LEVEL_LATE). Fitted on the 20,588 games of the three years to 2026-11-13 in Liquipedia's exports whose six players had
+// LEVEL_LATE). Fitted on the 21,156 games of the three years to 2026-11-13 in Liquipedia's exports whose six players had
 // each played 20 games before, as a rated player has (docs/design/rocket-league.md, "Calibration"), each played through this
-// model at its own pre-game Elo odds: 4.23 goals a game where they scored 4.26, 19.8% of the games to overtime where 19.7%
-// went, won by one goal 51.8% (52.2%), by two 22.1% (21.7%), by three or more 26.1% (26.1%). Without the late game the same
-// goals give 18.2% overtime and 50.4% by one.
+// model at its own pre-game Elo odds: 4.23 goals a game where they scored 4.26, 19.8% of the games to overtime where 19.6%
+// went, won by one goal 51.7% (52.1%), by two 22.1% (21.7%), by three or more 26.2% (26.2%). Without the late game the same
+// goals give 18.1% overtime and 50.3% by one. An earlier season plays its own year's rate instead (ROCKET_LEAGUE_SCORING,
+// `rocketLeagueIn`), solved the same way on that year's games.
 export const GOALS = 3.8;
 const LATE_SLICES = 2;
 const TRAILING_LATE = 1.4;
@@ -44,14 +47,14 @@ const OVERTIME_PACE = 0.83;
 
 // Match-day form: one draw for the series in rating points, on every game's gap. It grows with the square of the drama,
 // as in the other sports, so Wild swings series hard and Predictable plays Elo's odds game by game. Real series are less
-// predictable than their games: in the same years' 1,097 best-of-sevens with a favourite, its game odds 0.685 on average
-// before the first game, the favourite won 78.8%, where independent games at those odds would win 81.4%. The series'
-// scorelines are likeliest with a spread of 4.5 rating points (112 Elo) at Balanced: the favourite wins 76.7%, sweeps 27.6%
-// (27.8% real), and the underdog sweeps 3.3% (3.0%).
+// predictable than their games: in the same years' 1,118 best-of-sevens with a favourite, its game odds 0.685 on average
+// before the first game, the favourite won 79.0%, where independent games at those odds would win 81.3%. The series'
+// scorelines are likeliest with a spread of 4.5 rating points (112 Elo) at Balanced: the favourite wins 76.6%, sweeps 27.6%
+// (27.5% real), and the underdog sweeps 3.4% (3.1%).
 const FORM_AT_BALANCED = 4.5;
 const formSpread = variation => FORM_AT_BALANCED * (variation / 6) ** 2;
-// No home advantage: in the 1,857 games of the exports' LANs where one side was the host nation's, that side did as Elo
-// expected, within the error (+9.7 ± 7.7 Elo), so the campaign's Home advantage rule is not offered (`homeAdvantage`
+// No home advantage: in the 1,933 games of the exports' LANs where one side was the host nation's, that side did as Elo
+// expected, within the error (+11.8 ± 7.6 Elo), so the campaign's Home advantage rule is not offered (`homeAdvantage`
 // false) and a home venue changes nothing.
 export const HOME_EDGE = 0;
 
@@ -123,32 +126,35 @@ export function gameTable(rateA, rateD) {
 /** The attacker's chance from the start of slice `s`, `margin` goals ahead, in a game's table. */
 export const chanceFrom = (table, s, margin) => table[clamp(s, 0, SLICES)][clamp(margin, -MAX_MARGIN, MAX_MARGIN) + MAX_MARGIN];
 
-/** The two sides' five-minute rates when the attacker's share of the goals is `split` (log scale): GOALS between them. */
-const ratesOf = split => [GOALS / 2 * Math.exp(split), GOALS / 2 * Math.exp(-split)];
+/** The two sides' five-minute rates when the attacker's share of the goals is `split` (log scale): `goals` between them. */
+const ratesOf = (split, goals) => [goals / 2 * Math.exp(split), goals / 2 * Math.exp(-split)];
 
-// A game's win chance by the split of the goals, on a grid of splits (built when first read): the split that gives Elo's
-// odds is read from it between its points, so the goals follow the ratings and the winner is Elo's exactly.
+// A game's win chance by the split of the goals, on a grid of splits (built when first read, one for each goal rate:
+// today's, an earlier season's): the split that gives Elo's odds is read from it between its points, so the goals follow
+// the ratings and the winner is Elo's exactly.
 const SPLIT_STEP = 1 / 64, SPLIT_RANGE = 4;
-let splitTable = null;
-function splits() {
-  if (!splitTable) {
-    splitTable = [];
+const splitTables = new Map();
+function splits(goals) {
+  let table = splitTables.get(goals);
+  if (!table) {
+    table = [];
     for (let i = 0; i <= 2 * SPLIT_RANGE / SPLIT_STEP; i++) {
       const split = -SPLIT_RANGE + i * SPLIT_STEP;
-      const [a, d] = ratesOf(split);
-      splitTable.push(chanceFrom(gameTable(a, d), 0, 0));
+      const [a, d] = ratesOf(split, goals);
+      table.push(chanceFrom(gameTable(a, d), 0, 0));
     }
+    splitTables.set(goals, table);
   }
-  return splitTable;
+  return table;
 }
 
 /**
  * The two sides' five-minute scoring rates in a game the attacker wins with `odds` → [attacker, defender]: the goals
- * split between them so that the game, played slice by slice with its late game and overtime, is the attacker's with
- * exactly that chance. Exported for the live win probability.
+ * (`goals` between equals, GOALS today's) split between them so that the game, played slice by slice with its late game
+ * and overtime, is the attacker's with exactly that chance. Exported for the live win probability.
  */
-export function gameRates(odds) {
-  const table = splits();
+export function gameRates(odds, goals = GOALS) {
+  const table = splits(goals);
   const target = clamp(odds, table[0], table.at(-1));
   let lo = 0, hi = table.length - 1;
   while (hi - lo > 1) {
@@ -156,7 +162,37 @@ export function gameRates(odds) {
     if (table[mid] < target) lo = mid; else hi = mid;
   }
   const t = table[hi] > table[lo] ? (target - table[lo]) / (table[hi] - table[lo]) : 0;
-  return ratesOf(-SPLIT_RANGE + (lo + t) * SPLIT_STEP);
+  return ratesOf(-SPLIT_RANGE + (lo + t) * SPLIT_STEP, goals);
+}
+
+/**
+ * What a game should bring when the attacker wins it with `odds` at the goal rate `goals` → { goals, overtime }: its goals,
+ * both sides' and a level game's overtime goal, and its chance to go to overtime, its slices played forward over the
+ * margin, each at the late game's rates. How an earlier season's rate is solved (scripts/build-rocket-league-seasons.mjs)
+ * and checked.
+ */
+export function gameMeans(odds, goals = GOALS) {
+  const [rateA, rateD] = gameRates(odds, goals);
+  const width = 2 * MAX_MARGIN + 1;
+  let chances = new Float64Array(width);
+  chances[MAX_MARGIN] = 1;
+  let total = 0;
+  for (let s = 0; s < SLICES; s++) {
+    const next = new Float64Array(width);
+    for (let m = -MAX_MARGIN; m <= MAX_MARGIN; m++) {
+      const p = chances[m + MAX_MARGIN];
+      if (p < 1e-15) continue;
+      const [a, d] = sliceMeans(rateA, rateD, m, s);
+      total += p * (a + d);
+      const pa = masses(a), pd = masses(d);
+      for (let i = 0; i <= GOAL_CAP; i++) {
+        if (pa[i] < 1e-12) continue;
+        for (let j = 0; j <= GOAL_CAP; j++) next[clamp(m + i - j, -MAX_MARGIN, MAX_MARGIN) + MAX_MARGIN] += p * pa[i] * pd[j];
+      }
+    }
+    chances = next;
+  }
+  return { goals: total + chances[MAX_MARGIN], overtime: chances[MAX_MARGIN] };
 }
 
 /**
@@ -209,14 +245,16 @@ function playGameWon(rng, rateA, rateD, aWins) {
 
 /**
  * Prepare a series once for cheap resampling: the attacker's edge in rating points on every game (`gap`), tactics,
- * upsets and the venue included. `venue.home`: the defender is at home.
+ * upsets and the venue included. `venue.home`: the defender is at home. `rules`: an earlier season's ({ year, goals },
+ * `rocketLeagueWith`), whose goal rate the series keeps (`goals`); none for today's.
  */
-export function prepareMatch(attacker, defender, effA, effD, { home = false } = {}) {
+export function prepareMatch(attacker, defender, effA, effD, { home = false } = {}, rules = null) {
   const lineupA = selectLineup(attacker), lineupD = selectLineup(defender);
   const adjustmentA = (Number.isFinite(effA) ? effA : lineupA.rating) - lineupA.rating;
   const adjustmentD = (Number.isFinite(effD) ? effD : lineupD.rating) - lineupD.rating;
   const gap = lineupA.rating + adjustmentA - (lineupD.rating + adjustmentD) - (home ? HOME_EDGE : 0);
-  return { attackerId: attacker.id, defenderId: defender.id, lineupA, lineupD, gap, series: { games: GAMES, toWin: TO_WIN } };
+  return { attackerId: attacker.id, defenderId: defender.id, lineupA, lineupD, gap, series: { games: GAMES, toWin: TO_WIN },
+    ...(rules ? { goals: rules.goals } : {}) };
 }
 
 /**
@@ -256,7 +294,7 @@ const SCORER_FLOOR = 40;
  */
 export function simulateSeries(rng, prepared, drama = 6) {
   const result = sampleResult(rng, prepared, drama);
-  const [rateA, rateD] = gameRates(gameOdds(prepared.gap + result.form));
+  const [rateA, rateD] = gameRates(gameOdds(prepared.gap + result.form), prepared.goals ?? GOALS);
   const scorer = { A: createScorerSampler(prepared.lineupA, SCORER_WEIGHTS, SCORER_FLOOR),
     D: createScorerSampler(prepared.lineupD, SCORER_WEIGHTS, SCORER_FLOOR) };
   const ev = [];
@@ -312,6 +350,8 @@ const rocketLeagueRules = {
   territory: undefined,
   // That empire plays as Great Britain, under the Union Jack.
   playsAs: { '826': GREAT_BRITAIN },
+  /** The rules a campaign plays (matchSport): an earlier season's goal rate (`rocketLeagueIn`), today's for the built-in one. */
+  rulesFor: settings => rocketLeagueIn(settings),
 
   squadSize: 5,
   formation: { PLR: 3 },
@@ -350,16 +390,45 @@ const rocketLeagueRules = {
 
   prepareMatch,
   sampleResult,
+  simulate: simulateUnder(null),
+};
 
-  simulate(rng, attacker, defender, drama, effA, effD, venue) {
-    const prepared = prepareMatch(attacker, defender, effA, effD, venue);
+/** A whole series under `rules` (an earlier season's, or none for today's), its events each side's team's. */
+function simulateUnder(rules) {
+  return (rng, attacker, defender, drama, effA, effD, venue) => {
+    const prepared = prepareMatch(attacker, defender, effA, effD, venue, rules);
     const { ga, gd, ev, winner } = simulateSeries(rng, prepared, drama);
     return { ga, gd, regA: ga, regD: gd, tie: null, winner,
       ev: ev.map(({ side, ...e }) => ({ ...e, tid: side === 'A' ? attacker.id : defender.id })) };
-  },
-};
+  };
+}
 
 export const rocketLeague = defineSportData({ ...rocketLeagueRules }, { clubs: false, territoryOf });
+
+/**
+ * Rocket League at an earlier season's goal rate (`rules`: { year, goals }): the same series, each game's goals at that
+ * year's rate. Who wins is Elo's at any rate, so a season's odds are today's and its simulation version too.
+ */
+export function rocketLeagueWith(rules) {
+  return defineSportData({
+    ...rocketLeagueRules,
+    rules,
+    prepareMatch: (attacker, defender, effA, effD, venue) => prepareMatch(attacker, defender, effA, effD, venue, rules),
+    simulate: simulateUnder(rules),
+  }, { clubs: false, territoryOf });
+}
+
+const seasonRocketLeague = rulesMemo(year => rocketLeagueWith(Object.freeze({ year, goals: ROCKET_LEAGUE_SCORING[year].scoring })));
+
+/**
+ * Rocket League as a setup's or campaign's season played it (`settings`: `dataSet`, `dataYear`; matchSport): each
+ * earlier season at its own year's goal rate (ROCKET_LEAGUE_SCORING's `scoring`, solved so its games score as that year's
+ * did). The built-in season, which has no data set, and a year the table lacks play today's (`rocketLeague` itself).
+ */
+export function rocketLeagueIn(settings) {
+  const year = rulesYear(settings);
+  return year != null && Object.hasOwn(ROCKET_LEAGUE_SCORING, year) ? seasonRocketLeague(year) : rocketLeague;
+}
 
 /**
  * Squad-screen strength profile: the three who play and the best of them → { team, best } on the player-rating scale.

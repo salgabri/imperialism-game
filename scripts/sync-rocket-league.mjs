@@ -1,18 +1,20 @@
 // Rocket League's player Elo from Liquipedia's results: reads the wiki's own export (Special:Export's XML, saved by hand
 // into data-src/liquipedia/) and writes scripts/data/rocket-league-elo.json, which npm run build-rocket-league turns into
-// the national teams. Nothing is fetched: Liquipedia's robots.txt shuts Anthropic's crawlers out of the whole site and
-// every bot out of its API (scripts/lib/liquipedia.mjs), so the export is made in a browser (docs/design/rocket-league.md,
-// "The Liquipedia export").
+// the national teams, and scripts/data/rocket-league-seasons/<year>.json, each earlier year's players as rated on its last
+// day, which npm run build:rocket-league-seasons turns into the earlier seasons. Nothing is fetched: Liquipedia's
+// robots.txt shuts Anthropic's crawlers out of the whole site and every bot out of its API (scripts/lib/liquipedia.mjs),
+// so the export is made in a browser (docs/design/rocket-league.md, "The Liquipedia export").
 //
 // Usage: node scripts/sync-rocket-league.mjs [--tune]
 //   npm run sync:rocket-league
 //   --tune  also scores K and the regional starts on the last HOLDOUT_DAYS of games, before each is played
-import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { readExport } from './lib/liquipedia.mjs';
-import { ACTIVE_DAYS, EDITION, K_SCALE, MIN_GAMES, TIERS, homeEdge, isRegionFlag, leftOut, nationalTeams, nationOfPlayer, nationsOf, playerKey,
-  playerOf, ratedPlayers, readTournaments, regionalStarts, rowOf, runElo, scoreOf, seriesInOrder } from './lib/rocket-league.mjs';
+import { ACTIVE_DAYS, EDITION, K_SCALE, MIN_GAMES, ODDS_BINS, TIERS, homeEdge, isRegionFlag, leftOut, nationalTeams, nationOfPlayer,
+  nationsOf, oddsBin, playerKey, playerOf, playersAsOf, ratedPlayers, readTournaments, regionalStarts, rowOf, runElo, scoreOf,
+  seriesInOrder } from './lib/rocket-league.mjs';
 
 const args = process.argv.slice(2);
 const unknown = args.filter(arg => arg !== '--tune');
@@ -20,9 +22,8 @@ if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const folder = path.join(root, 'data-src', 'liquipedia');
 const snapshotFile = path.join(root, 'scripts', 'data', 'rocket-league-elo.json');
+const seasonsDir = path.join(root, 'scripts', 'data', 'rocket-league-seasons');
 const HOLDOUT_DAYS = 180;
-// The stage pages worth another export: those of the events of the last three years, whose series rate today's players.
-const STAGE_YEARS = 3;
 // The real games the match model is held against: the last three years' (scoring between seasoned players has been
 // steady since 2022).
 const PLAY_YEARS = 3;
@@ -74,29 +75,29 @@ if (args.includes('--tune')) {
 }
 
 const starts = regionalStarts(series);
-const { players, scored, lan } = runElo(series, { starts, holdout });
+// Each year's real games between seasoned players (as `play` below has them), for its season's goal rate
+// (scripts/build-rocket-league-seasons.mjs): how many, their goals and overtimes, and the favourite's odds in each.
+const yearPlay = new Map();
+const countYear = (one, game, e, sides) => {
+  if (!game.goals || !sides.flat().every(player => player.games >= MIN_GAMES)) return;
+  const year = Number(one.date.slice(0, 4));
+  if (!yearPlay.has(year)) yearPlay.set(year, { games: 0, goals: 0, ot: 0, odds: new Array(ODDS_BINS).fill(0) });
+  const row = yearPlay.get(year);
+  row.games++;
+  row.goals += game.goals[0] + game.goals[1];
+  if (game.ot) row.ot++;
+  row.odds[oddsBin(e)]++;
+};
+const { players, scored, lan } = runElo(series, { starts, holdout, onGame: countYear });
 // The home crowd at a LAN, against Elo's expectation (the sport's HOME_EDGE), each side's nation as the ratings give it.
 const home = homeEdge(lan, key => nationOfPlayer(players.get(key) ?? { key, flags: new Map() }, people, national));
 const rated = ratedPlayers(players, last, people, national);
 const exported = pages.reduce((latest, page) => (String(page.timestamp) > latest ? String(page.timestamp) : latest), '').slice(0, 10);
+const round3 = x => Math.round(x * 1000) / 1000;
 
-// What another export should add, one title a line to paste into Special:Export: the stage pages of the last three years'
-// events that the export lacks, then the pages of the rated players it still has no nation for (the wiki reads a flag a
-// card leaves out from there).
-const cutoff = new Date(Date.parse(last) - STAGE_YEARS * 365 * 86400000).toISOString().slice(0, 10);
-const stages = missing.filter(title => String(stageStarts.get(title) ?? '') >= cutoff);
-// Every spelling of each, as one of them may be the page and the others redirects to it.
-const spellings = new Map();
-for (const [from, to] of folded) spellings.set(to, [...(spellings.get(to) ?? []), from]);
-// A player filed under a country off the map (Singapore, Malta) has one: his page would add nothing.
-const nationless = rated.filter(player => player.nation == null && (!player.flag || isRegionFlag(player.flag)))
-  .flatMap(player => [player.key, ...(spellings.get(player.key) ?? [])]);
-const list = path.join(folder, 'next-export.txt');
-if (stages.length || nationless.length) {
-  await writeFile(list, `${[...stages, ...nationless].join('\n')}\n`);
-  console.log(`  another export would add ${stages.length} stage pages of the last ${STAGE_YEARS} years (of ${missing.length} missing)`
-    + ` and ${nationless.length} rated players' pages: the titles are in ${path.relative(root, list)}, one a line.`);
-}
+/** A snapshot file: one line a header field and one a player, so a new export's diff reads player by player. */
+const writeSnapshot = (file, head, rows) => writeFile(file, `{\n${Object.entries(head).map(([key, value]) => ` ${JSON.stringify(key)}: ${JSON.stringify(value)}`).join(',\n')},
+ "players": [\n${rows.map(row => `  ${JSON.stringify(row)}`).join(',\n')}\n ]\n}\n`);
 
 // How the real games of the last PLAY_YEARS went, the game as it is played now, for the match model
 // (src/sports/rocketLeague.js): goals, overtime, margins, series scores. Only the games whose six players had each played
@@ -139,14 +140,11 @@ const snapshot = {
     kScale: K_SCALE, starts, holdout: { from: holdout, ...scoreOf(scored.all), international: scoreOf(scored.international), calibration },
     home,
   },
-  play: { ...play, goals: Math.round(play.goals / Math.max(1, play.games) * 1000) / 1000,
-    ot: Math.round(play.ot / Math.max(1, play.games) * 1000) / 1000 },
+  play: { ...play, goals: round3(play.goals / Math.max(1, play.games)), ot: round3(play.ot / Math.max(1, play.games)) },
   players: rated.map(rowOf),
 };
-// One line a header field and one a player, so a new export's diff reads player by player.
 const { players: rows, ...head } = snapshot;
-await writeFile(snapshotFile, `{\n${Object.entries(head).map(([key, value]) => ` ${JSON.stringify(key)}: ${JSON.stringify(value)}`).join(',\n')},
- "players": [\n${rows.map(row => `  ${JSON.stringify(row)}`).join(',\n')}\n ]\n}\n`);
+await writeSnapshot(snapshotFile, head, rows);
 
 const asPlayers = snapshot.players.map((row, i) => playerOf(row, exported, i + 1));
 const nations = nationsOf(asPlayers);
@@ -167,3 +165,53 @@ const unknownFlags = new Map();
 for (const player of offMap) unknownFlags.set(player.flag, (unknownFlags.get(player.flag) ?? 0) + 1);
 if (unknownFlags.size) console.log(`  flags no nation answers to: ${[...unknownFlags].map(([flag, n]) => `${flag} ×${n}`).join(', ')}`);
 console.log(`  ${people.size} player pages read for their country`);
+
+// The earlier seasons (docs/design/rocket-league.md, "Earlier seasons"): every calendar year from the first game's to the
+// one before the export's last, its players as rated on its last day (playersAsOf) and its real games between seasoned
+// players (yearPlay), for npm run build:rocket-league-seasons.
+await mkdir(seasonsDir, { recursive: true });
+const seasonRated = [];
+console.log(`\nEarlier seasons, each as rated on 31 December, to ${path.relative(root, seasonsDir)}:`);
+for (let year = Number(series[0].date.slice(0, 4)); year < Number(last.slice(0, 4)); year++) {
+  const date = `${year}-12-31`;
+  const upTo = series.filter(one => one.date <= date);
+  const ratedThen = playersAsOf(series, date, { starts, people, national, whole: players });
+  if (!ratedThen.length) {
+    console.log(`  ${year}: nobody rated yet (${upTo.reduce((sum, one) => sum + one.games.length, 0)} games so far)`);
+    continue;
+  }
+  seasonRated.push(ratedThen);
+  const thatYear = yearPlay.get(year) ?? { games: 0, goals: 0, ot: 0, odds: new Array(ODDS_BINS).fill(0) };
+  const season = { season: year, date, exported, from: series[0].date, to: upTo.at(-1).date, series: upTo.length,
+    games: upTo.reduce((sum, one) => sum + one.games.length, 0), rated: ratedThen.length, activeDays: ACTIVE_DAYS, minGames: MIN_GAMES,
+    play: { games: thatYear.games, goals: round3(thatYear.goals / Math.max(1, thatYear.games)), ot: round3(thatYear.ot / Math.max(1, thatYear.games)),
+      odds: thatYear.odds } };
+  await writeSnapshot(path.join(seasonsDir, `${year}.json`), season, ratedThen.map(rowOf));
+  const fielded = nationsOf(ratedThen.map((player, i) => playerOf(rowOf(player), date, i + 1)));
+  console.log(`  ${year}: ${ratedThen.length} rated, ${fielded.length} nations (${fielded.slice(0, 4).map(n => `${n.name} ${n.str}`).join(', ')}…);`
+    + ` ${season.play.games} games between seasoned players, ${season.play.goals} goals a game, ${(season.play.ot * 100).toFixed(1)}% to overtime`);
+}
+
+// What another export should add, one title a line to paste into Special:Export: the stage pages the exports' events link
+// to but lack, the newest first, then the pages of the players rated today or at an earlier season's end whom it still
+// has no nation for, the best first (the wiki reads a flag a card leaves out from there), each under every spelling of
+// him, as one of them may be the page and the others redirects to it. A title an export already holds has nothing more to
+// give (a redirect's target is listed in its place), and a player filed under a country off the map (Singapore, Malta)
+// has one: his page would add nothing.
+const spellings = new Map();
+for (const [from, to] of folded) spellings.set(to, [...(spellings.get(to) ?? []), from]);
+const held = new Set(pages.map(page => page.title));
+const stages = missing.slice().sort((a, b) => String(stageStarts.get(b) ?? '').localeCompare(String(stageStarts.get(a) ?? '')) || a.localeCompare(b));
+const best = new Map();
+for (const player of [rated, ...seasonRated].flat()) {
+  if (player.nation != null || (player.flag && !isRegionFlag(player.flag))) continue;
+  best.set(player.key, Math.max(best.get(player.key) ?? -Infinity, player.elo));
+}
+const nationless = [...best].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).flatMap(([key]) => [key, ...(spellings.get(key) ?? [])]);
+const titles = [...new Set([...stages, ...nationless])].filter(title => !held.has(title));
+const list = path.join(folder, 'next-export.txt');
+if (titles.length) {
+  await writeFile(list, `${titles.join('\n')}\n`);
+  console.log(`\nAnother export would add ${stages.length} stage pages and the pages of ${best.size} rated players with no nation`
+    + ` (${titles.length} titles in all): they are in ${path.relative(root, list)}, one a line.`);
+}

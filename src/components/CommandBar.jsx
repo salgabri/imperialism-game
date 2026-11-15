@@ -22,8 +22,9 @@ function PanelKicker({ id, title, aside }) {
 
 /**
  * Campaign settings: the masthead popover body and the phone More sheet (A-10). `idPrefix` is prefixed onto
- * every control id so both can be mounted at once. Show matches is the one live control (`resolution` / `express`
- * through `onSetting`); the launch rules are read-only facts, each with its stored value in `data-value`.
+ * every control id so both can be mounted at once. Show matches is the one live control (`resolution` / `express`, and
+ * `results` for scores entered by you, through `onSetting`); the launch rules are read-only facts, each with its stored
+ * value in `data-value`.
  */
 export function SettingsPanel({
   confirmNew, onNew, busy = false, completed = false, saveStatus, onExport, onImport, onResults, onCancelNew, seed,

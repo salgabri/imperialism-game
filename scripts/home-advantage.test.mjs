@@ -76,8 +76,8 @@ const SPORTS = [
 const scoreFields = ({ ga, gd, tie, winner }) => ({ ga, gd, tie, winner });
 
 test('Rocket League has no home edge, so the rule is no choice there: its LANs\' host nations did as Elo expected', () => {
-  // The Liquipedia snapshot's LAN games with one side of the host nation (REAL.rocketLeague.homeEdge): +9.7 ± 7.7 Elo
-  // over 1,857 games.
+  // The Liquipedia snapshot's LAN games with one side of the host nation (REAL.rocketLeague.homeEdge): +11.8 ± 7.6 Elo
+  // over 1,933 games.
   assert.equal(ROCKET_LEAGUE_HOME_EDGE, 0);
   if (REAL.rocketLeague?.homeEdge) assert.ok(Math.abs(REAL.rocketLeague.homeEdge.elo) < 2 * REAL.rocketLeague.homeEdge.se, 'no edge to measure');
   const [a, d] = equalSides(rocketLeague, null);
