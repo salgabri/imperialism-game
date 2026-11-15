@@ -49,6 +49,7 @@ export function mapOpponentId(st, ctx = {}) {
   const pairs = [];
   if (st.spin?.stage === 'locked') pairs.push([st.spin.attackerId, st.spin.targetId]);
   if (st.tacticalChoice) pairs.push([st.tacticalChoice.aId, st.tacticalChoice.dId]);
+  if (st.resultEntry) pairs.push([st.resultEntry.aId, st.resultEntry.dId]);
   if (st.match && !st.match.applied) pairs.push([st.match.aId, st.match.dId]);
   for (const [a, d] of pairs) {
     const other = a === me ? d : d === me ? a : null;
@@ -106,7 +107,7 @@ export function fixtureWinChance(st, ctx = {}, me = mapMeId(st, ctx)) {
   const teams = st?.teams || {};
   if (!me || !teams[me]) return null;
   let pair = null;
-  const m = st.match, tc = st.tacticalChoice, spin = st.spin;
+  const m = st.match, tc = st.tacticalChoice || st.resultEntry, spin = st.spin;
   if (m && !m.applied && !m.done && teams[m.aId] && teams[m.dId]) pair = { kind: 'live', aId: m.aId, dId: m.dId };
   else if (tc && teams[tc.aId] && teams[tc.dId]) pair = { kind: 'tactical', aId: tc.aId, dId: tc.dId };
   else if (spin && teams[spin.attackerId] && teams[spin.targetId]) {

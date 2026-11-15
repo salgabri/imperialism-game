@@ -26,7 +26,7 @@ export class SessionEngagement {
 export function engagementMode(state, away = false) {
   if (away || state.phase !== 'playing' || state.aliveIds.length <= 1) return 'away';
   // A pending "You choose" target is a manager decision like the tactical and signing gates.
-  if (state.tacticalChoice || state.choice || state.pendingTarget) return 'decision';
+  if (state.tacticalChoice || state.choice || state.pendingTarget || state.resultEntry) return 'decision';
   if (state.paused || state.managerElimination || state.storageDialog) return 'paused';
   return 'viewing';
 }

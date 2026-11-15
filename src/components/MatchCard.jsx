@@ -211,7 +211,7 @@ function CompactMatchCard({ round, status, statusLive, startLabel, a, b, firstTe
 }
 
 /** The latest match stays visible while its territory and player rewards resolve. */
-export default function MatchCard({ round, status, statusColor, statusLive, startLabel, a, b, aId, bId, dId, winnerId, kicks, events = [], noEvents, result, eventsRef, odds, series, onViewConquest, onSelectTeam, archived = false, routeLabel, variant = 'full', minuteStore = null, minuteFallback = 0, clockSport = 'football' }) {
+export default function MatchCard({ round, status, statusColor, statusLive, startLabel, a, b, aId, bId, dId, winnerId, kicks, events = [], noEvents, result, eventsRef, odds, series, onViewConquest, onSelectTeam, archived = false, routeLabel, variant = 'full', minuteStore = null, minuteFallback = 0, clockSport = 'football', entered = false }) {
   // Flag IDs describe artwork; only campaign IDs can open a squad, particularly for clubs.
   const firstTeamId = a.teamId ?? a.tid ?? aId;
   const secondTeamId = b.teamId ?? b.tid ?? dId ?? bId;
@@ -251,7 +251,8 @@ export default function MatchCard({ round, status, statusColor, statusLive, star
       {completed && <details className="fi-match-report" key={`${round}-${firstTeamId}-${secondTeamId}`}>
         <summary><span>Match report</span><span className="fi-match-report-count">{events.length} {events.length === 1 ? 'event' : 'events'}</span></summary>
         <div className="fi-match-events fi-match-events--report" role="region" aria-label="Completed match events">
-          {events.length ? <MatchEvents events={events} /> : <p className="fi-match-wait">No match events recorded.</p>}
+          {events.length ? <MatchEvents events={events} />
+            : <p className="fi-match-wait">{entered ? 'You entered this result: the match was played away from here.' : 'No match events recorded.'}</p>}
         </div>
       </details>}
     </section>

@@ -213,7 +213,7 @@ export function openTargetChoice(attackerId, turnArg = null) {
   const st = this.state;
   if (st.phase !== 'playing' || !st.teams?.[attackerId] || !st.aliveIds.includes(attackerId)) return false;
   // Never on top of another pending decision or a running draw/match (parseCampaign would reject the save).
-  if (st.pendingTarget || st.spin || (st.match && !st.match.applied) || st.choice || st.tacticalChoice || st.managerElimination) return false;
+  if (st.pendingTarget || st.spin || (st.match && !st.match.applied) || st.choice || st.tacticalChoice || st.managerElimination || st.resultEntry) return false;
   const turn = turnOf(turnArg);
   let seed;
   try {

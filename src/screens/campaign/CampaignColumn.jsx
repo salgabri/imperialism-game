@@ -8,19 +8,20 @@ import './campaign.css';
 /**
  * Composition (A-1): manager → `targetPanel` or <NextFixture/> (which embeds the `matchCard` slot whenever a
  * match exists), Your fronts only without a target panel, then Latest results. Spectator → `spectatorPanel`, then
- * Latest results. Layout is CSS-only: a column at ≥1200px, a two-column body under the map at 700–1199px, and a
- * bottom sheet below 700px (collapsed = the first block; the grab handle expands it over the map).
+ * Latest results. A match waiting for the score you type in (`resultPanel`) leads in either role.
+ * Layout is CSS-only: a column at ≥1200px, a two-column body under the map at 700–1199px, and a bottom sheet below
+ * 700px (collapsed = the first block; the grab handle expands it over the map).
  */
 export default function CampaignColumn({
   role = 'manager', sheet = 'collapsed', fixture = null, fronts = null, results = null, idleText = null,
-  matchCard = null, targetPanel = null, spectatorPanel = null,
+  matchCard = null, targetPanel = null, spectatorPanel = null, resultPanel = null,
   onPreview, onSimulate, onSkip, onStopSkip, onToggleSheet, onOpenChronicle, onSelectTeam,
 }) {
   const spectator = role === 'spectator' && !!spectatorPanel;
   const showFronts = !spectator && !targetPanel && !!fronts;
   const expanded = sheet === 'expanded';
   const toggle = typeof onToggleSheet === 'function' ? onToggleSheet : null;
-  const lead = spectator ? spectatorPanel : targetPanel || (
+  const lead = resultPanel || (spectator ? spectatorPanel : targetPanel) || (
     <NextFixture fixture={fixture} idleText={idleText} matchCard={matchCard} onPreview={onPreview} onSimulate={onSimulate}
       onSkip={onSkip} onStopSkip={onStopSkip} />
   );

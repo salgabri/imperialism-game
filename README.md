@@ -476,9 +476,10 @@ choice; no timer runs.
 ### Match rules
 
 **Show matches** is *Live, minute by minute* (a live ticker), *Final score
-only* (an instant final score) or *Fast-forward* (Express playback: final scores,
+only* (an instant final score), *Fast-forward* (Express playback: final scores,
 with shorter pauses for routine matches, but your team's matches still on the live
-ticker). It stores the existing `resolution` and `express` settings. Under Live and
+ticker) or *Scores entered by you* ([below](#scores-entered-by-you)). It stores the
+existing `resolution` and `express` settings, and `results`. Under Live and
 Fast-forward your team's match (the managed team, or the followed team while
 spectating) plays at 1× whatever the speed, and the chosen speed returns with the
 result; a speed picked during the match is kept. Level games go to extra time in football, then
@@ -526,6 +527,24 @@ even ties go its way 60% of the time. Attacks fail more often, and a failed
 attack hands the defender the attacker's territory, so conquests change hands but
 campaigns run as many matches. A best-of-three final keeps its attacker, so its
 defender hosts every game.
+#### Scores entered by you
+
+Under *Scores entered by you* (Show matches) the game plays no match: you play each one somewhere else, in another
+game (EA FC, NBA 2K, Madden, MLB The Show, NHL, Rocket League…) or for real, and type in its score, as imperialism
+videos do with a console game deciding every fixture. The draw, the map, the conquest and a manager's signings go on
+as usual; only the result is yours. After the draw the match waits in the column (the phone's sheet), in place of Next
+fixture, as **Enter the result**: the two scores, the attacker's first, and a line saying what the score does ("Bolivia
+wins 3–1 and takes Paraguay") or what it lacks. A level football score asks for its penalty shoot-out's score (only the
+shoot-out's score is kept, no kicks). Every other sport plays on until one side wins, so its final score has a winner:
+after overtime, extra innings or golden point, an ice hockey shoot-out's winner one goal up as the NHL counts it, and a
+tennis tie or a Rocket League series won outright. **Confirm result** (Enter, or Space from outside the form) settles
+the match at once, with no kick-off notice, live clock or chart, and autoplay carries on to the next draw. **Simulate**
+lets the game play that one match after all, decided at once (a manager's own with the recommended approach). There is
+no tactical gate, since no approach plays a match played elsewhere, and no skipping to your next match: every match
+waits. A reload or a save keeps the match waiting (the typed scores start blank again). The Match view and the
+Chronicle show an entered score with no events ("Result entered by you"). Picking another Show matches mode in game
+kicks a waiting match off on the model; picking this one starts with the next kick-off.
+
 Pre-match percentages estimate this model with an independent seeded sample.
 They do not consume the campaign's random stream.
 Odds prepare the two lineups once and sample scores without building hundreds of
@@ -554,6 +573,7 @@ own Space, and open dialogs block it.
 | **Finish match** | Reveal a live ticker match's result |
 | **Attack <team>** | Confirm your target under *You choose* |
 | **Sign <player>** | Confirm the signing on the conquest screen (the masthead button reads "Sign player") |
+| **Enter result** / **Confirm result** | A match waits for the score you type in (*Scores entered by you*): go to its form, then confirm a complete score (the masthead button reads "Confirm") |
 | **Pause** / **Resume** | Autoplay is running / the clock is paused |
 | **Play campaign** | A spectator's primary (it becomes **Pause** while autoplay runs) |
 | **Results** | The campaign is over |
@@ -818,7 +838,7 @@ Each key names a setup choice, and a key left at its default is left out:
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`, `mlb-the-show-24`) | the built-in season |
 | `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
 | `opponent` | Who picks your opponent | `player` (You choose), `compass` | Compass, and whenever launch would drop it (a spectator, a pairing draw) |
-| `show` | Show matches | `ticker`, `instant`, `express` | Live |
+| `show` | Show matches | `ticker`, `instant`, `express`, `entered` (scores entered by you) | Live |
 | `upsets` | Upsets | `predictable`, `balanced`, `wild` | Balanced |
 | `final` | Final | `single`, `best-of-three` | Single match |
 | `signings` | Computer signings (not in tennis, where both sign the same player) | `highest-rated`, `best-fit` | Best-rated player |

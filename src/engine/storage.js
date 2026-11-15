@@ -31,7 +31,7 @@ export const CHECKPOINT_KEYS = Object.freeze(['settings', 'round', 'matches', 'o
   'followedId', 'pauseFollow', 'choice', 'metrics', 'startedAt', 'completedAt', 'conquestIds',
   'campaignId', 'revision', 'campaignName', 'managedTeamId', 'managementEnded', 'managerElimination',
   'tacticalChoice', 'tactics', 'rules', 'historyFilter', 'selectedHistoryId', 'decisionLedger', 'initialSettings',
-  'turnQueue', 'turnIndex', 'pendingTarget', 'claims']);
+  'turnQueue', 'turnIndex', 'pendingTarget', 'claims', 'resultEntry']);
 
 export function campaignSnapshot(state) {
   return { v: SAVE_VERSION, savedAt: Date.now(), ...Object.fromEntries(CHECKPOINT_KEYS.map(key => [key, state[key]])),
@@ -322,7 +322,8 @@ function validateCampaign(input, rebuildSources) {
   const enums = { sport: SPORT_LIST.map(sport => sport.id), layer: ['nations', 'clubs'], pacing: ['duel', 'blitz', 'chaos'],
     resolution: ['ticker', 'instant'], role: ['spectator', 'manager'], uncertainty: ['predictable', 'balanced', 'wild'],
     finale: ['single', 'best-of-three'], acquisitionPolicy: ['best-fit', 'highest-rated'], rosterPreset: ['authentic', 'competitive'],
-    turnOrder: ['round-robin', 'random'], targeting: ['player', 'compass'], homeAdvantage: ['off', 'on'] };
+    turnOrder: ['round-robin', 'random'], targeting: ['player', 'compass'], homeAdvantage: ['off', 'on'],
+    results: ['simulated', 'entered'] };
   for (const configuration of [settings, data.initialSettings].filter(Boolean)) {
     for (const [key, values] of Object.entries(enums)) if (configuration[key] != null && !values.includes(configuration[key])) invalid(`Campaign ${key} setting is unsupported.`);
     if (configuration.managedTeamId != null && configuration.managedTeamId !== '' && !known(configuration.managedTeamId)) invalid('The managed team setting is unavailable.');
@@ -415,6 +416,16 @@ function validateCampaign(input, rebuildSources) {
           || (option.winProbability != null && (!Number.isFinite(option.winProbability) || option.winProbability < 0 || option.winProbability > 1)))) invalid('The saved tactical options are incomplete.');
     if (typeof choice.managerName !== 'string' || typeof choice.opponentName !== 'string') invalid('The saved tactical decision is incomplete.');
   }
+  // A match waiting for the result the player types in (scores entered by you, src/engine/enteredResult.js): the pairing, its
+  // route and the autoplay to resume. It holds the campaign as the tactical gate does, never beside another decision.
+  if (data.resultEntry != null) {
+    pending(data.resultEntry, 'aId', 'dId', 'result entry');
+    const entry = data.resultEntry;
+    if ((data.match && !data.match.applied) || data.choice || data.spin || data.tacticalChoice
+        || (entry.route != null && !record(entry.route))
+        || (entry.resumeAutoplay != null && typeof entry.resumeAutoplay !== 'boolean')
+        || (entry.openedAt != null && (!Number.isFinite(entry.openedAt) || entry.openedAt < 0))) invalid('The saved result entry is incomplete.');
+  }
   if (data.match != null) {
     const m = data.match;
     if (!record(m) || !known(m.aId) || !known(m.dId) || m.aId === m.dId || ![m.aId, m.dId].includes(m.winner)
@@ -450,7 +461,7 @@ function validateCampaign(input, rebuildSources) {
         || (target.turn != null && (!record(target.turn) || !validTurn(target.turn.turnQueue, target.turn.turnIndex)
           || !nonnegative(target.turn.round) || typeof target.turn.newRound !== 'boolean'
           || (target.turn.attackerId != null && target.turn.attackerId !== target.attackerId)))) invalid('The saved target choice is incomplete.');
-    if ((data.match && !data.match.applied) || data.spin || data.choice || data.tacticalChoice) invalid('The saved target choice overlaps another pending decision.');
+    if ((data.match && !data.match.applied) || data.spin || data.choice || data.tacticalChoice || data.resultEntry) invalid('The saved target choice overlaps another pending decision.');
   }
   if (data.series != null) {
     const s = data.series;

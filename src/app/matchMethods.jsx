@@ -93,6 +93,8 @@ export function presentMatch() {
   const lastTick = lastTickOf(m, sport);
   // Instant and express reveals show the final minute (the store is reset at every kickoff, so no stale minute).
   if (m.express) { this.minuteStore?.set(lastTick); this.after(18, () => this.revealAll()); return; }
+  // A score typed in (scores entered by you) shows at once, with no kick-off notice: its form already named the match.
+  if (m.entered) { this.minuteStore?.set(lastTick); this.after(18, () => this.revealAll()); return; }
 
   const instant = !playsLive.call(this, st, m);
   this.showPopup(
@@ -192,7 +194,8 @@ export function revealAll() {
   for (const token of pendingTasks.call(this)) cancelTask.call(this, token);
   this.stopMinuteClock();
   this.minuteStore?.set(lastTickOf(m, sport));
-  const kicks = shootoutOf(sport, m.tie);
+  // A typed-in shoot-out has its score but no kicks: nothing to reveal kick by kick.
+  const kicks = m.entered ? null : shootoutOf(sport, m.tie);
   this.patchMatch({
     shown: m.allEv,
     ga: m.finalGa,
@@ -237,6 +240,8 @@ export function matchCard(m = this.state.match, teams = this.state.teams) {
     }),
     noEvents: m.shown.length === 0 && !m.done,
     odds: m.odds, series: m.series, routeLabel: m.routeLabel,
+    // A score typed in by the player (scores entered by you): the archive says so, as it has no events to show.
+    ...(m.entered ? { entered: true } : {}),
     // The live minute's floor: the last revealed event (small number, persisted in history; the store does the rest).
     minuteFallback: lastShownMinute(m),
     result: m.done

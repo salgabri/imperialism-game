@@ -67,9 +67,9 @@ function lineupRating(team) {
   try { return selectLineup(team).rating; } catch { return 0; }
 }
 
-/** HEAD Sidebar `paused`: playback paused, a signing pending or a tactical choice pending. */
+/** HEAD Sidebar `paused`: playback paused, a signing pending, a tactical choice pending or a result to enter. */
 export function sessionPaused(st) {
-  return !!(st?.paused || st?.choice || st?.tacticalChoice);
+  return !!(st?.paused || st?.choice || st?.tacticalChoice || st?.resultEntry);
 }
 
 /**
