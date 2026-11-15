@@ -27,11 +27,11 @@ export const gameOdds = gap => 1 / (1 + 10 ** (-gap * ELO_PER_POINT / 400));
 
 // Goals in a game's five minutes, both sides together, between equal teams, and the last minute (two slices): a side a goal
 // down pushes up (its rate × TRAILING_LATE) and the leader sits back (× LEADING_LATE); level, both go for the winner (×
-// LEVEL_LATE). Fitted on the 20,072 games of the three years to 2026-11-13 in Liquipedia's export whose six players had
+// LEVEL_LATE). Fitted on the 20,588 games of the three years to 2026-11-13 in Liquipedia's exports whose six players had
 // each played 20 games before, as a rated player has (docs/design/rocket-league.md, "Calibration"), each played through this
-// model at its own pre-game Elo odds: 4.23 goals a game where they scored 4.25, 19.8% of the games to overtime where 19.7%
-// went, won by one goal 51.8% (52.1%), by two 22.1% (21.6%), by three or more 26.2% (26.3%). Without the late game the same
-// goals give 18.1% overtime and 50.3% by one.
+// model at its own pre-game Elo odds: 4.23 goals a game where they scored 4.26, 19.8% of the games to overtime where 19.7%
+// went, won by one goal 51.8% (52.2%), by two 22.1% (21.7%), by three or more 26.1% (26.1%). Without the late game the same
+// goals give 18.2% overtime and 50.4% by one.
 export const GOALS = 3.8;
 const LATE_SLICES = 2;
 const TRAILING_LATE = 1.4;
@@ -44,14 +44,14 @@ const OVERTIME_PACE = 0.83;
 
 // Match-day form: one draw for the series in rating points, on every game's gap. It grows with the square of the drama,
 // as in the other sports, so Wild swings series hard and Predictable plays Elo's odds game by game. Real series are less
-// predictable than their games: in the same years' 1,092 best-of-sevens with a favourite, its game odds 0.686 on average
-// before the first game, the favourite won 79.2%, where independent games at those odds would win 81.6%. The series'
-// scorelines are likeliest with a spread of 4.5 rating points (112 Elo) at Balanced: the favourite wins 76.9%, sweeps 27.8%
-// (27.9% real), and the underdog sweeps 3.3% (2.9%).
+// predictable than their games: in the same years' 1,097 best-of-sevens with a favourite, its game odds 0.685 on average
+// before the first game, the favourite won 78.8%, where independent games at those odds would win 81.4%. The series'
+// scorelines are likeliest with a spread of 4.5 rating points (112 Elo) at Balanced: the favourite wins 76.7%, sweeps 27.6%
+// (27.8% real), and the underdog sweeps 3.3% (3.0%).
 const FORM_AT_BALANCED = 4.5;
 const formSpread = variation => FORM_AT_BALANCED * (variation / 6) ** 2;
-// No home advantage: in the 1,853 games of the export's LANs where one side was the host nation's, that side did as Elo
-// expected, within the error (+9.9 ± 7.7 Elo), so the campaign's Home advantage rule is not offered (`homeAdvantage`
+// No home advantage: in the 1,857 games of the exports' LANs where one side was the host nation's, that side did as Elo
+// expected, within the error (+9.7 ± 7.7 Elo), so the campaign's Home advantage rule is not offered (`homeAdvantage`
 // false) and a home venue changes nothing.
 export const HOME_EDGE = 0;
 

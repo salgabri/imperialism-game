@@ -36,10 +36,12 @@ the pages are saved by a person, in a browser, with the wiki's own export.
 
 The first export, of 2026-11-14, held 1,135 pages: 935 3v3 events of S- and A-Tier (125 school
 leagues left out) with 18,365 series and 74,770 games from 2015-09-10 to 2026-11-13. The second,
-the same day, held 428 pages of its list's 438 titles (325 stage pages, then the players'): the
-two make 943 events, 20,355 series and 81,534 games, and the players' own pages left 32 rated
-players with no country where the first export alone left 102. The list the second leaves (25
-stage pages, 51 players' pages and spellings) would hardly move a nation.
+the same day, held 428 pages of its list's 438 titles (325 stage pages, then the players'), and
+the third, that night, 65 of its 76 (14 stage pages and all 51 players' titles): the three make
+947 events, 20,491 series and 82,072 games, and the players' own pages left 3 rated players with
+no country, where the first export alone left 102 and the first two 32. The list the third leaves
+is short: 13 stage pages, 11 of them titles it asked for that the wiki has no page for, and the
+pages of the three rated players still without a country (rated 50 to 65).
 
 What the reader expects was checked against Liquipedia's own modules, which are open source
 (github.com/Liquipedia/Lua-Modules, read through GitHub's API and raw.githubusercontent.com,
@@ -73,7 +75,7 @@ turns them into what the ratings play:
   ten years of rosters ("Atow." on his clubs' cards, "Atow" on Belgium's; "AcroniK", "AcroniK.",
   "Acronic"), so spellings that differ only in case and punctuation fold into the one the rosters
   use most, unless their nations clash; a page the wiki disambiguates ("Dead (Israeli Player)")
-  never meets a namesake, and a redirect page in an export is followed. 730 spellings folded.
+  never meets a namesake, and a redirect page in an export is followed. 737 spellings folded.
 - **Nations.** A player plays for the nation he last played for in a national-team event (the
   FIFAe World Cup and the Esports Nations Cup, and their regionals: 611 players), as rugby
   league takes a Test side before a birthplace; else the country flag his cards file him under
@@ -90,21 +92,21 @@ by his team's amount. A player's K shrinks with his games: 320 / (games + 5)^0.4
 The regions meet only at the majors and the world championship, too rarely for Elo alone to bring
 a whole region's players to its level, so a newcomer starts at his region's level, each region's
 start solved so that its teams win as often at the international events as Elo expects
-(`regionalStarts`: North America 1,583, Europe 1,582, MENA 1,518, Asia-Pacific 1,515, South
-America 1,473, Oceania 1,447, Sub-Saharan Africa 1,208).
+(`regionalStarts`: North America 1,582, Europe 1,579, MENA 1,519, Asia-Pacific 1,514, South
+America 1,471, Oceania 1,446, Sub-Saharan Africa 1,206).
 
 K was chosen by scoring the exports' last 180 days (2,462 games), each game before it was
-played (`npm run sync:rocket-league -- --tune`): log loss 0.6021 at K 110, 0.5853 at 240, 0.5829
-at 320, 0.5835 at 400, 0.5868 at 500, regional starts on (they lower it at every K). At 320 the
+played (`npm run sync:rocket-league -- --tune`): log loss 0.6025 at K 110, 0.5855 at 240, 0.5831
+at 320, 0.5837 at 400, 0.5869 at 500, regional starts on (they lower it at every K). At 320 the
 predictions are calibrated: games it gave 75% went 78%, 84% went 85%, 94.5% went 92.5%.
 
 A player is rated once he has 20 games behind him and has played within a year of the export's
-last game: 815 of 4,393. On the game's scale a rating is Elo / 25 − 2: a rating point is 25 Elo
+last game: 812 of 4,391. On the game's scale a rating is Elo / 25 − 2: a rating point is 25 Elo
 points, as in tennis, so the match model plays Elo's own odds; the best player, dralii (Morocco),
 is 97, a newcomer at 1,500 is 58. Each nation names its five best; it needs three for a team, so
 a nation with fewer fields none and its land stays neutral. 57 nations field a team, from France
-(90.3: Vatira, zen, ExoTiiK), the United States (90) and Saudi Arabia (89.3) down to Madagascar
-(49). Rocket League offers every nation theatre, the Elite 32 included.
+(90.3: Vatira, zen, ExoTiiK), Saudi Arabia and the United States (89.7) down to Madagascar (49).
+Rocket League offers every nation theatre, the Elite 32 included.
 
 ## The match
 
@@ -129,38 +131,38 @@ margin, then the games left, over the form nodes weighed by the games already wo
 ## Calibration
 
 Fitted to the exports' games of the three years to 2026-11-13 whose six players had each played
-20 games before, as every rated player has: 20,072 with their goals (scoring has been steady
-since 2022: 4.15–4.32 goals a game, 18.6–21.0% to overtime). A newcomer's games are left out, as
+20 games before, as every rated player has: 20,588 with their goals (scoring has been steady
+since 2022: 4.16–4.31 goals a game, 18.6–21.0% to overtime). A newcomer's games are left out, as
 his Elo has not yet found his level and they are more lopsided than their odds say: the window's
-other 8,171 scored 4.91 goals a game, 12.8% to overtime. Each game is played through the model at
+other 8,193 scored 4.91 goals a game, 12.8% to overtime. Each game is played through the model at
 its own pre-game Elo odds, so the real mix of matchups is the model's:
 
 | | Model | Real |
 | --- | --- | --- |
-| Goals a game | 4.23 | 4.25 |
+| Goals a game | 4.23 | 4.26 |
 | Games to overtime | 19.8% | 19.7% |
-| Won by one / two / three or more | 51.8% / 22.1% / 26.2% | 52.1% / 21.6% / 26.3% |
+| Won by one / two / three or more | 51.8% / 22.1% / 26.1% | 52.2% / 21.7% / 26.1% |
 
 That takes 3.8 goals in five minutes between equals and the last minute's play: the side a goal
 down scores at 1.4 times its rate, the leader at 0.9, both at 1.1 when level. Without it the same
-goals give 18.1% overtime and 50.3% won by one. Overtime's goal came after 95 seconds on average
+goals give 18.2% overtime and 50.4% won by one. Overtime's goal came after 95 seconds on average
 (median 64, sudden death's exponential wait), slower than regulation's pace (79 seconds): the
 model times it at 0.83 of that pace.
 
-Series are less predictable than their games. In the same years' 1,092 best-of-sevens with a
-favourite, its odds 0.686 a game before the first, the favourite won 79.2%, where independent
-games at those odds would win 81.6%; it swept 27.9% (25.7%), the underdog 2.9% (1.6%). The
+Series are less predictable than their games. In the same years' 1,097 best-of-sevens with a
+favourite, its odds 0.685 a game before the first, the favourite won 78.8%, where independent
+games at those odds would win 81.4%; it swept 27.8% (25.5%), the underdog 3.0% (1.6%). The
 scorelines of all 1,194 are likeliest with match-day form of 4.5 rating points (112 Elo) at
-Balanced, which gives 76.9%, 27.8% and 3.3% (the favourite's share alone would ask for 3); the
-best-of-fives ask for more (6.5: the favourite won 74.1% of 3,166). Form grows with the square of
+Balanced, which gives 76.7%, 27.6% and 3.3% (the favourite's share alone would ask for 3); the
+best-of-fives ask for more (6.5: the favourite won 74.1% of 3,277). Form grows with the square of
 the drama, as in every sport, so Wild swings Rocket League hardest of all.
 
 The harness (`npm run simulation:realism`) plays the sixteen strongest nations twice a season:
-4.22 goals a game, 20.2% to overtime, best of seven won 4–0 / 4–1 / 4–2 / 4–3 29.0% / 29.0% /
-22.7% / 19.3% (real 30.5% / 26.6% / 22.9% / 20.0%), the favourite 76.1%.
+4.21 goals a game, 20.3% to overtime, best of seven won 4–0 / 4–1 / 4–2 / 4–3 28.4% / 28.4% /
+23.9% / 19.2% (real 30.5% / 26.6% / 22.9% / 20.0%), the favourite 75.6%.
 
-**No home advantage.** At the exports' LANs, 1,853 games had one side of the host nation (two of
-its three players); those sides did as Elo expected, within two standard errors (+9.9 ± 7.7 Elo:
+**No home advantage.** At the exports' LANs, 1,857 games had one side of the host nation (two of
+its three players); those sides did as Elo expected, within two standard errors (+9.7 ± 7.7 Elo:
 were it real, 51.4% a game, and the first export alone gave +6.1 ± 8.3). So Rocket League offers no
 Home advantage rule: the setup leaves it out, as tennis leaves out Computer signings, and a home
 venue changes nothing. Computer signings is left out too, as in tennis: any player plays any place,
@@ -171,8 +173,9 @@ the 57 nations).
 
 - Nations only: the orgs (Vitality, Karmine Corp, Falcons…) need a map of their own.
 - One season, the built-in one: no earlier seasons yet.
-- The exports still lack 25 recent stage pages and 32 rated players' countries
-  (`next-export.txt` lists them for a third), and 104 recent series name a team with no roster.
+- Three rated players have no country yet (Chaaneel, K1ng and Vinlll, rated 50 to 65:
+  `next-export.txt` lists their pages), 13 recent stage pages are missing (11 of them have no page
+  on the wiki yet), and 104 recent series name a team with no roster.
 - A player who changed his name (not only its punctuation) is two players to the reader. Côte
   d'Ivoire's "Aidenrll" and "Luchibald" (the FIFAe Nations League, to 2026-07-15) and "Aiden"
   and "Luchi" (its later events, from 2026-07-18) never play in the same series and look like

@@ -10,7 +10,7 @@
 //
 // On the game's scale a rating is Elo / 25 − 2, so a rating point is 25 Elo points, as in tennis, and the match model
 // plays Elo's own odds for each game (src/sports/rocketLeague.js); the offset puts the best player of the exports of
-// 2026-11-14 (dralii, 2,470) at 97 and a newcomer at 1,500 at 58. A nation names its best players by Elo (TEAM_SIZE); it
+// 2026-11-14 (dralii, 2,466) at 97 and a newcomer at 1,500 at 58. A nation names its best players by Elo (TEAM_SIZE); it
 // needs three for a team, so a nation with fewer fields none and its land stays neutral.
 import { FLAG_CODES } from '../../src/data/flags.js';
 import { HOME_NATIONS, NATIONS, nationIdentity } from '../../src/data/teams.js';
@@ -42,8 +42,8 @@ export const expected = gap => 1 / (1 + 10 ** (-gap / 400));
 
 // K per game: K_SCALE / (games + 5) ^ 0.4, FiveThirtyEight's shape, never below K_FLOOR. A newcomer's first game moves
 // him about 5.2 times a 300-game veteran's. K_SCALE is the one that best foresaw the last 180 days of the exports of
-// 2026-11-14 (2,462 games, each scored before it was played; regional starts on): log loss 0.5829 at 320, 0.6021 at
-// 110, 0.5853 at 240, 0.5835 at 400, 0.5868 at 500; at 320 the games it gave 75% went 78%, those at 94.5% went 92.5%.
+// 2026-11-14 (2,462 games, each scored before it was played; regional starts on): log loss 0.5831 at 320, 0.6025 at
+// 110, 0.5855 at 240, 0.5837 at 400, 0.5869 at 500; at 320 the games it gave 75% went 78%, those at 94.5% went 92.5%.
 // Rocket League's form moves fast: rosters change and a team's level with them.
 export const K_SCALE = 320;
 export const K_FLOOR = 8;
