@@ -34,12 +34,15 @@ export const FLAGS_OF_THE_DAY = Object.freeze({
   '124': periods(at('1965-02-14', 'CAN-1957')),
   // The People's Republic of the Congo, 1970 to 10 June 1991.
   '178': periods(at('1991-06-09', 'CGO-1970', '1970-01-01')),
-  // DR Congo, after Zaire (src/data/namesOfTheDay.js): 17 May 1997 to 19 February 2006.
-  '180': periods(at('2006-02-19', 'COD-1997', '1997-05-17')),
+  // DR Congo: the royal blue flag of 1966 until Zaire's of 21 November 1971 (src/data/namesOfTheDay.js), then after
+  // Zaire, 17 May 1997 to 19 February 2006.
+  '180': periods(at('1971-11-20', 'COD-1966'), at('2006-02-19', 'COD-1997', '1997-05-17')),
   // The People's Republic of Benin, 30 November 1975 to 1 August 1990.
   '204': periods(at('1990-07-31', 'BEN-1975', '1975-11-30')),
-  // Ethiopia's plain tricolour, from 28 May 1991 to 6 February 1996.
-  '231': periods(at('1996-02-05', 'ETH-1991', '1991-05-28')),
+  // Ethiopia's plain tricolour, from 28 May 1991 to 6 February 1996; the emblem of 1996, on a smaller disc of a lighter
+  // blue, until 2009 (de.wikipedia and Commons give 6 February 1996; en.wikipedia now 31 October 1996, the day of an
+  // amending proclamation).
+  '231': periods(at('1996-02-05', 'ETH-1991', '1991-05-28'), at('2009-05-15', 'ETH-1996')),
   // Georgia, 14 November 1990 to 14 January 2004.
   '268': periods(at('2004-01-13', 'GEO-1990', '1990-11-14')),
   // Greece's land flag: the cross with the crown until 18 August 1969, the stripes (today's) until 7 June 1975, the
@@ -61,8 +64,9 @@ export const FLAGS_OF_THE_DAY = Object.freeze({
   '484': periods(at('1968-09-15', 'MEX-1934')),
   // Romania: the people's republic's arms of 1952, the socialist republic's of 21 August 1965, until 27 December 1989.
   '642': periods(at('1965-08-20', 'ROU-1952'), at('1989-12-26', 'ROU-1965')),
-  // Russia, where a season plays it as itself (hockey's birthplaces): the Russian SFSR's flag until 22 August 1991.
-  '643': periods(at('1991-08-21', 'RUS-1954')),
+  // Russia, where a season plays it as itself (hockey's birthplaces): the Russian SFSR's flag until 22 August 1991,
+  // then the white-azure-scarlet tricolour of 1991 until today's darker blue of 11 December 1993 (the CIS plays 1992).
+  '643': periods(at('1991-08-21', 'RUS-1954'), at('1993-12-10', 'RUS-1991')),
   // South Africa: the flag of 1928 until 27 April 1994.
   '710': periods(at('1994-04-26', 'RSA-1928')),
   // Rhodesia (src/data/namesOfTheDay.js): the Federation's flag to 1963, Rhodesia's of 1964 and of 11 November 1968,
@@ -78,6 +82,18 @@ export const FLAGS_OF_THE_DAY = Object.freeze({
   '840': periods(at('1960-07-03', 'USA-1959', '1959-07-04')),
   // Venezuela: seven stars until the eighth of 12 March 2006.
   '862': periods(at('2006-03-11', 'VEN-1930')),
+  // Round 3 (15 November 2026; data-src/crest-eras/FLAGS-ROUND3.md): changes a viewer sees at 64 px, design or colour.
+  // Egypt: the Federation of Arab Republics' flag (the hawk of Quraish), 1 January 1972 to 4 October 1984 (the United
+  // Arab Republic's name and flag before, src/data/namesOfTheDay.js and the football federations).
+  '818': periods(at('1984-10-03', 'EGY-1972', '1972-01-01')),
+  // Puerto Rico: the dark blue triangle of 1952 until the 1995 law's medium blue (3 August 1995).
+  '630': periods(at('1995-08-02', 'PUR-1952')),
+  // Zambia: the darker green of 1964 until the brighter one of 1996 (its 1 January: Wikipedia gives only the year).
+  '894': periods(at('1995-12-31', 'ZAM-1964')),
+  // The Philippines: the National Flag Blue (navy) until the royal blue of 12 February 1998.
+  '608': periods(at('1998-02-11', 'PHI-1936')),
+  // Poland: vermilion red from 1928 until the crimson of 31 January 1980.
+  '616': periods(at('1980-01-30', 'POL-1928')),
 });
 
 /** The flag id shape `id` flew in season year `year`, or null for today's flag (or no year: a season of today). Pure. */

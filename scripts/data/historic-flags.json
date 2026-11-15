@@ -846,6 +846,204 @@
       "sha256": "1ec8aba371ddde5ddf47c27771f301224b12501b2534ea848101249f01ca395d",
       "bytes": 5427,
       "fit": "slice"
+    },
+    {
+      "file": "tpe",
+      "flagId": "158",
+      "name": "Chinese Taipei (the Chinese Taipei Olympic flag)",
+      "flies": "1981-",
+      "source": "scripts/data/historic-flags/Flag_of_Chinese_Taipei_for_Olympic_Games.svg",
+      "commons": {
+        "title": "File:Flag of Chinese Taipei for Olympic Games.svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Chinese_Taipei_for_Olympic_Games.svg",
+        "revision": 1301333019,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Flag_of_Chinese_Taipei_for_Olympic_Games.svg"
+      },
+      "licence": "Public domain (Commons: PD-ineligible), with the insignia tag and a Trademarked tag (the Olympic rings), as the file page states. No ring-free version of this flag exists: the ring-less Chinese Taipei flags on Commons are other bodies' (Universiade U, Paralympic, Deaflympics, volleyball, WorldSkills, esports), not the one teams fly; the trademark tag does not change the copyright status.",
+      "sha256": "306f1f59251d937410e8f982a3f84a9cfe15f84bd8d99404a38f3b1cce7e6010",
+      "lfSha256": "306f1f59251d937410e8f982a3f84a9cfe15f84bd8d99404a38f3b1cce7e6010",
+      "bytes": 6744,
+      "fit": "slice"
+    },
+    {
+      "file": "eg-1972",
+      "flagId": "EGY-1972",
+      "name": "Egypt (the Federation of Arab Republics flag, 1972-1984)",
+      "flies": "1972-1984",
+      "source": "scripts/data/historic-flags/Flag_of_Egypt_(1972-1984).svg",
+      "commons": {
+        "title": "File:Flag of Egypt (1972–1984).svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Egypt_(1972%E2%80%931984).svg",
+        "revision": 1301272248,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/d/db/Flag_of_Egypt_%281972%E2%80%931984%29.svg"
+      },
+      "licence": "Public domain: released by its author (Commons: PD-self) and ineligible for copyright (PD-ineligible); insignia tag, as the file page states",
+      "sha256": "fc85f906ed39f477abc7e94c66835d17844d8978495af23d7d8a72528ff88f39",
+      "lfSha256": "fc85f906ed39f477abc7e94c66835d17844d8978495af23d7d8a72528ff88f39",
+      "bytes": 110582,
+      "fit": "slice"
+    },
+    {
+      "file": "cd-1966",
+      "flagId": "COD-1966",
+      "name": "Democratic Republic of the Congo (1966-1971)",
+      "flies": "1966-1971",
+      "source": "scripts/data/historic-flags/Flag_of_the_Democratic_Republic_of_the_Congo_(1966-1971).svg",
+      "commons": {
+        "title": "File:Flag of the Democratic Republic of the Congo (1966–1971).svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Democratic_Republic_of_the_Congo_(1966%E2%80%931971).svg",
+        "revision": 1301403134,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Flag_of_the_Democratic_Republic_of_the_Congo_%281966%E2%80%931971%29.svg"
+      },
+      "licence": "Public domain (Commons: PD-Democratic Republic of the Congo, PD-ineligible); insignia tag, as the file page states",
+      "sha256": "1cd045cf85e960ac60cad3138597feb0467b65c5e12b144255d22f4f9da39819",
+      "lfSha256": "1cd045cf85e960ac60cad3138597feb0467b65c5e12b144255d22f4f9da39819",
+      "bytes": 568,
+      "fit": "stretch"
+    },
+    {
+      "file": "pr-1952",
+      "flagId": "PUR-1952",
+      "name": "Puerto Rico (dark blue triangle, 1952-1995)",
+      "flies": "1952-1995",
+      "source": "scripts/data/historic-flags/Flag_of_Puerto_Rico_(1952-1995).svg",
+      "commons": {
+        "title": "File:Flag of Puerto Rico (1952–1995).svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Puerto_Rico_(1952%E2%80%931995).svg",
+        "revision": 1290769705,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Flag_of_Puerto_Rico_%281952%E2%80%931995%29.svg"
+      },
+      "licence": "Public domain (Commons: PD-ineligible), as the file page states",
+      "sha256": "c20df1007aefe9176c2dd4617db288fddf5188da1c9a47100c9d9edfe69e6b7d",
+      "lfSha256": "82315605d26ae20d58de8841d65f46ee068ae2e91596a9fafaddf795040a6f52",
+      "bytes": 275,
+      "fit": "slice-hoist"
+    },
+    {
+      "file": "zm-1964",
+      "flagId": "ZAM-1964",
+      "name": "Zambia (1964-1996)",
+      "flies": "1964-1996",
+      "source": "scripts/data/historic-flags/Flag_of_Zambia_(1964-1996).svg",
+      "commons": {
+        "title": "File:Flag of Zambia (1964–1996).svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Zambia_(1964%E2%80%931996).svg",
+        "revision": 1254220153,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Flag_of_Zambia_%281964%E2%80%931996%29.svg"
+      },
+      "licence": "Public domain in Zambia under the Copyright and Performance Rights Act 1994 (the page's Zambian public-domain tag) and ineligible for copyright (Commons: PD-ineligible); insignia tag, as the file page states",
+      "sha256": "7b6ad7e3cd54268741aec37fdf74587937f1f8f1e88066e3a29025cdff318562",
+      "lfSha256": "495a28aa9724f554518b1b00dd34f1212ac0471707685a6eac73b5ae03b3c426",
+      "bytes": 5323,
+      "fit": "stretch"
+    },
+    {
+      "file": "ru-1991",
+      "flagId": "RUS-1991",
+      "name": "Russia (1991-1993)",
+      "flies": "1991-1993",
+      "source": "scripts/data/historic-flags/Flag_of_Russia_(1991-1993).svg",
+      "commons": {
+        "title": "File:Flag of Russia (1991–1993).svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Russia_(1991%E2%80%931993).svg",
+        "revision": 1295066117,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/3/32/Flag_of_Russia_%281991%E2%80%931993%29.svg"
+      },
+      "licence": "Public domain: not an object of copyright under article 1259 of Book IV of the Civil Code of the Russian Federation (Commons: PD-RU-exempt), as the file page states; it also carries the insignia tag and two legal disclaimers (communist symbol, \"Zed\" symbol)",
+      "sha256": "d4a232611d499d4151b1ac66168b7548bda3fef62e3997aa4c62197690a83e73",
+      "lfSha256": "9fd2d363e82747163a84580537d02a92a72cf49ab5ecb1b28460181336cddb2d",
+      "bytes": 197,
+      "fit": "stretch"
+    },
+    {
+      "file": "et-1996",
+      "flagId": "ETH-1996",
+      "name": "Ethiopia (1996-2009)",
+      "flies": "1996-2009",
+      "source": "scripts/data/historic-flags/Flag_of_Ethiopia_(1996-2009).svg",
+      "commons": {
+        "title": "File:Flag of Ethiopia (1996–2009).svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Ethiopia_(1996%E2%80%932009).svg",
+        "revision": 1236930568,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Flag_of_Ethiopia_%281996%E2%80%932009%29.svg"
+      },
+      "licence": "Public domain (Commons: PD-Ethiopia, PD-ineligible); insignia tag, as the file page states",
+      "sha256": "84d1bc78bfde9dd94eb3e45855536839b7fd1c54bf99ce7dec26c2247f9c7a5d",
+      "lfSha256": "ee20d2cb7c371dc5f4e91f0b48b751d822ae0cf548512bdce4b304e2f21bd677",
+      "bytes": 894,
+      "fit": "slice"
+    },
+    {
+      "file": "ph-1936",
+      "flagId": "PHI-1936",
+      "name": "Philippines (1936-1985, 1986-1998)",
+      "flies": "1936-1998",
+      "source": "scripts/data/historic-flags/Flag_of_the_Philippines_(1936-1985,_1986-1998).svg",
+      "commons": {
+        "title": "File:Flag of the Philippines (1936–1985, 1986–1998).svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_the_Philippines_(1936%E2%80%931985%2C_1986%E2%80%931998).svg",
+        "revision": 1301084376,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Flag_of_the_Philippines_%281936%E2%80%931985%2C_1986%E2%80%931998%29.svg"
+      },
+      "licence": "Public domain in the Philippines (created or published before 14 November 1972 without copyright registration, Commons: PD-Philippines 1972) and ineligible for copyright (PD-ineligible); its uploader also licenses the drawing CC BY-SA 3.0 (2.5, 2.0, 1.0) and GFDL; insignia tag, as the file page states",
+      "sha256": "2e84b16c26100a457c43777415b00920832b45a2c4a1e783db534d62563b5b23",
+      "lfSha256": "2e84b16c26100a457c43777415b00920832b45a2c4a1e783db534d62563b5b23",
+      "bytes": 814,
+      "fit": "slice-hoist"
+    },
+    {
+      "file": "pl-1928",
+      "flagId": "POL-1928",
+      "name": "Poland (1928-1980)",
+      "flies": "1928-1980",
+      "source": "scripts/data/historic-flags/Flag_of_Poland_(1928-1980).svg",
+      "commons": {
+        "title": "File:Flag of Poland (1928–1980).svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Flag_of_Poland_(1928%E2%80%931980).svg",
+        "revision": 1280476298,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/4/41/Flag_of_Poland_%281928%E2%80%931980%29.svg"
+      },
+      "licence": "Public domain: a Polish state symbol under article 4 of the Polish Copyright Act of 4 February 1994 (Commons: PD-Polish symbol) and simple geometry (PD-shape); insignia tag and a communist-symbol disclaimer, as the file page states",
+      "sha256": "dcb630e7d66d31906bab8a4e4976d5f0f962e904b013483e787dbaeeb3e674a8",
+      "lfSha256": "dcb630e7d66d31906bab8a4e4976d5f0f962e904b013483e787dbaeeb3e674a8",
+      "bytes": 157,
+      "fit": "stretch"
+    },
+    {
+      "file": "tpe-ctfa",
+      "flagId": "TPE-CTFA",
+      "name": "Chinese Taipei (the Chinese Taipei Football Association's flag, to about 2006)",
+      "flies": "to 2006",
+      "source": "scripts/data/historic-flags/Former_Chinese_Taipei_Football_Flag.svg",
+      "commons": {
+        "title": "File:Former Chinese Taipei Football Flag.svg",
+        "page": "https://commons.wikimedia.org/wiki/File:Former_Chinese_Taipei_Football_Flag.svg",
+        "revision": 1183686374,
+        "original": "https://upload.wikimedia.org/wikipedia/commons/2/2d/Former_Chinese_Taipei_Football_Flag.svg"
+      },
+      "licence": "Public domain: released by its uploader (Commons: PD-self), as the file page states; the page carries a deletion nomination of 19 March 2026 (\"Fails TOO Taiwan\", Commons:Deletion requests/Files found with deepcat:\"Flags_of_Chinese_Taipei\"), still open",
+      "sha256": "0e8bf09cf029c83a956dd4f665348de2cf6843ba2dabb06b95c27fa3fb769fef",
+      "lfSha256": "0e8bf09cf029c83a956dd4f665348de2cf6843ba2dabb06b95c27fa3fb769fef",
+      "bytes": 24227,
+      "fit": "slice"
+    },
+    {
+      "file": "rtf",
+      "flagId": "RTF",
+      "name": "RTF (the Russian Tennis Federation's flag, 2021)",
+      "flies": "2021",
+      "source": "scripts/data/historic-flags/Rtf_tennis_flag_vector.svg",
+      "commons": {
+        "title": "File:Rtf tennis flag vector.svg",
+        "page": "https://en.wikipedia.org/wiki/File:Rtf_tennis_flag_vector.svg",
+        "revision": 1054271095,
+        "original": "https://upload.wikimedia.org/wikipedia/en/b/b5/Rtf_tennis_flag_vector.svg"
+      },
+      "licence": "Public domain in the United States: ineligible for copyright (typefaces and simple geometric shapes, English Wikipedia: PD-ineligible), as the file page states; an English Wikipedia file, not on Commons",
+      "sha256": "8bc0ffc93bfbf96a94abaa600f93d732a6f3ec478fb9d75abc1e6ffb90565947",
+      "lfSha256": "8bc0ffc93bfbf96a94abaa600f93d732a6f3ec478fb9d75abc1e6ffb90565947",
+      "bytes": 5943,
+      "fit": "slice"
     }
   ]
 }

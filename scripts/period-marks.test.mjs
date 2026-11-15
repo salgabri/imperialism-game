@@ -102,6 +102,26 @@ test('a men\'s football season\'s own identities come first', () => {
   assert.ok(!fieldedNations(sport).includes('804'), 'Ukraine plays for the Soviet Union');
 });
 
+test('round 3: every change a viewer sees at 64 px, and teams under a flag other than their state\'s', () => {
+  for (const [shape, year, flagId] of [
+    ['818', 1980, 'EGY-1972'], ['818', 1985, null], ['180', 1971, 'COD-1966'], ['630', 1995, 'PUR-1952'], ['630', 1996, null],
+    ['894', 1995, 'ZAM-1964'], ['894', 1996, null], ['643', 1993, 'RUS-1991'], ['643', 1994, null], ['231', 1995, 'ETH-1991'],
+    ['231', 1996, 'ETH-1996'], ['231', 2010, null], ['608', 1997, 'PHI-1936'], ['608', 1998, null], ['616', 1979, 'POL-1928'],
+    ['616', 1980, null],
+  ]) assert.equal(flagOfTheDay(shape, year), flagId, `${shape} ${year}`);
+  // In the seasons' teams: Egypt in 1979/80, Puerto Rico's birthplace team of 1990, Russia in hockey's 1992/93.
+  assert.equal(nationIdentity('818', season('football', 'nt-1980')).flagId, 'EGY-1972');
+  assert.equal(nationIdentity('630', season('baseball', 'mlb-war-1990')).flagId, 'PUR-1952');
+  assert.deepEqual(nationIdentity('643', season('hockey', 'nhl-1993')), identity('Russia', 'RUS', 'RUS-1991'));
+  // Chinese Taipei's teams fly the Chinese Taipei Olympic flag, today too, its football teams their association's
+  // flag before 2006; Russia played tennis's 2021 as RTF.
+  assert.equal(FLAG_CODES['158'], 'tpe');
+  assert.deepEqual(nationIdentity('158', getSport('tennis')), identity('Chinese Taipei', 'TPE', '158'));
+  assert.deepEqual(nationIdentity('158', season('football', 'swos-9697')), identity('Chinese Taipei', 'TPE', 'TPE-CTFA'));
+  assert.deepEqual(nationIdentity('643', season('tennis', 'tennis-2021')), identity('RTF', 'RTF', 'RTF'));
+  assert.deepEqual(nationIdentity('643', season('tennis', 'tennis-2020')), identity('Russia', 'RUS', '643'));
+});
+
 // ---------- crests of the day ----------
 
 const compiled = await build({

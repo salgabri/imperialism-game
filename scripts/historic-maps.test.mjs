@@ -110,7 +110,7 @@ test('a setup or campaign plays the map of its season\'s year: today\'s for the 
   }
 });
 
-test('the names of the day: tennis\'s federations, FR Yugoslavia, Swaziland, Macedonia, Zaire and Rhodesia, each sourced', () => {
+test('the names of the day: tennis\'s federations, FR Yugoslavia, Swaziland, Macedonia, Zaire, Rhodesia, Chinese Taipei and RTF, each sourced', () => {
   for (const entry of NAMES_OF_THE_DAY) {
     assert.ok(NATIONS[entry.shape], entry.name);
     assert.match(entry.code, /^[A-Z]{3}$/);
@@ -127,7 +127,16 @@ test('the names of the day: tennis\'s federations, FR Yugoslavia, Swaziland, Mac
   assert.equal(named('tennis', 1979)[716], 'Zimbabwe Rhodesia');
   assert.equal(named('tennis', 1980)[716], undefined, '1980: Zimbabwe');
   assert.equal(named('football', 1997)[180], undefined, '1997: DR Congo');
-  assert.deepEqual(named('football', 2005), { 688: 'Serbia and Montenegro', 748: 'Swaziland', 807: 'Macedonia' });
+  assert.deepEqual(named('football', 2005), { 158: 'Chinese Taipei', 688: 'Serbia and Montenegro', 748: 'Swaziland', 807: 'Macedonia' });
+  // Teams under a flag other than their state's: Chinese Taipei's football flag before 2006, RTF in tennis's 2021.
+  assert.equal(namesOfTheDay('football', 2004)[158].flagId, 'TPE-CTFA');
+  assert.equal(namesOfTheDay('womens-football', 1992)[158].flagId, 'TPE-CTFA');
+  assert.equal(namesOfTheDay('football', 2006)[158], undefined, '2006: the Olympic flag, Chinese Taipei\'s own');
+  assert.equal(namesOfTheDay('tennis', 2004)[158], undefined, 'tennis: the Olympic flag, Chinese Taipei\'s own');
+  assert.deepEqual(namesOfTheDay('tennis', 2021)[643], { name: 'RTF', code: 'RTF', flagId: 'RTF' });
+  assert.equal(namesOfTheDay('womens-tennis', 2021)[643].name, 'RTF');
+  assert.equal(namesOfTheDay('tennis', 2020)[643], undefined, '2020: Russia');
+  assert.equal(namesOfTheDay('football', 2021)[643], undefined, 'football 2021: Russia');
   assert.deepEqual(named('football', 2019), {});
   assert.deepEqual(namesOfTheDay('tennis', null), {}, 'the built-in season plays today\'s names');
   // Each season plays them: a file's own win (the 1990 World Cup's West Germany), the table's fill the rest.

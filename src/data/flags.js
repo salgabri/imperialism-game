@@ -28,7 +28,7 @@ export const FLAG_CODES = {
   '148': 'td',        // Chad
   '152': 'cl',        // Chile
   '156': 'cn',        // China
-  '158': 'tw',        // Chinese Taipei
+  '158': 'tpe',       // Chinese Taipei: the Chinese Taipei Olympic flag its teams fly (scripts/data/historic-flags.json)
   '170': 'co',        // Colombia
   '178': 'cg',        // Congo
   '180': 'cd',        // DR Congo
@@ -242,6 +242,17 @@ export const FLAG_CODES = {
   'MYA-1974': 'mm-1974', // Burma (1974-2010)
   'VEN-1930': 've-1930', // Venezuela, seven stars (to 2006)
   'HON-2022': 'hn',      // Honduras, turquoise (2022-26: flag-icons' drawing)
+  'EGY-1972': 'eg-1972', // Egypt, the Federation of Arab Republics' flag (1972-84)
+  'COD-1966': 'cd-1966', // DR Congo, royal blue (1966-71)
+  'PUR-1952': 'pr-1952', // Puerto Rico, the dark blue triangle (1952-95)
+  'ZAM-1964': 'zm-1964', // Zambia, the darker green (1964-96)
+  'RUS-1991': 'ru-1991', // Russia, white-azure-scarlet (1991-93)
+  'ETH-1996': 'et-1996', // Ethiopia, the emblem of 1996 (1996-2009)
+  'PHI-1936': 'ph-1936', // Philippines, the National Flag Blue (to 1998)
+  'POL-1928': 'pl-1928', // Poland, vermilion (1928-80)
+  // Teams under a flag other than their state's (src/data/namesOfTheDay.js; scripts/data/historic-flags.json):
+  'TPE-CTFA': 'tpe-ctfa', // Chinese Taipei's football flag (to about 2006)
+  'RTF': 'rtf',          // Russia as RTF, the Russian Tennis Federation (2021)
 };
 
 /** URL of a nation's flag, or null for shapes without a mapped national flag. */

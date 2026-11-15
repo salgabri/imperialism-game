@@ -57,6 +57,17 @@ export const NAMES_OF_THE_DAY = Object.freeze([
     source: 'https://en.wikipedia.org/w/index.php?oldid=1384455084' },
   { shape: '716', name: 'Zimbabwe Rhodesia', code: 'RHO', flagId: '716', from: 1979, through: 1979,
     source: 'https://en.wikipedia.org/w/index.php?oldid=1381427191' },
+  // Teams under a flag other than their state's (docs/design/period-marks.md, "Nations"). Chinese Taipei's teams have
+  // flown the Chinese Taipei Olympic flag since 1981 (its flag in src/data/flags.js, every season); its football teams
+  // flew the Chinese Taipei Football Association's flag, a ball-dotted taijitu, before 2006 (Chinese Taipei Olympic
+  // flag, Wikipedia, revision 1367166095), its women's teams of the same association too.
+  { shape: '158', name: 'Chinese Taipei', code: 'TPE', flagId: 'TPE-CTFA', through: 2005, sports: ['football', 'womens-football'],
+    source: 'https://en.wikipedia.org/w/index.php?oldid=1367166095' },
+  // Russia played the 2021 Davis Cup Finals and the 2020-21 Billie Jean King Cup Finals as RTF, the Russian Tennis
+  // Federation, under its flag: the Court of Arbitration for Sport barred Russia's name and flag from December 2020
+  // (2021 Davis Cup Finals, Wikipedia, revision 1382744310).
+  { shape: '643', name: 'RTF', code: 'RTF', flagId: 'RTF', from: 2021, through: 2021, sports: TENNIS,
+    source: 'https://en.wikipedia.org/w/index.php?oldid=1382744310' },
 ].map(entry => Object.freeze(entry)));
 
 const inYears = (entry, year) => (entry.from ?? -Infinity) <= year && year <= (entry.through ?? Infinity);

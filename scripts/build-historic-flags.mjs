@@ -316,6 +316,10 @@ const EDITOR_NAMESPACES = /^(sodipodi|inkscape|rdf|dc|cc|sketch|serif|i|x|graph|
 // each axis on its own (bands, stars spread across the field, where cutting would lose part of the design).
 const FITS = { slice: 'xMidYMid slice', 'slice-hoist': 'xMinYMid slice', stretch: 'none' };
 
+// The root's presentation attributes its shapes inherit.
+const INHERITED = ['fill', 'fill-rule', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-linejoin', 'stroke-linecap',
+  'stroke-miterlimit', 'stroke-opacity', 'font-family', 'font-size', 'font-weight', 'opacity'];
+
 /**
  * The original's elements, cleaned of editor data, comments and anything active, nested in a viewport that fills the
  * 640 x 480 canvas as `fit` says. Every id stays as it was: each flag is a document of its own (an <img> or <image>).
@@ -352,7 +356,10 @@ function nestedFlag(svg, fit) {
   const inner = [...svg.children].map(node => serializer.serializeToString(node)
     .replace(/ xmlns="http:\/\/www\.w3\.org\/2000\/svg"/g, '')).join('').replace(/>\s+</g, '><');
   const xlink = /xlink:href/.test(inner) ? ' xmlns:xlink="http://www.w3.org/1999/xlink"' : '';
-  return { field: `<svg${xlink} width="640" height="480" viewBox="${viewBox}" preserveAspectRatio="${FITS[fit]}">${inner.replace(/ xmlns:xlink="http:\/\/www\.w3\.org\/1999\/xlink"/g, '')}</svg>`, emblem: '' };
+  // The root's own paint (`fill="#fff"` that every unpainted shape inherits: Puerto Rico's stripes and star, the
+  // Philippines' sun) goes on the nested viewport, whose children inherit it as they did the root's.
+  const paint = INHERITED.filter(name => svg.hasAttribute(name)).map(name => ` ${name}="${svg.getAttribute(name).replace(/"/g, '&quot;')}"`).join('');
+  return { field: `<svg${xlink} width="640" height="480" viewBox="${viewBox}" preserveAspectRatio="${FITS[fit]}"${paint}>${inner.replace(/ xmlns:xlink="http:\/\/www\.w3\.org\/1999\/xlink"/g, '')}</svg>`, emblem: '' };
 }
 
 // ---- big drawings, drawn once into a bitmap ----
