@@ -665,8 +665,8 @@ if (!filtered && fixedChecks) {
     'womens-football': ['Spain', 'England', 'France', 'Germany'], tennis: ['Spain', 'Italy', 'United States', 'Germany'],
     'womens-tennis': ['United States', 'Russia', 'Czechia', 'Ukraine'],
     'rugby-league': ['Australia', 'New Zealand', 'England', 'Fiji'],
-    // Rocket League's, by the Liquipedia snapshot's Elo: France, Saudi Arabia, the United States and Canada lead it.
-    'rocket-league': ['France', 'Saudi Arabia', 'United States', 'Canada'] };
+    // Rocket League's, by the Liquipedia snapshot's Elo: the United States, France, Saudi Arabia and Brazil lead it.
+    'rocket-league': ['United States', 'France', 'Saudi Arabia', 'Brazil'] };
 
   for (const sport of SPORT_LIST) {
     // A sport with clubs only (American football) fields no nations: its clubs are checked below.

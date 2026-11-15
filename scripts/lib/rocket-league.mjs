@@ -10,7 +10,7 @@
 //
 // On the game's scale a rating is Elo / 25 − 2, so a rating point is 25 Elo points, as in tennis, and the match model
 // plays Elo's own odds for each game (src/sports/rocketLeague.js); the offset puts the best player of the exports of
-// 2026-11-14 (dralii, 2,466) at 97 and a newcomer at 1,500 at 58. A nation names its best players by Elo (TEAM_SIZE); it
+// 2026-11-14 and 15 (dralii, 2,506) at 98 and a newcomer at 1,500 at 58. A nation names its best players by Elo (TEAM_SIZE); it
 // needs three for a team, so a nation with fewer fields none and its land stays neutral.
 import { FLAG_CODES } from '../../src/data/flags.js';
 import { HOME_NATIONS, NATIONS, nationIdentity } from '../../src/data/teams.js';
@@ -42,8 +42,8 @@ export const expected = gap => 1 / (1 + 10 ** (-gap / 400));
 
 // K per game: K_SCALE / (games + 5) ^ 0.4, FiveThirtyEight's shape, never below K_FLOOR. A newcomer's first game moves
 // him about 5.2 times a 300-game veteran's. K_SCALE is the one that best foresaw the last 180 days of the exports of
-// 2026-11-14 (2,462 games, each scored before it was played; regional starts on): log loss 0.5831 at 320, 0.6025 at
-// 110, 0.5855 at 240, 0.5837 at 400, 0.5869 at 500; at 320 the games it gave 75% went 78%, those at 94.5% went 92.5%.
+// 2026-11-14 and 15 (2,462 games, each scored before it was played; regional starts on): log loss 0.5811 at 320, 0.5995
+// at 110, 0.5834 at 240, 0.5818 at 400, 0.5851 at 500; at 320 the games it gave 75% went 78%, those at 94.6% went 92.3%.
 // Rocket League's form moves fast: rosters change and a team's level with them.
 export const K_SCALE = 320;
 export const K_FLOOR = 8;
@@ -386,10 +386,11 @@ const daysBetween = (from, to) => Math.round((Date.parse(to) - Date.parse(from))
  * whose first game is in that region's event (START elsewhere); `holdout`: the date from which each game's prediction
  * is scored, before it is played (log loss, Brier score, the same for the international events alone, and calibration
  * by tenths of the expected score). Each international game is kept in `international` as the two sides' player keys
- * and the first side's surprise (won − expected), for regionalStarts.
+ * and the first side's surprise (won − expected), for regionalStarts. `onGame(one, game, expected, sides)` is told of
+ * each game before it moves anyone, its sides' players as they stand (each one's `games` those he had played before).
  * → { players: Map(key → player), games, scored, international }
  */
-export function runElo(series, { scale = K_SCALE, starts = {}, holdout = null } = {}) {
+export function runElo(series, { scale = K_SCALE, starts = {}, holdout = null, onGame = null } = {}) {
   const players = new Map();
   const scored = { all: newScore(), international: newScore(), bins: Array.from({ length: 10 }, () => ({ n: 0, expected: 0, won: 0 })) };
   const international = [], lan = [];
@@ -424,6 +425,7 @@ export function runElo(series, { scale = K_SCALE, starts = {}, holdout = null } 
       const [a, b] = sides.map(side => side.reduce((sum, player) => sum + player.elo, 0) / side.length);
       const e = expected(a - b);
       const won = game.winner === 1 ? 1 : 0;
+      if (onGame) onGame(one, game, e, sides);
       if (one.international) international.push({ keys, surprise: won - e });
       if (one.host) lan.push({ keys, host: one.host, surprise: won - e });
       if (holdout && one.date >= holdout) {
@@ -553,6 +555,28 @@ export function ratedPlayers(players, asOf, people = new Map(), national = new M
     .sort((a, b) => b.elo - a.elo || a.name.localeCompare(b.name));
 }
 
+/**
+ * The players rated at the end of an earlier season (`asOf`, its last day): the Elo of the games up to that day, rated as
+ * ratedPlayers rates them then, each with the flag, nation and national team the whole record gives him (`whole`, the run
+ * of every game's players): a player's country is his, whichever year it is.
+ */
+export function playersAsOf(series, asOf, { starts = {}, people = new Map(), national = new Map(), whole }) {
+  const { players } = runElo(series.filter(one => one.date <= asOf), { starts });
+  return ratedPlayers(players, asOf, people, national).map(player => {
+    const all = whole.get(player.key);
+    return { ...player, flag: flagOf(all, people), nation: nationOfPlayer(all, people, national) };
+  });
+}
+
+/**
+ * The favourite's odds a game, in ODDS_BINS bins of 1% from even (0.50–0.51 the first, 0.99–1 the last): how an earlier
+ * season's real games are kept, so its goal rate can be solved at their own odds (scripts/build-rocket-league-seasons.mjs).
+ */
+export const ODDS_BINS = 50;
+export const oddsBin = e => Math.min(ODDS_BINS - 1, Math.floor((Math.max(e, 1 - e) - 0.5) * 2 * ODDS_BINS));
+/** A bin's middle: 0.505 for the first. */
+export const binOdds = bin => 0.5 + (bin + 0.5) / (2 * ODDS_BINS);
+
 /** The snapshot's row: `[key, name, flag, nation, national team, elo, games, wins, last, team, region]`. */
 export const rowOf = p => [p.key, p.name, p.flag, p.nation, p.side, p.elo, p.games, p.wins, p.last, p.team, p.region];
 
@@ -570,8 +594,26 @@ const byElo = (a, b) => b.elo - a.elo || a.name.localeCompare(b.name);
 export const tupleOf = player => [player.name, 'PLR', player.rating, player.source];
 
 /**
+ * A squad whose players each have a name of his own: two of a nation's five who go by one name (two players Liquipedia
+ * keeps apart, or one under two pages) are each shown by his page's title, a disambiguation left out ("Abdullah (Omani
+ * Player)" and "Abdullahrll" rather than two Abdullahs), and one still alike gets " II".
+ */
+function distinctNames(squad) {
+  const count = new Map();
+  for (const player of squad) count.set(player.name, (count.get(player.name) ?? 0) + 1);
+  const seen = new Set();
+  return squad.map(player => {
+    let name = count.get(player.name) > 1 ? player.key.replace(/ \([^)]*\)$/, '') : player.name;
+    if (seen.has(name)) name = `${name} II`;
+    seen.add(name);
+    return name === player.name ? player : { ...player, name };
+  });
+}
+
+/**
  * The nations that field a team, strongest first: each `{ id, name, str, squad, players }`, `squad` its TEAM_SIZE best
- * by Elo, `players` how many it has in all, `str` its three best players' mean rating (the lineup the game fields).
+ * by Elo (distinctNames), `players` how many it has in all, `str` its three best players' mean rating (the lineup the game
+ * fields).
  */
 export function nationsOf(players, sport = null) {
   const pools = new Map();
@@ -581,7 +623,7 @@ export function nationsOf(players, sport = null) {
     pools.get(player.nation).push(player);
   }
   return [...pools.entries()].filter(([, pool]) => pool.length >= MIN_PLAYERS).map(([id, pool]) => {
-    const squad = pool.slice().sort(byElo).slice(0, TEAM_SIZE);
+    const squad = distinctNames(pool.slice().sort(byElo).slice(0, TEAM_SIZE));
     const str = Math.round(squad.slice(0, LINEUP).reduce((sum, player) => sum + player.rating, 0) / LINEUP * 10) / 10;
     return { id, name: nationIdentity(id, sport).name, str, squad, players: pool.length };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));

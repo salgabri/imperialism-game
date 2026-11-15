@@ -396,7 +396,8 @@ export const SEASON_NOTES = Object.freeze({
     + 'before 2016 computed from Jeff Sackmann\'s match results by its method (1963–1979 rough; before 1968 the majors and the '
     + 'Federation Cup only, as Wikipedia records them). Each nation names its five '
     + 'best; one with fewer than two rated players fields no team.',
-  'rocket-league': 'Elo ratings computed from every 3v3 series Liquipedia records (CC BY-SA 3.0), to November 2026. A '
+  'rocket-league': 'Elo ratings computed from every 3v3 series Liquipedia records (CC BY-SA 3.0): to November 2026, and '
+    + 'at the end of each year from 2016 (2016–2017 rough), each year at its own scoring. A '
     + 'player plays for the nation he last played for at the FIFAe World Cup or the Esports Nations Cup, else the flag '
     + 'Liquipedia files him under, and only if he has played within the year. Each nation fields its best three; one with '
     + 'fewer fields no team.',

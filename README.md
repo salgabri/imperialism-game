@@ -153,6 +153,7 @@ npm run sync:womens-tennis # snapshot Tennis Abstract's women's Elo ratings and 
 npm run build-womens-tennis # rebuild the women's tennis nations from that snapshot (--check compares byte for byte)
 npm run sync:rocket-league # Rocket League's player Elo from a Liquipedia export saved by hand in data-src/liquipedia/ (no network) into scripts/data/rocket-league-elo.json
 npm run build-rocket-league # rebuild the Rocket League nations from that snapshot (--check compares byte for byte)
+npm run build:rocket-league-seasons # rebuild Rocket League's earlier seasons, 2016-2025, from the sync's year-end snapshots (--check)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 npm run build:icons      # render favicon.ico, apple-touch-icon.png and the app icons from public/favicon.svg
 npm run build:fonts      # cut the Latin Extended + Vietnamese font files from the pinned Archivo sources (--check compares byte for byte)
@@ -384,7 +385,8 @@ manager of the theatre's favourite, with decisions from the first match.
    2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1963, rugby league its built-in 2025
    (Rugby League 26) then [its earlier seasons](#rugby-league-seasons) 2024 back to 1960 (computed from
    NRL.com's match statistics, but 2008: Rugby League 2, the overall ours; before 1998 from the Rugby League
-   Project's team lists), the premiership's clubs on the map of their day.
+   Project's team lists), the premiership's clubs on the map of their day, and Rocket League its 2026 then its
+   [earlier seasons](#rocket-league-seasons) 2025 back to 2016 (the Elo of Liquipedia's results at each year's end).
    The Season list names a season by its years, adding "· computed", "· converted"
    or "· fan-made" where its label calls its ratings so ("1969/70 · computed"); a
    year with two seasons (football's 1993/94 and 1989/90, the NFL's and AFL's of
@@ -1020,14 +1022,15 @@ neutral. See the
 [design notes](docs/design/rugby-league.md).
 
 **Rocket League** — `src/data/rosters.rocket-league.js`, from every 3v3 series Liquipedia records (CC BY-SA 3.0),
-read from three exports of the wiki saved by hand on 2026-11-14 (no script fetches Liquipedia: its robots.txt shuts
-Anthropic's crawlers out) into `scripts/data/rocket-league-elo.json`: 947 events of S- and A-Tier, 82,072 games from 2015
-to November 2026. There is no game's rating list for an esport: each player's rating is an Elo built game by game, a
-team playing at its three players' mean, on the game's scale Elo / 25 − 2 (dralii's 2,466 is 97), so the match model
-plays Elo's own odds; held out on the last 180 days its predictions were calibrated (log loss 0.583). A player plays for
-the nation he last played for at the FIFAe World Cup or the Esports Nations Cup, else the flag Liquipedia files him
-under; 812 players have played within the year, and 57 nations have the three a series needs, from France, Saudi Arabia
-and the United States down. Nothing is estimated. See the [design notes](docs/design/rocket-league.md).
+read from four exports of the wiki saved by hand on 2026-11-14 and 15 (no script fetches Liquipedia: its robots.txt
+shuts Anthropic's crawlers out) into `scripts/data/rocket-league-elo.json`: 1,009 events of S- and A-Tier, 90,966 games
+from 2015 to November 2026. There is no game's rating list for an esport: each player's rating is an Elo built game by
+game, a team playing at its three players' mean, on the game's scale Elo / 25 − 2 (dralii's 2,506 is 98), so the match
+model plays Elo's own odds; held out on the last 180 days its predictions were calibrated (log loss 0.581). A player
+plays for the nation he last played for at the FIFAe World Cup or the Esports Nations Cup, else the flag Liquipedia
+files him under; 817 players have played within the year, and 57 nations have the three a series needs, from the United
+States, France and Saudi Arabia down. Nothing is estimated. Each year from 2016 is an
+[earlier season](#rocket-league-seasons). See the [design notes](docs/design/rocket-league.md).
 
 **Women's football** — `src/data/clubs.womens-football.js` and
 `src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07
@@ -2352,6 +2355,35 @@ weights and their reasons, the club shift, the computed seasons
 [1998–2007](docs/design/rugby-league.md#computed-seasons-19982007),
 [1960–1997](docs/design/rugby-league.md#computed-seasons-19601997)) and the
 known limits.
+
+## Rocket League seasons
+
+Rocket League can be played on ten earlier seasons as well as the built-in 2026: the end of every
+year from 2016 to 2025, nations only. Pick one under **Season** in setup. Each season is a file in
+`public/rocket-league/` (12–64 KB) that loads only when chosen.
+
+- **Ratings** are the same Elo as the built-in season's, run over Liquipedia's results up to 31
+  December of that year: who was rated then (20 games behind him, one within the year), on the
+  same scale (Elo / 25 − 2), each nation's five best with its three best playing. The record begins
+  in September 2015, so 2016 is the first season, and 2016 and 2017 are marked rough.
+- **Nations** grow with the game: 9 at the end of 2016 (the United States, Great Britain and the
+  Netherlands lead), 18 in 2019, 29 in 2021 (Saudi Arabia first) and 50 in 2025. A player plays for
+  the nation the whole record gives him, whichever year it is, for the team he played for that
+  December.
+- **Scoring by year:** each season plays its own year's goal rate, solved so that the year's real
+  games between seasoned players, each at its own Elo odds, score as they did: 3.9 goals a game in
+  2019 and 2020, 4.2–4.3 from 2022. Who wins is Elo's at any rate; only the goals differ.
+- **Licence:** Liquipedia's content is CC BY-SA 3.0, as for the built-in season:
+  `public/rocket-league/ATTRIBUTION.txt` credits it and the files are shared under the same licence.
+  To rebuild:
+
+  ```bash
+  npm run sync:rocket-league            # the year-end snapshots in scripts/data/rocket-league-seasons/, from the exports in data-src/liquipedia/
+  npm run build:rocket-league-seasons   # the season files, their listing, the scoring table and the audit (--check compares byte for byte)
+  ```
+
+The [design notes](docs/design/rocket-league.md#earlier-seasons) give each season's nations and
+scoring.
 
 ## Squad economics
 

@@ -102,6 +102,7 @@
     "build:womens-tennis-seasons": "node scripts/build-tennis-seasons.mjs --tour=wta",
     "sync:rocket-league": "node scripts/sync-rocket-league.mjs",
     "build-rocket-league": "node scripts/build-rocket-league.mjs",
+    "build:rocket-league-seasons": "node scripts/build-rocket-league-seasons.mjs",
     "test:domestic": "node --test scripts/domestic-data.test.mjs scripts/domestic-geometry.test.mjs scripts/domestic-campaign.test.mjs scripts/domestic-routing.test.mjs scripts/nba-map.test.mjs scripts/club-maps.test.mjs scripts/europe-maps.test.mjs",
     "test:american-football": "node --test scripts/american-football.test.mjs scripts/nfl-seasons.test.mjs scripts/tecmo.test.mjs scripts/pfa-seasons.test.mjs",
     "test:baseball": "node --test scripts/baseball.test.mjs scripts/baseball-seasons.test.mjs scripts/baseball-war-seasons.test.mjs scripts/baseball-eras.test.mjs",
