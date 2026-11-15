@@ -183,6 +183,48 @@ test('rugby league 1998 to 2007: every club wears the crest of its day, the era 
   ]) assert.equal(crestFile(id, year), file, `${id} ${year}`);
 });
 
+test('the EuroLeague of 2000/01 to 2025/26: every club wears the crest of its day, the clubs since gone too', () => {
+  const files = new Set(readdirSync(new URL('public/club-logos/', root)).filter(name => name.endsWith('.webp')).map(name => name.slice(0, -5)));
+  // Club-seasons whose crest no allowed source pictures or dates keep their code (docs/design/period-marks.md,
+  // "Coverage").
+  const codes = {
+    'el-aek-athens': [2001, 2002, 2003, 2004], 'el-buducnost': [2001, 2002, 2003], 'el-cska-moscow': [2002, 2003, 2004, 2005, 2006],
+    'el-dynamo-moscow': [2007], 'el-krka': [2002, 2004], 'el-london-towers': [2001, 2002], 'el-lugano': [2001],
+    'el-olimpija': [2001, 2002, 2003, 2004, 2005, 2006], 'el-oostende': [2002], 'el-ovarense': [2001], 'el-paok': [2001],
+    'el-peristeri': [2001, 2002], 'el-pesaro': [2002, 2005], 'el-siena': [2003, 2004, 2005, 2006],
+    'el-skyliners-frankfurt': [2002, 2005], 'el-spirou-charleroi': [2001, 2002], 'el-st-petersburg-lions': [2001],
+    'el-ural-great': [2002], 'el-verona': [2001], 'el-zadar': [2001, 2002],
+  };
+  let seasons = 0;
+  for (const name of readdirSync(new URL('public/basketball/', root)).filter(name => /^nba-2k\d\d\.json$/.test(name))) {
+    const { year, clubs } = JSON.parse(read(`public/basketball/${name}`));
+    const euroleague = clubs.filter(club => club.id.startsWith('el-'));
+    if (!euroleague.length) continue;
+    seasons++;
+    for (const { id } of euroleague) {
+      const file = crestFile(id, year);
+      if (codes[id]?.includes(year)) assert.equal(file, null, `${id} ${year}: its code`);
+      else assert.ok(file && files.has(file), `${id} ${year}: a crest the game ships`);
+    }
+  }
+  assert.equal(seasons, 26, 'the seasons 2000/01 to 2025/26');
+  const today = id => clubLogoFile(id);
+  for (const [id, year, file] of [
+    // Ülkerspor, whose code EuroLeague files Fenerbahçe under since, wears its own badge.
+    ['el-ulkerspor', 2002, 'el-ulkerspor.2002'], ['el-ulkerspor', 2006, 'el-ulkerspor.2002'], ['el-fenerbahce', 2007, today('el-fenerbahce')],
+    ['el-fc-barcelona', 2002, 'el-fc-barcelona.2001'], ['el-fc-barcelona', 2003, today('el-fc-barcelona')],
+    // Real Madrid's plain club crest (the football club's of today) to 2008/09, today's lockup after.
+    ['el-real-madrid', 2009, today('f-real-madrid')], ['el-real-madrid', 2010, today('el-real-madrid')],
+    // Valencia's 2017 badge through 2025/26 (its 40th-year crest is 2026/27's); Efes's 50th-year logo in 2025/26.
+    ['el-valencia-basket', 2026, 'el-valencia-basket.2018'], ['el-valencia-basket', null, today('el-valencia-basket')],
+    ['el-anadolu-efes', 2025, today('el-anadolu-efes')], ['el-anadolu-efes', 2026, 'el-anadolu-efes.2026'],
+    ['el-cska-moscow', 2006, null], ['el-cska-moscow', 2007, 'el-cska-moscow.2007'], ['el-cska-moscow', 2018, 'el-cska-moscow.2018'],
+    ['el-arka-gdynia', 2008, 'el-arka-gdynia.2005'], ['el-arka-gdynia', 2009, 'el-arka-gdynia.2009'],
+    // Galatasaray under the sports club's emblem; AEK's 1997 emblem has no picture, its 2004 redraw has.
+    ['el-galatasaray', 2014, today('f-galatasaray-sk')], ['el-aek-athens', 2004, null], ['el-aek-athens', 2005, 'el-aek-athens.2005'],
+  ]) assert.equal(crestFile(id, year), file, `${id} ${year}`);
+});
+
 test('TeamMark and SquadFlag draw the crest of the season on screen', () => {
   const entry = Object.entries(CREST_ERAS).find(([id, eras]) => clubLogoFile(id) && eras.some(([, , file]) => file));
   const [id, eras] = entry ?? ['b-boston-celtics', [[1961, 1961, null]]];

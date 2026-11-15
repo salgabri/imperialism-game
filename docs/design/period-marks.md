@@ -2,7 +2,8 @@
 
 Status: implemented 2026-11-10 to 2026-11-13, when the user asked: "as we go back in
 time make sure the logos and flag match those years versions!"; rugby league's
-computed seasons of 1998-2007 added 2026-11-14.
+computed seasons of 1998-2007 added 2026-11-14; the EuroLeague's clubs of 2000/01 to
+2025/26 added 2026-11-15.
 
 A season of another day shows every nation under the flag it flew then, and every
 club under the crest it wore then. Before this, every season flew today's flags and
@@ -147,7 +148,7 @@ is present. `sync:club-logos` leaves period crests alone.
 
 ### Coverage
 
-As of 14 November 2026: 557 period crests for 637 club ids, every club the game has
+As of 15 November 2026: 649 period crests for 813 club ids, every club the game has
 researched. Of the club-seasons before today's season (each club id in each season
 year it plays):
 
@@ -156,6 +157,7 @@ year it plays):
 | Football (men's) | 41% | 45% | 1% | 9% |
 | American football | 36% | 52% | 0% | 12% |
 | Basketball (NBA) | 29% | 37% | 0% | 34% |
+| Basketball (EuroLeague) | 59% | 32% | 1% | 8% |
 | Baseball | 25% | 57% | 0% | 18% |
 | Ice hockey | 29% | 56% | 4% | 11% |
 | Rugby league | 63% | 36% | 0% | 0% |
@@ -199,6 +201,28 @@ Gold Coast Chargers, the Illawarra Steelers, the Northern Eagles); the Balmain T
 the North Sydney Bears and the Western Suburbs Magpies, whose logos of 1998-1999 no
 source dates, keep their monogram.
 
+The EuroLeague's seasons of 2000/01 to 2025/26 came next (15 November 2026): the 69
+clubs not in today's EuroLeague, which until then showed their code, and today's 20
+where their crest of those seasons was another. Each club's articles in its own
+language and English, their galleries and the Wayback Machine's captures of them gave
+92 period crests. Real Madrid wore the club's plain crest (the football club's of
+today) to 2008/09, Galatasaray and Zenit their sports club's emblem; Valencia's 40th-year
+crest and Virtus Bologna's centenary crest are 2026/27's, so 2025/26 shows the badges
+they replaced, and Efes's 50th-year logo is 2025/26's. Where a club's primary logo was a
+sponsor's team logo and no crest of its own was in use (Baskonia's TAU Cerámica, Siena's
+Montepaschi, the Brose Baskets, ASVEL's Adecco and LDLC), that logo is its crest; where
+the club's own emblem stood beside the sponsor's (Joventut's beside DKV's, Fortitudo's
+beside Climamio's), the emblem is. A crest first seen by 30 June of a season the club
+played (the cutoff flags use) covers that season and the club's earlier seasons of that
+run where no source shows another: Unicaja's and Ülkerspor's, first seen in 2005/06, from
+2001/02. A logo first seen only in a summer after a club's seasons does not reach back,
+as a new logo may have come that summer. So 44 of the 568 club-seasons keep the club's
+code: CSKA Moscow 2001/02 to 2005/06 and Olimpija 2000/01 to 2005/06 (logos first seen
+in August and September 2006), Dynamo Moscow 2006/07 (July 2007), AEK's 1997 emblem
+(2000/01 to 2003/04, no picture), Siena 2002/03 to 2005/06, and fifteen clubs of the
+first seasons whose logo no source shows or dates (Zadar, PAOK, Pesaro, the London
+Towers, the Skyliners as Opel Skyliners…).
+
 Crests are the clubs' trademarks; as with today's crests (the user's choice of
 Wikipedia crests, 2026-10-25), many are non-free files that Wikipedia hosts under
 its non-free content policy, and `SOURCES-eras.tsv` records each one's licence as
@@ -217,6 +241,9 @@ flying the flag of the day while a federation keeps its own; tennis 1975
 1993 (Russia, Czechia); football 1996/97 to 2005/06 (FR Yugoslavia, then Serbia and
 Montenegro); rugby league's 1998 to 2007 (every club of each season under a crest
 the game ships, era names and gone clubs too, except the three undated ones; the
-logos of the day and the first round's two corrections by name); and TeamMark and
+logos of the day and the first round's two corrections by name); the EuroLeague's
+2000/01 to 2025/26 (every club of each season under a crest the game ships, except
+the 44 club-seasons named with their code; Ülkerspor, Real Madrid's plain crest,
+Valencia's and Efes's last seasons and others by name); and TeamMark and
 SquadFlag drawing the crest of the season on screen.
 `npm run test:flag-symbols` runs `build-historic-flags --check`.

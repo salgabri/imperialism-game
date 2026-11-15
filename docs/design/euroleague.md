@@ -167,7 +167,8 @@ Asked for on 2026-11-14 ("give earlier basketball seasons their EuroLeague"). Ev
 basketball season from 2000/01 on offers the EuroLeague beside the NBA: that season's clubs, rated
 by the built-in season's rule, on a map of Europe of their own, at that season's pace and scoring
 rate. The user chose the range (every season the API holds), the rating scale (each season put on
-2025/26's level) and the crests (code badges for clubs the game has none for).
+2025/26's level) and the crests (code badges for clubs the game had none for, then each club's crest
+of its day on 2026-11-15, under **The clubs**).
 
 **Coverage.** The EuroLeague's API holds every season of its own competition from its first,
 2000/01 (`E2000`), to 2025/26 (`E2025`), and nothing before it: `E1999` lists no club, and its
@@ -223,7 +224,12 @@ sponsor-free name for the club (its `clubPermanentAlias`), with their accents: C
 Benetton Treviso, Unicaja, Arka Gdynia. One code was two clubs: EuroLeague files Ülkerspor (2001/02
 to 2005/06) under the code Fenerbahçe has played under since, so those seasons play Ülkerspor
 (`eras`). Each club's arena of those seasons is placed by hand (`scripts/data/europe-clubs.json`).
-The 69 have no crest in the game, so they show their code, as the NRL's defunct clubs do.
+Every club wears its crest of the day ([period-marks.md](period-marks.md), "Coverage"): 92 period
+crests from Wikipedia, Commons and the Wayback Machine's copies of them, for the 69 and for today's
+20 where theirs differed (Barcelona's F.C.B. crest of 1975 to 2002, Efes's four logos, Valencia's
+2017 badge before 2026/27's). Where no allowed source pictures or dates a club's crest of a season,
+it shows its code, as the NRL's gone clubs do: 44 of the 568 club-seasons, among them CSKA Moscow
+2001/02 to 2005/06, Olimpija 2000/01 to 2005/06 and Siena 2002/03 to 2005/06.
 
 **Where they live.** Each season's EuroLeague clubs ride in its NBA season's file
 (`public/basketball/nba-2k01.json` … `nba-2k26.json`), after the NBA's, `euroleague` naming their
@@ -311,7 +317,11 @@ the four in Iceland's small lineups, is its power forward.
   earlier seasons read every player; the built-in one will when it is next refreshed.
 - Earlier seasons' names are EuroLeague's, title-cased: its API spells most players without their
   accents (Jasikevicius, Tomasevic), and only today's starters have spellings of their own.
-- The 69 clubs not in today's EuroLeague have no crest in the game yet, so they show their code.
+- 44 of the earlier seasons' 568 club-seasons show the club's code: no allowed source pictures or
+  dates its crest of that season.
+- ASVEL's crest of today (the built-in season's) is its 2011–2018 logo, which none of its
+  EuroLeague seasons wore; it has played under the LDLC ASVEL logo since 2018/19, as the earlier
+  seasons show it. Today's crest wants that logo when `sync:club-logos` next runs for it.
 - Dubai, the frame's south-east corner, opens partly under the map's zoom buttons (about a third of
   its land at 1024×768); zooming or panning shows it whole. More room in the map's `focus` barely
   moves it, as the camera keeps to the map's backdrop.

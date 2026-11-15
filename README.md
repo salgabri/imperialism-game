@@ -1779,8 +1779,10 @@ the map of its era.
   players, so every rating is an estimate from the box scores, by the built-in
   season's rule, each season's PIR, assists, rebounds and threes first put on
   2025/26's level (league scoring rose from 74 to 86 points a team). Each season
-  plays at its own pace and scoring rate. The 69 clubs not in today's EuroLeague
-  (CSKA Moscow, Siena, Benetton Treviso…) show their code for a crest. See the
+  plays at its own pace and scoring rate. Every club wears its crest of the day,
+  the 69 not in today's EuroLeague (CSKA Moscow, Siena, Benetton Treviso…) too;
+  where no allowed source pictures it, the club shows its code (44 of 568
+  club-seasons). See the
   [design notes](docs/design/euroleague.md#earlier-seasons-200001-to-202526).
 
 - **What a season holds:** the franchises of that season, each with the best

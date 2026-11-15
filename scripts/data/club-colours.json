@@ -54,6 +54,23 @@
     "el-maccabi-tel-aviv": "#f8d000",
     "el-fenerbahce": "#fde100",
     "el-besiktas": "#000000",
-    "el-partizan": "#000000"
+    "el-partizan": "#000000",
+    "el-arka-gdynia": "#ffcc00",
+    "el-cedevita": "#ff6e01",
+    "el-cibona": "#002fa7",
+    "el-elan-chalon": "#cc0000",
+    "el-le-mans": "#ff5c00",
+    "el-napoli": "#0000ff",
+    "el-olimpija": "#247b4e",
+    "el-unics-kazan": "#03ad4f",
+    "el-zielona-gora": "#52ac62",
+    "el-krka": "#006633",
+    "el-london-towers": "#ffff00",
+    "el-paok": "#000000",
+    "el-pesaro": "#c11b17",
+    "el-st-petersburg-lions": "#008000",
+    "el-ural-great": "#2554c7",
+    "el-verona": "#ffeb3b",
+    "el-zadar": "#0044cc"
   }
 }

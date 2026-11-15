@@ -673,6 +673,1294 @@
    "verified": "red/blue/white W with stars and ball, WIZARDS",
    "league": "nba"
   },
+  "el-aek-athens.2005": {
+   "club": "AEK Athens",
+   "years": "2005–2006",
+   "kind": "wikipedia",
+   "title": "Vaizdas:Aekbasket.gif",
+   "page": "https://lt.wikipedia.org/wiki/Vaizdas:Aekbasket.gif",
+   "download": "https://upload.wikimedia.org/wikipedia/lt/c/c3/Aekbasket.gif",
+   "licence": "non-free logo, as the file page states (lt.wikipedia's non-free content)",
+   "sha256": "7ab849d30f73c5a9563a0f53f128d70abe3ec0abcb7ef48c804cb70b0b4d4de9",
+   "cache": "data-src/crest-eras/files/euroleague/el-aek-athens/2005-Aekbasket.gif",
+   "evidence": "el.wikipedia Α.Ε.Κ. (καλαθοσφαίριση), Έμβλημα: the 1997 basketball emblem was changed considerably in 2004 and kept that form for three years, then 2007-2015 the football-style shield with BC. This file, «AEK BC logotipas» copied from the English Wikipedia's Image:Aekbasket.gif, was uploaded to lt.wikipedia on 2007-01-28 and is still its infobox logo: the 2004 version (an orange ball, no «Eagles» lettering). The en original (archived file page of 2007-06-29) was uploaded 2006-09-21, 100×123, 9,055 bytes (the lt copy's exact size), and was used in the en articles AEK Athens BC and A1 Ethniki 2005-06. The en article showed the 2007 B.C. shield (Aekbc_logo.jpg) from its 2007-11-18 capture. Read as 2004-05 to 2006-07.",
+   "verified": "black frame with white AEK lettering on top, orange basketball on yellow carrying the black double-headed eagle, ribbon BASKETBALL CLUB across the ball; 100×123 GIF",
+   "league": "euroleague"
+  },
+  "el-alba-berlin.2002": {
+   "club": "Alba Berlin",
+   "years": "2002–2009",
+   "kind": "wikipedia",
+   "title": "Datei:Logo_ALBA_Berlin.svg",
+   "page": "https://de.wikipedia.org/wiki/Datei:Logo_ALBA_Berlin.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/de/7/76/Logo_ALBA_Berlin.svg",
+   "licence": "see the file page",
+   "sha256": "d04889561e2732092c7992ab7b846eea3ca62a55d3778d9257fe4e5fde03468c",
+   "cache": "data-src/crest-eras/files/euroleague/el-alba-berlin/2002-Logo_ALBA_Berlin.svg",
+   "evidence": "de.wikipedia Alba Berlin shows this file captioned 'Logo 1991–2009'; its description reads '1991–2009 Logo von ALBA Berlin'. Seasons 2001-02 to 2003-04 and 2008-09",
+   "verified": "bright blue basketball with a white albatross, a red banner with yellow ALBA and BERLIN in white on a blue band",
+   "league": "euroleague"
+  },
+  "el-alba-berlin.2010": {
+   "club": "Alba Berlin",
+   "years": "2010–2015",
+   "kind": "wayback",
+   "title": "File:Alba_logo3d_klein.png",
+   "page": "https://web.archive.org/web/20161222060342/http://en.wikipedia.org/wiki/File:Alba_logo3d_klein.png",
+   "wayback": "https://web.archive.org/web/20090806204955im_/http://upload.wikimedia.org/wikipedia/en/0/02/Alba_logo3d_klein.png",
+   "licence": "non-free logo, as the file page states (Wikipedia's non-free content)",
+   "sha256": "e9cc89a18e66ed8401f1f9614e7c14df81343ba4aca88fc0b5b1e787426555a1",
+   "cache": "data-src/crest-eras/files/euroleague/el-alba-berlin/2010-Alba_logo3d_klein.png",
+   "evidence": "The same design, rendered glossy (3D), as the club's own website showed it: en.wikipedia's File:Alba_logo3d_klein.png was uploaded on 10 Dec 2008 from albaberlin.de (for the 2008–09 Euroleague article; archived file page). en.wikipedia's Alba Berlin infobox showed it in captures from 6 Aug 2009 to 28 Mar 2015 (2009-08, 2009-11, 2010-10, 2012-05, 2014-09, 2015-03), de.wikipedia's infobox its de copy from Jul 2013 to 7 Sep 2015 (Nov 2012: the flat logo). en replaced it with File:Alba_Berlin_logo_2015-16.png (the new logo) by 24 Nov 2015. The de caption '1991–2009' for the flat logo is read as the end of the flat rendering (the 3D one already on the club site in 2008-09: the same logo, so 2008-09 is covered either way); no source dates the new design before 2015-16 (sources would disagree only if the caption meant the new design: noted). Seasons 2012-13 and 2014-15",
+   "verified": "the same albatross-on-ball logo with the red ALBA banner, its ball dark blue with a glossy highlight, 200x219",
+   "league": "euroleague"
+  },
+  "el-alba-berlin.2016": {
+   "club": "Alba Berlin",
+   "years": "2016–2025",
+   "kind": "wikipedia",
+   "title": "Datei:Alba-berlin-logo.svg",
+   "page": "https://de.wikipedia.org/wiki/Datei:Alba-berlin-logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/de/2/22/Alba-berlin-logo.svg",
+   "licence": "see the file page",
+   "sha256": "638b0b520c88210912a7ae1369e6e06adb7a3696252798c5d4221e009b855278",
+   "cache": "data-src/crest-eras/files/euroleague/el-alba-berlin/2016-Alba-berlin-logo.svg",
+   "evidence": "en.wikipedia's infobox showed this design as File:Alba_Berlin_logo_2015-16.png from the capture of 24 Nov 2015 (also 12 Oct 2016, 23 Mar 2017; the archived 200px copy checked on the contact sheet), then File:Alba_Berlin_logo.svg (uploaded 23 Sep 2017 from the EuroLeague media centre); de.wikipedia's infobox shows it today (uploaded 29 Aug 2025 from albaberlin.de). All three look the same. Seasons 2015-16 (by its file name) to 2024-25",
+   "verified": "navy ball with light-blue seams and rim, white albatross, yellow ALBA BERLIN letters with navy outline; same as the 2015-16 and 2017 copies",
+   "league": "euroleague"
+  },
+  "el-anadolu-efes.2002": {
+   "club": "Anadolu Efes",
+   "years": "2002–2009",
+   "kind": "wikipedia",
+   "title": "Dosya:EfesPilsenSKLogo.png",
+   "page": "https://tr.wikipedia.org/wiki/Dosya:EfesPilsenSKLogo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/tr/b/b8/EfesPilsenSKLogo.png",
+   "licence": "non-free logo, as the file page states (tr.wikipedia's non-free content)",
+   "sha256": "eab2c85c102150b9f2e2ec6f0c775b44ab2bd92808b55338b550baa89f08288b",
+   "cache": "data-src/crest-eras/files/euroleague/el-anadolu-efes/2002-EfesPilsenSKLogo.png",
+   "evidence": "tr article Anadolu Efes SK, Logo ve Renkler: the first logo was used in the 1976-2008 seasons, the second from the 2009-10 season; its gallery captions this file 'Kuruluş logosu' (founding logo). The en article's capture of 2007-07-01 shows the same file name (en EfesPilsenSKLogo.png) on the page; the tr article's capture of 2011-11-12 keeps it as 'Efes Pilsen SK'nın eski logosu' (old logo). 2008-09 is taken as the last season of the first logo (the second is dated from 2009-10).",
+   "verified": "blue arch-topped badge, white EFES over Pilsen with a small star and dotted rule, SPOR KULÜBÜ on a white band below",
+   "league": "euroleague"
+  },
+  "el-anadolu-efes.2010": {
+   "club": "Anadolu Efes",
+   "years": "2010–2011",
+   "kind": "wayback",
+   "title": "File:EfesPilsenSKnewLogo.png",
+   "page": "https://en.wikipedia.org/wiki/File:EfesPilsenSKnewLogo.png",
+   "wayback": "https://web.archive.org/web/20110301062552im_/http://upload.wikimedia.org/wikipedia/en/4/45/EfesPilsenSKnewLogo.png",
+   "licence": "non-free logo: an English Wikipedia upload, deleted since (the file name was later reused for the star logo); its file page was not found in an archive",
+   "sha256": "2131299fc638e68ee18083497ca4c9468c841bd767cce38e5bfa9e9a320af86e",
+   "cache": "data-src/crest-eras/files/euroleague/el-anadolu-efes/2010-EfesPilsenSKnewLogo.png",
+   "evidence": "The en article Efes_Pilsen_S.K. shows EfesPilsenSKnewLogo.png in its infobox in the captures of 2009-09-25, 2010-01-18, 2010-10-08 and 2011-05-04 (alt 'Efes Pilsen S.K. logo'); the 100px copy archived 2010-01-18 and the full file archived 2011-03-01 are this oval. tr text: the second logo was used from the 2009-10 season; the club was renamed Anadolu Efes in 2011 (TAPDK's ban on alcohol brands), when the star logo followed. Sources disagree: the tr gallery dates the star logo '2010-2018', but the star logo reads ANADOLU EFES, a name the club took only in 2011, and the archived en pages show this oval through May 2011.",
+   "verified": "blue oval with a red-white outline and dotted edge, white EFES over Pilsen and a small star, SPOR KULÜBÜ in blue below",
+   "league": "euroleague"
+  },
+  "el-anadolu-efes.2012": {
+   "club": "Anadolu Efes",
+   "years": "2012–2018",
+   "kind": "wikipedia",
+   "title": "Dosya:EfesPilsenSKyeniLogo.png",
+   "page": "https://tr.wikipedia.org/wiki/Dosya:EfesPilsenSKyeniLogo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/tr/5/5c/EfesPilsenSKyeniLogo.png",
+   "licence": "non-free logo, as the file page states (tr.wikipedia's non-free content)",
+   "sha256": "03102e24e864bb81d425453ae577f5a19b6dc063a42b4e279d976960ba46efc2",
+   "cache": "data-src/crest-eras/files/euroleague/el-anadolu-efes/2012-EfesPilsenSKyeniLogo.png",
+   "evidence": "tr article: 'the final form of the logo was decided as a star'; gallery caption 'used 2010-2018'; 'at the start of the 2018-19 season the logo was changed'. The tr article's infobox shows this file in the capture of 2011-11-12 (2011-12 season) and, in the capture of 2016-01-20, the same star logo as Anadolu_Efes_Spor_Kulübü_Logosu.png (version of 15 November 2013). The 40th-anniversary 'special logo' designed before 2015-16 (tr gallery '40. yıl özel logosu (2016)') is not taken for 2016: neither the tr infobox (2016-01-20) nor the en infobox (captures 2015-10-02, 2016-04-21) showed it; the file is kept in the work folder as efes-tr-40th-2015.jpg.",
+   "verified": "blue five-pointed star outlined in white with a small red star inside, ANADOLU / EFES / SPOR KULÜBÜ in blue below",
+   "league": "euroleague"
+  },
+  "el-anadolu-efes.2026": {
+   "club": "Anadolu Efes",
+   "years": "2026–2026",
+   "kind": "wikipedia",
+   "title": "Dosya:Anadolu_Efes_50._Yıl_logo.png",
+   "page": "https://tr.wikipedia.org/wiki/Dosya:Anadolu_Efes_50._Y%C4%B1l_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/tr/8/80/Anadolu_Efes_50._Y%C4%B1l_logo.png",
+   "licence": "non-free logo, as the file page states (tr.wikipedia's non-free content)",
+   "sha256": "34246834a0785998a955933968fbe9555f3c0307c23ed1b6f5f50bbdcfc1fd36",
+   "cache": "data-src/crest-eras/files/euroleague/el-anadolu-efes/2026-Anadolu_Efes_50._Yıl_logo.png",
+   "evidence": "The tr season article 'Anadolu Efes 2025-26 sezonu' shows this 50th-anniversary logo in its infobox; the club article's gallery: '50. yıl özel logosu (2026)'. The club article's own infobox still shows the 2018 shield (the 50 logo is called a special logo), so this era is a judgement: the brief's anniversary-logo rule and the season article make it the 2025-26 crest.",
+   "verified": "white shield with blue and red rims, a large blue 50 whose zero holds a red flame star, ANADOLU EFES 1976 below",
+   "league": "euroleague"
+  },
+  "el-aris.2007": {
+   "club": "Aris Thessaloniki",
+   "years": "2007–2008",
+   "kind": "wikipedia",
+   "title": "File:Arisbc_logo.gif",
+   "page": "https://it.wikipedia.org/wiki/File:Arisbc_logo.gif",
+   "download": "https://upload.wikimedia.org/wikipedia/it/6/6a/Arisbc_logo.gif",
+   "licence": "non-free logo, as the file page states (it.wikipedia's non-free content)",
+   "sha256": "72a1a27e910b9a8c7f085ab81e5efcdd52afd9f9e34d853a5f0624e5abe09416",
+   "cache": "data-src/crest-eras/files/euroleague/el-aris/2007-Arisbc_logo.gif",
+   "evidence": "it.wikipedia's Aris basketball article still shows this file, uploaded 2007-07-16 and never replaced (between the 2006-07 and 2007-08 seasons). The en article's «Crest evolution» gallery as it stands: ArisBasketball.png «Older» (the same K.A.E. shield with two stars, black stars), Arisbc_crest.png 2014-2025, then the 2025 and 2026 logos. Sources disagree: the en infobox of 2008-04-09 and 2009-01-11 showed the general A.S. Aris emblem (Aris_Thessalonikis.png: Α Σ above the seated Ares, ΑΡΗΣ below, no stars); followed the club's article as it stands (its own K.A.E. crest before 2014).",
+   "verified": "yellow shield, two gold stars above, the seated statue of Ares over a Greek-key band, black ΑΡΗΣ and K.A.E. below; 86×140 GIF",
+   "league": "euroleague"
+  },
+  "el-arka-gdynia.2005": {
+   "club": "Arka Gdynia",
+   "years": "2005–2008",
+   "kind": "wayback",
+   "title": "File:Prokom_Trefl_Sopot.jpg",
+   "page": "https://web.archive.org/web/20061101184407/http://en.wikipedia.org/wiki/Image:Prokom_Trefl_Sopot.jpg",
+   "wayback": "https://web.archive.org/web/20050505204126im_/http://upload.wikimedia.org/wikipedia/en/b/b7/Prokom_Trefl_Sopot.jpg",
+   "licence": "non-free logo, as the file page states (Wikipedia's non-free content)",
+   "sha256": "7ecfe2680fae765ef79a4096f8217524780088b25645ecb9fb8d5b5d5290c12f",
+   "cache": "data-src/crest-eras/files/euroleague/el-arka-gdynia/2005-Prokom_Trefl_Sopot.jpg",
+   "evidence": "Uploaded to en on 26 June 2004 (archived file page), just after the 2003-04 season. The en article Prokom_Trefl_Sopot showed Image:Prokom_Trefl_Sopot.jpg at its head in its captures of 2005-05-05 (during 2004-05), 2005-12-15, 2006-09-13 and 2007-07-11 (the archived file of 2005-05 and of 2006 is the same 130×130 JPEG); its capture of 2008-04-05 showed no logo. The club was Prokom Trefl Sopot until 2008 (en 'Names': 1998–2008) and became Asseco Prokom with the next roundel (next era), so 2007-08 rests on the name and the capture of July 2007. The team logo carries the owner-sponsors' names (Prokom Software, Trefl) and no crest of the club's own was in use (the brief's sponsor rule for Prokom/Asseco).",
+   "verified": "work/el/east/sheet15.png: black ring lettered PROKOM TREFL round an orange basketball; the Asseco Prokom roundel of 2009 has other lettering and grey triangles round it.",
+   "league": "euroleague"
+  },
+  "el-arka-gdynia.2009": {
+   "club": "Arka Gdynia",
+   "years": "2009–2013",
+   "kind": "wayback",
+   "title": "File:Prokom_logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Prokom_logo.png",
+   "wayback": "https://web.archive.org/web/20090702114745im_/http://upload.wikimedia.org/wikipedia/en/9/99/Prokom_logo.png",
+   "licence": "non-free logo: an English Wikipedia upload, deleted since; its file page was not archived",
+   "sha256": "5d3aceb898b5c068344488dda673f80f191786622664f754ba349cad9875e1de",
+   "cache": "data-src/crest-eras/files/euroleague/el-arka-gdynia/2009-Prokom_logo.png",
+   "evidence": "Names (en 'Names'): Asseco Prokom Sopot 2008–2009, Asseco Prokom Gdynia 2009–2013, then Asseco Gdynia 2013–2018 with the same roundel lettered ASSECO GDYNIA (en figure File:Asseco_Gdynia_logo.png 'used from 2013, until 2018'). The en article's infobox showed File:Prokom_logo.png in its captures of 2009-07-02 (alt 'Asseco Prokom Sopot SSA logo'), 2009-09-06, 2010-05-26 (alt 'Asseco Prokom Gdynia logo'), 2010-11-07, 2012-08-27 and 2013-05-28: seasons 2008-09 to 2012-13. The team's primary logo carries the owner-sponsors' names and no crest of the club's own was in use (the brief's sponsor rule for Prokom/Asseco).",
+   "verified": "work/el/east/sheet11.png: black ring lettered ASSECO PROKOM round an orange basketball, grey triangles all round; the Asseco Gdynia logo of 2013-2018 is the same roundel with GDYNIA.",
+   "league": "euroleague"
+  },
+  "el-as-monaco.2022": {
+   "club": "AS Monaco",
+   "years": "2022–2026",
+   "kind": "wikipedia",
+   "title": "File:AS_Monaco_Basket.svg",
+   "page": "https://en.wikipedia.org/wiki/File:AS_Monaco_Basket.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/d/d3/AS_Monaco_Basket.svg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "367d8a7c63b77cf7a5d2255959d254d989d40cdc63ee7c760efb0d9e0c3a4bf0",
+   "cache": "data-src/crest-eras/files/euroleague/el-as-monaco/2022-AS_Monaco_Basket.svg",
+   "evidence": "The basketball club's own 'Roca Team' roundel (not the football club's shield) is the infobox logo of both the en and fr articles. Worn through all five seasons: en File:AS_Monaco_Basket_Logo.png ('the primary logo of AS Monaco Basket', current version uploaded 29 September 2021) shows the same design as en File:AS_Monaco_Basket.svg (uploaded 10 July 2025 from EuroLeague's media hub) and fr Fichier:Logo_AS_Monaco_Basket.svg (updated 2 January 2025 from the club shop's logo); the en PNG was first uploaded in July 2014 and the fr file's 2021 version came from a 2014 club document. The shield 'AS MONACO BASKETBALL' (en File:AS_Monaco_Basket_2015-16.png) is captioned 'A.S. Monaco Basket Amateur': the amateur section's, not the pro team's.",
+   "verified": "red roundel with a gold-trimmed red crown on top, 'A.S. MONACO' arched in white, a basketball and red-white stripes behind black script 'Roca team', 'BASKET' on the lower rim; the 2021 en PNG and the 2025 fr SVG look the same; unlike the football club's red-white crowned shield",
+   "league": "euroleague"
+  },
+  "el-asvel.2002": {
+   "club": "ASVEL",
+   "years": "2002–2007",
+   "kind": "wikipedia",
+   "title": "Fichier:Logo_Adecco_Asvel.jpg",
+   "page": "https://fr.wikipedia.org/wiki/Fichier:Logo_Adecco_Asvel.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/fr/5/5e/Logo_Adecco_Asvel.jpg",
+   "licence": "non-free logo, as the file page states (fr.wikipedia's non-free content)",
+   "sha256": "5d4178f428af63a483e2ea413f44ed26364ae0d70ec80af277636d15e916c0fe",
+   "cache": "data-src/crest-eras/files/euroleague/el-asvel/2002-Logo_Adecco_Asvel.jpg",
+   "evidence": "fr article: 'L'ASVEL Lyon-Villeurbanne devient l'Adecco ASVEL en 2001' and 'En 2007, l'ASVEL crée un nouveau logo et retire Adecco de son nom'; gallery 'Logo de 2001 à 2007'; file description 'Logo de l'ASVEL Lyon-Villeurbanne entre 2001 et 2007'. Seasons 2001-02 to 2006-07. No club emblem of its own is recorded for these years, so the sponsor's team logo.",
+   "verified": "white panel: red 'Adecco' box, green 'BASKET ASVEL' box, orange ball with stars, 'LYON * VILLEURBANNE' (498x318 JPEG)",
+   "league": "euroleague"
+  },
+  "el-asvel.2008": {
+   "club": "ASVEL",
+   "years": "2008–2011",
+   "kind": "wikipedia",
+   "title": "Fichier:ASVEL_nouveau.jpg",
+   "page": "https://fr.wikipedia.org/wiki/Fichier:ASVEL_nouveau.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/fr/c/c3/ASVEL_nouveau.jpg",
+   "licence": "non-free logo, as the file page states (fr.wikipedia's non-free content)",
+   "sha256": "460c222efafb45ae4b3af199dfa0346bfd70f5f0fdbf498e26549f75351f482d",
+   "cache": "data-src/crest-eras/files/euroleague/el-asvel/2008-ASVEL_nouveau.jpg",
+   "evidence": "fr gallery 'Logo de 2008 à 2011'; file description 'Logo de l'ASVEL entre 2008 et 2011 (pour fêter les 60 ans du club)'; first uploaded 24 July 2007 as the 'Nouveau logo' (from lnb.fr), with the article's 'En 2007, l'ASVEL crée un nouveau logo': worn from 2007-08; the 2011 logo replaced it for 2011-12. The en article (ASVEL_Lyon-Villeurbanne) showed en File:ASVEL_PRIMAIRE.jpg in its infobox in the Wayback capture of 26 July 2009 (during the off-season before 2009-10); that file as archived on 8 July 2014 (https://web.archive.org/web/20140708014318id_/http://upload.wikimedia.org/wikipedia/en/d/dd/ASVEL_PRIMAIRE.jpg) has the very same bytes as this one (sha256 460c222e...).",
+   "verified": "green shield, white 'ASVEL' banner with a long V, orange ball on top, 'LYON VILLEURBANNE', gold '60 ANS 1948-2008' ribbon and star (531x492 JPEG on white)",
+   "league": "euroleague"
+  },
+  "el-asvel.2019": {
+   "club": "ASVEL",
+   "years": "2019–2026",
+   "kind": "wikipedia",
+   "title": "Fichier:Logo_ASVEL_Lyon_Villeurbanne_-_2018.svg",
+   "page": "https://fr.wikipedia.org/wiki/Fichier:Logo_ASVEL_Lyon_Villeurbanne_-_2018.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/fr/b/bf/Logo_ASVEL_Lyon_Villeurbanne_-_2018.svg",
+   "licence": "non-free logo, as the file page states (fr.wikipedia's non-free content)",
+   "sha256": "ad79a374889c0fdbec177ec598c101e09e6edf7710372c068f66ff2364ae93f2",
+   "cache": "data-src/crest-eras/files/euroleague/el-asvel/2019-Logo_ASVEL_Lyon_Villeurbanne_-_2018.svg",
+   "evidence": "en 'Logos and branding': on 11 September 2018 the club became LDLC ASVEL (sponsorship) and 'The new logo, used since 2018, consists of the number four ... keeping the V'; en gallery 'The official logo of the club, 2018–present'; fr gallery 'Logo depuis 2018'. Seasons 2018-19 on. Still the logo in 2025: en infobox file LDLC_ASVEL_Basket.svg, uploaded 10 July 2025 from EuroLeague's media hub, is the same design. The club's own mark is the 4/V figure, but the logo as a whole reads 'LDLC ASVEL' and no sponsor-free crest is recorded.",
+   "verified": "black lightning-like 4 whose lower half forms a V, 'LDLC' in grey and 'ASVEL' in bold black under it; the 2025 en SVG and the 2018 en PNG look the same",
+   "league": "euroleague"
+  },
+  "el-avellino.2009": {
+   "club": "Avellino",
+   "years": "2009–2009",
+   "kind": "wikipedia",
+   "title": "קובץ:Felice_Scandone_logo-1-.jpg (he.wikipedia)",
+   "page": "https://he.wikipedia.org/wiki/%D7%A7%D7%95%D7%91%D7%A5:Felice_Scandone_logo-1-.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/he/d/d9/Felice_Scandone_logo-1-.jpg",
+   "licence": "non-free logo, as the file page states (he.wikipedia's non-free content)",
+   "sha256": "18e28b5ab51e06464ac51b86a8827a5ec8cad241d9a85615487f64323ee315ba",
+   "cache": "data-src/crest-eras/files/euroleague/el-avellino/2009-Felice_Scandone_logo-1-.jpg",
+   "evidence": "the club's logo in its EuroLeague season 2008-09 (as Air Avellino; Air was the sponsor): he.wiki's file was taken from the club's official site on 30-31 Oct 2008, during that season; en.wiki's S.S. Felice Scandone infobox showed a logo of the same size (File:Felice_Scandone_logo.jpg, 180 x 100) in the capture of 2008-09-16 and File:Felice_Scandone_logo.png (180 x 100) on 2010-01-06. The file's EXIF date (2005-10-03, Photoshop) shows the artwork already existed in 2005. The club's later logos (2015 wordmark on en.wiki; the 1948 wolf shield of the refounded club on it.wiki) came after.",
+   "verified": "a leaping cartoon wolf (the club's lupo) drawn in green outline, wearing a green vest, over Felice Scandone in outlined green letters; white ground, 180 x 100 JPEG; no sponsor",
+   "league": "euroleague"
+  },
+  "el-bamberg.2006": {
+   "club": "Bamberg",
+   "years": "2006–2006",
+   "kind": "wikipedia",
+   "title": "File:GHP_Bamberg_logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:GHP_Bamberg_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/0/03/GHP_Bamberg_logo.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "4059696e6c62faa0ef488423cf31a86b8d1693ea117bc3d3f63ed754e1e4e861",
+   "cache": "data-src/crest-eras/files/euroleague/el-bamberg/2006-GHP_Bamberg_logo.png",
+   "evidence": "en.wikipedia Bamberg Baskets, 'Club logos' gallery: 'GHP Bamberg era logo, 2003–2006.' de.wikipedia: after GHP Holding came in as name sponsor in 2003 the team was GHP Bamberg, until it became Brose Baskets with the 2006-07 season. The logo carries the name sponsor's name and no separate club emblem of the time is known. Season 2005-06",
+   "verified": "blue-yellow swoosh with a yellow basketball and 'GHP BAMBERG' in white-outlined blue letters, 220x125",
+   "league": "euroleague"
+  },
+  "el-bamberg.2007": {
+   "club": "Bamberg",
+   "years": "2007–2016",
+   "kind": "commons",
+   "title": "File:Brose_Baskets_Logo.svg",
+   "page": "https://commons.wikimedia.org/wiki/File:Brose_Baskets_Logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/commons/0/09/Brose_Baskets_Logo.svg",
+   "licence": "public domain: below the threshold of originality, as the file page states (trademark rights may apply)",
+   "sha256": "9c61186aece2463d7e26145c519f878c780ecd9e75a7c363a4007520c8deea6e",
+   "cache": "data-src/crest-eras/files/euroleague/el-bamberg/2007-Brose_Baskets_Logo.svg",
+   "evidence": "en.wikipedia Bamberg Baskets, 'Club logos' gallery: File:Brose_Baskets_logo.png 'Brose Baskets logo, 2006–2016.' (non-free PNG, the same design as this Commons SVG, whose source is Brose Baskets' 2013-14 bonus folder). de.wikipedia: Brose Baskets from the start of 2006-07 (Brose Fahrzeugteile the new main sponsor), Brose Bamberg from the start of 2016-17. The logo carries the name sponsor's name; no separate club emblem of the time is known. Seasons 2007-08, 2010-11 to 2013-14, 2015-16",
+   "verified": "red 'brose' over grey 'baskets' above a red-black basketball in a black hoop-shaped frame; the en PNG (2006-2016 caption) shows the same design",
+   "league": "euroleague"
+  },
+  "el-bamberg.2017": {
+   "club": "Bamberg",
+   "years": "2017–2018",
+   "kind": "wayback",
+   "title": "File:Brose_Bamberg_logo.png",
+   "page": "https://web.archive.org/web/20161125142404/http://en.wikipedia.org/wiki/File:Brose_Bamberg_logo.png",
+   "wayback": "https://web.archive.org/web/20170213065800im_/https://upload.wikimedia.org/wikipedia/en/6/62/Brose_Bamberg_logo.png",
+   "licence": "non-free logo, as the file page states (Wikipedia's non-free content)",
+   "sha256": "7534f9742a8168b0272a5a9223b124507c0ebb9fb59c3acdfa7a85851fa660f1",
+   "cache": "data-src/crest-eras/files/euroleague/el-bamberg/2017-Brose_Bamberg_logo.png",
+   "evidence": "en.wikipedia's infobox (article Brose Bamberg, captured under its old title Brose_Baskets) showed File:Brose_Bamberg_logo.png on 13 Feb 2017 and 2 Apr 2019. de.wikipedia: renamed Brose Bamberg with the start of 2016-17, Bamberg Baskets (with a redesigned crest) from 1 July 2023. The Brose Baskets design with the lettering changed to 'bamberg' (the same at chip size, but new lettering, so its own era). The logo carries the name sponsor's name; no separate club emblem of the time is known. Seasons 2016-17 and 2017-18. The archive holds the original once (capture of 25 Aug 2018), which the im_ request above returns",
+   "verified": "red 'brose' over grey 'bamberg' above the red-black basketball in the black hoop-shaped frame, 184x272",
+   "league": "euroleague"
+  },
+  "el-baskonia.2001": {
+   "club": "Baskonia",
+   "years": "2001–2009",
+   "kind": "wikipedia",
+   "title": "File:TAU_Ceramica.png",
+   "page": "https://en.wikipedia.org/wiki/File:TAU_Ceramica.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/2/25/TAU_Ceramica.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "fc5ee9035d0d0d5285607c692ef0f2c4f76a87d513b8f00413eba8f8c37b27bb",
+   "cache": "data-src/crest-eras/files/euroleague/el-baskonia/2001-TAU_Ceramica.png",
+   "evidence": "en Saski Baskonia, Logos gallery: 'Tau sponsorship logo (1987–2009)'; the en article showed this TAU logo (Image:TAU_Ceramica.gif, captured from 2005-12) in 2006-06 and in its infobox in 2007-07, then this File:TAU_Ceramica.png (uploaded 2008-10-03 from baskonia.com as the club's 'shield') in 2009-02; fr Saski Baskonia: the same logo (Fichier:TAU_Ceramica.gif, uploaded 2006-07-19) 'Logo commercial de 1987 et 2009'; sponsor name TAU Cerámica 1997–2009 (es); no logo of the club's own is dated before 2010, so the sponsor's team logo is used",
+   "verified": "TAU CERÁMICA in blue serif letters above red BASKONIA block letters with a navy outline, a grey star and a small basketball behind, VITORIA • GASTEIZ: the same design as fr's 2006 GIF",
+   "league": "euroleague"
+  },
+  "el-baskonia.2010": {
+   "club": "Baskonia",
+   "years": "2010–2016",
+   "kind": "commons",
+   "title": "File:Baskonia_logo.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Baskonia_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/commons/8/8c/Baskonia_logo.png",
+   "licence": "public domain: below the threshold of originality, as the file page states (trademark rights may apply)",
+   "sha256": "19aa23c369972255c8f339112e503c50c34ba427d34e680ab1ba2847629049a7",
+   "cache": "data-src/crest-eras/files/euroleague/el-baskonia/2010-Baskonia_logo.png",
+   "evidence": "en Saski Baskonia, Logos gallery: 'Non commercial logo (2010–2016)', en File:Saski_Baskonia_Logo.gif (203×58, uploaded 2013-10-10 from baskonia.com; the article's infobox from the 2013-10 capture to 2016); this Commons copy is the same wordmark, larger and free. In captures of 2010-04 and 2011-10 the infobox showed only File:Caja_Laboral_Logo.png, the bank's own logo ('Sponsor logo from the Caja Laboral era (2009–2013)'), not a team crest; 2009-10 (2010) to 2012-13 are given to this club logo as the gallery dates it from 2010 and the BASKONIA wordmark was already the club part of the TAU logo",
+   "verified": "red BASKONIA block letters with a navy outline, VITORIA ★ GASTEIZ beneath with a red star: identical to en's Saski_Baskonia_Logo.gif",
+   "league": "euroleague"
+  },
+  "el-bayern-munich.2014": {
+   "club": "Bayern Munich",
+   "years": "2014–2022",
+   "kind": "wayback",
+   "title": "File:FC_Bayern_München_(Basketball)_Logo.svg (first version, 419x450)",
+   "page": "https://commons.wikimedia.org/wiki/File:FC_Bayern_M%C3%BCnchen_(Basketball)_Logo.svg",
+   "wayback": "https://web.archive.org/web/20130723104444id_/https://upload.wikimedia.org/wikipedia/de/1/12/FC_Bayern_M%C3%BCnchen_%28Basketball%29_Logo.svg",
+   "licence": "public domain: below the threshold of originality, as the file page states (trademark rights may apply)",
+   "sha256": "0824d0f1204fabf2880d1c31c44e95902d287511e9e029cef1c2ae19ac9cdf6d",
+   "cache": "data-src/crest-eras/files/euroleague/el-bayern-munich/2014-FC_Bayern_München_(Basketball)_Logo.svg",
+   "evidence": "The basketball department's logo of the 2010s: the Commons file's first version (419x450, uploaded to de.wikipedia by Marlus Gancher, source the 2011-12 information brochure of EnBW Ludwigsburg) stayed the file until the club's own account uploaded a 'Neues Logo' over it on 23 Nov 2020; the Wayback Machine holds that first version as the de.wikipedia original (captures Jul-Oct 2013). It carries the FC Bayern crest of 2002-2017; the crest was redrawn in June 2017 (Commons File:Logo_FC_Bayern_München_(2002–2017).svg). Seasons 2013-14 to 2015-16 fall inside 2011-2017. en.wikipedia's infobox showed the same design as File:FC_Bayern_Munich_Basketball_(emblem).png (non-free upload, deleted since) in the captures of 18 Jun 2016 and 15 Feb 2017 (the 2016 copy checked on the contact sheet); in April 2013 it still showed the football crest Seasons 2017-18 to 2021-22 wore the same layout around the 2017 redraw of the FC Bayern crest: The same layout with the FC Bayern crest of 2017 (introduced June 2017, Commons File:FC_Bayern_München_logo_(2017).svg). en.wikipedia's infobox showed this design as its own upload File:FC_Bayern_Munich_(basketball)_logo.svg (deleted since) on 5 Apr 2019, 15 Nov 2020 and 24 Feb 2022 (the archived 2019 150px copy checked on the contact sheet); the club's account 'FC Bayern München Basketball' uploaded it to Commons as 'Neues Logo' on 23 Nov 2020; it was replaced by the club's File:Logo_FC_Bayern_München_Basketball_ab_2022.png ('2022-', dated 8 Aug 2022; en infobox by 12 Feb 2023). The start at 2017-18 (a season Bayern did not play in the EuroLeague) follows the crest's June 2017 redraw. At chip size it looks the same as the 2011 version; kept as its own era because each period's picture exists. Seasons 2018-19 to 2021-22",
+   "verified": "the red-ring FC BAYERN MÜNCHEN roundel (2002-2017 drawing, blue-white lozenges) with an orange basketball behind its lower left and a grey BASKETBALL banner under it",
+   "league": "euroleague"
+  },
+  "el-benetton-treviso.2001": {
+   "club": "Benetton Treviso",
+   "years": "2001–2006",
+   "kind": "commons",
+   "title": "File:Benetton_2.JPG",
+   "page": "https://commons.wikimedia.org/wiki/File:Benetton_2.JPG",
+   "download": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Benetton_2.JPG",
+   "licence": "public domain: below the threshold of originality, as the file page states (trademark rights may apply)",
+   "sha256": "4006f6334854ba78d33a1852b225c16bb4fa214c8f9c57ce7ecc2d127239d73e",
+   "cache": "data-src/crest-eras/files/euroleague/el-benetton-treviso/2001-Benetton_2.JPG",
+   "evidence": "it.wiki Pallacanestro Treviso 'I loghi' gallery: 'Il logo sino al 2006' (file description: 'Logo della Benetton Basket in uso sino al 2006'), followed by the 25th-anniversary logo and the current B logo (both files cite the 2006 trademark registration MI2006C010333). Benetton sponsored the club from 1981-82 and owned it from 1983 (it.wiki), so 'Benetton' is the owner's name, not a sponsor's. en.wiki's article of 2006 (captured 2006-03-22 as 'Benetton Basket') had no logo; no source dates another crest in 2000-2006.",
+   "verified": "a green rectangle with BENETTON / BASKET in white capitals and a white outline basketball on the right; 239 x 127 JPEG",
+   "league": "euroleague"
+  },
+  "el-benetton-treviso.2007": {
+   "club": "Benetton Treviso",
+   "years": "2007–2007",
+   "kind": "wikipedia",
+   "title": "File:Benetton_25.JPG (it.wikipedia)",
+   "page": "https://it.wikipedia.org/wiki/File:Benetton_25.JPG",
+   "download": "https://upload.wikimedia.org/wikipedia/it/e/ef/Benetton_25.JPG",
+   "licence": "non-free logo, as the file page states (it.wikipedia's non-free content)",
+   "sha256": "80fede7a8e210228a6c987eba1e96cc58276fd43ba6d7457ecb6ef674bbead9d",
+   "cache": "data-src/crest-eras/files/euroleague/el-benetton-treviso/2007-Benetton_25.JPG",
+   "evidence": "it.wiki's 'I loghi' gallery lists the club's logos in order: 'Il logo sino al 2006' (the green rectangle), 'Il logo del venticinquesimo anniversario' (this B over 25) and 'Il logo attuale' (the plain B with BENETTON BASKET, File:Logo_Benetton_basket.png); this file (uploaded Dec 2008 by the uploader of the 'until 2006' logo) cites the 2006 trademark registration MI2006C010333. Benetton came in as sponsor in 1981-82 and as owner in 1983 (it.wiki), so its 25 years fall around 2006-07, the first season after the rectangle; the file itself was last saved in Photoshop on 2006-10-09 (its EXIF date), at the start of 2006-07. it.wiki's infobox showed a Logo_Benetton_basket.jpg (not archived) in its capture of 2008-10-11; en.wiki's article had no logo in its captures of 2007-12-08 and 2008-12-08.",
+   "verified": "a big green block-serif B with a white inline and green outline over a large grey 25 with a grey basketball between them; 211 x 205 JPEG",
+   "league": "euroleague"
+  },
+  "el-bilbao-basket.2012": {
+   "club": "Bilbao Basket",
+   "years": "2012–2012",
+   "kind": "wikipedia",
+   "title": "File:Bilbaobasket.png",
+   "page": "https://en.wikipedia.org/wiki/File:Bilbaobasket.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/5/5d/Bilbaobasket.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "1fb636dcabfa5380fedb3456a124e5fd001d70774afe897e8bf7f82cd69909ae",
+   "cache": "data-src/crest-eras/files/euroleague/el-bilbao-basket/2012-Bilbaobasket.png",
+   "evidence": "en Bilbao Basket, Logos gallery: 'Non-commercial logo since 2009'; first uploaded 2012-06-23 (the end of the 2011-12 season) and shown in the en infobox in the 2013-04 capture ('Uxúe Bilbao Basket logo'; the capture's 170px copy has the same design on white); the current file is its 2015 transparent redraw. The 2011-12 sponsor name (Gescrap Bizkaia) carries no other club emblem",
+   "verified": "dark grey shield with a laurel wreath and a black basketball, BILBAOBASKET in white block letters on a black band, BB monogram and 2000 urtetik",
+   "league": "euroleague"
+  },
+  "el-budivelnyk.2014": {
+   "club": "Budivelnyk Kyiv",
+   "years": "2014–2014",
+   "kind": "wikipedia",
+   "title": "File:BC_Budivelnik_Logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:BC_Budivelnik_Logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/4/4c/BC_Budivelnik_Logo.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "c030a1c8797af44b97be136546e4c046fbb68365f1bfb9f0e37529ea3cf35dfa",
+   "cache": "data-src/crest-eras/files/euroleague/el-budivelnyk/2014-BC_Budivelnik_Logo.png",
+   "evidence": "The en article's infobox logo, first uploaded 21 January 2014 (during 2013-14, the club's EuroLeague season) and replaced on 13 October 2020 by this cleaner copy described 'former logo'. The uk article's infobox file Bcbudiwelnik_logo.jpg ('Логотип баскетбольного клубу Будівельник', created 2009 by the club, uploaded 8 October 2009) is the same design, so the helmet shield ran from 2009 through 2013-14. (en File:Budivelnyk_logo.png, the 1962 variant, is captioned an alternate logo.) The en article shows it in its infobox (170×219) in the capture of 2014-03-19, during 2013-14.",
+   "verified": "blue-and-yellow split shield with a dark blue gladiator helmet, a gold star on top, white БУДІВЕЛЬНИК banner and 1945; the same as the uk 2009 file",
+   "league": "euroleague"
+  },
+  "el-buducnost.2019": {
+   "club": "Budućnost",
+   "years": "2019–2019",
+   "kind": "wikipedia",
+   "title": "File:KK_Budućnost_logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:KK_Budu%C4%87nost_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/f/f7/KK_Budu%C4%87nost_logo.svg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "ea1b9c15f1496d34ac82346dce5df1023eb2df0bf1a3514f8e46cd7c6bdd8a82",
+   "cache": "data-src/crest-eras/files/euroleague/el-buducnost/2019-KK_Budućnost_logo.svg",
+   "evidence": "en File:KK_Budućnost_logo.svg was updated to this logo on 30 August 2018, before the 2018-19 season, which the club played as Budućnost VOLI; sr.wikipedia's copy 'Grb KK Buducnost' (17 January 2020). The crest itself carries the sponsor's name: the Commons photo of the crest at the club's hall, File:Grb_KK_Budućnost_Podgorica.jpg (4 March 2023), shows the same logo with VOLI under it, so no sponsor-free crest of the club's own was in use.",
+   "verified": "contact sheets work/el/east/sheet7.png and sheet-files1.png: white two-headed eagle over an orange ball in a blue ring, BUDUĆNOST, EST. 1949, BASKETBALL CLUB PODGORICA, red VOLI below; matches the 2023 photo.",
+   "league": "euroleague"
+  },
+  "el-cantu.2012": {
+   "club": "Cantù",
+   "years": "2012–2013",
+   "kind": "wikipedia",
+   "title": "Датотека:Pallacanestro_Cantù_Logo.jpg (sr.wikipedia)",
+   "page": "https://sr.wikipedia.org/wiki/%D0%94%D0%B0%D1%82%D0%BE%D1%82%D0%B5%D0%BA%D0%B0:Pallacanestro_Cant%C3%B9_Logo.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/sr/e/e4/Pallacanestro_Cant%C3%B9_Logo.jpg",
+   "licence": "non-free logo, as the file page states (sr.wikipedia's non-free content)",
+   "sha256": "2f29b8ee958ec3db36a2449be567fd7065b45f145af88a64814a0bfa94fbba6d",
+   "cache": "data-src/crest-eras/files/euroleague/el-cantu/2012-Pallacanestro_Cantu_Logo.jpg",
+   "evidence": "en.wiki's Pallacanestro Cantù infobox showed File:Pallacanestro_Cantù_Logo.jpg (170 px thumb of a 219 x 218 original) in the captures of 2011-11-08 (the 2011-12 season) and 2013-10-24 (after 2012-13); that en.wiki file was deleted since, but sr.wiki (Jul 2011), he.wiki ('created 06/2012') and tr.wiki (Jan 2013, copied from en.wiki's file) keep identical copies. ru.wiki's 2021 file from pallacanestrocantu.com is the same shield; en.wiki's infobox now shows a roundel uploaded in June 2026. Bennet and Mapooro (2011-12, 2012-13) were sponsors; the shield carries none.",
+   "verified": "a white shield with a thick blue border, a blue swirl wrapped round an orange basketball, PALLACANESTRO / CANTÙ in blue and 1936 in orange; 219 x 218 JPEG",
+   "league": "euroleague"
+  },
+  "el-cedevita.2013": {
+   "club": "Cedevita",
+   "years": "2013–2016",
+   "kind": "wikipedia",
+   "title": "File:KK_Cedevita_Zagreb.svg",
+   "page": "https://en.wikipedia.org/wiki/File:KK_Cedevita_Zagreb.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/2/2f/KK_Cedevita_Zagreb.svg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "75a76f8126a2d915c8ed09bea528a5fac4e0607a6f399e0cd71a1d8052b4b0c6",
+   "cache": "data-src/crest-eras/files/euroleague/el-cedevita/2013-KK_Cedevita_Zagreb.svg",
+   "evidence": "en.wikipedia KK Cedevita: figure File:KK_Cedevita_Zagreb.svg captioned 'The club logo used from 2005 to 2016'; 'Identity': after the Cedevita company changed its brand colours from red to orange in 2015, the club re-branded with orange for the 2016–17 season. Seasons 2012-13, 2014-15 and 2015-16 wore it. Cedevita is the club's own (owner's brand) name, not a sponsor case. The en article showed File:KK_Cedevita_Zagreb.svg in its captures of 2014-11-03 and 2015-12-27 (during 2014-15 and 2015-16).",
+   "verified": "contact sheet work/el/east/sheet-files1.png: red C round a black-lined basketball, red CEDEVITA lettering below.",
+   "league": "euroleague"
+  },
+  "el-cholet.2011": {
+   "club": "Cholet",
+   "years": "2011–2011",
+   "kind": "wikipedia",
+   "title": "File:Cholet_Basket_Logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Cholet_Basket_Logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/1/12/Cholet_Basket_Logo.svg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "90f243305e122d979015f81e3c44135fdbab8b5f6e18075af7baf39fb46fb636",
+   "cache": "data-src/crest-eras/files/euroleague/el-cholet/2011-Cholet_Basket_Logo.svg",
+   "evidence": "fr 'Historique du logo': CholetBasketlogo.jpg 'Logo de 1997 à 2012', then 'Logo de 2012 à 2019' (CholetBasketlogo2012.jpg, uploaded September 2012) and 'Logo depuis 2019'; en 'Evolution of the Logo': this SVG '–2012'. The SVG was on en Wikipedia by February 2010 and both files come from a 2007 copy of the logo (choletblog.fr 2007/11), so the 2010-11 season wore it.",
+   "verified": "red outlined college letters 'CB' with a red outlined five-point star, 'CHOLET BASKET' in red below; the fr JPEG of 1997-2012 is the same design",
+   "league": "euroleague"
+  },
+  "el-chorale-roanne.2008": {
+   "club": "Chorale Roanne",
+   "years": "2008–2008",
+   "kind": "wikipedia",
+   "title": "File:Chorale_Roanne_Basket_logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Chorale_Roanne_Basket_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/9/91/Chorale_Roanne_Basket_logo.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "dee83f83f616e0bf8ddb327f4c8d2bdbf748d5e503b8f8321ac64a36be49ecc5",
+   "cache": "data-src/crest-eras/files/euroleague/el-chorale-roanne/2008-Chorale_Roanne_Basket_logo.png",
+   "evidence": "en figure caption 'Former logo (2007–2014)'; fr 'Logos successifs': Chorale_roanne.jpg '? - 2007', ChoraleRoanne.gif '2007 - 2014', Logo_Chorale_Roanne_2014.svg 'Depuis 2014'. The fr GIF is described as the 'Nouveau logo (2007-08)' and was taken from EuroLeague's own Roanne team page on 12 September 2007, before the 2007-08 EuroLeague began.",
+   "verified": "orange basketball with blue figures leaping above a white 'Chorale' script swoosh, two gold stars on top, 'chorale-roanne.com' on the rim; the fr GIF from EuroLeague's 2007-08 page is the same design (the 300 px en PNG used)",
+   "league": "euroleague"
+  },
+  "el-cibona.2001": {
+   "club": "Cibona",
+   "years": "2001–2011",
+   "kind": "commons",
+   "title": "File:KK_Cibona_Zagreb_secondary.png",
+   "page": "https://commons.wikimedia.org/wiki/File:KK_Cibona_Zagreb_secondary.png",
+   "download": "https://upload.wikimedia.org/wikipedia/commons/1/1b/KK_Cibona_Zagreb_secondary.png",
+   "licence": "see the file page",
+   "sha256": "78595611782443aea1c834e0c594463e818e90414a134fcc4d1c645e91204c82",
+   "cache": "data-src/crest-eras/files/euroleague/el-cibona/2001-KK_Cibona_Zagreb_secondary.png",
+   "evidence": "The red disc cut like a C with white chevrons, the Cibona food concern's mark whose name the club took in 1975 (sh.wikipedia 'Ime kluba'). Its Commons files (primary and secondary versions) date the logo 1 August 1975. Period copies show the same mark through the club's EuroLeague years: the en article's infobox logo Image:cibona.gif already in its capture of 2006-09-13 (that file was not archived) and Image:Cibona_Zagreb.gif in 2007-03-21; lt.wikipedia File:Zagreb-Cibona.jpg (8 March 2007); the en article's File:Cibona-logo.jpg (capture 2010-04-09, archived copy 100×100); ru.wikipedia File:Logo_BK_Cibona.jpg from cibona.com, 2011 (4 August 2011, 350×350). No source names another crest for 2000-01 to 2010-11. Cibona is the club's own name since 1975 (a sponsor's then, the concern long gone), not a sponsor case.",
+   "verified": "work/el/east/sheet14.png: the Commons file beside the lt 2007 copy, the archived en 2010 logo and the ru 2011 file: same red disc with a wedge cut on the right and white chevrons; the Commons rendering adds a thin red outline ring (a tidied outline: the same crest at chip size).",
+   "league": "euroleague"
+  },
+  "el-cska-moscow.2007": {
+   "club": "CSKA Moscow",
+   "years": "2007–2017",
+   "kind": "wikipedia",
+   "title": "Файл:Cskabasket.png",
+   "page": "https://uk.wikipedia.org/wiki/%D0%A4%D0%B0%D0%B9%D0%BB:Cskabasket.png",
+   "download": "https://upload.wikimedia.org/wikipedia/uk/6/6c/Cskabasket.png",
+   "licence": "non-free logo, as the file page states (uk.wikipedia's non-free content)",
+   "sha256": "0421ac935d3af17b0db300e7248e6050231f4a189a624454c1383b5e55397577",
+   "cache": "data-src/crest-eras/files/euroleague/el-cska-moscow/2007-Cskabasket.png",
+   "evidence": "The red-star shield is the logo of every source until 2017: ru File:Cskabasket.jpg (the shield with Cyrillic ЦСКА letters) was first uploaded to fr.wikipedia on 7 August 2006 as 'Logo du CSKA Moscou (basket-ball)' and shows in the ru article's capture of 2008-01-17; the en article PBC_CSKA_Moscow shows the Latin-lettered shield as Cskka.jpg (capture 2009-06-01), PBC_CSKA_Moscow.gif (2011-01-26) and Cska-moscow.png (2013-05-13), all the same design, and in the capture of 2017-03-20 (during 2016-17) an SVG of the Cyrillic version (archived 200px copy checked). The uk copy of Cska-moscow.png is dated 7 May 2011. The new logo is dated 2017 (next era), after the 2016-17 season. The Cyrillic and Latin letterings are the same shield at chip size (only Ц/C differs) and were used side by side, so one era; the Latin one (EuroLeague's spelling) is the picture.",
+   "verified": "white-edged shield with a red star with a blue border on top, white CSKA on blue, a red band with small white stars and a basketball at the bottom right; the 2006 ЦСКА version and the 2009/2011 en copies show the same shield",
+   "league": "euroleague"
+  },
+  "el-cska-moscow.2018": {
+   "club": "CSKA Moscow",
+   "years": "2018–2022",
+   "kind": "wikipedia",
+   "title": "File:PBC_CSKA_Moscow_logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:PBC_CSKA_Moscow_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/7/7e/PBC_CSKA_Moscow_logo.svg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "b0ed2a96907b149171dafaef2fd69dcab01b7421f873ce8d20a2b4fa15d0905c",
+   "cache": "data-src/crest-eras/files/euroleague/el-cska-moscow/2018-PBC_CSKA_Moscow_logo.svg",
+   "evidence": "ru File:PBC_CSKA_Moscow_logo.png ('Эмблема баскетбольного клуба ЦСКА', created 2017, first uploaded 3 August 2017 from cskabasket.com; re-uploaded 15 March 2025 as 'the current logo in higher resolution') and the en SVG (uploaded 23 September 2017) are this logo; it is still the ru and en infobox logo, so it covers 2017-18 to 2021-22 (CSKA's last EuroLeague season).",
+   "verified": "navy shield with a gold rim and a red star on top, white CSKA, a red basketball at the bottom",
+   "league": "euroleague"
+  },
+  "el-darussafaka.2016": {
+   "club": "Darüşşafaka",
+   "years": "2016–2017",
+   "kind": "wikipedia",
+   "title": "Dosya:Darüşşafaka_Doğuş.jpg",
+   "page": "https://tr.wikipedia.org/wiki/Dosya:Dar%C3%BC%C5%9F%C5%9Fafaka_Do%C4%9Fu%C5%9F.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/tr/e/e2/Dar%C3%BC%C5%9F%C5%9Fafaka_Do%C4%9Fu%C5%9F.jpg",
+   "licence": "non-free logo, as the file page states (tr.wikipedia's non-free content)",
+   "sha256": "045eb94e86d377dd0bad1be99c4654269f34c9407e370389cca8d6e25324a917",
+   "cache": "data-src/crest-eras/files/euroleague/el-darussafaka/2016-Darüşşafaka_Doğuş.jpg",
+   "evidence": "tr article Darüşşafaka (basketbol takımı) captions this file 'Kulübün Doğuş sponsorluğunda bulunduğu yıllarda kullandığı logo' (the logo of the Doğuş sponsorship years) and the club's older emblem (Darüşşafaka_SK_logo.jpg, the horizontal panther) 'used before the Doğuş sponsorship', so no club emblem of its own was in use beside it. en Darüşşafaka Basketbol: 'Darüşşafaka Doğuş (2013–2017)'; tr: the Doğuş deal and the name Darüşşafaka Doğuş from the start of 2013-14. File uploaded 12 November 2014. EuroLeague names it Darussafaka Dogus Istanbul in 2015-16 and 2016-17. The en article Darüşşafaka_S.K. shows Darüşşafaka_Doğuş_logo.png (alt 'Darüşşafaka Doğuş Istanbul logo') in its infobox in the capture of 2015-11-28, during 2015-16.",
+   "verified": "black roundel with a green rim, white lettering DARÜŞŞAFAKA DOĞUŞ above and BASKETBOL below, a leaping white-and-green panther, 1914",
+   "league": "euroleague"
+  },
+  "el-darussafaka.2019": {
+   "club": "Darüşşafaka",
+   "years": "2019–2019",
+   "kind": "wikipedia",
+   "title": "Dosya:Darussafaka_basketbol_logo.png",
+   "page": "https://tr.wikipedia.org/wiki/Dosya:Darussafaka_basketbol_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/tr/6/6a/Darussafaka_basketbol_logo.png",
+   "licence": "non-free logo, as the file page states (tr.wikipedia's non-free content)",
+   "sha256": "793d6424a75a403697087b131bdd78240d55540466e234da694db8287f04cd95",
+   "cache": "data-src/crest-eras/files/euroleague/el-darussafaka/2019-Darussafaka_basketbol_logo.png",
+   "evidence": "tr article Darüşşafaka (basketbol takımı) captions this file 'Kulübün Tekfen sponsorluğunda bulunduğu yıllarda kullandığı logo' (the logo of the Tekfen sponsorship years); en: Darüşşafaka Tekfen 2018–2021, the deal announced September 2018, so 2018-19 (EuroLeague: Darussafaka Tekfen Istanbul) falls in it. Uploaded 20 January 2022 from darussafakabasketbol.com; the logo carries no sponsor's name. The en article's infobox in 2018-19 (captures 2018-11-27 and 2019-07-10, archived 200px copy checked) showed the sponsor team version of the same roundel, DARÜŞŞAFAKA TEKFEN BASKETBOL; since the club's own SPOR KULÜBÜ roundel was in use in the same years (tr caption), the brief's rule gives the club roundel, not the Tekfen one.",
+   "verified": "black roundel with a green rim, white DARÜŞŞAFAKA above and SPOR KULÜBÜ below, a white panther head over green speed stripes, 1914",
+   "league": "euroleague"
+  },
+  "el-dinamo-sassari.2015": {
+   "club": "Dinamo Sassari",
+   "years": "2015–2016",
+   "kind": "wikipedia",
+   "title": "File:Logo_Dinamo_Sassari.png (it.wikipedia)",
+   "page": "https://it.wikipedia.org/wiki/File:Logo_Dinamo_Sassari.png",
+   "download": "https://upload.wikimedia.org/wikipedia/it/3/3d/Logo_Dinamo_Sassari.png",
+   "licence": "non-free logo, as the file page states (it.wikipedia's non-free content)",
+   "sha256": "5dd12c7fcbd99d5952b86ee08e36b87fafdf84b03c27a8f3a99f788a6bf63606",
+   "cache": "data-src/crest-eras/files/euroleague/el-dinamo-sassari/2015-Logo_Dinamo_Sassari.png",
+   "evidence": "it.wiki Dinamo Basket Sassari gallery: Logo_Dinamo_Sassari.png 'Logo utilizzato dal 2010 al 2026', Logo_dinamo.png 'Logo utilizzato dal 2026'; 'Simboli ufficiali': the D with a lightning bolt is the logo in use since 2026. The same shield is en.wiki's File:Dinamo_Sassari_logo.png (uploaded 2016, sourced from a March 2013 page).",
+   "verified": "blue shield with a white outline, the map of Sardinia in light blue, a white lightning bolt, DINAMO (a small red-and-white flag mark in the i) over SASSARI, a basketball as the O; the same as en.wiki's 2016 upload",
+   "league": "euroleague"
+  },
+  "el-elan-chalon.2013": {
+   "club": "Élan Chalon",
+   "years": "2013–2013",
+   "kind": "wikipedia",
+   "title": "File:Elan_Chalon_Official_Logo.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Elan_Chalon_Official_Logo.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/7/7a/Elan_Chalon_Official_Logo.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "cf06035d73e5fb5665cc8dcdae5b045715c2b4d63e4a0b773d2bd133376b696b",
+   "cache": "data-src/crest-eras/files/euroleague/el-elan-chalon/2013-Elan_Chalon_Official_Logo.jpg",
+   "evidence": "en 'Logos' gallery: this file '2007–2013', then Elan_Chalon_2014_Logo.png '2013–2018' ('Logo of Elan Chalon as of the 2013–14 season', from an August 2013 source) and the 2018 logo in the infobox. This file ('the official logo of the professional LNB Pro A basketball club Élan Chalon', from the club site) was uploaded 29 August 2012, just before the 2012-13 season.",
+   "verified": "cartoon brown moose (an 'élan') dribbling an orange ball above red-white block letters 'CHALON ELAN' (328x303 JPEG on white); the 2013-14 red roundel 'ELAN Chalon / Au-delà d'un club' is different",
+   "league": "euroleague"
+  },
+  "el-estudiantes.2001": {
+   "club": "Estudiantes",
+   "years": "2001–2005",
+   "kind": "commons",
+   "title": "File:Club_Baloncesto_Estudiantes_Madrid_(logo).svg",
+   "page": "https://commons.wikimedia.org/wiki/File:Club_Baloncesto_Estudiantes_Madrid_(logo).svg",
+   "download": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Club_Baloncesto_Estudiantes_Madrid_%28logo%29.svg",
+   "licence": "public domain: below the threshold of originality, as the file page states (trademark rights may apply)",
+   "sha256": "fe5b4dfd7cb9a3b0eb693ca7f9b78cbd1c3847a267646dcc50679ecdb4dc7601",
+   "cache": "data-src/crest-eras/files/euroleague/el-estudiantes/2001-Club_Baloncesto_Estudiantes_Madrid_(logo).svg",
+   "evidence": "es Club Baloncesto Estudiantes, Colores y símbolos: the club crest is this pointed shield (dark and light blue, gold border, 'E C' above and 'R I M' interlaced for the Instituto Ramiro de Maeztu), no change mentioned; the en CB Estudiantes article showed it (Image:CB_Estudiantes.gif) in captures of 2006-08 and 2008-02; Commons File:Estudiantes_Classic_Logotype.jpg, a photo of 19 November 2005 at the Madrid Arena, shows the same shield beside the Estudiantes script; en calls it the 'Non-commercial logo'. The team played as Adecco Estudiantes in 2000-01 and 2004-05: the club emblem is used",
+   "verified": "pointed blue shield with gold border, E C on dark blue above, light-blue left and dark-blue right halves below with the gold R-I-M monogram: the same shield as the en article's 2006 GIF and the 2005 photo",
+   "league": "euroleague"
+  },
+  "el-fc-barcelona.2001": {
+   "club": "FC Barcelona",
+   "years": "2001–2002",
+   "kind": "wikipedia",
+   "title": "Fitxer:FC_Barcelona_1975.png",
+   "page": "https://ca.wikipedia.org/wiki/Fitxer:FC_Barcelona_1975.png",
+   "download": "https://upload.wikimedia.org/wikipedia/ca/f/fc/FC_Barcelona_1975.png",
+   "licence": "non-free logo, as the file page states (ca.wikipedia's non-free content)",
+   "sha256": "30e515259a1b2c7dcae659a79a91d8edb14a1f325585178a60c264d8ca159cb3",
+   "cache": "data-src/crest-eras/files/euroleague/el-fc-barcelona/2001-FC_Barcelona_1975.png",
+   "evidence": "ca Escut del Futbol Club Barcelona, gallery and text: this crest 1975–2002 (side points softened, the band joined to the border, modernised initials F.C.B.), today's very stylised design 2002–; es Fútbol Club Barcelona: today's design is Claret Serrahima's adaptation made in 2002 (fewer points, no dots between the initials); the basketball section wears the club crest; the game's football eras also end this crest with 2001/02",
+   "verified": "F.C.B. with dots between the letters on the yellow band, St George cross and senyera above, blue-garnet stripes with a ball below, pointed side tips: the pre-2002 crest, not today's three-point FCB crest",
+   "league": "euroleague"
+  },
+  "el-fortitudo-bologna.2001": {
+   "club": "Fortitudo Bologna",
+   "years": "2001–2007",
+   "kind": "wikipedia",
+   "title": "File:BC_Fortitudo_Bologna_logo.gif (en.wikipedia)",
+   "page": "https://en.wikipedia.org/wiki/File:BC_Fortitudo_Bologna_logo.gif",
+   "download": "https://upload.wikimedia.org/wikipedia/en/0/08/BC_Fortitudo_Bologna_logo.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "c21ee40f8c51f69206b178e828d46cf2aa4c7aa6def0185847bc33360b2dacb8",
+   "cache": "data-src/crest-eras/files/euroleague/el-fortitudo-bologna/2001-BC_Fortitudo_Bologna_logo.gif",
+   "evidence": "Fortitudo's emblem, the eagle over the F shield, is the club's own crest through the sponsor names of these seasons (Paf, Skipper, Climamio). en.wiki's article showed it in its infobox (File:Logo_fortitudo.jpg, 120 x 130) in the captures of 2006-10-21, 2008-04-09 and 2009-02-23; ru.wiki's File:Logo_fortitudo.jpg (uploaded Feb 2009 from www.fortitudo.it, 120 x 130) is the same emblem, white on a navy square; he.wiki (2008/2011, from the club's site), el.wiki (2014) and today's Fortitudo 103 file (2026) show the same eagle and F shield. No dated source shows another crest in 2000-2007.",
+   "verified": "a blue-and-white eagle with spread wings perched on a pointed blue-edged white shield with a blue serif F, FORTITUDO / BOLOGNA in blue capitals below; the same emblem as ru.wiki's 2009 navy-square copy and today's Fortitudo 103 shield",
+   "league": "euroleague"
+  },
+  "el-gran-canaria.2019": {
+   "club": "Gran Canaria",
+   "years": "2019–2019",
+   "kind": "wikipedia",
+   "title": "File:CB_Gran_Canaria_logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:CB_Gran_Canaria_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/c/c7/CB_Gran_Canaria_logo.svg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "a1ed2e28e8301c022c0262d3ba785b5a18c63b5a6f8748ee476a83396ba65c21",
+   "cache": "data-src/crest-eras/files/euroleague/el-gran-canaria/2019-CB_Gran_Canaria_logo.svg",
+   "evidence": "en CB Gran Canaria, Logos gallery: 'CB Gran Canaria logo (2014–present)'; the file was uploaded 2017-09-23 from the EuroLeague media centre and the en infobox showed it ('Herbalife Gran Canaria logo') in a 2019 capture, the season of the club's EuroLeague (sponsor name Herbalife Gran Canaria 2012–2021; the club logo carries no sponsor)",
+   "verified": "yellow silhouette of the island with a blue-white swoosh and a basketball, GRAN CANARIA in blue-outlined yellow letters",
+   "league": "euroleague"
+  },
+  "el-hapoel-jerusalem.2001": {
+   "club": "Hapoel Jerusalem",
+   "years": "2001–2001",
+   "kind": "wikipedia",
+   "title": "קובץ:Hjm1.png",
+   "page": "https://he.wikipedia.org/wiki/%D7%A7%D7%95%D7%91%D7%A5:Hjm1.png",
+   "download": "https://upload.wikimedia.org/wikipedia/he/6/61/Hjm1.png",
+   "licence": "non-free logo, as the file page states (he.wikipedia's non-free content)",
+   "sha256": "291af6769b43c61dadaec6c2d23ea42a590902afd6d15ffed368cdf410a17f18",
+   "cache": "data-src/crest-eras/files/euroleague/el-hapoel-jerusalem/2001-Hjm1.png",
+   "evidence": "he.wikipedia הפועל ירושלים (כדורסל), logo gallery: Hapoel123.jpg 1943–1991, Hapoel_JLM_old.jpg 1991–1999, Hjm1.png «סמל הקבוצה בעבר (1999–2014)», the 2014 logo from 2014-15 to 2025-26, a new one from 2026-27. The en article's infobox showed the same roundel (Hjm.png, alt «Hapoel 'Migdal' Jerusalem B.C. logo») in its capture of 2008-02-28; the en logo file was replaced by a «New 2014 Logo» in July 2014.",
+   "verified": "red roundel, white ring lettering הפועל ירושלים above and HAPOEL JERUSALEM B.C. below; inside, a white half basketball on the left and the white Jerusalem lion on red on the right; the 2008 en copy is the same drawing",
+   "league": "euroleague"
+  },
+  "el-joventut.2007": {
+   "club": "Joventut Badalona",
+   "years": "2007–2009",
+   "kind": "commons",
+   "title": "File:Club_Joventut_de_Badalona_(logo).svg",
+   "page": "https://commons.wikimedia.org/wiki/File:Club_Joventut_de_Badalona_(logo).svg",
+   "download": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Club_Joventut_de_Badalona_%28logo%29.svg",
+   "licence": "public domain: below the threshold of originality, as the file page states (trademark rights may apply)",
+   "sha256": "420c6da0c1274cb7e2b22ad40e8225a5bf6980fb7e47e0e81d37c36d81a884ca",
+   "cache": "data-src/crest-eras/files/euroleague/el-joventut/2007-Club_Joventut_de_Badalona_(logo).svg",
+   "evidence": "the club's own CJB shield, used beside the DKV sponsor's team logos: en Joventut Badalona, Logos gallery, 'Non commercial logo' (File:Joventut_Badalona.jpg, the CJB shield from penya.cat, 2011) beside the 'DKV sponsorship logo' and 'FIATC sponsorship logo'; in 2006-09 and 2008-03 the en article showed a DKV joventut wordmark logo and in 2009-01 the DKV joventut sphere (File:DKV_Joventut_logo.png): sponsor team logos, so the club emblem is used; Commons File:Rudy_Fernández.JPG (2008-05-20, DKV Joventut shirt in the 2007-08 ACB play-offs) shows a small tall white-edged shield, the CJB crest's shape, on the chest under the Reebok logo",
+   "verified": "tall green-black shield with white border and the letters C, J, B stacked in three panels",
+   "league": "euroleague"
+  },
+  "el-karsiyaka.2016": {
+   "club": "Karşıyaka",
+   "years": "2016–2016",
+   "kind": "commons",
+   "title": "File:Karşıyaka Spor Kulübü (logo).png",
+   "page": "https://commons.wikimedia.org/wiki/File:Kar%C5%9F%C4%B1yaka_Spor_Kul%C3%BCb%C3%BC_(logo).png",
+   "download": "https://upload.wikimedia.org/wikipedia/commons/8/89/Kar%C5%9F%C4%B1yaka_Spor_Kul%C3%BCb%C3%BC_%28logo%29.png",
+   "licence": "public domain: below the threshold of originality, as the file page states (trademark rights may apply)",
+   "sha256": "bab21c4e85e8ac3139b557e5a54f1bc399c3e93b691f8e1609377f305591df92",
+   "cache": "data-src/crest-eras/files/euroleague/el-karsiyaka/2016-Karşıyaka_Spor_Kulübü_(logo).png",
+   "evidence": "Karşıyaka's basketball side (Pınar Karşıyaka in 2015-16: en Karşıyaka Basket, 'sponsored by ... Pınar between 1998 and 2024') wears the sports club's emblem, the K.S.K. shield: tr article Karşıyaka (basketbol takımı) shows, captioned 'the team's logo while it used the Pınar Karşıyaka name', File:Pınar_Karşıyaka_logo.png (tr, uploaded 29 June 2011): the word PINAR above this same K.S.K. shield. The brief's rule (club emblem and sponsor team logo both in use: the club's emblem) gives the shield. The en/tr infobox today shows Commons File:Ksk_logo.png (2025, a darker redraw of the same shield, CC0 claim flagged as possibly wrong), so the 2021 PD-textlogo file is used. The en article Pınar_Karşıyaka shows that PINAR-over-shield logo (Pınar_Karşıyaka_logo.png) in its capture of 2015-10-22, during 2015-16.",
+   "verified": "red shield, white-edged green diagonal band with K.S.K., white crescent and star top left, 1912 at the bottom; the same shield as under PINAR in the 2011 Pınar Karşıyaka logo",
+   "league": "euroleague"
+  },
+  "el-khimki.2010": {
+   "club": "Khimki",
+   "years": "2010–2016",
+   "kind": "wikipedia",
+   "title": "File:Khimki_logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Khimki_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/2/22/Khimki_logo.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "2ad49b940d4f12e60936b1215e7d2043d3a685ea982999331f9e060ada1091d8",
+   "cache": "data-src/crest-eras/files/euroleague/el-khimki/2010-Khimki_logo.png",
+   "evidence": "en BC Khimki, Logos: 'On August 9, 2016, Khimki adopted a new logo to celebrate its 20th anniversary'; gallery caption for this file: 'The original Khimki logo (used until 2016)'. The same laurel-and-ball logo is dated throughout: hr File:BK_Khimki_Moskva_.png (14 March 2009, from the EuroCup's KHI page) and fi File:Khimki.png (1 April 2009, eurocupbasketball.com); the en article's capture of 2010-11-27 shows Khimki_Moscow_Region_logo.jpg, of which lv keeps the copy (uploaded 12 October 2011: this logo on a blue ground); de File:Chimki_Logo.png (22 February 2012, from bckhimki.ru); the en capture of 2013-04-25 shows it as BC_Khimki_logo.gif; this en file was uploaded 3 August 2015. So 2009-10 to 2015-16.",
+   "verified": "orange basketball over a gold laurel wreath, БАСКЕТБОЛЬНЫЙ КЛУБ arched above, a blue ХИМКИ ribbon with two stars and the town arms, МОСКОВСКАЯ ОБЛАСТЬ below",
+   "league": "euroleague"
+  },
+  "el-khimki.2018": {
+   "club": "Khimki",
+   "years": "2018–2021",
+   "kind": "wikipedia",
+   "title": "File:BC_Khimki_2016_logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:BC_Khimki_2016_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/8/8b/BC_Khimki_2016_logo.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "30d544a943064ebc7c5d29700c79a2949b874366b5716c995e564d1dbe92e1e3",
+   "cache": "data-src/crest-eras/files/euroleague/el-khimki/2018-BC_Khimki_2016_logo.png",
+   "evidence": "en BC Khimki: the new logo adopted on 9 August 2016 (gallery: '2016–present'); the ru infobox file Chimki_logo.png (uploaded 6 February 2018) is the same logo, so it covers 2017-18 to 2020-21.",
+   "verified": "blue-and-gold shield, white БАСКЕТБОЛЬНЫЙ КЛУБ ХИМКИ МОСКОВСКАЯ ОБЛАСТЬ on top, a blue-gold X-like K over a basketball, the town arms and 1997 below",
+   "league": "euroleague"
+  },
+  "el-koln-99ers.2007": {
+   "club": "Köln 99ers",
+   "years": "2007–2007",
+   "kind": "wikipedia",
+   "title": "Datei:Rheinenerie-koeln.PNG",
+   "page": "https://de.wikipedia.org/wiki/Datei:Rheinenerie-koeln.PNG",
+   "download": "https://upload.wikimedia.org/wikipedia/de/6/64/Rheinenerie-koeln.PNG",
+   "licence": "see the file page",
+   "sha256": "be6f3c6cfa2631993b4b505d79c3585b6684b760e04b0f4e520b65e0fcc46eaf",
+   "cache": "data-src/crest-eras/files/euroleague/el-koln-99ers/2007-Rheinenerie-koeln.PNG",
+   "evidence": "de.wikipedia Köln 99ers: the team was named RheinEnergie Köln from 2003-04 until July 2007, when RheinEnergie AG ended its name sponsorship and the club became Köln 99ers; the article shows this file as 'Ehemaliges Logo der Mannschaft als RheinEnergie Köln'. The file ('Logo RheinEnergie Köln', source rheinenergie-koeln.de) was uploaded on 6 Oct 2006, at the start of the 2006-07 season the club played in the EuroLeague. The team's name was its sponsor's and no other club emblem of the time is known; the Köln 99ers logo (Datei:Koeln99er.svg, 2008) came after the renaming",
+   "verified": "white wordmark: red 'RheinEnergie' over blue 'Köln' with a small orange basketball, 246x117",
+   "league": "euroleague"
+  },
+  "el-le-mans.2007": {
+   "club": "Le Mans",
+   "years": "2007–2009",
+   "kind": "wikipedia",
+   "title": "Tiedosto:754.png",
+   "page": "https://fi.wikipedia.org/wiki/Tiedosto:754.png",
+   "download": "https://upload.wikimedia.org/wikipedia/fi/7/7c/754.png",
+   "licence": "non-free logo, as the file page states (fi.wikipedia's non-free content)",
+   "sha256": "3be008cb9badb2619e612295cc7e3701ec0ec839907a159e42a5138fc9e4554d",
+   "cache": "data-src/crest-eras/files/euroleague/el-le-mans/2007-754.png",
+   "evidence": "fr 'Éléments distinctifs': 'Le logo existe depuis 1993 ... À l'été 2009, le MSB change de blason et opte pour un lion' (en says the same); fr gallery: Fichier:Logo_MSB.jpg 'Ancien logo (1993-2009)', then 'Logo de 2009 à 2025' and 'Logo depuis 2025'. Seasons 2006-07 to 2008-09 all before the summer-2009 lion. This Finnish Wikipedia copy ('Le Mans Sarthe Basketin logo', 120x120) was taken from euroleague.net on 29 March 2009, during the 2008-09 season; the fr copy (Logo_MSB.jpg, uploaded from msb.fr on 26 March 2006, https://upload.wikimedia.org/wikipedia/fr/d/d0/Logo_MSB.jpg, sha256 6b552c72665b4cb7670ca7cd3b898e1dd65215a2666d4a898173c0d93046d00b, kept beside it as 2007-Logo_MSB.jpg) is the same emblem at 99x74 without the name line.",
+   "verified": "navy horizontal banner with white outlined 'MSB', an orange-red star at each end, an orange basketball behind it, 'Le Mans Sarthe Basket' in orange with the M, S and B outlined in blue under it (120x120 PNG on white, enlarged to read it); the fr 99x74 copy shows the same banner, stars and ball",
+   "league": "euroleague"
+  },
+  "el-limoges.2015": {
+   "club": "Limoges CSP",
+   "years": "2015–2016",
+   "kind": "commons",
+   "title": "File:Logo_Limoges_Cercle_Saint-Pierre.svg",
+   "page": "https://commons.wikimedia.org/wiki/File:Logo_Limoges_Cercle_Saint-Pierre.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Logo_Limoges_Cercle_Saint-Pierre.svg",
+   "licence": "public domain: below the threshold of originality, as the file page states (trademark rights may apply)",
+   "sha256": "d775bd7ac43ab1121a550f4a85958946d80c95bc22ae44e77fea0152fa4da7a4",
+   "cache": "data-src/crest-eras/files/euroleague/el-limoges/2015-Logo_Limoges_Cercle_Saint-Pierre.svg",
+   "evidence": "fr text: in 2011 'retour au maillot vert et blanc ..., le logo est également changé'. The fr article's infobox in the Wayback capture of 18 April 2015 showed Commons File:Logo_CSP_Limoges_1929.svg ('Logo du CSP Limoges 1929', drawn by Chabe01 on 21 May 2013, CC BY-SA 3.0 per the archived file page of 26 November 2016; deleted from Commons since); its 130 px thumbnail was captured in May 2015, March 2016 and May 2016, so it was still the logo in 2015-16. Today's en infobox file (this SVG, same author, same 604x604 size) is the same design. Fr's newer infobox file Logo_CSPajamaislespremier.svg (uploaded 3 July 2026, adds 'À JAMAIS LES PREMIERS') is later.",
+   "verified": "green roundel, 'LIMOGES' arched at the top and 'DEPUIS 1929' at the foot in white, big white 'CSP' with a white star under the S; identical to the archived 2015 130 px thumbnail (saved beside it: 2015-wb-langfr-130px-Logo_CSP_Limoges_1929.svg.png, from https://web.archive.org/web/20150526100134im_/https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Logo_CSP_Limoges_1929.svg/langfr-130px-Logo_CSP_Limoges_1929.svg.png, sha256 2e7c697b44ca09a7d731cbfe9d743504902052704a987939ffedaf885af926a4)",
+   "league": "euroleague"
+  },
+  "el-lokomotiv-kuban.2014": {
+   "club": "Lokomotiv Kuban",
+   "years": "2014–2014",
+   "kind": "wikipedia",
+   "title": "Tiedosto:Logo_Lokomotiv-Kuban.jpg",
+   "page": "https://fi.wikipedia.org/wiki/Tiedosto:Logo_Lokomotiv-Kuban.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/fi/7/7c/Logo_Lokomotiv-Kuban.jpg",
+   "licence": "non-free logo, as the file page states (fi.wikipedia's non-free content)",
+   "sha256": "65f7ff087952562e9633cde90e054424e51d9a4b3da408e38664662f719a77e2",
+   "cache": "data-src/crest-eras/files/euroleague/el-lokomotiv-kuban/2014-Logo_Lokomotiv-Kuban.jpg",
+   "evidence": "The ru article Локомотив-Кубань shows this logo (its since-deleted file Локомотив-кубань.png, archived copy checked: the same design on a dark ground) in its captures of 2014-01-05 and 2014-07-22, i.e. during and just after 2013-14; the en article shows it as Logo_Lokomotiv-Kuban.jpg in the captures of 2011-11-18 and 2013-04-20. The next logo was uploaded to en on 3 November 2015 (next era); between them the en infobox (June 2015) used a since-deleted Commons file Lokomotiv_Kuban_Logo_Eng.png that no archive holds.",
+   "verified": "red Л over a green-and-white locomotive, black-and-white ЛОКОМОТИВ with КУБАНЬ, an orange basketball; the ru 2014 copy is the same logo",
+   "league": "euroleague"
+  },
+  "el-lokomotiv-kuban.2016": {
+   "club": "Lokomotiv Kuban",
+   "years": "2016–2016",
+   "kind": "wikipedia",
+   "title": "ملف:Lokomotiv_Kuban_logo.png",
+   "page": "https://ar.wikipedia.org/wiki/%D9%85%D9%84%D9%81:Lokomotiv_Kuban_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/ar/0/04/Lokomotiv_Kuban_logo.png",
+   "licence": "non-free logo, as the file page states (ar.wikipedia's non-free content)",
+   "sha256": "a07f63d7f1fbc014d836a7facac6ed75abe378d4194efbd499749f05c6a8cd7a",
+   "cache": "data-src/crest-eras/files/euroleague/el-lokomotiv-kuban/2016-Lokomotiv_Kuban_logo.png",
+   "evidence": "en File:Lokomotiv_Kuban_logo.png ('Logo of PBC Lokomotiv Kuban', source en.lokobasket.com, 338×330) was uploaded on 3 November 2015 (its file page archived 2017-02-03) and the en article PBC_Lokomotiv-Kuban shows it in its infobox in the capture of 2016-02-23, during 2015-16 (its Final Four season); the 200px copy archived then is this logo, and the ar file of the same name is the en file copied in February 2017. The logo was replaced in 2018 (en SVG 'Update' of 13 December 2018: the Л with LOKOMOTIV KUBAN).",
+   "verified": "red three-dimensional Л with green speed stripes sweeping under it, white-outlined ЛОКОМОТИВ КУБАНЬ in black and green, an orange basketball and orange flame trail; the archived 2016 en copy shows the same",
+   "league": "euroleague"
+  },
+  "el-maroussi.2010": {
+   "club": "Maroussi",
+   "years": "2010–2010",
+   "kind": "wayback",
+   "title": "File:Maroussi_Athens_BC_English_logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Maroussi_Athens_BC_English_logo.png",
+   "wayback": "https://web.archive.org/web/20100924015548im_/http://upload.wikimedia.org/wikipedia/en/thumb/c/c7/Maroussi_Athens_BC_English_logo.png/150px-Maroussi_Athens_BC_English_logo.png",
+   "licence": "non-free logo: an English Wikipedia upload, deleted since; its file page was not archived",
+   "sha256": "da8999b5ec17705e18286b478003b51824257c2c31ce7c93862b9bc0f1c6b1ee",
+   "cache": "data-src/crest-eras/files/euroleague/el-maroussi/2010-150px-Maroussi_Athens_BC_English_logo.png",
+   "evidence": "The en article Maroussi_BC showed this logo in its infobox in the Wayback capture of 2010-01-24 (mid 2009-10 season, alt «Maroussi Athens B.C. Μαρούσι K.A.E. logo») and again on 2010-09-24 (Maroussi_B.C.), there beside Maroussi_BC_Logo.png captioned «official Greek language logo». The capture of 2009-06-03 showed that Greek version (ΜΑΡΟΥΣΙ, K.A.E.) of the same design. The full-size file was not archived (404); this is the archived 150px thumbnail.",
+   "verified": "yellow disc, black MAROUSSI arched at the top, orange basketball with B.C., black fleur-de-lis, «Basketball» below; the club's later crest (GS Amarousiou ring with fleur-de-lis, 1896, star) differs",
+   "league": "euroleague"
+  },
+  "el-nanterre.2014": {
+   "club": "Nanterre 92",
+   "years": "2014–2014",
+   "kind": "wikipedia",
+   "title": "File:Logo_JSF_Nanterre.png",
+   "page": "https://en.wikipedia.org/wiki/File:Logo_JSF_Nanterre.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/0/0f/Logo_JSF_Nanterre.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "3369fdac65aa9ade66b2c5959a3a090c4611b01c1251fe5827c22a132f664caa",
+   "cache": "data-src/crest-eras/files/euroleague/el-nanterre/2014-Logo_JSF_Nanterre.png",
+   "evidence": "en 'Logos' gallery: 'The club's JSF Nanterre logo (used until 2016)', then 'The club's Nanterre 92 logo (2016–present)'; fr: 'Le 15 février 2016, le club change de nom passant de JSF Nanterre à Nanterre 92'. The en JSF_Nanterre article's infobox in the Wayback captures of 13 June 2013 and 21 March 2014 showed Commons File:Logo_JSF_Nanterre.jpg (deleted since); its 200 px thumbnail as archived on 28 February 2014 is this same logo. This PNG (uploaded April 2015) is the larger copy.",
+   "verified": "green basketball with black seams, white 'NANTERRE' banner with 'JSF' above and '1927' below, a small flaming orange ball at top right (354x281 PNG); the archived February 2014 thumbnail (saved beside it as 2014-wb-200px-Logo_JSF_Nanterre.jpg, from https://web.archive.org/web/20140228144441im_/http://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Logo_JSF_Nanterre.jpg/200px-Logo_JSF_Nanterre.jpg, sha256 72e27a252d6b9fc83e94afa9c86a5042c216d18264664335e5de7e8931ea3266) is the same design",
+   "league": "euroleague"
+  },
+  "el-napoli.2007": {
+   "club": "Napoli",
+   "years": "2007–2007",
+   "kind": "wikipedia",
+   "title": "File:Napoli_Basket.png (en.wikipedia)",
+   "page": "https://en.wikipedia.org/wiki/File:Napoli_Basket.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/2/22/Napoli_Basket.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "ca2f7d66798358f2242d7c2eb3bea0821fee09276749c655c731a36352c9d603",
+   "cache": "data-src/crest-eras/files/euroleague/el-napoli/2007-Napoli_Basket.png",
+   "evidence": "the club of the 2006-07 EuroLeague is S.S. Basket Napoli (Carpisa/Eldo Napoli, 1999-2008; en.wiki 'S.S. Basket Napoli', it.wiki 'Societa Sportiva Basket Napoli'), not today's Napoli Basket. Its logo: en.wiki infobox File:Napoli_Basket.png (uploaded Oct 2008, the club's last year); he.wiki's File:Napoli_Basket-1-.jpg, the same logo as a JPEG (uploaded June 2008 from the Eldo Napoli club site, 'created 8 Sep 2002'); it.wiki's infobox 'stemma' File:Basketnapolistemma.jpg, uploaded 3 Feb 2007 during the 2006-07 season, shows the same N-and-ball emblem with the lettering beside it (trademark registered 2003, NA2003C000883). No sponsor in the logo.",
+   "verified": "a blue brush-stroke N ending in an orange basketball above S.S. BASKET / NAPOLI in blue serif capitals, white ground; the same emblem as it.wiki's Feb 2007 horizontal version and he.wiki's 2008 copy",
+   "league": "euroleague"
+  },
+  "el-neptunas.2015": {
+   "club": "Neptūnas Klaipėda",
+   "years": "2015–2015",
+   "kind": "wikipedia",
+   "title": "File:BC_Neptunas_logo_2.png",
+   "page": "https://en.wikipedia.org/wiki/File:BC_Neptunas_logo_2.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/7/7f/BC_Neptunas_logo_2.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "e401f580b1533ed533099bc6d4ab7dfa40bd0b00d0c52c554f7f5a8816e29520",
+   "cache": "data-src/crest-eras/files/euroleague/el-neptunas/2015-BC_Neptunas_logo_2.png",
+   "evidence": "en.wikipedia BC Neptūnas 'Logos' gallery: 'Classic logo (1964–2011)', 'BC_Neptunas_logo_2.png | 2010s logo (2011–2019)', then the 55th anniversary logo (2019–2020). The file was first uploaded 18 June 2014 as 'Logo of BC Neptunas as of the 2013–14 season'; lt.wikipedia File:Neptunas_nuo_2010.jpg ('Neptūnas since 2010', uploaded 7 September 2010) is the same design. The 2014-15 EuroLeague season wore it. The en article showed it in its infobox in its capture of 2015-04-05, during 2014-15.",
+   "verified": "contact sheet work/el/east/sheet-files1.png: blue shield, KLAIPĖDA 1964 and NEPTŪNAS on a ribbon, trident over a basketball.",
+   "league": "euroleague"
+  },
+  "el-nizhny-novgorod.2015": {
+   "club": "Nizhny Novgorod",
+   "years": "2015–2015",
+   "kind": "wikipedia",
+   "title": "File:BC_Nizhny_Novgorod_logo_2014.png",
+   "page": "https://en.wikipedia.org/wiki/File:BC_Nizhny_Novgorod_logo_2014.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/9/97/BC_Nizhny_Novgorod_logo_2014.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "1e8e391e626e3a16d0c9d7cc7a1f5483647d08e63df9be75547b0d0ddaab0e14",
+   "cache": "data-src/crest-eras/files/euroleague/el-nizhny-novgorod/2015-BC_Nizhny_Novgorod_logo_2014.png",
+   "evidence": "en BC Nizhny Novgorod, Logos: 'Before the start of the 2016–17 season, Nizhny Novgorod changed its primary logo'; gallery caption 'Logo used until 2016' for this file; file description 'Logo of BC Nizhny Novgorod used in the 2013–14 season' (uploaded 14 March 2014). The ru article's emblem gallery starts its next logo at 2016. The en article shows this file in its infobox in the capture of 2015-04-23, during 2014-15.",
+   "verified": "dark grey НН monogram (two tall letters, a hooked tail) with a small orange basketball on top",
+   "league": "euroleague"
+  },
+  "el-oldenburg.2010": {
+   "club": "Oldenburg",
+   "years": "2010–2010",
+   "kind": "wayback",
+   "title": "File:EWE_Baskets_Oldenburg_logo.png (220px thumbnail; the original was not archived)",
+   "page": "https://web.archive.org/web/20161119072327/http://en.wikipedia.org/wiki/EWE_Baskets_Oldenburg",
+   "wayback": "https://web.archive.org/web/20161119072327im_/https://upload.wikimedia.org/wikipedia/en/thumb/5/51/EWE_Baskets_Oldenburg_logo.png/220px-EWE_Baskets_Oldenburg_logo.png",
+   "licence": "non-free logo: an English Wikipedia upload, deleted since; its file page was not looked up in the archive",
+   "sha256": "026b51db3aadb45fb9cbaed74e2d02b52c66c28ea9909683df711f166f9b4ee1",
+   "cache": "data-src/crest-eras/files/euroleague/el-oldenburg/2010-220px-EWE_Baskets_Oldenburg_logo.png",
+   "evidence": "de.wikipedia EWE Baskets Oldenburg 'Name und Wappen': in spring 2009 EWE changed its company logo, so the team crest was adapted, from then on with a white background; a redesigned crest followed in 2018. en.wikipedia 'Colors and logos': 'From 2009 to 2018, the team adopted a slightly reworked logo, this time with a white background and which again featured an eagle.' en.wikipedia's infobox showed this design as File:Logo_EWE_Baskets_460px.jpg on 10 Oct 2009, 19 Sep 2010 and 23 Jul 2012 (archived 160px copy checked) and as File:EWE_Baskets_Oldenburg_logo.png on 19 Nov 2016 (this 220px copy, the largest archived). The crest carries the name sponsor's name (EWE) and no other club emblem of the time is known. Season 2009-10",
+   "verified": "white shield with a yellow rim, small blue EWE, blue BASKETS lettering, a yellow eagle with spread wings holding a basketball, OLDENBURG under it; same as the 2009 jpg copy",
+   "league": "euroleague"
+  },
+  "el-olimpia-milano.2006": {
+   "club": "Olimpia Milano",
+   "years": "2006–2009",
+   "kind": "wikipedia",
+   "title": "File:Olimpia_Milano_logo_1985.png (it.wikipedia)",
+   "page": "https://it.wikipedia.org/wiki/File:Olimpia_Milano_logo_1985.png",
+   "download": "https://upload.wikimedia.org/wikipedia/it/f/f6/Olimpia_Milano_logo_1985.png",
+   "licence": "non-free logo, as the file page states (it.wikipedia's non-free content)",
+   "sha256": "f741aa247d975cf73eebe5d7d468dba5b0571d9f9d34b3e9ce62a8defd5e2105",
+   "cache": "data-src/crest-eras/files/euroleague/el-olimpia-milano/2006-Olimpia_Milano_logo_1985.png",
+   "evidence": "it.wiki Pallacanestro Olimpia Milano gallery: 'Stemma usato dal 1985 al 2009' (file description: 'adottato dal 1985 al 2009'); 'Simboli ufficiali': 'Fiero il Guerriero' is the club's symbol from 1983-84 and leaves the club's identity at the start of 2009-10. en.wiki's article showed this same logo in its captures of 2006-10-20 (File:Olimpia_Milano.gif) and, in the infobox, 2009-04-10 (File:Logo_Olimpia_Milano.jpg; archived thumbnail saved in work/el/italy/check/). In these years the team was 'Armani Jeans Milano', and en.wiki later showed an AJ Armani Jeans logo for 2004-2011: a sponsor's team logo while the club's own emblem existed, so the emblem is used (the brief's sponsor rule).",
+   "verified": "red stylised warrior (Fiero il Guerriero) with a shield showing the Duomo and a basketball, two yellow stars, over OLIMPIAMILANO in white-on-red outlined capitals and a ruled 1936; identical to the archived en.wiki 2006 GIF and 2009 JPEG",
+   "league": "euroleague"
+  },
+  "el-olimpia-milano.2010": {
+   "club": "Olimpia Milano",
+   "years": "2010–2016",
+   "kind": "commons",
+   "title": "File:Logo_Pallacanestro_Olimpia_Milano.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Logo_Pallacanestro_Olimpia_Milano.png",
+   "download": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Logo_Pallacanestro_Olimpia_Milano.png",
+   "licence": "public domain: below the threshold of originality, as the file page states (trademark rights may apply)",
+   "sha256": "c6628153158dbe3d4962ecc121232e69036d86c89e7f7e3bda0895fe84e43ccc",
+   "cache": "data-src/crest-eras/files/euroleague/el-olimpia-milano/2010-Logo_Pallacanestro_Olimpia_Milano.png",
+   "evidence": "it.wiki gallery: 'Stemma usato dal 2009 al 2016' (file description: 'Logo della Pallacanestro Olimpia Milano dal 2009 al 2016'), and 'Simboli ufficiali': Fiero il Guerriero leaves the club's identity at the start of 2009-10. Sources differ on 2009-10: en.wiki's infobox still showed Fiero in its capture of 2010-08-19 (an infobox not yet updated, or a lag); the club's own article as it stands (it.wiki) is followed. en.wiki's infobox showed this wordmark as 'the non-sponsorship Olimpia Milano logo' on 2016-06-14, and the roundel from 2016-12-15. The sponsor logos of the time (AJ Armani Jeans 2004-2011, EA7 Emporio Armani 2011-2018) carry this same OLIMPIA MILANO 1936 lettering under the sponsor's mark; the club's own logo is used.",
+   "verified": "a wordmark only: OLIMPIA MILANO arched in red condensed capitals over a red 1936; no emblem (it was the club's primary non-sponsor logo then)",
+   "league": "euroleague"
+  },
+  "el-olimpija.2007": {
+   "club": "Olimpija Ljubljana",
+   "years": "2007–2013",
+   "kind": "wayback",
+   "title": "File:Union_olimpija.png",
+   "page": "https://en.wikipedia.org/wiki/File:Union_olimpija.png",
+   "wayback": "https://web.archive.org/web/20090813110104im_/http://upload.wikimedia.org/wikipedia/en/8/8e/Union_olimpija.png",
+   "licence": "non-free logo: an English Wikipedia upload, deleted since; its file page was not archived",
+   "sha256": "0565d9ff011befa824d11bc14258317cabb917cf5fd805ad412aa31ce3c8afd8",
+   "cache": "data-src/crest-eras/files/euroleague/el-olimpija/2007-Union_olimpija.png",
+   "evidence": "The black-red dragon roundel lettered 'KK UNION OLIMPIJA LJUBLJANA' (Union, the brewery, was the club's name sponsor 1997–2017, en 'Names through history'): lt.wikipedia File:Union_olimpija.gif uploaded 2 February 2007 from the Adriatic League's club page (goodyear.adriaticbasket.com); the en article showed Image:Union_olimpija.gif in its captures of 2006-09-13, 2007-07-01 (captioned 'The team logo') and 2007-11-13, and File:Union_olimpija.png (created 3 October 2008, per the ru copy) in those of 2009-08-13 and 2013-10-22; el.wikipedia's copy from the club site as archived 2016-03-05 is the same roundel. In 2017 it became 'KK PETROL OLIMPIJA LJUBLJANA' (en File:KK_Olimpija_logo.svg). The logo carries the sponsor's name and no sponsor-free crest of the club's own was in use.",
+   "verified": "work/el/east/sheet12.png: the archived en PNG of 2009 (171×177) beside the ru copy, the lt 2007 GIF and the el 2016 copy: same black dragon on a white disc in a red crescent, KK UNION OLIMPIJA arched above, LJUBLJANA below.",
+   "league": "euroleague"
+  },
+  "el-olympiacos.2001": {
+   "club": "Olympiacos",
+   "years": "2001–2003",
+   "kind": "wikipedia",
+   "title": "Fichier:Olympiakos_Basketball_Retro.png",
+   "page": "https://fr.wikipedia.org/wiki/Fichier:Olympiakos_Basketball_Retro.png",
+   "download": "https://upload.wikimedia.org/wikipedia/fr/3/3e/Olympiakos_Basketball_Retro.png",
+   "licence": "non-free logo, as the file page states (fr.wikipedia's non-free content)",
+   "sha256": "87686974fd8bccb9622dd996164c570b8e4a45bfb7714cbc308f59d833eca772",
+   "cache": "data-src/crest-eras/files/euroleague/el-olympiacos/2001-Olympiakos_Basketball_Retro.png",
+   "evidence": "el.wikipedia Ολυμπιακός Σ.Φ.Π. (καλαθοσφαίριση ανδρών), section Έμβλημα: from 1992-93 the basketball emblem took a triangular shape and was used up to and including 2002-03. fr.wikipedia Olympiakós (basket-ball), logo gallery: this file «De 1992 à 2003», then Olympiakos-Piraeus.png (the club's ringed emblem) «De 2003 à 2009», then the basketball shield «Depuis 2009».",
+   "verified": "red banner BASKETBALL CLUB over large red OLYMPIAKOS lettering, below it an inverted white triangle outlined in black holding the red laurel-crowned head in a circle; 251×209 PNG",
+   "league": "euroleague"
+  },
+  "el-olympiacos.2004": {
+   "club": "Olympiacos",
+   "years": "2004–2009",
+   "kind": "wayback",
+   "title": "File:Olympiakos4.svg",
+   "page": "https://web.archive.org/web/20090325221812/http://en.wikipedia.org/wiki/File:Olympiakos4.svg",
+   "wayback": "https://web.archive.org/web/20090205194600im_/http://upload.wikimedia.org/wikipedia/en/b/b4/Olympiakos4.svg",
+   "licence": "non-free logo, as the file page states (Wikipedia's non-free content)",
+   "sha256": "45b22cdad2b21629667853f11157b72ea3889a7017690e5fe077084fa6d0f517",
+   "cache": "data-src/crest-eras/files/euroleague/el-olympiacos/2004-Olympiakos4.svg",
+   "evidence": "el.wikipedia basketball article, Έμβλημα: in 2003-04 all Olympiacos departments used a new version framed by a red circle with the inscription «Ολυμπιακός Σύνδεσμος Φιλάθλων Πειραιώς»; in 2009-10 the basketball department again made its own version. The English article Olympiacos_BC showed Olympiakos4.svg in its infobox in the Wayback captures of 2007-06-30, 2008-04-08 and 2009-02-05. The same drawing is el.wikipedia's OSFP-logo.svg, captioned 2003–2014 in the Olympiacos CFP article's emblem gallery.",
+   "verified": "red ring with white Greek lettering ΟΛΥΜΠΙΑΚΟΣ ΣΥΝΔΕΣΜΟΣ ΦΙΛΑΘΛΩΝ ΠΕΙΡΑΙΩΣ around the red laurel-crowned head on white, 1925; no stars (unlike today's football crest); today's basketball crest is a red-white shield with OLYMPIACOS BASKETBALL",
+   "league": "euroleague"
+  },
+  "el-orleans.2010": {
+   "club": "Orléans",
+   "years": "2010–2010",
+   "kind": "wikipedia",
+   "title": "Fichier:Logoeo45.gif",
+   "page": "https://fr.wikipedia.org/wiki/Fichier:Logoeo45.gif",
+   "download": "https://upload.wikimedia.org/wikipedia/fr/b/bd/Logoeo45.gif",
+   "licence": "non-free logo, as the file page states (fr.wikipedia's non-free content)",
+   "sha256": "c0d9163b1755290db9341342c4be2bf012d4ed95a87310be024346dd605c7cdd",
+   "cache": "data-src/crest-eras/files/euroleague/el-orleans/2010-Logoeo45.gif",
+   "evidence": "fr 'Logos': 'Le logo de l'Entente Orléanaise Loiret est présent jusqu'en 2010, accompagné de la devise du club « créateur d'émotions »', then in September 2010 the name Orléans Loiret Basket and a new logo; gallery: this file 'Entente Orléanaise Loiret (jusqu'en septembre 2010)'; file description 'Dernier logo de l'entente Orleanaise Loiret' (uploaded 28 September 2010 from the club's site, with the new OLB logo the same day). The club played as 'Entente Orléanaise 45' through 2007-08 and as 'Entente Orléanaise Loiret' in 2009-10 (fr cup table), and this logo carries the 2009-10 name and the slogan.",
+   "verified": "black tilted panel with a gold basketball trailing a gold comet tail, white 'EO / ENTENTE ORLEANAISE LOIRET', the slogan 'créateur d'émotions' under it, all on a dark grey square (123x133 GIF)",
+   "league": "euroleague"
+  },
+  "el-panathinaikos.2002": {
+   "club": "Panathinaikos",
+   "years": "2002–2024",
+   "kind": "wikipedia",
+   "title": "Αρχείο:ΚΑΕ_Παναθηναϊκός_ΑΟ.svg",
+   "page": "https://el.wikipedia.org/wiki/%CE%91%CF%81%CF%87%CE%B5%CE%AF%CE%BF:%CE%9A%CE%91%CE%95_%CE%A0%CE%B1%CE%BD%CE%B1%CE%B8%CE%B7%CE%BD%CE%B1%CF%8A%CE%BA%CF%8C%CF%82_%CE%91%CE%9F.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/el/1/1f/%CE%9A%CE%91%CE%95_%CE%A0%CE%B1%CE%BD%CE%B1%CE%B8%CE%B7%CE%BD%CE%B1%CF%8A%CE%BA%CF%8C%CF%82_%CE%91%CE%9F.svg",
+   "licence": "non-free logo, as the file page states (el.wikipedia's non-free content)",
+   "sha256": "01a5b331c1454bfba64fdaf9b911956db5ebc26498de5d3fb42dd17b6a004bbd",
+   "cache": "data-src/crest-eras/files/euroleague/el-panathinaikos/2009-KAE_Panathinaikos_AO.svg",
+   "evidence": "The plain ball with stars, one per EuroLeague title: the en infobox showed PAO_Current_Logo.png (four stars) on 2009-04-14 (it.wikipedia's Logo_pana.gif became a 120×120 version on 2009-01-05), Panathinaikos_BC_Logo.png (five stars) on 2010-03-06 and 2010-10-07, Panathinaikos_B.C._logo.png (six stars) on 2012-08-13; el.wikipedia's gallery dates this six-star drawing 2011–2024, and the en logo file had a drawing of the same 156×169 size from 2017-09-23 until the seven-star logo of 2024-05-31. Star counts differ (four to six): a star added is the same crest. 2008-09 is mixed (the Π.Α.Ο. - ΜΠΑΣΚΕΤ version was still in the en infobox on 2008-08-01); given to the plain ball, shown from January 2009. Seasons 2001-02 to 2007-08 wore the same ball with the shamrock and stars, under a «Π.Α.Ο. - ΜΠΑΣΚΕΤ» arc: Sources disagree. The en article as it stands: «Since 1992, the year in which the club's basketball department became professional, Panathinaikos B.C. has used its own logo.» The archived file page (2007-06-05) shows this logo uploaded from www.paobc.gr on 2007-05-04 (100×155, two days before the 2007 EuroLeague final) and again on 2007-05-11 (112×185, four stars); the en infobox showed it in the captures of 2007-06-05, 2008-04-08 and 2008-08-01, el.wikipedia's own article showed the same shape (Pao_basket_2007.jpg, 110×163) on 2009-10-10, and it.wikipedia's Logo_pana.gif was this 112×185 file from 2007-07-16. Against this, el.wikipedia's basketball article as it stands says the KAE used the amateur club's emblem in the 2000s (gallery «1998–2011»), contradicted for 2007-2011 by every capture; followed the en article and the captures. No picture from before May 2007 exists: for 2002-2006 the club's own ball logo is read back from en's «since 1992» (two, then three stars in those seasons; a star added is the same crest).",
+   "verified": "orange basketball with black seams, white disc with green ΠΑΟ and shamrock, 1908, six yellow stars in an arc above; no sponsor text (the archived 2009 and 2010 versions on the contact sheet are the same drawing with four and five stars)",
+   "league": "euroleague"
+  },
+  "el-panionios.2009": {
+   "club": "Panionios",
+   "years": "2009–2009",
+   "kind": "wikipedia",
+   "title": "File:Panionios_BC_Logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Panionios_BC_Logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/5/54/Panionios_BC_Logo.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "b21ab9cdb0bd4688455d3957924e7f25d3cf058157de2b2d60cd4ecf82baa3bc",
+   "cache": "data-src/crest-eras/files/euroleague/el-panionios/2009-Panionios_BC_Logo.png",
+   "evidence": "el.wikipedia Πανιώνιος (καλαθοσφαίριση ανδρών), «Εξέλιξη του εμβλήματος»: Panionios_Basket.jpg «Το παλιό έμβλημα του ΤΑΚ Πανιώνιος ως το 2007», then Panionios_BC_logo.png «Παλαιότερο λογότυπο της ΚΑΕ Πανιώνιος», then the 2025 logo; en gallery: this file «The official logo of Panionios' basketball club. Logo until 2024». Sources disagree: the en article's infobox showed the parent club's emblem (Panionios_B.C._(basketball_team)_logo.png, uploaded 2008-10-09, and 180px-Panionios_logo.svg.png in the capture of 2010-01-16) during these seasons; followed the club's articles as they stand (KAE logo after 2007).",
+   "verified": "navy-edged shield, red with white ΠΑΝΙΩΝΙΟΣ and K.A.E., orange-yellow basketball seams, blue band with Γ.Σ.Σ., 1890; the parent club's emblem (today's football crest) is the same shield without the ball and K.A.E.",
+   "league": "euroleague"
+  },
+  "el-pau-orthez.2002": {
+   "club": "Pau-Orthez",
+   "years": "2002–2007",
+   "kind": "wikipedia",
+   "title": "Tiedosto:Pau_orthez.JPG",
+   "page": "https://fi.wikipedia.org/wiki/Tiedosto:Pau_orthez.JPG",
+   "download": "https://upload.wikimedia.org/wikipedia/fi/a/a9/Pau_orthez.JPG",
+   "licence": "non-free logo, as the file page states (fi.wikipedia's non-free content)",
+   "sha256": "d9e4fdafb2ce899c51eee19aafc6478cfb6ae98f99645845d7c99652d953b620",
+   "cache": "data-src/crest-eras/files/euroleague/el-pau-orthez/2002-Pau_orthez.JPG",
+   "evidence": "fr 'Couleurs et logo' gallery: 1995 logo '(1995-2000)', Fichier:EBPO.jpg 'Logo de l'Élan béarnais Pau-Orthez (2000-2008)', then the Pau-Lacq-Orthez logo '(2008-2024)' (the same bear-and-mountain design reading PAU - LACQ - ORTHEZ) and the logo 'instauré en 2024'. Seasons 2001-02 to 2006-07 all inside 2000-2008. The fr EBPO.jpg (uploaded 25 July 2006) is only 99x74; this Finnish Wikipedia copy (276x202, 'Élan Béarnais Pau-Orthezin logo', uploaded 29 March 2009 from pau-pyrenees.com) is the same 2000-2008 logo, still reading PAU - ORTHEZ.",
+   "verified": "teal-and-navy ring round an orange basketball, a snow-capped turquoise mountain and a navy bear's head above, 'ELAN BEARNAIS' in white on the ring, 'PAU - ORTHEZ' at the foot (enlarged to read it); beside the fr 99x74 EBPO.jpg: the same design",
+   "league": "euroleague"
+  },
+  "el-rytas.2006": {
+   "club": "Rytas Vilnius",
+   "years": "2006–2010",
+   "kind": "wayback",
+   "title": "File:Logo_lrytas.png",
+   "page": "https://web.archive.org/web/20060220012335/http://en.wikipedia.org/wiki/Image:Logo_lrytas.png",
+   "wayback": "https://web.archive.org/web/20060127202029im_/http://upload.wikimedia.org/wikipedia/en/c/c1/Logo_lrytas.png",
+   "licence": "non-free logo, as the file page states (Wikipedia's non-free content)",
+   "sha256": "fd6a52b30ad7a80685f5c521fb9c5dca380750f37df984fda651be5dd5bdbfab",
+   "cache": "data-src/crest-eras/files/euroleague/el-rytas/2006-Logo_lrytas.png",
+   "evidence": "The en article BC Lietuvos Rytas showed Image:Logo_lrytas.png in its captures of 2006-01-27, 2008-02-29, 2010-01-24 and 2010-05-29 (the archived file, 103×103, is the same at 2006 and 2010); lt.wikipedia File:Lrytas_logo.jpg, the same round logo, uploaded 21 December 2005. It was replaced in 2010 by the shield of File:Lrytas_nuo_2010.png ('since 2010', uploaded 3 June 2010, after the 2009-10 season), so 2005-06 to 2009-10 wore the round logo.",
+   "verified": "work/el/east/sheet10.png: black and red disc, white A-shaped stroke with a basketball, black star below; the same as the lt 2005 copy.",
+   "league": "euroleague"
+  },
+  "el-rytas.2011": {
+   "club": "Rytas Vilnius",
+   "years": "2011–2014",
+   "kind": "wikipedia",
+   "title": "File:Lrytas_nuo_2010.png (lt.wikipedia Vaizdas:Lrytas_nuo_2010.png)",
+   "page": "https://lt.wikipedia.org/wiki/Vaizdas:Lrytas_nuo_2010.png",
+   "download": "https://upload.wikimedia.org/wikipedia/lt/e/e3/Lrytas_nuo_2010.png",
+   "licence": "non-free logo, as the file page states (lt.wikipedia's non-free content)",
+   "sha256": "996b3dbada87305fe90fe8ac097a2f13be175c843d12caf0477d6d1fee74fb56",
+   "cache": "data-src/crest-eras/files/euroleague/el-rytas/2011-Lrytas_nuo_2010.png",
+   "evidence": "lt.wikipedia Vilniaus Rytas: figure File:Lrytas_nuo_2010.png captioned 'Logo iki 2018 m.' (logo until 2018); file name 'Lietuvos rytas since 2010', uploaded 3 June 2010; replaced in 2018 by the wolf logo (lt File:Rytas(2018).png). Seasons 2010-11 to 2013-14 wore it.",
+   "verified": "work/el/east/sheet10.png: shield split red and black, a white L with a basketball, the Gediminas towers below.",
+   "league": "euroleague"
+  },
+  "el-siena.2008": {
+   "club": "Siena",
+   "years": "2008–2012",
+   "kind": "wikipedia",
+   "title": "Vaizdas:MontepaschiSienalogo.png (lt.wikipedia)",
+   "page": "https://lt.wikipedia.org/wiki/Vaizdas:MontepaschiSienalogo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/lt/6/63/MontepaschiSienalogo.png",
+   "licence": "non-free logo, as the file page states (lt.wikipedia's non-free content)",
+   "sha256": "2c9961960926c46ffed3c107c08c242411e244a56bf2a28241b6e97d1fc48b8c",
+   "cache": "data-src/crest-eras/files/euroleague/el-siena/2008-MontepaschiSienalogo.png",
+   "evidence": "en.wiki's Siena article (then 'Mens Sana Basket' / 'Montepaschi Siena') showed this logo in its infobox (File:Montepaschi_Siena_logo.png, 180 x 100) in the captures of 2008-06-27, 2009-12-25 and 2010-06-12; lt.wiki uploaded the same bytes in June 2008; tr.wiki's smaller copy (Dec 2010) cites menssanabasket.it/image/montepaschi.png, the club's own site, and sr.wiki (Dec 2010) and lv.wiki (Apr 2011) hold the same file. In the 2012-03-05 capture the infobox showed File:Montepaschi.png (not archived), which the 2013 capture captions 'Montepaschi Siena's main sponsorship logo'. The team logo is the sponsor's: Banca Monte dei Paschi's three hills and name with a basketball player, and no source shows a crest of the basketball club's own in use then (the Mens Sana 1871 shield on it/el/he.wiki belongs to the multi-sport society), so the sponsor's team logo is used and marked.",
+   "verified": "green three hills (the Monte dei Paschi mark) with a leaping green player holding an orange ball, MONTEPASCHI / BANCA DAL 1472 in green below; white ground, 180 x 100",
+   "league": "euroleague"
+  },
+  "el-siena.2013": {
+   "club": "Siena",
+   "years": "2013–2014",
+   "kind": "wikipedia",
+   "title": "File:Mens_Sana_Basket_Official_Logo.jpg (en.wikipedia)",
+   "page": "https://en.wikipedia.org/wiki/File:Mens_Sana_Basket_Official_Logo.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/e/ed/Mens_Sana_Basket_Official_Logo.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "7e4e1cbac88f4c25a7241190298c50227e3640f64dd0773393aaebb11dd3a12b",
+   "cache": "data-src/crest-eras/files/euroleague/el-siena/2013-Mens_Sana_Basket_Official_Logo.jpg",
+   "evidence": "uploaded on 6 Oct 2012 (start of 2012-13) as 'the official logo of ... Mens Sana 1871 Basket (Montepaschi Siena)' from the club's site; en.wiki's infobox showed it in the capture of 2013-05-13, with the plain Montepaschi logo captioned as the main sponsorship logo; en.wiki's article today still shows it as the 'Club logo during the Montepaschi era'. The club folded in 2014, after 2013-14, with Montepaschi still its sponsor.",
+   "verified": "the same Montepaschi three hills, player and MONTEPASCHI / BANCA DAL 1472 over a second line, MENSSANA in green condensed capitals with BASKET set vertically and an orange ball in a ring at the left; 250 x 173 JPEG",
+   "league": "euroleague"
+  },
+  "el-skyliners-frankfurt.2001": {
+   "club": "Skyliners Frankfurt",
+   "years": "2001–2001",
+   "kind": "wikipedia",
+   "title": "Datei:Skyliners.gif",
+   "page": "https://de.wikipedia.org/wiki/Datei:Skyliners.gif",
+   "download": "https://upload.wikimedia.org/wikipedia/de/3/3b/Skyliners.gif",
+   "licence": "see the file page",
+   "sha256": "74cc43c1cb173ebd0bc87ed35c13739f3786485da8cc06cfb8900a46fee92fb5",
+   "cache": "data-src/crest-eras/files/euroleague/el-skyliners-frankfurt/2001-Skyliners.gif",
+   "evidence": "de.wikipedia Skyliners Frankfurt, 'Sponsorennamen der GmbH' gallery: 'Das Logo der Skyliners in der Saison 2000/2001.' (the same caption already in the capture of 20 Jun 2008). Sources disagree: the file's own description (uploaded 15 Apr 2008) says 'in der Saison 1999/2000', and the text says the name Skyliners was used only in the first season, Opel being name sponsor from 2000 with only the logo's lettering changed. The article's caption is followed, as the brief asks. Season 2000-01",
+   "verified": "orange basketball under a blue stylised Frankfurt skyline, white-outlined blue SKY LINERS lettering at lower right, 120x95 GIF",
+   "league": "euroleague"
+  },
+  "el-slask-wroclaw.2002": {
+   "club": "Śląsk Wrocław",
+   "years": "2002–2004",
+   "kind": "wayback",
+   "title": "File:Idea_Slask_Wroclaw.jpg",
+   "page": "https://web.archive.org/web/20040714080458/http://en.wikipedia.org/wiki/Image:Idea_Slask_Wroclaw.jpg",
+   "wayback": "https://web.archive.org/web/20040712131849im_/http://upload.wikimedia.org/wikipedia/en/7/77/Idea_Slask_Wroclaw.jpg",
+   "licence": "non-free logo: an English Wikipedia upload of 26 June 2004, deleted since; its archived file page states no licence",
+   "sha256": "a0223b979d726a4cc97d96bb7900082d589186594642433b09c258e193c172e6",
+   "cache": "data-src/crest-eras/files/euroleague/el-slask-wroclaw/2002-Idea_Slask_Wroclaw.jpg",
+   "evidence": "The en article 'Idea Slask Wroclaw', captured 2004-07-12, 2004-11-19 and 2006-03-26, showed this image at its head (uploaded 26 June 2004 as 'Idea Slask Wroclaw logo', archived file page of 2004-07-14); its text is about the 2003/2004 season (second in the Era Basket Liga, beaten in the final by Prokom Trefl Sopot). The crest is lettered IDEA ŚLĄSK WROCŁAW, the club's name from 2001-02 to 2003-04 (pl.wikipedia season table: Zepter Idea Śląsk 2000-01, Idea Śląsk 2001-02, Deichmann Śląsk 2004-05, Era Śląsk 2005-06). 2003-04 is attested by the capture; 2001-02 and 2002-03 rest on the name the crest carries. It carries the sponsor's name (Idea, the mobile network) and the article showed no crest of the club's own.",
+   "verified": "work/el/east/sheet16.png: shield with the black Silesian eagle on green, white and red, IDEA on a scroll above, ŚLĄSK WROCŁAW round it with stars, a basketball below; not the football club's WKS crest of today.",
+   "league": "euroleague"
+  },
+  "el-sluc-nancy.2009": {
+   "club": "SLUC Nancy",
+   "years": "2009–2012",
+   "kind": "wikipedia",
+   "title": "Tiedosto:667.png",
+   "page": "https://fi.wikipedia.org/wiki/Tiedosto:667.png",
+   "download": "https://upload.wikimedia.org/wikipedia/fi/a/ad/667.png",
+   "licence": "non-free logo, as the file page states (fi.wikipedia's non-free content)",
+   "sha256": "22d7f5c732bb22d70d8a458982b0606b585b289b7543b9b11eaa499841e31da2",
+   "cache": "data-src/crest-eras/files/euroleague/el-sluc-nancy/2009-667.png",
+   "evidence": "No logo history on today's en or fr articles beyond the en caption 'Primary logo (since 2015)' for today's black-and-red cougar roundel. The fr article's infobox showed Fichier:Logo_SLUC.gif (fr, deleted since) in the Wayback captures of 22 June 2008 and 22 September 2013, and that file as archived on 30 September 2013 is this 'Couguars' logo: so it was the logo from before 2008-09 until after 2011-12 (2010 and 2011 between are covered by the same evidence). This Finnish Wikipedia copy ('SLUC Nancyn logo', 120x120) was taken from euroleague.net on 29 March 2009, during the 2008-09 EuroLeague; the same bytes are on tr and ru Wikipedia (ru: copied from en Wikipedia and sluc-basket.org, November 2012).",
+   "verified": "orange cartoon cougar leaping with claws out over an orange basketball, red 'COUGUARS' lettering across it, 'SLUC NANCY BASKET' in blue under it (120x120 PNG on white); the archived fr GIF (saved beside it as 2009-wb-Logo_SLUC.gif, 100x100, from https://web.archive.org/web/20130930164937id_/http://upload.wikimedia.org/wikipedia/fr/e/e2/Logo_SLUC.gif, sha256 0a3c93e469b294c9b0d4fb17cfd98d6b32febc8dc6e1d9a2609b960657719431) is the same logo; unlike today's black-and-red roundel 'Est. 1967'",
+   "league": "euroleague"
+  },
+  "el-spirou-charleroi.2011": {
+   "club": "Spirou Charleroi",
+   "years": "2011–2012",
+   "kind": "wayback",
+   "title": "File:Spirou-basket.png",
+   "page": "https://web.archive.org/web/20111008103230/http://en.wikipedia.org/wiki/Spirou_Charleroi",
+   "wayback": "https://web.archive.org/web/20111008103230im_/https://upload.wikimedia.org/wikipedia/en/8/81/Spirou-basket.png",
+   "licence": "non-free logo: an English Wikipedia upload, deleted since; its file page was not archived",
+   "sha256": "121d47ed9da69f6760fb6ea4dfee47c3b73214d267195c25803abdff01b47931",
+   "cache": "data-src/crest-eras/files/euroleague/el-spirou-charleroi/2011-Spirou-basket.png",
+   "evidence": "en.wikipedia's infobox ('Spirou Basket Club logo') showed File:Spirou-basket.png on 26 Nov 2010 (capture of the title Spirou_Basket) and 8 Oct 2011 (Spirou_Charleroi), in the 2010-11 and 2011-12 seasons (Oct 2010 still File:Spirou_Basket_Logo.png, not archived). fr/en: Spirou Charleroi until 2011, Belgacom Spirou 2011-2014; the club's emblem is used, no Belgacom team logo of the time is known. The red-ball 'SPIROU' logo with the bellboy cap came later (en File:Belgacom_Spirou_logo.png uploaded 9 Jun 2015 as 'New logo')",
+   "verified": "the comic character Spirou in his red bellboy uniform dunking an orange basketball, yellow-black SPIROU wordmark below, 280x320",
+   "league": "euroleague"
+  },
+  "el-strasbourg.2006": {
+   "club": "Strasbourg",
+   "years": "2006–2015",
+   "kind": "wikipedia",
+   "title": "Fichier:Ancien_Logo_SIG_Strasbourg.svg",
+   "page": "https://fr.wikipedia.org/wiki/Fichier:Ancien_Logo_SIG_Strasbourg.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/fr/0/06/Ancien_Logo_SIG_Strasbourg.svg",
+   "licence": "non-free logo, as the file page states (fr.wikipedia's non-free content)",
+   "sha256": "fc03569fde19b3e9a02bfbab3d3e0a64e12c38b296cc58291af784abd7c29fb0",
+   "cache": "data-src/crest-eras/files/euroleague/el-strasbourg/2006-Ancien_Logo_SIG_Strasbourg.svg",
+   "evidence": "fr 'Logo' gallery: Ancien_Logo_SIG_Strasbourg.svg 'Jusqu'en 2015' (drawn from a club document of July 2014), then 'De 2015 à 2024' and 'Depuis 2024'. Its start: fr Fichier:Logo_Strasbourg_Illkirch_Graffenstaden_Basket.jpg, per its original upload log, was uploaded by Sanguinez on 26 June 2006 from lnb.fr (99x74, 2191 bytes), just after the 2005-06 season; that very image (2191 bytes, 99x74), as archived on 8 February 2011 at https://web.archive.org/web/20110208140131id_/http://upload.wikimedia.org/wikipedia/fr/9/96/Logo_Strasbourg_Illkirch_Graffenstaden_Basket.jpg (saved beside it as 2006-wb-Logo_Strasbourg_Illkirch_Graffenstaden_Basket.jpg, sha256 b7eaaaf7a36deca70059da4b98c46c627ca21d88e1601b7ddf3619f2dc61fa01), is this logo. The fr article's infobox showed that file in the captures of 8 September 2008, 10 April 2009, 22 May, 19 September and 23 October 2015; its 336x336 replacement of 26 January 2013 (same design) is also en's File:Strasbourg_IG_logo.jpg, the en infobox logo in the capture of 17 June 2015. So worn from 2005-06 through 2014-15, including 2013-14.",
+   "verified": "red panel with a slanted white-striped top, a white basketball with black seams breaking out at top right, big white 'SIG', 'BASKET-BALL STRASBOURG' in black under it; the archived June-2006 LNB copy (99x74) and the 336 px fr/tr JPEG show the same logo",
+   "league": "euroleague"
+  },
+  "el-strasbourg.2016": {
+   "club": "Strasbourg",
+   "years": "2016–2016",
+   "kind": "wikipedia",
+   "title": "Fichier:Logo_SIG_Strasbourg_-_2015.svg",
+   "page": "https://fr.wikipedia.org/wiki/Fichier:Logo_SIG_Strasbourg_-_2015.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/fr/b/b0/Logo_SIG_Strasbourg_-_2015.svg",
+   "licence": "non-free logo, as the file page states (fr.wikipedia's non-free content)",
+   "sha256": "d4f9f6d462081e5e8133a105e3d690be063d6eec1501fca0634da26104014500",
+   "cache": "data-src/crest-eras/files/euroleague/el-strasbourg/2016-Logo_SIG_Strasbourg_-_2015.svg",
+   "evidence": "fr gallery 'De 2015 à 2024' (file 'Logo du SIG Strasbourg de 2015 à 2024', dated 2015). Introduced in summer 2015: the en article's infobox still had the old logo on 17 June 2015 but showed this one (File:Strasbourg_Basketball_logo.png, 234x425, archived at https://web.archive.org/web/20151023100703im_/http://upload.wikimedia.org/wikipedia/en/8/8e/Strasbourg_Basketball_logo.png, saved beside it as 2016-wb-Strasbourg_Basketball_logo.png, sha256 613ac2a63b9ffdde15990ed621824bc7daafdfe4d187e6543c1be0401239fc14) on 23 October 2015, as the 2015-16 EuroLeague opened, and again on 1 April 2016; el Wikipedia's copy came from LNB's Pro A teams page as archived on 23 March 2016. The fr article itself kept the old logo until after October 2015 (slow to update).",
+   "verified": "red panel with a slanted striped top, a white ball with a red speed trail inside the panel, big white 'SIG', 'STRASBOURG' in small spaced red capitals over a red line; the October 2015 en PNG is the same; differs from the older logo by the ball inside the panel and the lettering under it",
+   "league": "euroleague"
+  },
+  "el-turow-zgorzelec.2015": {
+   "club": "Turów Zgorzelec",
+   "years": "2015–2015",
+   "kind": "wikipedia",
+   "title": "File:Turow_logo_2.png",
+   "page": "https://en.wikipedia.org/wiki/File:Turow_logo_2.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/a/a6/Turow_logo_2.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "a972719513c9eb587c81740fdcf88f78d82149b802a51d3af6653232c8009028",
+   "cache": "data-src/crest-eras/files/euroleague/el-turow-zgorzelec/2015-Turow_logo_2.png",
+   "evidence": "en File:Turow_logo_2.png, uploaded 18 June 2014 as 'Logo of PGE Turow as of 2013–14', the en article's infobox logo; the same bull logo is ru.wikipedia File:Logo_TurowZgorzelec.jpg (22 October 2011) and sr.wikipedia File:KK_Turov.png (8 March 2014). The club played the 2014-15 EuroLeague as PGE Turów Zgorzelec. The en article showed File:Turow_logo_2.png in its capture of 2015-04-19, during the 2014-15 season.",
+   "verified": "contact sheets work/el/east/sheet6.png and sheet-files1.png: black bull's head with green horns, green TURÓW, ZGORZELEC with a ball in the O above.",
+   "league": "euroleague"
+  },
+  "el-ulkerspor.2002": {
+   "club": "Ülkerspor",
+   "years": "2002–2006",
+   "kind": "wikipedia",
+   "title": "File:Ulkerspor.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Ulkerspor.gif",
+   "download": "https://upload.wikimedia.org/wikipedia/en/3/31/Ulkerspor.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "3ed94f1b00dad5b704b0553b1b66e8df1bff85a0972c2474d17a6cd2074f7e50",
+   "cache": "data-src/crest-eras/files/euroleague/el-ulkerspor/2002-Ulkerspor.gif",
+   "evidence": "en file description: 'the logo for now defunct Ülkerspor basketball club', taken from the Turkish league statistics site's Ülkerspor page for 2005-06 (tblstat.net/team/2/0506), the club's last season; the tr article's infobox file Ülkerspor_logo.png (uploaded 4 August 2016 from ulkerspor.com) is the same badge. No source shows any other Ülkerspor logo for 2001-02 to 2004-05, so one era (the earlier seasons rest on that absence, not on a dated source).",
+   "verified": "basketball with a red ÜLKER wordmark inside a dark green ring lettered GENÇLİK VE SPOR KULÜBÜ, 1975 at the bottom; the tr PNG shows the same badge",
+   "league": "euroleague"
+  },
+  "el-unicaja.2002": {
+   "club": "Unicaja",
+   "years": "2002–2008",
+   "kind": "wayback",
+   "title": "Image:Unicaja_Malaga.gif",
+   "page": "https://web.archive.org/web/20060624231306/http://en.wikipedia.org/wiki/Image:Unicaja_Malaga.gif",
+   "wayback": "https://web.archive.org/web/20080112025702im_/http://upload.wikimedia.org/wikipedia/en/c/cf/Unicaja_Malaga.gif",
+   "licence": "non-free logo: an English Wikipedia upload of 2005-10-18, deleted since; its file page is archived (2006-06-24)",
+   "sha256": "b3432d8b17c538ce8cf40d693e669bba5d6b442a7bdf8f381531c9e702870a24",
+   "cache": "data-src/crest-eras/files/euroleague/el-unicaja/2002-Unicaja_Malaga.gif",
+   "evidence": "en CB Málaga / Baloncesto Malaga: this logo (uploaded 2005-10-18 from acb.com) in captures from 2005-12 to 2008-01 (infobox, 'Unicaja Málaga logo'); fr Fichier:Unicaja_malaga.gif (uploaded 2006-10-08) and it File:Logo_malaga.gif (2007-07-16) are the same logo; it was replaced on en only by the Unicaja fan logo uploaded 2008-10-03. Seasons 2001-02 to 2004-05: the earliest logo any source shows: en Image:Unicaja_Malaga.gif, uploaded 2005-10-18 from acb.com (the league's site), in the article from the first capture of its file page (2005-12) to 2008-01",
+   "verified": "the same file as 2002–2005",
+   "league": "euroleague"
+  },
+  "el-unicaja.2009": {
+   "club": "Unicaja",
+   "years": "2009–2014",
+   "kind": "wikipedia",
+   "title": "File:Unicaja_logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Unicaja_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/4/4b/Unicaja_logo.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "ca982cc488157b742500ced6b3a8dc36a9426dab0e8281e7d2c8e049e932ba95",
+   "cache": "data-src/crest-eras/files/euroleague/el-unicaja/2009-Unicaja_logo.png",
+   "evidence": "en File:Unicaja_logo.png, uploaded 2008-10-03 as the 'CB Málaga logo' from unicajabaloncesto.com (also used for the 2008–09 Euroleague): the infobox in captures of 2009-02, 2011-10 and 2013-04; de.wikipedia's copy from euroleague.net is dated 2012-10-31; in 2014-09 the infobox showed File:Unicaja_Malaga_logo.jpg, the same fan logo. The club bears its owner's name (Unicaja), so this is not a sponsor case",
+   "verified": "green fan of Unicaja above 'Unicaja' in black with a red and a green dot, a red rule beneath",
+   "league": "euroleague"
+  },
+  "el-unicaja.2015": {
+   "club": "Unicaja",
+   "years": "2015–2016",
+   "kind": "wikipedia",
+   "title": "File:Logo_of_Baloncesto_Málaga.png",
+   "page": "https://en.wikipedia.org/wiki/File:Logo_of_Baloncesto_M%C3%A1laga.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/e/ee/Logo_of_Baloncesto_M%C3%A1laga.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "137de1f78fd0622b3ed1048f2719de476c78abb450689e46cd04bad8e84a585b",
+   "cache": "data-src/crest-eras/files/euroleague/el-unicaja/2015-Logo_of_Baloncesto_Málaga.png",
+   "evidence": "en File:Logo_of_Baloncesto_Málaga.png, from unicajabaloncesto.com/images/cabecera20142015.png (the club site's 2014-15 header), uploaded 2015-05-22: the infobox in captures of 2015-06 and 2016-04 (en gallery: 'Former logo of the club')",
+   "verified": "green and red ribbon figure beside 'Unicaja' in green, CLUB BALONCESTO beneath",
+   "league": "euroleague"
+  },
+  "el-unicaja.2018": {
+   "club": "Unicaja",
+   "years": "2018–2018",
+   "kind": "wikipedia",
+   "title": "Dosya:Unicaja_logo.png",
+   "page": "https://tr.wikipedia.org/wiki/Dosya:Unicaja_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/tr/4/4b/Unicaja_logo.png",
+   "licence": "non-free logo, as the file page states (tr.wikipedia's non-free content)",
+   "sha256": "79f7d29f5c0538616b63e54a5aa3645f7a3ad634897514af0278165f63c68c83",
+   "cache": "data-src/crest-eras/files/euroleague/el-unicaja/2018-Unicaja_logo.png",
+   "evidence": "en File:CB_Unicaja_Logo.png was this shield from 2017-09-20 (from unicajabaloncesto.com/equipo/ver, reduced to 279×356 on 2017-09-25) until the 'new logo' of 2024-02-11; the en infobox showed it in the 2018-03 capture; el.wikipedia's copy from unicajabaloncesto.com is dated 2018-05-06; this tr copy has the same 279×356 size (en's 2017 version is deleted)",
+   "verified": "white shield with a black dashed border, the green Unicaja fan above 'Unicaja' and 'Baloncesto' on a red rule: the same shield as el.wikipedia's 2018 copy",
+   "league": "euroleague"
+  },
+  "el-unics-kazan.2012": {
+   "club": "UNICS Kazan",
+   "years": "2012–2012",
+   "kind": "wayback",
+   "title": "File:Basketball_club_UNICS(Kazan)_logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Basketball_club_UNICS(Kazan)_logo.png",
+   "wayback": "https://web.archive.org/web/20111106121216im_/http://upload.wikimedia.org/wikipedia/en/b/bc/Basketball_club_UNICS%28Kazan%29_logo.png",
+   "licence": "non-free logo: an English Wikipedia upload, deleted since; its file page was not archived",
+   "sha256": "b781aa343aec403d6f5284682b9d2848eabd8138f9fa58752faf756e36847bb7",
+   "cache": "data-src/crest-eras/files/euroleague/el-unics-kazan/2012-Basketball_club_UNICS(Kazan)_logo.png",
+   "evidence": "The en article shows this file in its infobox (alt 'UNICS Kazan logo') in the captures of BC_UNICS of 2011-11-06 and of UNICS_Kazan of 2012-07-15, i.e. through the 2011-12 season (EuroLeague: Unics Kazan); the next logo is described 'as of the 2013–14 season' (next era).",
+   "verified": "orange basketball half-disc over a black Kazan skyline (kremlin towers, minarets), black-and-white Cyrillic УНИКС below; 138×154",
+   "league": "euroleague"
+  },
+  "el-unics-kazan.2015": {
+   "club": "UNICS Kazan",
+   "years": "2015–2022",
+   "kind": "wikipedia",
+   "title": "File:UNICS_logo_2014.png",
+   "page": "https://en.wikipedia.org/wiki/File:UNICS_logo_2014.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/2/27/UNICS_logo_2014.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "6b5c32b5ac568f809a7aa1a8a418d403312b48721d7e80496c8aee8ed9508e9f",
+   "cache": "data-src/crest-eras/files/euroleague/el-unics-kazan/2015-UNICS_logo_2014.png",
+   "evidence": "en file description: 'Logo of UNICS Kazan as of the 2013–14 season' (uploaded 18 April 2014); the ru article's infobox file UNICS_logo.png, uploaded 30 July 2020 from unics.ru, is byte for byte this image and is still the club's infobox logo on en and ru, so it covers 2014-15, 2016-17 and 2021-22.",
+   "verified": "orange basketball with a black Kazan skyline, green-and-white UNICS block letters across it, KAZAN spaced out below",
+   "league": "euroleague"
+  },
+  "el-valencia-basket.2004": {
+   "club": "Valencia Basket",
+   "years": "2004–2016",
+   "kind": "wikipedia",
+   "title": "Vaizdas:Valencia_Basket_Club.gif",
+   "page": "https://lt.wikipedia.org/wiki/Vaizdas:Valencia_Basket_Club.gif",
+   "download": "https://upload.wikimedia.org/wikipedia/lt/4/4a/Valencia_Basket_Club.gif",
+   "licence": "non-free logo, as the file page states (lt.wikipedia's non-free content)",
+   "sha256": "4b9c92dd6411da04cac8dc16dc926a196b14cff61387bafac79a3eb7c066570e",
+   "cache": "data-src/crest-eras/files/euroleague/el-valencia-basket/2004-Valencia_Basket_Club.gif",
+   "evidence": "the club's shield, the same through the Pamesa (1987–2009), Power Electronics (2009–2011) and Valencia Basket years: en Valencia Basket, Logos gallery, 'The logo during the Pamesa era' 1987–2009 (File:Pamesa_Valencia.jpg) is this shield beside PAMESA VALENCIA basket, and the 'Original non commercial logo' 2009–2017 is this shield beside 'valencia basket club des de 1986'; the en article showed Image:Valencia_Basket_Club.gif (this shield; lt.wikipedia's copy was uploaded 2007-03-06) in captures of 2008-03 (Valencia_BC) and 2008-09 (Pamesa_Valencia), and a shield-only File:Valencia_Basket_Club.png ('Power Electronics Valencia logo', 150×193) in 2010-08; that file became the full logo with the name only in 2015-10. The club emblem is used, not the sponsor's PAMESA VALENCIA team logo. The 30-year logo (2016-17) falls in a year the club did not play the EuroLeague",
+   "verified": "grey bat wings over an orange basketball, blue VALENCIA BASKET band, red-yellow stripes and a black net below: the shield inside both the Pamesa logo and the 2009–2017 logo",
+   "league": "euroleague"
+  },
+  "el-valencia-basket.2018": {
+   "club": "Valencia Basket",
+   "years": "2018–2026",
+   "kind": "wikipedia",
+   "title": "File:Logo_Valencia_Basket_Club.png",
+   "page": "https://it.wikipedia.org/wiki/File:Logo_Valencia_Basket_Club.png",
+   "download": "https://upload.wikimedia.org/wikipedia/it/a/a3/Logo_Valencia_Basket_Club.png",
+   "licence": "non-free logo, as the file page states (it.wikipedia's non-free content)",
+   "sha256": "5ff61587eb87be2df71d8a605a4f1d9fd591ccfde65c8a80a96a6e533eb550d7",
+   "cache": "data-src/crest-eras/files/euroleague/el-valencia-basket/2018-Logo_Valencia_Basket_Club.png",
+   "evidence": "the badge of the 2017 logo: en Valencia Basket, Logos gallery, File:Valencia_Basket_logo.svg '2017–present' (this badge beside the club name, from the EuroLeague media centre, uploaded 2017-09-23); Commons File:Valencia_Basket_Club_2017.png: 'the logo of Valencia Basket since 2017', dated 2017-09-01; this badge-only copy is it.wikipedia's, taken from valenciabasket.com on 2019-11-17. Today's File:Valencia_Basket_(40_anys).svg is captioned '2026–2027' and was uploaded 2026-08-24 from the EuroLeague hub (founded 15 July 1986, the 40th year begins with 2026-27; the 30-year logo likewise covered only 2016-17), so 2025-26 (2026) still wore this badge",
+   "verified": "the same shield redrawn: grey wings and net without black outlines, cyan VALENCIA BASKET band, orange ball, red-yellow stripes; at chip size it looks like the 2004–2016 shield (a curator may use one image for both), unlike today's black-winged 40 ANYS crest",
+   "league": "euroleague"
+  },
+  "el-virtus-bologna.2001": {
+   "club": "Virtus Bologna",
+   "years": "2001–2026",
+   "kind": "commons",
+   "title": "File:Virtus_Bologna_logo.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Virtus_Bologna_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/commons/9/94/Virtus_Bologna_logo.png",
+   "licence": "public domain: below the threshold of originality, as the file page states (trademark rights may apply)",
+   "sha256": "43f7f35dd264d20c1b84e24c95279b0c0254aa4e65229fcc592191b7b3642cb7",
+   "cache": "data-src/crest-eras/files/euroleague/el-virtus-bologna/2001-Virtus_Bologna_logo.png",
+   "evidence": "en.wiki Virtus Bologna 'Logos' gallery: Virtus_Bologna_logo.svg (the same roundel) 'Used from 1996 to 2026', Virtus_Bologna_2027.png 'Current logo for the 2027 centenary'; it.wiki 'Stemma': the black V under the gold star of the 10th title (1984) enclosed in a circle since 1988/89. The same roundel is in en.wiki's infobox in captures of 2008-12-08 and 2012-06-09 (File:Virtus_Logo.jpg, a non-free upload of 14 Dec 2005, roundel over a VIRTUS wordmark, saved as 2001-Virtus_Logo.jpg) and 2015-06-16 (Virtus_Bologna_logo.svg). Today's crest (the 2027 centenary file) has a khaki ring and a khaki-grey star, so the earlier seasons get this file. The 2005 file draws the ring thinner: a tidied outline, same crest at chip size.",
+   "verified": "white disc, black V reaching the rim, bright yellow five-pointed star in the notch, thick black ring; beside today's khaki-ringed disc with khaki star (different colours); the 2005 file shows the same V-and-yellow-star roundel with a thin ring",
+   "league": "euroleague"
+  },
+  "el-virtus-roma.2004": {
+   "club": "Virtus Roma",
+   "years": "2004–2011",
+   "kind": "commons",
+   "title": "File:Pallacanestro_Virtus_Roma_logo.svg",
+   "page": "https://commons.wikimedia.org/wiki/File:Pallacanestro_Virtus_Roma_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/commons/d/de/Pallacanestro_Virtus_Roma_logo.svg",
+   "licence": "public domain: below the threshold of originality, as the file page states (trademark rights may apply)",
+   "sha256": "820527f09f773a70c802b316f7f5814a37a9c7d1ff7299a2ea00596e0d37f4be",
+   "cache": "data-src/crest-eras/files/euroleague/el-virtus-roma/2004-Pallacanestro_Virtus_Roma_logo.svg",
+   "evidence": "Commons/it.wiki: 'Logo societario (2002) della defunta societa cestistica Pallacanestro Virtus Roma (1960-2020)'. en.wiki showed this diamond in its infobox (File:Virtus_Roma.png, 180 x 100) in the captures of 'Virtus Roma' on 2008-10-14 and of 'Lottomatica Roma' on 2009-11-19 and 2012-02-14; he.wiki's File:Virtus_Roma-1-.png (uploaded 4 Oct 2008 from the club's site) and sr.wiki's Virtus_Roma.png (Jan 2009) are the same diamond. In the Lottomatica years (2002-03 to 2010-11) en.wiki's 'Lottomatica Roma' article showed this club logo, which carries no sponsor mark. Virtus Roma 1960's logo of 2026 (en.wiki) is still this diamond.",
+   "verified": "a horizontal diamond with a navy border, split yellow (left) and crimson (right), PALLACANESTRO / VIRTUS / ROMA in white with a basketball under the bottom point; matches he.wiki's 2008 copy from the club's site",
+   "league": "euroleague"
+  },
+  "el-zagreb.2012": {
+   "club": "Zagreb",
+   "years": "2012–2012",
+   "kind": "wikipedia",
+   "title": "File:KK_Zagreb_logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:KK_Zagreb_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/5/52/KK_Zagreb_logo.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "774f0a83ee1181237847daaeb62d48b06943f71585bca900bdf9e76165697387",
+   "cache": "data-src/crest-eras/files/euroleague/el-zagreb/2012-KK_Zagreb_logo.png",
+   "evidence": "ru.wikipedia File:Logo_Zagreb.jpg 'Эмблема баскетбольного клуба Загреб', source euroleague.net showteam?clubcode=ZAG&seasoncode=e2011 (the 2011-12 EuroLeague), uploaded 17 October 2011 (120×120 JPEG); lt.wikipedia File:Zagreblogo.gif (11 March 2007) the same. The en file (3 February 2015, 150×200 PNG) is the same design, the larger and cleaner copy. (The en article showed no logo in its capture of 2012-05-03.)",
+   "verified": "contact sheets work/el/east/sheet3.png and sheet-files1.png: blue ZAGREB over a cartoon figure in a yellow shirt holding an orange ball, 'KOŠARKAŠKI KLUB' below; same as the ru 2011-12 EuroLeague copy.",
+   "league": "euroleague"
+  },
+  "el-zalgiris.2001": {
+   "club": "Žalgiris Kaunas",
+   "years": "2001–2023",
+   "kind": "wikipedia",
+   "title": "File:Ž.svg (lt.wikipedia Vaizdas:Ž.svg)",
+   "page": "https://lt.wikipedia.org/wiki/Vaizdas:%C5%BD.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/lt/1/11/%C5%BD.svg",
+   "licence": "non-free logo, as the file page states (lt.wikipedia's non-free content)",
+   "sha256": "53df44c708d6b3ed61c3ea80610b5c1cd3331350e8c86f7b43a9b2bf60d78bf6",
+   "cache": "data-src/crest-eras/files/euroleague/el-zalgiris/2001-Ž.svg",
+   "evidence": "lt.wikipedia Kauno Žalgiris, section 'Naujas ženklas': figure 'Ž.svg | 1998–2023 m. logotipas'; text: on 7 September 2023 the club presented an updated logo, which replaced the earlier one used since 1998 (lrt.lt 2023-09-07). Seasons 2000-01 to 2022-23 wore it. The en article showed the same shield (Image:Zalgiris-jpg.jpg, archived copy of 2007-10-22, 85×100) in its captures of 2005-12-15 and 2007-10-22, and File:BC_Žalgiris_logo.JPG in 2014-05.",
+   "verified": "contact sheets work/el/east/sheet1.png and sheet-files1.png beside today's crest: green-white quartered shield, 'BC ŽALGIRIS' arched over an orange basketball, a green ribbon below; today's is a different shield (ŽALGIRIS over green-white-orange stripes, 1944). sheet9.png: the archived en logo of 2005-2007 is the same shield.",
+   "league": "euroleague"
+  },
+  "el-zielona-gora.2014": {
+   "club": "Zielona Góra",
+   "years": "2014–2016",
+   "kind": "wikipedia",
+   "title": "File:Basket_Zielona_Góra_Logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Basket_Zielona_G%C3%B3ra_Logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/3/3a/Basket_Zielona_G%C3%B3ra_Logo.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "7839aa0e67b783ed1dc7392e04dcc7e4cbc31408b6077ac73c9c512f155666ad",
+   "cache": "data-src/crest-eras/files/euroleague/el-zielona-gora/2014-Basket_Zielona_Góra_Logo.png",
+   "evidence": "The 'Basket Zielona Góra' shield: en File:Basket_Zielona_Góra_Logo.png uploaded 18 October 2013 from the club's Eurocup 2012-13 page (clubcode GSS, U2012); sr.wikipedia File:KK_Zjelona_Gora.png, the same bytes, uploaded 21 June 2015; en File:Basket_Zielona_Góra_logo.svg (11 January 2018, Basketball Champions League logos) and el File:Logo_Basket_Zielona_Góra.png (7 May 2018, BCL 2017-18) are the same shield with three small stars added. The en gallery calls both 'the previous official logo'. The club played as Stelmet Zielona Góra but the logo carries no sponsor. The en article (Zastal Zielona Góra) showed this file in its infobox in its capture of 2014-12-06, during 2014-15.",
+   "verified": "contact sheets work/el/east/sheet6.png and sheet-files1.png: orange basketball half over a black shield edge, script 'Zielona Góra' with BASKET, green-white stripes below; same as the 2018 versions bar the stars.",
+   "league": "euroleague"
+  },
   "f-1-fc-dynamo-dresden.1994": {
    "club": "Dynamo Dresden",
    "years": "1994–1995",
@@ -8322,6 +9610,650 @@
     2012,
     2015,
     "b-washington-wizards.2012"
+   ]
+  ],
+  "el-aek-athens": [
+   [
+    2001,
+    2004,
+    null
+   ],
+   [
+    2005,
+    2006,
+    "el-aek-athens.2005"
+   ]
+  ],
+  "el-alba-berlin": [
+   [
+    2002,
+    2009,
+    "el-alba-berlin.2002"
+   ],
+   [
+    2010,
+    2015,
+    "el-alba-berlin.2010"
+   ],
+   [
+    2016,
+    2025,
+    "el-alba-berlin.2016"
+   ]
+  ],
+  "el-anadolu-efes": [
+   [
+    2002,
+    2009,
+    "el-anadolu-efes.2002"
+   ],
+   [
+    2010,
+    2011,
+    "el-anadolu-efes.2010"
+   ],
+   [
+    2012,
+    2018,
+    "el-anadolu-efes.2012"
+   ],
+   [
+    2026,
+    2026,
+    "el-anadolu-efes.2026"
+   ]
+  ],
+  "el-aris": [
+   [
+    2007,
+    2008,
+    "el-aris.2007"
+   ]
+  ],
+  "el-arka-gdynia": [
+   [
+    2005,
+    2008,
+    "el-arka-gdynia.2005"
+   ],
+   [
+    2009,
+    2013,
+    "el-arka-gdynia.2009"
+   ]
+  ],
+  "el-as-monaco": [
+   [
+    2022,
+    2026,
+    "el-as-monaco.2022"
+   ]
+  ],
+  "el-asvel": [
+   [
+    2002,
+    2007,
+    "el-asvel.2002"
+   ],
+   [
+    2008,
+    2011,
+    "el-asvel.2008"
+   ],
+   [
+    2019,
+    2026,
+    "el-asvel.2019"
+   ]
+  ],
+  "el-avellino": [
+   [
+    2009,
+    2009,
+    "el-avellino.2009"
+   ]
+  ],
+  "el-bamberg": [
+   [
+    2006,
+    2006,
+    "el-bamberg.2006"
+   ],
+   [
+    2007,
+    2016,
+    "el-bamberg.2007"
+   ],
+   [
+    2017,
+    2018,
+    "el-bamberg.2017"
+   ]
+  ],
+  "el-baskonia": [
+   [
+    2001,
+    2009,
+    "el-baskonia.2001"
+   ],
+   [
+    2010,
+    2016,
+    "el-baskonia.2010"
+   ]
+  ],
+  "el-bayern-munich": [
+   [
+    2014,
+    2022,
+    "el-bayern-munich.2014"
+   ]
+  ],
+  "el-benetton-treviso": [
+   [
+    2001,
+    2006,
+    "el-benetton-treviso.2001"
+   ],
+   [
+    2007,
+    2007,
+    "el-benetton-treviso.2007"
+   ]
+  ],
+  "el-bilbao-basket": [
+   [
+    2012,
+    2012,
+    "el-bilbao-basket.2012"
+   ]
+  ],
+  "el-budivelnyk": [
+   [
+    2014,
+    2014,
+    "el-budivelnyk.2014"
+   ]
+  ],
+  "el-buducnost": [
+   [
+    2019,
+    2019,
+    "el-buducnost.2019"
+   ]
+  ],
+  "el-cantu": [
+   [
+    2012,
+    2013,
+    "el-cantu.2012"
+   ]
+  ],
+  "el-cedevita": [
+   [
+    2013,
+    2016,
+    "el-cedevita.2013"
+   ]
+  ],
+  "el-cholet": [
+   [
+    2011,
+    2011,
+    "el-cholet.2011"
+   ]
+  ],
+  "el-chorale-roanne": [
+   [
+    2008,
+    2008,
+    "el-chorale-roanne.2008"
+   ]
+  ],
+  "el-cibona": [
+   [
+    2001,
+    2011,
+    "el-cibona.2001"
+   ]
+  ],
+  "el-cska-moscow": [
+   [
+    2007,
+    2017,
+    "el-cska-moscow.2007"
+   ],
+   [
+    2018,
+    2022,
+    "el-cska-moscow.2018"
+   ]
+  ],
+  "el-darussafaka": [
+   [
+    2016,
+    2017,
+    "el-darussafaka.2016"
+   ],
+   [
+    2019,
+    2019,
+    "el-darussafaka.2019"
+   ]
+  ],
+  "el-dinamo-sassari": [
+   [
+    2015,
+    2016,
+    "el-dinamo-sassari.2015"
+   ]
+  ],
+  "el-elan-chalon": [
+   [
+    2013,
+    2013,
+    "el-elan-chalon.2013"
+   ]
+  ],
+  "el-estudiantes": [
+   [
+    2001,
+    2005,
+    "el-estudiantes.2001"
+   ]
+  ],
+  "el-fc-barcelona": [
+   [
+    2001,
+    2002,
+    "el-fc-barcelona.2001"
+   ]
+  ],
+  "el-fortitudo-bologna": [
+   [
+    2001,
+    2007,
+    "el-fortitudo-bologna.2001"
+   ]
+  ],
+  "el-galatasaray": [
+   [
+    2012,
+    2017,
+    "d792-1871"
+   ]
+  ],
+  "el-gran-canaria": [
+   [
+    2019,
+    2019,
+    "el-gran-canaria.2019"
+   ]
+  ],
+  "el-hapoel-jerusalem": [
+   [
+    2001,
+    2001,
+    "el-hapoel-jerusalem.2001"
+   ]
+  ],
+  "el-joventut": [
+   [
+    2007,
+    2009,
+    "el-joventut.2007"
+   ]
+  ],
+  "el-karsiyaka": [
+   [
+    2016,
+    2016,
+    "el-karsiyaka.2016"
+   ]
+  ],
+  "el-khimki": [
+   [
+    2010,
+    2016,
+    "el-khimki.2010"
+   ],
+   [
+    2018,
+    2021,
+    "el-khimki.2018"
+   ]
+  ],
+  "el-koln-99ers": [
+   [
+    2007,
+    2007,
+    "el-koln-99ers.2007"
+   ]
+  ],
+  "el-le-mans": [
+   [
+    2007,
+    2009,
+    "el-le-mans.2007"
+   ]
+  ],
+  "el-limoges": [
+   [
+    2015,
+    2016,
+    "el-limoges.2015"
+   ]
+  ],
+  "el-lokomotiv-kuban": [
+   [
+    2014,
+    2014,
+    "el-lokomotiv-kuban.2014"
+   ],
+   [
+    2016,
+    2016,
+    "el-lokomotiv-kuban.2016"
+   ]
+  ],
+  "el-lugano": [
+   [
+    2001,
+    2001,
+    null
+   ]
+  ],
+  "el-maroussi": [
+   [
+    2010,
+    2010,
+    "el-maroussi.2010"
+   ]
+  ],
+  "el-nanterre": [
+   [
+    2014,
+    2014,
+    "el-nanterre.2014"
+   ]
+  ],
+  "el-napoli": [
+   [
+    2007,
+    2007,
+    "el-napoli.2007"
+   ]
+  ],
+  "el-neptunas": [
+   [
+    2015,
+    2015,
+    "el-neptunas.2015"
+   ]
+  ],
+  "el-nizhny-novgorod": [
+   [
+    2015,
+    2015,
+    "el-nizhny-novgorod.2015"
+   ]
+  ],
+  "el-oldenburg": [
+   [
+    2010,
+    2010,
+    "el-oldenburg.2010"
+   ]
+  ],
+  "el-olimpia-milano": [
+   [
+    2006,
+    2009,
+    "el-olimpia-milano.2006"
+   ],
+   [
+    2010,
+    2016,
+    "el-olimpia-milano.2010"
+   ]
+  ],
+  "el-olimpija": [
+   [
+    2007,
+    2013,
+    "el-olimpija.2007"
+   ]
+  ],
+  "el-olympiacos": [
+   [
+    2001,
+    2003,
+    "el-olympiacos.2001"
+   ],
+   [
+    2004,
+    2009,
+    "el-olympiacos.2004"
+   ]
+  ],
+  "el-oostende": [
+   [
+    2002,
+    2002,
+    null
+   ]
+  ],
+  "el-orleans": [
+   [
+    2010,
+    2010,
+    "el-orleans.2010"
+   ]
+  ],
+  "el-panathinaikos": [
+   [
+    2002,
+    2024,
+    "el-panathinaikos.2002"
+   ]
+  ],
+  "el-panionios": [
+   [
+    2009,
+    2009,
+    "el-panionios.2009"
+   ]
+  ],
+  "el-pau-orthez": [
+   [
+    2002,
+    2007,
+    "el-pau-orthez.2002"
+   ]
+  ],
+  "el-real-madrid": [
+   [
+    2001,
+    2009,
+    "d724-1736"
+   ]
+  ],
+  "el-rytas": [
+   [
+    2006,
+    2010,
+    "el-rytas.2006"
+   ],
+   [
+    2011,
+    2014,
+    "el-rytas.2011"
+   ]
+  ],
+  "el-siena": [
+   [
+    2008,
+    2012,
+    "el-siena.2008"
+   ],
+   [
+    2013,
+    2014,
+    "el-siena.2013"
+   ]
+  ],
+  "el-skyliners-frankfurt": [
+   [
+    2001,
+    2001,
+    "el-skyliners-frankfurt.2001"
+   ],
+   [
+    2002,
+    2005,
+    null
+   ]
+  ],
+  "el-slask-wroclaw": [
+   [
+    2002,
+    2004,
+    "el-slask-wroclaw.2002"
+   ]
+  ],
+  "el-sluc-nancy": [
+   [
+    2009,
+    2012,
+    "el-sluc-nancy.2009"
+   ]
+  ],
+  "el-spirou-charleroi": [
+   [
+    2011,
+    2012,
+    "el-spirou-charleroi.2011"
+   ]
+  ],
+  "el-st-petersburg-lions": [
+   [
+    2001,
+    2001,
+    null
+   ]
+  ],
+  "el-strasbourg": [
+   [
+    2006,
+    2015,
+    "el-strasbourg.2006"
+   ],
+   [
+    2016,
+    2016,
+    "el-strasbourg.2016"
+   ]
+  ],
+  "el-turow-zgorzelec": [
+   [
+    2015,
+    2015,
+    "el-turow-zgorzelec.2015"
+   ]
+  ],
+  "el-ulkerspor": [
+   [
+    2002,
+    2006,
+    "el-ulkerspor.2002"
+   ]
+  ],
+  "el-unicaja": [
+   [
+    2002,
+    2008,
+    "el-unicaja.2002"
+   ],
+   [
+    2009,
+    2014,
+    "el-unicaja.2009"
+   ],
+   [
+    2015,
+    2016,
+    "el-unicaja.2015"
+   ],
+   [
+    2018,
+    2018,
+    "el-unicaja.2018"
+   ]
+  ],
+  "el-unics-kazan": [
+   [
+    2012,
+    2012,
+    "el-unics-kazan.2012"
+   ],
+   [
+    2015,
+    2022,
+    "el-unics-kazan.2015"
+   ]
+  ],
+  "el-valencia-basket": [
+   [
+    2004,
+    2016,
+    "el-valencia-basket.2004"
+   ],
+   [
+    2018,
+    2026,
+    "el-valencia-basket.2018"
+   ]
+  ],
+  "el-virtus-bologna": [
+   [
+    2001,
+    2026,
+    "el-virtus-bologna.2001"
+   ]
+  ],
+  "el-virtus-roma": [
+   [
+    2004,
+    2011,
+    "el-virtus-roma.2004"
+   ]
+  ],
+  "el-zagreb": [
+   [
+    2012,
+    2012,
+    "el-zagreb.2012"
+   ]
+  ],
+  "el-zalgiris": [
+   [
+    2001,
+    2023,
+    "el-zalgiris.2001"
+   ]
+  ],
+  "el-zenit": [
+   [
+    2020,
+    2022,
+    "d643-1301108"
+   ]
+  ],
+  "el-zielona-gora": [
+   [
+    2014,
+    2016,
+    "el-zielona-gora.2014"
    ]
   ],
   "f-1-fc-dynamo-dresden": [
