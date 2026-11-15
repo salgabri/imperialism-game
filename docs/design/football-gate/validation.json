@@ -3,7 +3,7 @@
   "gate": {
     "spearmanMin": 0.9,
     "linkingMaxAbsMean": 1,
-    "nations": "The nations that field a side in the season (footballSets.js fieldedNations): a nation with no squad of its own plays no part.",
+    "nations": "The nations that field a side in the season (footballSets.js fieldedNations): a nation with no squad of its own plays no part. build.noTeam and the audit's coverage take the nations on the season's map, so a nation the map has only in earlier years (teams.js HISTORIC_NATIONS) counts only in a season of its years.",
     "gateSet": "Every fielded nation except nations whose nationStatus is suspended or non-member; OFC stays in and is also reported alone.",
     "truth": "World Football Elo at ratingsDate (after matches dated on or before it), from a snapshot taken on ratingsDate or later",
     "eloDates": "Replay of {Y}_results.tsv over {Y-1}.tsv when the results file has a match dated on or after ratingsDate or a trusted fetch date on or after it, checked against {Y}.tsv from the same snapshot; otherwise World.tsv with a trusted fetch date 0 to 7 days after ratingsDate. A date is trusted when dateFrom is fetch or ends \"vouched by --trust-seed-dates\". Elo frozen at R_Y (the forecast baseline) takes the same replay, but World.tsv only when fetched 0 days after R_Y, on R_Y itself: a later World.tsv has seen results of the matches the forecast scores (leakage), so the forecast is incomplete instead.",
@@ -397,8 +397,8 @@
         },
         "strengthSd": 9.566,
         "probe": {
-          "favouriteWinRate": 0.7633,
-          "upsetRate": 0.078,
+          "favouriteWinRate": 0.7736,
+          "upsetRate": 0.0708,
           "pairs": 3603
         },
         "production": {
@@ -409,10 +409,10 @@
             0.9913,
             1
           ],
-          "topFiveChampionShare": 0.5591,
+          "topFiveChampionShare": 0.55,
           "topFiveChampionShare95": [
-            0.5124,
-            0.6048
+            0.5033,
+            0.5959
           ]
         },
         "failed": [],
