@@ -42,6 +42,8 @@ for (const [key, crest] of Object.entries(crests)) {
   // that serves the archived bytes as they were (`id_`, or `im_` for an image).
   if (crest.kind === 'wayback') assert.match(crest.wayback || '', /^https:\/\/web\.archive\.org\/web\/\d{4,14}(id|im)_\//, `${key}: a Wayback crest names its capture`);
   else assert.match(crest.download || '', /^https:\/\/upload\.wikimedia\.org\//, `${key}: a Wikimedia crest names its original file`);
+  // A picture saved on a solid box names the box's colour, which the drawing clears (scripts/lib/crest-image.mjs).
+  if (crest.background != null) assert.match(crest.background, /^#[0-9a-f]{6}$/, `${key}: background is a #rrggbb colour`);
 }
 const todays = new Set((await readdir(outDir)).filter(name => name.endsWith('.webp') && !/\.\d{4}\.webp$/.test(name)).map(name => name.slice(0, -5)));
 const used = new Set();
@@ -69,7 +71,7 @@ for (const key of Object.keys(crests).sort(byId)) {
   const bytes = await readFile(cache);
   assert.equal(sha256(bytes), crest.sha256, `${key}: ${crest.cache} is not the pinned original`);
   const isSvg = /\.svg$/i.test(crest.cache) || bytes.subarray(0, 512).toString('utf8').includes('<svg');
-  outputs.set(path.join(outDir, `${key}.webp`), await crestWebp(bytes, { svg: isSvg }));
+  outputs.set(path.join(outDir, `${key}.webp`), await crestWebp(bytes, { svg: isSvg, background: crest.background ?? null }));
 }
 
 const tsv = [

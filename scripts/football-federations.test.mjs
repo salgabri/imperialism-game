@@ -334,7 +334,8 @@ test('the historic flags are vendored, and the Soviet, Yugoslav, Zairean and CIS
     // Public domain, or (where Commons has no public-domain drawing: Spain's and Bulgaria's arms, Rhodesia's flag of 1964)
     // CC BY-SA with its author, credited in public/flags/SOURCES-historic.tsv.
     assert.match(flag.licence, /^(Public domain|CC BY-SA \d\.\d( \(or GFDL 1\.2 or later, at the reuser's choice\))?, by \S)/);
-    assert.match(flag.commons.page, /^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
+    // A Commons drawing, or (RTF's flag of 2021, which Commons does not have) an English Wikipedia file.
+    assert.match(flag.commons.page, flag.flagId === 'RTF' ? /^https:\/\/en\.wikipedia\.org\/wiki\/File:/ : /^https:\/\/commons\.wikimedia\.org\/wiki\/File:/);
     assert.ok(Number.isInteger(flag.commons.revision));
     assert.match(flag.sha256, /^[0-9a-f]{64}$/);
   }

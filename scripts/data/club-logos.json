@@ -58,6 +58,82 @@
     "el-asvel": {
       "file": "LDLC ASVEL Basket.svg",
       "sha256": "689e86edfefa0c00bc0d86b052eb4c497d04401e58dd80c648da114c12720c20"
+    },
+    "d012-5340080": {
+      "file": "USMAlger4Stars.png",
+      "sha256": "5b5fbca595577f35bae71fbbf92fba4c28c3ac9fa6578c82f95dfd6b4254144b"
+    },
+    "d076-142370": {
+      "file": "Guarany de Bagé.svg",
+      "sha256": "c50b038e53295f2fb8094b78d8707d37a5e58ca3ca5538c96c2f7d58ba3b7913"
+    },
+    "d076-309641": {
+      "file": "Sousa Esporte Clube.svg",
+      "sha256": "c50af0f21fe8f32488cc204784d29478f43c1c83bd5dd2f077f6faf50886d9c3"
+    },
+    "d076-318860": {
+      "file": "Tombense Futebol Clube.svg",
+      "sha256": "9ae6fc0329270167fd747a096b3248e5f37a3d576f8edc47241e103c01e6de86"
+    },
+    "d076-319141": {
+      "file": "Associação Atlética Aparecidense.svg",
+      "sha256": "af09ce07ca6295fd32ca5ade1ced25a603deb41659128f5ae48eff26f8e030b3"
+    },
+    "d076-19145268": {
+      "file": "Escudo do Maringá FC 2026.png",
+      "sha256": "8637e7c6e9bcba5228f89ab63b482d25a6aeb6eedd4378624a5f83d6b4c61d11"
+    },
+    "d076-19382040": {
+      "file": "Retrô Futebol Clube Brasil.svg",
+      "sha256": "e50142b06ae0cb48660d6a99e9ce0c3e9ce6e06d8753df344e654d8151fe152f"
+    },
+    "d076-19392509": {
+      "file": "Azuriz FC.png",
+      "sha256": "30bfcc00da611ed42981c56c5e70912621d0c27bc0d48d42ab273a5587b620d7"
+    },
+    "d152-130782": {
+      "file": "Everton de Viña del Mar.svg",
+      "sha256": "0092f7bdbe19b146bcdbb8552f3ee0471e7cf4138f579f3015368c47c8ecae75"
+    },
+    "d218-120979": {
+      "file": "Deportivo Cuenca.svg",
+      "sha256": "40049f28dc849edb749492cc2af0280bb0f1e9ef1d84ced62ce3f2c3b5d51a7b"
+    },
+    "d218-308091": {
+      "file": "S.D. Aucas.svg",
+      "sha256": "b5305f26783a9a24b45d20e0b238ee31fe364411bdd2d89ebc3a1c958f5fd63b"
+    },
+    "d218-5270169": {
+      "file": "Delfín S.C.svg",
+      "sha256": "42e637037e48917bfa66b304d727ed3b2c8985c1fc9d2f22c6d01c0fa7101a50"
+    },
+    "d400-5635323": {
+      "file": "Al-Sareeh SC Logo.png",
+      "sha256": "6827c5e5c02a8c11e49922e155b68411278197638e6e82dce2e39ff5c22d851f"
+    },
+    "d408-5621797": {
+      "file": "April 25 Sports Club logo.svg",
+      "sha256": "065fa11777f391d949fc25f8999cbbc2a9add6bffe4054e15d29ec2585a1eb76"
+    },
+    "d600-106071": {
+      "file": "Club Guaraní.svg",
+      "sha256": "b0d6a5f4b53ac50f65ca252737f279d713310665ef763e02e5ce89d39550b106"
+    },
+    "d862-86034571": {
+      "file": "Deportivo La Guaira.svg",
+      "sha256": "d232dc43c77cbbe0a07b165dbcd8d78829e3f4e914504f5ffa81fe0ec8e8676c"
+    },
+    "mlb-atlanta-braves": {
+      "file": "Atlanta Braves.svg",
+      "sha256": "c1f346ea8e7063224cd7b1458ab8e621852c4ae74f1620a4b0226d1c1eae635b"
+    },
+    "d578-1376": {
+      "file": "Rosenborg logo RGB.svg",
+      "sha256": "fe5d55b9baf6990e1cb1a8ec6c2d21005b4543376e6c66624f028250ae79f784"
+    },
+    "d208-545": {
+      "file": "Logo Odense Boldklub 2025.svg",
+      "sha256": "98ecdb0425c401823419f94660c6431c6e707fa39bb242a1cbf4296c570e3d38"
     }
   },
   "twins": {

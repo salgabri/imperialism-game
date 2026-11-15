@@ -2469,6 +2469,25 @@ dates keep today's crest. Period crests come
 only from sources whose robots.txt allows it: Wikipedia articles and file pages in
 any language, Wikimedia Commons, and the Wayback Machine's copies of them.
 
+A third round (15 November 2026, the user: "for clubs and countries, all of them, in
+all sports, you have to be accurate with the logo or flag for that year") researched
+every club-season the earlier rounds had left: the clubs of all Europe's leagues the
+EA and Championship Manager seasons gained, 1996/97, and every crest dated but never
+pictured, mostly from archived infoboxes. 974 period crests now cover 870 clubs; of
+the 12,340 club-seasons in the season files, 52% wear a period crest, 43% today's
+crest of the same design, under 1% today's crest for want of a dated source, and 4% a
+monogram (over a quarter of those are the retired Native American caricatures of Washington,
+Cleveland, the Milwaukee and Atlanta Braves and the Philadelphia Warriors, which stay
+monograms by the user's choice). A crest that differs at about 64 px is another crest
+(the earlier "same at chip size" rulings for Calgary, Pittsburgh and Buffalo are gone).
+A picture saved on a white box has the box cleared (`background` in
+`crest-eras.json`). Eight more flags of the day came of the same round (Egypt's
+Federation of Arab Republics flag, DR Congo's of 1966, Puerto Rico's dark blue,
+Zambia's darker green, Russia's of 1991, Ethiopia's of 1996, the Philippines' navy,
+Poland's vermilion); Chinese Taipei flies the Chinese Taipei Olympic flag, today too
+(its football teams their association's flag before 2006), and Russia plays tennis's
+2021 as RTF.
+
 ### Club crests
 
 A club with a crest shows it wherever a nation shows its flag: the masthead,
@@ -2521,6 +2540,11 @@ API answer, so it runs while the full sync cannot. ASVEL's LDLC ASVEL logo, worn
 since 2018/19, replaced its 2011–2018 logo this way (15 November 2026). That took
 its file out of one of the API requests the full sync makes (fifty files each), so
 a full run would now need an answer no cache holds: crests change only this way.
+Nineteen more followed the same day, found by comparing every crest of today with its
+club's English Wikipedia infobox as it stands (period-marks.md, "Round 3"): the
+Braves' primary logo (the script and tomahawk, not the cap's A), Rosenborg's of 2024,
+OB's of 2025, and sixteen clubs of the country maps that have added a star or
+redrawn their crest since the crests were first drawn.
 
 Crests are the clubs' trademarks, and most are non-free files that Wikipedia
 hosts under its non-free content policy. `public/club-logos/SOURCES.tsv` records

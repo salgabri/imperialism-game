@@ -3,7 +3,9 @@
 Status: implemented 2026-11-10 to 2026-11-13, when the user asked: "as we go back in
 time make sure the logos and flag match those years versions!"; rugby league's
 computed seasons of 1998-2007 and of 1960-1997 added 2026-11-14; the EuroLeague's clubs of
-2000/01 to 2025/26 added 2026-11-15.
+2000/01 to 2025/26 added 2026-11-15; round 3, every club and nation of every season, the
+same day, when the user asked: "for clubs and countries, all of them, in all sports, you
+have to be accurate with the logo or flag for that year" (below, "Round 3").
 
 A season of another day shows every nation under the flag it flew then, and every
 club under the crest it wore then. Before this, every season flew today's flags and
@@ -43,9 +45,29 @@ already count by. A season of today (the built-in one, no data set) flies today'
   team), South Africa (1928-1994), Rhodesia (the Federation's, 1964's, 1968's,
   Zimbabwe Rhodesia's), Spain (the eagles of 1945 and 1977), Syria (the United Arab
   Republic's flag, 1980-2025), Macedonia (the Vergina sun), the United States (49
-  stars in 1960) and Venezuela (seven stars). Shade and proportion changes too small
-  to see in a chip are left out (South Korea before 1984, Zambia before 1996, Oman
-  before 1995, Russia 1991-1993, Serbia 2004-2010, Lithuania before 2004).
+  stars in 1960) and Venezuela (seven stars). Round 3 checked every fielded
+  nation-year again and added eight, each a change a viewer sees at about 64 px
+  (design, emblem, or a clearly different colour): Egypt (the Federation of Arab
+  Republics' hawk, 1972-1984), DR Congo (royal blue, 1966-1971), Puerto Rico (the dark
+  blue triangle, to 1995), Zambia (the darker green, to 1995), Russia (white, azure and
+  scarlet, 1991-1993: hockey's, football's and tennis's 1992/93), Ethiopia (the 1996
+  emblem, to 2009), the Philippines (the navy of 1936, to 1998) and Poland (vermilion,
+  to 1980). Left out as proportion changes or shades too close to tell at that size
+  (36 in all, listed in the research): Lithuania, Japan, Oman, North Korea, South Korea
+  1949-2011, Serbia 2004-2010, Italy 2003-2006 and others; flag-icons draws Costa Rica
+  and Peru without the arms whose changes would show. Argentina flies its state flag
+  with the sun throughout, though private bodies flew the plain civil flag before 1985,
+  as Iran and Greece fly their state flags.
+- **Teams under a flag other than their state's** (names of the day): Chinese Taipei's
+  teams have flown the Chinese Taipei Olympic flag since 1981, so it flies that in every
+  season, today's too (flag-icons' Republic of China flag is no longer the game's), and
+  its football teams of 1990-2005 the Chinese Taipei Football Association's flag (its
+  Commons page has carried a deletion nomination since March 2026, "Fails TOO Taiwan":
+  the licence recorded is the page's, with that note). Russia played the 2021 Davis Cup
+  Finals and the 2020-21 Billie Jean King Cup as RTF under the Russian Tennis
+  Federation's flag (an English Wikipedia file, public domain as text and shapes).
+  Russia's and Belarus's suspensions from 2022 (the Davis Cup, the Billie Jean King Cup,
+  FIFA) are rosters, not flags: their seasons still field them.
 - **Today's flags** are flag-icons', except Honduras's: navy blue again since 27
   January 2026 (`hn-1949`); flag-icons draws the turquoise flag of 2022-2026, which
   flies in the seasons of 2022 to 2025. Syria's (flag-icons') is already the flag
@@ -66,7 +88,11 @@ recipes, every flag of the day whole inside a viewport that fits the original's
 aspect to 4:3 (`fit`: `slice` cuts evenly from both sides, for bands with a
 centred emblem; `slice-hoist` cuts at the fly, for an emblem in the canton;
 `stretch` scales each axis on its own, for vertical bands and ensigns, where
-cutting would lose part of the design). A drawing bigger than 40 KB once nested (a
+cutting would lose part of the design). The nested viewport carries the original's root
+paint (a `fill` on the root that unpainted shapes inherit: Puerto Rico's white stripes
+and star, the Philippines' gold sun, which drew black before round 3 kept it). RTF's
+flag is an English Wikipedia file, pinned the same way (`commons` names its page there).
+A drawing bigger than 40 KB once nested (a
 coat of arms in hundreds of paths: Bulgaria's 677 KB, Spain's 539 KB, Rhodesia's
 569 KB) ships as that drawing's 640 x 480 WebP inside the same SVG, a few kilobytes,
 which a chip and the map's bitmaps (`src/engine/flagRaster.js`) draw far sooner.
@@ -98,15 +124,30 @@ id's crest of today (a club spelled two ways by two data sources), or **null**:
 the club wore a crest the game has no picture of, so it shows its monogram rather
 than a crest it did not have yet.
 
-Only a crest known to have been another is null. A redraw that looks the same at
-chip size (a tidied outline, another shade, a star added) is the same crest, so
-Calgary's flaming C with its black trim (1995-2020), Pittsburgh's penguin in Vegas
-gold (2003-2016) and Buffalo's crest in navy (2011-2020) show today's. Seasons no
-source dates (a researcher's "none" for want of any source) keep today's crest, as
-before. Three retired caricatures of Native
-Americans are left out, as the game already leaves out Washington's retired name:
-Washington's logo to 2019, Cleveland's Chief Wahoo to 2018 and the Philadelphia
-Warriors' to 1962 show the monogram.
+Only a crest known to have been another is null. Since round 3 a crest is another
+when someone comparing the two at about 64 px would see it: another design, emblem,
+lettering, star count or colour scheme, including a changed trim (Calgary's flaming C
+with its black trim of 1995-2020, Pittsburgh's penguin in Vegas gold of 2003-2016 and
+Buffalo's crest in navy of 2011-2020, which rounds 1 and 2 had shown as today's "at
+chip size", now show their own pictures). Only a redraw no one could tell apart at that
+size (a tidied outline, a nearby shade) is the same crest. Seasons no source dates (a
+researcher's "none" for want of any source) keep today's crest, as before. Retired
+caricatures of Native Americans are left out, as the game already leaves out
+Washington's retired name: Washington's logo to 2019, Cleveland's Chief Wahoo to 2018,
+the Philadelphia Warriors' to 1962 and, by the same rule since round 3, the Milwaukee
+Braves' laughing brave of 1960-1965 (round 2 had shown the cap's M, not the logo) and the
+Atlanta Braves' of 1966 show the monogram. The user confirmed this when round 3 asked
+("Keep monograms", 15 November 2026). Cleveland's block C stays the 2019-2021 crest only:
+sources disagree on whether it was the primary logo from 2014, and the club's own
+article says it was secondary until 2019.
+
+A period picture saved on a solid white box (an archived thumbnail, a PNG of a scan)
+names the box in `crest-eras.json` (`"background": "#ffffff"`), and
+`scripts/lib/crest-image.mjs` clears it: a fill from the picture's edges through every
+pixel near that colour, so the crest's own white inside its outline stays. 152 period
+crests clear a box this way, each checked before and after on a contact sheet; two keep
+theirs (ASVEL's Adecco logo of 2002, whose white field is the design, and Newtown's N
+shield of 1960, whose white body touches the picture's edge).
 
 The season on screen reaches every mark through `SeasonYear`
 (`src/components/seasonYear.js`): App provides the campaign's `dataYear`, or the
@@ -148,37 +189,36 @@ is present. `sync:club-logos` leaves period crests alone.
 
 ### Coverage
 
-As of 15 November 2026: 648 period crests for 813 club ids, every club the game has
-researched. Of the club-seasons before today's season (each club id in each season
-year it plays):
+As of round 3 (15 November 2026): 974 period crests for 870 club ids, every club id of
+every season file researched. Of the 12,340 club-seasons in the season files (each club id
+in each season year it plays, all before today's season):
 
-| Sport | Period crest | Today's crest, researched | Today's crest, unverified | Monogram |
+| Sport | Period crest | Today's crest, researched | Today's crest, undated | Monogram |
 |---|---|---|---|---|
-| Football (men's) | 41% | 45% | 1% | 9% |
-| American football | 36% | 52% | 0% | 12% |
-| Basketball (NBA) | 29% | 37% | 0% | 34% |
-| Basketball (EuroLeague) | 58% | 34% | 1% | 8% |
-| Baseball | 25% | 57% | 0% | 18% |
-| Ice hockey | 29% | 56% | 4% | 11% |
-| Rugby league | 57% | 18% | 2% | 6% |
-| Women's football | 5% | 73% | 0% | 22% |
+| Football (men's) | 52% | 45% | 1% | 2% |
+| American football | 47% | 49% | 0% | 5% |
+| Basketball (NBA) | 75% | 25% | 0% | 0% |
+| Basketball (EuroLeague) | 59% | 33% | 1% | 8% |
+| Baseball | 43% | 49% | 1% | 7% |
+| Ice hockey | 42% | 58% | 0% | 0% |
+| Rugby league | 69% | 18% | 0% | 12% |
+| Women's football | 18% | 81% | 0% | 1% |
 
-The rest of men's football (4%) are club ids with no crest today and no dated one: a
-monogram. The unverified seasons are those no source dates, mostly Dutch and
-Portuguese ones before 2005, when Wikipedia's articles began to show their crests;
-the NBA's monograms are mostly logos of 1961-2005 that no allowed source still shows.
-Rugby league's (1960-2024) rest (16%) are clubs gone or under a name of the day with no
-crest today and no logo any source dates (below), which show their monogram too; its
-unverified seasons are Souths' of 1980-1997, and its monograms are logos of 1960-1979
-that no usable picture shows (Parramatta's, Penrith's, Wests'), Eastern Suburbs before
-its first logo of 1967, and the Warriors' anniversary logo of 2015.
-
-1996/97's clubs came later the same day (football-years.md, "Sensible World of Soccer
-96/97"), so its club-seasons are not in the table above. 75 of its 134 clubs have an era
-covering it, and most of the rest wear today's crest through the seasons around it. Nine
-clubs the research never saw in 1996/97 show today's crest there, unverified: Bologna,
-Sunderland, Hércules, Hellas Verona, AZ and SC Espinho, and Marseille, Derby County and
-Arminia Bielefeld, whose eras start in 1997/98.
+The monograms (451 club-seasons) are of three kinds. 128 are the retired caricatures of
+Native Americans above (Washington 1960-2019, Cleveland 1960-2018, the Milwaukee Braves,
+the Atlanta Braves of 1966, the Philadelphia Warriors). Some clubs had no emblem of
+their own: Eastern Suburbs before 1967, Balmain before 1964, the Bills before 1962. The
+rest are crests a source describes but no allowed source pictures: the NFL's of
+1960-1967 (Denver, the Colts' 1960, Chicago, Green Bay's 1960, San Francisco) and San
+Diego's of 1974-1987; MLB's Atlanta Braves of 1967-1986 (no source names a primary logo),
+Baltimore's of 1960-1965 and 1989-1997, Cincinnati's of 1960-1966 and Kansas City's of
+1969-2001; rugby league's Sydney logos of 1960-1977 (Balmain, Norths, St. George, Wests,
+Parramatta to 1979, Penrith), the Sydney Tigers' of 1996 and two 90th-season badges of
+1997; football's Groningen 1994-1996, NAC 1994-1996, MVV 1994-2000, Chelsea's lions of
+1994-1995 and 2000-2005, Crystal Palace 1995-2013, Aberdeen 1994-1997, Derby 1996-1997,
+Wisła 1994-1999 and a few single seasons; the EuroLeague's codes of 2000/01-2006/07
+(below). The undated seasons (64) keep today's crest: no source says which crest the club
+wore (mostly Dutch, Portuguese and Spanish clubs before 2005).
 
 A second round (13-14 November 2026) researched the 71 English, Dutch and Portuguese
 clubs the first had left, the Spanish, Italian, German, MLB and NFL seasons it had
@@ -246,7 +286,8 @@ where their crest of those seasons was another. Each club's articles in its own
 language and English, their galleries and the Wayback Machine's captures of them gave
 92 period crests; 91 ship, as ASVEL's LDLC ASVEL logo of 2018/19 on became its crest of
 today the same day (read from its file page, README "Club crests"). Real Madrid wore the club's plain crest (the football club's of
-today) to 2008/09, Galatasaray and Zenit their sports club's emblem; Valencia's 40th-year
+today) to 2008/09, Galatasaray and Zenit their sports club's emblem (Galatasaray's plain GS since
+round 3: the stars over the club's crest of today are its football team's); Valencia's 40th-year
 crest and Virtus Bologna's centenary crest are 2026/27's, so 2025/26 shows the badges
 they replaced, and Efes's 50th-year logo is 2025/26's. Where a club's primary logo was a
 sponsor's team logo and no crest of its own was in use (Baskonia's TAU Cerámica, Siena's
@@ -256,9 +297,10 @@ beside Climamio's), the emblem is. A crest first seen by 30 June of a season the
 played (the cutoff flags use) covers that season and the club's earlier seasons of that
 run where no source shows another: Unicaja's and Ülkerspor's, first seen in 2005/06, from
 2001/02. A logo first seen only in a summer after a club's seasons does not reach back,
-as a new logo may have come that summer. So 44 of the 568 club-seasons keep the club's
-code: CSKA Moscow 2001/02 to 2005/06 and Olimpija 2000/01 to 2005/06 (logos first seen
-in August and September 2006), Dynamo Moscow 2006/07 (July 2007), AEK's 1997 emblem
+as a new logo may have come that summer. So 43 of the 568 club-seasons keep the club's
+code: CSKA Moscow 2001/02 to 2005/06 (a logo first seen in August 2006) and Olimpija
+2000/01 to 2004/05 (round 3 found its dragon roundel in a Slovenian file citing a
+2005/06 source), Dynamo Moscow 2006/07 (July 2007), AEK's 1997 emblem
 (2000/01 to 2003/04, no picture), Siena 2002/03 to 2005/06, and fifteen clubs of the
 first seasons whose logo no source shows or dates (Zadar, PAOK, Pesaro, the London
 Towers, the Skyliners as Opel Skyliners…).
@@ -268,6 +310,40 @@ Barcelona's basketball section wore the club's crest, and its F.C.B. crest of
 (FC Barcelona, and F.C. Barcelona in most Championship Manager seasons) now wears it
 from 1993/94 to 2001/02 instead of its monogram: eight club-seasons of the table and
 1996/97, too few to move its rounded figures.
+
+### Round 3
+
+On 15 November 2026 the user asked: "for clubs and countries, all of them, in all
+sports, you have to be accurate with the logo or flag for that year". A census of every
+club id in every season file found about 3,000 club-seasons wrong or missing: 133
+football ids never researched (the clubs of all Europe's leagues the EA and Championship
+Manager seasons had gained, and 1996/97's), crests dated in earlier rounds but never
+pictured (the NBA's monograms above all), the chip-size rulings, rugby league's
+1960-1997 crests (researched on 14 November but not yet on main) and the women's sides.
+Twelve researchers took a league or a region each (`data-src/crest-eras/ROUND3.md`),
+and a thirteenth the flags (`FLAGS-ROUND3.md`). Their findings replaced each club's
+research whole (`tools/merge-round3.mjs`), and `tools/curate.mjs` built
+`crest-eras.json` from them; a key era naming a crest no image era draws any more
+(Oakland's 1983 logo, the Padres' of 1990) keeps the crest as shipped.
+
+Round 3's researchers worked from archived Wikipedia infoboxes (a crest current between
+2004 and today is very likely in one: `data-src/crest-eras/tools/wb-infobox.mjs`),
+archived season articles and logo galleries of 2005-2012, and other languages' galleries
+and file pages (French, Italian, Hebrew, Finnish and Russian above all). Where nothing
+dates a club's crest of the 1990s, its earliest dated picture stands for the seasons
+before it, as for the EuroLeague (below), and each such era says so in its evidence.
+Several pictures are archived thumbnails of 50-250 px (Wikipedia deleted the originals
+under its non-free content policy); their licence is recorded as the archived file page
+stated, or as a non-free English Wikipedia upload where no archive holds the page.
+
+Every crest of today was also compared with its club's English Wikipedia infobox as it
+stands (3,158 files): 109 differ, mostly the same crest in another file, and 19 were
+crests a club had replaced, added a star to or redrawn; they now come from their file
+pages (README, "Club crests"). Where a club's earlier seasons wore the crest being
+replaced (Rosenborg's two stars of 2007-2010), those seasons picture it as a period
+crest first. Tottenham's 2024 cockerel without the wordmark (French Wikipedia only) and
+a Turkish file of Ankaraspor's 1978 crest are left: the English articles still show the
+crests the game has.
 
 Crests are the clubs' trademarks; as with today's crests (the user's choice of
 Wikipedia crests, 2026-10-25), many are non-free files that Wikipedia hosts under
@@ -288,13 +364,18 @@ flying the flag of the day while a federation keeps its own; tennis 1975
 (Czechoslovakia, the Soviet Union, Yugoslavia, West Germany), 1992 (the CIS) and
 1993 (Russia, Czechia); football 1996/97 to 2005/06 (FR Yugoslavia, then Serbia and
 Montenegro); rugby league's 1998 to 2007 (every club of each season under a crest
-the game ships, era names and gone clubs too, except the three undated ones; the
-logos of the day and the first round's two corrections by name); rugby league's 1960
+the game ships, era names and gone clubs too; the logos of the day and the first
+round's two corrections by name); rugby league's 1960
 to 1997, the ARL's and Super League's 1997 both (every club under a crest the game
 ships but the seasons listed to show the monogram; the logos of the day by name); the
 EuroLeague's 2000/01 to 2025/26 (every club of each season under a crest the game ships,
-except the 44 club-seasons named with their code; Ülkerspor, Real Madrid's plain crest,
+except the 43 club-seasons named with their code; Ülkerspor, Real Madrid's plain crest,
 Valencia's and Efes's last seasons, football Barcelona's F.C.B. crest of 1993/94 to
-2001/02 and others by name); and TeamMark and SquadFlag drawing the crest of the season
-on screen.
+2001/02 and others by name); round 3's flags (each new flag of the day in the seasons
+that field the nation, Egypt's, Puerto Rico's and Russia's in real seasons' teams) and
+teams under another flag (Chinese Taipei's Olympic flag today and its football flag of
+1996/97, RTF in tennis's 2021); round 3's crests in every sport by name, the retired
+caricatures as monograms and the crests of today read from file pages; and TeamMark and
+SquadFlag drawing the crest of the season on screen. `scripts/historic-maps.test.mjs`
+checks every name of the day sourced, Chinese Taipei's and RTF's among them.
 `npm run test:flag-symbols` runs `build-historic-flags --check`.
