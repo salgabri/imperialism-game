@@ -1019,14 +1019,14 @@ neutral. See the
 [design notes](docs/design/rugby-league.md).
 
 **Rocket League** — `src/data/rosters.rocket-league.js`, from every 3v3 series Liquipedia records (CC BY-SA 3.0),
-read from two exports of the wiki saved by hand on 2026-11-14 (no script fetches Liquipedia: its robots.txt shuts
-Anthropic's crawlers out) into `scripts/data/rocket-league-elo.json`: 943 events of S- and A-Tier, 81,534 games from 2015
+read from three exports of the wiki saved by hand on 2026-11-14 (no script fetches Liquipedia: its robots.txt shuts
+Anthropic's crawlers out) into `scripts/data/rocket-league-elo.json`: 947 events of S- and A-Tier, 82,072 games from 2015
 to November 2026. There is no game's rating list for an esport: each player's rating is an Elo built game by game, a
-team playing at its three players' mean, on the game's scale Elo / 25 − 2 (dralii's 2,470 is 97), so the match model
+team playing at its three players' mean, on the game's scale Elo / 25 − 2 (dralii's 2,466 is 97), so the match model
 plays Elo's own odds; held out on the last 180 days its predictions were calibrated (log loss 0.583). A player plays for
 the nation he last played for at the FIFAe World Cup or the Esports Nations Cup, else the flag Liquipedia files him
-under; 815 players have played within the year, and 57 nations have the three a series needs, from France, the United
-States and Saudi Arabia down. Nothing is estimated. See the [design notes](docs/design/rocket-league.md).
+under; 812 players have played within the year, and 57 nations have the three a series needs, from France, Saudi Arabia
+and the United States down. Nothing is estimated. See the [design notes](docs/design/rocket-league.md).
 
 **Women's football** — `src/data/clubs.womens-football.js` and
 `src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07

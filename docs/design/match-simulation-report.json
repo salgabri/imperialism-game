@@ -44472,8 +44472,8 @@
           }
         ],
         "timing": {
-          "elapsedMs": 33.3684,
-          "samplesPerSecond": 5993695
+          "elapsedMs": 35.2219,
+          "samplesPerSecond": 5678285
         }
       },
       "ratingGaps": [
@@ -44598,8 +44598,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 35.0391,
-            "samplesPerSecond": 5707909
+            "elapsedMs": 35.7924,
+            "samplesPerSecond": 5587778
           }
         },
         {
@@ -44723,8 +44723,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 36.8969,
-            "samplesPerSecond": 5420510
+            "elapsedMs": 40.0786,
+            "samplesPerSecond": 4990194
           }
         },
         {
@@ -44848,8 +44848,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 29.6349,
-            "samplesPerSecond": 6748800
+            "elapsedMs": 31.054,
+            "samplesPerSecond": 6440394
           }
         },
         {
@@ -44973,8 +44973,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 32.418,
-            "samplesPerSecond": 6169412
+            "elapsedMs": 33.8295,
+            "samplesPerSecond": 5912000
           }
         },
         {
@@ -45067,8 +45067,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 31.4333,
-            "samplesPerSecond": 6362679
+            "elapsedMs": 32.5485,
+            "samplesPerSecond": 6144676
           }
         },
         {
@@ -45192,8 +45192,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 33.2922,
-            "samplesPerSecond": 6007413
+            "elapsedMs": 40.0909,
+            "samplesPerSecond": 4988663
           }
         },
         {
@@ -45317,8 +45317,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 32.0135,
-            "samplesPerSecond": 6247364
+            "elapsedMs": 41.2596,
+            "samplesPerSecond": 4847357
           }
         },
         {
@@ -45442,8 +45442,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 29.539,
-            "samplesPerSecond": 6770710
+            "elapsedMs": 37.0159,
+            "samplesPerSecond": 5403084
           }
         },
         {
@@ -45567,8 +45567,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 27.6382,
-            "samplesPerSecond": 7236361
+            "elapsedMs": 29.0897,
+            "samplesPerSecond": 6875286
           }
         },
         {
@@ -45672,8 +45672,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 26.3999,
-            "samplesPerSecond": 7575786
+            "elapsedMs": 27.8339,
+            "samplesPerSecond": 7185482
           }
         },
         {
@@ -45797,8 +45797,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 29.6309,
-            "samplesPerSecond": 6749711
+            "elapsedMs": 31.5525,
+            "samplesPerSecond": 6338642
           }
         },
         {
@@ -45922,8 +45922,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 29.7735,
-            "samplesPerSecond": 6717383
+            "elapsedMs": 31.2942,
+            "samplesPerSecond": 6390961
           }
         },
         {
@@ -46047,8 +46047,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 29.3962,
-            "samplesPerSecond": 6803600
+            "elapsedMs": 30.5917,
+            "samplesPerSecond": 6537721
           }
         },
         {
@@ -46172,8 +46172,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 28.4371,
-            "samplesPerSecond": 7033066
+            "elapsedMs": 31.7268,
+            "samplesPerSecond": 6303819
           }
         },
         {
@@ -46297,8 +46297,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 27.0294,
-            "samplesPerSecond": 7399350
+            "elapsedMs": 28.597,
+            "samplesPerSecond": 6993741
           }
         }
       ],
@@ -46312,22 +46312,22 @@
           "defender": {
             "id": "840",
             "name": "United States",
-            "rating": 90
+            "rating": 89.7
           },
           "samples": 200000,
           "seed": 3514755159,
           "drama": 6,
-          "attackerWinRate": 0.51802,
-          "defenderWinRate": 0.48198,
+          "attackerWinRate": 0.53612,
+          "defenderWinRate": 0.46388,
           "winRateMargin95": 0.00219,
           "regulationTieRate": 0,
           "attackerWinRateAfterTie": null,
           "zeroZeroRate": 0,
-          "largeTotalRate": 0.24551,
-          "blowoutRate": 0.19513,
+          "largeTotalRate": 0.24442,
+          "blowoutRate": 0.19583,
           "regulationTotal": {
-            "mean": 5.5759,
-            "sd": 1.0609,
+            "mean": 5.572,
+            "sd": 1.0608,
             "p05": 4,
             "median": 6,
             "p95": 7,
@@ -46335,8 +46335,8 @@
             "max": 7
           },
           "regulationMargin": {
-            "mean": 0.10307,
-            "sd": 2.64408,
+            "mean": 0.2088,
+            "sd": 2.64139,
             "p05": -4,
             "median": 1,
             "p95": 4,
@@ -46344,8 +46344,8 @@
             "max": 4
           },
           "attackerScore": {
-            "mean": 2.83948,
-            "sd": 1.41,
+            "mean": 2.8904,
+            "sd": 1.39309,
             "p05": 0,
             "median": 4,
             "p95": 4,
@@ -46353,94 +46353,94 @@
             "max": 4
           },
           "defenderScore": {
-            "mean": 2.73642,
-            "sd": 1.43883,
+            "mean": 2.6816,
+            "sd": 1.45273,
             "p05": 0,
             "median": 3,
             "p95": 4,
             "min": 0,
             "max": 4
           },
-          "finalTotalMean": 5.5759,
-          "regulationAbsoluteMarginMean": 2.42411,
+          "finalTotalMean": 5.572,
+          "regulationAbsoluteMarginMean": 2.42801,
           "mostCommonRegulationScores": [
             {
               "score": "4-1",
-              "count": 29131,
-              "rate": 0.14566
+              "count": 30533,
+              "rate": 0.15267
             },
             {
               "score": "4-2",
-              "count": 28765,
-              "rate": 0.14383
+              "count": 29360,
+              "rate": 0.1468
             },
             {
               "score": "2-4",
-              "count": 27237,
-              "rate": 0.13619
+              "count": 26439,
+              "rate": 0.1322
             },
             {
               "score": "1-4",
-              "count": 26741,
-              "rate": 0.1337
+              "count": 25619,
+              "rate": 0.12809
             },
             {
               "score": "4-3",
-              "count": 25014,
-              "rate": 0.12507
+              "count": 25321,
+              "rate": 0.12661
             },
             {
               "score": "3-4",
-              "count": 24087,
-              "rate": 0.12044
+              "count": 23562,
+              "rate": 0.11781
             },
             {
               "score": "4-0",
-              "count": 20695,
-              "rate": 0.10348
+              "count": 22010,
+              "rate": 0.11005
             },
             {
               "score": "0-4",
-              "count": 18330,
-              "rate": 0.09165
+              "count": 17156,
+              "rate": 0.08578
             }
           ],
           "totalHistogram": [
             {
               "from": 4,
               "to": 4,
-              "count": 39025,
-              "rate": 0.19513
+              "count": 39166,
+              "rate": 0.19583
             },
             {
               "from": 5,
               "to": 5,
-              "count": 55872,
-              "rate": 0.27936
+              "count": 56152,
+              "rate": 0.28076
             },
             {
               "from": 6,
               "to": 6,
-              "count": 56002,
-              "rate": 0.28001
+              "count": 55799,
+              "rate": 0.279
             },
             {
               "from": 7,
               "to": 7,
-              "count": 49101,
-              "rate": 0.24551
+              "count": 48883,
+              "rate": 0.24442
             }
           ],
           "timing": {
-            "elapsedMs": 37.938,
-            "samplesPerSecond": 5271759
+            "elapsedMs": 40.4897,
+            "samplesPerSecond": 4939528
           }
         },
         {
           "attacker": {
             "id": "682",
             "name": "Saudi Arabia",
-            "rating": 89.3
+            "rating": 89.7
           },
           "defender": {
             "id": "826",
@@ -46450,17 +46450,17 @@
           "samples": 200000,
           "seed": 3315610772,
           "drama": 6,
-          "attackerWinRate": 0.86569,
-          "defenderWinRate": 0.13431,
-          "winRateMargin95": 0.00149,
+          "attackerWinRate": 0.8776,
+          "defenderWinRate": 0.1224,
+          "winRateMargin95": 0.00144,
           "regulationTieRate": 0,
           "attackerWinRateAfterTie": null,
           "zeroZeroRate": 0,
-          "largeTotalRate": 0.14561,
-          "blowoutRate": 0.34367,
+          "largeTotalRate": 0.13787,
+          "blowoutRate": 0.35671,
           "regulationTotal": {
-            "mean": 5.1564,
-            "sd": 1.0538,
+            "mean": 5.12079,
+            "sd": 1.04659,
             "p05": 4,
             "median": 5,
             "p95": 7,
@@ -46468,8 +46468,8 @@
             "max": 7
           },
           "regulationMargin": {
-            "mean": 2.29364,
-            "sd": 1.98388,
+            "mean": 2.3821,
+            "sd": 1.92634,
             "p05": -2,
             "median": 3,
             "p95": 4,
@@ -46477,8 +46477,8 @@
             "max": 4
           },
           "attackerScore": {
-            "mean": 3.72502,
-            "sd": 0.78777,
+            "mean": 3.75145,
+            "sd": 0.75092,
             "p05": 2,
             "median": 4,
             "p95": 4,
@@ -46486,114 +46486,114 @@
             "max": 4
           },
           "defenderScore": {
-            "mean": 1.43138,
-            "sd": 1.37933,
+            "mean": 1.36935,
+            "sd": 1.35617,
             "p05": 0,
             "median": 1,
             "p95": 4,
             "min": 0,
             "max": 4
           },
-          "finalTotalMean": 5.1564,
-          "regulationAbsoluteMarginMean": 2.8436,
+          "finalTotalMean": 5.12079,
+          "regulationAbsoluteMarginMean": 2.87921,
           "mostCommonRegulationScores": [
             {
               "score": "4-0",
-              "count": 66066,
-              "rate": 0.33033
+              "count": 68951,
+              "rate": 0.34476
             },
             {
               "score": "4-1",
-              "count": 54388,
-              "rate": 0.27194
+              "count": 55424,
+              "rate": 0.27712
             },
             {
               "score": "4-2",
-              "count": 33613,
-              "rate": 0.16807
+              "count": 32910,
+              "rate": 0.16455
             },
             {
               "score": "4-3",
-              "count": 19070,
-              "rate": 0.09535
+              "count": 18235,
+              "rate": 0.09118
             },
             {
               "score": "3-4",
-              "count": 10052,
-              "rate": 0.05026
+              "count": 9339,
+              "rate": 0.0467
             },
             {
               "score": "2-4",
-              "count": 8156,
-              "rate": 0.04078
+              "count": 7441,
+              "rate": 0.03721
             },
             {
               "score": "1-4",
-              "count": 5988,
-              "rate": 0.02994
+              "count": 5310,
+              "rate": 0.02655
             },
             {
               "score": "0-4",
-              "count": 2667,
-              "rate": 0.01334
+              "count": 2390,
+              "rate": 0.01195
             }
           ],
           "totalHistogram": [
             {
               "from": 4,
               "to": 4,
-              "count": 68733,
-              "rate": 0.34367
+              "count": 71341,
+              "rate": 0.35671
             },
             {
               "from": 5,
               "to": 5,
-              "count": 60376,
-              "rate": 0.30188
+              "count": 60734,
+              "rate": 0.30367
             },
             {
               "from": 6,
               "to": 6,
-              "count": 41769,
-              "rate": 0.20885
+              "count": 40351,
+              "rate": 0.20176
             },
             {
               "from": 7,
               "to": 7,
-              "count": 29122,
-              "rate": 0.14561
+              "count": 27574,
+              "rate": 0.13787
             }
           ],
           "timing": {
-            "elapsedMs": 30.9064,
-            "samplesPerSecond": 6471152
+            "elapsedMs": 32.3023,
+            "samplesPerSecond": 6191510
           }
         },
         {
           "attacker": {
             "id": "724",
             "name": "Spain",
-            "rating": 81.3
+            "rating": 81
           },
           "defender": {
             "id": "076",
             "name": "Brazil",
-            "rating": 85
+            "rating": 84.3
           },
           "samples": 200000,
           "seed": 3160862274,
           "drama": 6,
-          "attackerWinRate": 0.29604,
-          "defenderWinRate": 0.70396,
-          "winRateMargin95": 0.002,
+          "attackerWinRate": 0.31478,
+          "defenderWinRate": 0.68522,
+          "winRateMargin95": 0.00204,
           "regulationTieRate": 0,
           "attackerWinRateAfterTie": null,
           "zeroZeroRate": 0,
-          "largeTotalRate": 0.21713,
-          "blowoutRate": 0.23107,
+          "largeTotalRate": 0.22315,
+          "blowoutRate": 0.22205,
           "regulationTotal": {
-            "mean": 5.46643,
-            "sd": 1.07016,
+            "mean": 5.49183,
+            "sd": 1.06785,
             "p05": 4,
             "median": 5,
             "p95": 7,
@@ -46601,8 +46601,8 @@
             "max": 7
           },
           "regulationMargin": {
-            "mean": -1.22331,
-            "sd": 2.46328,
+            "mean": -1.10424,
+            "sd": 2.49237,
             "p05": -4,
             "median": -2,
             "p95": 3,
@@ -46610,8 +46610,8 @@
             "max": 4
           },
           "attackerScore": {
-            "mean": 2.12156,
-            "sd": 1.50645,
+            "mean": 2.1938,
+            "sd": 1.50532,
             "p05": 0,
             "median": 2,
             "p95": 4,
@@ -46619,87 +46619,87 @@
             "max": 4
           },
           "defenderScore": {
-            "mean": 3.34487,
-            "sd": 1.15633,
+            "mean": 3.29803,
+            "sd": 1.18748,
             "p05": 1,
             "median": 4,
             "p95": 4,
             "min": 0,
             "max": 4
           },
-          "finalTotalMean": 5.46643,
-          "regulationAbsoluteMarginMean": 2.53358,
+          "finalTotalMean": 5.49183,
+          "regulationAbsoluteMarginMean": 2.50818,
           "mostCommonRegulationScores": [
             {
               "score": "1-4",
-              "count": 43099,
-              "rate": 0.2155
+              "count": 41598,
+              "rate": 0.20799
             },
             {
               "score": "0-4",
-              "count": 37985,
-              "rate": 0.18993
+              "count": 35474,
+              "rate": 0.17737
             },
             {
               "score": "2-4",
-              "count": 34744,
-              "rate": 0.17372
+              "count": 34579,
+              "rate": 0.1729
             },
             {
               "score": "3-4",
-              "count": 24964,
-              "rate": 0.12482
+              "count": 25393,
+              "rate": 0.12697
             },
             {
               "score": "4-3",
-              "count": 18461,
-              "rate": 0.09231
+              "count": 19236,
+              "rate": 0.09618
             },
             {
               "score": "4-2",
-              "count": 17904,
-              "rate": 0.08952
+              "count": 18937,
+              "rate": 0.09469
             },
             {
               "score": "4-1",
-              "count": 14615,
-              "rate": 0.07308
+              "count": 15848,
+              "rate": 0.07924
             },
             {
               "score": "4-0",
-              "count": 8228,
-              "rate": 0.04114
+              "count": 8935,
+              "rate": 0.04468
             }
           ],
           "totalHistogram": [
             {
               "from": 4,
               "to": 4,
-              "count": 46213,
-              "rate": 0.23107
+              "count": 44409,
+              "rate": 0.22205
             },
             {
               "from": 5,
               "to": 5,
-              "count": 57714,
-              "rate": 0.28857
+              "count": 57446,
+              "rate": 0.28723
             },
             {
               "from": 6,
               "to": 6,
-              "count": 52648,
-              "rate": 0.26324
+              "count": 53516,
+              "rate": 0.26758
             },
             {
               "from": 7,
               "to": 7,
-              "count": 43425,
-              "rate": 0.21713
+              "count": 44629,
+              "rate": 0.22315
             }
           ],
           "timing": {
-            "elapsedMs": 37.7579,
-            "samplesPerSecond": 5296905
+            "elapsedMs": 39.015,
+            "samplesPerSecond": 5126233
           }
         },
         {
@@ -46711,22 +46711,22 @@
           "defender": {
             "id": "682",
             "name": "Saudi Arabia",
-            "rating": 89.3
+            "rating": 89.7
           },
           "samples": 200000,
           "seed": 1784283775,
           "drama": 6,
-          "attackerWinRate": 0.55969,
-          "defenderWinRate": 0.44031,
-          "winRateMargin95": 0.00218,
+          "attackerWinRate": 0.53602,
+          "defenderWinRate": 0.46399,
+          "winRateMargin95": 0.00219,
           "regulationTieRate": 0,
           "attackerWinRateAfterTie": null,
           "zeroZeroRate": 0,
-          "largeTotalRate": 0.24553,
-          "blowoutRate": 0.19446,
+          "largeTotalRate": 0.2452,
+          "blowoutRate": 0.19298,
           "regulationTotal": {
-            "mean": 5.57612,
-            "sd": 1.06027,
+            "mean": 5.57866,
+            "sd": 1.05837,
             "p05": 4,
             "median": 6,
             "p95": 7,
@@ -46734,8 +46734,8 @@
             "max": 7
           },
           "regulationMargin": {
-            "mean": 0.35158,
-            "sd": 2.62217,
+            "mean": 0.21432,
+            "sd": 2.63384,
             "p05": -4,
             "median": 1,
             "p95": 4,
@@ -46743,8 +46743,8 @@
             "max": 4
           },
           "attackerScore": {
-            "mean": 2.96385,
-            "sd": 1.36155,
+            "mean": 2.89649,
+            "sd": 1.38671,
             "p05": 0,
             "median": 4,
             "p95": 4,
@@ -46752,109 +46752,109 @@
             "max": 4
           },
           "defenderScore": {
-            "mean": 2.61227,
-            "sd": 1.46498,
+            "mean": 2.68217,
+            "sd": 1.45109,
             "p05": 0,
             "median": 3,
             "p95": 4,
             "min": 0,
             "max": 4
           },
-          "finalTotalMean": 5.57612,
-          "regulationAbsoluteMarginMean": 2.42388,
+          "finalTotalMean": 5.57866,
+          "regulationAbsoluteMarginMean": 2.42134,
           "mostCommonRegulationScores": [
             {
               "score": "4-1",
-              "count": 32230,
-              "rate": 0.16115
+              "count": 30691,
+              "rate": 0.15346
             },
             {
               "score": "4-2",
-              "count": 30564,
-              "rate": 0.15282
-            },
-            {
-              "score": "4-3",
-              "count": 25616,
-              "rate": 0.12808
+              "count": 29584,
+              "rate": 0.14792
             },
             {
               "score": "2-4",
-              "count": 25342,
-              "rate": 0.12671
+              "count": 26665,
+              "rate": 0.13333
             },
             {
               "score": "1-4",
-              "count": 23867,
-              "rate": 0.11934
+              "count": 25426,
+              "rate": 0.12713
             },
             {
-              "score": "4-0",
-              "count": 23528,
-              "rate": 0.11764
+              "score": "4-3",
+              "count": 25129,
+              "rate": 0.12565
             },
             {
               "score": "3-4",
-              "count": 23489,
-              "rate": 0.11745
+              "count": 23910,
+              "rate": 0.11955
+            },
+            {
+              "score": "4-0",
+              "count": 21799,
+              "rate": 0.109
             },
             {
               "score": "0-4",
-              "count": 15364,
-              "rate": 0.07682
+              "count": 16796,
+              "rate": 0.08398
             }
           ],
           "totalHistogram": [
             {
               "from": 4,
               "to": 4,
-              "count": 38892,
-              "rate": 0.19446
+              "count": 38595,
+              "rate": 0.19298
             },
             {
               "from": 5,
               "to": 5,
-              "count": 56097,
-              "rate": 0.28049
+              "count": 56117,
+              "rate": 0.28058
             },
             {
               "from": 6,
               "to": 6,
-              "count": 55906,
-              "rate": 0.27953
+              "count": 56249,
+              "rate": 0.28125
             },
             {
               "from": 7,
               "to": 7,
-              "count": 49105,
-              "rate": 0.24553
+              "count": 49039,
+              "rate": 0.2452
             }
           ],
           "timing": {
-            "elapsedMs": 39.1521,
-            "samplesPerSecond": 5108283
+            "elapsedMs": 40.252,
+            "samplesPerSecond": 4968697
           }
         }
       ],
       "benchmark": {
         "prepare": {
           "samples": 250,
-          "elapsedMs": 1.2135,
-          "meanMs": 0.00485
+          "elapsedMs": 1.313,
+          "meanMs": 0.00525
         },
         "scores": {
           "samples": 100000,
-          "elapsedMs": 10.1924,
-          "perSecond": 9811232
+          "elapsedMs": 10.3893,
+          "perSecond": 9625288
         },
         "completeMatches": {
           "samples": 10000,
-          "elapsedMs": 127.9593,
-          "perSecond": 78150
+          "elapsedMs": 133.7089,
+          "perSecond": 74789
         },
         "odds": {
           "samples": 1024,
-          "firstMs": 0.7204,
+          "firstMs": 0.7228,
           "cachedMs": 0.039,
           "cacheIdentityPreserved": true
         },
