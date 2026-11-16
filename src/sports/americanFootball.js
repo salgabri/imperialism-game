@@ -14,6 +14,11 @@ const MAX_OVERTIMES = 3;
 // Possessions per side in regulation. Quality changes what a drive yields, not how many there are.
 const DRIVES = 11;
 const DRIVE_SD = 1.1;
+// The fewest and most possessions a side may have (a rulebook's `driveRange` replaces it).
+const DRIVE_RANGE = Object.freeze([8, 15]);
+// After the last overtime period a level game is decided by one last score, to either side with
+// logistic(DECISIVE_SLOPE · (edgeA − edgeD)) (times a rulebook's `scale`): an even coin flip between equals.
+const DECISIVE_SLOPE = 0.08;
 // Sudden-death possessions each side can still get in an overtime period after its first two: a period holds six
 // possessions at most, under every season's overtime rules.
 const SUDDEN_DEATH = 2;
@@ -157,17 +162,27 @@ export function seasonRules(league, year, dataSet) {
 /**
  * A side's chances on one drive with `edge` = its offence minus the opposing defence, and its kicker's rating: a
  * touchdown, a field-goal try and its make, and a touchdown's extra point and two-point try (0 where there is none),
- * under `rules` (today's by default).
+ * under `rules` (today's by default). A rulebook's `scale` multiplies how far each rating point of edge moves the
+ * touchdown, field-goal try and two-point odds (college football's, whose ratings sit closer together than its schools do).
  */
 export function driveOdds(edge, kicking, rules = TODAY) {
-  const e = edge - rules.edge, k = kicking - rules.kicker;
+  const e = edge - rules.edge, k = kicking - rules.kicker, scale = rules.scale ?? 1;
   return {
-    td: logistic(logit(rules.td) + TD_SCALE * e),
-    fgTry: logistic(logit(rules.fgTry) + FG_SCALE * e),
+    td: logistic(logit(rules.td) + TD_SCALE * scale * e),
+    fgTry: logistic(logit(rules.fgTry) + FG_SCALE * scale * e),
     make: clamp(rules.make + k * FG_PER_POINT, ...rules.makeRange),
     xp: clamp(rules.xp + k * (rules.xpSlope ?? XP_PER_POINT), ...rules.xpRange),
-    two: rules.two > 0 ? logistic(logit(rules.two) + FG_SCALE * e) : 0,
+    two: rules.two > 0 ? logistic(logit(rules.two) + FG_SCALE * scale * e) : 0,
   };
+}
+
+/**
+ * A side's chances on a college overtime possession, from the opponent's 25 (`rules.overtime` 'college'): the drive odds
+ * with that possession's own touchdown, field-goal try and make (`otTd`, `otFgTry`, `otMake` within `otMakeRange`),
+ * the tries as in regulation.
+ */
+export function collegeOvertimeOdds(edge, kicking, rules) {
+  return driveOdds(edge, kicking, { ...rules, td: rules.otTd, fgTry: rules.otFgTry, make: rules.otMake, makeRange: rules.otMakeRange });
 }
 
 /**
@@ -194,14 +209,14 @@ export function prepareMatch(attacker, defender, effA, effD, { home = false } = 
   const adjustmentA = (Number.isFinite(effA) ? effA : lineupA.rating) - lineupA.rating;
   const adjustmentD = (Number.isFinite(effD) ? effD : lineupD.rating) - lineupD.rating;
   const a = profile(lineupA), d = profile(lineupD);
-  const edge = home ? HOME_EDGE : 0;
+  const edge = home ? rules.homeEdge ?? HOME_EDGE : 0;
   return {
     attackerId: attacker.id,
     defenderId: defender.id,
     lineupA,
     lineupD,
     rules,
-    drives: DRIVES,
+    drives: rules.drives ?? DRIVES,
     edgeA: a.offence + adjustmentA - (d.defence + adjustmentD) - edge,
     edgeD: d.offence + adjustmentD - (a.defence + adjustmentA) + edge,
     kickingA: a.kicking + adjustmentA,
@@ -273,14 +288,99 @@ function overtimePeriod(rng, oddsA, oddsD, first, rules = TODAY) {
 }
 
 /**
+ * A college overtime period of possessions (the NCAA's since 2021: its first and second periods), `first` the side with
+ * the ball first, `oddsA`/`oddsD` each side's odds from the opponent's 25 (collegeOvertimeOdds). The first plays its possession
+ * out, kicking after a touchdown in the first period and going for two in the second (\`twoOnly\`), as the rules then
+ * require. The second plays to that score: level it plays for the field goal that wins (as late in a game), a field goal
+ * down it plays the possession out (its touchdown wins, its field goal draws level), a touchdown down it needs one (no
+ * field goal), and its touchdown is kicked, or in the second period goes for two, to win or draw level; a touchdown that
+ * wins has no try. No defensive scores. → { a, d, drives: [{ side, pts, conversion? }] }
+ */
+function collegePossessions(rng, oddsA, oddsD, first, twoOnly) {
+  const order = first === 'A' ? ['A', 'D'] : ['D', 'A'];
+  const drives = [];
+  let a = 0, d = 0;
+  const play = (side, odds, goForTwo) => {
+    const result = drive(rng, side, odds, goForTwo, side === 'A' ? a - d : d - a, 0);
+    drives.push(result);
+    if (result.side === 'A') a += result.pts; else d += result.pts;
+  };
+  const oddsOf = side => (side === 'A' ? oddsA : oddsD);
+  play(order[0], oddsOf(order[0]), () => twoOnly);
+  const behind = order[1] === 'A' ? d - a : a - d;
+  play(order[1], collegeAnswer(oddsOf(order[1]), behind), lead => (lead > 0 ? null : twoOnly));
+  return { a, d, drives };
+}
+
+/**
+ * The second side's odds in a college overtime possession, `behind` points down after the first's: level, the field goal
+ * that wins (late-game play-calling, level); a field goal down, its own odds; a touchdown down, going for it on fourth
+ * down with no field goal (late-game play-calling, a touchdown down).
+ */
+export function collegeAnswer(odds, behind) {
+  if (behind <= 0) return lateCall(odds, 0);
+  if (behind <= 3) return odds;
+  return { ...lateCall(odds, -behind), fgTry: 0 };
+}
+
+/**
+ * A college overtime period of two-point plays (from the NCAA's third period on): one each, `first` then the other, each
+ * made with its side's two-point odds → { a, d, drives: [{ side, pts: 2 or 0, kind: 'two' }] }.
+ */
+function twoPointRound(rng, oddsA, oddsD, first) {
+  const drives = [];
+  let a = 0, d = 0;
+  for (const side of first === 'A' ? ['A', 'D'] : ['D', 'A']) {
+    const pts = rng() < (side === 'A' ? oddsA : oddsD).two ? 2 : 0;
+    drives.push({ side, pts, kind: 'two' });
+    if (side === 'A') a += pts; else d += pts;
+  }
+  return { a, d, drives };
+}
+
+/**
+ * College overtime (the NCAA's rules since 2021) after a level regulation, under `rules.overtime` 'college': a coin toss,
+ * whose loser has the ball first in the first period (its winner defends, as nearly every team does), the first
+ * possession then alternating from period to period; the first two periods' possessions from the 25
+ * (collegePossessions), every later period's two-point plays (twoPointRound). A period that leaves the game level leads to
+ * the next; still level after `rules.maxOvertimes` periods, a last two-point play goes to either side with
+ * logistic(DECISIVE_SLOPE · scale · (edgeA − edgeD)), a coin flip between equals, so a match always has a winner. Form
+ * moves the overtime odds as it moves the drives'. Each play is pushed onto `plays` with its period (1, 2, …).
+ * → { periods: [[a, d], …], ga, gd } (the overtime's own points).
+ */
+function collegeOvertime(rng, prepared, rules, form, plays) {
+  const oddsA = collegeOvertimeOdds(prepared.edgeA + form, prepared.kickingA, rules);
+  const oddsD = collegeOvertimeOdds(prepared.edgeD - form, prepared.kickingD, rules);
+  const periods = [];
+  let ga = 0, gd = 0, first = rng() < 0.5 ? 'A' : 'D';
+  for (let period = 1; period <= rules.maxOvertimes && ga === gd; period++) {
+    const result = period <= 2 ? collegePossessions(rng, oddsA, oddsD, first, period === 2) : twoPointRound(rng, oddsA, oddsD, first);
+    if (period === rules.maxOvertimes && result.a === result.d) {
+      const side = rng() < logistic(DECISIVE_SLOPE * (rules.scale ?? 1) * (prepared.edgeA - prepared.edgeD)) ? 'A' : 'D';
+      result.drives.push({ side, pts: 2, kind: 'two' });
+      if (side === 'A') result.a += 2; else result.d += 2;
+    }
+    for (const play of result.drives) plays.push({ ...play, period });
+    periods.push([result.a, result.d]);
+    ga += result.a;
+    gd += result.d;
+    first = first === 'A' ? 'D' : 'A';
+  }
+  return { periods, ga, gd };
+}
+
+/**
  * Score-only path: possessions, form, drive luck, tries and late-game play-calling, under the prepared match's rules
  * (its season's). Also returns the scoring sequence (`plays`: each possession in order, `{ side, pts, period,
- * conversion? }` with `side` the side that scored, period 0 being regulation) so the full simulation can time its events.
+ * conversion?, kind? }` with `side` the side that scored, period 0 being regulation, `kind` 'two' a college overtime's
+ * two-point play) so the full simulation can time its events. A college rulebook (`overtime` 'college') plays college
+ * overtime (collegeOvertime), with its own possessions a side (`drives`, within `driveRange`).
  */
 export function sampleResult(rng, prepared, drama = 6) {
   const rules = prepared.rules ?? TODAY;
   const variation = Number.isFinite(drama) ? clamp(drama, 0, 12) : 6;
-  const drives = Math.round(clamp(prepared.drives + gauss(rng) * DRIVE_SD, 8, 15));
+  const [fewest, most] = rules.driveRange ?? DRIVE_RANGE;
+  const drives = Math.round(clamp(prepared.drives + gauss(rng) * DRIVE_SD, fewest, most));
   const form = gauss(rng) * variation * FORM_PER_DRAMA;
   const oddsA = driveOdds(prepared.edgeA + form, prepared.kickingA, rules);
   const oddsD = driveOdds(prepared.edgeD - form, prepared.kickingD, rules);
@@ -304,14 +404,20 @@ export function sampleResult(rng, prepared, drama = 6) {
     if (play.side === 'A') regA += play.pts; else regD += play.pts;
   }
   let ga = regA, gd = regD, tie = null;
-  if (ga === gd) {
+  if (ga === gd && rules.overtime === 'college') {
+    tie = collegeOvertime(rng, prepared, rules, form, plays);
+    ga += tie.ga;
+    gd += tie.gd;
+    tie.ga = ga;
+    tie.gd = gd;
+  } else if (ga === gd) {
     const periods = [];
     for (let period = 0; period < MAX_OVERTIMES && ga === gd; period++) {
       const result = overtimePeriod(rng, oddsA, oddsD, rng() < 0.5 ? 'A' : 'D', rules);
       if (period === MAX_OVERTIMES - 1 && result.a === result.d) {
         // A bounded final decisive field goal, in that period and in the ticker. Swapping sides swaps the odds;
         // an equal matchup is a coin flip, never an automatic attacker win.
-        const side = rng() < logistic(0.08 * (prepared.edgeA - prepared.edgeD)) ? 'A' : 'D';
+        const side = rng() < logistic(DECISIVE_SLOPE * (prepared.edgeA - prepared.edgeD)) ? 'A' : 'D';
         result.drives.push({ side, pts: 3 });
         if (side === 'A') result.a += 3; else result.d += 3;
       }
@@ -330,10 +436,16 @@ export function sampleResult(rng, prepared, drama = 6) {
  * defence's return touchdowns. Field goals go to the kicker.
  */
 const TD_WEIGHTS = { WR: 1.9, RB: 4.25, TE: 2.1, QB: 1.1, CB: 0.13, S: 0.09, LB: 0.07, DL: 0.035, OL: 0.0001, K: 0.0001 };
+/** Who scores a college overtime's two-point play: a back, a receiver or the quarterback himself. */
+const TWO_WEIGHTS = { WR: 1.9, RB: 4.25, TE: 2.1, QB: 1.1, CB: 0.0001, S: 0.0001, LB: 0.0001, DL: 0.0001, OL: 0.0001, K: 0.0001 };
 /** Who is credited with a safety: the pass rush above all. */
 const SAFETY_WEIGHTS = { DL: 3, LB: 1.5, S: 0.3, CB: 0.2, QB: 0.0001, RB: 0.0001, WR: 0.0001, TE: 0.0001, OL: 0.0001, K: 0.0001 };
-/** A score's name by its points: a touchdown is 6 to 8 with its try, a field goal 3, a safety 2. */
-const scoreName = (pts, short) => (pts === 3 ? (short ? 'FG' : 'FIELD GOAL') : pts === 2 ? 'SAFETY' : short ? 'TD' : 'TOUCHDOWN');
+/**
+ * A score's name by its points: a touchdown is 6 to 8 with its try, a field goal 3, a safety 2; a college overtime's
+ * two-point play (`kind` 'two') is 2 too.
+ */
+export const scoreName = (pts, short, kind = null) => (kind === 'two' ? (short ? '2PT' : 'TWO-POINT CONVERSION')
+  : pts === 3 ? (short ? 'FG' : 'FIELD GOAL') : pts === 2 ? 'SAFETY' : short ? 'TD' : 'TOUCHDOWN');
 
 /** The minute a possession ends: possessions share their period evenly, with a little jitter, never past its end. */
 function playMinute(rng, index, count, offset, span) {
@@ -345,13 +457,15 @@ function playMinute(rng, index, count, offset, span) {
  * A complete match from a prepared matchup: the score-only outcome under its rules, then each score at the end of its
  * possession, the possessions sharing the sixty minutes or their overtime period (ten or fifteen minutes, the season's).
  */
-function playMatch(rng, prepared, attacker, defender, drama) {
+export function playMatch(rng, prepared, attacker, defender, drama) {
   const { ot } = prepared.rules ?? TODAY;
   const { ga, gd, regA, regD, tie, plays, winner } = sampleResult(rng, prepared, drama);
   const scorerA = createScorerSampler(prepared.lineupA, TD_WEIGHTS, 50);
   const scorerD = createScorerSampler(prepared.lineupD, TD_WEIGHTS, 50);
   const rusherA = createScorerSampler(prepared.lineupA, SAFETY_WEIGHTS, 50);
   const rusherD = createScorerSampler(prepared.lineupD, SAFETY_WEIGHTS, 50);
+  const converterA = createScorerSampler(prepared.lineupA, TWO_WEIGHTS, 50);
+  const converterD = createScorerSampler(prepared.lineupD, TWO_WEIGHTS, 50);
   const kickerOf = lineup => lineup.slots.find(slot => slot.position === 'K')?.player?.name || 'Kicker';
   const kickerA = kickerOf(prepared.lineupA), kickerD = kickerOf(prepared.lineupD);
   const ev = [];
@@ -365,12 +479,14 @@ function playMatch(rng, prepared, attacker, defender, drama) {
     list.forEach((play, index) => {
       if (!play.pts) return;
       const own = play.side === 'A';
-      const scorer = play.pts === 2 ? (own ? rusherA : rusherD) : (own ? scorerA : scorerD);
+      const scorer = play.kind === 'two' ? (own ? converterA : converterD) : play.pts === 2 ? (own ? rusherA : rusherD)
+        : (own ? scorerA : scorerD);
       ev.push({
         m: playMinute(rng, index, count, offset, span),
         tid: own ? attacker.id : defender.id,
         name: play.pts === 3 ? (own ? kickerA : kickerD) : scorer(rng),
         pts: play.pts,
+        ...(play.kind === 'two' ? { kind: 'two' } : {}),
       });
     });
   });
@@ -378,8 +494,11 @@ function playMatch(rng, prepared, attacker, defender, drama) {
   return { ga, gd, regA, regD, ev, tie, winner };
 }
 
-/** American football without its players: today's rules, which every season's (americanFootballIn) restates. */
-const americanFootballRules = {
+/**
+ * American football without its players: today's rules, which every season's (americanFootballIn) restates, and college
+ * football (src/sports/collegeFootball.js) plays with its own rulebook.
+ */
+export const americanFootballRules = {
   id: 'american-football',
   // 4: an overtime side a touchdown down no longer settles for a field goal.
   simulationVersion: 4,
@@ -486,4 +605,4 @@ export function americanFootballProfile(lineup) {
  * own (its safeties, overtime rule and period) ride on its prepared match's `rules`.
  */
 export const DRIVE_MODEL = Object.freeze({ DRIVES, DRIVE_SD, OVERTIME, MAX_OVERTIMES, SUDDEN_DEATH, OT_POSSESSIONS, FORM_PER_DRAMA,
-  SAFETY });
+  SAFETY, DECISIVE_SLOPE });

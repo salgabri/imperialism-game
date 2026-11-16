@@ -1,5 +1,5 @@
 // Club crests for every club the game ships: the all-leagues football layer, the women's clubs, the NBA, NFL, MLB, NHL
-// and NRL franchises, the EuroLeague's clubs and every country's domestic clubs. A club with a crest shows it wherever
+// and NRL franchises, the EuroLeague's clubs, college football's FBS schools and every country's domestic clubs. A club with a crest shows it wherever
 // a nation shows its flag; a club without one keeps its monogram chip.
 //
 // Usage:
@@ -46,7 +46,9 @@
 //     there, and is drawn as the period crests are (scripts/lib/crest-image.mjs). So a club's crest of today can change
 //     though the API is never asked again: ASVEL's LDLC ASVEL logo (since 2018/19) came this way. Its file then drops
 //     out of the API's file requests (fifty files each), which changes one of them: a full run needs an answer no
-//     cache holds, and stops.
+//     cache holds, and stops. A record may name a standard thumbnail width instead (`thumb`: 250, 330 or 500), whose
+//     bytes are then pinned and drawn: upload.wikimedia.org answers a run of originals with HTTP 429 and asks for its
+//     standard thumbnails instead, so college football's 138 school crests are 330px thumbnails.
 //
 // Writes:
 //   public/club-logos/<club id>.webp   one per club with a crest (an all-leagues club with a
@@ -69,6 +71,7 @@ import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
 import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
+import { CLUBS as CFB_CLUBS } from '../src/data/clubs.college-football.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { cachedGz, createLimiter, DATABASE_DATE, readGzJson } from './lib/domestic-sync.mjs';
 import { norm } from './lib/domestic-locate.mjs';
@@ -391,6 +394,12 @@ for (const club of EUROLEAGUE_CLUBS) {
   if (!itemOverrides[club.id]) problems.push(`${club.id}: no item (add it to ${path.relative(root, overridesFile)} "items")`);
   clubs.push({ id: club.id, name: club.name, qid: null });
 }
+// College football's schools: each crest is its athletics logo, named in "pages" (scripts/data/cfb-teams.json `crest`),
+// which needs no Wikipedia API answer.
+for (const club of CFB_CLUBS) {
+  if (!pageOverrides[club.id] && !itemOverrides[club.id]) problems.push(`${club.id}: no crest (add its file to ${path.relative(root, overridesFile)} "pages")`);
+  clubs.push({ id: club.id, name: club.name, qid: null });
+}
 for (const [id, qid] of Object.entries(itemOverrides)) {
   const club = clubs.find(entry => entry.id === id);
   if (!club) throw new Error(`club-logos.json names unknown club ${id}`);
@@ -398,21 +407,32 @@ for (const [id, qid] of Object.entries(itemOverrides)) {
   club.twin = null;
 }
 
-// The "pages" crests: each file page read, its original checked against its pin and drawn before anything is written,
-// so a page or an original that has changed stops the run.
+// The "pages" crests: each file page read, its original (or, where the record names a `thumb` width, that standard
+// thumbnail of it) checked against its pin and drawn before anything is written, so a page or a file that has changed
+// stops the run. upload.wikimedia.org answers a run of originals with HTTP 429 and asks for thumbnails in its standard
+// sizes instead (https://w.wiki/GHai): college football's 138 crests are 330px thumbnails.
+const STANDARD_THUMBS = new Set([250, 330, 500]);
+/** A file's thumbnail `width` pixels wide on upload.wikimedia.org, from its original's address (an SVG's is a PNG). */
+const thumbOf = (original, width) => {
+  const match = /^(https:\/\/upload\.wikimedia\.org\/wikipedia\/(?:en|commons))\/([0-9a-f]\/[0-9a-f]{2})\/([^/?#]+)$/.exec(original);
+  if (!match) throw new Error(`${original} is no upload.wikimedia.org original`);
+  return `${match[1]}/thumb/${match[2]}/${match[3]}/${width}px-${match[3]}${/\.svg$/i.test(match[3]) ? '.png' : ''}`;
+};
 const pageCrests = new Map(); // club id -> { webp, crest }
 for (const [id, record] of Object.entries(pageOverrides)) {
   const club = clubs.find(entry => entry.id === id);
   if (!club) throw new Error(`club-logos.json "pages" names unknown club ${id}`);
   if (!record?.file || !/^[0-9a-f]{64}$/.test(record.sha256 ?? '')) throw new Error(`club-logos.json "pages" ${id}: give its file and its original's SHA-256`);
+  if (record.thumb !== undefined && !STANDARD_THUMBS.has(record.thumb)) throw new Error(`club-logos.json "pages" ${id}: thumb ${record.thumb} is no standard width (${[...STANDARD_THUMBS].join(', ')})`);
   const name = fileName(record.file);
   const info = await pageInfo(name);
-  const bytes = await download(info.original);
+  const source = record.thumb ? thumbOf(info.original, record.thumb) : info.original;
+  const bytes = await download(source);
   if (sha256(bytes) !== record.sha256) {
-    throw new Error(`${id}: ${info.original} (SHA-256 ${sha256(bytes)}) is not the original pinned in ${path.relative(root, overridesFile)} "pages". Nothing was written.`);
+    throw new Error(`${id}: ${source} (SHA-256 ${sha256(bytes)}) is not the ${record.thumb ? 'thumbnail' : 'original'} pinned in ${path.relative(root, overridesFile)} "pages". Nothing was written.`);
   }
   club.twin = null; // a file of its own
-  pageCrests.set(id, { webp: await crestWebp(bytes, { svg: /\.svg$/i.test(info.original) }), crest: { file: id, name, info, from: 'page' } });
+  pageCrests.set(id, { webp: await crestWebp(bytes, { svg: !record.thumb && /\.svg$/i.test(info.original) }), crest: { file: id, name, info, from: 'page' } });
 }
 
 const qids = pagesOnly ? [] : [...new Set(clubs.map(club => club.qid).filter(Boolean))].sort();
@@ -550,13 +570,14 @@ const worldClubs = clubs.filter(club => club.id.startsWith('f-')), nbaClubs = cl
 const nflClubs = clubs.filter(club => club.id.startsWith('nfl-')), mlbClubs = clubs.filter(club => club.id.startsWith('mlb-'));
 const nhlClubs = clubs.filter(club => club.id.startsWith('nhl-')), womensClubs = clubs.filter(club => club.id.startsWith('w-'));
 const nrlClubs = clubs.filter(club => club.id.startsWith('nrl-'));
+const cfbClubs = clubs.filter(club => club.id.startsWith('cfb-'));
 const euroleagueClubs = clubs.filter(club => club.id.startsWith('el-'));
 console.log(`Crests: ${crests.size} of ${clubs.length} clubs`);
-console.log(`  all-leagues football ${count(worldClubs)}/${worldClubs.length}, NBA ${count(nbaClubs)}/${nbaClubs.length}, NFL ${count(nflClubs)}/${nflClubs.length}, MLB ${count(mlbClubs)}/${mlbClubs.length}, NHL ${count(nhlClubs)}/${nhlClubs.length}, NRL ${count(nrlClubs)}/${nrlClubs.length}, EuroLeague ${count(euroleagueClubs)}/${euroleagueClubs.length}, women's ${count(womensClubs)}/${womensClubs.length}, domestic ${count(domestic)}/${domestic.length}`);
+console.log(`  all-leagues football ${count(worldClubs)}/${worldClubs.length}, NBA ${count(nbaClubs)}/${nbaClubs.length}, NFL ${count(nflClubs)}/${nflClubs.length}, MLB ${count(mlbClubs)}/${mlbClubs.length}, NHL ${count(nhlClubs)}/${nhlClubs.length}, NRL ${count(nrlClubs)}/${nrlClubs.length}, EuroLeague ${count(euroleagueClubs)}/${euroleagueClubs.length}, college football ${count(cfbClubs)}/${cfbClubs.length}, women's ${count(womensClubs)}/${womensClubs.length}, domestic ${count(domestic)}/${domestic.length}`);
 console.log(`  domestic clubs with a Wikidata item: ${domestic.filter(club => club.qid).length}`);
 for (const [reason, list] of Object.entries(rejected)) console.log(`  rejected (${reason}): ${list.length}${list.length <= 12 ? '\n    ' + list.join('\n    ') : ''}`);
-const missing = [...worldClubs, ...nbaClubs, ...nflClubs, ...mlbClubs, ...nhlClubs, ...nrlClubs, ...euroleagueClubs, ...womensClubs].filter(club => !crests.has(club.id));
-if (missing.length) console.log(`  all-leagues, NBA, NFL, MLB, NHL, NRL, EuroLeague and women's clubs without a crest:\n    ${missing.map(club => `${club.id} (${club.qid || 'no item'})`).join('\n    ')}`);
+const missing = [...worldClubs, ...nbaClubs, ...nflClubs, ...mlbClubs, ...nhlClubs, ...nrlClubs, ...euroleagueClubs, ...cfbClubs, ...womensClubs].filter(club => !crests.has(club.id));
+if (missing.length) console.log(`  all-leagues, NBA, NFL, MLB, NHL, NRL, EuroLeague, college football and women's clubs without a crest:\n    ${missing.map(club => `${club.id} (${club.qid || 'no item'})`).join('\n    ')}`);
 // (--pages looks up no item, so it has no problems of its own to report.)
 if (!pagesOnly) for (const problem of problems) console.log(`  ${problem}`);
 for (const [id, { crest }] of pageCrests) console.log(`  ${id}: ${crest.name} (${crest.info.licence}${crest.info.nonFree ? ', non-free' : ''}), from its file page ${crest.info.page}`);

@@ -13,35 +13,38 @@ Pick your sport at kick-off:
 | Football, and women's football | XI in a 4-4-2 | 90 minutes | extra time, then a penalty shootout (in earlier seasons the rules of their day: the drawing of lots to 1969/70, the golden goal 1995/96–2001/02, the silver goal 2002/03–2003/04; women's football's golden goal 1996/97–2003/04) |
 | Basketball | starting five | 40 minutes for nations and EuroLeague clubs (FIBA), 48 for NBA clubs | overtime periods |
 | American football | 23 starters: 11 on offence, the nickel defence, the kicker | 60 minutes | overtime periods |
+| College football | 23 starters, as American football's | 60 minutes | college overtime: a possession each from the 25, two-point plays from the third period |
 | Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings (each half from 2020 with a runner on second) |
 | Ice hockey | four lines, three pairs and the goalie | 60 minutes | sudden-death overtime, then a shoot-out |
 | Tennis, and women's tennis | a Davis Cup (or Billie Jean King Cup) team: No. 1 and No. 2 in the singles, a doubles pair | five rubbers, first to three, each best of three sets; an earlier season plays its year's ([format by year](#tennis-seasons)) | none: a tie always has a winner |
 | Rugby league | the matchday 17: thirteen and four on the bench | 80 minutes | golden point |
 | Rocket League | three a side, a nation's best of its five | best of seven five-minute games | sudden-death overtime in a level game; a series always has a winner |
+| Counter-Strike | five a side, a nation's best of its seven | best of three maps, each first to 13 rounds | overtimes of six rounds from 12–12; a series always has a winner |
 
 And pick who fights:
 
 - **Nations** — 176 nations on the map, each team starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
-  Basketball, baseball, ice hockey, both tennis games and Rocket League field them as one team, Great
+  Basketball, baseball, ice hockey, both tennis games and both esports field them as one team, Great
   Britain (GBR), under the Union Jack, and so does women's football's 2012 Olympic tournament
   ([its season](#the-world-cups-and-olympic-tournaments-1991-to-2015-computed)). A sport fields 173 at most: those four play Great Britain
   as one, and football leaves out Tonga, Samoa and the Cook Islands, whose players no
   source rates ([Pacific islands](docs/design/pacific-islands.md)). A nation fields a team
   only with a **real side**, its own rated players holding at least half the lineup, and
   every other nation's land stays neutral: 173 nations play football, 57 Rocket League, 52
-  tennis, 45 women's tennis, 47 basketball, 36 women's football, 12 baseball, 7 ice hockey and 6
-  rugby league. No team is made up of generated players or nearly empty.
+  tennis, 45 women's tennis, 47 basketball, 40 Counter-Strike, 36 women's football, 12 baseball, 7 ice
+  hockey and 6 rugby league. No team is made up of generated players or nearly empty.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs (Europe's 68
   on [their maps of Europe](#womens-football-on-the-europe-maps), the NWSL's 16 on [theirs](#the-nwsl-map) of the USA), all 30 NBA
   franchises on [their own map](#the-nba-map) of the USA and Canada, the EuroLeague's 20 clubs
   on [theirs](#the-euroleague-map) of Europe, all 32 NFL
-  franchises on [theirs](#the-nfl-map) of the USA, all 30 MLB clubs on
+  franchises on [theirs](#the-nfl-map) of the USA, all 138 FBS college football schools on [theirs](#the-fbs-map) of
+  the USA, Hawaii included, all 30 MLB clubs on
   [theirs](#the-mlb-map) of the USA and Canada, all 32 NHL clubs on
   [theirs](#the-nhl-map), or all 17 NRL clubs on [theirs](#the-nrl-map) of Australia and New Zealand. Real Madrid annexes territory
-  exactly the way Spain does. American football is played by clubs only, tennis,
-  women's tennis and Rocket League by nations only.
+  exactly the way Spain does. American football and college football are played by clubs only, tennis,
+  women's tennis and both esports by nations only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
   leagues, fewer for smaller ones) on that country's own map, split into 100
   sections ([domestic campaigns](#domestic-campaigns)).
@@ -50,7 +53,9 @@ Everything outside the match — territory, the spinner, targeting, conquest,
 autosave, the map — is sport- and layer-agnostic. A sport supplies its own roster
 data, lineup shape, match model and vocabulary (`words`) from `src/sports/`; adding
 American football took one module, its club file, its lineup plan and its squad
-field ([design notes](docs/design/american-football.md)). Baseball added the sport's
+field ([design notes](docs/design/american-football.md)), and college football plays that model under college
+rules: more possessions, the college game's kicking and tries, a steeper edge for its wider spread of schools, and
+college overtime ([design notes](docs/design/college-football.md)). Baseball added the sport's
 own match clock (half-innings, not minutes) and nations by birthplace
 ([design notes](docs/design/baseball.md)). Ice hockey's ratings are partly estimates, each
 marked as one ([design notes](docs/design/hockey.md)), women's football plays
@@ -60,7 +65,8 @@ Tennis plays Davis Cup ties between nations, its players rated by their Elo
 ([design notes](docs/design/tennis.md)), and women's tennis the Billie Jean King Cup's, the WTA's players
 by their Elo, with the WTA's serve ([design notes](docs/design/womens-tennis.md)). Rocket League, the first esport, plays
 the RLCS's best-of-seven series between nations, its players rated by an Elo built from every series Liquipedia
-records ([design notes](docs/design/rocket-league.md)).
+records ([design notes](docs/design/rocket-league.md)). Counter-Strike, the second, plays best-of-three series of maps
+round by round, its players rated by the same Elo, map by map ([design notes](docs/design/counter-strike.md)).
 
 Originally implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
@@ -132,6 +138,8 @@ npm run sync:euroleague-seasons # snapshot its seasons 2000/01 to 2025/26 (clubs
 npm run build:euroleague # rebuild the EuroLeague's clubs, every rating an estimate from that snapshot, and the earlier seasons' league figures and audit (--check compares byte for byte)
 npm run sync:madden      # snapshot Madden NFL ratings from EA's site into scripts/data/madden-nfl-27.json (network, cached)
 npm run build-nfl        # rebuild the NFL clubs from that snapshot (--check compares byte for byte)
+npm run sync:college-football # snapshot College Football 27 ratings from EA's site into scripts/data/college-football-27.json (network, cached)
+npm run build-college-football # rebuild the 138 FBS schools from that snapshot (--check compares byte for byte)
 npm run build:nfl-scoring # the NFL's and AFL's scoring season by season, 1960–2024, from Pro Football Archives' pages (--fetch saves missing pages politely; --check compares byte for byte)
 npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public API into scripts/data/mlb-the-show-26.json (network, cached)
 npm run build-mlb        # rebuild the MLB clubs and the baseball nations from that snapshot (--check compares byte for byte)
@@ -156,6 +164,8 @@ npm run build-womens-tennis # rebuild the women's tennis nations from that snaps
 npm run sync:rocket-league # Rocket League's player Elo from a Liquipedia export saved by hand in data-src/liquipedia/ (no network) into scripts/data/rocket-league-elo.json
 npm run build-rocket-league # rebuild the Rocket League nations from that snapshot (--check compares byte for byte)
 npm run build:rocket-league-seasons # rebuild Rocket League's earlier seasons, 2016-2025, from the sync's year-end snapshots (--check)
+npm run sync:counter-strike # Counter-Strike's player Elo from Liquipedia exports saved by hand in data-src/liquipedia-counterstrike/ (no network) into scripts/data/counter-strike-elo.json
+npm run build-counter-strike # rebuild the Counter-Strike nations from that snapshot (--check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 npm run build:icons      # render favicon.ico, apple-touch-icon.png and the app icons from public/favicon.svg
 npm run build:fonts      # cut the Latin Extended + Vietnamese font files from the pinned Archivo sources (--check compares byte for byte)
@@ -240,7 +250,7 @@ committed outputs:
 | GeoNames dumps | `download.geonames.org/` (everything) | the cached copies only |
 | CommonCrawl records | `data.commoncrawl.org/` (everything) | the pinned cached copies only (ice hockey's NHL 22 pages) |
 | The NHL's API | never fetched | the cached answers only: `sync:nhl` cannot refresh, `sync:nhl-seasons` reads its pinned rosters |
-| Liquipedia | `liquipedia.net/` (everything, for ClaudeBot and Claude-Web), `/rocketleague/api.php` and `/rocketleague/index.php` (every agent); `api.liquipedia.net/` (everything) | never fetched: `sync:rocket-league` reads an export saved by hand from the wiki's Special:Export in a browser ([design notes](docs/design/rocket-league.md#the-liquipedia-export)) |
+| Liquipedia | `liquipedia.net/` (everything, for ClaudeBot and Claude-Web), `/rocketleague/api.php` and `/rocketleague/index.php` (every agent); `api.liquipedia.net/` (everything) | never fetched: `sync:rocket-league` and `sync:counter-strike` read exports saved by hand from each wiki's Special:Export in a browser ([design notes](docs/design/rocket-league.md#the-liquipedia-export), [Counter-Strike's](docs/design/counter-strike.md#the-liquipedia-export)) |
 
 ## Deployment
 
@@ -335,7 +345,8 @@ manager of the theatre's favourite, with decisions from the first match.
    Football club campaigns offer Europe's 124 strongest clubs or its
    Elite 32 on [the map of Europe](#the-europe-maps); basketball clubs play the NBA on its own
    map of the USA and Canada or [the EuroLeague](#the-euroleague-map) on its map of Europe, American football (clubs only: choosing it
-   switches Teams to clubs and disables Nations) the NFL on its map of the USA,
+   switches Teams to clubs and disables Nations) the NFL on its map of the USA, college football (its schools only, the same
+   way) the FBS on its own map of the USA,
    baseball clubs MLB on its map of the USA and Canada, ice hockey clubs the NHL on its own and rugby league clubs the NRL
    on its map of Australia and New Zealand. Tennis and women's tennis are nations only
    (choosing either switches Teams to nations and disables Clubs). Women's football's clubs
@@ -387,8 +398,9 @@ manager of the theatre's favourite, with decisions from the first match.
    2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1963, rugby league its built-in 2025
    (Rugby League 26) then [its earlier seasons](#rugby-league-seasons) 2024 back to 1960 (computed from
    NRL.com's match statistics, but 2008: Rugby League 2, the overall ours; before 1998 from the Rugby League
-   Project's team lists), the premiership's clubs on the map of their day, and Rocket League its 2026 then its
-   [earlier seasons](#rocket-league-seasons) 2025 back to 2016 (the Elo of Liquipedia's results at each year's end).
+   Project's team lists), the premiership's clubs on the map of their day, Rocket League its 2026 then its
+   [earlier seasons](#rocket-league-seasons) 2025 back to 2016 (the Elo of Liquipedia's results at each year's end),
+   and Counter-Strike its 2026 (the Elo of Liquipedia's results to November).
    The Season list names a season by its years, adding "· computed", "· converted"
    or "· fan-made" where its label calls its ratings so ("1969/70 · computed"); a
    year with two seasons (football's 1993/94 and 1989/90, the NFL's and AFL's of
@@ -507,6 +519,10 @@ a field goal, now and then a safety, or nothing by its offence against the oppos
 with late-game play-calling that makes 3 the commonest margin, as in the NFL, and playoff overtime. An earlier season
 plays its own day's: its league's scoring and kicking (about 17 points a side in 1977, 23 in 2024), no two-point try in
 the NFL before 1994, and its playoffs' overtime (sudden death to 2009 and in the AFL, fifteen-minute periods before 2017).
+College football plays the same model under the FBS's rules and rates of 2024 and 2025 (about 12 possessions and 26.5
+points a side, extra points from the 3), each rating point of edge counting for more, as the schools differ far more than
+EA's ratings show, and college overtime: a possession each from the opponent's 25 (two-point tries only in the second
+period), then two-point plays.
 Ice hockey plays three-minute slices whose rates follow the score (a level game tightens up late, a side behind
 pushes and at the end pulls its goalie), then five minutes of sudden death and a shoot-out. An earlier season plays its
 own day's: its league's goals (four a side in 1981/82, two and a half in 2003/04), a calmer late game before 1999/2000,
@@ -524,7 +540,7 @@ every Upsets setting retains scoring randomness and possible upsets.
 the defending team wins half of even games. On, the defender plays at home and
 wins about as often as home teams do in its sport's league: 45% of even football
 games in ninety minutes (59% with extra time and the shoot-outs), 56% in basketball (64% in the EuroLeague), 54% in
-American football and ice hockey and 53% in baseball. A Davis Cup host picks the surface and fills the stands:
+American football and ice hockey, 56% in college football and 53% in baseball. A Davis Cup host picks the surface and fills the stands:
 even ties go its way 60% of the time. Attacks fail more often, and a failed
 attack hands the defender the attacker's territory, so conquests change hands but
 campaigns run as many matches. A best-of-three final keeps its attacker, so its
@@ -835,8 +851,8 @@ Each key names a setup choice, and a key left at its default is left out:
 | Key | Setup choice | Values | Left out when |
 | --- | --- | --- | --- |
 | `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey`, `tennis`, `womens-tennis`, `rugby-league` | football |
-| `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, an NBA season); tennis and women's tennis are nations only |
-| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite` where the sport offers it, and `eurobasket` in basketball; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), women's football's maps (`domestic:weu32`, `domestic:nwsl`; `all`, `elite` and `NWSL` still open on them), or the EuroLeague's (`domestic:euroleague`; an earlier season's, `domestic:el2010`, which with another season becomes that season's own) | Europe for nations, the Top 124 for football clubs, Europe for women's football clubs, the NBA's for basketball clubs, a sport's own map (NFL, MLB, NHL) |
+| `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, college football, an NBA season); tennis and women's tennis are nations only |
+| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite` where the sport offers it, and `eurobasket` in basketball; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), women's football's maps (`domestic:weu32`, `domestic:nwsl`; `all`, `elite` and `NWSL` still open on them), or the EuroLeague's (`domestic:euroleague`; an earlier season's, `domestic:el2010`, which with another season becomes that season's own) | Europe for nations, the Top 124 for football clubs, Europe for women's football clubs, the NBA's for basketball clubs, a sport's own map (NFL, FBS, MLB, NHL) |
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`, `mlb-the-show-24`) | the built-in season |
 | `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
 | `opponent` | Who picks your opponent | `player` (You choose), `compass` | Compass, and whenever launch would drop it (a spectator, a pairing draw) |
@@ -983,9 +999,10 @@ compares the squads offline with World Football Elo
 with martj42's international results (CC0).
 
 This project is not affiliated with, endorsed or sponsored by Electronic Arts
-(EA SPORTS FC, FIFA, Madden NFL, EA SPORTS NHL), Sports Interactive and SEGA (Football Manager),
+(EA SPORTS FC, FIFA, Madden NFL, EA SPORTS College Football, EA SPORTS NHL), Sports Interactive and SEGA (Football Manager),
 2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), Big Ant Studios (Rugby League 26), Psyonix and Epic Games (Rocket
-League and the RLCS), Liquipedia, the NBA, the NFL, MLB, the NHL, the NRL, or the clubs, leagues and federations it names.
+League and the RLCS), Valve (Counter-Strike), Liquipedia, the NBA, the NFL, the NCAA, MLB, the NHL, the NRL, or the clubs,
+schools, leagues, conferences, organisers and federations it names.
 All trademarks, names and ratings belong to their respective owners.
 
 **American football** — `src/data/clubs.american-football.js`, the 32 NFL
@@ -999,6 +1016,18 @@ Madden's overalls, unchanged. Positions are specialised, so playing out of
 position costs 25 points in this sport, not 12. There are no national teams: no
 source rates American football players by nation. See the
 [design notes](docs/design/american-football.md).
+
+**College football** — `src/data/clubs.college-football.js`, the 138 FBS schools of
+College Football 27 (Week 10 Ratings, retrieved 2026-11-15 from EA SPORTS' ratings
+site; `scripts/data/college-football-27.json` holds all 10,935 players and each
+school's conference). The squads follow the NFL's rules: 23 starters at natural
+positions and eleven backups (Western Michigan has no fourth cornerback), EA's
+overalls unchanged, a school's league its conference. EA lists Air Force with no
+kicker, so its punter kicks. Codes, territory names, stadiums and crests are in
+`scripts/data/cfb-teams.json` (stadiums from English Wikipedia's list of FBS
+stadiums, CC BY-SA 4.0). The match model's college rates come from cfbstats.com's
+2024 and 2025 tables of games between FBS schools. See the
+[design notes](docs/design/college-football.md).
 
 **Baseball** — `src/data/clubs.baseball.js` and `src/data/rosters.baseball.js`, from
 MLB The Show 26's Live series as of roster update 26 (2 October 2026), read from the
@@ -1058,6 +1087,16 @@ plays for the nation he last played for at the FIFAe World Cup or the Esports Na
 files him under; 817 players have played within the year, and 57 nations have the three a series needs, from the United
 States, France and Saudi Arabia down. Nothing is estimated. Each year from 2016 is an
 [earlier season](#rocket-league-seasons). See the [design notes](docs/design/rocket-league.md).
+
+**Counter-Strike** — `src/data/rosters.counter-strike.js`, from every 5v5 series of CS:GO and CS2 Liquipedia records
+(CC BY-SA 3.0), read from four exports of the wiki saved by hand on 2026-11-15 (no script fetches Liquipedia) into
+`scripts/data/counter-strike-elo.json`: 3,007 events of S-, A- and B-Tier, 110,249 maps from 2012 to November 2026. Each
+player's rating is Rocket League's Elo, built map by map, a team playing at its five players' mean, on the same scale
+(Aleksib's 2,368 is 93); held out on the last 180 days its predictions were calibrated (log loss 0.641). A player plays
+for the nation he last played for at a national-team event (the Esports Nations Cup, WESG, the IESF's world
+championships), else his Liquipedia page's country; 1,667 players have played within the year, and 40 nations have the
+five a map needs, from Russia, Ukraine, France and Brazil down. Nothing is estimated. See the
+[design notes](docs/design/counter-strike.md).
 
 **Women's football** — `src/data/clubs.womens-football.js` and
 `src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07
@@ -1169,7 +1208,8 @@ identical national flags would tell you nothing — and wherever a nation shows 
 flag, a club shows its [crest](#club-crests). Everything else (capital markers,
 the power table, squad panels, conquest, player theft) behaves identically.
 
-Each NFL franchise holds its own state of [the USA](#the-nfl-map), each MLB and NHL club its own of
+Each NFL franchise holds its own state of [the USA](#the-nfl-map), each FBS school its own of [the USA](#the-fbs-map), each
+MLB and NHL club its own of
 [the USA and Canada](#the-mlb-map) ([the NHL's](#the-nhl-map)), each NRL club its own of
 [Australia and New Zealand](#the-nrl-map), and each NWSL club its own of [the USA](#the-nwsl-map).
 
@@ -1482,6 +1522,27 @@ stadiums are in `scripts/data/nfl-teams.json`.
 ```bash
 npm run build:nfl-map                      # boundaries + stadiums → public/domestic/nfl.json and its index entry (seconds)
 npm run build:nfl-map -- --check           # offline rebuild must match the committed files byte for byte
+```
+
+### The FBS map
+
+College football has one theatre, **FBS**: the 138 schools fight over the USA, each
+holding the state its stadium stands in and nothing else, as on the NFL's map. A
+state with several schools is divided between them along county lines (Texas
+thirteen, Ohio and California eight, Florida and North Carolina seven …), and six
+counties with two stadiums are cut between them: Georgia Tech holds the north of
+Atlanta's Fulton County and Georgia State the south, Houston the east of Harris
+County and Rice the west, and so Miami and FIU, UCLA's Rose Bowl and USC, Stanford
+and San Jose State, Michigan and Eastern Michigan. A territory is named after its
+college town (Tuscaloosa, State College, South Bend). Hawaii is the Rainbow
+Warriors', at its true place in the Pacific; Montana, South Dakota, Maine, New
+Hampshire, Vermont, Rhode Island and DC hold no FBS school and stay empty, and
+Alaska lies off the map. The map is `public/domestic/cfb.json` (165 KB); stadiums
+are in `scripts/data/cfb-teams.json`.
+
+```bash
+npm run build:cfb-map                      # boundaries + stadiums → public/domestic/cfb.json and its index entry (seconds)
+npm run build:cfb-map -- --check           # offline rebuild must match the committed files byte for byte
 ```
 
 ### The MLB map
@@ -2993,16 +3054,16 @@ vercel.json            cache headers for the deployed site
 
 ## Verification
 
-`npm run smoke` boots the real component tree under jsdom and plays **twenty-two full
-campaigns** across all three pacings, both resolution modes, all nine sports, and
+`npm run smoke` boots the real component tree under jsdom and plays **twenty-eight full
+campaigns** across all three pacings, both resolution modes, all twelve sports, and
 national, club and domestic teams; two of them are England's top 100 clubs on
 their own map, one is Fiji's 16 clubs, each starting on a group of its 100
 sections, one the NFL's 32 franchises on theirs, with the live ticker, one MLB's 30
 clubs on theirs, also live, one baseball's nations of North and Central America, one the NHL's 32 clubs on
 their map, live, one hockey's nations of Europe, one the women's nations of Europe, live, one the NWSL's clubs, one
 tennis's Davis Cup nations of Europe, live, one women's tennis's Billie Jean King Cup nations of the world, one the NRL's 17
-clubs on their map, live, and one rugby league's nations of
-Asia and Oceania. A **manager campaign** (Italy, Europe, round robin × *You
+clubs on their map, live, one rugby league's nations of
+Asia and Oceania, one Rocket League's nations of Europe, live, and one Counter-Strike's nations of the world. A **manager campaign** (Italy, Europe, round robin × *You
 choose*, live ticker) is driven only through the primary action. It covers
 target choices, tactical gates, Finish match, signings on the conquest screen,
 the automatic switch to Match and back, and Continue as spectator after

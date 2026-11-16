@@ -1,7 +1,7 @@
 // Owner: WP-LEDGER (see PLAN.md §4). Ledger, Chronicle and Match-preview view-models (PLAN §3.6).
 // Pure: (state, ctx) in, plain data out. No window/document/timers/RNG. Tolerates loading/setup state
 // (teams {}, aliveIds [], board null), `stats: {}`, teams without baseEff and history entries without odds.
-import { DEPENDENCIES, isTennisSport, NATIONS, selectLineup, SCOPES } from '../data/teams.js';
+import { DEPENDENCIES, isGridironSport, isTennisSport, NATIONS, selectLineup, SCOPES } from '../data/teams.js';
 import { worldClubTheatreName } from '../data/scopes.js';
 import { domesticLabel } from '../data/domesticScope.js';
 import { getSport } from '../sports/index.js';
@@ -13,6 +13,7 @@ import { hockeyProfile } from '../sports/hockey.js';
 import { tennisProfile } from '../sports/tennis.js';
 import { rugbyLeagueProfile } from '../sports/rugbyLeague.js';
 import { rocketLeagueProfile } from '../sports/rocketLeague.js';
+import { counterStrikeProfile } from '../sports/counterStrike.js';
 import { campaignRecap, estimateSession } from '../engine/campaignExperience.js';
 import { empireNeighbors } from '../engine/campaign.js';
 import { FEED_CAP, domesticIdOf } from '../app/shared.js';
@@ -499,7 +500,7 @@ function tapeRows(sportId, lineupA, lineupD, copy) {
     if (sportId === 'basketball') {
       const pA = basketballProfile(lineupA), pD = basketballProfile(lineupD);
       rows = [['offence', 'Offence', pA.offence, pD.offence], ['defence', 'Defence', pA.defence, pD.defence]];
-    } else if (sportId === 'american-football') {
+    } else if (isGridironSport(sportId)) {
       const pA = americanFootballProfile(lineupA), pD = americanFootballProfile(lineupD);
       rows = [['offence', 'Offence', pA.offence, pD.offence], ['defence', 'Defence', pA.defence, pD.defence],
         ['kicking', 'Kicking', pA.kicking, pD.kicking]];
@@ -520,6 +521,9 @@ function tapeRows(sportId, lineupA, lineupD, copy) {
         ['forwards', 'Forwards', pA.forwards, pD.forwards]];
     } else if (sportId === 'rocket-league') {
       const pA = rocketLeagueProfile(lineupA), pD = rocketLeagueProfile(lineupD);
+      rows = [['best', 'Best player', pA.best, pD.best]];
+    } else if (sportId === 'counter-strike') {
+      const pA = counterStrikeProfile(lineupA), pD = counterStrikeProfile(lineupD);
       rows = [['best', 'Best player', pA.best, pD.best]];
     } else {
       const pA = footballProfile(lineupA), pD = footballProfile(lineupD);

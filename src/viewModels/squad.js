@@ -1,6 +1,6 @@
 // Owner: WP-SQUAD (see PLAN.md §4). Squad view-models (PLAN §3.6, C§16, DEC D8/D9).
 // Pure: no window/document/timers/RNG; tolerates missing teams, history, stats and baseEff.
-import { isTennisSport, selectLineup, teamSportId } from '../data/teams.js';
+import { isGridironSport, isTennisSport, selectLineup, teamSportId } from '../data/teams.js';
 import { estimateReason, estimateTitle, isEstimated } from '../data/estimates.js';
 import { footballProfile } from '../sports/football.js';
 import { basketballProfile } from '../sports/basketball.js';
@@ -10,6 +10,7 @@ import { hockeyProfile } from '../sports/hockey.js';
 import { tennisProfile } from '../sports/tennis.js';
 import { rugbyLeagueProfile } from '../sports/rugbyLeague.js';
 import { rocketLeagueProfile } from '../sports/rocketLeague.js';
+import { counterStrikeProfile } from '../sports/counterStrike.js';
 import { getSport, SPORTS } from '../sports/index.js';
 import { historyRound, memo, ratingTier, roman, shortName, signedDelta, teamChip } from './format.js';
 
@@ -35,8 +36,9 @@ const SPORT_ORDER = { baseball: { C: 0, '1B': 1, '2B': 2, '3B': 3, SS: 4, LF: 5,
   'womens-tennis': { SGL: 0, DBL: 1 },
   // Rugby league numbers its thirteen from the back: the fullback, the outside backs, the halves, then the pack.
   'rugby-league': { FB: 0, WG: 1, CE: 2, FE: 3, HB: 4, PR: 5, HK: 6, SR: 7, LK: 8 },
-  // Rocket League's three have no positions.
-  'rocket-league': { PLR: 0 } };
+  // Rocket League's three have no positions, nor Counter-Strike's five.
+  'rocket-league': { PLR: 0 },
+  'counter-strike': { PLR: 0 } };
 const SPORT_GROUPS = {
   baseball: { C: 'Catcher', '1B': 'Infield', '2B': 'Infield', '3B': 'Infield', SS: 'Infield', LF: 'Outfield', CF: 'Outfield',
     RF: 'Outfield', DH: 'Designated hitter', SP: 'Starting pitcher', RP: 'Bullpen' },
@@ -46,6 +48,7 @@ const SPORT_GROUPS = {
   'rugby-league': { FB: 'Outside backs', WG: 'Outside backs', CE: 'Outside backs', FE: 'Halves', HB: 'Halves', PR: 'Front row',
     HK: 'Front row', SR: 'Back row', LK: 'Back row' },
   'rocket-league': { PLR: 'Players' },
+  'counter-strike': { PLR: 'Players' },
 };
 /**
  * Formation slots in % of the pitch box (C§7.4, design V442), the basketball half court (C§17), the American football
@@ -96,19 +99,27 @@ const SLOTS = {
   },
   // Rocket League's rotation, attacking the goal at the top: the best player up front as first man, the others behind him.
   'rocket-league': { PLR: [[50, 28], [27, 60], [73, 60]] },
+  // Counter-Strike's five holding a map as its defenders do: two at the A site, one in mid, two at the B site, the best
+  // player first.
+  'counter-strike': { PLR: [[50, 44], [20, 22], [80, 22], [31, 40], [69, 40]] },
 };
+// College football fields the NFL's lineup on the same field.
+SLOTS['college-football'] = SLOTS['american-football'];
 /** Squad-screen copy per sport: the box the lineup is drawn on and its names. */
 const LAYOUTS = {
   football: { layout: 'pitch', viewLabel: 'Pitch' },
   'womens-football': { layout: 'pitch', viewLabel: 'Pitch' },
   basketball: { layout: 'court', viewLabel: 'Court' },
   'american-football': { layout: 'field', viewLabel: 'Field' },
+  'college-football': { layout: 'field', viewLabel: 'Field' },
   baseball: { layout: 'diamond', viewLabel: 'Diamond' },
   hockey: { layout: 'rink', viewLabel: 'Rink' },
   tennis: { layout: 'tennis', viewLabel: 'Court' },
   'womens-tennis': { layout: 'tennis', viewLabel: 'Court' },
   'rugby-league': { layout: 'rugby', viewLabel: 'Field' },
   'rocket-league': { layout: 'arena', viewLabel: 'Arena' },
+  // Not "Map": the campaign's own Map tab sits beside the squad screen's tabs.
+  'counter-strike': { layout: 'site', viewLabel: 'Sites' },
 };
 const BACK_LABELS = { map: 'Back to map', ledger: 'Back to standings', chronicle: 'Back to history', match: 'Back to match' };
 
@@ -189,7 +200,7 @@ export function profileSegments(value) {
 export function strengthProfile(lineup, sportId) {
   const rows = sportId === 'basketball'
     ? (({ offence, defence }) => [['offence', 'Offence', offence], ['defence', 'Defence', defence]])(basketballProfile(lineup))
-    : sportId === 'american-football'
+    : isGridironSport(sportId)
       ? (({ offence, defence, kicking }) => [['offence', 'Offence', offence], ['defence', 'Defence', defence], ['kicking', 'Kicking', kicking]])(americanFootballProfile(lineup))
       : sportId === 'baseball'
         ? (({ batting, pitching, fielding }) => [['batting', 'Batting', batting], ['pitching', 'Pitching', pitching], ['fielding', 'Fielding', fielding]])(baseballProfile(lineup))
@@ -201,6 +212,8 @@ export function strengthProfile(lineup, sportId) {
             ? (({ backs, halves, forwards }) => [['backs', 'Backs', backs], ['halves', 'Halves', halves], ['forwards', 'Forwards', forwards]])(rugbyLeagueProfile(lineup))
           : sportId === 'rocket-league'
             ? (({ team, best }) => [['team', 'Team', team], ['best', 'Best player', best]])(rocketLeagueProfile(lineup))
+          : sportId === 'counter-strike'
+            ? (({ team, best }) => [['team', 'Team', team], ['best', 'Best player', best]])(counterStrikeProfile(lineup))
           : (({ attack, defence, keeper }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goalkeeping', 'Goalkeeping', keeper]])(footballProfile(lineup));
   return rows.map(([key, label, value]) => {
     const raw = Number.isFinite(Number(value)) ? Number(value) : 0;

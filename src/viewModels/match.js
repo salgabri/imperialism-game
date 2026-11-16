@@ -2,7 +2,7 @@
 // Pure: no window/document/timers/RNG. The live minute is NOT read here (it lives in the minute store, DEC D7);
 // components pass it to buildFeedRows and to the win-probability series.
 import { clockLabel, getSport, matchSport, overtimeEnd, overtimePeriodsOf, settledText, shootoutOf } from '../sports/index.js';
-import { isTennisSport, selectLineup } from '../data/teams.js';
+import { isGridironSport, isTennisSport, selectLineup } from '../data/teams.js';
 import { estimateTitle, isEstimated } from '../data/estimates.js';
 import { BENCH } from '../sports/basketball.js';
 import { PERIOD_MODEL } from '../sports/hockey.js';
@@ -15,12 +15,14 @@ const GROUPS = {
   football: ['GK', 'DF', 'MF', 'FW'],
   basketball: ['PG', 'SG', 'SF', 'PF', 'C'],
   'american-football': ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'K'],
+  'college-football': ['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'K'],
   baseball: ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH', 'SP', 'RP'],
   hockey: ['C', 'LW', 'RW', 'D', 'G'],
   tennis: ['SGL', 'DBL'],
   'womens-tennis': ['SGL', 'DBL'],
   'rugby-league': ['FB', 'WG', 'CE', 'FE', 'HB', 'PR', 'HK', 'SR', 'LK'],
   'rocket-league': ['PLR'],
+  'counter-strike': ['PLR'],
 };
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
@@ -46,7 +48,8 @@ function oddsOf(odds) {
  * side's rubbers, in order; a set that does not win its rubber counts nothing) or "Walsh 2 tries · Cleary 3 PG" (rugby
  * league: the two who scored most, a try ranked as its four points, a penalty goal as two and a field goal as one; a
  * conversion is the try's, nobody's own) or "Zen 5 G · Alpha54 3 G" (Rocket League: the two who scored most over the series;
- * a game's end scores nothing of its own). `sport` is a sport id or a season's rules (matchSport): an ice hockey season
+ * a game's end scores nothing of its own) or "ZywOo 12 MVP · apEX 7 MVP" (Counter-Strike: the two who were their side's MVP
+ * of the most rounds; a map's end counts nothing of its own). `sport` is a sport id or a season's rules (matchSport): an ice hockey season
  * before the shoot-out has none to leave out.
  */
 export function scorersLine(shown, teamId, teams, sport = 'football') {
@@ -59,6 +62,12 @@ export function scorersLine(shown, teamId, teams, sport = 'football') {
     const totals = new Map();
     for (const e of own) if (!(Number(e.pts) > 0)) totals.set(e.name, (totals.get(e.name) || 0) + 1);
     return [...totals.entries()].sort((x, y) => y[1] - x[1]).slice(0, 2).map(([name, goals]) => `${shortName(name)} ${goals} G`).join(' · ');
+  }
+  if (sportId === 'counter-strike') {
+    // Rounds' MVPs only: a map's end (`pts` 1) is the team's, named for its MVP of the map, already counted.
+    const totals = new Map();
+    for (const e of own) if (!(Number(e.pts) > 0)) totals.set(e.name, (totals.get(e.name) || 0) + 1);
+    return [...totals.entries()].sort((x, y) => y[1] - x[1]).slice(0, 2).map(([name, mvps]) => `${shortName(name)} ${mvps} MVP`).join(' · ');
   }
   if (sportId === 'hockey') {
     const rules = typeof sport === 'object' && sport ? sport : getSport(sportId);
@@ -85,17 +94,18 @@ export function scorersLine(shown, teamId, teams, sport = 'football') {
     return [...totals.entries()].sort((x, y) => y[1] - x[1]).slice(0, 2)
       .map(([name, rbi]) => `${shortName(name)} ${rbi} RBI`).join(' · ');
   }
-  if (sportId === 'american-football') {
+  if (isGridironSport(sportId)) {
     const totals = new Map();
     for (const e of own) {
-      const row = totals.get(e.name) || { pts: 0, td: 0, fg: 0, sf: 0 };
+      const row = totals.get(e.name) || { pts: 0, td: 0, fg: 0, sf: 0, two: 0 };
       const pts = Number(e.pts) || 0;
-      if (pts === 3) { row.fg++; row.pts += 3; } else if (pts === 2) { row.sf++; row.pts += 2; } else { row.td++; row.pts += 6; }
+      if (e.kind === 'two') { row.two++; row.pts += 2; } else if (pts === 3) { row.fg++; row.pts += 3; }
+      else if (pts === 2) { row.sf++; row.pts += 2; } else { row.td++; row.pts += 6; }
       totals.set(e.name, row);
     }
     return [...totals.entries()].sort((x, y) => y[1].pts - x[1].pts).slice(0, 2)
-      .map(([name, { td, fg, sf }]) => `${shortName(name)} ${[td && `${td} TD`, fg && `${fg} FG`,
-        sf && `${sf} ${sf === 1 ? 'safety' : 'safeties'}`].filter(Boolean).join(', ')}`).join(' · ');
+      .map(([name, { td, fg, sf, two }]) => `${shortName(name)} ${[td && `${td} TD`, fg && `${fg} FG`,
+        sf && `${sf} ${sf === 1 ? 'safety' : 'safeties'}`, two && `${two} 2PT`].filter(Boolean).join(', ')}`).join(' · ');
   }
   if (sportId === 'basketball') {
     const totals = new Map();
@@ -204,16 +214,18 @@ const playsOn = sport => sport?.tieBreak === 'overtime' || (sport?.tieBreak === 
  * "SAFETY — Name (KCC)", "2 RBI — Name (NYY)"): read the scorer and the side back from it, so an archived full-time
  * header carries the same scorer lines as the live one. The copy keeps no touchdown's try, so a touchdown reads as 6.
  */
-const EVENT_COPY = /^(?:(?:GOLDEN )?GOAL|\+(\d+)|(TD|FG|SAFETY)|(\d+) RBI)\s+—\s+(.+?)\s+\(([^()]*)\)$/;
+const EVENT_COPY = /^(?:(?:GOLDEN )?GOAL|\+(\d+)|(TD|FG|SAFETY|2PT)|(\d+) RBI)\s+—\s+(.+?)\s+\(([^()]*)\)$/;
 // Tennis's rubber line, "SINGLES — Jannik Sinner (ITA) 6–4 7–6(5)", and a set's, "SET 1 — Jannik Sinner (ITA) 6–4".
 const TENNIS_COPY = /^(SINGLES|DOUBLES|SET \d+)\s+—\s+(.+?)\s+\(([A-Z]{3})\)\s/;
-const SCORE_POINTS = { TD: 6, FG: 3, SAFETY: 2 };
+const SCORE_POINTS = { TD: 6, FG: 3, SAFETY: 2, '2PT': 2 };
 // Rocket League's goal line, "GOAL — Zen (FRA) 2–1" or "OVERTIME GOAL — Zen (FRA) 3–2 +0:42": the game's score follows.
-const ROCKET_GOAL_COPY = /^(?:OVERTIME )?GOALs+—s+(.+?)s+(([A-Z]{3}))s+d+–d+/;
+const ROCKET_GOAL_COPY = /^(?:OVERTIME )?GOAL\s+—\s+(.+?)\s+\(([A-Z]{3})\)\s+\d+–\d+/;
+// Counter-Strike's round line, "R14 — ZywOo (FRA) 8–6" or "R27 OT — ZywOo (FRA) 14–13": the round's MVP, then the map's score.
+const ROUND_COPY = /^R\d+(?: OT)?\s+—\s+(.+?)\s+\(([A-Z]{3})\)\s+\d+–\d+$/;
 function historyShown(entry, aId, dId, aCode, dCode) {
   const shown = [];
   for (const e of Array.isArray(entry?.events) ? entry.events : []) {
-    const rocket = ROCKET_GOAL_COPY.exec(String(e?.text || '').trim());
+    const rocket = ROCKET_GOAL_COPY.exec(String(e?.text || '').trim()) ?? ROUND_COPY.exec(String(e?.text || '').trim());
     if (rocket) {
       const tid = rocket[2] === aCode ? aId : rocket[2] === dCode ? dId : null;
       if (tid != null) shown.push({ tid, name: rocket[1], m: 0, pts: 0 });
@@ -231,7 +243,9 @@ function historyShown(entry, aId, dId, aCode, dCode) {
     if (tid == null) continue;
     const minute = parseInt(e?.when, 10);
     shown.push({ tid, name: match[4], m: Number.isFinite(minute) ? minute : 0,
-      pts: match[1] ? Number(match[1]) : match[3] ? Number(match[3]) : SCORE_POINTS[match[2]] || 1 });
+      pts: match[1] ? Number(match[1]) : match[3] ? Number(match[3]) : SCORE_POINTS[match[2]] || 1,
+      // A college overtime's two-point play is 2, as a safety is: its kind tells the scorer lines apart.
+      ...(match[2] === '2PT' ? { kind: 'two' } : {}) });
   }
   return shown;
 }

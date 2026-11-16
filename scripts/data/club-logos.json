@@ -134,6 +134,694 @@
     "d208-545": {
       "file": "Logo Odense Boldklub 2025.svg",
       "sha256": "98ecdb0425c401823419f94660c6431c6e707fa39bb242a1cbf4296c570e3d38"
+    },
+    "cfb-air-force": {
+      "file": "Air Force Falcons logo.svg",
+      "sha256": "e07a3ed3319c24307882fa35872870e25d7dd4f0cf418b7be2a81e0661579aba",
+      "thumb": 330
+    },
+    "cfb-akron": {
+      "file": "Akron Zips logo 2022.svg",
+      "sha256": "6c4108b35e3561d2ec0e3306aa0183d9c050cd911ad90340a0778659b8d001e9",
+      "thumb": 330
+    },
+    "cfb-alabama": {
+      "file": "Alabama Athletics logo.svg",
+      "sha256": "a77c0c808167870ff6d642997db28deb04fd80cce593ef61224f75efc1380e0b",
+      "thumb": 330
+    },
+    "cfb-appalachian-state": {
+      "file": "Appalachian State Mountaineers logo.svg",
+      "sha256": "cafe4a3770daea5c606af27d3d32abdfba1696b6a1c89bb37d3318c128b2b74c",
+      "thumb": 330
+    },
+    "cfb-arizona": {
+      "file": "Arizona Wildcats logo.svg",
+      "sha256": "4541fec1968ec78d10a0cda45eea57cab48cd623e6e8aa46de7fca993143be0c",
+      "thumb": 330
+    },
+    "cfb-arizona-state": {
+      "file": "Arizona State Sun Devils logo.svg",
+      "sha256": "96c9cce3aa7cf2bd8d72785513a192b608892870754d00ba318d62d48fb13b81",
+      "thumb": 330
+    },
+    "cfb-arkansas": {
+      "file": "Arkansas razorbacks logo.png",
+      "sha256": "ab7ce73faba2ed9e902e333d2dff5a4d18fd3f758276ab6a0ac1291aafb6c768",
+      "thumb": 330
+    },
+    "cfb-arkansas-state": {
+      "file": "Arkansas State Red Wolves logo.svg",
+      "sha256": "d43a990f23f3598884f0abad36d11b106e708622ef25338308a2821a6b5e7cdb",
+      "thumb": 330
+    },
+    "cfb-army": {
+      "file": "Army West Point logo.svg",
+      "sha256": "1c7e1ec678621bca1e1e1624339f576a258c21e7fda09cda2ffa8d1cccfe5fd0",
+      "thumb": 330
+    },
+    "cfb-auburn": {
+      "file": "Auburn Tigers logo.svg",
+      "sha256": "5855d02c543b0ebd3b639271a4fbae49acb061f4e86832ebef259d699933bbb5",
+      "thumb": 330
+    },
+    "cfb-ball-state": {
+      "file": "Ball State Cardinals logo.svg",
+      "sha256": "e11be10e58a50c338aa5e96886c1e06f53e42a1a8d6b03b532573d69ae7a5c29",
+      "thumb": 330
+    },
+    "cfb-baylor": {
+      "file": "Baylor Athletics logo.svg",
+      "sha256": "50dbee0e4ff3ce8cd7ac1d0afb7927377e91519dff7279d64bdea874f7fc46ae",
+      "thumb": 330
+    },
+    "cfb-boise-state": {
+      "file": "Primary Boise State Broncos Athletics Logo.svg",
+      "sha256": "35c968aee9e2221c697d9d0294337acf320c32c7ba5af00a34ee180622fa161b",
+      "thumb": 330
+    },
+    "cfb-boston-college": {
+      "file": "Boston College Eagles logo.svg",
+      "sha256": "f3ab3cf12a6e10a9449d6fcf08c39385f94376233400f78f66c9e6a289cf83b6",
+      "thumb": 330
+    },
+    "cfb-bowling-green": {
+      "file": "Bowling Green Falcons logo.svg",
+      "sha256": "8656c151d6ae3bb37cf8c5dc4f0b7ac87b4d36190e07b0be797c6a42cb6311ea",
+      "thumb": 330
+    },
+    "cfb-buffalo": {
+      "file": "Buffalo Bulls Athletic Logo.svg",
+      "sha256": "a9ccecaa9191b0e77ca3450cace7ddaa8afb95422f4436d05410e42db7558aac",
+      "thumb": 330
+    },
+    "cfb-byu": {
+      "file": "BYU Stretch Y Logo.png",
+      "sha256": "72d161b007134ac2035edaa491013d040003374af8c9e9990a310a676c9e77d8",
+      "thumb": 330
+    },
+    "cfb-cal": {
+      "file": "California Golden Bears logo.svg",
+      "sha256": "f31a5668ecb6aa087bc638f64124fe72df3e745a3d7527408e23fb5d00a8b7f0",
+      "thumb": 330
+    },
+    "cfb-central-michigan": {
+      "file": "Central Michigan Chippewas logo.svg",
+      "sha256": "e8c13034bd1b95df6210f376682afab078318d2d52e148554480b0a3548ca789",
+      "thumb": 330
+    },
+    "cfb-charlotte": {
+      "file": "Charlotte 49ers logo.svg",
+      "sha256": "22c51a24c3e2c25196165ef07f776fc85c687c96d999d0251459aab0abfbcf14",
+      "thumb": 330
+    },
+    "cfb-cincinnati": {
+      "file": "Cincinnati Bearcats logo.svg",
+      "sha256": "f0e933952926c60d7c017d800b85536e8f33bb70290486222f0da18e0742df63",
+      "thumb": 330
+    },
+    "cfb-clemson": {
+      "file": "Clemson Tigers logo.svg",
+      "sha256": "0ecea22779d044a9ca4a328d7c2e20bdb93e6f2f449b8ff12f4d53f8ba0dee18",
+      "thumb": 330
+    },
+    "cfb-coastal-carolina": {
+      "file": "Coastal Carolina Chanticleers logo.svg",
+      "sha256": "d583eef1af2ad0098853bd275fd969bd1d0011643ac273f9a7ff3002e84aa753",
+      "thumb": 330
+    },
+    "cfb-colorado": {
+      "file": "Colorado Buffaloes logo.svg",
+      "sha256": "e1279cc144a9b085d5f81402b9a6240288198ed7e1ae2c846f3ae7bc5c92912c",
+      "thumb": 330
+    },
+    "cfb-colorado-state": {
+      "file": "Colorado State Rams logo.svg",
+      "sha256": "a125e379d1c5c498a9c647f3a88223fb6ef509e571804c5532b7067ec0623679",
+      "thumb": 330
+    },
+    "cfb-connecticut": {
+      "file": "Connecticut Huskies logo.svg",
+      "sha256": "1570f087f5a8b8184cd69c03f5c194888375b0965d98b4a6e26aa44950c8dd99",
+      "thumb": 330
+    },
+    "cfb-delaware": {
+      "file": "Delaware Blue Hens primary logo.svg",
+      "sha256": "bc1515f8599023098ee22cc46c313e32fbeec28acc417e2559236f115a59d37b",
+      "thumb": 330
+    },
+    "cfb-duke": {
+      "file": "Duke Athletics logo.svg",
+      "sha256": "ff113b091b01cc562403423c87e78dca6a2258b3743126dcc4f41c350536efa3",
+      "thumb": 330
+    },
+    "cfb-east-carolina": {
+      "file": "East Carolina Pirates logo.svg",
+      "sha256": "70fa07b6c0b1190ac30ac5990a7fbd649a058f68eb63742f8f7749cce7401bf4",
+      "thumb": 330
+    },
+    "cfb-eastern-michigan": {
+      "file": "Eastern Michigan Eagles logo.svg",
+      "sha256": "72a7900396e439e4e32a40757a45f1b316dc356beb97ee6f9c1f2b90986b653a",
+      "thumb": 330
+    },
+    "cfb-fau": {
+      "file": "Florida Atlantic Owls logo.svg",
+      "sha256": "87d21ddbced6e19fc2f4a4ba0b45134c8dda2ffa66b0e9dc3c9ca58ef7f5fcf4",
+      "thumb": 330
+    },
+    "cfb-fiu": {
+      "file": "FIU primary Panther head logo adopted 2022.png",
+      "sha256": "1c10c7e55a695ca7cae7c920fcf1e8084eaed7df395800a6732575b9bf207b62",
+      "thumb": 330
+    },
+    "cfb-florida": {
+      "file": "Florida Gators gator logo.svg",
+      "sha256": "93bf89496523d7ecb73a3adb8f0b50661a6a8034cc6be61787cc65cadb0a4df2",
+      "thumb": 330
+    },
+    "cfb-florida-state": {
+      "file": "Florida State Seminoles logo.svg",
+      "sha256": "935d5fa105cb75383dda24cd211a145d66076d225c6145b3dda2707e990afdb8",
+      "thumb": 330
+    },
+    "cfb-fresno-state": {
+      "file": "Fresno State Bulldogs logo.svg",
+      "sha256": "258c1b8f701c684605eb5cc1f67c15a372b435b03fd891d8702ed4de1304c665",
+      "thumb": 330
+    },
+    "cfb-georgia": {
+      "file": "Georgia Athletics logo.svg",
+      "sha256": "d8df604d6452251dda5565936e706b2ef99ec50402c7f882f499e27421e0edf3",
+      "thumb": 330
+    },
+    "cfb-georgia-southern": {
+      "file": "Georgia Southern Eagles logo.svg",
+      "sha256": "46580a713d378d1c4a18dd197ba7d4089493f1f38cf69fe4681183f188f86bff",
+      "thumb": 330
+    },
+    "cfb-georgia-state": {
+      "file": "Georgia State Athletics logo.svg",
+      "sha256": "0183d6d73f96e17fb07603918ddd5eaff7888d4aeebb7381ca1225647c29d7cf",
+      "thumb": 330
+    },
+    "cfb-georgia-tech": {
+      "file": "Tech2026logo.png",
+      "sha256": "3293848469cc70cf787bf181a43e5cd17c2c00d367573d3538c0564b3e89d4d3",
+      "thumb": 330
+    },
+    "cfb-hawaii": {
+      "file": "Hawaii Warriors logo.svg",
+      "sha256": "83f32437adbd3323cac1234601ac326adee686614b7feaf93242efe17f30dde2",
+      "thumb": 330
+    },
+    "cfb-houston": {
+      "file": "Houston Cougars primary logo.svg",
+      "sha256": "0c588d03e875c0af6171f17f21146e9812b4f7d918cef87c521d4f1d0acb3168",
+      "thumb": 330
+    },
+    "cfb-illinois": {
+      "file": "Illinois Fighting Illini logo.svg",
+      "sha256": "e87076dda6daa9d0ba69f98c1201082cd8251acaf54173ccc21c1aa949d925b1",
+      "thumb": 330
+    },
+    "cfb-indiana": {
+      "file": "Indiana Hoosiers logo.svg",
+      "sha256": "3b34cbe7c6cb2a3a03dce567a107c0697d10dcc81747529186ae775151a49673",
+      "thumb": 330
+    },
+    "cfb-iowa": {
+      "file": "Iowa Hawkeyes logo.svg",
+      "sha256": "4cb062f0b08f6c0faef8ebe2c864bf4805a70640bdcce95db4348bf697b316d9",
+      "thumb": 330
+    },
+    "cfb-iowa-state": {
+      "file": "Iowa State Cyclones logo.svg",
+      "sha256": "be03c9242cb801960658140a444685d669f07f058235a2e90adf84c02173f63e",
+      "thumb": 330
+    },
+    "cfb-jacksonville-state": {
+      "file": "Jacksonville State Gamecocks logo.svg",
+      "sha256": "55b8f63a1fe8b7910c5afd1182b6473926ea7e13e9a4bfea6b0eeac980a960bf",
+      "thumb": 330
+    },
+    "cfb-james-madison": {
+      "file": "James Madison University Athletics logo.svg",
+      "sha256": "f865ce05ae783736e657bf76ac1af5733985ee33568167cb3dec1ebde1a327f8",
+      "thumb": 330
+    },
+    "cfb-kansas": {
+      "file": "Kansas Jayhawks 1946 logo.svg",
+      "sha256": "40d0b6412676942a56030790beffcecc95b0760794f607993d3c8569e2aaf355",
+      "thumb": 330
+    },
+    "cfb-kansas-state": {
+      "file": "Kansas State Wildcats logo.svg",
+      "sha256": "945855e1c824a423879025b1873598f3fd746312b1e87dea3fb0fb0619854f7c",
+      "thumb": 330
+    },
+    "cfb-kennesaw-state": {
+      "file": "Kennesaw State Owls logo.svg",
+      "sha256": "ddfa895bbb37336d880f7d7912893933c04d484107c7e7e824beedf7348bf90d",
+      "thumb": 330
+    },
+    "cfb-kent-state": {
+      "file": "Kent State athletic logo.svg",
+      "sha256": "10dd663392b0b935d3421f4911c091393fdd7a45aaa31067a2224d6b767dca75",
+      "thumb": 330
+    },
+    "cfb-kentucky": {
+      "file": "Kentucky Wildcats logo.svg",
+      "sha256": "4d6500833c4e71a110652480da7fb7d02639d02f4443aed5bd7d9494a1b3e210",
+      "thumb": 330
+    },
+    "cfb-liberty": {
+      "file": "Liberty Flames logo.svg",
+      "sha256": "9944998c9582c7d8566684bf40f82075bc89b317eda37d9333b237166d7f9ffd",
+      "thumb": 330
+    },
+    "cfb-louisiana": {
+      "file": "La-lafayette logo from NCAA.svg",
+      "sha256": "0bf5e7a0cc19372703684bac441e3c140fd646b83c3143fa0f3de8f7bdeed1d9",
+      "thumb": 330
+    },
+    "cfb-louisiana-tech": {
+      "file": "Louisiana Tech Athletics logo.svg",
+      "sha256": "c3598dbc6264fc9d917794eb675d4a827c2f08f96f58c06a77f9dfcb3a97de72",
+      "thumb": 330
+    },
+    "cfb-louisville": {
+      "file": "Louisville Cardinals logo.svg",
+      "sha256": "9550a42124c6c3e5e4cabcf45eb5fb30b08225d672d2f856845227cdb8ea226f",
+      "thumb": 330
+    },
+    "cfb-lsu": {
+      "file": "LSU Athletics logo.svg",
+      "sha256": "5f39e6c429e122a8a06ac6d3f013a3ebf2656563f6c2b299eff3b459e7a7b6fa",
+      "thumb": 330
+    },
+    "cfb-marshall": {
+      "file": "Marshall Thundering Herd logo.svg",
+      "sha256": "96eef756b3deb0e751ef757531a55972f9e7e9ceae9c47c6d8c7dec61fccd2d1",
+      "thumb": 330
+    },
+    "cfb-maryland": {
+      "file": "Maryland Terrapins logo.svg",
+      "sha256": "06a7078f67bc93b2690a462e84db75956438739fb14788c22162a9c9d491fb45",
+      "thumb": 330
+    },
+    "cfb-memphis": {
+      "file": "Memphis Tigers logo.svg",
+      "sha256": "87d881bd2245df530f32cbe5a59ee9edda8cb4e7743c4c1557876f647283386b",
+      "thumb": 330
+    },
+    "cfb-miami": {
+      "file": "Miami Hurricanes logo.svg",
+      "sha256": "8d433286c60ccea5886a1b1d263c7c7640998096f3a2bbe80cbfa7274b729701",
+      "thumb": 330
+    },
+    "cfb-miami-ohio": {
+      "file": "Miami Redhawks logo.svg",
+      "sha256": "0ff7e659a2a2d980710ac6fedcf90c0a535562cff398552d56dc1ddd15002997",
+      "thumb": 330
+    },
+    "cfb-michigan": {
+      "file": "Michigan Wolverines logo.svg",
+      "sha256": "6a6b46a5147e795a97205a6384770855312e6c7e0e5fe607fed38f85e532461d",
+      "thumb": 330
+    },
+    "cfb-michigan-state": {
+      "file": "Michigan State Athletics logo.svg",
+      "sha256": "7ba1b5e04e858e3616710cd74871ca7bd3b5312e1d074987fb77c79e6fb253dc",
+      "thumb": 330
+    },
+    "cfb-middle-tennessee-state": {
+      "file": "Mt blue raiders logo.png",
+      "sha256": "507addf837a4f5be131caa84d4f408f653c6dcd5e1b19dca677f1057bd9daa14"
+    },
+    "cfb-minnesota": {
+      "file": "Minnesota Golden Gophers logo.svg",
+      "sha256": "1a72c54a408760c10d1c6986f917f03e7b8d18084e8701e11e39a3219d934a8e",
+      "thumb": 330
+    },
+    "cfb-mississippi-state": {
+      "file": "Mississippi State Bulldogs script logo.svg",
+      "sha256": "64962a8bceaad5702169b7362b8e9944061f24be65f318e0d0dedf1823ba8dda",
+      "thumb": 330
+    },
+    "cfb-missouri": {
+      "file": "Missouri Tigers logo.svg",
+      "sha256": "cd34360b7132680be525acd2849363458bd5f97061c7bd945058e6c09ca2278a",
+      "thumb": 330
+    },
+    "cfb-missouri-state": {
+      "file": "Missouri State Athletics logo.svg",
+      "sha256": "4a85aad958f7958f84b15030ad4a0c0f97510046d3015731dca108a3836dd5b6",
+      "thumb": 330
+    },
+    "cfb-navy": {
+      "file": "Navy Athletics logo.svg",
+      "sha256": "0a114c078de700fd6a3a370f6ae67f5d816f530d63e66dcdf3bbe8c97ca50a3b",
+      "thumb": 330
+    },
+    "cfb-nc-state": {
+      "file": "NC State Wolfpack logo.svg",
+      "sha256": "8dab2cfaf2e34ec46d76c70106b24f0f6791860d471dc137af01786e35274d6c",
+      "thumb": 330
+    },
+    "cfb-nebraska": {
+      "file": "Nebraska Cornhuskers logo.svg",
+      "sha256": "c3e3b944ebe2650fa8743ede9458e4b7fcce224f4286975b22c8de0c4a8273c0",
+      "thumb": 330
+    },
+    "cfb-nevada": {
+      "file": "Nevada Wolf Pack logo.svg",
+      "sha256": "79caa68f236180e817bb4b6148b4b4191c107f057e250ce61bf2cd0630374ca0",
+      "thumb": 330
+    },
+    "cfb-new-mexico": {
+      "file": "New Mexico Lobos logo.svg",
+      "sha256": "044c5f9f9f2c046d103f7bc9a4f315b36679c413c32805fca2982a9503bb3c44",
+      "thumb": 330
+    },
+    "cfb-new-mexico-state": {
+      "file": "New Mexico State Aggies logo.svg",
+      "sha256": "9ff85d9a23822640664530608cb2421ba0eb003533d1fdb7608029f97eccc421",
+      "thumb": 330
+    },
+    "cfb-north-carolina": {
+      "file": "North Carolina Tar Heels logo.svg",
+      "sha256": "9970b4c2616439cc4accaa59b9004fb5c79235c3fd6d7b18ee7a1f25bceaf3ee",
+      "thumb": 330
+    },
+    "cfb-north-dakota-state": {
+      "file": "North Dakota State Bison logo.svg",
+      "sha256": "28f6e7f1080123f34ed20951dc621c601034c3d15d1e108e3acd51d9d645dd52",
+      "thumb": 330
+    },
+    "cfb-north-texas": {
+      "file": "North Texas Mean Green logo.svg",
+      "sha256": "9088d47cf695f391d2a68e645e152556ac696d91cf2447f172ff1485573f7a82",
+      "thumb": 330
+    },
+    "cfb-northern-illinois": {
+      "file": "Northern Illinois Huskies logo.svg",
+      "sha256": "835c40ae3e8349effd6d887de322471dac0fff95062390eecfee411432708289",
+      "thumb": 330
+    },
+    "cfb-northwestern": {
+      "file": "Northwestern Wildcats logo.svg",
+      "sha256": "828f49fa7af9ff0b1126b51820c1d91e01f629970a2279c632b193741c60be50",
+      "thumb": 330
+    },
+    "cfb-notre-dame": {
+      "file": "Nd athletics gold logo 2015.svg",
+      "sha256": "38c746ffefcd354a9e74b2cc05eb53b31fa1462f56d91e9fd87fbbd84f5e0e64",
+      "thumb": 330
+    },
+    "cfb-ohio": {
+      "file": "Ohio Bobcats logo.svg",
+      "sha256": "9dd5e7c30be9063473dba3076c5cf42472d8fa8be434a3cba06b6d51f703a2b9",
+      "thumb": 330
+    },
+    "cfb-ohio-state": {
+      "file": "Ohio State Buckeyes logo.svg",
+      "sha256": "c22664a9e9ff89820d62ba2dfe34e0abe115667fcc732aa71cb5164e4d5366a3",
+      "thumb": 330
+    },
+    "cfb-oklahoma": {
+      "file": "Oklahoma Sooners logo.svg",
+      "sha256": "62dd11e024b1394481daf18be05dc3cc360fc16ebcddcb4bef822e1bc886e4c3",
+      "thumb": 330
+    },
+    "cfb-oklahoma-state": {
+      "file": "Oklahoma State University system logo.svg",
+      "sha256": "95d295569f2fc8f04aadf22acbe220f6ed30e7057a9bf15bdd61f945e87d4140",
+      "thumb": 330
+    },
+    "cfb-old-dominion": {
+      "file": "Old Dominion Monarchs primary logo.svg",
+      "sha256": "91f9e455f8ce9d181fcc221d0a88ca64edfc364970262be112ed178fe0edbab8",
+      "thumb": 330
+    },
+    "cfb-ole-miss": {
+      "file": "Ole-miss logo from NCAA.svg",
+      "sha256": "355264fac92c1f08130dae8da82536759b1065a7d6047f239c2cf4f95b123ca4",
+      "thumb": 330
+    },
+    "cfb-oregon": {
+      "file": "Oregon Ducks logo.svg",
+      "sha256": "f4026126cfcfa15762a92abbfd1bb207b0351cf9c961169e10a664dac7efdbe5",
+      "thumb": 330
+    },
+    "cfb-oregon-state": {
+      "file": "Oregon State Beavers logo.svg",
+      "sha256": "65ec08259c0ab0d2d717f3d05d639e509705945572bbcb5af563991c50bcf192",
+      "thumb": 330
+    },
+    "cfb-penn-state": {
+      "file": "Penn State Nittany Lions logo.svg",
+      "sha256": "31a8c00db260c1b2a687d9eead5f05bfccbc8592aac8bed67f050531efe774df",
+      "thumb": 330
+    },
+    "cfb-pittsburgh": {
+      "file": "Pitt Panthers wordmark.svg",
+      "sha256": "7b6834a87528650907782ca93073735da8cd687fc798201b87304832da2567f6",
+      "thumb": 330
+    },
+    "cfb-purdue": {
+      "file": "Purdue Boilermakers logo.svg",
+      "sha256": "4dcdd5537bf57869b145f2a19ca8de7a0d2caae05cd66afee225d246f0f59815",
+      "thumb": 330
+    },
+    "cfb-rice": {
+      "file": "Rice Owls logo.svg",
+      "sha256": "f42b7df1adbfc77fc92913348d81d0ba28e5d7cbc44abdb857b82eaca09d5060",
+      "thumb": 330
+    },
+    "cfb-rutgers": {
+      "file": "Rutgers Scarlet Knights logo.svg",
+      "sha256": "08505eb725db068f35c3b56847f850bcf53f56e5ef6dea34a151d249db4e0c27",
+      "thumb": 330
+    },
+    "cfb-sacramento-state": {
+      "file": "Sacramento State Hornets logo.svg",
+      "sha256": "ee03acccb325fd0f5848d81aa1d51ffb878a32f88cb49ae2c11fbb7ba2b3485f",
+      "thumb": 330
+    },
+    "cfb-sam-houston": {
+      "file": "SHSU athletics logo.svg",
+      "sha256": "38337b3abc9090309597931f43bdadea2ec737e304f89744ac45e42a2a234c42",
+      "thumb": 330
+    },
+    "cfb-san-diego-state": {
+      "file": "San Diego State Aztecs logo.svg",
+      "sha256": "fa97f8645e25efed4adb1b037663c89c88e332a0ca848854ab766576596d5c6f",
+      "thumb": 330
+    },
+    "cfb-san-jose-state": {
+      "file": "San Jose State Spartans logo.svg",
+      "sha256": "2085336d4232ec9b59b7f8db6bb26245d6895ec2adb837afb0f723610f125f24",
+      "thumb": 330
+    },
+    "cfb-smu": {
+      "file": "SMU Mustang logo.svg",
+      "sha256": "18238d083c59580cf0b3799c8c05a07225219efff48206b59286b480d5e663f7",
+      "thumb": 330
+    },
+    "cfb-south-alabama": {
+      "file": "South alabama jaguars prim logo.png",
+      "sha256": "41e5cd45f0a8fb04734cc293db86e878218f5a3948875add6fa42c1b62f4bdfd"
+    },
+    "cfb-south-carolina": {
+      "file": "South Carolina Gamecocks logo.svg",
+      "sha256": "fb0b1826d1ae9f34d50df20d582cacbb7f3ad21be54fa5b8b2fe6eda7aafb781",
+      "thumb": 330
+    },
+    "cfb-southern-miss": {
+      "file": "Southern Miss Athletics logo.svg",
+      "sha256": "b88affcc5a5f9f75bb4de78ee6cae7088fc0988b3275e00247e098e318f16c2d",
+      "thumb": 330
+    },
+    "cfb-stanford": {
+      "file": "Stanford Cardinal logo.svg",
+      "sha256": "656401a6d4de410e7c14f20a40178bfc3f5530d5b3987af9072b9a085f7cb011",
+      "thumb": 330
+    },
+    "cfb-syracuse": {
+      "file": "Syracuse Orange logo.svg",
+      "sha256": "d9dbb25144dc986ac22522fd4da20d66b398fcd722ab64168d6f7ac837b9aceb",
+      "thumb": 330
+    },
+    "cfb-tcu": {
+      "file": "TCU Horned Frogs logo.svg",
+      "sha256": "5b3cbe2d37ba092d3890848b8d6415985659f14bfe742470491bfb397e765396",
+      "thumb": 330
+    },
+    "cfb-temple": {
+      "file": "Temple T logo.svg",
+      "sha256": "73cd212badc7b2ebf874843208d800d20c38902547e8add1267b8abe47760654",
+      "thumb": 330
+    },
+    "cfb-tennessee": {
+      "file": "Tennessee Volunteers logo.svg",
+      "sha256": "6e44d7777e6c3d75cb4e7c3ac1d51021d18778b50caac659a6dffd7aefa16847",
+      "thumb": 330
+    },
+    "cfb-texas": {
+      "file": "Texas Longhorns logo.svg",
+      "sha256": "76158ee8044a283893a5e360ac324842375a907efc3b29446cf8c8219ebd3f8f",
+      "thumb": 330
+    },
+    "cfb-texas-am": {
+      "file": "Texas A&M Aggies Primary Logo (2021-Present).png",
+      "sha256": "1cfc6172e1d7d4c9f0b61b012d7f016d06940ad50a7cdb44cdd3baa95695be2a",
+      "thumb": 330
+    },
+    "cfb-texas-state": {
+      "file": "Texas State Bobcats logo.svg",
+      "sha256": "26d132400a915a1097fbc752a55d63c077a4b21be54f3e01bfee1bfb57e442a4",
+      "thumb": 330
+    },
+    "cfb-texas-tech": {
+      "file": "Texas Tech Athletics logo.svg",
+      "sha256": "70db062e074873a902ea91e98ee6df010e09f6d21f6819a536768637a34d6e60",
+      "thumb": 330
+    },
+    "cfb-toledo": {
+      "file": "Toledo Rockets logo.svg",
+      "sha256": "9176b6e71bdc46e43ce51f85719ff484faa9cb06b7036aa0ff1e65ec95bd9d2f",
+      "thumb": 330
+    },
+    "cfb-troy": {
+      "file": "Troy Trojans logo.svg",
+      "sha256": "4dbf454f4e84152410a06ef3145156d94a2924675610961404e49aeaa0713146",
+      "thumb": 330
+    },
+    "cfb-tulane": {
+      "file": "Tulane Green Wave logo.svg",
+      "sha256": "3f1d496853aed7522bea86b5bb45c51ad6397655e797e3a12b1e357ed24b8dbd",
+      "thumb": 330
+    },
+    "cfb-tulsa": {
+      "file": "Tulsa Golden Hurricane logo.svg",
+      "sha256": "b4dcb4fb6b31f84e68b667452eeda356e2fdd7042d26618f21a7de052e9a526f",
+      "thumb": 330
+    },
+    "cfb-uab": {
+      "file": "UAB Blazers primary logo.svg",
+      "sha256": "41634efb620406db6d606a3b05a301201e6b0f7bd25df8048b4fc7dce46ab3b7",
+      "thumb": 330
+    },
+    "cfb-ucf": {
+      "file": "UCF Knights logo.svg",
+      "sha256": "4db766a4a4d30290acb6b742599f0696bbf1dafda1321142d0e646a3e9811471",
+      "thumb": 330
+    },
+    "cfb-ucla": {
+      "file": "UCLA Bruins primary logo.svg",
+      "sha256": "48fcfd1813be18b8983882f465f1061371c97e55cda151da3ac07af2caed08e4",
+      "thumb": 330
+    },
+    "cfb-ul-monroe": {
+      "file": "Louisiana-Monroe Warhawks logo.svg",
+      "sha256": "24dca529baa71fe3d24bc4e0b348dace38afd085c497374ef68ba0e87e4970f3",
+      "thumb": 330
+    },
+    "cfb-umass": {
+      "file": "UMass Amherst athletics logo.svg",
+      "sha256": "ae5b7b763d5016c0e2da1cb4ada9bca20d2bea38d5bfffe7d0608d30a85bfe6b",
+      "thumb": 330
+    },
+    "cfb-unlv": {
+      "file": "UNLV Rebels wordmark.svg",
+      "sha256": "3e2bbe02c2f69603515d877cff3ad92c1e23109234618ca7f27821c0811beceb",
+      "thumb": 330
+    },
+    "cfb-usc": {
+      "file": "USC Trojans logo.svg",
+      "sha256": "5660ad2e709559bfd51075984c1ddce30041984711cf8a6c5a84e01da0e33b39",
+      "thumb": 330
+    },
+    "cfb-usf": {
+      "file": "Official USF Bulls Athletic Logo.png",
+      "sha256": "fe5f86df29ac56446d187754bc34bedd9276bf94a6ee69a9813635b9713b2023",
+      "thumb": 330
+    },
+    "cfb-utah": {
+      "file": "Utah Utes primary logo.svg",
+      "sha256": "0180caaf2a5b0f30212fd774a7749f1046b98bc293e4d27235a5ca8ffba414ee",
+      "thumb": 330
+    },
+    "cfb-utah-state": {
+      "file": "Utah State Aggies logo.svg",
+      "sha256": "1cde5631f5dcb6460e1b8f44c9cb64f2c74072449305372550ae747d5bb2d130",
+      "thumb": 330
+    },
+    "cfb-utep": {
+      "file": "UTEP Miners logo (2026).svg",
+      "sha256": "2bad7d48ee3c4a354522becdd02655ff5f20540d7b5c7b3fd99d004f06fb349b",
+      "thumb": 330
+    },
+    "cfb-utsa": {
+      "file": "UTSA Athletics logo.svg",
+      "sha256": "59fd330d5c91d36f91d94accda6b02d2282c88a102350ef707ce6de983f14f54",
+      "thumb": 330
+    },
+    "cfb-vanderbilt": {
+      "file": "Vanderbilt Athletics logo.svg",
+      "sha256": "6033bac3ee006e4bebb7fa121b272f8e0e3c1e3c6a695da9e978350b0892d7f0",
+      "thumb": 330
+    },
+    "cfb-virginia": {
+      "file": "Virginia Cavaliers logo.svg",
+      "sha256": "1fb39b71b39790635f6e8ffb1a526c7af866184bf8fec02b961cdaea257ff748",
+      "thumb": 330
+    },
+    "cfb-virginia-tech": {
+      "file": "Virginia Tech Hokies logo.svg",
+      "sha256": "741e359ad0362bc243d73971d8e1e168266335d831bd4ea7585bd17a180b2fe7",
+      "thumb": 330
+    },
+    "cfb-wake-forest": {
+      "file": "Wake Forest University Athletic logo.svg",
+      "sha256": "ad7446108a9219ecd235b84189ed3ee881b71b65548da1edb282765449914f22",
+      "thumb": 330
+    },
+    "cfb-washington": {
+      "file": "Washington Huskies logo.svg",
+      "sha256": "f93750c7926c77ddd3ebc72bb50868af4423f7976f127a2f033d694181e2ee40",
+      "thumb": 330
+    },
+    "cfb-washington-state": {
+      "file": "Washington State Cougars logo.svg",
+      "sha256": "69171a84f2ffad2103b2248eba683477403d1fd20bdbff2461bd7798f5f21e17",
+      "thumb": 330
+    },
+    "cfb-west-virginia": {
+      "file": "West Virginia Mountaineers logo.svg",
+      "sha256": "64f734f6bf3787ab9d33fe509f061725a63971a565bf816b809d58c7ff000ea8",
+      "thumb": 330
+    },
+    "cfb-western-kentucky": {
+      "file": "WKU Athletics logo.svg",
+      "sha256": "26f80bf223f7fd73ae19fe7eeabcc09daf07b3b4a3df70f5b36f1e422d23839f",
+      "thumb": 330
+    },
+    "cfb-western-michigan": {
+      "file": "Western Michigan Broncos (2021) logo.svg",
+      "sha256": "34e7e476eadf68df6a4c220c97302fe36b7f917021047de2f5f4f26efcf473ba",
+      "thumb": 330
+    },
+    "cfb-wisconsin": {
+      "file": "Wisconsin Badgers logo.svg",
+      "sha256": "ab9e13f7056afe7fae8c63ecf18123d43576bf9c846071f4bc53056b0ad6b255",
+      "thumb": 330
+    },
+    "cfb-wyoming": {
+      "file": "Wyoming Athletics logo.svg",
+      "sha256": "2a99005629292677059a87bc4d0e0b517335566aff0c1f385dc07f883c6adc40",
+      "thumb": 330
     }
   },
   "twins": {

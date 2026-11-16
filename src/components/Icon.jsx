@@ -33,6 +33,8 @@ const PATHS = {
   hockey: <><path d="M8.5 2.8l5.4 13.1a3 3 0 0 0 2.8 1.9H21" /><ellipse cx="6" cy="18.6" rx="3.2" ry="1.4" /><path d="M2.8 18.6v1.3c0 .8 1.4 1.4 3.2 1.4s3.2-.6 3.2-1.4v-1.3" /></>,
   basketball: <><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3v18M5.8 5.5a10 10 0 0 1 0 13M18.2 5.5a10 10 0 0 0 0 13" /></>,
   'american-football': <><path d="M19.8 4.2c1 5.4-.2 10-3 12.6s-7.2 4-12.6 3c-1-5.4.2-10 3-12.6s7.2-4 12.6-3Z" /><path d="m9 15 6-6M10.5 10.5l3 3M8.5 12.5l3 3M12.5 8.5l3 3" /></>,
+  // A helmet side on, facing right: its shell and stripe, the ear hole and the face mask.
+  'college-football': <g transform="translate(0 1)"><path d="M4.8 17.6C3.3 11 7 4.6 12.8 4.6c3.6 0 6.4 2.1 7.2 5.2l.1 1.9h-6.6l-.7 3.6-3.4 2.6c-1.7.9-3.6.8-4.6-.3Z" /><path d="M13.5 11.7h7M13.1 14.9h6.6M20.5 11.7v3.2M17.3 11.7v3.2" /><circle cx="9.6" cy="12.4" r="1.3" /><path d="M8.4 5.6c2.1 1.7 3.3 3.6 3.6 6.1" /></g>,
   baseball: <><circle cx="12" cy="12" r="9" /><path d="M6.2 5.2a10 10 0 0 1 0 13.6M17.8 5.2a10 10 0 0 0 0 13.6" /><path d="m7.6 8.4 1.7-.8M8.5 11l1.8-.3M8.5 13.2l1.8.3M7.6 15.8l1.7.8M16.4 8.4l-1.7-.8M15.5 11l-1.8-.3M15.5 13.2l-1.8.3M16.4 15.8l-1.7.8" /></>,
   // A racket, its strings crossed, and a ball. Women's tennis plays with the same racket.
   tennis: <><ellipse cx="9.5" cy="9.5" rx="5.2" ry="6.4" transform="rotate(-45 9.5 9.5)" /><path d="M13.2 13.2 20 20M6.6 9.5h5.8M9.5 6.6v5.8" /><circle cx="18.5" cy="5.5" r="2" /></>,
@@ -41,6 +43,8 @@ const PATHS = {
   'rugby-league': <><path d="M7 3v18M17 3v18M7 14h10" /><ellipse cx="12" cy="8" rx="3.6" ry="2.3" transform="rotate(-30 12 8)" /></>,
   // A car side on, nose to the right, and the ball above it.
   'rocket-league': <><path d="M2.5 16v-2.2l4-1.2 3.1-2.4h5l2.8 2.4 3.6.8V16" /><path d="M8.7 16h6.4" /><circle cx="6.8" cy="16.3" r="1.9" /><circle cx="17" cy="16.3" r="1.9" /><circle cx="18.5" cy="5.5" r="2.6" /></>,
+  // A crosshair: its ring, the four lines in to the gap at its centre, and the dot.
+  'counter-strike': <><circle cx="12" cy="12" r="7.5" /><path d="M12 2.5v6M12 15.5v6M2.5 12h6M15.5 12h6" /><circle cx="12" cy="12" r="0.9" /></>,
   folder: <path d="M3 7a1 1 0 0 1 1-1h5l2 2.5h9a1 1 0 0 1 1 1V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z" />,
   upload: <path d="M12 16V5m-4.5 4.5L12 5l4.5 4.5M4 19h16" />,
   download: <path d="M12 5v11m-4.5-4.5L12 16l4.5-4.5M4 19h16" />,
