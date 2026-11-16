@@ -1,12 +1,12 @@
 // Owner: WP-SQUAD (see PLAN.md §4). Formation pitch (C§7, board C1), the basketball half court (C§17, DEC misc), the
 // American football field, the baseball diamond, the hockey rink, the tennis court, the rugby league field, the Rocket
-// League arena and a Counter-Strike map.
+// League arena, a Counter-Strike map, and the Valorant and League of Legends maps.
 import React from 'react';
 import { ESTIMATE_TITLE } from '../../data/estimates.js';
 
 /**
  * `slots`: [{ key, x: '50%', y: '88%', name, fullName, rating, claimed, estimated }] positioned in % of the box.
- * `layout`: 'pitch' | 'court' | 'field' | 'diamond' | 'rink' | 'tennis' | 'rugby' | 'arena' | 'site'. `size`: 'side' (430×330, wide 500×384) | 'large' (Pitch tab) | 'phone'.
+ * `layout`: 'pitch' | 'court' | 'field' | 'diamond' | 'rink' | 'tennis' | 'rugby' | 'arena' | 'site' | 'spike' | 'rift'. `size`: 'side' (430×330, wide 500×384) | 'large' (Pitch tab) | 'phone'.
  */
 export default function SquadPitch({ slots = [], layout = 'pitch', size = 'side', label = 'Formation' }) {
   return (
@@ -68,6 +68,24 @@ export default function SquadPitch({ slots = [], layout = 'pitch', size = 'side'
           <path d="M34 21H66M20.5 34V66H79.5V34M50 66V100M50 34V66" />
           <ellipse cx="20.5" cy="21" rx="3.5" ry="3" />
           <ellipse cx="79.5" cy="21" rx="3.5" ry="3" />
+        </svg>
+      ) : layout === 'spike' ? (
+        // A Valorant map from above, attacked from the foot: the attackers' spawn, a lane to each of the spike's two sites at
+        // the top and one through the middle, joined near the spawn. Drawn for the game, not any real map; it stretches
+        // with the box.
+        <svg className="pitch__spike" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <path d="M8 8H36V32H8ZM64 8H92V32H64ZM38 82H62V96H38Z" />
+          <path d="M22 32V64H78V32M50 18V82" />
+        </svg>
+      ) : layout === 'rift' ? (
+        // A battle arena's map from above: the bases in the bottom-left and top-right corners, the top lane up the left
+        // edge and along the top, the bottom lane along the foot and up the right edge, the middle lane on the diagonal
+        // and the river across it. Drawn for the game; it stretches with the box.
+        <svg className="pitch__rift" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <path d="M8 92V8H92M8 92H92V8M8 92 92 8" />
+          <path className="pitch__rift-river" d="M8 8 92 92" />
+          <circle cx="8" cy="92" r="5" />
+          <circle cx="92" cy="8" r="5" />
         </svg>
       ) : layout === 'rink' ? (
         // One end of the rink: the goal line and crease at the foot, the blue line and the centre line and circle

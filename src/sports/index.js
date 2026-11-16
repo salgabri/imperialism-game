@@ -14,12 +14,14 @@ import { womensTennis } from './womensTennis.js';
 import { rugbyLeague } from './rugbyLeague.js';
 import { rocketLeague } from './rocketLeague.js';
 import { counterStrike } from './counterStrike.js';
+import { valorant } from './valorant.js';
+import { leagueOfLegends } from './leagueOfLegends.js';
 
 export const SPORTS = { football, 'womens-football': womensFootball, basketball, 'american-football': americanFootball,
   'college-football': collegeFootball, baseball, hockey, tennis, 'womens-tennis': womensTennis, 'rugby-league': rugbyLeague,
-  'rocket-league': rocketLeague, 'counter-strike': counterStrike };
+  'rocket-league': rocketLeague, 'counter-strike': counterStrike, valorant, 'league-of-legends': leagueOfLegends };
 export const SPORT_LIST = [football, womensFootball, basketball, americanFootball, collegeFootball, baseball, hockey, tennis, womensTennis,
-  rugbyLeague, rocketLeague, counterStrike];
+  rugbyLeague, rocketLeague, counterStrike, valorant, leagueOfLegends];
 export const DEFAULT_SPORT = 'football';
 
 export const getSport = id => SPORTS[id] || SPORTS[DEFAULT_SPORT];

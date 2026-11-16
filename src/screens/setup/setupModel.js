@@ -423,6 +423,12 @@ export const SEASON_NOTES = Object.freeze({
     + 'November 2026, map by map. A player plays for the nation he last played for at a national-team event (the Esports '
     + 'Nations Cup, WESG, the IESF\'s world championships), else the country of his Liquipedia page, and only if he has '
     + 'played within the year. Each nation fields its best five; one with fewer fields no team.',
+  valorant: 'Elo ratings computed from every map vlr.gg records of VCT, Challengers and the off-season, from 2023 to '
+    + 'November 2026. A player plays for the nation he last played for at the Esports Nations Cup, else the flag vlr.gg files '
+    + 'him under, and only if he has played within the year. Each nation fields its best five; one with fewer fields no team.',
+  'league-of-legends': 'Elo ratings computed from every game gol.gg records of the leagues and international events, from July '
+    + '2025 to November 2026. A player plays for the country gol.gg files him under, in the role he plays most, and only if he '
+    + 'has played within the year. Each nation fields its best player in each role; one with fewer than five fields no team.',
   tennis: 'Elo ratings of the ATP\'s men: Tennis Abstract\'s own as of 2 November 2026 and at the end of 2016–2025; before '
     + '2016 computed from Jeff Sackmann\'s match results by its method (1960–1979 rough; before 1968 the amateurs\' majors and '
     + 'Davis Cup only). Each nation names its five best; '
@@ -615,6 +621,8 @@ export const SPORT_NOTES = Object.freeze({
   'rugby-league': 'Nations · 17 NRL clubs',
   'rocket-league': 'Nations',
   'counter-strike': 'Nations',
+  valorant: 'Nations',
+  'league-of-legends': 'Nations',
 });
 
 /**

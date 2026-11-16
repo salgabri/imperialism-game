@@ -71,6 +71,8 @@ const SCENARIOS = [
   { name: 'ROCKET LEAGUE · Europe · duel · ticker', sport: 'rocket-league', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
   { name: 'COUNTER-STRIKE · World · blitz · instant', sport: 'counter-strike', scope: 'world', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · FBS · duel · ticker', ...FBS, pacing: 'duel', resolution: 'ticker' },
+  { name: 'VALORANT · Europe · duel · ticker', sport: 'valorant', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
+  { name: 'LEAGUE OF LEGENDS · World · blitz · instant', sport: 'league-of-legends', scope: 'world', pacing: 'blitz', resolution: 'instant' },
 ];
 
 const RESUME_SCENARIOS = [
@@ -105,8 +107,8 @@ const MANAGER_SCENARIOS = [
 // (England blitz), `=9` (Fiji duel) and `--resume-only=4` (England), `=5` (Fiji); the NFL's are `=10` and `=6`, MLB's `=11` and `=7`,
 // baseball's nations `=12`, the NHL's `=13`, hockey's nations `=14`, the women's nations `=15` and clubs `=16`, tennis's Davis Cup nations
 // `=17`, the NRL's `=18` and rugby league's nations `=19` (counted before Europe's two club maps came in at `=5` and `=6`: add two
-// to each), Rocket League's nations `=25`, Counter-Strike's `=26`, and college football's FBS schools the last, `=27` and
-// `--resume-only=9`.
+// to each), Rocket League's nations `=25`, Counter-Strike's `=26`, college football's FBS schools `=27` and
+// `--resume-only=9`, Valorant's nations `=28` and League of Legends' the last, `=29`.
 // `--scenarios=<text>` composes with
 // these: it narrows whatever they leave.
 function onlyIndex(name, list) {
@@ -680,8 +682,11 @@ if (!filtered && fixedChecks) {
     'rugby-league': ['Australia', 'New Zealand', 'England', 'Fiji'],
     // Rocket League's, by the Liquipedia snapshot's Elo: the United States, France, Saudi Arabia and Brazil lead it.
     'rocket-league': ['United States', 'France', 'Saudi Arabia', 'Brazil'],
-    // Counter-Strike's, by its Liquipedia snapshot's Elo.
-    'counter-strike': ['Russia', 'Ukraine', 'Brazil', 'France'] };
+    // Counter-Strike's, by its Liquipedia snapshot's Elo; Valorant's and League of Legends', by the vlr.gg and gol.gg snapshots':
+    // Turkey, Canada and South Korea lead Valorant, South Korea and China League of Legends, the United States third.
+    'counter-strike': ['Russia', 'Ukraine', 'Brazil', 'France'],
+    valorant: ['Turkey', 'Canada', 'South Korea'],
+    'league-of-legends': ['South Korea', 'China', 'United States'] };
 
   for (const sport of SPORT_LIST) {
     // A sport with clubs only (American football) fields no nations: its clubs are checked below.
@@ -710,8 +715,9 @@ if (!filtered && fixedChecks) {
       // Tennis invents nobody either: a nation needs two rated players, and a team of two or three plays its singles
       // players in the doubles too.
       // Rocket League invents nobody: a nation needs three rated players and fields its best three of up to five; Counter-
-      // Strike's needs five and fields its best five of up to seven.
-      const esportLineup = { 'rocket-league': 3, 'counter-strike': 5 }[sport.id];
+      // Strike's and Valorant's need five and field their best five of up to seven, and League of Legends' five (one may
+      // play out of his role).
+      const esportLineup = { 'rocket-league': 3, 'counter-strike': 5, valorant: 5, 'league-of-legends': 5 }[sport.id];
       const fielded = sport.id === 'womens-football' ? teams.filter(t => t.real >= size)
         : isTennisSport(sport.id) ? teams.filter(t => t.real >= 2) : esportLineup ? teams.filter(t => t.real >= esportLineup) : teams;
       const full = t => (isTennisSport(sport.id) || esportLineup ? lineupOf(t).slots.every(slot => slot.player)
@@ -827,8 +833,9 @@ if (!filtered && fixedChecks) {
         tennis: [1.5, 2.5], 'womens-tennis': [1.5, 2.5], 'rugby-league': [12, 35],
         // Games: the winner's four and the loser's none to three.
         'rocket-league': [2, 3.5],
-        // Maps: the winner's two and the loser's none or one.
-        'counter-strike': [1, 1.5] }[sport.id];
+        // Maps: the winner's two and the loser's none or one; League of Legends' games: the winner's three and the loser's
+        // none to two.
+        'counter-strike': [1, 1.5], valorant: [1, 1.5], 'league-of-legends': [1.5, 2.5] }[sport.id];
       check('scoring is in the right range for the sport', mean > low && mean < high, `mean ${mean.toFixed(1)}`);
       console.log(`    400 matches · mean score ${mean.toFixed(1)} · ${results.filter(r => r.tie).length} needed ${sport.labels.tie.toLowerCase()}`);
     } catch (e) {

@@ -210,12 +210,41 @@ test('Counter-Strike: rounds a map and overtime as in the real CS2 maps Liquiped
   assert.ok(cs.favourite.wins > 0.55, `the stronger nation wins most series: ${cs.favourite.wins}`);
 });
 
+test('Valorant: rounds a map and overtime as in the real maps vlr.gg records', t => {
+  const va = report.valorant, real = REAL.valorant;
+  if (!va || !real) {
+    t.skip('no vlr.gg snapshot yet (npm run sync:valorant)');
+    return;
+  }
+  within(va.roundsPerMap, real.roundsPerMap, 'rounds a map');
+  within(va.overtime, real.overtime, 'maps to overtime');
+  assert.ok(va.favourite.wins > 0.55, `the stronger nation wins most series: ${va.favourite.wins}`);
+});
+
+test('League of Legends: a game\'s length, kills and Barons as in the real games gol.gg records', t => {
+  const lol = report.leagueOfLegends, real = REAL.leagueOfLegends;
+  if (!lol || !real) {
+    t.skip('no gol.gg snapshot yet (npm run sync:league-of-legends)');
+    return;
+  }
+  within(lol.minutes, real.minutes, 'minutes a game');
+  within(lol.winnerKills, real.winnerKills, 'the winner\'s kills');
+  within(lol.loserKills, real.loserKills, 'the loser\'s kills');
+  within(lol.winnerBaron, real.winnerBaron, 'the winner took a Baron');
+  within(lol.loserBaron, real.loserBaron, 'the loser took a Baron');
+  assert.ok(lol.favourite.wins > 0.55, `the stronger nation wins most series: ${lol.favourite.wins}`);
+});
+
 test('home sides: half the decided games at a neutral venue, their league\'s share with Home advantage on', () => {
-  for (const [label, share] of [['NBA', report.nba.homeWins], ['EuroLeague', report.euroleague.homeWins], ['NFL', report.nfl.homeWins], ['MLB', report.mlb.homeWins], ['NHL', report.nhl.homeWins],
+  for (const [label, share, n] of [['NBA', report.nba.homeWins], ['EuroLeague', report.euroleague.homeWins], ['NFL', report.nfl.homeWins], ['MLB', report.mlb.homeWins], ['NHL', report.nhl.homeWins],
     ['Davis Cup', report.davisCup.homeWins], ['Billie Jean King Cup', report.billieJeanKingCup.homeWins], ['NRL', report.nrl.homeWins],
-    ...(report.rocketLeague ? [['Rocket League', report.rocketLeague.homeWins]] : []),
-    ...(report.counterStrike ? [['Counter-Strike', report.counterStrike.homeWins]] : [])]) {
-    assert.ok(Math.abs(share - 0.5) < 0.015, `${label} neutral: the defender won ${share}`);
+    ...(report.rocketLeague ? [['Rocket League', report.rocketLeague.homeWins, report.rocketLeague.series]] : []),
+    ...(report.counterStrike ? [['Counter-Strike', report.counterStrike.homeWins, report.counterStrike.series]] : []),
+    ...(report.valorant ? [['Valorant', report.valorant.homeWins, report.valorant.series]] : []),
+    ...(report.leagueOfLegends ? [['League of Legends', report.leagueOfLegends.homeWins, report.leagueOfLegends.series]] : [])]) {
+    // An esport's season is a few thousand series: three standard errors of their count, at least the leagues' 0.015.
+    const band = series => Math.max(0.015, 3 * Math.sqrt(0.25 / series));
+    assert.ok(Math.abs(share - 0.5) < band(n ?? Infinity), `${label} neutral: the defender won ${share}`);
   }
   for (const league of report.football) {
     assert.ok(Math.abs(league.homeWins - (1 - league.drawRate) / 2) < 0.02, `${league.league} neutral: ${league.homeWins}`);
@@ -234,4 +263,5 @@ test('home sides: half the decided games at a neutral venue, their league\'s sha
   within(home.billieJeanKingCup.homeWins, REAL.billieJeanKingCup.homeWins, 'Billie Jean King Cup host wins');
   within(home.nrl.homeWins, REAL.nrl.homeWins, 'NRL home wins');
   if (home.rocketLeague && REAL.rocketLeague?.homeWins) within(home.rocketLeague.homeWins, REAL.rocketLeague.homeWins, 'Rocket League home wins');
+  if (home.valorant && REAL.valorant?.homeWins) within(home.valorant.homeWins, REAL.valorant.homeWins, 'Valorant host wins at a LAN');
 });
