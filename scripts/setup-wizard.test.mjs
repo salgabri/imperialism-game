@@ -645,18 +645,19 @@ test('setup.css keeps the reviewed token and hit-target rules', () => {
   assert.match(narrow, /^\s*\.setup-foot \.setup-foot__back \{ padding:0 14px; \}\s*\.setup-foot \.setup-foot__next \{ padding:0 12px; \}\s*\.setup-theatre \{ padding:0 8px; \}\s*\}/);
 });
 
-test('ten sports sit in three rows of four, compact tiles that stay 44px targets, and step 1\'s heading gives way at 360×640', t => {
+test('twelve sports sit in three rows of four, compact tiles that stay 44px targets, and step 1\'s heading gives way at 360×640', t => {
   const sink = consoleSink(t);
   t.after(() => sink.release());
   const markup = renderToStaticMarkup(React.createElement(SetupOverlay, { setup: { ...BASE, sport: 'womens-tennis' }, managerTeams: TEAMS,
     hasSave: true, savedText: 'Round 4 · 20 nations remaining · Europe', onResume() {}, onCancel() {} }));
   const grid = new JSDOM(markup).window.document.querySelector('.setup-sports');
-  assert.equal(grid.children.length, 10);
+  assert.equal(grid.children.length, 12);
   assert.equal(grid.getAttribute('data-rows'), '3');
   assert.match(grid.getAttribute('style'), /--sport-cols:\s*4/, 'five across would squeeze "Basketball" out of its tile');
   assert.equal(grid.getAttribute('data-cols'), '4');
-  assert.deepEqual([...grid.querySelectorAll('.setup-card__button')].map(button => button.textContent).slice(6, 10),
-    ['Tennis', 'Women\'s tennis', 'Rugby league', 'Rocket League']);
+  assert.deepEqual([...grid.querySelectorAll('.setup-card__button')].map(button => button.textContent).slice(3, 12),
+    ['American football', 'College football', 'Baseball', 'Ice hockey', 'Tennis', 'Women\'s tennis', 'Rugby league', 'Rocket League',
+      'Counter-Strike']);
   const css = readFileSync(new URL('../src/components/setup.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   assert.match(css, /\.setup-sports\[data-rows="3"\] \.setup-card \{ min-height:44px;/);
   // Four across on a phone, the long names take two lines: a smaller icon and snug lines keep 390×664 from scrolling

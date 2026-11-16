@@ -457,7 +457,7 @@ export const OUT_OF_POSITION_PENALTY = 12;
 // field, and a starter in the bullpen (or a reliever starting) is out of his role. A hockey forward moves between the
 // lines' three places with little trouble: the NHL lists one position for players who play all three. So does a rugby
 // league back between the outside places, or a forward round the pack (RUGBY_UNIT below).
-const PENALTY_OF = { 'american-football': 25, baseball: 20, hockey: 4, 'rugby-league': 4 };
+const PENALTY_OF = { 'american-football': 25, 'college-football': 25, baseball: 20, hockey: 4, 'rugby-league': 4 };
 /** Rating points a starter loses outside his natural positions, in a sport ('football', 'basketball', …). */
 export const outOfPositionPenalty = sportId => PENALTY_OF[sportId] ?? OUT_OF_POSITION_PENALTY;
 // A baseball hitter on the mound, or a pitcher in the field or at the plate, is no rotation at all. Nor is a hockey
@@ -482,20 +482,26 @@ export const RUGBY_CROSSING_PENALTY = 15;
 export const TENNIS_SPORTS = Object.freeze(['tennis', 'womens-tennis']);
 /** Whether a sport id plays tennis's lineup, squad and match views: the men's game or the women's. */
 export const isTennisSport = sportId => TENNIS_SPORTS.includes(sportId);
-// Football's rule, in both of its games, tennis's, in both of its, and Rocket League's: a team fields only the players its
+/** The sports played by American football's rules and lineup: the NFL's, and college football's (src/sports/collegeFootball.js). */
+export const GRIDIRON_SPORTS = Object.freeze(['american-football', 'college-football']);
+/** Whether a sport id plays American football's lineup, squad and match views: the NFL's game or the college game. */
+export const isGridironSport = sportId => GRIDIRON_SPORTS.includes(sportId);
+// Football's rule, in both of its games, tennis's, in both of its, and the esports': a team fields only the players its
 // source rates.
-const REAL_PLAYERS_ONLY = new Set(['football', 'womens-football', ...TENNIS_SPORTS, 'rocket-league']);
+const REAL_PLAYERS_ONLY = new Set(['football', 'womens-football', ...TENNIS_SPORTS, 'rocket-league', 'counter-strike']);
 const FOOTBALL_PLAN = ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'FW', 'FW'];
 const TENNIS_PLAN = ['SGL', 'SGL', 'DBL', 'DBL'];
+// Eleven on offence (three receivers), eleven on defence (the nickel) and the kicker: the NFL's and college football's.
+const GRIDIRON_PLAN = ['QB', 'RB', 'WR', 'WR', 'WR', 'TE', 'OL', 'OL', 'OL', 'OL', 'OL',
+  'DL', 'DL', 'DL', 'DL', 'LB', 'LB', 'CB', 'CB', 'CB', 'S', 'S', 'K'];
 const LINEUP_PLANS = {
   football: FOOTBALL_PLAN,
   'womens-football': FOOTBALL_PLAN,
   // Four forward lines, three defence pairs and the goalie.
   hockey: ['C', 'C', 'C', 'C', 'LW', 'LW', 'LW', 'LW', 'RW', 'RW', 'RW', 'RW', 'D', 'D', 'D', 'D', 'D', 'D', 'G'],
   basketball: ['PG', 'SG', 'SF', 'PF', 'C'],
-  // Eleven on offence (three receivers), eleven on defence (the nickel) and the kicker.
-  'american-football': ['QB', 'RB', 'WR', 'WR', 'WR', 'TE', 'OL', 'OL', 'OL', 'OL', 'OL',
-    'DL', 'DL', 'DL', 'DL', 'LB', 'LB', 'CB', 'CB', 'CB', 'S', 'S', 'K'],
+  'american-football': GRIDIRON_PLAN,
+  'college-football': GRIDIRON_PLAN,
   // The batting order's nine (a designated hitter, no pitcher at the plate), the day's starter and three relievers.
   baseball: ['C', '1B', '2B', '3B', 'SS', 'LF', 'CF', 'RF', 'DH', 'SP', 'RP', 'RP', 'RP'],
   // A Davis Cup team (a Billie Jean King Cup team in the women's game): its No. 1 and No. 2 in the singles, and a doubles
@@ -507,6 +513,8 @@ const LINEUP_PLANS = {
   'rugby-league': ['FB', 'WG', 'WG', 'CE', 'CE', 'FE', 'HB', 'PR', 'HK', 'PR', 'SR', 'SR', 'LK', 'HK', 'PR', 'PR', 'LK'],
   // Rocket League's three, who rotate through every place on the field: no positions, so nobody is ever out of one.
   'rocket-league': ['PLR', 'PLR', 'PLR'],
+  // Counter-Strike's five, each of whom plays every role a round asks of him: no positions either.
+  'counter-strike': ['PLR', 'PLR', 'PLR', 'PLR', 'PLR'],
 };
 const TENNIS_POSITIONS = new Set(TENNIS_PLAN);
 // What each lineup place weighs in a tennis team's strength: the No. 1 and the No. 2 each play two of the five rubbers,

@@ -1,16 +1,16 @@
-// Liquipedia's Rocket League wiki, read from an export saved by hand. No I/O, and nothing here or in the sync fetches:
-// Liquipedia's robots.txt shuts Anthropic's crawlers out of the whole site (ClaudeBot, Claude-Web: "Disallow: /") and
-// every bot out of api.php and index.php, and api.liquipedia.net's shuts out every bot, so the project's fetcher
-// (scripts/lib/polite-fetch.mjs) refuses all of it. Instead someone saves the pages with the wiki's own Special:Export
-// in their browser ("Save as file", the current revision only) into data-src/liquipedia/, and the sync reads that file
-// (docs/design/rocket-league.md, "The Liquipedia export").
+// Liquipedia's wikis (Rocket League's, Counter-Strike's), read from an export saved by hand. No I/O, and nothing here or in
+// the syncs fetches: Liquipedia's robots.txt shuts Anthropic's crawlers out of the whole site (ClaudeBot, Claude-Web:
+// "Disallow: /") and every bot out of api.php and index.php, and api.liquipedia.net's shuts out every bot, so the
+// project's fetcher (scripts/lib/polite-fetch.mjs) refuses all of it. Instead someone saves the pages with the wiki's own
+// Special:Export in their browser ("Save as file", the current revision only) into data-src/, and the sync reads that
+// file (docs/design/rocket-league.md, "The Liquipedia export"; docs/design/counter-strike.md).
 //
 // What it reads, from each page's wikitext:
 //   - the tournament (`Infobox league`): its name, tier, mode (3v3, 2v2, 1v1), dates, region and kind;
 //   - its teams (`TeamCard`, or any template that names a team and numbered players `p1`, `p2`…): each player's name,
 //     the page it links to and the flag it is filed under;
-//   - its series (Match2's `Match` in brackets and match lists): the two teams, each game's goals, overtime, the
-//     winner, the date and the format (`bestof`).
+//   - its series (Match2's `Match` in brackets and match lists): the two teams, each game (`gameOf`, Rocket League's
+//     goals and overtime; another wiki passes its own reader), the winner, the date and the format (`bestof`).
 // Liquipedia's content is CC BY-SA 3.0: the game credits it wherever these ratings show (README, the setup's sources).
 
 const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
@@ -212,40 +212,64 @@ export const REGIONS = Object.freeze({
   APAC: ['asia-pacific', 'asia pacific', 'apac', 'asia', 'apac north', 'apac south'],
   SSA: ['sub-saharan africa', 'ssa', 'africa'],
 });
-const REGION_OF = new Map(Object.entries(REGIONS).flatMap(([key, names]) => names.map(name => [name, key])));
+const regionTables = new WeakMap();
+/** A table of regions (key → the names pages give it) as a lookup by name, built once per table. */
+function regionLookup(regions) {
+  let lookup = regionTables.get(regions);
+  if (!lookup) {
+    lookup = new Map(Object.entries(regions).flatMap(([key, names]) => names.map(name => [name, key])));
+    regionTables.set(regions, lookup);
+  }
+  return lookup;
+}
 
 /**
  * A tournament's region: its infobox's `region`, else the region its title names ("…/2026/Europe/Open 1"), else null
- * (an international event: a major, the world championship, the Esports World Cup).
+ * (an international event: a major, the world championship, the Esports World Cup). `regions`: the wiki's (REGIONS,
+ * the RLCS's, by default).
  */
-export function regionOf(infobox, title) {
-  const named = REGION_OF.get(plainText(infobox?.region ?? '').toLowerCase());
+export function regionOf(infobox, title, regions = REGIONS) {
+  const lookup = regionLookup(regions);
+  const named = lookup.get(plainText(infobox?.region ?? '').toLowerCase());
   if (named) return named;
   for (const segment of normalTitle(title).split('/')) {
-    const key = REGION_OF.get(segment.toLowerCase());
+    const key = lookup.get(segment.toLowerCase());
     if (key) return key;
   }
   return null;
 }
 
+/** A page's `Infobox league`, as parseTemplates gives it, or null. */
+export const infoboxOf = page => parseTemplates(stripNoise(page.text)).find(template => template.key === 'infobox league') ?? null;
+
+// The tiers by the names some wikis write (Counter-Strike's "S-Tier"; Liquipedia's Module:Tier/Data), as the number
+// others write (Rocket League's 1).
+const TIER_NAMES = Object.freeze({ 's-tier': 1, s: 1, 'a-tier': 2, a: 2, 'b-tier': 3, b: 3, 'c-tier': 4, c: 4 });
+/** An infobox's `liquipediatier`: 1 (S-Tier) to 4 (C-Tier), whether written as a number or a name, else null. */
+export function tierOf(value) {
+  const text = plainText(value).toLowerCase();
+  const number = Number(text);
+  return text && Number.isInteger(number) && number > 0 ? number : TIER_NAMES[text] ?? null;
+}
+
 /**
  * The tournament an `Infobox league` describes → { name, tier, tierType, mode, start, end, region, type, country, city,
- * series }, or null for a page without one. `tier`: Liquipedia's `liquipediatier`, 1 (S-Tier) to 4 (C-Tier), or null;
- * `type` "Offline" for a LAN, held in `country` (as the infobox writes it: a name or a flag code).
+ * series }, or null for a page without one. `tier`: Liquipedia's `liquipediatier` (tierOf), 1 (S-Tier) to 4 (C-Tier), or null;
+ * `type` "Offline" for a LAN, held in `country` (as the infobox writes it: a name or a flag code). `mode`: the infobox's,
+ * else the wiki's own (`mode`, the RLCS's 3v3 by default); `regions`: the wiki's (regionOf).
  */
-export function tournamentOf(page) {
-  const infobox = parseTemplates(stripNoise(page.text)).find(template => template.key === 'infobox league');
+export function tournamentOf(page, { mode = '3v3', regions = REGIONS } = {}) {
+  const infobox = infoboxOf(page);
   if (!infobox) return null;
   const p = infobox.params;
-  const tier = Number(plainText(p.liquipediatier));
   return {
     name: plainText(p.name) || normalTitle(page.title),
-    tier: Number.isInteger(tier) && tier > 0 ? tier : null,
+    tier: tierOf(p.liquipediatier),
     tierType: plainText(p.liquipediatiertype) || null,
-    mode: (plainText(p.mode) || '3v3').toLowerCase(),
+    mode: (plainText(p.mode) || mode).toLowerCase(),
     start: wikiDate(p.sdate ?? p.date),
     end: wikiDate(p.edate ?? p.date ?? p.sdate),
-    region: regionOf(p, page.title),
+    region: regionOf(p, page.title, regions),
     type: plainText(p.type) || null,
     country: plainText(p.country) || null,
     city: plainText(p.city) || null,
@@ -271,7 +295,8 @@ export function teamKeys(name) {
 // 2026-11-14 at github.com/Liquipedia/Lua-Modules): `p1` to `p3` start; `sub1` to `sub3` stand in for an empty starter's
 // place; `sub4` to `sub12` are substitutes whose flag and link are `p4flag`, `p4link` and so on; `sN` are substitutes
 // too; `ex`, `ex2`… are former players and `c`, `c2`… coaches, neither of whom plays. A flag is `pNflag_o` (an override)
-// before `pNflag`; with neither, the wiki reads the player's own page, as the sync does (personOf).
+// before `pNflag`; with neither, the wiki reads the player's own page, as the sync does (personOf). Counter-Strike's
+// cards are the same with five places (`starters`).
 const STARTERS = 3;
 const MAX_PLACE = 12;
 const BLANK = /^(?:tbd|tba|-+)$/i;
@@ -294,18 +319,18 @@ function cardPlayer(p, place, sides = place) {
 }
 
 /**
- * A legacy team card's players in order: its three places (a stand-in in an empty one counts as playing there), any
- * further `pN`, then its substitutes (`sub`); none who left (`pNleave`).
+ * A legacy team card's players in order: its `starters` places (a stand-in in an empty one counts as playing there),
+ * any further `pN`, then its substitutes (`sub`); none who left (`pNleave`).
  */
-function cardPlayers(p) {
+function cardPlayers(p, starters = STARTERS) {
   const players = [];
   for (let n = 1; n <= MAX_PLACE; n++) {
     if (truthy(p[`p${n}leave`])) continue;
-    const player = cardPlayer(p, `p${n}`) ?? (n <= STARTERS ? cardPlayer(p, `sub${n}`, `p${n}`) : null);
-    if (player) players.push({ ...player, sub: n > STARTERS });
+    const player = cardPlayer(p, `p${n}`) ?? (n <= starters ? cardPlayer(p, `sub${n}`, `p${n}`) : null);
+    if (player) players.push({ ...player, sub: n > starters });
   }
   for (let n = 1; n <= MAX_PLACE; n++) {
-    const sub = (n > STARTERS ? cardPlayer(p, `sub${n}`, `p${n}`) : null) ?? cardPlayer(p, `s${n}`);
+    const sub = (n > starters ? cardPlayer(p, `sub${n}`, `p${n}`) : null) ?? cardPlayer(p, `s${n}`);
     if (sub) players.push({ ...sub, sub: true });
   }
   return players;
@@ -325,16 +350,17 @@ function personPlayers(value) {
 
 /**
  * The teams a page lists → [{ team, keys, players: [{ name, link, flag, sub, dnp? }] }]: each legacy `TeamCard` (a
- * `team` and numbered players: cardPlayers) and each TeamParticipants participant (`{{Opponent|<team>|players=…}}`).
+ * `team` and numbered players: cardPlayers, `starters` of them in the team's places) and each TeamParticipants
+ * participant (`{{Opponent|<team>|players=…}}`).
  */
-export function rostersOf(text) {
+export function rostersOf(text, { starters = STARTERS } = {}) {
   const rosters = [];
   for (const template of allTemplates(text)) {
     const p = template.params;
     let team = null, players = [];
     if (p.team && Object.keys(p).some(key => /^(?:p|s|sub)\d+$/.test(key))) {
       team = p.team;
-      players = cardPlayers(p);
+      players = cardPlayers(p, starters);
     } else if (p.players && (template.positional[0] || p.template || p.team)) {
       team = template.positional[0] || p.template || p.team;
       players = personPlayers(p.players);
@@ -388,10 +414,12 @@ export function gameOf(value) {
 
 /**
  * Every series a page plays (Match2's `{{Match}}`) → [{ opponents: [a, b], games, winner, bestOf, date, walkover }]:
- * `games` each game played, in order; `winner` 1 or 2 (the games' or the match's own `winner`); `walkover` true for a
- * forfeit, whose games are none. A series with an opponent still to be decided, or neither games nor a result, is left out.
+ * `games` each game played, in order, as the wiki's reader gives it (`readGame`: gameOf, Rocket League's, by default;
+ * it gives a `winner`, 1 or 2, or null for a game not played); `winner` 1 or 2 (the games' or the match's own
+ * `winner`); `walkover` true for a forfeit, whose games are none. A series with an opponent still to be decided, or
+ * neither games nor a result, is left out.
  */
-export function seriesOf(text) {
+export function seriesOf(text, { gameOf: readGame = gameOf } = {}) {
   const out = [];
   for (const template of allTemplates(text)) {
     if (template.key !== 'match') continue;
@@ -402,7 +430,7 @@ export function seriesOf(text) {
     for (let k = 1; k <= 15; k++) {
       const game = p[`map${k}`] ?? p[`game${k}`];
       if (game == null) continue;
-      const played = gameOf(game);
+      const played = readGame(game);
       if (played) games.push(played);
     }
     const won = side => games.filter(game => game.winner === side).length;

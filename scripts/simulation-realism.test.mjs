@@ -199,10 +199,22 @@ test('Rocket League: goals a game and overtime as in the real games Liquipedia r
   assert.ok(rl.favourite.wins > 0.55, `the stronger nation wins most series: ${rl.favourite.wins}`);
 });
 
+test('Counter-Strike: rounds a map and overtime as in the real CS2 maps Liquipedia records', t => {
+  const cs = report.counterStrike, real = REAL.counterStrike;
+  if (!cs || !real) {
+    t.skip('no Liquipedia snapshot yet (npm run sync:counter-strike)');
+    return;
+  }
+  within(cs.roundsPerMap, real.roundsPerMap, 'rounds a map');
+  within(cs.overtime, real.overtime, 'maps to overtime');
+  assert.ok(cs.favourite.wins > 0.55, `the stronger nation wins most series: ${cs.favourite.wins}`);
+});
+
 test('home sides: half the decided games at a neutral venue, their league\'s share with Home advantage on', () => {
   for (const [label, share] of [['NBA', report.nba.homeWins], ['EuroLeague', report.euroleague.homeWins], ['NFL', report.nfl.homeWins], ['MLB', report.mlb.homeWins], ['NHL', report.nhl.homeWins],
     ['Davis Cup', report.davisCup.homeWins], ['Billie Jean King Cup', report.billieJeanKingCup.homeWins], ['NRL', report.nrl.homeWins],
-    ...(report.rocketLeague ? [['Rocket League', report.rocketLeague.homeWins]] : [])]) {
+    ...(report.rocketLeague ? [['Rocket League', report.rocketLeague.homeWins]] : []),
+    ...(report.counterStrike ? [['Counter-Strike', report.counterStrike.homeWins]] : [])]) {
     assert.ok(Math.abs(share - 0.5) < 0.015, `${label} neutral: the defender won ${share}`);
   }
   for (const league of report.football) {

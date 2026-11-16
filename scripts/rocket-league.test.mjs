@@ -436,7 +436,7 @@ test('the live chart\'s game chances are the model\'s: a series of games played 
 // ---------- the sport among the others ----------
 
 test('Rocket League is the tenth sport, nations only, Great Britain as one, a tile of its own', () => {
-  assert.equal(SPORT_LIST.at(-1), sport);
+  assert.equal(SPORT_LIST[10], sport, 'after the ten other sports, college football among them');
   assert.equal(sport.id, 'rocket-league');
   assert.equal(sport.nationsOnly, true);
   assert.deepEqual(sport.clubs, []);

@@ -36,6 +36,7 @@ import { hockey, PERIOD_MODEL } from '../src/sports/hockey.js';
 import { tennis } from '../src/sports/tennis.js';
 import { womensTennis } from '../src/sports/womensTennis.js';
 import { gameOdds, rocketLeague, TO_WIN } from '../src/sports/rocketLeague.js';
+import { counterStrike } from '../src/sports/counterStrike.js';
 import { decodeFootballSet, seasonSport } from '../src/engine/footballSets.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { onField, rugbyLeague, scoreKind, SLICE_MODEL } from '../src/sports/rugbyLeague.js';
@@ -621,6 +622,68 @@ function rocketLeagueReal() {
   };
 }
 
+// ---- Counter-Strike (best-of-three series of maps) -----------------------------------------------------------------
+
+/** The field: the sixteen strongest nations of Counter-Strike, a Major's worth. */
+export function csField(count = 16) {
+  const rng = makeRng(1);
+  return Object.keys(counterStrike.rosters).map(id => buildTeam(id, rng, counterStrike)).sort((a, b) => b.str - a.str).slice(0, count);
+}
+
+/**
+ * The field's series, each meeting every other twice a season, once at each end: the maps' rounds, overtimes and the
+ * loser's rounds, the series' scores.
+ */
+function csMajor(seasons, seed, venue) {
+  const nations = csField(16);
+  if (nations.length < 4) return null;
+  const { played } = playSeasons({ sport: counterStrike, teams: nations, games: 2 * (nations.length - 1), seasons, seed, venue });
+  const ends = played.flatMap(g => g.ev.filter(e => e.pts > 0));
+  const rounds = played.reduce((sum, g) => sum + g.ev.filter(e => !(e.pts > 0)).length, 0);
+  const loserOf = e => Number(String(e.score).split('–')[1]);
+  const regulation = ends.filter(e => !e.ot);
+  const score = (w, l) => share(played, g => Math.max(g.ga, g.gd) === w && Math.min(g.ga, g.gd) === l);
+  return {
+    nations: nations.length, series: played.length, maps: ends.length,
+    roundsPerMap: rounds / Math.max(1, ends.length),
+    overtime: share(ends, e => !!e.ot),
+    lopsided: share(regulation, e => loserOf(e) <= 5), close: share(regulation, e => loserOf(e) >= 10),
+    sweep: score(2, 0), twoOne: score(2, 1),
+    favourite: favouriteRecord(played),
+    homeWins: share(played, g => g.winner === g.j),
+  };
+}
+
+/**
+ * Counter-Strike's real figures, from the committed Liquipedia snapshot (scripts/data/counter-strike-elo.json): Counter-
+ * Strike 2's maps (MR12) of the export's S-, A- and B-Tier events whose ten players had each played 20 maps before, as
+ * every rated player has (`play`: its rounds a map and share to overtime, and by the favourite's odds the loser's rounds
+ * in regulation), and the best-of-threes they made up. Null until the first export is synced.
+ */
+function counterStrikeReal() {
+  const file = new URL('./data/counter-strike-elo.json', import.meta.url);
+  if (!existsSync(file)) return null;
+  const { source, play } = JSON.parse(readFileSync(file, 'utf8'));
+  const near = (value, width) => [Math.round((value - width) * 1000) / 1000, Math.round((value + width) * 1000) / 1000];
+  // bins: [maps, favourite's wins, overtimes, rounds, halves, half swing, the loser's rounds 0…11 in regulation].
+  const loser = new Array(12).fill(0);
+  for (const bin of play.bins) bin.slice(6).forEach((n, k) => { loser[k] += n; });
+  const regulation = loser.reduce((sum, n) => sum + n, 0);
+  const bo3 = play.series?.bo3;
+  return {
+    note: `the ${play.maps} CS2 maps of the S-, A- and B-Tier events of ${play.from} to ${source.to} whose ten players had each`
+      + ` played ${play.minGames} maps, as Liquipedia records them (CC BY-SA 3.0)`,
+    roundsPerMap: near(play.rounds, 0.6),
+    overtime: near(play.ot, 0.035),
+    // The real maps are a mix of matchups unlike the field's, so reported only.
+    lopsided: loser.slice(0, 6).reduce((sum, n) => sum + n, 0) / regulation,
+    close: loser.slice(10).reduce((sum, n) => sum + n, 0) / regulation,
+    bestOfThree: bo3 ? { series: bo3.n, sweep: ((bo3.scores['2-0'] ?? 0) + (bo3.scores['0-2'] ?? 0)) / bo3.n,
+      favourite: ((bo3.scores['2-0'] ?? 0) + (bo3.scores['2-1'] ?? 0)) / bo3.n } : null,
+    homeEdge: source.home,
+  };
+}
+
 /**
  * The cups of an earlier year (docs/design/tennis.md and womens-tennis.md, "Format by year"): `seasonId`'s sixteen
  * strongest nations from its season file, playing each other once a season under that year's format (matchSport). How
@@ -715,6 +778,7 @@ export function nrlSeason(seasons, seed, venue) {
  */
 export const REAL = Object.freeze({
   rocketLeague: rocketLeagueReal(),
+  counterStrike: counterStrikeReal(),
   football: {
     note: 'Premier League, La Liga, Serie A, Bundesliga and Ligue 1, 2021/22–2024/25',
     goalsPerGame: [2.5, 3.28], drawRate: [0.203, 0.295], goallessRate: [0.029, 0.096],
@@ -900,6 +964,7 @@ export function realismReport({ seasons = 40, seed = 20261101, home = false } = 
     billieJeanKingCup: davisCup(seasons, hashStr(`${seed}:billie-jean-king-cup`), venue, womensTennis),
     nrl: nrlSeason(seasons, hashStr(`${seed}:nrl`), venue),
     rocketLeague: rlcs(seasons, hashStr(`${seed}:rocket-league`), venue),
+    counterStrike: csMajor(seasons, hashStr(`${seed}:counter-strike`), venue),
   };
 }
 
@@ -1132,6 +1197,20 @@ EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
     }
     lines.push(row('favourite wins', rl.favourite.wins, null, pct));
     lines.push(row('home (defending) side wins', rl.homeWins, report.home ? rlReal.homeWins : null, pct));
+  }
+  const cs = report.counterStrike, csReal = REAL.counterStrike;
+  if (cs && csReal) {
+    lines.push(`\nCounter-Strike — the ${cs.nations} strongest nations, ${cs.series} series of best of three, ${cs.maps} maps (real: ${csReal.note})`);
+    lines.push(row('rounds a map', cs.roundsPerMap, csReal.roundsPerMap, x => num(x, 2)));
+    lines.push(row('maps to overtime', cs.overtime, csReal.overtime, pct));
+    lines.push(row('maps won 13–5 or wider', cs.lopsided, null, pct));
+    lines.push(`      (the real maps: ${pct(csReal.lopsided)}, a different mix of matchups)`);
+    lines.push(row('maps won 13–10 or 13–11', cs.close, null, pct));
+    lines.push(`      (the real maps: ${pct(csReal.close)})`);
+    lines.push(row('series won 2–0', cs.sweep, null, pct));
+    if (csReal.bestOfThree) lines.push(`      (the real best-of-threes, ${csReal.bestOfThree.series}: ${pct(csReal.bestOfThree.sweep)})`);
+    lines.push(row('favourite wins', cs.favourite.wins, null, pct));
+    lines.push(row('home (defending) side wins', cs.homeWins, null, pct));
   }
   const r = report.nrl, rr = REAL.nrl;
   lines.push(`\nNRL — ${r.clubs} clubs, ${NRL_GAMES} games (real: ${rr.note})`);

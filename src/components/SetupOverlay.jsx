@@ -608,7 +608,7 @@ export default function SetupOverlay({
                     ))}
                   </div>
                   {/* A sport with clubs only (American football) has no national teams to field. */}
-                  {model.clubsOnly ? <p className="sr-only" id="setup-layer-note">{model.sport.name} is played by {model.clubsOnly} clubs only.</p> : null}
+                  {model.clubsOnly ? <p className="sr-only" id="setup-layer-note">{model.sport.name} is played by {model.clubsOnly} {model.clubsNoun} only.</p> : null}
                   {/* A sport with nations only (tennis: the Davis Cup's) has no clubs to field. */}
                   {model.nationsOnly ? <p className="sr-only" id="setup-layer-note">{model.sport.name} is played by nations only.</p> : null}
                 </div>

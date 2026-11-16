@@ -923,6 +923,29 @@ clubs only, the NFL's joins; `--league=afl`). A map of another league of its day
 loader accepts (`validateClubsOnMap`). A club whose stadium lies outside its league's joined states holds its own
 state alone: the Giants at the Yale Bowl hold Connecticut in 1973–74, which `scripts/club-maps.test.mjs` allows.
 
+## The FBS map
+
+Status: implemented 2026-11-15. College football ([college-football.md](college-football.md)) has one theatre, **FBS**,
+played on `public/domestic/cfb.json` (165 KB): the USA, where each of the 138 schools holds the state its stadium stands
+in (`LEAGUES.cfb`, `npm run build:cfb-map`, built in about three seconds by the NFL's rule).
+
+- **Homes**: `scripts/data/cfb-teams.json`, each school's stadium (English Wikipedia's list of FBS stadiums and each
+  stadium's article). No two schools share a stadium. A territory is named after its college town (`city`); the
+  builder requires them distinct, so four towns two schools share carry their state's postal code and the two cities
+  with two schools name the side each holds.
+- **Shared states**: 33 states hold two schools or more and split along county lines: Texas thirteen, Ohio and
+  California eight, Florida and North Carolina seven, Alabama six, Virginia, Michigan, Louisiana and Georgia five. Six
+  counties hold two stadiums (Fulton, Harris, Miami-Dade, Los Angeles, Santa Clara, Washtenaw), and `maxGapKm` 0.5 cuts
+  each between its two, as the NRL's map cuts its shared councils: Georgia Tech takes the north of Fulton, Georgia
+  State the south; Houston the east of Harris, Rice the west; Miami (Hard Rock Stadium) the north of Miami-Dade, FIU the
+  south; UCLA (the Rose Bowl) the north of Los Angeles County, USC the south.
+- **Hawaii**: the partition drops land overseas unless a club's home stands on it (`dropOverseas`), so Hawaii, the
+  Rainbow Warriors' (a stadium in Honolulu), stays, at its true place: the map's opening view runs from −161.6° to −68.1°.
+  Moving it nearer as an inset would put it on Mexico, which the map draws beneath as inert land and an obstacle to
+  routes. `scripts/club-maps.test.mjs` keeps Honolulu on this map only (`HELD_OVERSEAS`).
+- **Empty**: Montana, South Dakota, Maine, New Hampshire, Vermont, Rhode Island and DC; Alaska is dropped. North Dakota
+  is North Dakota State's (the Mountain West's from 2026).
+
 ## The MLB map
 
 Status: implemented 2026-11-01. Baseball clubs ([baseball.md](baseball.md)) have one

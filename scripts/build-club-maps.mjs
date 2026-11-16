@@ -1,6 +1,7 @@
 // The maps a sport's clubs play on instead of the world (docs/design/domestic-campaigns.md,
-// "The NBA map", "The NFL map", "The MLB map", "The NHL map", "The NRL map" and "The NWSL map"): the NBA's, MLB's and the
-// NHL's USA and Canada, the NFL's and the NWSL's (women's football) United States and the NRL's Australia and New Zealand. A franchise holds the state or province its
+// "The NBA map", "The NFL map", "The MLB map", "The NHL map", "The NRL map", "The NWSL map" and "The FBS map"): the NBA's,
+// MLB's and the NHL's USA and Canada, the NFL's, the NWSL's (women's football) and college football's FBS United States, and
+// the NRL's Australia and New Zealand. A franchise holds the state or province its
 // arena, stadium, ballpark or ground stands in and nothing else, as one territory (the domestic partition, format 1: one
 // section per club). A state with two or more franchises is split, along its counties, between them
 // (and so is a state a league joins to it, such as New York to New Jersey's for the NFL), and
@@ -10,7 +11,7 @@
 // New Jersey where they played. Today's map is unchanged by them.
 //
 // Usage:
-//   node scripts/build-club-maps.mjs [--league=nba|nfl|afl|mlb|nhl|nrl|nwsl] [--check | --dry-run]
+//   node scripts/build-club-maps.mjs [--league=nba|nfl|afl|mlb|nhl|nrl|nwsl|cfb] [--check | --dry-run]
 //     --league   build one league's maps; the index keeps the other leagues' entries as they are
 //     --check    rebuild offline from the caches and compare every output byte for byte
 //     --dry-run  build and verify (downloading boundaries as needed) but write nothing
@@ -22,14 +23,15 @@
 //          public/countries-50m.json (land it gives to other countries is cut); the
 //          arenas in scripts/data/nba-arenas.json and scripts/data/nhl-teams.json, the stadiums in
 //          scripts/data/nfl-teams.json, the ballparks in scripts/data/mlb-teams.json, the grounds in
-//          scripts/data/nrl-teams.json and the NWSL's stadiums in scripts/data/nwsl-teams.json; the franchises in
+//          scripts/data/nrl-teams.json, the NWSL's stadiums in scripts/data/nwsl-teams.json and the FBS schools' in
+//          scripts/data/cfb-teams.json; the franchises in
 //          src/data/clubs.basketball.js, src/data/clubs.american-football.js, src/data/clubs.baseball.js,
 //          src/data/clubs.hockey.js, src/data/clubs.rugby-league.js and src/data/clubs.womens-football.js (its NWSL
-//          clubs; an earlier season's in public/womens-football/<id>.json);
+//          clubs; an earlier season's in public/womens-football/<id>.json) and src/data/clubs.college-football.js;
 //          each NBA era's teams and moved arenas in scripts/data/nba-seasons.json.
 // Outputs: public/domestic/nba.json, one public/domestic/nba<year>.json per era,
 //          public/domestic/nfl.json, public/domestic/mlb.json, public/domestic/nhl.json, public/domestic/nrl.json and
-//          public/domestic/nwsl.json (with nwsls<year>.json for each earlier season), an
+//          public/domestic/nwsl.json (with nwsls<year>.json for each earlier season), public/domestic/cfb.json, an
 //          ATTRIBUTION-<id>.txt beside each, and src/data/clubMaps.js
 //          (the setup screen's entries).
 import { existsSync } from 'node:fs';
@@ -45,6 +47,7 @@ import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
 import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
+import { CLUBS as CFB_CLUBS } from '../src/data/clubs.college-football.js';
 import { BUILT_IN_WOMENS_SEASONS } from '../src/data/womensFootballSeasons.js';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
@@ -73,6 +76,7 @@ const ballparksFile = path.join(root, 'scripts/data/mlb-teams.json');
 const nhlArenasFile = path.join(root, 'scripts/data/nhl-teams.json');
 const nrlGroundsFile = path.join(root, 'scripts/data/nrl-teams.json');
 const nwslStadiumsFile = path.join(root, 'scripts/data/nwsl-teams.json');
+const cfbStadiumsFile = path.join(root, 'scripts/data/cfb-teams.json');
 const womensSetFile = id => path.join(root, `public/womens-football/${id}.json`);
 const mlbSeasonsFile = path.join(root, 'scripts/data/mlb-seasons.json');
 const mlbWarSeasonsFile = path.join(root, 'scripts/data/mlb-war-seasons.json');
@@ -141,6 +145,12 @@ const LEAGUES = {
     entry: { venue: 'stadium', lines: 'state' }, eraTop: true,
     venues: 'Stadium locations: scripts/data/nwsl-teams.json (Boston Legacy FC, at its interim ground in Rhode Island, holds Massachusetts too).',
     eraVenues: 'Stadium locations: scripts/data/nwsl-teams.json, every club of the season at the stadium it played at.' },
+  // College football's FBS schools (src/data/clubs.college-football.js), each holding the county or state its stadium stands
+  // in: 43 states hold a school, Texas thirteen, and six counties two (Fulton, Harris, Miami-Dade, Los Angeles, Santa
+  // Clara and Washtenaw), which half a kilometre cuts between them. Hawaii stays: the Rainbow Warriors play there.
+  cfb: { id: 'cfb', sport: 'college-football', league: 'FBS', name: 'USA', countries: [USA], joins: {},
+    entry: { venue: 'stadium', lines: 'state' }, maxGapKm: 0.5,
+    venues: 'Stadium locations: scripts/data/cfb-teams.json (English Wikipedia\'s "List of NCAA Division I FBS football stadiums" and each stadium\'s article, CC BY-SA 4.0).' },
 };
 // Territories are states and provinces (REGION_LEVEL), built from their counties and
 // economic regions (UNIT_LEVEL) so that both share every border vertex for vertex.
@@ -598,6 +608,17 @@ async function nwslSpecs() {
   return specs;
 }
 
+/**
+ * College football's map, `{ id, seasons: null, clubs: [{ id, name, city, arena, home }] }`: the FBS schools of the
+ * built-in season at their stadiums (scripts/data/cfb-teams.json), strongest first.
+ */
+async function cfbSpecs() {
+  const stadiums = JSON.parse(await readFile(cfbStadiumsFile, 'utf8')).teams;
+  const clubs = rankedClubs(CFB_CLUBS, stadiums, 'stadium')
+    .map(c => ({ id: c.id, name: c.name, city: stadiums[c.id].city, arena: stadiums[c.id].stadium, home: stadiums[c.id].home }));
+  return [{ id: LEAGUES.cfb.id, seasons: null, clubs }];
+}
+
 async function build({ source, log, spec, league }) {
   const { id: mapId, seasons, clubs } = spec;
   const names = clubs.map(c => c.city);
@@ -758,10 +779,10 @@ async function build({ source, log, spec, league }) {
 }
 
 function indexModule(entries) {
-  return `// GENERATED by scripts/build-club-maps.mjs from public/domestic/nba*.json, nfl*.json, mlb*.json, nhl*.json, nrl*.json
-// and nwsl*.json; do not edit.
+  return `// GENERATED by scripts/build-club-maps.mjs from public/domestic/nba*.json, nfl*.json, mlb*.json, nhl*.json, nrl*.json,
+// nwsl*.json and cfb.json; do not edit.
 // Maps a sport's clubs play on instead of the world (docs/design/domestic-campaigns.md,
-// "The NBA map", "The NFL map", "The MLB map", "The NHL map", "The NRL map", "The NWSL map"): the setup offers each as its
+// "The NBA map", "The NFL map", "The MLB map", "The NHL map", "The NRL map", "The NWSL map", "The FBS map"): the setup offers each as its
 // sport's club theatre ('domestic:<id>'), the NWSL's beside women's football's Europe maps, and the loader fetches
 // public/domestic/<id>.json on demand. A map with \`seasons\` is an earlier era's, played only with those built-in
 // seasons' clubs, whose strongest each season names itself (the NWSL's entries name them).
@@ -802,7 +823,7 @@ function attributionText(doc, league, venues = null) {
   return `${lines.join('\n')}\n`;
 }
 
-const SPECS = { nba: nbaSpecs, nfl: nflSpecs, afl: aflSpecs, mlb: mlbSpecs, nhl: nhlSpecs, nrl: nrlSpecs, nwsl: nwslSpecs };
+const SPECS = { nba: nbaSpecs, nfl: nflSpecs, afl: aflSpecs, mlb: mlbSpecs, nhl: nhlSpecs, nrl: nrlSpecs, nwsl: nwslSpecs, cfb: cfbSpecs };
 
 async function main() {
   const argv = process.argv.slice(2), args = new Set(argv);
@@ -837,10 +858,10 @@ async function main() {
       for (const f of differs) console.error(`differs: ${f}`);
       process.exit(1);
     }
-    log(`Verified the ${only ? LEAGUES[only].league : 'NBA, NFL, AFL, MLB, NHL, NRL and NWSL'} maps, their index and attributions byte for byte.`);
+    log(`Verified the ${only ? LEAGUES[only].league : 'NBA, NFL, AFL, MLB, NHL, NRL, NWSL and FBS'} maps, their index and attributions byte for byte.`);
   } else if (!dryRun) {
     for (const [file, text] of outputs) await writeFile(file, text);
-    log(`Wrote the ${only ? LEAGUES[only].league : 'NBA, NFL, AFL, MLB, NHL, NRL and NWSL'} maps, their index and attributions in ${((Date.now() - started) / 1000).toFixed(1)} s.`);
+    log(`Wrote the ${only ? LEAGUES[only].league : 'NBA, NFL, AFL, MLB, NHL, NRL, NWSL and FBS'} maps, their index and attributions in ${((Date.now() - started) / 1000).toFixed(1)} s.`);
   }
 }
 
