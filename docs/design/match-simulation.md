@@ -247,33 +247,33 @@ players, never the bench.
 ## Statistical verification
 
 The checked-in [report](match-simulation-report.json) samples 200,000 outcomes per
-pairing, forty-four million outcomes over the eleven sports, plus 10,000 complete
+pairing, fifty-two million outcomes over the thirteen sports, plus 10,000 complete
 timelines a sport for timing. It covers three uncertainty settings, five rating
 gaps, equal teams and four pairings a sport built from national rosters, so its
 basketball figures are FIBA's. These equal-team results use 75-rated starters and
 Balanced uncertainty. The NBA rules are checked in
 `scripts/basketball-simulation.test.mjs` and `scripts/win-probability.test.mjs`.
 Football's and women's football's figures were sampled again with extra time on
-2026-11-10 (the same seeds; the timings stay the first run's). Rocket League joined on 2026-11-14 and Counter-Strike on
-2026-11-15, each sampled alone (`--sport=rocket-league`, `--sport=counter-strike`, the same seed scheme) with its
-Liquipedia exports, the other sports' figures kept as they were.
+2026-11-10 (the same seeds; the timings stay the first run's). Rocket League joined on 2026-11-14, Counter-Strike on
+2026-11-15 and Valorant and League of Legends on 2026-11-16, each sampled alone (`--sport=<id>`, the same seed scheme)
+with its own ratings, the other sports' figures kept as they were.
 
-| Measure | Football | Basketball | Ice hockey | Tennis | Rugby league | Rocket League | Counter-Strike |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Combined regulation score | 2.66 goals | 162.76 points | 6.30 goals | 4.11 rubbers | 43.74 points | 5.58 games | 2.45 maps |
-| Regulation tie rate | 27.46% | 7.05% | 23.43% | none: a tie is never level | 3.20% | none: a series is never level | none: a series is never level |
-| Attacking side wins | 50.02% | 50.04% | 50.07% | 50.05% | 50.11% | 49.90% | 49.98% |
-| Attacking side wins after a tie | 50.21% | 49.67% | 50.21% | — | 50.18% | — | — |
+| Measure | Football | Basketball | Ice hockey | Tennis | Rugby league | Rocket League | Counter-Strike | Valorant | League of Legends |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Combined regulation score | 2.66 goals | 162.76 points | 6.30 goals | 4.11 rubbers | 43.74 points | 5.58 games | 2.45 maps | 2.42 maps | 3.98 games |
+| Regulation tie rate | 27.46% | 7.05% | 23.43% | none: a tie is never level | 3.20% | none: a series is never level | none: a series is never level | none: a series is never level | none: a series is never level |
+| Attacking side wins | 50.02% | 50.04% | 50.07% | 50.05% | 50.11% | 49.90% | 49.98% | 50.06% | 49.87% |
+| Attacking side wins after a tie | 50.21% | 49.67% | 50.21% | — | 50.18% | — | — | — | — |
 
 Synthetic stronger-team win rates against a 55-rated lineup with Balanced
 uncertainty were:
 
-| Rating advantage | Football | Basketball | Ice hockey | Tennis | Rugby league | Rocket League | Counter-Strike |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 5 | 71.53% | 74.40% | 76.30% | 79.05% | 94.07% | 76.65% | 70.85% |
-| 10 | 86.63% | 90.48% | 91.48% | 94.44% | 99.54% | 92.70% | 86.22% |
-| 20 | 97.67% | 99.57% | 98.97% | 99.83% | 99.96% | 99.78% | 98.29% |
-| 40 | 99.69% | 100.00% | 99.89% | 100.00% | 99.97% | 100.00% | 99.99% |
+| Rating advantage | Football | Basketball | Ice hockey | Tennis | Rugby league | Rocket League | Counter-Strike | Valorant | League of Legends |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 5 | 71.53% | 74.40% | 76.30% | 79.05% | 94.07% | 76.65% | 70.85% | 69.27% | 73.80% |
+| 10 | 86.63% | 90.48% | 91.48% | 94.44% | 99.54% | 92.70% | 86.22% | 84.06% | 89.78% |
+| 20 | 97.67% | 99.57% | 98.97% | 99.83% | 99.96% | 99.78% | 98.29% | 97.39% | 99.36% |
+| 40 | 99.69% | 100.00% | 99.89% | 100.00% | 99.97% | 100.00% | 99.99% | 99.98% | 100.00% |
 
 Extra time, where the stronger side scores more of the goals, lifts football's
 favourites about a point over a straight shoot-out (85.63% at ten points).
@@ -284,7 +284,9 @@ each of its rubbers, 99.87% and 88.71% in rugby league, 97.07% and 70.40% in Roc
 the widest of any sport: its real series are less predictable than their games, so Wild swings it hardest
 ([rocket-league.md](rocket-league.md#calibration)), and 90.37% and 67.89% in Counter-Strike, whose best of three gives a
 favourite less than a longer series and whose form is fitted to real best-of-threes the favourites won about as often as
-a single map ([counter-strike.md](counter-strike.md#calibration)). Rugby league is the steepest: Rugby League 26 rates the 17
+a single map ([counter-strike.md](counter-strike.md#calibration)), 90.42% and 64.26% in Valorant, whose real
+best-of-threes went the same way and whose form is wider still ([valorant.md](valorant.md#calibration)), and 94.80% and
+68.29% in League of Legends, whose best of five gives a favourite more ([league-of-legends.md](league-of-legends.md#calibration)). Rugby league is the steepest: Rugby League 26 rates the 17
 NRL clubs within 3.3 points of each other, while the NRL's standings spread as widely as the NFL's, so each rating point
 must count for more ([rugby-league.md](rugby-league.md#the-match-model)). Increasing uncertainty raises upset chances while retaining a
 meaningful strength advantage. Women's football plays football's model, so on the
@@ -482,6 +484,33 @@ other twice a season, a different mix of matchups from the real maps'.
 | Best of three won 2–0 | 57.8% | 56.9% |
 | Home sides win | 49.8% (no edge) | as Elo expected |
 
+Valorant came in on 2026-11-16, calibrated against vlr.gg's maps ([valorant.md](valorant.md#calibration)): its economy
+(the round after a pistol, the bonus round, the broken buy, the lean of later rounds) on the rounds of the 10,287 maps of
+November 2024 to November 2026 whose ten players had each played 20 maps, each played through the model at its own
+pre-map Elo odds, and its match-day form on those years' 3,388 best-of-threes. The harness plays the sixteen strongest
+nations against each other twice a season.
+
+| Valorant | Now (nations) | Real (2024–2026) |
+| --- | --- | --- |
+| Rounds a map / to overtime | 21.22 / 11.5% | 21.17 / 11.3% |
+| Maps won 13–4 or wider / 13–10 or 13–11 | 14.7% / 23.4% | 16.0% / 23.5% |
+| Best of three won 2–0 | 58.8% | 58.9% |
+| Home sides win | 49.6% (53.3% with the rule on) | the LANs' host nations +23 ± 9 Elo |
+
+League of Legends came in the same day, calibrated against gol.gg's games
+([league-of-legends.md](league-of-legends.md#calibration)): a game's length, kills and Barons on the 4,563 games of July
+2025 to November 2026 whose ten players had each played 20 games (the kills and Barons on the 339 single games whose
+pages give them), and its match-day form on those months' 468 best-of-fives. The sixteen strongest nations sweep more
+often than the real best-of-fives, playoffs between closer teams.
+
+| League of Legends | Now (nations) | Real (2025–2026) |
+| --- | --- | --- |
+| Minutes a game | 32.2 | 32.1 |
+| The winner's kills / the loser's | 21.5 / 10.9 | 21.5 / 10.5 |
+| A Baron for the winner / the loser | 88.3% / 15.4% | 90.9% / 15.9% |
+| Best of five won 3–0 / 3–1 / 3–2 | 45.4% / 32.0% / 22.5% | 40.0% / 34.8% / 25.2% |
+| Home sides win | 50.8% (no edge) | not measured: gol.gg gives no event's host |
+
 Known gaps, reported but not tested:
 
 - **No home advantage by default.** Every sport plays at a neutral venue unless a
@@ -540,6 +569,8 @@ sides win at home about as often as home sides do in the sport's league:
 | Women's tennis | Tennis's | 1.6 | 60% of ties | none found for the Billie Jean King Cup: the Davis Cup's |
 | Rocket League | none, and the rule is not offered | 0 | 50% | the LANs' host nations did as Elo expected: +12 ± 8 Elo over 1,933 games of Liquipedia's exports |
 | Counter-Strike | none, and the rule is not offered | 0 | 50% | the LANs' host nations did as Elo expected: −3 ± 6 Elo over 3,319 maps between seasoned players in Liquipedia's exports |
+| Valorant | 1 rating point (25 Elo) on every map | 1 | 55% of best-of-threes | the LANs' host nations did 23 ± 9 Elo better than Elo expected over 1,607 maps between seasoned players in vlr.gg's records: 51.2–58.6% for an equal side's best of three |
+| League of Legends | none, and the rule is not offered | 0 | 50% | not measured: gol.gg gives no event's host |
 
 "Worth" is the rating advantage an attacker needs for an even match against a home
 defender; a manager's Attack approach adds 0.6 rating points, plus up to 1.2 for
@@ -551,7 +582,8 @@ in ninety minutes across the five football leagues (40.8% in the 2024/25 Premier
 League to 47.9% in the 2022/23 La Liga, from FootballRates and Statista), 55.9% in
 the NBA, 53.4% in the NFL, 53.1% in MLB, 54.6% in the NHL and 57.2% in the NRL, and Davis Cup hosts among the sixteen
 strongest tennis nations win 58.1% of their ties (49.7% at a neutral venue; [tennis.md](tennis.md)), Billie Jean King
-Cup hosts 56.3% (50.2%; [womens-tennis.md](womens-tennis.md)). Every other measure
+Cup hosts 56.3% (50.2%; [womens-tennis.md](womens-tennis.md)), and Valorant's host nations 53.3% of their best-of-threes
+(49.6%; [valorant.md](valorant.md)). Every other measure
 stays in its range, bar two of the NHL's: wins by three or more stay a little low
 (38.3%) and wins by five or more edge over the top (6.7%, real 5.5–6.5%). Football's
 draws stay at 23–25%. `scripts/simulation-realism.test.mjs` checks the

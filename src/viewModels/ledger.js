@@ -14,6 +14,8 @@ import { tennisProfile } from '../sports/tennis.js';
 import { rugbyLeagueProfile } from '../sports/rugbyLeague.js';
 import { rocketLeagueProfile } from '../sports/rocketLeague.js';
 import { counterStrikeProfile } from '../sports/counterStrike.js';
+import { valorantProfile } from '../sports/valorant.js';
+import { leagueOfLegendsProfile } from '../sports/leagueOfLegends.js';
 import { campaignRecap, estimateSession } from '../engine/campaignExperience.js';
 import { empireNeighbors } from '../engine/campaign.js';
 import { FEED_CAP, domesticIdOf } from '../app/shared.js';
@@ -489,7 +491,7 @@ function tapeRow(key, label, a, b) {
 /**
  * Board 07 tale of the tape: the positional profile (football Attack / Defence / Goalkeeping, basketball Offence /
  * Defence, American football Offence / Defence / Kicking, baseball Batting / Pitching / Fielding, ice hockey Attack /
- * Defence / Goaltending, tennis Singles / Doubles, rugby league Backs / Halves / Forwards, Rocket League's best player) from
+ * Defence / Goaltending, tennis Singles / Doubles, rugby league Backs / Halves / Forwards, the esports' best player) from
  * the sports engines' frozen
  * profile exports, then the lineup rating.
  */
@@ -519,8 +521,9 @@ function tapeRows(sportId, lineupA, lineupD, copy) {
       const pA = rugbyLeagueProfile(lineupA), pD = rugbyLeagueProfile(lineupD);
       rows = [['backs', 'Backs', pA.backs, pD.backs], ['halves', 'Halves', pA.halves, pD.halves],
         ['forwards', 'Forwards', pA.forwards, pD.forwards]];
-    } else if (sportId === 'rocket-league') {
-      const pA = rocketLeagueProfile(lineupA), pD = rocketLeagueProfile(lineupD);
+    } else if (sportId === 'rocket-league' || sportId === 'valorant' || sportId === 'league-of-legends') {
+      const profile = sportId === 'valorant' ? valorantProfile : sportId === 'league-of-legends' ? leagueOfLegendsProfile : rocketLeagueProfile;
+      const pA = profile(lineupA), pD = profile(lineupD);
       rows = [['best', 'Best player', pA.best, pD.best]];
     } else if (sportId === 'counter-strike') {
       const pA = counterStrikeProfile(lineupA), pD = counterStrikeProfile(lineupD);

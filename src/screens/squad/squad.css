@@ -208,6 +208,10 @@
 /* Counter-Strike: a map from above, its two bomb sites at the top and the lanes between them */
 .pitch__site { position: absolute; left: 10px; top: 10px; width: calc(100% - 20px); height: calc(100% - 20px); }
 .pitch__site rect, .pitch__site path, .pitch__site ellipse { fill: none; stroke: var(--ink); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+/* Valorant's map and League of Legends' arena, drawn as the arena is */
+.pitch__spike, .pitch__rift { position: absolute; left: 10px; top: 10px; width: calc(100% - 20px); height: calc(100% - 20px); }
+.pitch__spike path, .pitch__rift path, .pitch__rift circle { fill: none; stroke: var(--ink); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.pitch__rift .pitch__rift-river { stroke-dasharray: 4 4; }
 
 .pitch__rugby { position: absolute; left: 10px; top: 10px; width: calc(100% - 20px); height: calc(100% - 20px); }
 .pitch__rugby rect, .pitch__rugby path { fill: none; stroke: var(--ink); stroke-width: 1px; vector-effect: non-scaling-stroke; }

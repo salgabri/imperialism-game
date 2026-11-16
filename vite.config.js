@@ -82,8 +82,8 @@ const STABLE_MODULES = [
   /\/node_modules\/(?:react|react-dom|scheduler)\//,
   /\/src\/data\/(?:rosters|clubs\.football|sourceTable)\.js$/,
 ];
-// The players of every sport but football (first download), women's football (about as big as these nine together) and
-// college football (its 138 schools, more than half as big).
+// The players of every sport but football (first download), women's football (about half as big as the eleven others
+// together) and college football (its 138 schools, under a quarter as big).
 const SPORT_PLAYERS = /\/src\/data\/players\/(?!(?:womens-football|college-football)\.js$)[^/]+\.js$/;
 
 /**

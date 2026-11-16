@@ -456,8 +456,10 @@ export const OUT_OF_POSITION_PENALTY = 12;
 // cornerback, is an emergency, not a rotation. So are baseball's: MLB The Show lists every position a player can
 // field, and a starter in the bullpen (or a reliever starting) is out of his role. A hockey forward moves between the
 // lines' three places with little trouble: the NHL lists one position for players who play all three. So does a rugby
-// league back between the outside places, or a forward round the pack (RUGBY_UNIT below).
-const PENALTY_OF = { 'american-football': 25, 'college-football': 25, baseball: 20, hockey: 4, 'rugby-league': 4 };
+// league back between the outside places, or a forward round the pack (RUGBY_UNIT below). A League of Legends player out of
+// his role (a mid laner at support) plays a champion pool and a lane he does not know: a professional is not a club player
+// there, but he is far from his best.
+const PENALTY_OF = { 'american-football': 25, 'college-football': 25, baseball: 20, hockey: 4, 'rugby-league': 4, 'league-of-legends': 15 };
 /** Rating points a starter loses outside his natural positions, in a sport ('football', 'basketball', …). */
 export const outOfPositionPenalty = sportId => PENALTY_OF[sportId] ?? OUT_OF_POSITION_PENALTY;
 // A baseball hitter on the mound, or a pitcher in the field or at the plate, is no rotation at all. Nor is a hockey
@@ -486,9 +488,10 @@ export const isTennisSport = sportId => TENNIS_SPORTS.includes(sportId);
 export const GRIDIRON_SPORTS = Object.freeze(['american-football', 'college-football']);
 /** Whether a sport id plays American football's lineup, squad and match views: the NFL's game or the college game. */
 export const isGridironSport = sportId => GRIDIRON_SPORTS.includes(sportId);
-// Football's rule, in both of its games, tennis's, in both of its, and the esports': a team fields only the players its
-// source rates.
-const REAL_PLAYERS_ONLY = new Set(['football', 'womens-football', ...TENNIS_SPORTS, 'rocket-league', 'counter-strike']);
+// Football's rule, in both of its games, tennis's, in both of its, and the esports' (Rocket League, Counter-Strike, Valorant,
+// League of Legends): a team fields only the players its source rates.
+const REAL_PLAYERS_ONLY = new Set(['football', 'womens-football', ...TENNIS_SPORTS, 'rocket-league', 'counter-strike', 'valorant',
+  'league-of-legends']);
 const FOOTBALL_PLAN = ['GK', 'DF', 'DF', 'DF', 'DF', 'MF', 'MF', 'MF', 'MF', 'FW', 'FW'];
 const TENNIS_PLAN = ['SGL', 'SGL', 'DBL', 'DBL'];
 // Eleven on offence (three receivers), eleven on defence (the nickel) and the kicker: the NFL's and college football's.
@@ -515,6 +518,10 @@ const LINEUP_PLANS = {
   'rocket-league': ['PLR', 'PLR', 'PLR'],
   // Counter-Strike's five, each of whom plays every role a round asks of him: no positions either.
   'counter-strike': ['PLR', 'PLR', 'PLR', 'PLR', 'PLR'],
+  // Valorant's five, whose agents vary with the map and the plan: no fixed positions either.
+  valorant: ['PLR', 'PLR', 'PLR', 'PLR', 'PLR'],
+  // League of Legends' five roles: top, jungle, mid, bot and support.
+  'league-of-legends': ['TOP', 'JGL', 'MID', 'BOT', 'SUP'],
 };
 const TENNIS_POSITIONS = new Set(TENNIS_PLAN);
 // What each lineup place weighs in a tennis team's strength: the No. 1 and the No. 2 each play two of the five rubbers,
@@ -523,6 +530,7 @@ const TENNIS_WEIGHTS = [2, 2, 0.5, 0.5];
 const BASKETBALL_POSITIONS = new Set(LINEUP_PLANS.basketball);
 const RUGBY_POSITIONS = new Set(Object.keys(RUGBY_UNIT));
 const GRIDIRON_POSITIONS = new Set(LINEUP_PLANS['american-football']);
+const LOL_POSITIONS = new Set(LINEUP_PLANS['league-of-legends']);
 // Baseball's catcher shares basketball's 'C'; every other baseball position is its own.
 const BASEBALL_POSITIONS = new Set(LINEUP_PLANS.baseball.filter(position => position !== 'C'));
 // Baseball's designated hitter is any batter.
@@ -549,7 +557,9 @@ function slotPenalty(sportId, player, position) {
 export function teamSportId(team) {
   if (LINEUP_PLANS[team?.sport]) return team.sport;
   if (team?.squad?.some(player => TENNIS_POSITIONS.has(player.pos))) return 'tennis';
+  // A Valorant team always carries its sport: no save predates it, so a squad of 'PLR' alone is Rocket League's.
   if (team?.squad?.some(player => player.pos === 'PLR')) return 'rocket-league';
+  if (team?.squad?.some(player => LOL_POSITIONS.has(player.pos))) return 'league-of-legends';
   if (team?.squad?.some(player => BASEBALL_POSITIONS.has(player.pos))) return 'baseball';
   // Rugby league's codes are its own.
   if (team?.squad?.some(player => RUGBY_POSITIONS.has(player.pos))) return 'rugby-league';

@@ -44,11 +44,11 @@ const SEED_HELP = 'Replays the same campaign with the same rules and choices. Le
 const WALL = { ratio: 4 / 3, gap: 6, minCell: 34, maxCell: 104, touch: { ratio: 1, minCell: 44 } };
 
 /**
- * The sport tiles' columns: up to four share a row, up to eight split into two even rows, and more into three (nine
- * sports: three rows of three; ten: three rows of four, the last half full). Five across would squeeze "Basketball" out
- * of its tile on a desktop's setup column.
+ * The sport tiles' columns: up to four share a row, up to eight split into two even rows, nine to twelve into three (nine
+ * sports: three rows of three; ten to twelve: three rows of four), and more into rows of four (thirteen: four rows, the
+ * last with one). Five across would squeeze "Basketball" out of its tile on a desktop's setup column.
  */
-const sportColumns = count => (count <= 4 ? count : count <= 8 ? Math.ceil(count / 2) : Math.ceil(count / 3));
+const sportColumns = count => (count <= 4 ? count : count <= 8 ? Math.ceil(count / 2) : count <= 12 ? Math.ceil(count / 3) : 4);
 
 function focusQuietly(element) {
   element?.focus?.({ preventScroll: true });

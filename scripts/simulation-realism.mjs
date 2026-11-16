@@ -6,7 +6,9 @@
 // year's rules (formatsReport: best of five sets, advantage sets, three-rubber ties). Football's extra time is a
 // knockout game's, so its strongest 32 nations also meet once a season to measure it against the World Cups' knockout
 // games. Rocket League's sixteen strongest nations play each other once a season in best-of-seven series, beside every
-// real game of the Liquipedia snapshot (rocketLeagueReal).
+// real game of the Liquipedia snapshot (rocketLeagueReal); Valorant's in best-of-three series of maps, beside the vlr.gg
+// snapshot's real maps (valorantReal), and League of Legends' in best-of-five series, beside the gol.gg snapshot's real
+// games (leagueOfLegendsReal).
 // Each measure sits beside the real league's figure (REAL below, with its seasons). The defender of each fixture is
 // its home side: at a neutral venue, as campaigns play by default, or at home with `--home` (the Home advantage
 // launch rule).
@@ -37,6 +39,8 @@ import { tennis } from '../src/sports/tennis.js';
 import { womensTennis } from '../src/sports/womensTennis.js';
 import { gameOdds, rocketLeague, TO_WIN } from '../src/sports/rocketLeague.js';
 import { counterStrike } from '../src/sports/counterStrike.js';
+import { mapOdds, valorant } from '../src/sports/valorant.js';
+import { leagueOfLegends } from '../src/sports/leagueOfLegends.js';
 import { decodeFootballSet, seasonSport } from '../src/engine/footballSets.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { onField, rugbyLeague, scoreKind, SLICE_MODEL } from '../src/sports/rugbyLeague.js';
@@ -684,6 +688,128 @@ function counterStrikeReal() {
   };
 }
 
+// ---- Valorant (best-of-three series of maps) -------------------------------------------------------------------------
+
+/** The field: the sixteen strongest nations of Valorant, about a Champions' worth. */
+export function vctField(count = 16) {
+  const rng = makeRng(1);
+  return Object.keys(valorant.rosters).map(id => buildTeam(id, rng, valorant)).sort((a, b) => b.str - a.str).slice(0, count);
+}
+
+/**
+ * The field's series, each meeting every other twice a season, once at each end: the maps' rounds, overtime and scores,
+ * the series' scores.
+ */
+function vct(seasons, seed, venue) {
+  const nations = vctField(16);
+  if (nations.length < 4) return null;
+  const { played } = playSeasons({ sport: valorant, teams: nations, games: 2 * (nations.length - 1), seasons, seed, venue });
+  const ends = played.flatMap(g => g.ev.filter(e => e.pts > 0));
+  const score = (w, l) => share(played, g => Math.max(g.ga, g.gd) === w && Math.min(g.ga, g.gd) === l);
+  return {
+    nations: nations.length, series: played.length, maps: ends.length,
+    roundsPerMap: mean(ends.map(e => e.own + e.opp)), overtime: share(ends, e => !!e.ot),
+    closeMaps: share(ends, e => !e.ot && e.opp >= 10), routs: share(ends, e => e.opp <= 4),
+    sweep: score(2, 0), twoOne: score(2, 1),
+    favourite: favouriteRecord(played),
+    homeWins: share(played, g => g.winner === g.j),
+  };
+}
+
+/** A best-of-three won by the side that wins each map with `p`. */
+const bestOfThreeMaps = p => p * p * (3 - 2 * p);
+
+/**
+ * Valorant's real figures, from the committed vlr.gg snapshot (scripts/data/valorant-elo.json): the last two years' maps
+ * of VCT, Challengers and the off-season whose ten players had each played 20 maps before, as every rated player has
+ * (`play`), and the host nation's edge at the VCT's LANs (`source.home`, Elo points ± one standard error), as an equal
+ * side's best-of-three at home, two errors each way. Null until the first sync.
+ */
+function valorantReal() {
+  const file = new URL('./data/valorant-elo.json', import.meta.url);
+  if (!existsSync(file)) return null;
+  const { source, play } = JSON.parse(readFileSync(file, 'utf8'));
+  if (!play?.maps) return null;
+  const near = (value, width) => [Math.round((value - width) * 1000) / 1000, Math.round((value + width) * 1000) / 1000];
+  const loser = test => Object.entries(play.losers).filter(([x]) => test(Number(x))).reduce((sum, [, n]) => sum + n, 0) / play.maps;
+  const bo3 = play.series.bo3 ?? {};
+  const seriesCount = Object.values(bo3).reduce((sum, n) => sum + n, 0);
+  const home = source.home;
+  const rate = ([n, yes]) => (n ? yes / n : null);
+  return {
+    note: `the ${play.maps} maps of VCT, Challengers and the off-season of ${play.from} to ${source.to} whose ten players had each played`
+      + ` ${play.minGames} maps, as vlr.gg records them`,
+    roundsPerMap: near(play.rounds / play.maps, 0.8),
+    overtime: near(play.ot / play.maps, 0.04),
+    // The real maps' scores are a mix of matchups unlike the field's, so reported only.
+    closeMaps: loser(x => x >= 10), routs: loser(x => x <= 4),
+    rounds: { afterPistol: rate(play.roundStats.afterPistol), bonus: rate(play.roundStats.bonus), broken: rate(play.roundStats.broken),
+      lean: rate(play.roundStats.lean), defence: play.roundStats.rounds ? play.roundStats.defence / play.roundStats.rounds : null },
+    bestOfThree: seriesCount ? { series: seriesCount, sweep: (bo3['2-0'] ?? 0) / seriesCount, twoOne: (bo3['2-1'] ?? 0) / seriesCount } : null,
+    homeWins: home ? [bestOfThreeMaps(mapOdds((home.elo - 2 * home.se) / 25)), bestOfThreeMaps(mapOdds((home.elo + 2 * home.se) / 25))]
+      .map(x => Math.round(x * 1000) / 1000) : null,
+    homeEdge: home,
+  };
+}
+
+// ---- League of Legends (best-of-five series) ------------------------------------------------------------------------
+
+/** The field: the sixteen strongest nations of League of Legends, about a Worlds' worth. */
+export function worldsField(count = 16) {
+  const rng = makeRng(1);
+  return Object.keys(leagueOfLegends.rosters).map(id => buildTeam(id, rng, leagueOfLegends)).sort((a, b) => b.str - a.str).slice(0, count);
+}
+
+/** A game's length in minutes from its end event's clock ("31:42"). */
+const gameMinutes = e => { const [m, s] = String(e.clock).split(':').map(Number); return m + s / 60; };
+
+/**
+ * The field's series, each meeting every other twice a season, once at each end: the games' lengths, kills and Barons,
+ * the series' scores.
+ */
+function worlds(seasons, seed, venue) {
+  const nations = worldsField(16);
+  if (nations.length < 4) return null;
+  const { played } = playSeasons({ sport: leagueOfLegends, teams: nations, games: 2 * (nations.length - 1), seasons, seed, venue });
+  const games = played.flatMap(g => g.ev.filter(e => e.pts > 0).map(end => ({ end, barons: g.ev.filter(e => e.kind === 'baron' && e.game === end.game) })));
+  const kills = games.map(({ end }) => String(end.score).split('–').map(Number));
+  const score = (w, l) => share(played, g => Math.max(g.ga, g.gd) === w && Math.min(g.ga, g.gd) === l);
+  return {
+    nations: nations.length, series: played.length, games: games.length,
+    minutes: mean(games.map(({ end }) => gameMinutes(end))),
+    winnerKills: mean(kills.map(k => k[0])), loserKills: mean(kills.map(k => k[1])),
+    winnerBaron: share(games, ({ end, barons }) => barons.some(e => e.tid === end.tid)),
+    loserBaron: share(games, ({ end, barons }) => barons.some(e => e.tid !== end.tid)),
+    sweep: score(3, 0), threeOne: score(3, 1), threeTwo: score(3, 2),
+    favourite: favouriteRecord(played),
+    homeWins: share(played, g => g.winner === g.j),
+  };
+}
+
+/**
+ * League of Legends' real figures, from the committed gol.gg snapshot (scripts/data/league-of-legends-elo.json): the last
+ * two years' games whose ten players had each played 20 games before (`play`): their lengths, and the kills and Barons of
+ * the single games whose pages give them. Null until the first sync.
+ */
+function leagueOfLegendsReal() {
+  const file = new URL('./data/league-of-legends-elo.json', import.meta.url);
+  if (!existsSync(file)) return null;
+  const { source, play } = JSON.parse(readFileSync(file, 'utf8'));
+  if (!play?.games) return null;
+  const near = (value, width) => [Math.round((value - width) * 1000) / 1000, Math.round((value + width) * 1000) / 1000];
+  const bo5 = play.series.bo5 ?? {};
+  const seriesCount = Object.values(bo5).reduce((sum, n) => sum + n, 0);
+  return {
+    note: `the ${play.games} games of ${play.from} to ${source.to} whose ten players had each played ${play.minGames} games, as gol.gg`
+      + ` records them (kills and Barons: its ${play.kills.games} single games)`,
+    minutes: near(play.minutes.mean, 1.5),
+    winnerKills: near(play.kills.winner, 2), loserKills: near(play.kills.loser, 2),
+    winnerBaron: near(play.barons.winner, 0.08), loserBaron: near(play.barons.loser, 0.08),
+    bestOfFive: seriesCount ? { series: seriesCount, sweep: (bo5['3-0'] ?? 0) / seriesCount, threeOne: (bo5['3-1'] ?? 0) / seriesCount,
+      threeTwo: (bo5['3-2'] ?? 0) / seriesCount } : null,
+  };
+}
+
 /**
  * The cups of an earlier year (docs/design/tennis.md and womens-tennis.md, "Format by year"): `seasonId`'s sixteen
  * strongest nations from its season file, playing each other once a season under that year's format (matchSport). How
@@ -779,6 +905,8 @@ export function nrlSeason(seasons, seed, venue) {
 export const REAL = Object.freeze({
   rocketLeague: rocketLeagueReal(),
   counterStrike: counterStrikeReal(),
+  valorant: valorantReal(),
+  leagueOfLegends: leagueOfLegendsReal(),
   football: {
     note: 'Premier League, La Liga, Serie A, Bundesliga and Ligue 1, 2021/22–2024/25',
     goalsPerGame: [2.5, 3.28], drawRate: [0.203, 0.295], goallessRate: [0.029, 0.096],
@@ -965,6 +1093,8 @@ export function realismReport({ seasons = 40, seed = 20261101, home = false } = 
     nrl: nrlSeason(seasons, hashStr(`${seed}:nrl`), venue),
     rocketLeague: rlcs(seasons, hashStr(`${seed}:rocket-league`), venue),
     counterStrike: csMajor(seasons, hashStr(`${seed}:counter-strike`), venue),
+    valorant: vct(seasons, hashStr(`${seed}:valorant`), venue),
+    leagueOfLegends: worlds(seasons, hashStr(`${seed}:league-of-legends`), venue),
   };
 }
 
@@ -1211,6 +1341,37 @@ EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
     if (csReal.bestOfThree) lines.push(`      (the real best-of-threes, ${csReal.bestOfThree.series}: ${pct(csReal.bestOfThree.sweep)})`);
     lines.push(row('favourite wins', cs.favourite.wins, null, pct));
     lines.push(row('home (defending) side wins', cs.homeWins, null, pct));
+  }
+  const va = report.valorant, vaReal = REAL.valorant;
+  if (va && vaReal) {
+    lines.push(`\nValorant — the ${va.nations} strongest nations, ${va.series} series of best of three, ${va.maps} maps (real: ${vaReal.note})`);
+    lines.push(row('rounds a map', va.roundsPerMap, vaReal.roundsPerMap, x => num(x, 2)));
+    lines.push(row('maps to overtime', va.overtime, vaReal.overtime, pct));
+    lines.push(row('maps won 13–10 or 13–11', va.closeMaps, null, pct));
+    lines.push(`      (the real maps: ${pct(vaReal.closeMaps)}, a different mix of matchups)`);
+    lines.push(row('maps won 13–4 or wider', va.routs, null, pct));
+    lines.push(`      (the real maps: ${pct(vaReal.routs)})`);
+    for (const [label, key] of [['series won 2–0', 'sweep'], ['series won 2–1', 'twoOne']]) {
+      lines.push(row(label, va[key], null, pct));
+      if (vaReal.bestOfThree) lines.push(`      (the real best-of-threes, ${vaReal.bestOfThree.series}: ${pct(vaReal.bestOfThree[key])})`);
+    }
+    lines.push(row('favourite wins', va.favourite.wins, null, pct));
+    lines.push(row('home (defending) side wins', va.homeWins, report.home ? vaReal.homeWins : null, pct));
+  }
+  const lol = report.leagueOfLegends, lolReal = REAL.leagueOfLegends;
+  if (lol && lolReal) {
+    lines.push(`\nLeague of Legends — the ${lol.nations} strongest nations, ${lol.series} series of best of five, ${lol.games} games (real: ${lolReal.note})`);
+    lines.push(row('minutes a game', lol.minutes, lolReal.minutes, x => num(x, 1)));
+    lines.push(row('winner\'s kills', lol.winnerKills, lolReal.winnerKills, x => num(x, 1)));
+    lines.push(row('loser\'s kills', lol.loserKills, lolReal.loserKills, x => num(x, 1)));
+    lines.push(row('winner took a Baron', lol.winnerBaron, lolReal.winnerBaron, pct));
+    lines.push(row('loser took a Baron', lol.loserBaron, lolReal.loserBaron, pct));
+    for (const [label, key] of [['series won 3–0', 'sweep'], ['series won 3–1', 'threeOne'], ['series won 3–2', 'threeTwo']]) {
+      lines.push(row(label, lol[key], null, pct));
+      if (lolReal.bestOfFive) lines.push(`      (the real best-of-fives, ${lolReal.bestOfFive.series}: ${pct(lolReal.bestOfFive[key])})`);
+    }
+    lines.push(row('favourite wins', lol.favourite.wins, null, pct));
+    lines.push(row('home (defending) side wins', lol.homeWins, null, pct));
   }
   const r = report.nrl, rr = REAL.nrl;
   lines.push(`\nNRL — ${r.clubs} clubs, ${NRL_GAMES} games (real: ${rr.note})`);

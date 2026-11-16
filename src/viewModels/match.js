@@ -23,6 +23,8 @@ const GROUPS = {
   'rugby-league': ['FB', 'WG', 'CE', 'FE', 'HB', 'PR', 'HK', 'SR', 'LK'],
   'rocket-league': ['PLR'],
   'counter-strike': ['PLR'],
+  valorant: ['PLR'],
+  'league-of-legends': ['TOP', 'JGL', 'MID', 'BOT', 'SUP'],
 };
 
 const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
@@ -49,14 +51,17 @@ function oddsOf(odds) {
  * league: the two who scored most, a try ranked as its four points, a penalty goal as two and a field goal as one; a
  * conversion is the try's, nobody's own) or "Zen 5 G · Alpha54 3 G" (Rocket League: the two who scored most over the series;
  * a game's end scores nothing of its own) or "ZywOo 12 MVP · apEX 7 MVP" (Counter-Strike: the two who were their side's MVP
- * of the most rounds; a map's end counts nothing of its own). `sport` is a sport id or a season's rules (matchSport): an ice hockey season
+ * of the most rounds; a map's end counts nothing of its own) or "aspas · Less" (Valorant and League of Legends: the best
+ * player of each map or game the side won, in order). `sport` is a sport id or a season's rules (matchSport): an ice hockey season
  * before the shoot-out has none to leave out.
  */
 export function scorersLine(shown, teamId, teams, sport = 'football') {
   const sportId = typeof sport === 'object' && sport ? sport.id : sport;
   const own = (Array.isArray(shown) ? shown : []).filter(e => e && e.tid === teamId && e.name);
   if (!own.length) return '';
-  if (isTennisSport(sportId)) return own.filter(e => Number(e.pts) > 0).map(e => shortName(e.name)).join(' · ');
+  if (isTennisSport(sportId) || sportId === 'valorant' || sportId === 'league-of-legends') {
+    return own.filter(e => Number(e.pts) > 0).map(e => shortName(e.name)).join(' · ');
+  }
   if (sportId === 'rocket-league') {
     // Goals only: a game's end (`pts` 1) is the team's, named for its deciding goal, already counted.
     const totals = new Map();
@@ -222,6 +227,10 @@ const SCORE_POINTS = { TD: 6, FG: 3, SAFETY: 2, '2PT': 2 };
 const ROCKET_GOAL_COPY = /^(?:OVERTIME )?GOAL\s+—\s+(.+?)\s+\(([A-Z]{3})\)\s+\d+–\d+/;
 // Counter-Strike's round line, "R14 — ZywOo (FRA) 8–6" or "R27 OT — ZywOo (FRA) 14–13": the round's MVP, then the map's score.
 const ROUND_COPY = /^R\d+(?: OT)?\s+—\s+(.+?)\s+\(([A-Z]{3})\)\s+\d+–\d+$/;
+// Valorant's map line, "ASCENT — BRA 13–9 · aspas" (an overtime's "14–12 OT"), and League of Legends' game line, "GAME 2 —
+// KOR · 22–9 kills · Faker": the side's code, then the best player.
+const MAP_END_COPY = /^[A-Z][A-Z ]* — ([A-Z]{3}) \d+–\d+(?: OT)? · (.+)$/;
+const NEXUS_COPY = /^GAME \d+ — ([A-Z]{3}) · \d+–\d+ kills · (.+)$/;
 function historyShown(entry, aId, dId, aCode, dCode) {
   const shown = [];
   for (const e of Array.isArray(entry?.events) ? entry.events : []) {
@@ -229,6 +238,12 @@ function historyShown(entry, aId, dId, aCode, dCode) {
     if (rocket) {
       const tid = rocket[2] === aCode ? aId : rocket[2] === dCode ? dId : null;
       if (tid != null) shown.push({ tid, name: rocket[1], m: 0, pts: 0 });
+      continue;
+    }
+    const won = NEXUS_COPY.exec(String(e?.text || '').trim()) ?? MAP_END_COPY.exec(String(e?.text || '').trim());
+    if (won) {
+      const tid = won[1] === aCode ? aId : won[1] === dCode ? dId : null;
+      if (tid != null) shown.push({ tid, name: won[2], m: 0, pts: 1 });
       continue;
     }
     const tennis = TENNIS_COPY.exec(String(e?.text || '').trim());

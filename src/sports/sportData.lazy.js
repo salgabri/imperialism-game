@@ -1,7 +1,7 @@
 // The page's players (`#sport-data` in browser builds, package.json "imports"). Football's, the default setup's, come
 // with the first download; every other sport's rosters and clubs (src/data/players/) load the first time that sport is
 // played (sportData.js `loadSportData`). Women's football's and college football's are each a chunk of their own; the
-// eight smaller sports' share one, so a first visit's worker fetches one file for them, not eight (vite.config.js chunkOf).
+// eleven smaller sports' share one, so a first visit's worker fetches one file for them, not eleven (vite.config.js chunkOf).
 import { ROSTERS } from '../data/rosters.js';
 import { CLUBS } from '../data/clubs.football.js';
 
@@ -26,4 +26,6 @@ export const LOADERS = {
   'rugby-league': players(() => import('../data/players/rugby-league.js')),
   'rocket-league': players(() => import('../data/players/rocket-league.js')),
   'counter-strike': players(() => import('../data/players/counter-strike.js')),
+  valorant: players(() => import('../data/players/valorant.js')),
+  'league-of-legends': players(() => import('../data/players/league-of-legends.js')),
 };

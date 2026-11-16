@@ -59,7 +59,10 @@ const BUILT_IN_SEASONS_OF = Object.freeze({ football: BUILT_IN_SEASON, 'womens-f
   // Rocket League's is the RLCS's 2026 season, a calendar year: Liquipedia's results up to its world championship and after.
   'rocket-league': Object.freeze({ year: 2026, season: '2026' }),
   // Counter-Strike's likewise: Liquipedia's results of CS:GO and CS2 to November 2026.
-  'counter-strike': Object.freeze({ year: 2026, season: '2026' }) });
+  'counter-strike': Object.freeze({ year: 2026, season: '2026' }),
+  // Valorant's is the VCT's 2026 season and League of Legends' its 2026 season, calendar years: vlr.gg's and gol.gg's results
+  // up to their world championships.
+  valorant: Object.freeze({ year: 2026, season: '2026' }), 'league-of-legends': Object.freeze({ year: 2026, season: '2026' }) });
 /** The season a sport's built-in data plays. */
 export const builtInSeasonOf = sportId => BUILT_IN_SEASONS_OF[getSport(sportId).id];
 

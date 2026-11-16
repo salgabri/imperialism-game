@@ -17,7 +17,8 @@ import { bundleApp, bundleComponents, forceResult, syncAppFixture, withDom } fro
 const App = await bundleApp();
 const { SetupOverlay } = await bundleComponents({ SetupOverlay: 'src/components/SetupOverlay.jsx' });
 const IDS = ['250', '276', '826'];
-const AS_ONE = ['basketball', 'baseball', 'hockey', 'tennis', 'womens-tennis', 'rocket-league', 'counter-strike'];
+const AS_ONE = ['basketball', 'baseball', 'hockey', 'tennis', 'womens-tennis', 'rocket-league', 'counter-strike', 'valorant',
+  'league-of-legends'];
 const identityOf = team => [team.name, team.code, team.flagId];
 const GB = ['Great Britain', 'GBR', 'GBR'];
 const ENGLAND = ['England', 'ENG', '826'];
@@ -62,10 +63,10 @@ test('Great Britain flies the vendored Union Jack; England keeps the cross of St
 
 test('the setup wall lists Great Britain under the Union Jack where the sport plays it, England in football', async () => {
   // Great Britain fields a team where its own rated players hold half the lineup (fieldedNations): in basketball (its
-  // EuroBasket 2025 five), both tennis games and the esports (England's, Scotland's and Wales's players as one). Its
-  // baseball and hockey players are too few, and its land stays neutral there.
+  // EuroBasket 2025 five), both tennis games and the esports but League of Legends (England's, Scotland's and Wales's players
+  // as one). Its baseball, hockey and League of Legends players are too few, and its land stays neutral there.
   const playing = AS_ONE.filter(sport => fieldedNations(getSport(sport)).includes('826'));
-  assert.deepEqual(playing, ['basketball', 'tennis', 'womens-tennis', 'rocket-league', 'counter-strike']);
+  assert.deepEqual(playing, ['basketball', 'tennis', 'womens-tennis', 'rocket-league', 'counter-strike', 'valorant']);
   for (const sport of [...playing, 'football']) {
     const [name, code, flagId] = sport === 'football' ? ENGLAND : GB;
     const flag = sport === 'football' ? '/flags/gb-eng.svg' : '/flags/gb.svg';

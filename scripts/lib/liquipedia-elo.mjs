@@ -33,6 +33,7 @@ const FLAG_ALIASES = {
   'south korea': '410', 'republic of korea': '410', czechia: '203', 'czech republic': '203', czech: '203', turkiye: '792',
   holland: '528', 'bosnia and herzegovina': '070', 'ivory coast': '384', 'cote d ivoire': '384', 'dr congo': '180',
   'democratic republic of the congo': '180', 'north macedonia': '807', macedonia: '807', taiwan: '158', 'chinese taipei': '158',
+  tw: '158', // the game flies Chinese Taipei's own flag ("tpe"); the sites file its players under Taiwan's code
   russia: '643', 'russian federation': '643', vietnam: '704', 'viet nam': '704', iran: '364', syria: '760', palestine: '275',
   mex: '484', arg: '032', gha: '288', ger: '276', phl: '608', auz: '036', sweeden: '752', hn: '340', honduras: '340',
   re: '250', reunion: '250', gp: '250', guadeloupe: '250', mq: '250', martinique: '250', gf: '250', 'french guiana': '250',
