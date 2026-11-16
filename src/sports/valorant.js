@@ -1,6 +1,8 @@
 import { C } from '../theme.js';
 import { defineSportData } from './sportData.js';
+import { rulesMemo, rulesYear } from './eras.js';
 import { GREAT_BRITAIN, HISTORIC_NATIONS, HOME_NATIONS, NATIONS, selectLineup } from '../data/teams.js';
+import { VALORANT_MAP_POOLS } from '../data/valorantMapPools.js';
 import { clamp, createScorerSampler, gauss } from '../engine/random.js';
 
 // Valorant as the VCT plays its playoffs (docs/design/valorant.md): two teams of five, a series of maps, best of three. A
@@ -57,7 +59,8 @@ export const HOME_EDGE = 1;
 const EMPTY_STRENGTH = 40;
 
 // The maps a series is played on, three of the competitive pool in a random order: the seven played at vlr.gg's events
-// from mid-October to mid-November 2026, after the pool's last rotation (Corrode and Bind in, Split and Ascent out).
+// from mid-October to mid-November 2026, after the pool's last rotation (Corrode and Bind in, Split and Ascent out). An
+// earlier season plays on its own December's pool (VALORANT_MAP_POOLS, `valorantIn`).
 export const MAP_POOL = Object.freeze(['Lotus', 'Haven', 'Sunset', 'Summit', 'Corrode', 'Abyss', 'Bind']);
 
 const sigmoid = x => 1 / (1 + Math.exp(-x));
@@ -279,12 +282,12 @@ const unitOf = n => (n <= 2 * HALF ? n : n <= 2 * HALF + 2 ? 2 * HALF + 1 : 2 * 
  * named for its best player. Each event carries the map's rounds from its side (`own`, `opp`) and, for the live chart,
  * the half's last two winners (`prev`).
  */
-export function simulateSeries(rng, prepared, drama = 6) {
+export function simulateSeries(rng, prepared, drama = 6, mapPool = MAP_POOL) {
   const result = sampleResult(rng, prepared, drama);
   const beta = mapBeta(mapOdds(prepared.gap + result.form));
   const standout = { A: createScorerSampler(prepared.lineupA, STANDOUT_WEIGHTS, STANDOUT_FLOOR),
     D: createScorerSampler(prepared.lineupD, STANDOUT_WEIGHTS, STANDOUT_FLOOR) };
-  const pool = MAP_POOL.slice();
+  const pool = mapPool.slice();
   const ev = [];
   result.games.forEach((winner, k) => {
     const start = k * BLOCK;
@@ -328,6 +331,14 @@ const territoryOf = rosters => ({
   inactive: Object.keys(NATIONS).filter(nation => !HOME_NATIONS.includes(nation) && !HISTORIC_NATIONS.includes(nation)
     && !Object.hasOwn(rosters, nation)),
 });
+
+/** A campaign's match on `mapPool`: the series and its events, each side's events under its team's id. */
+const simulateOn = mapPool => (rng, attacker, defender, drama, effA, effD, venue) => {
+  const prepared = prepareMatch(attacker, defender, effA, effD, venue);
+  const { ga, gd, ev, winner } = simulateSeries(rng, prepared, drama, mapPool);
+  return { ga, gd, regA: ga, regD: gd, tie: null, winner,
+    ev: ev.map(({ side, ...e }) => ({ ...e, tid: side === 'A' ? attacker.id : defender.id })) };
+};
 
 const valorantRules = {
   id: 'valorant',
@@ -377,17 +388,35 @@ const valorantRules = {
   formatToast: e => (e.pts > 0 ? `MAP ${e.game} — ${e.score}${e.ot ? ' OT' : ''}`
     : e.kind === 'overtime' ? `OVERTIME — ${e.score}` : `PISTOL — ${String(e.name).toUpperCase()}`),
 
+  /** The rules a campaign plays (matchSport): an earlier season's map pool (`valorantIn`), today's for the built-in one. */
+  rulesFor: settings => valorantIn(settings),
+
   prepareMatch,
   sampleResult,
-  simulate: (rng, attacker, defender, drama, effA, effD, venue) => {
-    const prepared = prepareMatch(attacker, defender, effA, effD, venue);
-    const { ga, gd, ev, winner } = simulateSeries(rng, prepared, drama);
-    return { ga, gd, regA: ga, regD: gd, tie: null, winner,
-      ev: ev.map(({ side, ...e }) => ({ ...e, tid: side === 'A' ? attacker.id : defender.id })) };
-  },
+  simulate: simulateOn(MAP_POOL),
 };
 
 export const valorant = defineSportData({ ...valorantRules }, { clubs: false, territoryOf });
+
+/**
+ * Valorant on an earlier season's map pool (`rules`: { year, mapPool }): the same series, its maps drawn from that year's
+ * pool. Who wins is Elo's whatever the maps, so a season's odds are today's and its simulation version too.
+ */
+export function valorantWith(rules) {
+  return defineSportData({ ...valorantRules, rules, simulate: simulateOn(rules.mapPool) }, { clubs: false, territoryOf });
+}
+
+const seasonValorant = rulesMemo(year => valorantWith(Object.freeze({ year, mapPool: VALORANT_MAP_POOLS[year] })));
+
+/**
+ * Valorant as a setup's or campaign's season played it (`settings`: `dataSet`, `dataYear`; matchSport): each earlier
+ * season on its own December's map pool (VALORANT_MAP_POOLS). The built-in season, which has no data set, and a year the
+ * table lacks play today's (`valorant` itself).
+ */
+export function valorantIn(settings) {
+  const year = rulesYear(settings);
+  return year != null && Object.hasOwn(VALORANT_MAP_POOLS, year) ? seasonValorant(year) : valorant;
+}
 
 /**
  * Squad-screen strength profile: the five who play and the best of them → { team, best } on the player-rating scale.

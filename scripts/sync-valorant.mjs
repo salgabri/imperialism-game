@@ -2,21 +2,23 @@
 // (scripts/lib/vlr.mjs TIERS), each event's matches and each match's page, kept gzipped in data-src/vlr/ (git-ignored).
 //
 // Then rates every player by an Elo of the maps (scripts/lib/esports-elo.mjs) and writes scripts/data/valorant-elo.json,
-// which npm run build-valorant turns into the national teams.
+// which npm run build-valorant turns into the national teams, and scripts/data/valorant-seasons/<year>.json, each earlier
+// year's players as rated on its last day, which npm run build:valorant-seasons turns into the earlier seasons.
 //
 // Usage: node scripts/sync-valorant.mjs [--fetch] [--refresh-lists] [--tune] [--max-matches=N] [--pause=MS]
 //   npm run sync:valorant
 //   --fetch          fetch the pages the cache lacks (one at a time, PAUSE_MS apart); without it nothing is fetched
 //   --refresh-lists  fetch the events listings and the matches of events not yet over again
 //   --tune           also score K and the circuits' starts on the last HOLDOUT_DAYS of maps, before each is played
-import { readdir, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { FIRST_EVENT, SITE, TIERS, cached, countsEvent, readEventList, readEventMatches, vlrPage } from './lib/vlr.mjs';
 import { calibrationOf, circuitLevels, homesOf, leftOut, nationsOf, ratedPlayers, runElo, scoreOf, snapshotText } from './lib/esports-elo.mjs';
-import { ACTIVE_DAYS, CIRCUIT_LEVELS, EDITION, K_SCALE, LINEUP, MIN_GAMES, TEAM_SIZE, nationalTeams, nationOfPlayer, playerOf, playOf, readCache, rowOf,
-  seriesOf } from './lib/valorant.mjs';
+import { ACTIVE_DAYS, CIRCUIT_LEVELS, EDITION, K_SCALE, LINEUP, MIN_GAMES, TEAM_SIZE, flagOf, nationalTeams, nationOfPlayer, playerOf, playOf, readCache,
+  rowOf, seriesOf } from './lib/valorant.mjs';
 import { GREAT_BRITAIN } from '../src/data/teams.js';
+import { MAP_POOL } from '../src/sports/valorant.js';
 
 // Great Britain plays as one, as in Rocket League and tennis.
 const valorant = { playsAs: { '826': GREAT_BRITAIN } };
@@ -33,10 +35,14 @@ const pause = Number(option('pause') ?? 1000);
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const cache = path.join(root, 'data-src', 'vlr');
 const snapshotFile = path.join(root, 'scripts', 'data', 'valorant-elo.json');
+const seasonsDir = path.join(root, 'scripts', 'data', 'valorant-seasons');
 // The days before the last map whose maps score K: each predicted before it is played.
 const HOLDOUT_DAYS = 180;
 // The real maps the match model is held against: the last two years'.
 const PLAY_YEARS = 2;
+// An earlier season's map pool: the MAP_POOL.length maps played most in its year's last POOL_MAPS maps, the pool in play
+// when its ratings are taken (every year's last thousand hold exactly seven, the competitive pool of its December).
+const POOL_MAPS = 1000;
 
 /** A page from the cache, or fetched when --fetch allows it; null when neither. */
 async function page(url, file, { refresh = false } = {}) {
@@ -163,3 +169,41 @@ console.log(`  top: ${asPlayers.slice(0, 15).map(p => `${p.name} ${p.rating}`).j
 console.log(`  ${nations.length} nations field a team: ${nations.map(n => `${n.name} ${n.str}`).join(', ')}`);
 console.log(`  left out: ${noNation.length} with no country on the map (${noNation.slice(0, 15).map(p => `${p.name} ${p.flag ?? '—'}`).join(', ')}${noNation.length > 15 ? ' …' : ''}),`
   + ` ${short.length} from a nation of fewer than ${LINEUP}`);
+
+// The earlier seasons (docs/design/valorant.md, "Earlier seasons"): every calendar year from the first whole one (the cache
+// begins in September 2022, with 2023's first Challengers qualifiers) to the one before the cache's last, its players as
+// rated on 31 December by the Elo of the maps up to that day, each with the flag and nation the whole record gives him (a
+// country is a person's, whichever year it is) and the team he played for that December; its real maps between seasoned
+// players; and its map pool, the seven maps most played in its last thousand.
+await mkdir(seasonsDir, { recursive: true });
+console.log(`\nEarlier seasons, each as rated on 31 December, to ${path.relative(root, seasonsDir)}:`);
+const playedMaps = series.flatMap(one => one.games.map(game => ({ date: one.date, name: game.map.name })))
+  .filter(map => map.name && map.name !== 'TBD');
+for (let year = Number(series[0].date.slice(0, 4)) + 1; year < Number(last.slice(0, 4)); year++) {
+  const date = `${year}-12-31`;
+  const upTo = series.filter(one => one.date <= date);
+  const startsThen = CIRCUIT_LEVELS ? circuitLevels(upTo) : {};
+  const homesThen = CIRCUIT_LEVELS ? homesOf(upTo) : null;
+  const { players: then } = runElo(upTo, { scale: K_SCALE, starts: startsThen, homes: homesThen });
+  const ratedThen = ratedPlayers(then, date, { minGames: MIN_GAMES, activeDays: ACTIVE_DAYS,
+    flagOf: player => flagOf(players.get(player.key)), nationOf: player => nationByKey.get(player.key) ?? null,
+    sideOf: player => national.get(player.key)?.team ?? null });
+  const { play: thatYear } = playOf(series, { scale: K_SCALE, starts: startsThen, homes: homesThen, from: `${year}-01-01`,
+    until: `${year + 1}-01-01`, nationOf: () => null });
+  const lastMaps = playedMaps.filter(map => map.date <= date).slice(-POOL_MAPS);
+  const counts = new Map();
+  for (const map of lastMaps) counts.set(map.name, (counts.get(map.name) ?? 0) + 1);
+  const ranked = [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+  const season = { season: year, date, fetched: snapshot.source.fetched, from: series[0].date, to: upTo.at(-1).date,
+    matches: upTo.length, maps: upTo.reduce((sum, one) => sum + one.games.length, 0), rated: ratedThen.length,
+    activeDays: ACTIVE_DAYS, minGames: MIN_GAMES, kScale: K_SCALE,
+    mapPool: { from: lastMaps[0].date, maps: lastMaps.length, pool: ranked.slice(0, MAP_POOL.length).map(([name]) => name),
+      played: Object.fromEntries(ranked) },
+    play: { maps: thatYear.maps, rounds: thatYear.rounds, ot: thatYear.ot, roundStats: thatYear.roundStats, series: thatYear.series } };
+  await writeFile(path.join(seasonsDir, `${year}.json`), snapshotText(season, ratedThen.map(rowOf)));
+  const fielded = nationsOf(ratedThen.map((player, i) => playerOf(rowOf(player), date, i + 1)), { teamSize: TEAM_SIZE, lineup: LINEUP, sport: valorant });
+  console.log(`  ${year}: ${ratedThen.length} rated, ${fielded.length} nations (${fielded.slice(0, 4).map(n => `${n.name} ${n.str}`).join(', ')}…);`
+    + ` ${thatYear.maps} maps between seasoned players, ${(thatYear.rounds / Math.max(1, thatYear.maps)).toFixed(2)} rounds,`
+    + ` ${(100 * thatYear.ot / Math.max(1, thatYear.maps)).toFixed(1)}% to overtime; pool ${season.mapPool.pool.join(', ')}`
+    + ` (${ranked.slice(MAP_POOL.length).map(([name, n]) => `${name} ${n}`).join(', ') || 'no other map'} beside it)`);
+}
