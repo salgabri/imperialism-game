@@ -18,6 +18,8 @@ import { ROSTERS as RUGBY_LEAGUE } from '../data/rosters.rugby-league.js';
 import { CLUBS as NRL_CLUBS } from '../data/clubs.rugby-league.js';
 import { ROSTERS as ROCKET_LEAGUE } from '../data/rosters.rocket-league.js';
 import { ROSTERS as COUNTER_STRIKE } from '../data/rosters.counter-strike.js';
+import { ROSTERS as VALORANT } from '../data/rosters.valorant.js';
+import { ROSTERS as LEAGUE_OF_LEGENDS } from '../data/rosters.league-of-legends.js';
 
 /** Sport id → its players: `rosters` and `clubs`, each only where the sport reads them from its players. */
 export const EAGER = {
@@ -33,6 +35,8 @@ export const EAGER = {
   'rugby-league': { rosters: RUGBY_LEAGUE, clubs: NRL_CLUBS },
   'rocket-league': { rosters: ROCKET_LEAGUE },
   'counter-strike': { rosters: COUNTER_STRIKE },
+  valorant: { rosters: VALORANT },
+  'league-of-legends': { rosters: LEAGUE_OF_LEGENDS },
 };
 
 /** Nothing to load: every sport is here. */

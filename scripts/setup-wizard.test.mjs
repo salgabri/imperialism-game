@@ -645,19 +645,19 @@ test('setup.css keeps the reviewed token and hit-target rules', () => {
   assert.match(narrow, /^\s*\.setup-foot \.setup-foot__back \{ padding:0 14px; \}\s*\.setup-foot \.setup-foot__next \{ padding:0 12px; \}\s*\.setup-theatre \{ padding:0 8px; \}\s*\}/);
 });
 
-test('twelve sports sit in three rows of four, compact tiles that stay 44px targets, and step 1\'s heading gives way at 360×640', t => {
+test('fourteen sports sit in four rows of four, compact tiles that stay 44px targets, and step 1\'s heading gives way at 360×640', t => {
   const sink = consoleSink(t);
   t.after(() => sink.release());
   const markup = renderToStaticMarkup(React.createElement(SetupOverlay, { setup: { ...BASE, sport: 'womens-tennis' }, managerTeams: TEAMS,
     hasSave: true, savedText: 'Round 4 · 20 nations remaining · Europe', onResume() {}, onCancel() {} }));
   const grid = new JSDOM(markup).window.document.querySelector('.setup-sports');
-  assert.equal(grid.children.length, 12);
-  assert.equal(grid.getAttribute('data-rows'), '3');
+  assert.equal(grid.children.length, 14);
+  assert.equal(grid.getAttribute('data-rows'), '4');
   assert.match(grid.getAttribute('style'), /--sport-cols:\s*4/, 'five across would squeeze "Basketball" out of its tile');
   assert.equal(grid.getAttribute('data-cols'), '4');
-  assert.deepEqual([...grid.querySelectorAll('.setup-card__button')].map(button => button.textContent).slice(3, 12),
+  assert.deepEqual([...grid.querySelectorAll('.setup-card__button')].map(button => button.textContent).slice(3, 14),
     ['American football', 'College football', 'Baseball', 'Ice hockey', 'Tennis', 'Women\'s tennis', 'Rugby league', 'Rocket League',
-      'Counter-Strike']);
+      'Counter-Strike', 'Valorant', 'League of Legends']);
   const css = readFileSync(new URL('../src/components/setup.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   assert.match(css, /\.setup-sports\[data-rows="3"\] \.setup-card \{ min-height:44px;/);
   // Four across on a phone, the long names take two lines: a smaller icon and snug lines keep 390×664 from scrolling
@@ -665,6 +665,13 @@ test('twelve sports sit in three rows of four, compact tiles that stay 44px targ
   assert.match(css, /\.setup-sports\[data-rows="3"\]\[data-cols="4"\] \.setup-card__icon \{ width:18px; height:18px; \}/);
   assert.match(css, /\.setup-sports\[data-rows="3"\]\[data-cols="4"\] \.setup-card__button \{ line-height:1; \}/);
   assert.match(css, /@media \(max-width:699\.98px\) and \(max-height:660px\) \{\s*\.setup-step\[data-step="1"\]:has\(\.setup-notices\):has\(\.setup-sports\[data-rows="3"\]\) \.setup-heading \{ display:none; \}/);
+  // Four rows (fourteen sports): every tile is just its 44px target on a phone and on a window up to 800px tall, and step
+  // 1's heading gives way on any phone (measured in Chrome: 390×664 602px of content in 510px → 510px, 360×640 488px in
+  // 486px → 486px with the rows 2px closer, 1024×768 650px in 605px → 605px).
+  assert.match(css, /\.setup-sports\[data-rows="4"\] \.setup-card \{ min-height:44px;/);
+  assert.match(css, /@media \(max-width:699\.98px\), \(max-height:799\.98px\) \{\s*\.setup-sports\[data-rows="4"\] \.setup-card \{ padding:3px 4px 2px; gap:1px; \}\s*\.setup-sports\[data-rows="4"\] \.setup-card__icon \{ width:16px; height:16px; \}\s*\.setup-sports\[data-rows="4"\] \.setup-card__button \{ line-height:1; \}/);
+  assert.match(css, /\.setup-step\[data-step="1"\]:has\(\.setup-sports\[data-rows="4"\]\) \.setup-heading \{ display:none; \}/);
+  assert.match(css, /\.setup-sports\[data-rows="4"\] \{ row-gap:4px; \}/);
 });
 
 test('a season\'s credit shows whole under the Season choice, as quiet text, and step 1\'s extras make room for it', async t => {

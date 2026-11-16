@@ -38,6 +38,11 @@ const SUPPORT = {
   'rocket-league': { PLR: [.5, .5] },
   // Counter-Strike's reserves the same, for any of the five.
   'counter-strike': { PLR: [.5, .5] },
+  // So can a Valorant reserve for any of the five.
+  valorant: { PLR: [.5, .5] },
+  // A League of Legends carry (the mid and bot laners, the jungler's ganks) wins games; the top laner and the support
+  // hold the lanes and keep the team alive.
+  'league-of-legends': { TOP: [.4, .7], JGL: [.7, .5], MID: [1, .3], BOT: [1, .2], SUP: [.2, 1] },
 };
 
 export function tacticalProfile(team) {

@@ -20,20 +20,22 @@ Pick your sport at kick-off:
 | Rugby league | the matchday 17: thirteen and four on the bench | 80 minutes | golden point |
 | Rocket League | three a side, a nation's best of its five | best of seven five-minute games | sudden-death overtime in a level game; a series always has a winner |
 | Counter-Strike | five a side, a nation's best of its seven | best of three maps, each first to 13 rounds | overtimes of six rounds from 12–12; a series always has a winner |
+| Valorant | five a side, a nation's best of its seven | best of three maps, each first to 13 rounds | two clear rounds in overtime from 12–12; a series always has a winner |
+| League of Legends | one player in each of five roles, a nation's seven | best of five games, each until a Nexus falls | none: a game always has a winner |
 
 And pick who fights:
 
 - **Nations** — 176 nations on the map, each team starting on its own homeland. England,
   Scotland, Wales and Northern Ireland are four teams on four shapes, as in football.
-  Basketball, baseball, ice hockey, both tennis games and both esports field them as one team, Great
+  Basketball, baseball, ice hockey, both tennis games and the esports field them as one team, Great
   Britain (GBR), under the Union Jack, and so does women's football's 2012 Olympic tournament
   ([its season](#the-world-cups-and-olympic-tournaments-1991-to-2015-computed)). A sport fields 173 at most: those four play Great Britain
   as one, and football leaves out Tonga, Samoa and the Cook Islands, whose players no
   source rates ([Pacific islands](docs/design/pacific-islands.md)). A nation fields a team
   only with a **real side**, its own rated players holding at least half the lineup, and
-  every other nation's land stays neutral: 173 nations play football, 57 Rocket League, 52
-  tennis, 45 women's tennis, 47 basketball, 40 Counter-Strike, 36 women's football, 12 baseball, 7 ice
-  hockey and 6 rugby league. No team is made up of generated players or nearly empty.
+  every other nation's land stays neutral: 173 nations play football, 63 Valorant, 57 Rocket League, 52
+  tennis, 45 women's tennis, 47 basketball, 40 Counter-Strike, 40 League of Legends, 36 women's football, 12
+  baseball, 7 ice hockey and 6 rugby league. No team is made up of generated players or nearly empty.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs (Europe's 68
   on [their maps of Europe](#womens-football-on-the-europe-maps), the NWSL's 16 on [theirs](#the-nwsl-map) of the USA), all 30 NBA
@@ -44,7 +46,7 @@ And pick who fights:
   [theirs](#the-mlb-map) of the USA and Canada, all 32 NHL clubs on
   [theirs](#the-nhl-map), or all 17 NRL clubs on [theirs](#the-nrl-map) of Australia and New Zealand. Real Madrid annexes territory
   exactly the way Spain does. American football and college football are played by clubs only, tennis,
-  women's tennis and both esports by nations only.
+  women's tennis and the esports by nations only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
   leagues, fewer for smaller ones) on that country's own map, split into 100
   sections ([domestic campaigns](#domestic-campaigns)).
@@ -66,7 +68,10 @@ Tennis plays Davis Cup ties between nations, its players rated by their Elo
 by their Elo, with the WTA's serve ([design notes](docs/design/womens-tennis.md)). Rocket League, the first esport, plays
 the RLCS's best-of-seven series between nations, its players rated by an Elo built from every series Liquipedia
 records ([design notes](docs/design/rocket-league.md)). Counter-Strike, the second, plays best-of-three series of maps
-round by round, its players rated by the same Elo, map by map ([design notes](docs/design/counter-strike.md)).
+round by round, its players rated by the same Elo, map by map ([design notes](docs/design/counter-strike.md)). Valorant, the
+third, plays best-of-three series of maps round by round with the economy of its pistol rounds, its players rated by an Elo
+of vlr.gg's results ([design notes](docs/design/valorant.md)), and League of Legends, the fourth, best-of-five series between
+nations of one player a role, its players rated by an Elo of gol.gg's results ([design notes](docs/design/league-of-legends.md)).
 
 Originally implemented from the `Football Imperialism.dc.html` design in the
 [Football Imperialism Game](https://claude.ai/design/p/440e3f09-8445-4fa3-8acb-531957f27c9b)
@@ -164,6 +169,10 @@ npm run build-rocket-league # rebuild the Rocket League nations from that snapsh
 npm run build:rocket-league-seasons # rebuild Rocket League's earlier seasons, 2016-2025, from the sync's year-end snapshots (--check)
 npm run sync:counter-strike # Counter-Strike's player Elo from Liquipedia exports saved by hand in data-src/liquipedia-counterstrike/ (no network) into scripts/data/counter-strike-elo.json
 npm run build-counter-strike # rebuild the Counter-Strike nations from that snapshot (--check compares byte for byte)
+npm run sync:valorant    # Valorant's player Elo from vlr.gg's results cached in data-src/vlr/ into scripts/data/valorant-elo.json (--fetch fetches the pages the cache lacks)
+npm run build-valorant   # rebuild the Valorant nations from that snapshot (--check compares byte for byte)
+npm run sync:league-of-legends # League of Legends' player Elo from gol.gg's results cached in data-src/golgg/ into scripts/data/league-of-legends-elo.json (--fetch fetches the pages the cache lacks)
+npm run build-league-of-legends # rebuild the League of Legends nations from that snapshot (--check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 npm run build:icons      # render favicon.ico, apple-touch-icon.png and the app icons from public/favicon.svg
 npm run build:fonts      # cut the Latin Extended + Vietnamese font files from the pinned Archivo sources (--check compares byte for byte)
@@ -398,7 +407,8 @@ manager of the theatre's favourite, with decisions from the first match.
    NRL.com's match statistics, but 2008: Rugby League 2, the overall ours; before 1998 from the Rugby League
    Project's team lists), the premiership's clubs on the map of their day, Rocket League its 2026 then its
    [earlier seasons](#rocket-league-seasons) 2025 back to 2016 (the Elo of Liquipedia's results at each year's end),
-   and Counter-Strike its 2026 (the Elo of Liquipedia's results to November).
+   Counter-Strike its 2026 (the Elo of Liquipedia's results to November), Valorant its 2026 (the Elo of vlr.gg's results
+   to November) and League of Legends its 2026 (the Elo of gol.gg's results to November).
    The Season list names a season by its years, adding "· computed", "· converted"
    or "· fan-made" where its label calls its ratings so ("1969/70 · computed"); a
    year with two seasons (football's 1993/94 and 1989/90, the NFL's and AFL's of
@@ -994,8 +1004,9 @@ with martj42's international results (CC0).
 This project is not affiliated with, endorsed or sponsored by Electronic Arts
 (EA SPORTS FC, FIFA, Madden NFL, EA SPORTS College Football, EA SPORTS NHL), Sports Interactive and SEGA (Football Manager),
 2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), Big Ant Studios (Rugby League 26), Psyonix and Epic Games (Rocket
-League and the RLCS), Valve (Counter-Strike), Liquipedia, the NBA, the NFL, the NCAA, MLB, the NHL, the NRL, or the clubs,
-schools, leagues, conferences, organisers and federations it names.
+League and the RLCS), Valve (Counter-Strike), Riot Games (Valorant, League of Legends and the VCT), Liquipedia, vlr.gg, Game of
+Legends (gol.gg), the NBA, the NFL, the NCAA, MLB, the NHL, the NRL, or the clubs, schools, leagues, conferences, organisers
+and federations it names.
 All trademarks, names and ratings belong to their respective owners.
 
 **American football** — `src/data/clubs.american-football.js`, the 32 NFL
@@ -1090,6 +1101,25 @@ for the nation he last played for at a national-team event (the Esports Nations 
 championships), else his Liquipedia page's country; 1,667 players have played within the year, and 40 nations have the
 five a map needs, from Russia, Ukraine, France and Brazil down. Nothing is estimated. See the
 [design notes](docs/design/counter-strike.md).
+
+**Valorant** — `src/data/rosters.valorant.js`, from every map vlr.gg records of VCT, Challengers and the off-season,
+from 2023's season (its first qualifiers in September 2022) to 15 November 2026, fetched a page at a time through
+`scripts/lib/polite-fetch.mjs` (vlr.gg's robots.txt keeps no agent from its events and matches) and cached in
+`data-src/vlr/`, into `scripts/data/valorant-elo.json`: 534 events, 21,142 matches, 44,939 maps. Each player's rating is
+the same Elo, map by map, a team playing at its five players' mean, on the same scale (RieNs's 2,445 is 96); held out on
+the last 180 days its predictions were calibrated (log loss 0.638). A player plays for the nation he last played for at
+the Esports Nations Cup, else the flag vlr.gg files him under; 2,437 players have played within the year, and 63 nations
+have the five a map needs, from Turkey, Canada and South Korea down. Nothing is estimated. See the
+[design notes](docs/design/valorant.md).
+
+**League of Legends** — `src/data/rosters.league-of-legends.js`, from every game gol.gg records of the leagues and the
+international events from July 2025 (where gol.gg stopped answering the fetch) to 14 November 2026, fetched the same way
+and cached in `data-src/golgg/`, into `scripts/data/league-of-legends-elo.json`: 211 tournaments, 4,865 series, 10,940
+games. Each player's rating is the same Elo, game by game, a newcomer starting at his league's level as every link between
+the leagues sets it, on a scale of (Elo − 100) / 25 (Bin's 2,530 is 97); held out on the last 180 days its predictions
+were calibrated (log loss 0.609). A player plays for the country gol.gg files him under, in the role he plays most; 1,315
+players have played within the year, and 40 nations have the five a game needs, from South Korea and China down. Nothing
+is estimated. See the [design notes](docs/design/league-of-legends.md).
 
 **Women's football** — `src/data/clubs.womens-football.js` and
 `src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07
@@ -3029,8 +3059,8 @@ vercel.json            cache headers for the deployed site
 
 ## Verification
 
-`npm run smoke` boots the real component tree under jsdom and plays **twenty-eight full
-campaigns** across all three pacings, both resolution modes, all twelve sports, and
+`npm run smoke` boots the real component tree under jsdom and plays **thirty full
+campaigns** across all three pacings, both resolution modes, all fourteen sports, and
 national, club and domestic teams; two of them are England's top 100 clubs on
 their own map, one is Fiji's 16 clubs, each starting on a group of its 100
 sections, one the NFL's 32 franchises on theirs, with the live ticker, one MLB's 30
@@ -3038,7 +3068,9 @@ clubs on theirs, also live, one baseball's nations of North and Central America,
 their map, live, one hockey's nations of Europe, one the women's nations of Europe, live, one the NWSL's clubs, one
 tennis's Davis Cup nations of Europe, live, one women's tennis's Billie Jean King Cup nations of the world, one the NRL's 17
 clubs on their map, live, one rugby league's nations of
-Asia and Oceania, one Rocket League's nations of Europe, live, and one Counter-Strike's nations of the world. A **manager campaign** (Italy, Europe, round robin × *You
+Asia and Oceania, one Rocket League's nations of Europe, live, one Counter-Strike's nations of the world, one college
+football's 138 FBS schools on their map, live, one Valorant's nations of Europe, live, and one League of Legends' nations of
+the world. A **manager campaign** (Italy, Europe, round robin × *You
 choose*, live ticker) is driven only through the primary action. It covers
 target choices, tactical gates, Finish match, signings on the conquest screen,
 the automatic switch to Match and back, and Continue as spectator after

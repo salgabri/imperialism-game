@@ -11,6 +11,8 @@ import { tennisProfile } from '../sports/tennis.js';
 import { rugbyLeagueProfile } from '../sports/rugbyLeague.js';
 import { rocketLeagueProfile } from '../sports/rocketLeague.js';
 import { counterStrikeProfile } from '../sports/counterStrike.js';
+import { valorantProfile } from '../sports/valorant.js';
+import { leagueOfLegendsProfile } from '../sports/leagueOfLegends.js';
 import { getSport, SPORTS } from '../sports/index.js';
 import { historyRound, memo, ratingTier, roman, shortName, signedDelta, teamChip } from './format.js';
 
@@ -36,9 +38,12 @@ const SPORT_ORDER = { baseball: { C: 0, '1B': 1, '2B': 2, '3B': 3, SS: 4, LF: 5,
   'womens-tennis': { SGL: 0, DBL: 1 },
   // Rugby league numbers its thirteen from the back: the fullback, the outside backs, the halves, then the pack.
   'rugby-league': { FB: 0, WG: 1, CE: 2, FE: 3, HB: 4, PR: 5, HK: 6, SR: 7, LK: 8 },
-  // Rocket League's three have no positions, nor Counter-Strike's five.
+  // Rocket League's three have no positions, nor Counter-Strike's five or Valorant's.
   'rocket-league': { PLR: 0 },
-  'counter-strike': { PLR: 0 } };
+  'counter-strike': { PLR: 0 },
+  valorant: { PLR: 0 },
+  // League of Legends' roles, from the top lane down the map to the support.
+  'league-of-legends': { TOP: 0, JGL: 1, MID: 2, BOT: 3, SUP: 4 } };
 const SPORT_GROUPS = {
   baseball: { C: 'Catcher', '1B': 'Infield', '2B': 'Infield', '3B': 'Infield', SS: 'Infield', LF: 'Outfield', CF: 'Outfield',
     RF: 'Outfield', DH: 'Designated hitter', SP: 'Starting pitcher', RP: 'Bullpen' },
@@ -49,6 +54,8 @@ const SPORT_GROUPS = {
     HK: 'Front row', SR: 'Back row', LK: 'Back row' },
   'rocket-league': { PLR: 'Players' },
   'counter-strike': { PLR: 'Players' },
+  valorant: { PLR: 'Players' },
+  'league-of-legends': { TOP: 'Top', JGL: 'Jungle', MID: 'Mid', BOT: 'Bot', SUP: 'Support' },
 };
 /**
  * Formation slots in % of the pitch box (C§7.4, design V442), the basketball half court (C§17), the American football
@@ -102,6 +109,12 @@ const SLOTS = {
   // Counter-Strike's five holding a map as its defenders do: two at the A site, one in mid, two at the B site, the best
   // player first.
   'counter-strike': { PLR: [[50, 44], [20, 22], [80, 22], [31, 40], [69, 40]] },
+  // Valorant's five taking a map's lanes, attacking the two sites at the top: two on each site's lane and one through the
+  // middle.
+  valorant: { PLR: [[20, 42], [32, 56], [50, 36], [68, 56], [80, 42]] },
+  // League of Legends' five where the game begins, the team's base in the corner at the foot: the top laner up the left
+  // lane, the jungler between the lanes, the mid laner on the diagonal, the bot laner and the support along the bottom.
+  'league-of-legends': { TOP: [[12, 26]], JGL: [[32, 52]], MID: [[50, 50]], BOT: [[74, 86]], SUP: [[86, 76]] },
 };
 // College football fields the NFL's lineup on the same field.
 SLOTS['college-football'] = SLOTS['american-football'];
@@ -120,6 +133,8 @@ const LAYOUTS = {
   'rocket-league': { layout: 'arena', viewLabel: 'Arena' },
   // Not "Map": the campaign's own Map tab sits beside the squad screen's tabs.
   'counter-strike': { layout: 'site', viewLabel: 'Sites' },
+  valorant: { layout: 'spike', viewLabel: 'Sites' },
+  'league-of-legends': { layout: 'rift', viewLabel: 'Lanes' },
 };
 const BACK_LABELS = { map: 'Back to map', ledger: 'Back to standings', chronicle: 'Back to history', match: 'Back to match' };
 
@@ -193,7 +208,7 @@ export function profileSegments(value) {
 /**
  * Attack / Defence / Goalkeeping (football), Offence / Defence (basketball), Offence / Defence / Kicking (American
  * football), Batting / Pitching / Fielding (baseball), Attack / Defence / Goaltending (ice hockey), Singles / Doubles
- * (tennis), Backs / Halves / Forwards (rugby league) or Team / Best player (Rocket League) from the sports engines' profiles
+ * (tennis), Backs / Halves / Forwards (rugby league) or Team / Best player (the esports) from the sports engines' profiles
  * of the lineup (ED§4c;
  * no match-day offset), with the C1 segment count.
  */
@@ -214,6 +229,10 @@ export function strengthProfile(lineup, sportId) {
             ? (({ team, best }) => [['team', 'Team', team], ['best', 'Best player', best]])(rocketLeagueProfile(lineup))
           : sportId === 'counter-strike'
             ? (({ team, best }) => [['team', 'Team', team], ['best', 'Best player', best]])(counterStrikeProfile(lineup))
+          : sportId === 'valorant'
+            ? (({ team, best }) => [['team', 'Team', team], ['best', 'Best player', best]])(valorantProfile(lineup))
+          : sportId === 'league-of-legends'
+            ? (({ team, best }) => [['team', 'Team', team], ['best', 'Best player', best]])(leagueOfLegendsProfile(lineup))
           : (({ attack, defence, keeper }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goalkeeping', 'Goalkeeping', keeper]])(footballProfile(lineup));
   return rows.map(([key, label, value]) => {
     const raw = Number.isFinite(Number(value)) ? Number(value) : 0;

@@ -104,6 +104,16 @@
 //   weighed by how likely it made every round played so far (roundsChance; a finished map with no rounds known, by its
 //   winner alone).
 //
+// Valorant — exact at its events, from the model's own maps (src/sports/valorant.js): a series is best of three, each map
+//   won with Elo's odds for the gap (its mapOdds) and played round by round at the edge that makes it so (mapBeta), with the
+//   economy after each pistol round and the lean towards a round's winner (roundOdds). The events are the pistol rounds,
+//   twelve all and each map's end, each with the map's rounds from its side, so the chart knows the maps won and the map in
+//   play's score and economy at each event (mapTable), and holds that value until the next. Form as Rocket League's.
+//
+// League of Legends — from the model's own series (src/sports/leagueOfLegends.js): a series is best of five, each game won
+//   with Elo's odds for the gap (gameOdds); its events tell the games won, and a game in play counts at its odds. Form as
+//   Rocket League's.
+//
 // Constants mirror the private values in src/sports/football.js (BASE_GOALS, MAX_LOG_EDGE; extra time's FOOTBALL_MODEL); basketball's,
 // American football's, baseball's, ice hockey's, tennis's and rugby league's come from their own modules (BASKETBALL_MODEL;
 // DRIVE_MODEL, driveOdds, lateCall; INNING_MODEL, inningOdds, runMasses; PERIOD_MODEL, sliceMeans, overtimeMeans,
@@ -120,6 +130,9 @@ import { deciderOdds, goldenRate, POINTS, SLICE_MODEL, sliceMeans as rugbySliceM
 import { bestOfFive, bestOfThree, daySetChances, matchOdds, RUBBER_MODEL } from '../sports/tennis.js';
 import { chanceFrom, gameOdds, gameRates, gameTable, overtimeOdds, SERIES_MODEL } from '../sports/rocketLeague.js';
 import { mapChance, mapOdds, mapState, mapTable, MAPS_MODEL, roundsChance, strengthFor } from '../sports/counterStrike.js';
+import { chanceFrom as valorantChanceFrom, mapBeta as valorantBeta, mapOdds as valorantOdds, mapTable as valorantTable, ROUNDS_MODEL }
+  from '../sports/valorant.js';
+import { gameOdds as nexusOdds, GAMES_MODEL } from '../sports/leagueOfLegends.js';
 
 const BASE_GOALS = 1.28;
 const MAX_LOG_EDGE = 1.5;
@@ -193,6 +206,11 @@ export function footballRate(log) {
  *     ahead in every map, formSd the spread of match-day form in rating points; the clock gives each map twenty-six units,
  *     a round each in regulation and two for its overtime, the third map extending the shortest series as an overtime
  *     period does)
+ * | { kind:'rounds', gap, formSd, length:52, ot:26, maxOt:1, toWin:2 } (Valorant: its maps played round by round; gap and
+ *     formSd as Rocket League's; the clock gives each map twenty-six units, its rounds and overtime, the third map extending
+ *     the shortest series)
+ * | { kind:'games', gap, formSd, length:36, ot:12, maxOt:2, toWin:3 } (League of Legends; the clock gives each game twelve
+ *     units of four minutes, the fourth and fifth games extending the shortest series)
  * | null (no teams, unknown sport, or a model the approximation does not cover).
  * `sport` is a sport object or id; effA/effD are the match's effective strengths (tactics included); `drama`
  * is the match's uncertainty (football ignores it, as the README formula does); `home`, that the defender plays at
@@ -211,6 +229,14 @@ export function liveModelFor(sport, attacker, defender, effA, effD, drama, home 
   }
   if (!prepared) return null;
   const length = positive(model.clock?.length);
+  // Valorant's maps and League of Legends' games: a series as Rocket League's, of their own games (before Rocket League's
+  // branch: their prepared matches carry a `series` too).
+  if ((prepared.rounds || prepared.nexus) && isNum(prepared.gap)) {
+    const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
+    const spec = prepared.rounds ? ROUNDS_MODEL : GAMES_MODEL;
+    return { kind: prepared.rounds ? 'rounds' : 'games', gap: num(prepared.gap), formSd: spec.FORM_AT_BALANCED * (variation / 6) ** 2,
+      length: spec.LENGTH, ot: spec.BLOCK, maxOt: (prepared.rounds ? spec.MAPS : spec.GAMES) - spec.TO_WIN, toWin: spec.TO_WIN };
+  }
   if (prepared.series && isNum(prepared.gap)) {
     const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
     return {
@@ -523,7 +549,7 @@ export function isLiveModel(model) {
       && Number.isInteger(model.regulation) && model.regulation >= 1 && model.regulation < model.ot
       && (model.goals === undefined || (finite('goals') && model.goals > 0));
   }
-  if (model.kind === 'maps') {
+  if (model.kind === 'maps' || model.kind === 'rounds' || model.kind === 'games') {
     return ['gap', 'formSd', 'length', 'ot'].every(finite) && model.formSd >= 0 && model.length > 0 && model.ot > 0
       && Number.isInteger(model.maxOt) && model.maxOt >= 0 && Number.isInteger(model.toWin) && model.toWin >= 1;
   }
@@ -1288,6 +1314,70 @@ function mapsProgress(events, aId, t) {
   return { a, d, done, current };
 }
 
+const esportsCache = new WeakMap();
+
+/**
+ * A Valorant or League of Legends model's tables, built once per model: for each form node, the attacker's odds in every
+ * map or game (`p`) and, for Valorant, the map's table of chances by score and economy. Also a cache by state.
+ */
+function esportsTables(model) {
+  if (esportsCache.has(model)) return esportsCache.get(model);
+  const nodes = HERMITE.map(([t, weight]) => {
+    const gap = model.gap + t * model.formSd;
+    if (model.kind === 'games') return { weight, p: nexusOdds(gap), table: null };
+    const p = valorantOdds(gap);
+    return { weight, p, table: valorantTable(valorantBeta(p)) };
+  });
+  const tables = { nodes, cache: new Map() };
+  esportsCache.set(model, tables);
+  return tables;
+}
+
+/**
+ * Valorant or League of Legends: P(side A wins) with maps or games `a`–`d` won and, for Valorant, the map in play at
+ * `state` ({ ra, rd, prev1 }: its rounds from A's side and the last round's winner, 'A' or 'D', when that round was a pistol
+ * round), averaged over the form nodes, each weighed by its prior and by how likely it made the maps or games already won.
+ */
+function esportsAt(model, a, d, state = null) {
+  if (a >= model.toWin) return 1;
+  if (d >= model.toWin) return 0;
+  const { nodes, cache } = esportsTables(model);
+  const key = state ? `${a}|${d}|${state.ra}|${state.rd}|${state.prev1 ?? ''}` : `${a}|${d}`;
+  if (cache.has(key)) return cache.get(key);
+  let chance = 0, total = 0;
+  for (const node of nodes) {
+    const likely = node.weight * node.p ** a * (1 - node.p) ** d;
+    const q = state && node.table ? valorantChanceFrom(node.table, state.ra, state.rd, state.prev1 ?? null, null) : node.p;
+    chance += likely * (q * seriesFrom(node.p, a + 1, d, model.toWin) + (1 - q) * seriesFrom(node.p, a, d + 1, model.toWin));
+    total += likely;
+  }
+  const value = clamp01(total > 0 ? chance / total : 0.5);
+  cache.set(key, value);
+  return value;
+}
+
+/**
+ * A Valorant or League of Legends series' state after the revealed events up to minute `t` → { a, d, state }: a `pts` 1
+ * event ends a map or game for its side; within Valorant's map in play, the latest event gives its rounds from its own side
+ * (`own`, `opp`) and, after a pistol round, that round's winner (the next round's economy). Null `state` for a map not yet
+ * reported on, or for League of Legends.
+ */
+function esportsState(events, aId, t) {
+  let a = 0, d = 0, state = null;
+  for (const event of events) {
+    if (Math.ceil(num(event.m)) > t) continue;
+    const own = event.tid === aId;
+    if ((isNum(event.pts) ? num(event.pts) : 1) > 0) {
+      if (own) a++; else d++;
+      state = null;
+    } else if (isNum(event.own) && isNum(event.opp)) {
+      state = { ra: own ? num(event.own) : num(event.opp), rd: own ? num(event.opp) : num(event.own),
+        prev1: event.kind === 'pistol' ? (own ? 'A' : 'D') : null };
+    }
+  }
+  return { a, d, state };
+}
+
 /**
  * The tie's state after the revealed events up to minute `t` → { a, d, sa, sd }: every event is a set won by its side,
  * `pts` 1 the set that also wins the rubber.
@@ -1310,7 +1400,7 @@ function rubberState(events, aId, t) {
  * tennis's fourth and fifth rubbers, rugby league's golden point and football's extra time (not a model saved before it).
  */
 const hasOvertime = model => model.kind === 'normal' || model.kind === 'drives' || model.kind === 'innings' || model.kind === 'periods'
-  || model.kind === 'rubbers' || model.kind === 'series' || model.kind === 'maps' || model.kind === 'tries'
+  || model.kind === 'rubbers' || model.kind === 'series' || model.kind === 'maps' || model.kind === 'rounds' || model.kind === 'games' || model.kind === 'tries'
   || (model.kind === 'poisson' && model.ot > 0);
 
 /**
@@ -1376,6 +1466,12 @@ export function winProbabilityAt(model, minute, diff = 0) {
     const done = [...Array(a).fill({ rounds: [], winner: 'A' }), ...Array(d).fill({ rounds: [], winner: 'D' })];
     return mapsAt(model, a, d, done);
   }
+  if (model.kind === 'rounds' || model.kind === 'games') {
+    // Only the score is known here: the maps or games finished by minute t, nothing of the one in play.
+    const played = Math.min(model.toWin + model.maxOt, Math.floor(clamp(t, 0, lastMinute(model)) / model.ot));
+    const a = clamp(Math.round((played + lead) / 2), 0, played), d = played - a;
+    return esportsAt(model, a, d);
+  }
   if (model.kind === 'rubbers') {
     // Only the score is known here: the rubbers finished by minute t, none of the sets of the one in play.
     const played = Math.min(model.gaps.length, Math.floor(clamp(t, 0, lastMinute(model)) / model.ot));
@@ -1428,7 +1524,7 @@ function endMinute(model, events) {
   const latest = events.reduce((max, event) => Math.max(max, num(event.m)), 0);
   if (!hasOvertime(model) || latest <= model.length) return model.length;
   if (model.kind === 'drives' || model.kind === 'periods' || model.kind === 'rubbers' || model.kind === 'series'
-    || model.kind === 'maps' || model.kind === 'tries') {
+    || model.kind === 'maps' || model.kind === 'rounds' || model.kind === 'games' || model.kind === 'tries') {
     return Math.min(lastMinute(model), Math.ceil(latest));
   }
   // Football's extra time ends at a golden goal, plays its whole thirty minutes without one (the silver goal's ends at a
@@ -1475,6 +1571,19 @@ export function winSeries({ model, goals = [], aId, dId, minute = 0, perspective
     for (let t = 0; t <= upTo; t++) {
       const { a, d, done, current } = mapsProgress(ordered, aId, t);
       series.push({ t, p: mapsAt(model, a, d, done, current) });
+    }
+    const winner = winnerSideOf(final, aId, dId);
+    if (winner && series.length) series[series.length - 1].p = winner === 'A' ? 1 : 0;
+    if (sideOf(perspective, aId, dId) === 'D') for (const point of series) point.p = 1 - point.p;
+    return series;
+  }
+
+  if (model.kind === 'rounds' || model.kind === 'games') {
+    const ordered = events.slice().sort((x, y) => num(x.m) - num(y.m));
+    const series = [];
+    for (let t = 0; t <= upTo; t++) {
+      const { a, d, state } = esportsState(ordered, aId, t);
+      series.push({ t, p: esportsAt(model, a, d, model.kind === 'rounds' ? state : null) });
     }
     const winner = winnerSideOf(final, aId, dId);
     if (winner && series.length) series[series.length - 1].p = winner === 'A' ? 1 : 0;
@@ -1561,7 +1670,8 @@ export function chartDomain(model, minute = 0) {
     return { length: model.length + extra * model.ot, half: model.length / 2, ticks,
       guides: extra ? [model.length / 2, model.length] : [model.length / 2] };
   }
-  if (isLiveModel(model) && (model.kind === 'rubbers' || model.kind === 'series' || model.kind === 'maps')) {
+  if (isLiveModel(model) && (model.kind === 'rubbers' || model.kind === 'series' || model.kind === 'maps' || model.kind === 'rounds'
+    || model.kind === 'games')) {
     const t = isNum(minute) ? num(minute) : 0;
     const extra = t > model.length ? Math.min(model.maxOt, Math.ceil((t - model.length) / model.ot)) : 0;
     const length = model.length + extra * model.ot;
