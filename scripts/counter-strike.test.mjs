@@ -381,6 +381,7 @@ test('Computer signings is no choice, and the squad screen draws a map and profi
   const nation = team('fra', [92, 90, 88, 87, 85, 80, 70]);
   const view = buildSquad({ teams: { fra: nation }, aliveIds: ['fra'], history: [] }, { sport }, 'fra');
   assert.equal(view.layout, 'site');
+  assert.equal(view.viewLabel, 'Sites', 'not "Map", the campaign\'s own tab beside it');
   assert.equal(selectLineup(nation).starters.length, LINEUP);
   assert.deepEqual(counterStrikeProfile(selectLineup(nation)), { team: (92 + 90 + 88 + 87 + 85) / 5, best: 92 });
 });

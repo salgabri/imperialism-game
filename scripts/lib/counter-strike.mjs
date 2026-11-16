@@ -33,10 +33,12 @@ export const FIRST_DAY = '2012-08-21';
 const GAMES = new Set(['csgo', 'cs2', 'csgocs2']);
 
 // K per map: K_SCALE / (games + 5) ^ 0.4, never below K_FLOOR (liquipedia-elo.mjs's kFactor). K_SCALE is the one that best
-// foresaw the last 180 days of the exports of 2026-11-15 (2,285 maps, each scored before it was played; regional starts
-// on): log loss 0.6668 at 140, 0.6679 at 60, 0.6670 at 110 and 180, 0.6684 at 240, 0.6719 at 320, 0.6770 at 400. A map is
-// a noisier test of two teams than a Rocket League game, so each moves its players less (Rocket League's K is 320).
-export const K_SCALE = 140;
+// foresaw the last 180 days of the exports of 2026-11-15 (S-, A- and B-Tier: 6,487 maps, each scored before it was
+// played): log loss 0.6502 at 60, 0.6445 at 110, 0.6422 at 140, 0.6408 at 180, 0.6410 at 240, 0.6436 at 320, 0.6479 at
+// 400. A map is a noisier test of two teams than a Rocket League game, so each moves its players less (Rocket League's K
+// is 320). Every newcomer starts at START: regional starts (Rocket League's) foresaw no better (0.6408 with them too) and
+// put the CIS's newcomers 380 points below Europe's.
+export const K_SCALE = 180;
 export const K_FLOOR = 8;
 
 // Counter-Strike's regions as Liquipedia's pages name them (an infobox's `region`, or a segment of its title), by the

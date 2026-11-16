@@ -32,22 +32,22 @@ export const mapOdds = gap => 1 / (1 + 10 ** (-gap * ELO_PER_POINT / 400));
 // A round's odds: the two sides' strength in a logit (`c`, solved for each map so that the map is the favourite's with
 // exactly Elo's odds, `strengthFor`), moved toward the side that won the round before (MOMENTUM: the winners' money
 // and weapons carry over, the losers buy less) except in a half's first round, the pistol round, when both start again.
-// Fitted by maximum likelihood on the 8,277 CS2 maps (MR12) of Liquipedia's exports of 2026-11-15 whose ten players had
+// Fitted by maximum likelihood on the 27,271 CS2 maps (MR12) of Liquipedia's exports of 2026-11-15 whose ten players had
 // each played 20 maps before, each played at its own pre-map Elo odds (docs/design/counter-strike.md, "Calibration"):
-// 21.63 rounds a map where they played 21.80, 11.6% to overtime where 12.5% went, and the loser's 0 to 11 rounds within
-// a point of the real maps' at every score. Without it the same maps run long and close: 22.87 rounds, 15.2% overtime.
-export const MOMENTUM = 0.56;
+// 21.59 rounds a map where they played 21.77, 11.5% to overtime where 12.4% went, and the loser's 0 to 11 rounds within
+// a point of the real maps' at every score. Without it the same maps run long and close: 22.85 rounds, 15.1% overtime.
+export const MOMENTUM = 0.57;
 
 // Match-day form: one draw for the series in rating points, on every map's gap. It grows with the square of the drama,
 // as in the other sports, so Wild swings series hard and Predictable plays Elo's odds map by map. Real series are far
-// less predictable than their maps: in the same events' 3,048 best-of-threes, the favourite's odds 0.621 a map before the
-// first, the favourite won 64.0%, about as often as a single map. Their scorelines are likeliest with a spread of 5 rating
-// points (125 Elo) at Balanced: the favourite wins 64.5%, sweeps 40.1% (39.1% real) and is swept 18.2% (18.1%).
+// less predictable than their maps: in the same events' 10,394 best-of-threes, the favourite's odds 0.624 a map before the
+// first, the favourite won 63.9%, about as often as a single map. Their scorelines are likeliest with a spread of 5 rating
+// points (125 Elo) at Balanced: the favourite wins 65.0%, sweeps 40.6% (39.0% real) and is swept 17.9% (17.9%).
 const FORM_AT_BALANCED = 5;
 const formSpread = variation => FORM_AT_BALANCED * (variation / 6) ** 2;
-// No home advantage: in the 3,363 maps of the exports' LANs where one side was the host nation's (three of its five),
-// that side did as Elo expected, within the error (−5.2 ± 5.5 Elo), so the campaign's Home advantage rule is not offered
-// (`homeAdvantage` false) and a home venue changes nothing.
+// No home advantage: in the 3,319 maps between seasoned players at the exports' LANs where one side was the host nation's
+// (three of its five), that side did as Elo expected, within the error (−3.0 ± 5.7 Elo), so the campaign's Home advantage
+// rule is not offered (`homeAdvantage` false) and a home venue changes nothing.
 export const HOME_EDGE = 0;
 
 /** What a nation counts for when none of its players is rated; it fields no team, so nothing reads it in play. */

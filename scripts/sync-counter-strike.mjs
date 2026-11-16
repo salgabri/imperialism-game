@@ -72,7 +72,8 @@ if (args.includes('--tune')) {
   }
 }
 
-const starts = regionalStarts(series);
+// Every newcomer starts at START (scripts/lib/counter-strike.mjs, K_SCALE): regional starts foresee no better here.
+const starts = {};
 
 // How Counter-Strike 2's real maps went (MR12, from PLAY_FROM), for the match model (src/sports/counterStrike.js): only the
 // maps whose ten players had each played MIN_GAMES maps before, as every rated player has (a newcomer's Elo has not yet
@@ -83,8 +84,13 @@ const newBin = () => ({ n: 0, won: 0, ot: 0, rounds: 0, loser: new Array(12).fil
 const play = { from: PLAY_FROM, minGames: MIN_GAMES, maps: 0, ot: 0, rounds: 0, bins: Array.from({ length: ODDS_BINS }, newBin),
   otPeriods: {}, firstHalf: {}, series: {} };
 const seriesOdds = new Map();
+// The LANs' maps between seasoned players, for the home crowd's edge: a host nation's newcomers at a small local LAN start
+// at START and lose more than Elo expects, which would read as a crowd against them.
+const seasonedLan = [];
 const countMap = (one, game, e, sides) => {
-  if (one.date < PLAY_FROM || !sides.flat().every(player => player.games >= MIN_GAMES)) return;
+  if (!sides.flat().every(player => player.games >= MIN_GAMES)) return;
+  if (one.host) seasonedLan.push({ keys: sides.map(side => side.map(player => player.key)), host: one.host, surprise: (game.winner === 1 ? 1 : 0) - e });
+  if (one.date < PLAY_FROM) return;
   const format = formatOf(game, one.game);
   if (format !== 'mr12') return;
   const favourite = e >= 0.5 ? 1 : 2, odds = Math.max(e, 1 - e);
@@ -137,8 +143,11 @@ for (const [one, e] of seriesOdds) {
   row.bins[oddsBin(Math.max(e, 1 - e))][row.lines.indexOf(scoreline)]++;
 }
 for (const row of Object.values(play.series)) row.odds = Math.round(row.odds / row.n * 1000) / 1000;
-// The home crowd at a LAN, against Elo's expectation, each side's nation as the ratings give it.
-const home = homeEdge(lan, key => nationOfPlayer(players.get(key) ?? { key, flags: new Map() }, people, national));
+// The home crowd at a LAN, against Elo's expectation, each side's nation as the ratings give it: between seasoned players
+// (`home`), and over every LAN map (`homeAll`, reported only).
+const nationOfKey = key => nationOfPlayer(players.get(key) ?? { key, flags: new Map() }, people, national);
+const home = homeEdge(seasonedLan, nationOfKey);
+const homeAll = homeEdge(lan, nationOfKey);
 const rated = ratedPlayers(players, last, people, national);
 const exported = pages.reduce((latest, page) => (String(page.timestamp) > latest ? String(page.timestamp) : latest), '').slice(0, 10);
 const round3 = x => Math.round(x * 1000) / 1000;
@@ -155,7 +164,7 @@ const snapshot = {
     exported, files: files.length, pages: pages.length, from: series[0].date, to: last, tournaments: tournaments.length,
     series: series.length, maps, players: players.size, rated: rated.length, activeDays: ACTIVE_DAYS, minGames: MIN_GAMES,
     kScale: K_SCALE, starts, holdout: { from: holdout, ...scoreOf(scored.all), international: scoreOf(scored.international), calibration },
-    home,
+    home, homeAll,
   },
   play: { ...play, rounds: round3(play.rounds / Math.max(1, play.maps)), ot: round3(play.ot / Math.max(1, play.maps)),
     bins: play.bins.map(bin => [bin.n, bin.won, bin.ot, bin.rounds, bin.halves, bin.halfSwing, ...bin.loser]) },
@@ -170,7 +179,8 @@ const { noFlag, offMap, short } = leftOut(asPlayers);
 console.log(`\nWrote ${rated.length} rated players (of ${players.size}) to ${path.relative(root, snapshotFile)}; regional starts ${JSON.stringify(starts)}`);
 console.log(`  held out from ${holdout}: log loss ${scoreOf(scored.all).logLoss?.toFixed(4)} over ${scored.all.n} maps;`
   + ` calibration ${calibration.map(([e, w, n]) => `${e}→${w} (${n})`).join(', ')}`);
-console.log(`  home sides at LANs: ${home ? `${home.games} maps, ${home.elo} ± ${home.se} Elo against Elo's expectation` : 'none'}`);
+console.log(`  home sides at LANs, between seasoned players: ${home ? `${home.games} maps, ${home.elo} ± ${home.se} Elo against Elo's`
+  + ` expectation` : 'none'} (every LAN map: ${homeAll ? `${homeAll.games}, ${homeAll.elo} ± ${homeAll.se}` : 'none'})`);
 console.log(`  CS2 maps from ${PLAY_FROM} whose ten players had ${MIN_GAMES} maps: ${snapshot.play.maps}, ${snapshot.play.rounds} rounds a map,`
   + ` ${(snapshot.play.ot * 100).toFixed(1)}% to overtime (${JSON.stringify(play.otPeriods)}); series `
   + `${Object.entries(play.series).map(([key, row]) => `${key} ${row.n} at ${row.odds}: ${JSON.stringify(row.scores)}`).join('; ')}`);

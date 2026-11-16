@@ -118,7 +118,8 @@ const LAYOUTS = {
   'womens-tennis': { layout: 'tennis', viewLabel: 'Court' },
   'rugby-league': { layout: 'rugby', viewLabel: 'Field' },
   'rocket-league': { layout: 'arena', viewLabel: 'Arena' },
-  'counter-strike': { layout: 'site', viewLabel: 'Map' },
+  // Not "Map": the campaign's own Map tab sits beside the squad screen's tabs.
+  'counter-strike': { layout: 'site', viewLabel: 'Sites' },
 };
 const BACK_LABELS = { map: 'Back to map', ledger: 'Back to standings', chronicle: 'Back to history', match: 'Back to match' };
 

@@ -46949,8 +46949,8 @@
           }
         ],
         "timing": {
-          "elapsedMs": 28.2697,
-          "samplesPerSecond": 7074713
+          "elapsedMs": 27.0566,
+          "samplesPerSecond": 7391912
         }
       },
       "ratingGaps": [
@@ -47043,8 +47043,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 31.2409,
-            "samplesPerSecond": 6401864
+            "elapsedMs": 29.711,
+            "samplesPerSecond": 6731514
           }
         },
         {
@@ -47136,8 +47136,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 32.9732,
-            "samplesPerSecond": 6065532
+            "elapsedMs": 31.881,
+            "samplesPerSecond": 6273329
           }
         },
         {
@@ -47229,8 +47229,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 27.3493,
-            "samplesPerSecond": 7312801
+            "elapsedMs": 26.9444,
+            "samplesPerSecond": 7422693
           }
         },
         {
@@ -47322,8 +47322,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 30.5182,
-            "samplesPerSecond": 6553466
+            "elapsedMs": 30.1259,
+            "samplesPerSecond": 6638806
           }
         },
         {
@@ -47415,8 +47415,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 30.2803,
-            "samplesPerSecond": 6604954
+            "elapsedMs": 29.5689,
+            "samplesPerSecond": 6763863
           }
         },
         {
@@ -47508,8 +47508,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 28.5771,
-            "samplesPerSecond": 6998611
+            "elapsedMs": 27.4355,
+            "samplesPerSecond": 7289825
           }
         },
         {
@@ -47601,8 +47601,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 27.6881,
-            "samplesPerSecond": 7223320
+            "elapsedMs": 26.7396,
+            "samplesPerSecond": 7479543
           }
         },
         {
@@ -47694,8 +47694,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 27.7627,
-            "samplesPerSecond": 7203910
+            "elapsedMs": 26.4415,
+            "samplesPerSecond": 7563867
           }
         },
         {
@@ -47787,8 +47787,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 27.725,
-            "samplesPerSecond": 7213706
+            "elapsedMs": 25.3479,
+            "samplesPerSecond": 7890200
           }
         },
         {
@@ -47880,8 +47880,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 25.942,
-            "samplesPerSecond": 7709506
+            "elapsedMs": 24.8836,
+            "samplesPerSecond": 8037422
           }
         },
         {
@@ -47973,8 +47973,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 28.0972,
-            "samplesPerSecond": 7118147
+            "elapsedMs": 26.2193,
+            "samplesPerSecond": 7627969
           }
         },
         {
@@ -48066,8 +48066,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 30.4551,
-            "samplesPerSecond": 6567045
+            "elapsedMs": 26.1064,
+            "samplesPerSecond": 7660957
           }
         },
         {
@@ -48159,8 +48159,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 26.4577,
-            "samplesPerSecond": 7559236
+            "elapsedMs": 25.9763,
+            "samplesPerSecond": 7699326
           }
         },
         {
@@ -48252,8 +48252,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 26.5574,
-            "samplesPerSecond": 7530858
+            "elapsedMs": 25.4513,
+            "samplesPerSecond": 7858145
           }
         },
         {
@@ -48345,8 +48345,8 @@
             }
           ],
           "timing": {
-            "elapsedMs": 26.2855,
-            "samplesPerSecond": 7608758
+            "elapsedMs": 25.1021,
+            "samplesPerSecond": 7967461
           }
         }
       ],
@@ -48355,27 +48355,27 @@
           "attacker": {
             "id": "643",
             "name": "Russia",
-            "rating": 78.6
+            "rating": 84.2
           },
           "defender": {
             "id": "076",
             "name": "Brazil",
-            "rating": 76
+            "rating": 81.2
           },
           "samples": 200000,
           "seed": 3226289521,
           "drama": 6,
-          "attackerWinRate": 0.61259,
-          "defenderWinRate": 0.38741,
-          "winRateMargin95": 0.00214,
+          "attackerWinRate": 0.62958,
+          "defenderWinRate": 0.37043,
+          "winRateMargin95": 0.00212,
           "regulationTieRate": 0,
           "attackerWinRateAfterTie": null,
           "zeroZeroRate": 0,
-          "largeTotalRate": 0.43566,
-          "blowoutRate": 0.56435,
+          "largeTotalRate": 0.43239,
+          "blowoutRate": 0.56761,
           "regulationTotal": {
-            "mean": 2.43566,
-            "sd": 0.49584,
+            "mean": 2.43239,
+            "sd": 0.49541,
             "p05": 2,
             "median": 2,
             "p95": 3,
@@ -48383,8 +48383,8 @@
             "max": 3
           },
           "regulationMargin": {
-            "mean": 0.38891,
-            "sd": 1.5943,
+            "mean": 0.44755,
+            "sd": 1.58194,
             "p05": -2,
             "median": 1,
             "p95": 2,
@@ -48392,8 +48392,8 @@
             "max": 2
           },
           "attackerScore": {
-            "mean": 1.41228,
-            "sd": 0.80182,
+            "mean": 1.43997,
+            "sd": 0.79095,
             "p05": 0,
             "median": 2,
             "p95": 2,
@@ -48401,209 +48401,7 @@
             "max": 2
           },
           "defenderScore": {
-            "mean": 1.02337,
-            "sd": 0.86655,
-            "p05": 0,
-            "median": 1,
-            "p95": 2,
-            "min": 0,
-            "max": 2
-          },
-          "finalTotalMean": 2.43566,
-          "regulationAbsoluteMarginMean": 1.56435,
-          "mostCommonRegulationScores": [
-            {
-              "score": "2-0",
-              "count": 72808,
-              "rate": 0.36404
-            },
-            {
-              "score": "2-1",
-              "count": 49709,
-              "rate": 0.24855
-            },
-            {
-              "score": "0-2",
-              "count": 40061,
-              "rate": 0.20031
-            },
-            {
-              "score": "1-2",
-              "count": 37422,
-              "rate": 0.18711
-            }
-          ],
-          "totalHistogram": [
-            {
-              "from": 2,
-              "to": 2,
-              "count": 112869,
-              "rate": 0.56435
-            },
-            {
-              "from": 3,
-              "to": 3,
-              "count": 87131,
-              "rate": 0.43566
-            }
-          ],
-          "timing": {
-            "elapsedMs": 33.1156,
-            "samplesPerSecond": 6039450
-          }
-        },
-        {
-          "attacker": {
-            "id": "250",
-            "name": "France",
-            "rating": 76.2
-          },
-          "defender": {
-            "id": "208",
-            "name": "Denmark",
-            "rating": 72.6
-          },
-          "samples": 200000,
-          "seed": 1487725374,
-          "drama": 6,
-          "attackerWinRate": 0.65419,
-          "defenderWinRate": 0.34581,
-          "winRateMargin95": 0.00208,
-          "regulationTieRate": 0,
-          "attackerWinRateAfterTie": null,
-          "zeroZeroRate": 0,
-          "largeTotalRate": 0.4263,
-          "blowoutRate": 0.5737,
-          "regulationTotal": {
-            "mean": 2.4263,
-            "sd": 0.49454,
-            "p05": 2,
-            "median": 2,
-            "p95": 3,
-            "min": 2,
-            "max": 3
-          },
-          "regulationMargin": {
-            "mean": 0.53432,
-            "sd": 1.56064,
-            "p05": -2,
-            "median": 1,
-            "p95": 2,
-            "min": -2,
-            "max": 2
-          },
-          "attackerScore": {
-            "mean": 1.48031,
-            "sd": 0.7729,
-            "p05": 0,
-            "median": 2,
-            "p95": 2,
-            "min": 0,
-            "max": 2
-          },
-          "defenderScore": {
-            "mean": 0.94599,
-            "sd": 0.86181,
-            "p05": 0,
-            "median": 1,
-            "p95": 2,
-            "min": 0,
-            "max": 2
-          },
-          "finalTotalMean": 2.4263,
-          "regulationAbsoluteMarginMean": 1.5737,
-          "mostCommonRegulationScores": [
-            {
-              "score": "2-0",
-              "count": 79964,
-              "rate": 0.39982
-            },
-            {
-              "score": "2-1",
-              "count": 50874,
-              "rate": 0.25437
-            },
-            {
-              "score": "0-2",
-              "count": 34776,
-              "rate": 0.17388
-            },
-            {
-              "score": "1-2",
-              "count": 34386,
-              "rate": 0.17193
-            }
-          ],
-          "totalHistogram": [
-            {
-              "from": 2,
-              "to": 2,
-              "count": 114740,
-              "rate": 0.5737
-            },
-            {
-              "from": 3,
-              "to": 3,
-              "count": 85260,
-              "rate": 0.4263
-            }
-          ],
-          "timing": {
-            "elapsedMs": 28.9658,
-            "samplesPerSecond": 6904695
-          }
-        },
-        {
-          "attacker": {
-            "id": "804",
-            "name": "Ukraine",
-            "rating": 76.2
-          },
-          "defender": {
-            "id": "792",
-            "name": "Turkey",
-            "rating": 73.8
-          },
-          "samples": 200000,
-          "seed": 1883373841,
-          "drama": 6,
-          "attackerWinRate": 0.60643,
-          "defenderWinRate": 0.39358,
-          "winRateMargin95": 0.00214,
-          "regulationTieRate": 0,
-          "attackerWinRateAfterTie": null,
-          "zeroZeroRate": 0,
-          "largeTotalRate": 0.44146,
-          "blowoutRate": 0.55854,
-          "regulationTotal": {
-            "mean": 2.44146,
-            "sd": 0.49656,
-            "p05": 2,
-            "median": 2,
-            "p95": 3,
-            "min": 2,
-            "max": 3
-          },
-          "regulationMargin": {
-            "mean": 0.36672,
-            "sd": 1.5941,
-            "p05": -2,
-            "median": 1,
-            "p95": 2,
-            "min": -2,
-            "max": 2
-          },
-          "attackerScore": {
-            "mean": 1.40409,
-            "sd": 0.80342,
-            "p05": 0,
-            "median": 2,
-            "p95": 2,
-            "min": 0,
-            "max": 2
-          },
-          "defenderScore": {
-            "mean": 1.03737,
+            "mean": 0.99242,
             "sd": 0.86509,
             "p05": 0,
             "median": 1,
@@ -48611,74 +48409,74 @@
             "min": 0,
             "max": 2
           },
-          "finalTotalMean": 2.44146,
-          "regulationAbsoluteMarginMean": 1.55855,
+          "finalTotalMean": 2.43239,
+          "regulationAbsoluteMarginMean": 1.56761,
           "mostCommonRegulationScores": [
             {
               "score": "2-0",
-              "count": 71241,
-              "rate": 0.35621
+              "count": 75601,
+              "rate": 0.37801
             },
             {
               "score": "2-1",
-              "count": 50044,
-              "rate": 0.25022
+              "count": 50314,
+              "rate": 0.25157
             },
             {
               "score": "0-2",
-              "count": 40468,
-              "rate": 0.20234
+              "count": 37921,
+              "rate": 0.18961
             },
             {
               "score": "1-2",
-              "count": 38247,
-              "rate": 0.19124
+              "count": 36164,
+              "rate": 0.18082
             }
           ],
           "totalHistogram": [
             {
               "from": 2,
               "to": 2,
-              "count": 111709,
-              "rate": 0.55854
+              "count": 113522,
+              "rate": 0.56761
             },
             {
               "from": 3,
               "to": 3,
-              "count": 88291,
-              "rate": 0.44146
+              "count": 86478,
+              "rate": 0.43239
             }
           ],
           "timing": {
-            "elapsedMs": 33.4862,
-            "samplesPerSecond": 5972610
+            "elapsedMs": 31.19,
+            "samplesPerSecond": 6412312
           }
         },
         {
           "attacker": {
-            "id": "643",
-            "name": "Russia",
-            "rating": 78.6
-          },
-          "defender": {
             "id": "250",
             "name": "France",
-            "rating": 76.2
+            "rating": 81.6
+          },
+          "defender": {
+            "id": "208",
+            "name": "Denmark",
+            "rating": 80.4
           },
           "samples": 200000,
-          "seed": 77601939,
+          "seed": 1487725374,
           "drama": 6,
-          "attackerWinRate": 0.60469,
-          "defenderWinRate": 0.39531,
-          "winRateMargin95": 0.00214,
+          "attackerWinRate": 0.55388,
+          "defenderWinRate": 0.44612,
+          "winRateMargin95": 0.00218,
           "regulationTieRate": 0,
           "attackerWinRateAfterTie": null,
           "zeroZeroRate": 0,
-          "largeTotalRate": 0.43779,
-          "blowoutRate": 0.56222,
+          "largeTotalRate": 0.44484,
+          "blowoutRate": 0.55517,
           "regulationTotal": {
-            "mean": 2.43779,
-            "sd": 0.49611,
+            "mean": 2.44484,
+            "sd": 0.49695,
             "p05": 2,
             "median": 2,
             "p95": 3,
@@ -48686,8 +48484,8 @@
             "max": 3
           },
           "regulationMargin": {
-            "mean": 0.36196,
-            "sd": 1.59863,
+            "mean": 0.18543,
+            "sd": 1.62207,
             "p05": -2,
             "median": 1,
             "p95": 2,
@@ -48695,8 +48493,8 @@
             "max": 2
           },
           "attackerScore": {
-            "mean": 1.39987,
-            "sd": 0.80599,
+            "mean": 1.31513,
+            "sd": 0.83266,
             "p05": 0,
             "median": 2,
             "p95": 2,
@@ -48704,81 +48502,283 @@
             "max": 2
           },
           "defenderScore": {
-            "mean": 1.03791,
-            "sd": 0.86676,
+            "mean": 1.12971,
+            "sd": 0.86355,
             "p05": 0,
             "median": 1,
             "p95": 2,
             "min": 0,
             "max": 2
           },
-          "finalTotalMean": 2.43779,
-          "regulationAbsoluteMarginMean": 1.56222,
+          "finalTotalMean": 2.44484,
+          "regulationAbsoluteMarginMean": 1.55517,
           "mostCommonRegulationScores": [
             {
               "score": "2-0",
-              "count": 71479,
-              "rate": 0.3574
-            },
-            {
-              "score": "2-1",
-              "count": 49459,
-              "rate": 0.2473
+              "count": 63283,
+              "rate": 0.31642
             },
             {
               "score": "0-2",
-              "count": 40964,
-              "rate": 0.20482
+              "count": 47750,
+              "rate": 0.23875
+            },
+            {
+              "score": "2-1",
+              "count": 47493,
+              "rate": 0.23747
             },
             {
               "score": "1-2",
-              "count": 38098,
-              "rate": 0.19049
+              "count": 41474,
+              "rate": 0.20737
             }
           ],
           "totalHistogram": [
             {
               "from": 2,
               "to": 2,
-              "count": 112443,
-              "rate": 0.56222
+              "count": 111033,
+              "rate": 0.55517
             },
             {
               "from": 3,
               "to": 3,
-              "count": 87557,
-              "rate": 0.43779
+              "count": 88967,
+              "rate": 0.44484
             }
           ],
           "timing": {
-            "elapsedMs": 34.4151,
-            "samplesPerSecond": 5811403
+            "elapsedMs": 30.7052,
+            "samplesPerSecond": 6513555
+          }
+        },
+        {
+          "attacker": {
+            "id": "804",
+            "name": "Ukraine",
+            "rating": 82.6
+          },
+          "defender": {
+            "id": "792",
+            "name": "Turkey",
+            "rating": 78.4
+          },
+          "samples": 200000,
+          "seed": 1883373841,
+          "drama": 6,
+          "attackerWinRate": 0.67952,
+          "defenderWinRate": 0.32049,
+          "winRateMargin95": 0.00205,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.41879,
+          "blowoutRate": 0.58122,
+          "regulationTotal": {
+            "mean": 2.41879,
+            "sd": 0.49336,
+            "p05": 2,
+            "median": 2,
+            "p95": 3,
+            "min": 2,
+            "max": 3
+          },
+          "regulationMargin": {
+            "mean": 0.62479,
+            "sd": 1.53404,
+            "p05": -2,
+            "median": 1,
+            "p95": 2,
+            "min": -2,
+            "max": 2
+          },
+          "attackerScore": {
+            "mean": 1.52179,
+            "sd": 0.75166,
+            "p05": 0,
+            "median": 2,
+            "p95": 2,
+            "min": 0,
+            "max": 2
+          },
+          "defenderScore": {
+            "mean": 0.897,
+            "sd": 0.85636,
+            "p05": 0,
+            "median": 1,
+            "p95": 2,
+            "min": 0,
+            "max": 2
+          },
+          "finalTotalMean": 2.41879,
+          "regulationAbsoluteMarginMean": 1.58122,
+          "mostCommonRegulationScores": [
+            {
+              "score": "2-0",
+              "count": 84697,
+              "rate": 0.42349
+            },
+            {
+              "score": "2-1",
+              "count": 51206,
+              "rate": 0.25603
+            },
+            {
+              "score": "1-2",
+              "count": 32551,
+              "rate": 0.16276
+            },
+            {
+              "score": "0-2",
+              "count": 31546,
+              "rate": 0.15773
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 2,
+              "to": 2,
+              "count": 116243,
+              "rate": 0.58122
+            },
+            {
+              "from": 3,
+              "to": 3,
+              "count": 83757,
+              "rate": 0.41879
+            }
+          ],
+          "timing": {
+            "elapsedMs": 35.1047,
+            "samplesPerSecond": 5697243
+          }
+        },
+        {
+          "attacker": {
+            "id": "643",
+            "name": "Russia",
+            "rating": 84.2
+          },
+          "defender": {
+            "id": "250",
+            "name": "France",
+            "rating": 81.6
+          },
+          "samples": 200000,
+          "seed": 77601939,
+          "drama": 6,
+          "attackerWinRate": 0.61274,
+          "defenderWinRate": 0.38726,
+          "winRateMargin95": 0.00213,
+          "regulationTieRate": 0,
+          "attackerWinRateAfterTie": null,
+          "zeroZeroRate": 0,
+          "largeTotalRate": 0.43729,
+          "blowoutRate": 0.56272,
+          "regulationTotal": {
+            "mean": 2.43729,
+            "sd": 0.49605,
+            "p05": 2,
+            "median": 2,
+            "p95": 3,
+            "min": 2,
+            "max": 3
+          },
+          "regulationMargin": {
+            "mean": 0.38997,
+            "sd": 1.59251,
+            "p05": -2,
+            "median": 1,
+            "p95": 2,
+            "min": -2,
+            "max": 2
+          },
+          "attackerScore": {
+            "mean": 1.41363,
+            "sd": 0.80048,
+            "p05": 0,
+            "median": 2,
+            "p95": 2,
+            "min": 0,
+            "max": 2
+          },
+          "defenderScore": {
+            "mean": 1.02366,
+            "sd": 0.8662,
+            "p05": 0,
+            "median": 1,
+            "p95": 2,
+            "min": 0,
+            "max": 2
+          },
+          "finalTotalMean": 2.43729,
+          "regulationAbsoluteMarginMean": 1.56272,
+          "mostCommonRegulationScores": [
+            {
+              "score": "2-0",
+              "count": 72720,
+              "rate": 0.3636
+            },
+            {
+              "score": "2-1",
+              "count": 49828,
+              "rate": 0.24914
+            },
+            {
+              "score": "0-2",
+              "count": 39823,
+              "rate": 0.19912
+            },
+            {
+              "score": "1-2",
+              "count": 37629,
+              "rate": 0.18815
+            }
+          ],
+          "totalHistogram": [
+            {
+              "from": 2,
+              "to": 2,
+              "count": 112543,
+              "rate": 0.56272
+            },
+            {
+              "from": 3,
+              "to": 3,
+              "count": 87457,
+              "rate": 0.43729
+            }
+          ],
+          "timing": {
+            "elapsedMs": 32.4473,
+            "samplesPerSecond": 6163841
           }
         }
       ],
       "benchmark": {
         "prepare": {
           "samples": 250,
-          "elapsedMs": 1.1562,
-          "meanMs": 0.00462
+          "elapsedMs": 1.0504,
+          "meanMs": 0.0042
         },
         "scores": {
           "samples": 100000,
-          "elapsedMs": 7.8792,
-          "perSecond": 12691644
+          "elapsedMs": 7.6041,
+          "perSecond": 13150800
         },
         "completeMatches": {
           "samples": 10000,
-          "elapsedMs": 1910.4744,
-          "perSecond": 5234
+          "elapsedMs": 1905.4449,
+          "perSecond": 5248
         },
         "odds": {
           "samples": 1024,
-          "firstMs": 0.6931,
-          "cachedMs": 0.0539,
+          "firstMs": 0.6626,
+          "cachedMs": 0.0504,
           "cacheIdentityPreserved": true
         },
-        "checksum": 675673
+        "checksum": 673342
       }
     }
   }

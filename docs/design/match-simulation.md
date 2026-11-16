@@ -470,17 +470,17 @@ solved the same way on that year's games ([rocket-league.md](rocket-league.md#ea
 | Home sides win | 49.4% (no edge) | as Elo expected |
 
 Counter-Strike came in on 2026-11-15, calibrated against the CS2 maps of Liquipedia's exports
-([counter-strike.md](counter-strike.md#calibration)): its round momentum by maximum likelihood on the 8,277 maps (MR12) to
+([counter-strike.md](counter-strike.md#calibration)): its round momentum by maximum likelihood on the 27,271 maps (MR12) to
 November 2026 whose ten players had each played 20 maps, each played through the model at its own pre-map Elo odds, and
-its match-day form on those events' 3,048 best-of-threes. The harness plays the sixteen strongest nations against each
+its match-day form on those events' 10,394 best-of-threes. The harness plays the sixteen strongest nations against each
 other twice a season, a different mix of matchups from the real maps'.
 
 | Counter-Strike | Now (nations) | Real (CS2, 2023–2026) |
 | --- | --- | --- |
-| Rounds a map / to overtime | 21.40 / 11.0% | 21.80 / 12.5% |
-| Maps won 13–5 or wider / 13–10 or 13–11 | 27.2% / 24.7% | 25.6% / 27.5% |
-| Best of three won 2–0 | 57.9% | 57.2% |
-| Home sides win | 49.9% (no edge) | as Elo expected |
+| Rounds a map / to overtime | 21.39 / 10.9% | 21.77 / 12.4% |
+| Maps won 13–5 or wider / 13–10 or 13–11 | 28.0% / 25.4% | 26.0% / 27.1% |
+| Best of three won 2–0 | 57.8% | 56.9% |
+| Home sides win | 49.8% (no edge) | as Elo expected |
 
 Known gaps, reported but not tested:
 
@@ -539,7 +539,7 @@ sides win at home about as often as home sides do in the sport's league:
 | Tennis | 1.8 rating points (45 Elo) in a singles rubber, 0.7 in the doubles | 1.6 | 60% of ties | Davis Cup hosts won 60.9% of World Group ties where Elo expected 53.1% |
 | Women's tennis | Tennis's | 1.6 | 60% of ties | none found for the Billie Jean King Cup: the Davis Cup's |
 | Rocket League | none, and the rule is not offered | 0 | 50% | the LANs' host nations did as Elo expected: +12 ± 8 Elo over 1,933 games of Liquipedia's exports |
-| Counter-Strike | none, and the rule is not offered | 0 | 50% | the LANs' host nations did as Elo expected: −5 ± 6 Elo over 3,363 maps of Liquipedia's exports |
+| Counter-Strike | none, and the rule is not offered | 0 | 50% | the LANs' host nations did as Elo expected: −3 ± 6 Elo over 3,319 maps between seasoned players in Liquipedia's exports |
 
 "Worth" is the rating advantage an attacker needs for an even match against a home
 defender; a manager's Attack approach adds 0.6 rating points, plus up to 1.2 for

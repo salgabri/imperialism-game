@@ -32,7 +32,7 @@ And pick who fights:
   source rates ([Pacific islands](docs/design/pacific-islands.md)). A nation fields a team
   only with a **real side**, its own rated players holding at least half the lineup, and
   every other nation's land stays neutral: 173 nations play football, 57 Rocket League, 52
-  tennis, 45 women's tennis, 47 basketball, 36 women's football, 35 Counter-Strike, 12 baseball, 7 ice
+  tennis, 45 women's tennis, 47 basketball, 40 Counter-Strike, 36 women's football, 12 baseball, 7 ice
   hockey and 6 rugby league. No team is made up of generated players or nearly empty.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs (Europe's 68
@@ -1082,13 +1082,14 @@ States, France and Saudi Arabia down. Nothing is estimated. Each year from 2016 
 [earlier season](#rocket-league-seasons). See the [design notes](docs/design/rocket-league.md).
 
 **Counter-Strike** — `src/data/rosters.counter-strike.js`, from every 5v5 series of CS:GO and CS2 Liquipedia records
-(CC BY-SA 3.0), read from three exports of the wiki saved by hand on 2026-11-15 (no script fetches Liquipedia) into
-`scripts/data/counter-strike-elo.json`: 1,439 events of S-, A- and B-Tier, 52,015 maps from 2012 to November 2026. Each
+(CC BY-SA 3.0), read from four exports of the wiki saved by hand on 2026-11-15 (no script fetches Liquipedia) into
+`scripts/data/counter-strike-elo.json`: 3,007 events of S-, A- and B-Tier, 110,249 maps from 2012 to November 2026. Each
 player's rating is Rocket League's Elo, built map by map, a team playing at its five players' mean, on the same scale
-(apEX's 2,160 is 84); held out on the last 180 days its predictions were calibrated (log loss 0.667). A player plays for
-the nation he last played for at a national-team event (the Esports Nations Cup, WESG), else his Liquipedia page's
-country; 881 players have played within the year, and 35 nations have the five a map needs, from Russia, France,
-Ukraine and Brazil down. Nothing is estimated. See the [design notes](docs/design/counter-strike.md).
+(Aleksib's 2,368 is 93); held out on the last 180 days its predictions were calibrated (log loss 0.641). A player plays
+for the nation he last played for at a national-team event (the Esports Nations Cup, WESG, the IESF's world
+championships), else his Liquipedia page's country; 1,667 players have played within the year, and 40 nations have the
+five a map needs, from Russia, Ukraine, France and Brazil down. Nothing is estimated. See the
+[design notes](docs/design/counter-strike.md).
 
 **Women's football** — `src/data/clubs.womens-football.js` and
 `src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07
