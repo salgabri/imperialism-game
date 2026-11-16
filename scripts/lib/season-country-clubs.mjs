@@ -111,7 +111,7 @@ const fold = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase
 // built-in maps leave them off their league's country too (FM files them under their own nation).
 const ABROAD = [
   [/^(?:cardiff city|swansea city|newport county|wrexham|merthyr town)(?: a ?f ?c| fc)?$/, 'WAL'],
-  [/^(?:toronto fc|toronto|(?:vancouver )?whitecaps(?: fc)?|vancouver|montreal impact|cf montreal|club de foot montreal|impact montreal|montreal)$/, '124'],
+  [/^(?:toronto fc|toronto|toronto blizzard|(?:vancouver )?whitecaps(?: fc)?|vancouver|vancouver 86ers|montreal impact|cf montreal|club de foot montreal|impact montreal|montreal)$/, '124'],
   [/^(?:wellington phoenix(?: fc)?|well phoenix|wellington|auckland fc|auckland)$/, '554'],
   [/^derry city(?: fc)?$/, 'NIR'],
   [/^(?:fc )?vaduz$/, null], [/^(?:fc )?andorra$/, null],

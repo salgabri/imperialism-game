@@ -14189,6 +14189,393 @@
           "download": "https://cern.swos.eu/data/amiga/9697/TEAM.085"
         }
       ],
+      "leagueFiles": [
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.000",
+          "bytes": 10946,
+          "sha256": "6bd01f6d02adc0a8d733a7b93fd149d3192e1073d8c3d3c95ab5563c6b8a130c",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.000"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.001",
+          "bytes": 6842,
+          "sha256": "c18a56cceca481bdf4a28cb8c89ae7c262b3da738ed3fba0cdc29a7ec4bfbba6",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.001"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.002",
+          "bytes": 12314,
+          "sha256": "0f9bc9e8c1331cc87d6713fee8ad0488826f4c23467bef940b06aceccb9dfa44",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.002"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.003",
+          "bytes": 10946,
+          "sha256": "d4a1c7f0a128066b2564fe36bdb9aac45117e7687ed676b474e7b93e8a9ce003",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.003"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.004",
+          "bytes": 8210,
+          "sha256": "f707f46b02974b3aa04215156d2197e662b19b2ede71e4e5b32f39941ef90fb4",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.004"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.005",
+          "bytes": 9578,
+          "sha256": "fecd353340dd659f89415c5368280cc3971aee10eb6a78afea06c4f6495a82a3",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.005"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.006",
+          "bytes": 10946,
+          "sha256": "796d631cab5ff926c14291c272b936aa88e9349c6621f92123557ae22e3b6258",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.006"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.007",
+          "bytes": 8210,
+          "sha256": "9e1f1705bbf515b02600de5774b74f450f54e581cd5d94a840e1d335f153ba8d",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.007"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.010",
+          "bytes": 9578,
+          "sha256": "6ab2673f9e0425a49dd15d66af32e748d80b9691d8a0c8f919ac33eb210bcb54",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.010"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.012",
+          "bytes": 8210,
+          "sha256": "feb3412762371d5e0f82c0f0303a58172155ec5c541daad56e784bf53ee50945",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.012"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.015",
+          "bytes": 17102,
+          "sha256": "33dfe0a9cdc12781c901bfebdefbb4687c3edd742e0925d0f97a36bb70d61e8c",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.015"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.016",
+          "bytes": 14366,
+          "sha256": "3aebdbe6231e064b658ff594dc03b1ec5929111b19661da078ff844d143e5bcf",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.016"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.017",
+          "bytes": 8894,
+          "sha256": "11b5ebe735e7ad45797a2e772e23196cce34f3f1e1d9540ac5b832afbf1d50ec",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.017"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.018",
+          "bytes": 10262,
+          "sha256": "4d5e98bee3fe1990ff35e334ddd12393d88cbbd5be4b85414948c3254afa094c",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.018"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.019",
+          "bytes": 11630,
+          "sha256": "b8da392228e349dfca390f8b2e6e2db270c928385dbd7387ebbd12fe39d8252a",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.019"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.021",
+          "bytes": 6842,
+          "sha256": "236e1b8ef0c58f45606347552d61acaf8e830d313e85c2a046aa63c7909a68c5",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.021"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.022",
+          "bytes": 8210,
+          "sha256": "c999565b324ae773b8a9890aee1013e6805bcc5f7e4a99dc443bb19416308750",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.022"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.023",
+          "bytes": 10946,
+          "sha256": "52cd920a9889478b022d6aa53b161b6de5cb32c3eed5661a69d31e743969424f",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.023"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.026",
+          "bytes": 10946,
+          "sha256": "9031df8fffe35e909512af01622d80f0c1ceaf6dc3e62b07ae16d01738c5d2cb",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.026"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.027",
+          "bytes": 14366,
+          "sha256": "da56df5b6019de31f69d736e1f3b96ee36980d5fee22a288a8f74a14205ea2ed",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.027"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.028",
+          "bytes": 18470,
+          "sha256": "478ca47ce0bc3c3988bbba97b984bb0a1dda163d80b45cea9947a5277705b7ab",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.028"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.030",
+          "bytes": 15050,
+          "sha256": "963e6c50e499a5ffc5c6168100195d39b6a2d3b0ab691b539749a7f491283615",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.030"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.031",
+          "bytes": 15734,
+          "sha256": "6fe2aeee001b7574339656923688813cff01e57d370b8151b43616200d877ab8",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.031"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.033",
+          "bytes": 27362,
+          "sha256": "3598652b76ff174c44fbaefdee7ae3a8ef21e551d1315a6ab46c94f0b7f39934",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.033"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.034",
+          "bytes": 13682,
+          "sha256": "d38002d70339f56954293c6d157ae5cf488e4decc70feffd9b74b44a082c9a25",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.034"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.036",
+          "bytes": 12998,
+          "sha256": "c050c61c1bd6c02444000823d78be9a5e22f77e137dd193b000b5cad2295e08b",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.036"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.037",
+          "bytes": 10946,
+          "sha256": "1b7230ca00a1d3d560f3fdcc63ae6fd05775eaf48fedd8058c3689caf4647d48",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.037"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.038",
+          "bytes": 16418,
+          "sha256": "d8e5af0ca91208dff40725097ef1a2e6d183c1782fc7e463f981bbe547ffb65c",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.038"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.039",
+          "bytes": 12314,
+          "sha256": "75db96fc5e1c5ce8185f44e5bae30ef6251d1f774f3fdbde7e9c0d6b5cfa21ee",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.039"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.040",
+          "bytes": 15050,
+          "sha256": "596c31978d5f42eea4499dd37c309a568e806ddfb05ccf658217c461267f51f3",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.040"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.041",
+          "bytes": 6842,
+          "sha256": "b06277f6542569c0b5d109e9c70899315cf74414468c927f24a07b257813d1e8",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.041"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.042",
+          "bytes": 10946,
+          "sha256": "8c72d5abad22e8c50cc99332200b5347682dd4d1ad9bdb5a937fb2016fc77cdd",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.042"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.043",
+          "bytes": 27362,
+          "sha256": "60bd3954536b0d665bc59244ab038a9bbeaf219706fd3a8495c6811e6e476d58",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.043"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.044",
+          "bytes": 34886,
+          "sha256": "59f3c11c4da9fea71d94b2eb67e28d1fda29c9f152ffc53852d4d7ef52b7ce95",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.044"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.045",
+          "bytes": 9578,
+          "sha256": "7dbf58d0d3bbf2cf1a9bb4178703cd80d5b6c7638557346af19f745d5ac85b7d",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.045"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.046",
+          "bytes": 16418,
+          "sha256": "64b1542d176763016a1237490124dd5a014567505ba287a4fa07e497749cab05",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.046"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.048",
+          "bytes": 10946,
+          "sha256": "d349e2624882f97984aaf7faa24f70269986f2d0568d4d28fe49927f5fb6a9b9",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.048"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.049",
+          "bytes": 11630,
+          "sha256": "b7eb831e465e4fcd31ee4f72d302e905f5499a61da88fecd7eaec68c99366212",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.049"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.050",
+          "bytes": 9578,
+          "sha256": "4348583845c5078d9f27904475caa71f9a47248855c436e9e1e8af352b57a225",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.050"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.051",
+          "bytes": 31466,
+          "sha256": "179a6701a882084418fabf607c1cf4b94697feceb29fcac04148b8bad5bfb9f0",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.051"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.055",
+          "bytes": 19154,
+          "sha256": "539e9052dee665b9003622e8d576735dbccf38008f4e2dbb88014be55f4e9e95",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.055"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.060",
+          "bytes": 27362,
+          "sha256": "881cad73d45b6b6365c0360b4240f2083a950922af9e033e06446539eb563ee9",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.060"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.062",
+          "bytes": 20522,
+          "sha256": "1d178621ebf42f4cf8cf4b5107e3ffa9cda66ef7c241cd5ac177ce3a5c3311a5",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.062"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.064",
+          "bytes": 8210,
+          "sha256": "c42ef334c0957db648677f9a7a6590247801d548c3c1da217c59963f7055c2f9",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.064"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.065",
+          "bytes": 10946,
+          "sha256": "1d7585e50212fee1979efc07ca3fe7485e5d65a2b348e510786a2fb3c1f6667c",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.065"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.066",
+          "bytes": 6842,
+          "sha256": "eb4c57d82ea1b8eaa4300f0e4184d6a296d8194510a201295cc4299c89b1812a",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.066"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.067",
+          "bytes": 8210,
+          "sha256": "d5cd45746a28e8b2a138931fa3232533108b845fda3c649413323b8ca6cf2fe5",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.067"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.069",
+          "bytes": 10946,
+          "sha256": "523532889bfa5753636d18a32ff001df3255ac4e75f2b856d45b6fdb7e614236",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.069"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.071",
+          "bytes": 17786,
+          "sha256": "87ee42c5c4e27ab77bd8df5bea4501b76becae348e0beb1ace123fac68cf9aab",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.071"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.073",
+          "bytes": 12314,
+          "sha256": "acf2d79695575f7d68d9b6ebeb69ff18443d19f6ce3d3b50cfe8a030220cdcc4",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.073"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.075",
+          "bytes": 4106,
+          "sha256": "8e4b4c2023c52e05c31671c3517408660322556540d9daf3434d7ed5b0c835c1",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.075"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.076",
+          "bytes": 12314,
+          "sha256": "e07607338c50f285bb32e6e82650880b73232f6123e797f86d1618ff7ebcf9b6",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.076"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.077",
+          "bytes": 15050,
+          "sha256": "57abf5f81232f33c7726096216a44af5f848493942d778e9657f987ebb4120fc",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.077"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.078",
+          "bytes": 8210,
+          "sha256": "bc6751e923d041ba35fcc47b31d852f8f0a587fba9d1a51564a07c3e106e08a9",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.078"
+        },
+        {
+          "folder": "swos-9697",
+          "name": "TEAM.079",
+          "bytes": 5474,
+          "sha256": "3318323daab5c787092da9c45b995b6f2b201e57e0b2888351baf2810316368c",
+          "download": "https://cern.swos.eu/data/amiga/9697/TEAM.079"
+        }
+      ],
       "coverage": {
         "players": 2937,
         "nations": 133,
@@ -14570,6 +14957,393 @@
           "bytes": 2738,
           "sha256": "62f5f68418caa6da9d7b66b4d107b1d56287d853269f475a1b0d3947b41dd5b5",
           "download": "https://cern.swos.eu/data/amiga/9596/TEAM.085"
+        }
+      ],
+      "leagueFiles": [
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.000",
+          "bytes": 13682,
+          "sha256": "a9d20c5f22909cbff5c8ac75a350a76643f6fcff329de2b1b3787ec0e50db45b",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.000"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.001",
+          "bytes": 9578,
+          "sha256": "c8b8228d5ee12bd3697c4e379f5b5fed0664c87b839c02080a3ca0a923d972b2",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.001"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.002",
+          "bytes": 15734,
+          "sha256": "7acbd7da62a39937b41e4ede444f135cfdf99515553bd16bf9ee6f07b8748888",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.002"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.003",
+          "bytes": 15050,
+          "sha256": "1054ae5a64254a12727582e038e895faa1f04670eac6e7b7ac25efa59a6ac1d2",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.003"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.004",
+          "bytes": 12314,
+          "sha256": "4bc6c98f1e34a845633bf39323539388729dedbd662a6efe12e2a640f4a8ce60",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.004"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.005",
+          "bytes": 10946,
+          "sha256": "d3335f18604ec463866e975a167babf9ee50ffc895a7836fd000d0963abd0252",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.005"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.006",
+          "bytes": 13682,
+          "sha256": "52fef791a18e7afea1c0006a8b36e1af9e4d449976b0a7be537657dc97c32649",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.006"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.007",
+          "bytes": 10262,
+          "sha256": "8357916e0ac3a26ad6cb56a15fa159872b4fad669d2265fdc3daa1abc91bff24",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.007"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.010",
+          "bytes": 9578,
+          "sha256": "d5c0c942a9ecbe9cd514d78ba253b6f7ca35806ab476da6e2134789e884ffa14",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.010"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.012",
+          "bytes": 10946,
+          "sha256": "dc41110ead32ebb1e60826a726ec9953f4c5b47db7e076004c6bb4866deaf77e",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.012"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.015",
+          "bytes": 15734,
+          "sha256": "1c334f7e6f3d8c1f2406f66284857d2f922983677663b666976cd450bfa19fb7",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.015"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.016",
+          "bytes": 12998,
+          "sha256": "6ad61481ac10db2ca448924375a17615b909aa12361bb86662523d3fbc7ab45f",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.016"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.017",
+          "bytes": 6842,
+          "sha256": "473ce6f4450ecdac7ac600157023774b269eb0ebf8534623ceb0c201d6275c94",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.017"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.018",
+          "bytes": 10262,
+          "sha256": "ec2536964d0596f79dd2b71be660c79f84696a35e169f64c9e833445900473c8",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.018"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.019",
+          "bytes": 10262,
+          "sha256": "e3f357f4798b29bcf7034dfbab204396f03d89a0df1b184e5a8c642b5166c88d",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.019"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.021",
+          "bytes": 6842,
+          "sha256": "02093468682ad2492276ce4a526970e236038619d596a883751ed043014dc53a",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.021"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.022",
+          "bytes": 8210,
+          "sha256": "2e387923b30bf6eb6c8a379f235f92f915d7cfea16bb0dbd278fe97f01c6eec2",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.022"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.023",
+          "bytes": 9578,
+          "sha256": "9f643c2bafb4a172c69be085146f717577e4b25bff8e8e411580951402d59d4a",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.023"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.026",
+          "bytes": 10946,
+          "sha256": "0d3a2877b181c2c6a7819ae765605b76916bfcc32f529fc7b9f9c9b84e4cc054",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.026"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.027",
+          "bytes": 10946,
+          "sha256": "8c9ea211103bdbb8e60744f42d45702b4ed2f7d54e72e277a23c9f7ccace55cc",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.027"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.028",
+          "bytes": 17102,
+          "sha256": "a44f2079f5e537837539b5c626c0622f828579c4fd0a7f8c8abf0d738a8c8228",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.028"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.030",
+          "bytes": 13682,
+          "sha256": "006f80384ca48856b2a68f5f367c6622453fe9b17d746b6224e25ec31297b635",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.030"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.031",
+          "bytes": 15734,
+          "sha256": "9cbe49c8b467a11e3279b67e58fc44a90e3d0c7c35627075b8753e5a2440e1e8",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.031"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.033",
+          "bytes": 27362,
+          "sha256": "bd4a94a7d0b2a365648902fb7756c3f3de8cbe2f40b57271fbcd75d5b40cab57",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.033"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.034",
+          "bytes": 13682,
+          "sha256": "8924c249a2d1d90b53072b61b3f3e7de03aa2b2f0a461bf24f4010748e9569ff",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.034"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.036",
+          "bytes": 11630,
+          "sha256": "b1ff127180533647d889420a15b35ff7b09af15a2aca17c54c27b5eaadffee86",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.036"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.037",
+          "bytes": 10946,
+          "sha256": "8d4770527d3100caacf67ef56b5e571ff2e1b55381c728aa6a034c92a4aeb197",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.037"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.038",
+          "bytes": 12998,
+          "sha256": "e84ad9500e1336755b473e14618edf3334c075a5c277671f3fe8a4de13167328",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.038"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.039",
+          "bytes": 12314,
+          "sha256": "9b55032f80b51e7e4fd7ef3e95b622df46c7b1b1106b1eaa0fc1942fa8488f73",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.039"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.040",
+          "bytes": 15050,
+          "sha256": "98d664de96d748dd60032d726efab1c414921c788c9c486dd36b78d103fd54ff",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.040"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.041",
+          "bytes": 12998,
+          "sha256": "42e08e7e1d0cb757888ded047d85733461f3b0e542cab144eebf959ad96fd165",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.041"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.042",
+          "bytes": 10946,
+          "sha256": "9d99e343fcdca6fabf45e901c1b46fb615437f13aa98c2fddba8835aea6e9200",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.042"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.043",
+          "bytes": 28730,
+          "sha256": "4df347dfa3d34e8ae05f526dfd221b07004682a6b22edf408acb4b2909f06e61",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.043"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.044",
+          "bytes": 34886,
+          "sha256": "8bf2ceae6b14b5afe99637d962856823501d3ffb978f2a52e5f0131446a374fd",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.044"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.045",
+          "bytes": 9578,
+          "sha256": "095911dcd0ee18fcbc7a6b2597128a9bdfc93e341238314abf6d1d6040bf92e6",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.045"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.046",
+          "bytes": 16418,
+          "sha256": "72c3409449dcc7cbec94495d0f8411d2a7996253a482ef0f3711aeba2ec9e352",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.046"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.048",
+          "bytes": 12314,
+          "sha256": "017577453ce6af9a2523bdad7e02410fbb8445754dfc7ac1f0b59fb7c399d358",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.048"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.049",
+          "bytes": 10946,
+          "sha256": "c2a259fb78042dac3f7858a0488aebcdb773785862d8109a65ae1c21144e996b",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.049"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.050",
+          "bytes": 8210,
+          "sha256": "185d5d1d4af826f442e611abac199d08fb1c6345d7106f3ae149eb7ef628faaa",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.050"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.051",
+          "bytes": 31466,
+          "sha256": "118634a6ea899363ce59716dec2459c3ee4ef8fc06fd9ad33f6a0e64f1a167f7",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.051"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.055",
+          "bytes": 19154,
+          "sha256": "9389f4103e90635d51690c41101b55c969a160c3b272506b28a65fcc8c8fc9b8",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.055"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.060",
+          "bytes": 27362,
+          "sha256": "e2f3b12dc6bdde814b1f437b057aa02003e71f04f5070ce23e9cebc463cb153a",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.060"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.062",
+          "bytes": 20522,
+          "sha256": "94e479216d435dd57f25b130222e9f55cfecee72d199109a2fdd2966b9cadde2",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.062"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.064",
+          "bytes": 13682,
+          "sha256": "187e15dd73f189d3290d97af1186d85c02b9efef2cfd498483c158a70ed77e42",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.064"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.065",
+          "bytes": 10946,
+          "sha256": "5ddae8db8592b31cb4bcb27ec34e6bd21c54cc926b133f138e5c0bc609eeea6c",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.065"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.066",
+          "bytes": 6842,
+          "sha256": "abab4d07d516191eb25efd4fa8734d210431384dc5c3f9e4c619353780f46cba",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.066"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.067",
+          "bytes": 8210,
+          "sha256": "049ddf4bf92b44117654e910eec0de4063fb5bba6379de52b331157408883ad9",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.067"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.069",
+          "bytes": 20522,
+          "sha256": "6f2ce325ae2e444c035e4448f4b07b9e60b81d942b49d776c14f10d1c9e14862",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.069"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.071",
+          "bytes": 17786,
+          "sha256": "64ae787230b8e7856f3750eef6dab9047673ab64e3d40bf29d52cbb96aa0bb65",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.071"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.073",
+          "bytes": 5474,
+          "sha256": "923d989900c2d639afab8c78010283ed986cdee0cd53422b6243a1bc45fd189e",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.073"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.075",
+          "bytes": 4106,
+          "sha256": "a1e63937744496f1b7439f0f2e7fd68e2fcbd3a96aa171e646a40a53c491ef97",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.075"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.076",
+          "bytes": 12314,
+          "sha256": "b2e1632d25a8f150f3769973371bdd5e58d27032b47d8776f9074b2335472768",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.076"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.077",
+          "bytes": 10946,
+          "sha256": "bbdf93987d8695ac57ba3bde98476a7d6d9204487de031f31c171953d525e5f9",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.077"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.078",
+          "bytes": 8210,
+          "sha256": "e7fe4b889c2ddff8f20c0d647d28a6f1462f303612f8da00255606287e6630bb",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.078"
+        },
+        {
+          "folder": "swos-9596",
+          "name": "TEAM.079",
+          "bytes": 5474,
+          "sha256": "1436847bf98c15907bd82148b38eb50c87634b7e95de6f3b29ac137aa3d44d33",
+          "download": "https://cern.swos.eu/data/amiga/9596/TEAM.079"
         }
       ],
       "coverage": {
@@ -14964,6 +15738,393 @@
           "bytes": 2738,
           "sha256": "bdb4d1c24821eba397f4b68573d76e91cef1db55f2ba8829a80de22bb611193a",
           "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.085"
+        }
+      ],
+      "leagueFiles": [
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.000",
+          "bytes": 11630,
+          "sha256": "5c44c1fd9a717b4124e7c3a73c4a41f5dfbdedadbe5406dbfd3e354736680d03",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.000"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.001",
+          "bytes": 8210,
+          "sha256": "eb3cc912d47cf794ba15cbce0f2dd71f2bcc0d740586e3096a7ea65604399a1d",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.001"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.002",
+          "bytes": 15050,
+          "sha256": "bea103dac106b7653022988872cae3d55b341b8786bd91dedafa6e545330773f",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.002"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.003",
+          "bytes": 12314,
+          "sha256": "4e124c2698c2b93a73915d0fda264363d07e8653685c4e97971c188384abde7c",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.003"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.004",
+          "bytes": 12314,
+          "sha256": "ad01e10955f9aa8a4655906e7308aaab387258d9431cb415781ca70c78b5dd19",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.004"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.005",
+          "bytes": 10946,
+          "sha256": "dcffcd790faeeaa990d44252578e02f0ac755d9352ab7c06ab7726e8c3610642",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.005"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.006",
+          "bytes": 10946,
+          "sha256": "ffac9dd558b70f4ee32fcf96b40189b63d802deb51ecb030fd862a7adce31445",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.006"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.007",
+          "bytes": 8894,
+          "sha256": "9e0f60b64d5e5de49433171f0ec0dbafe12f5e619083c0d1e7e2aed6bde0455a",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.007"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.010",
+          "bytes": 9578,
+          "sha256": "bbd83db0d865dbf0036a62f2c915bada22cb93c59a8f31126b389179d66692be",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.010"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.012",
+          "bytes": 9578,
+          "sha256": "4e25185a6fe5de05381740907f686efe1caedeced92145d82100d56d753e84b6",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.012"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.015",
+          "bytes": 14366,
+          "sha256": "9db12ac7a83936910832f6c817d839c0531b55cd5d476547e2a897b3dfc74a8e",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.015"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.016",
+          "bytes": 12998,
+          "sha256": "78a1579d150093ae11ab503561abc5af5ff404c3a0c8516339b93c173633afc8",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.016"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.017",
+          "bytes": 6842,
+          "sha256": "8db7ad12d42c51023160e455d312535d21b77aa43a3991031e195e1056826b3d",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.017"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.018",
+          "bytes": 10262,
+          "sha256": "1c4ae2d31afc43a97a20777065d9e2bc89d7af9e930a8d401494b4208b7f54a1",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.018"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.019",
+          "bytes": 10262,
+          "sha256": "f10bf9731af57e297bcbd67478fb503b27c113a2f7bd11269e1217c17f95f711",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.019"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.021",
+          "bytes": 6842,
+          "sha256": "b0ea350310859edf6251bdd0839dafc1283ebdfa55518d1787b01e5c24d3e3d3",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.021"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.022",
+          "bytes": 8210,
+          "sha256": "037e8c5389761c5ab2e8ca1c3771de15c370837b06ce5277fdc8b81952575993",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.022"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.023",
+          "bytes": 7526,
+          "sha256": "f950f0ccaaf64ba552ce0f82980534273ae13b2f86cc081bf8a13d3622993470",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.023"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.026",
+          "bytes": 10946,
+          "sha256": "b02462a28e59737559a2adeaebf108028c7fa853a5c16736fc9b2ac65c2de4a3",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.026"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.027",
+          "bytes": 10946,
+          "sha256": "ac0b42af04b0af3006bf34ed33dda920beff1badfd36b589797faa748bcbbe0d",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.027"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.028",
+          "bytes": 15050,
+          "sha256": "391b4db83ed74ecbcc243249c64387a9922466f5e006c47f2d1cbcac575aac45",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.028"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.030",
+          "bytes": 13682,
+          "sha256": "b471fe0527f1699dda4e94380deebbd45213cb22f630787cced66008d3ecc392",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.030"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.031",
+          "bytes": 15734,
+          "sha256": "740df793bcf5876b885a1916ca4297c5ff12b9aec8369027ea04f52e23ae916e",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.031"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.033",
+          "bytes": 27362,
+          "sha256": "d039d6b187c0b32bf4733214a04fe6c149e76a73f579be3191c9010d85b9e9de",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.033"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.034",
+          "bytes": 13682,
+          "sha256": "e70b1f173583712486739e774189cc79980e0cf30e4ab1a77f032ae304825c46",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.034"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.036",
+          "bytes": 10946,
+          "sha256": "a16fd9c444cd45ebcdc207b7e00b3f9e57cfbc626bf10edb4d894788a20b3fcc",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.036"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.037",
+          "bytes": 10946,
+          "sha256": "cf26e850b740fac0ab786bac710d9e27fc2f773d47362090cea6a2e73f260c1a",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.037"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.038",
+          "bytes": 12998,
+          "sha256": "bf1e87372b3ba7fb4590762f84098fa463ed6c9df9972b9b8aa01e1da1f51f25",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.038"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.039",
+          "bytes": 12314,
+          "sha256": "77d07d7494092c6207694e907279c8ea3fa61cb21a8e0e18467a71fe1f05abea",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.039"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.040",
+          "bytes": 15050,
+          "sha256": "fb8150a499b4262768c6e69f72e4f11ecbab66215238fd55dd2bbf78abc39f81",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.040"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.041",
+          "bytes": 12998,
+          "sha256": "2de0b957c5668544bcc51311051f406c119c5f32f19a27087438ee077a2a9336",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.041"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.042",
+          "bytes": 10946,
+          "sha256": "b795d57f605f7d21c7547f497408db7c305724a6f303239446c66971ab478a4d",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.042"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.043",
+          "bytes": 28730,
+          "sha256": "ac2b3c316639e8c854e9c964cee596a5fba1c3c2ca0de8ec9bd91fa997358b99",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.043"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.044",
+          "bytes": 34886,
+          "sha256": "fb2191de46df999a693cc1ad3ddd44546ba87a44058ef91ded74a9cba7cfc96a",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.044"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.045",
+          "bytes": 10946,
+          "sha256": "6902ccbce4b72317fd9abc566c859839ebd9ef1bb1606bfa0258a0974ab6860e",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.045"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.046",
+          "bytes": 22574,
+          "sha256": "5f3fa488aebbebdb007f2065e04f4fc5181a85d6e9837584fd3dac0b936a9f22",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.046"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.048",
+          "bytes": 12998,
+          "sha256": "0ed7b9f7b8ce541cb0c2304251a500f4e498152366b26a3ac43959756c004f97",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.048"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.049",
+          "bytes": 11630,
+          "sha256": "c29efbdc1d78ce8d9e7fe5b9d7159f6142b7cdd2162af657488e3f0a68d871f2",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.049"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.050",
+          "bytes": 8210,
+          "sha256": "1d8ab4220e12a1e01397f88ef11cc285813622ae6290d57ebac35b4f5d3083fe",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.050"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.051",
+          "bytes": 31466,
+          "sha256": "0c8a37cf43840c0b169911c8e9f0a925d608842dc1507a99adeef49f8fad30ab",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.051"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.055",
+          "bytes": 19154,
+          "sha256": "15ed1fc65f89b2b19064b8a55c36bc1f977e2f9ca081c8530e61361961bf5d60",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.055"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.060",
+          "bytes": 27362,
+          "sha256": "9f27d5aca9db0df9359cbafacdab3af992ae58e671f1899e4bf3684d09b495a9",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.060"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.062",
+          "bytes": 21206,
+          "sha256": "f45e2759f16c574f587133df46b37fdd1f21d551638706eb635cad7d6312285d",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.062"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.064",
+          "bytes": 16418,
+          "sha256": "492c63ed0358ae8b2b48641d75c38cd6599d6658789e74a827d5245704b81ae3",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.064"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.065",
+          "bytes": 12314,
+          "sha256": "011da1b74cb60090041feed2817082ebd805008ff8b0a11d5cf4aff5b20b43bf",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.065"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.066",
+          "bytes": 6842,
+          "sha256": "57c40587f22d40994346b93aea96dbd8ec48c4511ffb6203838b7d95ec9fbb40",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.066"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.067",
+          "bytes": 8210,
+          "sha256": "4c111178e27f650e2d9ba40cfa47192a7ff68562f0eac3f965da987529f54410",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.067"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.069",
+          "bytes": 14366,
+          "sha256": "dab854c434e6283c1ffb22b6de4c58fc79aa2ed824c3e0dc1645614066b29edb",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.069"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.071",
+          "bytes": 17786,
+          "sha256": "148e3a86b8ea4131a04f7b788630022d2951c6dd94d2b237437fc0ad4db714a2",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.071"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.073",
+          "bytes": 6158,
+          "sha256": "12b31529f2564b58b6496122e386ddcdc59daae8ac89bc092f400fe0ea62974e",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.073"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.075",
+          "bytes": 4106,
+          "sha256": "680b87b7000ad14182ebf206986cdacb2c8c396f23979a59811a6d532c9abd15",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.075"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.076",
+          "bytes": 12314,
+          "sha256": "78144bfc424f8b11c2212e1ec9b1651aaed4aee1defe9aa0c2e51a2a89f2209e",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.076"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.077",
+          "bytes": 10946,
+          "sha256": "9cc2e53f3054de54c6ea504e15f799646c8b0aa3f842b6a120e8099997d5999f",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.077"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.078",
+          "bytes": 8210,
+          "sha256": "5669d0c92bde46d99595c400e89b2b5abb7db831bbca404f78d5e125f69025f7",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.078"
+        },
+        {
+          "folder": "swos-9495",
+          "name": "TEAM.079",
+          "bytes": 5474,
+          "sha256": "5c01252a2b88198ea862cba5aa2ccae6ed3a5061bd7413d6d1d132d41ce02402",
+          "download": "https://cern.swos.eu/data/amiga/v1.0/TEAM.079"
         }
       ],
       "coverage": {

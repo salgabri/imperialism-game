@@ -1,9 +1,11 @@
 // The football seasons from Sensible World of Soccer (docs/design/football-years.md, "Sensible World of Soccer 96/97" and
 // "Sensible World of Soccer 94/95 and 95/96"): each national team's own record of its sixteen players becomes that nation's squad, in the data set
 // format the game loads (src/engine/footballSets.js, kind 'swos'), and each of the seven big leagues' top-division clubs
-// plays its own sixteen, all read from the game's own team files (scripts/lib/swos-files.mjs). No I/O here:
-// scripts/build-retro-seasons.mjs reads the sources and writes the files, and tests build seasons from invented rows.
-// Every rating is SWOS's own price step, converted by src/data/swosPlayers.js; nothing is generated.
+// plays its own sixteen, all read from the game's own team files (scripts/lib/swos-files.mjs). Every division of every
+// league file SWOS has (SWOS_LEAGUE_FILES) gives the seasons' own country maps their clubs (`everyClubRows`,
+// scripts/build-season-countries.mjs). No I/O here: scripts/build-retro-seasons.mjs reads the sources and writes the
+// files, and tests build seasons from invented rows. Every rating is SWOS's own price step, converted by
+// src/data/swosPlayers.js; nothing is generated.
 import { NATIONS, HISTORIC_NATIONS, PACIFIC_ISLANDS, selectLineup } from '../../src/data/teams.js';
 import { SWOS_ROLES, SWOS_SCALE, SWOS_SKILLS, expandSwosTuple, swosTupleOf } from '../../src/data/swosPlayers.js';
 import { FOOTBALL_FEDERATIONS } from '../../src/data/footballFederations.js';
@@ -22,6 +24,31 @@ export const SWOS_LEAGUES = Object.freeze({
   '008': ['Premier League', '826'], '035': ['La Liga', '724'], '020': ['Serie A', '380'], '014': ['Bundesliga', '276'],
   '013': ['Ligue 1', '250'], '025': ['Eredivisie', '528'], '029': ['Liga Portugal', '620'],
 });
+
+/**
+ * Every league team file SWOS rates a country's clubs in, by number, and the game's nation those clubs play for: the
+ * seven of SWOS_LEAGUES, whose top divisions the season files hold, and every other league, read only for the seasons'
+ * own country maps. A file's country is that of its clubs and nearly all their players, and the one codemeyer's
+ * SwosPlayerFinder names for its number (Countries.cs, its team countries): TEAM.033 is Scotland, 038 Turkey, 041 Serbia
+ * and Montenegro (the game's Serbia, as SWOS_NATIONS reads Yugoslavia). Left out: 011, 024 and 032 (the Faroe Islands,
+ * Malta and San Marino, which have no shape on the map) and 072, SWOS's own invented teams (Amiga Power, Sensible
+ * Elect), whose players' nationality byte that table names CUSTOM.
+ */
+export const SWOS_LEAGUE_FILES = Object.freeze({
+  '000': '008', '001': '040', '002': '056', '003': '100', '004': '191', '005': '196', '006': '203', '007': '208', '008': '826',
+  '010': '233', '012': '246', '013': '250', '014': '276', '015': '300', '016': '348', '017': '352', '018': '372', '019': '376',
+  '020': '380', '021': '428', '022': '440', '023': '442', '025': '528', '026': 'NIR', '027': '578', '028': '616', '029': '620',
+  '030': '642', '031': '643', '033': 'SCO', '034': '705', '035': '724', '036': '752', '037': '756', '038': '792', '039': '804',
+  '040': 'WAL', '041': '688', '042': '012', '043': '032', '044': '036', '045': '068', '046': '076', '048': '152', '049': '170',
+  '050': '218', '051': '222', '055': '392', '060': '484', '062': '554', '064': '600', '065': '604', '066': '740', '067': '158',
+  '069': '710', '071': '858', '073': '840', '075': '356', '076': '112', '077': '862', '078': '703', '079': '288',
+});
+for (const [file, country] of Object.entries(SWOS_LEAGUE_FILES)) {
+  if (!NATIONS[country]) throw new Error(`SWOS_LEAGUE_FILES: TEAM.${file}'s ${country} is no game nation`);
+}
+for (const [file, [, country]] of Object.entries(SWOS_LEAGUES)) {
+  if (SWOS_LEAGUE_FILES[file] !== country) throw new Error(`SWOS_LEAGUE_FILES gives TEAM.${file} another country than SWOS_LEAGUES`);
+}
 
 /**
  * SWOS's top-division clubs of 1994/95 to 1996/97 (17-character names in capitals) by the name the game gives each; SWOS
@@ -241,25 +268,8 @@ export function buildSwosSeason(rows, { source, year, federations = FOOTBALL_FED
   if (idle.length) throw new Error(`SWOS rates national teams with no federation of their own in ${year}: ${idle.join(', ')}`);
 
   const { clubs, leagues: leagueAudit, collisions } = swosClubs(clubRows, playerFor, warn);
-  // Every division's clubs of the seven league files, for the season's own country maps (scripts/build-season-countries.mjs):
-  // each named by SWOS_CLUBS where it has a name there, else by its SWOS name in plain capitals ("Port Vale").
-  let allClubs = null;
-  if (everyClubRows) {
-    const byTeam = new Map();
-    for (const row of everyClubRows) {
-      if (row.type !== 'CLUB' || !Object.hasOwn(SWOS_LEAGUES, row.file)) throw new Error(`Row ${row.id} (${row.name}) is no club of SWOS_LEAGUES' files`);
-      const key = `${row.file}|${row.team}`;
-      (byTeam.get(key) || byTeam.set(key, []).get(key)).push(row);
-    }
-    allClubs = [...byTeam].map(([key, members]) => {
-      const file = key.slice(0, key.indexOf('|')), team = key.slice(file.length + 1);
-      const [top, country] = SWOS_LEAGUES[file];
-      const division = members[0].division;
-      return { key: `swos:${file}:${team}`, name: SWOS_CLUBS[team] ?? SWOS_LOWER_CLUBS[team] ?? capitalisedAll(team), short: null, nation: null, country,
-        league: SWOS_DIVISIONS[file]?.[division] ?? (division === 0 ? top : `${top} (division ${division + 1})`),
-        squad: pickFootballSquad(members.map(row => playerFor(row, row.nat, team))) };
-    });
-  }
+  // Every division's clubs of every league file, for the season's own country maps (scripts/build-season-countries.mjs).
+  const allClubs = everyClubRows ? swosLeagueClubs(everyClubRows, playerFor, seasonId, warn) : null;
   const written = new Set([...Object.values(nations).flatMap(([, , squad]) => squad), ...clubs.flatMap(club => club.squad)].map(tuple => tuple[0]));
   const coverage = {
     players: written.size, nations: nationAudit.filter(n => n.players).length,
@@ -281,21 +291,192 @@ export function buildSwosSeason(rows, { source, year, federations = FOOTBALL_FED
 }
 
 /**
- * The clubs below the top divisions whose SWOS names are cut short to fit 17 characters, by their full names; every other
- * one reads as SWOS writes it, in plain capitals ("PORT VALE" is Port Vale).
+ * The clubs below the seven big leagues' top divisions whose SWOS names are cut short, to fit 17 characters or to the
+ * club's initials (RBC, whose full name another season's map already places), by their full names (Arminia Bielefeld as
+ * SWOS_CLUBS names its top-division seasons); every other one reads as SWOS writes it, in the case swosClubName sets
+ * ("PORT VALE" is Port Vale).
  */
 export const SWOS_LOWER_CLUBS = Object.freeze({
   'CHARLTON ATH.': 'Charlton Athletic', 'COLCHESTER UTD': 'Colchester United', 'HARTLEPOOL UTD': 'Hartlepool United',
   'PETERBOROUGH UTD': 'Peterborough United', 'PRESTON N. END': 'Preston North End', 'SCUNTHORPE UTD': 'Scunthorpe United',
-  'WOLVERHAMPTON W.': 'Wolverhampton Wanderers', 'ATL. MARBELLA': 'Atlético Marbella',
+  'WOLVERHAMPTON W.': 'Wolverhampton Wanderers', 'WYCOMBE WDRS': 'Wycombe Wanderers', 'WEST BROMWICH': 'West Bromwich Albion',
+  'ATL. MARBELLA': 'Atlético Marbella', "ARMINIA B'FIELD": 'DSC Arminia Bielefeld', 'STUTTGART KICKER': 'Stuttgarter Kickers',
+  RBC: 'RBC Roosendaal',
 });
 
-/** The divisions of SWOS's seven league files, top first, as they were named in the mid-1990s. */
-export const SWOS_DIVISIONS = Object.freeze({
-  '008': ['Premier League', 'Division One', 'Division Two', 'Division Three'], '035': ['Primera División', 'Segunda División'],
-  '020': ['Serie A', 'Serie B'], '014': ['Bundesliga', '2. Bundesliga'], '013': ['Division 1', 'Division 2'],
-  '025': ['Eredivisie', 'Eerste Divisie'], '029': ['Primeira Divisão', 'Divisão de Honra'],
+/**
+ * Every other league file's clubs whose SWOS names are cut short or abbreviated, by file, with their full names: towns
+ * cut to an initial or a contraction ("BEROE S. ZAGORA", "RED STAR B'GRADE"), words cut at the seventeenth letter
+ * ("MAMELODI SUNDOWN"), abbreviations ("UNIV. CLUJ", "DEP. ESPANOL", Algeria's initials), and a few misspellings of a
+ * club another edition spells right (CARALAS for Caracas). Identities taken from the season's league where the
+ * abbreviation alone does not settle it: Algeria's J.S.K is JS Kabylie and W.A.M WA Mostaganem, Colombia's DEP. TULIA
+ * Cortuluá (of Tuluá), the club of 1995/96's Categoría Primera A it stands for. Where it is not certain which club a
+ * shortened name means (Uruguay's CENTRAL ESP, beside CENTRAL ESPANOL; Mexico's UN LEON), SWOS's name stays. SWOS's
+ * Japanese clubs carry names it scrambled on purpose (KOSHEMA ONTLORS for Kashima Antlers): those stay as SWOS wrote
+ * them, and their homes say which club each is (scripts/data/season-club-locations.json).
+ */
+export const SWOS_LEAGUE_CLUBS = Object.freeze({
+  '000': { 'ILIRIA F-KRUJE': 'Iliria Fushë-Krujë' },
+  '001': { 'VSE ST.POLTEN': 'VSE St. Pölten' },
+  '003': { 'BEROE S. ZAGORA': 'Beroe Stara Zagora', 'ETAR V. TARNOVO': 'Etar Veliko Tarnovo', 'LOK. GORNA ORIA.': 'Lokomotiv Gorna Oryahovitsa',
+    'LOK. PLOVDIV': 'Lokomotiv Plovdiv', "PIRIN BL'GRAD": 'Pirin Blagoevgrad' },
+  '004': { 'MARSONIA S. BROD': 'Marsonia Slavonski Brod', 'RADNIK V. GORICA': 'Radnik Velika Gorica' },
+  '010': { 'KEEMIK K-J': 'Keemik Kohtla-Järve' },
+  '019': { 'BNEI YEHODA': 'Bnei Yehuda', 'HAPOEL BEIT SHAN': "Hapoel Beit She'an", 'HAPOEL P-TIKVA': 'Hapoel Petah Tikva',
+    'MACCABI P-TIKVA': 'Maccabi Petah Tikva' },
+  '022': { 'EKRANAS PANEVEZS': 'Ekranas Panevėžys', 'ZYDRIUS MARIJAME': 'Žydrius Marijampolė' },
+  '023': { "RED BOYS D'DANGE": 'Red Boys Differdange' },
+  '026': { 'BALLYCLARE C.': 'Ballyclare Comrades' },
+  '028': { 'RAKOW CZESTOCHOA': 'Raków Częstochowa', 'SIARKA T.': 'Siarka Tarnobrzeg', 'ZAWISZA B.': 'Zawisza Bydgoszcz' },
+  '030': { 'CEAHLAUL P-N': 'Ceahlăul Piatra Neamț', 'POLITEHNICA T.': 'Politehnica Timișoara', 'SPORTUL STUD.': 'Sportul Studențesc',
+    'UNIV. CLUJ': 'Universitatea Cluj', 'UNIV. CRAIOVA': 'Universitatea Craiova' },
+  '031': { 'DINAMO G-TYUMEN': 'Dinamo-Gazovik Tyumen', 'KRYLYA S. SAMARA': 'Krylya Sovetov Samara', 'LOK. N. NOVGOROD': 'Lokomotiv Nizhny Novgorod',
+    'OKEAN NAKHODNA': 'Okean Nakhodka', 'SPARTAK VLAD.': 'Spartak Vladikavkaz' },
+  '033': { 'CALEDONIAN TH.': 'Caledonian Thistle', 'HAMILTON ACAD.': 'Hamilton Academical', 'QUEEN OF SOUTH': 'Queen of the South' },
+  '034': { 'MURA M. SOBOTA': 'Mura Murska Sobota', "OLIMPIJA L'JANA": 'Olimpija Ljubljana', 'RUDAR VELNJE': 'Rudar Velenje' },
+  '039': { 'METALLIST K.': 'Metallist Kharkov', 'METALLURG Z.': 'Metallurg Zaporozhye', 'TEMP SHETOVKA': 'Temp Shepetovka' },
+  '041': { "PARTIZAN B'GRADE": 'Partizan Belgrade', 'RADNICKI N.B.': 'Radnički Novi Beograd', "RED STAR B'GRADE": 'Red Star Belgrade',
+    'VOJVODINA N. SAD': 'Vojvodina Novi Sad' },
+  '042': { "A.S.AIN-M'LILA": "AS Aïn M'lila", 'C.A.BATNA': 'CA Batna', 'E.S.SETIF': 'ES Sétif', 'J.S.B.M': 'JS Bordj Ménaïel',
+    'J.S.K ALGER': 'JS Kabylie', 'M C ORAN': 'MC Oran', 'NASSER HUSSEIN': 'NA Hussein Dey', 'U.S.CHAOUIA': 'US Chaouia',
+    'U.S.M. BLIDA': 'USM Blida', 'U.S.M.B.A.': 'USM Bel Abbès', 'U.S.M.H': 'USM El Harrach', 'W.A.B.': 'WA Boufarik',
+    'W.A.M': 'WA Mostaganem', 'W.A.TLEMCEN': 'WA Tlemcen' },
+  '043': { 'ARGENTINOS JNRS.': 'Argentinos Juniors', 'CHACARITA JNRS.': 'Chacarita Juniors', 'CHACARITA JUNIOS': 'Chacarita Juniors',
+    'DEFENSA-JUSTICIA': 'Defensa y Justicia', 'DEP. ESPANOL': 'Deportivo Español', 'DEP. ITALIANO': 'Deportivo Italiano',
+    'DEP. LAFERRERE': 'Deportivo Laferrere', 'DEP. MANDIYU': 'Deportivo Mandiyú', FERROCARRIL: 'Ferro Carril Oeste',
+    'GIMNASIA-ESG LP': 'Gimnasia y Esgrima La Plata', 'GIMNASIA-ESGRIMA': 'Gimnasia y Esgrima La Plata', 'HUR. CORRIENTES': 'Huracán Corrientes',
+    'INST. CORDOBA': 'Instituto Córdoba', 'NEWELLS OLD BOYS': "Newell's Old Boys", 'S.MARTIN TUCUMAN': 'San Martín de Tucumán',
+    'TALLERES ESC.': 'Talleres de Remedios de Escalada' },
+  '044': { 'BRISBANE STRIKES': 'Brisbane Strikers', 'HEIDELBERG UTD': 'Heidelberg United', 'MARCONI FAIRFIED': 'Marconi Fairfield',
+    'MELBOURNE KNIGHS': 'Melbourne Knights', 'MELBOURNE KNIGHT': 'Melbourne Knights', "NEWCASTLE B'KERS": 'Newcastle Breakers',
+    'ROCKDALE HINDEN': 'Rockdale Ilinden', 'SALISBURY UTD': 'Salisbury United', 'WARRINGAH DOLPHN': 'Warringah Dolphins',
+    'WOLLONGONG UTD': 'Wollongong United' },
+  '045': { 'BLOOMING S. CRUZ': 'Blooming Santa Cruz', 'INDEPENDIENTE PS': 'Independiente Petrolero', 'JORGE WILSTERMAN': 'Jorge Wilstermann' },
+  '046': { 'ATL PARANAENSE': 'Atlético Paranaense', 'ATLETICO PARANA': 'Atlético Paranaense' },
+  '048': { 'DEP. CONCEPCION': 'Deportes Concepción', 'DEP. LA SERENA': 'Deportes La Serena', 'DEPORTES MELIPIA': 'Deportes Melipilla',
+    'DESP. IQUIQUE': 'Deportes Iquique', PROVINCIAL: 'Provincial Osorno', 'PROVINCIAL OSORO': 'Provincial Osorno',
+    'SANTIAGO WDRS.': 'Santiago Wanderers', 'UNIV. CATOLICA': 'Universidad Católica', 'UNIV. DE CHILE': 'Universidad de Chile' },
+  '049': { 'ATL. BUCARAMANGA': 'Atlético Bucaramanga', 'ATL. NACIONAL': 'Atlético Nacional', 'DEP. PEREIRA': 'Deportivo Pereira',
+    'DEP. QUINDIO': 'Deportes Quindío', 'DEP. TOLIMA': 'Deportes Tolima', 'DEP. TULIA': 'Cortuluá', 'IND. MEDELLIN': 'Independiente Medellín',
+    'IND. SANTA FE': 'Independiente Santa Fe' },
+  '050': { 'DEP. EL NACIONAL': 'El Nacional', 'OLMEDO RIO BAMBA': 'Olmedo Riobamba', 'UNIV. CATOLICA': 'Universidad Católica' },
+  '051': { 'C.D. FUERTE S F': 'C.D. Fuerte San Francisco', 'C.D.INDEPENDIENE': 'C.D. Independiente' },
+  '055': { 'BULLMORE HIR.': 'Bullmore Hiratsuka', 'KYOTO P SANGA': 'Kyoto Purple Sanga' },
+  '060': { 'DEPT TEPATITLAN': 'Deportivo Tepatitlán', 'TAMPILO-MADERO': 'Tampico-Madero', 'UNIV.GUADALAJARA': 'Universidad de Guadalajara',
+    'VERA CRUZ': 'Veracruz', YULATAN: 'Yucatán', ZALATEPEC: 'Zacatepec' },
+  '062': { 'CHRISTCHURCH TEC': 'Christchurch Technical', 'CHRISTCHURCH UTD': 'Christchurch United', 'DUNEDIN TEC': 'Dunedin Technical',
+    'NORTH SHORE UTD': 'North Shore United', 'WELLINGTON OLYM.': 'Wellington Olympic', 'WELLINGTON UTD': 'Wellington United' },
+  '064': { '8 DICIEMBRE C.': '8 de Diciembre', 'ATL. COLEGIALES': 'Atlético Colegiales', 'DEP. HUMAITA': 'Deportivo Humaitá',
+    'DEPORTIVO HUMAIA': 'Deportivo Humaitá', 'DEPORTIVO RECOLA': 'Deportivo Recoleta', 'SPORT TRINIDENSE': 'Sportivo Trinidense',
+    'SPORTIVO TRINIDN': 'Sportivo Trinidense' },
+  '065': { 'DEP. MUNICIPAL': 'Deportivo Municipal', 'DEP. SIPESA': 'Deportivo Sipesa' },
+  '066': { 'SV NAT LEGER': 'SV Nationaal Leger' },
+  '069': { 'AFRICAN WANDS.': 'African Wanderers', 'MAMELODI SUNDOWN': 'Mamelodi Sundowns', 'VAAL PROFS': 'Vaal Professionals' },
+  '073': { 'COLOMBUS CREW': 'Columbus Crew', 'KANSAS CITY WIZ': 'Kansas City Wizards', 'LA GALAXY': 'LA Galaxy',
+    'NEW ENGLAND REV.': 'New England Revolution', 'VANCOUVER 86': 'Vancouver 86ers' },
+  '076': { 'LOK VITEBSK': 'Lokomotiv Vitebsk', 'SHAKHTER SOLIGOK': 'Shakhtyor Soligorsk' },
+  '077': { 'AT ZAMORA': 'Atlético Zamora', CARALAS: 'Caracas', MARITIMO: 'Marítimo', MARTIMO: 'Marítimo', 'MINEROS DE GUAYA': 'Mineros de Guayana',
+    'MINEROS GUAYANA': 'Mineros de Guayana', 'UNI DE LOS ANDES': 'Universidad de Los Andes' },
+  '078': { '1.FC KOSICE': '1. FC Košice', 'LOK. KOSICE': 'Lokomotíva Košice', "SLOVAN BR'SLAVA": 'Slovan Bratislava' },
 });
+
+// Words a club writes in capitals (FC, AIK, PAOK, CSKA) or in a case of its own (VfB, AaB, KuPS), as SWOS's league files
+// carry them, and the particles a club's name joins in lower case inside it (Vasco da Gama, Gimnasia y Tiro, Ried im
+// Innkreis, Castel di Sangro).
+const CLUB_WORDS = new Map([
+  ...('AB AC AEK AEL AGF AIK AK AM APEP APOEL APOP ASK AZ BK BVSC CD CNI CP CR CS CSC CSKA CSM CYC DAG DC EP EPA ETO FAS FBK FC '
+    + 'FH FSV GAIS GKS HIT HJK IA IBK IBV IF IFK II IK JAF JC KFC KIM KR KV LASK LDU LKS MC MG MP MSC MSV MTK MVV NAC NEC NJ NK NTV NY '
+    + 'OB OFI OFK OTP PAOK PJN PSV PVV RAF RBC RKC RWD SC SD SK SP SPAL SV TE TM TOP TPS TPV UA UD UDC UN UNAM UTA UTC UTS VIF VPS VVV WMC')
+    .split(' ').map(word => [word, word]),
+  ['AAB', 'AaB'], ['AMAZULU', 'AmaZulu'], ['FINNPA', 'FinnPa'], ['KUPS', 'KuPS'], ['MYPA', 'MyPa'], ['ROPS', 'RoPS'], ['VFB', 'VfB'], ['VFL', 'VfL'],
+]);
+const CLUB_PARTICLES = new Set(['de', 'del', 'di', 'da', 'do', 'dos', 'das', 'of', 'the', 'y', 'im']);
+
+/** A club's name SWOS writes in capitals, in the case clubs write it: each word (and each part of a hyphenated one) capitalised but for CLUB_WORDS and the particles inside it. */
+export const clubCase = team => team.split(' ').map((word, i, words) => {
+  if (i > 0 && i < words.length - 1 && CLUB_PARTICLES.has(word.toLowerCase())) return word.toLowerCase();
+  return word.split('-').map(part => CLUB_WORDS.get(part) ?? capitalised(part)).join('-');
+}).join(' ');
+
+/**
+ * A league club's name: SWOS_CLUBS' or SWOS_LOWER_CLUBS' in the seven big leagues' files (not elsewhere: Ecuador's
+ * BARCELONA is not FC Barcelona), SWOS_LEAGUE_CLUBS' in every other one, else SWOS's own in clubCase's case.
+ */
+export function swosClubName(file, team) {
+  if (Object.hasOwn(SWOS_LEAGUES, file)) return SWOS_CLUBS[team] ?? SWOS_LOWER_CLUBS[team] ?? clubCase(team);
+  return SWOS_LEAGUE_CLUBS[file]?.[team] ?? clubCase(team);
+}
+
+/** SWOS's division byte of the teams it keeps outside a file's divisions (England's Halifax Town, then in the Conference). */
+export const SWOS_NON_LEAGUE = 4;
+
+/**
+ * The divisions of every league file, top first by SWOS's division byte, as they were named in the mid-1990s; a league
+ * renamed between the three seasons is named by season (South Africa's became the Premier Soccer League in 1996, the
+ * United States' top flight was the APSL, the A-League and from 1996 MLS). Australia's three lower divisions are SWOS's
+ * picks of three states' leagues, New Zealand's three its Northern, Central and Southern leagues. null where no name of
+ * the day fits (India's clubs before its National Football League, El Salvador's fourth division): the map then says
+ * the country's football.
+ */
+export const SWOS_DIVISIONS = Object.freeze({
+  '000': ['Kategoria e Parë'], '001': ['Bundesliga'], '002': ['Eerste Klasse'], '003': ['A Group'], '004': ['Prva HNL'],
+  '005': ['First Division'], '006': ['1. liga'], '007': ['Superliga'], '008': ['Premier League', 'Division One', 'Division Two', 'Division Three'],
+  '010': ['Meistriliiga'], '012': ['Veikkausliiga'], '013': ['Division 1', 'Division 2'], '014': ['Bundesliga', '2. Bundesliga'],
+  '015': ['Alpha Ethniki'], '016': ['Nemzeti Bajnokság I'], '017': ['1. deild'], '018': ['Premier Division'], '019': ['Liga Leumit'],
+  '020': ['Serie A', 'Serie B'], '021': ['Virslīga'], '022': ['A Lyga'], '023': ['Division Nationale'], '025': ['Eredivisie', 'Eerste Divisie'],
+  '026': ['Irish League'], '027': ['Tippeligaen'], '028': ['I liga'], '029': ['Primeira Divisão', 'Divisão de Honra'], '030': ['Divizia A'],
+  '031': ['Top League'], '033': ['Premier Division', 'First Division', 'Second Division', 'Third Division'], '034': ['1. SNL'],
+  '035': ['Primera División', 'Segunda División'], '036': ['Allsvenskan'], '037': ['Nationalliga A'], '038': ['1. Lig'], '039': ['Vyshcha Liha'],
+  '040': ['League of Wales'], '041': ['First League'], '042': ['Championnat National'], '043': ['Primera División', 'Primera B Nacional'],
+  '044': ['National Soccer League', 'South Australian state league', 'New South Wales state league', 'Queensland state league'],
+  '045': ['Liga Profesional'], '046': ['Série A'], '048': ['Primera División'], '049': ['Primera A'], '050': ['Serie A'],
+  '051': ['Primera División', 'Segunda División', 'Tercera División', null], '055': ['J.League', 'Japan Football League'],
+  '060': ['Primera División', 'Primera División A'], '062': ['Northern League', 'Central League', 'Southern League'],
+  '064': ['Primera División', 'Segunda División'], '065': ['Primera División'], '066': ['Hoofdklasse'], '067': ['Enterprise League'],
+  '069': { 'swos-9495': ['National Soccer League'], 'swos-9596': ['National Soccer League'], 'swos-9697': ['Premier Soccer League'] },
+  '071': ['Primera División', 'Segunda División'],
+  '073': { 'swos-9495': ['APSL'], 'swos-9596': ['A-League'], 'swos-9697': ['Major League Soccer'] },
+  '075': { 'swos-9495': [null], 'swos-9596': [null], 'swos-9697': ['National Football League'] },
+  '076': ['Vysheyshaya Liga'], '077': ['Primera División'], '078': ['1. liga'], '079': [null],
+});
+
+/** A league file's division as SWOS_DIVISIONS names it in the season: null where it names none, 'Non-league' for SWOS_NON_LEAGUE. */
+export function swosDivision(file, division, seasonId) {
+  if (division === SWOS_NON_LEAGUE) return 'Non-league';
+  const names = SWOS_DIVISIONS[file];
+  const list = Array.isArray(names) ? names : names?.[seasonId];
+  if (!list || division >= list.length) throw new Error(`SWOS_DIVISIONS names no division ${division} of TEAM.${file}${list ? '' : ` in ${seasonId}`}`);
+  return list[division];
+}
+
+/**
+ * Every division's clubs of every league file (`rows` of type CLUB, from the files of SWOS_LEAGUE_FILES), as
+ * scripts/lib/season-country-clubs.mjs takes them: `{ key, name, short, nation, country, league, squad }`, its country
+ * its file's, its league its division's name (swosDivision), its name swosClubName's, its squad pickFootballSquad's pick
+ * of its own sixteen. Where a file holds two teams of one name (SWOS 95/96's South Africa lists Manning Rangers in its
+ * top division and again outside it), the one in the higher division plays and the other is left out, with a warning.
+ */
+function swosLeagueClubs(rows, playerFor, seasonId, warn) {
+  const byPlace = new Map();
+  for (const row of rows) {
+    if (row.type !== 'CLUB' || !Object.hasOwn(SWOS_LEAGUE_FILES, row.file)) throw new Error(`Row ${row.id} (${row.name}) is no club of SWOS_LEAGUE_FILES' files`);
+    if (!Number.isInteger(row.place)) throw new Error(`Row ${row.id} (${row.name}) has no team place`);
+    const key = `${row.file}|${row.place}`;
+    (byPlace.get(key) || byPlace.set(key, []).get(key)).push(row);
+  }
+  const teams = [...byPlace.values()].map(members => ({ file: members[0].file, team: members[0].team, place: members[0].place, division: members[0].division, members }))
+    .sort((a, b) => (a.file < b.file ? -1 : a.file > b.file ? 1 : 0) || a.place - b.place);
+  const named = new Map();
+  for (const team of [...teams].sort((a, b) => a.division - b.division || a.place - b.place)) {
+    const key = `${team.file}|${team.team}`;
+    if (named.has(key)) warn(`TEAM.${team.file} lists ${team.team} twice: the one in division ${team.division} is left out`);
+    else named.set(key, team);
+  }
+  return teams.filter(team => named.get(`${team.file}|${team.team}`) === team).map(({ file, team, division, members }) => ({
+    key: `swos:${file}:${team}`, name: swosClubName(file, team), short: null, nation: null, country: SWOS_LEAGUE_FILES[file],
+    league: swosDivision(file, division, seasonId), squad: pickFootballSquad(members.map(row => playerFor(row, row.nat, team))),
+  }));
+}
 
 /**
  * The top-division clubs of SWOS's seven league files (`rows` of type CLUB, with `file` and `division`), as the game's

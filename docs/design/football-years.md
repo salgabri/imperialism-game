@@ -1179,8 +1179,11 @@ its European Championship Edition; SWOS 96/97 stayed as it was, nations only, un
   his nationality byte (`SWOS_NATIONALITIES`: the code SWOS 96/97's database
   records for the 7,650 players of 96/97's own team files matched by team and
   name, two of them disagreeing; Chad and Iran, which no 96/97 player carries,
-  as SwosPlayerFinder names them); a national squad's is its team's name, as in
-  96/97.
+  as SwosPlayerFinder names them, and so the four only the other leagues' files
+  carry: 52 El Salvador, every player of its league file, 48 Turkmenistan, 145
+  Uzbekistan; 144, which that table calls Thailand, only two Tajik internationals,
+  Mandreko at Rapid Vienna and Shirinbekov at Vasas, so it reads as Tajikistan); a
+  national squad's is its team's name, as in 96/97.
 - **Club names and ids** (`SWOS_CLUBS`): SWOS writes 17 capitals (`MANCHESTER UTD`,
   `BOR. DORTMUND`, `DEP. LA CORUNA`). Each club takes the name of a club the
   ground table already places, its id that name's slug (`presentClubs`), so it
@@ -1196,6 +1199,33 @@ its European Championship Edition; SWOS 96/97 stayed as it was, nations only, un
 - **Kind `swos`**: no SWOS season has nations only since 2026-11-14 (`nationsOnly`
   named `swos-9697` until then), and the manifest's `reader: 'swos-files'` builds
   all three (`scripts/build-retro-seasons.mjs`; its database reader is gone).
+- **Every other league, for the country maps** (2026-11-16): each edition's other
+  league files, 55 of them (`leagueFiles` in the manifest: TEAM.000 Albania to 079
+  Ghana, fetched through `scripts/lib/polite-fetch.mjs` one at a time, 1.5 s apart,
+  pinned by bytes and SHA-256), are read only with `everyClub`, for the seasons'
+  own country maps (`docs/design/domestic-campaigns.md`, "Earlier seasons"): the
+  season files read the same thirteen files as before and rebuild byte for byte.
+  `SWOS_LEAGUE_FILES` gives every league file's country, its clubs' and nearly all
+  their players' and the one SwosPlayerFinder's table of team countries names for
+  its number (033 Scotland, 036 Sweden, 038 Turkey, 041 Serbia and Montenegro, read
+  as the game's Serbia); left out are 011, 024 and 032 (the Faroe Islands, Malta and
+  San Marino, with no shape on the map) and 072, SWOS's own invented teams (Amiga
+  Power, Sensible Elect). `SWOS_DIVISIONS` names every file's divisions as they were
+  in the mid-1990s (Scotland's Premier to Third Division; South Africa's league is
+  the Premier Soccer League from 1996/97, the United States' the APSL, the A-League,
+  then MLS; Australia's lower three are SWOS's picks of three states' leagues), and
+  the teams SWOS keeps outside a file's divisions (division byte 4: England's
+  Halifax Town, then in the Conference) are "Non-league". A club's name is
+  `SWOS_LEAGUE_CLUBS`' where SWOS cuts or abbreviates it ("QUEEN OF SOUTH",
+  "RED STAR B'GRADE", "UNIV. CRAIOVA", Algeria's initials), else SWOS's own, each
+  word capitalised but for the letters clubs write in capitals or a case of their
+  own (FC, AIK, PAOK, VfB, AaB, KuPS) and the particles inside a name (Vasco da
+  Gama, Ried im Innkreis); `SWOS_CLUBS` names the seven big leagues' clubs only, so
+  Ecuador's Barcelona stays Barcelona. SWOS gives its Japanese clubs scrambled names
+  (KOSHEMA ONTLORS, Kashima Antlers): they stay as SWOS wrote them, and their homes
+  say which club each is. One team is listed twice in one file (SWOS 95/96's South
+  Africa has Manning Rangers in its league and outside it): the one in the higher
+  division plays.
 - **Spot check against history** (2026-11-09): 1994/95 has Klinsmann at Tottenham,
   Cantona at Manchester United, Romário at Barcelona, Baggio at Juventus, Weah at
   Paris Saint-Germain and Gullit at Sampdoria; 1995/96 Klinsmann at Bayern, Baggio

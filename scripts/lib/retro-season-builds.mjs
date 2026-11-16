@@ -12,7 +12,7 @@ import { buildFootballSet, seasonYear } from '../../src/data/footballSetBuild.js
 import { setHasClubs } from '../../src/engine/footballSets.js';
 import { TOP_CLUBS } from '../../src/data/scopes.js';
 import { buildCm9798Season } from './cm9798.mjs';
-import { SWOS_LEAGUES, buildSwosSeason } from './swos.mjs';
+import { SWOS_LEAGUES, SWOS_LEAGUE_FILES, buildSwosSeason } from './swos.mjs';
 import { SWOS_NATIONAL_FILES, readTeamFile, swosRows } from './swos-files.mjs';
 
 /** A source file's bytes, after checking it is the pinned one. */
@@ -66,7 +66,7 @@ async function buildCm9798(season, dataDir, retrieved, { everyClub = false } = {
 
 /**
  * A SWOS edition read from the game's own team files (scripts/lib/swos-files.mjs): its national squads, and its seven
- * leagues' top-division clubs.
+ * leagues' top-division clubs; with `everyClub`, every division's clubs of every league file too.
  */
 async function buildSwosFiles(season, dataDir, retrieved, { everyClub = false } = {}) {
   const read = await Promise.all(season.files.map(async file => readTeamFile(await pinned(dataDir, file), file.name.replace(/^TEAM\./, ''))));
@@ -83,9 +83,23 @@ async function buildSwosFiles(season, dataDir, retrieved, { everyClub = false } 
   const source = { provider: season.maker, edition: season.edition, version: season.version, snapshotDate: season.snapshotDate, url: season.url,
     rawScale: SWOS_SCALE, conversion: SWOS_CONVERSION, ...credits(season, retrieved) };
   const result = buildSwosSeason(rows, { source, year: seasonYear(season.season), prices: SWOS_PRICES, id: season.id, clubRows,
-    // Every division's clubs of the seven league files, for the season's own country maps.
-    ...(everyClub ? { everyClubRows: read.filter(file => Object.hasOwn(SWOS_LEAGUES, file.number)).flatMap(file => swosRows(file, 'CLUB', [])) } : {}) });
+    // Every division's clubs of every league file, for the season's own country maps.
+    ...(everyClub ? { everyClubRows: (await leagueFilesOf(season, dataDir, read)).flatMap(file => swosRows(file, 'CLUB', [])) } : {}) });
   return { ...result, audit: { ...result.audit, clamped } };
+}
+
+/**
+ * Every league file of a SWOS season's edition (SWOS_LEAGUE_FILES): the seven it reads for its file, and its
+ * `leagueFiles`, the other leagues' files pinned for its own country maps only.
+ */
+async function leagueFilesOf(season, dataDir, read) {
+  const others = await Promise.all((season.leagueFiles ?? []).map(async file => readTeamFile(await pinned(dataDir, file), file.name.replace(/^TEAM\./, ''))));
+  const files = [...read.filter(file => Object.hasOwn(SWOS_LEAGUES, file.number)), ...others];
+  const numbers = files.map(file => file.number).sort();
+  if (JSON.stringify(numbers) !== JSON.stringify(Object.keys(SWOS_LEAGUE_FILES).sort())) {
+    throw new Error(`${season.id}'s files and leagueFiles must be every league file of SWOS_LEAGUE_FILES, not ${numbers.join(', ')}`);
+  }
+  return files;
 }
 
 // By the season's `reader` where it names one, else by its kind (every SWOS season names its reader, 'swos-files').

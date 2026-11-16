@@ -24,22 +24,25 @@ export const SWOS_NATIONAL_FILES = Object.freeze(['080', '081', '082', '083', '0
  * records for the players whose record in SWOS 96/97's own national and seven league files carries that byte (7,650
  * players matched by team and name; two disagree, a Welshman at Cardiff and an Argentine at Pisa whom the files give
  * the byte of England and of Italy). Bytes 95 and 128, which no 96/97 player carries, are named as SwosPlayerFinder's
- * table names them (Chad, Iran). The code only sets a name's case (properCase) and is kept as a club player's
- * nationality; a national squad's players take their team's name.
+ * table names them (Chad, Iran), and so are three bytes only the other leagues' files carry (SWOS_LEAGUE_FILES): 52,
+ * every player of El Salvador's league file, El Salvador, as that table names it and 66, so it takes 66's code; 48
+ * Turkmenistan and 145 Uzbekistan. 144, which that table names Thailand, is carried only by two Tajik internationals
+ * (Sergei Mandreko at Rapid Vienna, Oleg Shirinbekov at Vasas), so it is read as Tajikistan. The code only sets a name's
+ * case (properCase) and is kept as a club player's nationality; a national squad's players take their team's name.
  */
 export const SWOS_NATIONALITIES = Object.freeze({
   0: 'ALB', 1: 'AUT', 2: 'BEL', 3: 'BUL', 4: 'CRO', 5: 'CYP', 6: 'TCH', 7: 'DEN', 8: 'ENG', 9: 'EST', 10: 'FAR', 11: 'FIN', 12: 'FRA',
   13: 'GER', 14: 'GRE', 15: 'HUN', 16: 'ISL', 17: 'ISR', 18: 'ITA', 19: 'LAT', 20: 'LIT', 21: 'LUX', 22: 'MLT', 23: 'HOL', 24: 'NIR',
   25: 'NOR', 26: 'POL', 27: 'POR', 28: 'ROM', 29: 'RUS', 30: 'SMR', 31: 'SCO', 32: 'SLO', 33: 'SWE', 34: 'TUR', 35: 'UKR', 36: 'WAL',
-  37: 'YUG', 38: 'BLS', 39: 'SVK', 40: 'ESP', 41: 'ARM', 42: 'BOS', 43: 'AZB', 44: 'GEO', 45: 'SUI', 46: 'IRL', 47: 'MAC', 49: 'LIE',
-  50: 'MOL', 51: 'CRC', 53: 'GUA', 54: 'HON', 56: 'MEX', 57: 'PAN', 58: 'USA', 59: 'BAH', 60: 'NIC', 61: 'BER', 62: 'JAM', 63: 'TRI',
+  37: 'YUG', 38: 'BLS', 39: 'SVK', 40: 'ESP', 41: 'ARM', 42: 'BOS', 43: 'AZB', 44: 'GEO', 45: 'SUI', 46: 'IRL', 47: 'MAC', 48: 'TKM', 49: 'LIE',
+  50: 'MOL', 51: 'CRC', 52: 'ELS', 53: 'GUA', 54: 'HON', 56: 'MEX', 57: 'PAN', 58: 'USA', 59: 'BAH', 60: 'NIC', 61: 'BER', 62: 'JAM', 63: 'TRI',
   64: 'CAN', 65: 'BAR', 66: 'ELS', 67: 'SVC', 68: 'ARG', 69: 'BOL', 70: 'BRA', 71: 'CHL', 72: 'COL', 73: 'ECU', 74: 'PAR', 75: 'SUR',
   76: 'URU', 77: 'VNZ', 78: 'GUY', 79: 'PER', 80: 'ALG', 81: 'SAF', 82: 'BOT', 83: 'BFS', 84: 'BUR', 85: 'LES', 86: 'ZAI', 87: 'ZAM',
   88: 'GHA', 89: 'SEN', 90: 'CIV', 91: 'TUN', 92: 'MLI', 94: 'CMR', 95: 'CHAD', 96: 'UGA', 97: 'LIB', 98: 'MOZ', 99: 'KEN', 100: 'SUD',
   101: 'SWA', 102: 'ANG', 103: 'TOG', 104: 'ZIM', 105: 'EGY', 106: 'TAN', 107: 'NIG', 108: 'ETH', 109: 'GAB', 110: 'SIE', 111: 'BEN',
   112: 'CON', 113: 'GUI', 114: 'SRL', 115: 'MAR', 116: 'GAM', 117: 'MLW', 118: 'JAP', 119: 'TAI', 120: 'IND', 121: 'BAN', 122: 'BRU',
   123: 'IRA', 124: 'JOR', 125: 'SRI', 126: 'SYR', 127: 'KOR', 128: 'IRAN', 129: 'VIE', 130: 'MLY', 131: 'SAU', 132: 'YEM', 133: 'KUW',
-  134: 'LAO', 135: 'NKR', 136: 'OMA', 137: 'PAK', 138: 'PHI', 139: 'CHI', 140: 'SGP', 141: 'MAU', 142: 'MYA', 143: 'PAP', 146: 'QAT',
+  134: 'LAO', 135: 'NKR', 136: 'OMA', 137: 'PAK', 138: 'PHI', 139: 'CHI', 140: 'SGP', 141: 'MAU', 142: 'MYA', 143: 'PAP', 144: 'TJK', 145: 'UZB', 146: 'QAT',
   147: 'UAE', 148: 'AUS', 149: 'NZL', 150: 'FIJ', 151: 'SOL',
 });
 
@@ -90,8 +93,9 @@ export const swosFileId = (number, index, slot) => Number(number) * 10000 + inde
 /**
  * A file's players as the rows buildSwosSeason reads (as the SWOS 96/97 database holds them): `id`, `name`, `pos`, `nat`
  * (the nationality's code, SWOS_NATIONALITIES), the seven skills, `GK`, `value` in pounds, `team`, `division`, `type`
- * ('NATIONAL' or 'CLUB'). The price step is read as that database stores it: step 0 as 1 (25K) and 49 as 48 (15M);
- * `clamped` lists the players whose step moved. Throws on a nationality byte with no code.
+ * ('NATIONAL' or 'CLUB'), and the team's `place` in its file (two teams of one file may share a name). The price step is
+ * read as that database stores it: step 0 as 1 (25K) and 49 as 48 (15M); `clamped` lists the players whose step moved.
+ * Throws on a nationality byte with no code.
  */
 export function swosRows(file, type, clamped = []) {
   return file.teams.flatMap(team => team.players.map(player => {
@@ -101,6 +105,6 @@ export function swosRows(file, type, clamped = []) {
     if (step !== player.value) clamped.push(`${team.name} ${player.name} ${player.value} -> ${step}`);
     const skills = Object.fromEntries(SWOS_SKILLS.map(skill => [skill, player[skill]]));
     return { id: swosFileId(file.number, team.index, player.slot), player_no: player.shirt, name: player.name, pos: player.pos, nat, ...skills,
-      GK: player.pos === 'G' ? step : 0, value: SWOS_PRICES[step], team: team.name, division: team.division, file: file.number, type };
+      GK: player.pos === 'G' ? step : 0, value: SWOS_PRICES[step], team: team.name, place: team.index, division: team.division, file: file.number, type };
   }));
 }

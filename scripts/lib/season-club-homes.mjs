@@ -1,15 +1,18 @@
 // Where the clubs of the earlier seasons' country maps stand (docs/design/domestic-campaigns.md, "Earlier seasons"),
 // in this order:
 //   1. a hand override (scripts/data/season-club-locations.json, keyed "<country>:<club name>"): a point, a Wikidata
-//      item, or a built-in country map's club (`as`: "d826-602") whose home it shares;
+//      item, a built-in country map's club (`as`: "d826-602") whose home it shares, or `unplaced` where the steps
+//      below would place it wrongly and its town is not known;
 //   2. the same club on today's map of its country (scripts/data/domestic/<country>.json): its name, short name or FM
 //      name folds to the season's name, or its distinctive words are the same; its home has been checked there, with
 //      the overrides of scripts/data/domestic-locations.json behind it;
-//   3. the club on the Europe maps (scripts/data/europe-clubs.json) under the season's own id;
+//   3. the club on the Europe maps (scripts/data/europe-clubs.json) under the season's own id, for a European (UEFA)
+//      nation only: New Zealand's Rangers and Venezuela's Valencia share an id with Glasgow's and Valencia CF;
 //   4. Wikidata's association football clubs of the country and GeoNames' towns, as the built-in maps find theirs
 //      (scripts/lib/domestic-locate.mjs).
 // A club none of them places starts at a populous place no other club stands in, as on the built-in maps
 // (scripts/lib/domestic-partition.mjs), and its home is marked as that estimate.
+import { NATIONS } from '../../src/data/teams.js';
 import { locateClubs, norm } from './domestic-locate.mjs';
 
 // The words a club's name shares with every other (FC, United, Club, City...) are no evidence that two names are one club.
@@ -106,6 +109,7 @@ export async function locateSeasonClubs({ nation, clubs, snapshot, europe = {}, 
   const rest = [];
   for (const club of clubs) {
     const override = overrides[club.name];
+    if (override?.unplaced) continue;
     if (override?.as) {
       const twin = byFm.get(override.as);
       if (!twin?.location) throw new Error(`${nation.name}: the override of ${club.name} names ${override.as}, no located club of today's map`);
@@ -123,7 +127,7 @@ export async function locateSeasonClubs({ nation, clubs, snapshot, europe = {}, 
       out.set(club.name, { lon: twin.location.lon, lat: twin.location.lat, source: `map:${id}`, label: twin.name, twin: id });
       continue;
     }
-    const seasonId = idOf(club.name), home = seasonId ? europe[seasonId] : null;
+    const seasonId = idOf(club.name), home = seasonId && NATIONS[nation.id]?.[2] === 'UEFA' ? europe[seasonId] : null;
     if (home?.home) {
       out.set(club.name, { lon: home.home[0], lat: home.home[1], source: `europe:${seasonId}`, label: home.city,
         ...(/^d[0-9A-Z]+-\d+$/.test(home.source) ? { twin: home.source } : {}) });

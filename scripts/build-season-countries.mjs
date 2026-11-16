@@ -7,7 +7,7 @@
 //   node scripts/build-season-countries.mjs --homes [--data=<dir>] [--retro-data=<dir>]
 //       find every season club's home: today's map of its country, the Europe maps, Wikidata's and GeoNames' cached
 //       answers (data-src/domestic/) and the hand overrides (scripts/data/season-club-locations.json); writes
-//       scripts/data/season-club-homes.json
+//       scripts/data/season-club-homes.json, where a club it already lists keeps its home unless an override names it
 //   node scripts/build-season-countries.mjs [--seasons=ea-fifa-11,...] [--only=826y2011,...] [--jobs=8] [--check | --dry-run] [--data=<dir>]
 //       build the maps: public/domestic/<country>y<year>.json, src/data/domesticSeasons.js (the setup's index),
 //       public/domestic/ATTRIBUTION-seasons.txt and docs/design/domestic-seasons-audit.json. --check rebuilds offline and
@@ -120,7 +120,13 @@ async function snapshotOf(country) {
   return readJson(path.join(snapshotDir, `${country}.json`), null);
 }
 
-/** Every season club's home (`--homes`): one call per country, its clubs strongest first by their best season. */
+/**
+ * Every season club's home (`--homes`): one call per country, its clubs strongest first by their best season. A club the
+ * homes file already places (or leaves unplaced) keeps that, unless a hand override names it, so a season added later
+ * never moves another season's club: Wikidata gives each item to one name only, and a new season's name for a club
+ * (SWOS's "MyPa") would otherwise take it from the name another season gives it ("Myllykosken Pallo-47"). Delete a
+ * club's entry to find its home again.
+ */
 async function findHomes(seasons) {
   const strongest = new Map();
   for (const season of seasons) {
@@ -132,13 +138,16 @@ async function findHomes(seasons) {
   }
   const overrides = await readJson(overridesFile, { clubs: {} });
   const europe = (await readJson(europeFile, { clubs: {} })).clubs;
+  const previous = (await readJson(homesFile, { clubs: {} })).clubs;
   const locate = { wikidata: createWikidata({ cacheDir: locateCache }), geoFiles: ensureGeonames(locateCache) };
   const out = {};
   for (const country of [...strongest.keys()].sort(byText)) {
     const clubs = [...strongest.get(country)].sort((a, b) => b[1] - a[1] || byText(a[0], b[0])).map(([name]) => ({ name }));
-    const found = await locateSeasonClubs({ nation: nationOf(country), clubs, snapshot: await snapshotOf(country), europe,
-      idOf: name => `f-${slug(name)}`, overrides: overrides.clubs[country] || {}, locate });
-    out[country] = Object.fromEntries(clubs.map(({ name }) => [name, found.get(name) ?? null]).sort(([a], [b]) => byText(a, b)));
+    const kept = previous[country] || {}, own = overrides.clubs[country] || {};
+    const keeps = name => Object.hasOwn(kept, name) && !Object.hasOwn(own, name);
+    const found = await locateSeasonClubs({ nation: nationOf(country), clubs: clubs.filter(({ name }) => !keeps(name)), snapshot: await snapshotOf(country),
+      europe, idOf: name => `f-${slug(name)}`, overrides: own, locate });
+    out[country] = Object.fromEntries(clubs.map(({ name }) => [name, keeps(name) ? kept[name] : found.get(name) ?? null]).sort(([a], [b]) => byText(a, b)));
     const sources = {};
     for (const home of Object.values(out[country])) { const kind = home ? home.source.split(':')[0] : 'none'; sources[kind] = (sources[kind] || 0) + 1; }
     console.log(`${country} ${NATIONS[country][0]}: ${clubs.length} clubs, ${JSON.stringify(sources)}`);
@@ -157,10 +166,15 @@ const HOMES_ABOUT = 'Where each club of the earlier seasons\' country maps stand
 
 // ---- Building ----
 
+// The GeoNames country of a nation a season rates ten clubs of but today's maps do not have (SWOS's Suriname); Scotland,
+// Wales and Northern Ireland take theirs from LOCATE_REGIONS.
+const UNMAPPED_GEONAMES = Object.freeze({ 740: { country: 'SR', admin1: null } });
+
 /** The GeoNames country and region of a nation, as its snapshot names them (Scotland's: the United Kingdom's, Scotland's region). */
 async function geonamesOf(country) {
   const region = LOCATE_REGIONS[country];
   if (region) return { country: region.a2, admin1: region.admin1 };
+  if (UNMAPPED_GEONAMES[country]) return UNMAPPED_GEONAMES[country];
   const snapshot = await snapshotOf(country);
   if (!snapshot?.nation?.geonames) throw new Error(`${country}: no snapshot gives its GeoNames country; add it to LOCATE_REGIONS`);
   return snapshot.nation.geonames;

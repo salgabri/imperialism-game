@@ -1,27 +1,166 @@
 {
-"about": "Hand overrides for the homes of the earlier seasons' country map clubs (scripts/lib/season-club-homes.mjs), by country and the name the season's source gives the club: `as` names today's map's club it is (its home and crest), else `lon`/`lat` with a `note` saying where the point is and why, or `qid` a Wikidata item. Each fixes a name the automatic matching cannot settle: a name two clubs could carry, or one it gives a namesake.",
+"about": "Hand overrides for the homes of the earlier seasons' country map clubs (scripts/lib/season-club-homes.mjs), by country and the name the season's source gives the club: `as` names today's map's club it is (its home and crest), else `lon`/`lat` with a `note` saying where the point is and why, or `qid` a Wikidata item, or `unplaced: true` where the automatic matching finds the wrong club and the right town is not known (the map then starts it at a populous place, an estimate). Each fixes a name the automatic matching cannot settle: a name two clubs could carry, or one it gives a namesake.",
 "clubs": {
+"008": {
+  "Shqiponja": { "lon": 20.1389, "lat": 40.0758, "note": "Gjirokastër (GeoNames 783148), KS Shqiponja's town" }
+},
+"012": {
+  "CR Belcourt": { "lon": 3.0875, "lat": 36.7323, "note": "Algiers (GeoNames 2507480): CR Belouizdad under its 1990s name, which today's map lacks" }
+},
+"032": {
+  "Huracán Corrientes": { "lon": -58.8344, "lat": -27.4678, "note": "Corrientes (GeoNames 3435217): not Buenos Aires' Huracán, whose name it shares" }
+},
+"036": {
+  "Canterbury": { "lon": 151.1186, "lat": -33.9119, "note": "Canterbury, Sydney (GeoNames 6949377): SWOS's New South Wales league, not Canterbury, Victoria" },
+  "Croydon P.S.C.": { "lon": 138.5678, "lat": -34.8803, "note": "Croydon Park, Adelaide (GeoNames 8348019): SWOS's South Australian league, not Croydon, Victoria" },
+  "East Suburbs": { "as": "d036-426791", "note": "Brisbane's Eastern Suburbs, of SWOS's Queensland league" },
+  "Eastern Suburbs": { "lon": 151.2472, "lat": -33.8927, "note": "Bondi Junction, Sydney's eastern suburbs (GeoNames 8555644): SWOS's New South Wales league; today's Eastern Suburbs FC is Brisbane's" },
+  "Marconi Fairfield": { "as": "d036-122993", "note": "Marconi Stallions of Fairfield, Sydney (SWOS 96/97's name)" },
+  "Marconi Sydney": { "as": "d036-122993", "note": "Marconi Stallions of Fairfield, Sydney" },
+  "Melbourne CSC": { "as": "d036-122994", "note": "Melbourne Croatia Sports Club, today's Melbourne Knights, not Melbourne City" },
+  "Melbourne SC": { "lon": 144.9633, "lat": -37.814, "note": "Melbourne (GeoNames 2158177): a club beside the Knights in SWOS 95/96, not Port Melbourne" },
+  "St. Georges": { "lon": 151.1333, "lat": -33.95, "note": "Rockdale, Sydney (GeoNames 2151443), St George's district: SWOS's New South Wales league, not St Georges, Adelaide" },
+  "UTS Olympic": { "as": "d036-123005", "note": "Sydney Olympic under its 1996/97 sponsor's name, not Brisbane Olympic" },
+  "White City": { "lon": 138.5429, "lat": -34.877, "note": "Woodville, Adelaide (GeoNames 2057897), White City Woodville's: SWOS's South Australian league, not Bonnyrigg White Eagles" },
+  "Wollongong United": { "lon": 150.8935, "lat": -34.424, "note": "Wollongong (GeoNames 2171507): not Wollongong City, today's Wolves" }
+},
 "040": {
-  "FC Flyeralarm Admira": { "as": "d040-16030340", "note": "Admira Wacker under its sponsor's name (FIFA 20 to FIFA 22)" }
+  "FC Flyeralarm Admira": { "as": "d040-16030340", "note": "Admira Wacker under its sponsor's name (FIFA 20 to FIFA 22)" },
+  "Niederosterreich": { "as": "d040-16030340", "note": "SWOS 96/97's name for FC Admira/Wacker of Mödling, Lower Austria, whose place in the 1996/97 Bundesliga it takes; not SKN St. Pölten" }
+},
+"068": {
+  "San Jose Oruro": { "as": "d068-2000210685", "note": "Club San José of Oruro, not Real Oruro" },
+  "Universitario": { "unplaced": true, "note": "A Universitario of the mid-1990s league, which SWOS does not place; not Universitario de Vinto (founded 2006)" }
+},
+"100": {
+  "Neftokhimik": { "lon": 27.4689, "lat": 42.5065, "note": "Burgas (GeoNames 732770), Neftochimic Burgas's" }
+},
+"112": {
+  "Moldechno": { "lon": 26.854, "lat": 54.3167, "note": "Maladziečna (GeoNames 625625)" },
+  "Stroitel Dorogi": { "lon": 28.267, "lat": 53.0402, "note": "Staryye Dorogi (GeoNames 621396), Stroitel Starye Dorogi's" },
+  "Torpedo Minsk": { "lon": 27.5665, "lat": 53.9002, "note": "Minsk (GeoNames 625144): not FC Minsk (2006)" }
+},
+"152": {
+  "Fernandez Vial": { "lon": -73.0498, "lat": -36.827, "note": "Concepción (GeoNames 3893894), Arturo Fernández Vial's" }
 },
 "156": {
   "Cangzhou Mighty Lions": { "lon": 116.8533, "lat": 38.3112, "note": "Cangzhou (GeoNames 1816080): the club moved there from Shijiazhuang in 2021, its name since; Wikidata's point is its old ground" },
   "Guizhou Zhicheng FC": { "as": "d156-2000337886", "note": "Guiyang, as today's Guizhou Zhucheng" },
   "Hebei CFFC": { "lon": 116.6833, "lat": 39.5167, "note": "Langfang (GeoNames 1804540), whose stadium Hebei China Fortune played in from 2018" }
 },
+"158": {
+  "Tai Dian": { "lon": 120.3133, "lat": 22.6163, "note": "Kaohsiung (GeoNames 1673820), Taipower's" }
+},
+"170": {
+  "Atletico Junior": { "as": "d170-419", "note": "Junior of Barranquilla, not Boca Juniors de Cali" },
+  "Once Philips": { "as": "d170-420", "note": "Once Caldas under its sponsor's name (SWOS 94/95)" }
+},
+"191": {
+  "Croatia Zagreb": { "as": "d191-432", "note": "Dinamo Zagreb under its 1993–2000 name" }
+},
+"196": {
+  "APEP Pitsilias": { "lon": 32.9755, "lat": 34.9382, "note": "Kyperounta (GeoNames 146414), APEP's village in Pitsilia" },
+  "Ethnikos Akhnas": { "lon": 33.7839, "lat": 35.0551, "note": "Achna (GeoNames 146767), the village Ethnikos Achna is named for" }
+},
+"218": {
+  "LDU Quito": { "as": "d218-5270338", "note": "LDU Quito, not Deportivo Quito" }
+},
+"246": {
+  "FC OTP": { "lon": 25.4682, "lat": 65.0124, "note": "Oulu (GeoNames 643492), Oulun Työväen Palloilijat's" }
+},
 "250": {
   "Paris": { "as": "d250-867", "note": "EA FC 26's Paris is Paris FC, not Paris Saint-Germain" }
+},
+"348": {
+  "Nyiregyhazi": { "lon": 21.7167, "lat": 47.9554, "note": "Nyíregyháza (GeoNames 716935)" },
+  "Parmalat": { "as": "d348-1062", "note": "Videoton of Székesfehérvár under its 1995/96 sponsor's name, today's Fehérvár FC" },
+  "Pecsi MSC": { "lon": 18.2281, "lat": 46.0762, "note": "Pécs (GeoNames 3046526)" },
+  "Stadler": { "lon": 19.2042, "lat": 46.6917, "note": "Akasztó (GeoNames 3056347), Stadler FC's village, not Kiskőrös" },
+  "Ujpesti TE": { "as": "d348-1064", "note": "Újpest under its 1990s name" }
+},
+"352": {
+  "IBK": { "as": "d352-1073", "note": "ÍBK, Keflavík's club under its 1990s name" },
+  "Leiftur": { "lon": -18.6493, "lat": 66.0731, "note": "Ólafsfjörður (66.07 N, 18.65 W), too small for GeoNames' cities1000" }
 },
 "356": {
   "ATK Mohun Bagan": { "as": "d356-40026576", "note": "Kolkata, as today's Mohun Bagan Super Giant" }
 },
 "392": {
+  "Atseki": { "as": "d392-786384", "note": "SWOS's scrambled name for Otsuka Pharmaceutical, today's Tokushima Vortis" },
+  "Bullmore Hiratsuka": { "as": "d392-1184", "note": "SWOS's scrambled name for Bellmare Hiratsuka, today's Shonan Bellmare" },
+  "Carazo Osaka": { "as": "d392-1185", "note": "SWOS's scrambled name for Cerezo Osaka" },
+  "Carazo Osika": { "as": "d392-1185", "note": "SWOS's scrambled name for Cerezo Osaka" },
+  "Cismi Oil": { "lon": 136.6167, "lat": 34.9667, "note": "Yokkaichi (GeoNames 1848373): SWOS's scrambled name for Cosmo Oil, of Yokkaichi" },
+  "Fajiedo Blax": { "as": "d392-1183", "note": "SWOS's scrambled name for Fukuoka Blux, today's Avispa Fukuoka" },
+  "Fijotsu": { "as": "d392-107296", "note": "SWOS's scrambled name for Fujitsu, today's Kawasaki Frontale" },
+  "Gimba Osoka": { "as": "d392-1186", "note": "SWOS's scrambled name for Gamba Osaka" },
+  "Gombo Osaka": { "as": "d392-1186", "note": "SWOS's scrambled name for Gamba Osaka" },
+  "Hindo": { "as": "d392-107291", "note": "SWOS's scrambled name for Honda FC" },
+  "JAF Ochohara": { "as": "d392-1187", "note": "SWOS's scrambled name for JEF United Ichihara, today's JEF United Chiba" },
+  "Jabolo Owata": { "as": "d392-1188", "note": "SWOS's scrambled name for Júbilo Iwata" },
+  "Jobalo Owata": { "as": "d392-1188", "note": "SWOS's scrambled name for Júbilo Iwata" },
+  "Kafo": { "as": "d392-107314", "note": "SWOS's scrambled name for Kofu, today's Ventforet Kofu" },
+  "Kewosaki Steel": { "as": "d392-106844", "note": "SWOS's scrambled name for Kawasaki Steel, which moved to Kobe as Vissel Kobe in 1995" },
+  "Koshama Intlers": { "as": "d392-1189", "note": "SWOS's scrambled name for Kashima Antlers" },
+  "Koshema Ontlors": { "as": "d392-1189", "note": "SWOS's scrambled name for Kashima Antlers" },
+  "Koshewa Raysol": { "as": "d392-1190", "note": "SWOS's scrambled name for Kashiwa Reysol" },
+  "Koshima Roysil": { "as": "d392-1190", "note": "SWOS's scrambled name for Kashiwa Reysol, not the town of Koshima" },
+  "NTV Kentu": { "as": "d392-107305", "note": "SWOS's scrambled name for NTT Kanto, today's Omiya Ardija" },
+  "Neguya Grempas": { "as": "d392-1191", "note": "SWOS's scrambled name for Nagoya Grampus Eight" },
+  "PJN Fatares": { "as": "d392-107309", "note": "SWOS's scrambled name for PJM Futures of Tosu, which Sagan Tosu followed" },
+  "Shumuza S-Palse": { "as": "d392-1194", "note": "SWOS's scrambled name for Shimizu S-Pulse" },
   "Tokyo": { "as": "d392-107313", "note": "FC Tokyo (Morishige, Nagatomo), not Tokyo Verdy" },
-  "Yokohama": { "as": "d392-7100042", "note": "Yokohama FC (FIFA 21 and FIFA 22: Matsuo, Tezuka), not Yokohama F. Marinos" }
+  "Tushoba": { "as": "d392-107285", "note": "SWOS's scrambled name for Toshiba, which moved to Sapporo as Consadole in 1996" },
+  "Virdy Kewisaki": { "as": "d392-1196", "note": "SWOS's scrambled name for Verdy Kawasaki, today's Tokyo Verdy" },
+  "Yakuhema Merunos": { "as": "d392-1198", "note": "SWOS's scrambled name for Yokohama Marinos" },
+  "Yokohama": { "as": "d392-7100042", "note": "Yokohama FC (FIFA 21 and FIFA 22: Matsuo, Tezuka), not Yokohama F. Marinos" },
+  "Yukuhema Flagils": { "lon": 139.65, "lat": 35.4333, "note": "Yokohama (GeoNames 1848354): SWOS's scrambled name for Yokohama Flügels, merged into the Marinos in 1999" }
+},
+"428": {
+  "FC DAG Riga": { "lon": 24.1059, "lat": 56.946, "note": "Riga (GeoNames 456172): not Riga FC (2015), whose name it shares" },
+  "Olympia Riga": { "lon": 24.1059, "lat": 56.946, "note": "Riga (GeoNames 456172): not Riga FC (2015), whose name it shares" },
+  "Pardaugava Riga": { "lon": 24.1059, "lat": 56.946, "note": "Riga (GeoNames 456172): not Riga FC (2015), whose name it shares" },
+  "Skonto Riga": { "lon": 24.1059, "lat": 56.946, "note": "Riga (GeoNames 456172): not Riga FC (2015), whose name it shares" },
+  "Vidus Riga": { "lon": 24.1059, "lat": 56.946, "note": "Riga (GeoNames 456172): not Riga FC (2015), whose name it shares" }
+},
+"484": {
+  "Inter de Tijuana": { "lon": -117.0037, "lat": 32.5027, "note": "Tijuana (GeoNames 3981609): not the Xolos (2007)" },
+  "Linces de Celaya": { "lon": -100.814, "lat": 20.5218, "note": "Celaya (GeoNames 4014875): SWOS also has Celaya, today's Celaya FC" },
+  "Marte Morelos": { "lon": -99.2308, "lat": 18.9261, "note": "Cuernavaca (GeoNames 3529947), Club Marte's city in Morelos, not Ecatepec de Morelos" },
+  "Toros Hidalgo": { "unplaced": true, "note": "SWOS names the state of Hidalgo only; not the village of Pueblo Hidalgo" },
+  "UA Guadalajara": { "lon": -103.3874, "lat": 20.7211, "note": "Zapopan (GeoNames 3979770), UAG Tecos', not Chivas" },
+  "UN Leon": { "lon": -101.6825, "lat": 21.1218, "note": "León (GeoNames 3998655): SWOS also has Club León" }
+},
+"554": {
+  "Central United": { "lon": 174.7364, "lat": -36.8978, "note": "Auckland, Central United's home as SWOS 94/95's Central has it (Wikidata Q166141)" },
+  "Christchurch Technical": { "lon": 172.6333, "lat": -43.5333, "note": "Christchurch (GeoNames 2192362): not Christchurch United" },
+  "Mount Manganui": { "lon": 176.1861, "lat": -37.6417, "note": "Mount Maunganui (GeoNames 2208041)" },
+  "Mount Wellington": { "lon": 174.844, "lat": -36.905, "note": "Mount Wellington, Auckland (36.91 S, 174.84 E), not Wellington" },
+  "Rangers": { "lon": 172.6333, "lat": -43.5333, "note": "Christchurch (GeoNames 2192362), of SWOS's Southern League: not Glasgow Rangers" },
+  "Waikato United": { "lon": 175.2833, "lat": -37.7833, "note": "Hamilton (GeoNames 2190324)" },
+  "Western": { "lon": 172.6333, "lat": -43.5333, "note": "Christchurch (GeoNames 2192362), Western AFC of SWOS's Southern League: not Wellington's Western Suburbs" },
+  "Woolston WMC": { "lon": 172.6333, "lat": -43.5333, "note": "Christchurch (GeoNames 2192362), whose suburb Woolston is" }
+},
+"600": {
+  "8 de Diciembre": { "lon": -57.1422, "lat": -25.3858, "note": "Caacupé (GeoNames 3439320)" },
+  "CP Ciudad Este": { "lon": -54.6507, "lat": -25.5036, "note": "Ciudad del Este (GeoNames 3439101)" },
+  "Silvio Petirossi": { "lon": -57.647, "lat": -25.2865, "note": "Asunción (GeoNames 3439389)" }
+},
+"604": {
+  "Deportivo Sipesa": { "lon": -78.5937, "lat": -9.0751, "note": "Chimbote (GeoNames 3698304): not Deportivo Wanka of Huancayo" },
+  "UTC Cajamarca": { "as": "d604-5290571", "note": "UTC, not FC Cajamarca" }
 },
 "642": {
   "Asociația Clubul Sportiv Petrolul 52": { "as": "d642-57151160", "note": "Ploiești, as today's ACS Petrolul 52" },
+  "Dacia Unirea": { "lon": 27.9743, "lat": 45.2715, "note": "Brăila (GeoNames 683902), Dacia Unirea Brăila's" },
+  "Electroputere": { "lon": 23.8, "lat": 44.3167, "note": "Craiova (GeoNames 680332)" },
+  "National": { "lon": 26.1063, "lat": 44.4323, "note": "Bucharest (GeoNames 683506), FC Național's: not Sebiș" },
   "Viitorul": { "as": "d642-2000104441", "note": "FC Viitorul Constanța, whose ground at Ovidiu today's Farul Constanța plays at since the clubs merged in 2021; not Viitorul Domnești" }
+},
+"643": {
+  "Rostselmash": { "as": "d643-1301104", "note": "Rostselmash, today's FC Rostov" },
+  "Tekstilschik": { "lon": 45.4128, "lat": 50.0885, "note": "Kamyshin (GeoNames 553287), Tekstilshchik Kamyshin's" },
+  "Uralmash": { "as": "d643-1533", "note": "Uralmash, today's Ural Yekaterinburg" }
 },
 "682": {
   "Al Ahli SFC": { "as": "d682-102850", "note": "Al-Ahli of Jeddah under EA FC 26's name" },
@@ -29,9 +168,53 @@
   "Al Qadisiyah": { "lon": 50.2083, "lat": 26.2794, "note": "Khobar (GeoNames 109323)" },
   "Al Wahda": { "lon": 39.8261, "lat": 21.4225, "note": "Mecca (GeoNames 104515)" }
 },
+"688": {
+  "Borac Banja Luka": { "lon": 17.2063, "lat": 44.7788, "note": "Banja Luka (GeoNames 3204541), in Bosnia, outside the map: not Borac Čačak" },
+  "Buducnost": { "lon": 19.2631, "lat": 42.4412, "note": "Podgorica (GeoNames 3193044), in Montenegro, outside the map: Budućnost Podgorica, not Banatski Dvor's" },
+  "Pristina": { "lon": 21.1669, "lat": 42.6727, "note": "Pristina (GeoNames 786714)" },
+  "Proleter": { "lon": 20.3819, "lat": 45.3836, "note": "Zrenjanin (GeoNames 783814), the league's Proleter, not Novi Sad's" },
+  "Radnički Novi Beograd": { "lon": 20.4242, "lat": 44.8056, "note": "New Belgrade (GeoNames 787607): not Radnički Niš" }
+},
+"703": {
+  "Lokomotíva Košice": { "lon": 21.258, "lat": 48.7144, "note": "Košice (GeoNames 724443): not FC Košice, whose crest 1. FC Košice wears" }
+},
+"705": {
+  "AM Cosmos": { "lon": 14.5051, "lat": 46.0511, "note": "Ljubljana (GeoNames 3196359)" },
+  "Elektroelement": { "lon": 14.9969, "lat": 46.1318, "note": "Zagorje ob Savi (GeoNames 3186906)" }
+},
+"710": {
+  "D'Alberton": { "lon": 28.1223, "lat": -26.2679, "note": "Alberton (GeoNames 1023441), D'Alberton Callies'" },
+  "Qwaqwa Stars": { "lon": 28.8158, "lat": -28.5242, "note": "Phuthaditjhaba (GeoNames 965401), QwaQwa's town" },
+  "Vaal Reefs Stars": { "lon": 26.6727, "lat": -26.9802, "note": "Orkney (GeoNames 967476), by the Vaal Reefs mine" }
+},
 "724": {
   "R. Sporting": { "as": "d724-1744", "note": "Real Sporting de Gijón under EA FC 25's short name" },
   "RC Deportivo": { "as": "d724-1705", "note": "RC Deportivo de La Coruña under EA FC 25's short name" }
+},
+"740": {
+  "SV Nationaal": { "lon": -55.1668, "lat": 5.8664, "note": "Paramaribo (GeoNames 3383330): the army's club" },
+  "SV Nationaal Leger": { "lon": -55.1668, "lat": 5.8664, "note": "Paramaribo (GeoNames 3383330): the army's club" }
+},
+"804": {
+  "Bukovina": { "lon": 25.9324, "lat": 48.2904, "note": "Chernivtsi (GeoNames 710719)" },
+  "Chernomorets": { "as": "d804-1884", "note": "Chornomorets Odesa, not Sevastopol's" },
+  "Krivbass": { "lon": 33.394, "lat": 47.9057, "note": "Kryvyi Rih (GeoNames 703845)" },
+  "Niva Vinnitsa": { "lon": 28.4687, "lat": 49.2322, "note": "Vinnytsia (GeoNames 689558)" },
+  "Torpedo Zaporoje": { "lon": 35.1171, "lat": 47.8517, "note": "Zaporizhzhia (GeoNames 687700)" }
+},
+"840": {
+  "Colorado Foxes": { "lon": -104.9847, "lat": 39.7392, "note": "Denver (GeoNames 5419384): not the Rapids" }
+},
+"862": {
+  "Valencia": { "lon": -68.0004, "lat": 10.1615, "note": "Valencia, Venezuela (GeoNames 3625549): not Valencia CF" }
+},
+"NIR": {
+  "Distillery": { "lon": -6.0353, "lat": 54.5234, "note": "Lisburn (GeoNames 2644411), by Distillery's ground at Lambeg" }
+},
+"SCO": {
+  "Caledonian Thistle": { "lon": -4.224, "lat": 57.4791, "note": "Inverness (GeoNames 2646088)" },
+  "East Stirling": { "lon": -3.7854, "lat": 56.0021, "note": "Falkirk (GeoNames 2649723), East Stirlingshire's town, not Stirling" },
+  "Meadowbank": { "lon": -3.1965, "lat": 55.9521, "note": "Edinburgh (GeoNames 2650225), Meadowbank Thistle's" }
 }
 }
 }

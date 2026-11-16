@@ -24,7 +24,8 @@ import { contentHash, identitiesFor, territoryFor } from '../src/data/footballSe
 import { readCm0102 } from '../src/data/cm0102.js';
 import { decodeFootballSet, fieldedNations, seasonSport, setHasClubs, setKindOf } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
-import { SWOS_CLUBS, SWOS_LEAGUES, buildSwosSeason, properCase } from './lib/swos.mjs';
+import { SWOS_CLUBS, SWOS_LEAGUES, SWOS_LEAGUE_FILES, buildSwosSeason, clubCase, properCase, swosClubName, swosDivision } from './lib/swos.mjs';
+import { abroadCountry } from './lib/season-country-clubs.mjs';
 import { SWOS_NATIONALITIES, readTeamFile, swosFileId, swosRows } from './lib/swos-files.mjs';
 import { EAST_GERMAN_BY_HAND, eastGermanClubs, germanPlaces } from './lib/east-german-clubs.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
@@ -332,6 +333,73 @@ test('a SWOS season\'s clubs: the top divisions\' own sixteen each, named by SWO
   assert.throws(() => build(1996, ['ENGLAND'], leagueRows({ ARSENAL: { team: 'ATLANTIS FC' } })), /SWOS club ATLANTIS FC \(Premier League\) has no name/);
   assert.throws(() => build(1996, ['ENGLAND'], leagueRows({ ARSENAL: { division: 1 } })), /is not in a top division/);
   assert.throws(() => build(1996, ['ENGLAND'], leagueRows().filter(row => row.team !== 'AJAX')), /No Eredivisie clubs in TEAM\.025/);
+});
+
+test('every SWOS season pins its edition\'s other league files, read only for its own country maps', () => {
+  const others = Object.keys(SWOS_LEAGUE_FILES).filter(number => !Object.hasOwn(SWOS_LEAGUES, number));
+  for (const id of SWOS) {
+    const season = entry(id);
+    assert.deepEqual(season.leagueFiles.map(file => file.name), others.map(number => `TEAM.${number}`), id);
+    for (const file of season.leagueFiles) {
+      assert.deepEqual([file.folder, file.download], [id, `https://cern.swos.eu/data/amiga/${EDITIONS[id]}/${file.name}`]);
+      assert.match(file.sha256, /^[0-9a-f]{64}$/);
+      assert.ok(Number.isInteger(file.bytes) && (file.bytes - 2) % 684 === 0, `${id} ${file.name}: whole teams`);
+    }
+    // The season file reads its six national and seven league files only: the others leave it as it was.
+    assert.equal(committed(id).coverage.leagues, 7);
+  }
+  // Every league file is a game nation's; the seven big leagues' as SWOS_LEAGUES has them. The Faroe Islands', Malta's
+  // and San Marino's (no shape on the map) and SWOS's own invented teams (072) are read for no map.
+  assert.ok(Object.values(SWOS_LEAGUE_FILES).every(country => NATIONS[country]));
+  assert.ok(Object.entries(SWOS_LEAGUES).every(([number, [, country]]) => SWOS_LEAGUE_FILES[number] === country));
+  assert.ok(['011', '024', '032', '072'].every(number => !Object.hasOwn(SWOS_LEAGUE_FILES, number)));
+  assert.deepEqual([SWOS_LEAGUE_FILES['033'], SWOS_LEAGUE_FILES['038'], SWOS_LEAGUE_FILES['041'], SWOS_LEAGUE_FILES['051']], ['SCO', '792', '688', '222']);
+  assert.equal(SWOS_NATIONALITIES[52], 'ELS', "El Salvador's league players' byte");
+});
+
+test('every league file\'s clubs for the country maps: each its file\'s country, its division of the day, its full name', () => {
+  const source = { provider: 'Sensible Software', edition: 'SWOS test', version: 'test', snapshotDate: '1996', url: 'https://example.test/swos',
+    rawScale: SWOS_SCALE, conversion: SWOS_CONVERSION };
+  const files = {
+    '008': [['WYCOMBE WDRS', 1], ['HALIFAX TOWN', 4]],
+    '033': [['CELTIC', 0], ['QUEEN OF SOUTH', 2]],
+    '036': [['IFK GOTHENBURG', 0]],
+    '046': [['VASCO DA GAMA', 0]],
+    '050': [['BARCELONA', 0]],
+    '069': [['MANNING RANGERS', 0], ['KAIZER CHIEFS', 0], ['MANNING RANGERS', 4]],
+    '075': [['EAST BENGAL', 0]],
+  };
+  const everyClubRows = Object.entries(files).flatMap(([number, teams]) => swosRows(readTeamFile(teamFile(number,
+    teams.map(([name, division]) => [name, division, sixteen(name, 8)])), number), 'CLUB'));
+  const nations = swosRows(readTeamFile(teamFile('080', [['ENGLAND', 0, sixteen('ENGLAND', 8)]]), '080'), 'NATIONAL');
+  const build = id => buildSwosSeason(nations, { source, year: 1997, prices: SWOS_PRICES, id, everyClubRows });
+  const { allClubs, warnings, doc } = build('swos-9697');
+  assert.deepEqual(doc.clubs, [], 'the season file keeps only its seven top divisions');
+  assert.deepEqual(allClubs.map(club => [club.name, club.country, club.league]), [
+    ['Wycombe Wanderers', '826', 'Division One'], ['Halifax Town', '826', 'Non-league'],
+    ['Celtic', 'SCO', 'Premier Division'], ['Queen of the South', 'SCO', 'Second Division'],
+    ['IFK Gothenburg', '752', 'Allsvenskan'], ['Vasco da Gama', '076', 'Série A'],
+    // Ecuador's Barcelona is not SWOS_CLUBS' FC Barcelona.
+    ['Barcelona', '218', 'Serie A'],
+    // South Africa's league took its new name in 1996; its second Manning Rangers, outside the league, is left out.
+    ['Manning Rangers', '710', 'Premier Soccer League'], ['Kaizer Chiefs', '710', 'Premier Soccer League'],
+    ['East Bengal', '356', 'National Football League']]);
+  assert.ok(allClubs.every(club => club.squad.length === 11 && club.key.startsWith('swos:')));
+  assert.deepEqual(warnings, ['TEAM.069 lists MANNING RANGERS twice: the one in division 4 is left out']);
+  // A league renamed between the seasons, and a division with no name of its day (India before its National Football League).
+  assert.deepEqual(build('swos-9495').allClubs.filter(club => ['710', '356'].includes(club.country)).map(club => club.league),
+    ['National Soccer League', 'National Soccer League', null]);
+  // A club of a file SWOS_LEAGUE_FILES does not read stops the build, as does a division SWOS_DIVISIONS does not name.
+  const custom = swosRows(readTeamFile(teamFile('072', [['AMIGA POWER', 0, sixteen('AMIGA POWER', 8)]]), '072'), 'CLUB');
+  assert.throws(() => buildSwosSeason(nations, { source, year: 1997, prices: SWOS_PRICES, id: 'swos-9697', everyClubRows: custom }), /no club of SWOS_LEAGUE_FILES' files/);
+  assert.throws(() => swosDivision('036', 1, 'swos-9697'), /names no division 1 of TEAM\.036/);
+  // Club names: SWOS's own, capitalised but for the letters clubs write in capitals or a case of their own, and particles.
+  assert.deepEqual(['AAB', 'KUPS', 'VFB MODLING', 'RIED IM INNKREIS', 'SOKOL-GKS TYCHY', 'GIMNASIA Y TIRO', "QUEEN'S PARK", 'THE STRONGEST'].map(clubCase),
+    ['AaB', 'KuPS', 'VfB Modling', 'Ried im Innkreis', 'Sokol-GKS Tychy', 'Gimnasia y Tiro', "Queen's Park", 'The Strongest']);
+  assert.deepEqual(['035|BARCELONA', '050|BARCELONA', '042|J.S.K ALGER', '025|VVV', '025|RBC'].map(key => swosClubName(...key.split('|'))),
+    ['FC Barcelona', 'Barcelona', 'JS Kabylie', 'VVV', 'RBC Roosendaal']);
+  // A Canadian club of the United States' file plays for Canada, which no SWOS season fields ten clubs of.
+  assert.deepEqual(['Toronto Blizzard', 'Vancouver 86ers', 'Montreal Impact'].map(abroadCountry), ['124', '124', '124']);
 });
 
 test('SWOS names keep the apostrophes of their countries', () => {

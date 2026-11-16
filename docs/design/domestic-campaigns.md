@@ -1185,8 +1185,9 @@ CSKA Moscow and Anzhi in FIFA 11–16, Celtic and Rangers in the CM seasons, Spa
 league its id is in in the nearest other edition (FIFA 20's Greek, Russian and Ukrainian
 clubs, Dinamo Zagreb, HJK). Two data quirks show: CM 99/00 rates Denmark's clubs like
 mid-table Serie A ones (11 make 1999/00's 124), CM 01/02 puts eight or nine Swedish clubs in.
-SWOS 96/97, 95/96 and 94/95 come from the game's team files, of which the seven big leagues' are
-cached: they keep those leagues' top divisions whole (134 clubs) and their maps their old ids.
+SWOS 96/97, 95/96 and 94/95 come from the game's team files, of which their season files read the
+seven big leagues' (every other league's feed only the seasons' country maps, below): they keep
+those leagues' top divisions whole (134 clubs) and their maps their old ids.
 Until then an earlier season's file held the seven big leagues only, and its two fields were
 the strongest of those; those maps stay for the campaigns saved on them (below). FIFA 06,
 FIFA 05 and Simon Treanor's fan-made 1989/90 (2005/06, 2004/05, 1989/90) and the computed
@@ -1392,25 +1393,30 @@ none, to the season's Top 124 as before; going back to the built-in season goes
 back to today's map. The "One country · top clubs" list shows the chosen season's
 countries only.
 
-**What ships.** 735 maps over the 31 seasons with clubs, 20,567 club-seasons, 94.9 MB
-(50–249 KB a map, median 125 KB), each fetched only when chosen; the index
-`src/data/domesticSeasons.js` is under 10 KB. `docs/design/domestic-seasons-audit.json`
+**What ships.** 892 maps over the 31 seasons with clubs, 23,581 club-seasons, 111.7 MB
+(47–249 KB a map, median 122 KB), each fetched only when chosen; the index
+`src/data/domesticSeasons.js` is about 11 KB. `docs/design/domestic-seasons-audit.json`
 gives every map's layer, clubs, homes and size.
 
 | Seasons | Source of the clubs | Maps | Countries a season |
 | --- | --- | --- | --- |
 | 2006/07 – 2025/26 (20) | EA's editions, every division EA rates | 483 | 20 – 28 |
 | 1993/94, 1997/98 – 2003/04 (8) | Championship Manager's databases, every club with players | 231 | 11 – 51 |
-| 1994/95 – 1996/97 (3) | SWOS's team files of the seven big leagues, every division | 21 | 7 |
+| 1994/95 – 1996/97 (3) | SWOS's team files, every league and division SWOS has | 178 | 59 – 60 |
 
 England has 88 to 90 clubs in an EA season (the four divisions less their Welsh
 clubs), 100 in most CM seasons (the four divisions and the Conference's strongest),
 68 in CM 97/98 (the rest of its extraction's lower-league clubs have no players)
 and 90 in SWOS's. Scotland, Wales and Northern Ireland, which today's maps lack,
-have maps where a season rates ten of their clubs: Scotland in 27 seasons (every EA
-and CM season but CM 97/98), Wales in CM 01/02's three, Northern Ireland in those and
-CM 00/01. A club's home lies in its own home section for 17,345 of 20,210 located
-club-seasons (85.8%); 357 club-seasons are placed (estimates).
+have maps where a season rates ten of their clubs: Scotland in 30 seasons (every
+season but CM 97/98), Wales in SWOS's three and CM 01/02's three, Northern Ireland in
+those and CM 00/01; Suriname, which today's maps lack too, in SWOS's three. SWOS's
+seasons field every league it has, Europe's and the Americas', Algeria's, South
+Africa's, Japan's, Taiwan's, Australia's and New Zealand's (until 2026-11-16 only the
+seven big leagues', the other league files uncached); India's, Ghana's and Canada's
+clubs, fewer than ten, have no map, nor 1994/95's and 1995/96's United States. A
+club's home lies in its own home section for 19,493 of 23,056 located club-seasons
+(84.5%); 525 club-seasons are placed (estimates).
 
 **Clubs** (`scripts/lib/season-country-clubs.mjs`, read through the season
 builders, so the players are the season file's own tuples):
@@ -1426,9 +1432,14 @@ builders, so the players are the season file's own tuples):
   database with players, under its own nation (CM files Cardiff City under Wales, as
   FM does), its division's name its league. CM 97/98's JSON lists teams with a
   division code (`CM9798_DIVISION_NAMES`).
-- **SWOS**: every division of the seven league files the season reads; names from
-  `SWOS_CLUBS`, `SWOS_LOWER_CLUBS` (eight names SWOS cuts short) or SWOS's own in plain
-  capitals.
+- **SWOS**: every division of every league file SWOS has (`SWOS_LEAGUE_FILES`: the
+  seven the season file reads and 55 more, pinned for these maps only), each club
+  under its file's country; names from `SWOS_CLUBS` and `SWOS_LOWER_CLUBS` in the
+  seven big leagues' files and `SWOS_LEAGUE_CLUBS` in the others (names SWOS cuts
+  short or abbreviates), else SWOS's own, capitalised but for the letters a club
+  writes in capitals or a case of its own (FC, PAOK, VfB, AaB); divisions as they
+  were named then (`SWOS_DIVISIONS`), "Non-league" for the teams SWOS keeps outside
+  them (`docs/design/football-years.md`, "Every other league").
 - A club plays for the country it stands in, whatever league it plays in (`ABROAD`):
   the Welsh clubs of the English leagues, Canada's MLS clubs, Wellington Phoenix and
   Derry City play for Wales, Canada, New Zealand and Northern Ireland, as on today's
@@ -1455,6 +1466,13 @@ today's maps find theirs. A club spelled two ways in two seasons ("St. Johnstone
 to both. A club none of them places starts at a populous place no other club stands
 in, an estimate, as on today's maps. Today's club found is the season club's
 `twin`: a club with no crest of its own wears its twin's (`src/data/crests.js`).
+A club the homes file already lists keeps its home when `--homes` runs again, unless
+an override names it: Wikidata gives each item to one name, so a season added later
+would otherwise take it for its own name of a club (SWOS's "MyPa") from another
+season's ("Myllykosken Pallo-47") and move clubs on maps already built. The Europe
+maps' clubs place a club of a European nation only (New Zealand's Rangers is not
+Glasgow's, nor Venezuela's Valencia Valencia CF), and an override can leave a club
+`unplaced` where the matching finds the wrong one and its town is not known.
 
 **Maps** (`scripts/build-season-countries.mjs`, through the same builder as today's,
 `scripts/lib/domestic-build.mjs`): id `<country>y<year>` ("826y2011", "SCOy2016"),
@@ -1462,7 +1480,8 @@ sections `<id>-001` to `-100`; the file adds `country`, `season` (the season fil
 id), `year` and `kind` (its players' kind), and its `source` is the season file's,
 so its players rebuild exactly as the season's (`expandSetPlayer`). Scotland, Wales
 and Northern Ireland are cut from the UK's layers by their GB-SCT, GB-WLS and GB-NIR
-polygons, as England is. A season map has fewer clubs than today's of the same
+polygons, as England is; Suriname, with no map of today, names its GeoNames country
+in `UNMAPPED_GEONAMES`. A season map has fewer clubs than today's of the same
 country, so more sections no club starts on: where GeoNames' country file was never
 cached (its host's robots.txt forbids fetching it), they grow around cities1000's
 places, unit centres and land samples (Saudi Arabia). Each map takes at most 8,000
@@ -1491,13 +1510,20 @@ node scripts/build-season-countries.mjs --check ...                             
 ```
 
 **Limitations.**
-- SWOS seasons have only the seven big leagues' countries: the other leagues' team
-  files are not cached. CM 97/98's England has 68 clubs.
+- CM 97/98's England has 68 clubs.
 - Homes from GeoNames are towns, sometimes namesakes a few towns off (Erzeni Shijak
-  at Tirana); 357 club-seasons are placed (EA FC 26's unlicensed "United Tigers SC"
+  at Tirana); 525 club-seasons are placed (EA FC 26's unlicensed "United Tigers SC"
   among them). Tavria Simferopol's home lies in Crimea, which Ukraine's maps leave
-  out as today's does, so it starts elsewhere in Ukraine.
-- Size: 94.9 MB of maps, so a full build takes about 50 minutes with 14 worker threads
+  out as today's does, so it starts elsewhere in Ukraine; so do FR Yugoslavia's
+  Montenegrin clubs, Borac Banja Luka and Priština on Serbia's maps.
+- SWOS's smaller leagues are thinly sourced: 171 of SWOS's 4,006 club-seasons are
+  placed, most of them El Salvador's lower divisions (34), Taiwan's clubs (30, whose
+  SWOS names say little), South Africa's (21) and Suriname's (14). SWOS's Japanese
+  clubs keep the names SWOS scrambled ("Koshema Ontlors"); their overrides give each
+  the home and crest of the club it stands for. A few of SWOS's shortened names stay
+  as SWOS wrote them where the club is not certain (Paraguay's "G Coronel Oviedo",
+  Uruguay's "Central Esp", Mexico's "UN Leon").
+- Size: 111.7 MB of maps, so a full build takes about an hour with 14 worker threads
   and holds about 18 GB of memory.
 - Crests: a club with neither a crest of its own nor a twin keeps its monogram (most of
   Scotland's, Wales's and Northern Ireland's, and the lower divisions of the 1990s).

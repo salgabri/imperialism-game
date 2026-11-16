@@ -708,27 +708,184 @@ SCOy1999 Scotland cm0102-2020-11-cm3 (CM3): geoBoundaries GBR ADM2 (GB-SCT), Ope
 724y1998 Spain cm-9798 (CM 97/98): geoBoundaries ESP ADM3, Creative Commons Attribution 4.0 International (CC BY 4.0)
 752y1998 Sweden cm-9798 (CM 97/98): geoBoundaries SWE ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
 826y1998 England cm-9798 (CM 97/98): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+008y1997 Albania swos-9697 (SWOS 96/97): geoBoundaries ALB ADM3, Open Data Commons Open Database License 1.0
+012y1997 Algeria swos-9697 (SWOS 96/97): geoBoundaries DZA ADM3, Creative Commons Attribution-ShareAlike 2.0
+032y1997 Argentina swos-9697 (SWOS 96/97): geoBoundaries ARG ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+036y1997 Australia swos-9697 (SWOS 96/97): geoBoundaries AUS ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+040y1997 Austria swos-9697 (SWOS 96/97): geoBoundaries AUT ADM3, Creative Commons Attribution-ShareAlike 2.0
+056y1997 Belgium swos-9697 (SWOS 96/97): geoBoundaries BEL ADM4, Creative Commons Attribution 4.0 International (CC BY 4.0)
+068y1997 Bolivia swos-9697 (SWOS 96/97): geoBoundaries BOL ADM3, Public Domain
+076y1997 Brazil swos-9697 (SWOS 96/97): geoBoundaries BRA ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+100y1997 Bulgaria swos-9697 (SWOS 96/97): geoBoundaries BGR ADM2, Public Domain
+112y1997 Belarus swos-9697 (SWOS 96/97): geoBoundaries BLR ADM2, Creative Commons Attribution 3.0 License
+152y1997 Chile swos-9697 (SWOS 96/97): geoBoundaries CHL ADM3, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+158y1997 Chinese Taipei swos-9697 (SWOS 96/97): geoBoundaries TWN ADM2, Creative Commons Attribution-ShareAlike 2.0
+170y1997 Colombia swos-9697 (SWOS 96/97): geoBoundaries COL ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+191y1997 Croatia swos-9697 (SWOS 96/97): geoBoundaries HRV ADM2, Creative Commons Attribution-ShareAlike 2.0
+196y1997 Cyprus swos-9697 (SWOS 96/97): geoBoundaries CYP ADM2, Creative Commons Attribution-ShareAlike 3.0 Unported
+203y1997 Czechia swos-9697 (SWOS 96/97): geoBoundaries CZE ADM3, Open Data Commons Open Database License 1.0
+208y1997 Denmark swos-9697 (SWOS 96/97): geoBoundaries DNK ADM2, Public Domain
+218y1997 Ecuador swos-9697 (SWOS 96/97): geoBoundaries ECU ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+222y1997 El Salvador swos-9697 (SWOS 96/97): geoBoundaries SLV ADM2, Public Domain
+233y1997 Estonia swos-9697 (SWOS 96/97): geoBoundaries EST ADM2, Open Data Commons Open Database License 1.0
+246y1997 Finland swos-9697 (SWOS 96/97): geoBoundaries FIN ADM3, Open Data Commons Open Database License 1.0
 250y1997 France swos-9697 (SWOS 96/97): geoBoundaries FRA ADM3, Etalab Open License 2.0
 276y1997 Germany swos-9697 (SWOS 96/97): geoBoundaries DEU ADM3, Data license Germany - Attribution - Version 2.0
+300y1997 Greece swos-9697 (SWOS 96/97): geoBoundaries GRC ADM3, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+348y1997 Hungary swos-9697 (SWOS 96/97): geoBoundaries HUN ADM3, Open Data Commons Open Database License 1.0
+352y1997 Iceland swos-9697 (SWOS 96/97): geoBoundaries ISL ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+372y1997 Ireland swos-9697 (SWOS 96/97): geoBoundaries IRL ADM2, Creative Commons Attribution 4.0 (CC BY 4.0)
+376y1997 Israel swos-9697 (SWOS 96/97): geoBoundaries ISR ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
 380y1997 Italy swos-9697 (SWOS 96/97): geoBoundaries ITA ADM4, Creative Commons Attribution 3.0 License
+392y1997 Japan swos-9697 (SWOS 96/97): geoBoundaries JPN ADM2, Creative Commons Attribution-ShareAlike 2.0
+428y1997 Latvia swos-9697 (SWOS 96/97): geoBoundaries LVA ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+440y1997 Lithuania swos-9697 (SWOS 96/97): geoBoundaries LTU ADM3, Public Domain
+442y1997 Luxembourg swos-9697 (SWOS 96/97): geoBoundaries LUX ADM2, Open Data Commons Open Database License 1.0
+484y1997 Mexico swos-9697 (SWOS 96/97): geoBoundaries MEX ADM2, Creative Commons Attribution 4.0 (CC BY 4.0)
 528y1997 Netherlands swos-9697 (SWOS 96/97): geoBoundaries NLD ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+554y1997 New Zealand swos-9697 (SWOS 96/97): geoBoundaries NZL ADM3, Creative Commons Attribution 4.0 International (CC BY 4.0)
+578y1997 Norway swos-9697 (SWOS 96/97): geoBoundaries NOR ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+600y1997 Paraguay swos-9697 (SWOS 96/97): geoBoundaries PRY ADM2, Creative Commons Attribution 4.0 (CC BY 4.0)
+604y1997 Peru swos-9697 (SWOS 96/97): geoBoundaries PER ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+616y1997 Poland swos-9697 (SWOS 96/97): geoBoundaries POL ADM2, Open Data Commons Open Database License 1.0
 620y1997 Portugal swos-9697 (SWOS 96/97): geoBoundaries PRT ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+642y1997 Romania swos-9697 (SWOS 96/97): geoBoundaries ROU ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+643y1997 Russia swos-9697 (SWOS 96/97): geoBoundaries RUS ADM2, Open Data Commons Open Database License 1.0
+688y1997 Serbia swos-9697 (SWOS 96/97): geoBoundaries SRB ADM2, Open Data Commons Open Database License 1.0
+703y1997 Slovakia swos-9697 (SWOS 96/97): geoBoundaries SVK ADM3, Open Data Commons Open Database License 1.0
+705y1997 Slovenia swos-9697 (SWOS 96/97): geoBoundaries SVN ADM2, Open Data Commons Open Database License 1.0
+710y1997 South Africa swos-9697 (SWOS 96/97): geoBoundaries ZAF ADM3, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 724y1997 Spain swos-9697 (SWOS 96/97): geoBoundaries ESP ADM3, Creative Commons Attribution 4.0 International (CC BY 4.0)
+740y1997 Suriname swos-9697 (SWOS 96/97): geoBoundaries SUR ADM2, Public Domain
+752y1997 Sweden swos-9697 (SWOS 96/97): geoBoundaries SWE ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+756y1997 Switzerland swos-9697 (SWOS 96/97): geoBoundaries CHE ADM3, Federal Office of Topography swisstopo License
+792y1997 Turkey swos-9697 (SWOS 96/97): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
+804y1997 Ukraine swos-9697 (SWOS 96/97): geoBoundaries UKR ADM2, Public Domain
 826y1997 England swos-9697 (SWOS 96/97): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+840y1997 United States swos-9697 (SWOS 96/97): geoBoundaries USA ADM2, Public Domain
+858y1997 Uruguay swos-9697 (SWOS 96/97): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
+862y1997 Venezuela swos-9697 (SWOS 96/97): geoBoundaries VEN ADM1, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+NIRy1997 Northern Ireland swos-9697 (SWOS 96/97): geoBoundaries GBR ADM2 (GB-NIR), Open Government Licence v3.0
+SCOy1997 Scotland swos-9697 (SWOS 96/97): geoBoundaries GBR ADM2 (GB-SCT), Open Government Licence v3.0
+WALy1997 Wales swos-9697 (SWOS 96/97): geoBoundaries GBR ADM2 (GB-WLS), Open Government Licence v3.0
+008y1996 Albania swos-9596 (SWOS 95/96): geoBoundaries ALB ADM3, Open Data Commons Open Database License 1.0
+012y1996 Algeria swos-9596 (SWOS 95/96): geoBoundaries DZA ADM3, Creative Commons Attribution-ShareAlike 2.0
+032y1996 Argentina swos-9596 (SWOS 95/96): geoBoundaries ARG ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+036y1996 Australia swos-9596 (SWOS 95/96): geoBoundaries AUS ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+040y1996 Austria swos-9596 (SWOS 95/96): geoBoundaries AUT ADM3, Creative Commons Attribution-ShareAlike 2.0
+056y1996 Belgium swos-9596 (SWOS 95/96): geoBoundaries BEL ADM4, Creative Commons Attribution 4.0 International (CC BY 4.0)
+068y1996 Bolivia swos-9596 (SWOS 95/96): geoBoundaries BOL ADM3, Public Domain
+076y1996 Brazil swos-9596 (SWOS 95/96): geoBoundaries BRA ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+100y1996 Bulgaria swos-9596 (SWOS 95/96): geoBoundaries BGR ADM2, Public Domain
+112y1996 Belarus swos-9596 (SWOS 95/96): geoBoundaries BLR ADM2, Creative Commons Attribution 3.0 License
+152y1996 Chile swos-9596 (SWOS 95/96): geoBoundaries CHL ADM3, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+158y1996 Chinese Taipei swos-9596 (SWOS 95/96): geoBoundaries TWN ADM2, Creative Commons Attribution-ShareAlike 2.0
+170y1996 Colombia swos-9596 (SWOS 95/96): geoBoundaries COL ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+191y1996 Croatia swos-9596 (SWOS 95/96): geoBoundaries HRV ADM2, Creative Commons Attribution-ShareAlike 2.0
+196y1996 Cyprus swos-9596 (SWOS 95/96): geoBoundaries CYP ADM2, Creative Commons Attribution-ShareAlike 3.0 Unported
+203y1996 Czechia swos-9596 (SWOS 95/96): geoBoundaries CZE ADM3, Open Data Commons Open Database License 1.0
+208y1996 Denmark swos-9596 (SWOS 95/96): geoBoundaries DNK ADM2, Public Domain
+218y1996 Ecuador swos-9596 (SWOS 95/96): geoBoundaries ECU ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+222y1996 El Salvador swos-9596 (SWOS 95/96): geoBoundaries SLV ADM2, Public Domain
+233y1996 Estonia swos-9596 (SWOS 95/96): geoBoundaries EST ADM2, Open Data Commons Open Database License 1.0
+246y1996 Finland swos-9596 (SWOS 95/96): geoBoundaries FIN ADM3, Open Data Commons Open Database License 1.0
 250y1996 France swos-9596 (SWOS 95/96): geoBoundaries FRA ADM3, Etalab Open License 2.0
 276y1996 Germany swos-9596 (SWOS 95/96): geoBoundaries DEU ADM3, Data license Germany - Attribution - Version 2.0
+300y1996 Greece swos-9596 (SWOS 95/96): geoBoundaries GRC ADM3, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+348y1996 Hungary swos-9596 (SWOS 95/96): geoBoundaries HUN ADM3, Open Data Commons Open Database License 1.0
+352y1996 Iceland swos-9596 (SWOS 95/96): geoBoundaries ISL ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+372y1996 Ireland swos-9596 (SWOS 95/96): geoBoundaries IRL ADM2, Creative Commons Attribution 4.0 (CC BY 4.0)
+376y1996 Israel swos-9596 (SWOS 95/96): geoBoundaries ISR ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
 380y1996 Italy swos-9596 (SWOS 95/96): geoBoundaries ITA ADM4, Creative Commons Attribution 3.0 License
+392y1996 Japan swos-9596 (SWOS 95/96): geoBoundaries JPN ADM2, Creative Commons Attribution-ShareAlike 2.0
+428y1996 Latvia swos-9596 (SWOS 95/96): geoBoundaries LVA ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+440y1996 Lithuania swos-9596 (SWOS 95/96): geoBoundaries LTU ADM3, Public Domain
+442y1996 Luxembourg swos-9596 (SWOS 95/96): geoBoundaries LUX ADM2, Open Data Commons Open Database License 1.0
+484y1996 Mexico swos-9596 (SWOS 95/96): geoBoundaries MEX ADM2, Creative Commons Attribution 4.0 (CC BY 4.0)
 528y1996 Netherlands swos-9596 (SWOS 95/96): geoBoundaries NLD ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+554y1996 New Zealand swos-9596 (SWOS 95/96): geoBoundaries NZL ADM3, Creative Commons Attribution 4.0 International (CC BY 4.0)
+578y1996 Norway swos-9596 (SWOS 95/96): geoBoundaries NOR ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+600y1996 Paraguay swos-9596 (SWOS 95/96): geoBoundaries PRY ADM2, Creative Commons Attribution 4.0 (CC BY 4.0)
+604y1996 Peru swos-9596 (SWOS 95/96): geoBoundaries PER ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+616y1996 Poland swos-9596 (SWOS 95/96): geoBoundaries POL ADM2, Open Data Commons Open Database License 1.0
 620y1996 Portugal swos-9596 (SWOS 95/96): geoBoundaries PRT ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+642y1996 Romania swos-9596 (SWOS 95/96): geoBoundaries ROU ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+643y1996 Russia swos-9596 (SWOS 95/96): geoBoundaries RUS ADM2, Open Data Commons Open Database License 1.0
+688y1996 Serbia swos-9596 (SWOS 95/96): geoBoundaries SRB ADM2, Open Data Commons Open Database License 1.0
+703y1996 Slovakia swos-9596 (SWOS 95/96): geoBoundaries SVK ADM3, Open Data Commons Open Database License 1.0
+705y1996 Slovenia swos-9596 (SWOS 95/96): geoBoundaries SVN ADM2, Open Data Commons Open Database License 1.0
+710y1996 South Africa swos-9596 (SWOS 95/96): geoBoundaries ZAF ADM3, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 724y1996 Spain swos-9596 (SWOS 95/96): geoBoundaries ESP ADM3, Creative Commons Attribution 4.0 International (CC BY 4.0)
+740y1996 Suriname swos-9596 (SWOS 95/96): geoBoundaries SUR ADM2, Public Domain
+752y1996 Sweden swos-9596 (SWOS 95/96): geoBoundaries SWE ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+756y1996 Switzerland swos-9596 (SWOS 95/96): geoBoundaries CHE ADM3, Federal Office of Topography swisstopo License
+792y1996 Turkey swos-9596 (SWOS 95/96): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
+804y1996 Ukraine swos-9596 (SWOS 95/96): geoBoundaries UKR ADM2, Public Domain
 826y1996 England swos-9596 (SWOS 95/96): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+858y1996 Uruguay swos-9596 (SWOS 95/96): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
+862y1996 Venezuela swos-9596 (SWOS 95/96): geoBoundaries VEN ADM1, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+NIRy1996 Northern Ireland swos-9596 (SWOS 95/96): geoBoundaries GBR ADM2 (GB-NIR), Open Government Licence v3.0
+SCOy1996 Scotland swos-9596 (SWOS 95/96): geoBoundaries GBR ADM2 (GB-SCT), Open Government Licence v3.0
+WALy1996 Wales swos-9596 (SWOS 95/96): geoBoundaries GBR ADM2 (GB-WLS), Open Government Licence v3.0
+008y1995 Albania swos-9495 (SWOS 94/95): geoBoundaries ALB ADM3, Open Data Commons Open Database License 1.0
+012y1995 Algeria swos-9495 (SWOS 94/95): geoBoundaries DZA ADM3, Creative Commons Attribution-ShareAlike 2.0
+032y1995 Argentina swos-9495 (SWOS 94/95): geoBoundaries ARG ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+036y1995 Australia swos-9495 (SWOS 94/95): geoBoundaries AUS ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+040y1995 Austria swos-9495 (SWOS 94/95): geoBoundaries AUT ADM3, Creative Commons Attribution-ShareAlike 2.0
+056y1995 Belgium swos-9495 (SWOS 94/95): geoBoundaries BEL ADM4, Creative Commons Attribution 4.0 International (CC BY 4.0)
+068y1995 Bolivia swos-9495 (SWOS 94/95): geoBoundaries BOL ADM3, Public Domain
+076y1995 Brazil swos-9495 (SWOS 94/95): geoBoundaries BRA ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+100y1995 Bulgaria swos-9495 (SWOS 94/95): geoBoundaries BGR ADM2, Public Domain
+112y1995 Belarus swos-9495 (SWOS 94/95): geoBoundaries BLR ADM2, Creative Commons Attribution 3.0 License
+152y1995 Chile swos-9495 (SWOS 94/95): geoBoundaries CHL ADM3, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+158y1995 Chinese Taipei swos-9495 (SWOS 94/95): geoBoundaries TWN ADM2, Creative Commons Attribution-ShareAlike 2.0
+170y1995 Colombia swos-9495 (SWOS 94/95): geoBoundaries COL ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+191y1995 Croatia swos-9495 (SWOS 94/95): geoBoundaries HRV ADM2, Creative Commons Attribution-ShareAlike 2.0
+196y1995 Cyprus swos-9495 (SWOS 94/95): geoBoundaries CYP ADM2, Creative Commons Attribution-ShareAlike 3.0 Unported
+203y1995 Czechia swos-9495 (SWOS 94/95): geoBoundaries CZE ADM3, Open Data Commons Open Database License 1.0
+208y1995 Denmark swos-9495 (SWOS 94/95): geoBoundaries DNK ADM2, Public Domain
+218y1995 Ecuador swos-9495 (SWOS 94/95): geoBoundaries ECU ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+222y1995 El Salvador swos-9495 (SWOS 94/95): geoBoundaries SLV ADM2, Public Domain
+233y1995 Estonia swos-9495 (SWOS 94/95): geoBoundaries EST ADM2, Open Data Commons Open Database License 1.0
+246y1995 Finland swos-9495 (SWOS 94/95): geoBoundaries FIN ADM3, Open Data Commons Open Database License 1.0
 250y1995 France swos-9495 (SWOS 94/95): geoBoundaries FRA ADM3, Etalab Open License 2.0
 276y1995 Germany swos-9495 (SWOS 94/95): geoBoundaries DEU ADM3, Data license Germany - Attribution - Version 2.0
+300y1995 Greece swos-9495 (SWOS 94/95): geoBoundaries GRC ADM3, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+348y1995 Hungary swos-9495 (SWOS 94/95): geoBoundaries HUN ADM3, Open Data Commons Open Database License 1.0
+352y1995 Iceland swos-9495 (SWOS 94/95): geoBoundaries ISL ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+372y1995 Ireland swos-9495 (SWOS 94/95): geoBoundaries IRL ADM2, Creative Commons Attribution 4.0 (CC BY 4.0)
+376y1995 Israel swos-9495 (SWOS 94/95): geoBoundaries ISR ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
 380y1995 Italy swos-9495 (SWOS 94/95): geoBoundaries ITA ADM4, Creative Commons Attribution 3.0 License
+392y1995 Japan swos-9495 (SWOS 94/95): geoBoundaries JPN ADM2, Creative Commons Attribution-ShareAlike 2.0
+428y1995 Latvia swos-9495 (SWOS 94/95): geoBoundaries LVA ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+440y1995 Lithuania swos-9495 (SWOS 94/95): geoBoundaries LTU ADM3, Public Domain
+442y1995 Luxembourg swos-9495 (SWOS 94/95): geoBoundaries LUX ADM2, Open Data Commons Open Database License 1.0
+484y1995 Mexico swos-9495 (SWOS 94/95): geoBoundaries MEX ADM2, Creative Commons Attribution 4.0 (CC BY 4.0)
 528y1995 Netherlands swos-9495 (SWOS 94/95): geoBoundaries NLD ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+554y1995 New Zealand swos-9495 (SWOS 94/95): geoBoundaries NZL ADM3, Creative Commons Attribution 4.0 International (CC BY 4.0)
+578y1995 Norway swos-9495 (SWOS 94/95): geoBoundaries NOR ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+600y1995 Paraguay swos-9495 (SWOS 94/95): geoBoundaries PRY ADM2, Creative Commons Attribution 4.0 (CC BY 4.0)
+604y1995 Peru swos-9495 (SWOS 94/95): geoBoundaries PER ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+616y1995 Poland swos-9495 (SWOS 94/95): geoBoundaries POL ADM2, Open Data Commons Open Database License 1.0
 620y1995 Portugal swos-9495 (SWOS 94/95): geoBoundaries PRT ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+642y1995 Romania swos-9495 (SWOS 94/95): geoBoundaries ROU ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+643y1995 Russia swos-9495 (SWOS 94/95): geoBoundaries RUS ADM2, Open Data Commons Open Database License 1.0
+688y1995 Serbia swos-9495 (SWOS 94/95): geoBoundaries SRB ADM2, Open Data Commons Open Database License 1.0
+703y1995 Slovakia swos-9495 (SWOS 94/95): geoBoundaries SVK ADM3, Open Data Commons Open Database License 1.0
+705y1995 Slovenia swos-9495 (SWOS 94/95): geoBoundaries SVN ADM2, Open Data Commons Open Database License 1.0
+710y1995 South Africa swos-9495 (SWOS 94/95): geoBoundaries ZAF ADM3, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 724y1995 Spain swos-9495 (SWOS 94/95): geoBoundaries ESP ADM3, Creative Commons Attribution 4.0 International (CC BY 4.0)
+740y1995 Suriname swos-9495 (SWOS 94/95): geoBoundaries SUR ADM2, Public Domain
+752y1995 Sweden swos-9495 (SWOS 94/95): geoBoundaries SWE ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+756y1995 Switzerland swos-9495 (SWOS 94/95): geoBoundaries CHE ADM3, Federal Office of Topography swisstopo License
+792y1995 Turkey swos-9495 (SWOS 94/95): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
+804y1995 Ukraine swos-9495 (SWOS 94/95): geoBoundaries UKR ADM2, Public Domain
 826y1995 England swos-9495 (SWOS 94/95): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+858y1995 Uruguay swos-9495 (SWOS 94/95): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
+862y1995 Venezuela swos-9495 (SWOS 94/95): geoBoundaries VEN ADM1, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+NIRy1995 Northern Ireland swos-9495 (SWOS 94/95): geoBoundaries GBR ADM2 (GB-NIR), Open Government Licence v3.0
+SCOy1995 Scotland swos-9495 (SWOS 94/95): geoBoundaries GBR ADM2 (GB-SCT), Open Government Licence v3.0
+WALy1995 Wales swos-9495 (SWOS 94/95): geoBoundaries GBR ADM2 (GB-WLS), Open Government Licence v3.0
 032y1994 Argentina cm0102-2020-11-cm93 (CM 01/02): geoBoundaries ARG ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 056y1994 Belgium cm0102-2020-11-cm93 (CM 01/02): geoBoundaries BEL ADM4, Creative Commons Attribution 4.0 International (CC BY 4.0)
 076y1994 Brazil cm0102-2020-11-cm93 (CM 01/02): geoBoundaries BRA ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
