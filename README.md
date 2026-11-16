@@ -114,6 +114,8 @@ npm run test:map-viewport # minimal camera reveal and world-edge checks
 npm run test:targeting # intervening borders, islands, neutral land and real Europe
 npm run test:flag-symbols # symbol proportions, land fitting and generated asset integrity
 npm run build:flag-symbols # regenerate reviewed field/emblem assets after source review
+npm run build:flag-fits # re-read every flag's stretch kind and edge colours after a flag changes (--check to verify)
+npm run preview:flag-fits # before/after sheet of whole-flag fitting, docs/design/flag-fit-review.html
 npm run sync-flags  # re-vendor flag SVGs after editing src/data/flags.js
 npm run build:historic-flags # redraw the federations of the day's public-domain flags (--check to verify)
 npm run sync:ea-fc       # snapshot EA FC 27 from EA's ratings API into scripts/data/ea-fc27.csv (network, cached)
@@ -920,8 +922,13 @@ Fourteen [symbol-aware flag designs](docs/design/flag-symbols.md) separate the
 continuous field from their emblem. Crosses, discs and coats of arms keep their
 proportions and fit on owned land instead of stretching across the region's box.
 The field remains continuous across nearby islands, and camera movement cannot
-relocate or repeat the emblem. Other flags and the small UI flag chips retain
-their original artwork.
+relocate or repeat the emblem. Every other flag is [fitted whole](docs/design/flag-fit.md)
+to the body of its land: stripes stretch only along themselves, a Nordic cross
+or Greece's canton at most a quarter, and anything with an emblem, a star or a
+diagonal keeps its own proportions. Norway's cross sits on southern Norway and
+Croatia's shield on Croatia, not over Sweden and Bosnia, the middles of their
+boxes; the flag's edge colours carry on over islands and long coasts beyond it.
+The small UI flag chips keep their original artwork.
 
 Scroll to zoom (up to 16×, anchored on the pointer), drag to pan, double-click or
 press the zoom readout to reset; the setup screen's map card works the same way. The view is clamped to the world, so the map
@@ -2538,6 +2545,24 @@ reveals the flag; seas and neutral countries stay untouched. A solid rectangle
 in the nation's colour is the fallback. Non-participants remain unflagged in
 continental campaigns. A club's land keeps its club colour with its crest placed
 on it, below.
+
+A region's flag goes on its **body**: its land in pieces at least a quarter the
+size of its largest, so mainland Greece but not Crete, Luzon and Mindanao but
+not the Visayas. How far a flag may leave its proportions depends on its
+artwork, read from each flag's own pixels by `npm run build:flag-fits`:
+horizontal stripes (Germany, Russia) span the body's height and stretch
+sideways at will, vertical stripes (France, Italy) the body's width; straight-
+edged blocks such as a Nordic cross or Greece's canton stretch at most 25%; a
+flag with an emblem, a star or a diagonal keeps its proportions, centred on the
+body, and grows towards covering it only as far as its sides are plain stripe,
+so Argentina's bands span the country with its sun round and whole while the
+United States keeps every star of its canton. When the middle of the body's box
+is not the body (Norway's lies in Sweden, Croatia's in Bosnia, Chile's in
+Argentina), the flag takes the largest box around the body that is mostly the
+body: Norway's south, Croatia's north. Beyond the flag, strips in the colours
+along its edges carry it over the rest of the region, so the islands and coasts
+past it continue its stripes, cross or field. The layout is fixed by geography,
+built with the region's other banner work, and never moves with the camera.
 
 Each banner is drawn once and shown through the outline of each flag part (about
 700 on a World War board, where a part per island took about 1,300), and

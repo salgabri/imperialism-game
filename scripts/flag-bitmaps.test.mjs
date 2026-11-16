@@ -369,3 +369,27 @@ test('the first banner to ask opens the encoder at once, one pixel encoded as lo
     assert.equal(encoderCanvases.length, 1);
   } finally { await view.close(); }
 });
+
+test('a fitted flag drops its lips with its bitmap, and a flag of stripes keeps its bitmap however long it is drawn', async () => {
+  // engine/flagFit.js layouts: Croatia's shield in a wide strip of land, Germany's stripes along it.
+  const region = { key: 'fit', bbox: { x: 0, y: 0, w: 400, h: 50 }, parts: [{ countryId: 'x', rings: [[[0, 0], [400, 0], [400, 50], [0, 50], [0, 0]]] }] };
+  const { flagFit, layoutFlagFit } = await import('../src/engine/flagFit.js');
+  const croatia = { ...native('191', '/flags/hr.svg', { x: -0.1, y: -0.1, w: 400.2, h: 50.2 }), fitLayout: layoutFlagFit(region, flagFit('hr')) };
+  const germany = { ...native('276-fit', '/flags/de-fit.svg', croatia.bbox), fitLayout: layoutFlagFit(region, flagFit('de')) };
+  const view = await mount([React.createElement(FlagArt, { key: 'hr', flag: croatia, scale: 1 }),
+    React.createElement(FlagArt, { key: 'de', flag: germany, scale: 1 })]);
+  try {
+    const lips = id => view.q(`#fi-flag-${id}`).querySelectorAll('[data-flag-lip]').length;
+    const href = id => view.q(`#fi-flag-${id} image`).getAttribute('href');
+    assert.ok(lips('191') >= 2, 'an SVG\'s layers leave a seam at its edge: lips cover it');
+    await until(() => href('191').startsWith('blob:') && href('276-fit').startsWith('blob:'), 'both swaps');
+    assert.equal(lips('191'), 0, 'a bitmap is one layer: no seam, no lips');
+    // Germany's stripes run the strip's whole 400 units: at 4 px a unit, 1600 px wide, 200 px tall. Only the height counts.
+    await view.render([React.createElement(FlagArt, { key: 'hr', flag: croatia, scale: 4 }),
+      React.createElement(FlagArt, { key: 'de', flag: germany, scale: 4 })]);
+    assert.ok(href('276-fit').startsWith('blob:'), 'stripes are the same at any width');
+    await view.render([React.createElement(FlagArt, { key: 'hr', flag: croatia, scale: 1 }),
+      React.createElement(FlagArt, { key: 'de', flag: germany, scale: 20 })]);
+    assert.equal(href('276-fit'), '/flags/de-fit.svg', 'but drawn taller than the bitmap, the SVG keeps them sharp');
+  } finally { await view.close(); }
+});

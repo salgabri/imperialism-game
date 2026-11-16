@@ -11,6 +11,7 @@ import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { JSDOM } from 'jsdom';
 import { FLAG_SYMBOLS } from '../src/data/flagSymbols.js';
+import { flagFit, layoutFlagFit } from '../src/engine/flagFit.js';
 
 const compiled = await build({
   entryPoints: [fileURLToPath(new URL('../src/components/FlagArt.jsx', import.meta.url))],
@@ -58,11 +59,14 @@ function assertMapSpace(banner, flag) {
   assert.equal(banner.hasAttribute('viewBox'), false, 'no normalized parent can stretch the emblem non-uniformly');
   assert.equal(banner.hasAttribute('transform'), false);
   assert.equal(banner.querySelector('[viewBox], [transform], [style*="transform"]'), null);
-  const fallback = banner.querySelector('rect');
+  const fallback = banner.children[0];
+  assert.equal(fallback.localName, 'rect');
   assert.deepEqual(box(fallback), flag.bbox, 'the field spans the geographic region in map coordinates');
   assert.equal(fallback.getAttribute('fill'), flag.color);
-  assert.equal(banner.querySelectorAll('rect').length, 1, 'no outside badge or border background');
-  assert.equal(banner.children.length, banner.querySelectorAll('image').length + 1, 'one field rect and only the specified artwork layers');
+  // A whole flag fitted to its land carries its edges on in strips, and over an SVG's edge in lips (engine/flagFit.js).
+  const strips = banner.querySelectorAll('rect[data-flag-strip], rect[data-flag-lip]').length;
+  assert.equal(banner.querySelectorAll('rect').length, 1 + strips, 'no outside badge or border background');
+  assert.equal(banner.children.length, banner.querySelectorAll('image').length + 1 + strips, 'one field rect and only the specified artwork layers');
   assert.ok([...banner.children].every(node => ['rect', 'image'].includes(node.localName)));
   assert.equal(fallback.hasAttribute('stroke'), false);
 }
@@ -187,8 +191,83 @@ test('regional banners have unique identities and fly their current conqueror’
   assert.equal(changed.querySelector('[data-flag-symbol]').getAttribute('href'), `/${FLAG_SYMBOLS.pt.symbolFile}`);
 });
 
+/** A whole flag fitted to a wide strip of land: it fills the strip's middle and its strips carry it to either end. */
+function fittedFlag(code = 'hr', overrides = {}) {
+  const ring = [[100, 0], [300, 0], [300, 50], [100, 50], [100, 0]];
+  const region = { key: `${code}-fit`, bbox: { x: 100, y: 0, w: 200, h: 50 }, parts: [{ countryId: code, rings: [ring] }] };
+  return nativeFlag({ id: `${code}-fit`, ownerId: code, url: `/flags/${code}.svg`, bbox: { x: 99.9, y: -0.1, w: 200.2, h: 50.2 },
+    fitLayout: layoutFlagFit(region, flagFit(code)), ...overrides });
+}
+const layerOrder = banner => [...banner.children].map(node => (node.localName === 'image' ? 'image'
+  : node.dataset.flagStrip ? 'strip' : node.dataset.flagLip ? 'lip' : 'field'));
+
+test('a fitted whole flag fills its fit\'s box and its strips carry its edges over the rest of its region', () => {
+  const flag = fittedFlag('hr'), layout = flag.fitLayout;
+  const svg = render(flag), banner = svg.querySelector('defs > g');
+  assertMapSpace(banner, flag);
+  assert.equal(banner.dataset.flagLayout, 'native', 'the whole original artwork');
+  assert.equal(banner.dataset.flagFit, 'free');
+  const images = [...banner.querySelectorAll('image')];
+  assert.equal(images.length, 1);
+  assert.equal(images[0].getAttribute('href'), flag.url);
+  assert.equal(images[0].getAttribute('preserveAspectRatio'), 'none');
+  assert.deepEqual(box(images[0]), layout.flag);
+  approx(box(images[0]).w / box(images[0]).h, 4 / 3, 'Croatia\'s shield keeps its shape');
+  const strips = [...banner.querySelectorAll('rect[data-flag-strip]')];
+  assert.deepEqual(strips.map(strip => strip.dataset.flagStrip), layout.strips.map(strip => strip.side));
+  assert.ok(strips.length >= 2, 'land either side of the flag');
+  for (const [i, strip] of strips.entries()) {
+    const spec = layout.strips[i];
+    assert.deepEqual(box(strip), { x: spec.x, y: spec.y, w: spec.w, h: spec.h });
+    const gradient = svg.querySelector(`defs > linearGradient#fi-flag-${flag.id}-${spec.side}`);
+    if (spec.color) {
+      assert.equal(strip.getAttribute('fill'), spec.color);
+      assert.equal(gradient, null);
+      continue;
+    }
+    assert.equal(strip.getAttribute('fill'), `url(#fi-flag-${flag.id}-${spec.side})`, 'its gradient sits beside the banner, outside its copies');
+    assert.equal(gradient.getAttribute('gradientUnits'), 'userSpaceOnUse');
+    assert.equal(Number(gradient.getAttribute(spec.axis === 'y' ? 'y1' : 'x1')), spec.from);
+    assert.equal(Number(gradient.getAttribute(spec.axis === 'y' ? 'y2' : 'x2')), spec.to);
+    assert.deepEqual([...gradient.querySelectorAll('stop')].map(stop => [Number(stop.getAttribute('offset')), stop.getAttribute('stop-color')]),
+      spec.stops.map(stop => [stop.offset, stop.color]));
+  }
+  const left = svg.querySelector(`#fi-flag-${flag.id}-left`);
+  assert.deepEqual([...left.querySelectorAll('stop')].map(stop => stop.getAttribute('stop-color')), ['#f00', '#f00', '#fff', '#fff', '#171796'],
+    'Croatia\'s left edge, red, white and blue, hard-edged');
+  // The strips reach under the flag's soft edge; an SVG's lips cover the seam its layers leave there.
+  assert.deepEqual(layerOrder(banner), ['field', ...strips.map(() => 'strip'), 'image', ...strips.map(() => 'lip')]);
+});
+
+test('an SVG flag\'s lips straddle its edges, a pixel and a half wide at the camera\'s scale', () => {
+  const flag = fittedFlag('hr'), art = flag.fitLayout.flag, unit = art.w / 640;
+  const lipAt = scale => {
+    const host = dom.window.document.createElement('div');
+    host.innerHTML = renderToStaticMarkup(React.createElement('svg', null, React.createElement('defs', null, React.createElement(FlagArt, { flag, scale }))));
+    return box(host.querySelector('rect[data-flag-lip="left"]'));
+  };
+  const close = lipAt(1 / unit), far = lipAt(.5 / unit);
+  approx(close.x + close.w / 2, art.x, 'centred on the flag\'s edge');
+  approx(close.w, 2 * 1.5 * unit, 'a pixel and a half each way');
+  approx(far.w, 2 * 3 * unit, 'more units where a unit is less than a pixel');
+  approx(close.h, art.h);
+});
+
+test('stripes fitted to their land need no gradient: each strip continues one stripe', () => {
+  const flag = fittedFlag('de'), svg = render(flag), banner = svg.querySelector('defs > g');
+  assertMapSpace(banner, flag);
+  assert.equal(banner.dataset.flagFit, 'rows');
+  assert.equal(svg.querySelector('linearGradient'), null);
+  const image = box(banner.querySelector('image'));
+  approx(image.x, flag.bbox.x, 'the stripes run the whole region');
+  approx(image.w, flag.bbox.w);
+  for (const strip of banner.querySelectorAll('rect[data-flag-strip]')) {
+    assert.equal(strip.getAttribute('fill'), strip.dataset.flagStrip === 'top' ? '#000001' : '#fc0');
+  }
+});
+
 test('flag layers remain inert, unlabelled paint rather than blocking map interaction', () => {
-  for (const flag of [nativeFlag(), symbolFlag()]) {
+  for (const flag of [nativeFlag(), symbolFlag(), fittedFlag()]) {
     const banner = render(flag).querySelector('g');
     assert.equal(banner.getAttribute('pointer-events'), 'none');
     assert.equal(banner.querySelector('[tabindex], [role], a, button, foreignObject'), null);

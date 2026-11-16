@@ -7,6 +7,7 @@ import { flushSync } from 'react-dom';
 import App from '../src/App.jsx';
 import { FLAG_CODES } from '../src/data/flags.js';
 import { FLAG_SYMBOLS } from '../src/data/flagSymbols.js';
+import { FLAG_HEIGHT, FLAG_WIDTH, GRID_STRETCH, flagFit } from '../src/engine/flagFit.js';
 import { clubLogoUrl } from '../src/data/clubLogos.js';
 import { DEPENDENCIES, HISTORIC_NATIONS, HISTORIC_THROUGH, NATIONS, buildClub, makeRng, teamEff } from '../src/data/teams.js';
 import { SAVE_KEY } from '../src/config.js';
@@ -124,16 +125,46 @@ function flagBanner(node) {
 
 const numericBox = node => ['x', 'y', 'width', 'height'].map(name => Number(node.getAttribute(name)));
 
-/** A banner (FlagArt) as drawn: a plain group in map coordinates, one region rect and only its artwork layers. */
+/**
+ * A banner (FlagArt) as drawn: a plain group in map coordinates, one region rect first, then only its artwork layers:
+ * images, and a whole flag's strips and lips (src/engine/flagFit.js).
+ */
 function bannerShape(banner) {
   if (!banner || banner.localName !== 'g' || banner.hasAttribute('viewBox') || banner.hasAttribute('transform')
     || banner.getAttribute('pointer-events') !== 'none') return null;
-  const images = [...banner.querySelectorAll('image')];
-  const fallback = banner.querySelector('rect');
-  if (banner.children.length !== images.length + 1 || [...banner.children].some(node => !['rect', 'image'].includes(node.localName))
-    || banner.querySelectorAll('rect').length !== 1 || !fallback || fallback.hasAttribute('stroke')
-    || banner.querySelector('[transform], [style*="transform"], [tabindex], a, use, foreignObject')) return null;
-  return { images, fallback, region: numericBox(fallback) };
+  const children = [...banner.children];
+  const images = children.filter(node => node.localName === 'image');
+  const strips = children.filter(node => node.localName === 'rect' && node.hasAttribute('data-flag-strip'));
+  const lips = children.filter(node => node.localName === 'rect' && node.hasAttribute('data-flag-lip'));
+  const fallback = children[0];
+  if (!fallback || fallback.localName !== 'rect' || fallback.hasAttribute('data-flag-strip') || fallback.hasAttribute('data-flag-lip')
+    || children.length !== 1 + images.length + strips.length + lips.length || fallback.hasAttribute('stroke')
+    || banner.querySelector('[stroke], [transform], [style*="transform"], [tabindex], a, use, foreignObject')) return null;
+  return { images, strips, lips, fallback, region: numericBox(fallback) };
+}
+
+/**
+ * A whole flag fitted to its land (src/engine/flagFit.js): its fit is the flag's own, its artwork keeps the proportions
+ * its kind allows, and with its strips it paints the whole of its region (but where its own edge is see-through, as
+ * Nepal's pennant is), the strips inside it.
+ */
+function fittedFlagMatches(banner, code, { images: [image], strips, region }) {
+  const kind = banner.dataset.flagFit, eps = 1e-6, fit = flagFit(code);
+  if (fit?.kind !== kind) return false;
+  const seeThrough = Object.values(fit.edges).some(runs => runs?.some(run => !run.color));
+  const [ax, ay, aw, ah] = numericBox(image), [px, py, pw, ph] = region;
+  const ratio = (aw / ah) / (FLAG_WIDTH / FLAG_HEIGHT);
+  const shaped = kind === 'free' ? Math.abs(ratio - 1) < eps
+    : kind === 'grid' ? ratio >= 1 / GRID_STRETCH - eps && ratio <= GRID_STRETCH + eps
+      : kind === 'rows' ? ax <= px + eps && ax + aw >= px + pw - eps
+        : kind === 'cols' ? ay <= py + eps && ay + ah >= py + ph - eps
+          : Math.abs(ax - px) < eps && Math.abs(ay - py) < eps && Math.abs(aw - pw) < eps && Math.abs(ah - ph) < eps;
+  const boxes = [[ax, ay, aw, ah], ...strips.map(numericBox)];
+  const inside = ([x, y, w, h], [qx, qy]) => qx >= x - eps && qy >= y - eps && qx <= x + w + eps && qy <= y + h + eps;
+  const samples = [];
+  for (let i = 0; i <= 8; i++) for (let j = 0; j <= 8; j++) samples.push([px + pw * i / 8, py + ph * j / 8]);
+  return shaped && (seeThrough || samples.every(point => boxes.some(box => inside(box, point))))
+    && strips.every(strip => { const [x, y, w, h] = numericBox(strip); return x >= px - eps && y >= py - eps && x + w <= px + pw + eps && y + h <= py + ph + eps; });
 }
 
 /** Exact provenance and one-banner semantics, for native and separated emblems. */
@@ -148,7 +179,8 @@ function flagAssetsMatch(banner, code) {
   if (!field && !symbol) return banner.dataset.flagLayout === 'native' && images.length === 1
     && images[0].getAttribute('href') === `/flags/${code}.svg`
     && images[0].getAttribute('preserveAspectRatio') === 'none'
-    && JSON.stringify(numericBox(images[0])) === JSON.stringify(region);
+    && (banner.dataset.flagFit ? validBox(images[0]) && fittedFlagMatches(banner, code, shape)
+      : !shape.strips.length && !shape.lips.length && JSON.stringify(numericBox(images[0])) === JSON.stringify(region));
   const profile = FLAG_SYMBOLS[code];
   if (!profile || !field || !symbol || images.length !== 2
     || banner.querySelectorAll('[data-flag-field]').length !== 1 || banner.querySelectorAll('[data-flag-symbol]').length !== 1
