@@ -129,7 +129,7 @@ const compiled = await build({
     contents: `export { default as TeamMark } from './src/components/TeamMark.jsx';
       export { default as SquadFlag } from './src/screens/squad/SquadFlag.jsx';
       export { SeasonYear } from './src/components/seasonYear.js';
-      export { crestFile, crestUrl } from './src/data/crests.js';`,
+      export { crestFile, crestUrl, rememberTwins } from './src/data/crests.js';`,
     resolveDir: fileURLToPath(root), loader: 'jsx',
   },
   bundle: true, write: false, platform: 'node', format: 'cjs', external: ['react'], jsx: 'automatic',
@@ -137,7 +137,7 @@ const compiled = await build({
 });
 const bundled = { exports: {} };
 new Function('require', 'module', 'exports', compiled.outputFiles[0].text)(createRequire(import.meta.url), bundled, bundled.exports);
-const { TeamMark, SquadFlag, SeasonYear, crestFile, crestUrl } = bundled.exports;
+const { TeamMark, SquadFlag, SeasonYear, crestFile, crestUrl, rememberTwins } = bundled.exports;
 const dom = new JSDOM('<!doctype html><html><body></body></html>');
 after(() => dom.window.close());
 const render = element => {
