@@ -83,7 +83,10 @@ The fits are 21 KB (5 KB compressed) in the first download. A flag added or redr
 needs `npm run build:flag-fits`: the file records a digest of `public/flags`, and
 `scripts/flag-fit.test.mjs` fails until it matches. The kinds are read from pixels,
 not guessed from file names; colour runs use each run's commonest pixel, so they are
-the SVG's own colours.
+the SVG's own colours. An edge is read just inside any see-through sliver its drawing
+leaves (flag-icons starts Papua New Guinea's triangles a unit and a half in, the
+Bahamas' stripes two units down), at most four units in. Only Nepal's pennant is
+see-through at its edges; there the banner's own colour shows past it, as before.
 
 `npm run preview:flag-fits` writes [flag-fit-review.html](flag-fit-review.html): 35
 before/after pairs on real geography with the production renderer, including three

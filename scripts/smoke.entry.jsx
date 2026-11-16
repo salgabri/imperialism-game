@@ -145,11 +145,13 @@ function bannerShape(banner) {
 
 /**
  * A whole flag fitted to its land (src/engine/flagFit.js): its fit is the flag's own, its artwork keeps the proportions
- * its kind allows, and with its strips it paints the whole of its region, the strips inside it.
+ * its kind allows, and with its strips it paints the whole of its region (but where its own edge is see-through, as
+ * Nepal's pennant is), the strips inside it.
  */
 function fittedFlagMatches(banner, code, { images: [image], strips, region }) {
-  const kind = banner.dataset.flagFit, eps = 1e-6;
-  if (flagFit(code)?.kind !== kind) return false;
+  const kind = banner.dataset.flagFit, eps = 1e-6, fit = flagFit(code);
+  if (fit?.kind !== kind) return false;
+  const seeThrough = Object.values(fit.edges).some(runs => runs?.some(run => !run.color));
   const [ax, ay, aw, ah] = numericBox(image), [px, py, pw, ph] = region;
   const ratio = (aw / ah) / (FLAG_WIDTH / FLAG_HEIGHT);
   const shaped = kind === 'free' ? Math.abs(ratio - 1) < eps
@@ -161,7 +163,7 @@ function fittedFlagMatches(banner, code, { images: [image], strips, region }) {
   const inside = ([x, y, w, h], [qx, qy]) => qx >= x - eps && qy >= y - eps && qx <= x + w + eps && qy <= y + h + eps;
   const samples = [];
   for (let i = 0; i <= 8; i++) for (let j = 0; j <= 8; j++) samples.push([px + pw * i / 8, py + ph * j / 8]);
-  return shaped && samples.every(point => boxes.some(box => inside(box, point)))
+  return shaped && (seeThrough || samples.every(point => boxes.some(box => inside(box, point))))
     && strips.every(strip => { const [x, y, w, h] = numericBox(strip); return x >= px - eps && y >= py - eps && x + w <= px + pw + eps && y + h <= py + ph + eps; });
 }
 

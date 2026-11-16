@@ -155,13 +155,35 @@ function runsOf(samples, unit, tolerance) {
   return merged.map(run => [Math.round(run.start / unit * 2) / 2, run.colour]);
 }
 
-/** A flag's edges, read one pixel in from its outline (anti-aliasing leaves the outermost pixels part see-through). */
+// How far in an edge is read at most, in units: past a see-through sliver some drawings leave along an edge (Papua New
+// Guinea's triangles start a unit and a half in, the Bahamas' stripes two units down), never past a real border.
+const EDGE_DEPTH = 4;
+
+/**
+ * A flag's edges, each read along the first line in from its outline that nothing shows through but a sliver at its
+ * ends (the edge across's own sliver): one pixel in at the least (anti-aliasing leaves the outermost pixels part
+ * see-through), at most EDGE_DEPTH units, and a see-through run at either end no longer than that given to its
+ * neighbour. A flag see-through further in, as Nepal's pennant is, keeps the line one pixel in as it is.
+ */
 function edgesOf(image, unit, tolerance) {
   const { width, height } = image, px = pixelOf(image);
   const column = x => Array.from({ length: height }, (_, y) => px(x, y));
   const row = y => Array.from({ length: width }, (_, x) => px(x, y));
-  return { left: runsOf(column(1), unit, tolerance), right: runsOf(column(width - 2), unit, tolerance),
-    top: runsOf(row(1), unit, tolerance), bottom: runsOf(row(height - 2), unit, tolerance) };
+  const ends = EDGE_DEPTH * unit;
+  const solid = line => line.every((pixel, i) => pixel[3] >= 128 || i < ends || i >= line.length - ends);
+  const trimmed = (runs, length) => {
+    if (runs.length > 1 && runs[0][1] === '-' && runs[1][0] <= EDGE_DEPTH) runs = [[0, runs[1][1]], ...runs.slice(2)];
+    if (runs.length > 1 && runs.at(-1)[1] === '-' && length - runs.at(-1)[0] <= EDGE_DEPTH) runs = runs.slice(0, -1);
+    return runs;
+  };
+  const read = (at, length) => {
+    for (let depth = 1; depth <= ends; depth++) {
+      if (solid(at(depth))) return trimmed(runsOf(at(depth), unit, tolerance), length);
+    }
+    return runsOf(at(1), unit, tolerance);
+  };
+  return { left: read(depth => column(depth), H), right: read(depth => column(width - 1 - depth), H),
+    top: read(depth => row(depth), W), bottom: read(depth => row(height - 1 - depth), W) };
 }
 
 /**

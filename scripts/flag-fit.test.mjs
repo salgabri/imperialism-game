@@ -99,6 +99,13 @@ test('kinds come from the artwork: stripes stretch along themselves, crosses a l
   assert.ok(flagFit('us').margins.left <= 20 && flagFit('us').margins.top <= 15);
   assert.equal(flagFit('no').margins, null);
   assert.ok(flagFit('np').edges.right.every(run => run.color === null), 'Nepal\'s fly is see-through');
+  // flag-icons draws Papua New Guinea's triangles from a unit and a half in and the Bahamas' stripes from two units
+  // down: their edges are read past those slivers, so no strip beside them shows through.
+  for (const code of ['pg', 'bs']) {
+    assert.ok(Object.values(flagFit(code).edges).every(runs => runs.every(run => run.color)), `${code} has no see-through edge`);
+  }
+  assert.deepEqual(Object.keys(FLAG_FITS).filter(code => Object.values(flagFit(code).edges).some(runs => runs?.some(run => !run.color))),
+    ['np'], 'only Nepal\'s pennant is see-through at its edges');
 });
 
 test('stripes span the body, whatever its shape; the region\'s small islands take the outer stripes', () => {
