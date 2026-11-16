@@ -131,7 +131,9 @@ with its black trim of 1995-2020, Pittsburgh's penguin in Vegas gold of 2003-201
 Buffalo's crest in navy of 2011-2020, which rounds 1 and 2 had shown as today's "at
 chip size", now show their own pictures). Only a redraw no one could tell apart at that
 size (a tidied outline, a nearby shade) is the same crest. Seasons no source dates (a
-researcher's "none" for want of any source) keep today's crest, as before. Retired
+researcher's "none" for want of any source) keep today's crest, as before, unless a
+pictured crest follows them directly: that picture, the club's earliest dated one,
+stands for them (the reach-back rule), since today's crest may have come later. Retired
 caricatures of Native Americans are left out, as the game already leaves out
 Washington's retired name: Washington's logo to 2019, Cleveland's Chief Wahoo to 2018,
 the Philadelphia Warriors' to 1962 and, by the same rule since round 3, the Milwaukee
@@ -140,6 +142,14 @@ Atlanta Braves' of 1966 show the monogram. The user confirmed this when round 3 
 ("Keep monograms", 15 November 2026). Cleveland's block C stays the 2019-2021 crest only:
 sources disagree on whether it was the primary logo from 2014, and the club's own
 article says it was secondary until 2019.
+
+Since round 4 a crest known to differ from a pictured one only as a variant of it (a star
+more or fewer, another colouring or trim, small lettering, a one-season anniversary or
+jubilee logo) shows that nearest picture, the variant's own design, rather than a monogram
+that would hide the club altogether: Panathinaikos's ball with two and three stars shows
+its four-star picture, Chelsea's lion in red its yellow colouring of 1996-1999, the Mets'
+first skyline roundel today's. A crest of another design with no picture keeps the
+monogram.
 
 A period picture saved on a solid white box (an archived thumbnail, a PNG of a scan)
 names the box in `crest-eras.json` (`"background": "#ffffff"`), and
@@ -189,36 +199,43 @@ is present. `sync:club-logos` leaves period crests alone.
 
 ### Coverage
 
-As of round 3 (15 November 2026): 974 period crests for 870 club ids, every club id of
-every season file researched. Of the 12,340 club-seasons in the season files (each club id
-in each season year it plays, all before today's season):
+As of round 4 (16 November 2026): 1,062 period crests for 908 club ids, every club id of
+every season file researched, and every one rechecked under the 64 px rule. Of the 12,340
+club-seasons in the season files (each club id in each season year it plays, all before
+today's season; college football and the esports play today's season only):
 
 | Sport | Period crest | Today's crest, researched | Today's crest, undated | Monogram |
 |---|---|---|---|---|
-| Football (men's) | 52% | 45% | 1% | 2% |
-| American football | 47% | 49% | 0% | 5% |
-| Basketball (NBA) | 75% | 25% | 0% | 0% |
-| Basketball (EuroLeague) | 59% | 33% | 1% | 8% |
-| Baseball | 43% | 49% | 1% | 7% |
-| Ice hockey | 42% | 58% | 0% | 0% |
-| Rugby league | 69% | 18% | 0% | 12% |
-| Women's football | 18% | 81% | 0% | 1% |
+| Football (men's) | 59% | 39% | 1% | 1% |
+| American football | 54% | 42% | 0% | 4% |
+| Basketball (NBA) | 76% | 24% | 0% | 0% |
+| Basketball (EuroLeague) | 65% | 28% | 1% | 7% |
+| Baseball | 54% | 40% | 0% | 6% |
+| Ice hockey | 48% | 52% | 0% | 0% |
+| Rugby league | 70% | 18% | 0% | 12% |
+| Women's football | 30% | 70% | 0% | 1% |
 
-The monograms (451 club-seasons) are of three kinds. 128 are the retired caricatures of
-Native Americans above (Washington 1960-2019, Cleveland 1960-2018, the Milwaukee Braves,
-the Atlanta Braves of 1966, the Philadelphia Warriors). Some clubs had no emblem of
-their own: Eastern Suburbs before 1967, Balmain before 1964, the Bills before 1962. The
-rest are crests a source describes but no allowed source pictures: the NFL's of
-1960-1967 (Denver, the Colts' 1960, Chicago, Green Bay's 1960, San Francisco) and San
-Diego's of 1974-1987; MLB's Atlanta Braves of 1967-1986 (no source names a primary logo),
-Baltimore's of 1960-1965 and 1989-1997, Cincinnati's of 1960-1966 and Kansas City's of
-1969-2001; rugby league's Sydney logos of 1960-1977 (Balmain, Norths, St. George, Wests,
-Parramatta to 1979, Penrith), the Sydney Tigers' of 1996 and two 90th-season badges of
-1997; football's Groningen 1994-1996, NAC 1994-1996, MVV 1994-2000, Chelsea's lions of
-1994-1995 and 2000-2005, Crystal Palace 1995-2013, Aberdeen 1994-1997, Derby 1996-1997,
-Wisła 1994-1999 and a few single seasons; the EuroLeague's codes of 2000/01-2006/07
-(below). The undated seasons (64) keep today's crest: no source says which crest the club
-wore (mostly Dutch, Portuguese and Spanish clubs before 2005).
+Round 3 had left 52% of the club-seasons under a period crest and 451 under a monogram;
+round 4 leaves 59% and 387. The monograms are of three kinds. 128 are the retired
+caricatures of Native Americans above (Washington 1960-2019, Cleveland 1960-2018, the
+Milwaukee Braves, the Atlanta Braves of 1966, the Philadelphia Warriors). Some clubs had no
+emblem of their own: Eastern Suburbs before 1967, Balmain before 1964, the Bills before
+1962. The rest are crests of another design that a source describes but no allowed source
+pictures: the NFL's of 1960-1967 (Denver, the Colts' 1960, Chicago's and San Francisco's
+1960-1961, Green Bay's 1960); MLB's Atlanta Braves of 1967-1986 (no source names a
+primary logo before today's of 1987), Baltimore's of 1960-1965 and 1989-1997 and Texas's
+1983; rugby league's Sydney logos of 1960-1977 (Balmain, Norths, St. George, Wests,
+Parramatta to 1979, Penrith), the Sydney Tigers' of 1996 and the Perth Reds' of 1997;
+football's Valladolid 1993/94-1997/98, Sporting Gijón 1993/94-1996/97, Groningen
+1993/94-1995/96, NEC 1994/95-1996/97, CSKA Moscow 2001/02-2003/04, two seasons each of
+Málaga, NAC and Wisła and eleven single seasons; the EuroLeague's codes of 2000/01-2006/07
+(below); Badalona's women of 2023/24-2024/25. The undated seasons (30) keep today's crest:
+no source says which crest the club wore (mostly Dutch, Portuguese and Spanish clubs
+before 2005). Twelve football ids of the Championship Manager seasons are undated too
+but have no crest of today under that id and no picture right after (Osasuna, Las Palmas,
+Numancia, Extremadura, Norwich City of 1993/94-1994/95, Servette, Gaziantepspor and five
+Portuguese clubs since fallen away): their 21 club-seasons show the monogram rather than
+a guess.
 
 A second round (13-14 November 2026) researched the 71 English, Dutch and Portuguese
 clubs the first had left, the Spanish, Italian, German, MLB and NFL seasons it had
@@ -297,13 +314,15 @@ beside Climamio's), the emblem is. A crest first seen by 30 June of a season the
 played (the cutoff flags use) covers that season and the club's earlier seasons of that
 run where no source shows another: Unicaja's and Ülkerspor's, first seen in 2005/06, from
 2001/02. A logo first seen only in a summer after a club's seasons does not reach back,
-as a new logo may have come that summer. So 43 of the 568 club-seasons keep the club's
+as a new logo may have come that summer. So 37 of the 568 club-seasons keep the club's
 code: CSKA Moscow 2001/02 to 2005/06 (a logo first seen in August 2006) and Olimpija
 2000/01 to 2004/05 (round 3 found its dragon roundel in a Slovenian file citing a
 2005/06 source), Dynamo Moscow 2006/07 (July 2007), AEK's 1997 emblem
-(2000/01 to 2003/04, no picture), Siena 2002/03 to 2005/06, and fifteen clubs of the
-first seasons whose logo no source shows or dates (Zadar, PAOK, Pesaro, the London
-Towers, the Skyliners as Opel Skyliners…).
+(2000/01 to 2003/04, no picture), and fourteen clubs of the first seasons whose logo no
+source shows or dates (Zadar, PAOK, Pesaro, the London Towers…). Round 4 pictured
+Siena's Montepaschi logo from 2002/03 (French Wikipedia's copy of the club's file of
+2008), and the Opel Skyliners, whose logo changed only its lettering, show the
+Skyliners' logo of 2000/01.
 
 Barcelona's basketball section wore the club's crest, and its F.C.B. crest of
 1975-2002 is one the football research had found no picture of. Football's Barcelona
@@ -354,6 +373,55 @@ file pages no archive holds: they are recorded as non-free English Wikipedia upl
 and for two of them an earlier upload of the same logo states fair use. Three survive
 only as the articles' thumbnails (Souths' oval at 150 px, Illawarra's logo to 1997 and
 Wests' shield at 125 px).
+
+### Round 4
+
+After round 3 the user asked to go through all the clubs in the game again and search
+for their historical logos (15 November 2026). Round 4 rechecked the 664 club ids round
+3 had not touched: those of rounds 1 and 2 and of the EuroLeague's research, whose 373
+eras of today's crest (about 3,800 club-seasons) had been judged at chip size, now under
+the 64 px rule; and it searched again for the crests round 3 knew of but could not
+picture. Eleven researchers took a league or region each (`data-src/crest-eras/ROUND4.md`);
+`tools/merge-round3.mjs --round 4` replaced the research of each club they changed, and
+round 3's curator patches were applied again (`work/round3/curator-patches.txt`).
+
+It drew 103 period crests and retired 15 (pictures re-dated under a new first year, or
+crests found to be today's or a variant of another picture), so 1,062 ship: 48 more in
+football (Arsenal's crests of 1994/95-2001/02 and its 125th-anniversary crest of 2011/12,
+Juventus's J from 2017/18, Paris Saint-Germain's of 2013/14, Lens's,
+Sassuolo's, Braga's, Benfica's emblem of 1999), 17 in MLB (the Tigers', the Pirates', the
+Angels'), 10 each in the NFL (the Cowboys' star of 1960, the Rams' of 2020) and NHL (the
+Bruins', the Islanders', the North Stars'), 9 in the EuroLeague (Panathinaikos's stars,
+Siena's, Crvena zvezda's of 2014-2018), 4 in the NBA (the Hawks' of 1970 and 2016), 3 in
+rugby league and 2 for women's sides. Fenerbahçe's basketball side wore the sports
+club's emblem (the football club's crest of today) to 2016/17 and one star from 2017/18;
+its second star (2025) is on its crest of today.
+
+The variant rule (above) gave 22 eras their nearest picture instead of the monogram:
+Panathinaikos's two and three stars, Chelsea's red lion, Sheffield United's crest in
+white on black, the jubilee logos of Utrecht and Volendam, Valencia's centenary
+colouring, the Mets' first roundel, the Angels' gold halo, the White Sox's Gothic SOX in
+black and navy, the Reds' first C's, the Royals' crowned shield, the Chargers' helmet of
+1974-1987, the Golden Seals' script in green and gold, the Auckland Warriors' mask, the
+anniversary logos of North Queensland, Penrith, Souths and Wests, the Opel Skyliners and
+IFK Göteborg's crest of the Reebok years. The reach-back rule (above) gave seven undated
+eras the picture worn right after them: PSV's 1993/94-1995/96 (today's crest has the
+stars of 2020), St. Pauli's of the 1990s (today's brown is of 2018), Racing Santander's
+before 2004 and Valencia's before 2005 under both their ids, and De Graafschap's early
+2000s. The Atlanta Braves' seasons of 1967-1986, whose research keeps the monogram but
+whose wording ("No source read names a primary logo") had read as undated, had shown
+today's logo of 1987 since round 3; they show the monogram.
+
+Seven crests of today were brought up to date from their file pages (README, "Club
+crests"): Benfica's badge of 31 October 2026, Sassuolo's of 2025 and Athletic's (from
+Italian Wikipedia, the only one that has those two), Braga's and Fleury 91's of November
+2023 (French Wikipedia), FC Zürich Frauen's two stars and Montpellier's own logo of
+today. Where a club's earlier
+seasons wore the crest being replaced, those seasons picture it first (Braga's of
+1997/98-2017/18, Benfica's women's side under the emblem of 1999). Left as they are:
+Tottenham's cockerel of 2024 and Ankaraspor's crest of 1978 (French and Turkish
+Wikipedia only), and the stars of Gotham, the North Carolina Courage and Orlando, which
+no source dates.
 
 ## Checks
 

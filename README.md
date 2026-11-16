@@ -2657,7 +2657,15 @@ Nineteen more followed the same day, found by comparing every crest of today wit
 club's English Wikipedia infobox as it stands (period-marks.md, "Round 3"): the
 Braves' primary logo (the script and tomahawk, not the cap's A), Rosenborg's of 2024,
 OB's of 2025, and sixteen clubs of the country maps that have added a star or
-redrawn their crest since the crests were first drawn.
+redrawn their crest since the crests were first drawn. Round 4 (16 November 2026)
+renewed seven more: Benfica's, Sassuolo's of 2025, Braga's and Athletic's, and the
+women's sides of FC Zürich, Fleury 91 and Montpellier under their own logos. Where
+only another language's Wikipedia has a club's crest of today, the record names it
+(`wiki`: `it` for Sassuolo's and Athletic's, `fr` for Braga's and Fleury's) and the
+sync reads that Wikipedia's file page and its own upload; `SOURCES.tsv` then links
+that page. A record may also pin a standard thumbnail (`thumb`: 250, 330 or 500 px)
+instead of the original, as college football's 138 school crests do, since
+`upload.wikimedia.org` answers a run of originals with HTTP 429.
 
 Crests are the clubs' trademarks, and most are non-free files that Wikipedia
 hosts under its non-free content policy. `public/club-logos/SOURCES.tsv` records

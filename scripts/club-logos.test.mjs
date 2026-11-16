@@ -64,7 +64,9 @@ test('every club the list gives a crest has its file, a source row, and nothing 
   for (const [id, row] of rows) {
     assert.equal(row.length, 7, `${id}: club, name, image, file, licence, non-free, file page`);
     assert.equal(row[2], `${clubLogoFile(id)}.webp`);
-    assert.match(row[6], /^https:\/\/(en\.wikipedia|commons\.wikimedia)\.org\/wiki\/File:/, `${id}: links its file page`);
+    // A crest of today read from another Wikipedia's file page (club-logos.json "pages" `wiki`) links that page, under
+    // its own name for the File namespace (French Wikipedia's Fichier:).
+    assert.match(row[6], /^https:\/\/([a-z]{2,3}\.wikipedia|commons\.wikimedia)\.org\/wiki\/(File|Fichier):/, `${id}: links its file page`);
   }
 });
 

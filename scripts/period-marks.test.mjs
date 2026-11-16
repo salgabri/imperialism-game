@@ -212,8 +212,7 @@ test('the EuroLeague of 2000/01 to 2025/26: every club wears the crest of its da
     'el-aek-athens': [2001, 2002, 2003, 2004], 'el-buducnost': [2001, 2002, 2003], 'el-cska-moscow': [2002, 2003, 2004, 2005, 2006],
     'el-dynamo-moscow': [2007], 'el-krka': [2002, 2004], 'el-london-towers': [2001, 2002], 'el-lugano': [2001],
     'el-olimpija': [2001, 2002, 2003, 2004, 2005], 'el-oostende': [2002], 'el-ovarense': [2001], 'el-paok': [2001],
-    'el-peristeri': [2001, 2002], 'el-pesaro': [2002, 2005], 'el-siena': [2003, 2004, 2005, 2006],
-    'el-skyliners-frankfurt': [2002, 2005], 'el-spirou-charleroi': [2001, 2002], 'el-st-petersburg-lions': [2001],
+    'el-peristeri': [2001, 2002], 'el-pesaro': [2002, 2005], 'el-spirou-charleroi': [2001, 2002], 'el-st-petersburg-lions': [2001],
     'el-ural-great': [2002], 'el-verona': [2001], 'el-zadar': [2001, 2002],
   };
   let seasons = 0;
@@ -231,8 +230,11 @@ test('the EuroLeague of 2000/01 to 2025/26: every club wears the crest of its da
   assert.equal(seasons, 26, 'the seasons 2000/01 to 2025/26');
   const today = id => clubLogoFile(id);
   for (const [id, year, file] of [
-    // Ülkerspor, whose code EuroLeague files Fenerbahçe under since, wears its own badge.
-    ['el-ulkerspor', 2002, 'el-ulkerspor.2002'], ['el-ulkerspor', 2006, 'el-ulkerspor.2002'], ['el-fenerbahce', 2007, today('el-fenerbahce')],
+    // Ülkerspor, whose code EuroLeague files Fenerbahçe under since, wears its own badge. Fenerbahçe wears the sports
+    // club's emblem (the football club's of today) to 2016/17, one star for its EuroLeague title of 2017 from 2017/18,
+    // the second (2025) on today's crest (round 4).
+    ['el-ulkerspor', 2002, 'el-ulkerspor.2002'], ['el-ulkerspor', 2006, 'el-ulkerspor.2002'], ['el-fenerbahce', 2007, 'd792-1870'],
+    ['el-fenerbahce', 2017, 'd792-1870'], ['el-fenerbahce', 2018, 'el-fenerbahce.2018'], ['el-fenerbahce', 2026, today('el-fenerbahce')],
     ['el-fc-barcelona', 2002, 'el-fc-barcelona.2001'], ['el-fc-barcelona', 2003, today('el-fc-barcelona')],
     // The football club wore the same crest, as FC Barcelona and (in most CM seasons) F.C. Barcelona, to 2001/02.
     ['f-f-c-barcelona', 1994, 'el-fc-barcelona.2001'], ['f-fc-barcelona', 1997, 'el-fc-barcelona.2001'],
@@ -261,17 +263,17 @@ test('rugby league 1960 to 1997: every club wears the crest of its day, the era 
   // The seasons that show a monogram (docs/design/period-marks.md, "Coverage"). Eastern Suburbs had no logo before 1967
   // and Balmain no badge before 1964. A logo known to differ that no picture shows: Parramatta's to 1979, Penrith's
   // before its panther of 1978, the badges of Balmain, Norths, St. George and Wests before 1978, the Sydney Tigers'
-  // roundel of 1996, Souths' and Wests' 90th-season badges of 1997. No source dates the Perth Reds' logo of 1997.
+  // roundel of 1996. No source dates the Perth Reds' logo of 1997. Souths' and Wests' 90th-season badges of 1997, variants
+  // of the badges worn before, show those (round 4).
   const monogram = {
     'nrl-eastern-suburbs-roosters': [[1960, 1966]],
     'nrl-parramatta-eels': [[1960, 1979]],
     'nrl-penrith-panthers': [[1967, 1977]],
-    'nrl-western-suburbs-magpies': [[1960, 1977], [1997, 1997]],
+    'nrl-western-suburbs-magpies': [[1960, 1977]],
     'nrl-balmain-tigers': [[1960, 1977]],
     'nrl-sydney-tigers': [[1996, 1996]],
     'nrl-north-sydney-bears': [[1960, 1977]],
     'nrl-st-george-dragons': [[1960, 1977]],
-    'nrl-south-sydney-rabbitohs': [[1997, 1997]],
     'nrl-perth-reds': [[1997, 1997]],
   };
   const seasons = readdirSync(new URL('public/rugby-league/', root)).filter(name => /^nrl-(?:sl-)?(?:19[6-8]\d|199[0-7])\.json$/.test(name));
@@ -358,6 +360,56 @@ test('round 3: crests of the day in every sport, retired caricatures as monogram
     const row = read('public/club-logos/SOURCES.tsv').split('\n').find(line => line.startsWith(`${id}\t`));
     assert.equal(row?.split('\t')[3], name, `${id}: SOURCES.tsv names the file page's crest`);
   }
+});
+
+test('round 4: every club rechecked under the 64 px rule, a variant shows its nearest picture, crests of today renewed', () => {
+  const today = id => clubLogoFile(id);
+  for (const [id, year, file] of [
+    // Crests the rounds before kept at today's design, told apart at 64 px and pictured: Arsenal's four crests of
+    // 1994/95-2025/26, Juventus's J from 2017/18, PSG's of 2013/14, the Hawks' and Bruins' and Tigers' older marks.
+    ['f-arsenal', 1995, 'f-arsenal.1995'], ['f-arsenal', 2012, 'f-arsenal.2012'], ['f-arsenal', 2026, today('f-arsenal')],
+    ['f-juventus', 2017, 'f-juventus.2005'], ['f-juventus', 2018, 'f-juventus.2018'],
+    ['f-paris-saint-germain', 2013, 'f-paris-saint-germain.2003'], ['f-paris-saint-germain', 2014, 'f-paris-saint-germain.2014'],
+    ['b-atlanta-hawks', 1970, 'b-atlanta-hawks.1970'], ['nhl-boston-bruins', 1961, 'nhl-boston-bruins.1961'],
+    ['mlb-detroit-tigers', 1994, 'mlb-detroit-tigers.1994'], ['nfl-dallas-cowboys', 1960, 'nfl-dallas-cowboys.1960'],
+    ['nfl-dallas-cowboys', 1964, today('nfl-dallas-cowboys')], ['nrl-sydney-roosters', 2007, 'nrl-sydney-roosters.2007'],
+    ['el-siena', 2003, 'el-siena.2003'],
+    // A crest that differs from a pictured one only as a variant (stars, colours, small lettering, a one-season
+    // anniversary logo) shows that nearest picture, not a monogram: Panathinaikos's two- and three-star ball under the
+    // four-star picture, Chelsea's red lion under its yellow colouring, the Mets' first roundel under today's.
+    ['el-panathinaikos', 2002, 'el-panathinaikos.2008'], ['f-chelsea', 1994, 'f-chelsea.1996'],
+    ['mlb-new-york-mets', 1962, today('mlb-new-york-mets')], ['nrl-western-suburbs-magpies', 1997, 'nrl-western-suburbs-magpies.1978'],
+    ['nhl-california-golden-seals', 1971, 'nhl-california-golden-seals.1975'],
+    // A different design with no picture keeps the monogram; the retired caricatures stay monograms. The Braves' logos
+    // before today's of 1987 are named by no source: the monogram, not the logo of 1987.
+    ['nrl-perth-reds', 1997, null], ['mlb-cleveland-indians', 2018, null], ['mlb-milwaukee-braves', 1960, null],
+    ['mlb-atlanta-braves', 1967, null], ['mlb-atlanta-braves', 1986, null], ['mlb-atlanta-braves', 1987, today('mlb-atlanta-braves')],
+    // Undated seasons right before a pictured crest show that picture, not today's crest of later years (PSV's stars
+    // of 2020, St. Pauli's brown of 2018, Racing's "RC" of 2004, Valencia's C.F. crest of 2009/10) or a monogram.
+    ['f-psv', 1994, 'f-psv.1997'], ['f-fc-st-pauli', 1996, 'f-fc-st-pauli.2007'], ['f-racing-santander', 1995, 'f-racing-club-de-santander.2004'],
+    ['f-racing-club-de-santander', 1994, 'f-racing-club-de-santander.2004'], ['f-valencia-cf', 1995, 'f-valencia-cf.2005'],
+    ['f-valencia-c-f', 1994, 'f-valencia-cf.2005'], ['f-de-graafschap', 2000, 'f-de-graafschap.2007'],
+    // Women's sides under their own marks: FC Zürich Frauen's two stars, Fleury's logo of November 2023, Montpellier
+    // under the HSC's roundel of 2025 before its own Montpellier FC logo of today.
+    ['w-fc-zurich', 2024, 'w-fc-zurich.2024'], ['w-fc-fleury-91', 2024, 'w-fc-fleury-91.2024'],
+    ['w-montpellier-fc', 2026, today('d250-859')],
+  ]) assert.equal(crestFile(id, year), file, `${id} ${year}`);
+  // Crests of today brought up to date from their file pages, English Wikipedia's or (where only that one has it) Italian
+  // or French Wikipedia's: Benfica, Sassuolo's of 2025, Braga, Athletic, and the women's sides' own logos.
+  const pages = JSON.parse(read('scripts/data/club-logos.json')).pages;
+  const sources = read('public/club-logos/SOURCES.tsv').split('\n');
+  for (const [id, name, wiki] of [['d620-1487', 'SL Benfica logo.svg'], ['d380-3800256', 'Sassuolocalcio2026.svg', 'it'],
+    ['d620-1488', 'Logo SC Braga 2018.svg', 'fr'], ['d724-1664', 'Athletic Club Bilbao logo.svg', 'it'],
+    ['w-fc-zurich', 'FC Zurich logo (with two stars).svg'], ['w-fc-fleury-91', 'Logo FC Fleury 91 - 2023-11.svg', 'fr'],
+    ['w-montpellier-fc', 'Montpellier FC logo.png']]) {
+    assert.equal(pages[id]?.file, name, id);
+    assert.equal(pages[id]?.wiki, wiki, `${id}: its file page's Wikipedia`);
+    const row = sources.find(line => line.startsWith(`${id}\t`))?.split('\t');
+    assert.equal(row?.[3], name, `${id}: SOURCES.tsv names the file page's crest`);
+    if (wiki) assert.ok(row[6].startsWith(`https://${wiki}.wikipedia.org/wiki/`), `${id}: links ${wiki}.wikipedia.org's file page`);
+  }
+  for (const id of ['w-fc-zurich', 'w-fc-fleury-91', 'w-montpellier-fc']) assert.equal(today(id), id, `${id}: a file of its own`);
+  assert.equal(today('f-sassuolo'), 'd380-3800256', 'the all-leagues club shares its domestic twin\'s renewed crest');
 });
 
 test('TeamMark and SquadFlag draw the crest of the season on screen', () => {
