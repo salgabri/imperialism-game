@@ -1,42 +1,74 @@
 import React, { memo } from 'react';
+import { flagLip } from '../engine/flagFit.js';
 import { useFlagBitmap } from './flagBitmaps.js';
 
 /**
  * One geographic banner in map coordinates, drawn once in the map's defs: WorldMap shows it through each of the
  * region's land parts (a `<use>` clipped to the part). Only its field stretches; an emblem never does. A club's crest
- * is an emblem on its colour. `scale` is device px per map unit: SVG artwork is drawn from its bitmap while the bitmap
- * covers the drawn size (flagBitmaps.js), and from the SVG itself beyond that.
+ * is an emblem on its colour. A whole flag fills the box its fit gives it (`fitLayout`, engine/flagFit.js), and strips
+ * in the colours of its edges carry it on over the rest of the region; each strip's gradient sits beside the banner in
+ * the defs. `scale` is device px per map unit: SVG artwork is drawn from its bitmap while the bitmap covers the drawn
+ * size (flagBitmaps.js), and from the SVG itself beyond that.
  */
 function FlagArt({ flag: f, scale = 0 }) {
   const { bbox: b, symbolLayout: layout } = f;
   const crest = !!f.crestUrl;
   const layered = !crest && !!(layout && f.fieldUrl && f.symbolUrl);
-  const flagHref = useArtwork(crest || layered ? null : f.url, b, scale);
+  const fit = !crest && !layered ? f.fitLayout || null : null;
+  const art = fit ? fit.flag : b;
+  const flagHref = useArtwork(crest || layered ? null : f.url, art, scale, fit?.kind);
   const fieldHref = useArtwork(layered ? f.fieldUrl : null, layout?.field, scale);
   const symbolHref = useArtwork(layered ? f.symbolUrl : null, layout?.symbol, scale);
+  const gradientId = side => `fi-flag-${f.id}-${side}`;
   return (
-    <g id={`fi-flag-${f.id}`} data-owner={f.ownerId} data-flag-source={f.url}
-      data-flag-layout={crest ? 'crest' : layered ? 'symbol-aware' : 'native'} pointerEvents="none">
-      <rect x={b.x} y={b.y} width={b.w} height={b.h} fill={f.color} />
-      {/* Land too small for a crest keeps the plain colour. */}
-      {crest ? layout && <image data-flag-symbol="" href={f.crestUrl} x={layout.symbol.x} y={layout.symbol.y}
-        width={layout.symbol.w} height={layout.symbol.h} preserveAspectRatio="xMidYMid meet" />
-      : layered ? <>
-        <image data-flag-field="" href={fieldHref} x={layout.field.x} y={layout.field.y}
-          width={layout.field.w} height={layout.field.h} preserveAspectRatio="none" />
-        <image data-flag-symbol="" href={symbolHref} x={layout.symbol.x} y={layout.symbol.y}
+    <>
+      {fit?.strips.filter(strip => strip.stops).map(strip => (
+        <linearGradient key={strip.side} id={gradientId(strip.side)} gradientUnits="userSpaceOnUse"
+          x1={strip.axis === 'x' ? strip.from : 0} x2={strip.axis === 'x' ? strip.to : 0}
+          y1={strip.axis === 'y' ? strip.from : 0} y2={strip.axis === 'y' ? strip.to : 0}>
+          {strip.stops.map((stop, i) => <stop key={i} offset={stop.offset} stopColor={stop.color}
+            stopOpacity={stop.opacity === 1 ? undefined : stop.opacity} />)}
+        </linearGradient>
+      ))}
+      <g id={`fi-flag-${f.id}`} data-owner={f.ownerId} data-flag-source={f.url}
+        data-flag-layout={crest ? 'crest' : layered ? 'symbol-aware' : 'native'} data-flag-fit={fit?.kind}
+        pointerEvents="none">
+        <rect x={b.x} y={b.y} width={b.w} height={b.h} fill={f.color} />
+        {/* Land too small for a crest keeps the plain colour. */}
+        {crest ? layout && <image data-flag-symbol="" href={f.crestUrl} x={layout.symbol.x} y={layout.symbol.y}
           width={layout.symbol.w} height={layout.symbol.h} preserveAspectRatio="xMidYMid meet" />
-      </> : <image href={flagHref} x={b.x} y={b.y} width={b.w} height={b.h} preserveAspectRatio="none" />}
-    </g>
+        : layered ? <>
+          <image data-flag-field="" href={fieldHref} x={layout.field.x} y={layout.field.y}
+            width={layout.field.w} height={layout.field.h} preserveAspectRatio="none" />
+          <image data-flag-symbol="" href={symbolHref} x={layout.symbol.x} y={layout.symbol.y}
+            width={layout.symbol.w} height={layout.symbol.h} preserveAspectRatio="xMidYMid meet" />
+        </> : <>
+          {fit?.strips.map(strip => <rect key={strip.side} data-flag-strip={strip.side} x={strip.x} y={strip.y}
+            width={strip.w} height={strip.h} fill={strip.color || `url(#${gradientId(strip.side)})`} />)}
+          <image href={flagHref} x={art.x} y={art.y} width={art.w} height={art.h} preserveAspectRatio="none" />
+          {/* An SVG's layers leave a seam along its edge, which a lip in the strip's colours hides (engine/flagFit.js). */}
+          {flagHref === f.url && fit?.strips.map(({ side, color }) => {
+            const lip = flagLip(art, side, scale);
+            return <rect key={`lip-${side}`} data-flag-lip={side} x={lip.x} y={lip.y} width={lip.w} height={lip.h}
+              fill={color || `url(#${gradientId(side)})`} />;
+          })}
+        </>}
+      </g>
+    </>
   );
 }
 
-/** An artwork layer's href: its bitmap while that covers the layer's drawn size in device px, else the SVG. */
-function useArtwork(url, box, scale) {
+/**
+ * An artwork layer's href: its bitmap while that covers the layer's drawn size in device px, else the SVG. A flag of
+ * horizontal stripes (`kind` rows) is the same at any width, so only its height counts; one of vertical stripes only its
+ * width; a plain one neither.
+ */
+function useArtwork(url, box, scale, kind) {
   // The size it is drawn at puts the biggest flags first in the rasteriser's queue.
   const bitmap = useFlagBitmap(url, url && box ? Math.max(box.w, box.h) * scale : 0);
   if (!url) return null;
-  return bitmap && box.w * scale <= bitmap.width && box.h * scale <= bitmap.height ? bitmap.href : url;
+  return bitmap && (kind === 'rows' || kind === 'plain' || box.w * scale <= bitmap.width)
+    && (kind === 'cols' || kind === 'plain' || box.h * scale <= bitmap.height) ? bitmap.href : url;
 }
 
 export default memo(FlagArt);

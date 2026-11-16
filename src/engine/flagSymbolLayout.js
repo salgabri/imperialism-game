@@ -3,36 +3,16 @@
 // the emblem's original focal point. All coordinates are projected map units.
 // Raster cells only propose candidates. A vector sweep certifies the complete
 // padded rectangle, including holes, before any symbol is returned.
+import { landIntervals, makeRaster, regionCountries } from './landRaster.js';
 
 const CACHE = new WeakMap();
-const MAX_SIDE = 120;
-const MAX_CELLS = 10000;
 const MAX_CANDIDATES = 20;
 const SYMBOL_PADDING = 1.1;
 const clamp = (n, lo, hi) => Math.max(lo, Math.min(hi, n));
 const finiteBox = b => b && [b.x, b.y, b.w, b.h].every(Number.isFinite) && b.w > 0 && b.h > 0;
 
 function prepare(component) {
-  const grouped = new Map();
-  for (const part of component.parts || []) {
-    const id = String(part.countryId);
-    if (!grouped.has(id)) grouped.set(id, []);
-    for (const ring of part.rings || []) {
-      if (ring.length >= 3 && ring.every(p => p.length >= 2 && Number.isFinite(p[0]) && Number.isFinite(p[1]))) grouped.get(id).push(ring);
-    }
-  }
-  const countries = [];
-  const allEdges = [];
-  for (const rings of grouped.values()) {
-    const edges = [];
-    for (const ring of rings) for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-      const a = ring[j], b = ring[i];
-      if (a[0] === b[0] && a[1] === b[1]) continue;
-      const edge = { a, b, country: edges, x0: Math.min(a[0], b[0]), x1: Math.max(a[0], b[0]), y0: Math.min(a[1], b[1]), y1: Math.max(a[1], b[1]) };
-      edges.push(edge); allEdges.push(edge);
-    }
-    if (edges.length) countries.push(edges);
-  }
+  const { countries, allEdges } = regionCountries(component);
   // Native atlas borders have matching segments. Remove only proven internal
   // duplicates from the certification sweep; retaining thousands of vanished
   // national borders would turn a late-game empire fit into quadratic work.
@@ -104,78 +84,6 @@ export function containsCountry(edges, x, y) {
     else if (a[1] > y && b[1] <= y && cross < 0) winding--;
   }
   return winding !== 0;
-}
-
-// Preserve each country's nonzero winding before OR-ing countries. Opposite
-// ring orientations in neighboring countries must never cancel owned land.
-function landIntervals(countries, y, epsilon = 0) {
-  const intervals = [];
-  for (const edges of countries) {
-    const events = [];
-    for (const { a, b, y0, y1 } of edges) {
-      if (y < y0 || y >= y1) continue;
-      events.push([a[0] + (y - a[1]) * (b[0] - a[0]) / (b[1] - a[1]), b[1] > a[1] ? 1 : -1]);
-    }
-    events.sort((a, b) => a[0] - b[0]);
-    let winding = 0, start = 0;
-    for (let i = 0; i < events.length;) {
-      const x = events[i][0];
-      let delta = 0;
-      while (i < events.length && events[i][0] === x) delta += events[i++][1];
-      if (!winding && winding + delta) start = x;
-      if (winding && !(winding + delta)) intervals.push([start, x]);
-      winding += delta;
-    }
-  }
-  intervals.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
-  const merged = [];
-  for (const interval of intervals) {
-    const last = merged[merged.length - 1];
-    if (last && interval[0] <= last[1] + epsilon) last[1] = Math.max(last[1], interval[1]);
-    else merged.push(interval.slice());
-  }
-  return merged;
-}
-
-function makeRaster(geometry) {
-  const b = geometry.bbox;
-  const cell = Math.max(b.w / MAX_SIDE, b.h / MAX_SIDE, Math.sqrt(b.w * b.h / MAX_CELLS));
-  const nx = Math.ceil(b.w / cell) + 2, ny = Math.ceil(b.h / cell) + 2;
-  const x0 = b.x - cell, y0 = b.y - cell;
-  const mask = new Uint8Array(nx * ny);
-  let landCount = 0;
-  for (let row = 1; row < ny - 1; row++) {
-    for (const [left, right] of landIntervals(geometry.countries, y0 + (row + 0.5) * cell)) {
-      const start = clamp(Math.ceil((left - x0) / cell - 0.5), 1, nx - 1);
-      const end = clamp(Math.ceil((right - x0) / cell - 0.5), 1, nx - 1);
-      mask.fill(1, row * nx + start, row * nx + end);
-      landCount += end - start;
-    }
-  }
-  if (!landCount) return null;
-  // Select a connected substantial landmass, not an isolated, conveniently
-  // round speck. This choice is fixed by geography, never by zoom or labels.
-  const visited = new Uint8Array(mask.length);
-  let main = [];
-  for (let start = 0; start < mask.length; start++) {
-    if (!mask[start] || visited[start]) continue;
-    const flood = [start]; visited[start] = 1;
-    for (let j = 0; j < flood.length; j++) {
-      const i = flood[j];
-      for (const next of [i - 1, i + 1, i - nx, i + nx]) {
-        if (mask[next] && !visited[next]) { visited[next] = 1; flood.push(next); }
-      }
-    }
-    if (flood.length > main.length) main = flood;
-  }
-  const prefix = new Uint32Array((nx + 1) * (ny + 1));
-  for (let y = 0; y < ny; y++) for (let x = 0; x < nx; x++) {
-    const p = (y + 1) * (nx + 1) + x + 1;
-    prefix[p] = (mask[y * nx + x] ? 0 : 1) + prefix[p - 1] + prefix[p - nx - 1] - prefix[p - nx - 2];
-  }
-  const mainMask = new Uint8Array(mask.length);
-  for (const i of main) mainMask[i] = 1;
-  return { cell, nx, ny, x0, y0, prefix, main, mainMask, area: landCount * cell * cell };
 }
 
 function rasterFits(r, cx, cy, w, h) {

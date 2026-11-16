@@ -11,6 +11,7 @@ import { FLAG_CODES, flagUrl } from '../data/flags.js';
 import { FLAG_SYMBOLS } from '../data/flagSymbols.js';
 import { crestUrl } from '../data/crests.js';
 import { regionClips } from '../engine/flagClips.js';
+import { BANNER_PAD, flagFit, layoutFlagFit } from '../engine/flagFit.js';
 import { flagRegionIndexSteps } from '../engine/flagRegions.js';
 import { layoutFlagSymbol } from '../engine/flagSymbolLayout.js';
 import { runQuietly } from '../engine/quietTurns.js';
@@ -140,6 +141,8 @@ export function handleMapMove(e) {
  * through: one per territory and region, its parts joined (engine/flagClips.js, kept per region object).
  * `markOf(ownerId)` says what an owner flies: `{ crestUrl }` for a club with a crest, else `{ nationId }` for a flag, and
  * the `color` behind it; an owner with neither flies nothing. `idPrefix` keeps two maps' banners apart in one document.
+ * A flag with a separated emblem places the emblem (engine/flagSymbolLayout.js); a whole flag, or one whose emblem has
+ * no room, is fitted to its land whole (`fitLayout`, engine/flagFit.js).
  * → { flagParts: Map(territory id → [{ id, d }]), flagPatterns }
  */
 function layoutBanners(components, markOf, { idPrefix = '' } = {}) {
@@ -152,12 +155,15 @@ function layoutBanners(components, markOf, { idPrefix = '' } = {}) {
     // a country's mainland and overseas polygons need different flag tiles.
     const id = idPrefix + component.key.split('|').slice(0, 2).join('-').replace(/[^a-zA-Z0-9_-]/g, '-');
     const b = component.bbox;
-    const symbolProfile = crestUrl ? CREST_PROFILE : FLAG_SYMBOLS[FLAG_CODES[nationId]];
+    const code = crestUrl ? null : FLAG_CODES[nationId];
+    const symbolProfile = crestUrl ? CREST_PROFILE : FLAG_SYMBOLS[code];
     const symbolLayout = symbolProfile ? layoutFlagSymbol(component, symbolProfile) : null;
+    const fit = !crestUrl && !symbolLayout ? flagFit(code) : null;
     flagPatterns.push({ id, ownerId: component.ownerId, url, color, symbolProfile, symbolLayout, crestUrl,
+      fitLayout: fit ? layoutFlagFit(component, fit) : null,
       fieldUrl: symbolProfile?.fieldFile ? `${import.meta.env.BASE_URL}${symbolProfile.fieldFile}` : null,
       symbolUrl: symbolProfile?.symbolFile ? `${import.meta.env.BASE_URL}${symbolProfile.symbolFile}` : null,
-      bbox: { x: b.x - .1, y: b.y - .1, w: b.w + .2, h: b.h + .2 } });
+      bbox: { x: b.x - BANNER_PAD, y: b.y - BANNER_PAD, w: b.w + 2 * BANNER_PAD, h: b.h + 2 * BANNER_PAD } });
     for (const { countryId, d } of regionClips(component)) {
       if (!flagParts.has(countryId)) flagParts.set(countryId, []);
       flagParts.get(countryId).push({ id, d });
