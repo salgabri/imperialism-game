@@ -200,14 +200,14 @@ const isLan = event => event?.tier === 60 && !/qualifier/i.test(event?.title ?? 
 
 /**
  * How the real maps went, for the match model (src/sports/valorant.js) and its checks (scripts/simulation-realism.mjs):
- * the maps from `from` whose ten players had each played MIN_GAMES maps before, as every rated player has, each at its own
- * pre-map Elo odds. Their rounds, overtimes and scores (`losers`: the loser's rounds in a map won 13–x; `otFinals`), the
+ * the maps from `from` (and before `until`, when given) whose ten players had each played MIN_GAMES maps before, as every
+ * rated player has, each at its own pre-map Elo odds. Their rounds, overtimes and scores (`losers`: the loser's rounds in a map won 13–x; `otFinals`), the
  * economy of their rounds (`roundStats`: how often the pistol's winner took the next round, the bonus round and the
  * broken buy went as they do, and a later round went to the previous one's winner), the series' scores (`series`), the
  * favourite's record by its odds (`favourites`), the maps by their odds (`odds`: [bin, maps, overtimes, favourite won,
  * rounds]), and the host nation's edge at the VCT's LANs (`home`, a side of three of its players or more).
  */
-export function playOf(series, { scale, starts, homes, from, nationOf }) {
+export function playOf(series, { scale, starts, homes, from, until = null, nationOf }) {
   const play = { from, minGames: MIN_GAMES, maps: 0, rounds: 0, ot: 0, losers: {}, otFinals: {},
     roundStats: { rounds: 0, defence: 0, afterPistol: [0, 0], bonus: [0, 0], broken: [0, 0], lean: [0, 0] }, series: {} };
   const byOdds = new Map();
@@ -220,7 +220,7 @@ export function playOf(series, { scale, starts, homes, from, nationOf }) {
       const host = nationOfFlag(one.event.flag);
       if (host) lan.push({ host, keys: sides.map(side => side.map(player => player.key)), surprise: won - e });
     }
-    if (one.date < from) return;
+    if (one.date < from || (until && one.date >= until)) return;
     const seasoned = sides.flat().every(player => player.games >= MIN_GAMES);
     if (current?.one !== one) {
       current = { one, odds: e, seasoned, won: [0, 0] };

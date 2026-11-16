@@ -173,6 +173,7 @@ npm run sync:counter-strike # Counter-Strike's player Elo from Liquipedia export
 npm run build-counter-strike # rebuild the Counter-Strike nations from that snapshot (--check compares byte for byte)
 npm run sync:valorant    # Valorant's player Elo from vlr.gg's results cached in data-src/vlr/ into scripts/data/valorant-elo.json (--fetch fetches the pages the cache lacks)
 npm run build-valorant   # rebuild the Valorant nations from that snapshot (--check compares byte for byte)
+npm run build:valorant-seasons # rebuild Valorant's earlier seasons, 2023-2025, from the sync's year-end snapshots (--check)
 npm run sync:league-of-legends # League of Legends' player Elo from gol.gg's results cached in data-src/golgg/ into scripts/data/league-of-legends-elo.json (--fetch fetches the pages the cache lacks)
 npm run build-league-of-legends # rebuild the League of Legends nations from that snapshot (--check compares byte for byte)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
@@ -409,8 +410,9 @@ manager of the theatre's favourite, with decisions from the first match.
    NRL.com's match statistics, but 2008: Rugby League 2, the overall ours; before 1998 from the Rugby League
    Project's team lists), the premiership's clubs on the map of their day, Rocket League its 2026 then its
    [earlier seasons](#rocket-league-seasons) 2025 back to 2016 (the Elo of Liquipedia's results at each year's end),
-   Counter-Strike its 2026 (the Elo of Liquipedia's results to November), Valorant its 2026 (the Elo of vlr.gg's results
-   to November) and League of Legends its 2026 (the Elo of gol.gg's results to November).
+   Counter-Strike its 2026 (the Elo of Liquipedia's results to November), Valorant its 2026 then its
+   [earlier seasons](#valorant-seasons) 2025 back to 2023 (the Elo of vlr.gg's results at each year's end) and League of
+   Legends its 2026 (the Elo of gol.gg's results to November).
    The Season list names a season by its years, adding "· computed", "· converted"
    or "· fan-made" where its label calls its ratings so ("1969/70 · computed"); a
    year with two seasons (football's 1993/94 and 1989/90, the NFL's and AFL's of
@@ -1116,8 +1118,8 @@ from 2023's season (its first qualifiers in September 2022) to 15 November 2026,
 the same Elo, map by map, a team playing at its five players' mean, on the same scale (RieNs's 2,445 is 96); held out on
 the last 180 days its predictions were calibrated (log loss 0.638). A player plays for the nation he last played for at
 the Esports Nations Cup, else the flag vlr.gg files him under; 2,437 players have played within the year, and 63 nations
-have the five a map needs, from Turkey, Canada and South Korea down. Nothing is estimated. See the
-[design notes](docs/design/valorant.md).
+have the five a map needs, from Turkey, Canada and South Korea down. Nothing is estimated. Each year from 2023 is an
+[earlier season](#valorant-seasons). See the [design notes](docs/design/valorant.md).
 
 **League of Legends** — `src/data/rosters.league-of-legends.js`, from every game gol.gg records of the leagues and the
 international events from July 2025 (where gol.gg stopped answering the fetch) to 14 November 2026, fetched the same way
@@ -2503,6 +2505,32 @@ year from 2016 to 2025, nations only. Pick one under **Season** in setup. Each s
 The [design notes](docs/design/rocket-league.md#earlier-seasons) give each season's nations and
 scoring.
 
+## Valorant seasons
+
+Valorant can be played on three earlier seasons as well as the built-in 2026: the end of every
+year from 2023 to 2025, nations only. Pick one under **Season** in setup. Each season is a file in
+`public/valorant/` (85–108 KB) that loads only when chosen.
+
+- **Ratings** are the same Elo as the built-in season's, run over vlr.gg's results up to 31
+  December of that year: who was rated then (20 maps behind him, one within the year), on the
+  same scale (Elo / 25 − 2), each nation's seven best with its five best playing. The cache begins
+  in September 2022, so 2023 is the first season.
+- **Nations:** 48 at the end of 2023 (the United States, Turkey and Canada lead), 60 in 2024 (South
+  Korea first) and 61 in 2025 (Turkey). A player plays for the nation the whole record gives him,
+  whichever year it is, for the team he played for that December.
+- **Maps by year:** each season plays its series on its December's map pool, the seven maps played
+  most in the year's last thousand (2023's has Breeze and Lotus, 2024's Abyss and Pearl, 2025's
+  Corrode). Its rounds are today's model, as each year's real rounds went as today's do.
+- **Credit:** `public/valorant/ATTRIBUTION.txt` credits vlr.gg, whose match results the ratings
+  are computed from. To rebuild:
+
+  ```bash
+  npm run sync:valorant                 # the year-end snapshots in scripts/data/valorant-seasons/, from the cache in data-src/vlr/
+  npm run build:valorant-seasons        # the season files, their listing, the map pools and the audit (--check compares byte for byte)
+  ```
+
+The [design notes](docs/design/valorant.md#earlier-seasons) give each season's nations and maps.
+
 ## Squad economics
 
 Beating a team claims one player. Strength (`EFF`) is the best-lineup rating, so
@@ -3036,6 +3064,8 @@ public/
   tennis/              the built-in earlier tennis seasons (tennis-*.json), fetched when chosen
   womens-tennis/       the built-in earlier women's tennis seasons (wta-*.json), fetched when chosen
   rugby-league/        the built-in earlier rugby league seasons (nrl-2008.json to nrl-2024.json), fetched when chosen
+  rocket-league/       the built-in earlier Rocket League seasons (rl-2016.json to rl-2025.json), fetched when chosen
+  valorant/            the built-in earlier Valorant seasons (val-2023.json to val-2025.json), fetched when chosen
   fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
   textures/            former cartographic paper texture (unused since v4)
   flags/               176 vendored flag SVGs

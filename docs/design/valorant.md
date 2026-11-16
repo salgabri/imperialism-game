@@ -166,6 +166,39 @@ among the sixteen strongest nations the hosts win 53.3% of their series (49.6% a
 not offered: any player plays any place, so the best-rated player is always the one who most
 improves a lineup.
 
+## Earlier seasons
+
+Every year from 2023 to 2025 is a season of its own (`val-2023` to `val-2025`, chosen under Season in setup): its
+players as the Elo of vlr.gg's results stood on its last day. The sync runs the same Elo over the maps up to 31 December
+only and keeps who was rated then by today's rules, 20 maps behind him and one within the year; each nation names its seven
+best and plays its five best, as today. A player plays for the nation the whole record gives him (his Esports Nations Cup
+team, else his flags), whichever year it is: a country is a person's, and the record's national-team event is recent. His
+team is the one he played for that December. The cache begins in September 2022 with 2023's first Challengers
+qualifiers, so 2023 is the first whole year and the first season.
+
+| Season | Rated | Nations | Strongest | Real maps | Rounds a map | Overtime | Map pool |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2023 | 1,810 | 48 | United States 82.8, Turkey 79.6, Canada 79.4 | 2,397 | 21.29 | 11.9% | Haven, Ascent, Lotus, Bind, Split, Sunset, Breeze |
+| 2024 | 2,437 | 60 | South Korea 84.4, Turkey 83.6, Indonesia 82.8 | 4,786 | 21.15 | 11.5% | Haven, Bind, Sunset, Ascent, Abyss, Pearl, Split |
+| 2025 | 2,277 | 61 | Turkey 88.2, South Korea 85.2, Canada 84.4 | 4,994 | 21.15 | 11.3% | Haven, Split, Bind, Sunset, Abyss, Pearl, Corrode |
+
+2023's United States are The Guard's neT and Evil Geniuses' Demon1, the year EG won Champions; 2024's South Korea leads
+behind Gen.G's Lakia.
+
+**Each year's maps.** A season plays its series on its December's pool: the seven maps played most in the year's last
+thousand on vlr.gg, which hold exactly seven each year (an eighth, Lotus, appears once in 2025's). Maps come and go:
+Sunset came in during 2023, Abyss in 2024 and Corrode in 2025, and Lotus sat out the ends of 2024 and 2025. The rounds
+are today's model: each year's real maps between seasoned players went as today's do (the pistol's winner took the next
+round 86.7–87.6% of the time, the bonus round went to the team on saved weapons 42–44%, a later round to its
+predecessor's winner 58.5–59.2%, and maps went to overtime 11.3–11.9%; only the broken buy moved, from 81% in 2023 and
+2024 to 84.5% in 2025). So only the maps' names differ: a season's odds and its simulation version are today's.
+
+`npm run build:valorant-seasons` writes each season's file (`public/valorant/val-<year>.json`, format 1, kind `val`),
+`public/valorant/ATTRIBUTION.txt` (vlr.gg), the listing `src/data/valorantSeasons.js`, the pools
+`src/data/valorantMapPools.js` and `docs/design/valorant-seasons-audit.json` (each season's nations, who is left out,
+its pool and its real maps), from the sync's `scripts/data/valorant-seasons/<year>.json`; `--check` compares them byte
+for byte.
+
 ## Known limits
 
 - Nations only: the orgs (Fnatic, Sentinels, Paper Rex…) need a map of their own.
@@ -173,4 +206,4 @@ improves a lineup.
 - 130 rated players play for no nation: Singapore's (Jinggg, STYRON…), Hong Kong's and others' whose country the map does
   not draw, and those vlr.gg files under no country; 55 more are from a nation with fewer than five.
 - vlr.gg's events before VCT 2023 are not read (the cache begins with 2023's first Challengers qualifiers, in September
-  2022), so the game has November 2026's Valorant only.
+  2022), so the earliest season is the end of 2023.

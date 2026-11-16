@@ -112,6 +112,7 @@
     "build-counter-strike": "node scripts/build-counter-strike.mjs",
     "sync:valorant": "node scripts/sync-valorant.mjs",
     "build-valorant": "node scripts/build-valorant.mjs",
+    "build:valorant-seasons": "node scripts/build-valorant-seasons.mjs",
     "sync:league-of-legends": "node scripts/sync-league-of-legends.mjs",
     "build-league-of-legends": "node scripts/build-league-of-legends.mjs",
     "test:domestic": "node --test scripts/domestic-data.test.mjs scripts/domestic-geometry.test.mjs scripts/domestic-campaign.test.mjs scripts/domestic-routing.test.mjs scripts/nba-map.test.mjs scripts/club-maps.test.mjs scripts/europe-maps.test.mjs",
