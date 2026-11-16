@@ -440,6 +440,7 @@ function withoutTrailingBytes(files, trailing) {
 export function buildFootballSet(files, {
   databases = CM0102_RELEASES, nationMap = CM0102_NATIONS, federations = FOOTBALL_FEDERATIONS, identity = {}, allowUnmapped = false,
   famous = FAMOUS_BIRTHDAYS, verifyFiles = true, local = true, sourceExtra = {}, kind, noNationAt = null, clubs: withClubs = true, topClubs = null,
+  everyClub = false,
 } = {}) {
   const warnings = [];
   const warn = message => warnings.push(message);
@@ -612,6 +613,14 @@ export function buildFootballSet(files, {
   // A season keeps Europe's strongest clubs (`topClubs`); one with nations only keeps its leagues in the audit, as the
   // reason it has no clubs.
   const clubs = withClubs ? presentClubs(strongestBuilt(built, topClubs), warn) : [];
+  // Every live club of every nation, for the season's own country maps (scripts/build-season-countries.mjs, `everyClub`):
+  // its division, its nation as the game names it, and its squad as a season file picks one (a club with no player
+  // has none).
+  const allClubs = everyClub ? parsed.clubs.filter(club => club.nation != null && clubPools.has(club.row)).map(club => ({
+    key: `cm:${club.row}`, name: club.name, short: club.shortName || null, nation: parsed.nations[club.nation].name,
+    country: nationRows[club.nation].id, league: club.division == null ? null : parsed.competitions[club.division]?.name || null,
+    squad: pickFootballSquad(clubPools.get(club.row)),
+  })) : null;
   for (const club of clubs) leagueAudit.find(entry => entry.league === club.league).kept++;
 
   // The names, codes and flags of the federations of the day that field players (none from 1996/97 on).
@@ -655,7 +664,8 @@ export function buildFootballSet(files, {
     `Unmapped nations: ${unmappedNames.length ? unmappedNames.map(name => `${name} (${unmapped[name]})`).join(', ') : 'none'}`,
     `Dropped: ${Object.entries(dropped).map(([why, n]) => `${n} ${why}`).join(', ')}`,
   ];
-  return { doc, text: serializeFootballSet(doc), audit, summary, warnings: [...parsed.warnings.map(w => `cm0102: ${w}`), ...warnings] };
+  return { doc, text: serializeFootballSet(doc), audit, summary, warnings: [...parsed.warnings.map(w => `cm0102: ${w}`), ...warnings],
+    ...(allClubs ? { allClubs } : {}) };
 }
 
 /** index.json for the sets present, newest season first, checking each set's format, id and version. */

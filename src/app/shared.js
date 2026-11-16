@@ -2,7 +2,8 @@
 import { C } from '../theme.js';
 import { DEFAULT_SPORT, getSport } from '../sports/index.js';
 import { domesticScope, domesticScopeId } from '../engine/domestic.js';
-import { clubMapScope, domesticEntry, hasTheatreMaps, isCountryScope, isEuropeScope, theatreMapsOf, theatreOf } from '../data/domesticScope.js';
+import { clubMapScope, countryMapOf, countryOfEntry, domesticEntry, hasTheatreMaps, isCountryScope, isEuropeScope, theatreMapsOf,
+  theatreOf } from '../data/domesticScope.js';
 import { BUILT_IN_SETS, getLoadedFootballSet, seasonMapOf, setHasClubs, setHasNations, setSportOf } from '../engine/footballSets.js';
 
 export const LOG_CAP = 220;
@@ -35,8 +36,8 @@ export function domesticIdOf(settings) {
 
 /**
  * The data set a setup or saved campaign is played on, or null for the built-in data. A set plays in its own sport: a
- * football season on its Europe maps, or the world for a set without them (country maps use the built-in data, and so
- * do clubs with a season of nations only: FIFA 05 and FIFA 06), a
+ * football season on its Europe maps or its own country maps, or the world for a set without them (today's country maps
+ * use the built-in data, and so do clubs with a season of nations only: FIFA 05 and FIFA 06), a
  * basketball season with clubs only, on its era's map, a baseball season with its nations or with its clubs on its
  * era's map, and a women's football season with its nations or with its clubs on its own maps. Pure.
  */
@@ -44,8 +45,9 @@ export function dataSetOf(settings) {
   const id = settings?.dataSet ?? null, sport = getSport(settings?.sport).id;
   if (id == null || setSportOf(id) !== sport) return null;
   if (sport === 'football') {
-    return (domesticIdOf(settings) && !isEuropeScope(settings.clubScope)) || (settings.layer === 'clubs' && !setHasClubs(id))
-      ? null : id;
+    // A country's map is played with the data it is built from: today's, or its own season's.
+    if (domesticIdOf(settings) && !isEuropeScope(settings.clubScope)) return domesticEntry(settings.clubScope)?.season === id ? id : null;
+    return settings.layer === 'clubs' && !setHasClubs(id) ? null : id;
   }
   // Any other sport's season plays the layer it has: its clubs (on its era's map or its own maps, if it has them), or its
   // nations.
@@ -73,8 +75,9 @@ export function mapYearOf(settings) {
  * women's football's on Europe's (every club, or the elite) or on the NWSL's USA; basketball's on the NBA's USA and
  * Canada or the EuroLeague's Europe. The theatre carries over between seasons and sports that have it; a league's
  * theatre of before, or a map with no counterpart, falls back to the season's era map, Europe's strongest clubs, or a
- * sport's first map (the NBA's). One country's map stays chosen, with the built-in football data it is built from; a
- * data set brings its own clubs, so it leaves that map for the set's. A set with no maps (a CM 01/02 database built on
+ * sport's first map (the NBA's). One country's map stays chosen: today's with the built-in football data, an earlier
+ * season's own map of that country with the season (England's of 2010/11 holds that season's English clubs); a season
+ * with no map of it plays its Europe maps. A set with no maps (a CM 01/02 database built on
  * this computer) plays football's two theatres on the world. Shared by App's setup and challenge links.
  */
 export function setClubScope(setup) {
@@ -85,7 +88,13 @@ export function setClubScope(setup) {
   const own = clubMapScope(sportId);
   if (own) return own;
   if (!hasTheatreMaps(sportId)) return domesticEntry(setup.clubScope)?.sport ? 'all' : setup.clubScope;
-  if (sportId === 'football' && dataSet == null && isCountryScope(setup.clubScope)) return setup.clubScope;
+  if (sportId === 'football' && isCountryScope(setup.clubScope)) {
+    const entry = domesticEntry(setup.clubScope);
+    // A country no longer shipped stays chosen with the built-in data, so its save says why it cannot resume.
+    if (!entry && dataSet == null) return setup.clubScope;
+    const map = entry ? countryMapOf(countryOfEntry(entry), dataSet) : null;
+    if (map) return domesticScope(map.id);
+  }
   const chosen = domesticEntry(setup.clubScope);
   const theatre = chosen ? theatreOf(chosen) : setup.clubScope;
   const maps = theatreMapsOf(sportId, dataSet);

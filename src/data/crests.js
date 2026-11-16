@@ -8,11 +8,23 @@
 import { clubLogoFile } from './clubLogos.js';
 import { CREST_ERAS } from './clubCrestEras.js';
 
+// An earlier season's club on its country's map of that season (src/engine/domestic.js) with no crest of its own wears
+// its twin's, the same club on today's map of the country, as the Europe maps' clubs share their twins' files
+// (clubLogos.js SHARED): club id → twin id, remembered as such a map decodes. The last decoded map's twins stand, since a
+// season's `f-<name>` id names one club in it.
+const twins = new Map();
+
+/** Remember the twins of a decoded map's clubs (`[{ id, twin }]`, twin null for none). */
+export function rememberTwins(clubs) {
+  for (const club of clubs) if (club.twin) twins.set(club.id, club.twin);
+}
+
 /** The crest file club `id` wears in season year `year` (null: today's season), or null for none (its monogram). */
 export function crestFile(id, year) {
   const eras = year == null ? null : CREST_ERAS[id];
   if (eras) for (const [from, through, file] of eras) if (from <= year && year <= through) return file;
-  return clubLogoFile(id);
+  const own = clubLogoFile(id);
+  return own || !twins.has(id) ? own : crestFile(twins.get(id), year);
 }
 
 /** The URL of the crest club `id` wears in season year `year`, or null when it has none (it keeps its monogram). */

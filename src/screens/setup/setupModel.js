@@ -5,9 +5,8 @@
 // (`setupTeams()` → `managerTeams`): no window/document, no RNG, no timers. Caches are keyed by immutable data.
 import { NATIONS, SCOPES, isTennisSport, nationIdentity } from '../../data/teams.js';
 import { CLUB_SCOPES, TOP_CLUBS, nationTheatre, nationTheatres, strongestClubs as topClubs } from '../../data/scopes.js';
-import { DOMESTIC } from '../../data/domestic.js';
 import { nationPriority } from '../../data/domesticTiers.js';
-import { clubMapOf, domesticEntry, domesticLabel, isDomesticScope, isTheatreMap, theatreMapsOf } from '../../data/domesticScope.js';
+import { clubMapOf, countryMapsOf, countryOfEntry, domesticEntry, domesticLabel, isDomesticScope, isTheatreMap, theatreMapsOf } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport, matchSport } from '../../sports/index.js';
 import { builtInSeasonOf, fieldedNations, setHasClubs, setHasNations, setSportOf } from '../../engine/footballSets.js';
 import { V4, ratingTierOf } from '../../theme.js';
@@ -342,28 +341,34 @@ function pendingTheatres(builtIn, clubLayer, clubScope) {
 export const LEAGUE_GROUP = 'Europe';
 export const DOMESTIC_GROUP = 'One country · top clubs';
 
-let domesticRowCache = null;
+const domesticRowCache = new Map();
 /**
- * One country's own top clubs (docs/design/domestic-campaigns.md): one row per shipped map, in the leagues' priority
- * order (data/domesticTiers.js), in the theatre row shape. Offered for football clubs only (`domesticOffered`).
+ * One country's own top clubs (docs/design/domestic-campaigns.md): one row per shipped map of a season (`dataSet`;
+ * null: today's), in the leagues' priority order (data/domesticTiers.js), in the theatre row shape. Offered for football
+ * clubs only (`domesticOffered`).
  */
-export function domesticTheatres() {
-  if (!domesticRowCache) {
-    domesticRowCache = Object.freeze([...DOMESTIC]
-      .sort((a, b) => nationPriority(a.id) - nationPriority(b.id) || a.name.localeCompare(b.name))
-      .map(entry => Object.freeze({ id: `domestic:${entry.id}`, name: entry.name, label: entry.name, count: entry.clubs, note: '' })));
+export function domesticTheatres(dataSet = null) {
+  if (!domesticRowCache.has(dataSet)) {
+    domesticRowCache.set(dataSet, Object.freeze([...countryMapsOf(dataSet)]
+      .sort((a, b) => nationPriority(countryOfEntry(a)) - nationPriority(countryOfEntry(b)) || a.name.localeCompare(b.name))
+      .map(entry => Object.freeze({ id: `domestic:${entry.id}`, name: entry.name, label: entry.name, count: entry.clubs, note: '' }))));
   }
-  return domesticRowCache;
+  return domesticRowCache.get(dataSet);
 }
 
-/** Country maps are built from the built-in data, so a chosen data set (`dataSet`) leaves them out. */
-export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer && sport?.id === 'football' && dataSet == null;
+/**
+ * Football's clubs choose a country of today's season, or of a chosen earlier season that has country maps of its own
+ * (a CM 01/02 database built on this computer has none).
+ */
+export const domesticOffered = (sport, clubLayer, dataSet = null) => !!clubLayer && sport?.id === 'football'
+  && countryMapsOf(dataSet).length > 0;
 
 /** Copy under the Season choice, per sport: where the earlier seasons' players come from, and what that leaves out. */
 export const SEASON_NOTES = Object.freeze({
   football: 'Earlier seasons use EA FIFA ratings of that season, before 2004/05 SI\'s Championship Manager ratings (2003/04: '
     + 'Alex Sawczuk\'s fan update of them; 1994/95 to 1996/97: Sensible World of Soccer\'s; 1993/94 and 1989/90: fans\' ratings, '
-    + 'Cam F\'s and Simon Treanor\'s), with Europe\'s 124 strongest clubs (SWOS\'s from the seven biggest leagues). A nation with fewer than six rated players '
+    + 'Cam F\'s and Simon Treanor\'s), with Europe\'s 124 strongest clubs (SWOS\'s from the seven biggest leagues), and a map of '
+    + 'each country whose clubs that season\'s source rates, ten or more, holding its top clubs of that season. A nation with fewer than six rated players '
     + 'fields no team, and one without eleven starts short-handed. 2005/06, 2004/05 and 1989/90 have nations only. '
     + '1960/61, the World Cups of 1961/62 to 1993/94 and the seasons between them are computed and have nations only: each '
     + 'nation rated from its Elo, its eleven from its World Cup squad or, in the other seasons, from its players\' caps on '
@@ -747,7 +752,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const scopes = pending ? pendingTheatres(sport, clubLayer, setup.clubScope) : theatreOptions(sport, clubLayer);
   // One country's own top clubs: football clubs only, listed after the leagues.
   const domesticOn = domesticOffered(sport, clubLayer, dataSet);
-  const domesticScopes = domesticOn ? domesticTheatres() : NO_ROWS;
+  const domesticScopes = domesticOn ? domesticTheatres(dataSet) : NO_ROWS;
   // A chosen country (football), or the map a sport's clubs play on (basketball: the NBA's USA and Canada).
   const chosenMap = clubLayer && isDomesticScope(setup.clubScope) ? domesticEntry(setup.clubScope) : null;
   const country = chosenMap && (chosenMap.sport ? chosenMap.sport === sport.id : domesticOn) ? chosenMap : null;
@@ -860,9 +865,11 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     domesticScopes, leagueGroup: LEAGUE_GROUP, domesticGroup: DOMESTIC_GROUP,
     country: country ? { id: country.id, name: country.name, clubs: country.clubs, sections: country.sections ?? country.clubs, countries: country.countries ?? null } : null,
     // A basketball season's own strongest clubs lead its map, named once it has loaded. A season's map with only some of
-    // its clubs (women's football's: Europe's, the NWSL's) names its own.
-    countryNote: !country ? '' : domesticDescription(dataSet == null || (country.top && country.seasons?.includes(dataSet)) ? country
-      : { ...country, top: pending ? [] : strongestClubs(sport, country) }),
+    // its clubs (women's football's: Europe's, the NWSL's) names its own, and an earlier season's country map those its
+    // decoded map holds (App's domesticStatus `top`).
+    countryNote: !country ? '' : domesticDescription(country.season ? { ...country, top: ctx.domestic?.top ?? [] }
+      : dataSet == null || (country.top && country.seasons?.includes(dataSet)) ? country
+        : { ...country, top: pending ? [] : strongestClubs(sport, country) }),
     countryState, countryMessage: countryState === 'error' ? (ctx.domestic?.message || mapFailed) : '',
     mapLoading, launching,
     // Step 3's team list is empty until a country's map decodes.

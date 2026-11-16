@@ -236,15 +236,18 @@ export default function SetupOverlay({
   // App passes a fresh `domestic` object (with a fresh `onRetry`) every render: the model keys on its values only.
   const mapState = domestic?.state || 'idle';
   const mapMessage = domestic?.message || null;
+  // An earlier season's country map names its strongest clubs once decoded: keyed as one string, so a fresh list of the
+  // same names keeps the model.
+  const mapTop = domestic?.top?.join('\u0000') || '';
   // Likewise `season`: its list and sport keep their identity until they change.
   const { sets: seasonSets = NO_TEAMS, state: seasonState = 'idle', message: seasonMessage = null, sport: seasonSport = null } = season || IDLE_SEASON;
   // Likewise `sportLoad`.
   const { id: sportLoadId = null, state: sportLoadState = 'idle', message: sportLoadMessage = null } = sportLoad || {};
   const model = useMemo(() => setupModel.buildSetupModel(setup, {
-    managerTeams, domestic: { state: mapState, message: mapMessage }, launching,
+    managerTeams, domestic: { state: mapState, message: mapMessage, top: mapTop ? mapTop.split('\u0000') : null }, launching,
     season: { sets: seasonSets, state: seasonState, message: seasonMessage, sport: seasonSport }, suggest: suggestTeam,
     sportLoad: { id: sportLoadId, state: sportLoadState, message: sportLoadMessage },
-  }), [setup, managerTeams, mapState, mapMessage, launching, seasonSets, seasonState, seasonMessage, seasonSport, suggestTeam,
+  }), [setup, managerTeams, mapState, mapMessage, mapTop, launching, seasonSets, seasonState, seasonMessage, seasonSport, suggestTeam,
     sportLoadId, sportLoadState, sportLoadMessage]);
   const { rules } = model;
   const manager = model.role === 'manager';

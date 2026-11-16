@@ -1408,6 +1408,32 @@ ones included. The [design notes](docs/design/domestic-campaigns.md) give the
 sources and queries, the partition, the file format, saves, acceptance checks and
 known limitations.
 
+### Earlier seasons' country maps
+
+A country's top clubs are those of the season played. Every earlier football season
+with clubs has its own country maps, one for each country whose clubs that season's
+source rates, ten or more of them: England's of 2010/11 holds FIFA 11's 89 English
+league clubs, its 2003/04 map CM 01/02's top 100 English clubs down to the
+Conference, and Scotland, Wales and Northern Ireland get maps wherever a season rates
+ten of their clubs. With **Clubs** and an earlier season chosen, **One country · top
+clubs** lists that season's countries; a country chosen before stays chosen, on that
+season's map of it, and a season with none plays its Europe maps. The clubs are the
+season's own (EA's editions from 2006/07, Championship Manager's databases and SWOS's
+before), with the season file's players and ids, so a club fields the same eleven on
+a Europe map and a country map. Their homes come from today's maps where the club is
+on one (its crest too), else from Wikidata and GeoNames, and are listed with their
+sources in `scripts/data/season-club-homes.json`. Each map is
+`public/domestic/<country>y<year>.json`, built by the same partition as today's:
+
+```bash
+node scripts/build-season-countries.mjs --homes --data=<EA sources> --retro-data=<CM and SWOS sources>
+node scripts/build-season-countries.mjs --data=<EA sources> --retro-data=<CM and SWOS sources>   # every map, about 50 minutes
+node scripts/build-season-countries.mjs --check --data=... --retro-data=...                     # offline, byte for byte
+```
+
+The [design notes](docs/design/domestic-campaigns.md#earlier-seasons) give the rules,
+the counts and the limitations.
+
 ### The NBA map
 
 Basketball clubs have two theatres: **NBA**, here, and [EuroLeague](#the-euroleague-map). In

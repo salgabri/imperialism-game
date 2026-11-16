@@ -5,8 +5,10 @@ Status: implemented. Format 1 (one section per club, 128 countries) shipped on
 club groups, then 163 countries. Since 2026-10-29 a country's club count follows
 its league's tier (Tiers, below) rather than 100 for every country that has them.
 Since 2026-11-07 a country needs ten clubs for a map (What ships), which brings
-back format 1's 128 countries. This describes the system as built; the code
-comments in the files named below are the detailed reference.
+back format 1's 128 countries. Since 2026-11-16 every earlier football season with
+clubs has its own country maps, that season's top clubs ("Earlier seasons" below).
+This describes the system as built; the code comments in the files named below are
+the detailed reference.
 
 ## Goal
 
@@ -1376,6 +1378,131 @@ land rules; `scripts/womens-club-maps.test.mjs` checks the fields, the places, s
 and grey countries, the setup, challenge links, seeded campaigns to a champion, launching
 built-in and season maps, refusing a season on another's map, and old world saves. The
 smoke runs a women's Elite 32 duel.
+
+## Earlier seasons
+
+Since 16 November 2026 a country's top clubs are those of the season played: the
+top 100 of England in 2010/11 are not those of 2020/21. Every earlier football
+season with clubs has its own country maps, one per country whose clubs that
+season's source rates, ten or more of them (`MIN_CLUBS`, as today's), each
+holding that season's strongest min(tier, clubs) of them (Tiers, above) with that
+season's players. Choosing a season with a country chosen keeps the country: the
+setup moves to that season's map of it (`setClubScope`), or, in a season with
+none, to the season's Top 124 as before; going back to the built-in season goes
+back to today's map. The "One country · top clubs" list shows the chosen season's
+countries only.
+
+**What ships.** 735 maps over the 31 seasons with clubs, 20,567 club-seasons, 94.9 MB
+(50–249 KB a map, median 125 KB), each fetched only when chosen; the index
+`src/data/domesticSeasons.js` is under 10 KB. `docs/design/domestic-seasons-audit.json`
+gives every map's layer, clubs, homes and size.
+
+| Seasons | Source of the clubs | Maps | Countries a season |
+| --- | --- | --- | --- |
+| 2006/07 – 2025/26 (20) | EA's editions, every division EA rates | 483 | 20 – 28 |
+| 1993/94, 1997/98 – 2003/04 (8) | Championship Manager's databases, every club with players | 231 | 11 – 51 |
+| 1994/95 – 1996/97 (3) | SWOS's team files of the seven big leagues, every division | 21 | 7 |
+
+England has 88 to 90 clubs in an EA season (the four divisions less their Welsh
+clubs), 100 in most CM seasons (the four divisions and the Conference's strongest),
+68 in CM 97/98 (the rest of its extraction's lower-league clubs have no players)
+and 90 in SWOS's. Scotland, Wales and Northern Ireland, which today's maps lack,
+have maps where a season rates ten of their clubs: Scotland in 27 seasons (every EA
+and CM season but CM 97/98), Wales in CM 01/02's three, Northern Ireland in those and
+CM 00/01. A club's home lies in its own home section for 17,345 of 20,210 located
+club-seasons (85.8%); 357 club-seasons are placed (estimates).
+
+**Clubs** (`scripts/lib/season-country-clubs.mjs`, read through the season
+builders, so the players are the season file's own tuples):
+
+- **EA** (`scripts/lib/ea-season-builds.mjs`, whose `assemble` hook hands over each
+  edition's player records): a club's competition by EA's own id (FIFA 15 – EA FC 26;
+  the export names a league as a later edition does, its id does not), by the SoFIFA
+  scrape's league name (FIFA 07 – FIFA 14) or by EA's website's (EA FC 25), each
+  mapped to its country (`EA_COMPETITIONS`, `SOFIFA_COMPETITIONS`, `SITE_COMPETITIONS`).
+  A club of a competition several countries play in (EA's Rest of World, EA FC 25's
+  Libertadores and Sudamericana) plays for the country most of its players are from.
+- **CM** (`scripts/lib/retro-season-builds.mjs`, `everyClub`): every live club of the
+  database with players, under its own nation (CM files Cardiff City under Wales, as
+  FM does), its division's name its league. CM 97/98's JSON lists teams with a
+  division code (`CM9798_DIVISION_NAMES`).
+- **SWOS**: every division of the seven league files the season reads; names from
+  `SWOS_CLUBS`, `SWOS_LOWER_CLUBS` (eight names SWOS cuts short) or SWOS's own in plain
+  capitals.
+- A club plays for the country it stands in, whatever league it plays in (`ABROAD`):
+  the Welsh clubs of the English leagues, Canada's MLS clubs, Wellington Phoenix and
+  Derry City play for Wales, Canada, New Zealand and Northern Ireland, as on today's
+  maps; AS Monaco stays on France's. Reserve sides (II, B, Castilla, -2) are left out,
+  as today's maps leave them out.
+- A club is viable with eleven players and a natural goalkeeper in its squad, which
+  is the season file's pick (pickFootballSquad's natural 4-4-2 XI), so a club on a
+  Europe map and a country map fields the same eleven. Clubs rank by `str`, their
+  lineup's rating as the game computes it.
+- **Ids.** A club the season file has keeps its id there (same country and name);
+  every other one takes `f-<slug of its name>`, numbered after a clash, the strongest
+  of the season first.
+
+**Homes** (`scripts/lib/season-club-homes.mjs`, written once to
+`scripts/data/season-club-homes.json` by `--homes`, offline from the caches): a hand
+override (`scripts/data/season-club-locations.json`: a point, a Wikidata item, or
+today's map's club it is); the same club on today's map of its country (its name,
+short name or FM name, or every word of one inside the other, which ranks above
+sharing distinctive words, with EA's abbreviations expanded: "Sheffield Wed",
+"Melb. Victory"), whose home is that map's checked one; the Europe maps' club under
+the season's id; Wikidata's football clubs of the country and GeoNames' towns, as
+today's maps find theirs. A club spelled two ways in two seasons ("St. Johnstone",
+"St Johnstone FC") is located once, by its fullest spelling, so Wikidata's item goes
+to both. A club none of them places starts at a populous place no other club stands
+in, an estimate, as on today's maps. Today's club found is the season club's
+`twin`: a club with no crest of its own wears its twin's (`src/data/crests.js`).
+
+**Maps** (`scripts/build-season-countries.mjs`, through the same builder as today's,
+`scripts/lib/domestic-build.mjs`): id `<country>y<year>` ("826y2011", "SCOy2016"),
+sections `<id>-001` to `-100`; the file adds `country`, `season` (the season file's
+id), `year` and `kind` (its players' kind), and its `source` is the season file's,
+so its players rebuild exactly as the season's (`expandSetPlayer`). Scotland, Wales
+and Northern Ireland are cut from the UK's layers by their GB-SCT, GB-WLS and GB-NIR
+polygons, as England is. A season map has fewer clubs than today's of the same
+country, so more sections no club starts on: where GeoNames' country file was never
+cached (its host's robots.txt forbids fetching it), they grow around cities1000's
+places, unit centres and land samples (Saudi Arabia). Each map takes at most 8,000
+arc points (today's 14,000), since a country has a map in every season that rates it.
+
+**Runtime.** `src/data/domesticSeasons.js` lists each season's countries and their
+club counts; `src/data/domesticScope.js` gives `SEASON_COUNTRY_MAPS`,
+`countryMapsOf(season)` and `countryMapOf(country, season)`. The setup lists the
+chosen season's countries (`domesticTheatres(dataSet)`), and its description names
+the map's three strongest clubs once it has decoded. A campaign on a season's map
+plays that season's data set (`dataSetOf` keeps it) and saves it as any season
+campaign does; a save on such a map with another season, or none, is refused
+(`isSeasonCountryMap`, `isEraMap`).
+
+**Checks.** `scripts/domestic-seasons.test.mjs`: the index, the files and the audit
+agree; each map's header, version, sections and groups as today's; its clubs strongest
+first, with the season file's squads where the season file has the club, homes as the
+homes file has them, and decoded by the game's loader; a setup follows the season and
+a campaign plays, saves and resumes on a season's map.
+
+```bash
+node scripts/build-season-countries.mjs --homes --data=<EA sources> --retro-data=<CM and SWOS sources>
+node scripts/build-season-countries.mjs --data=<EA sources> --retro-data=<CM and SWOS sources> --jobs=12   # about 50 minutes
+node scripts/build-season-countries.mjs --seasons=ea-fifa-11 --only=826y2011 ...                          # one season, one map
+node scripts/build-season-countries.mjs --check ...                                                        # as long
+```
+
+**Limitations.**
+- SWOS seasons have only the seven big leagues' countries: the other leagues' team
+  files are not cached. CM 97/98's England has 68 clubs.
+- Homes from GeoNames are towns, sometimes namesakes a few towns off (Erzeni Shijak
+  at Tirana); 357 club-seasons are placed (EA FC 26's unlicensed "United Tigers SC"
+  among them). Tavria Simferopol's home lies in Crimea, which Ukraine's maps leave
+  out as today's does, so it starts elsewhere in Ukraine.
+- Size: 94.9 MB of maps, so a full build takes about 50 minutes with 14 worker threads
+  and holds about 18 GB of memory.
+- Crests: a club with neither a crest of its own nor a twin keeps its monogram (most of
+  Scotland's, Wales's and Northern Ireland's, and the lower divisions of the 1990s).
+- EA FIFA 07 – FIFA 14's league names are as the scrape found them later, so a club's
+  `league` may be a later division of the same country.
 
 ## Known limitations
 

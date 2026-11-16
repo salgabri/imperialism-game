@@ -54,6 +54,9 @@ export const ISO3 = {
   '784': 'ARE', '788': 'TUN', '792': 'TUR', '795': 'TKM', '800': 'UGA', '804': 'UKR', '807': 'MKD', '818': 'EGY',
   '826': 'GBR', '834': 'TZA', '840': 'USA', '854': 'BFA', '858': 'URY', '860': 'UZB', '862': 'VEN', '887': 'YEM',
   '894': 'ZMB', KOS: 'XKX',
+  // The home nations other than England, mapped as England is (MASKS): only earlier seasons' maps have them
+  // (scripts/build-season-countries.mjs), since FM 26's clubs of Scotland, Wales and Northern Ireland were never synced.
+  SCO: 'GBR', WAL: 'GBR', NIR: 'GBR',
 };
 // Natural Earth spells a few adm0_a3 codes its own way.
 const NE_A3 = { XKX: 'KOS', SSD: 'SDS', PSE: 'PSX' };
@@ -62,6 +65,9 @@ const NE_A3 = { XKX: 'KOS', SSD: 'SDS', PSE: 'PSX' };
 // units whose centroid lies in the England polygon of the ADM1 layer.
 export const MASKS = {
   '826': { iso3: 'GBR', level: 'ADM1', shapeISO: 'GB-ENG', name: 'GB-ENG', neField: 'gu_a3', neValue: 'ENG' },
+  SCO: { iso3: 'GBR', level: 'ADM1', shapeISO: 'GB-SCT', name: 'GB-SCT', neField: 'gu_a3', neValue: 'SCT' },
+  WAL: { iso3: 'GBR', level: 'ADM1', shapeISO: 'GB-WLS', name: 'GB-WLS', neField: 'gu_a3', neValue: 'WLS' },
+  NIR: { iso3: 'GBR', level: 'ADM1', shapeISO: 'GB-NIR', name: 'GB-NIR', neField: 'gu_a3', neValue: 'NIR' },
 };
 
 // Land another football association runs, cut from a nation's units by Natural Earth

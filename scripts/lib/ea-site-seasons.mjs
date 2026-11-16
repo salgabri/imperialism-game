@@ -146,7 +146,7 @@ export function clubNames(players, label) {
  * Every one of the seven leagues must have its clubs. Throws on a link, position or overall EA's format does not allow,
  * an id listed twice, or a club the June file cannot name.
  */
-export function buildSiteEaSeason({ ratings, later }, edition, { ratingsUrl, federations } = {}) {
+export function buildSiteEaSeason({ ratings, later }, edition, { ratingsUrl, federations, assemble = assembleEaSeason } = {}) {
   const { id, fifaVersion, edition: label, update, roster, snapshotDate } = edition;
   if (!SET_ID.test(id)) throw new Error(`Season id ${id} is not like ea-fc-25`);
   if (!isDay(snapshotDate)) throw new Error(`${label}: snapshot date ${snapshotDate} is not YYYY-MM-DD`);
@@ -186,6 +186,8 @@ export function buildSiteEaSeason({ ratings, later }, edition, { ratingsUrl, fed
     eaId, name: row.Name, fullName: fullName || row.Name, overall: row.OVR, positions: keys.join(', '), keys,
     dob: match?.dob || '', nationality: row.Nation, club: clubKey ? names.get(clubKey) : row.Team, slug,
     clubKey, league: clubKey ? EA_LEAGUES[leagueId] : null,
+    // The website's competition and team, first division or not, for the earlier seasons' country maps.
+    siteLeague: row.League, team: row.Team.trim(),
   }));
   const renamed = [...names].map(([clubKey, name]) => [clubKey.slice(clubKey.indexOf(':') + 1), name])
     .filter(([team, name]) => team !== name).sort(([a], [b]) => (a < b ? -1 : 1));
@@ -194,5 +196,5 @@ export function buildSiteEaSeason({ ratings, later }, edition, { ratingsUrl, fed
       joined, ageMismatch, withoutLater: ratings.length - joined, fullNamesTrimmed },
     clubNames: Object.fromEntries(renamed),
   };
-  return assembleEaSeason(records, { id, year: 2000 + fifaVersion, edition: label, update, source, federations, auditExtra, everyLeague: true });
+  return assemble(records, { id, year: 2000 + fifaVersion, edition: label, update, source, federations, auditExtra, everyLeague: true });
 }

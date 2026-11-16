@@ -157,7 +157,7 @@ const mean = xs => (xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : 0);
  * add the clubs of the seven leagues' top divisions (division 0), each named by SWOS_CLUBS. Returns `{ doc, text,
  * audit, warnings }`; throws on anything it does not understand rather than guess.
  */
-export function buildSwosSeason(rows, { source, year, federations = FOOTBALL_FEDERATIONS, prices, id: seasonId = SWOS_ID, clubRows = [] }) {
+export function buildSwosSeason(rows, { source, year, federations = FOOTBALL_FEDERATIONS, prices, id: seasonId = SWOS_ID, clubRows = [], everyClubRows = null }) {
   const warnings = [];
   const warn = message => warnings.push(message);
   const resolve = nationResolver(SWOS_NATIONS);
@@ -209,6 +209,9 @@ export function buildSwosSeason(rows, { source, year, federations = FOOTBALL_FED
     if (JSON.stringify(swosTupleOf(name, sourceInfo)) !== JSON.stringify(tuple)) throw new Error(`SWOS player ${row.id} (${name}) does not rebuild from its tuple`);
     return { name, pos, positions: sourceInfo.positions, rating, sourceInfo, tuple };
   };
+  // Each record makes its player once: the top divisions' clubs and every division's (`everyClubRows`) share theirs.
+  const made = new Map();
+  const playerFor = (row, nationality, where) => made.get(row.id) ?? made.set(row.id, playerOf(row, nationality, where)).get(row.id);
   const players = new Map();
   for (const { teamName, members } of nationOf.values()) {
     for (const row of members) players.set(row.id, playerOf(row, teamName, teamName));
@@ -237,7 +240,26 @@ export function buildSwosSeason(rows, { source, year, federations = FOOTBALL_FED
   const idle = [...nationOf.keys()].filter(id => Object.hasOwn(territory.merged, id) || territory.inactive.includes(id));
   if (idle.length) throw new Error(`SWOS rates national teams with no federation of their own in ${year}: ${idle.join(', ')}`);
 
-  const { clubs, leagues: leagueAudit, collisions } = swosClubs(clubRows, playerOf, warn);
+  const { clubs, leagues: leagueAudit, collisions } = swosClubs(clubRows, playerFor, warn);
+  // Every division's clubs of the seven league files, for the season's own country maps (scripts/build-season-countries.mjs):
+  // each named by SWOS_CLUBS where it has a name there, else by its SWOS name in plain capitals ("Port Vale").
+  let allClubs = null;
+  if (everyClubRows) {
+    const byTeam = new Map();
+    for (const row of everyClubRows) {
+      if (row.type !== 'CLUB' || !Object.hasOwn(SWOS_LEAGUES, row.file)) throw new Error(`Row ${row.id} (${row.name}) is no club of SWOS_LEAGUES' files`);
+      const key = `${row.file}|${row.team}`;
+      (byTeam.get(key) || byTeam.set(key, []).get(key)).push(row);
+    }
+    allClubs = [...byTeam].map(([key, members]) => {
+      const file = key.slice(0, key.indexOf('|')), team = key.slice(file.length + 1);
+      const [top, country] = SWOS_LEAGUES[file];
+      const division = members[0].division;
+      return { key: `swos:${file}:${team}`, name: SWOS_CLUBS[team] ?? SWOS_LOWER_CLUBS[team] ?? capitalisedAll(team), short: null, nation: null, country,
+        league: SWOS_DIVISIONS[file]?.[division] ?? (division === 0 ? top : `${top} (division ${division + 1})`),
+        squad: pickFootballSquad(members.map(row => playerFor(row, row.nat, team))) };
+    });
+  }
   const written = new Set([...Object.values(nations).flatMap(([, , squad]) => squad), ...clubs.flatMap(club => club.squad)].map(tuple => tuple[0]));
   const coverage = {
     players: written.size, nations: nationAudit.filter(n => n.players).length,
@@ -255,8 +277,25 @@ export function buildSwosSeason(rows, { source, year, federations = FOOTBALL_FED
     // Every name whose case the rule sets other than plain capitalisation, for review.
     names, shortNations: nationAudit.filter(n => !n.naturalLineup).map(n => `${n.id} ${n.name} (${n.players})`), warnings,
   };
-  return { doc, text: serializeFootballSet(doc), audit, warnings };
+  return { doc, text: serializeFootballSet(doc), audit, warnings, ...(allClubs ? { allClubs } : {}) };
 }
+
+/**
+ * The clubs below the top divisions whose SWOS names are cut short to fit 17 characters, by their full names; every other
+ * one reads as SWOS writes it, in plain capitals ("PORT VALE" is Port Vale).
+ */
+export const SWOS_LOWER_CLUBS = Object.freeze({
+  'CHARLTON ATH.': 'Charlton Athletic', 'COLCHESTER UTD': 'Colchester United', 'HARTLEPOOL UTD': 'Hartlepool United',
+  'PETERBOROUGH UTD': 'Peterborough United', 'PRESTON N. END': 'Preston North End', 'SCUNTHORPE UTD': 'Scunthorpe United',
+  'WOLVERHAMPTON W.': 'Wolverhampton Wanderers', 'ATL. MARBELLA': 'Atlético Marbella',
+});
+
+/** The divisions of SWOS's seven league files, top first, as they were named in the mid-1990s. */
+export const SWOS_DIVISIONS = Object.freeze({
+  '008': ['Premier League', 'Division One', 'Division Two', 'Division Three'], '035': ['Primera División', 'Segunda División'],
+  '020': ['Serie A', 'Serie B'], '014': ['Bundesliga', '2. Bundesliga'], '013': ['Division 1', 'Division 2'],
+  '025': ['Eredivisie', 'Eerste Divisie'], '029': ['Primeira Divisão', 'Divisão de Honra'],
+});
 
 /**
  * The top-division clubs of SWOS's seven league files (`rows` of type CLUB, with `file` and `division`), as the game's

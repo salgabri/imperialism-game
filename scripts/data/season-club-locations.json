@@ -1,0 +1,37 @@
+{
+"about": "Hand overrides for the homes of the earlier seasons' country map clubs (scripts/lib/season-club-homes.mjs), by country and the name the season's source gives the club: `as` names today's map's club it is (its home and crest), else `lon`/`lat` with a `note` saying where the point is and why, or `qid` a Wikidata item. Each fixes a name the automatic matching cannot settle: a name two clubs could carry, or one it gives a namesake.",
+"clubs": {
+"040": {
+  "FC Flyeralarm Admira": { "as": "d040-16030340", "note": "Admira Wacker under its sponsor's name (FIFA 20 to FIFA 22)" }
+},
+"156": {
+  "Cangzhou Mighty Lions": { "lon": 116.8533, "lat": 38.3112, "note": "Cangzhou (GeoNames 1816080): the club moved there from Shijiazhuang in 2021, its name since; Wikidata's point is its old ground" },
+  "Guizhou Zhicheng FC": { "as": "d156-2000337886", "note": "Guiyang, as today's Guizhou Zhucheng" },
+  "Hebei CFFC": { "lon": 116.6833, "lat": 39.5167, "note": "Langfang (GeoNames 1804540), whose stadium Hebei China Fortune played in from 2018" }
+},
+"250": {
+  "Paris": { "as": "d250-867", "note": "EA FC 26's Paris is Paris FC, not Paris Saint-Germain" }
+},
+"356": {
+  "ATK Mohun Bagan": { "as": "d356-40026576", "note": "Kolkata, as today's Mohun Bagan Super Giant" }
+},
+"392": {
+  "Tokyo": { "as": "d392-107313", "note": "FC Tokyo (Morishige, Nagatomo), not Tokyo Verdy" },
+  "Yokohama": { "as": "d392-7100042", "note": "Yokohama FC (FIFA 21 and FIFA 22: Matsuo, Tezuka), not Yokohama F. Marinos" }
+},
+"642": {
+  "Asociația Clubul Sportiv Petrolul 52": { "as": "d642-57151160", "note": "Ploiești, as today's ACS Petrolul 52" },
+  "Viitorul": { "as": "d642-2000104441", "note": "FC Viitorul Constanța, whose ground at Ovidiu today's Farul Constanța plays at since the clubs merged in 2021; not Viitorul Domnești" }
+},
+"682": {
+  "Al Ahli SFC": { "as": "d682-102850", "note": "Al-Ahli of Jeddah under EA FC 26's name" },
+  "Al Akhdoud Saudi Club": { "lon": 44.1277, "lat": 17.4924, "note": "Najran (GeoNames 103630)" },
+  "Al Qadisiyah": { "lon": 50.2083, "lat": 26.2794, "note": "Khobar (GeoNames 109323)" },
+  "Al Wahda": { "lon": 39.8261, "lat": 21.4225, "note": "Mecca (GeoNames 104515)" }
+},
+"724": {
+  "R. Sporting": { "as": "d724-1744", "note": "Real Sporting de Gijón under EA FC 25's short name" },
+  "RC Deportivo": { "as": "d724-1705", "note": "RC Deportivo de La Coruña under EA FC 25's short name" }
+}
+}
+}

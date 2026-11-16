@@ -5,6 +5,8 @@
 
 import { WorldGeometry, arcBorders, topologyArcs } from './geo.js';
 import { createLand, touchingLand } from './claims.js';
+import { expandSetPlayer } from './footballSets.js';
+import { rememberTwins } from '../data/crests.js';
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
 import { NATIONS } from '../data/teams.js';
 import { SPORTS } from '../sports/index.js';
@@ -169,14 +171,20 @@ export function decodeDomestic(data, id = data?.id) {
       str: club.str,
       rep: club.rep ?? null,
       fm: club.fm,
+      // An earlier season's club that today's map of its country also has: its id there (its crest's, when it has none of its own).
+      twin: club.twin ?? null,
       homeSection: club.section,
       startSections: Object.freeze(meta.format === 1 ? [club.section] : [...club.sections]),
       homePoint: club.home || null,
-      // An era map's squads come from its season when a campaign starts.
-      squad: builtIn ? club.squad : meta.seasons ? [] : club.squad.map(tuple => expandFmTuple(tuple, meta.source, club.name)),
+      // An era map's squads come from its season when a campaign starts; an earlier season's country map carries the
+      // season's own players.
+      squad: builtIn ? club.squad : meta.seasons ? [] : seasonCountry(meta)
+        ? club.squad.map(tuple => expandSetPlayer(tuple, meta.source, meta.kind)) : club.squad.map(tuple => expandFmTuple(tuple, meta.source, club.name)),
     };
   });
   const startOwners = Object.freeze(Object.fromEntries(clubs.flatMap(club => club.startSections.map(s => [s, club.id]))));
+  // An earlier season's club with no crest of its own wears its twin's (src/data/crests.js).
+  if (seasonCountry(meta)) rememberTwins(clubs);
   // Land no club starts on (topology.objects.empty), never territory: drawn (see domesticSurroundings) and claimed
   // (domesticLand), with its neighbours among the sections and itself.
   const empty = topology.objects.empty?.geometries.length
@@ -205,6 +213,17 @@ function emptyBorders(topology) {
   return { borders: Object.fromEntries(ids.map(id => [id, borders[id] || new Map()])),
     edges: Object.fromEntries(ids.map(id => [id, edges[id] || 0])) };
 }
+
+/**
+ * Whether a map is one country's in an earlier football season (`season`: the season file's id, `kind`: its players'):
+ * its clubs are that season's, each with the season's own players (src/engine/footballSets.js expandSetPlayer), as
+ * scripts/build-season-countries.mjs writes them. Today's country maps carry FM 26's players instead.
+ */
+export const seasonCountry = data => data?.season != null && data?.sport == null;
+// The football kinds whose players a season's country map may carry.
+const SEASON_COUNTRY_KINDS = new Set(['ea', 'cm', 'cm0102', 'swos']);
+// The season builders' `f-<slug>` club ids (src/engine/footballSets.js).
+const SEASON_CLUB_ID = /^f-[a-z0-9-]{1,62}$/;
 
 /**
  * The game's clubs by id for a sport's own map (`sport` set), else null: a country map carries its own clubs, and an
@@ -256,7 +275,15 @@ function validateDomestic(data, id) {
   }
   const builtIn = builtInClubs(data);
   const src = data.source;
-  if (!builtIn && !seasonal && (!isObject(src) || !text(src.version) || !text(src.snapshotDate))) fail('source must name the FM data version and snapshotDate');
+  // An earlier season's country map: its country, the season it belongs to, its players' kind and the season's source.
+  const ofSeason = seasonCountry(data);
+  if (ofSeason) {
+    if (!text(data.season)) fail('season must name the season the map belongs to');
+    if (!SEASON_COUNTRY_KINDS.has(data.kind)) fail(`kind ${JSON.stringify(data.kind)} is not a football season's players`);
+    if (!text(data.country) || !NATIONS[data.country]) fail(`country ${JSON.stringify(data.country)} is not a game nation`);
+    if (!Number.isInteger(data.year)) fail('year must be the season\'s year');
+    if (!isObject(src) || !text(src.edition) || !text(src.snapshotDate)) fail('source must name the season\'s edition and snapshotDate');
+  } else if (!builtIn && !seasonal && (!isObject(src) || !text(src.version) || !text(src.snapshotDate))) fail('source must name the FM data version and snapshotDate');
 
   const t = data.topology;
   if (!isObject(t) || t.type !== 'Topology' || !Array.isArray(t.arcs)) fail('topology is not a TopoJSON Topology');
@@ -336,6 +363,9 @@ function validateDomestic(data, id) {
       if (!builtIn.has(club.id)) fail(`${at} is not one of the game's ${data.sport} clubs`);
     } else if (seasonal) {
       if (typeof club.id !== 'string' || !/^[a-z]{1,3}-[a-z0-9-]{1,62}$/.test(club.id)) fail(`${at} id must look like "b-<name>" or "mlb-<name>"`);
+    } else if (ofSeason) {
+      if (typeof club.id !== 'string' || !SEASON_CLUB_ID.test(club.id)) fail(`${at} id must look like "f-<name>"`);
+      if (club.twin != null && (typeof club.twin !== 'string' || !/^d[0-9A-Z]{3}-\d{1,15}$/.test(club.twin))) fail(`${at} twin must be a country map's club id`);
     } else {
       if (!Number.isInteger(club.fm) || club.fm < 0) fail(`${at} fm must be the FM club id`);
       if (club.id !== `d${id}-${club.fm}`) fail(`${at} id must be "d${id}-${club.fm}"`);
@@ -372,6 +402,25 @@ function validateDomestic(data, id) {
     // A sport's own map takes squads from the game's clubs, an era's map from its season.
     if (builtIn || seasonal) return;
     if (!Array.isArray(club.squad) || club.squad.length < 11) fail(`${at} squad needs at least 11 players`);
+    // An earlier season's players are its own tuples, each rebuilt as the season file's are.
+    if (ofSeason) {
+      const players = new Set();
+      let keeper = false;
+      club.squad.forEach((tuple, j) => {
+        if (!Array.isArray(tuple)) fail(`${at} squad[${j}] is not a player tuple`);
+        if (players.has(tuple[0])) fail(`${at} squad[${j}] repeats player ${tuple[0]}`);
+        players.add(tuple[0]);
+        let player;
+        try {
+          player = expandSetPlayer(tuple, src, data.kind);
+        } catch (e) {
+          fail(`${at} squad[${j}]: ${e.message}`);
+        }
+        if (player[3]?.positions?.includes('GK')) keeper = true;
+      });
+      if (!keeper) fail(`${at} squad has no natural goalkeeper`);
+      return;
+    }
     const players = new Set();
     let keeper = false;
     club.squad.forEach((tuple, j) => {

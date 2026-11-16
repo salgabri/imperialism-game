@@ -26,6 +26,7 @@ import { BUILT_IN_RUGBY_LEAGUE_SEASONS } from '../data/rugbyLeagueSeasons.js';
 import { BUILT_IN_ROCKET_LEAGUE_SEASONS } from '../data/rocketLeagueSeasons.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
 import { EUROPE_MAPS } from '../data/europeMaps.js';
+import { DOMESTIC_SEASON_ROWS } from '../data/domesticSeasons.js';
 import { EUROPEAN_LEAGUES } from '../data/footballLeagues.js';
 import { FLAG_CODES } from '../data/flags.js';
 import { basketball } from '../sports/basketball.js';
@@ -244,8 +245,14 @@ function listing(data) {
 const eraMapOf = (id, map) => CLUB_MAPS.find(entry => entry.id === map && entry.sport === setSportOf(id)
   && (entry.seasons == null || entry.seasons.includes(id))) || null;
 
-/** Whether a club map is an earlier era's, played only with its seasons' clubs. */
-export const isEraMap = id => [...CLUB_MAPS, ...EUROPE_MAPS].some(entry => entry.id === id && entry.seasons != null);
+// The earlier football seasons' own country maps (src/data/domesticSeasons.js): map id ('826y2011') → its season's id.
+const SEASON_COUNTRY_MAPS = new Map(DOMESTIC_SEASON_ROWS.flatMap(([season, year, maps]) => maps.map(([country]) => [`${country}y${year}`, season])));
+
+/** Whether a club map is an earlier era's, played only with its seasons' clubs: an era's club map, or an earlier season's country map. */
+export const isEraMap = id => [...CLUB_MAPS, ...EUROPE_MAPS].some(entry => entry.id === id && entry.seasons != null) || SEASON_COUNTRY_MAPS.has(id);
+
+/** Whether a map is one of football season `id`'s own country maps ('826y2011', England's of 2010/11). */
+export const isSeasonCountryMap = (mapId, id) => SEASON_COUNTRY_MAPS.get(mapId) === id;
 
 /**
  * Whether a map its clubs choose between is one of data set `id`'s: a football season's Europe map, or a women's

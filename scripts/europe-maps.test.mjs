@@ -299,15 +299,22 @@ test('a football setup always names the map of its theatre and season', () => {
   assert.equal(setClubScope(clubs({ clubScope: 'domestic:eu32', dataSet: 'ea-fifa-18' })), 'domestic:eu32e2018', 'the elite of the season');
   assert.equal(setClubScope(clubs({ clubScope: 'domestic:eu124e2018', dataSet: null })), 'domestic:eu124', 'back to the built-in season');
   assert.equal(setClubScope(clubs({ clubScope: 'domestic:eu124s2018', dataSet: 'ea-fifa-18' })), 'domestic:eu124e2018', 'on from a map another replaced');
-  assert.equal(setClubScope(clubs({ clubScope: 'domestic:826', dataSet: 'ea-fifa-18' })), 'domestic:eu124e2018', 'a country map has only built-in clubs');
+  // A country follows the season: its own map of that season (England's of 2017/18), or back to today's.
+  assert.equal(setClubScope(clubs({ clubScope: 'domestic:826', dataSet: 'ea-fifa-18' })), 'domestic:826y2018', "the season's own England");
+  assert.equal(setClubScope(clubs({ clubScope: 'domestic:826y2018', dataSet: 'ea-fifa-11' })), 'domestic:826y2011', "another season's England");
+  assert.equal(setClubScope(clubs({ clubScope: 'domestic:826y2018', dataSet: null })), 'domestic:826', "today's England");
+  assert.equal(setClubScope(clubs({ clubScope: 'domestic:242', dataSet: 'ea-fifa-18' })), 'domestic:eu124e2018', 'a season with no map of a country plays its Europe maps');
+  assert.equal(setClubScope(clubs({ clubScope: 'domestic:826', dataSet: 'cm0102-2026-05' })), 'all', 'a set with no maps plays on the world');
   assert.equal(setClubScope(clubs({ clubScope: 'elite', dataSet: 'cm0102-2026-05' })), 'elite', 'a set with no maps plays on the world');
   assert.equal(setClubScope(clubs({ clubScope: 'domestic:eu124', dataSet: 'cm0102-2026-05' })), 'all');
   assert.equal(europeMapOf('elite').id, 'eu32');
   assert.ok(isEuropeScope('domestic:eu124') && !isEuropeScope('domestic:826') && !isEuropeScope('all'));
   assert.ok(isCountryScope('domestic:826') && isCountryScope('domestic:999') && !isCountryScope('domestic:eu32') && !isCountryScope('domestic:nba') && !isCountryScope('all'));
-  // A season's Europe map keeps the season; a country map plays the built-in data.
+  // A season's Europe map keeps the season, and so does its own country map; today's country map plays the built-in data.
   assert.equal(dataSetOf(clubs({ clubScope: 'domestic:eu124e2018', dataSet: 'ea-fifa-18' })), 'ea-fifa-18');
   assert.equal(dataSetOf(clubs({ clubScope: 'domestic:eu124s2018', dataSet: 'ea-fifa-18' })), 'ea-fifa-18', 'a save on a map another replaced keeps its season');
+  assert.equal(dataSetOf(clubs({ clubScope: 'domestic:826y2018', dataSet: 'ea-fifa-18' })), 'ea-fifa-18', "a season's own country map");
+  assert.equal(dataSetOf(clubs({ clubScope: 'domestic:826y2018', dataSet: 'ea-fifa-11' })), null, "another season's map is none of this one's");
   assert.equal(dataSetOf(clubs({ clubScope: 'domestic:826', dataSet: 'ea-fifa-18' })), null);
   assert.equal(domesticIdOf(clubs({ clubScope: 'domestic:eu32' })), 'eu32');
   assert.equal(domesticIdOf(clubs({ clubScope: 'all' })), null, 'a campaign saved on the world stays there');

@@ -19,12 +19,10 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { committedSeasons, footballSeasonsModule, nationalTeamSeasonIds, retroSeasonIds, worldCupSeasonIds } from './lib/football-seasons-listing.mjs';
-import { buildEaSeason, buildSnapshotEaSeason } from './lib/ea-seasons.mjs';
 import { EARLY_EXTRA_FIELDS, buildEarlyEaSeason, nationalityEntries } from './lib/ea-early-seasons.mjs';
-import { LEGACY_POSITIONS, buildLegacyEaSeason, legacyExclusions, readRatingsRows, rosterDates } from './lib/ea-legacy-seasons.mjs';
-import { buildSiteEaSeason, readLaterRows, readSiteRows } from './lib/ea-site-seasons.mjs';
-import { pinned, readExport, readLaterEditions, readLegacyFiles } from './lib/ea-season-files.mjs';
-import { loadEaPlayers } from './lib/football-data.mjs';
+import { LEGACY_POSITIONS, readRatingsRows } from './lib/ea-legacy-seasons.mjs';
+import { pinned, readExport, readLaterEditions } from './lib/ea-season-files.mjs';
+import { buildClubSeasons } from './lib/ea-season-builds.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
@@ -37,36 +35,6 @@ function parseArgs(argv) {
     else throw new Error(`Unknown option ${arg}`);
   }
   return args;
-}
-
-/** EA FC 25: EA's ratings website joined to a later SoFIFA scrape by EA id (scripts/lib/ea-site-seasons.mjs). */
-async function buildSiteSeasons(site, dataDir) {
-  const results = [];
-  for (const edition of site.editions) {
-    const { ratings: ratingsFile, later: laterFile } = edition;
-    const ratings = readSiteRows(await pinned(path.join(dataDir, ratingsFile.folder, ratingsFile.file), ratingsFile.sha256,
-      `${edition.edition} ratings file; download ${ratingsFile.download}`));
-    if (ratings.length !== ratingsFile.rows) throw new Error(`${ratingsFile.file} has ${ratings.length} rows, not ${ratingsFile.rows}`);
-    const later = readLaterRows(await pinned(path.join(dataDir, laterFile.folder, laterFile.file), laterFile.sha256,
-      `${edition.edition} later file; download ${laterFile.download}`));
-    results.push(buildSiteEaSeason({ ratings, later }, edition, { ratingsUrl: ratingsFile.url }));
-  }
-  return results;
-}
-
-/** FIFA 07 – FIFA 14: each edition's two files joined by EA id (scripts/lib/ea-legacy-seasons.mjs). */
-async function buildLegacySeasons(legacy, dataDir) {
-  const dates = rosterDates(JSON.parse(await pinned(path.join(dataDir, legacy.dates.file), legacy.dates.sha256, 'roster dates')));
-  const exclusions = legacyExclusions(legacy.exclusions);
-  const editions = new Set(legacy.editions.map(edition => edition.edition));
-  const stray = exclusions.filter(exclusion => !editions.has(exclusion.edition));
-  if (stray.length) throw new Error(`Exclusions name editions that are not built: ${[...new Set(stray.map(x => x.edition))].join(', ')}`);
-  const results = [];
-  for (const edition of legacy.editions) {
-    const files = await readLegacyFiles(legacy, edition, dataDir);
-    results.push(buildLegacyEaSeason(files, edition, { ratingsUrl: legacy.ratings.url, clubsUrl: legacy.clubs.url, dates, exclusions }));
-  }
-  return results;
 }
 
 /** FIFA 05 and FIFA 06: each edition's ratings, with nationalities from the later editions and Wikidata (scripts/lib/ea-early-seasons.mjs). */
@@ -91,17 +59,7 @@ async function main() {
   const csv = path.resolve(args.csv ?? path.join(dataDir, 'ea-leone', manifest.dataset.file));
   const rows = await readExport(manifest.dataset, csv);
 
-  const snapshots = [];
-  for (const snapshot of manifest.snapshots) {
-    const file = path.join(root, snapshot.file);
-    await pinned(file, snapshot.sha256, `${snapshot.edition} snapshot`);
-    const { players, rows: count } = await loadEaPlayers(file);
-    if (count !== snapshot.rows) throw new Error(`${snapshot.file} has ${count} rows, not ${snapshot.rows}`);
-    snapshots.push(buildSnapshotEaSeason(players, snapshot, { dataset: snapshot.url }));
-  }
-  const results = [...snapshots, ...await buildSiteSeasons(manifest.site, dataDir),
-    ...manifest.editions.map(edition => buildEaSeason(rows, edition, { dataset: manifest.dataset.url })),
-    ...await buildLegacySeasons(manifest.legacy, dataDir), ...await buildEarlySeasons(manifest, dataDir, rows)];
+  const results = [...await buildClubSeasons(manifest, { root, dataDir, rows }), ...await buildEarlySeasons(manifest, dataDir, rows)];
   for (const { doc, text, audit } of results) {
     const { coverage } = doc;
     console.log(`${doc.id} ${doc.season} ${doc.label} (${audit.snapshotDate}, ${audit.rows} players): `

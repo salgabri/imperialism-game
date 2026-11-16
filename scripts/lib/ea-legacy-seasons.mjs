@@ -170,7 +170,7 @@ export function legacyExclusions(groups = []) {
  * that is not listed as having no team, or an exclusion that names no player of the edition.
  */
 export function buildLegacyEaSeason({ ratings, clubs, clubDuplicates = 0 }, edition, {
-  ratingsUrl, clubsUrl, dates, exclusions = [], federations = FOOTBALL_FEDERATIONS,
+  ratingsUrl, clubsUrl, dates, exclusions = [], federations = FOOTBALL_FEDERATIONS, assemble = assembleEaSeason,
 } = {}) {
   const { id, fifaVersion, edition: label, leagues } = edition;
   if (!SET_ID.test(id)) throw new Error(`Season id ${id} is not like ea-fifa-07`);
@@ -261,6 +261,8 @@ export function buildLegacyEaSeason({ ratings, clubs, clubDuplicates = 0 }, edit
       eaId: String(playerId), name, fullName: rating.Fullname, overall: rating.current_rating,
       positions: rating.preferred_positions, keys: positions.keys, dob, nationality: club.nationality, club: club.club_name,
       slug: links.get(playerId), clubKey: club.club_name.trim() || null, league: leagueOf.get(club.league_name) || null,
+      // SoFIFA's name of the club's league, first division or not, for the earlier seasons' country maps.
+      leagueName: club.league_name.trim(),
     };
   });
 
@@ -272,5 +274,5 @@ export function buildLegacyEaSeason({ ratings, clubs, clubDuplicates = 0 }, edit
     mappedPositions: Object.fromEntries(Object.entries(mappedCodes).sort(([a], [b]) => (a < b ? -1 : 1))),
     namesFromRatings,
   };
-  return assembleEaSeason(records, { id, year: 2000 + fifaVersion, edition: label, update, source, federations, auditExtra, everyLeague: true });
+  return assemble(records, { id, year: 2000 + fifaVersion, edition: label, update, source, federations, auditExtra, everyLeague: true });
 }

@@ -1,19 +1,39 @@
 // Display helpers for a domestic club scope ('domestic:<nation id>', a sport's own map such as 'domestic:nba', or a
 // Europe map such as 'domestic:eu124'), shared by the setup screen, titles, saved-campaign previews and the command bar.
 import { DOMESTIC } from './domestic.js';
+import { DOMESTIC_SEASON_ROWS } from './domesticSeasons.js';
 import { CLUB_MAPS } from './clubMaps.js';
 import { EUROPE_MAPS } from './europeMaps.js';
 import { BUILT_IN_BASKETBALL_SEASONS } from './basketballSeasons.js';
+import { NATIONS } from './teams.js';
 import { domesticScope, domesticScopeId, isDomesticScope } from '../engine/domestic.js';
 
 export { isDomesticScope, domesticScopeId };
 
+/**
+ * The earlier football seasons' own country maps (src/data/domesticSeasons.js, docs/design/domestic-campaigns.md "Earlier
+ * seasons") as index entries, newest season first: `{ id: '826y2011', country: '826', name, season: the season file's
+ * id, year, clubs, sections: 100 }`. A country map of today (DOMESTIC) has no `country` or `season`: its id is its nation.
+ */
+export const SEASON_COUNTRY_MAPS = Object.freeze(DOMESTIC_SEASON_ROWS.flatMap(([season, year, maps]) => maps.map(([country, clubs]) =>
+  Object.freeze({ id: `${country}y${year}`, country, name: NATIONS[country]?.[0] ?? country, season, year, clubs, sections: 100 }))));
+const SEASON_MAP_BY_ID = new Map(SEASON_COUNTRY_MAPS.map(entry => [entry.id, entry]));
+
 /** The index entry for a domestic scope, or null (unknown or not domestic). */
 export function domesticEntry(scope) {
   const id = domesticScopeId(scope);
-  return id ? DOMESTIC.find(entry => entry.id === id) || CLUB_MAPS.find(entry => entry.id === id)
+  return id ? DOMESTIC.find(entry => entry.id === id) || SEASON_MAP_BY_ID.get(id) || CLUB_MAPS.find(entry => entry.id === id)
     || EUROPE_MAPS.find(entry => entry.id === id) || null : null;
 }
+
+/** The nation a country map is of ('826' for today's England and for England's of 2010/11), or null for any other map. */
+export const countryOfEntry = entry => (!entry || entry.sport ? null : entry.country ?? entry.id);
+
+/** The country maps of a season (null: today's, DOMESTIC), in their index's order. */
+export const countryMapsOf = (dataSet = null) => (dataSet == null ? DOMESTIC : SEASON_COUNTRY_MAPS.filter(entry => entry.season === dataSet));
+
+/** A nation's map in a season (null: today's), or null when that season has none of it. */
+export const countryMapOf = (nationId, dataSet = null) => countryMapsOf(dataSet).find(entry => countryOfEntry(entry) === nationId) || null;
 
 // The sports whose clubs choose between maps: Europe's strongest clubs and its elite (football), and for women's
 // football the NWSL's USA too (its entry in CLUB_MAPS); basketball's NBA (USA and Canada) and its EuroLeague (Europe).
@@ -77,8 +97,9 @@ export const isTheatreMap = entry => !!entry && hasTheatreMaps(entry.sport);
 export const isEuropeScope = scope => !!domesticEntry(scope)?.theatre;
 
 /**
- * Whether a scope is one country's own map (football's 'domestic:826'): a theatre a session length leaves as it is,
- * played only with the built-in data. An id the index no longer lists counts too: a saved country no longer shipped.
+ * Whether a scope is one country's own map (football's 'domestic:826', or 'domestic:826y2011' of an earlier season): a
+ * theatre a session length leaves as it is, played with the data it is built from (today's FM 26 clubs, or that season's
+ * own). An id the index no longer lists counts too: a saved country no longer shipped.
  */
 export function isCountryScope(scope) {
   if (!isDomesticScope(scope)) return false;

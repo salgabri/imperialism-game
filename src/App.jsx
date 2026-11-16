@@ -819,7 +819,9 @@ export default class App extends React.Component {
     const state = !id ? 'idle' : loaded ? 'ready' : load?.id === id ? load.state : 'loading';
     const preview = loaded && this.fittedDomestic === loaded && this.geo === loaded.geo
       ? countryMapPreview(loaded, this.backdrop) : null;
-    return { state, message: state === 'error' ? load.message : null, preview, onRetry: () => this.retryDomestic() };
+    // An earlier season's country map names its own three strongest clubs once decoded (its index carries no names).
+    const top = loaded ? loaded.clubs.slice().sort((a, b) => b.str - a.str || a.name.localeCompare(b.name)).slice(0, 3).map(club => club.name) : null;
+    return { state, message: state === 'error' ? load.message : null, preview, top, onRetry: () => this.retryDomestic() };
   }
 
   /**

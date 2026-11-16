@@ -33,14 +33,14 @@ const offers = (options, value) => options.some(([id]) => id === value);
 
 /**
  * Whether `value` is a club theatre this build offers the sport: the strongest clubs or the elite (and women's
- * football's NWSL), a country of its own (football's built-in clubs only: country maps are built from them) or a map its
- * clubs play on. The map of the sport and season then takes over in `setClubScope`, as in setup. A link to one European
- * league's theatre, which this build no longer has, keeps the default.
+ * football's NWSL), a country of its own (football's: today's with the built-in season, an earlier season's own with
+ * that season) or a map its clubs play on. The map of the sport and season then takes over in `setClubScope`, as in
+ * setup. A link to one European league's theatre, which this build no longer has, keeps the default.
  */
 function offeredClubTheatre(sport, dataSet, value) {
   if (isDomesticScope(value)) {
     const entry = domesticEntry(value);
-    return !!entry && (entry.sport ? entry.sport === sport.id : sport.id === 'football' && dataSet == null);
+    return !!entry && (entry.sport ? entry.sport === sport.id : sport.id === 'football' && (entry.season ?? null) === (dataSet ?? null));
   }
   return CLUB_SCOPES(sport).some(scope => scope.id === value);
 }

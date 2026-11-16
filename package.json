@@ -53,6 +53,7 @@
     "build-clubs": "node scripts/build-clubs.mjs",
     "sync:domestic-clubs": "node scripts/sync-domestic-clubs.mjs",
     "build:domestic": "node scripts/build-domestic.mjs",
+    "build:season-countries": "node scripts/build-season-countries.mjs",
     "build:club-maps": "node scripts/build-club-maps.mjs",
     "build:nba-map": "node scripts/build-club-maps.mjs --league=nba",
     "build:nfl-map": "node scripts/build-club-maps.mjs --league=nfl",

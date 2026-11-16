@@ -31,6 +31,18 @@ export const CM9798_DIVISIONS = Object.freeze(Object.fromEntries(Object.entries(
  * own spellings. Its "Republic of Congo" is the former Zaire, today's DR Congo (Roger Lukaku, Nzelo Lembi and
  * Jean-Claude Mukanya are among its players); its "Congo" and "The Congo" are Congo-Brazzaville, as in CM 01/02.
  */
+/** The database's division codes as the leagues of 1997/98 were named; a code it uses for non-league clubs reads "Non-league". */
+export const CM9798_DIVISION_NAMES = Object.freeze({
+  EPR: 'Premier League', ED1: 'Division One', ED2: 'Division Two', ED3: 'Division Three', ENL: 'Non-league',
+  SPR: 'Scottish Premier Division', SD1: 'Scottish First Division', SD2: 'Scottish Second Division', SD3: 'Scottish Third Division', SNL: 'Non-league',
+  GD1: 'Bundesliga', GD2: '2. Bundesliga', GNL: 'Non-league', ISA: 'Serie A', ISB: 'Serie B', ISC: 'Serie C', SP1: 'Primera División',
+  SP2: 'Segunda División', SPN: 'Non-league', FD1: 'Division 1', FD2: 'Division 2', FNL: 'Non-league', HD1: 'Eredivisie', HD2: 'Eerste Divisie',
+  NNL: 'Non-league', PD1: 'Primeira Divisão', PD2: 'Segunda Divisão de Honra', PNL: 'Non-league', BD1: 'First Division', BD2: 'Second Division',
+  BNL: 'Non-league', DD1: 'Superliga', DD2: '1st Division', DD3: '2nd Division', DB2: '2nd Division', DNL: 'Non-league', ND1: 'Tippeligaen',
+  ND2: '1. divisjon', HNL: 'Non-league', WD1: 'Allsvenskan', WD2: 'Division 1', WD3: 'Division 2', WNL: 'Non-league', TR1: '1. Lig', TR2: '2. Lig',
+  'J-L': 'J.League', MLS: 'MLS',
+});
+
 export const CM9798_NATIONS = {
   aliases: {
     ...CM0102_NATIONS.aliases, Bielorussia: '112', Bosnia: '070', 'Burkino Faso': '854', Eire: '372', Netherland: '528',
@@ -80,7 +92,7 @@ const count = (map, key) => { map[key] = (map[key] || 0) + 1; };
  * its first record), since the extraction's own ids repeat (627 of them are shared by unrelated players). `source` is
  * the season's source block. Returns `{ doc, text, audit, warnings }`; throws on anything it does not understand.
  */
-export function buildCm9798Season({ players, teams }, { source, year, federations = FOOTBALL_FEDERATIONS }) {
+export function buildCm9798Season({ players, teams }, { source, year, federations = FOOTBALL_FEDERATIONS, everyClub = false }) {
   const warnings = [];
   const warn = message => warnings.push(message);
   const resolve = nationResolver(CM9798_NATIONS);
@@ -176,5 +188,11 @@ export function buildCm9798Season({ players, teams }, { source, year, federation
     id: CM9798_ID, version: doc.version, records: players.length, teams: teams.length, eligible: kept.length, dropped, unread, noTeam, coverage,
     leagues: leagueAudit, territory, shortNations: nationAudit.filter(n => !n.naturalLineup).map(n => `${n.id} ${n.name} (${n.players})`), warnings,
   };
-  return { doc, text: serializeFootballSet(doc), audit, warnings };
+  // Every team of a division with players, for the season's own country maps (scripts/build-season-countries.mjs,
+  // `everyClub`): its division's name, its nation as the game names it, its town, and its squad as a season file picks one.
+  const allClubs = everyClub ? teams.filter(team => team.division && byTeam.has(team)).map(team => ({
+    key: `cm9798:${team.id}`, name: team.name, short: team.shortName || null, nation: team.nation, country: resolve(team.nation),
+    league: CM9798_DIVISION_NAMES[team.division] ?? team.division, city: team.city || null, squad: pickFootballSquad(byTeam.get(team)),
+  })) : null;
+  return { doc, text: serializeFootballSet(doc), audit, warnings, ...(allClubs ? { allClubs } : {}) };
 }

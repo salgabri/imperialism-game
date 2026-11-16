@@ -69,7 +69,7 @@ const count = (map, key) => { map[key] = (map[key] || 0) + 1; };
  * Returns `{ doc, text, audit, warnings }`. Throws on a nationality that is neither a game nation nor listed in
  * EA_NO_TEAM, a row EA's format does not allow, or rows from more than one roster or date.
  */
-export function buildEaSeason(rows, { id, fifaVersion, edition, update }, { dataset, federations = FOOTBALL_FEDERATIONS } = {}) {
+export function buildEaSeason(rows, { id, fifaVersion, edition, update }, { dataset, federations = FOOTBALL_FEDERATIONS, assemble = assembleEaSeason } = {}) {
   if (!SET_ID.test(id)) throw new Error(`Season id ${id} is not like ea-fifa-15 or ea-fc-24`);
   const mine = rows.filter(row => Number(row.fifa_version) === fifaVersion && Number(row.fifa_update) === update);
   if (!mine.length) throw new Error(`${edition}: the export has no rows of roster update ${update}`);
@@ -97,10 +97,12 @@ export function buildEaSeason(rows, { id, fifaVersion, edition, update }, { data
     // Clubs by EA's competition id: the export names each club's league as it is in a later edition (FIFA 15's
     // Burnley sits in "Championship"), but its id is the edition's own.
     clubKey: Number(row.club_team_id) || null, league: leagueOf(row),
+    // Every club's own competition, first division or not, for the earlier seasons' country maps (scripts/lib/season-country-clubs.mjs).
+    leagueId: Number(row.league_id) || null,
   }));
   // The audit names each Rest of World club and the league it plays in, or why it plays in none.
   const placed = [...restOfWorld.values()].map(({ name, league, from }) => `${name}: ${league ? `${league[0]}, as in ${from}` : 'in no European first division in any edition'}`).sort();
-  return assembleEaSeason(records, { id, year: 2000 + fifaVersion, edition, update, source, federations, ...(placed.length ? { auditExtra: { restOfWorld: placed } } : {}) });
+  return assemble(records, { id, year: 2000 + fifaVersion, edition, update, source, federations, ...(placed.length ? { auditExtra: { restOfWorld: placed } } : {}) });
 }
 
 // Each export's clubs by EA club id: the first division each is in, edition by edition (a WeakMap, so one export is read once).
@@ -135,7 +137,7 @@ export function restOfWorldLeague(rows, club, fifaVersion, update) {
  * generated players are already gone, all of one SoFIFA roster and date. `edition` is a snapshots entry of
  * scripts/data/ea-seasons.json; `dataset` the snapshot's page. Returns `{ doc, text, audit, warnings }`.
  */
-export function buildSnapshotEaSeason(players, { id, fifaVersion, edition, update }, { dataset, federations = FOOTBALL_FEDERATIONS } = {}) {
+export function buildSnapshotEaSeason(players, { id, fifaVersion, edition, update }, { dataset, federations = FOOTBALL_FEDERATIONS, assemble = assembleEaSeason } = {}) {
   if (!SET_ID.test(id)) throw new Error(`Season id ${id} is not like ea-fifa-15 or ea-fc-24`);
   const rosters = new Set(), dates = new Set();
   const records = players.map(player => {
@@ -147,12 +149,12 @@ export function buildSnapshotEaSeason(players, { id, fifaVersion, edition, updat
     dates.add(info.snapshotDate);
     return { eaId: link[1], name: player.name, fullName: info.fullName, overall: player.rating, positions: info.naturalPositions.join(', '),
       keys: info.naturalPositions, dob: info.dateOfBirth, nationality: info.nationality, club: info.club, slug: link[2],
-      clubKey: info.clubId, league: EA_LEAGUES[player.leagueId] || null };
+      clubKey: info.clubId, league: EA_LEAGUES[player.leagueId] || null, leagueId: player.leagueId ?? null };
   });
   if (rosters.size !== 1) throw new Error(`${edition}: rows from rosters ${[...rosters].join(', ')}, not one`);
   if (dates.size !== 1) throw new Error(`${edition}: roster dates ${[...dates].join(', ')}, not one`);
   const source = { provider: 'EA Sports', edition, update, roster: [...rosters][0], snapshotDate: [...dates][0], url: dataset, rawScale: EA_SCALE };
-  return assembleEaSeason(records, { id, year: 2000 + fifaVersion, edition, update, source, federations });
+  return assemble(records, { id, year: 2000 + fifaVersion, edition, update, source, federations });
 }
 
 /**
@@ -168,7 +170,37 @@ export function buildSnapshotEaSeason(players, { id, fifaVersion, edition, updat
 export function assembleEaSeason(records, { id, year, edition, update, source, federations = FOOTBALL_FEDERATIONS, auditExtra = {}, everyLeague = false, noClubs = false }) {
   const warnings = [];
   const warn = message => warnings.push(message);
+  const { players, noTeam } = eaPlayersOf(records, { edition, source });
 
+  const pools = new Map();
+  for (const player of players) if (player.nationId) (pools.get(player.nationId) || pools.set(player.nationId, []).get(player.nationId)).push(player);
+  const nations = {}, nationAudit = [];
+  // Tonga, Samoa and the Cook Islands are listed only when the edition rates a player of theirs, and no edition does:
+  // without them a season plays as on the map it was built for, where they field no team (src/engine/footballSets.js),
+  // and every season rebuilds byte for byte.
+  const islands = PACIFIC_ISLANDS.some(nation => pools.get(nation)?.length);
+  for (const [nation, rec] of Object.entries(NATIONS)) {
+    if (!islands && PACIFIC_ISLANDS.includes(nation)) continue;
+    // East Germany is no EA nation: a nation of the map's earlier years is listed only with players of its own.
+    if (HISTORIC_NATIONS.includes(nation) && !pools.get(nation)?.length) continue;
+    const pool = pools.get(nation) || [];
+    const squad = pickFootballSquad(pool);
+    const lineup = selectLineup({ sport: 'football', squad });
+    nations[nation] = [Math.round(lineup.rating), pool.length, squad.map(player => player.tuple)];
+    nationAudit.push({ id: nation, name: rec[0], pool: pool.length, players: squad.length, strength: nations[nation][0],
+      naturalLineup: squad.length === CLUB_SIZE && lineup.slots.every(slot => slot.player && !slot.outOfPosition) });
+  }
+  return assembleEaClubs(players, { id, year, edition, update, source, federations, auditExtra, everyLeague, noClubs, warnings, warn, noTeam, nations, nationAudit, records });
+}
+
+/**
+ * EA's player records (assembleEaSeason's `records`) as the season writes them: `{ players, noTeam }`, each player
+ * `{ name, pos, positions, rating, sourceInfo, tuple, nationId, clubKey, league }` with EA's tuple, checked to rebuild
+ * exactly, and `noTeam` the nationalities with no national team, counted. Throws on a row EA's format does not allow or a
+ * nationality that is neither a game nation nor listed in EA_NO_TEAM. Shared with the earlier seasons' country maps
+ * (scripts/lib/season-country-clubs.mjs), so a club's players are the same tuples in both.
+ */
+export function eaPlayersOf(records, { edition, source }) {
   const nationIds = new Map(Object.entries(NATIONS).map(([nation, rec]) => [rec[0], nation]));
   const noTeamNames = new Set(EA_NO_TEAM);
   const unmapped = {}, noTeam = {}, seen = new Set();
@@ -196,26 +228,11 @@ export function assembleEaSeason(records, { id, year, edition, update, source, f
     throw new Error(`${edition}: nationalities with no game nation, and not listed as having no team: `
       + `${unmappedNames.map(nation => `${nation} (${unmapped[nation]} players)`).join(', ')}. Add them to EA_NATION_ALIASES or EA_NO_TEAM`);
   }
+  return { players, noTeam };
+}
 
-  const pools = new Map();
-  for (const player of players) if (player.nationId) (pools.get(player.nationId) || pools.set(player.nationId, []).get(player.nationId)).push(player);
-  const nations = {}, nationAudit = [];
-  // Tonga, Samoa and the Cook Islands are listed only when the edition rates a player of theirs, and no edition does:
-  // without them a season plays as on the map it was built for, where they field no team (src/engine/footballSets.js),
-  // and every season rebuilds byte for byte.
-  const islands = PACIFIC_ISLANDS.some(nation => pools.get(nation)?.length);
-  for (const [nation, rec] of Object.entries(NATIONS)) {
-    if (!islands && PACIFIC_ISLANDS.includes(nation)) continue;
-    // East Germany is no EA nation: a nation of the map's earlier years is listed only with players of its own.
-    if (HISTORIC_NATIONS.includes(nation) && !pools.get(nation)?.length) continue;
-    const pool = pools.get(nation) || [];
-    const squad = pickFootballSquad(pool);
-    const lineup = selectLineup({ sport: 'football', squad });
-    nations[nation] = [Math.round(lineup.rating), pool.length, squad.map(player => player.tuple)];
-    nationAudit.push({ id: nation, name: rec[0], pool: pool.length, players: squad.length, strength: nations[nation][0],
-      naturalLineup: squad.length === CLUB_SIZE && lineup.slots.every(slot => slot.player && !slot.outOfPosition) });
-  }
-
+/** assembleEaSeason's clubs, territory and document, from its players and nations. */
+function assembleEaClubs(players, { id, year, edition, update, source, federations, auditExtra, everyLeague, noClubs, warnings, warn, noTeam, nations, nationAudit, records }) {
   const byClub = new Map();
   for (const player of players) {
     const { league } = player;
