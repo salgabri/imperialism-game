@@ -134,6 +134,38 @@
     "d208-545": {
       "file": "Logo Odense Boldklub 2025.svg",
       "sha256": "98ecdb0425c401823419f94660c6431c6e707fa39bb242a1cbf4296c570e3d38"
+    },
+    "d620-1487": {
+      "file": "SL Benfica logo.svg",
+      "sha256": "c843e3793f5aedb2433de351a92eb449747b8ed24d302a890202e3e1681fd580"
+    },
+    "d380-3800256": {
+      "file": "Sassuolocalcio2026.svg",
+      "sha256": "42934eed55f1fb4b3f846279e9a14f2cfa2c94612d8886bfc29a13f716073b8f",
+      "wiki": "it"
+    },
+    "d620-1488": {
+      "file": "Logo SC Braga 2018.svg",
+      "sha256": "5cbacccbfeef68f2b7c6969f84f151f29aa77820ccbd0a16859982095d53e8fd",
+      "wiki": "fr"
+    },
+    "d724-1664": {
+      "file": "Athletic Club Bilbao logo.svg",
+      "sha256": "bf6588c07b4b308633d22b23f623f27c689792ad15aaf9056e593092cc2a1821",
+      "wiki": "it"
+    },
+    "w-fc-zurich": {
+      "file": "FC Zurich logo (with two stars).svg",
+      "sha256": "97e81c6e133f1500fb0c1db2f311352fbce971d85100431b83f5799e01577238"
+    },
+    "w-fc-fleury-91": {
+      "file": "Logo FC Fleury 91 - 2023-11.svg",
+      "sha256": "05dc65c16b9c09d68fc209898eba003efe8513ee4debb043de1aebda3e48a20e",
+      "wiki": "fr"
+    },
+    "w-montpellier-fc": {
+      "file": "Montpellier FC logo.png",
+      "sha256": "3e15e42020678f9aa57f9085cc1977ccde1d4b6aaede1ca57148432e96a97730"
     }
   },
   "twins": {

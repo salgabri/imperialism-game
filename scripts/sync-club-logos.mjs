@@ -39,8 +39,9 @@
 //     purpose, with --pin.
 //   - The file's 250px thumbnail from upload.wikimedia.org (allowed by its robots.txt), trimmed
 //     and saved as WebP fitting 128x128.
-//   - A crest named in scripts/data/club-logos.json "pages" (club id -> { file, sha256 }) needs none of those answers:
-//     its English Wikipedia file page (/wiki/File:…, which robots.txt allows) gives the facts the API's answers gave,
+//   - A crest named in scripts/data/club-logos.json "pages" (club id -> { file, sha256, wiki? }) needs none of those
+//     answers: its English Wikipedia file page (/wiki/File:…, which robots.txt allows; another language's where `wiki`
+//     names it, as Italian Wikipedia's for Sassuolo's crest of 2025) gives the facts the API's answers gave,
 //     the address of the file's original on upload.wikimedia.org and the licence its licence template states (the
 //     licensetpl data the API's LicenseShortName and NonFree are read from). The original must have the SHA-256 pinned
 //     there, and is drawn as the period crests are (scripts/lib/crest-image.mjs). So a club's crest of today can change
@@ -275,15 +276,15 @@ async function fileInfo(names) {
 }
 
 /**
- * A "pages" file's details from its English Wikipedia file page (scripts/lib/wiki-file-page.mjs), the page cached as it
- * came: { original, page, licence, nonFree }.
+ * A "pages" file's details from its Wikipedia file page (scripts/lib/wiki-file-page.mjs: English Wikipedia's, or
+ * `wiki`'s), the page cached as it came: { original, page, licence, nonFree }.
  */
-async function pageInfo(name) {
-  const url = filePageUrl(name);
+async function pageInfo(name, wiki = 'en') {
+  const url = filePageUrl(name, wiki);
   const { html } = await cachedGz(path.join(cacheDir, `page-${sha1(url)}.json.gz`), false,
     async () => ({ url, html: await (await limit(() => fetchOk(url))).text() }));
   try {
-    return filePageFacts(html, name);
+    return filePageFacts(html, name, wiki);
   } catch (error) {
     throw new Error(`${url}: ${error.message}. Nothing was written.`);
   }
@@ -406,7 +407,7 @@ for (const [id, record] of Object.entries(pageOverrides)) {
   if (!club) throw new Error(`club-logos.json "pages" names unknown club ${id}`);
   if (!record?.file || !/^[0-9a-f]{64}$/.test(record.sha256 ?? '')) throw new Error(`club-logos.json "pages" ${id}: give its file and its original's SHA-256`);
   const name = fileName(record.file);
-  const info = await pageInfo(name);
+  const info = await pageInfo(name, record.wiki ?? 'en');
   const bytes = await download(info.original);
   if (sha256(bytes) !== record.sha256) {
     throw new Error(`${id}: ${info.original} (SHA-256 ${sha256(bytes)}) is not the original pinned in ${path.relative(root, overridesFile)} "pages". Nothing was written.`);

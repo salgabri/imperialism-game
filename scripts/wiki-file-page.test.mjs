@@ -40,4 +40,19 @@ test('a file page that does not link one original of the file, or lacks its addr
 test('a file page\'s address is the one Wikipedia gives it', () => {
   assert.equal(filePageUrl('LDLC ASVEL Basket.svg'), 'https://en.wikipedia.org/wiki/File:LDLC_ASVEL_Basket.svg');
   assert.equal(filePageUrl('Beşiktaş logo.png'), 'https://en.wikipedia.org/wiki/File:Be%C5%9Fikta%C5%9F_logo.png');
+  assert.equal(filePageUrl('Sassuolocalcio2026.svg', 'it'), 'https://it.wikipedia.org/wiki/File:Sassuolocalcio2026.svg');
+  assert.throws(() => filePageUrl('X.svg', 'it.wikipedia.org/evil'), /not a Wikipedia language/);
+});
+
+test('another language\'s file page gives that Wikipedia\'s own upload (Sassuolo\'s crest of 2025 on Italian Wikipedia)', () => {
+  const it = page({ file: 'Sassuolocalcio2026.svg', hash: '4/45', licence: 'Marchio', nonFree: false })
+    .replace(/wikipedia\/en\//g, 'wikipedia/it/').replace('https://en.wikipedia.org', 'https://it.wikipedia.org');
+  assert.deepEqual(filePageFacts(it, 'Sassuolocalcio2026.svg', 'it'), {
+    original: 'https://upload.wikimedia.org/wikipedia/it/4/45/Sassuolocalcio2026.svg',
+    page: 'https://it.wikipedia.org/wiki/File:Sassuolocalcio2026.svg',
+    licence: 'Marchio',
+    nonFree: false,
+  });
+  // Read as English Wikipedia's page, it links no original of its own.
+  assert.throws(() => filePageFacts(it, 'Sassuolocalcio2026.svg'), /0 links to the original/);
 });
