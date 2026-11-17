@@ -48,7 +48,9 @@ test('a national five\'s player who also plays for a built-in club has his club\
         `${id} ${name} ${rating}: ${atClubs.map(p => `${p.name} ${p.rating} (${p.club})`).join(', ')}`);
     }
   }
-  assert.ok(shared >= 40, `${shared} national players also start for a club`);
+  // 38 since the EuroLeague's re-rating of 2026-11-18 (41 before): Daniel Theis, Filip Petrušev and Vasilije Micić now
+  // sit for their clubs. Who starts follows the ratings, so the floor leaves room for a refresh.
+  assert.ok(shared >= 35, `${shared} national players also start for a club`);
 });
 
 test('every national and NBA five fields all five positions without a penalty, using second positions', () => {
