@@ -22,12 +22,17 @@ const NONE = Object.freeze([]);
 /**
  * A club's crest on its land in Flags mode, placed like a flag's emblem (engine/flagSymbolLayout.js): one undistorted
  * square, centred in a 4:3 field the size of the land, on the club's colour. Up to about 30% of the land: the crest
- * stands in for the club's code, which WorldMap leaves off land that shows one.
+ * stands in for the club's code, which WorldMap leaves off land that shows one. A club with no crest shows its
+ * monogram in the same square (FlagArt), as the UI shows its monogram chip.
  */
 const CREST_PROFILE = Object.freeze({ id: 'club-crest', sourceWidth: 640, sourceHeight: 480,
   bounds: Object.freeze({ x: 190, y: 110, w: 260, h: 260 }) });
 /** A team's crest URL when it is a club with one in season year `year` (null: today's; src/data/crests.js). */
 const crestOf = (team, year) => (team?.kind === 'club' ? crestUrl(team.id, year) : null);
+/** The monogram a club flies on its land when it has no crest (`crest`): its code. Null for a nation or a crest. */
+const monogramOf = (team, crest) => (team?.kind === 'club' && !crest ? team.code || null : null);
+/** Whether a team flies anything in Flags mode: a nation its flag, a club its crest or, without one, its monogram. */
+const fliesMark = (team, year) => !!(team?.flagId || crestOf(team, year) || monogramOf(team, null));
 const NO_IDENTITY = Object.freeze({ meId: null, meFill: false, opponentId: null });
 const NO_CLAIMS = Object.freeze({});
 // mapFlags' empty value: one object (never written to), so the memoised country rows keep their identity.
@@ -139,27 +144,31 @@ export function handleMapMove(e) {
 /**
  * Each flag region's banner (`components` from createFlagRegionIndex) and the clip paths every territory shows it
  * through: one per territory and region, its parts joined (engine/flagClips.js, kept per region object).
- * `markOf(ownerId)` says what an owner flies: `{ crestUrl }` for a club with a crest, else `{ nationId }` for a flag, and
- * the `color` behind it; an owner with neither flies nothing. `idPrefix` keeps two maps' banners apart in one document.
- * A flag with a separated emblem places the emblem (engine/flagSymbolLayout.js); a whole flag, or one whose emblem has
- * no room, is fitted to its land whole (`fitLayout`, engine/flagFit.js).
+ * `markOf(ownerId)` says what an owner flies: `{ crestUrl }` for a club with a crest, `{ monogram }` (its code) for one
+ * without, else `{ nationId }` for a flag, and the `color` behind it; an owner with none of them flies nothing.
+ * `idPrefix` keeps two maps' banners apart in one document. A crest or a monogram sits in the crest's square
+ * (CREST_PROFILE); a flag with a separated emblem places the emblem (engine/flagSymbolLayout.js); a whole flag, or one
+ * whose emblem has no room, is fitted to its land whole (`fitLayout`, engine/flagFit.js).
  * → { flagParts: Map(territory id → [{ id, d }]), flagPatterns }
  */
 function layoutBanners(components, markOf, { idPrefix = '' } = {}) {
   const flagParts = new Map(), flagPatterns = [];
   for (const component of components) {
-    const { crestUrl = null, nationId = null, color = V4.flagBg } = markOf(component.ownerId) || {};
+    const { crestUrl = null, monogram: code = null, nationId = null, color = V4.flagBg } = markOf(component.ownerId) || {};
     const url = crestUrl || flagUrl(nationId);
-    if (!url) continue;
+    // A club with no crest shows its monogram where the crest would be.
+    const monogram = url ? null : code;
+    if (!url && !monogram) continue;
     // Owner + the lowest stable piece id is short and unique, including when
     // a country's mainland and overseas polygons need different flag tiles.
     const id = idPrefix + component.key.split('|').slice(0, 2).join('-').replace(/[^a-zA-Z0-9_-]/g, '-');
     const b = component.bbox;
-    const code = crestUrl ? null : FLAG_CODES[nationId];
-    const symbolProfile = crestUrl ? CREST_PROFILE : FLAG_SYMBOLS[code];
+    const club = !!(crestUrl || monogram);
+    const flag = club ? null : FLAG_CODES[nationId];
+    const symbolProfile = club ? CREST_PROFILE : FLAG_SYMBOLS[flag];
     const symbolLayout = symbolProfile ? layoutFlagSymbol(component, symbolProfile) : null;
-    const fit = !crestUrl && !symbolLayout ? flagFit(code) : null;
-    flagPatterns.push({ id, ownerId: component.ownerId, url, color, symbolProfile, symbolLayout, crestUrl,
+    const fit = !club && !symbolLayout ? flagFit(flag) : null;
+    flagPatterns.push({ id, ownerId: component.ownerId, url, color, symbolProfile, symbolLayout, crestUrl, monogram,
       fitLayout: fit ? layoutFlagFit(component, fit) : null,
       fieldUrl: symbolProfile?.fieldFile ? `${import.meta.env.BASE_URL}${symbolProfile.fieldFile}` : null,
       symbolUrl: symbolProfile?.symbolFile ? `${import.meta.env.BASE_URL}${symbolProfile.symbolFile}` : null,
@@ -193,21 +202,22 @@ function flagIndex(app) {
 /** What each owner flies on the campaign map (layoutBanners' `markOf`). */
 const campaignMarks = (teams, playing, year = null) => ownerId => {
   const owner = playing ? teams[ownerId] : null;
-  // README §Map rendering: flag-bg behind a flag (clubs keep their colour, under the crest).
-  return { crestUrl: crestOf(owner, year), color: owner?.col || V4.flagBg,
+  const crest = crestOf(owner, year);
+  // README §Map rendering: flag-bg behind a flag (clubs keep their colour, under the crest or monogram).
+  return { crestUrl: crest, monogram: monogramOf(owner, crest), color: owner?.col || V4.flagBg,
     nationId: playing ? owner?.flagId : NATIONS[ownerId] ? ownerId : DEPENDENCIES[ownerId]?.of };
 };
 
 /**
- * One regional banner across mainland and nearby islands, not tiny repeats; a club flies its crest. `mapMode` is the
- * map's mode unless asked for Flags' banners while the map shows another (the warm-up).
+ * One regional banner across mainland and nearby islands, not tiny repeats; a club flies its crest, or its monogram
+ * without one. `mapMode` is the map's mode unless asked for Flags' banners while the map shows another (the warm-up).
  */
 export function mapFlags(playing, mapMode = this.state.mapMode) {
   const { teams } = this.state;
   if (mapMode !== 'flags') return NO_FLAGS;
   // Clubs wear the crests of the campaign's season.
   const year = playing ? this.state.settings?.dataYear ?? null : null;
-  if (playing && !Object.values(teams).some(team => team.flagId || crestOf(team, year))) return NO_FLAGS;
+  if (playing && !Object.values(teams).some(team => fliesMark(team, year))) return NO_FLAGS;
   if (!flagIndex(this)) return NO_FLAGS;
   // While signing, the projected board: the taken land already flies the winner's banner (DEC D15). Claimed nations fly
   // their holder's banner too (paintedOwnership).
@@ -238,11 +248,11 @@ function warmupWanted(app) {
 
 /**
  * The warm-up's steps for the board on screen: the region index, then each region's banner, then the banners. None
- * when no team flies a flag or crest (Flags mode then shows none).
+ * when no team flies a flag, crest or monogram (Flags mode then shows none).
  */
 function* flagWarmupSteps(app) {
   const source = app.flagRegionSource;
-  if (!Object.values(app.state.teams || {}).some(team => team.flagId || crestOf(team, app.state.settings?.dataYear ?? null))) return;
+  if (!Object.values(app.state.teams || {}).some(team => fliesMark(team, app.state.settings?.dataYear ?? null))) return;
   if (!app.flagComponents) {
     // Kept on the app, so a click on Flags meanwhile finishes this build (flagIndex) instead of starting it over.
     const build = app.flagIndexBuild = { source, steps: flagRegionIndexSteps(source.geometry, { maxGap: source.maxGap }) };
@@ -303,11 +313,11 @@ export function stopFlagWarmup() {
 /** Banner ids of the setup map card: apart from the campaign map's, which stays mounted behind the wizard. */
 const SETUP_FLAG_PREFIX = 'setup-';
 /**
- * Step 1's map card in Flags mode: every starting team's flag (a nation) or crest (a club) across the land it holds at
- * kick-off, one banner per region exactly as the campaign's Flags mode draws it (mapFlags), on the board the card
- * shows: a world theatre's (`setupMapPreview`) or the chosen country's once it is on screen (`domesticStatus`).
- * `fills` gives a club's land its colour, the ground behind its crest or, with no crest, all it shows. Render-safe;
- * memoised per board. → { flagParts, flagPatterns, fills: Map(territory id → colour) } | null
+ * Step 1's map card in Flags mode: every starting team's flag (a nation) or crest (a club; its monogram without one)
+ * across the land it holds at kick-off, one banner per region exactly as the campaign's Flags mode draws it (mapFlags),
+ * on the board the card shows: a world theatre's (`setupMapPreview`) or the chosen country's once it is on screen
+ * (`domesticStatus`). `fills` gives a club's land its colour wherever no banner covers it. Render-safe; memoised per
+ * board. → { flagParts, flagPatterns, fills: Map(territory id → colour) } | null
  */
 export function setupMapFlags(setup = this.state.setup) {
   if (!this.geo || !this.flagRegionSource) return null;
@@ -321,8 +331,9 @@ export function setupMapFlags(setup = this.state.setup) {
   const result = layoutBanners(index.components(opening), ownerId => {
     const team = marks[ownerId];
     if (!team) return null;
-    return team.kind === 'club' ? { crestUrl: crestUrl(ownerId, year), color: team.col || V4.flagBg }
-      : { nationId: team.flagId, color: team.col || V4.flagBg };
+    if (team.kind !== 'club') return { nationId: team.flagId, color: team.col || V4.flagBg };
+    const crest = crestUrl(ownerId, year);
+    return { crestUrl: crest, monogram: monogramOf(team, crest), color: team.col || V4.flagBg };
   }, { idPrefix: SETUP_FLAG_PREFIX });
   const fills = new Map();
   for (const [territory, ownerId] of Object.entries(opening)) {

@@ -165,6 +165,27 @@ test('a fit keeps only the flag region source: the first Flags view builds the i
   } finally { f.close(); }
 });
 
+test('Flags mode: a club with no crest flies its monogram, so a board of such clubs still shows banners', () => {
+  const f = fixture();
+  try {
+    const { app } = f;
+    app.geo.fitTo = () => {};
+    App.prototype.fitMap.call(app, IDS);
+    // Clubs with no flag and no crest file (their ids are nations', which have none): before monograms, nothing flew.
+    const clubs = Object.fromEntries(Object.entries(app.state.teams).map(([id, team]) =>
+      [id, { ...team, kind: 'club', flagId: null, code: `C${id}`, col: '#345678' }]));
+    app.setState({ teams: clubs, mapMode: 'flags' });
+    const { flagPatterns } = app.mapFlags(true);
+    assert.deepEqual(flagPatterns.map(pattern => pattern.ownerId).sort(), IDS, 'every club flies a banner');
+    for (const pattern of flagPatterns) {
+      assert.deepEqual([pattern.url, pattern.crestUrl, pattern.monogram, pattern.color], [null, null, `C${pattern.ownerId}`, '#345678']);
+    }
+    assert.equal(countryOf(app, '250').fill, 'transparent', 'the land shows its banner');
+    assert.deepEqual(countryOf(app, '250').flagParts.map(part => part.id),
+      [flagPatterns.find(pattern => pattern.ownerId === '250').id]);
+  } finally { f.close(); }
+});
+
 /**
  * Lets the Flags warm-up run: its quiet turns wait out real time since the commit that queued it (quietTurns.js) and
  * then the fixture's timers, so this lets both pass until `done()` holds (or 3 s).

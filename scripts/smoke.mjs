@@ -264,9 +264,12 @@ function checkBackdrop(label, backdrop) {
   check(`${label}: the backdrop is muted, inert and never a territory`, backdrop.muted && backdrop.inert && backdrop.notTerritory, JSON.stringify(backdrop));
 }
 
-/** A country map: every section held and, in Flags mode, painted in its club's colour with its crest when it has one. */
+/**
+ * A country map: every section held and, in Flags mode, painted in its club's colour with its crest, or its monogram
+ * without one.
+ */
 function checkDomesticMap(label, snapshot) {
-  check(`${label}: in Flags mode every section shows its holder's club colour, with its crest when it has one, and no flag`, snapshot.correct);
+  check(`${label}: in Flags mode every section shows its holder's club colour, with its crest or else its monogram, and no flag`, snapshot.correct);
   check(`${label}: every section is held, so no land is neutral`, snapshot.neutralCount === 0 && snapshot.sections === snapshot.expectedSections,
     `${snapshot.sections}/${snapshot.expectedSections} sections, ${snapshot.neutralCount} neutral`);
   checkEmpireFlags(label, snapshot.empireFlags);
@@ -537,7 +540,7 @@ if (!filtered && !process.argv.includes('--duel-frame-only')) {
       if (r.domestic) check('every section is held, so labels follow owners only', r.neutralTerritories === 0 && r.restored.onlyCurrentOwners);
       else check('uninvolved territories do not acquire empire labels', r.neutralTerritories > 0 && r.restored.onlyCurrentOwners);
       if (scenario.layer === 'clubs') check('club territory labels use club codes', r.usesClubCodes && r.restored.count > 0);
-      if (scenario.layer === 'clubs') check('Flags mode prints no club code over a drawn crest', r.crestLabels.drawn > 0 && r.crestLabels.labelledOverCrest === 0,
+      if (scenario.layer === 'clubs') check('Flags mode prints no club code over a drawn crest or monogram', r.crestLabels.drawn > 0 && r.crestLabels.labelledOverCrest === 0,
         JSON.stringify(r.crestLabels));
     } catch (error) {
       failures++;
@@ -895,7 +898,7 @@ for (const scenario of campaignScenarios) {
       check('map decoded all shapes', r.nations > 150, `${r.nations}`);
     }
     if (r.layer === 'clubs') {
-      check('in Flags mode a drawn crest replaces its club code', r.crestLabelsAtKickoff.drawn > 0 && r.crestLabelsAtKickoff.labelledOverCrest === 0,
+      check('in Flags mode a drawn crest or monogram replaces its club code', r.crestLabelsAtKickoff.drawn > 0 && r.crestLabelsAtKickoff.labelledOverCrest === 0,
         JSON.stringify(r.crestLabelsAtKickoff));
     }
     check('theatre fielded a full bracket', r.fielded > 1, `${r.fielded}`);
@@ -933,15 +936,12 @@ for (const scenario of campaignScenarios) {
       check('a conquest takes whole starting groups, and the first takes exactly the loser’s', r.domestic.groupsStayedWhole && r.domestic.firstConquestTakesGroup);
       check('the victory screen names the country', r.domestic.victoryNamesCountry);
     }
-    if (r.layer === 'clubs' && !r.championCrest) {
-      check('a club without a crest paints territory rather than flying a banner', r.flagPatterns === 0, `${r.flagPatterns} flag patterns`);
-      check('conquered land shows the conqueror’s colour', r.championFill === r.territoriesHeld, `${r.championFill} of ${r.territoriesHeld}`);
-    } else {
-      check('every held territory with visible fill area flies a flag (or its club’s crest)', r.flagFills === r.paintableTerritories, `${r.flagFills} fills vs ${r.paintableTerritories} paintable territories`);
-      check('champion flags have one unique pattern per regional land group', r.flagPatterns > 0 && r.flagPatterns === r.uniqueHeldPatterns
-        && r.flagPatterns === r.finalFlagScope.empireFlags.componentCount, `${r.flagPatterns} patterns, ${r.uniqueHeldPatterns} unique`);
-      check('every land region flies the conqueror’s flag', r.patternsFlyingChampionFlag === r.flagPatterns, `${r.patternsFlyingChampionFlag} champion flag patterns`);
-    }
+    // A club with no crest flies its monogram, so every champion flies a banner: its flag, its crest or its monogram.
+    check(`every held territory with visible fill area flies the champion’s ${r.championMark}`, r.flagFills === r.paintableTerritories,
+      `${r.flagFills} fills vs ${r.paintableTerritories} paintable territories`);
+    check('champion banners have one unique pattern per regional land group', r.flagPatterns > 0 && r.flagPatterns === r.uniqueHeldPatterns
+      && r.flagPatterns === r.finalFlagScope.empireFlags.componentCount, `${r.flagPatterns} patterns, ${r.uniqueHeldPatterns} unique`);
+    check('every land region flies the conqueror’s banner', r.patternsFlyingChampionFlag === r.flagPatterns, `${r.patternsFlyingChampionFlag} champion banners`);
     check('victory screen rendered', r.victoryScreen);
     check('completed campaign leaves no spinner or simulation timers', r.campaignIdle);
     check('result names the winner, territory gain and claimed player', r.structuredConsequences);

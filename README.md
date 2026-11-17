@@ -366,8 +366,8 @@ manager of the theatre's favourite, with decisions from the first match.
    the campaign's opening camera frames it (the continent for Europe). The map
    zooms and pans like the campaign's: scroll or pinch, drag, and double-click
    or the −/+/reset buttons (phones pinch). Its **Political** / **Flags** switch
-   (**Crests** with clubs) puts each team's flag or club crest on its land, as
-   the campaign's Flags mode does. Its foot
+   (**Crests** with clubs) puts each team's flag or club crest (a club without
+   one, its monogram) on its land, as the campaign's Flags mode does. Its foot
    shows the number of teams, the number of matches and the estimated length
    (the length's title names the Show matches mode the estimate assumes). With
    clubs in football, the **One country · top clubs** dropdown under the
@@ -1295,7 +1295,7 @@ labels the marker **Home town** instead of Capital. Tooltips name the section
 and read "Home of Burnley", "Held by … since Round …" or "Unclaimed". The
 conquest screen and results name the sections taken. When an exclave's attack
 has to cross a neighbour, the Next fixture route line reads "Through foreign
-land — never claimed". In Flags mode, clubs keep their own colours and carry their crests.
+land — never claimed". In Flags mode, clubs keep their own colours and carry their crests (a club without one, its monogram).
 
 Each country is one file, `public/domestic/<id>.json`, fetched only when chosen.
 The setup screen shows a loading state, and Retry if the fetch fails. The setup
@@ -2599,8 +2599,8 @@ region share one part, outlined together so that it covers exactly the land they
 cover, while a large landmass and islands far apart keep parts of their own. Bounds update after conquest, not on zoom or pan. Only land
 reveals the flag; seas and neutral countries stay untouched. A solid rectangle
 in the nation's colour is the fallback. Non-participants remain unflagged in
-continental campaigns. A club's land keeps its club colour with its crest placed
-on it, below.
+continental campaigns. A club's land keeps its club colour with its crest (or,
+without one, its monogram) placed on it, below.
 
 A region's flag goes on its **body**: its land in pieces at least a quarter the
 size of its largest, so mainland Greece but not Crete, Luzon and Mindanao but
@@ -2721,7 +2721,11 @@ crest, placed like a flag's emblem: one undistorted crest per region, fitted on
 owned land at up to about 30% of it. Land too small for one stays plain. The
 crest stands in for the club's code there: a club whose crest is on the map has
 no code printed over its land, while a club whose crest fits nowhere keeps its
-code. A club without a crest keeps its monogram chip and its code on the map.
+code. A club without a crest shows its monogram chip instead, on the map too:
+the same 4:3 chip with its code, centred where the crest would sit and drawn in
+either theme as the chip is, so no club's land is bare in **Flags** mode. Like a
+crest, a monogram on the map stands in for the club's code, and land too small
+for one stays plain.
 
 The crests come from Wikipedia. `npm run sync:club-logos` finds each club's
 Wikidata item (by SPARQL from QLever's Wikidata endpoint, since the Wikidata Query
