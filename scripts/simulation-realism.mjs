@@ -1,6 +1,7 @@
 // Plays whole league seasons with the built-in clubs, each of football's five leagues whole (leagueClubs), and
 // measures what a fan of each league would look at: scores, draws and overtime, margins, standings, and who scores.
-// American football also plays a few earlier NFL and AFL seasons' clubs under their own day's rules (NFL_ERAS).
+// American football also plays a few earlier NFL and AFL seasons' clubs under their own day's rules (NFL_ERAS), the
+// computed ones also on their own schedules beside the real standings' spread and margins (ownSchedule).
 // Tennis has no league: its nations play Davis Cup ties (the women's game's, Billie Jean King Cup ties), the sixteen
 // strongest each meeting every other once a season; and a season of each earlier format the cups played, under its
 // year's rules (formatsReport: best of five sets, advantage sets, three-rubber ties). Football's extra time is a
@@ -394,6 +395,7 @@ function nflEra(id, seasons, seed, venue) {
   const sides = played.length * 2;
   const level = meta.year < 1974 ? scoring.ties / (real.games / 2) : scoring.nflverse ? scoring.nflverse.overtime / (real.games / 2) : null;
   return {
+    ...ownSchedule(id, sport, clubs, seasons, hashStr(`${seed}:schedule`), venue),
     id, league, year: meta.year, clubs: clubs.length, games, overtimeRule: sport.prepareMatch(clubs[0], clubs[1]).rules.overtime,
     pointsPerTeam: mean(played.flatMap(g => [g.ga, g.gd])), realPoints: real.points / real.games,
     touchdowns: count.touchdowns / sides, realTouchdowns: real.td / real.games,
@@ -403,6 +405,45 @@ function nflEra(id, seasons, seed, venue) {
     safeties: count.safeties / sides, realSafeties: real.safeties / real.games,
     overtimeRate: share(played, g => g.tie), realLevel: level,
     marginMean: mean(played.map(g => Math.abs(g.ga - g.gd))),
+  };
+}
+
+/**
+ * A computed season (pfa-*) played on its own schedule, every game of its snapshot's (scripts/data/pfa-seasons/, the
+ * games its clubs' move toward their results read), `seasons` times: the standings' spread (win% SD) and the margins
+ * (one-score games, by exactly 3 and by exactly 7), each beside the real season's. A schedule keeps the real spread
+ * comparable: the 1960s clubs met their own conference twelve times in fourteen. Empty for any other season.
+ */
+function ownSchedule(id, sport, clubs, seasons, seed, venue) {
+  const key = id.startsWith('pfa-afl-') ? `afl-${id.slice(8)}` : id.startsWith('pfa-') ? id.slice(4) : null;
+  const file = key && new URL(`./data/pfa-seasons/${key}.json`, import.meta.url);
+  const snapshot = file && existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null;
+  if (!snapshot?.games?.length) return {};
+  const at = new Map(Object.entries(snapshot.teams).map(([franchise, team]) => [franchise, clubs.findIndex(club => club.id === team.era)]));
+  const games = snapshot.games.map(([, home, away, homeScore, awayScore]) => ({ home: at.get(home), away: at.get(away), homeScore, awayScore }));
+  const marginsOf = list => ({ oneScore: share(list, m => m <= 8), byThree: share(list, m => m === 3), bySeven: share(list, m => m === 7) });
+  const spreadOf = (wins, played) => sd(wins.map((w, i) => w / played[i]));
+  const realWins = clubs.map(() => 0), realPlayed = clubs.map(() => 0);
+  for (const g of games) {
+    realPlayed[g.home]++; realPlayed[g.away]++;
+    realWins[g.home] += g.homeScore > g.awayScore ? 1 : g.homeScore === g.awayScore ? 0.5 : 0;
+    realWins[g.away] += g.awayScore > g.homeScore ? 1 : g.homeScore === g.awayScore ? 0.5 : 0;
+  }
+  const rng = makeRng(seed), eff = clubs.map(teamEff), prepared = new Map(), margins = [], spreads = [];
+  for (let s = 0; s < seasons; s++) {
+    const wins = clubs.map(() => 0);
+    for (const g of games) {
+      const key2 = `${g.away}:${g.home}`;
+      if (!prepared.has(key2)) prepared.set(key2, sport.prepareMatch(clubs[g.away], clubs[g.home], eff[g.away], eff[g.home], venue));
+      const result = sport.sampleResult(rng, prepared.get(key2), DRAMA);
+      wins[result.ga > result.gd ? g.away : g.home]++;
+      margins.push(Math.abs(result.ga - result.gd));
+    }
+    spreads.push(spreadOf(wins, realPlayed));
+  }
+  return {
+    ownSchedule: { games: games.length, winPctSd: mean(spreads), ...marginsOf(margins) },
+    realOwnSchedule: { winPctSd: spreadOf(realWins, realPlayed), ...marginsOf(games.map(g => Math.abs(g.homeScore - g.awayScore))) },
   };
 }
 
@@ -1223,6 +1264,13 @@ EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
       + ` ${pair(e.touchdowns, e.realTouchdowns, x => num(x, 2)).padEnd(13)} ${pair(e.fieldGoals, e.realFieldGoals, x => num(x, 2)).padEnd(13)}`
       + ` ${pair(e.xpRate, e.realXpRate, pct).padEnd(15)} ${pair(e.twoPointShare, e.realTwoPointShare, pct).padEnd(15)}`
       + ` ${pair(e.overtimeRate, e.realLevel, pct).padEnd(14)}`);
+  }
+  lines.push('  the computed seasons on their own schedules (real: the season\'s games)');
+  lines.push(`  ${'season'.padEnd(10)} ${'win% SD'.padEnd(15)} ${'one-score (≤ 8)'.padEnd(17)} ${'by exactly 3'.padEnd(15)} ${'by exactly 7'.padEnd(15)}`);
+  for (const e of report.nflEras.filter(era => era.ownSchedule)) {
+    const own = e.ownSchedule, real = e.realOwnSchedule;
+    lines.push(`  ${`${e.league} ${e.year}`.padEnd(10)} ${pair(own.winPctSd, real.winPctSd, x => num(x, 3)).padEnd(15)}`
+      + ` ${pair(own.oneScore, real.oneScore, pct).padEnd(17)} ${pair(own.byThree, real.byThree, pct).padEnd(15)} ${pair(own.bySeven, real.bySeven, pct).padEnd(15)}`);
   }
   const m = report.mlb, rm = REAL.mlb;
   lines.push(`\nMLB — ${m.clubs} clubs, 162 games (real: ${rm.note})`);

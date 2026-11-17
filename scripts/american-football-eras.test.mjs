@@ -83,7 +83,7 @@ test('every earlier season plays its own day\'s rules, one sport object per seas
     assert.notEqual(sport, americanFootball, season.id);
     assert.equal(sport, matchSport(settingsOf(season)), `${season.id}: one object, so caches keyed by it hold`);
     assert.equal(sport.id, 'american-football');
-    assert.equal(sport.simulationVersion, 5);
+    assert.equal(sport.simulationVersion, 6);
     assert.ok(figuresOf(season), `${season.id}: the table has the ${league}'s ${year}`);
     assert.ok(NFL_SEASON_MATCHUPS[season.id], `${season.id}: its average matchup`);
     const { rules } = sport.prepareMatch(builtIn[0], builtIn[1]);

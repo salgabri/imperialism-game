@@ -127,11 +127,22 @@ const touchdownsPerDrive = s => s.td / s.games / DRIVES;
 const tryPerDrive = s => s.fga / s.games / (DRIVES - s.td / s.games);
 
 /**
+ * How far a season's odds at its average matchup sit below what they would be with today's spread of matchups, in log
+ * odds, for odds `logOdds` that move by `scale` a point of edge: the drive odds are a logistic curve in the edge, bent
+ * upward while a drive scores less than half the time, so clubs further apart score more on average at the same average
+ * matchup. To second order that is half the bend, (1 − 2p) × scale², times the variance of the season's edges beyond
+ * today's (`spread`, src/data/nflLeagueAverages.js).
+ */
+const spreadAllowance = (logOdds, scale, extraSpread) => -0.5 * (1 - 2 * logistic(logOdds)) * scale ** 2 * extraSpread;
+
+/**
  * The rules of `league`'s `year` (an NFL season from 1960, the latest finished one's figures standing in for any later,
  * or the AFL's 1960–69) for the built-in season data set `dataSet`, or null when the table has no such season:
  * - the drive odds at its own average matchup (`edge`: its clubs' mean offence less their mean defence, src/data/
  *   nflLeagueAverages.js), which sit from today's at the built-in clubs' average matchup as far, in log odds, as the
- *   season's touchdowns and field-goal tries a possession sit from 2023 and 2024's;
+ *   season's touchdowns and field-goal tries a possession sit from 2023 and 2024's, less the allowance for its clubs'
+ *   spread beyond today's (spreadAllowance), so that across its own pairings it scores as its league did; a data set the
+ *   table lacks (or none) plays at today's matchup and spread;
  * - its league's field goals and extra points made (`make`, `xp`) by its average kicker (`kicker`), each kicker a rating
  *   point better making 0.6 more field goals in a hundred, as today, and more extra points by as much less than today's
  *   0.3 as its league missed fewer than today's 5% (`xpSlope`: none in the AFL of 1965, which made all 267), so the
@@ -149,9 +160,12 @@ export function seasonRules(league, year, dataSet) {
   const make = figures.fgm / figures.fga, xp = figures.xpm / figures.xpa;
   const share = twoPointTry(league, year) && figures.twoMade > 0 ? figures.twoAtt / figures.td : 0;
   const ratio = share / (reference.twoAtt / reference.td);
+  const td = logit(BASE_TD) + TD_SCALE * today.edge + logit(touchdownsPerDrive(figures)) - logit(touchdownsPerDrive(reference));
+  const fgTry = logit(BASE_FG_TRY) + FG_SCALE * today.edge + logit(tryPerDrive(figures)) - logit(tryPerDrive(reference));
+  const extraSpread = matchup.spread - today.spread;
   return Object.freeze({ league, year,
-    td: logistic(logit(BASE_TD) + TD_SCALE * today.edge + logit(touchdownsPerDrive(figures)) - logit(touchdownsPerDrive(reference))),
-    fgTry: logistic(logit(BASE_FG_TRY) + FG_SCALE * today.edge + logit(tryPerDrive(figures)) - logit(tryPerDrive(reference))),
+    td: logistic(td + spreadAllowance(td, TD_SCALE, extraSpread)),
+    fgTry: logistic(fgTry + spreadAllowance(fgTry, FG_SCALE, extraSpread)),
     edge: matchup.edge, make, makeRange: Object.freeze([make - 0.25, Math.min(0.97, make + 0.12)]), xp,
     xpRange: Object.freeze([xp - 0.1, Math.min(0.999, xp + 0.04)]), xpSlope: XP_PER_POINT * (1 - xp) / (1 - BASE_XP), kicker: matchup.kicking,
     two: share ? figures.twoMade / figures.twoAtt : 0, early: share ? EARLY_TWO * ratio : 0, chart: share ? Math.min(1, ratio) : 0,
@@ -561,7 +575,7 @@ export const americanFootball = defineSportData({ ...americanFootballRules }, { 
 /**
  * One sport object per earlier season ('madden-2010@2010', its data set and year), under that season's rules
  * (seasonRules); a season the table lacks plays today's. Version 5: each season plays its own day's scoring, tries and
- * overtime.
+ * overtime; 6: its drive odds allow for how far apart its clubs are (spreadAllowance).
  */
 const seasonSports = rulesMemo(key => {
   const [dataSet, year] = key.split('@');
@@ -569,7 +583,7 @@ const seasonSports = rulesMemo(key => {
   if (!rules) return americanFootball;
   return defineSportData({
     ...americanFootballRules,
-    simulationVersion: 5,
+    simulationVersion: 6,
     clock: { ...americanFootballRules.clock, ot: rules.ot },
     prepareMatch: (attacker, defender, effA, effD, venue) => prepareMatch(attacker, defender, effA, effD, venue, rules),
 

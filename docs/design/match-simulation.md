@@ -669,7 +669,8 @@ simulation version 4 (extra time, then the tie-break of the season's day; versio
 was the realism pass above and went straight to penalties), FIBA basketball version 3,
 NBA basketball version 5 and baseball version 2 (the realism pass above). American
 football's version 3 added its touchdown tries and safeties and version 4 its overtime
-answer; its earlier seasons play version 5, each by its day's rules. Baseball's earlier
+answer; its earlier seasons play version 6, each by its day's rules, its drive odds allowing for how far apart its
+clubs are (version 5 without). Baseball's earlier
 seasons are version 3, which plays each one's runs and extra innings. Women's football
 is at version 2 (extra time), and ice hockey, tennis and women's tennis at version 1;
 an earlier ice hockey season's scoring and overtime are version 2, and an earlier tennis

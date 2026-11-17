@@ -20,8 +20,8 @@ export const countOf = text => {
 /**
  * One team-season page (/<year><league><team>.html, the regular season): `{ year, team, league, games, roster, stats,
  * totals, notes }`.
- * - `games`: the regular season's, `{ date, site: 'H' | 'A' | 'N', opponent, for, against, venue, location }` (exhibition and
- *   playoff games left out).
+ * - `games`: the regular season's, `{ date, site: 'H' | 'A' | 'N', opponent, opponentPage, for, against, venue, location }`
+ *   (exhibition and playoff games left out; `opponentPage` the opponent's own page, '1965nflpit.html').
  * - `roster`: `{ id, name, no, positions: ['RLB', 'MLB'], gp, gs }`, `id` the site's player page.
  * - `stats`: each table by its title (RUSHING, PASSING …), each player's row by his id: `{ column: number }`.
  * - `totals`: each table's Team Totals and Opponents Totals rows.
@@ -55,7 +55,9 @@ export function parseTeamSeason(html) {
         // A game the strikes of 1982 and 1987 cancelled is listed without a score.
         if (!/^\d+$/.test(pf) || !/^\d+$/.test(pa)) continue;
         const [month, date, year] = day.split('/');
-        page.games.push({ date: `${year}-${month.padStart(2, '0')}-${date.padStart(2, '0')}`, site, opponent, for: countOf(pf), against: countOf(pa), location, venue });
+        // The opponent's own page ('1965nflpit.html'), which names its club where the text may not.
+        const opponentPage = /href="\/?([^"/]+\.html)"/.exec(row.cells[3])?.[1] ?? null;
+        page.games.push({ date: `${year}-${month.padStart(2, '0')}-${date.padStart(2, '0')}`, site, opponent, opponentPage, for: countOf(pf), against: countOf(pa), location, venue });
       }
     } else if (name === 'ROSTER') {
       const col = key => heads.indexOf(key);
@@ -95,6 +97,48 @@ export function clubPagesOf(html, year, league) {
     out.push(`${m[1]}.html`);
   }
   return out;
+}
+
+/**
+ * A league-season's games, each once, as srsOf reads them (docs/design/computed-ratings.md, step 5): `clubs` its club
+ * pages, `[{ file, page }]` with `file` the page's name ('1965nflgb.html') and `page` parsed, `clubOf(file)` the club a
+ * page is. Each game is on both its clubs' pages, and each club's points are read from its own: the site's score tables
+ * slip now and then on the other side's (the 1961 Giants' page has their 24–9 win at St. Louis as 24–0), while a club's
+ * own column adds up to its scoring table's points. A game is its home club's (site H on one page, A on the other), or
+ * neutral (N on both). Games dated within `leave` ([first, last], inclusive) are left out. Throws on a game one page
+ * lacks, sites that do not pair, or an opponent no page of the season is.
+ * → `{ games: [{ date, home, away, homeScore, awayScore, neutral? }], slips: ['1961-10-08 …'] }`, by date, then home club.
+ */
+export function seasonGames(clubs, clubOf, { leave = null } = {}) {
+  const byGame = new Map();
+  for (const { file, page } of clubs) {
+    for (const game of page.games) {
+      if (!clubs.some(club => club.file === game.opponentPage)) throw new Error(`${file}: ${game.date}'s opponent ${game.opponent} (${game.opponentPage}) is no club of the season`);
+      const key = `${game.date}|${[file, game.opponentPage].sort().join('|')}`;
+      const sides = byGame.get(key) ?? {};
+      if (sides[file]) throw new Error(`${file}: two games with ${game.opponent} on ${game.date}`);
+      sides[file] = game;
+      byGame.set(key, sides);
+    }
+  }
+  const games = [], slips = [];
+  for (const [key, sides] of byGame) {
+    const [date, a, b] = key.split('|');
+    const one = sides[a], other = sides[b];
+    if (!one || !other) throw new Error(`${one ? a : b} has a game on ${date} that ${one ? b : a} does not`);
+    const sites = one.site + other.site;
+    if (!['HA', 'AH', 'NN'].includes(sites)) throw new Error(`${a} and ${b} on ${date}: sites ${one.site} and ${other.site}`);
+    if (one.against !== other.for || other.against !== one.for) {
+      slips.push(`${date}: ${a} reads ${one.for}–${one.against}, ${b} ${other.for}–${other.against}; each club's own points kept`);
+    }
+    if (leave && date >= leave[0] && date <= leave[1]) continue;
+    const [home, away] = one.site === 'A' ? [other, one] : [one, other];
+    const [homeFile, awayFile] = one.site === 'A' ? [b, a] : [a, b];
+    games.push({ date, home: clubOf(homeFile), away: clubOf(awayFile), homeScore: home.for, awayScore: away.for, ...(sites === 'NN' ? { neutral: true } : {}) });
+  }
+  games.sort((x, y) => (x.date < y.date ? -1 : x.date > y.date ? 1 : x.home < y.home ? -1 : x.home > y.home ? 1 : 0));
+  slips.sort();
+  return { games, slips };
 }
 
 // ---------- positions ----------
