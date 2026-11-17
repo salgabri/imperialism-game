@@ -2781,9 +2781,10 @@ instead of the original, as college football's 138 school crests do, since
 `upload.wikimedia.org` answers a run of originals with HTTP 429.
 
 The clubs of today's country maps that had no crest got one wherever Wikipedia has it
-(17 November 2026). Of the 4,184 clubs on the 128 FM 26 maps, 1,208 had none, so in
-**Crests** mode over a third of the land (4,499 of 12,800 sections) showed only a club
-colour. Each was matched to its Wikidata item: the one its home town came from, else
+(17 November 2026). Of the 4,184 clubs on the 128 FM 26 maps, 1,208 had none, over a
+third of the land (4,499 of 12,800 sections), which showed only a club colour in
+**Crests** mode until the monograms came the same day. Each was matched to its
+Wikidata item: the one its home town came from, else
 by its names (FM's full and short name, transliterations folded) against every
 football club of its country, or of the world for clubs whose items name no country
 (New Caledonia's are filed under France). The item's article gave the infobox crest,
