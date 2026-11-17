@@ -32,6 +32,25 @@ test('most real basketball players cover two positions', () => {
   }
 });
 
+test('a national five\'s player who also plays for a built-in club has his club\'s name and rating', () => {
+  // NBA 2K's spelling and overall for an NBA player, the EuroLeague's estimate for a EuroLeague one
+  // (scripts/build-basketball.mjs): one man is never "Nikola Jokic" for Serbia and "Nikola Jokić" in Denver.
+  const fold = name => name.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+  const clubPlayers = new Map();
+  for (const club of basketball.clubs) for (const [name, , rating] of club.squad) clubPlayers.set(fold(name), [...(clubPlayers.get(fold(name)) ?? []), { name, rating, club: club.name }]);
+  let shared = 0;
+  for (const [id, [, , squad]] of Object.entries(basketball.rosters)) {
+    for (const [name, , rating] of squad) {
+      const atClubs = clubPlayers.get(fold(name));
+      if (!atClubs) continue;
+      shared++;
+      assert.ok(atClubs.some(p => p.name === name && p.rating === rating),
+        `${id} ${name} ${rating}: ${atClubs.map(p => `${p.name} ${p.rating} (${p.club})`).join(', ')}`);
+    }
+  }
+  assert.ok(shared >= 40, `${shared} national players also start for a club`);
+});
+
 test('every national and NBA five fields all five positions without a penalty, using second positions', () => {
   let second = 0;
   for (const team of [...nations(), ...clubs()]) {

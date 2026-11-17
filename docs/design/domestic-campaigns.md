@@ -1079,6 +1079,10 @@ Project's results the same way, leaving out the games the league staged at the S
 Suburbs, Newtown, the South Queensland Crushers, the Western Reds and the Hunter Mariners) keep their own ids and rank
 after today's clubs, so section ids still follow one order; `nrlSpecs` refuses any other club that is no franchise of
 today's. A season is keyed by its year, but Super League's 1997, which ran beside the ARL's, by its id (`nrl-sl-1997`).
+The maps before 1998 name their seasons' premiership in the NRL's place (2026-11-14): `league` is `NSWRFL` to
+`nrl1982`, `NSWRL` from `nrl1984`, `ARL` from `nrl1995` and `Super League` on `sl1997`, as the AFL's maps name the AFL,
+so the setup's theatre and club count and the campaign's title say the competition of the day; the seasons' clubs carry
+the same league. `LEAGUES.nrl.eraLeagues` lists the four, so that building another league's maps keeps their entries.
 
 | Map | Seasons | Grounds and bases that set it apart |
 | --- | --- | --- |
@@ -1400,9 +1404,9 @@ none, to the season's Top 124 as before; going back to the built-in season goes
 back to today's map. The "One country · top clubs" list shows the chosen season's
 countries only.
 
-**What ships.** 892 maps over the 31 seasons with clubs, 23,597 club-seasons, 111.7 MB
+**What ships.** 963 maps over the 31 seasons with clubs, 25,065 club-seasons, 119.7 MB
 (47–249 KB a map, median 122 KB), each fetched only when chosen; the index
-`src/data/domesticSeasons.js` is about 11 KB. `docs/design/domestic-seasons-audit.json`
+`src/data/domesticSeasons.js` is about 12 KB. `docs/design/domestic-seasons-audit.json`
 gives every map's layer, clubs, homes and size.
 
 | Seasons | Source of the clubs | Maps | Countries a season |
@@ -1410,6 +1414,27 @@ gives every map's layer, clubs, homes and size.
 | 2006/07 – 2025/26 (20) | EA's editions, every division EA rates | 483 | 20 – 28 |
 | 1993/94, 1997/98 – 2003/04 (8) | Championship Manager's databases, every club with players | 231 | 11 – 51 |
 | 1994/95 – 1996/97 (3) | SWOS's team files, every league and division SWOS has | 178 | 59 – 60 |
+| 2025/26 | the CM 01/02 Update Team's December 2025 database, for the countries EA does not rate | 71 | 71 |
+
+**The Update Team's countries** (since 17 November 2026, by the user's choice of that day:
+[football-year-permissions.md](football-year-permissions.md)). An EA season whose season
+has a CM 01/02 Update Team database (`scripts/data/cm0102-updates.json`, its eleven Data
+tables fetched by `scripts/sync-cm0102-updates.mjs` into `data-src/cm0102/<release>/Data/`,
+pinned by size and SHA-256) also gets a map of every country that database rates ten clubs
+of and the EA edition does not: the season's fill (`updateTeamFills` in
+`scripts/build-season-countries.mjs`), read by the CM 01/02 builder with every club. Such a
+map is `kind: 'cm0102'` with the database's own source (provider and compiler "CM 01/02
+Update Team", version the release's label), so its players are credited to the Update Team;
+its clubs take `f-` ids after the EA maps' and never a season file club's, whose players are
+EA's. 2025/26 has its fill from the December 2025 database (archive.org item `cm-25`, only
+its Data tables read, by range requests): 71 countries, 1,468 clubs, 8.0 MB, from Brazil's
+100 and Russia's 60 to the Philippines' 10 (a country today's maps lack, so its map is a
+season's only). 30 of them had no earlier-season map at all (Egypt, Morocco, Tunisia,
+Nigeria, Ghana, Iran, Qatar, the UAE, Thailand, Vietnam, Canada, Costa Rica, Bosnia,
+Georgia, Kazakhstan…). The other EA seasons' databases (2007/08–2024/25) wait for the user to
+download them from the champman0102.co.uk forum, whose attachments need a login; 2006/07
+has none. The database also rates 23 of EA's own countries deeper (Turkey 100 clubs to EA's
+18, Argentina 100 to 30); those maps stay EA's.
 
 England has 88 to 90 clubs in an EA season (the four divisions less their Welsh
 clubs), 100 in most CM seasons (the four divisions and the Conference's strongest),
@@ -1422,8 +1447,8 @@ seasons field every league it has, Europe's and the Americas', Algeria's, South
 Africa's, Japan's, Taiwan's, Australia's and New Zealand's (until 2026-11-16 only the
 seven big leagues', the other league files uncached); India's, Ghana's and Canada's
 clubs, fewer than ten, have no map, nor 1994/95's and 1995/96's United States. A
-club's home lies in its own home section for 19,546 of 23,072 located club-seasons
-(84.7%); 525 club-seasons are placed (estimates).
+club's home lies in its own home section for 20,674 of 24,500 located club-seasons
+(84.4%); 565 club-seasons are placed (estimates).
 
 **Clubs** (`scripts/lib/season-country-clubs.mjs`, read through the season
 builders, so the players are the season file's own tuples):
@@ -1467,6 +1492,14 @@ builders, so the players are the season file's own tuples):
 - **Ids.** A club the season file has keeps its id there (same country and name);
   every other one takes `f-<slug of its name>`, numbered after a clash, the strongest
   of the season first.
+
+**Full names and short names.** A club the season's source names in full ("Clube de Regatas
+Vasco da Gama") is matched to today's map by its full name, then by its source's short name where one of today's
+names is exactly that ("HJK", "Ferencváros"; a short name inside a longer one named the
+wrong club too often: "KaPa", "Apollon", "Independiente Mza."). Botafogo and Pumas, whose
+full names had matched Brasília's and Guadalajara's clubs on Wikidata, are overrides since
+17 November 2026, which moved them on CM's Brazil and Mexico maps of 1993/94 and 2000/01 to
+2003/04.
 
 **Homes** (`scripts/lib/season-club-homes.mjs`, written once to
 `scripts/data/season-club-homes.json` by `--homes`, offline from the caches): a hand

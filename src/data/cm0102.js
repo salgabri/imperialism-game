@@ -190,12 +190,16 @@ function checkIds(label, table, idOffset, expected, warn) {
   if (wrong) warn(`${label}: ${wrong} of ${table.count} record ids differ from their row`);
 }
 
-/** A name table's text by row, decoded on first use; blank and out-of-range rows are null. */
+/**
+ * A name table's text by row, decoded on first use; blank and out-of-range rows are null. A name record is one line:
+ * some carry a line break and a second copy after it (CM3's "Masashi\r\nMasashi" before "Nakayama"), and some a
+ * doubled space ("Abdel  Hady" in CM 99/00), so a name is cut at its first line break and its spaces are single.
+ */
 function nameTable(table) {
   const cache = new Map();
   return row => {
     if (!Number.isInteger(row) || row < 0 || row >= table.count) return null;
-    if (!cache.has(row)) cache.set(row, text(table.bytes, table.offset + row * table.size, 51) || null);
+    if (!cache.has(row)) cache.set(row, text(table.bytes, table.offset + row * table.size, 51, true).replace(/\s+/g, ' ') || null);
     return cache.get(row);
   };
 }

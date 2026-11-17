@@ -13,7 +13,10 @@
 // scripts/build-ea-seasons.mjs reads the files.
 import { EA_ROLES, EA_SCALE } from '../../src/data/eaPlayers.js';
 import { EA_LEAGUES, SET_ID, assembleEaSeason } from './ea-seasons.mjs';
-import { parseCsv } from './football-data.mjs';
+import { latinPart, parseCsv } from './football-data.mjs';
+
+// The full-name trim is the EA reader's (scripts/lib/football-data.mjs), which every SoFIFA long name passes through.
+export { latinPart };
 
 /**
  * Europe's first divisions as EA's website names them, by EA's competition id (EA_LEAGUES). The website files the few
@@ -37,8 +40,6 @@ const NAMING_PLAYERS = 5;
 
 // A player's page on EA's website: /player-ratings/<slug>/<EA id>.
 const SITE_PLAYER = /^https:\/\/www\.ea\.com\/games\/ea-sports-fc\/ratings\/player-ratings\/([a-z0-9-]+)\/(\d{1,10})\/?$/;
-// A letter of another script than Latin. Spaces, punctuation and combining accents belong to every script.
-const NOT_LATIN = /[^\p{Script=Latin}\p{Script=Common}\p{Script=Inherited}]/u;
 
 /** Whether `text` is a real day, YYYY-MM-DD. */
 const isDay = text => /^\d{4}-\d{2}-\d{2}$/.test(text) && new Date(`${text}T00:00:00Z`).toISOString().slice(0, 10) === text;
@@ -85,18 +86,6 @@ export function readLaterRows(text) {
     else throw new Error(`The later file lists EA id ${id} twice, differently`);
   }
   return { rows: byId, unreadable, repeats };
-}
-
-/**
- * A full name without the same name in another script glued to its end ("Hakim Ziyechحكيم زياش" → "Hakim Ziyech"), or
- * '' when no Latin part stands alone (a name only in another script, or scripts that alternate).
- */
-export function latinPart(text) {
-  const name = String(text || '').trim();
-  const cut = name.search(NOT_LATIN);
-  if (cut < 0) return name;
-  if (/\p{Script=Latin}/u.test(name.slice(cut))) return '';
-  return name.slice(0, cut).trim();
 }
 
 /** Age in whole years on `day` of someone born on `dob`, both YYYY-MM-DD. */

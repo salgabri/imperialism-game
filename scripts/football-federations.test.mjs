@@ -223,9 +223,10 @@ const XI = [R('gk'), R('d', 'right'), R('d', 'centre'), R('d', 'centre'), R('d',
   R('m', 'right'), R('m', 'centre'), R('m', 'centre'), R('m', 'left'), R('f', 'centre'), R('f', 'centre')];
 
 /** The fixture database with eleven Russians, eleven stronger Ukrainians, two 'Soviet Union' players, eleven Croats,
- * eleven Slovaks and two players of SI's 'Zaire'. */
+ * eleven Slovaks and two players of SI's 'Zaire'. Its own players are born 32 years before the fixture's usual, 1938 to
+ * 1952, so all are 16 by 1 July 1969 (MIN_PLAYING_AGE) and its Germans still play as West Germany. */
 function databaseOf1970() {
-  const db = sampleDatabase();
+  const db = sampleDatabase({ birthYearShift: 32 });
   const europe = db.continents.findIndex(c => c.name === 'Europe'), africa = db.continents.findIndex(c => c.name === 'Africa');
   const nation = (name, continent = europe) => db.nations.findIndex(n => n.name === name) + 1
     || db.nations.push({ name, short: name, code: name.slice(0, 3).toUpperCase(), continent });

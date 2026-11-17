@@ -188,6 +188,17 @@ test('every shipped rating and identity resolves to its exact committed database
   }
 });
 
+test('a SoFIFA long name loses the same name glued on in another script', async () => {
+  const ea = await loadEaPlayers(new URL('./data/ea-fc26.csv', import.meta.url));
+  const fullNames = new Map(ea.players.map(player => [player.sourceInfo.id, player.sourceInfo.fullName]));
+  // EA FC 26's snapshot glued 286 names to their Cyrillic, Arabic or other spelling: "Kiril Vasilev Despodov" + Cyrillic,
+  // and "Milan Borjan" + a Serbian Cyrillic copy typed partly in Latin look-alikes. The full name is shown on hover.
+  assert.equal(fullNames.get('ea:245977'), 'Kiril Vasilev Despodov');
+  assert.equal(fullNames.get('ea:205211'), 'Milan Borjan');
+  const glued = /\p{Script=Latin}[\p{L}--\p{Script=Latin}]|[\p{L}--\p{Script=Latin}]\p{Script=Latin}/v;
+  assert.deepEqual([...fullNames.values()].filter(name => glued.test(name)), []);
+});
+
 test('generated EA clubs are excluded by 29-February births without touching real clubs', async () => {
   const csv = await readFile(new URL('./data/ea-fc26.csv', import.meta.url), 'utf8');
   const [header, ...rows] = parseCsv(csv);

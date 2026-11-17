@@ -92,8 +92,8 @@ test('the four seasons are built in, newest first, each its committed file, cred
 const COVERAGE = {
   'swos-9596': { players: 2816, nations: 132, completeXIs: 132, clubs: 124, leagues: 18 },
   'swos-9495': { players: 2805, nations: 131, completeXIs: 131, clubs: 124, leagues: 18 },
-  'cm0102-2020-11-cm93': { players: 2148, nations: 124, completeXIs: 77, clubs: 124, leagues: 20 },
-  'cm0102-2017-04-cm89': { players: 1216, nations: 138, completeXIs: 89, clubs: 0, leagues: 0 },
+  'cm0102-2020-11-cm93': { players: 2119, nations: 121, completeXIs: 75, clubs: 124, leagues: 20 },
+  'cm0102-2017-04-cm89': { players: 1203, nations: 138, completeXIs: 88, clubs: 0, leagues: 0 },
 };
 
 test('each season decodes, with the nations and clubs its source rates; 1989/90 has nations only', () => {
@@ -235,7 +235,7 @@ test('1989/90: a German at an East German club plays for East Germany, so West G
   assert.equal(eastGermany.length, 11);
   assert.ok(eastGermany.every(tuple => tuple[5] === 'Germany' && noNationAt.clubs.includes(tuple[6])));
   assert.ok(['Matthias Sammer', 'Andreas Thom', 'Ulf Kirsten'].every(name => eastGermany.some(tuple => tuple[1] === name)));
-  assert.equal(doc.nations['278'][1], 1431, 'every rated German at an East German club');
+  assert.equal(doc.nations['278'][1], 1400, 'every rated German at an East German club, 16 or older when the season starts');
   assert.ok(westGermany.some(tuple => tuple[1] === 'Lothar Matthäus' && tuple[6] === 'Internazionale'));
   const audit = JSON.parse(read('docs/design/football-retro-seasons-audit.json')).seasons.find(season => season.id === 'cm0102-2017-04-cm89').audit;
   assert.equal(audit.noTeam['Germany at East German clubs'], undefined, 'they play for East Germany');

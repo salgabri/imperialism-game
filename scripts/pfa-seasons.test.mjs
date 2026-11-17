@@ -62,6 +62,14 @@ test('a team-season page gives the regular season\'s games, the roster with its 
     ['1965aflbuf.html', '1965aflnyj.html']);
 });
 
+test('a stray note after a player\'s name is cut: a name holds no digit or question mark', () => {
+  // The 1981 Dolphins' page names "Bob Baumhower 9SK?" (scripts/lib/pfa.mjs); a nickname in quotes is his own.
+  const parsed = parseTeamSeason(page({ games: [game('', 'H', 20, 17, 'Field')],
+    roster: [['b/baum01000', 'Bob Baumhower 9SK?', 73, 'NT', 1, 1], ['j/jone08000', 'Ed "Too Tall" Jones', 72, 'RDE', 1, 1],
+      ['s/smit00100', 'Bubba Smith', 78, 'LDE', 1, 1]] }));
+  assert.deepEqual(parsed.roster.map(r => r.name), ['Bob Baumhower', 'Ed "Too Tall" Jones', 'Bubba Smith']);
+});
+
 test('the site\'s positions are the game\'s: LS and RS are safeties, flankers and ends receivers, slips read as meant', () => {
   assert.deepEqual(['LS', 'RS', 'FL', 'SE', 'OE', 'HB', 'FB', 'LOT', 'ROG', 'C', 'LDE', 'MG', 'RLB', 'WLB', 'LCB', 'DB', 'HBK', 'K', 'P', 'LONG']
     .map(positionOfCode), ['S', 'S', 'WR', 'WR', 'WR', 'RB', 'RB', 'OL', 'OL', 'OL', 'DL', 'DL', 'LB', 'LB', 'CB', 'CB', 'TE', 'K', 'P', 'LONG']);

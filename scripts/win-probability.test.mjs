@@ -287,7 +287,14 @@ test('basketball mid-game values are calibrated against full simulated matches',
     }
     close(predicted / count, wins / count, 0.03, `mean chance at ${minute}'`);
     assert.ok(brier < baseline * 0.9, `the live value carries information at ${minute}'`);
-    for (const bin of bins) if (bin.n >= 200) close(bin.p / bin.n, bin.wins / bin.n, 0.07, `calibration bin at ${minute}'`);
+    // A bin of a few hundred games measures its win rate to about ±0.03, so it may stray by 0.07 or three of its
+    // standard errors, whichever is wider: Serbia–Italy's 20' bin of 275 games once read 0.711 against 0.636 here,
+    // where 20,000 games put it at 0.706 against 0.693.
+    for (const bin of bins) {
+      if (bin.n < 200) continue;
+      const rate = bin.wins / bin.n;
+      close(bin.p / bin.n, rate, Math.max(0.07, 3 * Math.sqrt(rate * (1 - rate) / bin.n)), `calibration bin at ${minute}'`);
+    }
   }
 });
 
