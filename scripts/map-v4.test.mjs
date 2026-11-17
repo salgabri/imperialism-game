@@ -453,6 +453,22 @@ test('Flags mode: a club whose crest is drawn shows the crest, not its code; one
   } finally { await view.close(); }
 });
 
+test('Flags mode: a club with no crest shows its monogram chip, which stands in for its code as a crest does', async () => {
+  const monogram = (ownerId, code, x, symbolLayout) => ({ id: `${ownerId}-monogram`, ownerId, url: null, crestUrl: null,
+    monogram: code, color: '#888', bbox: { x, y: 100, w: 300, h: 200 }, symbolLayout });
+  const flagPatterns = [monogram('380', 'ROM', 100, { field: { x: 100, y: 100, w: 300, h: 200 }, symbol: { x: 200, y: 150, w: 80, h: 80 } }),
+    monogram('040', 'VIE', 700, null)];
+  const labelIds = () => globalThis.__mapV4LastLayout.labels.map(label => label.id).sort();
+  const { props } = mapProps({ mapMode: 'flags', flagPatterns });
+  const view = await mount(props);
+  try {
+    assert.deepEqual(view.qa('[data-flag-layout="monogram"] [data-flag-monogram]').map(chip => chip.textContent), ['ROM'],
+      'one chip is drawn: the other land has no room for one');
+    assert.deepEqual(labelIds(), ['040', '688'], 'the club with a drawn chip gets no code over it; the others keep their labels');
+    assert.ok(!view.qa('text[data-empire-label]').some(label => label.dataset.empireLabel === '380'));
+  } finally { await view.close(); }
+});
+
 test('labels: 700 for your empire, 600 for others, capped by the viewport tier (A-6)', async () => {
   globalThis.__mapV4Layouts = 0;
   const tiers = [[1920, 'wide', 30], [1440, 'std', 22], [1024, 'tablet', 20], [390, 'phone', 18]];

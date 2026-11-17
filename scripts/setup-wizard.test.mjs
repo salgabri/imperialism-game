@@ -1278,7 +1278,8 @@ test('the map card zooms like the campaign map, and its Political / Flags switch
   await view.click(view.button('Flags', card));
   assert.deepEqual(modes, ['flags']);
 
-  // Flags: a nation's banner and a club's crest, each shown through its land's parts; a club with no crest keeps its colour.
+  // Flags: a nation's banner and a club's crest, each shown through its land's parts; club land no banner covers keeps
+  // its colour.
   const flag = { id: 'setup-a-a-0', ownerId: 'a', url: '/flags/fr.svg', crestUrl: null, color: '#fafafa', symbolLayout: null,
     bbox: { x: 99.9, y: 49.9, w: 100.2, h: 100.2 } };
   const crest = { id: 'setup-b-b-0', ownerId: 'b', url: '/club-logos/b.webp', crestUrl: '/club-logos/b.webp', color: '#123456',
@@ -1307,7 +1308,7 @@ test('the map card zooms like the campaign map, and its Political / Flags switch
     assert.ok(clip?.querySelector('path'), 'each part is clipped to its own outline');
   }
   assert.deepEqual([...flagged.querySelectorAll('.setup-map__sections path')].map(path => path.getAttribute('fill')),
-    ['transparent', 'transparent', '#abcdef'], 'land under a banner shows it; a club with no crest its colour');
+    ['transparent', 'transparent', '#abcdef'], 'land under a banner shows it; club land no banner covers its colour');
   assert.equal(flagged.querySelectorAll('.setup-map__sections path').length, 3, 'one land path per section, banners apart');
   await flags.click(flags.button('Flags', flagged));
   await flags.click(flags.button('Political', flagged));

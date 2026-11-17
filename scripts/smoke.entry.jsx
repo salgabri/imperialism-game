@@ -199,8 +199,10 @@ function flagAssetsMatch(banner, code) {
 
 /** A club's crest URL when it has one (README "Club crests"). */
 const crestOf = team => (team?.kind === 'club' ? clubLogoUrl(team.id) : null);
-/** Whether a team's land carries a banner in Flags mode: a nation's flag or a club's crest. */
-const flies = team => !!(FLAG_CODES[team?.flagId] || crestOf(team));
+/** The monogram a club with no crest shows on its land in Flags mode: its code (README "Club crests"). */
+const monogramOf = team => (team?.kind === 'club' && !crestOf(team) ? team.code || null : null);
+/** Whether a team's land carries a banner in Flags mode: a nation's flag, a club's crest or, without one, its monogram. */
+const flies = team => !!(FLAG_CODES[team?.flagId] || crestOf(team) || monogramOf(team));
 
 /** A club crest banner: the club colour across the region and at most one undistorted crest inside it. */
 function crestAssetsMatch(banner, team) {
@@ -216,8 +218,32 @@ function crestAssetsMatch(banner, team) {
     && w > 0 && h > 0 && x >= px - eps && y >= py - eps && x + w <= px + pw + eps && y + h <= py + ph + eps;
 }
 
-/** The right banner for a region's owner: its crest for a club with one, else its flag. */
-const ownerAssetsMatch = (banner, team) => (crestOf(team) ? crestAssetsMatch(banner, team) : flagAssetsMatch(banner, FLAG_CODES[team?.flagId]));
+/**
+ * A club monogram banner (a club with no crest): the club colour across the region and, where there is room, one 4:3
+ * chip inside it carrying the club's code, painted by the stylesheet (no artwork, no stroke or fill of its own).
+ */
+function monogramAssetsMatch(banner, team) {
+  const code = monogramOf(team);
+  if (!code || !banner || banner.localName !== 'g' || banner.hasAttribute('viewBox') || banner.hasAttribute('transform')
+    || banner.getAttribute('pointer-events') !== 'none' || banner.dataset.flagLayout !== 'monogram'
+    || banner.hasAttribute('data-flag-source')
+    || banner.querySelector('image, [stroke], [transform], [style*="transform"], [tabindex], a, use, foreignObject')) return false;
+  const [fallback, chip, ...rest] = banner.children;
+  if (fallback?.localName !== 'rect' || fallback.getAttribute('fill') !== team.col || rest.length) return false;
+  if (!chip) return true;
+  const rect = chip.querySelector('rect'), text = chip.querySelector('text');
+  if (chip.localName !== 'g' || chip.getAttribute('class') !== 'fi-map-monogram' || chip.dataset.flagMonogram !== code
+    || !rect || rect.hasAttribute('fill') || text?.textContent !== code) return false;
+  const [px, py, pw, ph] = numericBox(fallback);
+  const [x, y, w, h] = numericBox(rect);
+  const eps = 1e-6;
+  return w > 0 && h > 0 && Math.abs(h / w - .75) < eps
+    && x >= px - eps && y >= py - eps && x + w <= px + pw + eps && y + h <= py + ph + eps;
+}
+
+/** The right banner for a region's owner: its crest for a club with one, its monogram for one without, else its flag. */
+const ownerAssetsMatch = (banner, team) => (crestOf(team) ? crestAssetsMatch(banner, team)
+  : monogramOf(team) ? monogramAssetsMatch(banner, team) : flagAssetsMatch(banner, FLAG_CODES[team?.flagId]));
 
 /**
  * Who the map paints a country for: its holder, else the team that claimed it (a world map's nation with no team,
@@ -242,15 +268,14 @@ function expectedFlagsShown(app) {
   const paths = countryPaths();
   const domestic = domesticOf(app);
   if (domestic) {
-    // A country map is exactly its sections, each in its club's colour with the club's crest when it has one.
-    // Setup flies nothing.
+    // A country map is exactly its sections, each in its club's colour with the club's crest, or its monogram without
+    // one. Setup flies nothing.
     const ids = paths.map(path => path.dataset.country);
     if (app.state.mapMode !== 'flags' || ids.length !== domestic.sectionIds.size || !ids.every(id => domestic.sectionIds.has(id))) return false;
     if (!playing) return !countryFlagParts().length && !document.querySelector('g[id^="fi-flag-"]');
     return paths.every(path => {
       const owner = app.state.teams[app.state.own[path.dataset.country]];
       if (owner?.kind !== 'club') return false;
-      if (!crestOf(owner)) return path.getAttribute('fill') === owner.col && !flagBanner(path);
       return filledRings(path.getAttribute('d')).length ? bannerPartsMatch(app, path, owner) : countryFlagParts(path.dataset.country).length === 0;
     });
   }
@@ -261,7 +286,6 @@ function expectedFlagsShown(app) {
     const owner = playing ? app.state.teams[holderOf(app, id)] : null;
     const flagId = playing ? owner?.flagId : FLAG_CODES[id] ? id : DEPENDENCIES[id]?.of;
     const parts = countryFlagParts(id);
-    if (owner?.kind === 'club' && !crestOf(owner)) return parts.length === 0 && !flagBanner(path) && path.getAttribute('fill') === owner.col;
     if (owner?.kind === 'club') return filledRings(path.getAttribute('d')).length === 0 ? parts.length === 0 : bannerPartsMatch(app, path, owner);
     if (!FLAG_CODES[flagId]) return parts.length === 0 && !flagBanner(path);
     if (filledRings(path.getAttribute('d')).length === 0) return parts.length === 0;
@@ -468,10 +492,10 @@ function regionalFlagsSnapshot(app) {
     conqueredCount: conquered.length,
     conqueredKeepOwnerFlags: conquered.every(ownerFlagMatches),
     empireFlags: empireFlagsSnapshot(app),
-    // A held dependency flies its owner's banner (a club's crest); land held by a club without one, or nobody, has none.
+    // A held dependency flies its owner's banner (a club's crest, or its monogram without one); land nobody holds has none.
     dependenciesCorrect: paths.filter(path => DEPENDENCIES[path.dataset.country]).every(path => {
       const owner = app.state.teams[holderOf(app, path.dataset.country)];
-      return owner && (owner.kind !== 'club' || crestOf(owner)) ? ownerFlagMatches(path) : neutralMatches(path);
+      return owner && (owner.kind !== 'club' || flies(owner)) ? ownerFlagMatches(path) : neutralMatches(path);
     }),
   };
 }
@@ -624,12 +648,17 @@ function empireLabelsSnapshot(app, { geography = false } = {}) {
   };
 }
 
-/** Flags mode: an owner whose crest is drawn on its land has no code printed over it (README "Club crests"). */
+/**
+ * Flags mode: an owner whose crest, or monogram for a club with no crest, is drawn on its land has no code printed
+ * over it (README "Club crests").
+ */
 function crestLabelsSnapshot() {
-  const drawn = new Set([...document.querySelectorAll('g[data-flag-layout="crest"]')]
-    .filter(banner => banner.querySelector('image')).map(banner => banner.dataset.owner));
+  const drawnOf = (layout, mark) => new Set([...document.querySelectorAll(`g[data-flag-layout="${layout}"]`)]
+    .filter(banner => banner.querySelector(mark)).map(banner => banner.dataset.owner));
+  const crests = drawnOf('crest', 'image'), monograms = drawnOf('monogram', '[data-flag-monogram]');
+  const drawn = new Set([...crests, ...monograms]);
   const labelled = [...document.querySelectorAll('text[data-empire-label]')].map(label => label.dataset.empireLabel);
-  return { drawn: drawn.size, labelledOverCrest: labelled.filter(id => drawn.has(id)).length };
+  return { drawn: drawn.size, crests: crests.size, monograms: monograms.size, labelledOverCrest: labelled.filter(id => drawn.has(id)).length };
 }
 
 /** Nation and club campaigns exercise the same owner-wide label wiring. */
@@ -2212,7 +2241,7 @@ export async function run(scenario) {
     const politicalConquest = countryPaths().filter(path => path.dataset.owner).every(path =>
       path.dataset.owner === champion.id && path.getAttribute('fill') === kickoffColors[champion.id]);
 
-    // Return to Flags: only owned territory receives the current owner's flag (a club's crest).
+    // Return to Flags: only owned territory receives the current owner's flag (a club's crest, or its monogram).
     button('Flags').click();
     await until('flag map selected', () => app.state.mapMode === 'flags');
     const heldPaths = countryPaths().filter(path => path.dataset.owner);
@@ -2223,7 +2252,6 @@ export async function run(scenario) {
     const uniqueHeldPatterns = new Set(patterns.map(pattern => pattern.id)).size;
     const finalFlags = expectedFlagsShown(app);
     const finalFlagScope = regionalFlagsSnapshot(app);
-    const championFill = heldPaths.filter(path => path.getAttribute('fill') === champion.col).length;
     const championConquests = app.state.stats[champion.id].conq;
     const stealsAllTeams = Object.values(app.state.stats).reduce((n, stats) => n + stats.steals.length, 0);
     const conquestsAllTeams = Object.values(app.state.stats).reduce((n, stats) => n + stats.conq, 0);
@@ -2257,9 +2285,10 @@ export async function run(scenario) {
       totalTerritories: Object.keys(app.state.own).length,
       flagPatterns: patterns.length,
       uniqueHeldPatterns,
-      championFill, flagFills, paintableTerritories,
+      flagFills, paintableTerritories,
       patternsFlyingChampionFlag: championFlag.length,
-      championCrest: !!crestOf(champion),
+      // What the champion flies: its flag, crest or monogram (the smoke log names it).
+      championMark: crestOf(champion) ? 'crest' : monogramOf(champion) ? 'monogram' : FLAG_CODES[champion.flagId] ? 'flag' : 'none',
       logEntries: app.state.log.length,
       victoryScreen,
       campaignIdle: app.state.spin === null && app.timers.size === 0,

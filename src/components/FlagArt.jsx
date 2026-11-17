@@ -5,18 +5,21 @@ import { useFlagBitmap } from './flagBitmaps.js';
 /**
  * One geographic banner in map coordinates, drawn once in the map's defs: WorldMap shows it through each of the
  * region's land parts (a `<use>` clipped to the part). Only its field stretches; an emblem never does. A club's crest
- * is an emblem on its colour. A whole flag fills the box its fit gives it (`fitLayout`, engine/flagFit.js), and strips
- * in the colours of its edges carry it on over the rest of the region; each strip's gradient sits beside the banner in
- * the defs. `scale` is device px per map unit: SVG artwork is drawn from its bitmap while the bitmap covers the drawn
- * size (flagBitmaps.js), and from the SVG itself beyond that.
+ * is an emblem on its colour, and a club with no crest shows its monogram there instead (MonogramChip). A whole flag
+ * fills the box its fit gives it (`fitLayout`, engine/flagFit.js), and strips in the colours of its edges carry it on
+ * over the rest of the region; each strip's gradient sits beside the banner in the defs. `scale` is device px per map
+ * unit: SVG artwork is drawn from its bitmap while the bitmap covers the drawn size (flagBitmaps.js), and from the SVG
+ * itself beyond that.
  */
 function FlagArt({ flag: f, scale = 0 }) {
   const { bbox: b, symbolLayout: layout } = f;
   const crest = !!f.crestUrl;
-  const layered = !crest && !!(layout && f.fieldUrl && f.symbolUrl);
-  const fit = !crest && !layered ? f.fitLayout || null : null;
+  const monogram = !crest && !!f.monogram;
+  const club = crest || monogram;
+  const layered = !club && !!(layout && f.fieldUrl && f.symbolUrl);
+  const fit = !club && !layered ? f.fitLayout || null : null;
   const art = fit ? fit.flag : b;
-  const flagHref = useArtwork(crest || layered ? null : f.url, art, scale, fit?.kind);
+  const flagHref = useArtwork(club || layered ? null : f.url, art, scale, fit?.kind);
   const fieldHref = useArtwork(layered ? f.fieldUrl : null, layout?.field, scale);
   const symbolHref = useArtwork(layered ? f.symbolUrl : null, layout?.symbol, scale);
   const gradientId = side => `fi-flag-${f.id}-${side}`;
@@ -31,12 +34,13 @@ function FlagArt({ flag: f, scale = 0 }) {
         </linearGradient>
       ))}
       <g id={`fi-flag-${f.id}`} data-owner={f.ownerId} data-flag-source={f.url}
-        data-flag-layout={crest ? 'crest' : layered ? 'symbol-aware' : 'native'} data-flag-fit={fit?.kind}
+        data-flag-layout={crest ? 'crest' : monogram ? 'monogram' : layered ? 'symbol-aware' : 'native'} data-flag-fit={fit?.kind}
         pointerEvents="none">
         <rect x={b.x} y={b.y} width={b.w} height={b.h} fill={f.color} />
-        {/* Land too small for a crest keeps the plain colour. */}
+        {/* Land too small for a crest, or a monogram, keeps the plain colour. */}
         {crest ? layout && <image data-flag-symbol="" href={f.crestUrl} x={layout.symbol.x} y={layout.symbol.y}
           width={layout.symbol.w} height={layout.symbol.h} preserveAspectRatio="xMidYMid meet" />
+        : monogram ? layout && <MonogramChip code={f.monogram} box={layout.symbol} />
         : layered ? <>
           <image data-flag-field="" href={fieldHref} x={layout.field.x} y={layout.field.y}
             width={layout.field.w} height={layout.field.h} preserveAspectRatio="none" />
@@ -55,6 +59,27 @@ function FlagArt({ flag: f, scale = 0 }) {
         </>}
       </g>
     </>
+  );
+}
+
+/** The monogram chip's height to its width, as the UI's chip (TeamMark: 0.75). */
+const MONOGRAM_RATIO = .75;
+/** Its code's size to the chip's height, as the UI's chip (.fi-team-monogram in src/styles/primitives.css). */
+const MONOGRAM_TEXT = .42;
+
+/**
+ * A club's monogram where its crest would sit, for a club with no crest: the UI's monogram chip, a 4:3 box centred in
+ * the crest's square (`box`) with the club's code in its middle. `.fi-map-monogram` (src/styles/primitives.css) paints
+ * it in either theme, as `.fi-team-monogram` paints the chip.
+ */
+function MonogramChip({ code, box }) {
+  const w = Math.min(box.w, box.h / MONOGRAM_RATIO), h = w * MONOGRAM_RATIO;
+  const x = box.x + (box.w - w) / 2, y = box.y + (box.h - h) / 2;
+  return (
+    <g className="fi-map-monogram" data-flag-monogram={code}>
+      <rect x={x} y={y} width={w} height={h} />
+      <text x={x + w / 2} y={y + h / 2} fontSize={h * MONOGRAM_TEXT} textAnchor="middle" dominantBaseline="central">{code}</text>
+    </g>
   );
 }
 

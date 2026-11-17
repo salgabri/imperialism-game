@@ -89,6 +89,54 @@ test('a club crest is one undistorted emblem on the club colour, and small land 
   assert.equal(plain.querySelectorAll('image').length, 0, 'no stretched crest on land too small for one');
 });
 
+test('a club with no crest shows its monogram chip where the crest would sit, and small land keeps the plain colour', () => {
+  const monogram = nativeFlag({ id: 'f-bury-826', ownerId: 'f-bury', url: null, crestUrl: null, monogram: 'BUR',
+    color: 'oklch(0.62 0.12 250)', symbolLayout: { field: { x: 120, y: -40, w: 270, h: 90 }, symbol: { x: 200, y: -25, w: 40, h: 40 } } });
+  const banner = render(monogram).querySelector('g');
+  assert.equal(banner.id, `fi-flag-${monogram.id}`);
+  assert.equal(banner.dataset.owner, 'f-bury');
+  assert.equal(banner.dataset.flagLayout, 'monogram');
+  assert.equal(banner.hasAttribute('data-flag-source'), false, 'no artwork file behind a monogram');
+  assert.equal(banner.getAttribute('pointer-events'), 'none');
+  assert.equal(banner.querySelector('[viewBox], [transform], [style*="transform"], image'), null, 'drawn in map space, no image');
+  const [field, chip] = banner.children;
+  assert.equal(banner.children.length, 2, 'the club colour, then the chip');
+  assert.equal(field.localName, 'rect');
+  assert.deepEqual(box(field), monogram.bbox, 'the colour spans the region');
+  assert.equal(field.getAttribute('fill'), monogram.color);
+  assert.equal(chip.localName, 'g');
+  assert.equal(chip.getAttribute('class'), 'fi-map-monogram', 'themed like the UI chip, not hard-coded colours');
+  assert.equal(chip.dataset.flagMonogram, 'BUR');
+  const rect = chip.querySelector('rect');
+  assert.equal(rect.hasAttribute('fill') || rect.hasAttribute('stroke'), false, 'the stylesheet paints it in either theme');
+  // A 4:3 chip across the crest's square, centred in it, with the code in its middle at the UI chip's .42 of its height.
+  const symbol = monogram.symbolLayout.symbol;
+  assert.deepEqual(box(rect), { x: 200, y: -25 + (40 - 30) / 2, w: 40, h: 30 });
+  const code = chip.querySelector('text');
+  assert.equal(code.textContent, 'BUR');
+  assert.deepEqual([code.getAttribute('x'), code.getAttribute('y')].map(Number), [symbol.x + symbol.w / 2, symbol.y + symbol.h / 2]);
+  approx(Number(code.getAttribute('font-size')), 30 * .42, 'the code at .42 of the chip');
+  assert.deepEqual([code.getAttribute('text-anchor'), code.getAttribute('dominant-baseline')], ['middle', 'central']);
+
+  // A box taller than wide (it never is: the crest's is square) still holds a whole 4:3 chip.
+  const tall = render({ ...monogram, symbolLayout: { ...monogram.symbolLayout, symbol: { x: 0, y: 0, w: 40, h: 80 } } });
+  assert.deepEqual(box(tall.querySelector('.fi-map-monogram rect')), { x: 0, y: 25, w: 40, h: 30 });
+
+  const tiny = { ...monogram, symbolLayout: null };
+  const plain = render(tiny).querySelector('g');
+  assert.equal(plain.dataset.flagLayout, 'monogram');
+  assert.deepEqual([...plain.children].map(node => node.localName), ['rect'], 'land too small for a chip keeps its colour');
+});
+
+test('a crest wins over a monogram, and a nation never shows one', () => {
+  const crest = nativeFlag({ id: 'f-arsenal-826', ownerId: 'f-arsenal', url: '/club-logos/f-arsenal.webp', crestUrl: '/club-logos/f-arsenal.webp',
+    monogram: 'ARS', symbolLayout: { field: { x: 120, y: -40, w: 270, h: 90 }, symbol: { x: 200, y: -25, w: 30, h: 30 } } });
+  const banner = render(crest).querySelector('g');
+  assert.equal(banner.dataset.flagLayout, 'crest');
+  assert.equal(banner.querySelector('.fi-map-monogram'), null);
+  assert.equal(render(nativeFlag()).querySelector('.fi-map-monogram'), null);
+});
+
 test('native banners keep one original owner asset across the geographic region', () => {
   const flag = nativeFlag();
   const banner = render(flag).querySelector('g');
