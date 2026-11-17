@@ -732,7 +732,7 @@ test('the computed seasons are computed by the manifest\'s rule, moved toward th
   // End to end, the rule (before any move) rates the seasons NBA 2K27's MyNBA Eras rate as 2K does.
   for (const id of ['nba-eras-1984', 'nba-eras-1992']) {
     const check = computed.checks[id];
-    assert.ok(check.matched > 200 && check.rankCorrelation >= 0.93 && check.meanError < 2.5, `${id}: ${JSON.stringify(check)}`);
+    assert.ok(check.matched > 200 && check.rankCorrelation >= 0.94 && check.meanError < 2.5, `${id}: ${JSON.stringify(check)}`);
   }
   assert.deepEqual([computed.spreadRatings.edition, computed.spreadRatings.ratings, computed.spreadRatings.quantiles['0'], computed.spreadRatings.quantiles['1']],
     ['NBA 2K27', 390, 69, 97]);
@@ -791,12 +791,12 @@ test('the computed seasons are computed by the manifest\'s rule, moved toward th
   assert.deepEqual(['nba-stats-1962', 'nba-stats-1968', 'nba-stats-1972', 'nba-stats-1973', 'nba-stats-1983'].map(top),
     ['Boston Celtics', 'Philadelphia 76ers', 'Los Angeles Lakers', 'Los Angeles Lakers', 'Philadelphia 76ers']);
   const player = (id, club, name) => seasonFile(id).clubs.find(item => item.name === club).squad.find(([who]) => who === name);
-  assert.deepEqual(player('nba-stats-1962', 'Philadelphia Warriors', 'Wilt Chamberlain'), ['Wilt Chamberlain', 'C', 97]);
+  assert.deepEqual(player('nba-stats-1962', 'Philadelphia Warriors', 'Wilt Chamberlain'), ['Wilt Chamberlain', 'C', 98]);
   assert.deepEqual(player('nba-stats-1965', 'San Francisco Warriors', 'Wilt Chamberlain'), ['Wilt Chamberlain', 'C', 93],
     'traded in January 1965, he plays for the club he played the most minutes for, moved with it toward its 17-63 record');
   assert.deepEqual(player('nba-stats-1972', 'Milwaukee Bucks', 'Kareem Abdul-Jabbar'), ['Kareem Abdul-Jabbar', 'C', 99]);
   // 1988/89's Bullets had two Charles Joneses: the one with more minutes plays.
-  assert.deepEqual(audit.seasons.find(season => season.id === 'nba-stats-1989').namesakes, ['Charles Jones (WSB, 72, 516 min; Basketball-Reference\'s jonesch02)']);
+  assert.deepEqual(audit.seasons.find(season => season.id === 'nba-stats-1989').namesakes, ['Charles Jones (WSB, 73, 516 min; Basketball-Reference\'s jonesch02)']);
 });
 
 test('the seasons before NBA 2K come from their own pinned sources: every player real, every rating the source\'s', () => {

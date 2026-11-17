@@ -6,8 +6,9 @@
 // with a `format`: NBA 2K27's MyNBA Eras leagues as 2kratings.com lists them, and NBA Live 99's own roster files, each
 // player checked against Basketball-Reference's seasons (realPlayers). The seasons no game rated (the manifest's
 // `computed`, 1960/61 to 1997/98 but 1983/84 and 1991/92) are computed from Basketball-Reference's player seasons by
-// docs/design/computed-ratings.md: one score fitted to NBA 2K's overalls on rates pooled over three seasons, each season
-// ranked onto NBA 2K27's ratings, then its clubs moved toward their real results (readComputedSources). Only
+// docs/design/computed-ratings.md: one score fitted to NBA 2K's overalls on rates pooled over the manifest's window of
+// seasons (the season and the one before, 3:1), each season ranked onto NBA 2K27's ratings, then its clubs moved toward
+// their real results (readComputedSources). Only
 // readArchive, readSeasonSources and readComputedSources do I/O: scripts/build-nba-seasons.mjs writes the files,
 // scripts/build-club-maps.mjs takes each era's teams and arenas from `teamsOf`, and tests build seasons from invented
 // players. Every rating is 2K's, unchanged, but NBA Live 99's, which one documented straight line puts on NBA 2K's

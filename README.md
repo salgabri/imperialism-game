@@ -1963,19 +1963,20 @@ the map of its era.
   Basketball-Reference's own figures, under Sports-Reference's data-use terms
   ([Rights and terms](docs/design/football-year-sources.md#rights-and-terms)).
   The score weighs PER, points, assists and defensive win shares a game, each
-  pooled over the season and the two before it (3:2:1) and shrunk toward the
-  season's replacement level by a prior the data measure, the player's share of
-  his club's minutes, and All-Star and All-NBA picks, its weights fitted by
-  least squares to NBA 2K's overalls of 1999/00 to 2025/26 (0.895 rank
-  correlation on an edition left out); each club's 13 players with the most
+  pooled over the season and the one before it (3:1, the user's choice for the
+  NBA over the method's 3:2:1) and shrunk toward the season's replacement level
+  by a prior the data measure, the player's share of his club's minutes, and
+  All-Star and All-NBA picks, its weights fitted by least squares to NBA 2K's
+  overalls of 1999/00 to 2025/26 (0.896 rank correlation on an edition left
+  out); each club's 13 players with the most
   minutes are ranked by it and given NBA 2K27's ratings rank for rank. Then each
   club moves toward its real results (Basketball-Reference's SRS, at the match
   engine's margin a rating point), by the user's decision of 2026-11-17
   ([computed-ratings.md](docs/design/computed-ratings.md)): clubs follow their
   season's SRS at 0.99. A player traded during a season plays for the club he
   played the most minutes for. Rated this way before the move, 1983/84 and
-  1991/92 match NBA 2K27's own ratings of them at a rank correlation of 0.94 and
-  0.93 (about 2 points out). Specialists rate low (Dennis Rodman does not start
+  1991/92 match NBA 2K27's own ratings of them at a rank correlation of 0.95 and
+  0.94 (about 2 points out). Specialists rate low (Dennis Rodman does not start
   for the 1995/96 Bulls), and the engine plays every season with today's rules
   at that season's pace.
 - **What is missing:** any national team (NBA 2K rates NBA players only), and
