@@ -1,18 +1,22 @@
 // The EuroLeague's earlier seasons, 2000/01 to 2025/26 (docs/design/euroleague.md, "Earlier seasons"): each season's
-// clubs with their best fives, rated by the built-in season's rule (scripts/lib/euroleague.mjs) with each season's PIR
-// put on 2025/26's league level, and the maps they play on, one per run of seasons with the same clubs. Read by
-// scripts/build-euroleague.mjs (the audit and the seasons' league figures), scripts/build-nba-seasons.mjs (each season's
+// clubs with their best fives, rated as the built-in season is (scripts/lib/euroleague-ratings.mjs) with each season's
+// box scores put on 2025/26's league level, each club then moved toward its results that season; and the maps they play
+// on, one per run of seasons with the same clubs. Read by scripts/build-euroleague.mjs (the audits, the seasons' league
+// figures and, through `playerRecords`, the built-in season's window), scripts/build-nba-seasons.mjs (each season's
 // clubs ride in its NBA season's file) and scripts/build-europe-maps.mjs (the maps). The snapshots are
 // scripts/sync-euroleague-seasons.mjs's.
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { colourFor } from './club-identity.mjs';
-import { FIVE, blendedPir, displayName, estimateRating, per36, positionsOf, startingFive } from './euroleague.mjs';
+import { FIVE, displayName, per36, positionsOf } from './euroleague.mjs';
+import { leagueConstants, moveToResults, rateSeason, recordOf, seasonGames, valuesOf } from './euroleague-ratings.mjs';
 import { selectLineup } from '../../src/data/teams.js';
+import { euroleagueBasketballIn } from '../../src/sports/basketball.js';
+import { EUROLEAGUE_LEAGUE_AVERAGES } from '../../src/data/euroleagueLeagueAverages.js';
 
 /** The season whose league level every earlier season's PIR is put on: 2025/26, the built-in season's last full one. */
 export const REFERENCE_SEASON = 2025;
-/** A season's lines: the season itself and the two before it, oldest first, as the built-in season's (SEASON_WEIGHTS). */
+/** A season's lines: the season itself and the two before it, oldest first (the window, scripts/lib/euroleague-ratings.mjs). */
 const SPAN = 3;
 // A line is [games, minutes, points, rebounds, assists, three-point attempts, PIR], per game.
 const REB = 3, AST = 4, TPA = 5, PIR = 6;
@@ -63,6 +67,38 @@ export function boxScorePosition(lines) {
   return rates.ast >= 4 ? 'G' : rates.reb >= 9 && rates.tpa < 1.5 ? 'C' : 'F';
 }
 
+/**
+ * Every season's player records, by year and EuroLeague code (scripts/lib/euroleague-ratings.mjs `recordOf`: his club
+ * and position, games, minutes and PIR on 2025/26's level, his club's games), and `constants`, what every season's ratings
+ * share, measured on every pair of consecutive seasons (`leagueConstants`). The built-in season's window reads its
+ * 2024/25 and 2025/26 from here. → `{ records: { year: Map code → record }, constants }`.
+ */
+export function playerRecords(snapshots) {
+  const years = Object.keys(snapshots).map(Number).sort((a, b) => a - b);
+  const records = {};
+  for (const year of years) {
+    const snapshot = snapshots[year], pirScale = seasonScale(snapshots, year).pir;
+    const games = new Map(snapshot.clubs.map(club => [club.code, club.games]));
+    records[year] = new Map(snapshot.players.map(row => [row[0],
+      recordOf({ club: row[2], group: row[3] ?? boxScorePosition([row[6]]), line: row[6], clubGames: games.get(row[2]), pirScale })]));
+  }
+  return { records, constants: leagueConstants(years.map(year => records[year])) };
+}
+
+/**
+ * The rules a season's clubs play, which their move toward their results is measured in: its EuroLeague's pace and
+ * scoring rate (src/sports/basketball.js euroleagueBasketballIn). The figures are src/data/euroleagueLeagueAverages.js's,
+ * which npm run build:euroleague writes from the same snapshot; the move stops if they are not this snapshot's.
+ */
+function seasonSport(snapshot, label) {
+  const league = EUROLEAGUE_LEAGUE_AVERAGES[label];
+  const own = snapshot.league;
+  if (!league || league.pace !== Number(own.pace.toFixed(1)) || league.rating !== Number(own.rating.toFixed(1))) {
+    throw new Error(`src/data/euroleagueLeagueAverages.js does not hold ${label}'s league figures: write it from the snapshots first`);
+  }
+  return euroleagueBasketballIn(label);
+}
+
 /** Spearman's rank correlation of two lists (average ranks for ties). */
 export function spearman(xs, ys) {
   const ranks = list => {
@@ -86,11 +122,15 @@ export function spearman(xs, ys) {
 
 /**
  * One season's clubs, strongest first, as the built-in season's: each with its best five as `[name, 'PG/SG', rating]`
- * and `str` the five's mean. A player's lines are his seasons `year` - 2 to `year`, each season's PIR on the reference
- * scale; he plays for the club the snapshot gives him. Returns `{ year, season, label, clubs, players, warnings }`,
- * `players` every player of the season as rated, and each club its `record` ([wins, games]) that season.
+ * and `str` the five's mean. A player plays for the club the snapshot gives him; his window is his seasons `year` - 2 to
+ * `year` (`earlier`: playerRecords), his positions read from the same seasons' box scores on the reference scale. Rated
+ * as the built-in season is (scripts/lib/euroleague-ratings.mjs `valuesOf`, `rateSeason`), then each club's five moved
+ * toward the season's results (`moveToResults`). Returns `{ year, season, label, clubs, players, warnings, results }`:
+ * `players` every player of the season as rated before the move, each club its `record` ([wins, games]), `regular`
+ * record and `move` ({ results, target, shift, plus, before, after }), and `results` the move's SRS, reliability and
+ * engine units.
  */
-export function seasonClubs(snapshots, year, identity) {
+export function seasonClubs(snapshots, year, identity, earlier = playerRecords(snapshots)) {
   const snapshot = snapshots[year];
   if (!snapshot) throw new Error(`No EuroLeague snapshot for ${seasonLabel(year)}`);
   const names = identity.names ?? {};
@@ -114,8 +154,9 @@ export function seasonClubs(snapshots, year, identity) {
   const players = snapshot.players.map(row => {
     const [code, name, club, position, height, nationality, , extra = {}] = row;
     const lines = lineOf.get(code);
-    return { code, club, nationality, name: displayName(name, extra, names[code]), positions: positionsOf(position ?? boxScorePosition(lines), height, lines),
-      rating: estimateRating(lines), pir: blendedPir(lines), games: row[6][0] };
+    const listed = position ?? boxScorePosition(lines);
+    return { code, club, nationality, name: displayName(name, extra, names[code]), positions: positionsOf(listed, height, lines), group: listed,
+      window: Array.from({ length: SPAN }, (_, back) => earlier.records[year - back]?.get(code) ?? null), games: row[6][0] };
   });
   const seen = new Set();
   for (const player of players) {
@@ -123,20 +164,30 @@ export function seasonClubs(snapshots, year, identity) {
     if (seen.has(key)) throw new Error(`Two players called ${player.name} at ${player.club} in ${seasonLabel(year)}`);
     seen.add(key);
   }
+  const { values, groups } = valuesOf(players, earlier.constants);
+  for (const player of players) Object.assign(player, values.get(player.code));
+  const codes = snapshot.clubs.map(entry => entry.code);
+  const rated = rateSeason(players, codes);
+  for (const player of players) player.rating = rated.ratings.get(player.code);
+  for (const code of codes) {
+    if (rated.fives.get(code).length < FIVE) throw new Error(`${identityOf(identity, code, year).name} has ${rated.fives.get(code).length} players in ${seasonLabel(year)}`);
+  }
+  const move = moveToResults(codes.map(code => ({ code, five: rated.fives.get(code) })), seasonGames(snapshot.games),
+    seasonSport(snapshot, seasonLabel(year)), `euroleague ${seasonLabel(year)}`);
   const clubs = snapshot.clubs.map(entry => {
     const team = identityOf(identity, entry.code, year);
-    const pool = players.filter(player => player.club === entry.code).map(p => ({ ...p, pos: p.positions[0] }));
-    const five = startingFive(pool);
-    if (five.length < FIVE) throw new Error(`${team.name} has ${five.length} players in ${seasonLabel(year)}`);
-    const stretched = selectLineup({ sport: 'basketball', squad: five }).slots.filter(slot => slot.outOfPosition)
+    const { five, results, target, shift, plus, before, after } = move.clubs.find(club => club.code === entry.code);
+    const stretched = selectLineup({ sport: 'basketball', squad: five.map(p => ({ ...p, pos: p.positions[0] })) }).slots.filter(slot => slot.outOfPosition)
       .map(slot => `${slot.player.name} at ${slot.position}`);
     if (stretched.length) warnings.push(`${team.name} plays ${stretched.join(', ')} out of position`);
     return { ...team, league: 'EuroLeague', col: colourFor(team.id), str: Math.round(five.reduce((sum, p) => sum + p.rating, 0) / five.length),
-      squad: five.map(p => [p.name, p.positions.join('/'), p.rating]), source: entry.code, record: [entry.wins, entry.games], regular: entry.regular };
+      squad: five.map(p => [p.name, p.positions.join('/'), p.rating]), source: entry.code, record: [entry.wins, entry.games], regular: entry.regular,
+      move: { results, target, shift, plus, before, after } };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
-  const ids = new Set(clubs.map(club => club.id)), codes = new Set(clubs.map(club => club.code));
-  if (ids.size !== clubs.length || codes.size !== clubs.length) throw new Error(`${seasonLabel(year)}: two clubs share an id or a code`);
-  return { year, season: seasonLabel(year), label: snapshot.source.label, clubs, players, warnings };
+  const ids = new Set(clubs.map(club => club.id)), clubCodes = new Set(clubs.map(club => club.code));
+  if (ids.size !== clubs.length || clubCodes.size !== clubs.length) throw new Error(`${seasonLabel(year)}: two clubs share an id or a code`);
+  const results = { srs: move.srs, perPoint: move.perPoint, mean: move.mean, scale: move.scale, groups };
+  return { year, season: seasonLabel(year), label: snapshot.source.label, clubs, players, warnings, results };
 }
 
 /**
@@ -148,7 +199,8 @@ export function euroleagueSeasons(root, identity = JSON.parse(readFileSync(path.
   const snapshots = readSnapshots(root);
   const years = Object.keys(snapshots).map(Number).sort((a, b) => a - b);
   if (years.length && !snapshots[REFERENCE_SEASON]) throw new Error(`The reference season ${seasonLabel(REFERENCE_SEASON)} has no snapshot`);
-  const seasons = years.map(year => seasonClubs(snapshots, year, identity));
+  const earlier = years.length ? playerRecords(snapshots) : { records: {}, constants: null };
+  const seasons = years.map(year => seasonClubs(snapshots, year, identity, earlier));
   const maps = [];
   for (const season of seasons) {
     const key = season.clubs.map(club => club.id).sort().join();
@@ -157,5 +209,5 @@ export function euroleagueSeasons(root, identity = JSON.parse(readFileSync(path.
     else maps.push({ id: mapIdOf(season.year), key, years: [season.year], clubs: season.clubs });
     season.map = maps.at(-1).id;
   }
-  return { snapshots, seasons, maps: maps.map(({ key, ...map }) => map) };
+  return { snapshots, seasons, maps: maps.map(({ key, ...map }) => map), ...earlier };
 }
