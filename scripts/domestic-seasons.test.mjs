@@ -15,6 +15,7 @@ import { expandSetPlayer, isEraMap, isSeasonCountryMap, setKindOf } from '../src
 import { countryMapOf, countryMapsOf, domesticEntry, domesticLabel, isCountryScope, SEASON_COUNTRY_MAPS } from '../src/data/domesticScope.js';
 import { MIN_CLUBS } from './lib/domestic-sync.mjs';
 import { rememberStronger, secondTeamReason } from './lib/season-country-clubs.mjs';
+import { CM0102_RELEASES } from '../src/data/cm0102Releases.js';
 import { parseCampaign } from '../src/engine/storage.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
@@ -28,6 +29,12 @@ const shipped = readdirSync(shippedDir).filter(f => FILE.test(f)).map(f => f.sli
 const homes = JSON.parse(readFileSync(path.join(root, 'scripts/data/season-club-homes.json'), 'utf8')).clubs;
 const audit = JSON.parse(readFileSync(path.join(root, 'docs/design/domestic-seasons-audit.json'), 'utf8'));
 const attribution = readFileSync(path.join(shippedDir, 'ATTRIBUTION-seasons.txt'), 'utf8');
+const UPDATES = JSON.parse(readFileSync(path.join(root, 'scripts/data/cm0102-updates.json'), 'utf8')).releases;
+/** The Update Team release that fills an EA season's countries (its season's), or null. */
+const updateTeamRelease = season => {
+  const year = BUILT_IN_SEASONS.find(entry => entry.id === season)?.year;
+  return UPDATES.find(release => release.season === `${year - 1}/${String(year % 100).padStart(2, '0')}`) ?? null;
+};
 const seasonFiles = new Map();
 const seasonFile = id => {
   if (!seasonFiles.has(id)) seasonFiles.set(id, JSON.parse(readFileSync(path.join(root, 'public/football', `${id}.json`), 'utf8')));
@@ -104,8 +111,16 @@ for (const entry of SEASON_COUNTRY_MAPS) {
     assert.equal(doc.country, country);
     assert.equal(doc.season, season);
     assert.equal(doc.year, set.year);
-    assert.equal(doc.kind, setKindOf(season));
-    assert.deepEqual(doc.source, set.source, "the season file's source");
+    // A country the EA edition rates too few clubs of takes the season's CM 01/02 Update Team database (cm0102-updates.json).
+    const fill = updateTeamRelease(season);
+    if (doc.kind === 'cm0102' && setKindOf(season) === 'ea') {
+      assert.ok(fill, `${season} has no Update Team database`);
+      assert.deepEqual([doc.source.provider, doc.source.compiler], ['CM 01/02 Update Team', 'CM 01/02 Update Team'], 'the Update Team credited');
+      assert.equal(doc.source.version, CM0102_RELEASES.find(release => release.id === fill.id).label, "the release's label");
+    } else {
+      assert.equal(doc.kind, setKindOf(season));
+      assert.deepEqual(doc.source, set.source, "the season file's source");
+    }
     assert.ok(seasonCountry(doc));
     const { version, ...rest } = doc;
     assert.equal(version, `${id}-${createHash('sha256').update(JSON.stringify(rest)).digest('hex').slice(0, 8)}`, 'version is not the content hash');
