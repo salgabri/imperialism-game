@@ -2776,6 +2776,31 @@ that page. A record may also pin a standard thumbnail (`thumb`: 250, 330 or 500 
 instead of the original, as college football's 138 school crests do, since
 `upload.wikimedia.org` answers a run of originals with HTTP 429.
 
+The clubs of today's country maps that had no crest got one wherever Wikipedia has it
+(17 November 2026). Of the 4,184 clubs on the 128 FM 26 maps, 1,208 had none, so in
+**Crests** mode over a third of the land (4,499 of 12,800 sections) showed only a club
+colour. Each was matched to its Wikidata item: the one its home town came from, else
+by its names (FM's full and short name, transliterations folded) against every
+football club of its country, or of the world for clubs whose items name no country
+(New Caledonia's are filed under France). The item's article gave the infobox crest,
+English Wikipedia's first, else that of the club's own language. Every match and every
+picture was checked by hand, and 748 clubs now wear a crest through `pages`: 662 from
+English Wikipedia's file pages (Commons' files among them), 86 from another language's
+(Turkish 31, Arabic 27, Hebrew 11, Russian and Persian 5 each, Uzbek 3, Greek 2,
+Finnish and Portuguese 1), 287 of them as 330 px thumbnails. That is 89% of the clubs
+and 85% of the land, and 36 maps are complete instead of 6 (Spain's, Germany's,
+Italy's, France's, Portugal's, the Netherlands' and Brazil's among them, with England's).
+The other 460 still have none: no article, an article without a crest, a crest that
+may be a namesake's or a predecessor's, a club renamed since the FM 26 data (Malut
+United's article now shows Java United's crest), or a file whose page states no licence
+template (files uploaded to Croatian, Serbian, Azerbaijani, Fiji Hindi and, some,
+Ukrainian Wikipedia). `--pages` now also gives an all-leagues or women's club
+its twin's new crest, as the full sync would (Union Berlin's, Brann's and US
+Saint-Malo's women's sides, and Union Berlin's all-leagues club). Since an earlier
+season's club wears its twin's crest (`src/data/crests.js`), 394 more club-seasons on
+the earlier seasons' maps show one too. The worker's image cache now holds 8,000
+files, enough for the 5,400 flags and crests.
+
 Crests are the clubs' trademarks, and most are non-free files that Wikipedia
 hosts under its non-free content policy. `public/club-logos/SOURCES.tsv` records
 each club's file, its licence as Wikipedia records it, and its file page.

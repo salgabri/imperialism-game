@@ -461,19 +461,20 @@ test('App\'s boot settles the first-boot signal once setup is up, and when the m
 
 const football = getSport('football');
 const clubsOf = (rows, sport = football) => Object.fromEntries(rows.map(row => [row.id, buildClub(row, sport)]));
-const montenegro = () => decodeDomestic(JSON.parse(readFileSync(publicFile('domestic/499.json'), 'utf8'))).clubs;
+const moldova = () => decodeDomestic(JSON.parse(readFileSync(publicFile('domestic/498.json'), 'utf8'))).clubs;
 
 test('a campaign keeps each team\'s crest or flag once, with the field and emblem the map draws a flag from', () => {
-  // Clubs: Arsenal and Real Madrid share their domestic twins' crests; Union Berlin has only its monogram.
+  // Clubs: Arsenal, Real Madrid and Union Berlin share their domestic twins' crests (Union Berlin's twin since
+  // 17 November 2026).
   const clubs = clubsOf(['f-arsenal', 'f-real-madrid', 'f-1-fc-union-berlin'].map(id => football.clubs.find(club => club.id === id)));
-  assert.deepEqual(teamMarkUrls(clubs), ['/club-logos/d826-602.webp', '/club-logos/d724-1736.webp']);
+  assert.deepEqual(teamMarkUrls(clubs), ['/club-logos/d826-602.webp', '/club-logos/d724-1736.webp', '/club-logos/d276-121182.webp']);
   assert.deepEqual(teamMarkUrls({ old: { ...clubs['f-arsenal'], id: 'old' } }), ['/club-logos/d826-602.webp'], 'found by its origin');
   // Nations: France's flag; Portugal's, which the map lays out from a field and an emblem.
   const rng = makeRng(20261101);
   const nations = Object.fromEntries(['250', '620'].map(id => [id, buildTeam(id, rng, football)]));
   assert.deepEqual(teamMarkUrls(nations), ['/flags/fr.svg', '/flags/pt.svg', '/flags-symbols/pt-field.svg', '/flags-symbols/pt-symbol.svg']);
-  // A country: Montenegro's 16 clubs, one of them without a crest.
-  const rows = montenegro();
+  // A country: Moldova's 12 clubs, one of them (FC Stăuceni) with only its monogram.
+  const rows = moldova();
   const crests = rows.filter(row => existsSync(publicFile(`club-logos/${row.id}.webp`))).map(row => `/club-logos/${row.id}.webp`);
   assert.equal(crests.length, rows.length - 1);
   assert.deepEqual(teamMarkUrls(clubsOf(rows)), crests);
@@ -482,7 +483,7 @@ test('a campaign keeps each team\'s crest or flag once, with the field and emble
 test('every crest and flag a campaign can keep is in public/, and the worker caches it on first use', () => {
   const rng = makeRng(1);
   const world = Object.fromEntries(fieldedNations(football).map(id => [id, buildTeam(id, rng, football)]));
-  const urls = [teamMarkUrls(world), teamMarkUrls(clubsOf(montenegro())),
+  const urls = [teamMarkUrls(world), teamMarkUrls(clubsOf(moldova())),
     ...['football', 'womens-football', 'basketball', 'american-football', 'baseball', 'hockey', 'rugby-league'].map(id => teamMarkUrls(clubsOf(getSport(id).clubs, getSport(id))))].flat();
   assert.ok(urls.some(url => url.startsWith('/flags-symbols/')) && urls.length > 300, `${urls.length} files`);
   for (const url of urls) {

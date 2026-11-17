@@ -1554,6 +1554,14 @@ node scripts/build-season-countries.mjs --check ...                             
   five clubs share one town point (in eight countries, Bangladesh, Brunei and
   Ethiopia among them); only one can hold the point. Some overrides rest on
   medium-confidence judgement (noted in the file).
+- **Crests.** 460 of the 4,184 clubs have no crest (README "Club crests"), holding
+  1,985 of the sections (15.5%). 748 clubs gained a crest from Wikipedia's file pages
+  on 17 November 2026 (1,208 had none before, 35% of the sections). 36 maps are complete;
+  the most left are China's (15 of 60 clubs), Uzbekistan's (13 of 40), South
+  Africa's, Tanzania's, Gambia's and Laos's (12 each), mostly clubs with no article
+  or an article without a crest; a few were left out for a doubt (a namesake's crest,
+  a renamed club's, a file page without a licence template). `SOURCES.tsv` gives each
+  crest's file page.
 - **Group sizes are not always by strength.** "The stronger clubs take the
   larger groups" holds only where they have room: a club hemmed in by its city
   hands its larger size to the strongest club with room (150 clubs involved).
