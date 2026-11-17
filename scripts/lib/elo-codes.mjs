@@ -3,8 +3,10 @@
 // the label differences noted inline, and checked against World.tsv of
 // 18 Oct 2026: all 176 codes are present and distinct (Scotland, Wales,
 // Northern Ireland and the three Pacific islands added on 10 Nov 2026, when
-// they joined the map). Codes are stable across years (teams.tsv remaps only
-// historical sides such as Yugoslavia or Zaire). They are not ISO alpha-2:
+// they joined the map). Codes are stable across the years the squad gate scores;
+// the yearly tables of earlier years use the names of their day (WG, SU, YU, RM,
+// CS, ZR, MK, SZ), which scripts/validate-football-elo.mjs maps in
+// PERIOD_ELO_CODES. They are not ISO alpha-2:
 // England is EN, Kosovo KO, Northern Ireland EI, Scotland SQ, Timor-Leste TL.
 // Used offline by scripts/football-validate.mjs only; Elo is never shipped.
 

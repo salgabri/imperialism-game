@@ -4,8 +4,8 @@
 // 10 and gives no overall. Then the seasons no game rated, 2009–2024, computed from NRL.com's match centre ("the
 // computed seasons", below). No I/O here: scripts/sync-rugby-league-seasons.mjs reads the pinned inputs and writes the
 // snapshots, scripts/build-rugby-league-seasons.mjs builds the seasons from them.
-import { NATIONS, RUGBY_NEAR_PENALTY, buildClub, makeRng, teamEff } from '../../src/data/teams.js';
-import { BASELINE, rugbyLeague } from '../../src/sports/rugbyLeague.js';
+import { NATIONS, RUGBY_NEAR_PENALTY, buildClub, hashStr, makeRng, selectLineup, teamEff } from '../../src/data/teams.js';
+import { BASELINE, marginPerStrength, rugbyLeague, rugbyLeagueStrength, SLICE_MODEL } from '../../src/sports/rugbyLeague.js';
 import { rosterOf } from './nrl.mjs';
 
 // ---------- the database (RLDatabase.xml) ----------
@@ -680,6 +680,77 @@ export function clubShiftOf(pool, target) {
   return { shift: best.shift, before, after: best.after };
 }
 
+// ---------- the computed seasons' spread ----------
+//
+// 2008's shift reads a club's rank off the 2025 clubs' strengths, so its clubs spread as 2025's do. A computed season's
+// clubs spread as its own results did (docs/design/rugby-league.md, "The spread"): each club's target is its Simple
+// Rating System turned into points of the match model's strength, and the club moves in steps fine enough to keep the
+// targets' order.
+
+/**
+ * `matched`: the match model's points of margin for a point of strength over the first order's (marginPerStrength), 0.95
+ * on the 66 computed seasons (the late game's score effects take the rest), over its game-to-game margin spread against
+ * the real game's, 1.06: 0.95 / 1.06 ≈ 0.9, so that a gap in strength gives two clubs the chance against each other that
+ * the same gap in their margins gave them.
+ */
+export const SPREAD = Object.freeze({ matched: 0.9 });
+
+/** A lineup's model strength (rugbyLeagueStrength), three decimals. */
+const strengthOf = lineup => Math.round(rugbyLeagueStrength(lineup) * 1000) / 1000;
+
+/** A club's model strength from its players `pool` (`[{ name, pos, rating }]`): its matchday 17's (clubSquadOf). */
+export const modelStrengthOf = pool => strengthOf(clubSquadOf(pool).lineup);
+
+/** Clubs of the game (src/data/clubs.rugby-league.js), each's model strength as the match model fields it. */
+export const builtInStrengths = clubs => clubs.map(club => strengthOf(selectLineup(buildClub(club, rugbyLeague))));
+
+/**
+ * Each club's target, the model strength it plays at: `mean` (the built-in 2025 clubs') plus its Simple Rating System
+ * (srsOf: `ratings`, `reliability`) scaled to the clubs' own spread, ×√reliability (the ratings' variance less their
+ * games' luck), and turned into points of strength: ÷ `margin`, SPREAD.matched × marginPerStrength at the season's `tries`
+ * a team game and its try's `tryPoints`. → `{ margin, scale, targets }`: `margin` and `scale` (= √reliability ÷ margin)
+ * to four decimals, each club's target to two.
+ */
+export function spreadTargets({ ratings, reliability }, { mean, tries, tryPoints }) {
+  const margin = SPREAD.matched * marginPerStrength(tries, tryPoints);
+  const scale = Math.sqrt(reliability) / margin;
+  const round = (x, places) => Math.round(x * 10 ** places) / 10 ** places + 0;
+  return { margin: round(margin, 4), scale: round(scale, 4),
+    targets: Object.fromEntries(Object.entries(ratings).map(([club, srs]) => [club, round(mean + scale * srs, 2)])) };
+}
+
+/** The order a club's players take a move's extra point in: the best first (overall, then value, then id). */
+export const bestFirst = (a, b) => b.rating - a.rating || b.value - a.value || a.id - b.id;
+
+/**
+ * A computed club's move toward its `target`: every player by the whole number `shift` and its `plus` best players
+ * (bestFirst) by one point more, each held to 1–99, whichever brings its model strength (modelStrengthOf) nearest the
+ * target; of two as near, the smaller move, then the lower. A player never passes one rated above him, and the club moves
+ * in steps of about a seventeenth of a point where a whole number for all moves it by whole points only, too coarse to
+ * keep the order of clubs whose targets lie a tenth apart. `pool`: `[{ id, name, pos, rating, value }]`, the rating his
+ * overall. → `{ shift, plus, before, after, rating, best }`: the model strength unmoved and moved, the moved matchday 17's
+ * rating (as the season shows it), and the ids of the `plus` best.
+ */
+export function clubMoveOf(pool, target) {
+  const ranked = pool.slice().sort(bestFirst), n = ranked.length;
+  const moved = t => {
+    const shift = Math.floor(t / n), plus = t - shift * n;
+    return ranked.map((p, i) => ({ name: p.name, pos: p.pos, rating: Math.min(99, Math.max(1, p.rating + shift + (i < plus ? 1 : 0))) }));
+  };
+  const before = modelStrengthOf(moved(0));
+  let best = null;
+  // A whole number for all moves the model strength by as many points (its lineup unchanged), so the nearest move lies
+  // within one point of the nearest whole one: every step from a point below it to a point above.
+  const whole = Math.round(target - before);
+  for (let t = (whole - 1) * n; t <= (whole + 1) * n; t++) {
+    const after = modelStrengthOf(moved(t)), miss = Math.abs(after - target);
+    if (!best || miss < best.miss - 1e-9 || (Math.abs(miss - best.miss) <= 1e-9
+      && (Math.abs(t) < Math.abs(best.t) || (Math.abs(t) === Math.abs(best.t) && t < best.t)))) best = { t, after, miss };
+  }
+  const shift = Math.floor(best.t / n), plus = best.t - shift * n;
+  return { shift, plus, before, after: best.after, rating: clubSquadOf(moved(best.t)).lineup.rating, best: ranked.slice(0, plus).map(p => p.id) };
+}
+
 /** Spearman's rank correlation (mid-ranks for ties). */
 export function spearman(xs, ys) {
   const ranks = values => {
@@ -719,6 +790,17 @@ export const seasonIdOf = key => (typeof key === 'number' ? `nrl-${key}` : key);
 
 /** A manifest season's key in `teams` and `maps`: its year, but Super League's 1997, by its id. */
 export const seasonKeyOf = entry => (entry.id === seasonIdOf(entry.year) ? entry.year : entry.id);
+
+/**
+ * The league the season of `key` (seasonKeyOf) was, as its clubs and its era map name it (a club's and a map's `league`,
+ * which the setup and the campaign show): the manifest season's `competition`, the NSWRFL's to 1983, the NSWRL's from
+ * 1984, the ARL's from 1995 and Super League's 1997, else the NRL's (1998 on).
+ */
+export function leagueOf(manifest, key) {
+  const entry = manifest.seasons.find(season => seasonKeyOf(season) === key);
+  if (!entry) throw new Error(`No rugby league season ${key} in the manifest`);
+  return entry.competition ?? 'NRL';
+}
 
 /** The era map the season of `key` (seasonKeyOf) plays on (scripts/data/rugby-league-seasons.json `maps`). */
 export function mapOf(manifest, key) {
@@ -787,18 +869,23 @@ function roundRobin(n) {
 
 /**
  * Plays `seasons` seeded seasons of `clubs` (a season file's), 24 games each, every game at a neutral venue at Balanced,
- * as scripts/simulation-realism.mjs plays the built-in clubs, and measures what it measures of the NRL: points, margins and
- * the standings, and each club's mean record (`clubs`, strongest first). An odd number of clubs (the seventeen of 2023
- * on) adds a bye, as the NRL's draw has one: each round one club sits out, over enough rounds that each plays 24 or 25,
- * and records count by games played.
+ * as scripts/simulation-realism.mjs plays the built-in clubs, and measures what it measures of the NRL: points, tries,
+ * goals, margins and the standings, and each club's mean record (`clubs`, strongest first). An odd number of clubs (the
+ * seventeen of 2023 on) adds a bye, as the NRL's draw has one: each round one club sits out, over enough rounds that each
+ * plays 24 or 25, and records count by games played. `sport`: the rules played, the season's own (`rugbyLeagueIn`) or,
+ * unless told, today's. Scores count as the league counted them: before golden point at full time (`level`, the share
+ * of games level then, were draws), the campaign's extra time deciding only who wins.
  */
-export function playSeasons(clubs, { seasons = 40, seed = 20261108, games = 24 } = {}) {
+export function playSeasons(clubs, { seasons = 40, seed = 20261108, games = 24, sport = rugbyLeague } = {}) {
   const teams = clubs.map(club => buildClub(club, rugbyLeague));
   const eff = teams.map(teamEff);
   const rng = makeRng(seed);
   const n = teams.length, slots = n % 2 ? n + 1 : n;
   const roundsPlayed = slots === n ? games : Math.ceil(games * slots / n);
+  const atFullTime = !sport.rules.golden;
   const points = [], margins = [], spreads = [], best = [], worst = [];
+  const kinds = { try: 0, penalty: 0, field: 0 };
+  let level = 0;
   const totals = teams.map(() => ({ wins: 0, for: 0, against: 0, played: 0 }));
   for (let s = 0; s < seasons; s++) {
     const order = [...Array(slots).keys()];
@@ -810,11 +897,14 @@ export function playSeasons(clubs, { seasons = 40, seed = 20261108, games = 24 }
       for (const [x, y] of rounds[g % rounds.length]) {
         const [i, j] = flip ? [order[y], order[x]] : [order[x], order[y]];
         if (i >= n || j >= n) continue;
-        const result = rugbyLeague.simulate(rng, teams[i], teams[j], 6, eff[i], eff[j]);
-        points.push(result.ga, result.gd);
-        margins.push(Math.abs(result.ga - result.gd));
+        const result = sport.simulate(rng, teams[i], teams[j], 6, eff[i], eff[j]);
+        const [scoredI, scoredJ] = atFullTime ? [result.regA, result.regD] : [result.ga, result.gd];
+        points.push(scoredI, scoredJ);
+        margins.push(Math.abs(scoredI - scoredJ));
+        if (result.tie) level++;
+        for (const e of result.ev) if (!atFullTime || e.m <= SLICE_MODEL.MINUTES) kinds[e.kind]++;
         const winner = result.winner === teams[i].id ? i : j;
-        for (const [k, own, other] of [[i, result.ga, result.gd], [j, result.gd, result.ga]]) {
+        for (const [k, own, other] of [[i, scoredI, scoredJ], [j, scoredJ, scoredI]]) {
           table[k].played++;
           totals[k].played++;
           totals[k].for += own;
@@ -830,6 +920,8 @@ export function playSeasons(clubs, { seasons = 40, seed = 20261108, games = 24 }
   }
   return {
     pointsPerTeam: mean(points), teamPointsSd: sd(points), marginMean: mean(margins),
+    triesPerTeam: kinds.try / points.length, penaltyGoalsPerTeam: kinds.penalty / points.length, fieldGoalsPerTeam: kinds.field / points.length,
+    level: level / margins.length,
     byOne: share(margins, m => m === 1), withinSix: share(margins, m => m > 0 && m <= 6), withinTwelve: share(margins, m => m > 0 && m <= 12),
     byThirteenPlus: share(margins, m => m >= 13), byTwentyFivePlus: share(margins, m => m >= 25),
     nilRate: share(points, p => p === 0), fortyPlusRate: share(points, p => p >= 40),
@@ -838,6 +930,30 @@ export function playSeasons(clubs, { seasons = 40, seed = 20261108, games = 24 }
       pointsFor: totals[k].for / totals[k].played, pointsAgainst: totals[k].against / totals[k].played }))
       .sort((a, b) => b.wins - a.wins || a.name.localeCompare(b.name)),
   };
+}
+
+/**
+ * Each club's expected wins of `games` in the model under `sport`'s rules: its chance against every other club, attacking
+ * and defending, `samples` games each at Balanced at a neutral venue (seeded by `seed` and the pairing) → [{ id, wins }]
+ * in the clubs' order. The 40 seasons' tallies move a club by about a third of a win from one seed to the next, enough to
+ * swap close neighbours; these are steady to about a twentieth.
+ */
+export function expectedWins(clubs, { sport = rugbyLeague, games = 24, samples = 2000, seed = 'nrl' } = {}) {
+  const teams = clubs.map(club => buildClub(club, rugbyLeague));
+  const eff = teams.map(teamEff);
+  const share = teams.map(() => 0);
+  for (let i = 0; i < teams.length; i++) {
+    for (let j = 0; j < teams.length; j++) {
+      if (i === j) continue;
+      const prepared = sport.prepareMatch(teams[i], teams[j], eff[i], eff[j]);
+      const rng = makeRng(hashStr(`${seed}|${i}|${j}`));
+      let won = 0;
+      for (let k = 0; k < samples; k++) if (sport.sampleResult(rng, prepared, 6).winner === teams[i].id) won++;
+      share[i] += won / samples;
+      share[j] += 1 - won / samples;
+    }
+  }
+  return teams.map((team, i) => ({ id: team.id, wins: share[i] / (2 * (teams.length - 1)) * games }));
 }
 
 // ---------- the real season ----------
@@ -887,7 +1003,8 @@ export function seasonFigures(games) {
 // centre recorded of it (its team lists and player stats): a player's season is scored at NRL Fantasy's points for the
 // stats NRL.com kept that season (all eleven from 2003), ranked within his position and read off Rugby League 26's
 // overalls there, as 2008's attribute overall is read; then each club moves by its results that season (its Simple
-// Rating System), as 2008's moves by the game's own team rating.
+// Rating System), as 2008's moves by the game's own team rating, and as far from the others as its results put it
+// ("the computed seasons' spread", above).
 
 /** NRL.com's team-list positions, as the game's. A player listed at one started there, whatever his jersey number. */
 export const NRLCOM_POSITION = Object.freeze({ Fullback: 'FB', Winger: 'WG', Centre: 'CE', 'Five-Eighth': 'FE', Halfback: 'HB',
@@ -1119,15 +1236,21 @@ export function rlpPositions(html) {
 /**
  * The Simple Rating System of a season's games (`[{ home, away, homeScore, awayScore }]`): each club's rating and one home
  * edge that fit every margin as the home club's rating less the away club's, plus the edge, by least squares, the
- * ratings summing to zero. Solved exactly: the normal equations with that constraint, by Gaussian elimination. →
- * `{ ratings: { club: rating }, homeEdge }`, in points a game, three decimals.
+ * ratings summing to zero. Solved exactly: the normal equations with that constraint, inverted by Gauss-Jordan
+ * elimination. Also how much of the ratings' spread is the clubs' and how much the luck of their games: `sigma`, the
+ * margins' spread about the fit (points a game, over the games less the n ratings and edge fitted, one of them fixed by
+ * the constraint), and `reliability`, the share of the ratings' variance that is not their error's (each rating's error
+ * variance σ² times its diagonal entry of the inverse, the constrained fit's covariance, averaged over the clubs; at
+ * least 0). → `{ ratings: { club: rating }, homeEdge, sigma, reliability }`, ratings, edge and sigma in points a game to
+ * three decimals, reliability to four.
  */
 export function srsOf(games) {
   const clubs = [...new Set(games.flatMap(game => [game.home, game.away]))].sort();
   const n = clubs.length, at = new Map(clubs.map((club, i) => [club, i]));
-  // Unknowns: the n ratings, the home edge and the constraint's multiplier; the last column is the right-hand side.
+  // Unknowns: the n ratings, the home edge and the constraint's multiplier.
   const size = n + 2;
-  const m = Array.from({ length: size }, () => new Array(size + 1).fill(0));
+  const m = Array.from({ length: size }, () => new Array(size).fill(0));
+  const rhs = new Array(size).fill(0);
   for (const game of games) {
     const row = new Array(n + 1).fill(0);
     row[at.get(game.home)] += 1;
@@ -1137,21 +1260,33 @@ export function srsOf(games) {
     for (let i = 0; i <= n; i++) {
       if (!row[i]) continue;
       for (let j = 0; j <= n; j++) m[i][j] += row[i] * row[j];
-      m[i][size] += row[i] * margin;
+      rhs[i] += row[i] * margin;
     }
   }
   for (let i = 0; i < n; i++) { m[i][n + 1] = 1; m[n + 1][i] = 1; }
+  // Gauss-Jordan on [m | I]: the right half becomes m's inverse.
+  const a = m.map((row, i) => [...row, ...Array.from({ length: size }, (_, j) => (i === j ? 1 : 0))]);
   for (let col = 0; col < size; col++) {
     let pivot = col;
-    for (let r = col + 1; r < size; r++) if (Math.abs(m[r][col]) > Math.abs(m[pivot][col])) pivot = r;
-    if (Math.abs(m[pivot][col]) < 1e-12) throw new Error('The games do not rate every club');
-    [m[col], m[pivot]] = [m[pivot], m[col]];
+    for (let r = col + 1; r < size; r++) if (Math.abs(a[r][col]) > Math.abs(a[pivot][col])) pivot = r;
+    if (Math.abs(a[pivot][col]) < 1e-12) throw new Error('The games do not rate every club');
+    [a[col], a[pivot]] = [a[pivot], a[col]];
+    const lead = a[col][col];
+    for (let c = 0; c < 2 * size; c++) a[col][c] /= lead;
     for (let r = 0; r < size; r++) {
-      if (r === col || !m[r][col]) continue;
-      const factor = m[r][col] / m[col][col];
-      for (let c = col; c <= size; c++) m[r][c] -= factor * m[col][c];
+      if (r === col || !a[r][col]) continue;
+      const factor = a[r][col];
+      for (let c = 0; c < 2 * size; c++) a[r][c] -= factor * a[col][c];
     }
   }
-  const round = value => Math.round(value * 1000) / 1000 + 0;
-  return { ratings: Object.fromEntries(clubs.map((club, i) => [club, round(m[i][size] / m[i][i])])), homeEdge: round(m[n][size] / m[n][n]) };
+  const inverse = a.map(row => row.slice(size));
+  const solution = inverse.map(row => row.reduce((sum, x, j) => sum + x * rhs[j], 0));
+  const rating = clubs.map((club, i) => solution[i]), edge = solution[n];
+  const residuals = games.map(game => game.homeScore - game.awayScore - (rating[at.get(game.home)] - rating[at.get(game.away)] + edge));
+  const variance = residuals.reduce((sum, r) => sum + r * r, 0) / (games.length - n);
+  const error = variance * clubs.reduce((sum, club, i) => sum + inverse[i][i], 0) / n;
+  const spread = rating.reduce((sum, r) => sum + r * r, 0) / n;
+  const round = (value, places = 3) => Math.round(value * 10 ** places) / 10 ** places + 0;
+  return { ratings: Object.fromEntries(clubs.map((club, i) => [club, round(rating[i])])), homeEdge: round(edge), sigma: round(Math.sqrt(variance)),
+    reliability: round(Math.max(0, 1 - error / spread), 4) };
 }

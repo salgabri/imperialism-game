@@ -21,6 +21,28 @@ export const NATION_ALIASES = {
 /** EA's own player pages: `<this><slug>/<EA id>`, the evidence link of a ratings-API pull. */
 export const EA_PLAYER_PAGE = 'https://www.ea.com/games/ea-sports-fc/ratings/player-ratings/';
 
+// A letter of another script than Latin. Spaces, punctuation and combining accents belong to every script.
+const NOT_LATIN = /[^\p{Script=Latin}\p{Script=Common}\p{Script=Inherited}]/u;
+
+/**
+ * A full name without the same name in another script glued to its end ("Hakim Ziyechحكيم زياش" → "Hakim Ziyech"), or
+ * '' when no Latin part stands alone (a name only in another script, or scripts that alternate).
+ */
+export function latinPart(text) {
+  const name = String(text || '').trim();
+  const cut = name.search(NOT_LATIN);
+  if (cut < 0) return name;
+  if (!/\p{Script=Latin}/u.test(name.slice(cut))) return name.slice(0, cut).trim();
+  // A glued copy typed partly in Latin look-alikes ("Milan Borjan" + Serbian Cyrillic with a Latin M, a, o, p and j)
+  // alternates scripts, but it still begins where a small letter meets a capital with no space between.
+  let glue = -1;
+  for (const match of name.matchAll(/\p{Ll}(?=\p{Lu})/gu)) {
+    if (match.index + 1 > cut) break;
+    glue = match.index + 1;
+  }
+  return glue < 0 ? '' : name.slice(0, glue).trim();
+}
+
 export function parseCsv(text) {
   const rows = [];
   let field = '', row = [], quoted = false;
@@ -96,7 +118,10 @@ export function parseEaPlayers(text) {
     const natural = get('player_positions').split(',').map(p => p.trim());
     if (!natural.length || natural.some(p => !ROLE_OF_POSITION[p])) throw new Error(`Unknown EA position for ${id}`);
     const positions = [...new Set(natural.map(p => ROLE_OF_POSITION[p]))];
-    const name = get('short_name').trim(), fullName = get('long_name').trim();
+    // SoFIFA's long names can end in the same name in another script, glued on ("Kiril Vasilev DespodovКирил Василев
+    // Десподов": 286 of EA FC 26's): the Latin part is the full name. One with no Latin part to stand alone stays whole.
+    const longName = get('long_name').trim();
+    const name = get('short_name').trim(), fullName = latinPart(longName) || longName;
     if (!name || !fullName || !get('nationality_name') || !/^\d{4}-\d{2}-\d{2}$/.test(get('fifa_update_date'))) throw new Error(`Missing EA identity/date for ${id}`);
     // A SoFIFA export links a site path, a ratings-API pull EA's own player page; either names this player's id.
     const playerUrl = get('player_url'), eaId = get('player_id');

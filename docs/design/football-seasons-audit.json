@@ -439,7 +439,7 @@
   "seasons": [
     {
       "id": "ea-fc-26",
-      "version": "ea-fc-26-2474d463",
+      "version": "ea-fc-26-ef694992",
       "edition": "EA FC 26",
       "update": 4,
       "roster": "260004",
@@ -1080,7 +1080,7 @@
     },
     {
       "id": "ea-fc-25",
-      "version": "ea-fc-25-8e3d25b2",
+      "version": "ea-fc-25-30f5f544",
       "edition": "EA FC 25",
       "update": 2,
       "roster": "250002",
@@ -1887,7 +1887,7 @@
     },
     {
       "id": "ea-fc-24",
-      "version": "ea-fc-24-564f44cb",
+      "version": "ea-fc-24-d7b1f46e",
       "edition": "EA FC 24",
       "update": 2,
       "roster": "240002",
@@ -2601,7 +2601,7 @@
     },
     {
       "id": "ea-fifa-23",
-      "version": "ea-fifa-23-ac1e9c8b",
+      "version": "ea-fifa-23-bdc896ca",
       "edition": "FIFA 23",
       "update": 2,
       "roster": "230002",
@@ -3237,7 +3237,7 @@
     },
     {
       "id": "ea-fifa-22",
-      "version": "ea-fifa-22-0f9776fe",
+      "version": "ea-fifa-22-a7873a91",
       "edition": "FIFA 22",
       "update": 2,
       "roster": "220002",
@@ -3326,15 +3326,8 @@
             "ea": 10,
             "before": 61.9,
             "elo": 1535.4,
-            "rank": 66,
             "T": 72.51,
-            "after": 65.3,
-            "kept": 10,
-            "held": "down to T + max D",
-            "added": [
-              "Chelsea Surpris DF 77 13 caps 2020–2021* (3.25)"
-            ],
-            "outOfPosition": [],
+            "why": "no candidate for the 1 places",
             "sameAsEa": 3
           },
           {
@@ -3696,10 +3689,10 @@
       "coverage": {
         "players": 2162,
         "nations": 146,
-        "completeXIs": 81,
+        "completeXIs": 80,
         "clubs": 124,
         "leagues": 16,
-        "computed": 23
+        "computed": 22
       },
       "leagues": {
         "Premier League": {
@@ -3862,6 +3855,7 @@
         "275 Palestine (2)",
         "320 Guatemala (2)",
         "328 Guyana (7)",
+        "332 Haiti (10)",
         "340 Honduras (11)",
         "360 Indonesia (1)",
         "368 Iraq (4)",
@@ -3935,7 +3929,7 @@
     },
     {
       "id": "ea-fifa-21",
-      "version": "ea-fifa-21-72a88e36",
+      "version": "ea-fifa-21-f40d137b",
       "edition": "FIFA 21",
       "update": 2,
       "roster": "210002",
@@ -4074,18 +4068,8 @@
             "ea": 10,
             "before": 59.1,
             "elo": 1559.8,
-            "rank": 61,
             "T": 72.9,
-            "after": 62.5,
-            "kept": 10,
-            "held": "down to T + max D",
-            "added": [
-              "Chelsea Surpris DF 78 13 caps 2020–2021* (6.5)"
-            ],
-            "outOfPosition": [
-              "S. Saba (MF as GK)",
-              "H. Bazile (MF as DF)"
-            ],
+            "why": "no candidate for the 3 places",
             "sameAsEa": 3
           },
           {
@@ -4445,7 +4429,7 @@
         "completeXIs": 81,
         "clubs": 124,
         "leagues": 17,
-        "computed": 28
+        "computed": 27
       },
       "leagues": {
         "Premier League": {
@@ -4599,7 +4583,7 @@
         "275 Palestine (2)",
         "320 Guatemala (0)",
         "328 Guyana (10)",
-        "332 Haiti (11)",
+        "332 Haiti (10)",
         "340 Honduras (11)",
         "360 Indonesia (1)",
         "368 Iraq (4)",
@@ -4671,7 +4655,7 @@
     },
     {
       "id": "ea-fifa-20",
-      "version": "ea-fifa-20-9a157147",
+      "version": "ea-fifa-20-a29674db",
       "edition": "FIFA 20",
       "update": 2,
       "roster": "200002",
@@ -4790,21 +4774,9 @@
             "ea": 8,
             "before": 56.8,
             "elo": 1563.9,
-            "rank": 60,
             "T": 73.89,
-            "after": 65,
-            "kept": 8,
-            "held": "down to T + max D",
-            "added": [
-              "Duckens Nazon FW 79 83 caps 2014–2024* (7.55)",
-              "Chelsea Surpris DF 79 13 caps 2020–2021* (3.25)",
-              "Roseline Éloissaint MF 76 9 caps 2018–2019* (2.25)"
-            ],
-            "outOfPosition": [
-              "B. Chevreuil (MF as GK)",
-              "D. Etienne Jr. (FW as DF)"
-            ],
-            "sameAsEa": 3
+            "why": "no candidate for the 3 places",
+            "sameAsEa": 2
           },
           {
             "id": "340",
@@ -5146,7 +5118,7 @@
         "completeXIs": 83,
         "clubs": 124,
         "leagues": 16,
-        "computed": 25
+        "computed": 22
       },
       "leagues": {
         "Premier League": {
@@ -5296,7 +5268,7 @@
         "275 Palestine (4)",
         "320 Guatemala (2)",
         "328 Guyana (4)",
-        "332 Haiti (11)",
+        "332 Haiti (8)",
         "340 Honduras (11)",
         "360 Indonesia (1)",
         "368 Iraq (10)",
@@ -5370,7 +5342,7 @@
     },
     {
       "id": "ea-fifa-19",
-      "version": "ea-fifa-19-8e5a9119",
+      "version": "ea-fifa-19-8c90f1b3",
       "edition": "FIFA 19",
       "update": 2,
       "roster": "190002",
@@ -5464,7 +5436,7 @@
             "elo": 1515.3,
             "T": 72.67,
             "why": "no candidate for the 2 places",
-            "sameAsEa": 4
+            "sameAsEa": 3
           },
           {
             "id": "368",
@@ -5963,7 +5935,7 @@
     },
     {
       "id": "ea-fifa-18",
-      "version": "ea-fifa-18-fc5fbca8",
+      "version": "ea-fifa-18-8dcc650f",
       "edition": "FIFA 18",
       "update": 2,
       "roster": "180002",
@@ -6655,7 +6627,7 @@
     },
     {
       "id": "ea-fifa-17",
-      "version": "ea-fifa-17-c67a2071",
+      "version": "ea-fifa-17-665f3481",
       "edition": "FIFA 17",
       "update": 2,
       "roster": "170002",
@@ -7339,7 +7311,7 @@
     },
     {
       "id": "ea-fifa-16",
-      "version": "ea-fifa-16-8f8558ce",
+      "version": "ea-fifa-16-5256787d",
       "edition": "FIFA 16",
       "update": 2,
       "roster": "160002",
@@ -7436,7 +7408,7 @@
             "kept": 10,
             "held": "down to T + max D",
             "added": [
-              "Sherly Jeudy FW 76 15 caps 2015–2016* (7.5)"
+              "Derrick Etienne Jr. FW/MF 76 46 caps 2016–2021* (3.83)"
             ],
             "outOfPosition": [],
             "sameAsEa": 4
@@ -8039,7 +8011,7 @@
     },
     {
       "id": "ea-fifa-15",
-      "version": "ea-fifa-15-72102f86",
+      "version": "ea-fifa-15-50770e37",
       "edition": "FIFA 15",
       "update": 2,
       "roster": "150002",
@@ -8148,8 +8120,8 @@
             "added": [
               "Duckens Nazon FW 73 83 caps 2014–2024* (7.55)",
               "Frantz Bertin MF 72 41 caps 2007–2016 (4.1)",
-              "Sherly Jeudy FW 71 15 caps 2015–2016* (3.75)",
-              "Sebastien Thuriere MF 69 ? caps 2014–2014* (0)"
+              "Sebastien Thuriere MF 71 ? caps 2014–2014* (0)",
+              "Jonel Désiré FW 69 ? caps 2015–2015* (0)"
             ],
             "outOfPosition": [],
             "sameAsEa": 3
@@ -8737,7 +8709,7 @@
     },
     {
       "id": "ea-fifa-14",
-      "version": "ea-fifa-14-be2f0e92",
+      "version": "ea-fifa-14-01d0b8c6",
       "edition": "FIFA 14",
       "update": 52,
       "roster": "140052",
@@ -9568,7 +9540,7 @@
     },
     {
       "id": "ea-fifa-13",
-      "version": "ea-fifa-13-abaed8e7",
+      "version": "ea-fifa-13-eb3e18fb",
       "edition": "FIFA 13",
       "update": 34,
       "roster": "130034",
@@ -10377,7 +10349,7 @@
     },
     {
       "id": "ea-fifa-12",
-      "version": "ea-fifa-12-15f352a3",
+      "version": "ea-fifa-12-b4311ccd",
       "edition": "FIFA 12",
       "update": 2,
       "roster": "120002",
@@ -11035,7 +11007,7 @@
     },
     {
       "id": "ea-fifa-11",
-      "version": "ea-fifa-11-8c8634a7",
+      "version": "ea-fifa-11-585e9f9a",
       "edition": "FIFA 11",
       "update": 2,
       "roster": "110002",
@@ -11700,7 +11672,7 @@
     },
     {
       "id": "ea-fifa-10",
-      "version": "ea-fifa-10-a1a95d9d",
+      "version": "ea-fifa-10-2806c61b",
       "edition": "FIFA 10",
       "update": 2,
       "roster": "100002",
@@ -12506,7 +12478,7 @@
     },
     {
       "id": "ea-fifa-09",
-      "version": "ea-fifa-09-4d068ad9",
+      "version": "ea-fifa-09-adae4ba7",
       "edition": "FIFA 09",
       "update": 2,
       "roster": "090002",
@@ -13585,7 +13557,7 @@
     },
     {
       "id": "ea-fifa-08",
-      "version": "ea-fifa-08-165d147d",
+      "version": "ea-fifa-08-c56ebfc2",
       "edition": "FIFA 08",
       "update": 2,
       "roster": "080002",
@@ -14600,7 +14572,7 @@
     },
     {
       "id": "ea-fifa-07",
-      "version": "ea-fifa-07-ab2eee26",
+      "version": "ea-fifa-07-5350bca2",
       "edition": "FIFA 07",
       "update": 2,
       "roster": "070002",
@@ -15514,7 +15486,7 @@
     },
     {
       "id": "ea-fifa-06",
-      "version": "ea-fifa-06-745cfba3",
+      "version": "ea-fifa-06-2c27a54b",
       "edition": "FIFA 06",
       "update": 1,
       "roster": "060001",
@@ -16291,7 +16263,7 @@
     },
     {
       "id": "ea-fifa-05",
-      "version": "ea-fifa-05-e32d7a3a",
+      "version": "ea-fifa-05-d97fdbef",
       "edition": "FIFA 05",
       "update": 1,
       "roster": "050001",

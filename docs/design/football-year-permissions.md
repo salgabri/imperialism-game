@@ -15,6 +15,14 @@ ignored `data-src/cm0102/`, and its output stays out of git.
 When an answer arrives, record its date, who gave it, a link to it and its exact
 scope here before any derived data is committed.
 
+**Shipping by the user's choice of 2026-11-17** ("Yes, credit them"), without waiting
+for request 1: the CM 01/02 Update Team's official databases, one per season from
+2007/08 to 2025/26 (Helvete's September 2005 for 2005/06), credited to the Update Team
+like the other fan-made seasons, to give each earlier season's country maps the leagues
+EA's edition of that season does not rate. The user was told they carry no licence,
+that request 1 was never sent, and that the forum attachments need a login, so the user
+downloads them. Request 1 stays open; an answer, either way, is recorded here.
+
 These requests cover the community's databases. On 2026-11-08 the user chose to
 ship five seasons whose data no one has licensed, credited to their makers
 ([football-years.md](football-years.md#seasons-before-fifa-05)): SI's own CM 01/02

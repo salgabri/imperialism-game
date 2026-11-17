@@ -19,8 +19,8 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { eloOn, resultRows } from './lib/football-elo.mjs';
 import { csvRows } from './lib/world-cup-facts.mjs';
-import { seasonElo, sparqlRows, wikidataTables } from './lib/national-team-facts.mjs';
-import { FILL_YEARS, withoutMalformedDays } from './lib/football-fills.mjs';
+import { entityId, seasonElo, sparqlRows, wikidataTables } from './lib/national-team-facts.mjs';
+import { FILL_YEARS, withoutMalformedDays, womenOf } from './lib/football-fills.mjs';
 import { politeFetch } from './lib/polite-fetch.mjs';
 import { WIKIDATA_SPARQL, sparqlRequest } from './lib/wikidata-sparql.mjs';
 
@@ -102,7 +102,13 @@ async function main() {
 
   const answers = {};
   for (const file of wikidata.files) answers[file.query] = sparqlRows(JSON.parse(await pinned(dataDir, wikidata.folder, file, `${wikidata.endpoint} (query ${file.query})`)));
-  const { rows: stints, malformed } = withoutMalformedDays(answers.stints);
+  const { rows: dated, malformed } = withoutMalformedDays(answers.stints);
+  // A woman with a membership of a men's team is Wikidata's error (Haiti's women's internationals filed under its men's
+  // team): her stints are left out.
+  const women = womenOf(answers.sexes);
+  const stints = dated.filter(row => !women.has(entityId(row.player)));
+  const womenLeftOut = [...new Set(dated.filter(row => women.has(entityId(row.player))).map(row => entityId(row.player)))]
+    .sort((a, b) => Number(a.slice(1)) - Number(b.slice(1)));
   const tables = wikidataTables({ ...answers, stints }, { positions: manifest.positions, names: manifest.names, years: FILL_YEARS, openCapsPerYear: manifest.selection.openCapsPerYear, openFirstYear: true });
 
   const matches = resultRows(csvRows(await pinned(dataDir, results.folder, results.files[0], `${results.download}${results.files[0].name}`)));
@@ -115,7 +121,7 @@ async function main() {
         + 'pinned in scripts/data/football-fills.json (CC0). Rows: teams [qid, country]; players [qid, name, born, English Wikipedia article, '
         + 'positions]; stints [player, team, from, to, caps, goals, ended], ended 1 where Wikidata gives no end and the manifest\'s rule does '
         + '(selection.openCapsPerYear). Written by scripts/sync-football-fills.mjs.',
-      audit: { ...tables.audit, malformedDays: malformed }, teams: tables.teams, players: tables.players, stints: tables.stints,
+      audit: { ...tables.audit, malformedDays: malformed, women: womenLeftOut }, teams: tables.teams, players: tables.players, stints: tables.stints,
     })],
     [path.join(OUT, 'elo.json'), factsText({
       about: 'Each season\'s World Football Elo on its ratings date, computed from martj42\'s results (CC0) by the formula eloratings.net '

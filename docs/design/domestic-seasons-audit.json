@@ -3,8 +3,61 @@
  "note": "Per earlier season's country map: boundary layer, clubs, homes found, placed and in their own section, file size; and each season's countries below ten clubs.",
  "maps": [
   {
+   "id": "008y2026",
+   "version": "008y2026-42c1ba7d",
+   "name": "Albania",
+   "level": "ADM3",
+   "clubs": 12,
+   "located": 12,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 10,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 95314
+  },
+  {
+   "id": "012y2026",
+   "version": "012y2026-5e49d4d5",
+   "name": "Algeria",
+   "level": "ADM3",
+   "clubs": 18,
+   "located": 18,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 15,
+   "displacementKm": {
+    "median": 0,
+    "p90": 2.7,
+    "max": 23.7
+   },
+   "bytes": 113995
+  },
+  {
+   "id": "031y2026",
+   "version": "031y2026-fd4dcf11",
+   "name": "Azerbaijan",
+   "level": "ADM2",
+   "clubs": 13,
+   "located": 12,
+   "unlocated": [],
+   "placed": [
+    "Neftchi PFK"
+   ],
+   "homeInSection": 11,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 13.8
+   },
+   "bytes": 76072
+  },
+  {
    "id": "032y2026",
-   "version": "032y2026-a1a35d80",
+   "version": "032y2026-76513889",
    "name": "Argentina",
    "level": "ADM2",
    "clubs": 30,
@@ -17,11 +70,11 @@
     "p90": 110.3,
     "max": 131.1
    },
-   "bytes": 144922
+   "bytes": 144883
   },
   {
    "id": "036y2026",
-   "version": "036y2026-a0bbe551",
+   "version": "036y2026-02322f65",
    "name": "Australia",
    "level": "ADM2",
    "clubs": 10,
@@ -34,11 +87,11 @@
     "p90": 105.3,
     "max": 183.3
    },
-   "bytes": 113585
+   "bytes": 113209
   },
   {
    "id": "040y2026",
-   "version": "040y2026-7a2d074c",
+   "version": "040y2026-498f72c3",
    "name": "Austria",
    "level": "ADM3",
    "clubs": 12,
@@ -51,11 +104,47 @@
     "p90": 0,
     "max": 1.4
    },
-   "bytes": 123368
+   "bytes": 123162
+  },
+  {
+   "id": "050y2026",
+   "version": "050y2026-5d4be9f8",
+   "name": "Bangladesh",
+   "level": "ADM3",
+   "clubs": 10,
+   "located": 10,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 4,
+   "displacementKm": {
+    "median": 0.6,
+    "p90": 2.2,
+    "max": 2.6
+   },
+   "bytes": 114476
+  },
+  {
+   "id": "051y2026",
+   "version": "051y2026-fddd6ff3",
+   "name": "Armenia",
+   "level": "ADM2",
+   "clubs": 11,
+   "located": 10,
+   "unlocated": [],
+   "placed": [
+    "FC West Armenia"
+   ],
+   "homeInSection": 4,
+   "displacementKm": {
+    "median": 0,
+    "p90": 6,
+    "max": 6
+   },
+   "bytes": 67263
   },
   {
    "id": "056y2026",
-   "version": "056y2026-05999143",
+   "version": "056y2026-4c44e47f",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 16,
@@ -68,11 +157,134 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 106204
+   "bytes": 105762
+  },
+  {
+   "id": "068y2026",
+   "version": "068y2026-3cced91e",
+   "name": "Bolivia",
+   "level": "ADM3",
+   "clubs": 24,
+   "located": 21,
+   "unlocated": [],
+   "placed": [
+    "Club A.B.B.",
+    "Club Deportivo Sur-Car",
+    "24 de Septiembre"
+   ],
+   "homeInSection": 14,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0.2,
+    "max": 15.6
+   },
+   "bytes": 127051
+  },
+  {
+   "id": "070y2026",
+   "version": "070y2026-d0de8082",
+   "name": "Bosnia & Herz.",
+   "level": "ADM3",
+   "clubs": 14,
+   "located": 14,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 14,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 93050
+  },
+  {
+   "id": "076y2026",
+   "version": "076y2026-22571fc4",
+   "name": "Brazil",
+   "level": "ADM2",
+   "clubs": 100,
+   "located": 100,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 78,
+   "displacementKm": {
+    "median": 0,
+    "p90": 3.3,
+    "max": 9
+   },
+   "bytes": 240760
+  },
+  {
+   "id": "100y2026",
+   "version": "100y2026-a7837496",
+   "name": "Bulgaria",
+   "level": "ADM2",
+   "clubs": 34,
+   "located": 34,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 28,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0.7,
+    "max": 6.5
+   },
+   "bytes": 116898
+  },
+  {
+   "id": "112y2026",
+   "version": "112y2026-66ea0045",
+   "name": "Belarus",
+   "level": "ADM2",
+   "clubs": 24,
+   "located": 24,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 20,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 125813
+  },
+  {
+   "id": "124y2026",
+   "version": "124y2026-2449b089",
+   "name": "Canada",
+   "level": "ADM3",
+   "clubs": 11,
+   "located": 11,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 11,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 115509
+  },
+  {
+   "id": "152y2026",
+   "version": "152y2026-07dea0d3",
+   "name": "Chile",
+   "level": "ADM3",
+   "clubs": 33,
+   "located": 33,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 22,
+   "displacementKm": {
+    "median": 0,
+    "p90": 98.2,
+    "max": 134
+   },
+   "bytes": 139898
   },
   {
    "id": "156y2026",
-   "version": "156y2026-c12fc083",
+   "version": "156y2026-2b2c0ba1",
    "name": "China",
    "level": "ADM2",
    "clubs": 16,
@@ -85,11 +297,108 @@
     "p90": 0,
     "max": 2.7
    },
-   "bytes": 126213
+   "bytes": 124257
+  },
+  {
+   "id": "170y2026",
+   "version": "170y2026-d8566f48",
+   "name": "Colombia",
+   "level": "ADM2",
+   "clubs": 34,
+   "located": 33,
+   "unlocated": [],
+   "placed": [
+    "Atlético FC"
+   ],
+   "homeInSection": 22,
+   "displacementKm": {
+    "median": 0,
+    "p90": 3,
+    "max": 10.3
+   },
+   "bytes": 138480
+  },
+  {
+   "id": "188y2026",
+   "version": "188y2026-f6479246",
+   "name": "Costa Rica",
+   "level": "ADM3",
+   "clubs": 12,
+   "located": 11,
+   "unlocated": [],
+   "placed": [
+    "Sporting FC"
+   ],
+   "homeInSection": 11,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 112157
+  },
+  {
+   "id": "191y2026",
+   "version": "191y2026-e95fddde",
+   "name": "Croatia",
+   "level": "ADM2",
+   "clubs": 40,
+   "located": 37,
+   "unlocated": [],
+   "placed": [
+    "NK Zrinski Osjecko 1664",
+    "NK Vrapce",
+    "NK Ravnice"
+   ],
+   "homeInSection": 28,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0.7,
+    "max": 9
+   },
+   "bytes": 145383
+  },
+  {
+   "id": "196y2026",
+   "version": "196y2026-6d7945c9",
+   "name": "Cyprus",
+   "level": "ADM2",
+   "clubs": 24,
+   "located": 21,
+   "unlocated": [],
+   "placed": [
+    "Omonia 29is Maiou",
+    "Enosis Neon Paralimniou",
+    "Anagennisi Derynias"
+   ],
+   "homeInSection": 13,
+   "displacementKm": {
+    "median": 0,
+    "p90": 1,
+    "max": 6.4
+   },
+   "bytes": 96381
+  },
+  {
+   "id": "203y2026",
+   "version": "203y2026-82f26fb6",
+   "name": "Czechia",
+   "level": "ADM3",
+   "clubs": 28,
+   "located": 28,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 25,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 2
+   },
+   "bytes": 133932
   },
   {
    "id": "208y2026",
-   "version": "208y2026-87b08f3b",
+   "version": "208y2026-56a87498",
    "name": "Denmark",
    "level": "ADM2",
    "clubs": 12,
@@ -102,11 +411,117 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 97665
+   "bytes": 97508
+  },
+  {
+   "id": "214y2026",
+   "version": "214y2026-adee35e8",
+   "name": "Dominican Rep.",
+   "level": "ADM2",
+   "clubs": 12,
+   "located": 11,
+   "unlocated": [],
+   "placed": [
+    "Santa Fe FC"
+   ],
+   "homeInSection": 10,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 1
+   },
+   "bytes": 108008
+  },
+  {
+   "id": "218y2026",
+   "version": "218y2026-952a2ca5",
+   "name": "Ecuador",
+   "level": "ADM2",
+   "clubs": 19,
+   "located": 18,
+   "unlocated": [],
+   "placed": [
+    "Chacaritas FC"
+   ],
+   "homeInSection": 13,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 5.5
+   },
+   "bytes": 118368
+  },
+  {
+   "id": "222y2026",
+   "version": "222y2026-428d8f21",
+   "name": "El Salvador",
+   "level": "ADM2",
+   "clubs": 13,
+   "located": 13,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 12,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 77614
+  },
+  {
+   "id": "233y2026",
+   "version": "233y2026-7b13e310",
+   "name": "Estonia",
+   "level": "ADM2",
+   "clubs": 10,
+   "located": 10,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 6,
+   "displacementKm": {
+    "median": 0,
+    "p90": 2.8,
+    "max": 7
+   },
+   "bytes": 110851
+  },
+  {
+   "id": "242y2026",
+   "version": "242y2026-63ca0f80",
+   "name": "Fiji",
+   "level": "ADM4",
+   "clubs": 10,
+   "located": 10,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 8,
+   "displacementKm": {
+    "median": 0,
+    "p90": 8,
+    "max": 11.8
+   },
+   "bytes": 103762
+  },
+  {
+   "id": "246y2026",
+   "version": "246y2026-425006b4",
+   "name": "Finland",
+   "level": "ADM3",
+   "clubs": 24,
+   "located": 24,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 20,
+   "displacementKm": {
+    "median": 0,
+    "p90": 4.3,
+    "max": 12.8
+   },
+   "bytes": 126825
   },
   {
    "id": "250y2026",
-   "version": "250y2026-1db8b487",
+   "version": "250y2026-1f2c70fc",
    "name": "France",
    "level": "ADM3",
    "clubs": 36,
@@ -119,11 +534,28 @@
     "p90": 0,
     "max": 14.5
    },
-   "bytes": 153557
+   "bytes": 152845
+  },
+  {
+   "id": "268y2026",
+   "version": "268y2026-5ee674ae",
+   "name": "Georgia",
+   "level": "ADM2",
+   "clubs": 10,
+   "located": 10,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 10,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 111078
   },
   {
    "id": "276y2026",
-   "version": "276y2026-f1207201",
+   "version": "276y2026-52d4ee1d",
    "name": "Germany",
    "level": "ADM3",
    "clubs": 54,
@@ -136,11 +568,124 @@
     "p90": 0,
     "max": 12.7
    },
-   "bytes": 183181
+   "bytes": 182340
+  },
+  {
+   "id": "288y2026",
+   "version": "288y2026-c670dbfc",
+   "name": "Ghana",
+   "level": "ADM2",
+   "clubs": 18,
+   "located": 17,
+   "unlocated": [],
+   "placed": [
+    "Nsoatreman FC"
+   ],
+   "homeInSection": 14,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0.2,
+    "max": 0.2
+   },
+   "bytes": 121611
+  },
+  {
+   "id": "300y2026",
+   "version": "300y2026-af2b5db6",
+   "name": "Greece",
+   "level": "ADM3",
+   "clubs": 39,
+   "located": 31,
+   "unlocated": [],
+   "placed": [
+    "APO Levadiakos",
+    "Asteras Aktor",
+    "Panargiakos APO",
+    "Panachaiki GE",
+    "AO Neas Artakis",
+    "Diagoras Rodou",
+    "AO Giouchtas",
+    "Tilykratis Lefkadas"
+   ],
+   "homeInSection": 20,
+   "displacementKm": {
+    "median": 0,
+    "p90": 1.5,
+    "max": 23.2
+   },
+   "bytes": 145073
+  },
+  {
+   "id": "320y2026",
+   "version": "320y2026-21a54a1d",
+   "name": "Guatemala",
+   "level": "ADM2",
+   "clubs": 11,
+   "located": 11,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 9,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0.9,
+    "max": 3.6
+   },
+   "bytes": 110143
+  },
+  {
+   "id": "340y2026",
+   "version": "340y2026-eb4f47b1",
+   "name": "Honduras",
+   "level": "ADM2",
+   "clubs": 10,
+   "located": 10,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 7,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0.7,
+    "max": 2.9
+   },
+   "bytes": 110226
+  },
+  {
+   "id": "348y2026",
+   "version": "348y2026-e4914259",
+   "name": "Hungary",
+   "level": "ADM3",
+   "clubs": 16,
+   "located": 16,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 13,
+   "displacementKm": {
+    "median": 0,
+    "p90": 1.4,
+    "max": 6.4
+   },
+   "bytes": 118544
+  },
+  {
+   "id": "352y2026",
+   "version": "352y2026-dda1b485",
+   "name": "Iceland",
+   "level": "ADM2",
+   "clubs": 12,
+   "located": 12,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 5,
+   "displacementKm": {
+    "median": 0.4,
+    "p90": 8.7,
+    "max": 19.8
+   },
+   "bytes": 112658
   },
   {
    "id": "356y2026",
-   "version": "356y2026-50f238ae",
+   "version": "356y2026-d9009260",
    "name": "India",
    "level": "ADM2",
    "clubs": 13,
@@ -155,11 +700,82 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 120595
+   "bytes": 120307
+  },
+  {
+   "id": "360y2026",
+   "version": "360y2026-ad8d4a76",
+   "name": "Indonesia",
+   "level": "ADM2",
+   "clubs": 22,
+   "located": 22,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 13,
+   "displacementKm": {
+    "median": 0,
+    "p90": 193.7,
+    "max": 212.6
+   },
+   "bytes": 146319
+  },
+  {
+   "id": "364y2026",
+   "version": "364y2026-45b08ad5",
+   "name": "Iran",
+   "level": "ADM2",
+   "clubs": 34,
+   "located": 32,
+   "unlocated": [],
+   "placed": [
+    "Mes Soongoun Varzaghan",
+    "Shahr Raz FC"
+   ],
+   "homeInSection": 25,
+   "displacementKm": {
+    "median": 0,
+    "p90": 5,
+    "max": 16.7
+   },
+   "bytes": 137183
+  },
+  {
+   "id": "372y2026",
+   "version": "372y2026-e4b76e58",
+   "name": "Ireland",
+   "level": "ADM2",
+   "clubs": 20,
+   "located": 20,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 18,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0.7
+   },
+   "bytes": 126324
+  },
+  {
+   "id": "376y2026",
+   "version": "376y2026-8db8a3ac",
+   "name": "Israel",
+   "level": "ADM2",
+   "clubs": 30,
+   "located": 30,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 21,
+   "displacementKm": {
+    "median": 0,
+    "p90": 9.3,
+    "max": 17.9
+   },
+   "bytes": 74719
   },
   {
    "id": "380y2026",
-   "version": "380y2026-7d4a7166",
+   "version": "380y2026-be16e845",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 40,
@@ -172,11 +788,64 @@
     "p90": 0,
     "max": 2.5
    },
-   "bytes": 155594
+   "bytes": 155011
+  },
+  {
+   "id": "388y2026",
+   "version": "388y2026-dc90879f",
+   "name": "Jamaica",
+   "level": "ADM2",
+   "clubs": 14,
+   "located": 13,
+   "unlocated": [],
+   "placed": [
+    "Vere United FC"
+   ],
+   "homeInSection": 9,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0.7,
+    "max": 0.8
+   },
+   "bytes": 114726
+  },
+  {
+   "id": "392y2026",
+   "version": "392y2026-305055bc",
+   "name": "Japan",
+   "level": "ADM2",
+   "clubs": 54,
+   "located": 54,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 52,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 4
+   },
+   "bytes": 158387
+  },
+  {
+   "id": "398y2026",
+   "version": "398y2026-1d775c4d",
+   "name": "Kazakhstan",
+   "level": "ADM2",
+   "clubs": 14,
+   "located": 14,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 13,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 113313
   },
   {
    "id": "410y2026",
-   "version": "410y2026-798a9338",
+   "version": "410y2026-b40f7f77",
    "name": "South Korea",
    "level": "ADM2",
    "clubs": 12,
@@ -189,11 +858,170 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 121604
+   "bytes": 120204
+  },
+  {
+   "id": "417y2026",
+   "version": "417y2026-3dc74f88",
+   "name": "Kyrgyzstan",
+   "level": "ADM2",
+   "clubs": 14,
+   "located": 14,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 7,
+   "displacementKm": {
+    "median": 1.6,
+    "p90": 6.6,
+    "max": 19.7
+   },
+   "bytes": 101224
+  },
+  {
+   "id": "422y2026",
+   "version": "422y2026-4eda00e3",
+   "name": "Lebanon",
+   "level": "ADM2",
+   "clubs": 10,
+   "located": 9,
+   "unlocated": [],
+   "placed": [
+    "Jwaya SC"
+   ],
+   "homeInSection": 4,
+   "displacementKm": {
+    "median": 0.1,
+    "p90": 3.2,
+    "max": 9.2
+   },
+   "bytes": 51491
+  },
+  {
+   "id": "428y2026",
+   "version": "428y2026-bdb1a68f",
+   "name": "Latvia",
+   "level": "ADM2",
+   "clubs": 10,
+   "located": 10,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 6,
+   "displacementKm": {
+    "median": 0,
+    "p90": 1.8,
+    "max": 2.3
+   },
+   "bytes": 110057
+  },
+  {
+   "id": "440y2026",
+   "version": "440y2026-b99e2be5",
+   "name": "Lithuania",
+   "level": "ADM3",
+   "clubs": 11,
+   "located": 11,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 10,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 113931
+  },
+  {
+   "id": "442y2026",
+   "version": "442y2026-d128dc04",
+   "name": "Luxembourg",
+   "level": "ADM2",
+   "clubs": 16,
+   "located": 16,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 16,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 68188
+  },
+  {
+   "id": "458y2026",
+   "version": "458y2026-a3dfe4f2",
+   "name": "Malaysia",
+   "level": "ADM2",
+   "clubs": 14,
+   "located": 13,
+   "unlocated": [],
+   "placed": [
+    "Brunei DPMM FC"
+   ],
+   "homeInSection": 12,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 111462
+  },
+  {
+   "id": "484y2026",
+   "version": "484y2026-05414780",
+   "name": "Mexico",
+   "level": "ADM2",
+   "clubs": 34,
+   "located": 34,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 30,
+   "displacementKm": {
+    "median": 0,
+    "p90": 1.5,
+    "max": 7.5
+   },
+   "bytes": 137124
+  },
+  {
+   "id": "499y2026",
+   "version": "499y2026-38fa16b1",
+   "name": "Montenegro",
+   "level": "ADM1",
+   "clubs": 11,
+   "located": 11,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 11,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 55432
+  },
+  {
+   "id": "504y2026",
+   "version": "504y2026-5e302e4f",
+   "name": "Morocco",
+   "level": "ADM2",
+   "clubs": 15,
+   "located": 14,
+   "unlocated": [],
+   "placed": [
+    "Hassania d'Agadir"
+   ],
+   "homeInSection": 11,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 2.1
+   },
+   "bytes": 109679
   },
   {
    "id": "528y2026",
-   "version": "528y2026-8823400c",
+   "version": "528y2026-53ad7b94",
    "name": "Netherlands",
    "level": "ADM2",
    "clubs": 18,
@@ -206,11 +1034,28 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 111781
+   "bytes": 111520
+  },
+  {
+   "id": "566y2026",
+   "version": "566y2026-365b4a0d",
+   "name": "Nigeria",
+   "level": "ADM2",
+   "clubs": 21,
+   "located": 21,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 21,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 123700
   },
   {
    "id": "578y2026",
-   "version": "578y2026-d0d0b44c",
+   "version": "578y2026-19231afa",
    "name": "Norway",
    "level": "ADM2",
    "clubs": 16,
@@ -223,11 +1068,82 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 126615
+   "bytes": 126397
+  },
+  {
+   "id": "591y2026",
+   "version": "591y2026-c631dede",
+   "name": "Panama",
+   "level": "ADM3",
+   "clubs": 12,
+   "located": 12,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 8,
+   "displacementKm": {
+    "median": 0,
+    "p90": 12,
+    "max": 13.4
+   },
+   "bytes": 116108
+  },
+  {
+   "id": "600y2026",
+   "version": "600y2026-5a8f5812",
+   "name": "Paraguay",
+   "level": "ADM2",
+   "clubs": 18,
+   "located": 18,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 6,
+   "displacementKm": {
+    "median": 25.6,
+    "p90": 33.8,
+    "max": 47.9
+   },
+   "bytes": 116173
+  },
+  {
+   "id": "604y2026",
+   "version": "604y2026-b9052d37",
+   "name": "Peru",
+   "level": "ADM2",
+   "clubs": 34,
+   "located": 34,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 25,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0.7,
+    "max": 43.2
+   },
+   "bytes": 137842
+  },
+  {
+   "id": "608y2026",
+   "version": "608y2026-badb4027",
+   "name": "Philippines",
+   "level": "ADM3",
+   "clubs": 10,
+   "located": 8,
+   "unlocated": [],
+   "placed": [
+    "Don Bosco Garelli United",
+    "Tuloy FC"
+   ],
+   "homeInSection": 5,
+   "displacementKm": {
+    "median": 0,
+    "p90": 1,
+    "max": 2
+   },
+   "bytes": 118134
   },
   {
    "id": "616y2026",
-   "version": "616y2026-05671b5a",
+   "version": "616y2026-ea085933",
    "name": "Poland",
    "level": "ADM2",
    "clubs": 18,
@@ -240,11 +1156,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 128532
+   "bytes": 127683
   },
   {
    "id": "620y2026",
-   "version": "620y2026-90f88c30",
+   "version": "620y2026-b4af0eff",
    "name": "Portugal",
    "level": "ADM2",
    "clubs": 18,
@@ -257,11 +1173,30 @@
     "p90": 40.9,
     "max": 45.4
    },
-   "bytes": 75689
+   "bytes": 75371
+  },
+  {
+   "id": "634y2026",
+   "version": "634y2026-b299500f",
+   "name": "Qatar",
+   "level": "ADM2",
+   "clubs": 14,
+   "located": 13,
+   "unlocated": [],
+   "placed": [
+    "Al-Shahania SC"
+   ],
+   "homeInSection": 11,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 63624
   },
   {
    "id": "642y2026",
-   "version": "642y2026-547fba32",
+   "version": "642y2026-2fe6ddd3",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 16,
@@ -274,11 +1209,28 @@
     "p90": 0,
     "max": 2.6
    },
-   "bytes": 126960
+   "bytes": 126531
+  },
+  {
+   "id": "643y2026",
+   "version": "643y2026-5c3f3432",
+   "name": "Russia",
+   "level": "ADM2",
+   "clubs": 60,
+   "located": 60,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 47,
+   "displacementKm": {
+    "median": 0,
+    "p90": 6.3,
+    "max": 15.5
+   },
+   "bytes": 171274
   },
   {
    "id": "682y2026",
-   "version": "682y2026-76fa0564",
+   "version": "682y2026-c4374bdd",
    "name": "Saudi Arabia",
    "level": "ADM2",
    "clubs": 18,
@@ -291,11 +1243,98 @@
     "p90": 28.7,
     "max": 36.6
    },
-   "bytes": 126220
+   "bytes": 124343
+  },
+  {
+   "id": "688y2026",
+   "version": "688y2026-3392bcb6",
+   "name": "Serbia",
+   "level": "ADM2",
+   "clubs": 33,
+   "located": 33,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 25,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0.6,
+    "max": 1
+   },
+   "bytes": 137153
+  },
+  {
+   "id": "703y2026",
+   "version": "703y2026-2ea57c7b",
+   "name": "Slovakia",
+   "level": "ADM3",
+   "clubs": 24,
+   "located": 24,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 24,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 127517
+  },
+  {
+   "id": "704y2026",
+   "version": "704y2026-be9e886b",
+   "name": "Vietnam",
+   "level": "ADM2",
+   "clubs": 16,
+   "located": 15,
+   "unlocated": [],
+   "placed": [
+    "PVF-CAND FC"
+   ],
+   "homeInSection": 13,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 117402
+  },
+  {
+   "id": "705y2026",
+   "version": "705y2026-a412bfd8",
+   "name": "Slovenia",
+   "level": "ADM2",
+   "clubs": 14,
+   "located": 14,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 13,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 113820
+  },
+  {
+   "id": "710y2026",
+   "version": "710y2026-30d1db54",
+   "name": "South Africa",
+   "level": "ADM3",
+   "clubs": 18,
+   "located": 18,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 15,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0.3,
+    "max": 16.5
+   },
+   "bytes": 121596
   },
   {
    "id": "724y2026",
-   "version": "724y2026-8a59cbf2",
+   "version": "724y2026-58504871",
    "name": "Spain",
    "level": "ADM3",
    "clubs": 40,
@@ -308,11 +1347,11 @@
     "p90": 0.8,
     "max": 2.8
    },
-   "bytes": 160436
+   "bytes": 160063
   },
   {
    "id": "752y2026",
-   "version": "752y2026-9306a5c4",
+   "version": "752y2026-254d49d8",
    "name": "Sweden",
    "level": "ADM2",
    "clubs": 16,
@@ -325,11 +1364,11 @@
     "p90": 1.3,
     "max": 2.3
    },
-   "bytes": 120638
+   "bytes": 120284
   },
   {
    "id": "756y2026",
-   "version": "756y2026-5cae3203",
+   "version": "756y2026-274f4938",
    "name": "Switzerland",
    "level": "ADM3",
    "clubs": 12,
@@ -342,11 +1381,79 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 117934
+   "bytes": 117727
+  },
+  {
+   "id": "762y2026",
+   "version": "762y2026-7209eca8",
+   "name": "Tajikistan",
+   "level": "ADM2",
+   "clubs": 12,
+   "located": 12,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 11,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 24.3
+   },
+   "bytes": 89110
+  },
+  {
+   "id": "764y2026",
+   "version": "764y2026-a747cae6",
+   "name": "Thailand",
+   "level": "ADM2",
+   "clubs": 19,
+   "located": 19,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 18,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 24.7
+   },
+   "bytes": 122168
+  },
+  {
+   "id": "784y2026",
+   "version": "784y2026-dfab66fd",
+   "name": "United Arab Emirates",
+   "level": "ADM1",
+   "clubs": 19,
+   "located": 19,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 16,
+   "displacementKm": {
+    "median": 0,
+    "p90": 1,
+    "max": 10.5
+   },
+   "bytes": 113434
+  },
+  {
+   "id": "788y2026",
+   "version": "788y2026-723a41aa",
+   "name": "Tunisia",
+   "level": "ADM2",
+   "clubs": 17,
+   "located": 17,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 15,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 14.8
+   },
+   "bytes": 117008
   },
   {
    "id": "792y2026",
-   "version": "792y2026-2748bce6",
+   "version": "792y2026-df673f36",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 18,
@@ -359,11 +1466,67 @@
     "p90": 35.3,
     "max": 43.1
    },
-   "bytes": 127735
+   "bytes": 127139
+  },
+  {
+   "id": "804y2026",
+   "version": "804y2026-985492d4",
+   "name": "Ukraine",
+   "level": "ADM2",
+   "clubs": 19,
+   "located": 19,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 18,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 6.1
+   },
+   "bytes": 87502
+  },
+  {
+   "id": "807y2026",
+   "version": "807y2026-f2e9b304",
+   "name": "N. Macedonia",
+   "level": "ADM2",
+   "clubs": 15,
+   "located": 14,
+   "unlocated": [],
+   "placed": [
+    "Voska Sport"
+   ],
+   "homeInSection": 11,
+   "displacementKm": {
+    "median": 0,
+    "p90": 1.7,
+    "max": 2.8
+   },
+   "bytes": 79650
+  },
+  {
+   "id": "818y2026",
+   "version": "818y2026-cbe2f8f4",
+   "name": "Egypt",
+   "level": "ADM2",
+   "clubs": 19,
+   "located": 17,
+   "unlocated": [],
+   "placed": [
+    "Harras El Hodoud",
+    "El Mokawloon SC"
+   ],
+   "homeInSection": 8,
+   "displacementKm": {
+    "median": 0.2,
+    "p90": 8.4,
+    "max": 30.4
+   },
+   "bytes": 116802
   },
   {
    "id": "826y2026",
-   "version": "826y2026-ff01321e",
+   "version": "826y2026-68479a37",
    "name": "England",
    "level": "ADM2",
    "clubs": 88,
@@ -376,11 +1539,11 @@
     "p90": 0,
     "max": 5
    },
-   "bytes": 204088
+   "bytes": 203453
   },
   {
    "id": "840y2026",
-   "version": "840y2026-e96405f9",
+   "version": "840y2026-a84d3ed5",
    "name": "United States",
    "level": "ADM2",
    "clubs": 27,
@@ -393,11 +1556,99 @@
     "p90": 0,
     "max": 17.8
    },
-   "bytes": 138252
+   "bytes": 137818
+  },
+  {
+   "id": "858y2026",
+   "version": "858y2026-f54ece93",
+   "name": "Uruguay",
+   "level": "ADM1",
+   "clubs": 32,
+   "located": 30,
+   "unlocated": [],
+   "placed": [
+    "CSD Cooper",
+    "IA Sud América"
+   ],
+   "homeInSection": 12,
+   "displacementKm": {
+    "median": 12.2,
+    "p90": 35.1,
+    "max": 42.6
+   },
+   "bytes": 123493
+  },
+  {
+   "id": "860y2026",
+   "version": "860y2026-de511b62",
+   "name": "Uzbekistan",
+   "level": "ADM2",
+   "clubs": 16,
+   "located": 16,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 16,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 104988
+  },
+  {
+   "id": "862y2026",
+   "version": "862y2026-0041441c",
+   "name": "Venezuela",
+   "level": "ADM1",
+   "clubs": 15,
+   "located": 15,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 11,
+   "displacementKm": {
+    "median": 0,
+    "p90": 3.8,
+    "max": 19.6
+   },
+   "bytes": 112068
+  },
+  {
+   "id": "KOSy2026",
+   "version": "KOSy2026-f7dd05e9",
+   "name": "Kosovo",
+   "level": "ADM2",
+   "clubs": 10,
+   "located": 10,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 10,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 68781
+  },
+  {
+   "id": "NIRy2026",
+   "version": "NIRy2026-7342122b",
+   "name": "Northern Ireland",
+   "level": "ADM2",
+   "clubs": 16,
+   "located": 16,
+   "unlocated": [],
+   "placed": [],
+   "homeInSection": 16,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 50851
   },
   {
    "id": "SCOy2026",
-   "version": "SCOy2026-8f031332",
+   "version": "SCOy2026-5e46fd1c",
    "name": "Scotland",
    "level": "ADM2",
    "clubs": 12,
@@ -410,7 +1661,26 @@
     "p90": 0.3,
     "max": 2.8
    },
-   "bytes": 99138
+   "bytes": 98922
+  },
+  {
+   "id": "WALy2026",
+   "version": "WALy2026-62410366",
+   "name": "Wales",
+   "level": "ADM2",
+   "clubs": 16,
+   "located": 15,
+   "unlocated": [],
+   "placed": [
+    "The New Saints"
+   ],
+   "homeInSection": 15,
+   "displacementKm": {
+    "median": 0,
+    "p90": 0,
+    "max": 0
+   },
+   "bytes": 54892
   },
   {
    "id": "032y2025",
@@ -8352,7 +9622,7 @@
   },
   {
    "id": "076y2004",
-   "version": "076y2004-66d78a14",
+   "version": "076y2004-0bbe936d",
    "name": "Brazil",
    "level": "ADM2",
    "clubs": 100,
@@ -8362,10 +9632,10 @@
    "homeInSection": 66,
    "displacementKm": {
     "median": 0,
-    "p90": 7.5,
+    "p90": 7,
     "max": 9.7
    },
-   "bytes": 248631
+   "bytes": 248553
   },
   {
    "id": "100y2004",
@@ -8445,7 +9715,7 @@
   },
   {
    "id": "170y2004",
-   "version": "170y2004-487290f1",
+   "version": "170y2004-6fb4e9e1",
    "name": "Colombia",
    "level": "ADM2",
    "clubs": 30,
@@ -8463,7 +9733,7 @@
     "p90": 0.1,
     "max": 6.5
    },
-   "bytes": 143076
+   "bytes": 143061
   },
   {
    "id": "191y2004",
@@ -8700,7 +9970,7 @@
   },
   {
    "id": "392y2004",
-   "version": "392y2004-2be5ed4d",
+   "version": "392y2004-abb80616",
    "name": "Japan",
    "level": "ADM2",
    "clubs": 37,
@@ -8717,7 +9987,7 @@
     "p90": 14.6,
     "max": 59.2
    },
-   "bytes": 142622
+   "bytes": 142611
   },
   {
    "id": "410y2004",
@@ -8741,7 +10011,7 @@
   },
   {
    "id": "484y2004",
-   "version": "484y2004-c211c088",
+   "version": "484y2004-eb438418",
    "name": "Mexico",
    "level": "ADM2",
    "clubs": 32,
@@ -8750,13 +10020,13 @@
    "placed": [
     "Club de Fútbol de la UAT"
    ],
-   "homeInSection": 23,
+   "homeInSection": 24,
    "displacementKm": {
     "median": 0,
-    "p90": 2.9,
-    "max": 10.3
+    "p90": 2.8,
+    "max": 9
    },
-   "bytes": 141184
+   "bytes": 141132
   },
   {
    "id": "528y2004",
@@ -9346,7 +10616,7 @@
   },
   {
    "id": "076y2003",
-   "version": "076y2003-07036451",
+   "version": "076y2003-a9f10cd0",
    "name": "Brazil",
    "level": "ADM2",
    "clubs": 100,
@@ -9356,14 +10626,14 @@
    "homeInSection": 64,
    "displacementKm": {
     "median": 0,
-    "p90": 7,
+    "p90": 6.3,
     "max": 9.7
    },
-   "bytes": 247036
+   "bytes": 246960
   },
   {
    "id": "100y2003",
-   "version": "100y2003-1df247c3",
+   "version": "100y2003-443be6f3",
    "name": "Bulgaria",
    "level": "ADM2",
    "clubs": 21,
@@ -9376,7 +10646,7 @@
     "p90": 0.3,
     "max": 1.2
    },
-   "bytes": 103537
+   "bytes": 103531
   },
   {
    "id": "112y2003",
@@ -9439,7 +10709,7 @@
   },
   {
    "id": "170y2003",
-   "version": "170y2003-33796209",
+   "version": "170y2003-5b779ea6",
    "name": "Colombia",
    "level": "ADM2",
    "clubs": 30,
@@ -9457,7 +10727,7 @@
     "p90": 0.1,
     "max": 6.5
    },
-   "bytes": 141556
+   "bytes": 141541
   },
   {
    "id": "191y2003",
@@ -9695,7 +10965,7 @@
   },
   {
    "id": "392y2003",
-   "version": "392y2003-0ff74b00",
+   "version": "392y2003-39546e9c",
    "name": "Japan",
    "level": "ADM2",
    "clubs": 37,
@@ -9712,7 +10982,7 @@
     "p90": 14.6,
     "max": 59.2
    },
-   "bytes": 141127
+   "bytes": 141116
   },
   {
    "id": "410y2003",
@@ -9736,7 +11006,7 @@
   },
   {
    "id": "484y2003",
-   "version": "484y2003-6e6d03b7",
+   "version": "484y2003-7d310931",
    "name": "Mexico",
    "level": "ADM2",
    "clubs": 32,
@@ -9745,13 +11015,13 @@
    "placed": [
     "Club de Fútbol de la UAT"
    ],
-   "homeInSection": 23,
+   "homeInSection": 24,
    "displacementKm": {
     "median": 0,
-    "p90": 2.9,
-    "max": 10.3
+    "p90": 2.8,
+    "max": 9
    },
-   "bytes": 139841
+   "bytes": 139803
   },
   {
    "id": "528y2003",
@@ -9812,7 +11082,7 @@
   },
   {
    "id": "604y2003",
-   "version": "604y2003-c15274d7",
+   "version": "604y2003-8d9de8e4",
    "name": "Peru",
    "level": "ADM2",
    "clubs": 14,
@@ -9828,7 +11098,7 @@
     "p90": 3.2,
     "max": 7.1
    },
-   "bytes": 116520
+   "bytes": 116514
   },
   {
    "id": "616y2003",
@@ -10320,7 +11590,7 @@
   },
   {
    "id": "076y2002",
-   "version": "076y2002-cc42b103",
+   "version": "076y2002-f8042e4b",
    "name": "Brazil",
    "level": "ADM2",
    "clubs": 100,
@@ -10333,7 +11603,7 @@
     "p90": 7.5,
     "max": 9.8
    },
-   "bytes": 247030
+   "bytes": 246969
   },
   {
    "id": "152y2002",
@@ -10436,7 +11706,7 @@
   },
   {
    "id": "208y2002",
-   "version": "208y2002-ad2106fd",
+   "version": "208y2002-51055d79",
    "name": "Denmark",
    "level": "ADM2",
    "clubs": 33,
@@ -10451,7 +11721,7 @@
     "p90": 0.9,
     "max": 13.4
    },
-   "bytes": 118768
+   "bytes": 118753
   },
   {
    "id": "246y2002",
@@ -10633,20 +11903,20 @@
   },
   {
    "id": "484y2002",
-   "version": "484y2002-70fbafde",
+   "version": "484y2002-2849f9cc",
    "name": "Mexico",
    "level": "ADM2",
    "clubs": 21,
    "located": 21,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 16,
+   "homeInSection": 18,
    "displacementKm": {
     "median": 0,
-    "p90": 0.7,
-    "max": 5.8
+    "p90": 0,
+    "max": 1.5
    },
-   "bytes": 126010
+   "bytes": 126143
   },
   {
    "id": "528y2002",
@@ -10808,7 +12078,7 @@
   },
   {
    "id": "710y2002",
-   "version": "710y2002-bc6b3d13",
+   "version": "710y2002-8d80940c",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 19,
@@ -10823,7 +12093,7 @@
     "p90": 21.9,
     "max": 50.9
    },
-   "bytes": 121111
+   "bytes": 121115
   },
   {
    "id": "724y2002",
@@ -10847,7 +12117,7 @@
   },
   {
    "id": "752y2002",
-   "version": "752y2002-635b097c",
+   "version": "752y2002-14993381",
    "name": "Sweden",
    "level": "ADM2",
    "clubs": 40,
@@ -10866,7 +12136,7 @@
   },
   {
    "id": "792y2002",
-   "version": "792y2002-02a59173",
+   "version": "792y2002-5084587c",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 100,
@@ -10897,7 +12167,7 @@
     "p90": 0.3,
     "max": 6.8
    },
-   "bytes": 210524
+   "bytes": 210521
   },
   {
    "id": "804y2002",
@@ -11044,11 +12314,11 @@
   },
   {
    "id": "036y2001",
-   "version": "036y2001-5f236bc4",
+   "version": "036y2001-dedb9c85",
    "name": "Australia",
    "level": "ADM2",
-   "clubs": 15,
-   "located": 14,
+   "clubs": 14,
+   "located": 13,
    "unlocated": [],
    "placed": [
     "NZ Football Kingz FC"
@@ -11056,10 +12326,10 @@
    "homeInSection": 10,
    "displacementKm": {
     "median": 0,
-    "p90": 86.7,
-    "max": 118.5
+    "p90": 82.9,
+    "max": 101.7
    },
-   "bytes": 115952
+   "bytes": 114679
   },
   {
    "id": "056y2001",
@@ -11083,7 +12353,7 @@
   },
   {
    "id": "076y2001",
-   "version": "076y2001-958fab3e",
+   "version": "076y2001-bdde3981",
    "name": "Brazil",
    "level": "ADM2",
    "clubs": 100,
@@ -11092,13 +12362,13 @@
    "placed": [
     "Atlético Clube Goianense"
    ],
-   "homeInSection": 68,
+   "homeInSection": 69,
    "displacementKm": {
     "median": 0,
     "p90": 6.4,
     "max": 9.7
    },
-   "bytes": 243070
+   "bytes": 243069
   },
   {
    "id": "156y2001",
@@ -11374,7 +12644,7 @@
   },
   {
    "id": "620y2001",
-   "version": "620y2001-6d16ef60",
+   "version": "620y2001-8b457862",
    "name": "Portugal",
    "level": "ADM2",
    "clubs": 46,
@@ -11393,7 +12663,7 @@
     "p90": 21.1,
     "max": 34.8
    },
-   "bytes": 106400
+   "bytes": 106392
   },
   {
    "id": "642y2001",
@@ -11876,7 +13146,7 @@
   },
   {
    "id": "SCOy2000",
-   "version": "SCOy2000-7bc534e0",
+   "version": "SCOy2000-106f817a",
    "name": "Scotland",
    "level": "ADM2",
    "clubs": 27,
@@ -11929,7 +13199,7 @@
   },
   {
    "id": "076y1999",
-   "version": "076y1999-b0d95150",
+   "version": "076y1999-ffc61a3f",
    "name": "Brazil",
    "level": "ADM2",
    "clubs": 10,
@@ -11942,7 +13212,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 115758
+   "bytes": 115757
   },
   {
    "id": "250y1999",
@@ -11999,7 +13269,7 @@
   },
   {
    "id": "392y1999",
-   "version": "392y1999-76024188",
+   "version": "392y1999-90174828",
    "name": "Japan",
    "level": "ADM2",
    "clubs": 16,
@@ -12012,7 +13282,7 @@
     "p90": 18.7,
     "max": 43.7
    },
-   "bytes": 116972
+   "bytes": 116961
   },
   {
    "id": "528y1999",
@@ -12123,7 +13393,7 @@
   },
   {
    "id": "SCOy1999",
-   "version": "SCOy1999-4dea3c17",
+   "version": "SCOy1999-24544814",
    "name": "Scotland",
    "level": "ADM2",
    "clubs": 28,
@@ -12139,7 +13409,7 @@
     "p90": 3.2,
     "max": 6.8
    },
-   "bytes": 112645
+   "bytes": 112435
   },
   {
    "id": "056y1998",
@@ -15582,7 +16852,7 @@
   },
   {
    "id": "032y1994",
-   "version": "032y1994-6a3d2faf",
+   "version": "032y1994-5a59ec4c",
    "name": "Argentina",
    "level": "ADM2",
    "clubs": 21,
@@ -15591,172 +16861,172 @@
    "placed": [],
    "homeInSection": 10,
    "displacementKm": {
-    "median": 17.9,
-    "p90": 137.6,
+    "median": 45.7,
+    "p90": 134.9,
     "max": 172.7
    },
-   "bytes": 122909
+   "bytes": 122893
   },
   {
    "id": "056y1994",
-   "version": "056y1994-6f5b5a32",
+   "version": "056y1994-4120ab4f",
    "name": "Belgium",
    "level": "ADM4",
-   "clubs": 25,
-   "located": 25,
+   "clubs": 24,
+   "located": 24,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 22,
+   "homeInSection": 21,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 2.8
    },
-   "bytes": 109262
+   "bytes": 108134
   },
   {
    "id": "076y1994",
-   "version": "076y1994-621cc654",
+   "version": "076y1994-c25f7410",
    "name": "Brazil",
    "level": "ADM2",
    "clubs": 30,
    "located": 30,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 27,
+   "homeInSection": 25,
    "displacementKm": {
     "median": 0,
-    "p90": 0,
-    "max": 10.7
+    "p90": 0.2,
+    "max": 45.7
    },
-   "bytes": 144520
+   "bytes": 144286
   },
   {
    "id": "208y1994",
-   "version": "208y1994-915b325e",
+   "version": "208y1994-8ec506df",
    "name": "Denmark",
    "level": "ADM2",
-   "clubs": 11,
-   "located": 11,
+   "clubs": 10,
+   "located": 10,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 10,
+   "homeInSection": 9,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 1
    },
-   "bytes": 93826
+   "bytes": 92781
   },
   {
    "id": "250y1994",
-   "version": "250y1994-fc17ddd6",
+   "version": "250y1994-ec1e6446",
    "name": "France",
    "level": "ADM3",
-   "clubs": 56,
-   "located": 56,
+   "clubs": 54,
+   "located": 54,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 49,
+   "homeInSection": 48,
    "displacementKm": {
     "median": 0,
-    "p90": 0.3,
+    "p90": 0.2,
     "max": 14.5
    },
-   "bytes": 164806
+   "bytes": 162603
   },
   {
    "id": "276y1994",
-   "version": "276y1994-5cf23b4b",
+   "version": "276y1994-b5f33bc5",
    "name": "Germany",
    "level": "ADM3",
-   "clubs": 62,
-   "located": 62,
+   "clubs": 61,
+   "located": 61,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 54,
+   "homeInSection": 53,
    "displacementKm": {
     "median": 0,
     "p90": 3.3,
     "max": 12.7
    },
-   "bytes": 173356
+   "bytes": 172226
   },
   {
    "id": "380y1994",
-   "version": "380y1994-20cc837a",
+   "version": "380y1994-b021938c",
    "name": "Italy",
    "level": "ADM4",
-   "clubs": 65,
-   "located": 64,
+   "clubs": 60,
+   "located": 59,
    "unlocated": [],
    "placed": [
     "Lucchese-Libertas"
    ],
-   "homeInSection": 59,
+   "homeInSection": 54,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 2.5
    },
-   "bytes": 166264
+   "bytes": 161638
   },
   {
    "id": "392y1994",
-   "version": "392y1994-44e840c6",
+   "version": "392y1994-4587b10d",
    "name": "Japan",
    "level": "ADM2",
-   "clubs": 19,
-   "located": 19,
+   "clubs": 18,
+   "located": 18,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 15,
+   "homeInSection": 13,
    "displacementKm": {
     "median": 0,
-    "p90": 32.9,
-    "max": 41.1
+    "p90": 39.9,
+    "max": 52.9
    },
-   "bytes": 120750
+   "bytes": 119849
   },
   {
    "id": "528y1994",
-   "version": "528y1994-b32de48c",
+   "version": "528y1994-0e7e6e1c",
    "name": "Netherlands",
    "level": "ADM2",
-   "clubs": 33,
-   "located": 33,
+   "clubs": 32,
+   "located": 32,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 32,
+   "homeInSection": 31,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 119041
+   "bytes": 117477
   },
   {
    "id": "578y1994",
-   "version": "578y1994-5e8654af",
+   "version": "578y1994-bf197c6f",
    "name": "Norway",
    "level": "ADM2",
-   "clubs": 15,
-   "located": 14,
+   "clubs": 14,
+   "located": 13,
    "unlocated": [],
    "placed": [
     "IL Runar"
    ],
-   "homeInSection": 12,
+   "homeInSection": 11,
    "displacementKm": {
     "median": 0,
     "p90": 0.4,
     "max": 15.5
    },
-   "bytes": 119351
+   "bytes": 118360
   },
   {
    "id": "620y1994",
-   "version": "620y1994-cdefd11a",
+   "version": "620y1994-f0171543",
    "name": "Portugal",
    "level": "ADM2",
    "clubs": 32,
@@ -15765,17 +17035,17 @@
    "placed": [
     "Sporting Clube Campomaiorense"
    ],
-   "homeInSection": 16,
+   "homeInSection": 15,
    "displacementKm": {
     "median": 0,
-    "p90": 26.6,
-    "max": 47.8
+    "p90": 38.7,
+    "max": 51.6
    },
-   "bytes": 90572
+   "bytes": 90830
   },
   {
    "id": "724y1994",
-   "version": "724y1994-af26c560",
+   "version": "724y1994-a5c544a2",
    "name": "Spain",
    "level": "ADM3",
    "clubs": 53,
@@ -15791,26 +17061,24 @@
     "p90": 0,
     "max": 0.8
    },
-   "bytes": 160771
+   "bytes": 160767
   },
   {
    "id": "752y1994",
-   "version": "752y1994-2cf67c95",
+   "version": "752y1994-b69d4564",
    "name": "Sweden",
    "level": "ADM2",
    "clubs": 40,
-   "located": 39,
+   "located": 40,
    "unlocated": [],
-   "placed": [
-    "Spårvägens FF"
-   ],
-   "homeInSection": 31,
+   "placed": [],
+   "homeInSection": 32,
    "displacementKm": {
     "median": 0,
     "p90": 0.5,
     "max": 7.6
    },
-   "bytes": 141647
+   "bytes": 141631
   },
   {
    "id": "756y1994",
@@ -15833,28 +17101,28 @@
   },
   {
    "id": "826y1994",
-   "version": "826y1994-eb49ea87",
+   "version": "826y1994-2f6ff9ea",
    "name": "England",
    "level": "ADM2",
    "clubs": 100,
    "located": 100,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 94,
+   "homeInSection": 93,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 5
    },
-   "bytes": 183889
+   "bytes": 183575
   },
   {
    "id": "SCOy1994",
-   "version": "SCOy1994-eae8536b",
+   "version": "SCOy1994-da8cc198",
    "name": "Scotland",
    "level": "ADM2",
-   "clubs": 39,
-   "located": 37,
+   "clubs": 38,
+   "located": 36,
    "unlocated": [],
    "placed": [
     "Meadowbank Thistle",
@@ -15863,10 +17131,10 @@
    "homeInSection": 26,
    "displacementKm": {
     "median": 0,
-    "p90": 4.3,
-    "max": 10.3
+    "p90": 4.6,
+    "max": 10.6
    },
-   "bytes": 124635
+   "bytes": 122695
   }
  ],
  "short": [

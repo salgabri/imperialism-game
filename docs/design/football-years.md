@@ -754,15 +754,15 @@ line's level, the natural 4-4-2, the first-year rule and the hold below, and the
 | 2016/17 FIFA 17 | 25 | 16 | 32 | 16 | 15 → 9 | 0.876 → 0.898 |
 | 2017/18 FIFA 18 | 27 | 16 | 40 | 7 | 15 → 7 | 0.856 → 0.868 |
 | 2018/19 FIFA 19 | 23 | 8 | 22 | 2 | 12 → 9 | 0.877 → 0.879 |
-| 2019/20 FIFA 20 | 26 | 13 | 25 | 6 | 14 → 11 | 0.876 → 0.885 |
-| 2020/21 FIFA 21 | 29 | 15 | 28 | 5 | 16 → 12 | 0.889 → 0.900 |
-| 2021/22 FIFA 22 | 29 | 12 | 23 | 1 | 18 → 12 | 0.882 → 0.887 |
+| 2019/20 FIFA 20 | 26 | 12 | 22 | 6 | 14 → 12 | 0.876 → 0.881 |
+| 2020/21 FIFA 21 | 29 | 14 | 27 | 5 | 16 → 13 | 0.889 → 0.899 |
+| 2021/22 FIFA 22 | 29 | 11 | 22 | 1 | 18 → 13 | 0.882 → 0.886 |
 | 2022/23 FIFA 23 | 27 | 9 | 14 | 3 | 15 → 9 | 0.871 → 0.875 |
 | 2023/24 EA FC 24 | 31 | 10 | 17 | 3 | 12 → 10 | 0.863 → 0.869 |
 | 2024/25 EA FC 25 | 30 | 9 | 16 | 4 | 14 → 11 | 0.800 → 0.814 |
 | 2025/26 EA FC 26 | 32 | 4 | 8 | 1 | 17 → 16 | 0.832 → 0.845 |
 
-"Short" is a fielded nation without a natural XI of EA's own (595 nation-seasons); 403 are filled with 1,062 players.
+"Short" is a fielded nation without a natural XI of EA's own (595 nation-seasons); 400 are filled with 1,057 players.
 The Spearman is every fielded nation's XI strength against eloratings.net's Elo on 1 July of the season's first year,
 as the roster audit's `npm run validate:football-elo` scores it (on the unmerged branch
 `claude/roster-validation-quality-0702ce`; measured here with its code and its cached tables, outside the build). The fill
@@ -779,7 +779,11 @@ How a season is filled (`scripts/lib/football-fills.mjs`, called by `assembleEaS
   seasons' figure, `seasonPools`). A stint Wikidata has not closed ends as its caps would run out at 8 a year; one with
   neither end nor caps, which national-team seasons leave out, covers its first year, its start being the debut
   (`wikidataTables`' `openFirstYear`: 8,971 of the 22,702 stints kept have no caps). A typed year such as 112020 is no
-  day, so its stint has no start. A stint with 0 caps is no cap. Nobody EA rates in that edition is a candidate: one
+  day, so its stint has no start. A stint with 0 caps is no cap, and a player under 14 or over 45 when the season starts
+  is in no pool (the national-team seasons' ages: his stint and his birth cannot both be right). A player Wikidata records
+  as a woman (sex or gender, P21) is no candidate: her membership of a men's team is Wikidata's error (17 in the
+  answers, among them three of Haiti's women's internationals filed under its men's team, who would have played for
+  it in 2014/15 to 2021/22). Nobody EA rates in that edition is a candidate: one
   born the same day with a name word in common, or whose name agrees (`namesAgree`) and who plays for the same nation
   or was born the same year, is EA's player already. Serbia and Montenegro, a team of its own on Wikidata, plays as
   Serbia's shape (688).
@@ -803,8 +807,8 @@ How a season is filled (`scripts/lib/football-fills.mjs`, called by `assembleEaS
   eleven, by straight lines, less their mean; rounded so they sum exactly (largest remainders) and never invert. Their
   mean R, and each rating, are held within T + min D and T + max D (T − 3.9 to T + 5.3), where a member of an XI at T
   can be: one place beside ten EA players far below the line would otherwise ask 99 of its player (Ivan Ivanov for
-  Bulgaria in 2008/09), and far above it 36 (Algeria's keeper). The hold binds in 300 of the 403 filled nations, 225 of
-  them because EA's own players sit below the line; filled XIs end a median 1.5 points below T (quartiles −4.1 and
+  Bulgaria in 2008/09), and far above it 36 (Algeria's keeper). The hold binds in 297 of the 400 filled nations, 222 of
+  them because EA's own players sit below the line; filled XIs end a median 1.5 points below T (quartiles −4.0 and
   0.0), from 7.9 before.
 - **Marking.** A computed player is `[name, position, rating, source]` beside EA's tuples: his source names him
   (`wd:Q…`, linked to his English Wikipedia article, else his Wikidata item), `source: 'estimate'`, `league:
@@ -826,7 +830,7 @@ Sources:
 
 | Source | Pinned | Use | Licence |
 | --- | --- | --- | --- |
-| Wikidata, through QLever (`https://qlever.dev/api/wikidata`) | four answers by SHA-256, saved 2026-11-17 (22:36–22:40 UTC, a minute apart) | The men's national teams (instances of Q135408445); every membership (P54) that began in 1970 or later and ended in 2003 or later or has no end, with start, end, caps and goals; the players' names, births, English Wikipedia articles and positions (P413) | CC0 1.0 |
+| Wikidata, through QLever (`https://qlever.dev/api/wikidata`) | five answers by SHA-256, saved 2026-11-17 (22:36–22:40 UTC, a minute apart, and the players' sex or gender at 23:44) | The men's national teams (instances of Q135408445); every membership (P54) that began in 1970 or later and ended in 2003 or later or has no end, with start, end, caps and goals; the players' names, births, English Wikipedia articles, positions (P413) and sex or gender (P21) | CC0 1.0 |
 | [martj42/international_results](https://github.com/martj42/international_results), `results.csv` | the computed seasons' commit `b0948cb` | Every men's full international to 2026-10-06, for the Elo | CC0-1.0 |
 | eloratings.net's yearly tables | not pinned; the cached copies the roster audit and the gate read | The before and after check above only, never an input | none stated |
 
@@ -849,8 +853,14 @@ npm run build:ea-seasons                 # reads the facts, fills each season, w
   place, the hold, the places still out of position or empty, and why a nation could not be filled.
 - `scripts/football-fills.test.mjs`: the rule on invented players, the constants and dates, every computed player
   against the facts (capped that season for that nation, listed once, no EA player of the season, within his hold),
-  FIFA 05–09 with no fielded XI under eleven, the loader's refusals, the facts rebuilt byte for byte where data-src/ has
-  the answers.
+  FIFA 05–09 with no fielded XI under eleven, the loader's refusals, a 2008/09 campaign that shows Egypt's computed
+  players as estimates and saves and resumes them, the facts rebuilt byte for byte where data-src/ has the answers.
+
+The roster audit (`npm run audit:rosters`, [roster-audit.md](roster-audit.md)) finds no error in the filled seasons;
+its lineup gaps fall from 709 to 444, and five computed players are among its unusual ages (under 16 or over 40 when
+the season starts: Roman Berezovsky, Armenia's keeper at 41 in 2016/17, and Vincent Thill, Luxembourg's at 15 in
+2015/16, as they played). `npm run validate:football-elo` rescored football-elo-agreement.json from the same cached
+tables: the 35 seasons' median rises from 0.852 to 0.869, and FIFA 11 (0.805) is now the lowest.
 
 The gate (`npm run validate:football`) scores the 2025/26 file, EA FC 26: its four filled nations take it from 0.8457
 to 0.8577 against Elo (still below the 0.90 bar it failed before) and its forecast log loss from 0.9169 to 0.9077. The
@@ -1404,8 +1414,8 @@ non-commercial use) that name no licence; the data's rights are reserved.
   championship-manager-93-tools export) they correlate 0.72, 74 are equal, and
   Cam F's run 19 lower on average. One rating is wild: Olympiakos's defender
   Vassilis Ioannidis has the database's highest ability, 200 (rated 99, above
-  Roberto Baggio's 198), so he leads Greece's XI; it ships as Cam F set it. 124
-  nations with players (77 full XIs) and Europe's 124 strongest clubs, 26 of them from
+  Roberto Baggio's 198), so he leads Greece's XI; it ships as Cam F set it. 121
+  nations with players (75 full XIs) and Europe's 124 strongest clubs, 26 of them from
   beyond the seven big leagues (Rangers and Spartak Moscow in its elite), on `eu124e1994`
   and `eu32e1994` (until 14 November 2026 the seven leagues' 130, on `eu124s1994` and
   `eu32s1994`, which stay for the campaigns saved on them). It keeps CM 01/02's league sizes, not 1993/94's,
@@ -1430,12 +1440,13 @@ non-commercial use) that name no licence; the data's rights are reserved.
   - **Nationalities are today's** (Ukraine, Croatia, Slovakia; East Germans as
     'Germany'), so the season plays 1989/90's federations (`territoryFor` and
     `identitiesFor` of 1990, the builder's `federationTeamOf`): the Soviet Union
-    fields 1,806 players of the other fourteen republics, Yugoslavia 1,182 (Croats,
-    Slovenes, Macedonians and Bosnians), Czechoslovakia 191 Slovaks, and West
-    Germany and Zaire play under their own names.
+    fields 1,737 players of the other fourteen republics, Yugoslavia 1,078 (Croats,
+    Slovenes, Macedonians and Bosnians), Czechoslovakia 168 Slovaks, and West
+    Germany and Zaire play under their own names (1,806, 1,182 and 191 before the
+    3,555 players younger than 16 in 1989 left the season, 2026-11-14).
   - **East Germans**: a 'Germany' player at an East German club is East German, of
     a federation with no shape on the map, and plays for no nation (the manifest's
-    `noNationAt`; `buildFootballSet` keeps him for his club): 1,431 players. A
+    `noNationAt`; `buildFootballSet` keeps him for his club): 1,400 players. A
     club is East German when its stadium's city, by the database's own stadium and
     city records, is one GeoNames' `cities1000` (CC BY 4.0; a copy of 18 October
     2026 pinned by SHA-256) places only in the five eastern states, or
@@ -1467,6 +1478,18 @@ non-commercial use) that name no licence; the data's rights are reserved.
     highest ability, 198 against a potential of 140 (rated 98, above Maradona's
     193), so he keeps Sweden's goal ahead of Thomas Ravelli (160, rated 79); it
     ships as Simon Treanor set it.
+- **Too young to play** (since 2026-11-14, every CM-format database: `MIN_PLAYING_AGE` in
+  `src/data/footballSetBuild.js`): a player younger than 16 on 1 July of the season's
+  first year plays for neither a nation nor a club. Both fan-made databases keep later
+  players as children, and the roster audit (`npm run audit:rosters`,
+  docs/design/roster-audit.md) found 55 of them in 1993/94's XIs: Ibrahim Sunday, 12, in
+  Nigeria's XI and Wisła Kraków's, Kabba Samura, 11, in Sierra Leone's, six 14- and
+  15-year-olds rated 20 to 25 in Niger's. Without them 1993/94 has 121 nations with
+  players (Niger, left with two, no longer takes the field), and Helsingborgs IF, two of
+  whose XI were 14, drops out of Europe's 124 for RFC Seraing (its ground from Belgium's
+  map, `d056-216`); 1989/90 loses 18 such players from 13 XIs, and Gambia its side. SI's
+  own databases have no one that young in any XI: they lose only children from their
+  nations' pools.
 
 ### How they play
 
@@ -1820,7 +1843,14 @@ the credits and licenses the season files under CC BY-SA 4.0.
   with a position whose stint for one of its teams covers Y − 1 or Y. His figure is
   the stint's caps a year, caps / (end − start + 1), halved when the stint covers
   one of the two years only. A player in two nations' pools plays for the one where
-  his figure is higher.
+  his figure is higher. A player younger than 14 or older than 45 on 1 July of Y − 1,
+  when the season starts, is in no pool (the manifest's `selection.ages`, since
+  2026-11-14): his stint and his date of birth cannot both be right. The roster audit
+  (`npm run audit:rosters`) found three: Óscar Ulloa (born 1986 on Wikidata) for El
+  Salvador from 1988, in its XI from 1988/89 to 1992/93 (Raúl Díaz Arce takes his
+  place); Rusdi Suparman (born 1973) for Malaysia from 1986, in its 1986/87 XI; and
+  Antoine Tassy (born 1924), Haiti's coach, as its player from 1965 to 1976, in its
+  1970/71 XI. Without him Haiti names 10 players for 1970/71 and fields no team.
 - **Who fields a team.** A nation whose pool holds 11 players or more, one a
   goalkeeper, that played a full international in the four years before (so it has
   an Elo), and whose shape takes part that year. The rest are listed with why in

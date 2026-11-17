@@ -21,6 +21,17 @@ const ROLES = ['GK', 'DF', 'MF', 'FW'];
 const XI = 11;
 
 const WIKIDATA_DAY = /^\d{4}-\d{2}-\d{2}T00:00:00Z$/;
+/** Wikidata's female (sex or gender, P21). */
+export const FEMALE = 'Q6581072';
+
+/**
+ * The players QLever's sex-or-gender answer (sparqlRows' rows of `sexes`: player, sex) records as women: a membership of
+ * a men's team of theirs is Wikidata's error, as for three of Haiti's women's internationals filed under its men's team.
+ * An unknown value is no answer. → Set(qid)
+ */
+export function womenOf(rows) {
+  return new Set(rows.filter(row => String(row.sex).endsWith(`/entity/${FEMALE}`)).map(row => String(row.player).split('/').pop()));
+}
 
 /**
  * QLever's stint rows with each start or end that is no Wikidata day (a typed year such as 112020) read as unknown, so
@@ -265,7 +276,9 @@ export function fillSeason({ nations, players, fill, federations = FOOTBALL_FEDE
   const level = lineLevel(points, elo.best.elo, perHundredElo);
 
   const teamNation = teamNations(wikidata.teams, year, manifest.names, federations);
-  const pools = seasonPools(wikidata, year, team => teamNation.get(team) ?? null);
+  // The national-team seasons' ages: a stint whose player would be under 14 or over 45 when the season starts names the wrong
+  // person or the wrong years (the roster audit's age-impossible).
+  const pools = seasonPools(wikidata, year, team => teamNation.get(team) ?? null, { ages: manifest.selection.ages });
   const countryOf = new Map(wikidata.teams);
   const index = personIndex(players);
   const edition = `${season} national team, computed`;
@@ -296,7 +309,8 @@ export function fillSeason({ nations, players, fill, federations = FOOTBALL_FEDE
     const records = filled.added.map(player => {
       const shared = used.has(player.name) || filled.added.filter(other => other.name === player.name).length > 1;
       used.add(player.name);
-      const name = shared ? `${player.name} (${player.born ? player.born.slice(0, 4) : player.qid})` : player.name;
+      // Namesakes in one XI carry their birth year, as the computed seasons' do; one with no birth date keeps his name.
+      const name = shared && player.born ? `${player.name} (${player.born.slice(0, 4)})` : player.name;
       return filledPlayer(player, { edition, eloDate: elo.date, teamElo: teamElo.value, country: countryOf.get(player.team), name });
     });
     const file = [...filled.ea.map(player => ({ rating: player.rating, id: player.sourceInfo.id, row: player.tuple, player })),

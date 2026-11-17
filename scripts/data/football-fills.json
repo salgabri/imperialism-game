@@ -4,7 +4,7 @@
   "retrieved": "2026-11-17",
   "sources": {
     "wikidata": {
-      "name": "Wikidata: the men's national association football teams (instances of Q135408445) and their players' memberships (P54) with start (P580), end (P582), matches played (P1350) and goals (P1351), for every membership that began in 1970 or later and ended in 2003 or later, or has no end; the players' names, dates of birth (P569), English Wikipedia articles and positions (P413)",
+      "name": "Wikidata: the men's national association football teams (instances of Q135408445) and their players' memberships (P54) with start (P580), end (P582), matches played (P1350) and goals (P1351), for every membership that began in 1970 or later and ended in 2003 or later, or has no end; the players' names, dates of birth (P569), English Wikipedia articles, positions (P413) and sex or gender (P21)",
       "url": "https://www.wikidata.org/",
       "endpoint": "https://qlever.dev/api/wikidata",
       "endpointNote": "QLever (University of Freiburg) answers SPARQL over the whole Wikidata dump; qlever.dev has no robots.txt. The Wikidata Query Service and Wikidata's API are disallowed for every agent by their robots.txt (scripts/lib/wikidata-sparql.mjs).",
@@ -15,7 +15,8 @@
         "teams": "SELECT ?team ?teamLabel WHERE {\n  ?team wdt:P31 wd:Q135408445 .\n  OPTIONAL { ?team rdfs:label ?teamLabel . FILTER(LANG(?teamLabel) = \"en\") }\n}",
         "stints": "SELECT ?player ?team ?st ?rank ?start ?end ?caps ?goals WHERE {\n  ?team wdt:P31 wd:Q135408445 .\n  ?player p:P54 ?st .\n  ?st ps:P54 ?team ;\n    wikibase:rank ?rank ;\n    pq:P580 ?start .\n  OPTIONAL { ?st pq:P582 ?end }\n  OPTIONAL { ?st pq:P1350 ?caps }\n  OPTIONAL { ?st pq:P1351 ?goals }\n  FILTER(YEAR(?start) >= 1970 && (!BOUND(?end) || isBlank(?end) || YEAR(?end) >= 2003))\n}",
         "players": "SELECT ?player (SAMPLE(?en) AS ?label) (SAMPLE(?mul) AS ?mulLabel) (MIN(?born) AS ?birth) (SAMPLE(?article) AS ?enwiki) WHERE {\n  { SELECT DISTINCT ?player WHERE {\n    ?team wdt:P31 wd:Q135408445 .\n    ?player p:P54 ?st .\n    ?st ps:P54 ?team ;\n      pq:P580 ?start .\n    OPTIONAL { ?st pq:P582 ?end }\n    FILTER(YEAR(?start) >= 1970 && (!BOUND(?end) || isBlank(?end) || YEAR(?end) >= 2003))\n  } }\n  OPTIONAL { ?player rdfs:label ?en . FILTER(LANG(?en) = \"en\") }\n  OPTIONAL { ?player rdfs:label ?mul . FILTER(LANG(?mul) = \"mul\") }\n  OPTIONAL { ?player wdt:P569 ?born }\n  OPTIONAL { ?article schema:about ?player ; schema:isPartOf <https://en.wikipedia.org/> }\n} GROUP BY ?player",
-        "positions": "SELECT DISTINCT ?player ?position WHERE {\n  { SELECT DISTINCT ?player WHERE {\n    ?team wdt:P31 wd:Q135408445 .\n    ?player p:P54 ?st .\n    ?st ps:P54 ?team ;\n      pq:P580 ?start .\n    OPTIONAL { ?st pq:P582 ?end }\n    FILTER(YEAR(?start) >= 1970 && (!BOUND(?end) || isBlank(?end) || YEAR(?end) >= 2003))\n  } }\n  ?player wdt:P413 ?position .\n}"
+        "positions": "SELECT DISTINCT ?player ?position WHERE {\n  { SELECT DISTINCT ?player WHERE {\n    ?team wdt:P31 wd:Q135408445 .\n    ?player p:P54 ?st .\n    ?st ps:P54 ?team ;\n      pq:P580 ?start .\n    OPTIONAL { ?st pq:P582 ?end }\n    FILTER(YEAR(?start) >= 1970 && (!BOUND(?end) || isBlank(?end) || YEAR(?end) >= 2003))\n  } }\n  ?player wdt:P413 ?position .\n}",
+        "sexes": "SELECT DISTINCT ?player ?sex WHERE {\n  { SELECT DISTINCT ?player WHERE {\n    ?team wdt:P31 wd:Q135408445 .\n    ?player p:P54 ?st .\n    ?st ps:P54 ?team ;\n      pq:P580 ?start .\n    OPTIONAL { ?st pq:P582 ?end }\n    FILTER(YEAR(?start) >= 1970 && (!BOUND(?end) || isBlank(?end) || YEAR(?end) >= 2003))\n  } }\n  ?player wdt:P21 ?sex .\n}"
       },
       "files": [
         {
@@ -41,6 +42,12 @@
           "query": "positions",
           "sha256": "911037bf695c4697b03eb9c55b8c5cef3b92b6d231be8fe24b98fcf11d4c9bde",
           "bytes": 3812203
+        },
+        {
+          "name": "sexes.json",
+          "query": "sexes",
+          "sha256": "f619ebcdddf9f29474e83501b82d70ee128c3803750057afdda1c95e0b00e79d",
+          "bytes": 3536156
         }
       ]
     },
@@ -130,7 +137,12 @@
   "profileSource": "The mean sorted deviation from the XI's mean of the 32 strongest built-in XIs (2026/27), to one decimal.",
   "selection": {
     "openCapsPerYear": 8,
-    "rule": "A nation's candidates for the season ending in Y: the players of its team with a Wikidata stint covering Y − 1 or Y, each with his stint's caps a year, caps / (end − start + 1), halved when the stint covers only one of the two years (the computed national-team seasons' figure). A stint Wikidata has not closed ends as its caps would run out at 8 a year (start + ⌈caps / 8⌉ − 1); one with neither end nor caps covers its first year only, its start being the debut. A player with 0 caps on the stint, or who is one of the edition's EA players (born the same day with a name word in common, or a name that agrees and the same nation or birth year), is no candidate. A nation is filled when it fields a side (its EA players hold at least half the lineup), has an Elo and is short of a natural XI: each role (1 GK, 4 DF, 4 MF, 2 FW) EA's natural part leaves short takes the candidates of that position, the most caps a year first (then the caps for the nation by the season's end, then the lower Wikidata id); a place still empty keeps EA's own player out of position, and only then takes a candidate out of position. The added players are rated, ordered by the same claim, so the XI's ratings sum to round(11 × T), each R + d_j (d the profile read at m evenly spaced places of the eleven and centred), their mean R and each rating held within T + min D and T + max D."
+    "ages": {
+      "least": 14,
+      "most": 45,
+      "why": "A player younger than 14 or older than 45 on 1 July of Y − 1, when the season starts, is in no pool: his Wikidata stint and his date of birth cannot both be right. The roster audit (scripts/audit-rosters.mjs) found three: Óscar Ulloa (Q8078877, born 1986) for El Salvador from 1988, Rusdi Suparman (born 1973) for Malaysia from 1986, and Antoine Tassy (born 1924), Haiti's coach, as its player from 1965 to 1976."
+    },
+    "rule": "A nation's candidates for the season ending in Y: the players of its team with a Wikidata stint covering Y − 1 or Y, each with his stint's caps a year, caps / (end − start + 1), halved when the stint covers only one of the two years (the computed national-team seasons' figure). A stint Wikidata has not closed ends as its caps would run out at 8 a year (start + ⌈caps / 8⌉ − 1); one with neither end nor caps covers its first year only, its start being the debut. A player under 14 or over 45 when the season starts (the national-team seasons' ages), a player with 0 caps on the stint, or who is one of the edition's EA players (born the same day with a name word in common, or a name that agrees and the same nation or birth year), is no candidate. A nation is filled when it fields a side (its EA players hold at least half the lineup), has an Elo and is short of a natural XI: each role (1 GK, 4 DF, 4 MF, 2 FW) EA's natural part leaves short takes the candidates of that position, the most caps a year first (then the caps for the nation by the season's end, then the lower Wikidata id); a place still empty keeps EA's own player out of position, and only then takes a candidate out of position. The added players are rated, ordered by the same claim, so the XI's ratings sum to round(11 × T), each R + d_j (d the profile read at m evenly spaced places of the eleven and centred), their mean R and each rating held within T + min D and T + max D."
   },
   "positions": {
     "Q201330": "GK",

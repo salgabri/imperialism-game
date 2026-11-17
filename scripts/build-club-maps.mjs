@@ -58,7 +58,7 @@ import { seasonIdOf as mlbSeasonIdOf, teamsOf as mlbTeamsOf } from './lib/mlb.mj
 import { teamsOfWar, warSeasonIdOf } from './lib/mlb-war.mjs';
 import { setIdOf as nflSetIdOf, teamsOf as nflTeamsOf } from './lib/nfl.mjs';
 import { seasonIdOf as nhlSeasonIdOf, teamsOf as nhlTeamsOf } from './lib/nhl-seasons.mjs';
-import { seasonIdOf as nrlSeasonIdOf, teamsOf as nrlTeamsOf } from './lib/rugby-league-seasons.mjs';
+import { leagueOf as nrlLeagueOf, seasonIdOf as nrlSeasonIdOf, teamsOf as nrlTeamsOf } from './lib/rugby-league-seasons.mjs';
 import {
   arcPoints, bboxOf, dissolve, dropOverseas, EARTH_KM, facingKm, facingSections, interiorPoint, joinRealms, kmBetween, kmToPolys,
   nodeRings, partitionCountry, pointInPolys, polysAreaKm2, polysOf, prepareUnits, quantize, sectionTopology, simplifyTopology, splitOnLand,
@@ -98,7 +98,9 @@ const AUS = { id: '036', iso3: 'AUS' }, NZL = { id: '554', iso3: 'NZL' };
  * `east`, that the countries lie east of Greenwich, so the land kept is on that side of the antimeridian; `border`, the
  * realm whose line a land border between the countries is fitted to (the USA's, unless named; null for none);
  * `grouping`, the attribution's word for the regions; `eraTop`, that an era's entry names its own strongest clubs,
- * as only some of its season's clubs are on the map (women's football: the NWSL's, its European clubs play Europe's).
+ * as only some of its season's clubs are on the map (women's football: the NWSL's, its European clubs play Europe's);
+ * `eraLeagues`, the leagues of its era maps' seasons before it took its name (rugby league's premierships before the
+ * NRL), which such a map and its entry name in its place, as the setup and the campaign show them.
  */
 const LEAGUES = {
   nba: { id: 'nba', sport: 'basketball', league: 'NBA', name: 'USA and Canada', countries: [USA, CAN], joins: {}, entry: {},
@@ -128,8 +130,10 @@ const LEAGUES = {
   // Australia's states and territories and New Zealand's regions. The Tasman Sea is between them: no border to fit. In
   // 2008 the Bulldogs at Sydney Olympic Park and the Eels share the City of Parramatta, and the Rabbitohs at Redfern and
   // the Roosters the City of Sydney: half a kilometre cuts each council between its two (today's map is the same with or
-  // without it).
-  nrl: { id: 'nrl', sport: 'rugby-league', league: 'NRL', name: 'Australia and New Zealand', countries: [AUS, NZL], joins: {},
+  // without it). The maps before 1998 name their seasons' premiership (scripts/data/rugby-league-seasons.json
+  // `competition`): the NSWRFL's to 1983, the NSWRL's from 1984, the ARL's from 1995, and Super League's of 1997.
+  nrl: { id: 'nrl', sport: 'rugby-league', league: 'NRL', eraLeagues: ['NSWRFL', 'NSWRL', 'ARL', 'Super League'], name: 'Australia and New Zealand',
+    countries: [AUS, NZL], joins: {},
     entry: { venue: 'ground', lines: 'state or region' }, east: true, border: null, grouping: 'state, territory or region', maxGapKm: 0.5,
     venues: 'Ground locations: scripts/data/nrl-teams.json (the Rabbitohs and the Bulldogs, who share Accor Stadium, and the Wests Tigers, who play at three grounds, grow from their training bases).',
     eraVenues: 'Ground locations: scripts/data/rugby-league-seasons.json, every club of each season at the ground it played at (a club that shared its ground, or played at several, grows from where it trained).',
@@ -435,7 +439,8 @@ async function mlbSpecs() {
  * same order on every map; a defunct club, which no club of today's continues (the manifest's `defunct`: the Adelaide
  * Rams, the North Sydney Bears …), ranks after them in that list's order, under its own id. Seasons with today's clubs at
  * today's grounds (2023 on) play on today's map, which is built once. The maps of 1998–2007 cite the Wikipedia articles
- * their clubs' grounds are placed and named from (`earlyVenues`).
+ * their clubs' grounds are placed and named from (`earlyVenues`). A map's seasons share one league, which a map before
+ * 1998 names in place of the NRL (`league`: the NSWRFL …, one of LEAGUES.nrl's `eraLeagues`).
  */
 async function nrlSpecs() {
   const grounds = JSON.parse(await readFile(nrlGroundsFile, 'utf8')).teams;
@@ -461,13 +466,20 @@ async function nrlSpecs() {
     const teams = teamsAt(first);
     const differs = rest.find(year => places(teamsAt(year)) !== places(teams));
     if (differs) throw new Error(`${map.id}: the clubs or grounds of ${differs} are not those of ${first}`);
+    const leagues = [...new Set(map.seasons.map(key => nrlLeagueOf(manifest, key)))];
+    if (leagues.length > 1) throw new Error(`${map.id}: its seasons are of two leagues, ${leagues.join(' and ')}`);
+    const [league] = leagues;
     if (map.id === LEAGUES.nrl.id) {
       if (places(teams) !== today) throw new Error(`${map.id}: the seasons ${map.seasons.join(', ')} are not today's clubs and grounds`);
+      if (league !== LEAGUES.nrl.league) throw new Error(`${map.id}: today's map serves ${league} seasons`);
       continue;
+    }
+    if (league !== LEAGUES.nrl.league && !LEAGUES.nrl.eraLeagues.includes(league)) {
+      throw new Error(`${map.id}: ${league} is not one of LEAGUES.nrl's eraLeagues, which keep its index entry when another league is built`);
     }
     const firstYear = typeof first === 'number' ? first : Number(first.match(/\d{4}$/)[0]);
     const venues = firstYear < 1998 ? LEAGUES.nrl.rlpVenues : firstYear < 2008 ? LEAGUES.nrl.earlyVenues : null;
-    specs.push({ id: map.id, seasons: map.seasons.map(nrlSeasonIdOf), ...(venues ? { venues } : {}),
+    specs.push({ id: map.id, seasons: map.seasons.map(nrlSeasonIdOf), ...(league !== LEAGUES.nrl.league ? { league } : {}), ...(venues ? { venues } : {}),
       clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.ground, home: t.home })) });
   }
   return specs;
@@ -621,6 +633,8 @@ async function cfbSpecs() {
 
 async function build({ source, log, spec, league }) {
   const { id: mapId, seasons, clubs } = spec;
+  // The league the map names: an era map's own where its seasons had another (rugby league's NSWRFL …), else its league's.
+  const leagueName = spec.league ?? league.league;
   const names = clubs.map(c => c.city);
   if (new Set(names).size !== names.length) throw new Error(`${mapId}: two franchises share a city name`);
   const n = clubs.length;
@@ -710,7 +724,7 @@ async function build({ source, log, spec, league }) {
     id: mapId,
     name: league.name,
     sport: league.sport,
-    league: league.league,
+    league: leagueName,
     // An era's map serves its seasons, whose own clubs take its sections; today's map serves the game's clubs.
     ...(seasons ? { seasons } : {}),
     hosts: league.countries.map(c => c.id),
@@ -773,7 +787,7 @@ async function build({ source, log, spec, league }) {
   // An era's strongest clubs are each of its seasons' own, which the setup reads from the season, unless only some of its
   // clubs are on the map (`eraTop`): then its clubs come strongest first, and the entry names them.
   const top = rows.slice(0, 3).map(row => clubs.find(c => c.id === row.id).name);
-  const entry = { id: mapId, sport: league.sport, league: league.league, name: league.name, ...(seasons ? { seasons } : {}), clubs: n,
+  const entry = { id: mapId, sport: league.sport, league: leagueName, name: league.name, ...(seasons ? { seasons } : {}), clubs: n,
     sections: n, ...league.entry, version: doc.version, ...(seasons && !league.eraTop ? {} : { top }) };
   return { entry, outputs: [[outFile(mapId), text], [attributionFile(mapId), attributionText(doc, league, spec.venues)]] };
 }
@@ -785,7 +799,8 @@ function indexModule(entries) {
 // "The NBA map", "The NFL map", "The MLB map", "The NHL map", "The NRL map", "The NWSL map", "The FBS map"): the setup offers each as its
 // sport's club theatre ('domestic:<id>'), the NWSL's beside women's football's Europe maps, and the loader fetches
 // public/domestic/<id>.json on demand. A map with \`seasons\` is an earlier era's, played only with those built-in
-// seasons' clubs, whose strongest each season names itself (the NWSL's entries name them).
+// seasons' clubs, whose strongest each season names itself (the NWSL's entries name them), in the league it names (an
+// era's own where it had another: the AFL, rugby league's NSWRFL …).
 // { id, sport, league, name, seasons?, clubs, sections, venue? ('arena' unless named), lines? ('state or province'
 //   unless named), version, top?: three strongest clubs }
 
@@ -795,11 +810,14 @@ ${entries.map(entry => `  ${JSON.stringify(entry)},`).join('\n')}
 `;
 }
 
-/** A map's attribution; `venues`, a map's own words for where its venues come from (else its league's). */
+/**
+ * A map's attribution, headed by the league it names (`doc.league`); `venues`, a map's own words for where its venues
+ * come from (else its league's).
+ */
 function attributionText(doc, league, venues = null) {
   const lines = [
-    doc.seasons ? `${league.league} map of the seasons ${doc.seasons.join(', ')} (public/domestic/${doc.id}.json), ${doc.version}`
-      : `${league.league} map (public/domestic/${doc.id}.json), ${doc.version}`,
+    doc.seasons ? `${doc.league} map of the seasons ${doc.seasons.join(', ')} (public/domestic/${doc.id}.json), ${doc.version}`
+      : `${doc.league} map (public/domestic/${doc.id}.json), ${doc.version}`,
     'Generated by scripts/build-club-maps.mjs; do not edit.',
     '',
     'Territory shapes are derived (dissolved, simplified, quantized) from the administrative',
@@ -844,9 +862,10 @@ async function main() {
     }
     built.set(key, entries);
   }
-  // A league not built keeps its entries as the index lists them; the leagues stay in LEAGUES order.
+  // A league not built keeps its entries as the index lists them, those of era maps that name a league of their own
+  // (`eraLeagues`) too; the leagues stay in LEAGUES order.
   const entries = Object.entries(LEAGUES).flatMap(([key, league]) => built.get(key)
-    ?? CLUB_MAPS.filter(entry => entry.league === league.league));
+    ?? CLUB_MAPS.filter(entry => entry.league === league.league || !!league.eraLeagues?.includes(entry.league)));
   outputs.set(indexFile, indexModule(entries));
   if (check) {
     const differs = [];

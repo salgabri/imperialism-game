@@ -6,34 +6,107 @@ boundary layers as today's map of the country (public/domestic/ATTRIBUTION.txt l
 grown around that season's clubs. Scotland's, which today's maps lack, are listed below.
 geoBoundaries (https://www.geoboundaries.org), gbOpen release, files pinned to commit 9469f09: Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative boundaries. PLOS ONE 15(4): e0231866. https://doi.org/10.1371/journal.pone.0231866
 Clubs and players: the season's own source, as its season file credits it (public/football/<season>.json,
-  docs/design/football-years.md). Club home towns: Wikidata (CC0 1.0), GeoNames cities1000 (https://www.geonames.org,
+  docs/design/football-years.md); in an EA season, a country the EA edition rates too few clubs of takes the CM 01/02
+  Update Team's database of that season (credited to the CM 01/02 Update Team, https://www.champman0102.co.uk;
+  scripts/data/cm0102-updates.json), as the map's line below names it. Club home towns: Wikidata (CC0 1.0), GeoNames cities1000 (https://www.geonames.org,
   CC BY 4.0), today's maps' homes and hand overrides (scripts/data/season-club-homes.json lists each with its source).
 
 Per map:
+008y2026 Albania ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries ALB ADM3, Open Data Commons Open Database License 1.0
+012y2026 Algeria ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries DZA ADM3, Creative Commons Attribution-ShareAlike 2.0
+031y2026 Azerbaijan ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries AZE ADM2, Creative Commons Attribution-ShareAlike 3.0 Unported
 032y2026 Argentina ea-fc-26 (EA FC 26): geoBoundaries ARG ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 036y2026 Australia ea-fc-26 (EA FC 26): geoBoundaries AUS ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
 040y2026 Austria ea-fc-26 (EA FC 26): geoBoundaries AUT ADM3, Creative Commons Attribution-ShareAlike 2.0
+050y2026 Bangladesh ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries BGD ADM3, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+051y2026 Armenia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries ARM ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 056y2026 Belgium ea-fc-26 (EA FC 26): geoBoundaries BEL ADM4, Creative Commons Attribution 4.0 International (CC BY 4.0)
+068y2026 Bolivia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries BOL ADM3, Public Domain
+070y2026 Bosnia & Herz. ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries BIH ADM3, Public Domain
+076y2026 Brazil ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries BRA ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+100y2026 Bulgaria ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries BGR ADM2, Public Domain
+112y2026 Belarus ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries BLR ADM2, Creative Commons Attribution 3.0 License
+124y2026 Canada ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries CAN ADM3, Open Data Commons Open Database License 1.0
+152y2026 Chile ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries CHL ADM3, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 156y2026 China ea-fc-26 (EA FC 26): geoBoundaries CHN ADM2, Open Data Commons Public Domain Dedication and License (PDDL) v1.0
+170y2026 Colombia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries COL ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+188y2026 Costa Rica ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries CRI ADM3, Open Data Commons Open Database License 1.0
+191y2026 Croatia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries HRV ADM2, Creative Commons Attribution-ShareAlike 2.0
+196y2026 Cyprus ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries CYP ADM2, Creative Commons Attribution-ShareAlike 3.0 Unported
+203y2026 Czechia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries CZE ADM3, Open Data Commons Open Database License 1.0
 208y2026 Denmark ea-fc-26 (EA FC 26): geoBoundaries DNK ADM2, Public Domain
+214y2026 Dominican Rep. ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries DOM ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+218y2026 Ecuador ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries ECU ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+222y2026 El Salvador ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries SLV ADM2, Public Domain
+233y2026 Estonia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries EST ADM2, Open Data Commons Open Database License 1.0
+242y2026 Fiji ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries FJI ADM4, Creative Commons Attribution 4.0 (CC BY 4.0)
+246y2026 Finland ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries FIN ADM3, Open Data Commons Open Database License 1.0
 250y2026 France ea-fc-26 (EA FC 26): geoBoundaries FRA ADM3, Etalab Open License 2.0
+268y2026 Georgia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries GEO ADM2, Public Domain
 276y2026 Germany ea-fc-26 (EA FC 26): geoBoundaries DEU ADM3, Data license Germany - Attribution - Version 2.0
+288y2026 Ghana ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries GHA ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+300y2026 Greece ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries GRC ADM3, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+320y2026 Guatemala ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries GTM ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+340y2026 Honduras ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries HND ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+348y2026 Hungary ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries HUN ADM3, Open Data Commons Open Database License 1.0
+352y2026 Iceland ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries ISL ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
 356y2026 India ea-fc-26 (EA FC 26): geoBoundaries IND ADM2, Open Data Commons Open Database License 1.0
+360y2026 Indonesia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries IDN ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+364y2026 Iran ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries IRN ADM2, Open Data Commons Open Database License 1.0
+372y2026 Ireland ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries IRL ADM2, Creative Commons Attribution 4.0 (CC BY 4.0)
+376y2026 Israel ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries ISR ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
 380y2026 Italy ea-fc-26 (EA FC 26): geoBoundaries ITA ADM4, Creative Commons Attribution 3.0 License
+388y2026 Jamaica ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries JAM ADM2, Open Data Commons Open Database License 1.0
+392y2026 Japan ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries JPN ADM2, Creative Commons Attribution-ShareAlike 2.0
+398y2026 Kazakhstan ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries KAZ ADM2, Open Data Commons Open Database License 1.0
 410y2026 South Korea ea-fc-26 (EA FC 26): geoBoundaries KOR ADM2, Creative Commons Attribution 3.0 License
+417y2026 Kyrgyzstan ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries KGZ ADM2, Creative Commons Attribution-ShareAlike 3.0 Unported
+422y2026 Lebanon ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries LBN ADM2, Public Domain
+428y2026 Latvia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries LVA ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+440y2026 Lithuania ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries LTU ADM3, Public Domain
+442y2026 Luxembourg ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries LUX ADM2, Open Data Commons Open Database License 1.0
+458y2026 Malaysia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries MYS ADM2, Creative Commons Attribution 3.0 License
+484y2026 Mexico ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries MEX ADM2, Creative Commons Attribution 4.0 (CC BY 4.0)
+499y2026 Montenegro ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries MNE ADM1, Open Data Commons Open Database License 1.0
+504y2026 Morocco ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries MAR ADM2, Open Data Commons Open Database License 1.0
 528y2026 Netherlands ea-fc-26 (EA FC 26): geoBoundaries NLD ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+566y2026 Nigeria ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries NGA ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
 578y2026 Norway ea-fc-26 (EA FC 26): geoBoundaries NOR ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+591y2026 Panama ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries PAN ADM3, Creative Commons Attribution 4.0 International (CC BY 4.0)
+600y2026 Paraguay ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries PRY ADM2, Creative Commons Attribution 4.0 (CC BY 4.0)
+604y2026 Peru ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries PER ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+608y2026 Philippines ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries PHL ADM3, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 616y2026 Poland ea-fc-26 (EA FC 26): geoBoundaries POL ADM2, Open Data Commons Open Database License 1.0
 620y2026 Portugal ea-fc-26 (EA FC 26): geoBoundaries PRT ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+634y2026 Qatar ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries QAT ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
 642y2026 Romania ea-fc-26 (EA FC 26): geoBoundaries ROU ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+643y2026 Russia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries RUS ADM2, Open Data Commons Open Database License 1.0
 682y2026 Saudi Arabia ea-fc-26 (EA FC 26): geoBoundaries SAU ADM2, Creative Commons Attribution-ShareAlike 2.0
+688y2026 Serbia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries SRB ADM2, Open Data Commons Open Database License 1.0
+703y2026 Slovakia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries SVK ADM3, Open Data Commons Open Database License 1.0
+704y2026 Vietnam ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries VNM ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+705y2026 Slovenia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries SVN ADM2, Open Data Commons Open Database License 1.0
+710y2026 South Africa ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries ZAF ADM3, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 724y2026 Spain ea-fc-26 (EA FC 26): geoBoundaries ESP ADM3, Creative Commons Attribution 4.0 International (CC BY 4.0)
 752y2026 Sweden ea-fc-26 (EA FC 26): geoBoundaries SWE ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
 756y2026 Switzerland ea-fc-26 (EA FC 26): geoBoundaries CHE ADM3, Federal Office of Topography swisstopo License
+762y2026 Tajikistan ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries TJK ADM2, Open Data Commons Open Database License 1.0
+764y2026 Thailand ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries THA ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+784y2026 United Arab Emirates ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries ARE ADM1, Open Data Commons Open Database License 1.0
+788y2026 Tunisia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries TUN ADM2, Open Data Commons Open Database License 1.0
 792y2026 Turkey ea-fc-26 (EA FC 26): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
+804y2026 Ukraine ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
+807y2026 N. Macedonia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries MKD ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
+818y2026 Egypt ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries EGY ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 826y2026 England ea-fc-26 (EA FC 26): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
 840y2026 United States ea-fc-26 (EA FC 26): geoBoundaries USA ADM2, Public Domain
+858y2026 Uruguay ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
+860y2026 Uzbekistan ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries UZB ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+862y2026 Venezuela ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries VEN ADM1, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
+KOSy2026 Kosovo ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries XKX ADM2, Creative Commons Attribution-ShareAlike 2.0
+NIRy2026 Northern Ireland ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries GBR ADM2 (GB-NIR), Open Government Licence v3.0
 SCOy2026 Scotland ea-fc-26 (EA FC 26): geoBoundaries GBR ADM2 (GB-SCT), Open Government Licence v3.0
+WALy2026 Wales ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries GBR ADM2 (GB-WLS), Open Government Licence v3.0
 032y2025 Argentina ea-fc-25 (EA FC 25): geoBoundaries ARG ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 036y2025 Australia ea-fc-25 (EA FC 25): geoBoundaries AUS ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
 040y2025 Austria ea-fc-25 (EA FC 25): geoBoundaries AUT ADM3, Creative Commons Attribution-ShareAlike 2.0

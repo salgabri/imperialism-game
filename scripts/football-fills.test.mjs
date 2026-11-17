@@ -23,8 +23,8 @@ import { expandEaTuple } from '../src/data/eaPlayers.js';
 import { wikidataTables } from './lib/national-team-facts.mjs';
 import { coverOf } from './lib/national-team-seasons.mjs';
 import {
-  FILL_LEAGUE, FILL_SOURCE, FILL_YEARS, addedSum, fillEleven, fillTarget, lineLevel, personIndex, playerRange, profileOf,
-  samePersonIn, spreadRatings, teamNations, withoutMalformedDays,
+  FEMALE, FILL_LEAGUE, FILL_SOURCE, FILL_YEARS, addedSum, fillEleven, fillTarget, lineLevel, personIndex, playerRange, profileOf,
+  samePersonIn, spreadRatings, teamNations, withoutMalformedDays, womenOf,
 } from './lib/football-fills.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -106,6 +106,20 @@ test('Wikidata\'s stints: one with neither end nor caps covers its first year on
   assert.equal(fills.audit.noStart, 1, 'the typed year leaves its stint without a start');
 });
 
+test('a woman Wikidata files under a men\'s team plays for no men\'s side: her stints are left out of the facts', () => {
+  const entity = q => `http://www.wikidata.org/entity/${q}`;
+  const women = womenOf([{ player: entity('Q1'), sex: entity(FEMALE) }, { player: entity('Q2'), sex: entity('Q6581097') },
+    { player: entity('Q3'), sex: 'http://www.wikidata.org/.well-known/genid/abc' }]);
+  assert.deepEqual([...women], ['Q1']);
+  // Haiti's three women's internationals Wikidata files under its men's team are among those left out, and in no season.
+  for (const qid of ['Q27943424', 'Q83880803', 'Q83906425']) assert.ok(WIKIDATA.audit.women.includes(qid), qid);
+  const left = new Set(WIKIDATA.audit.women);
+  assert.ok(!WIKIDATA.stints.some(([player]) => left.has(player)) && !WIKIDATA.players.some(([qid]) => left.has(qid)));
+  for (const id of EA_IDS) {
+    for (const [, , list] of Object.values(season(id).nations)) assert.ok(!list.some(t => isComputed(t) && left.has(t[3].id.slice(3))), id);
+  }
+});
+
 test('one person: born the same day with a word in common, or an agreeing name of the same nation or birth year', () => {
   const ea = (name, fullName, dateOfBirth, nationId) => ({ name, nationId, sourceInfo: { fullName, ...(dateOfBirth ? { dateOfBirth } : {}) } });
   const index = personIndex([ea('M. Aboutrika', 'Mohamed Aboutrika', '1978-11-07', '818'), ea('Lee Chung Yong', 'Lee Chung Yong', '1988-07-02', '410'),
@@ -155,7 +169,8 @@ test('teams play for the nation of their year: Serbia and Montenegro for Serbia,
 test('the manifest shares the computed seasons\' constants and names every EA season at its ratings date', () => {
   assert.deepEqual(MANIFEST.elo, NATIONAL.elo);
   assert.equal(MANIFEST.strength.perHundredElo, NATIONAL.strength.perHundredElo);
-  assert.deepEqual([MANIFEST.xi, MANIFEST.profile, MANIFEST.selection.openCapsPerYear], [NATIONAL.xi, NATIONAL.profile, NATIONAL.selection.openCapsPerYear]);
+  assert.deepEqual([MANIFEST.xi, MANIFEST.profile, MANIFEST.selection.openCapsPerYear, MANIFEST.selection.ages],
+    [NATIONAL.xi, NATIONAL.profile, NATIONAL.selection.openCapsPerYear, NATIONAL.selection.ages]);
   for (const [item, role] of Object.entries(NATIONAL.positions)) assert.equal(MANIFEST.positions[item], role, item);
   for (const [name, nation] of Object.entries(NATIONAL.names.nations.aliases)) assert.equal(MANIFEST.names.nations.aliases[name], nation, name);
   assert.deepEqual(MANIFEST.names.nations.noTeam, NATIONAL.names.nations.noTeam);

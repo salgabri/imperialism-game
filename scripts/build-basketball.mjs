@@ -1,6 +1,7 @@
 // Generates src/data/rosters.basketball.js from the curated FIBA squad list plus
 // the built-in season's NBA 2K ratings, as 2K Archive compiles them
-// (scripts/data/nba-seasons.json; the pinned page in data-src/bball-2karchive/).
+// (scripts/data/nba-seasons.json; the pinned page in data-src/bball-2karchive/),
+// and the built-in EuroLeague's estimates (scripts/data/euroleague-2026-27.json).
 //
 //   npm run build-basketball
 //
@@ -8,12 +9,16 @@
 // nationality. 2K has real 1-99 overalls but no country; NBA bio datasets with a
 // country column stop in 2014. FIBA eligibility follows the federation anyway,
 // so nationality and positions are curated in fiba-squads.json and ratings are
-// resolved from 2K by name, with a curated fallback for EuroLeague players.
+// resolved by name: from 2K for an NBA player, from the EuroLeague's estimate for
+// a EuroLeague one (each under his club's spelling of his name, so a five and a
+// club agree), and from the curated rating for anyone else.
 
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { CONF_META, NATIONS, selectLineup } from '../src/data/teams.js';
+import { colourFor } from './lib/club-identity.mjs';
+import { euroleagueClubs } from './lib/euroleague.mjs';
 import { editionOf, readArchive } from './lib/nba-seasons.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -41,20 +46,33 @@ const { manifest, years } = await readArchive(root);
 const nba = years[String(manifest.builtIn.year)];
 if (!Array.isArray(nba)) throw new Error(`2K Archive has no ${manifest.builtIn.edition}`);
 
-const ratingByName = new Map();
-for (const p of nba) ratingByName.set(norm(p.n), Math.min(MAX_RATING, p.o));
+// Each player plays under the name and at the rating the built-in season's clubs give him, so a national five and a
+// club never show one man two ways: an NBA player's are NBA 2K's (its spelling, "Nikola Jokić"), a EuroLeague
+// player's the built-in EuroLeague's estimate for every rostered player (scripts/lib/euroleague.mjs, the clubs'
+// rule). A name two of a source's players share resolves to neither.
+const byName = (players, nameOf) => {
+  const map = new Map();
+  for (const p of players) map.set(norm(nameOf(p)), map.has(norm(nameOf(p))) ? null : p);
+  return map;
+};
+const nbaByName = byName(nba, p => p.n);
+const snapshot = JSON.parse(await readFile(path.join(root, 'scripts', 'data', 'euroleague-2026-27.json'), 'utf8'));
+const identity = JSON.parse(await readFile(path.join(root, 'scripts', 'data', 'euroleague-teams.json'), 'utf8'));
+const euroleagueTeams = Object.fromEntries(Object.entries(identity.clubs).map(([code, team]) => [code, { ...team, col: colourFor(team.id) }]));
+const euroleagueByName = byName(euroleagueClubs(snapshot, euroleagueTeams, identity.names).players, p => p.name);
 // A listed NBA player who has left the league since keeps his latest NBA 2K rating, the newest earlier edition first.
 const earlierYears = Object.keys(years).map(Number).filter(year => year < manifest.builtIn.year).sort((a, b) => b - a);
 function lastNbaRating(name) {
   for (const year of earlierYears) {
     const listed = years[String(year)].find(p => norm(p.n) === name);
-    if (listed) return { rating: Math.min(MAX_RATING, listed.o), edition: editionOf(year) };
+    if (listed) return { name: listed.n.trim(), rating: Math.min(MAX_RATING, listed.o), edition: editionOf(year) };
   }
   return null;
 }
 
 const rosters = {};
 const resolved = [];
+const euroleague = [];
 const former = [];
 const missing = [];
 const unknownNations = [];
@@ -68,17 +86,20 @@ for (const [id, players] of Object.entries(curated)) {
   for (const [name, listed, curatedRating] of players) {
     const positions = parsePositions(listed, `${NATIONS[id][0]}: ${name}`);
     const player = { name, pos: positions[0], positions };
-    const fromNba = ratingByName.get(norm(name));
-    if (fromNba != null) {
-      squad.push({ ...player, rating: fromNba });
+    const fromNba = nbaByName.get(norm(name)), fromEuroleague = euroleagueByName.get(norm(name));
+    if (fromNba) {
+      squad.push({ ...player, name: fromNba.n.trim(), rating: Math.min(MAX_RATING, fromNba.o) });
       resolved.push(name);
+    } else if (fromEuroleague) {
+      squad.push({ ...player, name: fromEuroleague.name, rating: fromEuroleague.rating });
+      euroleague.push(`${NATIONS[id][0]}: ${fromEuroleague.name} ${fromEuroleague.rating} (${fromEuroleague.club})${curatedRating != null && curatedRating !== fromEuroleague.rating ? `, curated ${curatedRating}` : ''}`);
     } else if (curatedRating != null) {
       squad.push({ ...player, rating: Math.min(MAX_RATING, curatedRating) });
     } else {
       const last = lastNbaRating(norm(name));
       if (last) {
-        squad.push({ ...player, rating: last.rating });
-        former.push(`${NATIONS[id][0]}: ${name} ${last.rating} (${last.edition})`);
+        squad.push({ ...player, name: last.name, rating: last.rating });
+        former.push(`${NATIONS[id][0]}: ${last.name} ${last.rating} (${last.edition})`);
       } else {
         // Listed as an NBA player but in no NBA 2K edition's ratings — usually a
         // name spelling drift. Skip rather than invent a rating; the shirt is generated.
@@ -119,8 +140,10 @@ const out = `// GENERATED by scripts/build-basketball.mjs — do not edit by han
 // squad is [name, positions, rating]. Most players cover two neighbouring
 // positions, listed primary first ('PG/SG'). Ratings for NBA players come from
 // ${manifest.builtIn.edition} (real 1-${MAX_RATING} overalls, as 2K Archive compiles them);
-// EuroLeague players carry a curated rating on the same scale. Nationality and
-// positions are curated — see scripts/fiba-squads.json.
+// EuroLeague players take the built-in EuroLeague's estimate (src/data/clubs.euroleague.js's
+// rule), each under the name his club plays him by; other players carry a curated
+// rating on the same scale. Nationality and positions are curated — see
+// scripts/fiba-squads.json.
 
 export const ROSTERS = {
 ${body}
@@ -133,9 +156,13 @@ const nations = Object.keys(rosters).length;
 const players = Object.values(rosters).reduce((s, r) => s + r.squad.length, 0);
 const dual = Object.values(rosters).reduce((s, r) => s + r.squad.filter(p => p.positions.length > 1).length, 0);
 console.log(`wrote src/data/rosters.basketball.js`);
-console.log(`  ${nations} nations, ${players} players (${resolved.length} rated from ${manifest.builtIn.edition}, ${former.length} from an earlier NBA 2K, `
-  + `${players - resolved.length - former.length} curated)`);
+console.log(`  ${nations} nations, ${players} players (${resolved.length} rated from ${manifest.builtIn.edition}, ${euroleague.length} from the EuroLeague's estimates, `
+  + `${former.length} from an earlier NBA 2K, ${players - resolved.length - euroleague.length - former.length} curated)`);
 console.log(`  ${dual} of ${players} players cover two positions`);
+if (euroleague.length) {
+  console.log(`  ${euroleague.length} EuroLeague players at their clubs' ratings:`);
+  for (const e of euroleague) console.log(`    ${e}`);
+}
 if (former.length) {
   console.log(`  ${former.length} listed as NBA but not in ${manifest.builtIn.edition}, so rated by their latest NBA 2K:`);
   for (const f of former) console.log(`    ${f}`);

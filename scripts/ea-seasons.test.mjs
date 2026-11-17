@@ -716,6 +716,10 @@ test('EA FC 25\'s files are read as they are: the website\'s columns, the June s
   assert.equal(latinPart(' Martin Ødegaard '), 'Martin Ødegaard');
   assert.equal(latinPart('محمد صلاح'), '');
   assert.equal(latinPart('Kiril Кирил Despodov'), '', 'scripts that alternate are not trimmed');
+  // A glued copy typed partly in Latin look-alikes still begins where a small letter meets a capital: EA FC 26's Borjan.
+  const cyrillic = (...codes) => String.fromCharCode(...codes);
+  assert.equal(latinPart(`Milan BorjanM${cyrillic(0x438, 0x43B)}a${cyrillic(0x43D)} ${cyrillic(0x411)}opja${cyrillic(0x43D)}`), 'Milan Borjan');
+  assert.equal(latinPart(`LeBron James${cyrillic(0x41B)}e${cyrillic(0x431, 0x440, 0x43E, 0x43D)}`), 'LeBron James', 'a capital inside the name is no glue');
   // EA's website counts age from an earlier day of the year: the same age or a year less fits a date of birth.
   assert.deepEqual([ageOn('1996-06-22', '2024-09-26'), ageOn('1996-09-27', '2024-09-26')], [28, 27]);
   assert.deepEqual([26, 27, 28, 29].map(age => ageFits(String(age), '1996-06-22', '2024-09-26')), [false, true, true, false]);
