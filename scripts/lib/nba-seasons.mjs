@@ -5,8 +5,9 @@
 // come from the same page. The seasons before NBA 2K come from other sources, each a season of the manifest's `extra`
 // with a `format`: NBA 2K27's MyNBA Eras leagues as 2kratings.com lists them, and NBA Live 99's own roster files, each
 // player checked against Basketball-Reference's seasons (realPlayers). The seasons no game rated (the manifest's
-// `computed`, 1960/61 to 1997/98 but 1983/84 and 1991/92) are computed from Basketball-Reference's player seasons: one
-// score fitted to NBA 2K's overalls, then each season ranked onto NBA 2K27's ratings (readComputedSources). Only
+// `computed`, 1960/61 to 1997/98 but 1983/84 and 1991/92) are computed from Basketball-Reference's player seasons by
+// docs/design/computed-ratings.md: one score fitted to NBA 2K's overalls on rates pooled over three seasons, each season
+// ranked onto NBA 2K27's ratings, then its clubs moved toward their real results (readComputedSources). Only
 // readArchive, readSeasonSources and readComputedSources do I/O: scripts/build-nba-seasons.mjs writes the files,
 // scripts/build-club-maps.mjs takes each era's teams and arenas from `teamsOf`, and tests build seasons from invented
 // players. Every rating is 2K's, unchanged, but NBA Live 99's, which one documented straight line puts on NBA 2K's
@@ -14,8 +15,11 @@
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { selectLineup } from '../../src/data/teams.js';
+import { hashStr, makeRng, selectLineup } from '../../src/data/teams.js';
 import { colourFor, contentHash, makeCode, serializeFootballSet } from '../../src/data/footballSetBuild.js';
+import { nbaBasketballIn, prepareMatch, sampleResult } from '../../src/sports/basketball.js';
+import { clubMoveOf, mean, perPointOf, pooled, priorFromReliability, replacementRate, resultsTargets, seasonReliability, shrunkRate,
+  variance } from './computed-ratings.mjs';
 
 export const POSITIONS = ['PG', 'SG', 'SF', 'PF', 'C'];
 export const SET_ID = /^nba-2k\d{2}$/;
@@ -574,14 +578,16 @@ export function buildNbaSeason(years, year, manifest, { arenas, builtIn = [], ar
   const scale = extra?.scale;
   const conversion = scale ? { conversion: `round(${scale.intercept} + ${scale.slope} * raw): the least-squares line of ${scale.edition}'s overall `
     + `(${seasonOf(scale.year)}) on ${edition}'s, through the players both rate` }
-    : computed ? { method: 'computed', conversion: computedConversion(computed) } : {};
+    : computed ? { method: 'computed', conversion: computedConversion(computed, source?.move) } : {};
   const doc = { format: 1, kind: 'nba2k', id: setIdOf(manifest, year), version: '', year, season: seasonOf(year), label: labelOf(manifest, year), local: false,
     source: { provider: extra?.provider ?? computed?.provider ?? '2K Sports', edition, compiler: compiled.name, url: compiled.url, rawScale: 99, ...conversion },
     map: mapOf(manifest, year), clubs, coverage: { players: clubs.length * FIVE, clubs: clubs.length } };
   doc.version = `${doc.id}-${contentHash(doc)}`;
   const checked = archived[String(year)] ? { checkedAgainst2KArchive: agreement(years[String(year)], archived[String(year)]) } : {};
   const teams = teamsOf(manifest, year, arenas);
-  const told = !source ? {} : source.computed ? computedAudit(source, clubs, doc, teams) : sourceAudit(source, clubs, doc, teams);
+  // A computed season's clubs before their move, for the audit's comparison.
+  const unmoved = source?.computed && source.ranked ? nbaSeasonClubs({ [year]: source.ranked }, year, manifest, { arenas, builtIn }).clubs : null;
+  const told = !source ? {} : source.computed ? computedAudit(source, clubs, doc, teams, unmoved) : sourceAudit(source, clubs, doc, teams);
   const audit = { id: doc.id, version: doc.version, edition, rows, map: doc.map, clubs: clubs.length,
     filledPositions: filled, droppedNoPosition: dropped, narrowedPositions: narrowed.length, ...checked,
     ...(outOfPosition.length ? { outOfPosition } : {}), ...told, warnings };
@@ -616,10 +622,12 @@ function sourceAudit(source, clubs, doc, teams) {
 
 // ---------- the seasons no game rated: computed from Basketball-Reference's player seasons ----------
 
-/** The score's inputs, in the order of the manifest's coefficients. */
-export const SCORE_INPUTS = Object.freeze(['per', 'ws48', 'mpg', 'mpg2', 'ppg', 'rpg', 'apg', 'allStar', 'allNba', 'dws']);
-const INPUT_NAMES = { per: 'PER', ws48: 'WS/48', mpg: 'MPG', mpg2: 'MPG^2', ppg: 'PPG', rpg: 'RPG', apg: 'APG', allStar: 'All-Star',
-  allNba: 'All-NBA', dws: 'DWS' };
+/**
+ * The score's inputs, in the order of the manifest's coefficients: four production rates (PER, points, assists and
+ * defensive win shares a game), the selection (`share`, his share of his club's minutes) and two season honours.
+ */
+export const SCORE_INPUTS = Object.freeze(['per', 'ppg', 'apg', 'dws', 'share', 'allStar', 'allNba']);
+const INPUT_NAMES = { per: 'PER', ppg: 'PPG', apg: 'APG', dws: 'DWS/G', share: 'minutes share', allStar: 'All-Star', allNba: 'All-NBA' };
 const number = value => (value === '' || value === 'NA' || value == null ? null : Number(value));
 const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 const average = values => values.reduce((sum, v) => sum + v, 0) / values.length;
@@ -675,19 +683,100 @@ export function brefPlayerSeasons({ advanced, totals, allStar, endOfSeason }, al
 }
 
 /**
- * The score's inputs for one player season (a brefPlayerSeasons record), by the manifest's `score.shrink`: PER and
- * WS/48 shrunk toward a bench player's by `minutes` minutes of his (a few good minutes count for little), minutes a
- * game and its square, points, rebounds and assists a game, All-Star, All-NBA and defensive win shares. Null when the
- * season lacks one of them.
+ * Each club's games a season, from Basketball-Reference's team summaries (`[{ season, abbreviation, w, l }]`, readTable's
+ * rows of Team Summaries.csv, its League Average row left out): a Map '<season>|<team>' → wins plus losses.
  */
-export function scoreInputs(record, { shrink }) {
-  const { games, minutes } = record;
-  const facts = [record.per, record.ws48, record.dws, record.points, record.rebounds, record.assists];
-  if (!(games > 0) || !(minutes >= 0) || facts.some(value => value == null || !Number.isFinite(value))) return null;
-  const k = shrink.minutes, mpg = minutes / games;
-  return { per: (record.per * minutes + shrink.per * k) / (minutes + k), ws48: (record.ws48 * minutes + shrink.ws48 * k) / (minutes + k),
-    mpg, mpg2: mpg * mpg, ppg: record.points / games, rpg: record.rebounds / games, apg: record.assists / games,
-    allStar: record.allStar, allNba: record.allNba, dws: record.dws };
+export function clubGamesOf(summaries) {
+  return new Map(summaries.filter(row => row.team !== 'League Average')
+    .map(row => [`${row.season}|${row.abbreviation}`, Number(row.w) + Number(row.l)]));
+}
+
+/**
+ * The score's production rates: each a player season's events over its exposure (a brefPlayerSeasons record), null
+ * when the season lacks them. PER is a rate a minute played; points, assists and defensive win shares are rates a game.
+ */
+const RATES = Object.freeze({
+  per: record => (record.minutes > 0 && record.per != null ? { exposure: record.minutes, events: record.per * record.minutes } : null),
+  ppg: record => (record.games > 0 && record.points != null ? { exposure: record.games, events: record.points } : null),
+  apg: record => (record.games > 0 && record.assists != null ? { exposure: record.games, events: record.assists } : null),
+  dws: record => (record.games > 0 && record.dws != null ? { exposure: record.games, events: record.dws } : null),
+});
+const MINUTES_A_GAME = 48;
+
+/**
+ * Every player season's score inputs, by the design doc's step 3 (docs/design/computed-ratings.md, "Each player's
+ * value"), over `records` (brefPlayerSeasons'), `clubGames` (clubGamesOf) and the window's weights `window` (the season
+ * itself first, then the seasons before it; a season he did not play adds nothing):
+ * - each production rate pooled over the window (Σ weight × events ÷ Σ weight × exposure, so a season of few games
+ *   counts for little) and shrunk toward the season's replacement level by a prior measured from the data: p̂ =
+ *   (Σ w·events + k·r₀) ÷ (Σ w·exposure + k);
+ * - the replacement level r₀ is the pooled rate of the quarter of the season's players with the least exposure
+ *   (`replacementRate`);
+ * - the prior k = n̄(1 − rel) ÷ rel (`priorFromReliability`), rel the rate's rank correlation between the season and
+ *   the one before among the players with a quarter of each season's games in both, n̄ their mean exposure in the
+ *   season; it is one season's evidence, so it counts at the season's own weight (× window[0]): a player with the season
+ *   alone is shrunk as exactly one season's record;
+ * - `share`, the selection: his minutes over his club's (48 a game), pooled over the window, not shrunk;
+ * - All-Star (1 if picked) and All-NBA (the manifest's points), the season's own.
+ * Returns `{ inputsOf(record), priorsOf(season) }`: a record's inputs by SCORE_INPUTS, null when its own season lacks a
+ * rate; a season's `{ [rate]: { replacement, prior, reliability, typical, regulars } }`.
+ */
+export function valueInputs(records, { window, clubGames }) {
+  if (!Array.isArray(window) || !window.length || window.some(weight => !(weight > 0))) throw new Error('The window needs positive weights');
+  const byId = new Map(), bySeason = new Map(), length = new Map();
+  for (const record of records) {
+    if (!byId.has(record.id)) byId.set(record.id, new Map());
+    byId.get(record.id).set(record.season, record);
+    if (!bySeason.has(record.season)) bySeason.set(record.season, []);
+    bySeason.get(record.season).push(record);
+  }
+  for (const [key, games] of clubGames) {
+    const season = Number(key.split('|')[0]);
+    length.set(season, Math.max(length.get(season) ?? 0, games));
+  }
+  const windowOf = record => window.map((_, back) => byId.get(record.id).get(record.season - back) ?? null);
+  const pooledOf = (seasons, rate) => pooled(seasons.map(record => (record ? rate(record) : null)), window);
+  const clubMinutes = record => {
+    const games = clubGames.get(`${record.season}|${record.team}`);
+    if (!(games > 0)) throw new Error(`${record.season}: no games for ${record.team}`);
+    return MINUTES_A_GAME * games;
+  };
+  const selection = record => (record.minutes != null ? { exposure: clubMinutes(record), events: record.minutes } : null);
+  const priors = new Map();
+  const priorsOf = season => {
+    if (priors.has(season)) return priors.get(season);
+    const players = (bySeason.get(season) ?? []).filter(record => record.games > 0);
+    if (!players.length || !length.has(season) || !length.has(season - 1)) throw new Error(`No players or schedule to measure ${season}'s priors`);
+    const regular = (record, year) => record.games >= length.get(year) / 4;
+    const measured = {};
+    for (const [name, rate] of Object.entries(RATES)) {
+      const latest = [], before = [], exposure = [];
+      for (const record of players) {
+        const previous = byId.get(record.id).get(season - 1);
+        const now = rate(record), then = previous ? rate(previous) : null;
+        if (!now || !then || !regular(record, season) || !regular(previous, season - 1)) continue;
+        latest.push(now.events / now.exposure);
+        before.push(then.events / then.exposure);
+        exposure.push(now.exposure);
+      }
+      const reliability = seasonReliability(latest, before);
+      const typical = mean(exposure);
+      measured[name] = { replacement: replacementRate(players.map(record => pooledOf(windowOf(record), rate))),
+        prior: priorFromReliability(reliability, typical) * window[0], reliability, typical, regulars: latest.length };
+    }
+    priors.set(season, measured);
+    return measured;
+  };
+  const inputsOf = record => {
+    if (!(record.games > 0) || Object.values(RATES).some(rate => !rate(record))) return null;
+    const seasons = windowOf(record), measured = priorsOf(record.season);
+    const inputs = {};
+    for (const [name, rate] of Object.entries(RATES)) inputs[name] = shrunkRate(pooledOf(seasons, rate), measured[name].prior, measured[name].replacement);
+    const share = pooledOf(seasons, selection);
+    return Object.fromEntries(SCORE_INPUTS.map(name => [name, name === 'share' ? share.x / share.n
+      : name === 'allStar' ? record.allStar : name === 'allNba' ? record.allNba : inputs[name]]));
+  };
+  return { inputsOf, priorsOf };
 }
 
 /** The manifest's score (`{ intercept, coefficients }`) of a player's inputs, summed in SCORE_INPUTS' order. */
@@ -800,7 +889,28 @@ export function checkScore(pairs, score) {
   const predicted = pairs.map(pair => scoreOf(score)(pair.inputs)), z = pairs.map(pair => pair.z);
   return { pairs: pairs.length, editions: new Set(pairs.map(pair => pair.edition)).size,
     coefficients: Object.fromEntries(fitted.map(([name, value]) => [name, Number(value.toPrecision(6))])),
-    correlation: three(correlation(predicted, z)), rankCorrelation: three(rankCorrelation(predicted, z)) };
+    correlation: three(correlation(predicted, z)), rankCorrelation: three(rankCorrelation(predicted, z)),
+    leaveOneEditionOut: leaveOneEditionOut(pairs) };
+}
+
+/**
+ * How the score does on an edition it was not fitted on: for each edition of the pairs, the score fitted on every
+ * other edition's pairs predicts this one's, and Spearman's correlation of the prediction with 2K's overall (Pearson's
+ * with its z-score) is taken within the edition. → `{ editions, rankCorrelation, correlation, weakest }`, the means over
+ * the editions and the three weakest by rank.
+ */
+export function leaveOneEditionOut(pairs) {
+  const row = pair => [1, ...SCORE_INPUTS.map(name => pair.inputs[name])];
+  const editions = [...new Set(pairs.map(pair => pair.edition))].sort((a, b) => a - b);
+  const each = editions.map(edition => {
+    const fit = pairs.filter(pair => pair.edition !== edition), held = pairs.filter(pair => pair.edition === edition);
+    const beta = leastSquares(fit.map(row), fit.map(pair => pair.z));
+    const predicted = held.map(pair => row(pair).reduce((sum, x, j) => sum + x * beta[j], 0));
+    return { edition, rankCorrelation: rankCorrelation(predicted, held.map(pair => pair.rating)), correlation: correlation(predicted, held.map(pair => pair.z)) };
+  });
+  return { editions: each.length, rankCorrelation: three(average(each.map(e => e.rankCorrelation))), correlation: three(average(each.map(e => e.correlation))),
+    weakest: each.slice().sort((a, b) => a.rankCorrelation - b.rankCorrelation).slice(0, 3)
+      .map(e => `${editionOf(e.edition)} (${seasonOf(e.edition)}) ${two(e.rankCorrelation)}`) };
 }
 
 /** The ratings a computed season goes onto: an edition's ratings of each club's `perClub` best (free agents aside), lowest first. */
@@ -926,28 +1036,152 @@ export function computedSeasonPlayers(rated, { listed, career, careerPositions, 
   return { players, noPosition, namesakes, traded, scores };
 }
 
+// ---------- step 5: each club's move toward its results ----------
+
+/** The standard normal distribution function, by erfc's Chebyshev fit (Numerical Recipes; fractional error under 1.2e-7). */
+export function normalCdf(x) {
+  const z = Math.abs(x) / Math.SQRT2, t = 1 / (1 + 0.5 * z);
+  const tail = t * Math.exp(-z * z - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806
+    + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+  return x >= 0 ? 1 - tail / 2 : tail / 2;
+}
+
 /**
- * What a computed season's source says of how its ratings were made: the score, how it was fitted, and the rule that
- * puts it on NBA 2K's scale.
+ * The game-margin spread σ of a run of seasons, from their clubs' records alone, since the copy of Basketball-Reference
+ * keeps no games: the one σ under which each club's expected win share, Φ((SRS_i − SRS_j) ÷ σ) averaged over every other
+ * club j of its season, best explains every club's wins and losses (binomial maximum likelihood, golden-section search
+ * between 3 and 40 points). It assumes a balanced schedule and folds the home edge into σ. One σ for all the seasons:
+ * fitted season by season it jumps by several points between neighbouring seasons, more than the game changes, so a
+ * season's own fit is mostly noise. `seasons`: `[[{ srs, w, l }]]`, each season's clubs. → σ in points a game.
  */
-export function computedConversion({ score, roster, spread }) {
-  const c = score.coefficients, s = score.shrink, points = Object.entries(score.allNba);
+export function marginSigmaOf(seasons) {
+  if (!seasons.length || seasons.some(clubs => clubs.length < 2)) throw new Error('Every season needs two clubs to measure its margins');
+  const surprise = sigma => seasons.reduce((sum, clubs) => clubs.reduce((total, club) => {
+    const expected = clubs.reduce((share, other) => (other === club ? share : share + normalCdf((club.srs - other.srs) / sigma)), 0) / (clubs.length - 1);
+    return total - club.w * Math.log(expected) - club.l * Math.log(1 - expected);
+  }, sum), 0);
+  const golden = (Math.sqrt(5) - 1) / 2;
+  let low = 3, high = 40;
+  let a = high - golden * (high - low), b = low + golden * (high - low), fa = surprise(a), fb = surprise(b);
+  while (high - low > 1e-7) {
+    if (fa < fb) { high = b; b = a; fb = fa; a = high - golden * (high - low); fa = surprise(a); } else { low = a; a = b; fa = fb; b = low + golden * (high - low); fb = surprise(b); }
+  }
+  return (low + high) / 2;
+}
+
+/**
+ * The share of a season's SRS spread that is not luck: r = 1 − (σ² ÷ games) ÷ Var(SRS), σ the season's game-margin spread
+ * (marginSigmaOf) and `games` each club's (its SRS is a mean of that many margins), at least 0. An approximation: the
+ * copy keeps no games to fit srsOf on. `clubs`: `[{ srs, w, l }]`.
+ */
+export function srsReliabilityOf(clubs, sigma) {
+  const games = mean(clubs.map(club => club.w + club.l));
+  const spread = variance(clubs.map(club => club.srs));
+  return spread > 0 ? Math.max(0, 1 - (sigma * sigma / games) / spread) : 0;
+}
+
+/** A five as the engine fields it (`[{ name, positions, rating }]`), each player at his first position unless the lineup moves him. */
+const engineSide = (id, five) => ({ id, sport: 'basketball',
+  squad: five.map(player => ({ name: player.name, pos: player.positions[0], positions: player.positions, rating: player.rating })) });
+const evenFive = rating => engineSide(`even-${rating}`, POSITIONS.map(pos => ({ name: pos, positions: [pos], rating })));
+const ENGINE_LEVEL = 74;
+/** A side's net efficiency (points a possession) against a five of 74s, under FIBA's rules (prepareMatch's default). */
+const netEfficiency = side => { const match = prepareMatch(side, evenFive(ENGINE_LEVEL)); return match.efficiencyA - match.efficiencyD; };
+const NET_PER_POINT = netEfficiency(evenFive(ENGINE_LEVEL + 1)) - netEfficiency(evenFive(ENGINE_LEVEL));
+
+/**
+ * The strength the match engine plays a five at (src/sports/basketball.js): its offence lifts its own efficiency and its
+ * defence lowers its opponent's, each a weighted sum of the five's ratings by the slots selectLineup gives them; the net
+ * of the two, against a five of 74s, in lineup points (one point on every slot is one). It differs from the five's mean
+ * where its players differ by position: a centre counts more in defence, a guard in offence.
+ */
+export const engineStrengthOf = five => ENGINE_LEVEL + netEfficiency(engineSide('five', five)) / NET_PER_POINT;
+
+/**
+ * The engine's margin, in points a game, for a lineup point (perPointOf): two fives of 80s, one `delta` points better on
+ * every slot, play `games` games at each gap of perPointOf's under season `season`'s NBA rules (its pace and offensive
+ * rating, nbaBasketballIn) at a neutral venue, Balanced drama, on a generator seeded by the season.
+ */
+export function enginePerPoint(season, { games = 20000 } = {}) {
+  const sport = nbaBasketballIn(season), side = evenFive(80);
+  return perPointOf({ rng: makeRng(hashStr(`nba-stats margin per point ${season}`)), games,
+    play: (delta, rng) => { const result = sampleResult(rng, sport.prepareMatch(side, side, 80 + delta, 80)); return result.ga - result.gd; } });
+}
+
+/**
+ * A completed season's clubs moved toward their real results (docs/design/computed-ratings.md, step 5): `players` in the
+ * table's shape (`[{ n, o, p, t }]`, computedSeasonPlayers'), `clubs` Basketball-Reference's records by the same codes
+ * (`Map code → { srs, w, l }`), `season` its label and `sigma` the game-margin spread (marginSigmaOf). Each club's
+ * target is T = μ + √r × SRS ÷ m (resultsTargets): μ the season's mean engine strength before the move, r its SRS's
+ * reliability (srsReliabilityOf), m the engine's margin a lineup point (enginePerPoint). Each club then moves by a whole
+ * number for all its players and one more for its best few (clubMoveOf: best by rating, then by score where `scores`
+ * gives them by '<code>|<name>', then minutes), whichever brings the five the engine plays (selectLineup's,
+ * engineStrengthOf) nearest its target; no player passes a teammate he was rated or scored below. Returns `{ players,
+ * move }`: the moved players in their order and the season's constants with each club's `[code, srs, target, before,
+ * after, shift, plus]`, best target first.
+ */
+export function resultsMove(players, clubs, season, sigma, scores = null) {
+  const rows = [...clubs.values()];
+  const reliability = srsReliabilityOf(rows, sigma), perPoint = enginePerPoint(season);
+  const pools = new Map();
+  players.forEach((player, index) => {
+    if (!clubs.has(player.t)) throw new Error(`${season}: no record for ${player.t}`);
+    if (!pools.has(player.t)) pools.set(player.t, []);
+    const score = scores ? scores.get(`${player.t}|${player.n}`) : 0;
+    if (!Number.isFinite(score)) throw new Error(`${season}: no score for ${player.n} (${player.t})`);
+    pools.get(player.t).push({ index, name: player.n, positions: player.p.split('/'), rating: player.o, score });
+  });
+  const missing = [...clubs.keys()].filter(code => !pools.has(code));
+  if (missing.length) throw new Error(`${season}: no players for ${missing.join(', ')}`);
+  const strengthOf = pool => engineStrengthOf(startingFive(pool).five);
+  const before = new Map([...pools].map(([code, pool]) => [code, strengthOf(pool)]));
+  const level = mean([...before.values()]);
+  const { scale, targets } = resultsTargets({ ratings: Object.fromEntries([...clubs].map(([code, club]) => [code, club.srs])), reliability },
+    { mean: level, perPoint });
+  const moved = players.slice(), lines = [];
+  for (const [code, pool] of pools) {
+    const move = clubMoveOf(pool, targets[code], strengthOf, { bestFirst: (a, b) => b.rating - a.rating || b.score - a.score });
+    move.pool.forEach(player => { moved[player.index] = { ...players[player.index], o: player.rating }; });
+    lines.push([code, clubs.get(code).srs, targets[code], move.before, move.after, move.shift, move.plus]);
+  }
+  lines.sort((a, b) => b[2] - a[2] || byText(a[0], b[0]));
+  return { players: moved, move: { sigma, games: mean(rows.map(club => club.w + club.l)), reliability, perPoint, level, scale, clubs: lines } };
+}
+
+/**
+ * What a computed season's source says of how its ratings were made: the score, how it was fitted, the rule that puts it
+ * on NBA 2K's scale and, for a completed season, its clubs' move toward their results with the season's own constants
+ * (`move`, resultsMove's).
+ */
+export function computedConversion({ score, roster, spread }, move = null) {
+  const c = score.coefficients, points = Object.entries(score.allNba);
   const terms = SCORE_INPUTS.map(name => `${c[name] < 0 ? '-' : '+'} ${Math.abs(c[name])} * ${INPUT_NAMES[name]}`).join(' ');
-  return `computed: score = ${score.intercept} ${terms}, PER and WS/48 shrunk toward ${s.per} and ${s.ws48} by ${s.minutes} minutes, `
-    + `All-NBA ${points.map(([, value]) => value).join(', ')} for the ${points.map(([team]) => team).join(', ')} team; fitted by least squares on `
-    + `NBA 2K's overall (a z-score within each edition, ${editionOf(score.training.editions[0])} to ${editionOf(score.training.editions[1])}, 2K Archive) `
-    + `against each player's season before; each club's ${roster} players with the most minutes ranked by score and given `
-    + `${editionOf(spread.edition)}'s ratings of each club's ${spread.perClub} best, rank for rank`;
+  const before = ['', 'the season before', 'the two before it', 'the three before it'][score.window.length - 1] ?? `the ${score.window.length - 1} before it`;
+  const rated = `computed: score = ${score.intercept} ${terms}; PER, PPG, APG and DWS/G pooled over the season${before ? ` and ${before}` : ''}, `
+    + `weighted ${score.window.join(':')}, and shrunk toward the season's replacement level by a prior from their reliability between seasons; `
+    + `minutes share = minutes / (48 * the club's games), pooled the same way; All-NBA ${points.map(([, value]) => value).join(', ')} for the `
+    + `${points.map(([team]) => team).join(', ')} team; fitted by least squares on NBA 2K's overall (a z-score within each edition, `
+    + `${editionOf(score.training.editions[0])} to ${editionOf(score.training.editions[1])}, 2K Archive) against each player's seasons before; `
+    + `each club's ${roster} players with the most minutes ranked by score and given ${editionOf(spread.edition)}'s ratings of each club's `
+    + `${spread.perClub} best, rank for rank`;
+  if (!move) return rated;
+  const f = (value, digits) => value.toFixed(digits);
+  return `${rated}; then each club moved toward its results: target = ${f(move.level, 2)} + sqrt(${f(move.reliability, 3)}) * SRS / ${f(move.perPoint, 3)} `
+    + `(the season's mean strength before the move; SRS's reliability 1 - (${f(move.sigma, 2)}^2 / ${f(move.games, 0)}) / Var(SRS), the game-margin `
+    + `spread fitted to every computed season's records; the engine's margin a lineup point at the season's pace and offensive rating), every player `
+    + `shifted by a whole number and the best few one more, whichever brings the five the engine plays nearest its target`;
 }
 
 /**
  * The seasons of the manifest's `computed`, read from its pinned copy of Basketball-Reference's tables in
- * data-src/<folder>/: the score is fitted again on 2K Archive's whole table (`years`, NBA 2K12 its own) and checked
- * against the manifest's (checkScore), and so is the spread (checkSpread); each season is rated onto the spread
- * (rateComputedSeason) and its players put in the table's shape (computedSeasonPlayers). Each season's franchises must have Basketball-Reference's names for its
- * teams, and src/data/nbaLeagueAverages.js (`leagueAverages`) its league averages. The audit's checks rate the MyNBA
- * Eras seasons the same way and compare with 2K's own ratings (`sources`, readSeasonSources'). Returns
- * `{ seasons: { [year]: source }, summary }`, or null without a `computed`.
+ * data-src/<folder>/: each player season's inputs are taken over the score's window (valueInputs), the score is fitted
+ * again on 2K Archive's whole table (`years`, NBA 2K12 its own) and checked against the manifest's (checkScore, with how
+ * it does on each edition left out), and so is the spread (checkSpread); each season is rated onto the spread
+ * (rateComputedSeason), its players put in the table's shape (computedSeasonPlayers), and its clubs moved toward their
+ * real results (resultsMove: Basketball-Reference's SRS and records). Each season's franchises must have
+ * Basketball-Reference's names for its teams, and src/data/nbaLeagueAverages.js (`leagueAverages`) its league averages.
+ * The audit's checks rate the MyNBA Eras seasons by the same score and spread, unmoved, and compare with 2K's own ratings
+ * (`sources`, readSeasonSources'). Returns `{ seasons: { [year]: source }, summary }`, or null without a `computed`.
  */
 export async function readComputedSources(root, manifest, years, { arenas = {}, sources = {}, leagueAverages = {} } = {}) {
   const computed = manifest.computed;
@@ -956,10 +1190,10 @@ export async function readComputedSources(root, manifest, years, { arenas = {}, 
   const records = brefPlayerSeasons({ advanced: await text('advanced'), totals: await text('totals'), allStar: await text('allStar'),
     endOfSeason: await text('endOfSeason') }, computed.score.allNba);
   const career = new Map(readTable(await text('career'), ['player_id', 'pos'], 'Player Career Info.csv').map(row => [row.player_id, row.pos]));
-  const summaries = readTable(await text('summaries'), ['season', 'lg', 'team', 'abbreviation', 'srs', 'pace', 'o_rtg'], 'Team Summaries.csv')
+  const summaries = readTable(await text('summaries'), ['season', 'lg', 'team', 'abbreviation', 'w', 'l', 'srs', 'pace', 'o_rtg'], 'Team Summaries.csv')
     .filter(row => row.lg === 'NBA');
   const perGame = readTable(await text('perGame'), ['season', 'lg', 'team', 'pts_per_game'], 'Team Stats Per Game.csv').filter(row => row.lg === 'NBA');
-  const inputsOf = record => scoreInputs(record, computed.score);
+  const { inputsOf, priorsOf } = valueInputs(records, { window: computed.score.window, clubGames: clubGamesOf(summaries) });
   const scoreFor = scoreOf(computed.score);
   const fit = checkScore(trainingPairs(years, records, computed.score.training, inputsOf), computed.score);
   const spread = checkSpread(ratingSpread(years[String(computed.spread.edition)] || [], computed.spread.perClub), computed.spread.counts);
@@ -967,6 +1201,11 @@ export async function readComputedSources(root, manifest, years, { arenas = {}, 
   const options = { roster: computed.roster, inputsOf, scoreFor, spread };
   const codes = manifest.check?.codes ?? {};
   const back = Object.fromEntries(Object.entries(codes).map(([ours, theirs]) => [theirs, ours]));
+
+  // Each season's records, by the manifest's codes, and the game-margin spread of them all.
+  const recordsOf = year => new Map(summaries.filter(row => Number(row.season) === year && row.team !== 'League Average')
+    .map(row => [back[row.abbreviation] ?? row.abbreviation, { srs: Number(row.srs), w: Number(row.w), l: Number(row.l) }]));
+  const sigma = marginSigmaOf(computed.seasons.map(year => [...recordsOf(year).values()]));
 
   const seasons = {};
   for (const year of computed.seasons) {
@@ -988,10 +1227,16 @@ export async function readComputedSources(root, manifest, years, { arenas = {}, 
       throw new Error(`${label}: src/data/nbaLeagueAverages.js has ${JSON.stringify(game ?? null)}, Basketball-Reference ${JSON.stringify(averages ?? null)}`);
     }
     const { rated, unscored } = rateComputedSeason(records, year, options);
-    const { players, noPosition, namesakes, traded, scores } = computedSeasonPlayers(rated, { listed, career, careerPositions: computed.positions, codes });
-    seasons[year] = { computed: true, players, rows: rated.length + unscored.length, rated: rated.length,
+    const { players: ranked, noPosition, namesakes, traded, scores } = computedSeasonPlayers(rated, { listed, career, careerPositions: computed.positions, codes });
+    // Every computed season is a completed one: its clubs move toward their real results.
+    const results = recordsOf(year);
+    const { players, move } = resultsMove(ranked, results, label, sigma, scores);
+    const priors = priorsOf(year);
+    seasons[year] = { computed: true, players, ranked, move, rows: rated.length + unscored.length, rated: rated.length,
       unscored: unscored.map(record => `${record.name} (${back[record.team] ?? record.team})`), noPosition, namesakes, traded, scores,
-      srs: new Map(teams.map(row => [back[row.abbreviation] ?? row.abbreviation, Number(row.srs)])), averages };
+      srs: new Map([...results].map(([code, club]) => [code, club.srs])), averages,
+      priors: Object.fromEntries(Object.entries(priors).map(([name, prior]) => [name, { replacement: Number(prior.replacement.toPrecision(4)),
+        prior: Number(prior.prior.toPrecision(4)), reliability: three(prior.reliability), regulars: prior.regulars }])) };
   }
 
   // The same rule on the seasons NBA 2K27's MyNBA Eras rate, against 2K's own ratings of them.
@@ -1022,22 +1267,30 @@ export async function readComputedSources(root, manifest, years, { arenas = {}, 
   }
   return {
     seasons,
-    summary: { fit, spreadRatings: { edition: editionOf(computed.spread.edition), ratings: spread.length, quantiles: spreadQuantiles(spread) }, checks },
+    summary: { fit, spreadRatings: { edition: editionOf(computed.spread.edition), ratings: spread.length, quantiles: spreadQuantiles(spread) }, checks,
+      marginSigma: { points: two(sigma), seasons: computed.seasons.length } },
   };
 }
 
+/** The sample standard deviation of a list. */
+const sampleSd = values => Math.sqrt(values.reduce((sum, v) => sum + (v - average(values)) ** 2, 0) / (values.length - 1));
+
 /**
  * What the audit says of a computed season: its population and who was left out, every traded player and the club he
- * plays for, each five with each player's score, and how the clubs' strengths follow the season's real results
- * (Basketball-Reference's SRS), which the ratings never use.
+ * plays for, the priors its rates were shrunk by, its clubs' move toward their results (the season's constants and each
+ * club's SRS, target and strength before and after), each five with each player's score, and how the clubs' strengths
+ * (`str`) follow the season's SRS and spread, before the move (`unmoved`, the same players unmoved) and after.
  */
-function computedAudit(source, clubs, doc, teams) {
-  const codeOf = new Map(teams.map(team => [team.id, team.code]));
+function computedAudit(source, clubs, doc, teams, unmoved) {
+  const codeOf = new Map(teams.map(team => [team.id, team.code])), nameOf = new Map(teams.map(team => [team.code, team.name]));
   const scoreText = (club, name) => {
     const value = source.scores.get(`${codeOf.get(club.id)}|${name}`);
     if (value == null) throw new Error(`${club.name}: no score for ${name}`);
     return value.toFixed(3);
   };
+  const againstSrs = list => two(correlation(list.map(club => club.str), list.map(club => source.srs.get(codeOf.get(club.id)))));
+  const { move } = source;
+  const signed = (value, digits) => `${value >= 0 ? '+' : ''}${value.toFixed(digits)}`;
   return {
     label: doc.label,
     population: source.rows,
@@ -1047,7 +1300,14 @@ function computedAudit(source, clubs, doc, teams) {
     ...(source.namesakes.length ? { namesakes: source.namesakes } : {}),
     traded: source.traded,
     leagueAverages: source.averages,
-    clubsAgainstSRS: two(correlation(clubs.map(club => club.str), clubs.map(club => source.srs.get(codeOf.get(club.id))))),
+    priors: source.priors,
+    results: { sigma: two(move.sigma), games: move.games, reliability: three(move.reliability), perPoint: three(move.perPoint), level: two(move.level),
+      pointsPerSrs: Number(move.scale.toPrecision(4)) },
+    clubsAgainstSRS: againstSrs(clubs),
+    ...(unmoved ? { clubsAgainstSRSBeforeMove: againstSrs(unmoved) } : {}),
+    strengthSd: { ...(unmoved ? { beforeMove: two(sampleSd(unmoved.map(club => club.str))) } : {}), afterMove: two(sampleSd(clubs.map(club => club.str))) },
+    moves: move.clubs.map(([code, srs, target, before, after, shift, plus]) => `${nameOf.get(code)}: SRS ${signed(srs, 2)}, target ${target.toFixed(2)}; `
+      + `plays ${before.toFixed(2)} → ${after.toFixed(2)} (${signed(shift, 0)}${plus ? `, ${plus} best +1 more` : ''})`),
     fives: clubs.map(club => `${club.name} ${club.str}: ${club.squad.map(([name, positions, rating]) => `${name} ${positions} ${rating} (${scoreText(club, name)})`).join(', ')}`),
   };
 }

@@ -1934,18 +1934,23 @@ year>`, labelled 'Basketball-Reference (computed)'. 1983/84, 1991/92 and 1998/99
 keep their games' ratings (Claude's decision). No BAA, no ABA, no 1959/60.
 Claude's decisions here and below were taken that day under the user's request
 to cover every missing season; the user approved them with the release of 2026-11-10.
+On 2026-11-17 the 36 seasons were re-rated by the method the user adopted that
+day ([computed-ratings.md](computed-ratings.md)): each player's value pooled
+over three seasons, shrunk by priors the data measure and given his share of
+his club's minutes (steps 3 and 4 below), then each club moved toward its real
+results (step 5, **Toward results** below).
 
 - **Source.** Sumitro Datta's 'NBA Stats (1947-present)' on Kaggle, version 57
   (updated 1 November 2026): a CC0 copy of Basketball-Reference's regular
   seasons, downloaded anonymously from Kaggle's API on 2026-11-09. The
   manifest's `computed.files` pins seven of its tables by SHA-256 in
   `data-src/research-gaps/basketball/kaggle-sumitrodatta-v57/` (ignored):
-  Advanced (position, games, minutes, PER, WS/48, DWS), Player Totals (points,
+  Advanced (position, games, minutes, PER, DWS), Player Totals (points,
   rebounds, assists; the file `check` pins too), All-Star Selections, End of
   Season Teams (All-NBA), Player Career Info (career position), Team Summaries
-  (team names, SRS, the league's pace and offensive rating) and Team Stats Per
-  Game (the league's points a game). Nothing was fetched from
-  basketball-reference.com. PER, WS/48 and DWS are Basketball-Reference's own
+  (team names, records and SRS, the league's pace and offensive rating) and
+  Team Stats Per Game (the league's points a game). Nothing was fetched from
+  basketball-reference.com. PER, DWS and SRS are Basketball-Reference's own
   calculations, and Sports-Reference's data-use terms forbid scraping that harms
   its sites, building a competing database and AI training with its data, and
   say facts are not copyrightable; Claude chose on 2026-11-09 to use them,
@@ -1957,33 +1962,61 @@ to cover every missing season; the user approved them with the release of 2026-1
   (1947-present), Kaggle, CC0, version 57', url, rawScale: 99, method:
   'computed', conversion }`, `conversion` stating the whole rule; the loader
   requires `conversion` of an `nba-stats` season.
-- **The score.** One formula for every season, on inputs that exist from
-  1951/52: score = −1.91373 + 0.0541565 × PER′ + 0.342456 × WS/48′ +
-  0.00592352 × MPG + 0.00000972204 × MPG² + 0.0683889 × PPG + 0.0254284 × RPG +
-  0.0709854 × APG + 0.264524 × All-Star + 0.0486592 × All-NBA + 0.111944 × DWS.
-  PER′ and WS/48′ are shrunk toward a bench player's 11 and 0.050 by 400
-  minutes ((value × minutes + prior × 400) / (minutes + 400)), so a few good
-  minutes count for little; All-Star is 1 if picked, All-NBA 3, 2 or 1 for the
-  first, second or third team; every input is the player's whole season. Every
-  coefficient is positive.
+- **The score.** One formula for every season, by step 3 of the method
+  ([computed-ratings.md](computed-ratings.md#3-each-players-value)), on inputs
+  that exist from 1951/52: score = −2.26204 + 0.0759846 × PER + 0.0694096 ×
+  PPG + 0.0538217 × APG + 13.3768 × DWS/G + 0.682648 × minutes share +
+  0.228396 × All-Star + 0.0448952 × All-NBA.
+  - **Production.** PER (a rate a minute), points, assists and defensive win
+    shares a game, each pooled over the season and the two before it, weighted
+    3:2:1 (`score.window`): Σ weight × events ÷ Σ weight × exposure, a season he
+    did not play adding nothing, so four games count for little beside two full
+    seasons.
+  - **Shrinkage.** Each pooled rate is shrunk toward the season's replacement
+    level, the pooled rate of the quarter of its players with the least
+    exposure (`replacementRate`: a PER of about 10–11, 4–8 points a game), by a
+    prior the data measure: k = n̄(1 − rel) ÷ rel (`priorFromReliability`), rel
+    the rate's rank correlation between the season and the one before among the
+    players with a quarter of each season's games, n̄ their mean exposure. k is
+    one season's evidence, so it counts at the season's weight (× 3): a player
+    with nothing but the season is shrunk exactly as one season's record. In
+    1997/98 it is 2,157 minutes for PER (rel 0.70), 43 games for points (0.82),
+    24 for assists (0.89) and 87 for defensive win shares (0.70); in 1960/61,
+    735 minutes and 39, 33 and 35 games. Nothing is set by hand any more (the
+    one-season score shrank PER and WS/48 toward 11 and 0.050 by 400 minutes and
+    its rates a game not at all).
+  - **Selection.** His share of his club's minutes, minutes ÷ (48 × the club's
+    games), pooled over the same window, not shrunk.
+  - **Honours.** All-Star is 1 if picked, All-NBA 3, 2 or 1 for the first,
+    second or third team: the season's own.
+  - Every coefficient is positive. The one-season score's WS/48, rebounds and
+    minutes a game are gone: beside PER and defensive win shares their weights
+    turned negative, and dropping them cost nothing left out.
 - **Its fit.** The coefficients are the least-squares fit of NBA 2K's overall,
-  as a z-score within each edition, on those inputs from each player's season
-  before (2K rates a season's players from the season before): 2K Archive's NBA
-  2K (1999/00) to NBA 2K26 (2025/26), its own NBA 2K12 included, players matched
-  by name and, where two share one, by club: 9,970 pairs. In sample the score
-  correlates 0.904 with the z-scores (Spearman 0.876). The manifest fixes the
-  coefficients, the training editions (2000 to 2026), the spread's edition
-  (2027) and its 390 ratings (`spread.counts`); the build fits the score again
-  and stops if a coefficient differs at six significant figures or the spread
-  has moved, so a later copy of 2K Archive's page cannot move a season unseen.
-  The research pass measured it leaving each edition out in turn (its scratch
-  scripts, in `data-src/research-gaps/basketball/_scratch/`, reproduce every
-  figure): Spearman 0.882, Pearson 0.906, 2.51 points mean error (2.26 for each
-  club's top five), weakest on 2004/05 (0.81). Against the same season's launch
-  ratings it does worse (0.78, 3.38 points): launch ratings come before the
-  season they rate. A score on BPM gained nothing and cannot go before 1973/74;
-  age terms gained nothing and learn 2K's ageing; box-score facts alone (no PER,
-  WS or DWS) reach 0.871 but order clubs worse (0.53 to 0.66 against SRS).
+  as a z-score within each edition, on those inputs as of each player's season
+  before (the window ending there: 2K rates a season's players from the seasons
+  before): 2K Archive's NBA 2K (1999/00) to NBA 2K26 (2025/26), its own NBA
+  2K12 included, players matched by name and, where two share one, by club:
+  9,970 pairs. In sample the score correlates 0.913 with the z-scores (Spearman
+  0.889). The manifest fixes the coefficients, the window, the training editions
+  (2000 to 2026), the spread's edition (2027) and its 390 ratings
+  (`spread.counts`); the build fits the score again and stops if a coefficient
+  differs at six significant figures or the spread has moved, so a later copy of
+  2K Archive's page cannot move a season unseen.
+  - **Left out one edition at a time** (the build measures it, and the audit
+    keeps it as `fit.leaveOneEditionOut`): Spearman 0.895, Pearson 0.916,
+    weakest on 2001/02 and 2025/26 (0.83). The one-season score this replaced
+    reached 0.882 and 0.906 (weakest 2004/05, 0.81), as the research pass of
+    2026-11-09 measured it. Each change was adopted because it did not lower
+    that figure: the window alone took it to 0.888, shrinkage by measured priors
+    to 0.892, the minutes share to 0.895.
+  - **Earlier pass.** The research pass of 2026-11-09 found that a score against
+    the same season's launch ratings does worse (0.78, 3.38 points; launch ratings
+    come before the season they rate), that a score on BPM gained nothing and
+    cannot go before 1973/74, that age terms gained nothing and learn 2K's
+    ageing, and that box-score facts alone (no PER, WS or DWS) reached 0.871 but
+    ordered clubs worse (0.53 to 0.66 against SRS). Its scratch scripts are in
+    `data-src/research-gaps/basketball/_scratch/`.
 - **The ratings.** Each season, each club's 13 players with the most minutes
   are rated. A player traded during the season counts once, for the club he
   played the most minutes for (then the most games, then the earlier club):
@@ -1992,13 +2025,55 @@ to cover every missing season; the user approved them with the release of 2026-1
   player at rank quantile (rank − 0.5) / N takes NBA 2K27's rating at that
   quantile of its ratings of each club's 13 best (2K Archive's 2026/27 table: 390
   ratings from 69 to 97; 72 at 5%, 74 at 25%, 78 at the median, 81 at 75%, 90 at
-  95%). No player passes another, and every season has NBA 2K27's spread, as the
-  1990s hockey seasons have NHL 27's. No input is a team's result: no SRS,
-  record or point margin (Claude's decision of 2026-11-09: a team-results term
-  ordered clubs a little better, 0.75 to 0.87 against SRS, but would choose
-  ratings by real results). Basketball-Reference's defensive win shares, and so
-  WS/48, do start from each club's points allowed, so some of a club's defence
-  reaches its players' scores.
+  95%), as the 1990s hockey seasons take NHL 27's. Then each club moves toward
+  its results (next).
+- **Toward results.** By the user's decision of 2026-11-17 (the full results
+  shift, [computed-ratings.md](computed-ratings.md#decisions)), which replaces
+  Claude's rule of 2026-11-09 that no input be a team's result, every computed
+  season, each a completed one, moves its clubs toward their real results by
+  step 5 of the method (`resultsMove`):
+  - **Results strength.** S is Basketball-Reference's SRS (Team Summaries). The
+    copy keeps no game results, so `srsOf` cannot be fitted on games, and the
+    reliability is an approximation: r = 1 − (σ² ÷ games) ÷ Var(SRS), as if each
+    club's SRS were the mean of its games' margins about the fit, each with
+    spread σ. σ = 10.9 points, one figure fitted to the records of all 36
+    seasons (`marginSigmaOf`: each club's wins against Φ((SRS_i − SRS_j) ÷ σ)
+    averaged over the rest of its league, by binomial likelihood; a balanced
+    schedule is assumed and the home edge folds into σ). Fitted season by season
+    it jumps between 9 and 14 points from one season to the next, more than the
+    game changes, so a season's own fit is mostly noise. r runs from 0.70 in
+    1975/76, whose clubs' SRS spread least, to 0.96 in 1971/72.
+  - **Engine units.** m is the match engine's margin a lineup point under the
+    season's own rules (pace and offensive rating), measured by playing two
+    fives of 80s, one 2 or 4 points better or worse on every slot, 20,000 times
+    at each gap on a generator seeded by the season (`enginePerPoint`, with
+    `perPointOf`): from 2.05 points in 1966/67 to 1.65 in 1997/98.
+  - **Target.** T = μ + √r × S ÷ m (`resultsTargets`), μ the season's mean
+    strength before the move, so the league's level stays NBA 2K27's.
+  - **The strength moved** is the one the engine plays: the five `selectLineup`
+    picks from the club's 13, at its net efficiency (its offence lifts its own
+    points a possession, its defence lowers the other side's) against a five of
+    74s, in lineup points (`engineStrengthOf`). It differs from the five's mean
+    where its ratings differ by position: a point at a guard counts 0.21, at
+    small forward 0.20, at centre 0.20, at power forward 0.18.
+  - **Move.** Every player of the club by one whole number, and its best few
+    (by rating, then by score) one more, whichever brings that strength nearest
+    T (`clubMoveOf`); no player passes a teammate he was rated or scored below.
+    Every club ends within 0.12 of its target. Of the 703 clubs, 225 do not
+    move, 287 move one point either way and 138 two; 36 fall 3, 8 fall 4, and
+    one each 5 and 6; 7 rise 3. The largest falls: the 1996/97 Spurs −6 (David
+    Robinson, six games, rated on his seasons before; they went 20–62), the
+    1976/77 Celtics −5 (the 1975/76 champions' window, at 44–38), the 1964/65
+    Warriors −4 (Wilt Chamberlain's half season, 17–63), the Lakers −4 in
+    1968/69, 1969/70, 1970/71 and 1980/81 (stars rated on seasons before an
+    injury: Chamberlain played 12 games of 1969/70, Magic Johnson 37 of
+    1980/81), the 1982/83 Jazz, the 1992/93 Mavericks (11–71) and the 1994/95
+    Warriors −4. The rises of 3: the Bulls of 1990/91, 1995/96 (72–10) and
+    1996/97, the 1990/91 Magic, the 1992/93 SuperSonics, the 1993/94 Pacers and
+    the 1975/76 Cavaliers.
+  - A starter's rating now runs from 72 to 99 (NBA 2K27's 69 to 97, moved):
+    Kareem Abdul-Jabbar is 99 in 1971/72 (97, and the Bucks +2), Wilt
+    Chamberlain 93 for the 1964/65 Warriors (97, and −4).
 - **Positions and fives.** A player's first position is the season's
   (Basketball-Reference lists PG, SG, SF, PF or C), else the first his career
   position implies (G is PG/SG, F SF/PF, C C, G-F SG/SF, F-G SF/SG, F-C PF/C,
@@ -2014,35 +2089,47 @@ to cover every missing season; the user approved them with the release of 2026-1
   its league averages (pace, offensive rating and points a game) those of
   `src/data/nbaLeagueAverages.js`; the build stops otherwise. The audit gives
   how many players each season rates (its clubs' 13s by minutes, 8,884 player
-  seasons in all), every traded player and his club, each five with each
-  player's score, the season's league
-  averages, and how its clubs' strengths follow its real SRS. Run end to end on
-  the two seasons NBA 2K27's MyNBA Eras rate, the rule rates them as 2K does:
-  1983/84's 233 players whom both rate at Spearman 0.95, 1.94 points mean error
-  and 1.40 points too high on average; 1991/92's 297 at 0.94, 2.10 and 1.85. The
-  research pass found the same on 378 players of 2K27's 34 classic teams from
-  1964/65 to 1999/2000 (0.91 and 2.82 points; before 1980, 0.93 and 2.42): Jerry
-  West 93 against 2K's 93 in 1964/65, Kareem Abdul-Jabbar 97 against 97 in
-  1970/71. The bias is mostly bench players: 2K27's spread starts at 69, and the
+  seasons in all), every traded player and his club, the priors its rates were
+  shrunk by, its move (σ, r, m, μ, and each club's SRS, target and strength
+  before and after), each five with each player's score, the season's league
+  averages, and how its clubs' strengths follow its SRS and spread, before the
+  move and after. Run end to end on the two seasons NBA 2K27's MyNBA Eras rate
+  (before any move), the rule rates them as 2K does: 1983/84's 233 players whom
+  both rate at Spearman 0.94, 1.97 points mean error and 1.45 points too high on
+  average; 1991/92's 297 at 0.93, 2.11 and 1.81 (the one-season score: 0.95 and
+  0.94, 1.94 and 2.10). On 378 players of 2K27's 34 classic teams from 1964/65
+  to 1999/2000 it reaches 0.91 (0.92 before 1980; the one-season score 0.91 and
+  0.93). The bias is mostly bench players: 2K27's spread starts at 69, and the
   eras' benches reach the low 70s.
-- **Clubs.** A club's strength follows its season's SRS at 0.79 on average,
-  from 0.51 in 1964/65 (Wilt Chamberlain counts for the Warriors, who traded him
-  in January) and 0.56 in 1975/76 and 1976/77 to 0.93 in 1963/64 and 1966/67.
-  Strengths spread less than the games' seasons do (a standard deviation of 1.37
-  to 2.37 a season, against 1.80 to 3.70), so computed seasons play a little
-  more evenly. Spot checks, each the season's best record: the strongest clubs
-  are the 1961/62 Celtics (86, Bill Russell 93), the 1967/68 76ers (87, Wilt
-  Chamberlain 97), the 1971/72 Lakers (88: Jerry West 96, Chamberlain 91, Gail
-  Goodrich 90), the 1972/73 Celtics (89: Dave Cowens 96, John Havlicek 95) and
-  the 1982/83 76ers (88: Moses Malone 97, Julius Erving 94); Oscar Robertson is
-  92 as a rookie in 1960/61, and Kareem Abdul-Jabbar 97 in 1971/72.
+  - **The window costs a little there.** A two-season window weighted 3:1, its
+    score fitted the same way, did better on every check measured on 2026-11-17:
+    left out 0.896, the eras 0.95 and 0.94, classic teams 0.92 (0.93 before
+    1980), clubs against SRS before the move 0.82, smaller moves (one of −5 and
+    four of −4, against one each of −6 and −5 and eight of −4) and 60 starters
+    who played under 40% of their season's games, against 3:2:1's 84. The NBA
+    keeps the method's 3:2:1 as the user adopted it.
+- **Clubs.** Before the move a club's strength follows its season's SRS at 0.79
+  on average (Pearson's r), from 0.45 in 1975/76 and 0.48 in 1976/77 to 0.94 in
+  1989/90, as the one-season score's did (0.79, from 0.51 to 0.93); after it, at
+  0.99 (0.97 to 1.00). Strengths spread by a standard deviation of 1.29 to 3.32
+  a season (1.64 to 2.78 before the move, the one-season score's 1.37 to 2.37),
+  against the games' 1.80 to 3.70: each season now spreads as its results did,
+  so 1975/76 to 1978/79, whose records were close, stay narrow (1.29 to 1.59),
+  and 1971/72 and 1997/98 are the widest. Spot checks: the club with the
+  season's best SRS plays strongest (in 1968/69 the Knicks within 0.02 of the
+  next): the 1961/62 Celtics (87: Bill Russell 93, Bob Cousy 89), the 1967/68
+  76ers (87: Wilt Chamberlain 97, Hal Greer 91), the 1971/72 Lakers (89: Jerry
+  West 98, Chamberlain 95, Gail Goodrich 89), the 1972/73 Lakers (88, SRS 8.16:
+  the 68–14 Celtics' was 7.35), the 1982/83 76ers (87: Moses Malone 96, Julius
+  Erving 94), and the 72–10 Bulls of 1995/96 (90: Michael Jordan and Scottie
+  Pippen 99); Oscar Robertson is 90 as a rookie in 1960/61.
 - They play at their own league averages (127.7 possessions and 118.1 points a
   game in 1960/61, 115.1 and 112.4 in 1970/71, 90.3 and 95.6 in 1997/98), from
   the same CC0 copy (Team Summaries' League Average pace and ORtg, Team Stats Per
   Game's points), which the build checks against `src/data/nbaLeagueAverages.js`.
-  Played every pairing four times, their clubs score from 1.3 points a game
-  under the league (1960/61) to 1.6 over (1987/88), 0.7 over on average; the
-  games' seasons run from 2.1 under to 1.9 over. The match engine is unchanged
+  Played every pairing four times, their clubs score from 0.2 points a game over
+  the league (1965/66) to 1.9 over (1970/71), 1.0 over on average; the games'
+  seasons run from 2.1 under to 1.9 over. The match engine is unchanged
   (Claude's decision): see [Known limits](#known-limits).
 
 ### Era maps
@@ -2320,27 +2407,29 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
 - Basketball seasons have no national teams, and none before 1960/61 (the
   user's floor; no BAA or ABA). 36 of them are computed, not a game's ratings
   ([Computed seasons](#computed-seasons-196061-to-199798)), and their limits are
-  the score's:
+  the score's and the move's:
   - Specialists rate low and scorers on weak clubs high, as PER and win shares
     see them: in 1995/96 Dennis Rodman is not in the Bulls' five (Toni Kukoč
-    starts), so the 72–10 Bulls are only the fourth-strongest club (86, behind
-    Orlando's 89); in 1996/97 (69–13) four clubs match their 86, behind Houston
-    and Seattle; and nine clubs rate above the 63–19 champion Pistons of
-    1988/89 (84).
+    starts). Since 2026-11-17 each club's move toward its results sets its
+    level, so the 72–10 Bulls are the strongest club anyway (90; 86 and fourth
+    under the one-season score), but inside a club the order is still the
+    score's.
+  - Clubs follow SRS, not wins: the 60–22 Lakers of 1972/73 (SRS 8.16) play
+    stronger than the 68–14 Celtics (7.35), and the 63–19 champion Pistons of
+    1988/89 (6.24) fourth, behind Cleveland, Phoenix and the Lakers.
   - A player traded during a season counts only for the club he played the most
     minutes for, 5.6% of all starters: Wilt Chamberlain plays 1964/65 for the
     San Francisco Warriors, not the 76ers he finished it with; Clyde Drexler
     1994/95 for Portland, not the champion Rockets; Bob McAdoo 1976/77 for the
-    Knicks.
+    Knicks. The move pulls such a club toward its record with him in it: the
+    17–63 Warriors fall 4 points, Chamberlain to 93.
   - A club's 13 by minutes can hold a player who missed most of the season, and
-    he is rated on the games he played (PER and WS/48 are shrunk by minutes, his
-    points, rebounds and assists a game are not), so he starts all season: 56 of
-    the 3,515 starters played under 40% of the season's games, among them Bob
-    Rule (4 games in 1970/71, rated 85), Larry Bird (6 in 1988/89, 83) and David
-    Robinson (6 in 1996/97, 82).
-  - Club strengths spread less than the games' seasons (standard deviation 1.37
-    to 2.37 against 1.80 to 3.70), and follow real results least in 1964/65,
-    1975/76, 1976/77 and 1977/78 (0.51 to 0.61 against SRS).
+    the window rates him on his seasons before, as NBA 2K rates an injured player
+    on his talent, so he starts all season: 84 of the 3,515 starters played under
+    40% of the season's games (56 under the one-season score), among them Bob
+    Rule (4 games in 1970/71, rated 85), Larry Bird (6 in 1988/89, 91) and David
+    Robinson (6 in 1996/97, 90). The club's move then takes his teammates down
+    with the club: the 1996/97 Spurs' whole roster by 6 points.
   - Positions are Basketball-Reference's modern labels given retroactively, and
     the second position is derived. Names are Basketball-Reference's too, each
     player's latest: Kareem Abdul-Jabbar in 1969/70 and 1970/71, when he played
