@@ -1,7 +1,8 @@
 // The built-in earlier basketball seasons (docs/design/football-years.md, "Earlier basketball seasons"): the builder
 // on invented players (scripts/lib/nba-seasons.mjs), the readers of the seasons before NBA 2K (a 2kratings MyNBA Eras
 // page, NBA Live 99's dBase tables, Basketball-Reference's player seasons) and NBA Live 99's line on invented data, the
-// computed seasons' score, ranking and positions on invented statistics, the shipped seasons against their era maps,
+// computed seasons' value, score, ranking, positions and their clubs' move toward results on invented statistics, the
+// shipped seasons against their era maps,
 // the manifest and the audit, the loader's checks, and the running App: a season's Season row, its era's map, a launch
 // with its fives, and a save that resumes as it was played.
 import test from 'node:test';
