@@ -211,8 +211,9 @@ Three settings, one of them the user's call (see "Decisions"):
   0.80 in the median season. This holds after step 5; without it, the shipped seasons reach 0.60–0.82.
 - **Realism.** The realism harness (`npm run simulation:realism`) keeps win% spreads and scoring inside the sport's real
   ranges.
-- **Audits.** The roster audit (`npm run audit:rosters`) reports 0 errors; every season rebuilds byte for byte with
-  `--check`; the label and `source.conversion` are written.
+- **Audits.** Every season rebuilds byte for byte with `--check`; the label and `source.conversion` are written. The
+  roster audit (`npm run audit:rosters`) reports 0 errors once it reaches main; when this was written it sat on the
+  unmerged branch `claude/roster-validation-quality-0702ce`, with `npm run validate:football-elo`.
 
 ## Special cases
 
