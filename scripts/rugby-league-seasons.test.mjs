@@ -5,6 +5,7 @@
 // every overall recomputed from its snapshot, the club shift from the season's own results, the clubs and maps of each era.
 // Then the seasons before 1998, 1960–1997 and Super League's 1997 ("Computed seasons, 1960–1997"), computed from the
 // Rugby League Project's lists of who started, where and how often: the same checks, and the clubs and grounds of the day.
+// Each season plays its own day's points, scoring and extra time ("Rules by era"), its scoring the record's.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -14,25 +15,27 @@ import { SAVE_KEY } from '../src/config.js';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { CLUBS } from '../src/data/clubs.rugby-league.js';
 import { BUILT_IN_RUGBY_LEAGUE_SEASONS } from '../src/data/rugbyLeagueSeasons.js';
-import { buildClub, selectLineup } from '../src/data/teams.js';
+import { buildClub, hashStr, makeRng, selectLineup, teamEff } from '../src/data/teams.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import {
   BUILT_IN_SETS, builtInSeasonOf, decodeFootballSet, isEraMap, seasonMapOf, seasonSport, setHasClubs, setHasNations, setIsMapped, setKindOf,
   setSportOf, sportOf,
 } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
-import { rugbyLeague } from '../src/sports/rugbyLeague.js';
+import { NRL_LEAGUE_AVERAGES } from '../src/data/nrlLeagueAverages.js';
+import { marginPerStrength, rugbyLeague, rugbyLeagueIn, rulesOf } from '../src/sports/rugbyLeague.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { kmToPolys, pointInPolys } from './lib/domestic-partition.mjs';
 import { playerOf } from './lib/nrl.mjs';
 import {
   ATTRIBUTE_ORDER, CORE, CORE_REASONS, DEFAULTS, KEPT, NRLCOM_BENCH, NRLCOM_POSITION, PREVIOUS_WEIGHT, PRIMARY_POSITION, REASONS, RECORDED_SHARE, RLP_POSITION,
-  TEAM_RATING_PARTS, WEIGHTS, bornAlike, clubGamesOf, clubOf, clubShiftOf, corePoints, drawGames, findListed, fold, mapOf, matchRecord, mostStarted,
+  TEAM_RATING_PARTS, WEIGHTS, bornAlike, clubGamesOf, clubOf, clubShiftOf, corePoints, drawGames, findListed, fold, leagueOf, mapOf, matchRecord, mostStarted,
   nameParts, overallOf, playSeasons, positionScore, readOff, readRl2Database, referenceOf, rlpGrid, rlpName, rlpPlayer, rlpPositions, rlpResults,
   RLP_CLUB_CODES, RLP_LIST_POSITION, SELECTION, checkListAgainstResults, clubsByCode, mostStartedListed, rlpRepresentative, rlpSeasonList, rlpSquadGames,
   rlpSurname, seasonFigures, seasonIdOf, seasonKeyOf, seasonPlayers, seasonValue, selectionValue, shifted, spearman, srsOf, statCensus, teamRatingOf, teamsOf,
-  tookField,
+  tookField, expectedWins, SPREAD, bestFirst, builtInStrengths, clubMoveOf, clubSquadOf, modelStrengthOf, spreadTargets,
 } from './lib/rugby-league-seasons.mjs';
+import { cachedList, leagueFigures, leagueScoring, rlpListTotals, seasonClubs, solveScoring } from './lib/nrl-league.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 import { colourFor } from './lib/club-identity.mjs';
 
@@ -408,12 +411,15 @@ test('the loader refuses an NRL season that is not the builder\'s', () => {
 
 // ---------- the season played ----------
 
+/** A season's own rules (rugbyLeagueIn): its day's points and extra time at its scoring. */
+const rulesOfSeason = id => rugbyLeagueIn({ dataSet: id, dataYear: MANIFEST.seasons.find(season => season.id === id).year });
+
 test("the 2008 clubs play NRL-like seasons; their order, a check only, comes nearer 2008's with the shift", () => {
-  const report = playSeasons(DOC.clubs, { seasons: 40, seed: 20261108 });
+  const report = playSeasons(DOC.clubs, { seasons: 40, seed: 20261108, sport: rulesOfSeason('nrl-2008') });
   const real = SNAPSHOT.real.figures;
   assert.deepEqual([real.games, real.bestWins, real.worstWins, real.draws], [192, 17, 5, 1], 'the real 2008 regular season, from RLP');
   assert.deepEqual(SNAPSHOT.real.ladder[0].slice(0, 4), ['nrl-melbourne-storm', 17, 0, 7], 'Melbourne the minor premiers');
-  assert.ok(report.pointsPerTeam > 19 && report.pointsPerTeam < 26, `points a team ${report.pointsPerTeam}`);
+  assert.ok(Math.abs(report.pointsPerTeam - real.pointsPerTeam) < 0.6, `points a team ${report.pointsPerTeam}, 2008's ${real.pointsPerTeam}`);
   assert.ok(report.marginMean > 12 && report.marginMean < 19, `mean margin ${report.marginMean}`);
   assert.ok(report.winPctSd > 0.12 && report.winPctSd < 0.23, `win% SD ${report.winPctSd}`);
   assert.ok(report.bestWins > 15 && report.bestWins < 22 && report.worstWins > 2 && report.worstWins < 8);
@@ -469,7 +475,7 @@ test('the computed seasons are 1998 to 2007 and 2009 to 2024: one method, clubs 
     assert.equal(meta.source.rawScale, undefined, 'no game\'s scale');
     assert.equal(meta.source.metric, METRIC[season.year] ?? ELEVEN, season.id);
     assert.match(meta.source.conversion, new RegExp(`^No game rated the ${season.year} season`));
-    assert.match(meta.source.conversion, /the season's results set each club's level, while its players keep their order/);
+    assert.match(meta.source.conversion, /the season's results set each club's level and how far apart the clubs play, while its players keep their order/);
     assert.equal(setHasNations(season.id), false, 'clubs only: a nations game plays the built-in nations');
   }
   // The seasons 2009–2024 read as they did before 1998–2007 joined: their formula names no stat NRL.com did not record.
@@ -650,8 +656,11 @@ test('every computed overall recomputes from its snapshot: value, percentile at 
   }
 });
 
-test("each computed club moves by its season's Simple Rating System, read off the built-in clubs' strengths; its players keep their order", () => {
-  const reference = CLUBS.map(club => club.str).sort((a, b) => a - b);
+test("each computed club moves by its season's Simple Rating System, spread as its own results were; its players keep their order", () => {
+  // Every target meets the built-in 2025 clubs' model strengths on average.
+  const reference = builtInStrengths(CLUBS).sort((a, b) => a - b);
+  const mean = round(reference.reduce((s, x) => s + x, 0) / reference.length, 3);
+  assert.equal(mean, 83.883);
   // The seasons before 1998 move their clubs the same way.
   for (const [id, snapshot] of [...SNAPSHOTS, ...SELECTED_SNAPSHOTS]) {
     const games = snapshot.real.games.map(([, home, away, homeScore, awayScore]) => ({ home, away, homeScore, awayScore }));
@@ -659,23 +668,40 @@ test("each computed club moves by its season's Simple Rating System, read off th
     assert.deepEqual(snapshot.real.figures, figures, `${id}: the real season's figures are its games'`);
     assert.deepEqual(snapshot.real.ladder.map(([club, won, drawn, lost]) => [club, won, drawn, lost]).sort(),
       Object.entries(records).map(([club, r]) => [club, r.won, r.drawn, r.lost]).sort());
-    const { ratings, homeEdge } = srsOf(games);
-    assert.equal(snapshot.conversion.clubShift.homeEdge, homeEdge, id);
-    assert.deepEqual(snapshot.conversion.clubShift.reference, reference, "the built-in 2025 NRL clubs' strengths");
+    const fit = srsOf(games);
+    const { clubShift } = snapshot.conversion;
+    assert.deepEqual([clubShift.homeEdge, clubShift.sigma, clubShift.reliability], [fit.homeEdge, fit.sigma, fit.reliability], id);
+    assert.deepEqual([clubShift.reference, clubShift.mean], [reference, mean], "the built-in 2025 NRL clubs' model strengths");
     const rows = snapshot.players.map(rowOf);
+    // Its tries a team game: before 1998 its list's try rate, from 1998 its placed players' tries over its games.
+    const { year } = MANIFEST.seasons.find(season => season.id === id);
+    const tries = snapshot.source.basis === 'selection' ? snapshot.conversion.selection.tryRate
+      : round(rows.reduce((sum, row) => sum + row.sums[KEPT.indexOf('tries')], 0) / snapshot.source.games / 2, 4);
+    assert.deepEqual([clubShift.tries, clubShift.tryPoints, clubShift.matched], [tries, rulesOf(year).tryPoints, SPREAD.matched], id);
+    const spread = spreadTargets(fit, { mean, tries, tryPoints: clubShift.tryPoints });
+    assert.deepEqual([clubShift.margin, clubShift.scale], [spread.margin, spread.scale], id);
+    assert.ok(Math.abs(clubShift.margin - 0.9 * marginPerStrength(tries, clubShift.tryPoints)) < 1e-4);
     const doc = DOCS.get(id) ?? SELECTED_DOCS.get(id);
     for (const club of snapshot.clubs) {
       const { team } = club;
-      assert.equal(team.srs, ratings[club.id], `${id}: ${club.id}'s SRS from the season's own games`);
-      assert.equal(team.target, round(readOff(ratings[club.id], Object.values(ratings), reference), 2), `${id}: ${club.id}'s target`);
-      const pool = rows.filter(row => row.club === club.id).map(row => ({ name: row.name, pos: row.pos, rating: row.overall }));
-      assert.deepEqual(clubShiftOf(pool, team.target), { shift: team.shift, before: team.strength, after: team.shifted }, `${id}: ${club.id}'s shift`);
-      assert.ok(rows.filter(row => row.club === club.id).every(row => row.shift === team.shift), 'one whole number for all its players');
-      assert.ok(Math.abs(team.shifted - team.target) <= 0.5 + 1e-9, `${id}: ${club.id} within half a point of its target`);
-      assert.equal(doc.clubs.find(c => c.id === club.id).str, team.shifted, 'the season plays the shifted strength');
+      assert.equal(team.srs, fit.ratings[club.id], `${id}: ${club.id}'s SRS from the season's own games`);
+      assert.equal(team.target, spread.targets[club.id], `${id}: ${club.id}'s target`);
+      const at = rows.filter(row => row.club === club.id);
+      const move = clubMoveOf(at.map(row => ({ id: row.nrlId, name: row.name, pos: row.pos, rating: row.overall, value: row.value })), team.target);
+      assert.deepEqual([move.shift, move.plus, move.before, move.after, move.rating], [team.shift, team.plus, team.strength, team.shifted, team.rating],
+        `${id}: ${club.id}'s move`);
+      // Every player his club's whole number, its `plus` best one more: nobody passes a player rated above him.
+      const best = new Set(move.best);
+      assert.ok(at.every(row => row.shift === team.shift + (best.has(row.nrlId) ? 1 : 0)), `${id}: ${club.id}: one whole number, its best one more`);
+      assert.ok(at.every(a => at.every(b => !(a.overall > b.overall) || a.overall + a.shift >= b.overall + b.shift)), `${id}: ${club.id} keeps its order`);
+      assert.ok(Math.abs(team.shifted - team.target) <= 0.06, `${id}: ${club.id} within six hundredths of its target`);
+      assert.equal(modelStrengthOf(at.map(row => ({ name: row.name, pos: row.pos, rating: row.overall + row.shift }))), team.shifted);
+      assert.equal(doc.clubs.find(c => c.id === club.id).str, team.rating, 'the season shows the moved matchday 17\'s rating');
     }
     const bySrs = snapshot.clubs.slice().sort((a, b) => a.team.srs - b.team.srs);
     assert.ok(bySrs.every((club, i) => !i || club.team.target >= bySrs[i - 1].team.target), `${id}: the SRS order is the targets' order`);
+    // The moved model strengths keep the SRS's order but where two targets lie within a step of each other.
+    assert.ok(spearman(snapshot.clubs.map(club => club.team.shifted), snapshot.clubs.map(club => club.team.srs)) >= 0.98, id);
   }
   // The SRS on three clubs: margins fit exactly, ratings summing to zero, a home edge.
   const fit = srsOf([{ home: 'a', away: 'b', homeScore: 30, awayScore: 10 }, { home: 'b', away: 'a', homeScore: 12, awayScore: 20 },
@@ -683,6 +709,59 @@ test("each computed club moves by its season's Simple Rating System, read off th
     { home: 'a', away: 'c', homeScore: 26, awayScore: 6 }, { home: 'c', away: 'a', homeScore: 10, awayScore: 22 }]);
   assert.equal(round(Object.values(fit.ratings).reduce((s, r) => s + r, 0), 6), 0);
   assert.ok(fit.ratings.a > fit.ratings.b && fit.ratings.b > fit.ratings.c && fit.homeEdge > 0, JSON.stringify(fit));
+  // Its reliability: 1 when every margin fits, none when the ratings are no wider than their games' luck.
+  const exact = srsOf([['a', 'b', 20, 10], ['b', 'a', 10, 16], ['b', 'c', 14, 10], ['c', 'b', 12, 12], ['a', 'c', 22, 10], ['c', 'a', 10, 18]]
+    .map(([home, away, homeScore, awayScore]) => ({ home, away, homeScore, awayScore })));
+  assert.deepEqual([exact.sigma, exact.reliability], [0, 1], JSON.stringify(exact));
+  const luck = srsOf([['a', 'b', 30, 0], ['b', 'a', 30, 0], ['b', 'c', 2, 30], ['c', 'b', 30, 0], ['a', 'c', 0, 30], ['c', 'a', 0, 32]]
+    .map(([home, away, homeScore, awayScore]) => ({ home, away, homeScore, awayScore })));
+  assert.ok(luck.sigma > 25 && luck.reliability === 0, JSON.stringify(luck));
+  // The spread: a club a point a game better than average plays √reliability ÷ (0.9 × marginPerStrength) points above it.
+  const spread = spreadTargets({ ratings: { a: 4, b: -4 }, reliability: 0.81 }, { mean: 83, tries: 4, tryPoints: 4 });
+  assert.deepEqual(spread.targets, { a: round(83 + 4 * 0.9 / spread.margin, 2), b: round(83 - 4 * 0.9 / spread.margin, 2) });
+  assert.equal(spread.margin, round(0.9 * 2 * 0.14 * 4 * (4 + 2 * 0.755), 4));
+  // The move: a whole number for all and one more for the best few, nearest the target, the smaller move of two as near.
+  const pool = DOCS.get('nrl-2016').clubs[0].squad.map(([name, pos, rating], i) => ({ id: i, name, pos, rating, value: 1 / (i + 1) }));
+  const start = modelStrengthOf(pool);
+  assert.deepEqual(clubMoveOf(pool, start), { shift: 0, plus: 0, before: start, after: start, rating: clubSquadOf(pool).lineup.rating, best: [] });
+  const up = clubMoveOf(pool, start + 1.5);
+  assert.ok(up.shift === 1 && up.plus > 0 && Math.abs(up.after - start - 1.5) <= 0.06 && up.best.length === up.plus, JSON.stringify(up));
+  assert.deepEqual(up.best, pool.slice().sort(bestFirst).slice(0, up.plus).map(p => p.id), 'the best take the extra point');
+});
+
+test("the spread's 0.9 is the match model's: its margin for a point of strength over the first order, over its luck against the real game's", () => {
+  // Every pairing of six seasons' clubs, 300 games each way under the season's rules, its margins as the league counted
+  // them: the slope of their mean on the gap in model strength, against marginPerStrength, and their spread about that
+  // mean, against the season's own (`sigma`, its margins about its Simple Rating System).
+  const ratios = [];
+  for (const id of ['nrl-1965', 'nrl-1977', 'nrl-1990', 'nrl-2005', 'nrl-2016', 'nrl-2024']) {
+    const snapshot = SNAPSHOTS.get(id) ?? SELECTED_SNAPSHOTS.get(id), sport = rulesOfSeason(id);
+    const clubs = seasonClubs(root, id), eff = clubs.map(teamEff);
+    const strength = new Map(snapshot.clubs.map(club => [club.id, club.team.shifted]));
+    let sxy = 0, sxx = 0, squares = 0, games = 0;
+    for (let i = 0; i < clubs.length; i++) {
+      for (let j = 0; j < clubs.length; j++) {
+        if (i === j) continue;
+        const prepared = sport.prepareMatch(clubs[i], clubs[j], eff[i], eff[j]);
+        const rng = makeRng(hashStr(`${id}|spread|${i}|${j}`));
+        const margins = Array.from({ length: 300 }, () => {
+          const result = sport.sampleResult(rng, prepared, 6);
+          return sport.rules.golden ? result.ga - result.gd : result.regA - result.regD;
+        });
+        const mean = margins.reduce((s, m) => s + m, 0) / margins.length, gap = strength.get(clubs[i].id) - strength.get(clubs[j].id);
+        sxy += gap * mean;
+        sxx += gap * gap;
+        squares += margins.reduce((s, m) => s + (m - mean) ** 2, 0);
+        games += margins.length;
+      }
+    }
+    const { tries, tryPoints, sigma } = snapshot.conversion.clubShift;
+    const slope = sxy / sxx / marginPerStrength(tries, tryPoints), luck = Math.sqrt(squares / games) / sigma;
+    assert.ok(slope > 0.85 && slope < 1.05 && luck > 0.9 && luck < 1.25, `${id}: slope ${slope.toFixed(3)}, luck ${luck.toFixed(3)}`);
+    ratios.push(slope / luck);
+  }
+  const mean = ratios.reduce((s, r) => s + r, 0) / ratios.length;
+  assert.ok(Math.abs(mean - SPREAD.matched) < 0.04, `${ratios.map(r => r.toFixed(3)).join(', ')}: ${mean.toFixed(3)} against ${SPREAD.matched}`);
 });
 
 // The clubs of each computed season: twenty in 1998, seventeen in 1999, fourteen in 2000 and 2001, fifteen from 2002,
@@ -863,6 +942,9 @@ test("the seasons before 1998 are 1960 to 1997 and Super League's 1997: computed
     assert.ok(meta.source.conversion.startsWith(`Players: everyone the Rugby League Project lists as taking the field in the ${competition}'s ${season.year} premiership`), season.id);
     assert.equal(setHasNations(season.id), false, 'clubs only');
     assert.equal(doc.clubs.length, EARLY_CLUBS(season.id), season.id);
+    // Every club plays in the premiership of its day, which the setup and the campaign name (leagueOf).
+    assert.equal(leagueOf(MANIFEST, seasonKeyOf(season)), competition, season.id);
+    assert.deepEqual([...new Set(doc.clubs.map(club => club.league))], [competition], `${season.id}: every club in the ${competition}`);
     // RLP's season: the NSWRFL's to 1983, the NSWRL's to 1994, the ARL's, Super League's.
     assert.equal(season.rlp.season, season.id === 'nrl-sl-1997' ? 'super-league-1997'
       : `${season.year <= 1983 ? 'nswrfl' : season.year <= 1994 ? 'nswrl' : 'arl'}-${season.year}`);
@@ -871,6 +953,10 @@ test("the seasons before 1998 are 1960 to 1997 and Super League's 1997: computed
   assert.deepEqual([seasonKeyOf(SELECTED.at(-1)), seasonKeyOf(SELECTED.find(season => season.id === 'nrl-1997')), mapOf(MANIFEST, 'nrl-sl-1997')],
     ['nrl-sl-1997', 1997, 'sl1997']);
   assert.deepEqual([setKindOf('nrl-sl-1997'), setSportOf('nrl-sl-1997'), setKindOf('nrl-1960')], ['nrl', 'rugby-league', 'nrl']);
+  // The league a season was: its manifest entry's competition before 1998, the NRL from then.
+  assert.deepEqual([1960, 1983, 1984, 1994, 1995, 1997, 'nrl-sl-1997', 1998, 2008, 2024].map(key => leagueOf(MANIFEST, key)),
+    ['NSWRFL', 'NSWRFL', 'NSWRL', 'NSWRL', 'ARL', 'ARL', 'Super League', 'NRL', 'NRL', 'NRL']);
+  assert.throws(() => leagueOf(MANIFEST, 1959), /No rugby league season 1959 in the manifest/);
 });
 
 test('the Rugby League Project\'s lists: starts by position, the bench no start, surnames as they are written, clubs by their codes', () => {
@@ -1002,7 +1088,14 @@ test('the maps of 1960–1997: every club holds where it grows from, Sydney\'s a
   };
   for (const map of early) {
     const entry = CLUB_MAPS.find(e => e.id === map.id);
-    assert.deepEqual([entry.sport, entry.league, entry.clubs, entry.venue, entry.lines], ['rugby-league', 'NRL', EARLY_CLUBS(seasonIdOf(map.seasons[0])), 'ground', 'state or region']);
+    // Each map names its seasons' premiership, one to a map: its file, its index entry (the setup's theatre) and its
+    // attribution.
+    const competitions = [...new Set(map.seasons.map(key => competitionOf(SELECTED.find(season => seasonKeyOf(season) === key))))];
+    assert.equal(competitions.length, 1, `${map.id}: ${competitions.join(' and ')}`);
+    assert.deepEqual([entry.sport, entry.league, entry.clubs, entry.venue, entry.lines],
+      ['rugby-league', competitions[0], EARLY_CLUBS(seasonIdOf(map.seasons[0])), 'ground', 'state or region']);
+    assert.equal(JSON.parse(read(`public/domestic/${map.id}.json`)).league, competitions[0], `${map.id}: the file's league`);
+    assert.ok(read(`public/domestic/ATTRIBUTION-${map.id}.txt`).startsWith(`${competitions[0]} map of the seasons ${entry.seasons.join(', ')} `), map.id);
     assert.deepEqual(entry.seasons, map.seasons.map(seasonIdOf));
     const teams = teamsOf(MANIFEST, map.seasons[0]);
     const decoded = maps.get(map.id);
@@ -1028,22 +1121,105 @@ test('the maps of 1960–1997: every club holds where it grows from, Sydney\'s a
 test('the computed seasons play NRL-like seasons whose order, set by the season\'s results, is the real one', () => {
   for (const year of [1998, 2002, 2010, 2016, 2020, 2023]) {
     const id = `nrl-${year}`, snapshot = SNAPSHOTS.get(id), doc = DOCS.get(id);
-    const report = playSeasons(doc.clubs, { seasons: 40, seed: 20261108 });
-    assert.ok(report.pointsPerTeam > 19 && report.pointsPerTeam < 26, `${id}: points a team ${report.pointsPerTeam}`);
+    const report = playSeasons(doc.clubs, { seasons: 40, seed: 20261108, sport: rulesOfSeason(id) });
+    // Its own scoring: 20.1 points a team in 1998, 24.1 in 2002.
+    assert.ok(Math.abs(report.pointsPerTeam - snapshot.real.figures.pointsPerTeam) < 0.6,
+      `${id}: points a team ${report.pointsPerTeam}, the season's ${snapshot.real.figures.pointsPerTeam}`);
     assert.ok(report.marginMean > 12 && report.marginMean < 20, `${id}: mean margin ${report.marginMean}`);
-    assert.ok(report.winPctSd > 0.12 && report.winPctSd < 0.24, `${id}: win% SD ${report.winPctSd}`);
+    // Its standings spread as its own did: 2010's level (0.131), 2020's apart (0.226).
+    assert.ok(Math.abs(report.winPctSd - snapshot.real.figures.winPctSd) < 0.035, `${id}: win% SD ${report.winPctSd}, the season's ${snapshot.real.figures.winPctSd}`);
     const wins = new Map(snapshot.real.ladder.map(([club, won, drawn]) => [club, won + drawn / 2]));
     const rho = spearman(report.clubs.map(club => club.wins), report.clubs.map(club => wins.get(club.id)));
     assert.ok(rho >= 0.6, `${id}: the model's wins rank against the real season's at ${rho.toFixed(2)}`);
   }
-  // Every season: the shifted strengths follow the season's Simple Rating System, which the shift reads, at 0.9 or better,
-  // far closer than the stats alone, and rank against the real wins at 0.6 or better. Margins and wins part most in 2007
-  // (the Cowboys won 15 of 24 and conceded more than they scored): there the SRS itself ranks against the wins at 0.73.
+  // Every season: the moved model strengths follow the season's Simple Rating System, which the move reads, at 0.98 or
+  // better, far closer than the stats alone, and rank against the real wins at 0.7 or better. Margins and wins part most
+  // in 2007 (the Cowboys won 15 of 24 and conceded more than they scored): there the SRS itself ranks against the wins at
+  // 0.73. The matchday 17's rating the season shows weighs the bench as the starters, as the model does not: in a level
+  // season it orders neighbours otherwise, 0.7 or better against the SRS.
   for (const [id, snapshot] of SNAPSHOTS) {
     const bySrs = key => spearman(snapshot.clubs.map(club => club.team[key]), snapshot.clubs.map(club => club.team.srs));
-    assert.ok(bySrs('shifted') >= 0.9 && bySrs('shifted') > bySrs('strength'), `${id}: shifted ${bySrs('shifted')}, stats ${bySrs('strength')} against the SRS`);
+    assert.ok(bySrs('shifted') >= 0.98 && bySrs('shifted') > bySrs('strength'), `${id}: shifted ${bySrs('shifted')}, stats ${bySrs('strength')} against the SRS`);
+    assert.ok(bySrs('rating') >= 0.7, `${id}: the rating shown ${bySrs('rating')} against the SRS`);
     const audit = AUDITS.get(id);
-    assert.ok(audit.strengthAndResults.shifted >= 0.6, `${id}: ${JSON.stringify(audit.strengthAndResults)}`);
+    assert.ok(audit.strengthAndResults.shifted >= 0.7, `${id}: ${JSON.stringify(audit.strengthAndResults)}`);
+  }
+});
+
+// ---------- rules by era ----------
+
+test('each earlier season\'s scoring is its record\'s: its regular season\'s points, its tries and field goals', () => {
+  assert.deepEqual(Object.keys(NRL_LEAGUE_AVERAGES).sort(), MANIFEST.seasons.map(season => season.id).sort(), 'every earlier season, and no other');
+  for (const season of MANIFEST.seasons) {
+    const snapshot = JSON.parse(read(`scripts/data/rugby-league-seasons/${season.id}.json`));
+    const league = NRL_LEAGUE_AVERAGES[season.id];
+    assert.equal(league.points, snapshot.real.figures.pointsPerTeam, `${season.id}: the regular season's points`);
+    if (season.basis === 'selection') {
+      // RLP's list counts the tries the ratings read (the snapshot's try rate, over all the season's games), here at the
+      // regular season's level.
+      assert.ok(Math.abs(league.tries / snapshot.conversion.selection.tryRate - 1) < 0.03, `${season.id}: ${league.tries} v ${snapshot.conversion.selection.tryRate}`);
+      assert.ok(league.fieldGoals >= 0 && league.fieldGoals < 1, `${season.id}: ${league.fieldGoals} field goals`);
+    } else if (season.method === 'computed') {
+      const { tries, fieldGoals } = leagueFigures(snapshot);
+      assert.deepEqual([league.tries, league.fieldGoals], [tries, fieldGoals], `${season.id}: NRL.com's stats, as the snapshot keeps them`);
+    } else assert.deepEqual(Object.keys(league), ['points', 'scoring'], `${season.id} keeps no stats: its points alone`);
+    const { scoring } = league;
+    assert.ok(scoring.tries > 0.4 && scoring.tries < 1.2 && scoring.penalties >= 0 && scoring.penalties < 2.5, `${season.id}: ${JSON.stringify(scoring)}`);
+    assert.ok(scoring.fieldGoals >= 0 && scoring.fieldGoals <= 1 && scoring.openFieldGoals >= 0 && scoring.openFieldGoals < 1);
+  }
+  // Nobody kicked a field goal in 1960; the four-tackle rule (1967) made one the last tackle's play, a field goal and a half
+  // a game, until it was worth one point (1971); 1986 kicked the most of the one-pointers' seasons.
+  assert.deepEqual(['nrl-1960', 'nrl-1968', 'nrl-1971', 'nrl-1986'].map(id => NRL_LEAGUE_AVERAGES[id].fieldGoals), [0, 0.743, 0.081, 0.233]);
+  assert.deepEqual(['nrl-1960', 'nrl-1968'].map(id => NRL_LEAGUE_AVERAGES[id].scoring.fieldGoals), [0, 1]);
+  assert.ok(NRL_LEAGUE_AVERAGES['nrl-1968'].scoring.openFieldGoals > 0.5, 'most of 1968\'s field goals came in open play');
+  // The scoring is the solver's (node scripts/build-nrl-league.mjs --check solves every season again): the sixties' three
+  // parts, extra time's ARL of 1997, and 2008's points alone.
+  for (const id of ['nrl-1968', 'nrl-1997', 'nrl-2008']) {
+    const { year } = MANIFEST.seasons.find(season => season.id === id), { scoring, ...target } = NRL_LEAGUE_AVERAGES[id];
+    assert.deepEqual(solveScoring(id, year, seasonClubs(root, id), target, { games: 16000 }), { ...scoring }, id);
+  }
+});
+
+test('the league figures recompute from the Rugby League Project\'s pinned lists', { skip: !cached && 'the inputs (data-src/rugby-league-seasons/) are not on this computer' }, () => {
+  for (const season of SELECTED) {
+    const figures = leagueFigures(SELECTED_SNAPSHOTS.get(season.id), cachedList(root, season.rlp.season, SOURCES));
+    const { points, tries, fieldGoals } = NRL_LEAGUE_AVERAGES[season.id];
+    assert.deepEqual([figures.points, figures.tries, figures.fieldGoals, figures.from], [points, tries, fieldGoals, 'rlp'], season.id);
+  }
+  // Each list adds up as its day scored: a try three points to 1982 and four from 1983, a field goal two to 1970.
+  const listOf = slug => rlpListTotals(readFileSync(new URL(`../data-src/rugby-league-seasons/rlp/seasons/${slug}/players.html`, import.meta.url), 'utf8'));
+  for (const [slug, tryPoints, fieldGoalPoints] of [['nswrfl-1968', 3, 2], ['nswrfl-1975', 3, 1], ['nswrl-1985', 4, 1], ['nswrl-1986', 4, 1]]) {
+    const totals = listOf(slug);
+    assert.equal(totals.points, tryPoints * totals.tries + 2 * totals.goals + fieldGoalPoints * totals.fieldGoals, slug);
+  }
+  // From 1986 the lists give the kicks each goal came from.
+  assert.deepEqual([listOf('nswrl-1985').kicks, listOf('nswrl-1986').kicks > listOf('nswrl-1986').goals], [null, true]);
+});
+
+test('every earlier season scores like its record under its own day\'s rules', () => {
+  for (const season of MANIFEST.seasons) {
+    const sport = rulesOfSeason(season.id), league = NRL_LEAGUE_AVERAGES[season.id];
+    const measured = leagueScoring(sport, seasonClubs(root, season.id), { games: 4000, seed: `${season.id}:test` });
+    assert.ok(Math.abs(measured.points - league.points) < 0.45, `${season.id}: ${measured.points.toFixed(2)} points a team, its league's ${league.points}`);
+    if (league.tries != null) {
+      assert.ok(Math.abs(measured.tries - league.tries) < 0.1, `${season.id}: ${measured.tries.toFixed(2)} tries a team, its league's ${league.tries}`);
+      assert.ok(Math.abs(measured.fieldGoals - league.fieldGoals) < 0.05, `${season.id}: ${measured.fieldGoals.toFixed(3)} field goals, its league's ${league.fieldGoals}`);
+    }
+    // Before golden point, a game level at full time (a draw in the league) plays extra time, at most three periods.
+    if (!sport.rules.golden) assert.ok(measured.level > 0.01 && measured.level < 0.06 && measured.longest <= 3, `${season.id}: ${JSON.stringify(measured)}`);
+  }
+});
+
+test('the model ranks each computed season\'s clubs as its record does, by their expected wins', () => {
+  // The seasons whose clubs' expected wins rank lowest against their record (docs/design/rugby-league.md, "The spread"):
+  // 2007, when margins and wins parted most, and the level seasons of 1980, 1986 and 2009. A tally swaps close neighbours
+  // from one seed to the next, a club's expected wins do not.
+  for (const id of ['nrl-1980', 'nrl-1986', 'nrl-2007', 'nrl-2009']) {
+    const doc = JSON.parse(read(`public/rugby-league/${id}.json`)), snapshot = JSON.parse(read(`scripts/data/rugby-league-seasons/${id}.json`));
+    const wins = new Map(snapshot.real.ladder.map(([club, won]) => [club, won]));
+    const expected = expectedWins(doc.clubs, { sport: rulesOfSeason(id), samples: 1000, seed: id });
+    const rho = spearman(expected.map(club => club.wins), expected.map(club => wins.get(club.id)));
+    assert.ok(rho >= 0.6, `${id}: the model's expected wins rank against the real ones at ${rho.toFixed(2)}`);
   }
 });
 
@@ -1239,6 +1415,10 @@ test('a 1975 clubs campaign launches on the map of 1973–1976 with its twelve c
     assert.equal(st.phase, 'playing');
     assert.deepEqual([st.settings.dataSet, st.settings.dataVersion, st.settings.dataYear, st.settings.clubScope, st.settings.domesticVersion],
       ['nrl-1975', doc.version, 1975, 'domestic:nrl1973', CLUB_MAPS.find(entry => entry.id === 'nrl1973').version]);
+    // Its matches play 1975's rules: three-point tries, one-point field goals, extra time.
+    const rules = app.sport();
+    assert.deepEqual({ ...rules.rules }, { ...rulesOfSeason('nrl-1975').rules });
+    assert.deepEqual([rules.rules.tryPoints, rules.rules.fieldGoalPoints, rules.rules.golden, rules.labels.tie], [3, 1, false, 'EXTRA TIME']);
     assert.deepEqual(Object.keys(st.teams).sort(), doc.clubs.map(club => club.id).sort());
     assert.equal(Object.keys(st.teams).length, 12);
     for (const club of doc.clubs) {
@@ -1267,9 +1447,36 @@ test('a 1975 clubs campaign launches on the map of 1973–1976 with its twelve c
     app.startCampaign();
     const st = app.state;
     assert.deepEqual([st.phase, st.settings.dataSet, st.settings.dataYear, st.settings.clubScope], ['playing', 'nrl-sl-1997', 1997, 'domestic:sl1997']);
+    assert.equal(app.sport().rules.season, 'nrl-sl-1997', 'Super League\'s own scoring, not the ARL\'s');
     assert.deepEqual(Object.keys(st.teams).sort(), sl.clubs.map(club => club.id).sort());
     assert.deepEqual(['nrl-perth-reds', 'nrl-hunter-mariners'].map(id => st.teams[id].name), ['Perth Reds', 'Hunter Mariners']);
   });
+});
+
+test('the setup and the campaign name each season\'s premiership: the NSWRFL\'s 1962, the ARL\'s and Super League\'s 1997, the NRL from 1998', async () => {
+  for (const [id, map, count, league] of [['nrl-1962', 'nrl1960', 10, 'NSWRFL'], ['nrl-1990', 'nrl1990', 16, 'NSWRL'], ['nrl-1997', 'nrl1997', 12, 'ARL'],
+    ['nrl-sl-1997', 'sl1997', 10, 'Super League'], ['nrl-1998', 'nrl1998', 20, 'NRL'], ['nrl-2024', 'nrl', 17, 'NRL']]) {
+    const season = id.match(/\d{4}$/)[0];
+    await withApp(async ({ app, time }) => {
+      app.pickSetup('sport', 'rugby-league');
+      app.pickSetup('dataSet', id);
+      time.advance(200);
+      await Promise.all([app.loadCountry(map), app.loadSet(id)]);
+      await settle();
+      const model = modelOf(app);
+      // The sport card counts the season's clubs, the theatre is its premiership's, and the map card names it.
+      assert.equal(model.sports.find(sport => sport.id === 'rugby-league').note, `${count} ${league} clubs`, id);
+      assert.deepEqual(model.scopes.map(row => [row.id, row.label, row.count]), [[`domestic:${map}`, league, count]], id);
+      assert.equal(model.scopeName, `${league} · Australia and New Zealand`, id);
+      assert.match(model.countryNote, new RegExp(` lead the ${count} ${league} clubs fighting over Australia and New Zealand, `), id);
+      app.startCampaign();
+      const st = app.state;
+      assert.equal(st.phase, 'playing', id);
+      assert.equal(st.campaignName, `Rugby league ${season} · ${league} · Australia and New Zealand`, id);
+      assert.equal(app.mapOverlaysModel().titleCard.title, `${league} · Australia and New Zealand · ${season}`, id);
+      assert.ok(Object.values(st.teams).every(team => team.conf === league), `${id}: every club in the ${league}`);
+    });
+  }
 });
 
 test('a computed 2023 clubs campaign plays on today\'s map, with the Dolphins', async () => {

@@ -1,8 +1,8 @@
 // The baseball seasons no game rated, 1960 to 2017, computed from the players' WAR (docs/design/baseball.md, "Seasons
 // before 2018: computed from WAR"): their snapshots and calibration, the ratings rank for rank on MLB The Show's scale,
 // the clubs and nations of each season, the franchise eras and their maps (a ballpark renamed in place keeps its map;
-// the Angels of 1962-65 and the Yankees of 1974-75, tenants of another club's ballpark, grow from their own), the
-// loader and the App, which plays a 1961 season with its clubs on the map of 1961.
+// the Angels of 1962-65 and the Yankees of 1974-75, tenants of another club's ballpark, grow from their own), each club's
+// move toward its real record, the loader and the App, which plays a 1961 season with its clubs on the map of 1961.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
@@ -12,7 +12,7 @@ import { SAVE_KEY } from '../src/config.js';
 import { BUILT_IN_BASEBALL_SEASONS } from '../src/data/baseballSeasons.js';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { nationTheatres } from '../src/data/scopes.js';
-import { selectLineup } from '../src/data/teams.js';
+import { buildClub, hashStr, makeRng, selectLineup } from '../src/data/teams.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import {
   BUILT_IN_SETS, decodeFootballSet, fieldedNations, seasonLabelOf, seasonMapOf, seasonSport, setHasClubs, setHasNations, setIsMapped, setKindOf,
@@ -22,7 +22,8 @@ import { parseCampaign } from '../src/engine/storage.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { readChallenge } from '../src/screens/setup/challenge.js';
 import { kmToPolys, pointInPolys } from './lib/domestic-partition.mjs';
-import { nationOfBirthCountry, rateByRank, teamsOfWar, warScoreOf, warSeasonIdOf } from './lib/mlb-war.mjs';
+import { baseball, baseballOfSeason, seasonPremium } from '../src/sports/baseball.js';
+import { nationOfBirthCountry, rateByRank, resultsMove, teamsOfWar, warScoreOf, warSeasonIdOf } from './lib/mlb-war.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -163,15 +164,129 @@ test('the computed seasons look like their years: Mantle and Mays in 1961, the O
   assert.equal(seasonFile(1969).clubs[0].name, 'Baltimore Orioles');
   assert.equal(seasonFile(1975).clubs[0].name, 'Cincinnati Reds');
   assert.equal(seasonFile(1998).clubs[0].name, 'New York Yankees');
-  // Club strength follows the real records: r 0.82 on average over the 58 seasons.
+  // Club strength follows the real records: r 0.94 on average over the 58 seasons once each club has moved toward its
+  // record (0.82 from the players alone), 0.89 at the least (2014).
   const rs = YEARS.map(year => {
     const { teams } = snapshotOf(year);
     const clubs = teamsOfWar(FRANCHISES, MANIFEST, year);
     const doc = seasonFile(year);
     return pearson(clubs.map(t => doc.clubs.find(c => c.id === t.id).str), clubs.map(t => teams[t.war].w / (teams[t.war].w + teams[t.war].l)));
   });
-  assert.ok(rs.reduce((s, r) => s + r, 0) / rs.length >= 0.75, `mean r ${rs}`);
+  assert.ok(rs.reduce((s, r) => s + r, 0) / rs.length >= 0.92 && Math.min(...rs) >= 0.85, `r ${rs}`);
   assert.deepEqual(AUDIT.seasons.map(season => season.id), [...YEARS].reverse().map(warSeasonIdOf));
+});
+
+// ---------- each club's move toward its record ----------
+
+test('each club moves toward its record: every player by one whole number, the lineup\'s best few by one more, nobody passing a teammate', () => {
+  for (const year of [1961, 1984, 1991, 2004, 2017]) {
+    const list = rows(year);
+    const unmoved = rateByRank(list, REFERENCE.reference, snapshotOf(year).clubs, REFERENCE.teamSeasons);
+    const audit = AUDIT.seasons.find(season => season.id === warSeasonIdOf(year));
+    const doc = seasonFile(year);
+    const teams = teamsOfWar(FRANCHISES, MANIFEST, year);
+    for (const club of doc.clubs) {
+      const war = teams.find(team => team.id === club.id).war;
+      // The squad's players by the name the season gives them (a namesake's alias where it has one).
+      const own = list.filter(row => row.club === war);
+      const squad = club.squad.map(([name, , rating]) => {
+        const row = own.find(r => r.alias === name) ?? own.find(r => r.name === name);
+        return { name, before: unmoved.get(row.id), after: rating };
+      });
+      const deltas = squad.filter(p => p.after > 1 && p.after < 99).map(p => p.after - p.before);
+      const shift = Math.min(...deltas);
+      assert.ok(deltas.every(d => d === shift || d === shift + 1), `${year} ${club.name}: moves ${[...new Set(deltas)]}`);
+      const line = audit.moves.find(move => move.startsWith(`${club.name} `));
+      assert.match(line, new RegExp(`; ${shift > 0 ? `\\+${shift}` : shift < 0 ? `−${-shift}` : '±0'} each`), line);
+      for (const a of squad) for (const b of squad) {
+        if (a.before > b.before) assert.ok(a.after >= b.after, `${year} ${club.name}: ${b.name} passes ${a.name}`);
+      }
+    }
+    // The strength the match model plays follows the record exactly; the conversion says how, with the season's constants.
+    assert.ok(audit.playedVsRecord >= 0.999 && audit.strengthVsRecord > audit.strengthVsRecordBefore, `${year}`);
+    assert.match(doc.source.conversion, /Then each club moves toward its real won-lost record/);
+    assert.ok(doc.source.conversion.includes(`r ${audit.results.reliability.toFixed(3)},`) && doc.source.conversion.includes(`m ${audit.results.perPoint.toFixed(4)},`),
+      `${year}: the conversion states the move's constants`);
+    assert.ok(audit.results.perPoint > 0.022 && audit.results.perPoint < 0.027, `${year}: m ${audit.results.perPoint}`);
+  }
+  // Moves of −5 to +4 points a player, most within two.
+  const shifts = AUDIT.seasons.flatMap(season => season.moves.map(move => /; ([+−±])(\d+) each/.exec(move)).map(([, sign, n]) => (sign === '−' ? -1 : 1) * Number(n)));
+  assert.equal(shifts.length, 1522);
+  assert.ok(Math.min(...shifts) >= -5 && Math.max(...shifts) <= 4 && shifts.filter(s => Math.abs(s) <= 2).length > 0.9 * shifts.length);
+});
+
+test('a club\'s target is μ + √r × (W% − ½) × (n − 1)/n ÷ m, and the extra point goes to the lineup before the bench', () => {
+  // Two leagues: a club's share counts against the others of its own league, never itself.
+  const player = (id, rating) => ({ id, rating });
+  const clubs = [
+    { id: 'a', league: 'AL', w: 60, l: 40, pool: [player('a1', 70), player('a2', 70), player('a3', 90)] },
+    { id: 'b', league: 'AL', w: 50, l: 50, pool: [player('b1', 70), player('b2', 70), player('b3', 70)] },
+    { id: 'c', league: 'AL', w: 40, l: 60, pool: [player('c1', 70), player('c2', 70), player('c3', 70)] },
+    { id: 'd', league: 'NL', w: 55, l: 45, pool: [player('d1', 70), player('d2', 70), player('d3', 70)] },
+    { id: 'e', league: 'NL', w: 45, l: 55, pool: [player('e1', 70), player('e2', 70), player('e3', 70)] },
+  ];
+  // The first two of each pool play; the third, however good, sits on the bench.
+  const lineupOf = pool => new Set(pool.filter(p => /[12]$/.test(p.id)).map(p => p.id));
+  const strengthOf = pool => (pool.find(p => /1$/.test(p.id)).rating + pool.find(p => /2$/.test(p.id)).rating) / 2;
+  const order = (x, y) => y.rating - x.rating || (x.id < y.id ? -1 : 1);
+  const perPoint = 0.025;
+  const { level, reliability, moves } = resultsMove(clubs, { perPoint, strengthOf, order, lineupOf });
+  assert.equal(level, 70);
+  const shares = [0.6, 0.5, 0.4, 0.55, 0.45];
+  const luck = shares.reduce((s, p) => s + p * (1 - p) / 100, 0) / 5, mean = 0.5;
+  const spread = shares.reduce((s, p) => s + (p - mean) ** 2, 0) / 5;
+  assert.ok(Math.abs(reliability - (1 - luck / spread)) < 1e-12);
+  const target = (share, n) => 70 + Math.sqrt(reliability) * (share - 0.5) * (n - 1) / n / perPoint;
+  [target(0.6, 3), target(0.5, 3), target(0.4, 3), target(0.55, 2), target(0.45, 2)].forEach((t, i) => assert.ok(Math.abs(moves[i].target - t) < 1e-9));
+  // Club a (target 70 + √r × 2.67) moves its lineup; its bench player gets the shift alone, never the extra point first.
+  const a = moves[0];
+  assert.ok(Math.abs(a.after - a.target) <= 0.5);
+  const rated = Object.fromEntries(a.pool.map(p => [p.id, p.rating]));
+  assert.equal(rated.a3, 90 + a.shift);
+  assert.ok([rated.a1, rated.a2].every(r => r === 70 + a.shift || r === 71 + a.shift));
+});
+
+test('played as their leagues played, the moved seasons\' standings spread as the real ones did', () => {
+  // Each club against its own league only, as many games as it played, 40 seasons of each: the win% spread a season
+  // against the real one (the Databank's records).
+  const sims = [], reals = [];
+  for (const year of YEARS) {
+    const doc = seasonFile(year), snapshot = snapshotOf(year), teams = teamsOfWar(FRANCHISES, MANIFEST, year);
+    const clubs = doc.clubs.map(club => buildClub(club, baseball));
+    const sport = baseballOfSeason(year, seasonPremium(clubs));
+    const leagueOf = clubs.map(club => snapshot.teams[teams.find(team => team.id === club.id).war].league);
+    const records = Object.values(snapshot.teams);
+    const games = Math.round(records.reduce((s, t) => s + t.w + t.l, 0) / records.length);
+    const rng = makeRng(hashStr(`leagues ${year}`));
+    const prepared = new Map();
+    let spread = 0;
+    for (let season = 0; season < 40; season++) {
+      const wins = clubs.map(() => 0), played = clubs.map(() => 0);
+      for (const league of ['AL', 'NL']) {
+        const at = clubs.map((club, i) => i).filter(i => leagueOf[i] === league);
+        for (let g = 0; g < games * at.length / 2; g++) {
+          // A random pairing of the league each game: every club plays about as many as it really did.
+          const i = at[Math.floor(rng() * at.length)];
+          let j = at[Math.floor(rng() * (at.length - 1))];
+          if (j === i) j = at[at.length - 1];
+          const key = `${i}:${j}`;
+          if (!prepared.has(key)) prepared.set(key, sport.prepareMatch(clubs[i], clubs[j]));
+          const { winner } = sport.sampleResult(rng, prepared.get(key), 6);
+          wins[winner === clubs[i].id ? i : j]++;
+          played[i]++; played[j]++;
+        }
+      }
+      const shares = wins.map((w, i) => w / played[i]);
+      const m = shares.reduce((s, x) => s + x, 0) / shares.length;
+      spread += Math.sqrt(shares.reduce((s, x) => s + (x - m) ** 2, 0) / shares.length) / 40;
+    }
+    const real = records.map(t => t.w / (t.w + t.l)), mr = real.reduce((s, x) => s + x, 0) / real.length;
+    sims.push(spread);
+    reals.push(Math.sqrt(real.reduce((s, x) => s + (x - mr) ** 2, 0) / real.length));
+  }
+  const gap = sims.reduce((s, x, i) => s + Math.abs(x - reals[i]), 0) / sims.length;
+  assert.ok(gap < 0.003, `the spreads are ${gap.toFixed(4)} from the real ones on average`);
+  assert.ok(pearson(sims, reals) > 0.95, `r ${pearson(sims, reals)}`);
 });
 
 test('nations by birthplace: four in 1960, the Databank\'s countries placed, one corrected, nobody without a birthplace', () => {

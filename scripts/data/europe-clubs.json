@@ -593,6 +593,7 @@
     "f-reggiana": {"city":"Reggio Emilia","home":[10.6497,44.7147],"source":"d380-1164"},
     "f-reggina": {"city":"Reggio Calabria","home":[15.644,38.0936],"source":"by hand"},
     "f-rennes": {"city":"Rennes","home":[-1.7128,48.1074],"source":"d250-884"},
+    "f-rfc-seraing": {"city":"Seraing","home":[5.5122,50.5986],"source":"d056-216"},
     "f-rio-ave": {"city":"Vila do Conde","home":[-8.7402,41.3628],"source":"d620-2383"},
     "f-rio-ave-fc": {"city":"Vila do Conde","home":[-8.7402,41.3628],"source":"d620-2383"},
     "f-rio-ave-futebol-clube": {"city":"Vila do Conde","home":[-8.7402,41.3628],"source":"d620-2383"},

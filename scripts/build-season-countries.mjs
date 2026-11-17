@@ -1,10 +1,12 @@
 // The earlier football seasons' own country maps (docs/design/domestic-campaigns.md, "Earlier seasons"): each season
 // with clubs gets a map of every country whose clubs its source rates, at least ten of them, each holding that season's
 // top clubs of the country (as many as its tier takes, src/data/domesticTiers.js) with that season's players. England's
-// map of 2010/11 holds FIFA 11's 89 English league clubs, its map of 2020/21 FIFA 21's.
+// map of 2010/11 holds FIFA 11's 89 English league clubs, its map of 2020/21 FIFA 21's. An EA season whose season has a
+// CM 01/02 Update Team database (scripts/data/cm0102-updates.json) also gets a map of every country that database rates
+// ten clubs of and the EA edition does not, with that database's clubs and players (since 17 November 2026).
 //
 // Usage:
-//   node scripts/build-season-countries.mjs --homes [--data=<dir>] [--retro-data=<dir>]
+//   node scripts/build-season-countries.mjs --homes [--data=<dir>] [--retro-data=<dir>] [--cm-data=<dir>]
 //       find every season club's home: today's map of its country, the Europe maps, Wikidata's and GeoNames' cached
 //       answers (data-src/domestic/) and the hand overrides (scripts/data/season-club-locations.json); writes
 //       scripts/data/season-club-homes.json, where a club it already lists keeps its home unless an override names it
@@ -18,6 +20,7 @@
 // homes above, and the boundary caches of scripts/build-domestic.mjs (data-src/boundaries/).
 import { existsSync } from 'node:fs';
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { availableParallelism } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { format } from 'node:util';
@@ -25,6 +28,8 @@ import { isMainThread, parentPort, Worker, workerData } from 'node:worker_thread
 import path from 'node:path';
 import { NATIONS, buildClub, selectLineup } from '../src/data/teams.js';
 import { expandSetPlayer, setHasClubs } from '../src/engine/footballSets.js';
+import { buildFootballSet } from '../src/data/footballSetBuild.js';
+import { TOP_CLUBS } from '../src/data/scopes.js';
 import { createBoundarySource, createDownloader, GB_CITATION } from './lib/domestic-boundaries.mjs';
 import { buildCountry, logging } from './lib/domestic-build.mjs';
 import { createWikidata, ensureGeonames } from './lib/domestic-locate.mjs';
@@ -63,7 +68,7 @@ const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
  * Every season with clubs, newest first, each `{ id, year, edition, source, kind, clubs }` (scripts/lib/season-country-clubs.mjs):
  * the EA seasons' from `dataDir`, the seasons before them (Championship Manager's and SWOS's) from `retroDir`.
  */
-async function seasonClubs(dataDir, retroDir) {
+async function seasonClubs(dataDir, retroDir, cmDir) {
   const manifest = JSON.parse(await readFile(path.join(root, 'scripts/data/ea-seasons.json'), 'utf8'));
   const rows = await readExport(manifest.dataset, path.join(dataDir, 'ea-leone', manifest.dataset.file));
   const ea = await buildClubSeasons(manifest, { root, dataDir, rows, assemble: (records, info) => eaSeasonClubs(records, info) });
@@ -73,7 +78,37 @@ async function seasonClubs(dataDir, retroDir) {
     const result = await buildRetroSeason(season, retroDir, season.retrieved ?? retro.retrieved, { everyClub: true });
     before.push(retroSeasonClubs(result));
   }
-  return [...ea, ...before].sort((a, b) => b.year - a.year);
+  return [...ea, ...await updateTeamFills(ea, cmDir), ...before].sort((a, b) => b.year - a.year || Number(!!a.fills) - Number(!!b.fills));
+}
+
+/**
+ * The CM 01/02 Update Team's database of each EA season's season (scripts/data/cm0102-updates.json, its tables in
+ * `cmDir`/cm0102/<release>/Data/, scripts/sync-cm0102-updates.mjs), read by the CM 01/02 builder with every club, as
+ * that EA season's fill: its maps are the countries the EA edition rates too few clubs of (seasonFields). Each table
+ * must have its pinned size and SHA-256. Shipped by the user's choice of 2026-11-17, credited to the Update Team.
+ */
+async function updateTeamFills(eaSeasons, cmDir) {
+  const updates = JSON.parse(await readFile(path.join(root, 'scripts/data/cm0102-updates.json'), 'utf8'));
+  const fills = [];
+  for (const season of eaSeasons) {
+    const label = `${season.year - 1}/${String(season.year % 100).padStart(2, '0')}`;
+    const release = updates.releases.find(entry => entry.season === label);
+    if (!release) continue;
+    const files = {};
+    for (const file of release.files) {
+      const at = path.join(cmDir, 'cm0102', release.id, 'Data', file.name);
+      if (!existsSync(at)) throw new Error(`${at} is missing: node scripts/sync-cm0102-updates.mjs fetches it (or --zip=<the release you downloaded>)`);
+      const bytes = await readFile(at);
+      if (bytes.length !== file.bytes || createHash('sha256').update(bytes).digest('hex') !== file.sha256) throw new Error(`${at} is not the pinned ${release.id} table`);
+      files[file.name] = new Uint8Array(bytes);
+    }
+    const result = buildFootballSet(files, { local: false, everyClub: true, topClubs: TOP_CLUBS,
+      sourceExtra: { compiler: 'CM 01/02 Update Team', provenance: release.zip.item ?? 'the champman0102.co.uk forum, downloaded by the user',
+        retrieved: release.retrieved ?? updates.retrieved } });
+    if (result.doc.season !== label) throw new Error(`${release.id} is the database of ${result.doc.season}, not ${label}`);
+    fills.push({ ...retroSeasonClubs(result), id: season.id, year: season.year, fills: season.id, release: release.id });
+  }
+  return fills;
 }
 
 /** A club's strength as the game computes it from its season's players (its lineup's rating). */
@@ -83,13 +118,16 @@ const strengthOf = season => club => selectLineup(buildClub({ ...club,
 /**
  * The season's country fields with their clubs' ids: a club the season file has (the Europe maps' clubs) keeps its id
  * there, every other one takes `f-<slug of its name>`, with a number after it when another club of the season has that
- * id already (as the season builders do).
+ * id already (as the season builders do). A fill (updateTeamFills) keeps only the countries its EA season's own fields
+ * (`primary`, this function's answer for it) lack, and numbers its ids after theirs. → { fields, short, ids }
  */
-async function seasonFields(season) {
+async function seasonFields(season, primary = null) {
   const { fields, short } = countryFields(season.clubs, strengthOf(season));
+  if (primary) for (const country of primary.fields.keys()) fields.delete(country);
   const file = JSON.parse(await readFile(path.join(seasonDir, `${season.id}.json`), 'utf8'));
-  const known = new Map(file.clubs.map(club => [`${club.country}:${club.name}`, club.id]));
-  const taken = new Set(file.clubs.map(club => club.id));
+  // A fill's players are another source's, so none of its clubs takes a season file club's id.
+  const known = new Map(primary ? [] : file.clubs.map(club => [`${club.country}:${club.name}`, club.id]));
+  const taken = new Set([...file.clubs.map(club => club.id), ...(primary?.ids ?? [])]);
   for (const list of fields.values()) {
     for (const club of list) {
       club.id = known.get(`${club.country}:${club.name}`) ?? null;
@@ -104,7 +142,27 @@ async function seasonFields(season) {
     taken.add(id);
     club.id = id;
   }
-  return { fields, short };
+  const ids = [...taken, ...[...fields.values()].flat().map(club => club.id)];
+  return { fields, short: primary ? short.filter(entry => !primary.fields.has(entry.country)) : short, ids };
+}
+
+/**
+ * Every season's fields, a fill's after its EA season's (seasonFields): Map(season object → { fields, short, ids }).
+ * `onlySeasons` limits it to those seasons (a fill comes with its EA season, whose fields it needs).
+ */
+async function everySeasonFields(seasons, onlySeasons = null) {
+  const out = new Map(), byId = new Map();
+  for (const season of seasons.filter(entry => !entry.fills)) {
+    if (onlySeasons && !onlySeasons.includes(season.id)) continue;
+    const result = await seasonFields(season);
+    out.set(season, result);
+    byId.set(season.id, result);
+  }
+  for (const season of seasons.filter(entry => entry.fills)) {
+    if (!byId.has(season.fills)) continue;
+    out.set(season, await seasonFields(season, byId.get(season.fills)));
+  }
+  return out;
 }
 
 // ---- Homes ----
@@ -128,12 +186,15 @@ async function snapshotOf(country) {
  * club's entry to find its home again.
  */
 async function findHomes(seasons) {
-  const strongest = new Map();
-  for (const season of seasons) {
-    const { fields } = countryFields(season.clubs, strengthOf(season));
+  const strongest = new Map(), shortOf = new Map();
+  for (const [, { fields }] of await everySeasonFields(seasons)) {
     for (const [country, clubs] of fields) {
       const names = strongest.get(country) || strongest.set(country, new Map()).get(country);
-      for (const club of clubs) names.set(club.name, Math.max(names.get(club.name) ?? -Infinity, club.str));
+      for (const club of clubs) {
+        names.set(club.name, Math.max(names.get(club.name) ?? -Infinity, club.str));
+        // A short name the season's source gives (the Update Team's "Vasco" for "Clube de Regatas Vasco da Gama").
+        if (club.short && club.short !== club.name && !shortOf.has(`${country}|${club.name}`)) shortOf.set(`${country}|${club.name}`, club.short);
+      }
     }
   }
   const overrides = await readJson(overridesFile, { clubs: {} });
@@ -142,7 +203,8 @@ async function findHomes(seasons) {
   const locate = { wikidata: createWikidata({ cacheDir: locateCache }), geoFiles: ensureGeonames(locateCache) };
   const out = {};
   for (const country of [...strongest.keys()].sort(byText)) {
-    const clubs = [...strongest.get(country)].sort((a, b) => b[1] - a[1] || byText(a[0], b[0])).map(([name]) => ({ name }));
+    const clubs = [...strongest.get(country)].sort((a, b) => b[1] - a[1] || byText(a[0], b[0]))
+      .map(([name]) => ({ name, short: shortOf.get(`${country}|${name}`) ?? null }));
     const kept = previous[country] || {}, own = overrides.clubs[country] || {};
     const keeps = name => Object.hasOwn(kept, name) && !Object.hasOwn(own, name);
     const found = await locateSeasonClubs({ nation: nationOf(country), clubs: clubs.filter(({ name }) => !keeps(name)), snapshot: await snapshotOf(country),
@@ -166,9 +228,9 @@ const HOMES_ABOUT = 'Where each club of the earlier seasons\' country maps stand
 
 // ---- Building ----
 
-// The GeoNames country of a nation a season rates ten clubs of but today's maps do not have (SWOS's Suriname); Scotland,
-// Wales and Northern Ireland take theirs from LOCATE_REGIONS.
-const UNMAPPED_GEONAMES = Object.freeze({ 740: { country: 'SR', admin1: null } });
+// The GeoNames country of a nation a season rates ten clubs of but today's maps do not have (SWOS's Suriname, the Update
+// Team's 2025/26 Philippines); Scotland, Wales and Northern Ireland take theirs from LOCATE_REGIONS.
+const UNMAPPED_GEONAMES = Object.freeze({ 740: { country: 'SR', admin1: null }, 608: { country: 'PH', admin1: null } });
 
 /** The GeoNames country and region of a nation, as its snapshot names them (Scotland's: the United Kingdom's, Scotland's region). */
 async function geonamesOf(country) {
@@ -183,9 +245,7 @@ async function geonamesOf(country) {
 /** The jobs: one per season and country, `{ id, snapshot, season }` as buildCountry takes them (without `season.expand`). */
 async function mapJobs(seasons, homes, { only, onlySeasons }) {
   const jobs = [], short = [];
-  for (const season of seasons) {
-    if (onlySeasons && !onlySeasons.includes(season.id)) continue;
-    const { fields, short: below } = await seasonFields(season);
+  for (const [season, { fields, short: below }] of await everySeasonFields(seasons, onlySeasons)) {
     short.push(...below.map(entry => ({ season: season.id, ...entry })));
     for (const [country, clubs] of fields) {
       const id = seasonMapId(country, season.year);
@@ -321,14 +381,17 @@ function attributionText(docs) {
     'grown around that season\'s clubs. Scotland\'s, which today\'s maps lack, are listed below.',
     `geoBoundaries (https://www.geoboundaries.org), gbOpen release, files pinned to commit 9469f09: ${GB_CITATION}`,
     "Clubs and players: the season's own source, as its season file credits it (public/football/<season>.json,",
-    '  docs/design/football-years.md). Club home towns: Wikidata (CC0 1.0), GeoNames cities1000 (https://www.geonames.org,',
+    "  docs/design/football-years.md); in an EA season, a country the EA edition rates too few clubs of takes the CM 01/02",
+    "  Update Team's database of that season (credited to the CM 01/02 Update Team, https://www.champman0102.co.uk;",
+    '  scripts/data/cm0102-updates.json), as the map\'s line below names it. Club home towns: Wikidata (CC0 1.0), GeoNames cities1000 (https://www.geonames.org,',
     '  CC BY 4.0), today\'s maps\' homes and hand overrides (scripts/data/season-club-homes.json lists each with its source).',
     '',
     'Per map:',
   ];
   for (const doc of docs) {
     const b = doc.boundaries;
-    lines.push(`${doc.id} ${doc.name} ${doc.season} (${doc.source.edition}): ${b.provider} ${b.iso3} ${b.level}${b.mask ? ` (${b.mask})` : ''}, ${b.license}`);
+    const players = doc.source.compiler === 'CM 01/02 Update Team' ? `${doc.source.edition}, ${doc.source.version} by the CM 01/02 Update Team` : doc.source.edition;
+    lines.push(`${doc.id} ${doc.name} ${doc.season} (${players}): ${b.provider} ${b.iso3} ${b.level}${b.mask ? ` (${b.mask})` : ''}, ${b.license}`);
   }
   return `${lines.join('\n')}\n`;
 }
@@ -343,11 +406,12 @@ async function main() {
     const [key, value = 'true'] = arg.replace(/^--/, '').split('=');
     return [key, value];
   }));
-  for (const key of Object.keys(args)) if (!['homes', 'seasons', 'only', 'jobs', 'check', 'dry-run', 'data', 'retro-data'].includes(key)) throw new Error(`Unknown option --${key}`);
+  for (const key of Object.keys(args)) if (!['homes', 'seasons', 'only', 'jobs', 'check', 'dry-run', 'data', 'retro-data', 'cm-data'].includes(key)) throw new Error(`Unknown option --${key}`);
   const dataDir = path.resolve(args.data ?? path.join(root, 'data-src'));
   const retroDir = path.resolve(args['retro-data'] ?? path.join(root, 'data-src'));
+  const cmDir = path.resolve(args['cm-data'] ?? path.join(root, 'data-src'));
   const started = Date.now();
-  const seasons = await seasonClubs(dataDir, retroDir);
+  const seasons = await seasonClubs(dataDir, retroDir, cmDir);
   console.log(`Read ${seasons.length} seasons' clubs in ${((Date.now() - started) / 1000).toFixed(1)} s`);
   if (args.homes === 'true') return findHomes(seasons);
 

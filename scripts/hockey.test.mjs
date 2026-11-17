@@ -61,9 +61,11 @@ test('EA\'s ratings stay as they are, and every other rating is an estimate belo
       assert.ok(player.rating >= Math.min(ESTIMATE_RANGE.skater, ESTIMATE_RANGE.goalie), `${player.name}: ${player.rating}`);
     }
   }
-  // The squad files say which is which, tuple by tuple.
+  // The squad files say which is which, tuple by tuple. Namesakes carry a birth-year tag ("Elias Pettersson (1998)"),
+  // which the snapshot's names do not.
   const tuples = [...CLUBS.flatMap(club => club.squad), ...Object.values(ROSTERS).flatMap(roster => roster[2])];
-  for (const [name, pos, rating, source] of tuples) {
+  for (const [tagged, pos, rating, source] of tuples) {
+    const name = tagged.replace(/ \(\d{4}\)$/, '');
     if (RATED.has(keyOf(name, pos))) {
       assert.deepEqual(source, { source: 'ea-nhl', edition: 'NHL 27' }, name);
       assert.equal(rating, RATED.get(keyOf(name, pos)), `${name}'s overall`);
@@ -119,7 +121,12 @@ test('every club ices a whole lineup, with a goalie and six defenders of its own
     assert.ok(club.squad.length >= 22 && club.squad.length <= 23, `${club.name}: ${club.squad.length}`);
     assert.ok(club.squad.filter(([, pos]) => pos === 'G').length >= 2, `${club.name} has a backup goalie`);
     assert.ok(lineup.bench.every(player => !lineup.starters.includes(player)));
+    // No squad names one player twice: namesakes carry the birth-year tag the 2025/26 season gives them.
+    assert.equal(new Set(club.squad.map(([name]) => name)).size, club.squad.length, `${club.name} names each player once`);
   }
+  const canucks = CLUBS.find(club => club.id === 'nhl-vancouver-canucks') ?? CLUBS.find(club => club.name === 'Vancouver Canucks');
+  assert.deepEqual(canucks.squad.filter(([name]) => name.startsWith('Elias Pettersson')).map(([name, pos]) => `${name} ${pos}`).sort(),
+    ['Elias Pettersson (1998) C', 'Elias Pettersson (2004) D']);
 });
 
 test('a forward moves easily between the lines\' places; a defender up front and a skater in goal much less so', () => {

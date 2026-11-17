@@ -815,7 +815,7 @@ test('a season\'s campaign plays its day\'s rules: 1977\'s match and its live ch
     app.startCampaign();
     // The App's own bundle plays the season's sport object; this file's copy of it is the same rules.
     const sport = matchSport(app.state.settings);
-    assert.deepEqual([app.sport().simulationVersion, app.sport().clock], [5, { length: 60, msPerUnit: 65, ot: 15, sudden: true }]);
+    assert.deepEqual([app.sport().simulationVersion, app.sport().clock], [6, { length: 60, msPerUnit: 65, ot: 15, sudden: true }]);
     assert.notEqual(sport, americanFootball, 'not today\'s rules');
     app.showPopup = () => {};
     app.showToast = () => {};

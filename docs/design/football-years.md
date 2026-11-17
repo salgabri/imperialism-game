@@ -1267,8 +1267,8 @@ non-commercial use) that name no licence; the data's rights are reserved.
   championship-manager-93-tools export) they correlate 0.72, 74 are equal, and
   Cam F's run 19 lower on average. One rating is wild: Olympiakos's defender
   Vassilis Ioannidis has the database's highest ability, 200 (rated 99, above
-  Roberto Baggio's 198), so he leads Greece's XI; it ships as Cam F set it. 124
-  nations with players (77 full XIs) and Europe's 124 strongest clubs, 26 of them from
+  Roberto Baggio's 198), so he leads Greece's XI; it ships as Cam F set it. 121
+  nations with players (75 full XIs) and Europe's 124 strongest clubs, 26 of them from
   beyond the seven big leagues (Rangers and Spartak Moscow in its elite), on `eu124e1994`
   and `eu32e1994` (until 14 November 2026 the seven leagues' 130, on `eu124s1994` and
   `eu32s1994`, which stay for the campaigns saved on them). It keeps CM 01/02's league sizes, not 1993/94's,
@@ -1293,12 +1293,13 @@ non-commercial use) that name no licence; the data's rights are reserved.
   - **Nationalities are today's** (Ukraine, Croatia, Slovakia; East Germans as
     'Germany'), so the season plays 1989/90's federations (`territoryFor` and
     `identitiesFor` of 1990, the builder's `federationTeamOf`): the Soviet Union
-    fields 1,806 players of the other fourteen republics, Yugoslavia 1,182 (Croats,
-    Slovenes, Macedonians and Bosnians), Czechoslovakia 191 Slovaks, and West
-    Germany and Zaire play under their own names.
+    fields 1,737 players of the other fourteen republics, Yugoslavia 1,078 (Croats,
+    Slovenes, Macedonians and Bosnians), Czechoslovakia 168 Slovaks, and West
+    Germany and Zaire play under their own names (1,806, 1,182 and 191 before the
+    3,555 players younger than 16 in 1989 left the season, 2026-11-14).
   - **East Germans**: a 'Germany' player at an East German club is East German, of
     a federation with no shape on the map, and plays for no nation (the manifest's
-    `noNationAt`; `buildFootballSet` keeps him for his club): 1,431 players. A
+    `noNationAt`; `buildFootballSet` keeps him for his club): 1,400 players. A
     club is East German when its stadium's city, by the database's own stadium and
     city records, is one GeoNames' `cities1000` (CC BY 4.0; a copy of 18 October
     2026 pinned by SHA-256) places only in the five eastern states, or
@@ -1330,6 +1331,18 @@ non-commercial use) that name no licence; the data's rights are reserved.
     highest ability, 198 against a potential of 140 (rated 98, above Maradona's
     193), so he keeps Sweden's goal ahead of Thomas Ravelli (160, rated 79); it
     ships as Simon Treanor set it.
+- **Too young to play** (since 2026-11-14, every CM-format database: `MIN_PLAYING_AGE` in
+  `src/data/footballSetBuild.js`): a player younger than 16 on 1 July of the season's
+  first year plays for neither a nation nor a club. Both fan-made databases keep later
+  players as children, and the roster audit (`npm run audit:rosters`,
+  docs/design/roster-audit.md) found 55 of them in 1993/94's XIs: Ibrahim Sunday, 12, in
+  Nigeria's XI and Wisła Kraków's, Kabba Samura, 11, in Sierra Leone's, six 14- and
+  15-year-olds rated 20 to 25 in Niger's. Without them 1993/94 has 121 nations with
+  players (Niger, left with two, no longer takes the field), and Helsingborgs IF, two of
+  whose XI were 14, drops out of Europe's 124 for RFC Seraing (its ground from Belgium's
+  map, `d056-216`); 1989/90 loses 18 such players from 13 XIs, and Gambia its side. SI's
+  own databases have no one that young in any XI: they lose only children from their
+  nations' pools.
 
 ### How they play
 
@@ -1683,7 +1696,14 @@ the credits and licenses the season files under CC BY-SA 4.0.
   with a position whose stint for one of its teams covers Y − 1 or Y. His figure is
   the stint's caps a year, caps / (end − start + 1), halved when the stint covers
   one of the two years only. A player in two nations' pools plays for the one where
-  his figure is higher.
+  his figure is higher. A player younger than 14 or older than 45 on 1 July of Y − 1,
+  when the season starts, is in no pool (the manifest's `selection.ages`, since
+  2026-11-14): his stint and his date of birth cannot both be right. The roster audit
+  (`npm run audit:rosters`) found three: Óscar Ulloa (born 1986 on Wikidata) for El
+  Salvador from 1988, in its XI from 1988/89 to 1992/93 (Raúl Díaz Arce takes his
+  place); Rusdi Suparman (born 1973) for Malaysia from 1986, in its 1986/87 XI; and
+  Antoine Tassy (born 1924), Haiti's coach, as its player from 1965 to 1976, in its
+  1970/71 XI. Without him Haiti names 10 players for 1970/71 and fields no team.
 - **Who fields a team.** A nation whose pool holds 11 players or more, one a
   goalkeeper, that played a full international in the four years before (so it has
   an Elo), and whose shape takes part that year. The rest are listed with why in

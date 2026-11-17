@@ -16,8 +16,8 @@ import { CM0102_RELEASES as databases } from '../src/data/cm0102Releases.js';
 import { CM0102_NATIONS as nationMap } from '../src/data/cm0102Nations.js';
 import { FOOTBALL_FEDERATIONS as federations } from '../src/data/footballFederations.js';
 import {
-  buildFootballIndex, buildFootballSet, contentHash, estimateBirthShift, LAST_YEAR, LEAGUES, nationResolver, NO_TEAM, resolveDatabase,
-  seasonOfRelease, seasonYear, territoryFor,
+  buildFootballIndex, buildFootballSet, contentHash, estimateBirthShift, LAST_YEAR, LEAGUES, MIN_PLAYING_AGE, nationResolver, NO_TEAM,
+  resolveDatabase, seasonOfRelease, seasonYear, territoryFor,
 } from '../src/data/footballSetBuild.js';
 import { decodeFootballSet } from '../src/engine/footballSets.js';
 import { BIG_LEAGUES, EUROPEAN_LEAGUES } from '../src/data/footballLeagues.js';
@@ -245,8 +245,9 @@ test('seasons ending before 1961 are refused; from 1960/61 each has the federati
   assert.throws(() => buildFootballSet(files, { databases: [old], nationMap, federations }), /before 1961/);
   // 1960/61, the first computed national-team season, is the first accepted, with the federations of its day: the
   // fixture's Germans play as West Germany and its Yugoslav as Yugoslavia, on Serbia's shape; the Soviet Union,
-  // Czechoslovakia and the United Arab Republic, with no players, have no identity.
-  const first = build(undefined, { identity: { ...identity, released: '1960-09', id: 'cm0102-1960-09-custom', dobShift: 0 } }).doc;
+  // Czechoslovakia and the United Arab Republic, with no players, have no identity. Its players are born 41 years
+  // earlier than the fixture's, 1929 to 1944, as no one younger than 16 plays (MIN_PLAYING_AGE).
+  const first = build(sampleDatabase({ birthYearShift: 41 }), { identity: { ...identity, released: '1960-09', id: 'cm0102-1960-09-custom', dobShift: 0 } }).doc;
   assert.deepEqual([first.year, first.season, first.territory], [1961, '1960/61', territoryFor(federations, 1961)]);
   assert.deepEqual(first.identities, { 276: { name: 'West Germany', code: 'FRG', flagId: '276' }, 688: { name: 'Yugoslavia', code: 'YUG', flagId: 'YUG' } });
   assert.equal(decodeFootballSet(first).meta.identities[688].name, 'Yugoslavia', 'the loader takes it');
@@ -399,7 +400,7 @@ test('never invents: every tuple is a stored fixture player, and rebuilds exactl
 test('players of teamless nations stay at clubs; the dropped are counted', () => {
   const { doc, audit } = build();
   assert.deepEqual(audit.noTeam, { Curaçao: 1 });
-  assert.deepEqual(audit.players.dropped, { nameless: 0, noAbility: 1, noPositions: 1, noNationality: 1, unmapped: 0, duplicates: 1 });
+  assert.deepEqual(audit.players.dropped, { nameless: 0, noAbility: 1, noPositions: 1, noNationality: 1, unmapped: 0, duplicates: 1, tooYoung: 0 });
   const national = Object.values(doc.nations).flatMap(([, , squad]) => squad);
   assert.ok(!national.some(t => t[5] === 'Curaçao'));
   // A home nation plays for itself, not for England.
@@ -409,6 +410,22 @@ test('players of teamless nations stay at clubs; the dropped are counted', () =>
   assert.equal(england.pool, doc.nations['826'][1]);
   assert.equal(england.naturalLineup, true);
   assert.equal(audit.nations.filter(n => n.naturalLineup).length, doc.coverage.completeXIs);
+});
+
+test('a player younger than 16 when the season starts plays in it for neither a nation nor a club', () => {
+  // The fixture is 2007/08: its season starts on 1 July 2007, so 16 by then means born on 1 July 1991 or before.
+  assert.equal(MIN_PLAYING_AGE, 16);
+  const db = sampleDatabase({ birthYearShift: 6 });
+  const prodigy = (second, year, month, day, ca) => ({ first: 'Youngo', second, dob: { year: year - 6, month, day, leap: 0 }, nation: 0,
+    club: -1, job: 11, player: { ca, ratings: { gk: 20 } } });
+  // Both outrate every English goalkeeper, so whichever plays takes England's goal.
+  db.people.push(prodigy('Sixteenfake', 1991, 6, 30, 199), prodigy('Fifteenfake', 1992, 1, 1, 200));
+  const { doc, audit } = build(db);
+  assert.equal(audit.players.dropped.tooYoung, 1);
+  const names = tuplesOf(doc).map(t => t[1]);
+  assert.ok(names.includes('Youngo Sixteenfake'), 'sixteen on the day the season starts plays');
+  assert.ok(!names.includes('Youngo Fifteenfake'), 'fifteen does not');
+  assert.equal(doc.nations['826'][1], build().doc.nations['826'][1] + 1, 'only the sixteen-year-old joins England\'s pool');
 });
 
 test('a database that rates a player of Tonga, Samoa or the Cook Islands lists all three', () => {

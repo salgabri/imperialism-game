@@ -3,7 +3,9 @@
 Status: implemented 2026-10-31; touchdown tries, safeties and the NFL's key margins
 2026-11-01 (simulation version 3); 2026-11-02 (version 4), an overtime side a
 touchdown down no longer settles for a field goal; 2026-11-10 (version 5, the earlier seasons only), each earlier
-season plays its own day's scoring, kicking, tries and overtime ([Rules by era](#rules-by-era)). A third sport beside football and basketball: the
+season plays its own day's scoring, kicking, tries and overtime ([Rules by era](#rules-by-era)); 2026-11-17 (version 6, the
+earlier seasons only), each earlier season's drive odds allow for how far apart its clubs are, as the computed seasons'
+clubs now move toward their real results ([Computed seasons](#computed-seasons)). A third sport beside football and basketball: the
 32 NFL franchises, rated by Madden NFL 27, fight over the USA. It is played with
 clubs only, on the NFL's own map ([domestic-campaigns.md](domestic-campaigns.md#the-nfl-map)).
 Everything outside the match (territory, the draw, targeting, conquest, signings,
@@ -458,7 +460,8 @@ to 1989, 1991, 1996 and 1997 (data sets `pfa-<season>`) and the AFL's ten season
 tells the two leagues of a 1960s year apart. The question the user answered named an Approximate Value as the measure:
 Pro-Football-Reference's own is off limits (its pages challenge automated clients, and Sports Reference's data-use terms
 forbid building on scraped data), so the value here is ours, AV-like. 1998, 1999 and 2000 were computed the same way
-on 2026-11-10 ([1998 to 2000](#1998-to-2000) below).
+on 2026-11-10 ([1998 to 2000](#1998-to-2000) below). Re-rated 2026-11-17 by `docs/design/computed-ratings.md`, the user's
+choice of that day: every club now moves toward its real results (step 5, the "full" setting), below.
 
 - **Source.** Pro Football Archives (`https://www.profootballarchives.com`, (c) 2006–2026, a privacy policy and no
   terms of use; robots.txt is HTTP 404) has every NFL and AFL team-season with complete starting lineups (games started
@@ -510,9 +513,50 @@ on 2026-11-10 ([1998 to 2000](#1998-to-2000) below).
   season's).
 - **The overall.** Each league-season's players are ranked at their game position by value, then games started, then
   games played, and read off Madden NFL 2002's overalls at that position exactly as the Tecmo seasons' are
-  (`scripts/lib/nfl-reference.mjs`). The label says so ("NFL (computed)", "AFL (computed)"), and the source block has
-  method 'computed', rawScale 'value' and the conversion. Each snapshot keeps every player's starts, games and value,
-  and the reference, so the overall can be recomputed from it alone.
+  (`scripts/lib/nfl-reference.mjs`), then moved with his club (next). The label says so ("NFL (computed)", "AFL
+  (computed)"), and the source block has method 'computed', rawScale 'value' and the conversion, which states the move
+  and the season's constants. Each snapshot keeps every player's starts, games and value, the reference, the season's
+  games and each club's move, so the overall can be recomputed from it alone.
+- **The move toward results** (2026-11-17; `scripts/lib/nfl-results.mjs`, step 5 of `docs/design/computed-ratings.md`).
+  Bottom-up club strengths followed their results only partly (0.83 against winning share, as low as 0.58) and spread
+  too little or too much, so each club now moves to the strength its results ask for:
+  - *S*, its Simple Rating System: every regular-season game's margin by least squares, with one home edge and the
+    league's ratings summing to nought (`srsOf`). The games are read off both clubs' pages, each club's points from its
+    own page (`seasonGames` in `scripts/lib/pfa.mjs`): the site's score tables slip now and then on the other side's,
+    ten times in the 46 seasons, while a club's own column adds up to its scoring table. Eight of the ten are a 24–9 game
+    the winner's page has as 24–0 (the 1961 Giants' win at St. Louis the first); the others are the 1983 Lions' 13–2 over
+    the Vikings (13–3 on their page) and the 1998 Jaguars' 34–17 over the Bengals (34–14 on theirs). The snapshot keeps
+    the games (`games`) and the slips (`source.notes`). No game of the 46 seasons was at a neutral venue. 1987's three
+    strike games are left out, as their replacement players are; the AFL's clubs are rated within the AFL, against its
+    own games and mean.
+  - *r*, the SRS's reliability (1 less its error over its spread): 0.23 (the AFL of 1960, 28 games between eight clubs
+    much alike) to 0.88 (the AFL of 1961 and 1968); 0.425 in 1988 and 0.428 in the strike season of 1982.
+  - *m*, the margin the match model gives a point of the strength it plays: the mean of the lineup's offence and
+    defence (`playedStrength`), the weighted means its drives are rated by, not the shown mean of the 23 starters. It is
+    measured by `perPointOf` over 160,000 simulated games a season (sides 2 and 4 points apart either way, Balanced form,
+    a neutral venue, the season's overtime) under the season's rules as its league's figures set them: 1.65 points a
+    game in 1977, the lowest-scoring season, to 2.10 in the AFL of 1961, about two (each point lifts a side's drives and
+    holds the other's). The kicker, about 2% of a point, is not counted, and the season's own spread (below) is not
+    allowed for, so that m does not depend on the move it sets.
+  - The target T = μ + √r × S ÷ m, μ the season's mean played strength before the move. Every player of the club then
+    moves by one whole number and its best few by one more, held to 1–99, whichever brings its played strength nearest
+    T (`clubMoveOf`): no player passes a teammate rated above him, and each club lands within 0.08 of its target.
+    Moves run from −6 (the 1–15 Colts of 1991, SRS −17.3) to +6; ten of the 960 clubs do not move.
+  - **The credit kept, the results counted twice.** The value's credit (each club's points for and against, to the
+    power 0.25) already reads the results, so it was measured against a credit of power 0, which leaves the move alone to
+    anchor the clubs: without it the players order worse against Madden (0.749 on the tuning seasons for 0.757, 0.722
+    held out on 2000 for 0.732; `withoutCredit` in `calibration.json`), and after the move the shown strengths follow
+    winning shares less (0.83 against 0.84), the offences their points scored less (0.80 against 0.88) and the defences
+    their points conceded less (0.77 against 0.85; `npm run sync:pfa -- --credit` measures both). So the results count
+    twice, and the conversion says so: the credit's
+    points for and against place a club's players at their positions and weigh its offence against its defence, and the
+    move then sets the club's level from its margins, wherever the credit left it.
+  - Measured on the season files, before and after: the played strength against the SRS 0.83 → 1.00; the shown
+    strength against winning share 0.829 → 0.842 on average (median 0.833 → 0.862), against the SRS 0.84 → 0.93; each
+    season's simulated standings on its own schedule spread within 0.010 of the real ones' win% SD on average (0.016
+    before; `npm run simulation:realism` plays five of them). The shown strength trails the played one (0.869 against
+    winning share) because it counts a quarterback 1/23 where the match counts him 15%: the 1981 Lions show first at
+    82.7 though their SRS ranks fifth, and the match plays them fifth.
 - **The strikes.** 1982's strike cancelled seven weeks: the season is ranked as played, nine games (the site lists a
   cancelled game without a score, and no such game is read). 1987's cancelled one week and was played by replacement
   players for three (4 to 19 October): that season ranks the clubs' own players only. A replacement player is one the
@@ -526,20 +570,21 @@ on 2026-11-10 ([1998 to 2000](#1998-to-2000) below).
   played most for other clubs; a kicker for 21 clubs whose kicker played a position for his larger share (Hornung's
   Packers, Blanda's Oilers, Cappelletti's Patriots); a third receiver for 9 clubs of the 1960s and 1970s; a tight end
   for the run-and-shoot Lions of 1989 and Oilers of 1991, as in the Tecmo seasons.
-- **Results.** Club strengths run 70.8–86.7 over the 46 seasons (the Madden seasons' 69–85) and follow each season's
-  results: Spearman 0.58–0.97 against the clubs' winning shares, 0.83 on average, where Madden's launch ratings of
-  2001 to 2005 reach 0.15–0.55 (0.36) against theirs: a hindsight rating. The champions or the best records lead: the
-  1962 Packers (13–1, 85.2), the 1968 Colts (13–1, 86.5), the 1969 Vikings, the 1972 Dolphins (14–0, 83.8), the 1985
-  Bears (15–1, 85.0), the 1989 49ers, the 1991 Washington club (14–2, 85.5), the 1996 Packers, the 1997 Broncos, the
-  1998 Vikings and the 1999 Rams; in the AFL the 1960 Oilers, the 1964 Bills, the 1967 Raiders and the 1969 Chiefs. Of
-  the 46 seasons' champions (the NFL's and AFL's title winners, the Super Bowl's from 1970), 17 rate first and 32 in the
-  top three. Where they do not: the 1979 Steelers, Super Bowl champions at 12–4, fifteenth of 28 (the most points, yet
-  a line and a secondary that shared their starts, and a starting line rates mostly by its starts); the 1970 Colts
-  tenth of 26, the 1980 Raiders ninth and the 1971 Cowboys seventh; the 1960 Eagles, champions at 10–2, sixth of 13
-  (their receivers and corners thin); the 1965 Packers third behind the 49ers, who scored the most and finished 7–6–1;
-  the 1976 Raiders (13–1) eighth; and, though not champions, the 1987 49ers (13–2) twelfth of 28, their line and tight
-  ends sharing starts. Every season is in the audit with each club's record and points, its gaps and its
-  out-of-position starters.
+- **Results.** After the move, club strengths run 67.4–88.0 over the 46 seasons (70.8–86.7 before it; the Madden
+  seasons' 69–85). The strength the match plays follows each season's SRS exactly (Spearman 0.995–1.000); the strength
+  shown, the 23 starters' mean, follows the clubs' winning shares at 0.64–0.97, 0.84 on average (0.58–0.97 and 0.83
+  before), where Madden's launch ratings of 2001 to 2005 reach 0.15–0.55 (0.36) against theirs: a hindsight rating, now
+  anchored to the results. The champions or the best records lead: the 1962 Packers (13–1, 85.7), the 1968 Colts (13–1,
+  87.7), the 1969 Vikings (87.9), the 1972 Dolphins (14–0, 85.3), the 1984 49ers and 1985 Bears (15–1, 85.2 and 86.8),
+  the 1991 Washington club (14–2, 88.0), the 1998 Vikings (15–1, 86.7), the 1999 Rams and the 2000 Ravens; in the AFL
+  eight of its ten champions. Of the 46 seasons' champions (the NFL's and AFL's title winners, the Super Bowl's from
+  1970), 22 show first and 36 in the top three (17 and 32 before the move); by the strength the match plays, 24 and 36
+  (16 and 29). The 1979 Steelers, fifteenth of 28 before, are second (first by SRS, +11.9). Where a champion does not
+  lead, its margins did not, or the shown mean weighs its players otherwise than the match: the 1970 Colts (11–2–1, SRS
+  +0.4, fourteenth) are eighth of 26; the 1976 Raiders (13–1, +8.5 against the Steelers' +15.3) sixth; the 1987
+  Washington club eleventh, its replacement players' three wins left out and 8–4 in the rest; the 1981 49ers ninth,
+  the 1978 Steelers sixth and the 1997 Broncos third, though second, second and first by SRS and played so. Every season
+  is in the audit with each club's record and points, its SRS and its move, its gaps and its out-of-position starters.
 - **The AFL.** Its ten seasons are computed as the NFL's are, each ranked among its own players, so its clubs read as
   strong as the NFL's of the same year though they were not: the two leagues never meet in the game, and each 1960s
   year has both seasons, labelled "NFL (computed)" and "AFL (computed)". Its clubs are 8 to 1965, 9 in 1966–67 and
@@ -584,9 +629,15 @@ on 2026-11-10 ([1998 to 2000](#1998-to-2000) below).
 - **Tests.** `scripts/pfa-seasons.test.mjs`: the reader on pages laid out as the site's (exhibition, playoff and
   cancelled games left out, a slip in a count read past, the draft list not the roster), the positions and the site's
   slips, the kickers' rule, the value on invented clubs (the line by starts, each league its own mean), the 1987 rule,
-  ties by starts then games, every season recomputed from its snapshot, every club's lineup or its documented gaps, the
-  calibration as recorded and held out on 2000, each snapshot's day of retrieval, pages found in `data-src/pfa/` or a
-  later download's folder, and the snapshots rebuilt byte for byte where `data-src/` has the pages.
+  a season's games on invented pages (each once, the home club's, each club's points its own page's, the strike's left
+  out where asked, a game one page lacks refused), the played strength (a point for every player a point of it) and m
+  (about two, the same for the same seed), ties by starts then games, every season recomputed from its snapshot (each
+  player read off Madden, then moved by his club's shift and its best few one more, never past a teammate), each club's
+  SRS, target, strength before and after recomputed from the snapshot's games and within 0.25 of its target, the whole
+  search replayed on eight seasons of every era and both leagues, m remeasured on three and 1987's strike games left out,
+  every club's lineup or its documented gaps, the calibration as recorded and held out on 2000 (and worse without the
+  credit), each snapshot's day of retrieval, pages found in `data-src/pfa/` or a later download's folder, and the
+  snapshots rebuilt byte for byte where `data-src/` has the pages.
   `scripts/nfl-seasons.test.mjs` adds the seasons from 1960 on their maps (the Texans at the Cotton Bowl, the
   Patriots' four Boston grounds, the Giants holding Connecticut, the Jets growing from Hofstra in 1975, the Oilers in
   Memphis and Nashville and the Titans so named, the Seahawks at Husky Stadium, no AFL club in an NFL season nor the
@@ -608,13 +659,14 @@ the same rule and frozen weights, from the 95 Pro Football Archives pages saved 
   0.757 on the tuning seasons, 0.726 (2005) to 0.798 (2002) a season (`holdout` in `calibration.json`). 1998
   and 1999 cannot be measured that way: the research found their next seasons' player ratings (Madden NFL 2000 and
   2001) only in NFL Draft Buzz's copy.
-- **Spot checks.** Club strengths run 73.7–85.8 (1998), 74.8–85.7 (1999) and 73.5–84.4 (2000), and order the clubs'
-  winning shares at Spearman 0.88, 0.82 and 0.81 (the other computed seasons' 0.58–0.97). The 1998 Vikings (15–1, the
-  most points) rate first, 85.8, just ahead of the champion Broncos (14–2, 85.5) and the 14–2 Falcons (85.0). The 1999
-  champion Rams (13–3, the most points) lead at 85.7; the 14–2 Jaguars, who conceded the fewest, are third (83.3). The
-  2000 champion Ravens (12–4, the fewest points conceded, 165) are third (83.5) behind the Buccaneers (10–6, 84.4) and
-  the Colts (10–6, 83.8); the 13–3 Titans are seventh. The 1999 Browns, back after three seasons without a club (2–14),
-  rate last. Every club fields its lineup but the 1998 Packers, a corner short (documented: their other corners that
+- **Spot checks.** Since the move toward results (2026-11-17), club strengths run 72.3–86.7 (1998), 70.9–84.3 (1999)
+  and 71.4–84.3 (2000), and order the clubs' winning shares at Spearman 0.81, 0.84 and 0.88 (before the move 73.7–85.8,
+  74.8–85.7 and 73.5–84.4, and 0.88, 0.82 and 0.81). The 1998 Vikings (15–1, the most points, SRS +14.9) rate first,
+  86.7, ahead of the champion Broncos (14–2, 85.2), the Jets and the 14–2 Falcons (83.8 and 83.7). The 1999 champion
+  Rams (13–3, the most points) lead at 84.3; the 14–2 Jaguars, who conceded the fewest, are third (82.4). The 2000
+  champion Ravens (12–4, the fewest points conceded, 165) lead at 84.3, ahead of the 13–3 Titans (83.3); before the move
+  they were third behind the Buccaneers (10–6), now seventh. The 1999 Browns, back after three seasons without a club
+  (2–14), rate last. Every club fields its lineup but the 1998 Packers, a corner short (documented: their other corners that
   season played most for other clubs); the game fills that place with a back, and starts a back at kicker for the 1998
   Cardinals and Eagles (Larry Centers and Kevin Turner, their kickers rating 25 below them, the out-of-position
   penalty). The audit lists each club with its record and points.
@@ -625,10 +677,10 @@ the same rule and frozen weights, from the 95 Pro Football Archives pages saved 
 
 ## Rules by era
 
-Status: built 2026-11-10, finished 2026-11-13. Every earlier season plays its own day's game: its league's scoring, its kicking, its tries
+Status: built 2026-11-10, finished 2026-11-13; the clubs' spread allowed for 2026-11-17. Every earlier season plays its own day's game: its league's scoring, its kicking, its tries
 and its playoffs' overtime. `matchSport` (src/sports/index.js) asks the sport for a campaign's rules (`rulesFor`), and
 `americanFootballIn(settings)` gives one sport object per season, under `seasonRules(league, year, dataSet)`, simulation
-version 5. The built-in season (no data set) gets `americanFootball` itself: today's rules and results, unchanged (its
+version 6 (5 before the spread). The built-in season (no data set) gets `americanFootball` itself: today's rules and results, unchanged (its
 version stays 4).
 
 | Seasons | Two-point try | Overtime (the playoffs') | Overtime periods |
@@ -685,6 +737,14 @@ side, late-game play-calling, the same rating scales); only its rates move:
   try odds when it ends in none, sit from today's at the built-in clubs' average matchup as far, in log odds, as the
   season's touchdowns (and field-goal tries) per possession, over eleven a side, sit from 2023 and 2024's, the seasons
   today's odds were tuned on.
+- **The clubs' spread** (version 6, 2026-11-17). The odds are a logistic curve in the edge, bent upward while a drive
+  scores less than half the time, so clubs further apart score more on average at the same average matchup. Each
+  season's odds there are lowered by half the curve's bend, (1 − 2p) × the odds' slope², times the variance of its
+  pairings' edges beyond today's (`spreadAllowance`; `spread` in `NFL_SEASON_MATCHUPS`, the variance of an offence's
+  edge over another club's defence about the average, 17.1 for the built-in clubs): to second order, its clubs then
+  score as its league did across their own pairings. The computed seasons' move toward their results spread the 1965
+  NFL's clubs to 52.8 and the 1968 AFL's to 59.7, which without it scored 1.1 points a team over their leagues; over
+  the 76 earlier seasons the mean miss fell from 0.51 to 0.40 points a team, and no season now misses by more than 0.55.
 - **Field goals and extra points made.** The league's own rates at the season's average kicker, each rating point above it
   worth 0.6 more field goals in a hundred, as today, and 0.3 more extra points scaled by the league's misses against
   today's 5% (`xpSlope`: none in the AFL of 1965, whose kickers made all 267, so its clubs make 99.9% of theirs; today's
@@ -734,27 +794,42 @@ read the season's sport object, so all follow its overtime.
   Wikipedia, "Conversion (gridiron football)", `https://en.wikipedia.org/w/index.php?oldid=1360354547`.
 
 **Measured.** Each season's clubs over 160 seasons of their league's own schedule (`npm run simulation:realism`, run
-2026-11-13), the league's figure in brackets; the level games' real share is the ties' before 1974 and nflverse's overtime
+2026-11-17), the league's figure in brackets; the level games' real share is the ties' before 1974 and nflverse's overtime
 games' from 1999, none between.
 
 | Season | Overtime | Points a team | Touchdowns | Field goals | Extra points made | Going for two | Level after 60 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| NFL 1965 | sudden death | 23.6 (23.1) | 2.96 (2.87) | 1.00 (1.00) | 95.7% (95.6%) | none (none) | 5.8% (2.0%) |
-| AFL 1965 | sudden death | 22.1 (21.5) | 2.63 (2.53) | 1.21 (1.23) | 99.9% (100.0%) | 5.2% (5.7%) | 5.3% (8.9%) |
-| NFL 1977 | sudden death | 17.8 (17.2) | 2.17 (2.08) | 0.92 (0.92) | 90.6% (91.1%) | none (none) | 5.7% |
-| NFL 1985 | sudden death | 22.0 (21.5) | 2.58 (2.51) | 1.32 (1.33) | 95.5% (95.7%) | none (none) | 5.6% |
-| NFL 1993 | sudden death | 19.4 (18.7) | 2.13 (2.02) | 1.48 (1.50) | 96.7% (96.8%) | none (none) | 5.0% |
-| NFL 2000 | sudden death | 21.3 (20.7) | 2.42 (2.32) | 1.45 (1.47) | 99.1% (99.1%) | 7.2% (7.4%) | 5.5% (5.2%) |
-| NFL 2010 | modified | 22.6 (22.0) | 2.56 (2.48) | 1.54 (1.55) | 99.1% (99.1%) | 3.9% (4.1%) | 5.4% (7.4%) |
-| NFL 2024 | both possess | 23.4 (22.9) | 2.61 (2.55) | 1.72 (1.72) | 95.8% (95.8%) | 9.8% (9.7%) | 5.5% (5.9%) |
+| NFL 1965 | sudden death | 23.4 (23.1) | 2.94 (2.87) | 0.98 (1.00) | 95.9% (95.6%) | none (none) | 5.0% (2.0%) |
+| AFL 1965 | sudden death | 21.9 (21.5) | 2.60 (2.53) | 1.22 (1.23) | 99.9% (100.0%) | 5.4% (5.7%) | 6.1% (8.9%) |
+| NFL 1977 | sudden death | 17.6 (17.2) | 2.15 (2.08) | 0.91 (0.92) | 91.0% (91.1%) | none (none) | 5.7% |
+| NFL 1985 | sudden death | 21.9 (21.5) | 2.58 (2.51) | 1.32 (1.33) | 95.5% (95.7%) | none (none) | 5.3% |
+| NFL 1993 | sudden death | 19.1 (18.7) | 2.09 (2.02) | 1.48 (1.50) | 96.7% (96.8%) | none (none) | 5.2% |
+| NFL 2000 | sudden death | 21.1 (20.7) | 2.39 (2.32) | 1.46 (1.47) | 99.1% (99.1%) | 7.1% (7.4%) | 5.4% (5.2%) |
+| NFL 2010 | modified | 22.5 (22.0) | 2.55 (2.48) | 1.54 (1.55) | 99.1% (99.1%) | 3.9% (4.1%) | 5.6% (7.4%) |
+| NFL 2024 | both possess | 23.3 (22.9) | 2.61 (2.55) | 1.72 (1.72) | 95.9% (95.8%) | 9.7% (9.7%) | 5.4% (5.9%) |
 
-Points run about half a point a team high in every era, overtime's included: within the point
-`scripts/simulation-realism.test.mjs` allows. Level games stay near today's share in every era: the late-game play-calling
-is today's, so a season with more ties (the AFL of 1965) or fewer has its own only through its scoring.
+Points run 0.3 to 0.5 a team high in every era, overtime's included (about half a point before the spread was allowed
+for): within the point `scripts/simulation-realism.test.mjs` allows. Level games stay near today's share in every era:
+the late-game play-calling is today's, so a season with more ties (the AFL of 1965) or fewer has its own only through its
+scoring.
+
+The computed seasons among them also play their own schedules, every game of the snapshot's, beside the real season's:
+
+| Season | Win% SD | One-score games (≤ 8) | By exactly 3 | By exactly 7 |
+| --- | --- | --- | --- | --- |
+| NFL 1965 | 0.180 (0.179) | 51.6% (43.9%) | 13.7% (9.2%) | 8.0% (8.2%) |
+| AFL 1965 | 0.187 (0.182) | 53.4% (37.5%) | 15.5% (7.1%) | 7.8% (1.8%) |
+| NFL 1977 | 0.198 (0.209) | 53.1% (45.4%) | 14.0% (10.7%) | 8.5% (7.1%) |
+| NFL 1985 | 0.183 (0.193) | 52.5% (41.5%) | 13.5% (10.3%) | 7.2% (7.1%) |
+| NFL 2000 | 0.201 (0.194) | 51.4% (48.0%) | 14.3% (16.9%) | 7.4% (8.5%) |
+
+The standings spread as the real ones did (before the move toward results: 0.198, 0.230, 0.188, 0.179 and 0.211). The
+margins are today's in every era: these seasons had fewer one-score games than the 2020s' 51–58% (43% over all 46
+computed seasons), and the game's late-game play-calling, tuned on the 2020s, closes games as today's coaches do.
 
 **Tests.** `scripts/american-football-eras.test.mjs`: the built-in season's rules and object unchanged; the record's
 overtime and two-point rules by year; every earlier season's own sport object, rules, clock and kicking; the table's
-rebuild, its points accounted for and nflverse's agreement; every one of the 76 built-in seasons scoring within a point of its
+rebuild, its points accounted for and nflverse's agreement, and each season's matchup and spread its clubs'; every one of the 76 built-in seasons scoring within a point of its
 league (all its pairings, about 4,000 games a season); kicked tries only in the NFL before 1994, and the share going for two near the
 league's after; sudden-death and modified sudden-death overtimes as the rules have them, in fifteen-minute periods; the
 live chart's chains against simulated overtimes, its periods and its leads in each rule; and the clock, the ticker's labels
