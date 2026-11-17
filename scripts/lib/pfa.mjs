@@ -65,8 +65,11 @@ export function parseTeamSeason(html) {
         const id = /href="\/players\/([^"]+)\.html"/.exec(row.cells[0])?.[1];
         if (!id) continue;
         const cell = key => decode(row.cells[col(key)]);
-        for (const key of ['GP', 'GS']) if (/^\d+\D/.test(cell(key))) page.notes.push(`${decode(row.cells[0])}: ${key} reads "${cell(key)}"`);
-        page.roster.push({ id, name: decode(row.cells[0]), no: cell('No'), positions: cell('Pos').split('-').map(p => p.trim()).filter(Boolean),
+        // A name never holds a digit or a question mark: the 1981 Dolphins' page has "Bob Baumhower 9SK?", a stray note
+        // after his name, which is cut.
+        const name = decode(row.cells[0]).replace(/(?:\s+\S*[\d?]\S*)+$/, '');
+        for (const key of ['GP', 'GS']) if (/^\d+\D/.test(cell(key))) page.notes.push(`${name}: ${key} reads "${cell(key)}"`);
+        page.roster.push({ id, name, no: cell('No'), positions: cell('Pos').split('-').map(p => p.trim()).filter(Boolean),
           gp: countOf(cell('GP')), gs: countOf(cell('GS')) });
       }
     } else if (!titled && /^[A-Z][A-Z &]+$/.test(name)) {

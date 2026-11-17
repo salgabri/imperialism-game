@@ -1200,7 +1200,8 @@ const NRL_CLUB_ID = /^nrl-[a-z0-9-]{1,62}$/;
  * A season of clubs only on its era's map (`map`), each player `[name, position, rating]` as the sport's built-in clubs
  * hold them: an NFL season. One club per section of the map; ids, codes and leagues follow the built-in clubs' rules,
  * so saved names resolve against them, except that a map of another league of its day (the AFL's, before the 1970
- * merger) names its clubs' league. `least` is the lineup a club must be able to name.
+ * merger; rugby league's premierships before the NRL, the NSWRFL's …) names its clubs' league. `least` is the lineup a
+ * club must be able to name.
  */
 function validateClubsOnMap(data, id, fail, { sport, clubId, positions, least, noun }) {
   const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);

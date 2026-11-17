@@ -16,21 +16,26 @@
 // Each season from 1960 to 2017 is its committed snapshot (scripts/data/mlb-war-seasons/<year>.json, npm run
 // import:mlb-war): every player's score, mapped rank for rank within his role onto MLB The Show 18 to 24's overalls
 // (scripts/data/mlb-war-reference.json, scripts/lib/mlb-war.mjs), then teamed by the same rules, its clubs those of the
-// franchise eras of scripts/data/mlb-war-seasons.json and its nations by the Baseball Databank's birth country.
+// franchise eras of scripts/data/mlb-war-seasons.json and its nations by the Baseball Databank's birth country. Each club
+// then moves toward its real won-lost record (docs/design/computed-ratings.md, step 5; scripts/lib/mlb-war.mjs
+// resultsMove), by the win share a point of strength is worth in the engine under the season's rules, measured by
+// playing it (perPointOfSeason, seeded by the season, so the season rebuilds byte for byte).
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { buildClub, HOME_NATIONS } from '../src/data/teams.js';
+import { buildClub, hashStr, HOME_NATIONS } from '../src/data/teams.js';
 import { CLUBS } from '../src/data/clubs.baseball.js';
 import { contentHash, serializeFootballSet } from '../src/data/footballSetBuild.js';
 import { fieldedNations } from '../src/engine/footballSets.js';
-import { baseball, seasonPremium } from '../src/sports/baseball.js';
+import { baseball, baseballOfSeason, baseballStrength, seasonPremium } from '../src/sports/baseball.js';
 import {
-  checkTeams, clubsOf, colourFor, editionOf, mapOf, nationOfBirthplace, nationsOf, nearestBirthplace, playerOf, seasonIdOf, teamsOf,
+  checkTeams, clubsOf, colourFor, editionOf, mapOf, nationOfBirthplace, nationsOf, nearestBirthplace, playerOf, rosterOf, seasonIdOf, teamsOf,
   trustsBirthplace, tupleOf,
 } from './lib/mlb.mjs';
-import { nationOfBirthCountry, rateByRank, teamsOfWar, warLabelOf, warMapOf, warScoreOf, warSeasonIdOf } from './lib/mlb-war.mjs';
+import {
+  nationOfBirthCountry, perPointOfSeason, rateByRank, resultsMove, teamsOfWar, warLabelOf, warMapOf, warScoreOf, warSeasonIdOf,
+} from './lib/mlb-war.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const outDir = path.join(root, 'public/baseball');
@@ -146,6 +151,22 @@ function buildWarSeason(snapshot, year, manifest, franchises, reference) {
     rating: ratings.get(row.id), score: row.score, nation: nationOfBirthCountry(row.born, manifest.nations), born: row.born }));
   // A club of the 1960s to 1980s that used fewer than thirteen pitchers all season keeps every one it used.
   const teamUp = () => ({ clubs: clubsOf(players, teams, { order: byRatingThenScore, fewerPitchers: true }), nations: nationsOf(players, byRatingThenScore) });
+  // Each club moves toward its real record (docs/design/computed-ratings.md, step 5): in the strength the match model
+  // plays, by the win share a point of it is worth in the engine under the season's own rules, measured on the clubs as
+  // their ratings make them.
+  const unmoved = teamUp().clubs;
+  const recordOf = team => snapshot.teams[team.war];
+  const lineupOf = pool => rosterOf(pool.slice().sort(byRatingThenScore)).lineup;
+  const strengthOf = pool => baseballStrength(lineupOf(pool));
+  const builtUnmoved = unmoved.map(club => buildClub({ ...club, league: 'MLB', squad: club.squad.map(tupleOf) }, baseball));
+  const premium = seasonPremium(builtUnmoved);
+  const perPoint = perPointOfSeason(builtUnmoved, baseballOfSeason(year, premium), hashStr(`${warSeasonIdOf(year)}|per point`));
+  const move = resultsMove(teams.map(team => ({ id: team.id, league: recordOf(team).league, w: recordOf(team).w, l: recordOf(team).l,
+    pool: players.filter(player => player.team === team.war).sort(byRatingThenScore) })), { perPoint, strengthOf, order: byRatingThenScore,
+    lineupOf: pool => new Set(lineupOf(pool).starters.map(player => player.id)) });
+  const moved = new Map(move.moves.flatMap(club => club.pool.map(player => [player.id, player.rating])));
+  if (moved.size !== players.length) throw new Error(`${year}: the clubs' moves rate ${moved.size} of ${players.length} players`);
+  for (const player of players) player.rating = moved.get(player.id);
   let { clubs, nations } = teamUp();
   // Namesakes who share a squad are told apart: the best of them keeps the name, the others take the names that tell
   // them apart (a middle initial, else a birth year: Pedro Martinez of 1968 in the Dominican Republic's squad of 1993).
@@ -178,7 +199,7 @@ function buildWarSeason(snapshot, year, manifest, franchises, reference) {
     name: 'JEFFBAGWELL WAR (Neil Paine) and the Baseball Databank (Chadwick Baseball Bureau)',
     computed: true,
     method: manifest.seasonSource.method,
-    conversion: manifest.seasonSource.conversion,
+    conversion: `${manifest.seasonSource.conversion} ${moveText(year, move, perPoint)}`,
     licence: manifest.seasonSource.licence,
     url: manifest.sources.war.url,
     retrieved: manifest.seasonSource.retrieved,
@@ -200,19 +221,52 @@ function buildWarSeason(snapshot, year, manifest, franchises, reference) {
   const databankOf = id => snapshot.teams[teams.find(t => t.id === id).war];
   const record = code => snapshot.teams[code].w / (snapshot.teams[code].w + snapshot.teams[code].l);
   const strength = new Map(clubs.map(c => [c.id, c.str]));
-  const best = rows.filter(row => row.role === 'H').sort((a, b) => ratings.get(b.id) - ratings.get(a.id) || b.score - a.score).slice(0, 5)
-    .concat(rows.filter(row => row.role !== 'H').sort((a, b) => ratings.get(b.id) - ratings.get(a.id) || b.score - a.score).slice(0, 3));
+  const unmovedStrength = new Map(unmoved.map(c => [c.id, c.str]));
+  const rated = new Map(players.map(p => [p.id, p.rating]));
+  const best = rows.filter(row => row.role === 'H').sort((a, b) => rated.get(b.id) - rated.get(a.id) || b.score - a.score).slice(0, 5)
+    .concat(rows.filter(row => row.role !== 'H').sort((a, b) => rated.get(b.id) - rated.get(a.id) || b.score - a.score).slice(0, 3));
+  const vsRecord = of => Math.round(pearson(teams.map(of), teams.map(t => record(t.war))) * 1000) / 1000;
+  const movedOf = new Map(move.moves.map(m => [m.id, m]));
+  const r2 = value => Math.round(value * 100) / 100;
   const audit = {
     id: doc.id, version: doc.version, map: doc.map, players: rows.length,
     clubs: clubs.map(c => `${c.name} ${c.str} (${databankOf(c.id).w}-${databankOf(c.id).l})`),
-    strengthVsRecord: Math.round(pearson(teams.map(t => strength.get(t.id)), teams.map(t => record(t.war))) * 1000) / 1000,
-    best: best.map(row => `${players.find(p => p.id === row.id).name} ${row.positions[0]} ${ratings.get(row.id)}`),
+    // Club strength (the lineup's mean rating the game shows) against the real win share, after the move and before.
+    strengthVsRecord: vsRecord(t => strength.get(t.id)),
+    strengthVsRecordBefore: vsRecord(t => unmovedStrength.get(t.id)),
+    // The same for the strength the match model plays, which the move sets.
+    playedVsRecord: vsRecord(t => movedOf.get(t.id).after),
+    playedVsRecordBefore: vsRecord(t => movedOf.get(t.id).before),
+    // The move's constants: the records' reliability, the win share a point is worth (measured at the pitching premium of
+    // the clubs before the move) and the season's mean strength before it.
+    results: { reliability: Math.round(move.reliability * 1000) / 1000, perPoint: Math.round(perPoint * 10000) / 10000, level: r2(move.level),
+      premiumBefore: premium },
+    // Each club's strength as the match model plays it, before and after, its target, and how its players moved.
+    moves: clubs.map(c => {
+      const m = movedOf.get(c.id);
+      const by = shift => (shift > 0 ? `+${shift}` : shift < 0 ? `−${-shift}` : '±0');
+      return `${c.name} ${r2(m.before)} → ${r2(m.after)} (target ${r2(m.target)}; ${by(m.shift)} each${m.plus ? `, the best ${m.plus} ${by(m.shift + 1)}` : ''})`;
+    }),
+    best: best.map(row => `${players.find(p => p.id === row.id).name} ${row.positions[0]} ${rated.get(row.id)}`),
     nations: nations.map(n => `${n.name} ${n.str} (${n.squad.length}${n.open.length ? `; the game fills ${n.open.join(' ')}` : ''})`),
     fielded: nations.filter(n => fielded.includes(n.id)).map(n => n.name),
     noNation: players.filter(p => p.nation == null).map(p => `${p.name} (${p.id}): ${p.born ? `born in ${p.born}, no nation of the game` : 'no birthplace'}`),
     renamed,
   };
   return { doc, text: serializeFootballSet(doc), audit };
+}
+
+/**
+ * The sentence each computed season's `source.conversion` ends with: how its clubs moved toward their real records, with
+ * the season's own constants.
+ */
+function moveText(year, move, perPoint) {
+  return 'Then each club moves toward its real won-lost record (docs/design/computed-ratings.md, step 5). Its target, in the strength '
+    + 'the match model plays (the mean of its lineup\'s batting and its defence, 75% pitching and 25% fielding), is '
+    + `μ + √r × (W% − ½) × (n − 1)/n ÷ m: μ ${move.level.toFixed(2)}, the season's mean strength before the move; r ${move.reliability.toFixed(3)}, `
+    + 'the share of the records\' variance that is not luck; n the clubs of its league, none of which plays itself; '
+    + `m ${perPoint.toFixed(4)}, the win share a point of strength is worth in the engine under ${year}'s rules. Every player of the `
+    + 'club moves by one whole number and the best few of its lineup by one more, so nobody passes a teammate.';
 }
 
 /**
@@ -233,7 +287,9 @@ Generated by scripts/build-mlb-seasons.mjs from scripts/data/mlb-war-seasons.jso
 
 The ratings in these files are computed by this project from the players' WAR (docs/design/baseball.md, "Seasons
 before 2018: computed from WAR"): each player's WAR per playing time over three seasons, put rank for rank on
-MLB The Show 18 to 24's scale. No game rated these seasons, and these are not any game's ratings.
+MLB The Show 18 to 24's scale, then every player of a club moved toward the club's real won-lost record (the
+Databank's), by one whole number and the best few of its lineup by one more. No game rated these seasons, and
+these are not any game's ratings.
 
 WAR: ${war.name} by ${war.author} (${war.repository}),
   file ${war.file} at commit ${war.commit}.

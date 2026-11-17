@@ -21,9 +21,11 @@ challenge links) is the game's own, unchanged.
 NBA 2K27), and no other public dataset rates them. So every EuroLeague rating is the game's own
 estimate, marked as one wherever it is shown, as hockey's below EA's top 300 are
 (`src/data/estimates.js`, in the EuroLeague's words: "no game rates EuroLeague players, so this
-one comes from his EuroLeague box scores"). The national fives' EuroLeague players keep the
-curated ratings they had (`scripts/fiba-squads.json`), so a player can rate differently for his
-club and his country: see Known limitations.
+one comes from his EuroLeague box scores"). Since 2026-11-14 the national fives' EuroLeague
+players take these estimates too, under their clubs' spelling (`npm run build-basketball`), so no
+player rates one way for his club and another for his country; the roster audit
+(`npm run audit:rosters`, docs/design/roster-audit.md) found 15 who did. Their curated ratings
+stay in `scripts/fiba-squads.json` for the day one leaves the EuroLeague.
 
 **Source.** `npm run sync:euroleague` (`scripts/sync-euroleague.mjs`) reads the EuroLeague's own
 public data API (`api-live.euroleague.net`, which its website reads), cached in the ignored
@@ -45,7 +47,8 @@ public data API (`api-live.euroleague.net`, which its website reads), cached in 
   four games at it. A player with no EuroLeague game rates there (67).
 - **Level**: PIR 9 rates 73, between the two references, which nearly agree. The 47 rostered
   players who were in a recent NBA 2K (2K24–2K27) rated 72.5 there, at a EuroLeague PIR of 8.4;
-  the 30 EuroLeague players in the national fives carry a curated 73.6 at 9.2.
+  the 30 EuroLeague players in the national fives carried a curated 73.6 at 9.2 (they have
+  played at the estimates since 2026-11-14).
 - **Slope**: 1.3 rating points a point of PIR, so the league's clubs spread as the real ones do.
   Neither reference can give it: NBA 2K rates the fringe of its league, where EuroLeague players
   come from, close together (a slope of 0.25), and the curated national ratings (0.31) follow
@@ -303,10 +306,11 @@ the four in Iceland's small lineups, is its power forward.
 
 - Every EuroLeague rating is an estimate from box scores. PIR rewards rebounding big men more
   than shooters and defenders, so a three-and-D wing rates lower than his coach would rate him.
-- The national fives' EuroLeague players keep their curated ratings, so a player can rate
-  differently for his club and his country: Kostas Sloukas is 79 for Greece and 77 by his
-  EuroLeague games, Andreas Obst 78 for Germany and 73 for Bayern. Switching the fives to these
-  estimates would change several nations' strengths.
+- The national fives' EuroLeague players play at these estimates (since 2026-11-14), so the
+  estimates' limits are their countries' too: 42 of the fives' 235 players, among them Andreas
+  Obst (78 curated, 73 by his EuroLeague games) and Chima Moneke (74 curated, 83). The switch
+  moved 14 of the 47 nations' strengths by one or two points (Slovenia, Latvia and Italy down
+  two, South Sudan up two).
 - Great Britain's new five makes it a real basketball side, so it now fields a team in
   basketball as in both tennis games, as Great Britain under the Union Jack on the United
   Kingdom's shape (`playsAs`); football still plays England. Basketball fields 47 nations (40

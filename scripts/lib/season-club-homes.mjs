@@ -73,14 +73,17 @@ function evidence(name, theirs) {
 
 /**
  * Today's clubs of one country (a built-in snapshot's `clubs`) by the names a season may give them (name, short and
- * FM's own): → (name) → the one club the name names most surely, or null when none does or two do equally.
+ * FM's own): → (name) → the one club the name names most surely, or null when none does or two do equally. With
+ * `exact`, only a name one of today's names equals (as written or folded) counts: a short name ("KaPa", "Apollon")
+ * inside a longer one names the wrong club too often.
  */
-export function snapshotMatcher(snapshotClubs = []) {
+export function snapshotMatcher(snapshotClubs = [], { exact = false } = {}) {
   const named = snapshotClubs.map(club => ({ club, names: [club.name, club.short, club.fmName, club.fmShort].filter(Boolean) }));
   return name => {
     let best = 0, hits = [];
     for (const { club, names } of named) {
       const score = evidence(name, names);
+      if (exact && score < 4) continue;
       if (score > best) { best = score; hits = [club]; } else if (score && score === best) hits.push(club);
     }
     return hits.length === 1 ? hits[0] : null;
@@ -88,7 +91,7 @@ export function snapshotMatcher(snapshotClubs = []) {
 }
 
 /**
- * Homes for one country's season clubs. `clubs` are `[{ name }]`, one per name, strongest first; `snapshot` the
+ * Homes for one country's season clubs. `clubs` are `[{ name, short? }]`, one per name, strongest first; `snapshot` the
  * country's built-in snapshot or null; `europe` the Europe maps' clubs by id with `idOf(name)` the season's id for a
  * name; `overrides` the hand overrides of this country by name; `locate` scripts/lib/domestic-locate.mjs's tools
  * (`{ wikidata, geoFiles }`) and `nation` `{ id, name }`. Returns Map(name → { lon, lat, source, label?, twin? }):
@@ -97,7 +100,7 @@ export function snapshotMatcher(snapshotClubs = []) {
  */
 export async function locateSeasonClubs({ nation, clubs, snapshot, europe = {}, idOf = () => null, overrides = {}, locate }) {
   const out = new Map();
-  const twinOf = snapshotMatcher(snapshot?.clubs);
+  const twinOf = snapshotMatcher(snapshot?.clubs), exactTwinOf = snapshotMatcher(snapshot?.clubs, { exact: true });
   const byFm = new Map((snapshot?.clubs || []).map(club => [`d${nation.id}-${club.fm}`, club]));
   const rest = [];
   for (const club of clubs) {
@@ -114,7 +117,8 @@ export async function locateSeasonClubs({ nation, clubs, snapshot, europe = {}, 
       continue;
     }
     if (override?.qid) { rest.push(club); continue; }
-    const twin = twinOf(club.name);
+    // Its full name first, then a short name its source gives it ("HJK", "Ferencváros"), where one of today's names is it.
+    const twin = twinOf(club.name) ?? (club.short ? exactTwinOf(club.short) : null);
     if (twin?.location) {
       const id = `d${nation.id}-${twin.fm}`;
       out.set(club.name, { lon: twin.location.lon, lat: twin.location.lat, source: `map:${id}`, label: twin.name, twin: id });

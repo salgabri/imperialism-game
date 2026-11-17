@@ -32,6 +32,9 @@
   "San Jose Oruro": { "as": "d068-2000210685", "note": "Club San José of Oruro, not Real Oruro" },
   "Universitario": { "unplaced": true, "note": "A Universitario of the mid-1990s league, which SWOS does not place; not Universitario de Vinto (founded 2006)" }
 },
+"076": {
+  "Botafogo de Futebol e Regatas": { "as": "d076-316", "note": "Rio de Janeiro's Botafogo, not Brasília's Associação Botafogo, whose Wikidata item the name matched" }
+},
 "100": {
   "Neftokhimik": { "lon": 27.4689, "lat": 42.5065, "note": "Burgas (GeoNames 732770), Neftochimic Burgas's" }
 },
@@ -132,6 +135,7 @@
   "Vidus Riga": { "lon": 24.1059, "lat": 56.946, "note": "Riga (GeoNames 456172): not Riga FC (2015), whose name it shares" }
 },
 "484": {
+  "Club de Fútbol Universidad": { "as": "d484-1260", "note": "Pumas de la UNAM (Mexico City), not Guadalajara's Leones Negros, whose Wikidata item the name matched" },
   "Inter de Tijuana": { "lon": -117.0037, "lat": 32.5027, "note": "Tijuana (GeoNames 3981609): not the Xolos (2007)" },
   "Linces de Celaya": { "lon": -100.814, "lat": 20.5218, "note": "Celaya (GeoNames 4014875): SWOS also has Celaya, today's Celaya FC" },
   "Marte Morelos": { "lon": -99.2308, "lat": 18.9261, "note": "Cuernavaca (GeoNames 3529947), Club Marte's city in Morelos, not Ecatepec de Morelos" },
@@ -202,6 +206,9 @@
 "740": {
   "SV Nationaal": { "lon": -55.1668, "lat": 5.8664, "note": "Paramaribo (GeoNames 3383330): the army's club" },
   "SV Nationaal Leger": { "lon": -55.1668, "lat": 5.8664, "note": "Paramaribo (GeoNames 3383330): the army's club" }
+},
+"752": {
+  "Myresjö IF": { "lon": 14.9647, "lat": 57.3846, "note": "Myresjö (Wikidata Q2140394, a Swedish urban area), the club's namesake village: Wikidata gives Myresjö IF (Q1131136) no place, and it is in no cached GeoNames file" }
 },
 "804": {
   "Bukovina": { "lon": 25.9324, "lat": 48.2904, "note": "Chernivtsi (GeoNames 710719)" },

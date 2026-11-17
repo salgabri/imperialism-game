@@ -102,7 +102,7 @@ test('each season\'s pitching premium is its clubs\' own, so its average lineup 
     assert.ok(Math.abs(edges / pairs) < 0.01, `${season.id}: the average edge is ${edges / pairs}`);
   }
   // MLB The Show rates its hitters against its pitchers differently each year; the built-in season keeps its 2.3.
-  assert.deepEqual(['mlb-the-show-25', 'mlb-the-show-19', 'mlb-war-1968'].map(id => BASEBALL_SEASON_PREMIUMS[id]), [0.93, 1.53, 2.46]);
+  assert.deepEqual(['mlb-the-show-25', 'mlb-the-show-19', 'mlb-war-1968'].map(id => BASEBALL_SEASON_PREMIUMS[id]), [0.93, 1.53, 2.57]);
   assert.equal(seasonPremium(baseball.clubs.map(club => buildClub(club, baseball))), 2.32);
 });
 

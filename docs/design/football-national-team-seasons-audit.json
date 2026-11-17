@@ -73,6 +73,11 @@
     "cutoff": "07-01",
     "least": 11,
     "openCapsPerYear": 8,
+    "ages": {
+      "least": 14,
+      "most": 45,
+      "why": "A player younger than 14 or older than 45 on 1 July of Y − 1, when the season starts, is in no pool: his Wikidata stint and his date of birth cannot both be right. The roster audit (scripts/audit-rosters.mjs) found three: Óscar Ulloa (Q8078877, born 1986) for El Salvador from 1988, Rusdi Suparman (born 1973) for Malaysia from 1986, and Antoine Tassy (born 1924), Haiti's coach, as its player from 1965 to 1976."
+    },
     "rule": "A nation's pool for the season ending in Y: the players of its team with a Wikidata stint covering Y − 1 or Y (a stint Wikidata has not closed, such as Paolo Maldini's for Italy from 1988, ends as its caps would run out at 8 a year: start + ⌈caps / 8⌉ − 1; one with neither end nor caps is left out), each with his stint's caps a year, caps / (end − start + 1), halved when the stint covers only one of the two years. A player in two nations' pools plays for the one where that figure is higher. The XI: for each role (1 GK, 4 DF, 4 MF, 2 FW) the pool's players of that position, the highest figure first (then the most caps for the team by then, then the lower Wikidata id); a role short of them takes the highest figures left. A nation fields a team when its pool holds at least 11 players with a position, one a goalkeeper, it played a full international in the four years before, and its shape takes part that year. The XI's order: Ballon d'Or points of the season's two years, then the caps for the team by the season's end (each stint's caps spread evenly over its years), then the figure, then the lower Wikidata id."
   },
   "wikidata": {
@@ -103,7 +108,7 @@
   "seasons": [
     {
       "id": "nt-1961",
-      "version": "nt-1961-e8cee68a",
+      "version": "nt-1961-7888dd55",
       "season": "1960/61",
       "elo": {
         "date": "1961-07-01",
@@ -225,12 +230,6 @@
           "why": "4 players with a position"
         },
         {
-          "team": "Pakistan",
-          "qid": "Q390989",
-          "players": 3,
-          "why": "3 players with a position"
-        },
-        {
           "team": "Australia",
           "qid": "Q268208",
           "players": 2,
@@ -257,6 +256,12 @@
         {
           "team": "Lebanon",
           "qid": "Q318928",
+          "players": 2,
+          "why": "2 players with a position"
+        },
+        {
+          "team": "Pakistan",
+          "qid": "Q390989",
           "players": 2,
           "why": "2 players with a position"
         },
@@ -343,12 +348,6 @@
           "qid": "Q241353",
           "players": 1,
           "why": "takes no part that season"
-        },
-        {
-          "team": "Myanmar",
-          "qid": "Q271753",
-          "players": 1,
-          "why": "1 players with a position"
         },
         {
           "team": "Nicaragua",
@@ -461,7 +460,7 @@
           "rank": 3,
           "T": 83.46,
           "strength": 84,
-          "pool": 39,
+          "pool": 38,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -513,7 +512,7 @@
           "rank": 5,
           "T": 82.24,
           "strength": 82,
-          "pool": 29,
+          "pool": 28,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -1464,7 +1463,7 @@
     },
     {
       "id": "nt-1963",
-      "version": "nt-1963-7fdddb9b",
+      "version": "nt-1963-e463073f",
       "season": "1962/63",
       "elo": {
         "date": "1963-07-01",
@@ -1724,12 +1723,6 @@
           "why": "takes no part that season"
         },
         {
-          "team": "Myanmar",
-          "qid": "Q271753",
-          "players": 1,
-          "why": "1 players with a position"
-        },
-        {
           "team": "New Caledonia",
           "qid": "Q328295",
           "players": 1,
@@ -1890,7 +1883,7 @@
           "rank": 4,
           "T": 85.19,
           "strength": 85,
-          "pool": 47,
+          "pool": 46,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -2132,7 +2125,7 @@
           "rank": 14,
           "T": 82.39,
           "strength": 82,
-          "pool": 36,
+          "pool": 35,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -2532,7 +2525,7 @@
           "rank": 38,
           "T": 76.07,
           "strength": 76,
-          "pool": 29,
+          "pool": 28,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -2845,7 +2838,7 @@
     },
     {
       "id": "nt-1964",
-      "version": "nt-1964-d35f1858",
+      "version": "nt-1964-52274857",
       "season": "1963/64",
       "elo": {
         "date": "1964-07-01",
@@ -3107,12 +3100,6 @@
         {
           "team": "Mali",
           "qid": "Q211733",
-          "players": 1,
-          "why": "1 players with a position"
-        },
-        {
-          "team": "Myanmar",
-          "qid": "Q271753",
           "players": 1,
           "why": "1 players with a position"
         },
@@ -3537,7 +3524,7 @@
           "rank": 16,
           "T": 81.8,
           "strength": 82,
-          "pool": 32,
+          "pool": 30,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -3745,7 +3732,7 @@
           "rank": 32,
           "T": 77.02,
           "strength": 77,
-          "pool": 35,
+          "pool": 34,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -3797,7 +3784,7 @@
           "rank": 35,
           "T": 76.31,
           "strength": 76,
-          "pool": 30,
+          "pool": 29,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -4188,7 +4175,7 @@
     },
     {
       "id": "nt-1965",
-      "version": "nt-1965-8cbcba34",
+      "version": "nt-1965-58fa2d01",
       "season": "1964/65",
       "elo": {
         "date": "1965-07-01",
@@ -4468,12 +4455,6 @@
         {
           "team": "Jordan",
           "qid": "Q275940",
-          "players": 1,
-          "why": "1 players with a position"
-        },
-        {
-          "team": "Myanmar",
-          "qid": "Q271753",
           "players": 1,
           "why": "1 players with a position"
         },
@@ -4782,7 +4763,7 @@
           "rank": 12,
           "T": 83.27,
           "strength": 83,
-          "pool": 36,
+          "pool": 34,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -4964,7 +4945,7 @@
           "rank": 20,
           "T": 80.49,
           "strength": 81,
-          "pool": 33,
+          "pool": 32,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -5384,7 +5365,7 @@
           "rank": 54,
           "T": 74.9,
           "strength": 75,
-          "pool": 38,
+          "pool": 37,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -5557,7 +5538,7 @@
     },
     {
       "id": "nt-1967",
-      "version": "nt-1967-a72cb83a",
+      "version": "nt-1967-3374b52b",
       "season": "1966/67",
       "elo": {
         "date": "1967-07-01",
@@ -5817,12 +5798,6 @@
           "why": "2 players with a position"
         },
         {
-          "team": "Thailand",
-          "qid": "Q239549",
-          "players": 2,
-          "why": "2 players with a position"
-        },
-        {
           "team": "Congo",
           "qid": "Q330056",
           "players": 1,
@@ -5859,12 +5834,6 @@
           "why": "1 players with a position"
         },
         {
-          "team": "Myanmar",
-          "qid": "Q271753",
-          "players": 1,
-          "why": "1 players with a position"
-        },
-        {
           "team": "New Caledonia",
           "qid": "Q328295",
           "players": 1,
@@ -5885,6 +5854,12 @@
         {
           "team": "Saudi Arabia",
           "qid": "Q189723",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Thailand",
+          "qid": "Q239549",
           "players": 1,
           "why": "1 players with a position"
         }
@@ -6157,7 +6132,7 @@
           "rank": 11,
           "T": 81.55,
           "strength": 82,
-          "pool": 46,
+          "pool": 43,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -6703,7 +6678,7 @@
           "rank": 44,
           "T": 73.24,
           "strength": 73,
-          "pool": 30,
+          "pool": 29,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -6952,7 +6927,7 @@
     },
     {
       "id": "nt-1968",
-      "version": "nt-1968-2ef1d499",
+      "version": "nt-1968-051165ad",
       "season": "1967/68",
       "elo": {
         "date": "1968-07-01",
@@ -7540,7 +7515,7 @@
           "rank": 11,
           "T": 80.77,
           "strength": 81,
-          "pool": 38,
+          "pool": 36,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -8228,7 +8203,7 @@
           "rank": 49,
           "T": 73.37,
           "strength": 73,
-          "pool": 35,
+          "pool": 34,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -8449,7 +8424,7 @@
     },
     {
       "id": "nt-1969",
-      "version": "nt-1969-7c2094ba",
+      "version": "nt-1969-2fd75bac",
       "season": "1968/69",
       "elo": {
         "date": "1969-07-01",
@@ -9051,7 +9026,7 @@
           "rank": 12,
           "T": 79.32,
           "strength": 79,
-          "pool": 28,
+          "pool": 27,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -9879,7 +9854,7 @@
           "rank": 67,
           "T": 71,
           "strength": 71,
-          "pool": 39,
+          "pool": 38,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -9988,7 +9963,7 @@
     },
     {
       "id": "nt-1971",
-      "version": "nt-1971-46950e07",
+      "version": "nt-1971-3049e412",
       "season": "1970/71",
       "elo": {
         "date": "1971-07-01",
@@ -10016,6 +9991,12 @@
         {
           "team": "Albania",
           "qid": "Q186262",
+          "players": 10,
+          "why": "10 players with a position"
+        },
+        {
+          "team": "Haiti",
+          "qid": "Q236006",
           "players": 10,
           "why": "10 players with a position"
         },
@@ -10074,12 +10055,6 @@
           "why": "6 players with a position"
         },
         {
-          "team": "Nigeria",
-          "qid": "Q181930",
-          "players": 6,
-          "why": "6 players with a position"
-        },
-        {
           "team": "Guatemala",
           "qid": "Q270168",
           "players": 5,
@@ -10100,6 +10075,12 @@
         {
           "team": "Indonesia",
           "qid": "Q657451",
+          "players": 5,
+          "why": "5 players with a position"
+        },
+        {
+          "team": "Nigeria",
+          "qid": "Q181930",
           "players": 5,
           "why": "5 players with a position"
         },
@@ -10604,7 +10585,7 @@
           "rank": 15,
           "T": 76.23,
           "strength": 76,
-          "pool": 32,
+          "pool": 31,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -10734,7 +10715,7 @@
           "rank": 20,
           "T": 74.79,
           "strength": 75,
-          "pool": 40,
+          "pool": 39,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -11216,40 +11197,6 @@
           ]
         },
         {
-          "id": "332",
-          "name": "Haiti",
-          "team": "Haiti",
-          "qid": "Q236006",
-          "elo": 1479.7,
-          "rank": 46,
-          "T": 70.29,
-          "strength": 67,
-          "pool": 11,
-          "outOfPosition": [
-            "Emmanuel Sanon (FW as DF)",
-            "Claude Barthélemy (FW as DF)",
-            "Guy Saint-Vil (FW as MF)"
-          ],
-          "filled": [
-            "Guy Saint-Vil (FW as DF)",
-            "Roger Saint-Vil (FW as DF)",
-            "Antoine Tassy (FW as MF)"
-          ],
-          "eleven": [
-            "Emmanuel Sanon FW 76 100 caps 1970–1981 (8.33)",
-            "Henri Françillon GK 74 26 caps 1968–1977 (2.6)",
-            "Guy François MF 72 17 caps 1968–1974 (2.43)",
-            "Jean-Claude Désir MF 71 24 caps 1968–1977 (2.4)",
-            "Philippe Vorbe MF 70 18 caps 1968–1976 (2)",
-            "Claude Barthélemy FW 70 14 caps 1968–1974 (2)",
-            "Guy Saint-Vil FW 69 16 caps 1968–1977 (1.6)",
-            "Serge Ducosté DF 69 14 caps 1970–1974 (2.8)",
-            "Pierre Bayonne DF 68 21 caps 1970–1978 (2.33)",
-            "Roger Saint-Vil FW 68 5 caps 1968–1974 (0.71)",
-            "Antoine Tassy FW 66 ? caps 1965–1976 (0)"
-          ]
-        },
-        {
           "id": "392",
           "name": "Japan",
           "team": "Japan",
@@ -11617,7 +11564,7 @@
     },
     {
       "id": "nt-1972",
-      "version": "nt-1972-b43999d9",
+      "version": "nt-1972-c8937cfc",
       "season": "1971/72",
       "elo": {
         "date": "1972-07-01",
@@ -11709,12 +11656,6 @@
           "why": "7 players with a position"
         },
         {
-          "team": "Nigeria",
-          "qid": "Q181930",
-          "players": 7,
-          "why": "7 players with a position"
-        },
-        {
           "team": "Tunisia",
           "qid": "Q27971",
           "players": 7,
@@ -11723,6 +11664,12 @@
         {
           "team": "Guinea",
           "qid": "Q235411",
+          "players": 6,
+          "why": "6 players with a position"
+        },
+        {
+          "team": "Nigeria",
+          "qid": "Q181930",
           "players": 6,
           "why": "6 players with a position"
         },
@@ -12382,7 +12329,7 @@
           "rank": 20,
           "T": 76.23,
           "strength": 76,
-          "pool": 29,
+          "pool": 28,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -12616,7 +12563,7 @@
           "rank": 34,
           "T": 74.4,
           "strength": 73,
-          "pool": 13,
+          "pool": 12,
           "outOfPosition": [
             "Emmanuel Sanon (FW as MF)"
           ],
@@ -13241,7 +13188,7 @@
     },
     {
       "id": "nt-1973",
-      "version": "nt-1973-c19e9060",
+      "version": "nt-1973-bf9365cb",
       "season": "1972/73",
       "elo": {
         "date": "1973-07-01",
@@ -13333,14 +13280,14 @@
           "why": "7 players with a position"
         },
         {
-          "team": "Nigeria",
-          "qid": "Q181930",
-          "players": 7,
-          "why": "7 players with a position"
-        },
-        {
           "team": "Cyprus",
           "qid": "Q188791",
+          "players": 6,
+          "why": "6 players with a position"
+        },
+        {
+          "team": "Nigeria",
+          "qid": "Q181930",
           "players": 6,
           "why": "6 players with a position"
         },
@@ -13497,12 +13444,6 @@
         {
           "team": "Panama",
           "qid": "Q223748",
-          "players": 1,
-          "why": "1 players with a position"
-        },
-        {
-          "team": "Qatar",
-          "qid": "Q232731",
           "players": 1,
           "why": "1 players with a position"
         },
@@ -14350,7 +14291,7 @@
           "rank": 41,
           "T": 73.21,
           "strength": 73,
-          "pool": 17,
+          "pool": 16,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -14921,7 +14862,7 @@
     },
     {
       "id": "nt-1975",
-      "version": "nt-1975-3762b211",
+      "version": "nt-1975-25f71081",
       "season": "1974/75",
       "elo": {
         "date": "1975-07-01",
@@ -14971,14 +14912,14 @@
           "why": "9 players with a position"
         },
         {
-          "team": "Nigeria",
-          "qid": "Q181930",
-          "players": 9,
-          "why": "9 players with a position"
-        },
-        {
           "team": "Luxembourg",
           "qid": "Q184266",
+          "players": 8,
+          "why": "8 players with a position"
+        },
+        {
+          "team": "Nigeria",
+          "qid": "Q181930",
           "players": 8,
           "why": "8 players with a position"
         },
@@ -15189,12 +15130,6 @@
         {
           "team": "Panama",
           "qid": "Q223748",
-          "players": 1,
-          "why": "1 players with a position"
-        },
-        {
-          "team": "Qatar",
-          "qid": "Q232731",
           "players": 1,
           "why": "1 players with a position"
         },
@@ -15458,7 +15393,7 @@
           "rank": 9,
           "T": 80.74,
           "strength": 81,
-          "pool": 41,
+          "pool": 40,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -16366,7 +16301,7 @@
           "rank": 58,
           "T": 71.72,
           "strength": 72,
-          "pool": 21,
+          "pool": 20,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -16667,7 +16602,7 @@
     },
     {
       "id": "nt-1976",
-      "version": "nt-1976-b4650a74",
+      "version": "nt-1976-df00a359",
       "season": "1975/76",
       "elo": {
         "date": "1976-07-01",
@@ -16819,12 +16754,6 @@
           "why": "4 players with a position"
         },
         {
-          "team": "Afghanistan",
-          "qid": "Q192966",
-          "players": 3,
-          "why": "3 players with a position"
-        },
-        {
           "team": "North Korea",
           "qid": "Q14132",
           "players": 3,
@@ -16835,6 +16764,12 @@
           "qid": "Q270682",
           "players": 3,
           "why": "3 players with a position"
+        },
+        {
+          "team": "Afghanistan",
+          "qid": "Q192966",
+          "players": 2,
+          "why": "2 players with a position"
         },
         {
           "team": "Bolivia",
@@ -16857,12 +16792,6 @@
         {
           "team": "Malawi",
           "qid": "Q365548",
-          "players": 2,
-          "why": "2 players with a position"
-        },
-        {
-          "team": "Qatar",
-          "qid": "Q232731",
           "players": 2,
           "why": "2 players with a position"
         },
@@ -16929,6 +16858,12 @@
         {
           "team": "Panama",
           "qid": "Q223748",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Qatar",
+          "qid": "Q232731",
           "players": 1,
           "why": "1 players with a position"
         },
@@ -17224,7 +17159,7 @@
           "rank": 10,
           "T": 80.01,
           "strength": 80,
-          "pool": 36,
+          "pool": 35,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -18028,7 +17963,7 @@
           "rank": 53,
           "T": 72.14,
           "strength": 71,
-          "pool": 12,
+          "pool": 11,
           "outOfPosition": [
             "Wilner Piquant (GK as DF)"
           ],
@@ -18441,7 +18376,7 @@
     },
     {
       "id": "nt-1977",
-      "version": "nt-1977-f2f71d40",
+      "version": "nt-1977-f5dd7c32",
       "season": "1976/77",
       "elo": {
         "date": "1977-07-01",
@@ -18653,12 +18588,6 @@
           "why": "2 players with a position"
         },
         {
-          "team": "Qatar",
-          "qid": "Q232731",
-          "players": 2,
-          "why": "2 players with a position"
-        },
-        {
           "team": "Bangladesh",
           "qid": "Q241670",
           "players": 1,
@@ -18703,6 +18632,12 @@
         {
           "team": "Panama",
           "qid": "Q223748",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Qatar",
+          "qid": "Q232731",
           "players": 1,
           "why": "1 players with a position"
         },
@@ -19050,7 +18985,7 @@
           "rank": 13,
           "T": 79.46,
           "strength": 80,
-          "pool": 37,
+          "pool": 36,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -19736,7 +19671,7 @@
           "rank": 50,
           "T": 72.35,
           "strength": 72,
-          "pool": 13,
+          "pool": 12,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -20225,7 +20160,7 @@
     },
     {
       "id": "nt-1979",
-      "version": "nt-1979-96a59517",
+      "version": "nt-1979-8ca93794",
       "season": "1978/79",
       "elo": {
         "date": "1979-07-01",
@@ -20335,12 +20270,6 @@
           "why": "6 players with a position"
         },
         {
-          "team": "Ghana",
-          "qid": "Q172014",
-          "players": 5,
-          "why": "5 players with a position"
-        },
-        {
           "team": "Guatemala",
           "qid": "Q270168",
           "players": 5,
@@ -20367,6 +20296,12 @@
         {
           "team": "DR Congo",
           "qid": "Q270080",
+          "players": 4,
+          "why": "4 players with a position"
+        },
+        {
+          "team": "Ghana",
+          "qid": "Q172014",
           "players": 4,
           "why": "4 players with a position"
         },
@@ -20409,12 +20344,6 @@
         {
           "team": "Mali",
           "qid": "Q211733",
-          "players": 2,
-          "why": "2 players with a position"
-        },
-        {
-          "team": "Qatar",
-          "qid": "Q232731",
           "players": 2,
           "why": "2 players with a position"
         },
@@ -20511,6 +20440,12 @@
         {
           "team": "Panama",
           "qid": "Q223748",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Qatar",
+          "qid": "Q232731",
           "players": 1,
           "why": "1 players with a position"
         },
@@ -20737,7 +20672,7 @@
           "rank": 8,
           "T": 80.4,
           "strength": 80,
-          "pool": 50,
+          "pool": 49,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -21469,7 +21404,7 @@
           "rank": 44,
           "T": 72.47,
           "strength": 73,
-          "pool": 40,
+          "pool": 39,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -21521,7 +21456,7 @@
           "rank": 46,
           "T": 72.3,
           "strength": 71,
-          "pool": 13,
+          "pool": 12,
           "outOfPosition": [
             "Peter Fregene (GK as DF)"
           ],
@@ -22084,7 +22019,7 @@
     },
     {
       "id": "nt-1980",
-      "version": "nt-1980-37fff507",
+      "version": "nt-1980-2ff8a857",
       "season": "1979/80",
       "elo": {
         "date": "1980-07-01",
@@ -22134,12 +22069,6 @@
           "why": "6 players with a position"
         },
         {
-          "team": "Haiti",
-          "qid": "Q236006",
-          "players": 6,
-          "why": "6 players with a position"
-        },
-        {
           "team": "Thailand",
           "qid": "Q239549",
           "players": 6,
@@ -22152,14 +22081,14 @@
           "why": "5 players with a position"
         },
         {
-          "team": "Ghana",
-          "qid": "Q172014",
+          "team": "Guatemala",
+          "qid": "Q270168",
           "players": 5,
           "why": "5 players with a position"
         },
         {
-          "team": "Guatemala",
-          "qid": "Q270168",
+          "team": "Haiti",
+          "qid": "Q236006",
           "players": 5,
           "why": "5 players with a position"
         },
@@ -22172,12 +22101,6 @@
         {
           "team": "Ivory Coast",
           "qid": "Q175145",
-          "players": 5,
-          "why": "5 players with a position"
-        },
-        {
-          "team": "Saudi Arabia",
-          "qid": "Q189723",
           "players": 5,
           "why": "5 players with a position"
         },
@@ -22200,8 +22123,20 @@
           "why": "4 players with a position"
         },
         {
+          "team": "Ghana",
+          "qid": "Q172014",
+          "players": 4,
+          "why": "4 players with a position"
+        },
+        {
           "team": "Guinea",
           "qid": "Q235411",
+          "players": 4,
+          "why": "4 players with a position"
+        },
+        {
+          "team": "Saudi Arabia",
+          "qid": "Q189723",
           "players": 4,
           "why": "4 players with a position"
         },
@@ -22268,12 +22203,6 @@
         {
           "team": "Panama",
           "qid": "Q223748",
-          "players": 2,
-          "why": "2 players with a position"
-        },
-        {
-          "team": "Qatar",
-          "qid": "Q232731",
           "players": 2,
           "why": "2 players with a position"
         },
@@ -22358,6 +22287,12 @@
         {
           "team": "Oman",
           "qid": "Q206830",
+          "players": 1,
+          "why": "1 players with a position"
+        },
+        {
+          "team": "Qatar",
+          "qid": "Q232731",
           "players": 1,
           "why": "1 players with a position"
         },
@@ -22792,7 +22727,7 @@
           "rank": 18,
           "T": 78.58,
           "strength": 79,
-          "pool": 49,
+          "pool": 48,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -23026,7 +22961,7 @@
           "rank": 29,
           "T": 76.65,
           "strength": 77,
-          "pool": 38,
+          "pool": 37,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -23448,7 +23383,7 @@
           "rank": 53,
           "T": 72.96,
           "strength": 73,
-          "pool": 45,
+          "pool": 44,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -24037,7 +23972,7 @@
     },
     {
       "id": "nt-1981",
-      "version": "nt-1981-d49bc8af",
+      "version": "nt-1981-54f36c8c",
       "season": "1980/81",
       "elo": {
         "date": "1981-07-01",
@@ -24069,32 +24004,20 @@
           "why": "no shape on the map"
         },
         {
-          "team": "Ghana",
-          "qid": "Q172014",
-          "players": 7,
-          "why": "7 players with a position"
-        },
-        {
           "team": "Cuba",
           "qid": "Q236014",
           "players": 6,
           "why": "6 players with a position"
         },
         {
+          "team": "Ghana",
+          "qid": "Q172014",
+          "players": 6,
+          "why": "6 players with a position"
+        },
+        {
           "team": "Guatemala",
           "qid": "Q270168",
-          "players": 6,
-          "why": "6 players with a position"
-        },
-        {
-          "team": "Haiti",
-          "qid": "Q236006",
-          "players": 6,
-          "why": "6 players with a position"
-        },
-        {
-          "team": "Saudi Arabia",
-          "qid": "Q189723",
           "players": 6,
           "why": "6 players with a position"
         },
@@ -24111,6 +24034,12 @@
           "why": "5 players with a position"
         },
         {
+          "team": "Haiti",
+          "qid": "Q236006",
+          "players": 5,
+          "why": "5 players with a position"
+        },
+        {
           "team": "India",
           "qid": "Q212206",
           "players": 5,
@@ -24119,6 +24048,12 @@
         {
           "team": "Ivory Coast",
           "qid": "Q175145",
+          "players": 5,
+          "why": "5 players with a position"
+        },
+        {
+          "team": "Saudi Arabia",
+          "qid": "Q189723",
           "players": 5,
           "why": "5 players with a position"
         },
@@ -24137,12 +24072,6 @@
         {
           "team": "Indonesia",
           "qid": "Q657451",
-          "players": 4,
-          "why": "4 players with a position"
-        },
-        {
-          "team": "Qatar",
-          "qid": "Q232731",
           "players": 4,
           "why": "4 players with a position"
         },
@@ -24173,6 +24102,12 @@
         {
           "team": "Malawi",
           "qid": "Q365548",
+          "players": 3,
+          "why": "3 players with a position"
+        },
+        {
+          "team": "Qatar",
+          "qid": "Q232731",
           "players": 3,
           "why": "3 players with a position"
         },
@@ -24791,7 +24726,7 @@
           "rank": 19,
           "T": 78.43,
           "strength": 79,
-          "pool": 46,
+          "pool": 45,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -25107,7 +25042,7 @@
           "rank": 34,
           "T": 76.4,
           "strength": 76,
-          "pool": 21,
+          "pool": 20,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -25996,7 +25931,7 @@
     },
     {
       "id": "nt-1983",
-      "version": "nt-1983-d7d6e3fc",
+      "version": "nt-1983-d24e6a27",
       "season": "1982/83",
       "elo": {
         "date": "1983-07-01",
@@ -26100,12 +26035,6 @@
           "why": "5 players with a position"
         },
         {
-          "team": "Qatar",
-          "qid": "Q232731",
-          "players": 4,
-          "why": "4 players with a position"
-        },
-        {
           "team": "Uganda",
           "qid": "Q242845",
           "players": 4,
@@ -26132,6 +26061,12 @@
         {
           "team": "Malawi",
           "qid": "Q365548",
+          "players": 3,
+          "why": "3 players with a position"
+        },
+        {
+          "team": "Qatar",
+          "qid": "Q232731",
           "players": 3,
           "why": "3 players with a position"
         },
@@ -26548,7 +26483,7 @@
           "rank": 10,
           "T": 80.48,
           "strength": 81,
-          "pool": 33,
+          "pool": 32,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -26860,7 +26795,7 @@
           "rank": 26,
           "T": 76.19,
           "strength": 76,
-          "pool": 49,
+          "pool": 48,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -26912,7 +26847,7 @@
           "rank": 28,
           "T": 76.01,
           "strength": 76,
-          "pool": 28,
+          "pool": 27,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -27224,7 +27159,7 @@
           "rank": 41,
           "T": 73.75,
           "strength": 74,
-          "pool": 24,
+          "pool": 23,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -27963,7 +27898,7 @@
     },
     {
       "id": "nt-1984",
-      "version": "nt-1984-23172718",
+      "version": "nt-1984-ebb08ed3",
       "season": "1983/84",
       "elo": {
         "date": "1984-07-01",
@@ -28067,12 +28002,6 @@
           "why": "4 players with a position"
         },
         {
-          "team": "Qatar",
-          "qid": "Q232731",
-          "players": 4,
-          "why": "4 players with a position"
-        },
-        {
           "team": "Tunisia",
           "qid": "Q27971",
           "players": 4,
@@ -28111,6 +28040,12 @@
         {
           "team": "Panama",
           "qid": "Q223748",
+          "players": 3,
+          "why": "3 players with a position"
+        },
+        {
+          "team": "Qatar",
+          "qid": "Q232731",
           "players": 3,
           "why": "3 players with a position"
         },
@@ -28781,7 +28716,7 @@
           "rank": 22,
           "T": 80,
           "strength": 80,
-          "pool": 31,
+          "pool": 30,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -28885,7 +28820,7 @@
           "rank": 28,
           "T": 79.3,
           "strength": 79,
-          "pool": 24,
+          "pool": 23,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -29101,7 +29036,7 @@
           "rank": 36,
           "T": 78.41,
           "strength": 78,
-          "pool": 58,
+          "pool": 57,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -29231,7 +29166,7 @@
           "rank": 41,
           "T": 76.91,
           "strength": 77,
-          "pool": 26,
+          "pool": 25,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -29507,7 +29442,7 @@
           "rank": 55,
           "T": 74.75,
           "strength": 75,
-          "pool": 35,
+          "pool": 34,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -29978,7 +29913,7 @@
     },
     {
       "id": "nt-1985",
-      "version": "nt-1985-53d63f73",
+      "version": "nt-1985-1a514a1d",
       "season": "1984/85",
       "elo": {
         "date": "1985-07-01",
@@ -30094,12 +30029,6 @@
           "why": "4 players with a position"
         },
         {
-          "team": "Qatar",
-          "qid": "Q232731",
-          "players": 4,
-          "why": "4 players with a position"
-        },
-        {
           "team": "Venezuela",
           "qid": "Q214151",
           "players": 4,
@@ -30120,6 +30049,12 @@
         {
           "team": "Panama",
           "qid": "Q223748",
+          "players": 3,
+          "why": "3 players with a position"
+        },
+        {
+          "team": "Qatar",
+          "qid": "Q232731",
           "players": 3,
           "why": "3 players with a position"
         },
@@ -31026,7 +30961,7 @@
           "rank": 31,
           "T": 79.75,
           "strength": 80,
-          "pool": 35,
+          "pool": 34,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -31296,7 +31231,7 @@
           "rank": 42,
           "T": 77.66,
           "strength": 78,
-          "pool": 35,
+          "pool": 34,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -31322,7 +31257,7 @@
           "rank": 43,
           "T": 77.66,
           "strength": 78,
-          "pool": 55,
+          "pool": 54,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -31995,7 +31930,7 @@
     },
     {
       "id": "nt-1987",
-      "version": "nt-1987-b2187f9b",
+      "version": "nt-1987-5ac33004",
       "season": "1986/87",
       "elo": {
         "date": "1987-07-01",
@@ -32093,12 +32028,6 @@
           "why": "6 players with a position"
         },
         {
-          "team": "Qatar",
-          "qid": "Q232731",
-          "players": 5,
-          "why": "5 players with a position"
-        },
-        {
           "team": "DR Congo",
           "qid": "Q270080",
           "players": 4,
@@ -32157,6 +32086,12 @@
           "qid": "Q186690",
           "players": 3,
           "why": "no shape on the map"
+        },
+        {
+          "team": "Qatar",
+          "qid": "Q232731",
+          "players": 3,
+          "why": "3 players with a position"
         },
         {
           "team": "Zimbabwe",
@@ -32357,7 +32292,7 @@
           "rank": 2,
           "T": 85.69,
           "strength": 86,
-          "pool": 35,
+          "pool": 34,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -32981,7 +32916,7 @@
           "rank": 29,
           "T": 78.24,
           "strength": 78,
-          "pool": 34,
+          "pool": 33,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -33899,7 +33834,7 @@
           "rank": 100,
           "T": 69.11,
           "strength": 68,
-          "pool": 18,
+          "pool": 16,
           "outOfPosition": [
             "Hassan Sani (FW as MF)"
           ],
@@ -33915,7 +33850,7 @@
             "Lim Teong Kim FW 69 42 caps 1982–1991 (4.2)",
             "Saleh Dollah FW 68 97 caps 1985–1996 (8.08)",
             "Azizol Abu Haniffah MF 67 77 caps 1987–1994 (4.81)",
-            "Rusdi Suparman DF 67 ? caps 1986–1996 (0)",
+            "Raja Azlan Shah Raja So'ib DF 67 ? caps 1987–1991 (0)",
             "Isham Shahruddin MF 66 ? caps 1987–1987 (0)",
             "Khalid Shahdan MF 65 ? caps 1985–1989 (0)"
           ]
@@ -34012,7 +33947,7 @@
     },
     {
       "id": "nt-1988",
-      "version": "nt-1988-fe3b688f",
+      "version": "nt-1988-0709356d",
       "season": "1987/88",
       "elo": {
         "date": "1988-07-01",
@@ -34110,16 +34045,16 @@
           "why": "7 players with a position"
         },
         {
-          "team": "Liberia",
-          "qid": "Q387301",
-          "players": 7,
-          "why": "7 players with a position"
-        },
-        {
           "team": "Panama",
           "qid": "Q223748",
           "players": 7,
           "why": "7 players with a position"
+        },
+        {
+          "team": "Liberia",
+          "qid": "Q387301",
+          "players": 6,
+          "why": "6 players with a position"
         },
         {
           "team": "Trinidad and Tobago",
@@ -34132,12 +34067,6 @@
           "qid": "Q214151",
           "players": 6,
           "why": "6 players with a position"
-        },
-        {
-          "team": "Qatar",
-          "qid": "Q232731",
-          "players": 5,
-          "why": "5 players with a position"
         },
         {
           "team": "Zimbabwe",
@@ -34160,6 +34089,12 @@
         {
           "team": "Malawi",
           "qid": "Q365548",
+          "players": 4,
+          "why": "4 players with a position"
+        },
+        {
+          "team": "Qatar",
+          "qid": "Q232731",
           "players": 4,
           "why": "4 players with a position"
         },
@@ -34548,7 +34483,7 @@
           "rank": 8,
           "T": 81.85,
           "strength": 82,
-          "pool": 37,
+          "pool": 36,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -35224,7 +35159,7 @@
           "rank": 37,
           "T": 76.91,
           "strength": 77,
-          "pool": 35,
+          "pool": 34,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -35620,7 +35555,7 @@
           "rank": 55,
           "T": 74.19,
           "strength": 74,
-          "pool": 23,
+          "pool": 22,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -35990,7 +35925,7 @@
           "rank": 108,
           "T": 67.18,
           "strength": 66,
-          "pool": 15,
+          "pool": 14,
           "outOfPosition": [
             "Saleh Dollah (FW as MF)"
           ],
@@ -36101,7 +36036,7 @@
     },
     {
       "id": "nt-1989",
-      "version": "nt-1989-f3da5a0d",
+      "version": "nt-1989-00beb450",
       "season": "1988/89",
       "elo": {
         "date": "1989-07-01",
@@ -36163,12 +36098,6 @@
           "why": "8 players with a position"
         },
         {
-          "team": "Liberia",
-          "qid": "Q387301",
-          "players": 8,
-          "why": "8 players with a position"
-        },
-        {
           "team": "Senegal",
           "qid": "Q207441",
           "players": 8,
@@ -36189,6 +36118,12 @@
         {
           "team": "Ghana",
           "qid": "Q172014",
+          "players": 7,
+          "why": "7 players with a position"
+        },
+        {
+          "team": "Liberia",
+          "qid": "Q387301",
           "players": 7,
           "why": "7 players with a position"
         },
@@ -37053,7 +36988,7 @@
           "rank": 26,
           "T": 78.68,
           "strength": 79,
-          "pool": 45,
+          "pool": 44,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -37579,7 +37514,7 @@
           "rank": 47,
           "T": 74.94,
           "strength": 75,
-          "pool": 34,
+          "pool": 33,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -37973,7 +37908,7 @@
           "rank": 73,
           "T": 72.22,
           "strength": 72,
-          "pool": 26,
+          "pool": 25,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -37983,9 +37918,9 @@
             "Julio Palacios Lozano MF 73 32 caps 1987–1993 (4.57)",
             "Óscar Antonio Ulloa FW 72 31 caps 1987–1993 (4.43)",
             "Leonel Cárcamo DF 72 84 caps 1988–2000 (6.46)",
+            "Raúl Díaz Arce FW 71 68 caps 1987–2003 (4)",
             "Mauricio Cienfuegos MF 71 68 caps 1987–2003 (4)",
-            "Guillermo Rivera MF 71 74 caps 1988–2000 (5.69)",
-            "Óscar Ulloa FW 70 33 caps 1988–1993 (5.5)",
+            "Guillermo Rivera MF 70 74 caps 1988–2000 (5.69)",
             "Giovanni Trigueros DF 69 47 caps 1988–1996 (5.22)",
             "Milton Meléndez MF 68 25 caps 1988–1996 (2.78)"
           ]
@@ -38107,7 +38042,7 @@
           "rank": 103,
           "T": 67.79,
           "strength": 67,
-          "pool": 14,
+          "pool": 13,
           "outOfPosition": [
             "Saleh Dollah (FW as MF)"
           ],
@@ -38244,7 +38179,7 @@
     },
     {
       "id": "nt-1991",
-      "version": "nt-1991-a6f949b2",
+      "version": "nt-1991-c19ee676",
       "season": "1990/91",
       "elo": {
         "date": "1991-07-01",
@@ -40143,7 +40078,7 @@
           "rank": 85,
           "T": 70.38,
           "strength": 70,
-          "pool": 25,
+          "pool": 24,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -40153,8 +40088,8 @@
             "Julio Palacios Lozano MF 71 32 caps 1987–1993 (4.57)",
             "Guillermo Rivera MF 70 74 caps 1988–2000 (5.69)",
             "Óscar Antonio Ulloa FW 70 31 caps 1987–1993 (4.43)",
-            "Óscar Ulloa FW 69 33 caps 1988–1993 (5.5)",
             "Giovanni Trigueros DF 69 47 caps 1988–1996 (5.22)",
+            "Raúl Díaz Arce FW 69 68 caps 1987–2003 (4)",
             "Mauricio Cienfuegos MF 68 68 caps 1987–2003 (4)",
             "Carlos Castro Borja DF 68 57 caps 1989–2000 (4.75)",
             "Milton Meléndez MF 66 25 caps 1988–1996 (2.78)"
@@ -40416,7 +40351,7 @@
     },
     {
       "id": "nt-1992",
-      "version": "nt-1992-9ae86e07",
+      "version": "nt-1992-99abea76",
       "season": "1991/92",
       "elo": {
         "date": "1992-07-01",
@@ -41165,7 +41100,7 @@
           "rank": 13,
           "T": 82.42,
           "strength": 83,
-          "pool": 39,
+          "pool": 38,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -42459,16 +42394,16 @@
           "rank": 82,
           "T": 72.32,
           "strength": 72,
-          "pool": 25,
+          "pool": 24,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
             "Leonel Cárcamo DF 78 84 caps 1988–2000 (6.46)",
             "Guillermo Rivera MF 76 74 caps 1988–2000 (5.69)",
-            "Óscar Ulloa FW 75 33 caps 1988–1993 (5.5)",
-            "Julio Palacios Lozano MF 73 32 caps 1987–1993 (4.57)",
-            "Óscar Antonio Ulloa FW 72 31 caps 1987–1993 (4.43)",
+            "Julio Palacios Lozano MF 75 32 caps 1987–1993 (4.57)",
+            "Óscar Antonio Ulloa FW 73 31 caps 1987–1993 (4.43)",
             "Giovanni Trigueros DF 72 47 caps 1988–1996 (5.22)",
+            "Raúl Díaz Arce FW 72 68 caps 1987–2003 (4)",
             "Mauricio Cienfuegos MF 71 68 caps 1987–2003 (4)",
             "William Osorio DF 71 67 caps 1991–2002 (5.58)",
             "William Renderos Iraheta MF 70 57 caps 1991–2001 (5.18)",
@@ -42786,7 +42721,7 @@
     },
     {
       "id": "nt-1993",
-      "version": "nt-1993-80393f50",
+      "version": "nt-1993-1287ac1c",
       "season": "1992/93",
       "elo": {
         "date": "1993-07-01",
@@ -43098,12 +43033,6 @@
           "qid": "Q174512",
           "players": 2,
           "why": "plays for Czechoslovakia that season"
-        },
-        {
-          "team": "Benin",
-          "qid": "Q239535",
-          "players": 1,
-          "why": "1 players with a position"
         },
         {
           "team": "Brunei",
@@ -43435,7 +43364,7 @@
           "rank": 10,
           "T": 83.67,
           "strength": 84,
-          "pool": 42,
+          "pool": 41,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
@@ -44863,16 +44792,16 @@
           "rank": 76,
           "T": 73.25,
           "strength": 73,
-          "pool": 26,
+          "pool": 25,
           "outOfPosition": [],
           "filled": [],
           "eleven": [
             "Leonel Cárcamo DF 79 84 caps 1988–2000 (6.46)",
             "Guillermo Rivera MF 77 74 caps 1988–2000 (5.69)",
-            "Óscar Ulloa FW 75 33 caps 1988–1993 (5.5)",
-            "Julio Palacios Lozano MF 74 32 caps 1987–1993 (4.57)",
-            "Giovanni Trigueros DF 73 47 caps 1988–1996 (5.22)",
+            "Julio Palacios Lozano MF 75 32 caps 1987–1993 (4.57)",
+            "Giovanni Trigueros DF 74 47 caps 1988–1996 (5.22)",
             "Óscar Antonio Ulloa FW 73 31 caps 1987–1993 (4.43)",
+            "Raúl Díaz Arce FW 73 68 caps 1987–2003 (4)",
             "Mauricio Cienfuegos MF 72 68 caps 1987–2003 (4)",
             "William Osorio DF 72 67 caps 1991–2002 (5.58)",
             "William Renderos Iraheta MF 71 57 caps 1991–2001 (5.18)",

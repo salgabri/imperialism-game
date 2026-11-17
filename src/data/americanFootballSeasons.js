@@ -47,7 +47,7 @@ export const BUILT_IN_AMERICAN_FOOTBALL_SEASONS = Object.freeze([
   Object.freeze({ id: 'pfa-1984', version: 'pfa-1984-9a01c4ae', year: 1984, season: '1984', label: 'NFL (computed)', map: 'nfl1984' }),
   Object.freeze({ id: 'pfa-1983', version: 'pfa-1983-e34903d2', year: 1983, season: '1983', label: 'NFL (computed)', map: 'nfl1982' }),
   Object.freeze({ id: 'pfa-1982', version: 'pfa-1982-00f77991', year: 1982, season: '1982', label: 'NFL (computed)', map: 'nfl1982' }),
-  Object.freeze({ id: 'pfa-1981', version: 'pfa-1981-a4d5d14c', year: 1981, season: '1981', label: 'NFL (computed)', map: 'nfl1980' }),
+  Object.freeze({ id: 'pfa-1981', version: 'pfa-1981-c6bd261d', year: 1981, season: '1981', label: 'NFL (computed)', map: 'nfl1980' }),
   Object.freeze({ id: 'pfa-1980', version: 'pfa-1980-f9f4a017', year: 1980, season: '1980', label: 'NFL (computed)', map: 'nfl1980' }),
   Object.freeze({ id: 'pfa-1979', version: 'pfa-1979-f5fc27a7', year: 1979, season: '1979', label: 'NFL (computed)', map: 'nfl1976' }),
   Object.freeze({ id: 'pfa-1978', version: 'pfa-1978-0ee5bfcf', year: 1978, season: '1978', label: 'NFL (computed)', map: 'nfl1976' }),

@@ -17,7 +17,7 @@ Pick your sport at kick-off:
 | Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings (each half from 2020 with a runner on second) |
 | Ice hockey | four lines, three pairs and the goalie | 60 minutes | sudden-death overtime, then a shoot-out |
 | Tennis, and women's tennis | a Davis Cup (or Billie Jean King Cup) team: No. 1 and No. 2 in the singles, a doubles pair | five rubbers, first to three, each best of three sets; an earlier season plays its year's ([format by year](#tennis-seasons)) | none: a tie always has a winner |
-| Rugby league | the matchday 17: thirteen and four on the bench | 80 minutes | golden point |
+| Rugby league | the matchday 17: thirteen and four on the bench | 80 minutes | golden point (in earlier seasons the rules of their day: before 2003 the finals' twenty minutes of extra time, played in full) |
 | Rocket League | three a side, a nation's best of its five | best of seven five-minute games | sudden-death overtime in a level game; a series always has a winner |
 | Counter-Strike | five a side, a nation's best of its seven | best of three maps, each first to 13 rounds | overtimes of six rounds from 12–12; a series always has a winner |
 | Valorant | five a side, a nation's best of its seven | best of three maps, each first to 13 rounds | two clear rounds in overtime from 12–12; a series always has a winner |
@@ -158,6 +158,7 @@ npm run build:nhl-league # each earlier NHL season's goals and scoring factor, a
 npm run sync:nrl         # snapshot Rugby League 26's NRL ratings, Zero Tackle's profiles and NRL.com's 2025 team lists into scripts/data/rugby-league-26.json (network, cached)
 npm run build-rugby-league # rebuild the NRL clubs and the rugby league nations from that snapshot (--check compares byte for byte)
 npm run build:nrl-map    # rebuild the NRL's map of Australia and New Zealand (seconds; --check compares byte for byte)
+npm run build:nrl-league # each earlier rugby league season's tries, field goals and points and its scoring (about 30 seconds; --check compares byte for byte)
 npm run sync:ea-fc-women # snapshot EA FC's women's players from its public API into scripts/data/ea-fc27-women.csv (network, cached)
 npm run build-womens-football # rebuild the women's nations and clubs from that snapshot (--check compares byte for byte)
 npm run sync:womens-tournament-seasons # read the pinned World Cup database, women's results, Wikipedia and RSSSF pages in data-src/ into scripts/data/womens-tournament-seasons/ (--fetch downloads what is missing)
@@ -1417,7 +1418,11 @@ with clubs has its own country maps, one for each country whose clubs that seaso
 source rates, ten or more of them: England's of 2010/11 holds FIFA 11's 89 English
 league clubs, its 2003/04 map CM 01/02's top 100 English clubs down to the
 Conference, and Scotland, Wales and Northern Ireland get maps wherever a season rates
-ten of their clubs. With **Clubs** and an earlier season chosen, **One country · top
+ten of their clubs. In an EA season, the countries EA does not rate come from the CM 01/02
+Update Team's database of that season, credited to them: so far 2025/26's, from their
+December 2025 database (71 more countries, Brazil, Greece, Croatia, Egypt and Iran among
+them); the other seasons' databases come from the champman0102.co.uk forum, behind its
+login (`node scripts/sync-cm0102-updates.mjs --zip=<downloaded release>`). With **Clubs** and an earlier season chosen, **One country · top
 clubs** lists that season's countries; a country chosen before stays chosen, on that
 season's map of it, and a season with none plays its Europe maps. The clubs are the
 season's own (EA's editions from 2006/07, Championship Manager's databases and SWOS's
@@ -2451,13 +2456,17 @@ is a file in `public/rugby-league/` (9–18 KB) that loads only when chosen.
   the stats it recorded, and the season before only when it recorded the same
   ones. His overall is that value's
   percentile at the position he started at most, read off Rugby League 26's
-  ratings there, as 2008's score is. Then every player of a club moves by one
-  whole number so the club lands where its Simple Rating System, fitted to the
-  season's real margins and adjusted for its opponents, ranks it among the
-  built-in 2025 clubs' strengths: 2008's shift, with the season's own results in
-  place of the game's team rating, so a season's strongest clubs are its best by
-  margin. A player NRL.com never shows starting takes his position from the
-  seasons either side, else from the Rugby League Project. Run on 2025, the
+  ratings there, as 2008's score is. Then every player of a club moves by a
+  whole number, its best few by one more, so the club plays where its Simple
+  Rating System, fitted to the season's real margins and adjusted for its
+  opponents, puts it: each point of margin turned into the match model's
+  strength at the season's scoring, less the share of the clubs' spread that was
+  their games' luck. So a season's strongest clubs are its best by margin, and
+  its clubs play as far apart as they did: the 1960s' St. George stands out, the
+  level seasons of the 1980s and 2000s sit close
+  ([the spread](docs/design/rugby-league.md#the-spread)). A player NRL.com
+  never shows starting takes his position from the seasons either side, else
+  from the Rugby League Project. Run on 2025, the
   method agrees with Rugby League 26 at a rank correlation of 0.76 within
   position.
 - **1960 to 1997 are computed from selection** (labelled "NSWRFL (computed)",
@@ -2469,8 +2478,20 @@ is a file in `public/rugby-league/` (9–18 KB) that loads only when chosen.
   rate of four tries a team game, scaled to his season's, per club game, the
   season before at half weight; then the overall and the club shift as above. Run
   on 2025, it agrees with Rugby League 26 at 0.73 within position, against the
-  stats method's 0.76. Every season plays today's scoring, so the seasons before
-  1983, when a try was worth three, score above their record.
+  stats method's 0.76. The setup and the campaign name each season's
+  premiership: "10 NSWRFL clubs" and "NSWRFL · Australia and New Zealand" in
+  1962, the NSWRL from 1984, the ARL from 1995 and Super League for its 1997;
+  from 1998 the NRL.
+- **Rules by era:** each season plays the points of its day, a try three until
+  1983 and a field goal two until 1971, and scores as its league did: its tries,
+  field goals and points a team a game, from the Rugby League Project's lists
+  before 1998 and NRL.com's stats from 1998. So the 1960s score 12 to 16 points a
+  team, and the four-tackle seasons of 1967 to 1970 kick a field goal and a half
+  a game. Golden point came in 2003; before it a game level at full time was a
+  draw, so a campaign plays the finals' twenty minutes of extra time, in full,
+  and again if still level (the finals replayed such a game), a field goal
+  deciding one still level after the third. The built-in 2025 plays today's
+  rules, unchanged.
 - **Maps:** each club grows from its ground, or from its training base where it
   shares one, and three rules keep the maps few: a ground being rebuilt stays its
   club's (R1), COVID-19 relocations are ignored (R2), and a rename on the same
@@ -2493,7 +2514,8 @@ is a file in `public/rugby-league/` (9–18 KB) that loads only when chosen.
 
   ```bash
   npm run sync:rugby-league-seasons -- --fetch   # missing inputs into data-src/ (the database, RLP pages, NRL.com's games), then scripts/data/rugby-league-seasons/nrl-<year>.json (--check)
-  npm run build:rugby-league-seasons             # the season files, their listing and the audit (--check; --realism plays them)
+  npm run build:rugby-league-seasons             # the season files, their listing and the audit (--check; --realism plays them, each by its own rules)
+  npm run build:nrl-league                       # each season's tries, field goals and points, and the scoring that plays them (--check)
   npm run build:nrl-map                          # today's map and the era maps nrl1960 … nrl1997, sl1997, nrl1998 … nrl2007, nrl2008, nrl2010, nrl2012 and nrl2020
   ```
 
