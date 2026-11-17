@@ -51,6 +51,9 @@ const domesticIds = DOMESTIC.flatMap(entry => JSON.parse(readFileSync(new URL(`p
 const allClubIds = [...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...EUROLEAGUE_CLUBS, ...NFL_CLUBS, ...CFB_CLUBS, ...MLB_CLUBS, ...NHL_CLUBS, ...NRL_CLUBS,
   ...WOMENS_CLUBS].map(club => club.id).concat(domesticIds);
 const withCrest = allClubIds.filter(id => clubLogoFile(id));
+// The File namespace's name on each Wikipedia a crest's file page comes from.
+const FILE_NAMESPACES = new Set(['File', 'Fichier', 'Dosya', 'Ficheiro', 'Archivo', 'Fayl', 'Файл', 'Датотека', 'ملف', 'קובץ', 'پرونده',
+  'Αρχείο', 'Tiedosto', 'Datoteka', 'Datei', 'Plik', 'Soubor', 'Bestand', 'Fil', 'Berkas', 'Tập tin', 'ファイル', '파일']);
 
 test('every club the list gives a crest has its file, a source row, and nothing else ships', () => {
   assert.ok(withCrest.length > 1000, `crests for ${withCrest.length} clubs`);
@@ -65,8 +68,10 @@ test('every club the list gives a crest has its file, a source row, and nothing 
     assert.equal(row.length, 7, `${id}: club, name, image, file, licence, non-free, file page`);
     assert.equal(row[2], `${clubLogoFile(id)}.webp`);
     // A crest of today read from another Wikipedia's file page (club-logos.json "pages" `wiki`) links that page, under
-    // its own name for the File namespace (French Wikipedia's Fichier:).
-    assert.match(row[6], /^https:\/\/([a-z]{2,3}\.wikipedia|commons\.wikimedia)\.org\/wiki\/(File|Fichier):/, `${id}: links its file page`);
+    // its own name for the File namespace (French Wikipedia's Fichier:, Turkish Wikipedia's Dosya:, Arabic Wikipedia's
+    // ملف:, percent-encoded as the page gives it).
+    const page = /^https:\/\/(?:[a-z]{2,3}\.wikipedia|commons\.wikimedia)\.org\/wiki\/([^:/]+):/.exec(row[6]);
+    assert.ok(page && FILE_NAMESPACES.has(decodeURIComponent(page[1]).replace(/_/g, ' ')), `${id}: links its file page (${row[6]})`);
   }
 });
 
