@@ -1385,8 +1385,10 @@ export default class App extends React.Component {
           .map(player => ({ pos: player.pos, name: player.name, rating: player.rating })),
         ...(board ? { neighbours: [...empireNeighbors(board, team.id)] } : {}) };
     }).sort((a, b) => a.name.localeCompare(b.name));
-    // What each team flies on the step-1 card in Flags mode (setupMapFlags): a nation its flag, a club its crest.
-    const marks = Object.fromEntries(included.map(team => [team.id, { kind: team.kind, flagId: team.flagId ?? null, col: team.col }]));
+    // What each team flies on the step-1 card in Flags mode (setupMapFlags): a nation its flag, a club its crest or,
+    // without one, its monogram (its code).
+    const marks = Object.fromEntries(included.map(team => [team.id,
+      { kind: team.kind, flagId: team.flagId ?? null, col: team.col, code: team.code ?? null }]));
     // `year`: the chosen season's, whose crests the step-1 card shows (src/data/crests.js); null for today's season.
     this.setupTeamsCache = { key, teams, opening, homes: Object.keys(own), marks, year: sport?.dataYear ?? null };
     return teams;

@@ -834,8 +834,20 @@ test('setupMapFlags: the step-1 card in Flags mode flies each starting nation’
     assert.deepEqual(clubs.flagPatterns.map(pattern => [pattern.ownerId, pattern.crestUrl, pattern.color, pattern.url === pattern.crestUrl]),
       [[arsenal.id, crestOf(arsenal.id), arsenal.col, true], [chelsea.id, crestOf(chelsea.id), chelsea.col, true]]);
     assert.ok(clubs.flagPatterns.every(pattern => pattern.crestUrl && pattern.symbolLayout), 'each crest placed on its land');
+    assert.ok(clubs.flagPatterns.every(pattern => pattern.monogram === null), 'a club with a crest shows no monogram');
     assert.deepEqual([...clubs.fills], [['208', arsenal.col], ['276', chelsea.col]]);
     assert.equal(clubs.flagParts.has('250'), false, 'unclaimed land flies nothing');
+
+    // A club with no crest flies its monogram (its code) where a crest would sit, on its colour.
+    const plain = { ...chelsea, id: 'f-no-crest-test', name: 'No Crest Test', code: 'NCT', col: '#345678' };
+    app.opening = () => ({ included: [arsenal, plain], own: { 208: arsenal.id, 250: plain.id }, scopeName: 'Fixture' });
+    const mixed = app.setupMapFlags({ ...setup, layer: 'clubs', clubScope: 'all', seed: '8' });
+    assert.deepEqual(mixed.flagPatterns.map(pattern => [pattern.ownerId, pattern.url, pattern.crestUrl, pattern.monogram, pattern.color])
+      .sort((a, b) => a[0].localeCompare(b[0])),
+    [[arsenal.id, crestOf(arsenal.id), crestOf(arsenal.id), null, arsenal.col], [plain.id, null, null, 'NCT', '#345678']]);
+    const chip = mixed.flagPatterns.find(pattern => pattern.ownerId === plain.id);
+    assert.ok(chip.symbolLayout, 'placed like a crest');
+    assert.deepEqual(mixed.flagParts.get('250').map(part => part.id), [chip.id], 'shown through the club’s own land');
   });
   // App hands the card its banners only while it shows Flags; the campaign map behind the wizard keeps its own mode.
   await withApp({ phase: 'setup' }, ({ app }) => {

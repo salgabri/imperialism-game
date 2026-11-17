@@ -1,8 +1,9 @@
 // Owner: WP-SETUP (see PLAN.md §4). Step 1's map card: the theatre's opening board, each starting territory in its
 // team's kick-off pastel over the land nobody holds or, in Flags mode, under its team's flag (a nation) or crest (a
-// club), one banner per region as the campaign's Flags mode draws it. A map like the campaign's (useMapViewport): scroll
-// or pinch to zoom, drag to pan, double-click to reset, with the −/+/reset group above a Political / Flags switch. Phones
-// pinch and get no zoom buttons, as on the campaign map. The territories carry no ids, roles or labels: the step's
+// club; its monogram without one), one banner per region as the campaign's Flags mode draws it. A map like the
+// campaign's (useMapViewport): scroll or pinch to zoom, drag to pan, double-click to reset, with the −/+/reset group
+// above a Political / Flags switch. Phones pinch and get no zoom buttons, as on the campaign map. The territories carry
+// no ids, roles or labels: the step's
 // title, description and stats say the same in text, so the drawing itself stays out of the accessibility tree.
 import React, { memo, useId, useMemo, useRef } from 'react';
 import { useMapViewport } from '../hooks/useMapViewport.js';
@@ -48,7 +49,7 @@ function SetupMapCard({ preview, caption, kind, flags, flagsOn, onMode, clubs, r
           <use data-setup-flag={part.id} href={`#fi-flag-${part.id}`} clipPath={`url(#${id})`} />
         </React.Fragment>);
       }
-      // Under a banner the land is see-through, its border still drawn; a club with no crest shows its colour.
+      // Under a banner the land is see-through, its border still drawn; club land no banner covers shows its colour.
       const fill = banners?.length ? 'transparent' : shown?.fills.get(section.id) ?? section.fill;
       return <path key={section.id} d={section.d} fill={fill} style={{ fill: themedPaint(fill) }} />;
     });
