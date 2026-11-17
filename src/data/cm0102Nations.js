@@ -6,7 +6,8 @@
 // 3.9.60 and 3.9.68 (213 records each; 3.9.60 has Taiwan for Chinese Taipei), the Update Team additions BOS and
 // CM0102Patcher name (Serbia, Montenegro, Kosovo, Gibraltar, North Macedonia, Curaçao, Martinique, eSwatini) and
 // the spellings TransferTool's lookup accepts (Serbia and Montenegro, Southern Sudan, Macedonia, Netherlands), and SI's
-// CM 99/00 misspelling of Burkina Faso.
+// CM 99/00 misspelling of Burkina Faso. The Update Team's December 2025 database adds eight territories with no team
+// (Bonaire, Comoros, French Guiana, Guadeloupe, the Northern Mariana Islands, Réunion, Saint-Martin, Sint Maarten).
 // With them every one of the 176 game nations has a CM name, Montenegro, Kosovo and South Sudan only in the
 // databases that add them. Yugoslavia is FR Yugoslavia, then Serbia and Montenegro, so it plays as Serbia; Timor,
 // an SI placeholder that Update Team data keeps, is Timor-Leste. The dead records Update Team data keeps beside
@@ -52,16 +53,20 @@ export const CM0102_NATIONS = {
     'Bahrain',
     'Barbados',
     'Bermuda',
+    'Bonaire',
     'British Virgin Islands',
     'Cape Verde Islands',
     'Cayman Islands',
     'Commonwealth of Soviet States',
+    'Comoros',
     'Curaçao',
     'Czechoslovakia',
     'Dominica',
     'Faroe Islands',
+    'French Guiana',
     'Gibraltar',
     'Grenada',
+    'Guadeloupe',
     'Guam',
     'Hong Kong',
     'Liechtenstein',
@@ -72,11 +77,15 @@ export const CM0102_NATIONS = {
     'Mauritius',
     'Montserrat',
     'Netherlands Antilles',
+    'Northern Mariana Islands',
     'Pays Basque',
+    'Réunion',
     'Saint Lucia',
+    'Saint-Martin',
     'San Marino',
     'Seychelles',
     'Singapore',
+    'Sint Maarten',
     'Soviet Union',
     'St Kitts & Nevis',
     'St Vincent & The Grenadines',

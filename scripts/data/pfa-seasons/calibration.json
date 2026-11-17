@@ -1,5 +1,5 @@
 {
- "note": "How well the computed seasons' value orders each position as the next season's Madden launch ratings do (Spearman's rank correlation; ties by starts, then games), on the 2001 to 2005 seasons the weights were tuned on (Madden NFL 2003 to 07), by npm run sync:pfa. Players are matched by name, a name two Madden players share left out. `team`: the spread of the computed 2001 season's club strengths by the credit's power, beside Madden NFL 2002's spread of 2001's. `holdout`: the same measure on 2000, which the weights were not tuned on, against Madden NFL 2002 (the 2001 season's launch roster); 1998 and 1999 have none, the next seasons' Madden ratings surviving in no copy the game reads.",
+ "note": "How well the computed seasons' value orders each position as the next season's Madden launch ratings do (Spearman's rank correlation; ties by starts, then games), on the 2001 to 2005 seasons the weights were tuned on (Madden NFL 2003 to 07), by npm run sync:pfa. Players are matched by name, a name two Madden players share left out. `team`: the spread of the computed 2001 season's club strengths by the credit's power, beside Madden NFL 2002's spread of 2001's. `holdout`: the same measure on 2000, which the weights were not tuned on, against Madden NFL 2002 (the 2001 season's launch roster); 1998 and 1999 have none, the next seasons' Madden ratings surviving in no copy the game reads. `withoutCredit`: both measures with the club's credit at power 0 (each club's players valued alike, its results left to the move toward them), against which the credit was kept.",
  "weights": {
   "pass": 0.2,
   "td": 40,
@@ -468,6 +468,36 @@
      "spearman": 0.732
     }
    ]
+  }
+ },
+ "withoutCredit": {
+  "mean": 0.7491,
+  "positions": {
+   "QB": 0.821,
+   "RB": 0.773,
+   "WR": 0.854,
+   "TE": 0.705,
+   "OL": 0.654,
+   "DL": 0.733,
+   "LB": 0.787,
+   "CB": 0.775,
+   "S": 0.753,
+   "K": 0.636
+  },
+  "holdout": {
+   "mean": 0.7219,
+   "positions": {
+    "QB": 0.793,
+    "RB": 0.686,
+    "WR": 0.8,
+    "TE": 0.765,
+    "OL": 0.611,
+    "DL": 0.682,
+    "LB": 0.729,
+    "CB": 0.707,
+    "S": 0.714,
+    "K": 0.732
+   }
   }
  },
  "files": {

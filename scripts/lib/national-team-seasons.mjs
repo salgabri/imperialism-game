@@ -33,10 +33,16 @@ export const coverOf = (from, to, year) => [year - 1, year].filter(y => from <= 
  * when it covers one of the two years) and his caps for the nation by the end of the season (`total`, capsBy over all
  * his stints for its teams). A player in two nations' pools stays only in the one where his figure is higher (then the
  * later stint, then the lower team id); two teams of one nation (the Soviet Union and the CIS in 1991/92) share a pool.
+ * A player whose date of birth makes him younger than `ages.least` or older than `ages.most` (in whole years) on 1 July
+ * of year − 1, when the season starts, is in no pool: his stint and his birth cannot both be right (manifest
+ * `selection.ages`). A player with no full date of birth stays.
  * → Map(nation → [{ qid, name, born, title, positions, team, from, to, caps, goals, ended, figure, total }])
  */
-export function seasonPools({ players, stints }, year, nationOf) {
-  const person = new Map(players.filter(([, name, , , positions]) => name && positions.length)
+export function seasonPools({ players, stints }, year, nationOf, { ages = null } = {}) {
+  // Born after `youngest`: not yet `least` that day. Born on or before `oldest`: `most + 1` already.
+  const youngest = ages && `${year - 1 - ages.least}-07-01`, oldest = ages && `${year - 2 - ages.most}-07-01`;
+  const playing = born => !ages || !/^\d{4}-\d{2}-\d{2}$/.test(born ?? '') || (born <= youngest && born > oldest);
+  const person = new Map(players.filter(([, name, born, , positions]) => name && positions.length && playing(born))
     .map(([qid, name, born, title, positions]) => [qid, { qid, name, born, title, positions }]));
   const totals = new Map();
   for (const [player, team, from, to, caps] of stints) {
@@ -188,7 +194,7 @@ export function buildNationalTeamSeason({ wikidata, elo, votes }, manifest, seas
     const size = sizeOf(team);
     if (size) dropped.push({ team: country, qid: team, players: size, why });
   }
-  const pools = seasonPools(wikidata, year, team => teamNation.get(team) ?? null);
+  const pools = seasonPools(wikidata, year, team => teamNation.get(team) ?? null, { ages: manifest.selection.ages });
   const entries = [];
   for (const nation of Object.keys(NATIONS)) {
     const pool = pools.get(nation);

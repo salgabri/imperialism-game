@@ -125,6 +125,14 @@ test('pools, the XI and its order', () => {
   // Away: 40 over 4 for B (10 a year, halved: 5) beats 8 over 8 for C (1); his caps by then are B's 10 and C's 8.
   assert.deepEqual(pools.get('200').map(p => [p.qid, p.team, p.figure, p.total]),
     [['Q2', 'QB', 2.5, 60], ['Q3', 'QB', 5, 18]], 'one pool for the two teams of a nation, caps by then summed over both');
+  // A stint his birth contradicts is none: 1971/72 starts on 1 July 1971, and the manifest's ages are 14 to 45.
+  assert.deepEqual(MANIFEST.selection.ages && [MANIFEST.selection.ages.least, MANIFEST.selection.ages.most], [14, 45]);
+  const dated = [['Q1', 'Child', '1958-01-01', null, ['GK']], ['Q2', 'Coach', '1925-06-30', null, ['MF']], ['Q3', 'Fourteen', '1957-07-01', null, ['DF']],
+    ['Q4', 'Undated', null, null, ['FW']], ['Q5', 'Veteran', '1925-07-02', null, ['DF']]];
+  const datedStints = dated.map(([qid]) => [qid, 'QA', 1970, 1975, 30, 0, 0]);
+  const aged = seasonPools({ players: dated, stints: datedStints }, 1972, nationOf, { ages: MANIFEST.selection.ages });
+  assert.deepEqual(aged.get('100').map(p => p.name), ['Fourteen', 'Undated', 'Veteran'], 'under 14 and over 45 out; no date, no judgement');
+  assert.equal(seasonPools({ players: dated, stints: datedStints }, 1972, nationOf).get('100').length, 5, 'no ages, everyone');
   const pool = [
     { qid: 'Q1', positions: ['GK'], figure: 5, total: 40 }, { qid: 'Q2', positions: ['GK'], figure: 6, total: 10 },
     ...['Q3', 'Q4', 'Q5'].map((qid, i) => ({ qid, positions: ['DF'], figure: 4 - i, total: 20 })),

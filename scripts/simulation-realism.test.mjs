@@ -1,6 +1,6 @@
 // Whole league seasons played with the built-in clubs land in each real league's range (REAL in
-// simulation-realism.mjs, with its seasons and sources), and a few earlier NFL and AFL seasons' clubs, each under its own
-// day's rules, score as their leagues did. Only what the models set out to match is held here. Matches
+// simulation-realism.mjs, with its seasons and sources), and a few earlier NFL, AFL, NHL and NRL seasons' clubs, each
+// under its own day's rules, score as their leagues did. Only what the models set out to match is held here. Matches
 // are at a neutral venue unless a campaign turns Home advantage on, so the home sides' wins are checked with it on.
 // The known gaps are reported by `npm run simulation:realism` and not tested: NBA and EuroLeague games decided by three or
 // fewer, the EuroLeague's best and worst clubs (a little too close to the middle), MLB's worst club.
@@ -162,6 +162,29 @@ test('NHL eras: each earlier season scores like its league and settles its level
     }
     // A sane spread: the 1990s' rescaled editions run wide (docs/design/hockey.md, "The scale"), never wild.
     within(era.winPctSd, [0.06, 0.2], `${era.season} spread of the standings`);
+  }
+});
+
+test('NRL eras: each earlier season scores as its league did, under its own day\'s points and extra time', () => {
+  assert.deepEqual(report.nrlEras.map(era => [era.year, ...era.points, era.golden]),
+    [[1968, 3, 2, false], [1977, 3, 1, false], [1986, 4, 1, false], [1995, 4, 1, false], [2005, 4, 1, true]]);
+  for (const era of report.nrlEras) {
+    const real = REAL.nrlEras[era.id];
+    // The season's own points, its league's figure the one the game holds it to; its tries and field goals the record's.
+    assert.equal(era.league, real.pointsPerTeam);
+    within(era.pointsPerTeam, [real.pointsPerTeam - 0.6, real.pointsPerTeam + 0.6], `${era.year} points a team`);
+    within(era.triesPerTeam, [real.triesPerTeam - 0.15, real.triesPerTeam + 0.15], `${era.year} tries a team`);
+    within(era.fieldGoalsPerTeam, [real.fieldGoalsPerTeam - 0.06, real.fieldGoalsPerTeam + 0.06], `${era.year} field goals a team`);
+    // Before golden point a game level at full time was a draw: the campaign's extra time decides who wins, at most three
+    // periods of it.
+    if (!era.golden) {
+      within(era.level, [real.draws - 0.025, real.draws + 0.025], `${era.year} level at full time`);
+      assert.ok(era.longest <= 3, `${era.year}: extra time ends by its third period`);
+    }
+    within(era.marginMean, [real.marginMean - 3, real.marginMean + 3], `${era.year} mean margin`);
+    // Its own spread: the clubs play as far apart as the season's margins, less their luck, put them
+    // (docs/design/rugby-league.md, "The spread"), so 1977's standings spread wide and 1986's sit level.
+    within(era.winPctSd, [real.winPctSd - 0.04, real.winPctSd + 0.04], `${era.year} spread of the standings`);
   }
 });
 

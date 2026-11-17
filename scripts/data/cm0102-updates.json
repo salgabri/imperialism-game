@@ -1,0 +1,72 @@
+{
+  "about": "The CM 01/02 Update Team's databases the earlier seasons' country maps read, one a season (scripts/sync-cm0102-updates.mjs): each release's eleven Data tables, pinned by size and SHA-256, from its zip on archive.org (`zip.url`, read by range requests) or from the .zip the user downloaded from the champman0102.co.uk forum, whose attachments need a login (`zip.local`, its file name). Shipped by the user's choice of 2026-11-17, credited to the CM 01/02 Update Team (docs/design/football-year-permissions.md).",
+  "retrieved": "2026-11-17",
+  "releases": [
+    {
+      "id": "cm0102-2025-12",
+      "season": "2025/26",
+      "zip": {
+        "url": "https://archive.org/download/cm-25/CM25.zip",
+        "item": "https://archive.org/details/cm-25",
+        "bytes": 335330657
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 6579244,
+          "sha256": "a5a01977903b1bfaf4ef3c4096173eb89fffca79f963a09b7e0ff2f4bf65cb30"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46438,
+          "sha256": "84a3fd81501455d006a26157460775715345d533c96f2e77916820b1303ca1a1"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 631860,
+          "sha256": "8f3d755d6675f11cf5c35006ec303992e922dc94a7dd14b75c1c51b717fb85d8"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "c0079d3e7ab71908f99e76bc68df373e0acb4249d5367abbe8807c376a92301a"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 4242240,
+          "sha256": "f8b728e2d7434179e99a7a4a78bf9e03868e85bc7d865cd1f0de3a22d0ad26cf"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "bb906041cb1c5737defce96e477b78c58e355f2e46172a0db630a276869f7762"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 268422,
+          "sha256": "64af43875551fb5f94fdac3557e750a4a413c0338f01eda90de3389339dde031"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 66990,
+          "sha256": "230f59d082421669d9ad463aa24cbd0ab3a5d46a65f624489ad237015e31c4a2"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "98741510eb30d5508f7a3705c58f8d89f6e8ad74f1c75bef8a29cd2357f6eed1"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 8053500,
+          "sha256": "36df17b5a6628eb2f708c3d3d12498d3e88ad57acaa4941028c5ccb03f38210e"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 42904256,
+          "sha256": "d284598c3d374fc43c54a376254a78205639894fe389ca4bc0eb3184d58dca7b"
+        }
+      ]
+    }
+  ]
+}

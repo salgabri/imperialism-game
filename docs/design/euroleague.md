@@ -25,9 +25,11 @@ NBA 2K27), and no other public dataset rates them. So every EuroLeague rating is
 estimate, marked as one wherever it is shown, as hockey's below EA's top 300 are
 (`src/data/estimates.js`, in the EuroLeague's words: "no game rates EuroLeague players, so this
 one comes from his EuroLeague minutes and PIR, ranked on NBA 2K27's scale (a past season's also
-moved toward his club's results)"). The national fives' EuroLeague players keep the curated
-ratings they had (`scripts/fiba-squads.json`), so a player can rate differently for his club and
-his country: see Known limitations.
+moved toward his club's results)"). Since 2026-11-14 the national fives' EuroLeague players take
+these estimates too, under their clubs' spelling (`npm run build-basketball`), so no player rates
+one way for his club and another for his country; the roster audit (`npm run audit:rosters`,
+docs/design/roster-audit.md) found 15 who did. Their curated ratings stay in
+`scripts/fiba-squads.json` for the day one leaves the EuroLeague.
 
 **Source.** `npm run sync:euroleague` (`scripts/sync-euroleague.mjs`) reads the EuroLeague's own
 public data API (`api-live.euroleague.net`, which its website reads), cached in the ignored
@@ -406,10 +408,12 @@ the four in Iceland's small lineups, is its power forward.
   NBA 2K would rate him (Valančiūnas was 79 in NBA 2K26).
 - The built-in season is being played, so its clubs are not moved toward their results; its best
   club wins more of a simulated season than any real club of the last five (above).
-- The national fives' EuroLeague players keep their curated ratings, so a player can rate
-  differently for his club and his country: Andreas Obst is 78 for Germany and 73 for Bayern
-  (Kostas Sloukas, 79 for Greece, is now 79 for Panathinaikos too). Switching the fives to these
-  estimates would change several nations' strengths.
+- The national fives' EuroLeague players play at these estimates (since 2026-11-14), so the
+  estimates' limits are their countries' too: 42 of the fives' 235 players, among them Andreas
+  Obst (78 curated, 73 by his EuroLeague games) and Chima Moneke (74 curated, 87). The switch
+  moved 14 of the 47 nations' strengths by one or two points (Slovenia, Latvia and Italy down
+  two, South Sudan up two); the re-rating of 2026-11-18 moved 12 again, Israel down two, Nigeria
+  up two and ten others by one.
 - Great Britain's new five makes it a real basketball side, so it now fields a team in
   basketball as in both tennis games, as Great Britain under the Union Jack on the United
   Kingdom's shape (`playsAs`); football still plays England. Basketball fields 47 nations (40
@@ -438,6 +442,8 @@ the four in Iceland's small lineups, is its power forward.
 To refresh: `npm run sync:euroleague -- --refresh`, `node scripts/build-euroleague-anchors.mjs` (it
 reads 2K Archive's pinned copy, as `npm run build:nba-seasons` does; `npm run build:euroleague`
 stops if the anchors no longer put the level at `LEVEL`, to a tenth), `npm run build:euroleague`,
+`npm run build-basketball` (the national fives' EuroLeague players),
 `node scripts/build-europe-maps.mjs --only=euroleague`, then `npm test`. The earlier seasons:
-`npm run sync:euroleague-seasons`, `npm run build:euroleague`, `npm run build:nba-seasons` (it needs
+`npm run sync:euroleague-seasons`, `npm run build:euroleague`, `npm run build-basketball` (the
+built-in season's window reads 2024/25 and 2025/26 from them), `npm run build:nba-seasons` (it needs
 the NBA seasons' caches), `node scripts/build-europe-maps.mjs --only=el2001,…,el2026`, then `npm test`.

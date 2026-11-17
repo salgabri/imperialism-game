@@ -456,6 +456,27 @@ from every game in NRL.com's draw and match centre; [rugby-league.md](rugby-leag
 | Spread of winning percentages | 0.162 | 0.154–0.223 |
 | Best and worst records (of 24) | 19.6 wins, 5.5 wins | 18–21 wins, 3–6 wins |
 
+Since 2026-11-14 each earlier NRL season plays its own day's points, scoring and extra time
+([rugby-league.md](rugby-league.md#rules-by-era)): a try three points before 1983, a field goal two before 1971, the
+league's own tries, field goals and points, and before golden point (2003) the finals' twenty minutes of extra time,
+played in full. Forty seasons of five of them, each on its own schedule, the scores counted at full time before 2003, as
+the league counted them (real: the seasons' snapshots, the Rugby League Project's results and lists to 1997, NRL.com's
+draw and stats from 1998), run 2026-11-15:
+
+| NRL by era (real) | 1968 | 1977 | 1986 | 1995 | 2005 |
+| --- | --- | --- | --- | --- | --- |
+| Points a team | 14.8 (14.8) | 15.8 (15.8) | 15.9 (16.0) | 21.3 (21.1) | 23.4 (23.5) |
+| Tries / field goals a team | 2.17 / 0.75 (2.19 / 0.74) | 2.91 / 0.04 (2.91 / 0.04) | 2.50 / 0.24 (2.52 / 0.23) | 3.72 / 0.10 (3.69 / 0.10) | 4.12 / 0.08 (4.14 / 0.08) |
+| Level at full time (draws) | 3.1% (3.0%) | 2.4% (2.3%) | 3.2% (3.2%) | 2.0% (1.4%) | golden point 3.0% |
+| Mean margin | 10.5 (9.5) | 12.8 (12.2) | 11.6 (11.9) | 18.3 (17.9) | 15.3 (15.8) |
+| Spread of winning percentages | 0.176 (0.199) | 0.206 (0.236) | 0.128 (0.125) | 0.223 (0.234) | 0.136 (0.104) |
+| Best and worst clubs' wins | 16.9, 4.2 (16, 2) | 17.4, 2.6 (19, 2) | 17.3, 6.8 (16, 7) | 19.3, 2.6 (20, 2) | 17.9, 6.1 (16, 8) |
+
+The spread is each season's too since 2026-11-15 ([rugby-league.md](rugby-league.md#the-spread)): its clubs play as far
+apart as its margins, less their luck, put them, so 1977's and 1995's standings spread wide and 1986's sit level. Until
+then every season's clubs were read onto today's spread of strengths (1968's 0.134, 1977's 0.164, 1995's 0.171, 2005's
+0.157). 2005, the most level of the computed seasons, still spreads a little wider than its record.
+
 Rocket League came in on 2026-11-14, calibrated against the games of Liquipedia's exports
 ([rocket-league.md](rocket-league.md#calibration)): its goals and late game on the 21,156 games of the three years to
 November 2026 whose six players had each played 20 games, as a rated player has, each played through the model at its
@@ -669,7 +690,8 @@ simulation version 4 (extra time, then the tie-break of the season's day; versio
 was the realism pass above and went straight to penalties), FIBA basketball version 3,
 NBA basketball version 5 and baseball version 2 (the realism pass above). American
 football's version 3 added its touchdown tries and safeties and version 4 its overtime
-answer; its earlier seasons play version 5, each by its day's rules. Baseball's earlier
+answer; its earlier seasons play version 6, each by its day's rules, its drive odds allowing for how far apart its
+clubs are (version 5 without). Baseball's earlier
 seasons are version 3, which plays each one's runs and extra innings. Women's football
 is at version 2 (extra time), and ice hockey, tennis and women's tennis at version 1;
 an earlier ice hockey season's scoring and overtime are version 2, and an earlier tennis

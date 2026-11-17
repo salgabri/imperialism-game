@@ -311,12 +311,14 @@ not used. The 2020 season was 60 games; here it is a season like any other.
 ## Seasons before 2018: computed from WAR
 
 Status: built 2026-11-09; its names, birthplaces, records and ballparks re-sourced from
-the Baseball Databank on 2026-11-10. Fifty-eight more seasons, 1960 to 2017
-(`mlb-war-<year>`, listed "Computed from WAR, end of <year>"), whose ratings no game
-published. Each player's rating is computed from his WAR and put on MLB The Show's
-scale, rank for rank within his role; the clubs, nations and maps are built as the MLB
-The Show seasons' are. They are not a game's ratings, and every file says so
-(`source.computed`, `method`, `conversion`, `rawScale: "WAR"`).
+the Baseball Databank on 2026-11-10; each club moved toward its real record on
+2026-11-17 (below, "Each club's move toward its record"). Fifty-eight more seasons, 1960
+to 2017 (`mlb-war-<year>`, listed "Computed from WAR, end of <year>"), whose ratings no
+game published. Each player's rating is computed from his WAR and put on MLB The Show's
+scale, rank for rank within his role; then every player of a club moves by the same
+whole number toward the club's real won-lost record. The clubs, nations and maps are
+built as the MLB The Show seasons' are. They are not a game's ratings, and every file
+says so (`source.computed`, `method`, `conversion`, `rawScale: "WAR"`).
 
 **Sources.** Pinned in `scripts/data/mlb-war-seasons.json` (`sources`) and cached in the
 ignored `data-src/mlb-war/`:
@@ -370,11 +372,13 @@ player who played in the season with his club, role, positions, score, the input
 computed from and his birth country, and each club's name, record and main ballpark. It
 also writes
 `scripts/data/mlb-war-reference.json` (below). `npm run build:mlb-seasons` rates and teams
-each season from its snapshot (`public/baseball/mlb-war-<year>.json`, 17–33 KB, 1.6 MB in
-all), with the listing, `docs/design/baseball-war-seasons-audit.json` and the attribution;
-`npm run build:mlb-map` draws the era maps. All three take `--check` and rebuild byte for
-byte offline: the importer from its cache, the seasons from committed files alone, the
-maps from the boundary cache (`data-src/boundaries/`).
+each season from its snapshot and moves each club toward its record
+(`public/baseball/mlb-war-<year>.json`, 17–33 KB, 1.6 MB in all), with the listing,
+`docs/design/baseball-war-seasons-audit.json` and the attribution; it takes about 17
+seconds, most of them the moves' search over lineups. `npm run build:mlb-map` draws the era
+maps. All three take `--check` and rebuild byte for byte offline: the importer from its
+cache, the seasons from committed files alone (the engine's per-point measure is seeded by
+the season), the maps from the boundary cache (`data-src/boundaries/`).
 
 **The rule** (constants in the manifest's `method`; `scripts/lib/mlb-war.mjs`):
 
@@ -412,6 +416,27 @@ maps from the boundary cache (`data-src/boundaries/`).
   deeper ranks take the floor; equal scores share their mean rank. Every era therefore
   has the 2018–24 spread per club, as hockey's rescaled 1990s and rugby league's 2008 do.
   Mapping hitters by position instead did worse (rank correlation 0.836 against 0.846).
+- **WAR, not a blend of selection and production.** The computed-ratings method
+  (`docs/design/computed-ratings.md`, step 3) values a player by selection (his share of
+  his club's playing time) and production (his WAR rate shrunk toward replacement), each
+  weighted once against a game where one has rated the sport. Measured as the
+  calibration below measures the WAR score, each of 2018–2024 left out in turn (Spearman
+  with the Show's overall over the 9,674 cards; `npm run import:mlb-war -- --blend`,
+  2026-11-17):
+
+  | | hitters | starters | relievers |
+  |---|---|---|---|
+  | the WAR score (kept) | 0.845 | 0.818 | 0.742 |
+  | selection alone (plate appearances or innings a scheduled game, 3/2/1 window) | 0.764 | 0.634 | 0.632 |
+  | production alone (WAR rate, 3/2/1 window, prior from its reliability) | 0.805 | 0.804 | 0.679 |
+  | the two, weight tuned on the six seasons left in | 0.837 | 0.808 | 0.706 |
+  | the WAR score and selection, weight tuned | 0.845 | 0.818 | 0.742 |
+
+  The tuned blend trails the WAR score by 0.008, 0.010 and 0.036 (it gives selection
+  0.375–0.4, 0.125–0.15 and 0.35–0.375 of the weight); added to the WAR score, selection
+  is given 0 to 0.025 and changes nothing to the third decimal. The WAR score already
+  counts playing time through its prior below replacement, and its reliever's leverage
+  term reads the role better than innings do. The seasons keep the WAR score.
 
 **Calibration** (`leaveOneOut` in the reference: each season of 2018–2024 rated against
 the other six seasons' reference):
@@ -433,23 +458,84 @@ sample, the computed 2016 against MLB The Show
 the computed 3.8 lower (the list is the Show's own top, which the rank mapping
 compresses).
 
-**Spot checks** (`docs/design/baseball-war-seasons-audit.json` has every season):
+**Each club's move toward its record** (2026-11-17; `docs/design/computed-ratings.md`,
+step 5, the user's "full" setting; `resultsMove` and `perPointOfSeason` in
+`scripts/lib/mlb-war.mjs`). Rated from its players alone, a club followed its real
+record at r 0.82 on average (0.56 in 1991, whose strongest club on paper, the Reds, went
+74–88): each player's rating carries its own error, and nothing in it knows how the club
+fared. So every completed season (all 58) moves each club toward the strength its record
+says it had:
 
-| season | strongest clubs (record) | best players | club strength vs win% |
+- **The strength moved** is the one the match model plays, `baseballStrength`
+  (`src/sports/baseball.js`): the mean of the lineup's batting and its defence (75%
+  pitching, of which the day's starter 60%, and 25% fielding), before the season's
+  pitching premium. A game's odds follow the gap between two sides' strengths, and a
+  point for every player moves it by a point. (The strength the game shows, the
+  lineup's mean rating, weighs the starter a third as much and the bullpen more.)
+- **Its results** are its won-lost record, the Databank's, as `winShareOf` reads one:
+  S = W% − ½, with its reliability r, the share of the records' variance that is not
+  luck (binomial luck, p(1 − p) ÷ games): 0.478 (1984) to 0.829 (1962), 0.669 on
+  average. Game scores would give the Simple Rating System (`srsOf`), but the only
+  source of them, Retrosheet's game logs, is disallowed by retrosheet.org's robots.txt
+  ("Rules by era"), and season totals of runs give neither scores nor a record.
+- **A club never plays itself**, so in a league of n clubs its share measures its gap to
+  the others, which is n ÷ (n − 1) times its gap to the league's mean: S × (n − 1)/n is
+  its strength above the mean, as a balanced schedule's SRS reads margins. n is its
+  league's clubs that season (8 to 16), the leagues met only in the World Series before
+  1997, and the interleague games since are a tenth of a schedule.
+- **m**, the win share a point of strength is worth, is measured with the engine under
+  the season's own rules (`perPointOf`): two copies of one of the season's clubs, drawn
+  at random, every player of one raised and of the other lowered by half a gap of ±2 or
+  ±4 points, 40,000 games at each gap at a neutral venue and the game's balanced
+  drama, the raised one batting first half the time, seeded by the season so it rebuilds
+  byte for byte. m is 0.0234 to 0.0252 (0.0242 on average).
+- **The target** is T = μ + √r × S × (n − 1)/n ÷ m, μ the season's mean strength before
+  the move (`resultsTargets`). The square root of r: the engine adds its own luck back.
+- **The move** (`clubMoveOf`): every player of the club by one whole number, and the best
+  few of the lineup it plays by one more, whichever brings its strength nearest the
+  target; then the rest of the club in rating order. Nobody passes a teammate. The best
+  few are the lineup's, not the club's, because a point more for a starter on the bench
+  would move him into the bullpen out of his position (the 2002 Diamondbacks). Clubs move
+  by −5 to +4 points a player (−2 to +2 for 1,409 of the 1,522), 1.08 points of strength
+  on average, and land within 0.12 of their targets (0.03 on average). The largest: the
+  2004 Diamondbacks (51–111) 77.9 → 73.1, the 1991 Reds (74–88) 82.8 → 78.4, the 2010
+  Mariners (61–101) 80.0 → 75.7, the 2001 Mariners (116–46) 82.2 → 86.4, the 1977 Angels
+  (74–88) 82.2 → 78.0 and the 1996 Mariners (85–76) 84.4 → 80.3.
+
+Each season's `source.conversion` states the move and its own μ, r and m, and the audit
+lists every club's strength before and after, its target and its move. After it, the
+strength the match model plays follows the record exactly (Pearson 1.000 every season),
+and the strength the game shows at r 0.944 on average (0.887 in 2014 to 0.983 in 1962;
+Spearman 0.94 in the median season), against 0.817 before. Played as their real leagues
+played (each club against its own league only, as many games as it played, 40 seasons
+each; `scripts/baseball-war-seasons.test.mjs`), the 58 seasons' standings spread as the
+real ones did: win% SD 0.0696 on average against the real 0.0704, 0.0012 from it on
+average (0.0063 before the move) and correlated with it at 0.99 across the seasons (0.71
+before). The realism harness plays every club against every other, which spreads them a
+little less: 1968, 1987 and 2000 at 0.057, 0.058 and 0.058 against the real 0.059, 0.059
+and 0.061 (`npm run simulation:realism`). Player ratings move with their clubs: Pedro Martinez's 2001, an
+injured season for a club that went 82–79, falls from 94 to 91; Mickey Mantle's 1961
+rises from 95 to 98. Each season's pitching premium, recomputed from the moved clubs,
+rises by 0.09 to 0.23, because the extra point goes first to the lineup's best, often
+its ace. The national teams take the moved ratings; one nation stops fielding a team:
+Mexico in 1993, whose own players now hold less than half its lineup.
+
+**Spot checks** (`docs/design/baseball-war-seasons-audit.json` has every season; strength
+is the lineup's mean rating, which the game shows):
+
+| season | strongest clubs (record) | best players | club strength vs win%, before → after |
 |---|---|---|---|
-| 1960 | Yankees 82.1 (97–57), White Sox 81.1, Pirates 80.8 | Mays 95, Banks 93, Aaron 92 | 0.80 |
-| 1961 | Yankees 82.3 (109–53), Tigers 80.6 (101–61) | Mantle 95, Mays 94, Aaron 92 | 0.93 |
-| 1969 | Orioles 83.5 (109–53), Tigers 81.4, Giants 81.3 | Clemente 96, Yastrzemski 94 | 0.92 |
-| 1975 | Reds 83.2 (108–54), Athletics 82.3 (98–64) | Morgan 96, Schmidt 94, Carew 93 | 0.87 |
-| 1984 | Tigers 81.8 (104–58), Blue Jays 80.5 | Ripken 96, Carter 94, Schmidt 93 | 0.68 |
-| 1998 | Yankees 82.5 (114–48), Indians 81.8 | Bonds 96, Griffey Jr. 94, Piazza 94 | 0.85 |
-| 2017 | Astros 83.5 (101–61), Dodgers 82.8 (104–58) | Trout 96, Altuve 94, Donaldson 94 | 0.83 |
+| 1960 | Yankees 83.3 (97–57), Pirates 82.1 (95–59), White Sox 81.4 | Mays 95, Aaron 94, Banks 93 | 0.80 → 0.95 |
+| 1961 | Yankees 84.4 (109–53), Reds 82.4 (93–61), Tigers 82.2 (101–61) | Mantle 98, Mays 95, Aaron 92 | 0.93 → 0.98 |
+| 1969 | Orioles 85.2 (109–53), Twins 81.9 (97–65), Mets 81.5 (100–62) | Clemente 96, Yastrzemski 95 | 0.92 → 0.97 |
+| 1975 | Reds 84.6 (108–54), Athletics 82.9 (98–64), Red Sox 81.7 | Morgan 98, Schmidt 96, Bench 93 | 0.87 → 0.96 |
+| 1984 | Tigers 83.0 (104–58), Padres 81.8 (92–70), Cubs 81.2 | Ripken 95, Carter 94, Schmidt 92 | 0.68 → 0.90 |
+| 1998 | Yankees 85.5 (114–48), Braves 82.4 (106–56), Astros 82.2 | Bonds 98, Piazza 94, Griffey Jr. 92 | 0.85 → 0.97 |
+| 2017 | Astros 82.4 (101–61), Indians 82.0 (102–60), Dodgers 81.9 (104–58) | Trout 97, Donaldson 94, Altuve 93 | 0.83 → 0.97 |
 
-Over the 58 seasons club strength correlates with the real win share at r 0.82 on
-average (0.56 in 1991, whose strongest club on paper, the Reds, went 74–88, to 0.93 in
-1961). The best pitchers read as expected: Gibson 93 in 1968, Seaver 94 in 1975, Gooden 94
-in 1985, Pedro Martinez 94 in 2001; Hoyt Wilhelm (1961), Gossage (1985) and Rivera (2001)
-head their seasons' bullpens.
+The best pitchers read as expected: Gibson 94 in 1968, Seaver 93 in 1975, Gooden 94 in
+1985; Hoyt Wilhelm (1961), Gossage (1985, level with Quisenberry) and Rivera (2001) head
+their seasons' bullpens.
 
 **Clubs.** Each club fields the lineup the game picks and the rest of an active roster
 of 26, as in every baseball season. A club that used fewer than thirteen pitchers all
@@ -555,7 +641,11 @@ inputs; the reference's 9,674 cards and its calibration (mean error at most 4.5,
 at least 0.88; records to 2022); ratings that keep each role's order; the listing, after
 MLB The Show's, each season on its map; every season decoding, computed, its clubs its
 map's, each fielding all nine places and keeping 26 players or every pitcher it used; the
-spot checks above and the record correlation; the nations of 1960, the Databank's birth
+spot checks above and the record correlation (at least 0.92 on average and 0.85 in every
+season); each club's move (one whole number a player and one more for the lineup's best
+few, nobody passing a teammate, its constants in the conversion) and the target's
+formula on a made-up season of two leagues; the standings played by the real leagues
+(within 0.003 of the real spreads on average, r above 0.95); the nations of 1960, the Databank's birth
 countries, Elmer Valo's correction and Rod Carew's Panama; the namesakes; the clubs of
 their day; the rename rule (37 maps, ballparks named in place,
 2017 with 2018's places); every club growing inside its own land, Los Angeles in 1961, the
@@ -581,6 +671,22 @@ the first choice asked for, read at the latest commit its forks hold, through on
 its names and birth countries as it gives them (the Peñas become Pena, Rod Carew and Mike
 Eden Panama's), Elmer Valo's alone corrected; the calibration's record check limited to the
 Databank's seasons (2018–2022) rather than a second source for 2023–24.
+
+**Decisions** (2026-11-17). The user's (`docs/design/computed-ratings.md`, "Decisions"):
+the full move toward each club's results in every completed computed season, and the
+seasons already shipped re-rated by it. Claude's, building it: the WAR score kept, since
+no blend of selection and production beat it with each calibration season left out; the
+won-lost record as the results (`winShareOf`), because game scores, which the Simple
+Rating System needs, would come only from Retrosheet's game logs, which its robots.txt
+disallows, and the Databank's season totals of runs scored and allowed are neither scores
+nor a record (run differential a game would order 304 of the 1,522 clubs more than a point
+from where the record puts them; its targets correlate with the record's at 0.935 on
+average); each club's share read against its league less itself, (n − 1)/n, which played
+by the real leagues gives the real standings' spread; the strength moved the match
+model's (`baseballStrength`), not the lineup's shown mean; m measured each season under
+its own rules, 40,000 games a gap; the extra point for the best of the lineup first, so the
+move never puts a starting pitcher in the bullpen; one rating a player, so the national
+teams take the moved ratings.
 
 ## Rules by era
 
@@ -637,22 +743,23 @@ pitchers differently each year, and the computed seasons inherit 2018–24's bal
 the 2.3 premium that makes the built-in clubs' average matchup an even edge would give
 2025's hitters 1.4 rating points too much. Each season takes its own,
 `seasonPremium` of its clubs (their defence's mean rating above their batting's):
-0.93 for MLB The Show 25, 1.53 for 19, 2.68 for 22, 1.72 to 2.71 for the computed
-seasons. `npm run build:mlb-seasons` writes them to `src/data/baseballSeasonPremiums.js`
+0.93 for MLB The Show 25, 1.53 for 19, 2.68 for 22, 1.86 to 2.88 for the computed
+seasons (1.72 to 2.71 before each club's move toward its record of 2026-11-17, which
+gives its extra point to the lineup's best first, often the ace). `npm run build:mlb-seasons` writes them to `src/data/baseballSeasonPremiums.js`
 (and `--check` holds them), and a season's nations play its clubs' premium.
 
 | Season | Runs a game | Runs a nine innings | Shut out | A half-inning scores | Runs a scoring one | Premium | The game: runs, shut out |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1960 | 4.31 | 4.32 | 6.4% | 25.9% | 1.84 | 1.99 | 4.36, 6.7% |
-| 1963 | 3.95 | 3.95 | 8.5% | 24.2% | 1.80 | 2.26 | 3.95, 8.6% |
-| 1968 | 3.42 | 3.42 | 10.4% | 21.6% | 1.73 | 2.46 | 3.40, 10.9% |
-| 1972 | 3.69 | 3.69 | 9.6% | 22.9% | 1.76 | 2.61 | 3.67, 9.5% |
-| 1977 | 4.47 | 4.48 | 5.7% | 26.7% | 1.86 | 2.39 | 4.46, 6.6% |
-| 1987 | 4.72 | 4.76 | 5.0% | 27.8% | 1.88 | 2.20 | 4.74, 5.4% |
-| 1994 | 4.92 | 4.96 | 4.5% | 28.7% | 1.90 | 2.28 | 4.90, 5.1% |
-| 2000 | 5.14 | 5.20 | 4.2% | 29.7% | 1.92 | 2.37 | 5.09, 4.5% |
-| 2010 | 4.38 | 4.43 | 6.8% | 26.3% | 1.85 | 2.34 | 4.38, 6.5% |
-| 2014 | 4.07 | 4.08 | 7.3% | 24.8% | 1.81 | 2.25 | 4.07, 7.6% |
+| 1960 | 4.31 | 4.32 | 6.4% | 25.9% | 1.84 | 2.10 | 4.35, 7.0% |
+| 1963 | 3.95 | 3.95 | 8.5% | 24.2% | 1.80 | 2.41 | 3.96, 8.3% |
+| 1968 | 3.42 | 3.42 | 10.4% | 21.6% | 1.73 | 2.57 | 3.45, 10.8% |
+| 1972 | 3.69 | 3.69 | 9.6% | 22.9% | 1.76 | 2.79 | 3.71, 9.3% |
+| 1977 | 4.47 | 4.48 | 5.7% | 26.7% | 1.86 | 2.54 | 4.49, 6.3% |
+| 1987 | 4.72 | 4.76 | 5.0% | 27.8% | 1.88 | 2.35 | 4.72, 5.6% |
+| 1994 | 4.92 | 4.96 | 4.5% | 28.7% | 1.90 | 2.42 | 4.91, 4.9% |
+| 2000 | 5.14 | 5.20 | 4.2% | 29.7% | 1.92 | 2.56 | 5.13, 4.5% |
+| 2010 | 4.38 | 4.43 | 6.8% | 26.3% | 1.85 | 2.49 | 4.38, 6.7% |
+| 2014 | 4.07 | 4.08 | 7.3% | 24.8% | 1.81 | 2.40 | 4.06, 7.6% |
 | 2019 | 4.83 | 4.86 | 5.5% | 28.3% | 1.89 | 1.53 | 4.81, 5.5% |
 | 2020 | 4.65 | 4.85 | 5.5% | 27.3% | 1.87 | 2.28 | 4.64, 6.2% |
 | 2021 | 4.53 | 4.65 | 6.2% | 26.7% | 1.86 | 0.89 | 4.50, 6.5% |
@@ -661,9 +768,10 @@ seasons. `npm run build:mlb-seasons` writes them to `src/data/baseballSeasonPrem
 
 The real columns are the module's (shut out: the share of a side's games it scored no
 runs in); "the game" plays every pairing of the season's clubs twelve times under its
-rules. Over all 67 seasons the game's runs a game sit within 1.8% of the league's (0.2%
-under on average) and its shutouts half a point above the league's on average (at most
-1.4 points, 1982). 2020 and 2021 scheduled seven-inning doubleheaders
+rules (the computed seasons' rows drawn again after their clubs' move, 2026-11-17). Over
+all 67 seasons the game's runs a game sit within 0.9% of the league's (0.2% over on
+average) and its shutouts 0.4 points above the league's on average (at most 1.4 points,
+1982). 2020 and 2021 scheduled seven-inning doubleheaders
 ([Wikipedia](https://en.wikipedia.org/w/index.php?oldid=1370243501), read 2026-11-10),
 which the game does not play, so their runs a game sit 2–4% under their runs a nine
 innings; the game plays their games at their runs a game.

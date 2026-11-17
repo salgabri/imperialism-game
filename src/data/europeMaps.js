@@ -69,7 +69,7 @@ export const EUROPE_MAPS = [
   {"id":"eu32e1996","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["swos-9596"],"clubs":32,"sections":32,"countries":8,"version":"eu32e1996-b8bfc6e9"},
   {"id":"eu124e1995","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["swos-9495"],"clubs":124,"sections":124,"countries":18,"version":"eu124e1995-9289681f"},
   {"id":"eu32e1995","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["swos-9495"],"clubs":32,"sections":32,"countries":8,"version":"eu32e1995-067795ef"},
-  {"id":"eu124e1994","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["cm0102-2020-11-cm93"],"clubs":124,"sections":124,"countries":20,"version":"eu124e1994-7a7c011e"},
+  {"id":"eu124e1994","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["cm0102-2020-11-cm93"],"clubs":124,"sections":124,"countries":20,"version":"eu124e1994-cb750007"},
   {"id":"eu32e1994","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["cm0102-2020-11-cm93"],"clubs":32,"sections":32,"countries":9,"version":"eu32e1994-51a13e80"},
   {"id":"weu","sport":"womens-football","league":"Europe","name":"Europe","theatre":"all","clubs":68,"sections":68,"countries":13,"version":"weu-46750eac","top":["Arsenal","FC Barcelona","OL Lyonnes"]},
   {"id":"weu32","sport":"womens-football","league":"Elite 32","name":"Europe","theatre":"elite","clubs":32,"sections":32,"countries":6,"version":"weu32-dd565bb5","top":["Arsenal","FC Barcelona","OL Lyonnes"]},
