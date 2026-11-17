@@ -156,7 +156,7 @@
     }
   },
   "seasonSource": {
-    "note": "The source block of every computed season's file (public/baseball/mlb-war-<year>.json), with `url` the WAR file's at its pinned commit.",
+    "note": "The source block of every computed season's file (public/baseball/mlb-war-<year>.json), with `url` the WAR file's at its pinned commit and `conversion` followed by the sentence that states the season's own move of its clubs toward their real records, with its constants (scripts/build-mlb-seasons.mjs moveText).",
     "method": "Each player's WAR (JEFFBAGWELL: the average of Baseball-Reference's and FanGraphs' WAR) per playing time over the season and the two before it, weighted 5, 3 and 2 (relievers 1, 1 and 1) and regressed toward a level below replacement: hitters 600 × (Σ weight·WAR − 9) / (Σ weight·PA + 600); starters 180 × (Σ weight·WAR − 4.5) / (Σ weight·IP + 150); relievers 65 × (Σ WAR − 1.5) / (Σ IP + 30) + 0.8 × the season's average leverage index. Roles and positions from his games, starts and innings, his club his last. docs/design/baseball.md, \"Seasons before 2018: computed from WAR\".",
     "conversion": "Rank for rank within each role (hitters, starters, relievers) onto MLB The Show 18 to 24's overalls at the same depth per club: the k-th best score of a season of T clubs takes the overall at index (k − 0.5) / T × 210 − 0.5 of that role's 9,674-card reference, strongest first (scripts/data/mlb-war-reference.json), interpolated and rounded; equal scores share their mean rank.",
     "licence": "WAR: JEFFBAGWELL (Neil Paine), MIT. Names, birthplaces, clubs and ballparks: the Baseball Databank (Chadwick Baseball Bureau), CC BY-SA 3.0; its home games from Retrosheet. See public/baseball/ATTRIBUTION.txt.",
