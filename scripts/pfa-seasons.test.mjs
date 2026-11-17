@@ -10,12 +10,15 @@ import { tmpdir } from 'node:os';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { FORMATION, shortOf } from './lib/nfl.mjs';
+import { FORMATION, shortOf, squadOf } from './lib/nfl.mjs';
 import { maddenReferencePlayers, overallsOf, referenceOf } from './lib/nfl-reference.mjs';
-import { clubPagesOf, countOf, parseTeamSeason, placePlayers, playersOfBoxScore, positionOfCode, replacementPlayers, seasonValues, settleKickers,
-  spearman, VALUE_WEIGHTS } from './lib/pfa.mjs';
-import { cacheFolders, copiesOf } from './fetch-pfa.mjs';
+import { marginPerPoint, moveSeason, PER_POINT_GAMES, playedStrength, rounded } from './lib/nfl-results.mjs';
+import { clubPagesOf, countOf, parseTeamSeason, placePlayers, playersOfBoxScore, positionOfCode, replacementPlayers, seasonGames, seasonValues,
+  settleKickers, spearman, VALUE_WEIGHTS } from './lib/pfa.mjs';
+import { mean, srsOf } from './lib/computed-ratings.mjs';
+import { cacheFolders, copiesOf, STRIKE_GAMES } from './fetch-pfa.mjs';
 import { ranked } from './sync-pfa.mjs';
+import { seasonRules } from '../src/sports/americanFootball.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const read = file => readFileSync(path.join(root, file), 'utf8');
@@ -51,6 +54,7 @@ test('a team-season page gives the regular season\'s games, the roster with its 
   assert.deepEqual([parsed.year, parsed.team, parsed.league], [1965, 'Green Bay Packers', 'NFL']);
   assert.deepEqual(parsed.games.map(g => [g.site, g.for, g.against, g.venue]), [['H', 20, 17, 'Lambeau Field'], ['A', 10, 31, 'Wrigley Field'],
     ['H', 13, 3, 'County Stadium']], 'exhibition and playoff games are not the season');
+  assert.deepEqual(parsed.games.map(g => g.opponentPage), ['x.html', 'x.html', 'x.html'], 'each game names its opponent\'s page');
   assert.deepEqual(parsed.roster.map(r => [r.name, r.positions, r.gp, r.gs]), [['Bart Starr', ['QB'], 3, 3],
     ['Lee Roy Caffey', ['RLB', 'MLB'], 3, 3], ['Tom Moore', ['HB', 'FB'], 3, 1], ['Don Chandler', ['P', 'K'], 3, 0]]);
   assert.ok(!parsed.roster.some(r => r.name === 'Donny Draftee'), 'the draft list is not the roster');
@@ -129,6 +133,45 @@ test('a replacement player of 1987 played strike games only, by their box scores
     ['r/repl00100', 'u/unna00100'], 'two games, in no box score and no other season: a substitute of the strike games');
 });
 
+test('a season\'s games are read once each, every club\'s points from its own page, the strike\'s left out where asked', () => {
+  const on = (date, site, opponent, pf, pa) => `<tr><td>Sun</td><td><a href="/nflboxscores1/x.html">${date}</a></td><td>${site}</td><td><a href="${opponent}">Opponent</a></td>${td(pf)}${td(pa)}<td>W</td><td></td><td>City, ST</td><td>Field</td>${td(40000)}</tr>`;
+  const club = (team, rows) => parseTeamSeason(page({ team, games: rows, roster: [] }));
+  const a = club('Green Bay Packers', [on('9/19/1965', 'H', '1965nflb.html', 20, 17), on('9/26/1965', 'A', '1965nflb.html', 10, 31),
+    on('10/3/1965', 'N', '1965nflb.html', 13, 3), on('10/10/1965', 'H', '1965nflb.html', 24, 0)]);
+  const b = club('Chicago Bears', [on('9/19/1965', 'A', '1965nfla.html', 17, 20), on('9/26/1965', 'H', '1965nfla.html', 31, 10),
+    on('10/3/1965', 'N', '1965nfla.html', 3, 13), on('10/10/1965', 'A', '1965nfla.html', 9, 24)]);
+  const clubs = [{ file: '1965nfla.html', page: a }, { file: '1965nflb.html', page: b }];
+  const clubOf = file => ({ '1965nfla.html': 'gb', '1965nflb.html': 'chi' })[file];
+  const { games, slips } = seasonGames(clubs, clubOf);
+  assert.deepEqual(games, [
+    { date: '1965-09-19', home: 'gb', away: 'chi', homeScore: 20, awayScore: 17 },
+    { date: '1965-09-26', home: 'chi', away: 'gb', homeScore: 31, awayScore: 10 },
+    { date: '1965-10-03', home: 'gb', away: 'chi', homeScore: 13, awayScore: 3, neutral: true },
+    { date: '1965-10-10', home: 'gb', away: 'chi', homeScore: 24, awayScore: 9 },
+  ], 'each game once; the home club\'s; the 24–0 slip read as each club\'s own points, 24–9');
+  assert.deepEqual(slips, ['1965-10-10: 1965nfla.html reads 24–0, 1965nflb.html 9–24; each club\'s own points kept']);
+  assert.deepEqual(seasonGames(clubs, clubOf, { leave: ['1965-09-26', '1965-10-03'] }).games.map(g => g.date), ['1965-09-19', '1965-10-10']);
+  const lonely = [{ file: '1965nfla.html', page: club('Green Bay Packers', [on('9/19/1965', 'H', '1965nflb.html', 20, 17)]) },
+    { file: '1965nflb.html', page: club('Chicago Bears', []) }];
+  assert.throws(() => seasonGames(lonely, clubOf), /1965nfla\.html has a game on 1965-09-19 that 1965nflb\.html does not/);
+  const both = [{ file: '1965nfla.html', page: club('Green Bay Packers', [on('9/19/1965', 'H', '1965nflb.html', 20, 17)]) },
+    { file: '1965nflb.html', page: club('Chicago Bears', [on('9/19/1965', 'H', '1965nfla.html', 17, 20)]) }];
+  assert.throws(() => seasonGames(both, clubOf), /sites H and H/);
+  assert.throws(() => seasonGames([clubs[0]], clubOf), /is no club of the season/);
+});
+
+test('the strength the match model plays is its lineup\'s offence and defence; m is the margin a point of it is worth', () => {
+  const snapshot = snapshotOf('1977');
+  const pool = snapshot.players.filter(p => p[1] === 'nfl-dallas-cowboys').map(([name, , , pos, rating]) => ({ name, pos, rating }));
+  const { squad } = squadOf(pool, '1977 Dallas Cowboys');
+  const up = squad.map(p => ({ ...p, rating: p.rating + 1 }));
+  assert.ok(Math.abs(playedStrength(up) - playedStrength(squad) - 1) < 1e-9, 'a point for every player is a point of strength');
+  const rules = seasonRules('NFL', 1977);
+  const m = marginPerPoint(rules, 'pfa-move:1977', 4000);
+  assert.ok(m > 1.4 && m < 2, `about two points of margin a point of strength, both sides' drives counted: ${m}`);
+  assert.equal(marginPerPoint(rules, 'pfa-move:1977', 4000), m, 'the same seed, the same margin');
+});
+
 test('ties are broken by starts, then games; the mapping onto Madden NFL 2002 stays within 1–99 and never falls', () => {
   const players = [{ value: 5, gs: 3, gp: 10 }, { value: 5, gs: 4, gp: 9 }, { value: 5, gs: 4, gp: 12 }, { value: 2, gs: 9, gp: 9 }, { value: 5, gs: 4, gp: 12 }];
   const rank = ranked(players);
@@ -157,28 +200,110 @@ test('the pages of a later download, in a data-src/pfa-<name>/ of their own, are
 
 // ---------- the snapshots ----------
 
-test('every computed season is recomputed from its snapshot: ranks by value, starts and games, read off Madden NFL 2002', () => {
-  const madden = maddenReferencePlayers(JSON.parse(read('scripts/data/madden-seasons/2001.json')));
+const MADDEN_2002 = maddenReferencePlayers(JSON.parse(read('scripts/data/madden-seasons/2001.json')));
+/**
+ * Each player's overall as read off Madden NFL 2002, before his club's move: his rank at his position by value, starts and
+ * games, read off the snapshot's reference (checked against Madden NFL 2002's own). → Map row → rating.
+ */
+function readOff(key, snapshot) {
+  const clubs = Object.keys(snapshot.teams).length;
+  const rated = new Map();
+  for (const position of POSITIONS) {
+    const at = snapshot.players.filter(p => p[3] === position).map(p => ({ row: p, value: p[5].value, gs: p[5].gs, gp: p[5].gp }));
+    const reference = snapshot.conversion.reference.positions[position];
+    assert.deepEqual(reference.madden, referenceOf(MADDEN_2002, position, at.length / clubs), `${key} ${position}`);
+    const rank = ranked(at);
+    const overall = overallsOf(at.map(p => rank.get(p)), reference.madden);
+    for (const p of at) rated.set(p.row, overall.get(rank.get(p)));
+    const order = at.slice().sort((a, b) => rank.get(a) - rank.get(b));
+    assert.ok(order.every((p, i) => !i || rated.get(p.row) >= rated.get(order[i - 1].row)), `${key} ${position}: never falls as the value rises`);
+  }
+  return rated;
+}
+/** A snapshot's games as srsOf reads them. */
+const gamesOf = snapshot => snapshot.games.map(([date, home, away, homeScore, awayScore, site]) => ({ date, home, away, homeScore, awayScore,
+  ...(site === 'N' ? { neutral: true } : {}) }));
+
+test('every computed season is recomputed from its snapshot: ranks read off Madden NFL 2002, then each club moved whole', () => {
   assert.equal(KEYS.length, 36 + 10, 'NFL 1960–1989, 1991 and 1996–2000; the AFL 1960–1969');
   for (const key of KEYS) {
     const snapshot = snapshotOf(key);
-    const clubs = Object.keys(snapshot.teams).length;
     assert.deepEqual(snapshot.conversion.weights, VALUE_WEIGHTS, `${key}: the frozen weights`);
     assert.match(snapshot.conversion.overall, /^Ours, computed/);
-    for (const position of POSITIONS) {
-      const at = snapshot.players.filter(p => p[3] === position).map(p => ({ row: p, value: p[5].value, gs: p[5].gs, gp: p[5].gp }));
-      const reference = snapshot.conversion.reference.positions[position];
-      assert.deepEqual(reference.madden, referenceOf(madden, position, at.length / clubs), `${key} ${position}`);
-      const rank = ranked(at);
-      const overall = overallsOf(at.map(p => rank.get(p)), reference.madden);
-      for (const p of at) {
-        assert.equal(p.row[4], overall.get(rank.get(p)), `${key} ${p.row[0]}`);
-        assert.ok(p.row[4] >= 1 && p.row[4] <= 99);
+    assert.match(snapshot.conversion.overall, /T = μ \+ √r × S ÷ m/);
+    assert.match(snapshot.conversion.overall, /The results count twice, by design/, `${key}: the credit and the move both read the results, and say so`);
+    const rated = readOff(key, snapshot);
+    assert.deepEqual(Object.keys(snapshot.moves), Object.keys(snapshot.teams), `${key}: every club moved`);
+    for (const [franchise, move] of Object.entries(snapshot.moves)) {
+      // Every player by the club's shift, its best `plus` (by the read-off, then the snapshot's order) by one more.
+      const rows = snapshot.players.filter(p => p[1] === franchise);
+      const best = rows.map((row, index) => ({ row, index })).sort((a, b) => rated.get(b.row) - rated.get(a.row) || a.index - b.index);
+      best.forEach(({ row }, place) => {
+        assert.equal(row[4], Math.min(99, Math.max(1, rated.get(row) + move.shift + (place < move.plus ? 1 : 0))), `${key} ${row[0]}`);
+      });
+      assert.ok(move.plus >= 0 && move.plus < rows.length, `${key} ${franchise}: ${move.plus} of ${rows.length} one more`);
+      for (const a of rows) {
+        for (const b of rows) assert.ok(!(rated.get(a) > rated.get(b)) || a[4] >= b[4], `${key} ${franchise}: ${a[0]} never falls below ${b[0]}`);
       }
-      const order = at.slice().sort((a, b) => rank.get(a) - rank.get(b));
-      assert.ok(order.every((p, i) => !i || p.row[4] >= order[i - 1].row[4]), `${key} ${position}: never falls as the value rises`);
     }
   }
+});
+
+test('each club moves to the target its results set, T = μ + √r × S ÷ m, recomputed from the snapshot\'s games', () => {
+  const two = x => rounded(x, 2);
+  for (const key of KEYS) {
+    const snapshot = snapshotOf(key);
+    const { move } = snapshot.conversion;
+    const games = gamesOf(snapshot);
+    assert.equal(games.length, move.games, key);
+    // S and its reliability from the games; the AFL's clubs rated within the AFL, its games its own clubs'.
+    const srs = srsOf(games);
+    assert.deepEqual(Object.keys(srs.ratings).sort(), Object.keys(snapshot.teams).sort(), key);
+    assert.deepEqual([two(srs.homeEdge), two(srs.sigma), rounded(srs.reliability, 3)], [move.srs.homeEdge, move.srs.sigma, move.srs.reliability], key);
+    // The strength the match model plays each club at, before (the read-off) and after (the snapshot's overall) its move.
+    const rated = readOff(key, snapshot);
+    const strengthOf = (franchise, rating) => playedStrength(squadOf(snapshot.players.filter(p => p[1] === franchise)
+      .map(row => ({ name: row[0], pos: row[3], rating: rating(row) })), `${key} ${franchise}`, { gaps: snapshot.lineup.gaps[franchise] ?? {} }).squad);
+    const before = Object.fromEntries(Object.keys(snapshot.teams).map(f => [f, strengthOf(f, row => rated.get(row))]));
+    const level = mean(Object.values(before));
+    assert.equal(two(level), move.mean, key);
+    assert.ok(Math.abs(move.scale - Math.sqrt(srs.reliability) / move.perPoint) < 1e-4, key);
+    for (const [franchise, club] of Object.entries(snapshot.moves)) {
+      const target = level + Math.sqrt(srs.reliability) / move.perPoint * srs.ratings[franchise];
+      const after = strengthOf(franchise, row => row[4]);
+      assert.deepEqual([club.srs, club.target, club.before, club.after], [two(srs.ratings[franchise]), two(target), two(before[franchise]), two(after)],
+        `${key} ${franchise}`);
+      assert.ok(Math.abs(after - target) < 0.25, `${key} ${franchise}: within a step of its target (${JSON.stringify(club)})`);
+    }
+  }
+  // The whole search replayed on seasons of each era, both leagues and the strike: no other move lands nearer.
+  for (const key of ['1960', '1965', '1977', '1987', '1991', '2000', 'afl-1960', 'afl-1969']) {
+    const snapshot = snapshotOf(key);
+    const rated = readOff(key, snapshot);
+    const pools = Object.fromEntries(Object.keys(snapshot.teams).map(franchise => [franchise, snapshot.players.filter(p => p[1] === franchise)
+      .map(row => ({ name: row[0], pos: row[3], rating: rated.get(row) }))]));
+    const result = moveSeason({ pools, gaps: snapshot.lineup.gaps, games: gamesOf(snapshot), perPoint: snapshot.conversion.move.perPoint, label: key });
+    assert.deepEqual(result.clubs, snapshot.moves, `${key}: each club's move`);
+    for (const [franchise, pool] of Object.entries(result.pools)) {
+      assert.deepEqual(pool.map(p => p.rating), snapshot.players.filter(p => p[1] === franchise).map(p => p[4]), `${key} ${franchise}`);
+    }
+  }
+});
+
+test('m is measured as recorded; the 1987 strike\'s replacement games are left out of the results, as their players are', () => {
+  for (const key of ['1965', 'afl-1965', '2000']) {
+    const { move, reference } = snapshotOf(key).conversion;
+    assert.equal(move.perPointGames, 4 * PER_POINT_GAMES);
+    assert.equal(move.seed, `pfa-move:${key}`);
+    const league = key.startsWith('afl-') ? 'AFL' : 'NFL', year = Number(key.replace('afl-', ''));
+    assert.equal(marginPerPoint(seasonRules(league, year), move.seed), move.perPoint, key);
+    assert.ok(reference.game === 'Madden NFL 2002');
+  }
+  const strike = snapshotOf('1987');
+  assert.deepEqual(strike.conversion.move.left, STRIKE_GAMES[1987]);
+  assert.ok(strike.games.every(([date]) => date < STRIKE_GAMES[1987][0] || date > STRIKE_GAMES[1987][1]));
+  assert.equal(strike.games.length, 28 * 12 / 2, 'twelve games a club of the fifteen played');
+  assert.ok(KEYS.filter(key => key !== '1987').every(key => !snapshotOf(key).conversion.move.left));
 });
 
 test('every club fields its lineup, or exactly the gaps its snapshot documents; the AFL\'s clubs only in AFL seasons', () => {
@@ -212,6 +337,9 @@ test('the calibration holds as recorded: the frozen weights on 2001–2005 again
   assert.deepEqual(Object.values(calibration.holdout.seasons).flat().map(row => row.season), POSITIONS.map(() => 2000));
   assert.ok(calibration.holdout.mean >= 0.7, `held out: mean Spearman ${calibration.holdout.mean}`);
   for (const position of POSITIONS) assert.ok(calibration.holdout.positions[position] >= 0.6, `held out: ${position} ${calibration.holdout.positions[position]}`);
+  // The credit was kept beside the move: without it the players order worse, tuned and held out.
+  assert.ok(calibration.withoutCredit.mean < calibration.mean, `without the credit ${calibration.withoutCredit.mean}`);
+  assert.ok(calibration.withoutCredit.holdout.mean < calibration.holdout.mean, `held out without the credit ${calibration.withoutCredit.holdout.mean}`);
 });
 
 test('each snapshot says on which day its pages were saved: 1998 to 2000 a day after the rest', () => {

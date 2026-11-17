@@ -196,14 +196,17 @@ export function buildPfaSeason(snapshot, year, manifest, franchises, league = 'N
   doc.version = `${doc.id}-${contentHash(doc)}`;
   const facts = snapshot.clubs;
   const strengths = clubs.map(c => c.str);
+  const signed = x => (x > 0 ? `+${x}` : x < 0 ? `−${-x}` : '0');
   const audit = {
     id: doc.id, version: doc.version, season: doc.season, label: doc.label, league, compiler: source.compiler, url: source.url,
     retrieved: source.retrieved, players: snapshot.players.length, map: doc.map,
     spread: [Math.min(...strengths), Math.max(...strengths)],
+    // Each club with its record and points, its SRS and its move toward it (the snapshot's `moves`).
     clubs: clubs.map(c => {
-      const franchise = teams.find(t => t.id === c.id).franchise, f = facts[franchise];
-      return `${c.name} ${c.str} (${f.record}, ${f.for}–${f.against})`;
+      const franchise = teams.find(t => t.id === c.id).franchise, f = facts[franchise], m = snapshot.moves[franchise];
+      return `${c.name} ${c.str} (${f.record}, ${f.for}–${f.against}; SRS ${signed(m.srs)}, moved ${signed(m.shift)}${m.plus ? ` and its best ${m.plus} one more` : ''})`;
     }),
+    move: { reliability: snapshot.conversion.move.srs.reliability, perPoint: snapshot.conversion.move.perPoint, mean: snapshot.conversion.move.mean },
     outOfPosition: Object.fromEntries(clubs.map(c => [c.name, outOfPosition(c.squad)]).filter(([, places]) => places.length)),
     gaps: Object.fromEntries(Object.entries(snapshot.lineup.gaps).map(([franchise, gaps]) => [teams.find(t => t.franchise === franchise).name, gaps])),
     calibration: snapshot.conversion.calibration.mean,

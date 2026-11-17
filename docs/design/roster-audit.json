@@ -513,7 +513,7 @@
    "pfa-1998": {
     "count": 1,
     "examples": [
-     "club:St. Louis Rams — namesakes-in-team: LB 84 and another Mike Jones"
+     "club:St. Louis Rams — namesakes-in-team: LB 86 and another Mike Jones"
     ]
    },
    "cm-9798": {
@@ -560,7 +560,7 @@
    "pfa-1976": {
     "count": 1,
     "examples": [
-     "club:Green Bay Packers — namesakes-in-team: CB 62 and another Mike McCoy"
+     "club:Green Bay Packers — namesakes-in-team: CB 61 and another Mike McCoy"
     ]
    }
   },
@@ -6037,8 +6037,8 @@
    "fielded": 0,
    "clubs": 31,
    "ratings": {
-    "players": 1053,
-    "min": 48,
+    "players": 1055,
+    "min": 47,
     "median": 74,
     "max": 99
    },
@@ -6178,8 +6178,8 @@
    "fielded": 0,
    "clubs": 31,
    "ratings": {
-    "players": 1053,
-    "min": 50,
+    "players": 1055,
+    "min": 49,
     "median": 74,
     "max": 99
    },
@@ -6321,7 +6321,7 @@
    "clubs": 30,
    "ratings": {
     "players": 1019,
-    "min": 51,
+    "min": 50,
     "median": 74,
     "max": 99
    },
@@ -6498,7 +6498,7 @@
    "clubs": 30,
    "ratings": {
     "players": 1022,
-    "min": 49,
+    "min": 45,
     "median": 74,
     "max": 99
    },
@@ -6654,7 +6654,7 @@
    "clubs": 30,
    "ratings": {
     "players": 1025,
-    "min": 48,
+    "min": 47,
     "median": 74,
     "max": 99
    },
@@ -7393,7 +7393,7 @@
    "clubs": 28,
    "ratings": {
     "players": 952,
-    "min": 49,
+    "min": 43,
     "median": 74,
     "max": 99
    },
@@ -7827,7 +7827,7 @@
    "clubs": 28,
    "ratings": {
     "players": 952,
-    "min": 45,
+    "min": 42,
     "median": 74,
     "max": 99
    },
@@ -7967,8 +7967,8 @@
    "fielded": 0,
    "clubs": 28,
    "ratings": {
-    "players": 952,
-    "min": 43,
+    "players": 954,
+    "min": 39,
     "median": 74,
     "max": 99
    },
@@ -8126,8 +8126,8 @@
    "clubs": 28,
    "ratings": {
     "players": 949,
-    "min": 49,
-    "median": 74,
+    "min": 48,
+    "median": 73,
     "max": 99
    },
    "findings": {}
@@ -8246,9 +8246,9 @@
    "fielded": 0,
    "clubs": 28,
    "ratings": {
-    "players": 949,
-    "min": 51,
-    "median": 74,
+    "players": 950,
+    "min": 47,
+    "median": 73,
     "max": 99
    },
    "findings": {}
@@ -8386,8 +8386,8 @@
    "fielded": 0,
    "clubs": 28,
    "ratings": {
-    "players": 952,
-    "min": 49,
+    "players": 953,
+    "min": 46,
     "median": 74,
     "max": 99
    },
@@ -8526,7 +8526,7 @@
    "fielded": 0,
    "clubs": 28,
    "ratings": {
-    "players": 953,
+    "players": 954,
     "min": 43,
     "median": 74,
     "max": 99
@@ -8681,8 +8681,8 @@
    "fielded": 0,
    "clubs": 28,
    "ratings": {
-    "players": 950,
-    "min": 35,
+    "players": 951,
+    "min": 34,
     "median": 74,
     "max": 99
    },
@@ -8800,9 +8800,9 @@
    "fielded": 0,
    "clubs": 28,
    "ratings": {
-    "players": 950,
-    "min": 51,
-    "median": 73,
+    "players": 951,
+    "min": 49,
+    "median": 74,
     "max": 99
    },
    "findings": {}
@@ -8936,9 +8936,9 @@
    "fielded": 0,
    "clubs": 28,
    "ratings": {
-    "players": 946,
-    "min": 49,
-    "median": 74,
+    "players": 947,
+    "min": 47,
+    "median": 73,
     "max": 99
    },
    "findings": {}
@@ -9074,8 +9074,8 @@
    "fielded": 0,
    "clubs": 28,
    "ratings": {
-    "players": 945,
-    "min": 49,
+    "players": 946,
+    "min": 46,
     "median": 74,
     "max": 99
    },
@@ -9351,7 +9351,7 @@
    "clubs": 28,
    "ratings": {
     "players": 938,
-    "min": 48,
+    "min": 45,
     "median": 73,
     "max": 99
    },
@@ -9489,7 +9489,7 @@
    "clubs": 28,
    "ratings": {
     "players": 939,
-    "min": 49,
+    "min": 45,
     "median": 73,
     "max": 99
    },
@@ -9629,7 +9629,7 @@
    "clubs": 26,
    "ratings": {
     "players": 868,
-    "min": 48,
+    "min": 47,
     "median": 73,
     "max": 99
    },
@@ -9783,8 +9783,8 @@
    "fielded": 0,
    "clubs": 26,
    "ratings": {
-    "players": 876,
-    "min": 49,
+    "players": 877,
+    "min": 46,
     "median": 73,
     "max": 99
    },
@@ -9905,7 +9905,7 @@
    "clubs": 26,
    "ratings": {
     "players": 861,
-    "min": 49,
+    "min": 46,
     "median": 74,
     "max": 99
    },
@@ -10040,8 +10040,8 @@
    "fielded": 0,
    "clubs": 26,
    "ratings": {
-    "players": 870,
-    "min": 35,
+    "players": 871,
+    "min": 33,
     "median": 73,
     "max": 99
    },
@@ -10179,8 +10179,8 @@
    "clubs": 26,
    "ratings": {
     "players": 871,
-    "min": 51,
-    "median": 73,
+    "min": 50,
+    "median": 74,
     "max": 99
    },
    "findings": {}
@@ -10333,7 +10333,7 @@
    "fielded": 0,
    "clubs": 26,
    "ratings": {
-    "players": 875,
+    "players": 878,
     "min": 45,
     "median": 73,
     "max": 99
@@ -10453,9 +10453,9 @@
    "clubs": 10,
    "ratings": {
     "players": 333,
-    "min": 48,
+    "min": 47,
     "median": 73,
-    "max": 98
+    "max": 99
    },
    "findings": {}
   },
@@ -10469,8 +10469,8 @@
    "fielded": 0,
    "clubs": 16,
    "ratings": {
-    "players": 531,
-    "min": 45,
+    "players": 532,
+    "min": 44,
     "median": 73,
     "max": 99
    },
@@ -10608,9 +10608,9 @@
    "clubs": 10,
    "ratings": {
     "players": 336,
-    "min": 43,
-    "median": 74,
-    "max": 98
+    "min": 44,
+    "median": 72,
+    "max": 99
    },
    "findings": {}
   },
@@ -10625,8 +10625,8 @@
    "clubs": 16,
    "ratings": {
     "players": 531,
-    "min": 37,
-    "median": 74,
+    "min": 36,
+    "median": 73,
     "max": 99
    },
    "findings": {}
@@ -10761,9 +10761,9 @@
    "clubs": 9,
    "ratings": {
     "players": 296,
-    "min": 51,
-    "median": 74,
-    "max": 98
+    "min": 50,
+    "median": 73,
+    "max": 99
    },
    "findings": {}
   },
@@ -10778,7 +10778,7 @@
    "clubs": 16,
    "ratings": {
     "players": 538,
-    "min": 52,
+    "min": 50,
     "median": 73,
     "max": 99
    },
@@ -10947,10 +10947,10 @@
    "fielded": 0,
    "clubs": 15,
    "ratings": {
-    "players": 503,
-    "min": 51,
+    "players": 504,
+    "min": 47,
     "median": 73,
-    "max": 98
+    "max": 99
    },
    "findings": {}
   },
@@ -11067,7 +11067,7 @@
    "clubs": 8,
    "ratings": {
     "players": 264,
-    "min": 53,
+    "min": 50,
     "median": 74,
     "max": 98
    },
@@ -11084,9 +11084,9 @@
    "clubs": 14,
    "ratings": {
     "players": 464,
-    "min": 51,
+    "min": 48,
     "median": 73,
-    "max": 98
+    "max": 99
    },
    "findings": {}
   },
@@ -11221,7 +11221,7 @@
    "ratings": {
     "players": 259,
     "min": 53,
-    "median": 74,
+    "median": 73,
     "max": 98
    },
    "findings": {}
@@ -11237,9 +11237,9 @@
    "clubs": 14,
    "ratings": {
     "players": 455,
-    "min": 52,
+    "min": 50,
     "median": 74,
-    "max": 98
+    "max": 99
    },
    "findings": {}
   },
@@ -11375,9 +11375,9 @@
    "clubs": 8,
    "ratings": {
     "players": 256,
-    "min": 49,
+    "min": 47,
     "median": 74,
-    "max": 98
+    "max": 99
    },
    "findings": {}
   },
@@ -11392,9 +11392,9 @@
    "clubs": 14,
    "ratings": {
     "players": 453,
-    "min": 52,
-    "median": 74,
-    "max": 98
+    "min": 51,
+    "median": 73,
+    "max": 99
    },
    "findings": {}
   },
@@ -11530,7 +11530,7 @@
     "players": 257,
     "min": 43,
     "median": 74,
-    "max": 98
+    "max": 99
    },
    "findings": {}
   },
@@ -11547,7 +11547,7 @@
     "players": 452,
     "min": 51,
     "median": 74,
-    "max": 98
+    "max": 99
    },
    "findings": {}
   },
@@ -11647,9 +11647,9 @@
    "clubs": 8,
    "ratings": {
     "players": 257,
-    "min": 52,
+    "min": 51,
     "median": 74,
-    "max": 98
+    "max": 99
    },
    "findings": {}
   },
@@ -11664,9 +11664,9 @@
    "clubs": 14,
    "ratings": {
     "players": 446,
-    "min": 40,
+    "min": 37,
     "median": 74,
-    "max": 98
+    "max": 99
    },
    "findings": {}
   },
@@ -11785,9 +11785,9 @@
    "clubs": 8,
    "ratings": {
     "players": 265,
-    "min": 48,
+    "min": 46,
     "median": 74,
-    "max": 98
+    "max": 99
    },
    "findings": {}
   },
@@ -11802,9 +11802,9 @@
    "clubs": 13,
    "ratings": {
     "players": 424,
-    "min": 53,
+    "min": 51,
     "median": 74,
-    "max": 98
+    "max": 99
    },
    "findings": {}
   },

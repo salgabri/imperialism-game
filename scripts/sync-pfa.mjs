@@ -10,16 +10,23 @@
 // are. The value's weights were tuned once on 2001 to 2005 against the next season's Madden launch ratings (--tune) and
 // are frozen; scripts/data/pfa-seasons/calibration.json records how well they order each position.
 //
+// Each club then moves toward its results (docs/design/computed-ratings.md, step 5; scripts/lib/nfl-results.mjs): its
+// Simple Rating System from the season's games (each club's points as its own page has them), the margin the match
+// model gives a point of the strength it plays under the season's rules, and a whole-number move of the club's players
+// toward its target, which never reorders them. The snapshot keeps the games and each club's move.
+//
 // 1987 is ranked on the clubs' own players only: those who played nothing but the three strike games, by those games'
 // box scores, are left out. 1982, whose strike cancelled games, is ranked as played (nine games).
 //
 // The pages stay in the gitignored data-src/pfa/ (and a later download's data-src/pfa-<name>/), each read only when it is
 // the file scripts/data/pfa-pages.json pins.
 //
-// Usage: node scripts/sync-pfa.mjs [--season=<year>|afl-<year>] [--check] [--tune]
+// Usage: node scripts/sync-pfa.mjs [--season=<year>|afl-<year>] [--check] [--tune] [--credit]
 //   --season  one season only
 //   --check   rebuild the snapshots and the calibration and compare them byte for byte; writes nothing
 //   --tune    search the weights' grid on 2001 to 2005 again and print the best (writes nothing)
+//   --credit  build the seasons with the club's credit and without it (power 0), each moved toward its results, and
+//             print how near each leaves the clubs to their results (writes nothing)
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -27,8 +34,12 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { FORMATION, POSITION_OF as MADDEN_POSITION_OF, shortOf, squadOf, teamsOf } from './lib/nfl.mjs';
 import { maddenReferencePlayers, overallsOf, referenceOf } from './lib/nfl-reference.mjs';
-import { clubPagesOf, parseTeamSeason, playersOfBoxScore, replacementPlayers, seasonValues, settleKickers, spearman, VALUE_WEIGHTS } from './lib/pfa.mjs';
+import { marginPerPoint, moveSeason, PER_POINT_GAMES, rounded } from './lib/nfl-results.mjs';
+import { clubPagesOf, parseTeamSeason, playersOfBoxScore, replacementPlayers, seasonGames, seasonValues, settleKickers, spearman, VALUE_WEIGHTS } from './lib/pfa.mjs';
+import { spearman as rankCorrelation } from './lib/computed-ratings.mjs';
 import { copiesOf, STRIKE_GAMES } from './fetch-pfa.mjs';
+import { americanFootballProfile, seasonRules } from '../src/sports/americanFootball.js';
+import { selectLineup } from '../src/data/teams.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const outDir = path.join(root, 'scripts/data/pfa-seasons');
@@ -42,7 +53,7 @@ const CALIBRATION = [2001, 2002, 2003, 2004, 2005];
 const HOLDOUT = [2000];
 
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
-const plain = text => String(text ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z]/g, '');
+export const plain = text => String(text ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z]/g, '');
 
 const { files: PINS, retrieved: RETRIEVED } = JSON.parse(await readFile(pinsFile, 'utf8'));
 /**
@@ -163,7 +174,7 @@ export function rate(players, clubs, madden) {
 // ---------- the calibration ----------
 
 /** Madden NFL `edition` season's launch roster by plain name (a name two players share is left out). */
-function maddenByName(snapshot) {
+export function maddenByName(snapshot) {
   const byName = new Map();
   for (const [name, , listed, overall] of snapshot.players) {
     const key = plain(name);
@@ -172,7 +183,7 @@ function maddenByName(snapshot) {
   return byName;
 }
 /** How well `weights` order the seasons' players (2001–2005's) as the next season's Madden launch ratings do, by position. */
-async function calibrate(weights, seasons) {
+export async function calibrate(weights, seasons) {
   const per = Object.fromEntries(POSITIONS.map(p => [p, []]));
   for (const { year, clubs, next } of seasons) {
     const players = seasonPlayers(clubs, () => null, weights);
@@ -185,7 +196,7 @@ async function calibrate(weights, seasons) {
   const mean = Object.fromEntries(POSITIONS.map(p => [p, Math.round(per[p].reduce((t, r) => t + r.spearman, 0) / per[p].length * 1000) / 1000]));
   return { per, mean, overall: Math.round(POSITIONS.reduce((t, p) => t + mean[p], 0) / POSITIONS.length * 10000) / 10000 };
 }
-async function calibrationSeasons(years = CALIBRATION) {
+export async function calibrationSeasons(years = CALIBRATION) {
   const out = [];
   for (const year of years) {
     const { clubs } = await leagueSeason(year, 'NFL');
@@ -237,7 +248,7 @@ const SECOND_HOME = { 'nfl-green-bay-packers': 'County Stadium' };
 
 // ---------- a season ----------
 
-async function snapshotOf(year, league, manifest, franchises, madden, calibration) {
+async function snapshotOf(year, league, manifest, franchises, madden, calibration, weights = VALUE_WEIGHTS) {
   const { index, clubs } = await leagueSeason(year, league);
   const teams = teamsOf(franchises, manifest, year, league);
   const franchiseOfPage = clubs.map(({ page, file }) => {
@@ -272,7 +283,7 @@ async function snapshotOf(year, league, manifest, franchises, madden, calibratio
   const strikeGames = Math.max(0, ...clubs.map(({ page }) => page.games.filter(g => g.date >= from && g.date <= to).length));
   const replaced = boxScores.length ? replacementPlayers([...games].map(([id, gp]) => ({ id, gp })), named, { strikeGames, around }) : new Set();
   const regular = replaced.size ? clubs.map(club => ({ ...club, page: { ...club.page, roster: club.page.roster.filter(r => !replaced.has(r.id)) } })) : clubs;
-  const players = seasonPlayers(regular, club => franchiseOfPage[club], VALUE_WEIGHTS).filter(p => p.position !== 'P' && p.position !== 'LONG');
+  const players = seasonPlayers(regular, club => franchiseOfPage[club], weights).filter(p => p.position !== 'P' && p.position !== 'LONG');
   const reference = rate(players, teams.length, madden);
   // The lineups, and the places a club has too few natural players for.
   const gaps = {};
@@ -282,9 +293,33 @@ async function snapshotOf(year, league, manifest, franchises, madden, calibratio
     if (Object.keys(short).length) gaps[team.franchise] = short;
     squadOf(pool, `${year} ${team.name}`, { gaps: short });
   }
+  // The snapshot's order, by the overall read off Madden: the move below keeps every club's order.
   const order = new Map(teams.map((team, i) => [team.franchise, i]));
   players.sort((a, b) => order.get(a.franchise) - order.get(b.franchise) || POSITIONS.indexOf(a.position) - POSITIONS.indexOf(b.position)
     || b.overall - a.overall || b.value - a.value || a.name.localeCompare(b.name));
+  // Each club moved toward its results (docs/design/computed-ratings.md, step 5; scripts/lib/nfl-results.mjs): its SRS
+  // from the season's games, each club's points as its own page has them, 1987's replacement games left out as its
+  // replacement players are; m measured under the season's rules; the AFL's clubs within the AFL.
+  const leave = STRIKE_GAMES[year] && league === 'NFL' ? STRIKE_GAMES[year] : null;
+  const pageName = file => file.slice(file.indexOf('/') + 1);
+  const { games: played, slips } = seasonGames(clubs.map(({ file, page }) => ({ file: pageName(file), page })),
+    name => franchiseOfPage[clubs.findIndex(club => pageName(club.file) === name)], { leave });
+  const key = league === 'AFL' ? `afl-${year}` : String(year);
+  // m under the season's rules as its league's figures set them: not its own clubs' spread, which the move sets.
+  const perPoint = marginPerPoint(seasonRules(league, year), `pfa-move:${key}`);
+  const pools = Object.fromEntries(teams.map(team => [team.franchise, players.filter(p => p.franchise === team.franchise)
+    .map(p => ({ name: p.name, pos: p.position, rating: p.overall, player: p }))]));
+  const move = moveSeason({ pools, gaps, games: played, perPoint, label: `${year} ${league}` });
+  for (const pool of Object.values(move.pools)) for (const { player, rating } of pool) player.overall = rating;
+  for (const team of teams) {
+    squadOf(players.filter(p => p.franchise === team.franchise).map(p => ({ name: p.name, pos: p.position, rating: p.overall })), `${year} ${team.name}`,
+      { gaps: gaps[team.franchise] ?? {} });
+  }
+  // The players' moves, fewest to most points: a club's shift, and one more for its best few.
+  const moves = Object.values(move.clubs);
+  const fewest = Math.min(...moves.map(c => c.shift)), most = Math.max(...moves.map(c => c.shift + (c.plus ? 1 : 0)));
+  const fixed = (x, places) => rounded(x, places).toFixed(places);
+  const signed = x => (x > 0 ? `+${x}` : x < 0 ? `−${-x}` : '0');
   const clubFacts = Object.fromEntries(clubs.map(({ page, file }, i) => {
     const home = page.games.filter(g => g.site === 'H');
     const venues = {};
@@ -309,33 +344,39 @@ async function snapshotOf(year, league, manifest, franchises, madden, calibratio
     files: Object.fromEntries([index, ...clubs.map(c => c.file), ...boxScores, ...aroundFiles].map(file => [file, PINS[file]])),
     ...(replaced.size ? { replacement: { rule: `The replacement players of the strike games (${from} to ${to}, ${strikeGames} a club) are left out: those the games' box scores (the starters and every player with a statistic) name as often as they played, and those who played no more than ${strikeGames} games and for no club in ${year - 1} or ${year + 1}.`,
       boxScores: boxScores.length, players: replaced.size } } : {}),
-    notes: clubs.flatMap(({ page, file }) => page.notes.map(note => `${file}: ${note}`)),
+    notes: [...clubs.flatMap(({ page, file }) => page.notes.map(note => `${file}: ${note}`)), ...slips.map(slip => `scores ${slip}`)],
   };
+  const left = leave ? `, the strike's replacement games of ${leave[0]} to ${leave[1]} left out` : '';
   const conversion = {
-    overall: `Ours, computed: no game rated this ${league} season. Each player's season value (his club's credit, its points per game against the league's to the power ${VALUE_WEIGHTS.team}, offence and defence apart, shared out: the offensive line by starts; quarterbacks, backs, receivers and tight ends by production, rushing and receiving yards, ${VALUE_WEIGHTS.pass} a passing yard, ${VALUE_WEIGHTS.td} a touchdown and less ${VALUE_WEIGHTS.int} an interception thrown, and by starts; defenders two thirds by starts and one third by plays, ${VALUE_WEIGHTS.sack} a sack where recorded, ${VALUE_WEIGHTS.pick} an interception, ${VALUE_WEIGHTS.recovery} a fumble recovered, ${VALUE_WEIGHTS.returnTd} a return touchdown; kickers by field goals, extra points and accuracy against the league) is ranked among the league-season's players at his game position (ties by starts, then games played) and read off Madden NFL 2002's overalls at that position (the 2001 season: maddenratings.net's 31 team spreadsheets, punters left out), as many of each Madden team's best as the season carries per club, by linear interpolation; rounded and held to 1–99. Facts from Pro Football Archives; the weights tuned once on 2001–2005 against the next season's Madden launch ratings, then frozen.`,
+    overall: `Ours, computed: no game rated this ${league} season. Each player's season value (his club's credit, its points per game against the league's to the power ${VALUE_WEIGHTS.team}, offence and defence apart, shared out: the offensive line by starts; quarterbacks, backs, receivers and tight ends by production, rushing and receiving yards, ${VALUE_WEIGHTS.pass} a passing yard, ${VALUE_WEIGHTS.td} a touchdown and less ${VALUE_WEIGHTS.int} an interception thrown, and by starts; defenders two thirds by starts and one third by plays, ${VALUE_WEIGHTS.sack} a sack where recorded, ${VALUE_WEIGHTS.pick} an interception, ${VALUE_WEIGHTS.recovery} a fumble recovered, ${VALUE_WEIGHTS.returnTd} a return touchdown; kickers by field goals, extra points and accuracy against the league) is ranked among the league-season's players at his game position (ties by starts, then games played) and read off Madden NFL 2002's overalls at that position (the 2001 season: maddenratings.net's 31 team spreadsheets, punters left out), as many of each Madden team's best as the season carries per club, by linear interpolation; rounded and held to 1–99. Then each club moves toward its results: its target is T = μ + √r × S ÷ m, where S is its Simple Rating System (its margins by least squares with a home edge, the ${league}'s ratings summing to nought) from the season's ${played.length} games${left}, r = ${fixed(move.srs.reliability, 3)} their reliability, m = ${perPoint} points of margin a game for each point of the strength the match model plays (its lineup's offence and defence, their mean), measured over ${(4 * PER_POINT_GAMES).toLocaleString('en-US')} simulated games under the season's rules, and μ = ${fixed(move.mean, 2)} the clubs' mean strength before the move. Every player of a club moves by one whole number and its best few by one more, held to 1–99 and never past a teammate rated above him, whichever brings the club nearest its target: ${signed(fewest)} to ${signed(most)} points this season. The results count twice, by design: the credit's points for and against place a club's players at their positions and weigh its offence against its defence, and the move then sets the club's level from its margins, wherever the credit left it. Facts from Pro Football Archives; the weights tuned once on 2001–2005 against the next season's Madden launch ratings, then frozen.`,
     weights: VALUE_WEIGHTS,
     calibration: { seasons: CALIBRATION, spearman: calibration.mean, mean: calibration.overall },
     reference: { game: 'Madden NFL 2002', season: 2001, positions: reference },
+    move: { target: 'μ + √r × S ÷ m', games: played.length, ...(leave ? { left: leave } : {}),
+      srs: { homeEdge: rounded(move.srs.homeEdge, 2), sigma: rounded(move.srs.sigma, 2), reliability: rounded(move.srs.reliability, 3) },
+      perPoint, perPointGames: 4 * PER_POINT_GAMES, seed: `pfa-move:${key}`, mean: rounded(move.mean, 2), scale: rounded(move.scale, 4) },
   };
   const rowOf = p => [p.name, p.franchise, p.codes.join('-'), p.position, p.overall, { id: p.id, ...(p.no ? { no: p.no } : {}), gp: p.gp, gs: p.gs,
     value: p.value, ...(p.played ? { played: p.played } : {}), ...(p.also ? { also: p.also } : {}) }];
   const head = {
-    note: `The ${year} ${league} season, computed from Pro Football Archives' facts: every player of its ${teams.length} clubs who played a game but the punters and long snappers, as [name, franchise (scripts/data/nfl-teams.json), the site's positions, game position, overall, { id: the site's player page, no: jersey, gp: games, gs: starts, value, played: the position a kicker also played, also: other clubs that season }], written by scripts/sync-pfa.mjs. The overall is ours (conversion).`,
+    note: `The ${year} ${league} season, computed from Pro Football Archives' facts: every player of its ${teams.length} clubs who played a game but the punters and long snappers, as [name, franchise (scripts/data/nfl-teams.json), the site's positions, game position, overall, { id: the site's player page, no: jersey, gp: games, gs: starts, value, played: the position a kicker also played, also: other clubs that season }], written by scripts/sync-pfa.mjs. The overall is ours (conversion): read off Madden NFL 2002, then moved with the player's club (\`moves\`: each club's SRS in points a game, its target, its strength the match model plays before and after, and its move, every player by \`shift\` and its best \`plus\` by one more). \`games\`: the season's games the SRS reads, [date, home, away, home points, away points, 'N' at a neutral venue].`,
     source, conversion,
     teams: Object.fromEntries(teams.map(team => [team.franchise, { era: team.id, name: team.name, code: team.code }])),
     clubs: clubFacts,
+    moves: move.clubs,
     lineup: { needs: FORMATION, gaps },
   };
   const lines = Object.entries(head).map(([key, value]) => `  ${JSON.stringify(key)}: ${JSON.stringify(value)}`);
   const list = (key, items) => `  ${JSON.stringify(key)}: [${items.length ? `\n${items.map(item => `    ${JSON.stringify(item)}`).join(',\n')}\n  ` : ''}]`;
-  return { text: `{\n${[...lines, list('players', players.map(rowOf))].join(',\n')}\n}\n`, players, gaps, teams };
+  const gameRow = g => [g.date, g.home, g.away, g.homeScore, g.awayScore, ...(g.neutral ? ['N'] : [])];
+  return { text: `{\n${[...lines, list('games', played.map(gameRow)), list('players', players.map(rowOf))].join(',\n')}\n}\n`, players, gaps, teams, move, clubs: clubFacts };
 }
 
 async function main() {
   const args = process.argv.slice(2);
   const checkOnly = args.includes('--check');
   const only = args.find(arg => arg.startsWith('--season='))?.slice('--season='.length);
-  const unknown = args.filter(arg => arg !== '--check' && arg !== '--tune' && !arg.startsWith('--season='));
+  const unknown = args.filter(arg => !['--check', '--tune', '--credit'].includes(arg) && !arg.startsWith('--season='));
   if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
   const manifest = JSON.parse(await readFile(path.join(root, 'scripts/data/nfl-seasons.json'), 'utf8'));
   const franchises = JSON.parse(await readFile(path.join(root, 'scripts/data/nfl-teams.json'), 'utf8')).teams;
@@ -361,29 +402,62 @@ async function main() {
   const calibration = await calibrate(VALUE_WEIGHTS, seasons);
   const heldOut = await calibrationSeasons(HOLDOUT);
   const holdout = await calibrate(VALUE_WEIGHTS, heldOut);
+  // The same without the club's credit (its power 0, every club's players valued alike, the move alone anchoring the
+  // clubs to their results): the credit was kept, as it orders the players better (docs/design/american-football.md).
+  const uncredited = { ...VALUE_WEIGHTS, team: 0 };
+  const withoutCredit = { tuned: await calibrate(uncredited, seasons), holdout: await calibrate(uncredited, heldOut) };
   const jobs = [
     ...manifest.seasons.filter(year => manifest.sources[year]?.kind === 'pfa').map(year => ({ year, league: 'NFL', key: String(year) })),
     ...(manifest.afl?.seasons ?? []).map(year => ({ year, league: 'AFL', key: `afl-${year}` })),
   ].filter(job => !only || job.key === only);
   if (!jobs.length && only) throw new Error(`No computed season ${only}`);
+  if (args.includes('--credit')) {
+    // How near the clubs land to their results, each season moved toward them, with the club's credit and without it:
+    // the shown strength against winning share, the offence against points scored a game and the defence against points
+    // conceded (each season's Spearman, then their mean).
+    for (const team of [VALUE_WEIGHTS.team, 0]) {
+      const seasons = [];
+      for (const { year, league } of jobs) {
+        const target = league === 'AFL' ? { ...manifest, ...manifest.afl, teams: manifest.teams } : manifest;
+        const { players, gaps, teams, clubs: facts } = await snapshotOf(year, league, target, franchises, madden, calibration, { ...VALUE_WEIGHTS, team });
+        const rows = teams.map(({ franchise, name }) => {
+          const pool = players.filter(p => p.franchise === franchise).map(p => ({ name: p.name, pos: p.position, rating: p.overall }));
+          const { squad, str } = squadOf(pool, `${year} ${name}`, { gaps: gaps[franchise] ?? {} });
+          const { offence, defence } = americanFootballProfile(selectLineup({ sport: 'american-football', squad }));
+          const f = facts[franchise], [won, lost, tied = 0] = f.record.split('-').map(Number);
+          return { str, offence, defence, share: (won + tied / 2) / (won + lost + tied), scored: f.for / f.games, conceded: -f.against / f.games };
+        });
+        const rho = (a, b) => rankCorrelation(rows.map(r => r[a]), rows.map(r => r[b]));
+        seasons.push({ shown: rho('str', 'share'), offence: rho('offence', 'scored'), defence: rho('defence', 'conceded') });
+      }
+      const mean = key => (seasons.reduce((sum, s) => sum + s[key], 0) / seasons.length).toFixed(3);
+      console.log(`Credit at power ${team}, ${seasons.length} seasons moved toward their results: shown strength against winning share `
+        + `${mean('shown')}, offence against points scored ${mean('offence')}, defence against points conceded ${mean('defence')}`);
+    }
+    return;
+  }
   const outputs = [];
   // The spread of club strengths the credit's power gives the computed 2001 season, beside Madden NFL 2002's.
   const madden2001 = JSON.parse(await readFile(path.join(root, 'public/american-football/madden-2001.json'), 'utf8')).clubs.map(c => c.str);
   const span = list => [Math.min(...list), Math.max(...list)];
   const spreads = Object.fromEntries(TEAM.map(team => [team, span(strengths(seasons[0].clubs, { ...VALUE_WEIGHTS, team }, madden))]));
   outputs.push([path.join(outDir, 'calibration.json'), `${JSON.stringify({
-    note: 'How well the computed seasons\' value orders each position as the next season\'s Madden launch ratings do (Spearman\'s rank correlation; ties by starts, then games), on the 2001 to 2005 seasons the weights were tuned on (Madden NFL 2003 to 07), by npm run sync:pfa. Players are matched by name, a name two Madden players share left out. `team`: the spread of the computed 2001 season\'s club strengths by the credit\'s power, beside Madden NFL 2002\'s spread of 2001\'s. `holdout`: the same measure on 2000, which the weights were not tuned on, against Madden NFL 2002 (the 2001 season\'s launch roster); 1998 and 1999 have none, the next seasons\' Madden ratings surviving in no copy the game reads.',
+    note: 'How well the computed seasons\' value orders each position as the next season\'s Madden launch ratings do (Spearman\'s rank correlation; ties by starts, then games), on the 2001 to 2005 seasons the weights were tuned on (Madden NFL 2003 to 07), by npm run sync:pfa. Players are matched by name, a name two Madden players share left out. `team`: the spread of the computed 2001 season\'s club strengths by the credit\'s power, beside Madden NFL 2002\'s spread of 2001\'s. `holdout`: the same measure on 2000, which the weights were not tuned on, against Madden NFL 2002 (the 2001 season\'s launch roster); 1998 and 1999 have none, the next seasons\' Madden ratings surviving in no copy the game reads. `withoutCredit`: both measures with the club\'s credit at power 0 (each club\'s players valued alike, its results left to the move toward them), against which the credit was kept.',
     weights: VALUE_WEIGHTS, grid: GRID, mean: calibration.overall, positions: calibration.mean, seasons: calibration.per,
     team: { madden2002: span(madden2001), computed2001: spreads },
     holdout: { mean: holdout.overall, positions: holdout.mean, seasons: holdout.per },
+    withoutCredit: { mean: withoutCredit.tuned.overall, positions: withoutCredit.tuned.mean, holdout: { mean: withoutCredit.holdout.overall, positions: withoutCredit.holdout.mean } },
     files: Object.fromEntries([...seasons, ...heldOut].flatMap(s => [`${s.year}/${s.year}nfl.html`, ...s.files]).map(file => [file, PINS[file]])),
   }, null, 1)}\n`]);
   console.log(`Calibration on 2001–2005: mean Spearman ${calibration.overall} (${POSITIONS.map(p => `${p} ${calibration.mean[p]}`).join(', ')})`);
   console.log(`Held out, 2000 against Madden NFL 2002: mean Spearman ${holdout.overall} (${POSITIONS.map(p => `${p} ${holdout.mean[p]}`).join(', ')})`);
+  console.log(`Without the club's credit: mean Spearman ${withoutCredit.tuned.overall}, held out ${withoutCredit.holdout.overall}`);
   for (const { year, league, key } of jobs) {
     const target = league === 'AFL' ? { ...manifest, ...manifest.afl, teams: manifest.teams } : manifest;
-    const { text, players, gaps, teams } = await snapshotOf(year, league, target, franchises, madden, calibration);
-    console.log(`${key}: ${teams.length} clubs, ${players.length} players; short: ${Object.entries(gaps).map(([f, g]) => `${f.replace('nfl-', '')} ${JSON.stringify(g)}`).join(', ') || 'none'}`);
+    const { text, players, gaps, teams, move } = await snapshotOf(year, league, target, franchises, madden, calibration);
+    const shifts = Object.values(move.clubs).map(c => c.shift);
+    console.log(`${key}: ${teams.length} clubs, ${players.length} players; short: ${Object.entries(gaps).map(([f, g]) => `${f.replace('nfl-', '')} ${JSON.stringify(g)}`).join(', ') || 'none'}; `
+      + `SRS reliability ${move.srs.reliability.toFixed(3)}, moves ${Math.min(...shifts)} to ${Math.max(...shifts)}`);
     outputs.push([path.join(outDir, `${key}.json`), text]);
   }
   const differs = [];
