@@ -88,13 +88,6 @@ export function snapshotMatcher(snapshotClubs = []) {
 }
 
 /**
- * Whether a club is a reserve side (Bayern München II, FC Barcelona B, Real Madrid Castilla, Athletic Club de Bilbao
- * B): the built-in maps leave reserve sides out (scripts/lib/domestic-sync.mjs), and so do the seasons'. EA rates them
- * only where they play in a league it rates, beside their first team.
- */
-export const isReserveSide = name => /\s(?:II|B|Castilla|U2[13]|Reserves)$|-(?:2|II|Yuni)\b/u.test(String(name).trim());
-
-/**
  * Homes for one country's season clubs. `clubs` are `[{ name }]`, one per name, strongest first; `snapshot` the
  * country's built-in snapshot or null; `europe` the Europe maps' clubs by id with `idOf(name)` the season's id for a
  * name; `overrides` the hand overrides of this country by name; `locate` scripts/lib/domestic-locate.mjs's tools

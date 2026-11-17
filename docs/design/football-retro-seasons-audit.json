@@ -14090,7 +14090,7 @@
       "listing": "Sensible Software's Sensible World of Soccer 96/97, its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)",
       "maker": "Sensible Software",
       "edition": "SWOS 96/97",
-      "version": "swos-9697-5e7af2be",
+      "version": "swos-9697-1478886e",
       "snapshotDate": "1996",
       "url": "https://cern.swos.eu/data/amiga/9697/",
       "compiler": "The game's own team files: the six national team files (TEAM.080 to 085) and the seven league files (TEAM.008 England, 013 France, 014 Germany, 020 Italy, 025 Holland, 029 Portugal, 035 Spain), as the SWOS United community server keeps them for its tools (cern.swos.eu/data/amiga/9697), read by scripts/lib/swos-files.mjs",
@@ -14577,15 +14577,15 @@
         }
       ],
       "coverage": {
-        "players": 2937,
+        "players": 2827,
         "nations": 133,
         "completeXIs": 133,
-        "clubs": 134,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 18
       },
       "audit": {
         "id": "swos-9697",
-        "version": "swos-9697-5e7af2be",
+        "version": "swos-9697-1478886e",
         "rows": 2288,
         "teams": 143,
         "noTeam": {
@@ -14601,11 +14601,11 @@
           "Singapore": 16
         },
         "coverage": {
-          "players": 2937,
+          "players": 2827,
           "nations": 133,
           "completeXIs": 133,
-          "clubs": 134,
-          "leagues": 7
+          "clubs": 124,
+          "leagues": 18
         },
         "territory": {
           "merged": {
@@ -14622,8 +14622,50 @@
             "626"
           ]
         },
-        "clubRows": 2144,
+        "clubRows": 7808,
         "leagues": [
+          {
+            "league": "Austrian Bundesliga",
+            "file": "001",
+            "clubs": 10,
+            "short": []
+          },
+          {
+            "league": "Belgian Pro League",
+            "file": "002",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Bulgarian First League",
+            "file": "003",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "Croatian HNL",
+            "file": "004",
+            "clubs": 12,
+            "short": []
+          },
+          {
+            "league": "Cypriot First Division",
+            "file": "005",
+            "clubs": 14,
+            "short": []
+          },
+          {
+            "league": "Czech First League",
+            "file": "006",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "Danish Superliga",
+            "file": "007",
+            "clubs": 12,
+            "short": []
+          },
           {
             "league": "Premier League",
             "file": "008",
@@ -14631,21 +14673,9 @@
             "short": []
           },
           {
-            "league": "La Liga",
-            "file": "035",
-            "clubs": 22,
-            "short": []
-          },
-          {
-            "league": "Serie A",
-            "file": "020",
-            "clubs": 18,
-            "short": []
-          },
-          {
-            "league": "Bundesliga",
-            "file": "014",
-            "clubs": 18,
+            "league": "Veikkausliiga",
+            "file": "012",
+            "clubs": 12,
             "short": []
           },
           {
@@ -14655,8 +14685,62 @@
             "short": []
           },
           {
+            "league": "Bundesliga",
+            "file": "014",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Greek Super League",
+            "file": "015",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Hungarian NB I",
+            "file": "016",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "League of Ireland",
+            "file": "018",
+            "clubs": 12,
+            "short": []
+          },
+          {
+            "league": "Serie A",
+            "file": "020",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Luxembourg National Division",
+            "file": "023",
+            "clubs": 12,
+            "short": []
+          },
+          {
             "league": "Eredivisie",
             "file": "025",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Irish League",
+            "file": "026",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "Eliteserien",
+            "file": "027",
+            "clubs": 14,
+            "short": []
+          },
+          {
+            "league": "Ekstraklasa",
+            "file": "028",
             "clubs": 18,
             "short": []
           },
@@ -14665,18 +14749,147 @@
             "file": "029",
             "clubs": 18,
             "short": []
+          },
+          {
+            "league": "Romanian Liga I",
+            "file": "030",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Russian Premier League",
+            "file": "031",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Scottish Premiership",
+            "file": "033",
+            "clubs": 10,
+            "short": []
+          },
+          {
+            "league": "La Liga",
+            "file": "035",
+            "clubs": 22,
+            "short": []
+          },
+          {
+            "league": "Allsvenskan",
+            "file": "036",
+            "clubs": 14,
+            "short": []
+          },
+          {
+            "league": "Swiss Super League",
+            "file": "037",
+            "clubs": 12,
+            "short": []
+          },
+          {
+            "league": "Süper Lig",
+            "file": "038",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Ukrainian Premier League",
+            "file": "039",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Welsh Premier League",
+            "file": "040",
+            "clubs": 20,
+            "short": []
+          },
+          {
+            "league": "Yugoslav First League",
+            "file": "041",
+            "clubs": 10,
+            "short": []
           }
         ],
         "collisions": [
+          "ATTILA HORVATH (Austria Vienna, Zalaegerszeg)",
+          "ZELJKO PAVLOVIC (FC Linz, NK Zagreb)",
+          "JOSKO POPOVIC (FC Linz, NK Zagreb)",
+          "BOBAN DMITROVIC (Grazer AK, Rad Belgrade)",
+          "RENE WAGNER (Rapid Vienna, Boby Brno)",
+          "ZSOLT PETRY (Charleroi, Genclerbirligi)",
+          "GERT CLAESSENS (Club Bruges, Club Bruges)",
+          "ANDERS NIELSEN (Club Bruges, Lyngby)",
+          "KRZYSZTOF BUKALSKI (Genk, Hutnik Krakow)",
+          "KJETIL REKDAL (Lierse, Stade Rennais FC)",
+          "ROMAN VONASEK (Lokeren, Sparta Prague)",
+          "JAN KOLLER (Lokeren, Sparta Prague)",
+          "VACLAV BUDKA (Lokeren, Sparta Prague)",
+          "WALDEMAR JASKULSKI (Standard Liege, Widzew Lodz)",
+          "NEBOJSA KRUPNIKOVIC (Standard Liege, Red Star Belgrade)",
+          "EDMILSON (Standard Liege, CS Marítimo)",
+          "DOBROMIR MINCHEV (Beroe Stara Zagora, Slavia Sofia)",
+          "DANIEL ZHELIAZKOV (Etar Veliko Tarnovo, Slavia Sofia)",
+          "MARIAN HRISTOV (Levski Sofia, Slavia Sofia)",
+          "DIMITAR PECHIKAMAKOV (Lokomotiv Gorna Oryahovitsa, Lokomotiv Gorna Oryahovitsa)",
+          "RUMEN VENKOV (Lokomotiv Gorna Oryahovitsa, Lokomotiv Gorna Oryahovitsa)",
+          "MARIO MESTROVIC (Cibalia Vinkovci, Hajduk Split)",
+          "KRUNOSLAV JURCIC (Croatia Zagreb, Istra Pula)",
+          "ZORAN GOSPIC (Istra Pula, NK Zagreb)",
+          "ZELJKO BRKIC (Marsonia Slavonski Brod, NK Zagreb)",
+          "KRUNOSLAV PINTURIC (NK Zagreb, Segesta Sisak)",
+          "MIROSLAV BICANIC (Osijek, MSV Duisburg)",
+          "DENIS PUTNIK (Sibenik, GD Chaves)",
+          "GEORGE CONSTANDINOU (AEK Larnaca, Omonia Aradippou)",
+          "YIANNAKIS IOANNOU (AEL Limassol, Nea Salamina)",
+          "ANDONIS ANDONIOU (AEL Limassol, APOEL Nicosia)",
+          "GEORGE GEORGIOU (Aris Limassol, Olympiakos)",
+          "DEMOS DIMOSTHENOUS (Aris Limassol, Evagoras Paphos)",
+          "JOVO MISELJIC (Aris Limassol, Radnicki Nis)",
+          "PAMBOS CHARALAMBOUS (Ethnikos Akhnas, Evagoras Paphos, Olympiakos)",
+          "NEBOJSA VIGNJEVIC (Paralimni, Rad Belgrade)",
+          "JAN PALINEK (Boby Brno, Petra Drnovice)",
+          "LUBOS KUBIK (Petra Drnovice, Slavia Prague)",
+          "JAROMIR JINDRACEK (Slavia Prague, Union Cheb)",
+          "MICHAL CALOUN (Sparta Prague, Viktoria Plzen)",
+          "JENS MADSEN (AaB, Vejle)",
+          "MARTIN NIELSEN (FC Copenhagen, Viborg)",
           "EMERSON (Middlesbrough, FC St. Pauli, C.F. Os Belenenses)",
-          "TONI (Atlético Madrid, RCD Espanyol)",
-          "RONALDO (FC Barcelona, Vitória Futebol Clube)",
-          "FRANCISCO VILLARROYA (RC Deportivo de La Coruña, Real Sporting de Gijón)",
-          "DMITRI RADCHENKO (RC Deportivo de La Coruña, Rayo Vallecano)",
-          "ALBERTO LOPEZ (Racing Santander, Real Sociedad)",
+          "MARCELO (Inter Turku, Olympique Lyonnais, PSV)",
+          "JANNE LAHTONEN (MP, MP)",
+          "JARI SARIOLA (MP, MP)",
+          "GRZEGORZ LEWANDOWSKI (Stade Malherbe Caen, Legia Warsaw)",
+          "TOMASZ WIESZCZYCKI (Le Havre AC, Legia Warsaw)",
+          "ZORAN MILINKOVIC (OGC Nice, Radnicki Nis)",
+          "CORNELIU PAPURA (Stade Rennais FC, Universitatea Craiova)",
           "PAULO SOUSA (Borussia Dortmund, Boavista FC)",
+          "PATRIK ANDERSSON (Borussia Mönchengladbach, Trelleborg)",
           "THOMAS WOLTER (SV Werder Bremen, SV Werder Bremen)",
-          "MARCELO (Olympique Lyonnais, PSV)",
+          "ANDREAS NINIADIS (Ethnikos, Olympiakos)",
+          "YORGOS PAPADOPOULOS (Iraklis, Larissa)",
+          "NIKOS MAHLAS (OFI Crete, Vitesse Arnhem)",
+          "ILIJA IVIC (Olympiakos, Red Star Belgrade)",
+          "ZOLTAN MOLNAR (BVSC, Stadler, Ujpesti TE)",
+          "CSABA JAKAB (Csepel, Gyor)",
+          "TAMAS SANDOR (Debrecen, Vac)",
+          "NORBERT NAGY (Ferencvaros, Stadler)",
+          "ZOLTAN JAGODICS (Ferencvaros, Gyor)",
+          "FERENC HAMORI (Gyor, CS Marítimo)",
+          "IGOR NICHENKO (Stadler, Krivbass)",
+          "TAMAS TIEFENBACH (Ujpesti TE, St. Gallen)",
+          "DEREK MURRAY (Derry City, Monaghan United)",
+          "BARRY RYAN (Derry City, Limerick)",
+          "PAUL DOOLIN (Shelbourne, Portadown)",
+          "BOBBY BROWNE (Shelbourne, Ards)",
+          "IGOR SIMUTENKOV (Reggiana, Dinamo Moscow)",
+          "DEJAN CUROVIC (Vitesse Arnhem, Partizan Belgrade)",
+          "DEJAN GOVEDARICA (FC Volendam, Vojvodina Novi Sad)",
+          "RADOSLAV SAMARDZIC (FC Volendam, Vojvodina Novi Sad)",
+          "BARRY MCCREADIE (Ballymena United, Omagh Town)",
+          "GEOFF FERRIS (Carrick Rangers, Glenavon)",
+          "COLIN NUTT (Cliftonville, Larne)",
+          "LINDSAY CURRY (Larne, Linfield)",
+          "MAGNUS JOHANSSON (Brann, IFK Gothenburg)",
           "JOAO PINTO (SL Benfica, Sporting Clube de Braga)",
           "QUIM (Sporting Clube de Braga, Vitória Futebol Clube)",
           "ARTUR JORGE (Sporting Clube de Braga, SC Espinho)",
@@ -14687,7 +14900,43 @@
           "REBELO (CF Estrela Amadora, Leça FC)",
           "RENATO (CF Estrela Amadora, SC Salgueiros)",
           "TOZE (SC Farense, Leça FC)",
-          "JOSE CARLOS (CS Marítimo, Vitória SC)"
+          "JOSE CARLOS (CS Marítimo, Vitória SC)",
+          "ZORAN HAJDIC (SC Salgueiros, Vojvodina Novi Sad)",
+          "RONALDO (Vitória Futebol Clube, FC Barcelona)",
+          "DENIS SERBAN (Farul Constanta, Steaua Bucharest)",
+          "LIVIU CIOBOTARIU (National, National)",
+          "CRISTIAN CIOCOIU (Selena Bacau, Steaua Bucharest)",
+          "ZOLTAN RITLI (Steaua Bucharest, Universitatea Cluj)",
+          "SERGEI KUZNETSOV (Asmaral Moscow, Rotor Volgograd)",
+          "VLADISLAV RADIMOV (CSKA Moscow, Real Zaragoza)",
+          "DMITRI TYAPUSHKIN (Spartak Moscow, Niva Ternopol)",
+          "SERGEI SHUSTIKOV (Torpedo Moscow, Racing Santander)",
+          "WILLIE MILLER (Dunfermline, Hibernian)",
+          "DRAGOJE LEKOVIC (Kilmarnock, Buducnost)",
+          "TONI (Atlético Madrid, RCD Espanyol)",
+          "FRANCISCO VILLARROYA (RC Deportivo de La Coruña, Real Sporting de Gijón)",
+          "DMITRI RADCHENKO (RC Deportivo de La Coruña, Rayo Vallecano)",
+          "BRANKO BRNOVIC (RCD Espanyol, Partizan Belgrade)",
+          "ALBERTO LOPEZ (Racing Santander, Real Sociedad)",
+          "DARKO KOVACEVIC (Real Sociedad, Proleter)",
+          "BENGT ANDERSSON (Club Deportivo Tenerife, Orgryte)",
+          "VLADAN LUKIC (Sion, Vojvodina Novi Sad)",
+          "FATIH SEZER (Altay, Samsunspor)",
+          "ADNAN GULEK (Antalyaspor, Antalyaspor)",
+          "RAHIM ZAFER (Besiktas, Genclerbirligi)",
+          "HAYRETTIN YILDIZ (Bursaspor, Karsiyaka)",
+          "ALEXANDER GORSHKOV (Chernomorets, Niva Vinnitsa)",
+          "MARK DAVIES (Aberystwyth, Holywell Town, Llanelli)",
+          "MIKE DAVIES (Aberystwyth, Llansantffraid)",
+          "DAVID EVANS (Bangor City, Conwy United)",
+          "LEE ANDREWS (Briton Ferry, Briton Ferry)",
+          "MARK EVANS (Caersws, Llanelli)",
+          "BARRY THOMAS (Connah's Quay, Connah's Quay)",
+          "DAVID DAVIES (Connah's Quay, Connah's Quay)",
+          "ANDREW EDWARDS (Conwy United, Llansantffraid)",
+          "MARK WILLIAMS (Holywell Town, Llansantffraid)",
+          "GARETH JONES (Newtown, Porthmadog)",
+          "DRAGOSLAV JEVRIC (Red Star Belgrade, Red Star Belgrade)"
         ],
         "names": [
           "EDWIN VAN DER SAR -> Edwin van der Sar",
@@ -14698,14 +14947,18 @@
           "PIERRE VAN HOOIJDONK -> Pierre van Hooijdonk",
           "JOSE DEL SOLAR -> Jose del Solar",
           "JOAQUIN DEL OLMO -> Joaquin del Olmo",
+          "YVES VAN DER STRAETEN -> Yves Van der Straeten",
+          "FRANKY VAN DER ELST -> Franky Van der Elst",
+          "FREDDIE VAN DER HOORN -> Freddie van der Hoorn",
+          "EDWIN VAN ANKEREN -> Edwin van Ankeren",
+          "JOSE DE SOUSA -> Jose de Sousa",
+          "HARM VAN VELDHOVEN -> Harm van Veldhoven",
+          "ERIK DE KOEYER -> Erik de Koeyer",
           "RAIMOND VAN DER GOUW -> Raimond van der Gouw",
-          "IVAN DE LA PENA -> Ivan de la Pena",
-          "JOSE DEL SOLAR -> Jose del Solar",
-          "RAMON DE QUINTANA -> Ramon de Quintana",
-          "FRANCISCO DE PEDRO -> Francisco de Pedro",
+          "ANDERSON DA SILVA -> Anderson da Silva",
           "THOMAS VON HEESEN -> Thomas von Heesen",
           "JOHAN DE KOCK -> Johan de Kock",
-          "ANDERSON DA SILVA -> Anderson da Silva",
+          "LUCANO DE SOUZA -> Lucano de Souza",
           "EDWIN VAN DER SAR -> Edwin van der Sar",
           "FRANK DE BOER -> Frank de Boer",
           "RONALD DE BOER -> Ronald de Boer",
@@ -14751,7 +15004,18 @@
           "MARK VAN HINTUM -> Mark van Hintum",
           "HARRY VAN DER VEGT -> Harry van der Vegt",
           "ARNE VAN DE BERG -> Arne van de Berg",
-          "JACK DE GIER -> Jack de Gier"
+          "JACK DE GIER -> Jack de Gier",
+          "PIERRE VAN HOOIJDONK -> Pierre van Hooijdonk",
+          "IVO DEN BIEMAN -> Ivo den Bieman",
+          "MITCHELL VAN DER GAAG -> Mitchell van der Gaag",
+          "PETER VAN VOSSEN -> Peter van Vossen",
+          "IVAN DE LA PENA -> Ivan de la Pena",
+          "JOSE DEL SOLAR -> Jose del Solar",
+          "RAMON DE QUINTANA -> Ramon de Quintana",
+          "FRANCISCO DE PEDRO -> Francisco de Pedro",
+          "RENE VAN ECK -> Rene van Eck",
+          "JUAREZ DE SOUSA -> Juarez de Sousa",
+          "ULRICH VAN GOBBEL -> Ulrich van Gobbel"
         ],
         "shortNations": [
           "116 Cambodia (0)",
@@ -14847,7 +15111,43 @@
           "SOLOMON ISLANDS ROBINSON BOE 0 -> 1",
           "SOLOMON ISLANDS GEORGE KIRIAU 0 -> 1",
           "AC MILAN GEORGE WEAH 49 -> 48",
-          "JUVENTUS ALESSANDRO DEL PIERO 49 -> 48"
+          "JUVENTUS ALESSANDRO DEL PIERO 49 -> 48",
+          "EVAGORAS PAPHOS DIMOS NEOPHYTOU 0 -> 1",
+          "EVAGORAS PAPHOS PANIKOS PHILIOTIS 0 -> 1",
+          "OMONIA ARADIPPOU GEORGE VASSILIOU 0 -> 1",
+          "OMONIA ARADIPPOU SAVVAS THEODOROU 0 -> 1",
+          "COBH RAMBLERS PHILIP LONG 0 -> 1",
+          "COBH RAMBLERS JOHN O'ROURKE 0 -> 1",
+          "DROGHEDA UNITED MICK SHELLEY 0 -> 1",
+          "DROGHEDA UNITED NOEL REID 0 -> 1",
+          "MONAGHAN UNITED DEREK SMYTH 0 -> 1",
+          "MONAGHAN UNITED NOEL MELVIN 0 -> 1",
+          "MONAGHAN UNITED MICK WILSON 0 -> 1",
+          "ARIS BONNEVOIE MARC SCHODER 0 -> 1",
+          "BALLYCLARE C. PAUL TUMILTY 0 -> 1",
+          "LARNE MICHAEL MCGARRY 0 -> 1",
+          "LARNE HARRY FAY 0 -> 1",
+          "NEWRY TOWN STEWART DOWDS 0 -> 1",
+          "NEWRY TOWN ULTAN MCCABE 0 -> 1",
+          "OMAGH TOWN SHAUN MCLAUGHLIN 0 -> 1",
+          "OMAGH TOWN DERMOT HILLEN 0 -> 1",
+          "ABERYSTWYTH GARY HAMAN 0 -> 1",
+          "ABERYSTWYTH DAVID BLAIR 0 -> 1",
+          "ABERYSTWYTH TOMMY MORGAN 0 -> 1",
+          "AFAN LIDO MARTIN MCCARTHY 0 -> 1",
+          "BRITON FERRY KERI SINGH 0 -> 1",
+          "BRITON FERRY NEIL WATERS 0 -> 1",
+          "CAERSWS PHILLIP STOKES 0 -> 1",
+          "CONNAH'S QUAY DARREN MARTIN 0 -> 1",
+          "HAVERFORDWEST DARREN YOUNG 0 -> 1",
+          "HAVERFORDWEST ANDREW JONES 0 -> 1",
+          "LLANELLI ANEURIN EVANS 0 -> 1",
+          "LLANELLI MARK DICKERSON 0 -> 1",
+          "LLANSANTFFRAID MARK WILLIAMS 0 -> 1",
+          "MAESTEG PARK CERI RICHARDS 0 -> 1",
+          "MAESTEG PARK PHIL MCNEIL 0 -> 1",
+          "MAESTEG PARK COLIN WALL 0 -> 1",
+          "MOLD ALEXANDRA PAUL FOLEY 0 -> 1"
         ]
       }
     },
@@ -14860,7 +15160,7 @@
       "listing": "Sensible Software's Sensible World of Soccer 95/96, its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)",
       "maker": "Sensible Software",
       "edition": "SWOS 95/96",
-      "version": "swos-9596-ef95edc8",
+      "version": "swos-9596-0fbcf999",
       "snapshotDate": "1995",
       "url": "https://cern.swos.eu/data/amiga/9596/",
       "compiler": "The game's own team files: the six national team files (TEAM.080 to 085) and the seven league files (TEAM.008 England, 013 France, 014 Germany, 020 Italy, 025 Holland, 029 Portugal, 035 Spain), as the SWOS United community server keeps them for its tools (cern.swos.eu/data/amiga/9596), read by scripts/lib/swos-files.mjs",
@@ -15347,15 +15647,15 @@
         }
       ],
       "coverage": {
-        "players": 2926,
+        "players": 2816,
         "nations": 132,
         "completeXIs": 132,
-        "clubs": 134,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 18
       },
       "audit": {
         "id": "swos-9596",
-        "version": "swos-9596-ef95edc8",
+        "version": "swos-9596-0fbcf999",
         "rows": 2272,
         "teams": 142,
         "noTeam": {
@@ -15371,11 +15671,11 @@
           "Singapore": 16
         },
         "coverage": {
-          "players": 2926,
+          "players": 2816,
           "nations": 132,
           "completeXIs": 132,
-          "clubs": 134,
-          "leagues": 7
+          "clubs": 124,
+          "leagues": 18
         },
         "territory": {
           "merged": {
@@ -15400,8 +15700,50 @@
             "flagId": "FRY"
           }
         },
-        "clubRows": 2144,
+        "clubRows": 7872,
         "leagues": [
+          {
+            "league": "Austrian Bundesliga",
+            "file": "001",
+            "clubs": 10,
+            "short": []
+          },
+          {
+            "league": "Belgian Pro League",
+            "file": "002",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Bulgarian First League",
+            "file": "003",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "Croatian HNL",
+            "file": "004",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Cypriot First Division",
+            "file": "005",
+            "clubs": 14,
+            "short": []
+          },
+          {
+            "league": "Czech First League",
+            "file": "006",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "Danish Superliga",
+            "file": "007",
+            "clubs": 12,
+            "short": []
+          },
           {
             "league": "Premier League",
             "file": "008",
@@ -15409,21 +15751,9 @@
             "short": []
           },
           {
-            "league": "La Liga",
-            "file": "035",
-            "clubs": 22,
-            "short": []
-          },
-          {
-            "league": "Serie A",
-            "file": "020",
-            "clubs": 18,
-            "short": []
-          },
-          {
-            "league": "Bundesliga",
-            "file": "014",
-            "clubs": 18,
+            "league": "Veikkausliiga",
+            "file": "012",
+            "clubs": 14,
             "short": []
           },
           {
@@ -15433,8 +15763,62 @@
             "short": []
           },
           {
+            "league": "Bundesliga",
+            "file": "014",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Greek Super League",
+            "file": "015",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Hungarian NB I",
+            "file": "016",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "League of Ireland",
+            "file": "018",
+            "clubs": 12,
+            "short": []
+          },
+          {
+            "league": "Serie A",
+            "file": "020",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Luxembourg National Division",
+            "file": "023",
+            "clubs": 12,
+            "short": []
+          },
+          {
             "league": "Eredivisie",
             "file": "025",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Irish League",
+            "file": "026",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "Eliteserien",
+            "file": "027",
+            "clubs": 12,
+            "short": []
+          },
+          {
+            "league": "Ekstraklasa",
+            "file": "028",
             "clubs": 18,
             "short": []
           },
@@ -15443,18 +15827,126 @@
             "file": "029",
             "clubs": 18,
             "short": []
+          },
+          {
+            "league": "Romanian Liga I",
+            "file": "030",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Russian Premier League",
+            "file": "031",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Scottish Premiership",
+            "file": "033",
+            "clubs": 10,
+            "short": []
+          },
+          {
+            "league": "La Liga",
+            "file": "035",
+            "clubs": 22,
+            "short": []
+          },
+          {
+            "league": "Allsvenskan",
+            "file": "036",
+            "clubs": 14,
+            "short": []
+          },
+          {
+            "league": "Swiss Super League",
+            "file": "037",
+            "clubs": 12,
+            "short": []
+          },
+          {
+            "league": "Süper Lig",
+            "file": "038",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "Ukrainian Premier League",
+            "file": "039",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Welsh Premier League",
+            "file": "040",
+            "clubs": 20,
+            "short": []
+          },
+          {
+            "league": "Yugoslav First League",
+            "file": "041",
+            "clubs": 10,
+            "short": []
           }
         ],
         "collisions": [
+          "DRAZEN BISKUP (Admira Wacker, NK Zagreb)",
+          "LASZLO KLAUSZ (Admira Wacker, ETO Gyor)",
+          "MONS IVAR MJELDE (Austria Vienna, Lillestrom)",
+          "MLADEN MLADENOVIC (SV Salzburg, Rijeka)",
+          "KRUNOSLAV JURCIC (Beveren, Istra Pula)",
+          "ANDERS NIELSEN (Sint-Truiden, Lyngby)",
+          "IVAN DIMITROV (Beroe Stara Zagora, Slavia Sofia)",
+          "PETKO PETKOV (CSKA Sofia, Montana)",
+          "ZARKO MACHEV (CSKA Sofia, Levski Sofia)",
+          "MILEN PETKOV (CSKA Sofia, Dobrudzha)",
+          "VESELIN IGNATOV (Levski Sofia, Montana)",
+          "MILEN PENCHEV (Levski Sofia, Levski Sofia, Shumen)",
+          "GORAN VASILIJEVIC (Lokomotiv Sofia, Red Star Belgrade)",
+          "TODOR PRAMATAROV (Lokomotiv Sofia, Kavala)",
+          "SERGEI KUZNETSOV (Shumen, Asmaral Moscow, Rotor Volgograd)",
+          "SAMIR TABAKOVIC (Belisce, Basel)",
+          "GORAN BRKIC (Belisce, Segesta Sisak)",
+          "MARIO MESTROVIC (Cibalia Vinkovci, Hajduk Split)",
+          "GORAN VLAOVIC (Croatia Zagreb, Padova)",
+          "ALEN PETROVIC (Croatia Zagreb, Osijek)",
+          "TONCI MRDULJAS (Dubrovnik, Osijek)",
+          "RENATO JURCEC (Hajduk Split, Inker Zapresic)",
+          "HARI VUKAS (Hajduk Split, Primorac Stobrec)",
+          "ZORAN GOSPIC (Istra Pula, NK Zagreb)",
+          "ELVIS BRAJKOVIC (Rijeka, TSV Munich 1860)",
+          "ALEN PETERNAC (Segesta Sisak, Real Valladolid)",
+          "YIANNAKIS IOANNOU (AEL Limassol, Nea Salamina, Pezoporikos)",
+          "TEMUR KETSBAIA (Anorthosis, AEK Athens)",
+          "DIMITRIS IOANNOU (Apollon Limassol, EPA Larnaca)",
+          "PAMBOS CHARALAMBOUS (Ethnikos Akhnas, Evagoras Paphos, Olympiakos)",
+          "KRZYSZTOF WALCZAK (Nea Salamina, GKS Katowice)",
+          "KAREL URBANEK (Hradec Kralove, Hradec Kralove)",
+          "JENS MADSEN (AaB, Vejle)",
+          "MARTIN NIELSEN (AGF, Viborg)",
+          "ALLAN NIELSEN (Brondby, FC Copenhagen)",
+          "JAN LARSEN (Vejle, Vejle)",
           "ISAIAS (Coventry City, FC Metz, Leça FC)",
-          "GELI (Atlético Madrid, RC Celta)",
-          "TONI (Atlético Madrid, RCD Espanyol)",
-          "MICHEL (RC Celta, Real Madrid)",
-          "LOREN (CP Mérida, Real Sociedad)",
-          "ALBERTO LOPEZ (Racing Santander, Real Sociedad)",
+          "SAMI KOSKINEN (FinnPa, TPS)",
+          "ALEKSANDR KOSTIN (Ilves, Spartak Vladikavkaz)",
+          "JEAN-LUC DOGON (Girondins de Bordeaux, Girondins de Bordeaux)",
+          "GORAN PANDUROVIC (Stade Rennais FC, Partizan Belgrade)",
+          "PATRIK ANDERSSON (Borussia Mönchengladbach, IFK Norrkoping)",
+          "YORGOS PAPADOPOULOS (Iraklis, Larissa)",
+          "ILIJA IVIC (Olympiakos, Red Star Belgrade)",
+          "CSABA JAKAB (Csepel, Haladas)",
+          "DEREK MURRAY (Derry City, Monaghan United)",
+          "BARRY RYAN (Derry City, Limerick)",
+          "PAUL DOOLIN (Shelbourne, Portadown)",
+          "BOBBY BROWNE (Shelbourne, Ards)",
           "LUCA MONDINI (Inter, Vicenza)",
           "PAULO SOUSA (Juventus, Boavista FC)",
-          "JEAN-LUC DOGON (Girondins de Bordeaux, Girondins de Bordeaux)",
+          "DEJAN CUROVIC (Vitesse Arnhem, Partizan Belgrade)",
+          "RADOSLAV SAMARDZIC (FC Volendam, Vojvodina Novi Sad)",
+          "BARRY MCCREADIE (Ballymena United, Omagh Town)",
+          "GEOFF FERRIS (Carrick Rangers, Glenavon)",
+          "COLIN NUTT (Cliftonville, Larne)",
+          "LINDSAY CURRY (Larne, Linfield)",
           "JOAO PINTO (SL Benfica, FC Porto)",
           "CAETANO (Boavista FC, FC Tirsense)",
           "QUIM (Sporting Clube de Braga, Sporting Clube Campomaiorense)",
@@ -15465,7 +15957,42 @@
           "TOZE (SC Farense, FC Tirsense)",
           "MADUREIRA (Gil Vicente FC, SC Salgueiros, Vitória SC)",
           "RICARDO (Leça FC, Vitória SC)",
-          "CABRAL (CS Marítimo, União Desportiva de Leiria)"
+          "CABRAL (CS Marítimo, União Desportiva de Leiria)",
+          "ZORAN HAJDIC (SC Salgueiros, Vojvodina Novi Sad)",
+          "MARIAN IVAN (Brasov, Dinamo Bucharest)",
+          "ZOLTAN KADAR (Dinamo Bucharest, Dinamo Bucharest)",
+          "ION SBURLEA (Dinamo Bucharest, Universitatea Craiova)",
+          "MARIN DUNA (National, Steaua Bucharest)",
+          "BOGDAN STELEA (Steaua Bucharest, Samsunspor)",
+          "DMITRI TYAPUSHKIN (Spartak Moscow, Niva Ternopol)",
+          "SCOTT THOMSON (Aberdeen, Raith Rovers)",
+          "DRAGOJE LEKOVIC (Kilmarnock, Buducnost)",
+          "GELI (Atlético Madrid, RC Celta)",
+          "TONI (Atlético Madrid, RCD Espanyol)",
+          "SRDJAN BAJCETIC (RC Celta, Vojvodina Novi Sad)",
+          "MICHEL (RC Celta, Real Madrid)",
+          "BENT CHRISTENSEN (S.D. Compostela, Young Boys Berne)",
+          "BRANKO BRNOVIC (RCD Espanyol, Partizan Belgrade)",
+          "LOREN (CP Mérida, Real Sociedad)",
+          "ALBERTO LOPEZ (Racing Santander, Real Sociedad)",
+          "STEFAN ALVEN (Djurgarden, Malmo)",
+          "MIKAEL NILSSON (Djurgarden, IFK Gothenburg)",
+          "THOMAS ANDERSSON (IFK Gothenburg, Orebro)",
+          "RATINHO (Aarau, Aarau)",
+          "SEDAT BALKANLI (Bursaspor, Galatasaray)",
+          "TUNCAY AKGUN (Bursaspor, Kocaelispor)",
+          "OSMAN AYKOL (Galatasaray, Samsunspor)",
+          "MUSTAFA UGUR (Gaziantepspor, Kayserispor)",
+          "MARK DAVIES (Aberystwyth, Holywell Town, Llanelli)",
+          "MIKE DAVIES (Aberystwyth, Llansantffraid)",
+          "DAVID EVANS (Bangor City, Conwy United)",
+          "LEE ANDREWS (Briton Ferry, Briton Ferry)",
+          "MARK EVANS (Caersws, Llanelli)",
+          "BARRY THOMAS (Connah's Quay, Connah's Quay)",
+          "DAVID DAVIES (Connah's Quay, Connah's Quay)",
+          "ANDREW EDWARDS (Conwy United, Llansantffraid)",
+          "MARK WILLIAMS (Holywell Town, Llansantffraid)",
+          "GARETH JONES (Newtown, Porthmadog)"
         ],
         "names": [
           "ED DE GOEY -> Ed de Goey",
@@ -15474,12 +16001,18 @@
           "RONALD DE BOER -> Ronald de Boer",
           "JOSE DEL SOLAR -> Jose del Solar",
           "JOAQUIN DEL OLMO -> Joaquin del Olmo",
+          "YVES VAN DER STRAETEN -> Yves Van der Straeten",
+          "FRANKY VAN DER ELST -> Franky Van der Elst",
+          "FREDDIE VAN DER HOORN -> Freddie van der Hoorn",
+          "EDWIN VAN ANKEREN -> Edwin van Ankeren",
+          "SERGE VAN DE WALLE -> Serge Van de Walle",
+          "JOSE DE SOUSA -> Jose de Sousa",
+          "HARM VAN VELDHOVEN -> Harm van Veldhoven",
+          "EDMILSON DA SILVA -> Edmilson da Silva",
           "FABIEN DE FREITAS -> Fabien de Freitas",
-          "IVAN DE LA PENA -> Ivan de la Pena",
-          "RAMON DE QUINTANA -> Ramon de Quintana",
-          "FRANCISCO DE PEDRO -> Francisco de Pedro",
-          "JOSE DEL SOLAR -> Jose del Solar",
           "ANDERSON DA SILVA -> Anderson da Silva",
+          "PAULO DA SILVA -> Paulo da Silva",
+          "FRANS VAN ROOY -> Frans van Rooy",
           "EDWIN VAN DER SAR -> Edwin van der Sar",
           "FRANK DE BOER -> Frank de Boer",
           "RONALD DE BOER -> Ronald de Boer",
@@ -15531,7 +16064,13 @@
           "MARK VAN HINTUM -> Mark van Hintum",
           "JEAN-PAUL VAN GASTEL -> Jean-Paul van Gastel",
           "JACK DE GIER -> Jack de Gier",
-          "MOREIRA DE SA -> Moreira de Sa"
+          "MOREIRA DE SA -> Moreira de Sa",
+          "PIERRE VAN HOOIJDONK -> Pierre van Hooijdonk",
+          "IVAN DE LA PENA -> Ivan de la Pena",
+          "RAMON DE QUINTANA -> Ramon de Quintana",
+          "FRANCISCO DE PEDRO -> Francisco de Pedro",
+          "JOSE DEL SOLAR -> Jose del Solar",
+          "RENE VAN ECK -> Rene van Eck"
         ],
         "shortNations": [
           "116 Cambodia (0)",
@@ -15628,7 +16167,54 @@
           "SOLOMON ISLANDS ALFRED WALA 0 -> 1",
           "SOLOMON ISLANDS IAN PWAHOLO 0 -> 1",
           "SOLOMON ISLANDS ROBINSON BOE 0 -> 1",
-          "SOLOMON ISLANDS GEORGE KIRIAU 0 -> 1"
+          "SOLOMON ISLANDS GEORGE KIRIAU 0 -> 1",
+          "APEP PITSILIAS DIMITRIS ORPHANIDIS 0 -> 1",
+          "APEP PITSILIAS ZORAN KRAJICEVIC 0 -> 1",
+          "EPA LARNACA ANDREAS MAVRIS 0 -> 1",
+          "EPA LARNACA DIMITRIS IOANNOU 0 -> 1",
+          "EPA LARNACA COSTAS CHARALABOUS 0 -> 1",
+          "EVAGORAS PAPHOS ANDREAS PAPAIOANNOU 0 -> 1",
+          "EVAGORAS PAPHOS PANIKOS PHILIOTIS 0 -> 1",
+          "OMONIA ARADIPPOU NIKOS SHIKKIS 0 -> 1",
+          "OMONIA ARADIPPOU SAVVAS THEODOROU 0 -> 1",
+          "COBH RAMBLERS PHILIP LONG 0 -> 1",
+          "COBH RAMBLERS JOHN O'ROURKE 0 -> 1",
+          "DROGHEDA UNITED MICK SHELLEY 0 -> 1",
+          "DROGHEDA UNITED NOEL REID 0 -> 1",
+          "MONAGHAN UNITED DEREK SMYTH 0 -> 1",
+          "MONAGHAN UNITED NOEL MELVIN 0 -> 1",
+          "MONAGHAN UNITED MICK WILSON 0 -> 1",
+          "ARIS BONNEVOIE ALAIN BIREN 0 -> 1",
+          "SWIFT HESPERANGE FRANCO DE PAOLA 0 -> 1",
+          "SWIFT HESPERANGE RAOUL HIPPERTCHEN 0 -> 1",
+          "WILTZ 71 FRANCO IOVINO 0 -> 1",
+          "WILTZ 71 TOM WEBER 0 -> 1",
+          "WORMELDANGE RALPH GLEBENER 0 -> 1",
+          "WORMELDANGE DANIEL CLEMEN 0 -> 1",
+          "BALLYCLARE C. PAUL TUMILTY 0 -> 1",
+          "LARNE MICHAEL MCGARRY 0 -> 1",
+          "LARNE HARRY FAY 0 -> 1",
+          "NEWRY TOWN STEWART DOWDS 0 -> 1",
+          "NEWRY TOWN ULTAN MCCABE 0 -> 1",
+          "OMAGH TOWN SHAUN MCLAUGHLIN 0 -> 1",
+          "OMAGH TOWN DERMOT HILLEN 0 -> 1",
+          "ABERYSTWYTH GARY HAMAN 0 -> 1",
+          "ABERYSTWYTH DAVID BLAIR 0 -> 1",
+          "ABERYSTWYTH TOMMY MORGAN 0 -> 1",
+          "AFAN LIDO MARTIN MCCARTHY 0 -> 1",
+          "BRITON FERRY KERI SINGH 0 -> 1",
+          "BRITON FERRY NEIL WATERS 0 -> 1",
+          "CAERSWS PHILLIP STOKES 0 -> 1",
+          "CONNAH'S QUAY DARREN MARTIN 0 -> 1",
+          "HAVERFORDWEST DARREN YOUNG 0 -> 1",
+          "HAVERFORDWEST ANDREW JONES 0 -> 1",
+          "LLANELLI ANEURIN EVANS 0 -> 1",
+          "LLANELLI MARK DICKERSON 0 -> 1",
+          "LLANSANTFFRAID MARK WILLIAMS 0 -> 1",
+          "MAESTEG PARK CERI RICHARDS 0 -> 1",
+          "MAESTEG PARK PHIL MCNEIL 0 -> 1",
+          "MAESTEG PARK COLIN WALL 0 -> 1",
+          "MOLD ALEXANDRA PAUL FOLEY 0 -> 1"
         ]
       }
     },
@@ -15641,7 +16227,7 @@
       "listing": "Sensible Software's original Sensible World of Soccer (1994), its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)",
       "maker": "Sensible Software",
       "edition": "SWOS 94/95",
-      "version": "swos-9495-3d369a28",
+      "version": "swos-9495-319aeb96",
       "snapshotDate": "1994-12",
       "url": "https://cern.swos.eu/data/amiga/v1.0/",
       "compiler": "The game's own team files: the six national team files (TEAM.080 to 085) and the seven league files (TEAM.008 England, 013 France, 014 Germany, 020 Italy, 025 Holland, 029 Portugal, 035 Spain), as the SWOS United community server keeps them for its tools (cern.swos.eu/data/amiga/v1.0), read by scripts/lib/swos-files.mjs",
@@ -16128,15 +16714,15 @@
         }
       ],
       "coverage": {
-        "players": 2915,
+        "players": 2805,
         "nations": 131,
         "completeXIs": 131,
-        "clubs": 134,
-        "leagues": 7
+        "clubs": 124,
+        "leagues": 18
       },
       "audit": {
         "id": "swos-9495",
-        "version": "swos-9495-3d369a28",
+        "version": "swos-9495-319aeb96",
         "rows": 2256,
         "teams": 141,
         "noTeam": {
@@ -16152,11 +16738,11 @@
           "Singapore": 16
         },
         "coverage": {
-          "players": 2915,
+          "players": 2805,
           "nations": 131,
           "completeXIs": 131,
-          "clubs": 134,
-          "leagues": 7
+          "clubs": 124,
+          "leagues": 18
         },
         "territory": {
           "merged": {
@@ -16174,8 +16760,50 @@
             "KOS"
           ]
         },
-        "clubRows": 2144,
+        "clubRows": 7808,
         "leagues": [
+          {
+            "league": "Austrian Bundesliga",
+            "file": "001",
+            "clubs": 10,
+            "short": []
+          },
+          {
+            "league": "Belgian Pro League",
+            "file": "002",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Bulgarian First League",
+            "file": "003",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "Croatian HNL",
+            "file": "004",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Cypriot First Division",
+            "file": "005",
+            "clubs": 14,
+            "short": []
+          },
+          {
+            "league": "Czech First League",
+            "file": "006",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "Danish Superliga",
+            "file": "007",
+            "clubs": 10,
+            "short": []
+          },
           {
             "league": "Premier League",
             "file": "008",
@@ -16183,21 +16811,9 @@
             "short": []
           },
           {
-            "league": "La Liga",
-            "file": "035",
-            "clubs": 20,
-            "short": []
-          },
-          {
-            "league": "Serie A",
-            "file": "020",
-            "clubs": 18,
-            "short": []
-          },
-          {
-            "league": "Bundesliga",
-            "file": "014",
-            "clubs": 18,
+            "league": "Veikkausliiga",
+            "file": "012",
+            "clubs": 14,
             "short": []
           },
           {
@@ -16207,8 +16823,62 @@
             "short": []
           },
           {
+            "league": "Bundesliga",
+            "file": "014",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Greek Super League",
+            "file": "015",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Hungarian NB I",
+            "file": "016",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "League of Ireland",
+            "file": "018",
+            "clubs": 12,
+            "short": []
+          },
+          {
+            "league": "Serie A",
+            "file": "020",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Luxembourg National Division",
+            "file": "023",
+            "clubs": 10,
+            "short": []
+          },
+          {
             "league": "Eredivisie",
             "file": "025",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Irish League",
+            "file": "026",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "Eliteserien",
+            "file": "027",
+            "clubs": 12,
+            "short": []
+          },
+          {
+            "league": "Ekstraklasa",
+            "file": "028",
             "clubs": 18,
             "short": []
           },
@@ -16217,15 +16887,130 @@
             "file": "029",
             "clubs": 18,
             "short": []
+          },
+          {
+            "league": "Romanian Liga I",
+            "file": "030",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Russian Premier League",
+            "file": "031",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Scottish Premiership",
+            "file": "033",
+            "clubs": 10,
+            "short": []
+          },
+          {
+            "league": "La Liga",
+            "file": "035",
+            "clubs": 20,
+            "short": []
+          },
+          {
+            "league": "Allsvenskan",
+            "file": "036",
+            "clubs": 14,
+            "short": []
+          },
+          {
+            "league": "Swiss Super League",
+            "file": "037",
+            "clubs": 12,
+            "short": []
+          },
+          {
+            "league": "Süper Lig",
+            "file": "038",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "Ukrainian Premier League",
+            "file": "039",
+            "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Welsh Premier League",
+            "file": "040",
+            "clubs": 20,
+            "short": []
+          },
+          {
+            "league": "Yugoslav First League",
+            "file": "041",
+            "clubs": 10,
+            "short": []
           }
         ],
         "collisions": [
-          "GELI (Atlético Madrid, Real Zaragoza)",
-          "TONI (Atlético Madrid, RCD Espanyol)",
-          "ALBERTO LOPEZ (Real Sociedad, Real Valladolid)",
-          "PAULO SOUSA (Juventus, Boavista FC)",
-          "RUI AGUAS (Reggiana, CF Estrela Amadora)",
+          "DRAZEN BISKUP (Admira Wacker, NK Zagreb)",
+          "LASZLO KLAUSZ (Admira Wacker, ETO Gyor)",
+          "MONS IVAR MJELDE (Austria Vienna, Lillestrom)",
+          "ROMAN PIVARNIK (Rapid Vienna, Olomouc Sigma, Olomouc Sigma)",
+          "MLADEN MLADENOVIC (SV Salzburg, Rijeka)",
+          "ZBIGNIEW GRZESIAK (VfB Modling, Legia Warsaw)",
+          "SLAVKO FERIC (Vorwarts Steyr, Primorac Stobrec)",
+          "MIROSLAW WALIGORA (Lommel, Hutnik Krakow)",
+          "KRASIMIR DIMITROV (Botev Plovdiv, Spartak Varna)",
+          "MILEN PETKOV (Cherno More, Dobrudzha, Yantra Gabrovo)",
+          "PETKO PETKOV (CSKA Sofia, Yantra Gabrovo)",
+          "IVAILO ANDONOV (CSKA Sofia, Albacete Balompié)",
+          "ZAKHARIN SABLIOV (Etar Veliko Tarnovo, Yantra Gabrovo)",
+          "PETAR ALEXANDROV (Levski Sofia, Neuchatel Xamax)",
+          "DIMITAR GIUDZHEMENOV (Slavia Sofia, Yantra Gabrovo)",
+          "GORAN BRKIC (Belisce, Segesta Sisak)",
+          "MIRALEM IBRAHIMOVIC (Croatia Zagreb, Zeytinburnu)",
+          "GORAN VLAOVIC (Croatia Zagreb, Padova)",
+          "TONCI MRDULJAS (Dubrovnik, Osijek)",
+          "ANTE MISE (Hajduk Split, Vitesse Arnhem)",
+          "ZORAN GOSPIC (Istra Pula, NK Zagreb)",
+          "DANIEL SARIC (Rijeka, Real Sporting de Gijón)",
+          "YIANNAKIS IOANNOU (AEL Limassol, Nea Salamina, Pezoporikos)",
+          "TEMUR KETSBAIA (Anorthosis, AEK Athens)",
+          "DIMITRIS IOANNOU (Apollon Limassol, EPA Larnaca)",
+          "PAMBOS CHARALAMBOUS (Ethnikos Akhnas, Evagoras Paphos, Olympiakos)",
+          "KAKHI KACHARAVA (Olympiakos, Trabzonspor)",
+          "JIRI ZALESKY (Boby Brno, Xanthi)",
+          "RADOSLAV LATAL (Olomouc Sigma, FC Schalke 04)",
+          "CLAUS THOMSEN (AGF, Ipswich Town)",
+          "CLAUS CHRISTIANSEN (AGF, Lyngby)",
+          "HENRIK LYKKE (FC Copenhagen, Lille OSC)",
+          "ANTTI SUMIALA (Ikast, FC Jazz)",
+          "SLOBODAN MAROVIC (Silkeborg, IFK Norrkoping)",
+          "RAMI RANTANEN (FC OTP, HJK)",
+          "VESA HOLLI (Ilves, Jaro)",
+          "ANTO DROBNJAK (SC Bastia, Red Star Belgrade)",
+          "HENRIK BERTILSSON (FC Martigues, Halmstad)",
           "MARTIN KREE (Bayer 04 Leverkusen, Borussia Dortmund)",
+          "MICHAL PROBIERZ (Bayer 05 Uerdingen, Ruch Chorzow)",
+          "PATRIK ANDERSSON (Borussia Mönchengladbach, IFK Norrkoping)",
+          "YORGOS VLAHOUDIS (Kalamarias, OFI Crete)",
+          "ILIJA IVIC (Olympiakos, Red Star Belgrade)",
+          "KRZYSZTOF BOCIEK (PAOK, Stal Mielec)",
+          "CSABA JAKAB (Csepel, Haladas)",
+          "DEREK MURRAY (Derry City, Monaghan United)",
+          "BARRY RYAN (Derry City, Limerick)",
+          "PAUL DOOLIN (Shelbourne, Portadown)",
+          "BOBBY BROWNE (Shelbourne, Ards)",
+          "PAULO SOUSA (Juventus, Boavista FC)",
+          "IGOR SIMUTENKOV (Reggiana, Dinamo Moscow)",
+          "RUI AGUAS (Reggiana, CF Estrela Amadora)",
+          "BARRY MCCREADIE (Ballymena United, Omagh Town)",
+          "GEOFF FERRIS (Carrick Rangers, Glenavon)",
+          "COLIN NUTT (Cliftonville, Larne)",
+          "LINDSAY CURRY (Larne, Linfield)",
+          "KRZYSZTOF ZAGORSKI (Gornik Zabrze, Siarka Tarnobrzeg)",
+          "DARIUSZ SKRZYPCZAK (Lech Poznan, Aarau)",
+          "WOJCIECH KOWALCZYK (Legia Warsaw, Real Betis Balompié)",
+          "DARIUSZ WOJTOWICZ (Pogon Szczecin, Polonia Warsaw)",
+          "NORMAN MAPEZA (TM Pniewy, Galatasaray)",
           "CABRAL (Sport Clube Beira-Mar, FC Tirsense)",
           "TONI (Sport Clube Beira-Mar, Sporting Clube de Braga)",
           "FIGUEIREDO (C.F. Os Belenenses, Vitória Futebol Clube)",
@@ -16237,7 +17022,35 @@
           "JOSE CARLOS (FC Porto, FC Tirsense, Vitória SC, Vitória SC)",
           "EMERSON (FC Porto, Vitória SC)",
           "MADUREIRA (SC Salgueiros, Vitória SC)",
-          "PEDRO (SC Salgueiros, SC Salgueiros, Vitória SC)"
+          "PEDRO (SC Salgueiros, SC Salgueiros, Vitória SC)",
+          "PREDRAG JOVANOVIC (União da Madeira, Proleter)",
+          "ZOLTAN KADAR (Dinamo Bucharest, Dinamo Bucharest)",
+          "SERGEI KUZNETSOV (Asmaral Moscow, Rotor Volgograd)",
+          "DMITRI TYAPUSHKIN (Spartak Moscow, Niva Ternopol)",
+          "GELI (Atlético Madrid, Real Zaragoza)",
+          "TONI (Atlético Madrid, RCD Espanyol)",
+          "BENT CHRISTENSEN (S.D. Compostela, Young Boys Berne)",
+          "BRANKO BRNOVIC (RCD Espanyol, Partizan Belgrade)",
+          "NEBOJSA GUDELJ (CD Logroñés, Partizan Belgrade)",
+          "ALBERTO LOPEZ (Real Sociedad, Real Valladolid)",
+          "THOMAS ANDERSSON (IFK Gothenburg, Orebro)",
+          "ANDERS ANDERSSON (Malmo, Trelleborg)",
+          "MARTIN BRUNNER (Grasshoppers, Lausanne)",
+          "THOMAS KASLIN (Lausanne, Lugano)",
+          "ERTUGRUL SAGLAM (Besiktas, Samsunspor)",
+          "UMIT BIROL (Fenerbahce, Kocaelispor)",
+          "SAFFET SANCAKLI (Galatasaray, Kocaelispor)",
+          "MUSTAFA UGUR (Gaziantepspor, Kayserispor)",
+          "MARK DAVIES (Aberystwyth, Holywell Town, Llanelli)",
+          "MIKE DAVIES (Aberystwyth, Llansantffraid)",
+          "DAVID EVANS (Bangor City, Conwy United)",
+          "LEE ANDREWS (Briton Ferry, Briton Ferry)",
+          "MARK EVANS (Caersws, Llanelli)",
+          "BARRY THOMAS (Connah's Quay, Connah's Quay)",
+          "DAVID DAVIES (Connah's Quay, Connah's Quay)",
+          "ANDREW EDWARDS (Conwy United, Llansantffraid)",
+          "MARK WILLIAMS (Holywell Town, Llansantffraid)",
+          "GARETH JONES (Newtown, Porthmadog)"
         ],
         "names": [
           "FRANKY VAN DER ELST -> Franky Van der Elst",
@@ -16249,11 +17062,21 @@
           "PETER VAN VOSSEN -> Peter van Vossen",
           "JOSE DEL SOLAR -> Jose del Solar",
           "JOAQUIN DEL OLMO -> Joaquin del Olmo",
-          "JOSE DEL SOLAR -> Jose del Solar",
-          "JOHN VAN 'T SCHIP -> John van 't Schip",
-          "MARKUS VON AHLEN -> Markus von Ahlen",
+          "YVES VAN DER STRAETEN -> Yves Van der Straeten",
+          "MAURICE VAN HAM -> Maurice van Ham",
+          "FRANKY VAN DER ELST -> Franky Van der Elst",
+          "HERNANDES DA SILVA -> Hernandes da Silva",
+          "FREDDIE VAN DER HOORN -> Freddie van der Hoorn",
+          "LEO VAN DER ELST -> Leo Van der Elst",
+          "STAN VAN DEN BUYS -> Stan Van den Buys",
+          "HARM VAN VELDHOVEN -> Harm van Veldhoven",
+          "EDMILSON DA SILVA -> Edmilson da Silva",
+          "PAOLO DA SILVA -> Paolo da Silva",
           "JERRY DE JONG -> Jerry de Jong",
           "ANDERSON DA SILVA -> Anderson da Silva",
+          "MARKUS VON AHLEN -> Markus von Ahlen",
+          "PAULO DA SILVA -> Paulo da Silva",
+          "JOHN VAN 'T SCHIP -> John van 't Schip",
           "EDWIN VAN DER SAR -> Edwin van der Sar",
           "FRANK DE BOER -> Frank de Boer",
           "PETER VAN VOSSEN -> Peter van Vossen",
@@ -16314,7 +17137,9 @@
           "JEAN-PAUL VAN GASTEL -> Jean-Paul van Gastel",
           "MARTIN VAN GEEL -> Martin van Geel",
           "HANS VAN ARUM -> Hans van Arum",
-          "MOREIRA DE SA -> Moreira de Sa"
+          "MOREIRA DE SA -> Moreira de Sa",
+          "JOSE DEL SOLAR -> Jose del Solar",
+          "MART VAN DUREN -> Mart van Duren"
         ],
         "shortNations": [
           "116 Cambodia (0)",
@@ -16424,7 +17249,55 @@
           "SOLOMON ISLANDS ROBINSON BOE 0 -> 1",
           "SOLOMON ISLANDS GEORGE KIRIAU 0 -> 1",
           "JUVENTUS ROBERTO BAGGIO 49 -> 48",
-          "BARCELONA ROMARIO 49 -> 48"
+          "BARCELONA ROMARIO 49 -> 48",
+          "APEP PITSILIAS DIMITRIS ORPHANIDIS 0 -> 1",
+          "APEP PITSILIAS ZORAN KRAJICEVIC 0 -> 1",
+          "EPA LARNACA ANDREAS MAVRIS 0 -> 1",
+          "EPA LARNACA DIMITRIS IOANNOU 0 -> 1",
+          "EPA LARNACA COSTAS CHARALABOUS 0 -> 1",
+          "EVAGORAS PAPHOS ANDREAS PAPAIOANNOU 0 -> 1",
+          "EVAGORAS PAPHOS PANIKOS PHILIOTIS 0 -> 1",
+          "OMONIA ARADIPPOU NIKOS SHIKKIS 0 -> 1",
+          "OMONIA ARADIPPOU SAVVAS THEODOROU 0 -> 1",
+          "COBH RAMBLERS PHILIP LONG 0 -> 1",
+          "COBH RAMBLERS JOHN O'ROURKE 0 -> 1",
+          "DROGHEDA UNITED MICK SHELLEY 0 -> 1",
+          "DROGHEDA UNITED NOEL REID 0 -> 1",
+          "MONAGHAN UNITED DEREK SMYTH 0 -> 1",
+          "MONAGHAN UNITED NOEL MELVIN 0 -> 1",
+          "MONAGHAN UNITED MICK WILSON 0 -> 1",
+          "ARIS BONNEVOIE CLAUDE MARK 0 -> 1",
+          "BALLYCLARE C. PAUL TUMILTY 0 -> 1",
+          "LARNE MICHAEL MCGARRY 0 -> 1",
+          "LARNE HARRY FAY 0 -> 1",
+          "NEWRY TOWN STEWART DOWDS 0 -> 1",
+          "NEWRY TOWN ULTAN MCCABE 0 -> 1",
+          "OMAGH TOWN SHAUN MCLAUGHLIN 0 -> 1",
+          "OMAGH TOWN STEPHEN DOHERTY 0 -> 1",
+          "OMAGH TOWN DERMOT HILLEN 0 -> 1",
+          "ABERYSTWYTH GARY HAMAN 0 -> 1",
+          "ABERYSTWYTH DAVID BLAIR 0 -> 1",
+          "ABERYSTWYTH TOMMY MORGAN 0 -> 1",
+          "AFAN LIDO MARTIN MCCARTHY 0 -> 1",
+          "BRITON FERRY KERI SINGH 0 -> 1",
+          "BRITON FERRY NEIL WATERS 0 -> 1",
+          "BRITON FERRY LEE STEPHENS 0 -> 1",
+          "CAERSWS PHILLIP STOKES 0 -> 1",
+          "CONNAH'S QUAY DARREN MARTIN 0 -> 1",
+          "CONNAH'S QUAY NEVILLE POWELL 0 -> 1",
+          "CONNAH'S QUAY MICHAEL CARROLL 0 -> 1",
+          "FFLINT TOWN ANDY CARROLL 0 -> 1",
+          "HAVERFORDWEST DARREN YOUNG 0 -> 1",
+          "HAVERFORDWEST ANDREW JONES 0 -> 1",
+          "LLANELLI ANEURIN EVANS 0 -> 1",
+          "LLANELLI MARK DICKERSON 0 -> 1",
+          "LLANSANTFFRAID ADAM BURGESS 0 -> 1",
+          "LLANSANTFFRAID MARK WILLIAMS 0 -> 1",
+          "MAESTEG PARK CERI RICHARDS 0 -> 1",
+          "MAESTEG PARK PHIL MCNEIL 0 -> 1",
+          "MAESTEG PARK COLIN WALL 0 -> 1",
+          "MOLD ALEXANDRA PAUL FOLEY 0 -> 1",
+          "MOLD ALEXANDRA MARK ROWELL 0 -> 1"
         ]
       }
     },

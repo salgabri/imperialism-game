@@ -129,7 +129,7 @@ const COVERAGE = {
   'cm-9900': { players: 2101, nations: 123, completeXIs: 74, clubs: 124, leagues: 12 },
   'cm0102-2020-11-cm3': { players: 1964, nations: 113, completeXIs: 64, clubs: 124, leagues: 18 },
   'cm-9798': { players: 1870, nations: 102, completeXIs: 52, clubs: 124, leagues: 12 },
-  'swos-9697': { players: 2937, nations: 133, completeXIs: 133, clubs: 134, leagues: 7 },
+  'swos-9697': { players: 2827, nations: 133, completeXIs: 133, clubs: 124, leagues: 18 },
 };
 
 test('each season decodes, and fields the nations and clubs its source rates', () => {
@@ -138,10 +138,10 @@ test('each season decodes, and fields the nations and clubs its source rates', (
     const set = decodeFootballSet(doc);
     assert.deepEqual(doc.coverage, COVERAGE[id], id);
     assert.equal(Object.keys(set.rosters).length, Object.keys(NATIONS).length, `${id}: every nation has a roster`);
-    // Europe's strongest 124 of every first division the database holds, the seven big leagues' among them; SWOS's
-    // team files hold the seven big leagues alone.
+    // Europe's strongest 124 of every first division the database holds, the seven big leagues' among them (SWOS's
+    // since 17 November 2026, from every European league file of its edition).
     const leagues = new Set(set.clubs.map(club => club.league));
-    const beyond = id.startsWith('swos-') ? leagues.size === BIG_LEAGUES.length : leagues.size > BIG_LEAGUES.length;
+    const beyond = leagues.size > BIG_LEAGUES.length;
     assert.ok(setHasClubs(id) ? BIG_LEAGUES.every(league => leagues.has(league)) && beyond : !leagues.size, id);
     assert.ok([...leagues].every(league => EUROPEAN_LEAGUES[league]), id);
     assert.ok(set.clubs.every(club => club.squad.length >= 11), `${id}: a club fields eleven`);
@@ -167,8 +167,8 @@ test('each season with clubs plays on its own two Europe maps: its strongest 124
       assert.ok(!EUROPE_MAPS.some(entry => entry.seasons?.includes(id)));
       continue;
     }
-    // A season whose clubs come from all of Europe has maps of its own ids; SWOS's, from its seven leagues' team files, keeps its first.
-    const tag = `${id.startsWith('swos-') ? 's' : 'e'}${doc.year}`;
+    // A season whose clubs come from all of Europe has maps of its own ids (SWOS's too, since 17 November 2026).
+    const tag = `e${doc.year}`;
     assert.deepEqual(maps.map(map => [map.id, map.clubs, map.theatre, map.seasons]),
       [[`eu124${tag}`, TOP_CLUBS, 'all', [id]], [`eu32${tag}`, ELITE_CLUBS, 'elite', [id]]], id);
     for (const [count, map] of [[TOP_CLUBS, maps[0]], [ELITE_CLUBS, maps[1]]]) {
@@ -525,7 +525,7 @@ test('the running App plays 1996/97\'s clubs on its own maps, and launches and r
     app.pickSetup('layer', 'clubs');
     app.pickSetup('clubScope', 'domestic:eu32');
     app.pickSetup('dataSet', 'swos-9697');
-    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32s1997'], 'the theatre follows the season');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32e1997'], 'the theatre follows the season');
     app.pickSetup('layer', 'nations');
     time.advance(200);
     await app.loadSet('swos-9697');

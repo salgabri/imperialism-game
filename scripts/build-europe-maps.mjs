@@ -605,8 +605,9 @@ async function mapSpecs() {
   for (const season of BUILT_IN_SEASONS) {
     const set = JSON.parse(await readFile(setFile(season.id), 'utf8'));
     if (!set.clubs.length) continue;
-    // A season whose clubs come from all of Europe has maps of their own ids (eu124e2018), since 14 November 2026; one
-    // whose source holds the seven big leagues alone (SWOS's team files) keeps its seven-league maps (eu124s1995).
+    // A season whose clubs come from all of Europe has maps of their own ids (eu124e2018), since 14 November 2026 (SWOS's
+    // since 17 November 2026, once its other league files were read); one whose file held the seven big leagues alone
+    // would keep its seven-league maps (eu124s1995, now replaced too).
     const allEurope = set.clubs.some(club => !BIG_LEAGUES.includes(club.league));
     seasons.push({ tag: `${allEurope ? 'e' : 's'}${season.year}`, set: season.id, clubs: set.clubs });
   }

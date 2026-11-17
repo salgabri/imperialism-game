@@ -17,8 +17,7 @@ import { domesticCap } from '../../src/data/domesticTiers.js';
 import { EUROPEAN_LEAGUES } from '../../src/data/footballLeagues.js';
 import { eaPlayersOf } from './ea-seasons.mjs';
 import { FOOTBALL_LEAGUES } from './first-divisions.mjs';
-import { MIN_CLUBS } from './domestic-sync.mjs';
-import { isReserveSide } from './season-club-homes.mjs';
+import { MIN_CLUBS, foldedNames, nameReason } from './domestic-sync.mjs';
 
 export { MIN_CLUBS };
 export const CLUB_SIZE = 11;
@@ -203,22 +202,106 @@ export function retroSeasonClubs({ doc, allClubs }) {
 
 const byText = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
+// The seasons' sources shorten the first team's name in its reserve side's ("B. Dortmund II", "Ath. Bilbao B",
+// "SpVgg Gr. Fürth Amateure") or put the marker inside it ("Dinamo-2 Kiev", "Dinamo-Yuni Minsk"), which the built-in
+// maps' rule, written for FM's names, does not read. Markers: last word, "Jong" first, or a hyphen's inside the name.
+const END_MARKERS = new Set(['b', 'c', 'ii', 'iii', '2', '3', 'reserve', 'reserves', 'reserva', 'reservas', 'amateure', 'amateurs', 'castilla', 'atletic']);
+const INNER_MARKERS = new Set(['2', 'ii', 'yuni']);
+const NAME_TOKENS = new Set(['fc', 'cf', 'ac', 'sc', 'afc', 'cd', 'ss', 'as', 'us', 'ssc', 'rcd', 'ud', 'sd', 'ca', 'rc', 'sk', 'sv', 'fk', 'nk',
+  'krc', 'kaa', 'kv', 'rsc', 'rfc', 'ksv', 'kvc', 'club', 'sad']);
+const plain = text => String(text || '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/\([^)]*\)/g, ' ').replace(/['’]/g, '');
+/**
+ * A name's words, a shortened one keeping its full stop ("ath."), club words (FC, SV) and ordinals ("1. FC Köln") left
+ * out, with the hyphens that join them.
+ */
+const wordsOf = text => plain(text).split(/\s+/).flatMap(part => part.split(/(?=-)|(?<=-)/)).map(word => word.replace(/[^a-z0-9.-]/g, ''))
+  .filter(word => word && !NAME_TOKENS.has(word.replace(/\.$/, '')) && !/^\d+\.$/.test(word));
+/** Whether two words of five letters or more differ by one letter added, dropped or changed ("metalurg", "metallurg"). */
+function oneLetterApart(a, b) {
+  if (a.length < 5 || b.length < 5 || Math.abs(a.length - b.length) > 1 || a.includes('.') || b.includes('.')) return false;
+  let i = 0;
+  while (i < a.length && a[i] === b[i]) i++;
+  return a.slice(i + (a.length >= b.length ? 1 : 0)) === b.slice(i + (b.length >= a.length ? 1 : 0));
+}
+/**
+ * One word of a name read as another: the same, one cut short with a full stop ("ath." for "athletic", "b." for
+ * "borussia"), or one spelt a letter apart, as two editions of a source spell a club ("Metalurg-2 Donetsk" beside
+ * "Metallurg Donetsk").
+ */
+const sameWord = (a, b) => a === b || (a.endsWith('.') && b.startsWith(a.slice(0, -1)) && a.length > 1)
+  || (b.endsWith('.') && a.startsWith(b.slice(0, -1)) && b.length > 1) || oneLetterApart(a, b);
+/**
+ * Whether `first`'s words run on in `second`'s, word for word, with at least one whole word of three letters or more the
+ * same ("Borussia Dortmund" in CM's "BV Borussia Dortmund"). Numbers do not count ("Bayer Leverkusen Amateure" is Bayer
+ * 04 Leverkusen's, "TSV München 1860 Amateure" TSV 1860 München's).
+ */
+const unnumbered = words => words.filter(word => !/^\d+$/.test(word));
+const within = (first, second) => {
+  const [a, b] = [unnumbered(first), unnumbered(second)];
+  if (!a.length || a.length > b.length) return false;
+  for (let at = 0; at + a.length <= b.length; at++) {
+    if (a.every((word, i) => sameWord(word, b[at + i])) && a.some((word, i) => word === b[at + i] && word.length >= 3)) return true;
+  }
+  return false;
+};
+
+/** A name's words without its second-team marker, or null when it carries none. */
+function withoutMarker(name) {
+  const words = wordsOf(name);
+  if (words.length > 1 && words[0] === 'jong') return words.slice(1).filter(word => word !== '-');
+  if (words.length > 1 && END_MARKERS.has(words.at(-1).replace(/\.$/, ''))) return words.slice(0, -1).filter(word => word !== '-');
+  const inner = words.findIndex((word, i) => INNER_MARKERS.has(word) && words[i - 1] === '-');
+  return inner > 0 ? words.filter((word, i) => i !== inner && word !== '-') : null;
+}
+
+/**
+ * Why a season's club is no senior side of its own, or null: the built-in maps' rule (nameReason in
+ * scripts/lib/domestic-sync.mjs), so a second-team marker counts only when the rest of the name is a stronger club of
+ * the same country, and that rest may shorten the stronger club's name (withoutMarker). "Borussia Dortmund II", "B.
+ * Dortmund II", "FC Barcelona B" and "Real Madrid Castilla" are reserve sides; "Willem II" is Tilburg's club and
+ * "Jong Rambaan" a senior club. Age groups (U-21, Sub-20) and all-star sides are never senior sides; a school's name
+ * counts only outside a senior league. `stronger`: the country's clubs ranked above it, `{ folded, words }` (rememberStronger).
+ */
+export function secondTeamReason(club, stronger) {
+  const reason = nameReason({ name: club.name, shortName: club.short ?? null, competition: club.league ? { name: club.league } : null }, stronger.folded);
+  if (reason) return reason;
+  const base = withoutMarker(club.name);
+  if (!base?.length) return null;
+  // The stronger club's name runs on in the rest, or the rest in that name; a rest of one word must be the whole name.
+  return stronger.words.some(parent => within(parent, base) || (unnumbered(base).length > 1 && within(base, parent))) ? 'reserve side' : null;
+}
+
+/**
+ * Adds a club's names to a country's `stronger` record (secondTeamReason): its name, short name and, for a SWOS club,
+ * the name SWOS writes (its key, "swos:024:ATHLETIC BILBAO"), which its reserve side's shortens ("ATH. BILBAO B").
+ */
+export function rememberStronger(stronger, club) {
+  for (const name of foldedNames({ name: club.name, shortName: club.short ?? null })) stronger.folded.add(name);
+  const written = /^swos:[^:]+:(.+)$/.exec(club.key ?? '')?.[1];
+  for (const name of [club.name, club.short, written].filter(Boolean)) stronger.words.push(wordsOf(name).filter(word => word !== '-'));
+}
+
 /**
  * A season's country fields: every country with at least MIN_CLUBS clubs that field eleven players and a natural
- * goalkeeper, reserve sides left out (isReserveSide, as the built-in maps leave them out), each its strongest
- * min(tier, clubs) of them (src/data/domesticTiers.js, as the built-in maps), strongest
- * first by `strengthOf(club)` (ties by name). `clubs` are eaSeasonClubs' (or the CM and SWOS readers'). Returns
+ * goalkeeper, reserve and youth sides left out as the built-in maps leave them out (secondTeamReason), each its
+ * strongest min(tier, clubs) of them (src/data/domesticTiers.js, as the built-in maps), strongest first by
+ * `strengthOf(club)` (ties by name). `clubs` are eaSeasonClubs' (or the CM and SWOS readers'). Returns
  * `{ fields: Map(country → clubs), short: [{ country, clubs }] }`: `short` the countries below MIN_CLUBS.
  */
 export function countryFields(clubs, strengthOf) {
   const byCountry = new Map();
   for (const club of clubs) {
-    if (club.squad.length < CLUB_SIZE || !club.squad.some(player => player.positions.includes('GK')) || isReserveSide(club.name)) continue;
+    if (club.squad.length < CLUB_SIZE || !club.squad.some(player => player.positions.includes('GK'))) continue;
     (byCountry.get(club.country) || byCountry.set(club.country, []).get(club.country)).push({ ...club, str: strengthOf(club) });
   }
   const fields = new Map(), short = [];
-  for (const [country, list] of [...byCountry].sort(([a], [b]) => byText(a, b))) {
-    list.sort((a, b) => b.str - a.str || byText(a.name, b.name) || byText(a.key, b.key));
+  for (const [country, ranked] of [...byCountry].sort(([a], [b]) => byText(a, b))) {
+    ranked.sort((a, b) => b.str - a.str || byText(a.name, b.name) || byText(a.key, b.key));
+    const stronger = { folded: new Set(), words: [] }, list = [];
+    for (const club of ranked) {
+      if (!secondTeamReason(club, stronger)) list.push(club);
+      rememberStronger(stronger, club);
+    }
     if (list.length < MIN_CLUBS) { short.push({ country, clubs: list.length }); continue; }
     fields.set(country, list.slice(0, domesticCap(country)));
   }

@@ -14,6 +14,7 @@ import { decodeDomestic, DOMESTIC_FORMAT, DOMESTIC_SECTIONS, seasonCountry } fro
 import { expandSetPlayer, isEraMap, isSeasonCountryMap, setKindOf } from '../src/engine/footballSets.js';
 import { countryMapOf, countryMapsOf, domesticEntry, domesticLabel, isCountryScope, SEASON_COUNTRY_MAPS } from '../src/data/domesticScope.js';
 import { MIN_CLUBS } from './lib/domestic-sync.mjs';
+import { rememberStronger, secondTeamReason } from './lib/season-country-clubs.mjs';
 import { parseCampaign } from '../src/engine/storage.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
@@ -32,6 +33,32 @@ const seasonFile = id => {
   if (!seasonFiles.has(id)) seasonFiles.set(id, JSON.parse(readFileSync(path.join(root, 'public/football', `${id}.json`), 'utf8')));
   return seasonFiles.get(id);
 };
+
+test("a season's reserve sides stay off its country maps; a first team named II stays on", () => {
+  // Each country's clubs strongest first, as countryFields reads them: a second team's marker counts only when the rest
+  // of its name is a stronger club's, shortened or spelt as the season's source spells it.
+  const reasons = clubs => {
+    const stronger = { folded: new Set(), words: [] };
+    return clubs.map(([name, key]) => {
+      const club = { name, short: null, league: 'A league', key: key ?? `test:${name}` };
+      const reason = secondTeamReason(club, stronger);
+      rememberStronger(stronger, club);
+      return reason;
+    });
+  };
+  assert.deepEqual(reasons([['Ajax'], ['PSV'], ['Willem II'], ['Jong Ajax'], ['Jong Rambaan']]), [null, null, null, 'reserve side', null]);
+  assert.deepEqual(reasons([['Borussia Dortmund'], ['SpVgg Greuther Fürth'], ['Tennis Borussia Berlin'], ['B. Dortmund II'],
+    ['SpVgg Gr. Fürth Amateure'], ['Tennis Borussia Amateure'], ['FC Bayern Hof']]), [null, null, null, 'reserve side', 'reserve side', 'reserve side', null]);
+  assert.deepEqual(reasons([['Athletic Club', 'swos:035:ATHLETIC BILBAO'], ['Real Madrid'], ['Ath. Bilbao B', 'swos:035:ATH. BILBAO B'],
+    ['Real Madrid Castilla']]), [null, null, 'reserve side', 'reserve side']);
+  assert.deepEqual(reasons([['Dinamo Kiev'], ['Metallurg Donetsk'], ['Dinamo-2 Kiev'], ['Metalurg-2 Donetsk'], ['Dinamo-Yuni Kiev']]),
+    [null, null, 'reserve side', 'reserve side', 'reserve side']);
+  assert.deepEqual(reasons([['Boca Juniors'], ['Argentinos Juniors'], ['Argentina U-20']]), [null, null, 'youth side']);
+  // On the maps: Willem II plays every Dutch season that rates it; no German Amateure side takes a senior club's place.
+  const names = id => JSON.parse(readFileSync(path.join(root, `public/domestic/${id}.json`), 'utf8')).clubs.map(club => club.name);
+  for (const id of ['528y2016', '528y2004', '528y1996']) assert.ok(names(id).includes('Willem II'), id);
+  for (const id of ['276y2000', '276y2001', '276y2002', '276y2003', '276y2004']) assert.ok(!names(id).some(name => /Amateure$/.test(name)), id);
+});
 
 test('the index lists every shipped season map once, by season and country', () => {
   const ids = SEASON_COUNTRY_MAPS.map(entry => entry.id);

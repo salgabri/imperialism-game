@@ -24,7 +24,8 @@ import { contentHash, identitiesFor, territoryFor } from '../src/data/footballSe
 import { readCm0102 } from '../src/data/cm0102.js';
 import { decodeFootballSet, fieldedNations, seasonSport, setHasClubs, setKindOf } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
-import { SWOS_CLUBS, SWOS_LEAGUES, SWOS_LEAGUE_FILES, buildSwosSeason, clubCase, properCase, swosClubName, swosDivision } from './lib/swos.mjs';
+import { SWOS_CLUBS, SWOS_EUROPE_LEAGUES, SWOS_LEAGUES, SWOS_LEAGUE_FILES, buildSwosSeason, clubCase, properCase, swosClubName, swosDivision } from './lib/swos.mjs';
+import { EUROPEAN_LEAGUES } from '../src/data/footballLeagues.js';
 import { abroadCountry } from './lib/season-country-clubs.mjs';
 import { SWOS_NATIONALITIES, readTeamFile, swosFileId, swosRows } from './lib/swos-files.mjs';
 import { EAST_GERMAN_BY_HAND, eastGermanClubs, germanPlaces } from './lib/east-german-clubs.mjs';
@@ -89,8 +90,8 @@ test('the four seasons are built in, newest first, each its committed file, cred
 });
 
 const COVERAGE = {
-  'swos-9596': { players: 2926, nations: 132, completeXIs: 132, clubs: 134, leagues: 7 },
-  'swos-9495': { players: 2915, nations: 131, completeXIs: 131, clubs: 134, leagues: 7 },
+  'swos-9596': { players: 2816, nations: 132, completeXIs: 132, clubs: 124, leagues: 18 },
+  'swos-9495': { players: 2805, nations: 131, completeXIs: 131, clubs: 124, leagues: 18 },
   'cm0102-2020-11-cm93': { players: 2148, nations: 124, completeXIs: 77, clubs: 124, leagues: 20 },
   'cm0102-2017-04-cm89': { players: 1216, nations: 138, completeXIs: 89, clubs: 0, leagues: 0 },
 };
@@ -107,10 +108,17 @@ test('each season decodes, with the nations and clubs its source rates; 1989/90 
   }
   assert.deepEqual(IDS.filter(id => !setHasClubs(id)), ['cm0102-2017-04-cm89']);
   assert.deepEqual(committed('cm0102-2017-04-cm89').clubs, []);
-  // SWOS's top divisions, league by league: 1994/95 had 22 clubs in England, 1995/96 22 in Spain.
-  const perLeague = id => Object.fromEntries(Object.values(SWOS_LEAGUES).map(([league]) => [league, committed(id).clubs.filter(club => club.league === league).length]));
-  assert.deepEqual(perLeague('swos-9495'), { 'Premier League': 22, 'La Liga': 20, 'Serie A': 18, Bundesliga: 18, 'Ligue 1': 20, Eredivisie: 18, 'Liga Portugal': 18 });
-  assert.deepEqual(perLeague('swos-9596'), { 'Premier League': 20, 'La Liga': 22, 'Serie A': 18, Bundesliga: 18, 'Ligue 1': 20, Eredivisie: 18, 'Liga Portugal': 18 });
+  // SWOS's top divisions, league by league as the audit reads them whole: 1994/95 had 22 clubs in England, 1995/96 22 in
+  // Spain. The season keeps Europe's strongest 124 of them, the Old Firm and Anderlecht among them.
+  const audits = JSON.parse(read('docs/design/football-retro-seasons-audit.json')).seasons;
+  const read32 = id => Object.fromEntries(audits.find(season => season.id === id).audit.leagues
+    .filter(entry => Object.values(SWOS_LEAGUES).some(([league]) => league === entry.league)).map(entry => [entry.league, entry.clubs]));
+  assert.deepEqual(read32('swos-9495'), { 'Premier League': 22, 'La Liga': 20, 'Serie A': 18, Bundesliga: 18, 'Ligue 1': 20, Eredivisie: 18, 'Liga Portugal': 18 });
+  assert.deepEqual(read32('swos-9596'), { 'Premier League': 20, 'La Liga': 22, 'Serie A': 18, Bundesliga: 18, 'Ligue 1': 20, Eredivisie: 18, 'Liga Portugal': 18 });
+  for (const id of ['swos-9495', 'swos-9596']) {
+    const names = committed(id).clubs.map(club => club.name);
+    assert.ok(['Rangers', 'Celtic', 'Anderlecht'].every(name => names.includes(name)), `${id}: Europe's strongest, not the seven leagues' alone`);
+  }
 });
 
 test('SWOS\'s ratings are its price steps, converted as 96/97\'s; its clubs keep their ids from season to season', () => {
@@ -121,9 +129,11 @@ test('SWOS\'s ratings are its price steps, converted as 96/97\'s; its clubs keep
       assert.deepEqual([info.source, info.rawScale, info.conversion, rating], ['swos', SWOS_SCALE, SWOS_CONVERSION, swosGameRating(info.rawRating)]);
       assert.ok(info.rawRating >= 1 && info.rawRating <= 48, 'steps 0 and 49 read as the 96/97 database stores them');
     }
-    // Every club takes a name of SWOS_CLUBS, whose slug is its id.
+    // A big league's club takes a name of SWOS_CLUBS, every other the name its country's map gives it; its id is that
+    // name's slug.
     const names = new Set(Object.values(SWOS_CLUBS));
-    assert.ok(doc.clubs.every(club => names.has(club.name) && club.id === `f-${slug(club.name)}`), id);
+    assert.ok(doc.clubs.every(club => club.id === `f-${slug(club.name)}`
+      && (!Object.values(SWOS_LEAGUES).some(([league]) => league === club.league) || names.has(club.name))), id);
   }
   // A club SWOS names in both seasons keeps one id, and every club that plays on a map has a ground row.
   const places = JSON.parse(read('scripts/data/europe-clubs.json')).clubs;
@@ -143,10 +153,10 @@ test('SWOS\'s ratings are its price steps, converted as 96/97\'s; its clubs keep
   const romario = committed('swos-9495').clubs.find(club => club.name === 'FC Barcelona').squad.find(tuple => tuple[1] === 'Romario');
   assert.deepEqual(romario.slice(3, 6), [48, 'a', 'BRA'], 'his step 49 read as 48; a club player keeps his SWOS code');
   assert.equal(committed('swos-9495').nations['380'][2].find(tuple => tuple[1] === 'Roberto Baggio')[3], 48);
-  // Players SWOS files at two top-division clubs (mostly namesakes): each club keeps its own sixteen.
+  // Players SWOS files at two top-division clubs of Europe (mostly namesakes): each club keeps its own sixteen.
   const audits = JSON.parse(read('docs/design/football-retro-seasons-audit.json')).seasons;
   const collisions = id => audits.find(season => season.id === id).audit.collisions;
-  assert.deepEqual(SWOS.map(id => collisions(id).length), [20, 20, 18]);
+  assert.deepEqual(SWOS.map(id => collisions(id).length), [125, 103, 101]);
   assert.ok(collisions('swos-9495').includes('MARTIN KREE (Bayer 04 Leverkusen, Borussia Dortmund)'));
 });
 
@@ -155,8 +165,8 @@ test('each season with clubs plays on its own two Europe maps', () => {
   for (const id of ['swos-9596', 'swos-9495', 'cm0102-2020-11-cm93']) {
     const doc = committed(id);
     const maps = europeMapsOf(id);
-    // Cam F's 1993/94 holds all of Europe's first divisions, so its maps have ids of their own; SWOS's seven leagues keep theirs.
-    const tag = `${id.startsWith('swos-') ? 's' : 'e'}${doc.year}`;
+    // Each holds Europe's first divisions (SWOS's since 17 November 2026), so its maps have ids of their own.
+    const tag = `e${doc.year}`;
     assert.deepEqual(maps.map(map => [map.id, map.clubs, map.theatre, map.seasons]),
       [[`eu124${tag}`, TOP_CLUBS, 'all', [id]], [`eu32${tag}`, ELITE_CLUBS, 'elite', [id]]], id);
     for (const [count, map] of [[TOP_CLUBS, maps[0]], [ELITE_CLUBS, maps[1]]]) {
@@ -335,7 +345,7 @@ test('a SWOS season\'s clubs: the top divisions\' own sixteen each, named by SWO
   assert.throws(() => build(1996, ['ENGLAND'], leagueRows().filter(row => row.team !== 'AJAX')), /No Eredivisie clubs in TEAM\.025/);
 });
 
-test('every SWOS season pins its edition\'s other league files, read only for its own country maps', () => {
+test('every SWOS season pins its edition\'s other league files, for its club layer and its own country maps', () => {
   const others = Object.keys(SWOS_LEAGUE_FILES).filter(number => !Object.hasOwn(SWOS_LEAGUES, number));
   for (const id of SWOS) {
     const season = entry(id);
@@ -345,9 +355,17 @@ test('every SWOS season pins its edition\'s other league files, read only for it
       assert.match(file.sha256, /^[0-9a-f]{64}$/);
       assert.ok(Number.isInteger(file.bytes) && (file.bytes - 2) % 684 === 0, `${id} ${file.name}: whole teams`);
     }
-    // The season file reads its six national and seven league files only: the others leave it as it was.
-    assert.equal(committed(id).coverage.leagues, 7);
+    // Their top divisions join the season's club layer: Europe's strongest 124 come from 18 of its first divisions.
+    assert.equal(committed(id).coverage.leagues, 18);
+    assert.ok(committed(id).clubs.every(club => EUROPEAN_LEAGUES[club.league] === club.country), id);
   }
+  // A league file whose top division is one of Europe's first divisions feeds the club layer: every one of them but
+  // Azerbaijan's, which SWOS does not rate. The nine others SWOS rates in Europe (Albania's to Slovenia's) are no first
+  // division the game names, so their clubs play on their maps only.
+  assert.equal(Object.keys(SWOS_EUROPE_LEAGUES).length, Object.keys(EUROPEAN_LEAGUES).length - 1);
+  assert.ok(!Object.values(SWOS_EUROPE_LEAGUES).some(([, country]) => country === '031'));
+  assert.ok(Object.entries(SWOS_EUROPE_LEAGUES).every(([number, [league, country]]) => SWOS_LEAGUE_FILES[number] === country && EUROPEAN_LEAGUES[league] === country));
+  assert.ok(['000', '010', '017', '019', '021', '022', '034', '076', '078'].every(number => SWOS_LEAGUE_FILES[number] && !SWOS_EUROPE_LEAGUES[number]));
   // Every league file is a game nation's; the seven big leagues' as SWOS_LEAGUES has them. The Faroe Islands', Malta's
   // and San Marino's (no shape on the map) and SWOS's own invented teams (072) are read for no map.
   assert.ok(Object.values(SWOS_LEAGUE_FILES).every(country => NATIONS[country]));
@@ -374,7 +392,7 @@ test('every league file\'s clubs for the country maps: each its file\'s country,
   const nations = swosRows(readTeamFile(teamFile('080', [['ENGLAND', 0, sixteen('ENGLAND', 8)]]), '080'), 'NATIONAL');
   const build = id => buildSwosSeason(nations, { source, year: 1997, prices: SWOS_PRICES, id, everyClubRows });
   const { allClubs, warnings, doc } = build('swos-9697');
-  assert.deepEqual(doc.clubs, [], 'the season file keeps only its seven top divisions');
+  assert.deepEqual(doc.clubs, [], 'the season file\'s clubs come from its club rows alone');
   assert.deepEqual(allClubs.map(club => [club.name, club.country, club.league]), [
     ['Wycombe Wanderers', '826', 'Division One'], ['Halifax Town', '826', 'Non-league'],
     ['Celtic', 'SCO', 'Premier Division'], ['Queen of the South', 'SCO', 'Second Division'],
@@ -466,16 +484,16 @@ test('the running App launches a 1995/96 clubs campaign on its own map of Europe
     app.pickSetup('layer', 'clubs');
     app.pickSetup('clubScope', 'domestic:eu32');
     app.pickSetup('dataSet', 'swos-9596');
-    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32s1996'], 'the theatre follows the season');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32e1996'], 'the theatre follows the season');
     time.advance(200);
     await app.loadSet('swos-9596');
-    await app.loadCountry('eu32s1996');
+    await app.loadCountry('eu32e1996');
     await settle();
     app.startCampaign();
     const st = app.state;
     assert.equal(st.phase, 'playing');
     assert.deepEqual([st.settings.dataSet, st.settings.dataSeason, st.settings.domesticVersion],
-      ['swos-9596', '1995/96', EUROPE_MAPS.find(map => map.id === 'eu32s1996').version]);
+      ['swos-9596', '1995/96', EUROPE_MAPS.find(map => map.id === 'eu32e1996').version]);
     const elite = strongestClubs(doc.clubs, ELITE_CLUBS);
     assert.deepEqual(Object.keys(st.teams).sort(), elite.map(club => club.id).sort(), 'the season\'s elite');
     const top = elite[0];

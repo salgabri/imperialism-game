@@ -10,8 +10,9 @@ import { NATIONS, HISTORIC_NATIONS, PACIFIC_ISLANDS, selectLineup } from '../../
 import { SWOS_ROLES, SWOS_SCALE, SWOS_SKILLS, expandSwosTuple, swosTupleOf } from '../../src/data/swosPlayers.js';
 import { FOOTBALL_FEDERATIONS } from '../../src/data/footballFederations.js';
 import {
-  FOOTBALL_SET_FORMAT, NO_TEAM, contentHash, identitiesFor, nationResolver, presentClubs, serializeFootballSet, territoryFor,
+  FOOTBALL_SET_FORMAT, NO_TEAM, contentHash, identitiesFor, nationResolver, presentClubs, serializeFootballSet, strongestBuilt, territoryFor,
 } from '../../src/data/footballSetBuild.js';
+import { EUROPEAN_LEAGUES } from '../../src/data/footballLeagues.js';
 import { pickFootballSquad } from '../../src/data/footballSquad.js';
 
 /** The id a season built with no id of its own takes (SWOS 96/97's), and how many players each team has. */
@@ -27,8 +28,9 @@ export const SWOS_LEAGUES = Object.freeze({
 
 /**
  * Every league team file SWOS rates a country's clubs in, by number, and the game's nation those clubs play for: the
- * seven of SWOS_LEAGUES, whose top divisions the season files hold, and every other league, read only for the seasons'
- * own country maps. A file's country is that of its clubs and nearly all their players, and the one codemeyer's
+ * seven of SWOS_LEAGUES and every other league, whose top divisions give the season files Europe's strongest clubs
+ * (SWOS_EUROPE_LEAGUES) and whose every division the seasons' own country maps read. A file's country is that of its
+ * clubs and nearly all their players, and the one codemeyer's
  * SwosPlayerFinder names for its number (Countries.cs, its team countries): TEAM.033 is Scotland, 038 Turkey, 041 Serbia
  * and Montenegro (the game's Serbia, as SWOS_NATIONS reads Yugoslavia). Left out: 011, 024 and 032 (the Faroe Islands,
  * Malta and San Marino, which have no shape on the map) and 072, SWOS's own invented teams (Amiga Power, Sensible
@@ -48,6 +50,21 @@ for (const [file, country] of Object.entries(SWOS_LEAGUE_FILES)) {
 }
 for (const [file, [, country]] of Object.entries(SWOS_LEAGUES)) {
   if (SWOS_LEAGUE_FILES[file] !== country) throw new Error(`SWOS_LEAGUE_FILES gives TEAM.${file} another country than SWOS_LEAGUES`);
+}
+
+/**
+ * The league files whose top division is one of Europe's first divisions as the game names them
+ * (src/data/footballLeagues.js), by file number: [league, country]. A SWOS season's club layer is Europe's strongest
+ * clubs of these top divisions, as every other season's is (since 17 November 2026; before, the seven of SWOS_LEAGUES
+ * alone): the seven big leagues' and 24 more, from Scotland's and Turkey's to Luxembourg's. SWOS's leagues of Albania,
+ * Belarus, Estonia, Iceland, Israel, Latvia, Lithuania, Slovakia and Slovenia are none of those first divisions, so
+ * their clubs play on their countries' maps only.
+ */
+const LEAGUE_OF_COUNTRY = new Map(Object.entries(EUROPEAN_LEAGUES).map(([league, country]) => [country, league]));
+export const SWOS_EUROPE_LEAGUES = Object.freeze(Object.fromEntries(Object.entries(SWOS_LEAGUE_FILES)
+  .filter(([, country]) => LEAGUE_OF_COUNTRY.has(country)).map(([file, country]) => [file, Object.freeze([LEAGUE_OF_COUNTRY.get(country), country])])));
+for (const [file, league] of Object.entries(SWOS_LEAGUES)) {
+  if (JSON.stringify(SWOS_EUROPE_LEAGUES[file]) !== JSON.stringify(league)) throw new Error(`SWOS_EUROPE_LEAGUES reads TEAM.${file} otherwise than SWOS_LEAGUES`);
 }
 
 /**
@@ -180,11 +197,13 @@ const mean = xs => (xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : 0);
 /**
  * Build a season from SWOS's national team records: `rows` are its `players` rows of type NATIONAL (`id`, `name`,
  * `pos`, `nat`, the seven skills, `GK`, `TOT`, `value` in pounds, `team`), `source` the season's source block, `id` the
- * season's id. `clubRows`, of type CLUB with their `file` (the league's TEAM file number, SWOS_LEAGUES) and `division`,
- * add the clubs of the seven leagues' top divisions (division 0), each named by SWOS_CLUBS. Returns `{ doc, text,
- * audit, warnings }`; throws on anything it does not understand rather than guess.
+ * season's id. `clubRows`, of type CLUB with their `file` (the league's TEAM file number, SWOS_EUROPE_LEAGUES) and
+ * `division`, add the clubs of those leagues' top divisions (division 0), the seven big leagues' named by SWOS_CLUBS
+ * and every other by swosClubName, as its country's map names it; `topClubs` keeps Europe's strongest that many of them.
+ * Returns `{ doc, text, audit, warnings }`; throws on anything it does not understand rather than guess.
  */
-export function buildSwosSeason(rows, { source, year, federations = FOOTBALL_FEDERATIONS, prices, id: seasonId = SWOS_ID, clubRows = [], everyClubRows = null }) {
+export function buildSwosSeason(rows, { source, year, federations = FOOTBALL_FEDERATIONS, prices, id: seasonId = SWOS_ID, clubRows = [], topClubs = null,
+  everyClubRows = null }) {
   const warnings = [];
   const warn = message => warnings.push(message);
   const resolve = nationResolver(SWOS_NATIONS);
@@ -267,7 +286,7 @@ export function buildSwosSeason(rows, { source, year, federations = FOOTBALL_FED
   const idle = [...nationOf.keys()].filter(id => Object.hasOwn(territory.merged, id) || territory.inactive.includes(id));
   if (idle.length) throw new Error(`SWOS rates national teams with no federation of their own in ${year}: ${idle.join(', ')}`);
 
-  const { clubs, leagues: leagueAudit, collisions } = swosClubs(clubRows, playerFor, warn);
+  const { clubs, leagues: leagueAudit, collisions } = swosClubs(clubRows, playerFor, warn, topClubs);
   // Every division's clubs of every league file, for the season's own country maps (scripts/build-season-countries.mjs).
   const allClubs = everyClubRows ? swosLeagueClubs(everyClubRows, playerFor, seasonId, warn) : null;
   const written = new Set([...Object.values(nations).flatMap(([, , squad]) => squad), ...clubs.flatMap(club => club.squad)].map(tuple => tuple[0]));
@@ -483,26 +502,29 @@ function swosLeagueClubs(rows, playerFor, seasonId, warn) {
  * clubs: each its own sixteen, its best eleven by SWOS's positions (pickFootballSquad), its strength their mean rating,
  * presented as every other set's clubs are (presentClubs). `playerOf` makes each player, its nationality his code.
  */
-function swosClubs(rows, playerOf, warn) {
+function swosClubs(rows, playerOf, warn, topClubs = null) {
   if (!rows.length) return { clubs: [], leagues: [], collisions: [] };
   const byTeam = new Map();
   for (const row of rows) {
     if (row.type !== 'CLUB') throw new Error(`Row ${row.id} (${row.name}) is not a club record`);
-    if (!Object.hasOwn(SWOS_LEAGUES, row.file)) throw new Error(`Row ${row.id} (${row.name}) is in TEAM.${row.file}, not one of SWOS_LEAGUES' files`);
+    if (!Object.hasOwn(SWOS_EUROPE_LEAGUES, row.file)) throw new Error(`Row ${row.id} (${row.name}) is in TEAM.${row.file}, not one of SWOS_EUROPE_LEAGUES' files`);
     if (row.division !== 0) throw new Error(`Row ${row.id} (${row.name}) of ${row.team} is not in a top division`);
     const key = `${row.file}|${row.team}`;
     (byTeam.get(key) || byTeam.set(key, []).get(key)).push(row);
   }
   const built = [], leagues = [], heldBy = new Map();
-  for (const [file, [league, country]] of Object.entries(SWOS_LEAGUES)) {
+  for (const [file, [league, country]] of Object.entries(SWOS_EUROPE_LEAGUES)) {
     const teams = [...byTeam].filter(([key]) => key.startsWith(`${file}|`));
-    if (!teams.length) throw new Error(`No ${league} clubs in TEAM.${file}`);
+    // Every big league fields its clubs; another league's file is read only where the season reads every league.
+    if (!teams.length && Object.hasOwn(SWOS_LEAGUES, file)) throw new Error(`No ${league} clubs in TEAM.${file}`);
+    if (!teams.length) continue;
     const short = [];
     for (const [key, members] of teams) {
       const team = key.slice(file.length + 1);
       if (members.length !== SWOS_SQUAD) throw new Error(`${team} has ${members.length} players, not ${SWOS_SQUAD}`);
-      if (!Object.hasOwn(SWOS_CLUBS, team)) throw new Error(`SWOS club ${team} (${league}) has no name in SWOS_CLUBS`);
-      const name = SWOS_CLUBS[team];
+      if (Object.hasOwn(SWOS_LEAGUES, file) && !Object.hasOwn(SWOS_CLUBS, team)) throw new Error(`SWOS club ${team} (${league}) has no name in SWOS_CLUBS`);
+      // The seven big leagues' clubs by SWOS_CLUBS' names, every other one by the name its country's map gives it.
+      const name = swosClubName(file, team);
       const pool = members.map(row => playerOf(row, row.nat, team));
       for (const row of members) {
         const who = `${row.name}|${row.nat}`;
@@ -510,14 +532,19 @@ function swosClubs(rows, playerOf, warn) {
       }
       const squad = pickFootballSquad(pool);
       if (squad.length < CLUB_SIZE) { short.push({ name, players: squad.length }); continue; }
-      built.push({ name, league, country, str: Math.round(mean(squad.map(p => p.rating))), squad });
+      const exact = mean(squad.map(p => p.rating));
+      built.push({ name, league, country, str: Math.round(exact), exact, squad });
     }
     leagues.push({ league, file, clubs: teams.length - short.length, short });
   }
-  const names = built.map(club => club.name);
-  if (new Set(names).size !== names.length) throw new Error('Two SWOS clubs take one name in SWOS_CLUBS');
+  const names = built.map(club => `${club.country}:${club.name}`);
+  if (new Set(names).size !== names.length) throw new Error('Two SWOS clubs of one country take one name');
   const collisions = [...heldBy].filter(([, clubs]) => clubs.length > 1).map(([who, clubs]) => `${who.split('|')[0]} (${clubs.join(', ')})`);
-  return { clubs: presentClubs(built, warn), leagues, collisions };
+  // A season reading every league keeps Europe's strongest `topClubs`, as every other season's club layer does. SWOS's
+  // coarse skills leave dozens of clubs on one rounded strength at the cut, so the cut goes by the unrounded one.
+  const kept = topClubs == null ? built : strongestBuilt(built.map(club => ({ ...club, str: club.exact })), topClubs)
+    .map(club => ({ ...club, str: Math.round(club.exact) }));
+  return { clubs: presentClubs(kept, warn), leagues, collisions };
 }
 
 const capitalisedAll = name => name.split(' ').map(capitalised).join(' ');

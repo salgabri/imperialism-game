@@ -1520,20 +1520,22 @@ as today's are: 11 to 31 of each season's 124 come from beyond the seven big lea
 Austria, Switzerland, Croatia, Serbia, Poland and Hungary), and up to five of its elite
 (Galatasaray and Fenerbahçe, Zenit and CSKA Moscow in FIFA 15 and 16, Celtic and
 Rangers in the Championship Manager seasons). The three SWOS seasons, 1996/97, 1995/96
-and 1994/95, hold their seven leagues' team files only, so their maps are those leagues'
-strongest. 2005/06, 2004/05, 1989/90 and the computed seasons have nations only, so no
-maps. A campaign saved on an earlier season's map of before (when its 124 came from
-the seven leagues) still resumes there; a new one plays the season's map of all of
-Europe. Football's "One country · top clubs" campaigns are unchanged, and play today's
-clubs only. A world campaign saved before these maps stays on the world, and resumes
-as it was; a CM 01/02 set built on your own computer has no map of Europe, so it
-deals its clubs onto the world.
+and 1994/95, read every European league file SWOS has since 17 November 2026: 28 or 29
+of their 124 come from beyond the seven big leagues (Rangers, Celtic, Anderlecht, Club
+Brugge, Spartak Moscow, Sparta Prague, Steaua, Dinamo Kiev, Galatasaray, Olympiakos and
+more), Rangers and Anderlecht in the elite. 2005/06, 2004/05, 1989/90 and the computed
+seasons have nations only, so no maps. A campaign saved on an earlier season's map of
+before (when its 124 came from the seven leagues) still resumes there; a new one plays
+the season's map of all of Europe. Football's "One country · top clubs" campaigns play
+the chosen season's own top clubs (below). A world campaign saved before these maps
+stays on the world, and resumes as it was; a CM 01/02 set built on your own computer
+has no map of Europe, so it deals its clubs onto the world.
 
 Each map is `public/domestic/eu<clubs>[<e or s><season year>].json`, fetched when chosen,
 with the index `src/data/europeMaps.js`: `eu124` and `eu32` today's, `eu124e2018` an earlier
-season's from all of Europe, `eu124s1995` a SWOS season's from its seven leagues (64 maps in
-play, 149–204 KB, 10.9 MB). The 56 seven-league maps the EA and Championship Manager seasons
-had before 14 November 2026 (`eu124s2018`, 9.3 MB) stay as they were, never rebuilt and never
+season's from all of Europe (64 maps in play). The 62 seven-league maps the earlier seasons
+had before (`eu124s2018`; the EA and Championship Manager seasons' until 14 November 2026,
+SWOS's until 17 November 2026) stay as they were, never rebuilt and never
 offered, for the campaigns saved on them. They follow the clubs, so rebuild them after
 `npm run build-clubs`, `npm run build:ea-seasons`, `npm run build:retro-seasons`,
 `npm run build-womens-football` or `npm run build:womens-seasons`:

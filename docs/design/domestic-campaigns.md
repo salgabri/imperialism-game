@@ -1185,11 +1185,17 @@ CSKA Moscow and Anzhi in FIFA 11–16, Celtic and Rangers in the CM seasons, Spa
 league its id is in in the nearest other edition (FIFA 20's Greek, Russian and Ukrainian
 clubs, Dinamo Zagreb, HJK). Two data quirks show: CM 99/00 rates Denmark's clubs like
 mid-table Serie A ones (11 make 1999/00's 124), CM 01/02 puts eight or nine Swedish clubs in.
-SWOS 96/97, 95/96 and 94/95 come from the game's team files, of which their season files read the
-seven big leagues' (every other league's feed only the seasons' country maps, below): they keep
-those leagues' top divisions whole (134 clubs) and their maps their old ids.
-Until then an earlier season's file held the seven big leagues only, and its two fields were
-the strongest of those; those maps stay for the campaigns saved on them (below). FIFA 06,
+SWOS 96/97, 95/96 and 94/95 come from the game's team files: since 17 November 2026 their
+season files read the top division of every league file whose league is one of Europe's first
+divisions (`SWOS_EUROPE_LEAGUES` in `scripts/lib/swos.mjs`: 31, every one but Azerbaijan's),
+28–29 clubs from beyond the seven big leagues a season make the 124, and the elite takes
+Rangers and Anderlecht every season. SWOS rates a club by its sixteen's mean price step, which
+leaves dozens of clubs on one rounded strength at the cut, so SWOS's cut goes by the unrounded
+mean. Until then they kept the seven big leagues' top divisions whole (134 clubs), the other
+league files being uncached.
+Until 14 November 2026 (SWOS's: 17 November) an earlier season's file held the seven big
+leagues only, and its two fields were the strongest of those; those maps stay for the
+campaigns saved on them (below). FIFA 06,
 FIFA 05 and Simon Treanor's fan-made 1989/90 (2005/06, 2004/05, 1989/90) and the computed
 seasons (1960/61 to 1993/94) have nations only, so they have no maps.
 
@@ -1293,13 +1299,14 @@ clubs 0.2 to 1.1 million each.
 **Maps of before** (`replacedBy`). A saved campaign resumes only on a map with exactly its
 clubs (`fitDomesticCampaign` in `src/engine/storage.js` moves one club by club onto a rebuild,
 but refuses a map that lost or gained a club). So when the earlier seasons' fields came from
-all of Europe, their maps took new ids, `eu124e<year>` and `eu32e<year>`, and the 56 maps of
+all of Europe, their maps took new ids, `eu124e<year>` and `eu32e<year>`, and the 62 maps of
 before, `eu124s<year>` and `eu32s<year>` with the seven leagues' fields, stay as they were:
 never rebuilt (the build carries their index entries and reads their files for the
 attribution), each entry naming the map that replaced it. The setup never offers one
 (`servesSeason` in `src/data/domesticScope.js`), a setup or link that names one moves on to
 its replacement (`setClubScope`), and a campaign saved on one still passes the save checks
-(`isSeasonTheatreMap`) and resumes there. SWOS's seasons keep their `s` maps, unchanged.
+(`isSeasonTheatreMap`) and resumes there. SWOS's seasons joined them on 17 November 2026
+(`eu124e1995` to `eu32e1997`; their six `s` maps are among the 62).
 
 **Runtime.** Scopes are `domestic:eu124`, `domestic:eu32` and `domestic:eu124e2018`.
 `setClubScope` keeps a setup on the map of its theatre and season: `all`, `elite`, an old
@@ -1336,7 +1343,7 @@ country with no club has no section and is drawn beneath as an obstacle; neighbo
 colours; seeded duel campaigns on both built-in maps reach a champion without treaties;
 `setClubScope` and `dataSetOf`; the App sets up and launches both a built-in and a season
 map, and keeps an old campaign on the world. Each earlier season's field is its file's
-strongest, with clubs from beyond the seven big leagues but in SWOS's; each map of before
+strongest, with clubs from beyond the seven big leagues (SWOS's too); each map of before
 names its replacement and is never offered; on every map with Russian clubs they hold
 Moscow, Kazan and Ufa and nothing east of the Urals, Russia is `partial`, drawn beneath and
 an obstacle but never claimed. The smoke runs Elite 32 and Top 124 campaigns and an Elite 32
@@ -1393,7 +1400,7 @@ none, to the season's Top 124 as before; going back to the built-in season goes
 back to today's map. The "One country · top clubs" list shows the chosen season's
 countries only.
 
-**What ships.** 892 maps over the 31 seasons with clubs, 23,581 club-seasons, 111.7 MB
+**What ships.** 892 maps over the 31 seasons with clubs, 23,597 club-seasons, 111.7 MB
 (47–249 KB a map, median 122 KB), each fetched only when chosen; the index
 `src/data/domesticSeasons.js` is about 11 KB. `docs/design/domestic-seasons-audit.json`
 gives every map's layer, clubs, homes and size.
@@ -1415,8 +1422,8 @@ seasons field every league it has, Europe's and the Americas', Algeria's, South
 Africa's, Japan's, Taiwan's, Australia's and New Zealand's (until 2026-11-16 only the
 seven big leagues', the other league files uncached); India's, Ghana's and Canada's
 clubs, fewer than ten, have no map, nor 1994/95's and 1995/96's United States. A
-club's home lies in its own home section for 19,493 of 23,056 located club-seasons
-(84.5%); 525 club-seasons are placed (estimates).
+club's home lies in its own home section for 19,546 of 23,072 located club-seasons
+(84.7%); 525 club-seasons are placed (estimates).
 
 **Clubs** (`scripts/lib/season-country-clubs.mjs`, read through the season
 builders, so the players are the season file's own tuples):
@@ -1443,8 +1450,16 @@ builders, so the players are the season file's own tuples):
 - A club plays for the country it stands in, whatever league it plays in (`ABROAD`):
   the Welsh clubs of the English leagues, Canada's MLS clubs, Wellington Phoenix and
   Derry City play for Wales, Canada, New Zealand and Northern Ireland, as on today's
-  maps; AS Monaco stays on France's. Reserve sides (II, B, Castilla, -2) are left out,
-  as today's maps leave them out.
+  maps; AS Monaco stays on France's. Reserve and youth sides are left out by today's
+  maps' rule (`secondTeamReason` in `scripts/lib/season-country-clubs.mjs`, reading
+  `nameReason`): a second team's marker (II, B, Amateure, Castilla, Jong, "-2", "-Yuni")
+  counts only when the rest of the name is a stronger club of the country, which the
+  seasons' sources may shorten or spell a letter apart ("B. Dortmund II", SWOS's "Ath. Bilbao B"
+  beside its ATHLETIC BILBAO, CM's "Metalurg-2 Donetsk" beside "Metallurg Donetsk"). So
+  Willem II plays every Dutch season (until 17 November 2026 a plain " II" left it out of
+  25 maps), and CM's German "Amateure" sides (Bayern München's to St. Pauli's), in before,
+  gave way to the senior clubs below them (FC Augsburg, SV Sandhausen, Tennis Borussia
+  Berlin, SV Borussia Wuppertal).
 - A club is viable with eleven players and a natural goalkeeper in its squad, which
   is the season file's pick (pickFootballSquad's natural 4-4-2 XI), so a club on a
   Europe map and a country map fields the same eleven. Clubs rank by `str`, their

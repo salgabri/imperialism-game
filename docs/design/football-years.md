@@ -1067,10 +1067,15 @@ game's own team files, with its clubs, since 2026-11-14, when the user answered
   Leonardo, not Dunga; Bolivia, Estonia and Iceland likewise). Steps 0 and 49 are
   read as the database stored them (0 as 1, 49 as 48): 51 players, Shearer and
   Maldini at 49, listed in the audit (`clamped`).
-- **Clubs**: the seven leagues' 134 top-division clubs (Premier League 20, La
-  Liga 22, Serie A 18, Bundesliga 18, Ligue 1 20, Eredivisie 18, Liga Portugal
-  18), each its own sixteen and best natural XI, on two Europe maps of their own
-  (`eu124s1997`, `eu32s1997`). Fourteen SWOS names are new to `SWOS_CLUBS`: thirteen
+- **Clubs**: since 17 November 2026 Europe's strongest 124 of the top divisions of every
+  European league file whose league is one of Europe's first divisions (`SWOS_EUROPE_LEAGUES`,
+  31 files; 28 of the 124 from beyond the seven big leagues: Rangers, Celtic, Anderlecht,
+  Club Brugge, Spartak Moscow, Fenerbahçe, Galatasaray, Ferencváros, Grasshoppers and more),
+  cut by their sixteen's unrounded mean price step, on two Europe maps of their own
+  (`eu124e1997`, `eu32e1997`). Until then the seven leagues' 134 top-division clubs
+  (Premier League 20, La Liga 22, Serie A 18, Bundesliga 18, Ligue 1 20, Eredivisie 18,
+  Liga Portugal 18), each its own sixteen and best natural XI, on `eu124s1997` and
+  `eu32s1997`, which stay for the campaigns saved on them. Fourteen SWOS names are new to `SWOS_CLUBS`: thirteen
   take the name other seasons give their club, so each keeps its id, colour and
   crest (Derby County, Sunderland, Extremadura C.F., Hércules CF, Bologna, Perugia,
   Hellas Verona FC, DSC Arminia Bielefeld, Olympique de Marseille, AS
@@ -1166,7 +1171,10 @@ its European Championship Edition; SWOS 96/97 stayed as it was, nations only, un
   1994), so Serbia, Montenegro and Kosovo are all neutral; in 1995/96 FR
   Yugoslavia plays under its own name and flag, holding Montenegro and Kosovo.
   SWOS has no Zaire squad, and Bosnia joined FIFA on 3 July 1996: both neutral.
-- **Clubs**: each league file's top division (division 0), 134 clubs a season,
+- **Clubs**: since 17 November 2026 Europe's strongest 124 of every European league
+  file's top division (as 1996/97 above; 29 from beyond the seven big leagues a season, on
+  `eu124e1995`/`eu32e1995` and `eu124e1996`/`eu32e1996`). Until then each of the seven
+  league files' top division (division 0), 134 clubs a season,
   the leagues' real top divisions: 1994/95 Premier League 22, La Liga 20, Serie A
   18, Bundesliga 18, Ligue 1 20, Eredivisie 18, Liga Portugal 18; 1995/96 20, 22,
   18, 18, 20, 18, 18. Each plays its own sixteen, its best natural XI by SWOS's

@@ -71,6 +71,14 @@
 "250": {
   "Paris": { "as": "d250-867", "note": "EA FC 26's Paris is Paris FC, not Paris Saint-Germain" }
 },
+"276": {
+  "FC Bayern Hof": { "lon": 11.9167, "lat": 50.3167, "note": "Hof, Upper Franconia: FC Bayern Hof's town, not FC Bayern München, whose name it shares" },
+  "Köpenicker SC": { "lon": 13.5767, "lat": 52.4456, "note": "Köpenick, Berlin: the club's district (Wikidata's point is Berlin's centre)" },
+  "SG Quelle Fürth": { "lon": 10.9887, "lat": 49.4771, "note": "Fürth: SG Quelle, an amateur club of the town, not SpVgg Greuther Fürth" },
+  "SG Quelle im TV 1860 Fürth": { "lon": 10.9887, "lat": 49.4771, "note": "Fürth: SG Quelle, an amateur club of the town, not SpVgg Greuther Fürth" },
+  "SpVgg Au/Iller": { "lon": 10.1047, "lat": 48.2247, "note": "Illertissen, of which Au is a part (Wikidata's point lies near Nuremberg)" },
+  "SV Borussia Wuppertal": { "lon": 7.1508, "lat": 51.2562, "note": "Wuppertal: SV Borussia, a club of its own until it merged into Wuppertaler SV in 2004, so not today's Wuppertaler SV" }
+},
 "348": {
   "Nyiregyhazi": { "lon": 21.7167, "lat": 47.9554, "note": "Nyíregyháza (GeoNames 716935)" },
   "Parmalat": { "as": "d348-1062", "note": "Videoton of Székesfehérvár under its 1995/96 sponsor's name, today's Fehérvár FC" },

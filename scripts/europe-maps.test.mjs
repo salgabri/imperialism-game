@@ -99,8 +99,9 @@ test('the index lists a built-in pair of maps and one for each earlier season wi
 });
 
 test('an earlier season\'s map of before its clubs came from all of Europe stays for its saves, never offered', () => {
-  // Every EA and CM season with clubs; SWOS's team files hold the seven big leagues alone, so its maps stay theirs.
-  const allEurope = CLUB_SEASONS.filter(season => !season.id.startsWith('swos-'));
+  // Every season with clubs: the EA and CM seasons' since 14 November 2026, SWOS's (whose other league files came later)
+  // since 17 November 2026.
+  const allEurope = CLUB_SEASONS;
   assert.equal(RETIRED.length, allEurope.length * 2);
   for (const season of allEurope) {
     for (const theatre of ['all', 'elite']) {
@@ -116,13 +117,11 @@ test('an earlier season\'s map of before its clubs came from all of Europe stays
       // (an elite with no club from beyond the seven leagues is the same 32, on a map of another id).
       if (theatre === 'all') assert.ok(docOf(old.id).clubs.some(club => !setOf(season.id).clubs.some(now => now.id === club.id)), `${old.id}: an older field`);
     }
-  }
-  for (const season of CLUB_SEASONS.filter(season => season.id.startsWith('swos-'))) {
-    assert.deepEqual(europeMapsOf(season.id).map(map => map.id), [`eu${TOP_CLUBS}s${season.year}`, `eu${ELITE_CLUBS}s${season.year}`], season.id);
+    assert.deepEqual(europeMapsOf(season.id).map(map => map.id), [`eu${TOP_CLUBS}e${season.year}`, `eu${ELITE_CLUBS}e${season.year}`], season.id);
   }
 });
 
-test('the field is the strongest clubs of the season, from all of Europe but in SWOS\'s seasons', () => {
+test('the field is the strongest clubs of the season, from all of Europe', () => {
   const ids = doc => doc.clubs.map(club => club.id);
   assert.deepEqual(ids(TOP), strongestClubs(CLUBS, TOP_CLUBS).map(club => club.id), 'the whole built-in club list');
   assert.deepEqual(ids(ELITE), strongestClubs(CLUBS, ELITE_CLUBS).map(club => club.id));
@@ -131,9 +130,13 @@ test('the field is the strongest clubs of the season, from all of Europe but in 
     const { clubs } = setOf(season.id);
     assert.deepEqual(ids(docOf(europeMapOf('all', season.id).id)), strongestClubs(clubs, TOP_CLUBS).map(club => club.id), season.id);
     assert.deepEqual(ids(docOf(europeMapOf('elite', season.id).id)), strongestClubs(clubs, ELITE_CLUBS).map(club => club.id), season.id);
-    const swos = season.id.startsWith('swos-');
-    assert.equal(clubs.length, swos ? 134 : TOP_CLUBS, `${season.id}: ${swos ? 'the seven leagues\' top divisions' : "Europe's strongest"}`);
-    assert.equal(clubs.some(club => !BIG_LEAGUES.includes(club.league)), !swos, `${season.id}: clubs beyond the seven big leagues`);
+    assert.equal(clubs.length, TOP_CLUBS, `${season.id}: Europe's strongest`);
+    assert.ok(clubs.some(club => !BIG_LEAGUES.includes(club.league)), `${season.id}: clubs beyond the seven big leagues`);
+  }
+  // SWOS's seasons, from every European top division SWOS rates: the Old Firm and Anderlecht each season.
+  for (const id of ['swos-9495', 'swos-9596', 'swos-9697']) {
+    const names = setOf(id).clubs.map(club => club.name);
+    for (const name of ['Rangers', 'Celtic', 'Anderlecht', 'Spartak Moscow']) assert.ok(names.includes(name), `${id} has ${name}`);
   }
 });
 

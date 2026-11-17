@@ -12,7 +12,7 @@ import { buildFootballSet, seasonYear } from '../../src/data/footballSetBuild.js
 import { setHasClubs } from '../../src/engine/footballSets.js';
 import { TOP_CLUBS } from '../../src/data/scopes.js';
 import { buildCm9798Season } from './cm9798.mjs';
-import { SWOS_LEAGUES, SWOS_LEAGUE_FILES, buildSwosSeason } from './swos.mjs';
+import { SWOS_EUROPE_LEAGUES, SWOS_LEAGUES, SWOS_LEAGUE_FILES, buildSwosSeason } from './swos.mjs';
 import { SWOS_NATIONAL_FILES, readTeamFile, swosRows } from './swos-files.mjs';
 
 /** A source file's bytes, after checking it is the pinned one. */
@@ -65,8 +65,9 @@ async function buildCm9798(season, dataDir, retrieved, { everyClub = false } = {
 }
 
 /**
- * A SWOS edition read from the game's own team files (scripts/lib/swos-files.mjs): its national squads, and its seven
- * leagues' top-division clubs; with `everyClub`, every division's clubs of every league file too.
+ * A SWOS edition read from the game's own team files (scripts/lib/swos-files.mjs): its national squads, and Europe's
+ * strongest TOP_CLUBS clubs of the top divisions of its European league files (SWOS_EUROPE_LEAGUES), as every other
+ * season's club layer; with `everyClub`, every division's clubs of every league file too.
  */
 async function buildSwosFiles(season, dataDir, retrieved, { everyClub = false } = {}) {
   const read = await Promise.all(season.files.map(async file => readTeamFile(await pinned(dataDir, file), file.name.replace(/^TEAM\./, ''))));
@@ -74,23 +75,25 @@ async function buildSwosFiles(season, dataDir, retrieved, { everyClub = false } 
   if (JSON.stringify(numbers) !== JSON.stringify([...SWOS_NATIONAL_FILES, ...Object.keys(SWOS_LEAGUES)].sort())) {
     throw new Error(`${season.id} must list the six national and seven league files, not ${numbers.join(', ')}`);
   }
+  const leagueFiles = await leagueFilesOf(season, dataDir, read);
   // Price steps as the SWOS 96/97 database stores them (0 as 1, 49 as 48), each one moved listed in the audit.
   const clamped = [];
   const rows = read.filter(file => SWOS_NATIONAL_FILES.includes(file.number)).flatMap(file => swosRows(file, 'NATIONAL', clamped));
-  // The leagues' top divisions (division 0).
-  const clubRows = read.filter(file => Object.hasOwn(SWOS_LEAGUES, file.number))
+  // Europe's first divisions (division 0 of each European league file).
+  const clubRows = leagueFiles.filter(file => Object.hasOwn(SWOS_EUROPE_LEAGUES, file.number))
     .flatMap(file => swosRows({ ...file, teams: file.teams.filter(team => team.division === 0) }, 'CLUB', clamped));
   const source = { provider: season.maker, edition: season.edition, version: season.version, snapshotDate: season.snapshotDate, url: season.url,
     rawScale: SWOS_SCALE, conversion: SWOS_CONVERSION, ...credits(season, retrieved) };
-  const result = buildSwosSeason(rows, { source, year: seasonYear(season.season), prices: SWOS_PRICES, id: season.id, clubRows,
+  const result = buildSwosSeason(rows, { source, year: seasonYear(season.season), prices: SWOS_PRICES, id: season.id, clubRows, topClubs: TOP_CLUBS,
     // Every division's clubs of every league file, for the season's own country maps.
-    ...(everyClub ? { everyClubRows: (await leagueFilesOf(season, dataDir, read)).flatMap(file => swosRows(file, 'CLUB', [])) } : {}) });
+    ...(everyClub ? { everyClubRows: leagueFiles.flatMap(file => swosRows(file, 'CLUB', [])) } : {}) });
   return { ...result, audit: { ...result.audit, clamped } };
 }
 
 /**
- * Every league file of a SWOS season's edition (SWOS_LEAGUE_FILES): the seven it reads for its file, and its
- * `leagueFiles`, the other leagues' files pinned for its own country maps only.
+ * Every league file of a SWOS season's edition (SWOS_LEAGUE_FILES): the seven it reads for its nations' file, and its
+ * `leagueFiles`, the other leagues' files, whose top divisions join the season's club layer and whose every division
+ * its own country maps read.
  */
 async function leagueFilesOf(season, dataDir, read) {
   const others = await Promise.all((season.leagueFiles ?? []).map(async file => readTeamFile(await pinned(dataDir, file), file.name.replace(/^TEAM\./, ''))));
