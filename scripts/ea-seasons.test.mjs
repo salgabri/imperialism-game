@@ -789,7 +789,8 @@ const FLOORS = {
   'ea-fifa-06': { completeXIs: 50, nations: 110, clubs: 0 }, 'ea-fifa-05': { completeXIs: 50, nations: 110, clubs: 0 },
 };
 const committed = id => JSON.parse(readFileSync(new URL(`../public/football/${id}.json`, import.meta.url), 'utf8'));
-const tuplesOf = doc => [...Object.values(doc.nations).flatMap(([, , squad]) => squad), ...doc.clubs.flatMap(club => club.squad)];
+// EA's own tuples: a computed player a nation lists beside them (scripts/lib/football-fills.mjs) is `[name, position, rating, source]`.
+const tuplesOf = doc => [...Object.values(doc.nations).flatMap(([, , squad]) => squad), ...doc.clubs.flatMap(club => club.squad)].filter(tuple => tuple.length !== 4);
 
 test('a club EA files under Rest of World plays in the first division its id is in, in the nearest other edition', () => {
   const row = (version, club, league) => ({ fifa_version: `${version}.0`, fifa_update: '2.0', club_team_id: `${club}.0`, league_id: `${league}.0` });

@@ -61,6 +61,11 @@ map. EFEM's robots.txt forbids fetching more (`scripts/sync-football-manager.mjs
 women's football's rule: a nation no source rates fields no team (`territory.inactive`). The rule leaves out
 exactly these three, and every nation football fields still has eleven source-backed players.
 
+On 2026-11-17 the user adopted [computed-ratings.md](computed-ratings.md), which would field them with players capped
+for them, rated from their Elo, where caps give eleven with a goalkeeper. They do not: Wikidata holds 150 memberships
+of the three national teams in all, and none begins after 2015 (asked of QLever on 2026-11-17), so the built-in season
+still leaves their land neutral ([football-years.md](football-years.md#computed-fills)).
+
 Earlier football seasons were built before the islands and list none of them. The loader treats a set that lists
 none of the three as one built for the map without them: they field no team. The EA and CM 01/02 builders list
 them only when their source rates a player of theirs, all three or none. No EA edition does, so every EA season

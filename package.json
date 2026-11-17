@@ -141,6 +141,7 @@
     "build:world-cup-seasons": "node scripts/build-world-cup-seasons.mjs",
     "sync:national-team-seasons": "node scripts/sync-national-team-seasons.mjs",
     "build:national-team-seasons": "node scripts/build-national-team-seasons.mjs",
+    "sync:football-fills": "node scripts/sync-football-fills.mjs",
     "sync:early-nationalities": "node scripts/sync-early-nationalities.mjs",
     "build:nba-seasons": "node scripts/build-nba-seasons.mjs",
     "test:football-sets": "node --test scripts/cm0102.test.mjs scripts/football-set-core.test.mjs scripts/football-set-build.test.mjs scripts/football-sets.test.mjs scripts/football-sets-wiring.test.mjs scripts/ea-seasons.test.mjs scripts/football-early-seasons.test.mjs scripts/nba-seasons.test.mjs scripts/football-federations.test.mjs scripts/football-swos-fan-seasons.test.mjs scripts/retro-cds.test.mjs scripts/football-world-cup-seasons.test.mjs scripts/football-national-team-seasons.test.mjs"

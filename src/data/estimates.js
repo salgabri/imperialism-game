@@ -3,6 +3,10 @@
 const REASONS = Object.freeze({
   NHL: Object.freeze({ reason: "EA publishes only NHL 27's top 300 players", basis: 'ice time and scoring' }),
   EuroLeague: Object.freeze({ reason: 'no game rates EuroLeague players', basis: 'his EuroLeague box scores (PIR a game)' }),
+  // Football's computed fills (scripts/lib/football-fills.mjs): an EA season's nation short of an XI, its empty places
+  // taken by players capped for it that season.
+  'International football': Object.freeze({ reason: 'EA rated too few of this nation\'s players for an XI',
+    basis: 'his caps for it that season and its World Football Elo' }),
 });
 const reasonOf = player => REASONS[player?.sourceInfo?.league] || REASONS.NHL;
 

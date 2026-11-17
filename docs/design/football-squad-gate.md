@@ -78,10 +78,10 @@ The provisional gate, plus:
 | | Built-in 2026/27 (EA FC 27 + FM 26) | 2025/26 season (EA FC 26) |
 | --- | --- | --- |
 | Gate set | 172 nations | 111 nations |
-| Spearman vs Elo at D_Y | **0.9291** (95% CI 0.896–0.950); before person keys 0.9296 | **0.8457** (0.764–0.898) |
-| Pearson | 0.9356 | 0.8154 |
-| Within confederation | 0.9111 | 0.8131 |
-| Elo top 50 | 0.7523 | 0.7833 |
+| Spearman vs Elo at D_Y | **0.9291** (95% CI 0.896–0.950); before person keys 0.9296 | **0.8577** (0.788–0.902); before the computed fills 0.8457 |
+| Pearson | 0.9356 | 0.8401 (0.8154) |
+| Within confederation | 0.9111 | 0.8341 (0.8131) |
+| Elo top 50 | 0.7523 | 0.7885 (0.7833) |
 | EA − FM linking (fuzzy / Reep) | +0.10 / +0.13 | not applicable |
 | Provisional gate | **pass** | **fail** (below 0.90) |
 | Forecast | not scored: the window opened on 1 November 2026 | **pass** on 600 matches, 2025-09-20 to 2026-10-06 (partial) |
@@ -92,12 +92,16 @@ Philippines, India and Congo, whose XIs rank 43–52 places above their Elo, and
 (AFC sides are under-rated by both databases: Iran, Oman and the UAE rank as low on FM alone). The person keys of
 the same day moved Spearman by −0.0005 and Pearson by −0.0002.
 
-EA FC 26 alone fields 112 nations, 80 of them with a complete natural XI, and ranks them less well: below the 0.90
-bar, as the branch measured for EA alone on 2025/26 (0.874 over all 170 nations then). Its forecast still holds: over
-the 2025/26 internationals between fielded nations, the 2026 World Cup included, roster log loss is 0.9169 against
-0.8935 for Elo frozen at 19 September 2025, a difference of 0.0234 inside the margin 2·SE = 0.0362 (SE 0.0181 by team
-pair; 19 match windows, 534 team pairs), and β = 1.06. Elo and roster together reach 0.8781, base rates alone
-1.0698. Competitive matches score 0.9011, friendlies 0.9469. The window closes on 1 November 2026, the built-in's
+EA FC 26 fields 112 nations, 80 of them with a complete natural XI of EA's own, and ranks them less well: below the
+0.90 bar, as the branch measured for EA alone on 2025/26 (0.874 over all 170 nations then). Its forecast still holds: over
+the 2025/26 internationals between fielded nations, the 2026 World Cup included, roster log loss is 0.9077 against
+0.8935 for Elo frozen at 19 September 2025, a difference of 0.0141 inside the margin 2·SE = 0.0348 (SE 0.0174 by team
+pair; 19 match windows, 534 team pairs), and β = 1.10. Elo and roster together reach 0.8765, base rates alone
+1.0698. Competitive matches score 0.8909, friendlies 0.9394. Rescored on 18 November 2026 after the computed fills
+([football-years.md](football-years.md#computed-fills)) gave four of its short nations (Benin, Eq. Guinea, Iran,
+Moldova) the players EA leaves out; before them the figures in brackets above, and a log loss of 0.9169 (difference
+0.0234, margin 0.0362, β 1.06, Elo and roster 0.8781, competitive 0.9011, friendlies 0.9469). The window closes on 1
+November 2026, the built-in's
 information date; martj42's results at the pinned commit end on 6 October, so it is re-scored when a later file is
 pinned.
 
