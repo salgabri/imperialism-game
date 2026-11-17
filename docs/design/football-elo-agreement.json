@@ -1,0 +1,1320 @@
+{
+  "generatedBy": "scripts/validate-football-elo.mjs",
+  "note": "Each game-rated football season's national XIs against World Football Elo (eloratings.net) on the day the season starts: Spearman of the strength each fielded nation plays at with its Elo, by the squad gate's crossSectional. Correlations and ranks only, never an Elo value. The computed seasons (nt-, wc-) are built from results and are not scored. docs/design/roster-audit.md reads them.",
+  "summary": {
+    "seasons": 35,
+    "scored": 35,
+    "medianSpearman": 0.8523,
+    "lowest": [
+      "ea-fifa-08 0.7441",
+      "ea-fifa-09 0.76",
+      "ea-fifa-07 0.7619",
+      "ea-fifa-11 0.7791",
+      "ea-fifa-10 0.7903"
+    ]
+  },
+  "seasons": [
+    {
+      "id": "cm0102-2017-04-cm89",
+      "season": "1989/90",
+      "label": "CM 01/02 · 89/90 by Simon Treanor, fan-made",
+      "ratingsDate": "1989-07-01",
+      "fielded": 104,
+      "scored": 103,
+      "spearman": 0.907,
+      "pearson": 0.8606,
+      "fullXIs": {
+        "n": 94,
+        "spearman": 0.9069
+      },
+      "spearmanCi95": [
+        0.8511,
+        0.9429
+      ],
+      "withinConfederation": 0.8793,
+      "top50ByElo": 0.8972,
+      "aboveElo": [
+        "Venezuela 44 by strength, 83 by Elo",
+        "Nicaragua 65.5 by strength, 103 by Elo",
+        "Bolivia 33.5 by strength, 62 by Elo"
+      ],
+      "belowElo": [
+        "Iraq 80 by strength, 37 by Elo",
+        "Iran 67.5 by strength, 43.5 by Elo",
+        "Australia 55.5 by strength, 33 by Elo"
+      ],
+      "noElo": [
+        "Vietnam"
+      ],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "200/200 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "cm0102-2020-11-cm93",
+      "season": "1993/94",
+      "label": "CM 01/02 · 93/94 by Cam F, fan-made",
+      "ratingsDate": "1993-07-01",
+      "fielded": 90,
+      "scored": 90,
+      "spearman": 0.8167,
+      "pearson": 0.7935,
+      "fullXIs": {
+        "n": 78,
+        "spearman": 0.7898
+      },
+      "spearmanCi95": [
+        0.7188,
+        0.8821
+      ],
+      "withinConfederation": 0.7188,
+      "top50ByElo": 0.8142,
+      "aboveElo": [
+        "Belarus 28 by strength, 74 by Elo",
+        "Estonia 56 by strength, 89 by Elo",
+        "Turkey 32.5 by strength, 64 by Elo"
+      ],
+      "belowElo": [
+        "Egypt 73.5 by strength, 31 by Elo",
+        "Zambia 86.5 by strength, 46.5 by Elo",
+        "Côte d'Ivoire 67 by strength, 36 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "220/220 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "swos-9495",
+      "season": "1994/95",
+      "label": "SWOS 94/95",
+      "ratingsDate": "1994-07-01",
+      "fielded": 131,
+      "scored": 131,
+      "spearman": 0.8513,
+      "pearson": 0.8402,
+      "fullXIs": {
+        "n": 131,
+        "spearman": 0.8513
+      },
+      "spearmanCi95": [
+        0.7844,
+        0.8977
+      ],
+      "withinConfederation": 0.819,
+      "top50ByElo": 0.7784,
+      "aboveElo": [
+        "Senegal 30.5 by strength, 82 by Elo",
+        "Luxembourg 71.5 by strength, 117 by Elo",
+        "Estonia 71.5 by strength, 116 by Elo"
+      ],
+      "belowElo": [
+        "Tunisia 127 by strength, 61.5 by Elo",
+        "Iraq 93.5 by strength, 39 by Elo",
+        "Honduras 119 by strength, 66 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "222/222 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "swos-9596",
+      "season": "1995/96",
+      "label": "SWOS 95/96",
+      "ratingsDate": "1995-07-01",
+      "fielded": 132,
+      "scored": 132,
+      "spearman": 0.865,
+      "pearson": 0.8482,
+      "fullXIs": {
+        "n": 132,
+        "spearman": 0.865
+      },
+      "spearmanCi95": [
+        0.8021,
+        0.9078
+      ],
+      "withinConfederation": 0.8038,
+      "top50ByElo": 0.7945,
+      "aboveElo": [
+        "Estonia 69.5 by strength, 120 by Elo",
+        "Senegal 33 by strength, 83 by Elo",
+        "Luxembourg 69.5 by strength, 112 by Elo"
+      ],
+      "belowElo": [
+        "Tunisia 130 by strength, 61.5 by Elo",
+        "Iraq 98 by strength, 38 by Elo",
+        "Honduras 118.5 by strength, 64 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "222/222 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "swos-9697",
+      "season": "1996/97",
+      "label": "SWOS 96/97",
+      "ratingsDate": "1996-07-01",
+      "fielded": 133,
+      "scored": 133,
+      "spearman": 0.8523,
+      "pearson": 0.8407,
+      "fullXIs": {
+        "n": 133,
+        "spearman": 0.8523
+      },
+      "spearmanCi95": [
+        0.7781,
+        0.9028
+      ],
+      "withinConfederation": 0.7956,
+      "top50ByElo": 0.7949,
+      "aboveElo": [
+        "Senegal 35 by strength, 88.5 by Elo",
+        "Luxembourg 70 by strength, 113 by Elo",
+        "Finland 35 by strength, 73 by Elo"
+      ],
+      "belowElo": [
+        "Tunisia 131 by strength, 47.5 by Elo",
+        "Iraq 99 by strength, 39 by Elo",
+        "Honduras 119.5 by strength, 65.5 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "223/223 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "cm-9798",
+      "season": "1997/98",
+      "label": "CM 97/98",
+      "ratingsDate": "1997-07-01",
+      "fielded": 68,
+      "scored": 68,
+      "spearman": 0.8709,
+      "pearson": 0.8524,
+      "fullXIs": {
+        "n": 62,
+        "spearman": 0.8638
+      },
+      "spearmanCi95": [
+        0.7719,
+        0.9304
+      ],
+      "withinConfederation": 0.8562,
+      "top50ByElo": 0.8106,
+      "aboveElo": [
+        "Belarus 36 by strength, 65 by Elo",
+        "Uruguay 10.5 by strength, 34.5 by Elo",
+        "Ghana 36 by strength, 54 by Elo"
+      ],
+      "belowElo": [
+        "Australia 52.5 by strength, 16 by Elo",
+        "South Africa 52.5 by strength, 28 by Elo",
+        "Canada 64 by strength, 41 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "223/223 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "cm0102-2020-11-cm3",
+      "season": "1998/99",
+      "label": "CM3 · 98/99 for CM 01/02",
+      "ratingsDate": "1998-07-01",
+      "fielded": 79,
+      "scored": 79,
+      "spearman": 0.8573,
+      "pearson": 0.8289,
+      "fullXIs": {
+        "n": 71,
+        "spearman": 0.8534
+      },
+      "spearmanCi95": [
+        0.7591,
+        0.9179
+      ],
+      "withinConfederation": 0.8448,
+      "top50ByElo": 0.8215,
+      "aboveElo": [
+        "Belarus 32.5 by strength, 73 by Elo",
+        "Ghana 38.5 by strength, 65 by Elo",
+        "Poland 14 by strength, 40.5 by Elo"
+      ],
+      "belowElo": [
+        "South Korea 66.5 by strength, 32 by Elo",
+        "Egypt 64.5 by strength, 34 by Elo",
+        "Iran 69 by strength, 45 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "226/226 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "cm-9900",
+      "season": "1999/00",
+      "label": "CM 99/00 · 3.70",
+      "ratingsDate": "1999-07-01",
+      "fielded": 93,
+      "scored": 93,
+      "spearman": 0.8465,
+      "pearson": 0.8334,
+      "fullXIs": {
+        "n": 80,
+        "spearman": 0.8311
+      },
+      "spearmanCi95": [
+        0.7549,
+        0.9075
+      ],
+      "withinConfederation": 0.7879,
+      "top50ByElo": 0.8,
+      "aboveElo": [
+        "Belarus 33 by strength, 81 by Elo",
+        "Estonia 64 by strength, 89 by Elo",
+        "Bulgaria 25 by strength, 47 by Elo"
+      ],
+      "belowElo": [
+        "Iran 67 by strength, 25 by Elo",
+        "Zambia 85.5 by strength, 45 by Elo",
+        "South Korea 72.5 by strength, 32 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "228/228 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "cm-0001",
+      "season": "2000/01",
+      "label": "CM 00/01 · 3.81",
+      "ratingsDate": "2000-07-01",
+      "fielded": 100,
+      "scored": 100,
+      "spearman": 0.8588,
+      "pearson": 0.8133,
+      "fullXIs": {
+        "n": 91,
+        "spearman": 0.859
+      },
+      "spearmanCi95": [
+        0.7744,
+        0.9124
+      ],
+      "withinConfederation": 0.8638,
+      "top50ByElo": 0.7954,
+      "aboveElo": [
+        "Belarus 37.5 by strength, 89 by Elo",
+        "Northern Ireland 45.5 by strength, 68 by Elo",
+        "Ghana 42 by strength, 64 by Elo"
+      ],
+      "belowElo": [
+        "Honduras 90.5 by strength, 44 by Elo",
+        "Iran 72.5 by strength, 27 by Elo",
+        "United States 50.5 by strength, 16.5 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "229/229 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "cm0102-2001-09",
+      "season": "2001/02",
+      "label": "CM 01/02 · 3.9.60",
+      "ratingsDate": "2001-07-01",
+      "fielded": 120,
+      "scored": 120,
+      "spearman": 0.8679,
+      "pearson": 0.8143,
+      "fullXIs": {
+        "n": 107,
+        "spearman": 0.8641
+      },
+      "spearmanCi95": [
+        0.8108,
+        0.9081
+      ],
+      "withinConfederation": 0.9068,
+      "top50ByElo": 0.7973,
+      "aboveElo": [
+        "Venezuela 59.5 by strength, 95 by Elo",
+        "Latvia 67 by strength, 101 by Elo",
+        "Belarus 45.5 by strength, 78.5 by Elo"
+      ],
+      "belowElo": [
+        "Kuwait 111.5 by strength, 61 by Elo",
+        "Iran 78 by strength, 31.5 by Elo",
+        "Saudi Arabia 78 by strength, 36 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "231/231 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "cm0102-2002-11",
+      "season": "2002/03",
+      "label": "CM 01/02 · 3.9.68",
+      "ratingsDate": "2002-07-01",
+      "fielded": 134,
+      "scored": 134,
+      "spearman": 0.8922,
+      "pearson": 0.8505,
+      "fullXIs": {
+        "n": 119,
+        "spearman": 0.8883
+      },
+      "spearmanCi95": [
+        0.8477,
+        0.9239
+      ],
+      "withinConfederation": 0.8893,
+      "top50ByElo": 0.7816,
+      "aboveElo": [
+        "Nicaragua 86 by strength, 133 by Elo",
+        "Belize 86 by strength, 128 by Elo",
+        "Bosnia & Herz. 33 by strength, 69.5 by Elo"
+      ],
+      "belowElo": [
+        "Qatar 113 by strength, 60 by Elo",
+        "Kuwait 119 by strength, 72 by Elo",
+        "Iran 77.5 by strength, 31 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "232/232 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "cm0102-2003-10",
+      "season": "2003/04",
+      "label": "CM 01/02 · October 2003 by Alex Sawczuk, fan-made",
+      "ratingsDate": "2003-07-01",
+      "fielded": 134,
+      "scored": 134,
+      "spearman": 0.8965,
+      "pearson": 0.859,
+      "fullXIs": {
+        "n": 119,
+        "spearman": 0.8935
+      },
+      "spearmanCi95": [
+        0.8493,
+        0.9296
+      ],
+      "withinConfederation": 0.8668,
+      "top50ByElo": 0.7924,
+      "aboveElo": [
+        "Nicaragua 86 by strength, 133 by Elo",
+        "Ghana 39.5 by strength, 85 by Elo",
+        "Belize 86 by strength, 129 by Elo"
+      ],
+      "belowElo": [
+        "Jordan 126 by strength, 68 by Elo",
+        "Iraq 106.5 by strength, 57 by Elo",
+        "Qatar 113 by strength, 70 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "233/233 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-05",
+      "season": "2004/05",
+      "label": "FIFA 05",
+      "ratingsDate": "2004-07-01",
+      "fielded": 78,
+      "scored": 78,
+      "spearman": 0.8019,
+      "pearson": 0.795,
+      "fullXIs": {
+        "n": 65,
+        "spearman": 0.8769
+      },
+      "spearmanCi95": [
+        0.6631,
+        0.8941
+      ],
+      "withinConfederation": 0.7784,
+      "top50ByElo": 0.7583,
+      "aboveElo": [
+        "Scotland 15 by strength, 47 by Elo",
+        "Ghana 40.5 by strength, 69 by Elo",
+        "Northern Ireland 40.5 by strength, 66 by Elo"
+      ],
+      "belowElo": [
+        "Ecuador 75 by strength, 29 by Elo",
+        "Japan 63 by strength, 20 by Elo",
+        "Iran 72 by strength, 30 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "235/235 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-06",
+      "season": "2005/06",
+      "label": "FIFA 06",
+      "ratingsDate": "2005-07-01",
+      "fielded": 76,
+      "scored": 76,
+      "spearman": 0.8174,
+      "pearson": 0.7985,
+      "fullXIs": {
+        "n": 64,
+        "spearman": 0.87
+      },
+      "spearmanCi95": [
+        0.6859,
+        0.9069
+      ],
+      "withinConfederation": 0.7397,
+      "top50ByElo": 0.7667,
+      "aboveElo": [
+        "Mali 38 by strength, 65 by Elo",
+        "Northern Ireland 50 by strength, 69.5 by Elo",
+        "Wales 35 by strength, 54 by Elo"
+      ],
+      "belowElo": [
+        "Japan 64.5 by strength, 18 by Elo",
+        "Iran 61.5 by strength, 17 by Elo",
+        "Ukraine 61.5 by strength, 22 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "235/235 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-07",
+      "season": "2006/07",
+      "label": "FIFA 07",
+      "ratingsDate": "2006-07-01",
+      "fielded": 80,
+      "scored": 80,
+      "spearman": 0.7619,
+      "pearson": 0.7422,
+      "fullXIs": {
+        "n": 62,
+        "spearman": 0.896
+      },
+      "spearmanCi95": [
+        0.6103,
+        0.8687
+      ],
+      "withinConfederation": 0.6923,
+      "top50ByElo": 0.738,
+      "aboveElo": [
+        "Serbia 11 by strength, 38 by Elo",
+        "Wales 28 by strength, 55 by Elo",
+        "Mali 34.5 by strength, 61 by Elo"
+      ],
+      "belowElo": [
+        "Ukraine 68 by strength, 22 by Elo",
+        "Ecuador 71 by strength, 28 by Elo",
+        "Iran 71 by strength, 32 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "235/236 exact",
+        "notReplayed": [
+          "ME"
+        ],
+        "fieldedNotReplayed": []
+      },
+      "reasons": [
+        "Replaying 2006_results.tsv over 2005.tsv does not reproduce 2006.tsv (235/236 exact)"
+      ]
+    },
+    {
+      "id": "ea-fifa-08",
+      "season": "2007/08",
+      "label": "FIFA 08",
+      "ratingsDate": "2007-07-01",
+      "fielded": 84,
+      "scored": 84,
+      "spearman": 0.7441,
+      "pearson": 0.742,
+      "fullXIs": {
+        "n": 70,
+        "spearman": 0.8619
+      },
+      "spearmanCi95": [
+        0.6025,
+        0.8489
+      ],
+      "withinConfederation": 0.7267,
+      "top50ByElo": 0.7318,
+      "aboveElo": [
+        "Iceland 44 by strength, 74 by Elo",
+        "Wales 30 by strength, 59 by Elo",
+        "South Africa 44 by strength, 72 by Elo"
+      ],
+      "belowElo": [
+        "Russia 79 by strength, 23.5 by Elo",
+        "Iran 75.5 by strength, 23.5 by Elo",
+        "Ukraine 66 by strength, 21 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "236/236 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-09",
+      "season": "2008/09",
+      "label": "FIFA 09",
+      "ratingsDate": "2008-07-01",
+      "fielded": 86,
+      "scored": 86,
+      "spearman": 0.76,
+      "pearson": 0.7586,
+      "fullXIs": {
+        "n": 72,
+        "spearman": 0.8179
+      },
+      "spearmanCi95": [
+        0.616,
+        0.8612
+      ],
+      "withinConfederation": 0.6837,
+      "top50ByElo": 0.6979,
+      "aboveElo": [
+        "South Africa 43 by strength, 72.5 by Elo",
+        "Iceland 49 by strength, 78 by Elo",
+        "Algeria 53 by strength, 80.5 by Elo"
+      ],
+      "belowElo": [
+        "Egypt 77.5 by strength, 22 by Elo",
+        "Iran 79 by strength, 28 by Elo",
+        "Japan 70.5 by strength, 24 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "236/236 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-10",
+      "season": "2009/10",
+      "label": "FIFA 10",
+      "ratingsDate": "2009-07-01",
+      "fielded": 85,
+      "scored": 85,
+      "spearman": 0.7903,
+      "pearson": 0.7678,
+      "fullXIs": {
+        "n": 77,
+        "spearman": 0.7725
+      },
+      "spearmanCi95": [
+        0.6697,
+        0.8725
+      ],
+      "withinConfederation": 0.7581,
+      "top50ByElo": 0.7217,
+      "aboveElo": [
+        "Senegal 23 by strength, 64 by Elo",
+        "Belgium 23 by strength, 57 by Elo",
+        "Iceland 53 by strength, 80 by Elo"
+      ],
+      "belowElo": [
+        "Costa Rica 67.5 by strength, 24 by Elo",
+        "Ecuador 72 by strength, 31 by Elo",
+        "Honduras 72 by strength, 35 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "236/236 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-11",
+      "season": "2010/11",
+      "label": "FIFA 11",
+      "ratingsDate": "2010-07-01",
+      "fielded": 84,
+      "scored": 84,
+      "spearman": 0.7791,
+      "pearson": 0.7514,
+      "fullXIs": {
+        "n": 74,
+        "spearman": 0.7624
+      },
+      "spearmanCi95": [
+        0.6494,
+        0.8609
+      ],
+      "withinConfederation": 0.7903,
+      "top50ByElo": 0.7109,
+      "aboveElo": [
+        "Belgium 15 by strength, 58 by Elo",
+        "Cameroon 15 by strength, 48 by Elo",
+        "Senegal 32 by strength, 65 by Elo"
+      ],
+      "belowElo": [
+        "Ukraine 57.5 by strength, 14 by Elo",
+        "Ecuador 75 by strength, 36 by Elo",
+        "Venezuela 70.5 by strength, 34 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "238/238 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-12",
+      "season": "2011/12",
+      "label": "FIFA 12",
+      "ratingsDate": "2011-07-01",
+      "fielded": 89,
+      "scored": 89,
+      "spearman": 0.8351,
+      "pearson": 0.8524,
+      "fullXIs": {
+        "n": 81,
+        "spearman": 0.7964
+      },
+      "spearmanCi95": [
+        0.7423,
+        0.8962
+      ],
+      "withinConfederation": 0.824,
+      "top50ByElo": 0.6286,
+      "aboveElo": [
+        "Wales 24.5 by strength, 62 by Elo",
+        "Cameroon 15 by strength, 50 by Elo",
+        "Belgium 11.5 by strength, 44 by Elo"
+      ],
+      "belowElo": [
+        "Ukraine 65.5 by strength, 23 by Elo",
+        "Australia 48 by strength, 17 by Elo",
+        "Japan 42 by strength, 15 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "238/238 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-13",
+      "season": "2012/13",
+      "label": "FIFA 13",
+      "ratingsDate": "2012-07-01",
+      "fielded": 94,
+      "scored": 94,
+      "spearman": 0.7938,
+      "pearson": 0.7517,
+      "fullXIs": {
+        "n": 80,
+        "spearman": 0.8328
+      },
+      "spearmanCi95": [
+        0.6844,
+        0.8736
+      ],
+      "withinConfederation": 0.8041,
+      "top50ByElo": 0.7246,
+      "aboveElo": [
+        "Senegal 30.5 by strength, 65 by Elo",
+        "Cameroon 17.5 by strength, 51 by Elo",
+        "Northern Ireland 47.5 by strength, 81 by Elo"
+      ],
+      "belowElo": [
+        "Iran 92.5 by strength, 33 by Elo",
+        "Ukraine 84.5 by strength, 32 by Elo",
+        "Panama 86 by strength, 34 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "241/241 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-14",
+      "season": "2013/14",
+      "label": "FIFA 14",
+      "ratingsDate": "2013-07-01",
+      "fielded": 94,
+      "scored": 94,
+      "spearman": 0.8186,
+      "pearson": 0.8031,
+      "fullXIs": {
+        "n": 80,
+        "spearman": 0.8083
+      },
+      "spearmanCi95": [
+        0.7195,
+        0.8875
+      ],
+      "withinConfederation": 0.8083,
+      "top50ByElo": 0.7726,
+      "aboveElo": [
+        "Cameroon 22 by strength, 64 by Elo",
+        "Northern Ireland 48.5 by strength, 85 by Elo",
+        "Morocco 34 by strength, 70 by Elo"
+      ],
+      "belowElo": [
+        "Iran 90.5 by strength, 39 by Elo",
+        "Ecuador 56.5 by strength, 13.5 by Elo",
+        "Panama 78 by strength, 44 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "241/241 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-15",
+      "season": "2014/15",
+      "label": "FIFA 15",
+      "ratingsDate": "2014-07-01",
+      "fielded": 97,
+      "scored": 97,
+      "spearman": 0.8307,
+      "pearson": 0.7863,
+      "fullXIs": {
+        "n": 85,
+        "spearman": 0.8267
+      },
+      "spearmanCi95": [
+        0.7369,
+        0.892
+      ],
+      "withinConfederation": 0.8166,
+      "top50ByElo": 0.7747,
+      "aboveElo": [
+        "Morocco 29.5 by strength, 72 by Elo",
+        "Cameroon 24.5 by strength, 64 by Elo",
+        "Northern Ireland 54.5 by strength, 89 by Elo"
+      ],
+      "belowElo": [
+        "Iran 96 by strength, 45 by Elo",
+        "Panama 77 by strength, 36 by Elo",
+        "Uzbekistan 93 by strength, 55 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "243/243 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-16",
+      "season": "2015/16",
+      "label": "FIFA 16",
+      "ratingsDate": "2015-07-01",
+      "fielded": 101,
+      "scored": 101,
+      "spearman": 0.8454,
+      "pearson": 0.8046,
+      "fullXIs": {
+        "n": 90,
+        "spearman": 0.8641
+      },
+      "spearmanCi95": [
+        0.7602,
+        0.9028
+      ],
+      "withinConfederation": 0.8309,
+      "top50ByElo": 0.617,
+      "aboveElo": [
+        "Cameroon 18.5 by strength, 53 by Elo",
+        "Morocco 31 by strength, 64 by Elo",
+        "Saudi Arabia 49.5 by strength, 77 by Elo"
+      ],
+      "belowElo": [
+        "Iran 97.5 by strength, 34.5 by Elo",
+        "Panama 89.5 by strength, 40 by Elo",
+        "Ecuador 49.5 by strength, 18 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "243/243 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-17",
+      "season": "2016/17",
+      "label": "FIFA 17",
+      "ratingsDate": "2016-07-01",
+      "fielded": 102,
+      "scored": 102,
+      "spearman": 0.8758,
+      "pearson": 0.8372,
+      "fullXIs": {
+        "n": 87,
+        "spearman": 0.8369
+      },
+      "spearmanCi95": [
+        0.7989,
+        0.9199
+      ],
+      "withinConfederation": 0.8569,
+      "top50ByElo": 0.7254,
+      "aboveElo": [
+        "Cameroon 24 by strength, 55.5 by Elo",
+        "Greece 24 by strength, 54 by Elo",
+        "Morocco 31.5 by strength, 60.5 by Elo"
+      ],
+      "belowElo": [
+        "Iran 89.5 by strength, 30.5 by Elo",
+        "Peru 53.5 by strength, 17 by Elo",
+        "Panama 81 by strength, 46 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "243/243 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-18",
+      "season": "2017/18",
+      "label": "FIFA 18",
+      "ratingsDate": "2017-07-01",
+      "fielded": 104,
+      "scored": 104,
+      "spearman": 0.8558,
+      "pearson": 0.8049,
+      "fullXIs": {
+        "n": 89,
+        "spearman": 0.8209
+      },
+      "spearmanCi95": [
+        0.7824,
+        0.9055
+      ],
+      "withinConfederation": 0.8494,
+      "top50ByElo": 0.6703,
+      "aboveElo": [
+        "Morocco 25 by strength, 60 by Elo",
+        "Algeria 25 by strength, 56 by Elo",
+        "Angola 73 by strength, 103 by Elo"
+      ],
+      "belowElo": [
+        "Iran 78 by strength, 22 by Elo",
+        "Iceland 60.5 by strength, 20 by Elo",
+        "Peru 53.5 by strength, 15 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "243/243 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-19",
+      "season": "2018/19",
+      "label": "FIFA 19",
+      "ratingsDate": "2018-07-01",
+      "fielded": 101,
+      "scored": 101,
+      "spearman": 0.8771,
+      "pearson": 0.8261,
+      "fullXIs": {
+        "n": 89,
+        "spearman": 0.8595
+      },
+      "spearmanCi95": [
+        0.8125,
+        0.922
+      ],
+      "withinConfederation": 0.8472,
+      "top50ByElo": 0.759,
+      "aboveElo": [
+        "Algeria 29.5 by strength, 75 by Elo",
+        "Côte d'Ivoire 29.5 by strength, 57 by Elo",
+        "Egypt 42 by strength, 66 by Elo"
+      ],
+      "belowElo": [
+        "Iran 71 by strength, 20 by Elo",
+        "Syria 90.5 by strength, 55 by Elo",
+        "Peru 48.5 by strength, 15 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "243/243 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-20",
+      "season": "2019/20",
+      "label": "FIFA 20",
+      "ratingsDate": "2019-07-01",
+      "fielded": 104,
+      "scored": 104,
+      "spearman": 0.8759,
+      "pearson": 0.8318,
+      "fullXIs": {
+        "n": 90,
+        "spearman": 0.8605
+      },
+      "spearmanCi95": [
+        0.8113,
+        0.9198
+      ],
+      "withinConfederation": 0.8453,
+      "top50ByElo": 0.8026,
+      "aboveElo": [
+        "Slovenia 29.5 by strength, 65 by Elo",
+        "Greece 29.5 by strength, 64 by Elo",
+        "Algeria 22.5 by strength, 53 by Elo"
+      ],
+      "belowElo": [
+        "Iran 72 by strength, 23 by Elo",
+        "Haiti 96 by strength, 56 by Elo",
+        "Iraq 98 by strength, 59 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "243/243 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-21",
+      "season": "2020/21",
+      "label": "FIFA 21",
+      "ratingsDate": "2020-07-01",
+      "fielded": 106,
+      "scored": 106,
+      "spearman": 0.8891,
+      "pearson": 0.8563,
+      "fullXIs": {
+        "n": 90,
+        "spearman": 0.8653
+      },
+      "spearmanCi95": [
+        0.8328,
+        0.9235
+      ],
+      "withinConfederation": 0.854,
+      "top50ByElo": 0.7762,
+      "aboveElo": [
+        "Cameroon 27 by strength, 61 by Elo",
+        "Angola 65 by strength, 94 by Elo",
+        "Mali 42 by strength, 70 by Elo"
+      ],
+      "belowElo": [
+        "Iran 72 by strength, 32 by Elo",
+        "Uzbekistan 98.5 by strength, 62 by Elo",
+        "Peru 51.5 by strength, 17 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "243/243 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-22",
+      "season": "2021/22",
+      "label": "FIFA 22",
+      "ratingsDate": "2021-07-01",
+      "fielded": 107,
+      "scored": 107,
+      "spearman": 0.8824,
+      "pearson": 0.8563,
+      "fullXIs": {
+        "n": 89,
+        "spearman": 0.8548
+      },
+      "spearmanCi95": [
+        0.8226,
+        0.918
+      ],
+      "withinConfederation": 0.8476,
+      "top50ByElo": 0.6689,
+      "aboveElo": [
+        "DR Congo 47 by strength, 81 by Elo",
+        "Ghana 34.5 by strength, 59 by Elo",
+        "Morocco 17 by strength, 41 by Elo"
+      ],
+      "belowElo": [
+        "Iran 70 by strength, 23 by Elo",
+        "Armenia 99 by strength, 60 by Elo",
+        "Uzbekistan 102.5 by strength, 67.5 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "243/243 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fifa-23",
+      "season": "2022/23",
+      "label": "FIFA 23",
+      "ratingsDate": "2022-07-01",
+      "fielded": 109,
+      "scored": 109,
+      "spearman": 0.8705,
+      "pearson": 0.8366,
+      "fullXIs": {
+        "n": 94,
+        "spearman": 0.8521
+      },
+      "spearmanCi95": [
+        0.8143,
+        0.9068
+      ],
+      "withinConfederation": 0.8664,
+      "top50ByElo": 0.7605,
+      "aboveElo": [
+        "Ghana 32.5 by strength, 73 by Elo",
+        "DR Congo 50.5 by strength, 83 by Elo",
+        "Guinea 63.5 by strength, 92 by Elo"
+      ],
+      "belowElo": [
+        "Iran 63.5 by strength, 25 by Elo",
+        "Iraq 102 by strength, 66 by Elo",
+        "El Salvador 108 by strength, 76 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "243/243 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fc-24",
+      "season": "2023/24",
+      "label": "EA FC 24",
+      "ratingsDate": "2023-07-01",
+      "fielded": 106,
+      "scored": 106,
+      "spearman": 0.8631,
+      "pearson": 0.8373,
+      "fullXIs": {
+        "n": 94,
+        "spearman": 0.8373
+      },
+      "spearmanCi95": [
+        0.7965,
+        0.9076
+      ],
+      "withinConfederation": 0.8662,
+      "top50ByElo": 0.8037,
+      "aboveElo": [
+        "Kosovo 46 by strength, 82 by Elo",
+        "Ghana 27.5 by strength, 61 by Elo",
+        "Nigeria 27.5 by strength, 57 by Elo"
+      ],
+      "belowElo": [
+        "Iran 66.5 by strength, 26.5 by Elo",
+        "Iraq 94 by strength, 56 by Elo",
+        "Russia 66.5 by strength, 31 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "243/243 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fc-25",
+      "season": "2024/25",
+      "label": "EA FC 25",
+      "ratingsDate": "2024-07-01",
+      "fielded": 105,
+      "scored": 105,
+      "spearman": 0.8004,
+      "pearson": 0.7788,
+      "fullXIs": {
+        "n": 91,
+        "spearman": 0.8217
+      },
+      "spearmanCi95": [
+        0.7021,
+        0.8698
+      ],
+      "withinConfederation": 0.763,
+      "top50ByElo": 0.6945,
+      "aboveElo": [
+        "Bosnia & Herz. 38.5 by strength, 83 by Elo",
+        "Ghana 28.5 by strength, 71 by Elo",
+        "Suriname 62.5 by strength, 102 by Elo"
+      ],
+      "belowElo": [
+        "Iran 87 by strength, 21 by Elo",
+        "Iraq 97 by strength, 49 by Elo",
+        "Egypt 97 by strength, 51 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "243/243 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "ea-fc-26",
+      "season": "2025/26",
+      "label": "EA FC 26",
+      "ratingsDate": "2025-07-01",
+      "fielded": 112,
+      "scored": 112,
+      "spearman": 0.8322,
+      "pearson": 0.8082,
+      "fullXIs": {
+        "n": 95,
+        "spearman": 0.8155
+      },
+      "spearmanCi95": [
+        0.7444,
+        0.8913
+      ],
+      "withinConfederation": 0.7799,
+      "top50ByElo": 0.7495,
+      "aboveElo": [
+        "Nigeria 18 by strength, 65 by Elo",
+        "Ghana 32.5 by strength, 79 by Elo",
+        "Côte d'Ivoire 25.5 by strength, 63 by Elo"
+      ],
+      "belowElo": [
+        "Iran 103.5 by strength, 26 by Elo",
+        "Panama 81.5 by strength, 33 by Elo",
+        "Egypt 87 by strength, 49 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "244/244 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    },
+    {
+      "id": "builtin:football",
+      "season": "2026/27",
+      "label": "built-in",
+      "ratingsDate": "2026-07-01",
+      "fielded": 173,
+      "scored": 173,
+      "spearman": 0.9267,
+      "pearson": 0.9365,
+      "fullXIs": {
+        "n": 173,
+        "spearman": 0.9267
+      },
+      "spearmanCi95": [
+        0.8945,
+        0.9499
+      ],
+      "withinConfederation": 0.8944,
+      "top50ByElo": 0.7359,
+      "aboveElo": [
+        "Guinea-Bissau 72.5 by strength, 138 by Elo",
+        "India 100 by strength, 151 by Elo",
+        "Philippines 100 by strength, 147 by Elo"
+      ],
+      "belowElo": [
+        "Belarus 130.5 by strength, 79 by Elo",
+        "Iran 80 by strength, 31.5 by Elo",
+        "Oman 130.5 by strength, 82.5 by Elo"
+      ],
+      "noElo": [],
+      "elo": {
+        "method": "replay",
+        "replayCheck": "244/244 exact",
+        "notReplayed": [],
+        "fieldedNotReplayed": []
+      }
+    }
+  ]
+}
