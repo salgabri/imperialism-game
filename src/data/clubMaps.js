@@ -4,7 +4,8 @@
 // "The NBA map", "The NFL map", "The MLB map", "The NHL map", "The NRL map", "The NWSL map", "The FBS map"): the setup offers each as its
 // sport's club theatre ('domestic:<id>'), the NWSL's beside women's football's Europe maps, and the loader fetches
 // public/domestic/<id>.json on demand. A map with `seasons` is an earlier era's, played only with those built-in
-// seasons' clubs, whose strongest each season names itself (the NWSL's entries name them).
+// seasons' clubs, whose strongest each season names itself (the NWSL's entries name them), in the league it names (an
+// era's own where it had another: the AFL, rugby league's NSWRFL …).
 // { id, sport, league, name, seasons?, clubs, sections, venue? ('arena' unless named), lines? ('state or province'
 //   unless named), version, top?: three strongest clubs }
 
@@ -177,24 +178,24 @@ export const CLUB_MAPS = [
   {"id":"nhl2023","sport":"hockey","league":"NHL","name":"USA and Canada","seasons":["nhl-2023","nhl-2024"],"clubs":32,"sections":32,"version":"nhl2023-3ae64102"},
   {"id":"nhl2025","sport":"hockey","league":"NHL","name":"USA and Canada","seasons":["nhl-2025"],"clubs":32,"sections":32,"version":"nhl2025-a9614d10"},
   {"id":"nrl","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","clubs":17,"sections":17,"venue":"ground","lines":"state or region","version":"nrl-3c3fee15","top":["Melbourne Storm","Penrith Panthers","Canterbury-Bankstown Bulldogs"]},
-  {"id":"nrl1960","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1960","nrl-1961","nrl-1962","nrl-1963","nrl-1964","nrl-1965","nrl-1966"],"clubs":10,"sections":10,"venue":"ground","lines":"state or region","version":"nrl1960-adedc679"},
-  {"id":"nrl1967","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1967"],"clubs":12,"sections":12,"venue":"ground","lines":"state or region","version":"nrl1967-30604e0a"},
-  {"id":"nrl1968","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1968","nrl-1969","nrl-1970"],"clubs":12,"sections":12,"venue":"ground","lines":"state or region","version":"nrl1968-4029a050"},
-  {"id":"nrl1971","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1971","nrl-1972"],"clubs":12,"sections":12,"venue":"ground","lines":"state or region","version":"nrl1971-f8b0bd15"},
-  {"id":"nrl1973","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1973","nrl-1974","nrl-1975","nrl-1976"],"clubs":12,"sections":12,"venue":"ground","lines":"state or region","version":"nrl1973-4b47d002"},
-  {"id":"nrl1977","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1977"],"clubs":12,"sections":12,"venue":"ground","lines":"state or region","version":"nrl1977-438eb0b3"},
-  {"id":"nrl1978","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1978","nrl-1979","nrl-1980","nrl-1981"],"clubs":12,"sections":12,"venue":"ground","lines":"state or region","version":"nrl1978-b5e5ef89"},
-  {"id":"nrl1982","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1982","nrl-1983"],"clubs":14,"sections":14,"venue":"ground","lines":"state or region","version":"nrl1982-64103154"},
-  {"id":"nrl1984","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1984","nrl-1985","nrl-1986"],"clubs":13,"sections":13,"venue":"ground","lines":"state or region","version":"nrl1984-93acc35c"},
-  {"id":"nrl1987","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1987"],"clubs":13,"sections":13,"venue":"ground","lines":"state or region","version":"nrl1987-4c413525"},
-  {"id":"nrl1988","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1988","nrl-1989"],"clubs":16,"sections":16,"venue":"ground","lines":"state or region","version":"nrl1988-6ff2f45c"},
-  {"id":"nrl1990","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1990"],"clubs":16,"sections":16,"venue":"ground","lines":"state or region","version":"nrl1990-09123714"},
-  {"id":"nrl1991","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1991","nrl-1992"],"clubs":16,"sections":16,"venue":"ground","lines":"state or region","version":"nrl1991-304b48cf"},
-  {"id":"nrl1993","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1993","nrl-1994"],"clubs":16,"sections":16,"venue":"ground","lines":"state or region","version":"nrl1993-93c7bff1"},
-  {"id":"nrl1995","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1995"],"clubs":20,"sections":20,"venue":"ground","lines":"state or region","version":"nrl1995-fd45f4d0"},
-  {"id":"nrl1996","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1996"],"clubs":20,"sections":20,"venue":"ground","lines":"state or region","version":"nrl1996-f445f74e"},
-  {"id":"nrl1997","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1997"],"clubs":12,"sections":12,"venue":"ground","lines":"state or region","version":"nrl1997-de6d8a1e"},
-  {"id":"sl1997","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-sl-1997"],"clubs":10,"sections":10,"venue":"ground","lines":"state or region","version":"sl1997-537ea13d"},
+  {"id":"nrl1960","sport":"rugby-league","league":"NSWRFL","name":"Australia and New Zealand","seasons":["nrl-1960","nrl-1961","nrl-1962","nrl-1963","nrl-1964","nrl-1965","nrl-1966"],"clubs":10,"sections":10,"venue":"ground","lines":"state or region","version":"nrl1960-ff7c149f"},
+  {"id":"nrl1967","sport":"rugby-league","league":"NSWRFL","name":"Australia and New Zealand","seasons":["nrl-1967"],"clubs":12,"sections":12,"venue":"ground","lines":"state or region","version":"nrl1967-7f28630a"},
+  {"id":"nrl1968","sport":"rugby-league","league":"NSWRFL","name":"Australia and New Zealand","seasons":["nrl-1968","nrl-1969","nrl-1970"],"clubs":12,"sections":12,"venue":"ground","lines":"state or region","version":"nrl1968-f6522d09"},
+  {"id":"nrl1971","sport":"rugby-league","league":"NSWRFL","name":"Australia and New Zealand","seasons":["nrl-1971","nrl-1972"],"clubs":12,"sections":12,"venue":"ground","lines":"state or region","version":"nrl1971-28ae987d"},
+  {"id":"nrl1973","sport":"rugby-league","league":"NSWRFL","name":"Australia and New Zealand","seasons":["nrl-1973","nrl-1974","nrl-1975","nrl-1976"],"clubs":12,"sections":12,"venue":"ground","lines":"state or region","version":"nrl1973-a6dd54ad"},
+  {"id":"nrl1977","sport":"rugby-league","league":"NSWRFL","name":"Australia and New Zealand","seasons":["nrl-1977"],"clubs":12,"sections":12,"venue":"ground","lines":"state or region","version":"nrl1977-3a165c48"},
+  {"id":"nrl1978","sport":"rugby-league","league":"NSWRFL","name":"Australia and New Zealand","seasons":["nrl-1978","nrl-1979","nrl-1980","nrl-1981"],"clubs":12,"sections":12,"venue":"ground","lines":"state or region","version":"nrl1978-9f705388"},
+  {"id":"nrl1982","sport":"rugby-league","league":"NSWRFL","name":"Australia and New Zealand","seasons":["nrl-1982","nrl-1983"],"clubs":14,"sections":14,"venue":"ground","lines":"state or region","version":"nrl1982-4fb4a0e9"},
+  {"id":"nrl1984","sport":"rugby-league","league":"NSWRL","name":"Australia and New Zealand","seasons":["nrl-1984","nrl-1985","nrl-1986"],"clubs":13,"sections":13,"venue":"ground","lines":"state or region","version":"nrl1984-e8b9a3ad"},
+  {"id":"nrl1987","sport":"rugby-league","league":"NSWRL","name":"Australia and New Zealand","seasons":["nrl-1987"],"clubs":13,"sections":13,"venue":"ground","lines":"state or region","version":"nrl1987-14e47cbc"},
+  {"id":"nrl1988","sport":"rugby-league","league":"NSWRL","name":"Australia and New Zealand","seasons":["nrl-1988","nrl-1989"],"clubs":16,"sections":16,"venue":"ground","lines":"state or region","version":"nrl1988-ca33c6cb"},
+  {"id":"nrl1990","sport":"rugby-league","league":"NSWRL","name":"Australia and New Zealand","seasons":["nrl-1990"],"clubs":16,"sections":16,"venue":"ground","lines":"state or region","version":"nrl1990-c5925179"},
+  {"id":"nrl1991","sport":"rugby-league","league":"NSWRL","name":"Australia and New Zealand","seasons":["nrl-1991","nrl-1992"],"clubs":16,"sections":16,"venue":"ground","lines":"state or region","version":"nrl1991-c81a948e"},
+  {"id":"nrl1993","sport":"rugby-league","league":"NSWRL","name":"Australia and New Zealand","seasons":["nrl-1993","nrl-1994"],"clubs":16,"sections":16,"venue":"ground","lines":"state or region","version":"nrl1993-0dd45435"},
+  {"id":"nrl1995","sport":"rugby-league","league":"ARL","name":"Australia and New Zealand","seasons":["nrl-1995"],"clubs":20,"sections":20,"venue":"ground","lines":"state or region","version":"nrl1995-b2efe791"},
+  {"id":"nrl1996","sport":"rugby-league","league":"ARL","name":"Australia and New Zealand","seasons":["nrl-1996"],"clubs":20,"sections":20,"venue":"ground","lines":"state or region","version":"nrl1996-8af73eb6"},
+  {"id":"nrl1997","sport":"rugby-league","league":"ARL","name":"Australia and New Zealand","seasons":["nrl-1997"],"clubs":12,"sections":12,"venue":"ground","lines":"state or region","version":"nrl1997-54bd94f8"},
+  {"id":"sl1997","sport":"rugby-league","league":"Super League","name":"Australia and New Zealand","seasons":["nrl-sl-1997"],"clubs":10,"sections":10,"venue":"ground","lines":"state or region","version":"sl1997-2e7be7af"},
   {"id":"nrl1998","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1998"],"clubs":20,"sections":20,"venue":"ground","lines":"state or region","version":"nrl1998-02899ba1"},
   {"id":"nrl1999","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-1999"],"clubs":17,"sections":17,"venue":"ground","lines":"state or region","version":"nrl1999-9d31941d"},
   {"id":"nrl2000","sport":"rugby-league","league":"NRL","name":"Australia and New Zealand","seasons":["nrl-2000"],"clubs":14,"sections":14,"venue":"ground","lines":"state or region","version":"nrl2000-8a0db8f5"},

@@ -1079,6 +1079,10 @@ Project's results the same way, leaving out the games the league staged at the S
 Suburbs, Newtown, the South Queensland Crushers, the Western Reds and the Hunter Mariners) keep their own ids and rank
 after today's clubs, so section ids still follow one order; `nrlSpecs` refuses any other club that is no franchise of
 today's. A season is keyed by its year, but Super League's 1997, which ran beside the ARL's, by its id (`nrl-sl-1997`).
+The maps before 1998 name their seasons' premiership in the NRL's place (2026-11-14): `league` is `NSWRFL` to
+`nrl1982`, `NSWRL` from `nrl1984`, `ARL` from `nrl1995` and `Super League` on `sl1997`, as the AFL's maps name the AFL,
+so the setup's theatre and club count and the campaign's title say the competition of the day; the seasons' clubs carry
+the same league. `LEAGUES.nrl.eraLeagues` lists the four, so that building another league's maps keeps their entries.
 
 | Map | Seasons | Grounds and bases that set it apart |
 | --- | --- | --- |

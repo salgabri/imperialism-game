@@ -23,15 +23,16 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { unzipSync } from 'fflate';
 import { CLUBS as BUILT_IN_CLUBS } from '../src/data/clubs.rugby-league.js';
+import { rulesOf } from '../src/sports/rugbyLeague.js';
 import { playerOf } from './lib/nrl.mjs';
 import { politeFetch } from './lib/polite-fetch.mjs';
 import {
-  ATTRIBUTE_ORDER, CORE, CORE_REASONS, DEFAULTS, KEPT, PREVIOUS_WEIGHT, REASONS, SELECTION, TEAM_RATING_PARTS, WEIGHTS, areaUnderCurve, bornAlike,
-  checkListAgainstResults, clubGamesOf, clubOf, clubShiftOf, clubsByCode, corePoints, drawGames, drawRounds, findListed, fold, gridPart, listPart,
-  matchRecord, mostStarted, mostStartedListed, overallOf, playerPart, positionScore, readOff, readRl2Database, referenceOf, representativePart,
-  resultsPart, rlpGrid, rlpPlayer, rlpPositions, rlpRepresentative, rlpResults, rlpSeasonList, rlpSquadGames, rlpSquads, rlpTestPlayers, seasonFigures,
-  seasonKeyOf, seasonPlayers, seasonValue,
-  selectionValue, spearman, squadsPart, srsOf, statCensus, teamRatingOf, teamsOf, testsPart,
+  ATTRIBUTE_ORDER, CORE, CORE_REASONS, DEFAULTS, KEPT, PREVIOUS_WEIGHT, REASONS, SELECTION, SPREAD, TEAM_RATING_PARTS, WEIGHTS, areaUnderCurve, bornAlike,
+  builtInStrengths, checkListAgainstResults, clubGamesOf, clubMoveOf, clubOf, clubShiftOf, clubsByCode, corePoints, drawGames, drawRounds, findListed,
+  fold, gridPart, listPart, matchRecord, mostStarted, mostStartedListed, overallOf, playerPart, positionScore, readOff, readRl2Database, referenceOf,
+  representativePart, resultsPart, rlpGrid, rlpPlayer, rlpPositions, rlpRepresentative, rlpResults, rlpSeasonList, rlpSquadGames, rlpSquads,
+  rlpTestPlayers, seasonFigures, seasonKeyOf, seasonPlayers, seasonValue, selectionValue, spearman, spreadTargets, squadsPart, srsOf, statCensus,
+  teamRatingOf, teamsOf, testsPart,
 } from './lib/rugby-league-seasons.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -497,12 +498,56 @@ function computedFormula(year, stats) {
     + `at half weight when he played in it, over his club's games in each.${sentence} Overall: the value's mid-rank percentile among the `
     + 'season\'s players at his position (ties sharing one), read off `reference`, Rugby League 26\'s overalls at that '
     + 'position (scripts/data/rugby-league-26.json), as many of each 2025 club\'s best as the season\'s clubs carry per club '
-    + '(`quota`), by linear interpolation; rounded and held to 1-99. Club shift: the season\'s results set each club\'s '
-    + 'level, while its players keep their order. Each club\'s Simple Rating System, its regular season\'s margins adjusted '
-    + 'for its opponents and a home edge by least squares, is ranked among the season\'s clubs (mid-rank percentiles) and '
-    + 'read off `clubShift.reference`, the built-in 2025 NRL clubs\' strengths: its target. Every player of the club moves '
-    + 'by the one whole number (`shift`) that brings its matchday 17\'s strength closest to the target (of two as close, the '
-    + 'smaller move), held to 1-99.';
+    + `(\`quota\`), by linear interpolation; rounded and held to 1-99. ${SHIFT_FORMULA}`;
+}
+
+/** The club shift of every computed season, as its source.conversion states it (seasonShift). */
+const SHIFT_FORMULA = 'Club shift: the season\'s results set each club\'s level and how far apart the clubs play, while its players keep '
+  + 'their order. Each club\'s Simple Rating System (`srs`), its regular season\'s margins adjusted for its opponents and a home '
+  + 'edge by least squares, is scaled to the clubs\' own spread, times the square root of the ratings\' reliability (the share of '
+  + 'their variance that is not their games\' luck, `clubShift.reliability`), and turned into points of the match model\'s '
+  + 'strength, the mean of its attack and its defence: divided by `clubShift.margin`, the points a game one point of strength is '
+  + 'worth at the season\'s scoring, 0.9 (`matched`: the model\'s margin over its first order, over its game-to-game spread against '
+  + 'the real game\'s) times the first order, 2 x 0.14 x its tries a team game (`tries`) x a try\'s points with a conversion at '
+  + '75.5% (`tryPoints` + 1.51). Added to the built-in 2025 NRL clubs\' mean model strength (`clubShift.mean`), that is its target. '
+  + 'Every player of the club moves by a whole number (`shift`) and its `plus` best players (overall, then value) by one more, '
+  + 'held to 1-99, whichever brings its matchday 17\'s model strength nearest the target (of two as near, the smaller move).';
+
+// The built-in 2025 clubs' model strengths, lowest first, and their mean: the level every computed season's clubs meet.
+const BUILT_IN_STRENGTHS = builtInStrengths(BUILT_IN_CLUBS).sort((a, b) => a - b);
+const BUILT_IN_MEAN = Math.round(BUILT_IN_STRENGTHS.reduce((sum, x) => sum + x, 0) / BUILT_IN_STRENGTHS.length * 1000) / 1000;
+
+/**
+ * A computed season's club shift (docs/design/rugby-league.md, "The spread"): the Simple Rating System of its regular
+ * season's games (`regular`), with how much of its spread is the clubs' own; its tries a team game (`tries`); each club's
+ * target, the model strength its margins call for (spreadTargets), and its move toward it (clubMoveOf), every `placed`
+ * player's own move set on him (`shift`: his club's whole number, or one more). → `{ teams: Map(club → team row),
+ * clubShift }`.
+ */
+function seasonShift(year, clubs, placed, regular, tries) {
+  const fit = srsOf(regular);
+  const { tryPoints } = rulesOf(year);
+  const { margin, scale, targets } = spreadTargets(fit, { mean: BUILT_IN_MEAN, tries, tryPoints });
+  const teams = new Map();
+  for (const club of clubs) {
+    const at = placed.filter(entry => entry.club === club.id);
+    const move = clubMoveOf(at.map(entry => ({ id: entry.player.id, name: entry.player.name, pos: entry.pos, rating: entry.overall, value: entry.value })),
+      targets[club.id]);
+    const best = new Set(move.best);
+    for (const entry of at) entry.shift = move.shift + (best.has(entry.player.id) ? 1 : 0);
+    teams.set(club.id, { srs: fit.ratings[club.id], target: targets[club.id], strength: move.before, shift: move.shift, plus: move.plus,
+      shifted: move.after, rating: move.rating });
+  }
+  return {
+    teams,
+    clubShift: { reference: BUILT_IN_STRENGTHS, mean: BUILT_IN_MEAN, homeEdge: fit.homeEdge, sigma: fit.sigma, reliability: fit.reliability, tries,
+      tryPoints, matched: SPREAD.matched, margin, scale,
+      note: 'Each club\'s `team`: its regular season\'s Simple Rating System (`srs`, points a game, home edge `homeEdge`, the margins\' '
+        + 'spread about it `sigma`), its target (`mean` + `scale` x srs, `scale` = the square root of `reliability` over `margin`), '
+        + 'its model strength (the mean of the match model\'s attack and defence) unmoved (`strength`) and moved (`shifted`), the '
+        + 'move (every player `shift`, its `plus` best one more; each player\'s row ends with his own), and the moved matchday 17\'s '
+        + 'rating (`rating`, the season\'s strength as shown). `reference`: the built-in 2025 clubs\' model strengths.' },
+  };
 }
 
 /**
@@ -617,18 +662,13 @@ async function computedSnapshotOf(season) {
   }
   for (const entry of placed) entry.overall = overallOf(entry.value, values[entry.pos], reference[entry.pos]);
 
-  // The club shift: the regular season's Simple Rating System, read off the built-in clubs' strengths.
+  // The club shift: the regular season's Simple Rating System, spread as the season's own (seasonShift), at its tries a
+  // team game, every try of its placed players over its games.
   const regular = games.filter(game => game.regular).map(game => ({ round: game.round, home: seasonClub(game.home), away: seasonClub(game.away),
     homeScore: game.home.score, awayScore: game.away.score }));
-  const { ratings, homeEdge } = srsOf(regular);
-  const clubStrengths = BUILT_IN_CLUBS.map(club => club.str).sort((a, b) => a - b);
-  const clubRows = clubs.map(club => {
-    const pool = placed.filter(entry => entry.club === club.id).map(entry => ({ name: entry.player.name, pos: entry.pos, rating: entry.overall }));
-    const target = Math.round(readOff(ratings[club.id], Object.values(ratings), clubStrengths) * 100) / 100;
-    const { shift, before, after } = clubShiftOf(pool, target);
-    for (const entry of placed) if (entry.club === club.id) entry.shift = shift;
-    return { id: club.id, list: club.list, games: clubGames[club.id], team: { srs: ratings[club.id], target, strength: before, shift, shifted: after } };
-  });
+  const tries = Math.round(placed.reduce((sum, entry) => sum + entry.player.sums[KEPT.indexOf('tries')], 0) / games.length / 2 * 1e4) / 1e4;
+  const { teams, clubShift } = seasonShift(year, clubs, placed, regular, tries);
+  const clubRows = clubs.map(club => ({ id: club.id, list: club.list, games: clubGames[club.id], team: teams.get(club.id) }));
 
   const { records: results, ...figures } = seasonFigures(regular);
   const ladder = Object.entries(results).map(([id, r]) => [id, r.won, r.drawn, r.lost, r.for, r.against])
@@ -644,11 +684,9 @@ async function computedSnapshotOf(season) {
       formula: computedFormula(year, stats),
       metric: statsWording(year, stats).metric,
       core: { weights: CORE, reasons: CORE_REASONS }, previous: PREVIOUS_WEIGHT, kept: KEPT, stats, quota, reference, values,
-      clubShift: { reference: clubStrengths, homeEdge,
-        note: 'Each club\'s `team`: its regular season\'s Simple Rating System (`srs`, points a game, home edge `homeEdge`), its '
-          + 'target, its lineup\'s strength unshifted (`strength`) and shifted (`shifted`), and the shift.' },
+      clubShift,
       columns: ['nrlId', 'name', 'club', 'position', 'placedBy', 'games', 'clubs', 'stats (`kept`)', 'previous season [games, clubs, stats (`core`)]',
-        'value', 'overall', 'shift'],
+        'value', 'overall', 'shift (his club\'s, or one more for its `plus` best)'],
     },
     clubs: clubRows,
     previousClubGames: Object.fromEntries(Object.entries(previousClubGames).sort((a, b) => a[0].localeCompare(b[0]))),
@@ -697,11 +735,7 @@ function selectionFormula(season) {
     + `the interstate series, NSW City v Country), plus ${SELECTION.tryWeight} for each try at today's ${SELECTION.tryRate} tries a team game, scaled to `
     + 'his season\'s rate (`tryRate`), per club game, the season before at half weight when he played in it. Overall: the value\'s mid-rank '
     + 'percentile among the season\'s players at his position, read off Rugby League 26\'s overalls at that position by as many of each 2025 '
-    + 'club\'s best as the season\'s clubs carry per club (`quota`), by linear interpolation; rounded and held to 1-99. Club shift: the '
-    + 'season\'s results set each club\'s target: its Simple Rating System, the regular season\'s points margin a game adjusted for its '
-    + 'opponents and a home edge by least squares, ranked among the season\'s clubs (mid-rank percentiles) and read off '
-    + '`clubShift.reference`, the built-in 2025 NRL clubs\' strengths. Every player of the club moves by the one whole number that brings its '
-    + 'matchday 17\'s strength closest to the target (of two as close, the smaller move), held to 1-99.';
+    + `club's best as the season's clubs carry per club (\`quota\`), by linear interpolation; rounded and held to 1-99. ${SHIFT_FORMULA}`;
 }
 
 async function selectionSnapshotOf(season) {
@@ -781,19 +815,12 @@ async function selectionSnapshotOf(season) {
   }
   for (const entry of placed) entry.overall = overallOf(entry.value, values[entry.pos], reference[entry.pos]);
 
-  // The club shift: the regular season's Simple Rating System, read off the built-in clubs' strengths.
+  // The club shift: the regular season's Simple Rating System, spread as the season's own (seasonShift), at its try rate.
   const idOfSlug = new Map(clubs.map(club => [club.rlp, club.id]));
   const regular = games.filter(game => /^Round \d+$/.test(game.round)).map(game => ({ round: game.round, home: idOfSlug.get(game.home), away: idOfSlug.get(game.away),
     homeScore: game.homeScore, awayScore: game.awayScore }));
-  const { ratings, homeEdge } = srsOf(regular);
-  const clubStrengths = BUILT_IN_CLUBS.map(club => club.str).sort((a, b) => a - b);
-  const clubRows = clubs.map(club => {
-    const pool = placed.filter(entry => entry.club === club.id).map(entry => ({ name: entry.player.name, pos: entry.pos, rating: entry.overall }));
-    const target = Math.round(readOff(ratings[club.id], Object.values(ratings), clubStrengths) * 100) / 100;
-    const { shift, before: strength, after } = clubShiftOf(pool, target);
-    for (const entry of placed) if (entry.club === club.id) entry.shift = shift;
-    return { id: club.id, list: club.list, games: clubGames[club.id], team: { srs: ratings[club.id], target, strength, shift, shifted: after } };
-  });
+  const { teams, clubShift } = seasonShift(year, clubs, placed, regular, tryRate);
+  const clubRows = clubs.map(club => ({ id: club.id, list: club.list, games: clubGames[club.id], team: teams.get(club.id) }));
 
   const { records: results, ...figures } = seasonFigures(regular);
   const ladder = Object.entries(results).map(([id, r]) => [id, r.won, r.drawn, r.lost, r.for, r.against])
@@ -810,11 +837,10 @@ async function selectionSnapshotOf(season) {
       selection: { ...SELECTION, tryRate, tryRateBefore,
         representative: manifest.rlpSelection.representative[year] ?? [], representativeBefore: manifest.rlpSelection.representative[year - 1] ?? [] },
       previous: PREVIOUS_WEIGHT, quota, reference, values,
-      clubShift: { reference: clubStrengths, homeEdge,
-        note: 'Each club\'s `team`: its regular season\'s Simple Rating System (`srs`, points a game, home edge `homeEdge`), its '
-          + 'target, its lineup\'s strength unshifted (`strength`) and shifted (`shifted`), and the shift.' },
+      clubShift,
       columns: ['rlpId', 'name', 'club', 'position', 'placedBy', 'games', 'clubs', '[starts, representative games, tries]',
-        'previous season [games, clubs (season/code), [starts, representative games, tries]]', 'value', 'overall', 'shift'],
+        'previous season [games, clubs (season/code), [starts, representative games, tries]]', 'value', 'overall',
+        'shift (his club\'s, or one more for its `plus` best)'],
     },
     clubs: clubRows,
     previousClubGames: Object.fromEntries(Object.entries(previousClubGames).sort((a, b) => a[0].localeCompare(b[0]))),
@@ -886,10 +912,12 @@ for (const season of manifest.seasons) {
     const snapshot = await (season.basis === 'selection' ? selectionSnapshotOf : computedSnapshotOf)(season);
     outputs.push([path.join(snapshotDir, `${season.id}.json`), serializeComputed(snapshot)]);
     const by = how => snapshot.players.filter(row => row[4] === how).length;
-    const shifts = snapshot.clubs.map(club => club.team.shift);
+    const shifts = snapshot.clubs.map(club => club.team.shift), targets = snapshot.clubs.map(club => club.team.target);
+    const { homeEdge, reliability, margin } = snapshot.conversion.clubShift;
     console.log(`${season.id}: ${snapshot.source.games} games (${snapshot.source.teamLists} with team lists), ${snapshot.players.length} players placed `
       + `(${by('S')} by the season, ${by('S±1')} a season either side, ${by('S±2')} two either side, ${by('RLP')} by RLP), ${snapshot.left.length} left out; `
-      + `shifts ${Math.min(...shifts)} to ${Math.max(...shifts)}, home edge ${snapshot.conversion.clubShift.homeEdge}`);
+      + `targets ${Math.min(...targets)}–${Math.max(...targets)} (reliability ${reliability}, ${margin} points a point), `
+      + `shifts ${Math.min(...shifts)} to ${Math.max(...shifts)}, home edge ${homeEdge}`);
     continue;
   }
   const snapshot = await snapshotOf(season);

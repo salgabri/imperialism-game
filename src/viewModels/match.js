@@ -48,12 +48,12 @@ function oddsOf(odds) {
  * "Judge 3 RBI · Soto 1 RBI" (baseball: the two who drove in most runs) or "McDavid 2 G · Draisaitl 1 G" (ice hockey: the
  * two who scored most; a shoot-out's goal is the side's, nobody's own), "Sinner · Bolelli/Vavassori" (tennis: who won the
  * side's rubbers, in order; a set that does not win its rubber counts nothing) or "Walsh 2 tries · Cleary 3 PG" (rugby
- * league: the two who scored most, a try ranked as its four points, a penalty goal as two and a field goal as one; a
- * conversion is the try's, nobody's own) or "Zen 5 G · Alpha54 3 G" (Rocket League: the two who scored most over the series;
- * a game's end scores nothing of its own) or "ZywOo 12 MVP · apEX 7 MVP" (Counter-Strike: the two who were their side's MVP
- * of the most rounds; a map's end counts nothing of its own) or "aspas · Less" (Valorant and League of Legends: the best
- * player of each map or game the side won, in order). `sport` is a sport id or a season's rules (matchSport): an ice hockey season
- * before the shoot-out has none to leave out.
+ * league: the two who scored most, a try ranked as its four points, a penalty goal as two and a field goal as one, or as
+ * their season's: three and two in the 1960s; a conversion is the try's, nobody's own) or "Zen 5 G · Alpha54 3 G" (Rocket
+ * League: the two who scored most over the series; a game's end scores nothing of its own) or "ZywOo 12 MVP · apEX 7 MVP"
+ * (Counter-Strike: the two who were their side's MVP of the most rounds; a map's end counts nothing of its own) or
+ * "aspas · Less" (Valorant and League of Legends: the best player of each map or game the side won, in order). `sport` is
+ * a sport id or a season's rules (matchSport): an ice hockey season before the shoot-out has none to leave out.
  */
 export function scorersLine(shown, teamId, teams, sport = 'football') {
   const sportId = typeof sport === 'object' && sport ? sport.id : sport;
@@ -82,11 +82,14 @@ export function scorersLine(shown, teamId, teams, sport = 'football') {
     return [...totals.entries()].sort((x, y) => y[1] - x[1]).slice(0, 2).map(([name, goals]) => `${shortName(name)} ${goals} G`).join(' · ');
   }
   if (sportId === 'rugby-league') {
+    // Each kind of score at its season's points (a try three and a field goal two in the 1960s), today's unless told.
+    const values = (typeof sport === 'object' && sport?.scoreValues) || getSport(sportId).scoreValues;
     const totals = new Map();
     for (const e of own) {
       const row = totals.get(e.name) || { pts: 0, tries: 0, penalty: 0, field: 0 };
       const kind = scoreKind(e);
-      if (kind === 'try') { row.tries++; row.pts += 4; } else if (kind === 'penalty') { row.penalty++; row.pts += 2; } else { row.field++; row.pts += 1; }
+      if (kind === 'try') row.tries++; else if (kind === 'penalty') row.penalty++; else row.field++;
+      row.pts += values[kind];
       totals.set(e.name, row);
     }
     return [...totals.entries()].sort((x, y) => y[1].pts - x[1].pts).slice(0, 2)
