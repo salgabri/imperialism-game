@@ -5142,7 +5142,6 @@
   "Sydney United": {"lon":150.8742,"lat":-33.8758,"source":"map:d036-123007","label":"Sydney United 58 FC","twin":"d036-123007"},
   "Taringa Rovers": {"lon":152.9786,"lat":-27.4906,"source":"geonames:6931018","label":"Taringa"},
   "UTS Olympic": {"lon":151.0947,"lat":-33.9167,"source":"map:d036-123005","label":"Sydney Olympic FC","twin":"d036-123005"},
-  "UTS Sydney Olympic": {"lon":151.0947,"lat":-33.9167,"source":"map:d036-123005","label":"Sydney Olympic FC","twin":"d036-123005"},
   "WS Wanderers": {"lon":151.0678,"lat":-33.8431,"source":"map:d036-15035999","label":"Western Sydney Wanderers FC","twin":"d036-15035999"},
   "Warringah Dolphins": null,
   "West Adelaide": {"lon":138.5689,"lat":-34.9075,"source":"map:d036-425110","label":"West Adelaide","twin":"d036-425110"},
