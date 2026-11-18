@@ -147,11 +147,13 @@ borders, and a country with no club stays grey. Its index entry (`src/data/europ
   Emirates, far to the south-east: the opening camera frames it with the rest);
 - Spain's four and Italy's and France's two each split their countries by region;
 - Istanbul's three: Anadolu Efes keeps Thrace, Fenerbahçe and Beşiktaş grow over Anatolia,
-  Beşiktaş starting across the Bosphorus (99 km from its arena);
+  Beşiktaş starting across the Bosphorus (141 km from its arena; 99 km before the levels went
+  down to the communes on 2026-11-15);
 - Athens and Piraeus: Panathinaikos holds more of Greece than Olympiacos;
 - Belgrade's two and Tel Aviv's two: each city is one unit of its country's finest layer, so it
-  joins a neighbouring region and one club starts next door. `COUNTRIES` gained Serbia (districts
-  and their municipalities) and Israel (districts and sub-districts).
+  joins a neighbouring region and one club starts next door. Serbia's levels are its districts and
+  municipalities, Israel's its districts and sub-districts (`COUNTRIES` in
+  `scripts/lib/admin-levels.mjs`): neither source goes below the city.
 
 ## Setup
 
@@ -271,9 +273,12 @@ Perm and St Petersburg), Croatia (Cibona and Zadar), Slovenia (Olimpija and Krka
   main, whose football maps shipped European Russia first, its maps moved onto main's, so both
   sports draw the same Russia.)
 - **Crowded cities.** As Beşiktaş does today, a club crowded into Istanbul or Athens can start next
-  door: Galatasaray across the Bosphorus (103 km from its arena in 2011/12), Darüşşafaka in
-  2015/16 to 2018/19, Anadolu Efes in 2014/15; AEK Athens, Peristeri, Panionios and Maroussi a
-  suburb or two away (30 to 54 km). Each map's build log lists them.
+  door: Galatasaray across the Bosphorus (136 km from its arena in 2011/12, 2013/14, 2014/15 and
+  2016/17; 103 km before the levels went down to the communes), Darüşşafaka in 2015/16 to 2018/19
+  (101 to 144 km), Ülkerspor or Anadolu Efes in 2001/02 to 2005/06 (about 100 km; Ülkerspor's
+  arena stood 11 km from its land before); AEK Athens, Peristeri, Panionios and Maroussi a suburb
+  or two away (17 to 54 km), and in 2001/02 to 2005/06 and 2009/10 Panathinaikos or Olympiacos too
+  (16 to 41 km). Each map's build log lists them.
 
 **Setup.** An earlier season's club theatres are its NBA era's map and its EuroLeague's; the
 EuroLeague carries over between seasons (2009/10's map, then 2019/20's), and a season before
