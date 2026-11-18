@@ -3,6 +3,1158 @@
   "retrieved": "2026-11-17",
   "releases": [
     {
+      "id": "cm0102-2007-11",
+      "season": "2007/08",
+      "zip": {
+        "local": "November-2007-Database.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 7583793,
+          "sha256": "9d20b7513ee87e9b7d57f8bca59316263c6cd955f9ba53d4780dc75ba70ad946"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46331,
+          "sha256": "7fbd277916488f69866425759ed81f139c829ebfec93e8ea0b750260c2cef1e5"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 986160,
+          "sha256": "1ecc3e9c9f7b25c4a95b939a5a15a2b8d6fb7ddfa7f3502e380e0d4024c7c9bc"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "d0af10d810ecddda219506886c5adaec31101cc3cf16a7803b9a4e5991386251"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 3385080,
+          "sha256": "6f429094872f0385653c62beb9bf24e4cf0bb90dc180a35ddd5f97d5869d9ebd"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "c6b35e0f9af7f29ae0d525c9b695c7de1c5c02572810f6154222d558b02c0764"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 247506,
+          "sha256": "9704e0cacb2a5fba8c45e80d4f10c0ee8d2118628ecc997e9a5350d2388e3ccd"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 61770,
+          "sha256": "f3bb1dd0b8fad018a15568c8297e27f60cd434b41792d485a2f2e94b71d2e10b"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "ce7e3cb62c982e360c07de8b87834acf2dd3fdc02fcbc222e1d5bf04b1ea04a2"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 7908420,
+          "sha256": "4f9faacbd7b3003f4a259d108e999f3136879c6e23b0c25bb3dac28c48fdf0bc"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 36759152,
+          "sha256": "d5aa76c9bbe7cb80507b707a4e83123fe0386357f845a99a8c8cb5d3c86ff5fd"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2008-09",
+      "season": "2008/09",
+      "zip": {
+        "local": "September-2008-Database.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 7726719,
+          "sha256": "5c2e3cdaf11e119dfc568986bc83af6599cdacae32e03e13cfc925194bb9c38d"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46331,
+          "sha256": "8098f44c80d10cad85b0dd92ee44b462bdc2b904df1509c6ebe64ce002a202da"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 1086840,
+          "sha256": "8b7a5a3eb5e8bca72c9510c15b102a959dd247312c2e3f45c7bbc967d7914f10"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "d0af10d810ecddda219506886c5adaec31101cc3cf16a7803b9a4e5991386251"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 3612600,
+          "sha256": "2301e09c95257e0e41a0edc5860e1a4fd11d357c55ad00bc1b6f03203a283bd6"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1485,
+          "sha256": "8329e2af1a901d25cd74ae057ce3eb6bc7d3929f18f8469dcb7e8187a03a4bb8"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 247506,
+          "sha256": "b8500080af5fd8947c37e234de53213b903edfdda0fcb07a42661bc27b72cbcd"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 61770,
+          "sha256": "f881791ff383b93ea60c6a7844eabf1e346f1bfc1518d57c7e2428da3d7d091b"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "ce7e3cb62c982e360c07de8b87834acf2dd3fdc02fcbc222e1d5bf04b1ea04a2"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 8598540,
+          "sha256": "5b5a0d0eea317c78efba5119fa4c8640ab539204162b6169a91c8f75ec2df5c5"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 30881518,
+          "sha256": "8da4b1477962c7770e6f13e0c8b030b0c9b5190f7330806700f2efdb667f5f61"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2009-09",
+      "season": "2009/10",
+      "zip": {
+        "local": "September-2009-Database.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 7937041,
+          "sha256": "b0fa7276a049c8eb9e0823183333f0c2660dc6cb4b1ce70c089b3b86aef65dd3"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46331,
+          "sha256": "5ee3b78757ec8ea7e2a7b285bf521ad07905247133d4bbb1b8cbac6ff6feae6b"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 1138920,
+          "sha256": "6ffc193e2b03d7830cee0cb4908035c13686c69d920327e70044b9e902600747"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "d0af10d810ecddda219506886c5adaec31101cc3cf16a7803b9a4e5991386251"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 3735060,
+          "sha256": "2f05ebcccde98757c91f1dc334f2ba4833ec25534f69c480df5177952cfcfeb5"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "91d89f04052fb659854edd94bf14052773419f7e68f670486ab3a822d294430c"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 247506,
+          "sha256": "a658369e806f8c1015705d86e6ec6738b20cf603b2865f4b7e3171a0a5fa7d8f"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 61770,
+          "sha256": "0c58eb23da80f0b071f83583ffc7d0fdc107017b8e79d2c128905bb756247950"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "ce7e3cb62c982e360c07de8b87834acf2dd3fdc02fcbc222e1d5bf04b1ea04a2"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 8952900,
+          "sha256": "f6d9185d8acdaae007ff1ecebda67b2342b402d465ae719f6c47dd876fc5daa3"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 29427794,
+          "sha256": "017af844afaab5b6d37c5cb3dc91ea661673c54f8a7dc4671574dc2994e60c2e"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2010-09",
+      "season": "2010/11",
+      "zip": {
+        "local": "September-2010-ODB-Database.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 8069509,
+          "sha256": "8678ba9ce53dd0cf255af5085c0775e6938a80d362ddf110570c388766f4aa81"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46331,
+          "sha256": "b057888485e48e0aecb258962835708266fcaf6d10ea096fe7f97a2a38e8a080"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 1207500,
+          "sha256": "60c7876952824e14f0acf9b61d54b5c14cc7343ec92c781d8e5a012dd1d43c4a"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "d0af10d810ecddda219506886c5adaec31101cc3cf16a7803b9a4e5991386251"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 3958140,
+          "sha256": "d0f64d5bda3dcdba769b1756e57a609802201f9ef59264eea3d685091427c019"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1483,
+          "sha256": "d8e61c728101c49b9cd299a1581531375957e56224e45e858d81f7b5629c4fea"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 247506,
+          "sha256": "1f59dad3372ca983720cddd4dccd5a718d66719362166570884f82036b9abb95"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 61770,
+          "sha256": "d65b02275e374bb7f1cd1247621d1b70998e3a6df38884cb96772b8f925466b6"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "9a05ac1835c6545c2a3a22741c65201a2c799a968c86c0eaf89dc16094677742"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 9350220,
+          "sha256": "3c32963efde095635d2cfd4dbc69c51eaf2df936650e7a1b8726d765b3a5813d"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 30072480,
+          "sha256": "3d160acc99a00fe661db8246e6727da094234fa17c32bb6b491099965d92cb3a"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2011-09",
+      "season": "2011/12",
+      "zip": {
+        "local": "September-2011-ODB-Database.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 8308300,
+          "sha256": "9f0cc88f7804daf49f7ede557b3dfc776f5d709c6beca306c0ce4d086225c344"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46331,
+          "sha256": "a66285b244d40145d9b50887564623960a78e923c1a5676b904972d32575143d"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 1336140,
+          "sha256": "ff72c4d85e2f435a37e0e4c9927934a0df8ac1debb27494775c63dd12f173e75"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "d0af10d810ecddda219506886c5adaec31101cc3cf16a7803b9a4e5991386251"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 4392300,
+          "sha256": "2c625cb9b2e23e2f0df39435c69ff1c87f8928a4a730995508a369b09037e71a"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "5f2ed7848827b07a216cb4a19ef62bbea06055a55197fa1ef9ae89829c2aca3d"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 249830,
+          "sha256": "c7dbf5589c6226446b2928e5c524390fb8ff78897776ee65d2641faeeb8be669"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 62350,
+          "sha256": "39e2b70adbc680b31fd189cac96fc904626d03e81d3a36185b9d8a564edfce3c"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "8ba2f4aa5d7e15ba8fddf4a07d2608d6fff61e0e52047ce2d0edd8e290f617ea"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 10112940,
+          "sha256": "aee667c9c96a021cec11b91d16253e2db163e8d7704d97ce62252360a066a996"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 27460598,
+          "sha256": "1c28084eea4b8c4826e38ece8c72bfddfb0d490d34e6ef3e7de821dc64964fb2"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2012-09",
+      "season": "2012/13",
+      "zip": {
+        "local": "September-2012-Database.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 8418109,
+          "sha256": "055bd760035767da2e8cebcd7a7db9dbbaf976ba919bdd58781cae1e34ef392a"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46331,
+          "sha256": "48fd7f28953b9e0fbc2e45f8fdb602d53dcfefdb5731cbc23150943a4ec9d3f0"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 1432080,
+          "sha256": "e7cfb9ed514eb7983ec82444f76e0db3753a0f78c41519673a203e67cf608dfa"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "d0af10d810ecddda219506886c5adaec31101cc3cf16a7803b9a4e5991386251"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 4912380,
+          "sha256": "aef4166446b9c5d9a4ba19a86c1e95d51430764fe84df3c6783b26fdacf4cf94"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1486,
+          "sha256": "cb5cf9545e2f17d85240993f329aa691eae84b201453a4448be48df031b34978"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 248668,
+          "sha256": "7794471b4fd61301338a43ba0c3d4f82fc946df26537c9f1e7ef898973d86fde"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 62060,
+          "sha256": "85223ee6685ef100641d5268fca845ce17dfc24a5d73aa17255d5cf0acd54541"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "f8fdf3d8d2d6eb7602bf0e0529fe33b3fd6e6ef1be6916ca2d44a01099159ddb"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 11380440,
+          "sha256": "500c0dbe253d3e86f1fd83381d57d2d1242c7806573ab8c18c91f169ae55a5fe"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 25832378,
+          "sha256": "bc3648badd802a647e33709c85b190a90d314d8c90bca66e29dcbe1fad93f8e6"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2013-10",
+      "season": "2013/14",
+      "zip": {
+        "local": "Autumn-2013-Database.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 7533827,
+          "sha256": "cd306e10ee0ddcc1f1152bfa6976e13a063b9e9c7d380aa85eab1a3683926ee3"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46331,
+          "sha256": "9d761177d56b90ec405e8613d29b17d4cb254958cb79fc9614096989e7afd803"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 1490340,
+          "sha256": "f6c56f08748aa4d605417926b6e927078143753f1dad5f5950c63f06d4bb7eb4"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "d0af10d810ecddda219506886c5adaec31101cc3cf16a7803b9a4e5991386251"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 5336340,
+          "sha256": "98215755a86c1487b48c7b6c6d23443f8bf1f501f3afeedc95c82e11dd25abaa"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "0eba2831243b79e6e11cba636726ca9493f09408dd4bdaeac945cde381db2147"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 249830,
+          "sha256": "819bb4d9ea42cf1b0a7d2921314d1654db4a01e8a1d15b58c63b9d0fce637253"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 62350,
+          "sha256": "55471374974388b270f7d2b5996efeefe01be238fa90392322833db36af73a8a"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "f8fdf3d8d2d6eb7602bf0e0529fe33b3fd6e6ef1be6916ca2d44a01099159ddb"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 12409620,
+          "sha256": "70df9a75b33a00c2dbfd15c09ed6959c4d19afc025c77e7b87c37dbc012c5efb"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 24522878,
+          "sha256": "752750f110643baf6ce108b9acd046495d189ae8df2d1dd1343ed96baff71286"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2014-10",
+      "season": "2014/15",
+      "zip": {
+        "local": "October-2014-Database.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 6587959,
+          "sha256": "795c3f0a5e3b4c8b06e35815b50a199f2b8e2840a0795c3e4ef12408d0d396eb"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46331,
+          "sha256": "039ec73bd874cc134cbdffbb03e560a938d6fcc3961e5b7ffd3f3deb21f472cc"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 1516800,
+          "sha256": "7f6453e60dd9524a4983bc26f9fccfbff4c69482f494bb04f926404580689287"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "d0af10d810ecddda219506886c5adaec31101cc3cf16a7803b9a4e5991386251"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 5508360,
+          "sha256": "848b0dcf90c2e2dd3b3a5e9e0fcca2a94ac8ca91730cf20e02b77728b229b318"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1483,
+          "sha256": "695acf201b6fd63026ee6218fd1c1f282df143210eb8d68d878643d5c08c19cd"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 249830,
+          "sha256": "c229444ce72a4ead36f3f2d06d98cf8cefdded6d69cd607edf95baded63fd456"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 62350,
+          "sha256": "fec0f2363216ab1ddd9967abbae98d33111f7902064465708391e4b7b6b8892c"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "6c2a70e662c04a812494d34bc52e619143183fc0c26ad24d4e2a1beb9c3b06cb"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 12888840,
+          "sha256": "df3b2f4f5de8ef26c59a4f39ae47771dab9e8cab6c3603a6b9d245a8c79eec4b"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 23292732,
+          "sha256": "f6b9abbc9cbfefca43bfedf999ea2ac01af73495ac58742c752441368d1a6d00"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2015-10",
+      "season": "2015/16",
+      "zip": {
+        "local": "October-2015-Database.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 6484541,
+          "sha256": "99cb6422bae197522a692ddeb354154f8e90edfe9466fd447cdf5f57740edf3e"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46331,
+          "sha256": "568de44ffd8412596f3053e19ab712ff4c555d9b5d703d8f42dec4e89e5d95e8"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 1547100,
+          "sha256": "923d955380daea137a5c8ba0fab938397ed0ce6a251e489e1f60a58dc0ea2db1"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "d0af10d810ecddda219506886c5adaec31101cc3cf16a7803b9a4e5991386251"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 5744220,
+          "sha256": "28d522a61f72259c4b4e42b432d03260b43aef21e43ce160bb5b2588fbc15263"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "9004daba5366a42522b80d469e73b8459072592dfe2f0b3c17aa63561ea02b2b"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 255640,
+          "sha256": "7a67d7976dfc5f938cee48a66b31417a939b9372efd4167b25bf5ad6fda5d8d1"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 63800,
+          "sha256": "37acc592d689be14304e01f7a5fea973bf0ce99a02c20ce50be95a624c27169e"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "79dedfc31f731790020766a16188b42f24a0b33910ed6af9c386817e172db7f0"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 13504560,
+          "sha256": "906ae8d903e41c77fd32705e29107abb312f0a22d7c11453cdab0343023b37b9"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 21873568,
+          "sha256": "8272b5f0470736a3fbe25abff778bfd08d2ee1a205fb727b7e6aefabfa53f30b"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2016-10",
+      "season": "2016/17",
+      "zip": {
+        "local": "October-2016-Database.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 6643154,
+          "sha256": "daa779af134633ae40de2d76582d51ac27627b78367489a03f3e4c1dddb60fd7"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46331,
+          "sha256": "39b8d51ffcd2cf85e3e4b2fb3c3d3d9a3e8a17aeff1f2dc3aeade152c6025fd7"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 1436220,
+          "sha256": "c34555eab7514c2195b52763949fefb77d7d7205fa8a06711e7fab7da01de9f9"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "d0af10d810ecddda219506886c5adaec31101cc3cf16a7803b9a4e5991386251"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 6056160,
+          "sha256": "e32e93504853e4564fc82c1925beaebd0b78b19e9eff8a593b282c00ae258ddf"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "537a71a6a5cfc7e91a4964528824a15e0aa11f13198791161db76cac88501839"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 266098,
+          "sha256": "803645ab54a5986da5c364fb05826e82591c78d1543bd91a3a38639a585c2cee"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 66410,
+          "sha256": "6b9383d1d9d480285c7df5ec0f482f2525233f564331e7ce8afd482a171e0d9a"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "79dedfc31f731790020766a16188b42f24a0b33910ed6af9c386817e172db7f0"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 14189820,
+          "sha256": "93aeb65b4a6117922675197c8faeccfbe5730b93b8ab62c2e41d3ce9abc8e5e1"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 22774108,
+          "sha256": "33e14cfcea0ea8a1c0ea6e22d0285779e365cfd54138c88312361ed9047bc2b9"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2017-10",
+      "season": "2017/18",
+      "zip": {
+        "local": "October-2017-Database.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 6885431,
+          "sha256": "a7c3f955a60ca08953f5e877e7ba692d90ae0b4e8c55ada72e84cb9d8f0598cb"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46331,
+          "sha256": "7514b81e6844c58fd1cb2ad8cee137b33b80beaeaefb1f91742fe2f3bcf8975d"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 1510740,
+          "sha256": "02374fa991e9d6dc1ce4fc4c7a711bc1b290deeff384758732a77e3f67c45206"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "5948f35fafcae26d85ca9b5d6df53140bd2648018a9b1f6b9aecc71f5335a694"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 3121440,
+          "sha256": "24dd321bc71a1d9d4576347fa3adfef82de87d36c69447a42e433a33a850d1d7"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "278069318124373bc023caa4ecd0c8c2de43df2fe775f15510855655a4508251"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 266098,
+          "sha256": "c4f73579c62e9a9babd29d95c777235f9caf4d76cb1aeba751f316ed06c8a9a6"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 66410,
+          "sha256": "754d98b3082b091a110f298a2baa4eb14165a249a0c53bfd92d351ecedaf2044"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "79dedfc31f731790020766a16188b42f24a0b33910ed6af9c386817e172db7f0"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 8352900,
+          "sha256": "5dad831c491c6e6958044518142f55a148c5731857f6cb65dbcfc896d829e35d"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 31545338,
+          "sha256": "53219eeac3f3a6a1277ebf1e3ab4bdcc506de36e725fbbe7e77bf847b6fa4cc3"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2018-10",
+      "season": "2018/19",
+      "zip": {
+        "local": "October-2018-Database.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 6776784,
+          "sha256": "b6d4d53163092478e3faddad3fc137eefa491a87b534bf6c5e702aaa0aab3b29"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46331,
+          "sha256": "a58eb99bc00713acd310dd5073668f372af0fb5984a291409e9a5cbabdcbb564"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 543180,
+          "sha256": "95c0f5d64d7ccf3c2fdef7d20981de8c3a00d9d5a44bde1e53a4534af5a44593"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "5948f35fafcae26d85ca9b5d6df53140bd2648018a9b1f6b9aecc71f5335a694"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 3408660,
+          "sha256": "0c10b11636c64cc622bf0b8fea53503873aeeeb33a5efb0c205b25944f4c73b5"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "f48e37a62648c709d6cd8cf311554b5624bfd212b0178c4945cd09c261c6de13"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 266098,
+          "sha256": "16d18b1cbf23cfbc4571c2fe9ac0fd05cdd93d03c7c4e63bf35c81091bbe3631"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 66410,
+          "sha256": "0b3c2e1fa79eaec04b7ca4364b29ffe6dbb9afb7d002fe64628cc47e91c4f4e5"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "79dedfc31f731790020766a16188b42f24a0b33910ed6af9c386817e172db7f0"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 6996960,
+          "sha256": "34ccf821c3c463e7e8b3a2c34e896d2f5edec476154e4d1acc94f40777ee7257"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 35282448,
+          "sha256": "82594d1cba9af92a3f9b5f1bc2e6193f3a877517a3a36736b06cfeec66d48152"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2019-10",
+      "season": "2019/20",
+      "zip": {
+        "local": "October-2019-Database.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 6475826,
+          "sha256": "dc5d732d5651484a751808e450da9b8fbc21f7ae88d0b493615dacfb4d859582"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46331,
+          "sha256": "6af86791c545ed44ab974aff6778d74bb721be237a522ecf33081bdf3ff1adf3"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 593400,
+          "sha256": "12c5eca09037a73b8b51dab3f5b9b48fb2daefaaf1e5076ff13823851f579bed"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "c0079d3e7ab71908f99e76bc68df373e0acb4249d5367abbe8807c376a92301a"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 3782040,
+          "sha256": "9857a637b615ea7bb2c7c2dd0487cebae305937d70de4c04508743887431619e"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "f4a08b1b92083126e00a07af3e641377cf6118f55598695b17b5c7c491487884"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 268422,
+          "sha256": "a88b5e7ea2b6e50234e68087d0e6d8ee340eb8223ab0660d5cc9abb4a1055cf7"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 66990,
+          "sha256": "2d0f3486c9f6c0ca3daff210f2bdb04be57a4641c353059b2382accd4640cb1f"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "79dedfc31f731790020766a16188b42f24a0b33910ed6af9c386817e172db7f0"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 7751040,
+          "sha256": "3946634c4778559a3a24e5c358d7f0211d3f09ce1ebf14a733aaa46108ae750a"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 33803000,
+          "sha256": "71cc833f73889f11f61cae2f0f59ea04bda9accd35c09318354f274540d59e6d"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2020-11",
+      "season": "2020/21",
+      "zip": {
+        "local": "November-2020-Data-Update.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 6664070,
+          "sha256": "6dffe15d59cff8c2362b23d698a39c2afb120769536281329ba054c796b5c3b6"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46438,
+          "sha256": "df4569e328f06c3c7c02b8b5491c599ee6fbf0abe9fc13061c8322b7e83bff5d"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 807960,
+          "sha256": "fd00c3f587d1692551219509d8f363b7817e41525207e529f4c16530e16a5987"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "c0079d3e7ab71908f99e76bc68df373e0acb4249d5367abbe8807c376a92301a"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 3404880,
+          "sha256": "3d6590c01230f31096abf697c1f70aacaefb5d04abf9fe021f59a154e0ac9cc6"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "ed630f83ccabc61d58d20745665b00e774fd721ce50ca423200403bfc6bd81fb"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 268422,
+          "sha256": "6a1135a39da753075b71a02c0f0b2901260197a8931aaed69067ff9c86a8e01d"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 66990,
+          "sha256": "f6e342689d0772fa00daf586fbfe8cf1f4b258b1ee7d54ca055017472a83a106"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "5f10e751929018e91b37c9209623ec25738a3c7f67e890e97a5eb12ea1eb1a67"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 6623040,
+          "sha256": "1b8e163a2e6172ce14367c95b3aa236a1bf1b9351ee5a7ee74cc3c0e92f3167c"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 36019444,
+          "sha256": "a09402e74d1f72f51b9d48a92d782d0d80ab02adfe138ac3fcf23f03c62bee8e"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2021-10",
+      "season": "2021/22",
+      "zip": {
+        "local": "October-2021-Data-Update.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 5896569,
+          "sha256": "9fd0faecbed60c815fdae7e44134ce3802ea3dccd7e1d57c2b30939538fb73a4"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46438,
+          "sha256": "9f0c17d43e69936db7cba41b869fed376266715f59b62f37637546bfb31440e5"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 753900,
+          "sha256": "ab25e8ca94bdd8f0f660ba76ad67c616d5fb6262ccc6941b7b7183b3a7bd7e81"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "c0079d3e7ab71908f99e76bc68df373e0acb4249d5367abbe8807c376a92301a"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 4004460,
+          "sha256": "3cee911b0d3bbb52e2914054232bb0b436e7f8f958cc2c5b6e121fd775002327"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "6aff1cd77230fa24c8e92df06c4ddc53238b1871cbbe16e7472e197240de6381"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 268422,
+          "sha256": "686a348fd1528525594393097c72b6dcd10d4872b1b4c53d282d1d6c43666016"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 66990,
+          "sha256": "3f8737b88dd7b91c6b618b819972f17d3ccbfe43ae02d7ac4cfd40d80feb46ab"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "5f10e751929018e91b37c9209623ec25738a3c7f67e890e97a5eb12ea1eb1a67"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 7876680,
+          "sha256": "5b29b79f6ac8243b98ea5a177a71cf1e53b4c317c78729e7ad2e91cb2b5c0a75"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 32367470,
+          "sha256": "ed0de7372bf4d068ce9e74b60e5ae38fc58ac896c0160650dd3f17c9bbd7e2d0"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2022-10",
+      "season": "2022/23",
+      "zip": {
+        "local": "October-2022-Data-Update.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 6152790,
+          "sha256": "ec35ff14e517912517159bb2fa3cb5353a16b04dfce03f650232297ac750cfaf"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46438,
+          "sha256": "c855603b40485a33792f8b6113c047ea99e337414b478c8e1fa3b4e7fdfeec1a"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 807000,
+          "sha256": "37ae1443e6293d845ab0aa3fb0f206ab6a27ff4787b1902d68b1c7cf2ffde16b"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "c0079d3e7ab71908f99e76bc68df373e0acb4249d5367abbe8807c376a92301a"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 4708740,
+          "sha256": "82897382a4c283e5c2deaa457744ff42a7bc371b5e8c1b74e937873c57bcb19d"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "3490e14ecfb7ae69011787506f53b0788ee7a3f621d1204a2c2d57bf3f719089"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 268422,
+          "sha256": "7061242e786272d512e5d554199e72445daadc6bbe817e56cc23eaa27a0c9a2f"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 66990,
+          "sha256": "1994bcb867880274dfc700d6a1b22c2d2f6ca13f5912d7206e1251482b04dee9"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "5f10e751929018e91b37c9209623ec25738a3c7f67e890e97a5eb12ea1eb1a67"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 9464520,
+          "sha256": "cc1df97e82e9aba532bcadeb86c3ac4afebb7fb0b5c53c0c9798b1552bf9714e"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 35224100,
+          "sha256": "4fa6a5067942d591b29ab433668cb01684674557a8c5ccee858c3bb55b4d2ac2"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2023-10",
+      "season": "2023/24",
+      "zip": {
+        "local": "October-2023-Data-Update.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 6351492,
+          "sha256": "6d5d019e63a147278094eff505c28211df8cae2966a00eaa3bf32e17a18749ad"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46438,
+          "sha256": "09ff9fc24471a2468e5fc61099d4cca69210861401b8da6500f1c8e3b25b2895"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 574320,
+          "sha256": "666f91f1cb89f87ac8a503aca6f302dc3ffcdda9c010b27c4276c7cca44e6810"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "c0079d3e7ab71908f99e76bc68df373e0acb4249d5367abbe8807c376a92301a"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 3869100,
+          "sha256": "2403b04cdba3342c3356efdcbd6783dd2f11e17c7c33f3e950b048372a0065b6"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "1f7a954ddbdacb582a08f1582da6eb74d3eee127197eca4176c79e981ed2cf54"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 268422,
+          "sha256": "1397e26c04b096fc2570d02623db2e792ef31cf3fba6e28099edad82e2840d66"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 66990,
+          "sha256": "6866221bf7dbfe96746a6351731967fdb19b3207bdac6011aa9963dd8666c5ba"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "5f10e751929018e91b37c9209623ec25738a3c7f67e890e97a5eb12ea1eb1a67"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 7569120,
+          "sha256": "cb10a66b595037ed556e51f905f3e8e21aab2f3d0a95ba1de3ffb25e07152fee"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 30361652,
+          "sha256": "78f13613264cdb52461548d2e42a817b97e8dacdda851e420cca03cb403c3cd4"
+        }
+      ]
+    },
+    {
+      "id": "cm0102-2024-10",
+      "season": "2024/25",
+      "zip": {
+        "local": "October-2024-Data-Update.zip"
+      },
+      "files": [
+        {
+          "name": "club.dat",
+          "bytes": 6450843,
+          "sha256": "3feb60d3e255851a7ce3027dc53ca6cdc95ba91f9534c3c25fa890b2e2a3a35b"
+        },
+        {
+          "name": "club_comp.dat",
+          "bytes": 46438,
+          "sha256": "09ff9fc24471a2468e5fc61099d4cca69210861401b8da6500f1c8e3b25b2895"
+        },
+        {
+          "name": "common_names.dat",
+          "bytes": 503160,
+          "sha256": "868d280c063c98d8e5336f312ab07baf5c5de94ae681d552aa4393b097d42171"
+        },
+        {
+          "name": "continent.dat",
+          "bytes": 1188,
+          "sha256": "c0079d3e7ab71908f99e76bc68df373e0acb4249d5367abbe8807c376a92301a"
+        },
+        {
+          "name": "first_names.dat",
+          "bytes": 3326880,
+          "sha256": "e606f762eaca42e35e53b9e1a817a7eb5022834f1a46a48986d47b9666c24077"
+        },
+        {
+          "name": "index.dat",
+          "bytes": 1482,
+          "sha256": "64506ba7ae6da5e57d45d7c54be9506977fe5a537a95c2341c474a425604cee5"
+        },
+        {
+          "name": "nat_club.dat",
+          "bytes": 268422,
+          "sha256": "0fde25db8e390db8bc3ef0645630adb548d295802483a5e870c6640bcd5313c0"
+        },
+        {
+          "name": "nation.dat",
+          "bytes": 66990,
+          "sha256": "97e23163ddd58d7b69f12f8b21cbac05f5669881fc4d8af3c3b0166bf18a5d64"
+        },
+        {
+          "name": "nation_comp.dat",
+          "bytes": 2033,
+          "sha256": "5f10e751929018e91b37c9209623ec25738a3c7f67e890e97a5eb12ea1eb1a67"
+        },
+        {
+          "name": "second_names.dat",
+          "bytes": 6558300,
+          "sha256": "dbe61bf94645ef904da502d1bdb20539692010b652eeeeb010d15be316cf657b"
+        },
+        {
+          "name": "staff.dat",
+          "bytes": 34047024,
+          "sha256": "434537fdaaab0cd4a2d9ae0c9087a1d04b9ff6e47e6cffad1c21d8f3edf262af"
+        }
+      ]
+    },
+    {
       "id": "cm0102-2025-12",
       "season": "2025/26",
       "zip": {

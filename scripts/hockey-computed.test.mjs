@@ -703,7 +703,10 @@ test('a 1967/68 clubs campaign plays the twelve clubs on the map of 1967/68 and 
   await withApp(async ({ app, time, items }) => {
     app.pickSetup('sport', 'hockey');
     app.pickSetup('dataSet', 'nhl-1968');
-    assert.equal(app.state.setup.layer, 'clubs', 'a clubs-only season takes the clubs');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', null], 'a clubs-only season is no choice for nations');
+    app.pickSetup('layer', 'clubs');
+    app.pickSetup('dataSet', 'nhl-1968');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['clubs', 'nhl-1968']);
     assert.equal(app.state.setup.clubScope, 'domestic:nhl1968');
     time.advance(200);
     await Promise.all([app.loadCountry('nhl1968'), app.loadSet('nhl-1968')]);
@@ -793,9 +796,15 @@ test('a 2007/08 nations campaign plays NHL 08\'s converted players, saves and re
 test('a 1960/61 clubs campaign plays the Original Six on the map of 1966/67, saves and resumes; it offers no nations', async () => {
   await withApp(async ({ app, time, items }) => {
     app.pickSetup('sport', 'hockey');
+    app.pickSetup('layer', 'clubs');
     app.pickSetup('dataSet', 'nhl-1961');
-    assert.equal(app.state.setup.layer, 'clubs', 'a clubs-only season takes the clubs');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['clubs', 'nhl-1961']);
     assert.equal(app.state.setup.clubScope, 'domestic:nhl1967', 'the six clubs in the arenas they played in to 1966/67');
+    // Nations take the nearest season with nations, 1977/78; Clubs straight back take 1960/61 again.
+    app.pickSetup('layer', 'nations');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', 'nhl-1978']);
+    app.pickSetup('layer', 'clubs');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet, app.state.setup.clubScope], ['clubs', 'nhl-1961', 'domestic:nhl1967']);
     time.advance(200);
     await Promise.all([app.loadCountry('nhl1967'), app.loadSet('nhl-1961')]);
     await settle();

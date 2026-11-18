@@ -422,9 +422,13 @@ manager of the theatre's favourite, with decisions from the first match.
    Legends its 2026 (the Elo of gol.gg's results to November).
    The Season list names a season by its years, adding "· computed", "· converted"
    or "· fan-made" where its label calls its ratings so ("1969/70 · computed"); a
-   year with two seasons (football's 1993/94 and 1989/90, the NFL's and AFL's of
+   year with two seasons in the list (football's 1993/94 and 1989/90, the NFL's and AFL's of
    the 1960s, rugby league's ARL and Super League of 1997) names each by its whole
-   label instead. Only ice hockey's seasons
+   label instead. The list holds only the seasons that field the Teams chosen (with
+   Clubs, no season of nations only; with Nations, no NBA, NRL or early NHL season),
+   so choosing a season never changes Teams. Choosing Nations or Clubs keeps the
+   season if it fields them, else takes the nearest season that does, and choosing
+   back straight away gives the season back. Only ice hockey's seasons
    carry a credit, the Hockey Databank's and MoneyPuck.com's as their sources ask,
    shown whole as small text under the Season choice. A one-line quick-resume
    strip (**Resume**, the save, ✕) appears when a save exists, and a page opened
@@ -1425,10 +1429,11 @@ source rates, ten or more of them: England's of 2010/11 holds FIFA 11's 89 Engli
 league clubs, its 2003/04 map CM 01/02's top 100 English clubs down to the
 Conference, and Scotland, Wales and Northern Ireland get maps wherever a season rates
 ten of their clubs. In an EA season, the countries EA does not rate come from the CM 01/02
-Update Team's database of that season, credited to them: so far 2025/26's, from their
-December 2025 database (71 more countries, Brazil, Greece, Croatia, Egypt and Iran among
-them); the other seasons' databases come from the champman0102.co.uk forum, behind its
-login (`node scripts/sync-cm0102-updates.mjs --zip=<downloaded release>`). With **Clubs** and an earlier season chosen, **One country · top
+Update Team's database of that season, credited to them, from 2007/08 on: 28 to 71 more
+countries a season (826 maps), Greece, Croatia, Serbia, Egypt and Iran among them, and Brazil
+and Russia in the seasons EA lacks them. Their databases come from the champman0102.co.uk
+forum, behind its login (`node scripts/sync-cm0102-updates.mjs --zip=<downloaded release>`),
+and December 2025's from archive.org (`node scripts/sync-cm0102-updates.mjs`). With **Clubs** and an earlier season chosen, **One country · top
 clubs** lists that season's countries; a country chosen before stays chosen, on that
 season's map of it, and a season with none plays its Europe maps. The clubs are the
 season's own (EA's editions from 2006/07, Championship Manager's databases and SWOS's
@@ -1506,14 +1511,21 @@ own country.
 - **A country's only club holds all of it**, on the outline the world map gives it:
   Bodø/Glimt holds Norway, Dinamo Zagreb Croatia, and in the Elite 32 Paris
   Saint-Germain holds France.
-- **Clubs that share a country split it along its regional borders.** A region with
-  one club goes whole to it, and one with two or more is split one level down,
-  between them only (Bavaria's clubs share Bavaria along its districts). A region
-  with no club goes to whichever neighbour reaches it, whole unless it is larger
-  than a club's share. A city-state is too small for its clubs and shares its largest
-  neighbour's land too (Berlin and Brandenburg, Madrid and Castile). Where clubs
-  are crowded into one city, it is cut into wedges so each has a way out, and a
-  club boxed in by the others may start next door: Beşiktaş plays out of Anatolia.
+- **Clubs that share a country split it along its administrative borders, level by
+  level, down to the communes.** A region with one club goes whole to it, and one with
+  two or more is split one level down, between them only, and so on: Bavaria's clubs
+  share Bavaria along its districts, Lisbon's split the city along its parishes, Paris's
+  along its arrondissements, Prague's along its cadastral areas. Every European
+  country has its levels (`scripts/lib/admin-levels.mjs`), England its counties,
+  councils and districts. A region with no club goes to whichever neighbour reaches it,
+  whole unless it is large for a club's share or borders a crowded region, whose clubs
+  then share it a level down (Moscow Oblast around Moscow's clubs). A city-state is too
+  small for its clubs and shares its largest neighbour's land too (Berlin and
+  Brandenburg, Madrid and Castile). Only a commune two clubs share is ever cut (Milan's
+  San Siro). Where clubs are crowded into one city, its communes are dealt out around it
+  so each has a way out, and a club boxed in by the others may start next door:
+  Beşiktaş plays out of Anatolia. A stray piece of a club's land under 400 km² that
+  lies inside another's goes to that club.
 - **A country with no club stays grey**: it is not on the map, only drawn beneath it
   as any country map's neighbours are. It is never territory, and attacks go around
   it, by sea if need be. The Elite 32 has no Dutch club, so the Netherlands stays grey.
@@ -1933,9 +1945,10 @@ every season from 1999/00 to 2025/26, each from that season's NBA 2K (NBA 2K to
 NBA 2K26), three before them from other games (below: 1998/99 from NBA Live 99,
 1991/92 and 1983/84 from NBA 2K27's MyNBA Eras), and the 36 others back to
 1960/61, which no game rated, computed from Basketball-Reference's statistics
-(below). Pick
-one under **Season** in setup; it plays clubs only, so it switches Teams to
-clubs: the NBA's of that season and, from 2000/01, the EuroLeague's. Each season
+(below). Choose
+**Clubs** and pick one under **Season** in setup (with Nations it lists only the
+built-in season): it plays clubs only, the NBA's of that season and, from
+2000/01, the EuroLeague's. Each season
 is a file in `public/basketball/` (3 to 20 KB) that loads only when chosen, with
 the map of its era.
 

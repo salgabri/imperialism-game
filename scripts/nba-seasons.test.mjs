@@ -956,8 +956,9 @@ async function withApp(fn) {
   }
 }
 
-/** Choose a season and wait for it and its map, as the player waits on the setup screen. */
+/** Choose Clubs, then a season, and wait for it and its map, as the player waits on the setup screen. */
 async function chooseSeason(app, time, id) {
+  app.pickSetup('layer', 'clubs');
   app.pickSetup('dataSet', id);
   time.advance(200);
   await Promise.all([app.loadCountry(seasonMapOf(id)), app.loadSet(id)]);
@@ -968,8 +969,14 @@ async function chooseSeason(app, time, id) {
 const modelOf = app => buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), domestic: app.domesticStatus(), season: app.seasonStatus() });
 const strongest = doc => nbaClubs(doc).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name)).slice(0, 3).map(club => club.name);
 
-test('basketball\'s Season choice lists its own seasons; one takes the clubs onto its era\'s map, and Nations goes back', async () => {
+test('basketball\'s Season choice lists its own seasons on Clubs; one takes them onto its era\'s map, and Nations goes back', async () => {
   await withApp(async ({ app, time }) => {
+    // Nations: only the built-in season has them, and a season of clubs is no choice.
+    assert.equal(app.state.setup.layer, 'nations');
+    assert.deepEqual(modelOf(app).season.options.map(option => option.name), ['2026/27']);
+    app.pickSetup('dataSet', 'nba-2k08');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', null]);
+    app.pickSetup('layer', 'clubs');
     const model = modelOf(app);
     assert.deepEqual(model.season.options.map(option => option.label),
       ['2026/27 · built in', ...BUILT_IN_BASKETBALL_SEASONS.map(set => `${set.season} · ${set.label}`)]);
@@ -992,6 +999,8 @@ test('basketball\'s Season choice lists its own seasons; one takes the clubs ont
 
     app.pickSetup('layer', 'nations');
     assert.deepEqual([app.state.setup.dataSet, app.state.setup.clubScope], [null, 'domestic:nba'], 'Nations plays the built-in season');
+    app.pickSetup('layer', 'clubs');
+    assert.deepEqual([app.state.setup.dataSet, app.state.setup.clubScope], ['nba-2k08', 'domestic:nba2008'], 'Clubs straight back take 2007/08 again');
     app.pickSetup('dataSet', 'nba-2k15');
     assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:nba'], 'today\'s franchises play on today\'s map');
     app.pickSetup('sport', 'football');

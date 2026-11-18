@@ -8,7 +8,7 @@ import { CLUB_SCOPES, TOP_CLUBS, nationTheatre, nationTheatres, strongestClubs a
 import { nationPriority } from '../../data/domesticTiers.js';
 import { clubMapOf, countryMapsOf, countryOfEntry, domesticEntry, domesticLabel, isDomesticScope, isTheatreMap, theatreMapsOf } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport, matchSport } from '../../sports/index.js';
-import { builtInSeasonOf, fieldedNations, setHasClubs, setHasNations, setSportOf } from '../../engine/footballSets.js';
+import { builtInSeasonOf, fieldedNations, setHasLayer, setHasNations, setSportOf } from '../../engine/footballSets.js';
 import { V4, ratingTierOf } from '../../theme.js';
 import { politicalFill } from '../../data/empireColours.js';
 
@@ -368,8 +368,8 @@ export const SEASON_NOTES = Object.freeze({
   football: 'Earlier seasons use EA FIFA ratings of that season, before 2004/05 SI\'s Championship Manager ratings (2003/04: '
     + 'Alex Sawczuk\'s fan update of them; 1994/95 to 1996/97: Sensible World of Soccer\'s; 1993/94 and 1989/90: fans\' ratings, '
     + 'Cam F\'s and Simon Treanor\'s), with Europe\'s 124 strongest clubs, and a map of '
-    + 'each country whose clubs that season\'s source rates, ten or more, holding its top clubs of that season (2025/26\'s '
-    + 'countries EA does not rate: the CM 01/02 Update Team\'s ratings). A nation with fewer than six rated players '
+    + 'each country whose clubs that season\'s source rates, ten or more, holding its top clubs of that season (from 2007/08, '
+    + 'the countries EA does not rate: the CM 01/02 Update Team\'s ratings of that season). A nation with fewer than six rated players '
     + 'fields no team, and one without eleven starts short-handed, except in EA\'s seasons, where the places EA leaves empty go '
     + 'to players capped for it that season on Wikidata, as far as it names them, rated from its World Football Elo and '
     + 'marked as estimates. 2005/06, 2004/05 and 1989/90 have nations only. '
@@ -460,7 +460,7 @@ export const seasonTagOf = label => SEASON_TAGS.find(([, words]) => words.test(S
 
 /**
  * The Season choice (docs/design/football-years.md): the sport's built-in season, then each of its listed data sets
- * newest first, as `{ id, key, season, source, label, name, credit, checked }`. `credit` is the plain text the set's
+ * (`sets`: those fielding the teams chosen) newest first, as `{ id, key, season, source, label, name, credit, checked }`. `credit` is the plain text the set's
  * listing asks to be shown with it ('' for none). `sport` names a chosen set the listing no longer has.
  */
 function seasonOptions(sets, dataSet, sport) {
@@ -520,8 +520,9 @@ const countryPreviewCache = new WeakMap();
  * Step 1's static country card (the v4 form of the setup preview): a decoded country map's sections, each in the
  * pastel its starting club takes at kick-off (`politicalFill(club.id)`, DEC D18), over the neighbouring land
  * (`backdrop`: [{ id, d }], App's `surroundings(map).shapes`). Framed on the map's opening focus, else on all sections,
- * in the fitted 960×540 frame. Pure; memoised per decoded map, fitted paths and backdrop.
- * → { viewBox, sections: [{ id, d, fill }], backdrop: [{ id, d }] } | null
+ * in the fitted 960×540 frame. A section's `owner` is the club starting on it (null for none): a click on it previews
+ * that club. Pure; memoised per decoded map, fitted paths and backdrop.
+ * → { viewBox, sections: [{ id, d, fill, owner }], backdrop: [{ id, d }] } | null
  */
 export function countryMapPreview(domestic, backdrop = null) {
   const paths = domestic?.geo?.paths;
@@ -532,7 +533,8 @@ export function countryMapPreview(domestic, backdrop = null) {
   const starter = domestic.startOwners || Object.fromEntries((domestic.clubs || []).map(club => [club.homeSection, club.id]));
   const ids = Object.keys(domestic.sectionNames).filter(id => paths[id]?.d);
   if (!ids.length) return null;
-  const sections = ids.map(id => Object.freeze({ id, d: paths[id].d, fill: starter[id] ? politicalFill(starter[id]) : V4.landNeutral }));
+  const sections = ids.map(id => Object.freeze({ id, d: paths[id].d, fill: starter[id] ? politicalFill(starter[id]) : V4.landNeutral,
+    owner: starter[id] ?? null }));
   let box = domestic.focus && typeof domestic.geo.focusView === 'function' ? domestic.geo.focusView(domestic.focus) : null;
   if (!(box && box.w > 0 && box.h > 0)) {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -556,10 +558,10 @@ const theatrePreviewCache = new WeakMap();
  * Step 1's world card, the country card's counterpart for every world theatre: the opening board, each held
  * territory in its team's kick-off pastel (`politicalFill(teamId)`, DEC D18) over the land nobody holds. `countries` is the
  * chart's draw order ([{ id }]); a shape comes from `paths` (the display atlas, as WorldMap draws it), else `basePaths`
- * (the topology), both fitted. `own` is territory → team at kick-off (overseas territory included). The card frames
- * `focus` (a fitted { x, y, w, h }) when given, else the main polygons of `frameIds`, the teams' starting land.
- * Pure; memoised per opening board, paths and focus.
- * → { viewBox, teams, sections: [{ id, d, fill }], backdrop: [{ id, d }] } | null
+ * (the topology), both fitted. `own` is territory → team at kick-off (overseas territory included): a section's `owner`,
+ * the team a click on it previews. The card frames `focus` (a fitted { x, y, w, h }) when given, else the main polygons
+ * of `frameIds`, the teams' starting land. Pure; memoised per opening board, paths and focus.
+ * → { viewBox, teams, sections: [{ id, d, fill, owner }], backdrop: [{ id, d }] } | null
  */
 export function theatreMapPreview({ countries, paths = null, basePaths, own, frameIds = [], focus = null } = {}) {
   if (!Array.isArray(countries) || !basePaths || !own) return null;
@@ -572,7 +574,7 @@ export function theatreMapPreview({ countries, paths = null, basePaths, own, fra
   for (const { id } of countries) {
     const d = pathOf(id)?.d;
     if (!d) continue;
-    if (own[id]) sections.push(Object.freeze({ id, d, fill: politicalFill(own[id]) }));
+    if (own[id]) sections.push(Object.freeze({ id, d, fill: politicalFill(own[id]), owner: own[id] }));
     else backdrop.push(Object.freeze({ id, d }));
   }
   if (!sections.length) return null;
@@ -741,15 +743,15 @@ export function suggestedTeamId(managerTeams = []) {
  * `ctx.launching` is true while App prepares a country campaign after Launch. `ctx.season` is App's `seasonStatus()`:
  * the listed data sets and the chosen one's load state ({ sets, state, message, sport }), `sport` once it has loaded.
  * A manager with no team picked has the suggested one (suggestedTeamId) unless `ctx.suggest` is false ("Another team"
- * after a defeat waits for a pick).
+ * after a defeat waits for a pick). `ctx.peek` is a team id clicked on step 1's map: `peek` is its card, or null.
  */
 export function buildSetupModel(setup = {}, ctx = {}) {
   const managerTeams = Array.isArray(ctx.managerTeams) ? ctx.managerTeams : [];
   const sportId = getSport(setup.sport).id;
   // A chosen data set plays with its own nations and clubs once it has loaded; a basketball season with clubs only, and
   // FIFA 05 and FIFA 06 with nations only.
-  const dataSet = setup.dataSet != null && setSportOf(setup.dataSet) === sportId && (setHasNations(setup.dataSet) || setup.layer === 'clubs')
-    && (setHasClubs(setup.dataSet) || setup.layer !== 'clubs') ? setup.dataSet : null;
+  const dataSet = setup.dataSet != null && setSportOf(setup.dataSet) === sportId
+    && setHasLayer(setup.dataSet, setup.layer === 'clubs' ? 'clubs' : 'nations') ? setup.dataSet : null;
   const seasonCtx = ctx.season || {};
   const sport = dataSet != null && seasonCtx.sport?.dataSet === dataSet ? seasonCtx.sport : getSport(setup.sport);
   // Until then no figure from the built-in season stands in for the set's.
@@ -775,7 +777,9 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const preview = pending ? PENDING_PREVIEW : campaignPreview(count, sport, setup);
   const rules = rulesOf(setup);
   const showMatches = showMatchesOf(setup);
-  const seasonSets = Array.isArray(seasonCtx.sets) ? seasonCtx.sets.filter(set => setSportOf(set.id) === sportId) : NO_ROWS;
+  // The Season choice lists only the seasons that field the teams chosen: on Clubs, no FIFA 05; on Nations, no NBA season.
+  const seasonSets = Array.isArray(seasonCtx.sets)
+    ? seasonCtx.sets.filter(set => setSportOf(set.id) === sportId && setHasLayer(set.id, clubLayer ? 'clubs' : 'nations')) : NO_ROWS;
   const seasonRows = seasonOptions(seasonSets, dataSet, sport);
   const chosenSeason = seasonRows.find(row => row.checked && row.id != null) || null;
   // Summaries use the label: the "*" footnote is only drawn under the theatre list in step 1.
@@ -815,21 +819,27 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   // No pick yet: the suggested team stands in (checked, described and launched) until the player picks another.
   const suggestion = role === 'manager' && !chosenTeam && ctx.suggest !== false && ranked.length ? ranked[0] : null;
   const picked = chosenTeam || suggestion;
-  let managed = null;
-  if (role === 'manager' && picked) {
-    const identity = teamIdentity(sport, picked.id, clubLayer);
-    const rank = rankOf.get(picked.id);
-    managed = {
-      ...row(picked),
-      meta: picked.meta || [identity.group || country?.name, `${sport.name} ${noun}`].filter(Boolean).join(' · '),
-      rankText: `${rank} / ${field}`, tier: tierOf(rank, field), suggested: !!suggestion,
-      players: bestPlayers(sport, picked, clubLayer, setup).map(player => ({
+  // A team's card: who it is, its rank and tier in the field, and its best players. Step 3's selected team adds its
+  // fronts; step 1's map preview (a click on the team's land) shows the card alone.
+  const card = team => {
+    const identity = teamIdentity(sport, team.id, clubLayer);
+    const rank = rankOf.get(team.id);
+    return {
+      ...row(team),
+      meta: team.meta || [identity.group || country?.name, `${sport.name} ${noun}`].filter(Boolean).join(' · '),
+      rankText: `${rank} / ${field}`, tier: tierOf(rank, field),
+      players: bestPlayers(sport, team, clubLayer, setup).map(player => ({
         ...player, ratingText: String(Math.round(player.rating)), tier: ratingTierOf(player.rating),
       })),
-      // The American leagues' maps have empty land between clubs; a map of Europe (football's, the EuroLeague's) has none.
-      fronts: frontsOf(picked, managerTeams, row, Boolean(country?.league && !country.theatre && !country.countries)),
     };
-  }
+  };
+  const managed = role === 'manager' && picked ? {
+    ...card(picked), suggested: !!suggestion,
+    // The American leagues' maps have empty land between clubs; a map of Europe (football's, the EuroLeague's) has none.
+    fronts: frontsOf(picked, managerTeams, row, Boolean(country?.league && !country.theatre && !country.countries)),
+  } : null;
+  // `ctx.peek`: the team whose land was clicked on step 1's map. A team the field no longer holds previews nothing.
+  const peekTeam = ctx.peek != null ? managerTeams.find(team => team.id === ctx.peek) : null;
   const favourites = ranked.slice(0, 5).map(row);
   const teamChosen = role !== 'manager' || !!picked;
   // A country campaign also waits for its map (and never launches twice while App prepares it), a data set for its file.
@@ -902,6 +912,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     homeAdvantage: valid(HOME_OPTIONS, setup.homeAdvantage, 'off'),
     moreRules: moreRulesSummary(setup),
     role, teams, field, managed, managedId: role === 'manager' ? picked?.id ?? null : null, favourites, canLaunch,
+    peek: peekTeam ? card(peekTeam) : null,
     // Spectators pick no team, so their step-3 heading names what they do choose.
     roleTitle: role === 'manager' ? `Choose your ${noun}` : 'Choose your role',
     stepSummaries: {

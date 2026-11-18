@@ -193,8 +193,12 @@ test('the women\'s Season choice lists its seasons; one of national teams keeps 
     app.pickSetup('sport', 'womens-football');
     const model = modelOf(app);
     assert.deepEqual(model.season.options.map(option => option.label),
-      ['2026/27 · built in', ...BUILT_IN_WOMENS_SEASONS.map(set => `${set.season} · ${set.label}`)]);
+      ['2026/27 · built in', ...BUILT_IN_WOMENS_SEASONS.map(set => `${set.season} · ${set.label}`)], 'every season has nations');
     assert.match(model.season.note, /national teams only until 2021\/22/);
+    app.pickSetup('layer', 'clubs');
+    assert.deepEqual(modelOf(app).season.options.map(option => option.name), ['2026/27', '2025/26', '2024/25', '2023/24', '2022/23'],
+      'Clubs list the seasons EA rated clubs in');
+    app.pickSetup('layer', 'nations');
 
     app.pickSetup('dataSet', 'eaw-fifa-19');
     assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', 'eaw-fifa-19']);
@@ -204,7 +208,10 @@ test('the women\'s Season choice lists its seasons; one of national teams keeps 
     assert.equal(app.seasonStatus().state, 'ready');
     assert.equal(modelOf(app).canLaunch, true);
     app.pickSetup('layer', 'clubs');
-    assert.equal(app.state.setup.dataSet, null, 'FIFA 19 rated no women\'s club: clubs go back to the built-in season');
+    assert.equal(app.state.setup.dataSet, 'eaw-fifa-23', 'FIFA 19 rated no women\'s club: clubs take the nearest season that did, FIFA 23');
+    app.pickSetup('layer', 'nations');
+    assert.equal(app.state.setup.dataSet, 'eaw-fifa-19', 'and Nations straight back take FIFA 19 again');
+    app.pickSetup('layer', 'clubs');
 
     app.pickSetup('dataSet', 'eaw-fc-24');
     assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['clubs', 'eaw-fc-24']);
