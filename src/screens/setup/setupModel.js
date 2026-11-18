@@ -408,7 +408,10 @@ export const SEASON_NOTES = Object.freeze({
     + 'EuroLeague\'s clubs of that season, on a map of Europe of theirs. No game rates EuroLeague players, so the '
     + 'EuroLeague\'s ratings are estimates from its box scores, each season\'s put on 2025/26\'s level, marked as such.',
   'college-football': 'EA SPORTS College Football 27 ratings, as of the week 10 update (15 November 2026): the 2026 '
-    + 'season\'s 138 FBS schools, each in its conference. One season only.',
+    + 'season\'s 138 FBS schools, each in its conference. No game rated 2009–2025: they are computed, each player\'s box '
+    + 'scores (from 2014 the tackles, sacks and passes defended the plays name), his 247Sports recruiting grade and his years in '
+    + 'college, ranked at his position onto College Football 27\'s ratings, each school then moved by its results that '
+    + 'season. Schools only: that season\'s FBS, each in its conference of the day, on the map of their day.',
   'american-football': 'Madden NFL ratings of each season at its launch (2026: Madden NFL 27, as of the week 7 update), '
     + 'from EA SPORTS and the fan archives that kept them; 1995–1992 and 1990 from Tecmo Super Bowl\'s attributes, the '
     + 'overall ours. 2000 back to 1996, 1991 and 1989 back to 1960 are computed from Pro Football Archives\' records of '

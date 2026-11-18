@@ -1,8 +1,10 @@
 # Computed ratings: rosters and ratings from real statistics
 
 How to build a season's rosters and ratings when nothing rates its players: no game, no fan database, no published list.
-The repo already computes seasons this way in every sport but college football, each sport with its own rule. This
-document turns what those rules learned, plus a new back-test, into one method for the next gap. Tuning it needs no game data. Written 2026-11-17 at the
+The repo already computes seasons this way in every sport, each sport with its own rule; college football's, the last
+(its FBS seasons 2009–2025, built 2026-11-18), follows this document's method from the start
+([college-football.md](college-football.md#earlier-seasons)). This document turns what those rules learned, plus a new
+back-test, into one method for the next gap. Tuning it needs no game data. Written 2026-11-17 at the
 user's request: "a good strategy for roster building and rating building when all else is missing … based on real data
 and real statistics".
 

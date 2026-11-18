@@ -47,7 +47,9 @@
 //   only a first possession's field goal leaves an answer; both chains are exact too. College football
 //   (src/sports/collegeFootball.js) plays the same chart under its own rules: its possessions, tries and edge scale, and
 //   college overtime, whose chain is exact too (one toss, the first possession alternating; possessions from the 25 in
-//   the first two periods, two-point plays from the third, a decisive two-point play after the last).
+//   the first two periods, two-point plays from the third, a decisive two-point play after the last). An earlier
+//   season's overtime is its day's: two-point tries from the third period and possessions in every one to 2018, and
+//   two-point plays from the fifth in 2019 and 2020 (the model's `twoFrom` and `playsFrom`).
 //
 // Baseball — the model's own distributions (src/sports/baseball.js): the clock counts outs (three a half-inning, 54 in
 //   nine innings), and each half-inning's runs follow the model's distribution for the batting side's edge
@@ -127,7 +129,7 @@
 import { getSport } from '../sports/index.js';
 import { FOOTBALL_MODEL } from '../sports/football.js';
 import { BASKETBALL_MODEL } from '../sports/basketball.js';
-import { collegeAnswer, collegeOvertimeOdds, DRIVE_MODEL, driveMoments, driveOdds, lateCall } from '../sports/americanFootball.js';
+import { collegeAnswer, collegeOvertimeOdds, collegeOvertimeOf, DRIVE_MODEL, driveMoments, driveOdds, lateCall } from '../sports/americanFootball.js';
 import { INNING_MODEL, inningOdds, runMasses } from '../sports/baseball.js';
 import { lateOf, overtimeMeans, PERIOD_MODEL, shootoutOdds, sliceMeans } from '../sports/hockey.js';
 import { deciderOdds, extraSlice, goldenRate, POINTS, RULES_TODAY as RUGBY_TODAY, SLICE_MODEL, sliceMeans as rugbySliceMeans } from '../sports/rugbyLeague.js';
@@ -183,7 +185,9 @@ export function footballRate(log) {
  *     A's chance from level with k overtimes left, td/fg a possession's chance of a touchdown / field goal, xp/two a
  *     touchdown's chance of its extra point / two points (0 in a season without the try); a model saved before tries
  *     has no xp/two; an earlier season's overtime periods are 15 minutes before 2017 and its `overtime` 'sudden' to
- *     2009 or 'modified' 2010–2021, today's both-possess rule having none)
+ *     2009 or 'modified' 2010–2021, today's both-possess rule having none; college football's `overtime` 'college', and
+ *     an earlier college season's `twoFrom` and `playsFrom`, the periods from which touchdowns go for two and two-point
+ *     plays begin, playsFrom null for none)
  * | { kind:'innings', edgeA, edgeD, formSd, length:54, ot:6, maxOt:6 } (baseball; the clock counts outs, edges are each
  *     side's batting minus the opposing defence, formSd the spread of match-day form in rating points; an earlier
  *     season's adds its half-inning odds between equals in logit, `score` and `extra`, and `more`, the ratio of a scoring
@@ -401,12 +405,14 @@ function modifiedPeriodChance(a, d, first) {
  * 25 (`td`, `fg`, `none`, its tries `xp` and `two`) and its answers `behind` points down (`answer`: collegeAnswer's
  * odds). A period's first possession is the toss loser's in the first period, then alternates, so from level at a
  * period's start the chain takes either side first, each half the time: exactly so at full time, where the toss decides.
+ * The overtime of the rules' day (collegeOvertimeOf): touchdowns go for two from period `twoFrom`, two-point plays from
+ * period `playsFrom` (null: never); today's 2 and 3.
  */
-function collegeChain(sideA, sideD, maxOt, decisive) {
+function collegeChain(sideA, sideD, maxOt, decisive, twoFrom = 2, playsFrom = 3) {
   const chance = (period, first) => {
     const [x, y] = first === 'A' ? [sideA, sideD] : [sideD, sideA];
     let xWins, yWins, open;
-    if (period >= 3) {
+    if (playsFrom !== null && period >= playsFrom) {
       xWins = x.two * (1 - y.two);
       yWins = (1 - x.two) * y.two;
       open = 1 - xWins - yWins;
@@ -416,9 +422,9 @@ function collegeChain(sideA, sideD, maxOt, decisive) {
       xWins = x.fg * fieldGoal.none;
       yWins = x.fg * fieldGoal.td + x.none * (level.td + level.fg);
       open = x.fg * fieldGoal.fg + x.none * level.none;
-      // Its touchdown: kicked in the first period (7, or 6 when missed), two-point in the second (8, or 6). The answer's
+      // Its touchdown: kicked (7, or 6 when missed), or two-point where the rules require it (8, or 6). The answer's
       // touchdown is kicked, or goes for two, to win against a 6 and to draw level against a 7 or an 8.
-      const conversion = period === 1 ? 'xp' : 'two';
+      const conversion = period >= twoFrom ? 'two' : 'xp';
       const made = x.td * x[conversion], missed = x.td * (1 - x[conversion]), answered = y[conversion];
       xWins += made * (1 - touchdown.td * answered) + missed * (1 - touchdown.td);
       yWins += missed * touchdown.td * answered;
@@ -484,11 +490,14 @@ function drivesModel(prepared, variation, length) {
  * The live model of a college football match (drivesModel under `rules.overtime` 'college'): regulation as American
  * football's, under the college rules' possessions, tries, safeties and edge scale; overtime by collegeChain, before
  * form, with `maxOvertimes` periods of `ot` minutes and the decisive two-point play's odds (logistic of the edge gap
- * times DECISIVE_SLOPE and the rules' scale).
+ * times DECISIVE_SLOPE and the rules' scale). An earlier season whose overtime is not today's carries its periods
+ * (`twoFrom`, `playsFrom`: collegeOvertimeOf; null `playsFrom` for none).
  */
 function collegeDrivesModel(prepared, variation, length) {
   const { DRIVE_SD, FORM_PER_DRAMA, DECISIVE_SLOPE } = DRIVE_MODEL;
   const { rules } = prepared;
+  const { twoFrom, playsFrom } = collegeOvertimeOf(rules);
+  const today = twoFrom === 2 && playsFrom === 3;
   const outcomes = odds => {
     const fg = (1 - odds.td) * odds.fgTry * odds.make;
     return { td: odds.td, fg, none: 1 - odds.td - fg, xp: odds.xp, two: odds.two };
@@ -505,9 +514,10 @@ function collegeDrivesModel(prepared, variation, length) {
   return {
     kind: 'drives', drives: num(prepared.drives), muA: a.mean, muD: d.mean, varA: a.variance, varD: d.variance, slope,
     formSd: variation * FORM_PER_DRAMA, driveSd: DRIVE_SD, length, ot: rules.ot, maxOt: rules.maxOvertimes,
-    otChain: collegeChain(sideA, sideD, rules.maxOvertimes, decisive),
+    otChain: collegeChain(sideA, sideD, rules.maxOvertimes, decisive, twoFrom, playsFrom),
     tdA: sideA.td, fgA: sideA.fg, xpA: sideA.xp, twoA: sideA.two, tdD: sideD.td, fgD: sideD.fg, xpD: sideD.xp, twoD: sideD.two,
     tdLateA: sideA.answer[6].td, tdLateD: sideD.answer[6].td, overtime: 'college',
+    ...(today ? {} : { twoFrom, playsFrom }),
   };
 }
 
@@ -529,13 +539,18 @@ export function isLiveModel(model) {
   }
   if (model.kind === 'drives') {
     const tries = ['xpA', 'twoA', 'xpD', 'twoD', 'tdLateA', 'tdLateD'].filter(key => model[key] !== undefined);
+    // An earlier college season's overtime periods come together (two from `twoFrom`, two-point plays from `playsFrom`,
+    // null for none); a model without them plays today's.
+    const era = ['twoFrom', 'playsFrom'].filter(key => model[key] !== undefined);
     return ['drives', 'muA', 'muD', 'varA', 'varD', 'slope', 'formSd', 'driveSd', 'length', 'ot', 'tdA', 'fgA', 'tdD', 'fgD', ...tries].every(finite)
       && ['tdA', 'fgA', 'tdD', 'fgD', ...tries].every(key => model[key] >= 0 && model[key] <= 1)
       && model.drives > 0 && model.muA >= 0 && model.muD >= 0 && model.varA >= 0 && model.varD >= 0 && model.formSd >= 0
       && model.driveSd >= 0 && model.length > 0 && model.ot > 0 && Number.isInteger(model.maxOt) && model.maxOt >= 0
       && Array.isArray(model.otChain) && model.otChain.length === model.maxOt + 1
       && model.otChain.every(p => typeof p === 'number' && p >= 0 && p <= 1)
-      && (model.overtime === undefined || OVERTIME_RULES.includes(model.overtime));
+      && (model.overtime === undefined || OVERTIME_RULES.includes(model.overtime))
+      && (era.length === 0 || (era.length === 2 && model.overtime === 'college' && Number.isInteger(model.twoFrom) && model.twoFrom >= 1
+        && (model.playsFrom === null || (Number.isInteger(model.playsFrom) && model.playsFrom > model.twoFrom))));
   }
   if (model.kind === 'innings') {
     // An earlier season's odds (`score`, `extra`, `more`) come together; a model without them plays today's.
@@ -767,10 +782,11 @@ function drivesAt(model, t, margin) {
 
 /**
  * A lead in college overtime's period `period` (0 the first), charted as the trailing side's one answer in it, which
- * levelled leaves the next period's chain (the decisive play after the last). In the first two periods: a touchdown wins
- * against up to 5 and, kicked (first period) or with two points (second), against 6; kicked, it levels 7, with two
- * points 8 (going for it a touchdown down, `tdLate`); a field goal wins against 1 or 2 and levels 3. From the third, a
- * two-point play levels 2.
+ * levelled leaves the next period's chain (the decisive play after the last). In a period of possessions: a touchdown
+ * wins against up to 5 and, kicked or with two points where the rules require them (today's from the second period),
+ * against 6; kicked, it levels 7, with two points 8 (going for it a touchdown down, `tdLate`); a field goal wins against
+ * 1 or 2 and levels 3. In a period of two-point plays (today's from the third; an earlier season's `playsFrom`, none to
+ * 2018), a two-point play levels 2.
  */
 function collegeLeadAt(model, period, margin) {
   const lead = Math.abs(margin);
@@ -778,8 +794,9 @@ function collegeLeadAt(model, period, margin) {
     : [model.tdA, model.fgA, model.xpA, model.twoA, model.tdLateA];
   const next = model.otChain[model.maxOt - period - 1];
   const levelled = margin > 0 ? 1 - next : next;
-  const conversion = period === 0 ? xp : two;
-  const trailer = period >= 2 ? (lead === 2 ? two * levelled : 0)
+  const { twoFrom = 2, playsFrom = 3 } = model;
+  const conversion = period + 1 >= twoFrom ? two : xp;
+  const trailer = playsFrom !== null && period + 1 >= playsFrom ? (lead === 2 ? two * levelled : 0)
     : lead > 8 ? 0 : lead === 8 ? tdLate * two * levelled : lead === 7 ? tdLate * xp * levelled
       : lead === 6 ? tdLate * (conversion + (1 - conversion) * levelled) : lead > 3 ? tdLate : lead === 3 ? td + fg * levelled : td + fg;
   return margin > 0 ? clamp01(1 - trailer) : clamp01(trailer);

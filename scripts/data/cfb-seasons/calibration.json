@@ -1,0 +1,246 @@
+{
+  "note": "How the frozen weights (scripts/sync-cfb-seasons.mjs VALUE_WEIGHTS) were fitted: each position's players of the 2025 season (full: with the tacklers, pass rushers and pass defenders the plays name, as from 2014; early: without them, as 2009–2013) matched by name to College Football 27's launch ratings (EA SPORTS' ratings site, iteration 1-base, retrieved 2026-11-18), their signals standardised over all the season's players at the position and regressed on the launch rating, signals with a negative weight dropped (fitWeights). spearman: the fitted value against the launch rating; heldOut: each half of the schools valued by weights fitted on the other half.",
+  "season": 2025,
+  "regimes": {
+    "full": {
+      "QB": {
+        "players": 369,
+        "weights": {
+          "passYdsPG": 0.253,
+          "anya": 0.16,
+          "rushYdsPG": 0.126,
+          "grade": 0.276,
+          "exp": 0.185
+        },
+        "spearman": 0.852,
+        "heldOut": 0.844
+      },
+      "RB": {
+        "players": 541,
+        "weights": {
+          "rushYdsPG": 0.516,
+          "ypc": 0.033,
+          "recYdsPG": 0.034,
+          "grade": 0.271,
+          "exp": 0.145
+        },
+        "spearman": 0.862,
+        "heldOut": 0.86
+      },
+      "WR": {
+        "players": 987,
+        "weights": {
+          "recShare": 0.141,
+          "recYdsPG": 0.409,
+          "recTdPG": 0.023,
+          "grade": 0.266,
+          "exp": 0.161
+        },
+        "spearman": 0.825,
+        "heldOut": 0.825
+      },
+      "TE": {
+        "players": 499,
+        "weights": {
+          "recShare": 0.092,
+          "recYdsPG": 0.501,
+          "grade": 0.248,
+          "exp": 0.159
+        },
+        "spearman": 0.733,
+        "heldOut": 0.726
+      },
+      "OL": {
+        "players": 1399,
+        "weights": {
+          "grade": 0.316,
+          "exp": 0.43,
+          "weight": 0.084,
+          "appearShare": 0.17
+        },
+        "spearman": 0.651,
+        "heldOut": 0.65
+      },
+      "DL": {
+        "players": 1317,
+        "weights": {
+          "tacklesPG": 0.165,
+          "sacksPG": 0.174,
+          "appearShare": 0.05,
+          "grade": 0.263,
+          "exp": 0.204,
+          "weight": 0.145
+        },
+        "spearman": 0.776,
+        "heldOut": 0.773
+      },
+      "LB": {
+        "players": 839,
+        "weights": {
+          "tacklesPG": 0.352,
+          "sacksPG": 0.133,
+          "pdPG": 0.02,
+          "intPG": 0.091,
+          "grade": 0.206,
+          "exp": 0.197
+        },
+        "spearman": 0.796,
+        "heldOut": 0.796
+      },
+      "CB": {
+        "players": 678,
+        "weights": {
+          "pdPG": 0.077,
+          "tacklesPG": 0.144,
+          "intPG": 0.152,
+          "appearShare": 0.12,
+          "grade": 0.276,
+          "exp": 0.232
+        },
+        "spearman": 0.796,
+        "heldOut": 0.794
+      },
+      "S": {
+        "players": 678,
+        "weights": {
+          "tacklesPG": 0.247,
+          "pdPG": 0.012,
+          "intPG": 0.187,
+          "appearShare": 0.07,
+          "grade": 0.236,
+          "exp": 0.248
+        },
+        "spearman": 0.799,
+        "heldOut": 0.795
+      },
+      "K": {
+        "players": 162,
+        "weights": {
+          "fgmPG": 0.249,
+          "fgPct": 0.117,
+          "xpaPG": 0.205,
+          "grade": 0.158,
+          "exp": 0.272
+        },
+        "spearman": 0.72,
+        "heldOut": 0.68
+      }
+    },
+    "early": {
+      "QB": {
+        "players": 369,
+        "weights": {
+          "passYdsPG": 0.253,
+          "anya": 0.16,
+          "rushYdsPG": 0.126,
+          "grade": 0.276,
+          "exp": 0.185
+        },
+        "spearman": 0.852,
+        "heldOut": 0.844
+      },
+      "RB": {
+        "players": 541,
+        "weights": {
+          "rushYdsPG": 0.516,
+          "ypc": 0.033,
+          "recYdsPG": 0.034,
+          "grade": 0.271,
+          "exp": 0.145
+        },
+        "spearman": 0.862,
+        "heldOut": 0.86
+      },
+      "WR": {
+        "players": 987,
+        "weights": {
+          "recShare": 0.141,
+          "recYdsPG": 0.409,
+          "recTdPG": 0.023,
+          "grade": 0.266,
+          "exp": 0.161
+        },
+        "spearman": 0.825,
+        "heldOut": 0.825
+      },
+      "TE": {
+        "players": 499,
+        "weights": {
+          "recShare": 0.092,
+          "recYdsPG": 0.501,
+          "grade": 0.248,
+          "exp": 0.159
+        },
+        "spearman": 0.733,
+        "heldOut": 0.726
+      },
+      "OL": {
+        "players": 1399,
+        "weights": {
+          "grade": 0.375,
+          "exp": 0.519,
+          "weight": 0.099,
+          "boxAppearShare": 0.006
+        },
+        "spearman": 0.644,
+        "heldOut": 0.644
+      },
+      "DL": {
+        "players": 1317,
+        "weights": {
+          "boxAppearShare": 0.069,
+          "grade": 0.379,
+          "exp": 0.398,
+          "weight": 0.155
+        },
+        "spearman": 0.653,
+        "heldOut": 0.651
+      },
+      "LB": {
+        "players": 839,
+        "weights": {
+          "intPG": 0.308,
+          "boxAppearShare": 0.015,
+          "grade": 0.305,
+          "exp": 0.372
+        },
+        "spearman": 0.65,
+        "heldOut": 0.638
+      },
+      "CB": {
+        "players": 678,
+        "weights": {
+          "intPG": 0.356,
+          "boxAppearShare": 0.04,
+          "grade": 0.299,
+          "exp": 0.305
+        },
+        "spearman": 0.74,
+        "heldOut": 0.739
+      },
+      "S": {
+        "players": 678,
+        "weights": {
+          "intPG": 0.338,
+          "boxAppearShare": 0.059,
+          "grade": 0.254,
+          "exp": 0.349
+        },
+        "spearman": 0.727,
+        "heldOut": 0.728
+      },
+      "K": {
+        "players": 162,
+        "weights": {
+          "fgmPG": 0.249,
+          "fgPct": 0.117,
+          "xpaPG": 0.205,
+          "grade": 0.158,
+          "exp": 0.272
+        },
+        "spearman": 0.72,
+        "heldOut": 0.68
+      }
+    }
+  }
+}

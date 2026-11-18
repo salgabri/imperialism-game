@@ -2098,6 +2098,23 @@
    }
   },
   {
+   "id": "cfb-2025",
+   "sport": "college-football",
+   "year": 2025,
+   "season": "2025",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 136,
+   "ratings": {
+    "players": 4624,
+    "min": 59,
+    "median": 78,
+    "max": 99
+   },
+   "findings": {}
+  },
+  {
    "id": "wta-2024",
    "sport": "womens-tennis",
    "year": 2024,
@@ -2294,6 +2311,23 @@
     "namesakes-in-team": 3,
     "birth-date-disagreement": 3
    }
+  },
+  {
+   "id": "cfb-2024",
+   "sport": "college-football",
+   "year": 2024,
+   "season": "2024",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 134,
+   "ratings": {
+    "players": 4555,
+    "min": 58,
+    "median": 78,
+    "max": 99
+   },
+   "findings": {}
   },
   {
    "id": "wta-2023",
@@ -2494,6 +2528,23 @@
    }
   },
   {
+   "id": "cfb-2023",
+   "sport": "college-football",
+   "year": 2023,
+   "season": "2023",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 133,
+   "ratings": {
+    "players": 4522,
+    "min": 54,
+    "median": 78,
+    "max": 99
+   },
+   "findings": {}
+  },
+  {
    "id": "wta-2022",
    "sport": "womens-tennis",
    "year": 2022,
@@ -2668,6 +2719,23 @@
     "namesakes-in-team": 3,
     "birth-date-disagreement": 5
    }
+  },
+  {
+   "id": "cfb-2022",
+   "sport": "college-football",
+   "year": 2022,
+   "season": "2022",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 131,
+   "ratings": {
+    "players": 4454,
+    "min": 57,
+    "median": 78,
+    "max": 99
+   },
+   "findings": {}
   },
   {
    "id": "wta-2021",
@@ -2849,6 +2917,23 @@
    }
   },
   {
+   "id": "cfb-2021",
+   "sport": "college-football",
+   "year": 2021,
+   "season": "2021",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 130,
+   "ratings": {
+    "players": 4419,
+    "min": 55,
+    "median": 78,
+    "max": 99
+   },
+   "findings": {}
+  },
+  {
    "id": "wta-2020",
    "sport": "womens-tennis",
    "year": 2020,
@@ -3026,6 +3111,23 @@
    }
   },
   {
+   "id": "cfb-2020",
+   "sport": "college-football",
+   "year": 2020,
+   "season": "2020",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 127,
+   "ratings": {
+    "players": 4316,
+    "min": 54,
+    "median": 77,
+    "max": 99
+   },
+   "findings": {}
+  },
+  {
    "id": "wta-2019",
    "sport": "womens-tennis",
    "year": 2019,
@@ -3199,6 +3301,23 @@
     "age-unusual": 2,
     "birth-date-disagreement": 7
    }
+  },
+  {
+   "id": "cfb-2019",
+   "sport": "college-football",
+   "year": 2019,
+   "season": "2019",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 130,
+   "ratings": {
+    "players": 4417,
+    "min": 56,
+    "median": 78,
+    "max": 99
+   },
+   "findings": {}
   },
   {
    "id": "wta-2018",
@@ -3375,6 +3494,23 @@
     "lineup-gap": 15,
     "birth-date-disagreement": 5
    }
+  },
+  {
+   "id": "cfb-2018",
+   "sport": "college-football",
+   "year": 2018,
+   "season": "2018",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 130,
+   "ratings": {
+    "players": 4418,
+    "min": 50,
+    "median": 78,
+    "max": 99
+   },
+   "findings": {}
   },
   {
    "id": "wta-2017",
@@ -3556,6 +3692,23 @@
    }
   },
   {
+   "id": "cfb-2017",
+   "sport": "college-football",
+   "year": 2017,
+   "season": "2017",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 129,
+   "ratings": {
+    "players": 4384,
+    "min": 57,
+    "median": 78,
+    "max": 99
+   },
+   "findings": {}
+  },
+  {
    "id": "wta-2016",
    "sport": "womens-tennis",
    "year": 2016,
@@ -3733,6 +3886,23 @@
    }
   },
   {
+   "id": "cfb-2016",
+   "sport": "college-football",
+   "year": 2016,
+   "season": "2016",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 127,
+   "ratings": {
+    "players": 4314,
+    "min": 57,
+    "median": 78,
+    "max": 99
+   },
+   "findings": {}
+  },
+  {
    "id": "wwc-2015",
    "sport": "womens-football",
    "year": 2015,
@@ -3893,6 +4063,23 @@
    }
   },
   {
+   "id": "cfb-2015",
+   "sport": "college-football",
+   "year": 2015,
+   "season": "2015",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 127,
+   "ratings": {
+    "players": 4310,
+    "min": 56,
+    "median": 78,
+    "max": 99
+   },
+   "findings": {}
+  },
+  {
    "id": "wta-2014",
    "sport": "womens-tennis",
    "year": 2014,
@@ -4035,6 +4222,23 @@
     "namesakes-in-team": 1,
     "birth-date-disagreement": 11
    }
+  },
+  {
+   "id": "cfb-2014",
+   "sport": "college-football",
+   "year": 2014,
+   "season": "2014",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 127,
+   "ratings": {
+    "players": 4311,
+    "min": 51,
+    "median": 78,
+    "max": 99
+   },
+   "findings": {}
   },
   {
    "id": "wta-2013",
@@ -4197,6 +4401,23 @@
    }
   },
   {
+   "id": "cfb-2013",
+   "sport": "college-football",
+   "year": 2013,
+   "season": "2013",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 124,
+   "ratings": {
+    "players": 4209,
+    "min": 58,
+    "median": 77,
+    "max": 99
+   },
+   "findings": {}
+  },
+  {
    "id": "wta-2012",
    "sport": "womens-tennis",
    "year": 2012,
@@ -4339,6 +4560,23 @@
     "birth-date-disagreement": 12,
     "rating-jump": 2
    }
+  },
+  {
+   "id": "cfb-2012",
+   "sport": "college-football",
+   "year": 2012,
+   "season": "2012",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 123,
+   "ratings": {
+    "players": 4168,
+    "min": 57,
+    "median": 77,
+    "max": 99
+   },
+   "findings": {}
   },
   {
    "id": "wwc-2011",
@@ -4507,6 +4745,23 @@
    }
   },
   {
+   "id": "cfb-2011",
+   "sport": "college-football",
+   "year": 2011,
+   "season": "2011",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 119,
+   "ratings": {
+    "players": 4031,
+    "min": 59,
+    "median": 77,
+    "max": 99
+   },
+   "findings": {}
+  },
+  {
    "id": "wta-2010",
    "sport": "womens-tennis",
    "year": 2010,
@@ -4653,6 +4908,23 @@
     "birth-date-disagreement": 15,
     "rating-jump": 1
    }
+  },
+  {
+   "id": "cfb-2010",
+   "sport": "college-football",
+   "year": 2010,
+   "season": "2010",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 119,
+   "ratings": {
+    "players": 4028,
+    "min": 55,
+    "median": 77,
+    "max": 99
+   },
+   "findings": {}
   },
   {
    "id": "wta-2009",
@@ -4813,6 +5085,23 @@
     "birth-date-disagreement": 12,
     "rating-jump": 3
    }
+  },
+  {
+   "id": "cfb-2009",
+   "sport": "college-football",
+   "year": 2009,
+   "season": "2009",
+   "label": "FBS (computed)",
+   "nations": 0,
+   "fielded": 0,
+   "clubs": 119,
+   "ratings": {
+    "players": 4032,
+    "min": 57,
+    "median": 77,
+    "max": 99
+   },
+   "findings": {}
   },
   {
    "id": "wwc-2007",

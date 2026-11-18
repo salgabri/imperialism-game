@@ -1,15 +1,16 @@
 // The leagues' maps, today's and every era's (docs/design/domestic-campaigns.md, "The NBA map", "The NFL map", "The MLB
-// map", "The NHL map" and "The NRL map"): a club holds its own state or province (in New Zealand, region) and nothing
-// else, a state with several clubs is divided between them, and every state and province without a club stays empty.
-// The boundary layers are not in the repository, so towns stand in for them: every town lies on empty land of its own
-// state or on a club's section, and no club's section reaches into a second state.
+// map", "The NHL map", "The NRL map" and "The FBS map"): a club holds its own state or province (in New Zealand, region)
+// and nothing else, a state with several clubs is divided between them, and every state and province without a club stays
+// empty. The boundary layers are not in the repository, so towns stand in for them: every town lies on empty land of its
+// own state or on a club's section, and no club's section reaches into a second state.
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { feature } from 'topojson-client';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
-import { pointInPolys, polysOf } from './lib/domestic-partition.mjs';
+import { kmToPolys, pointInPolys, polysOf } from './lib/domestic-partition.mjs';
+import { cfbMapOf, cfbSeasonIdOf, cfbTeamsOf } from './lib/cfb-maps.mjs';
 
 // Inland towns, clear of the simplified coasts and borders; the states that can be shared have several.
 const TOWNS = {
@@ -113,3 +114,105 @@ for (const entry of CLUB_MAPS) {
     if (canada && empties.has('CA-PE')) assert.ok(pointInPolys(TOWNS['CA-PE'][0], empties.get('CA-PE')), 'Prince Edward Island stays on the map');
   });
 }
+
+// ---------- college football: the FBS seasons 2009–2025 (scripts/data/cfb-seasons.json) ----------
+
+const CFB_TEAMS = JSON.parse(read('scripts/data/cfb-teams.json')).teams;
+const CFB = JSON.parse(read('scripts/data/cfb-seasons.json'));
+const FBS_YEARS = Array.from({ length: 17 }, (_, i) => 2009 + i);
+// Today's schools as today's map ranks them (strongest first), then the schools the built-in season lacks.
+const CFB_ORDER = [...JSON.parse(read('public/domestic/cfb.json')).clubs.map(club => club.id), ...Object.keys(CFB.schools)];
+// The contiguous states, and Hawaii.
+const inUSA = ([lon, lat]) => (lon > -125 && lon < -66.9 && lat > 24.5 && lat < 49.4) || (lon > -160.3 && lon < -154.8 && lat > 18.9 && lat < 22.3);
+
+test('the FBS seasons 2009–2025: each on one era map of its schools, each venue era a stadium of seasons its school played', () => {
+  const { maps, venues, schools, espn } = CFB;
+  assert.deepEqual(maps.flatMap(map => map.seasons), FBS_YEARS, 'the maps serve 2009 to 2025, each season once, in order');
+  const placesOf = (map, year = map.seasons[0]) => JSON.stringify(cfbTeamsOf(CFB_TEAMS, CFB, year, CFB_ORDER));
+  maps.forEach((map, i) => {
+    assert.equal(map.id, `cfb${map.seasons[0]}`);
+    assert.deepEqual(map.schools, [...new Set(map.schools)].sort(), `${map.id}: its schools once each, in order`);
+    for (const id of map.schools) {
+      assert.ok(CFB_TEAMS[id] || schools[id], `${map.id}: ${id} is a school of scripts/data/cfb-teams.json or the manifest's`);
+      assert.ok(Number.isInteger(espn[id]), `${map.id}: ESPN names ${id}`);
+    }
+    for (const year of map.seasons.slice(1)) assert.equal(placesOf(map, year), placesOf(map), `${map.id}: ${year} plays where ${map.seasons[0]} does`);
+    if (i) assert.notEqual(placesOf(map), placesOf(maps[i - 1]), `${map.id}: a season with its predecessor's schools and stadiums shares its map`);
+  });
+  for (const [id, school] of Object.entries(schools)) {
+    assert.ok(!CFB_TEAMS[id], `${id} is a school of the built-in season`);
+    assert.ok(school.name && /^[A-Z]{3}$/.test(school.code) && school.city && school.stadium && inUSA(school.home), `${id}: named, coded and placed`);
+    assert.ok(!Object.values(CFB_TEAMS).some(team => team.code === school.code || team.city === school.city), `${id}: its code and town its own`);
+  }
+  for (const [id, eras] of Object.entries(venues)) {
+    const today = CFB_TEAMS[id] ?? schools[id];
+    assert.ok(today, `${id} is a school of the game's or the manifest's`);
+    eras.forEach((era, k) => {
+      assert.ok(Number.isInteger(era.from) && era.from <= era.to, `${id}: ${era.stadium} from ${era.from} to ${era.to}`);
+      if (k) assert.ok(eras[k - 1].to < era.from, `${id}: its eras in order, never overlapping`);
+      for (let year = era.from; year <= era.to; year++) {
+        assert.ok(cfbMapOf(CFB, year)?.schools.includes(id), `${id}: ${era.stadium} in ${year}, an FBS season it played`);
+      }
+      assert.ok(era.stadium !== today.stadium || String(era.home) !== String(today.home), `${id}: ${era.stadium} is where it plays today`);
+      assert.ok(inUSA(era.home), `${id}: ${era.stadium} at [lon, lat]`);
+      assert.ok(typeof era.article === 'string' && Number.isInteger(era.revision) && era.revision > 0, `${id}: ${era.stadium} placed from a pinned article`);
+      for (const revision of Object.values(era.evidence ?? {})) assert.ok(Number.isInteger(revision) && revision > 0, `${id}: its season articles pinned`);
+    });
+  }
+});
+
+// The season snapshots the seasons are built from (scripts/sync-cfb-seasons.mjs) name each season's schools.
+const snapshotFile = year => `scripts/data/cfb-seasons/${year}.json`;
+const noSnapshots = !existsSync(new URL(`../${snapshotFile(2009)}`, import.meta.url)) && 'no season snapshots';
+test('each FBS era map\'s schools are those of its seasons\' snapshots', { skip: noSnapshots }, () => {
+  for (const year of FBS_YEARS) {
+    assert.deepEqual(cfbMapOf(CFB, year).schools, Object.keys(JSON.parse(read(snapshotFile(year))).schools).sort(), `the ${year} season`);
+  }
+});
+
+for (const entry of CLUB_MAPS.filter(item => item.sport === 'college-football' && item.seasons)) {
+  test(`${entry.id}: each school of ${entry.seasons.join(', ')} holds one territory around the stadium it played most of its home games in`, () => {
+    const map = CFB.maps.find(item => item.id === entry.id);
+    assert.ok(map, `${entry.id} is a map of scripts/data/cfb-seasons.json`);
+    const teams = cfbTeamsOf(CFB_TEAMS, CFB, map.seasons[0], CFB_ORDER);
+    const text = read(`public/domestic/${entry.id}.json`);
+    const doc = JSON.parse(text);
+    const { clubs, geo, sectionNames } = decodeDomestic(JSON.parse(text), entry.id);
+    assert.deepEqual(entry.seasons, map.seasons.map(cfbSeasonIdOf));
+    assert.deepEqual(doc.seasons, entry.seasons);
+    assert.deepEqual([entry.league, entry.name, entry.clubs, entry.sections, entry.venue, entry.lines, entry.version, entry.top],
+      ['FBS', 'USA', teams.length, teams.length, 'stadium', 'state', doc.version, undefined]);
+    assert.ok(Buffer.byteLength(text) <= 250000);
+    assert.ok(read(`public/domestic/ATTRIBUTION-${entry.id}.txt`).includes(doc.version));
+    assert.deepEqual(doc.clubs.map(club => [club.id, club.name, club.arena, club.home]), teams.map(t => [t.id, t.name, t.stadium, t.home]),
+      'its seasons\' schools in today\'s order, each at its stadium of the day');
+    for (const club of clubs) {
+      assert.equal(sectionNames[club.homeSection], teams.find(t => t.id === club.id).city);
+      const land = geo.countries.find(section => section.id === club.homeSection).polys;
+      assert.ok(kmToPolys(club.homePoint, land) <= 2, `${club.name} plays inside its own territory`);
+    }
+    assert.equal(new Set(Object.values(sectionNames)).size, teams.length, 'every territory its own name');
+  });
+}
+
+test('an FBS season\'s map holds a school where it played: Kansas City in 2024, Carson, Foxborough, Houston; Idaho Boise State\'s', () => {
+  const ownerAt = (mapId, point) => {
+    const { clubs, geo } = decodeDomestic(JSON.parse(read(`public/domestic/${mapId}.json`)), mapId);
+    const section = geo.countries.find(item => pointInPolys(point, item.polys))?.id;
+    return clubs.find(club => club.homeSection === section)?.id ?? null;
+  };
+  const lawrence = [-95.25, 38.96], moscow = [-117, 46.73];
+  assert.equal(ownerAt('cfb2024', [-94.48, 39.05]), 'cfb-kansas', 'Kansas at Arrowhead Stadium, Kansas City, Missouri');
+  assert.equal(ownerAt('cfb2024', lawrence), 'cfb-kansas-state', 'Lawrence Kansas State\'s while Kansas plays away from it');
+  assert.equal(ownerAt('cfb2025', lawrence), 'cfb-kansas', 'and Kansas\'s again');
+  assert.equal(ownerAt('cfb2020', [-118.26, 33.86]), 'cfb-san-diego-state', 'San Diego State at Carson');
+  assert.equal(ownerAt('cfb2015', [-71.26, 42.09]), 'cfb-umass', 'UMass at Gillette Stadium, Foxborough');
+  assert.equal(ownerAt('cfb2017', [-72.54, 42.38]), 'cfb-umass', 'UMass at home in Amherst from 2017');
+  assert.equal(ownerAt('cfb2025', [-95.35, 29.75]), 'cfb-sam-houston', 'Sam Houston at Shell Energy Stadium, Houston');
+  assert.equal(ownerAt('cfb2011', [-122.44, 37.76]), 'cfb-cal', 'Cal at AT&T Park, San Francisco');
+  assert.equal(ownerAt('cfb2013', [-84.4, 33.76]), 'cfb-georgia-state', 'Georgia State at the Georgia Dome');
+  // Idaho, FBS to 2017, fields no season (its rosters are too thin): Boise State holds the whole state.
+  for (const entry of CLUB_MAPS.filter(item => item.sport === 'college-football')) {
+    assert.equal(ownerAt(entry.id, moscow), 'cfb-boise-state', `${entry.id}: Moscow, Idaho is Boise State's`);
+  }
+});
