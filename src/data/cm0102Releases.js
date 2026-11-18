@@ -97,10 +97,12 @@ export const CM0102_RELEASES = [
     signatures: [
       { club: 8030582, staff: 29564922, clubSha256: '04dac9c4280f8d6c4183a22fe568326caa1776236a2f9ec3a457eca40cfd74fb', staffSha256: 'd12b6975af9a8f3ec872edcc9c95d3bcc9e220802a485afff5101beab5f4a4b0' },
     ] },
+  // Its staff.dat carries 164 bytes after its last table (8 bytes of 0xFF, then three stray 52-byte rows), as October 2014's
+  // and October 2016's carry 232 (24, then four), cut before reading (`staffTrailing`), like CM3's port below.
   { id: 'cm0102-2010-09', label: 'September 2010 ODB', provider: 'CM 01/02 Update Team', season: '2010/11', year: 2011, released: '2010-09',
     url: 'https://www.champman0102.co.uk/viewtopic.php?t=47', shifts: { birth: 9, joined: 9, contract: 9 },
     signatures: [
-      { club: 8069509, staff: 30072480, clubSha256: '8678ba9ce53dd0cf255af5085c0775e6938a80d362ddf110570c388766f4aa81', staffSha256: '3d160acc99a00fe661db8246e6727da094234fa17c32bb6b491099965d92cb3a' },
+      { club: 8069509, staff: 30072480, staffTrailing: 164, clubSha256: '8678ba9ce53dd0cf255af5085c0775e6938a80d362ddf110570c388766f4aa81', staffSha256: '3d160acc99a00fe661db8246e6727da094234fa17c32bb6b491099965d92cb3a' },
     ] },
   { id: 'cm0102-2010-12', label: 'December 2010 SIM', provider: 'CM 01/02 Update Team', season: '2010/11', year: 2011, released: '2010-12',
     url: 'https://www.champman0102.co.uk/viewtopic.php?t=45', shifts: { birth: 9, joined: 9, contract: 9 },
@@ -155,7 +157,7 @@ export const CM0102_RELEASES = [
   { id: 'cm0102-2014-10', label: 'October 2014', provider: 'CM 01/02 Update Team', season: '2014/15', year: 2015, released: '2014-10',
     url: 'https://www.champman0102.co.uk/viewtopic.php?t=55', shifts: { birth: 13, joined: 13, contract: 13 },
     signatures: [
-      { club: 6587959, staff: 23292732, clubSha256: '795c3f0a5e3b4c8b06e35815b50a199f2b8e2840a0795c3e4ef12408d0d396eb', staffSha256: 'f6b9abbc9cbfefca43bfedf999ea2ac01af73495ac58742c752441368d1a6d00' },
+      { club: 6587959, staff: 23292732, staffTrailing: 232, clubSha256: '795c3f0a5e3b4c8b06e35815b50a199f2b8e2840a0795c3e4ef12408d0d396eb', staffSha256: 'f6b9abbc9cbfefca43bfedf999ea2ac01af73495ac58742c752441368d1a6d00' },
     ] },
   { id: 'cm0102-2015-04', label: 'April 2015', provider: 'CM 01/02 Update Team', season: '2014/15', year: 2015, released: '2015-04',
     url: 'https://www.champman0102.co.uk/viewtopic.php?t=56', shifts: { birth: 13, joined: 13, contract: 13 },
@@ -175,7 +177,7 @@ export const CM0102_RELEASES = [
   { id: 'cm0102-2016-10', label: 'October 2016', provider: 'CM 01/02 Update Team', season: '2016/17', year: 2017, released: '2016-10',
     url: 'https://www.champman0102.co.uk/viewtopic.php?t=58', shifts: { birth: 15, joined: 15, contract: 15 },
     signatures: [
-      { club: 6643154, staff: 22774108, clubSha256: 'daa779af134633ae40de2d76582d51ac27627b78367489a03f3e4c1dddb60fd7', staffSha256: '33e14cfcea0ea8a1c0ea6e22d0285779e365cfd54138c88312361ed9047bc2b9' },
+      { club: 6643154, staff: 22774108, staffTrailing: 232, clubSha256: 'daa779af134633ae40de2d76582d51ac27627b78367489a03f3e4c1dddb60fd7', staffSha256: '33e14cfcea0ea8a1c0ea6e22d0285779e365cfd54138c88312361ed9047bc2b9' },
     ] },
   { id: 'cm0102-2017-04', label: 'April 2017', provider: 'CM 01/02 Update Team', season: '2016/17', year: 2017, released: '2017-04',
     url: 'https://www.champman0102.co.uk/viewtopic.php?t=59', shifts: { birth: 15, joined: 15, contract: 15 },
