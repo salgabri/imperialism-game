@@ -25,13 +25,17 @@ import { buildSquad, sourceLabel, sourceTitle } from '../src/viewModels/squad.js
 import { conquestOptions } from '../src/viewModels/conquest.js';
 import { buildFeedRows, scorersLine } from '../src/viewModels/match.js';
 import { kmToPolys, pointInPolys } from './lib/domestic-partition.mjs';
-import { ESTIMATE_RANGE, estimateScore, playerOf, ratePlayers } from './lib/nhl.mjs';
+import { estimateReference, estimateValues, playerOf, rateRoster } from './lib/nhl.mjs';
+import { mean } from './lib/computed-ratings.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 const sport = getSport('hockey');
 const SNAPSHOT = JSON.parse(read('scripts/data/nhl-27.json'));
 const FRANCHISES = JSON.parse(read('scripts/data/nhl-teams.json')).teams;
+// The estimates' shape: NHL 22's full edition below its top 300 (scripts/data/nhl-seasons/calibration.json).
+const NHL22 = JSON.parse(read('scripts/data/nhl-seasons/calibration.json')).editions.find(edition => edition.id === 'nhl-2022');
+const REFERENCE = estimateReference(NHL22, SNAPSHOT.source.floor);
 // By name and group: the NHL has two Elias Petterssons and two Sebastian Ahos, a forward and a defender each.
 const groupOf = pos => (pos === 'G' || pos === 'D' ? pos : 'F');
 const keyOf = (name, pos) => `${name}|${groupOf(pos)}`;
@@ -50,7 +54,7 @@ test('the 32 NHL clubs and the nations rebuild byte for byte from the committed 
 });
 
 test('EA\'s ratings stay as they are, and every other rating is an estimate below EA\'s cut-off', () => {
-  const rated = ratePlayers(SNAPSHOT.players.map(playerOf));
+  const rated = rateRoster(SNAPSHOT.players.map(playerOf), REFERENCE, FRANCHISES);
   for (const player of rated) {
     if (player.overall !== null) {
       assert.equal(player.rating, player.overall, `${player.name}: EA's overall`);
@@ -58,7 +62,7 @@ test('EA\'s ratings stay as they are, and every other rating is an estimate belo
     } else {
       assert.equal(player.estimated, true, `${player.name} is marked`);
       assert.ok(player.rating < SOURCE.floor, `${player.name}'s estimate is under EA's cut-off (${player.rating})`);
-      assert.ok(player.rating >= Math.min(ESTIMATE_RANGE.skater, ESTIMATE_RANGE.goalie), `${player.name}: ${player.rating}`);
+      assert.ok(player.rating >= Math.min(...Object.values(REFERENCE).flat()), `${player.name}: ${player.rating}`);
     }
   }
   // The squad files say which is which, tuple by tuple.
@@ -77,22 +81,34 @@ test('EA\'s ratings stay as they are, and every other rating is an estimate belo
   assert.ok(tuples.some(([, , , source]) => source.source === 'estimate') && tuples.some(([, , , source]) => source.source === 'ea-nhl'));
 });
 
-test('the estimates rank players by ice time and scoring, and a few games prove little', () => {
-  const skater = (over = {}) => ({ pos: 'C', games: 80, seconds: 80 * 15 * 60, points: 40, shots: 0, saves: 0, ...over });
-  assert.ok(estimateScore(skater({ seconds: 80 * 18 * 60 })) > estimateScore(skater()), 'more minutes');
-  assert.ok(estimateScore(skater({ points: 60 })) > estimateScore(skater()), 'more points');
-  assert.ok(estimateScore(skater({ games: 3, seconds: 3 * 22 * 60, points: 6 })) < estimateScore(skater({ seconds: 80 * 20 * 60, points: 70 })),
+test('the estimates blend ice time and scoring (a goalie\'s minutes and saves), a few games prove little, and they take NHL 22\'s shape', () => {
+  const league = SNAPSHOT.players.map(playerOf);
+  const skater = (over = {}) => ({ id: -1, name: 'Test', team: 'ANA', pos: 'C', nation: null, overall: null, games: 80, seconds: 80 * 15 * 60, points: 40,
+    shots: 0, saves: 0, ...over });
+  const goalie = (games, shots, saves) => skater({ pos: 'G', games, seconds: games * 3600, points: 0, shots, saves });
+  // Each in the league's company: its regulars set the prior, the replacement level and the z-scores.
+  const value = player => estimateValues([...league, player]).get(player);
+  assert.ok(value(skater({ seconds: 80 * 18 * 60 })) > value(skater()), 'more minutes');
+  assert.ok(value(skater({ points: 60 })) > value(skater()), 'more points');
+  assert.ok(value(skater({ games: 3, seconds: 3 * 22 * 60, points: 6 })) < value(skater({ seconds: 80 * 20 * 60, points: 70 })),
     'a three-game burst does not beat a full season of the same');
-  const goalie = (shots, saves) => ({ pos: 'G', games: 40, seconds: 0, points: 0, shots, saves });
-  assert.ok(estimateScore(goalie(1000, 915)) > estimateScore(goalie(1000, 880)));
-  assert.ok(estimateScore(goalie(30, 29)) < estimateScore(goalie(1500, 1400)), 'a good night is not a good season');
-  // Who the league uses most ranks first among the players EA leaves out, in each group.
-  const rated = ratePlayers(SNAPSHOT.players.map(playerOf)).filter(player => player.estimated);
-  for (const group of [p => p.pos === 'D', p => p.pos === 'C' || p.pos === 'LW' || p.pos === 'RW', p => p.pos === 'G']) {
-    const list = rated.filter(group);
-    assert.equal(Math.max(...list.map(p => p.rating)), ESTIMATE_RANGE.top);
-    const best = list.filter(p => p.rating === ESTIMATE_RANGE.top)[0], last = list.reduce((low, p) => (p.rating < low.rating ? p : low));
-    assert.ok(estimateScore(best) > estimateScore(last));
+  assert.ok(value(goalie(40, 1000, 915)) > value(goalie(40, 1000, 880)), 'a better save percentage');
+  assert.ok(value(goalie(1, 30, 29)) < value(goalie(50, 1500, 1400)), 'a good night is not a good season');
+  // The shape: NHL 22's ratings from its 300th player's (82) down, raised a point to sit just under NHL 27's cut-off.
+  const overalls = NHL22.players.map(p => p[3]).sort((a, b) => b - a);
+  assert.equal(overalls[299], 82);
+  assert.deepEqual(Object.fromEntries(Object.entries(REFERENCE).map(([g, list]) => [g, [list.length, list[0], list.at(-1)]])),
+    { F: [238, 71, 83], D: [137, 71, 83], G: [25, 78, 83] });
+  const rated = rateRoster(league, REFERENCE, FRANCHISES).filter(player => player.estimated);
+  const values = estimateValues(league), valueOf = new Map(league.map(p => [p.id, values.get(p)]));
+  const squads = new Set(CLUBS.flatMap(club => club.squad.map(([name, pos]) => keyOf(name, pos))));
+  for (const group of ['F', 'D', 'G']) {
+    const list = rated.filter(p => groupOf(p.pos) === group).sort((a, b) => valueOf.get(a.id) - valueOf.get(b.id));
+    assert.equal(Math.max(...list.map(p => p.rating)), 83, `${group}: the best estimate one under EA's cut-off`);
+    assert.ok(list.every((p, i) => i === 0 || p.rating >= list[i - 1].rating), `${group}: nobody passes anybody`);
+    // The squads' estimates are read off the shape among themselves, as NHL 22's launch rosters were rated.
+    const inSquads = list.filter(p => squads.has(keyOf(p.name, p.pos))).map(p => p.rating);
+    assert.ok(Math.abs(mean(inSquads) - mean(REFERENCE[group])) < 0.3, `${group}: squads ${mean(inSquads)}, NHL 22 ${mean(REFERENCE[group])}`);
   }
 });
 

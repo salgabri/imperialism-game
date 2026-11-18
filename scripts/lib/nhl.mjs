@@ -2,11 +2,13 @@
 // national teams, each with the lineup the game itself picks and a club's depth. No I/O here.
 //
 // EA publishes only NHL 27's top 300 players, 84 and up, and a club's lineup needs nineteen. Everyone else on an NHL
-// roster gets an estimate, always shown as one (`sourceInfo.source` 'estimate'): the players EA leaves out are put in
-// order by what they do on the ice, within their group, and that order is spread evenly from 83, just under EA's
-// cut-off, down to the bottom of the league (ESTIMATE_RANGE). Forwards and defenders rank by minutes a game and points
-// a game, goalies by save percentage. A few games prove little, so each line starts from a replacement player's
-// numbers (PRIOR). EA's own ratings are never changed.
+// roster gets an estimate, always shown as one (`sourceInfo.source` 'estimate'), by the computed seasons' value
+// (docs/design/computed-ratings.md, step 3; `estimateValues`): how much his club played him (his share of its ice time,
+// a goalie's of its minutes) blended with what he produced (points a game, a goalie's saves above the league's), each
+// rate shrunk toward replacement by a prior measured from the league's own players, with the weights tuned on EA's
+// editions (scripts/lib/nhl-computed.mjs BLEND). The players EA leaves out are ranked by it within their group, and read
+// off the shape of the last EA edition published whole, NHL 22, below its top 300 (`estimateReference`), so the best of
+// them sits at 83, just under EA's cut-off. EA's own ratings are never changed.
 //
 // A nation fields every player of its own: by EA's nationality for a player EA rates, else by the country the NHL says
 // he was born in. A place a nation cannot fill is the game's to fill with a generated player at the nation's strength,
@@ -14,19 +16,15 @@
 import { NATIONS, nationIdentity, selectLineup } from '../../src/data/teams.js';
 import { BASELINE, hockey } from '../../src/sports/hockey.js';
 import { namesOfTheDay } from '../../src/data/namesOfTheDay.js';
+import { NOISE, mean, priorFromNoise, ratingsOf, replacementRate, shrunkRate, variance } from './computed-ratings.mjs';
+import { BLEND, groupOf } from './nhl-computed.mjs';
 
 const SPORT = 'hockey';
 export const ROSTER_SIZE = 23;
 const ORDER = ['C', 'LW', 'RW', 'D', 'G'];
-const FORWARDS = new Set(['C', 'LW', 'RW']);
 
-/** The estimates' ranges, in rating points: the best player EA leaves out, and the last of his group. */
-export const ESTIMATE_RANGE = Object.freeze({ top: 83, skater: 72, goalie: 70 });
-// A replacement player's line, added to each player's own: ten games at nine minutes and a point every ten games; 300
-// shots faced at .880.
-const PRIOR = Object.freeze({ games: 10, minutes: 9, points: 0.1, shots: 300, savePct: 0.88 });
-// What a point a game is worth against minutes on the ice: forwards are there to score, defenders much less.
-const POINT_WEIGHT = { forward: 8, defender: 5 };
+/** How many players EA rates in the edition the estimates' shape comes from, NHL 22: they read off the rest. */
+export const EA_TOP = 300;
 
 /** Where a player EA rates comes from, by EA's nationality; every nation that holds one is here. */
 const NATION_OF_EA = {
@@ -57,30 +55,98 @@ export function playerOf([id, name, team, pos, born, eaNation, overall, games, s
   return { id, name, team, pos, nation, overall, games, seconds, points, shots, saves };
 }
 
-/** How a player EA leaves out ranks in his group: minutes and points a game for a skater, save percentage for a goalie. */
-export function estimateScore({ pos, games, seconds, points, shots, saves }) {
-  if (pos === 'G') return (saves + PRIOR.shots * PRIOR.savePct) / (shots + PRIOR.shots);
-  const played = games + PRIOR.games;
-  const minutes = (seconds / 60 + PRIOR.games * PRIOR.minutes) / played;
-  const perGame = (points + PRIOR.games * PRIOR.points) / played;
-  return minutes + (FORWARDS.has(pos) ? POINT_WEIGHT.forward : POINT_WEIGHT.defender) * perGame;
+/**
+ * Every player's value, the computed seasons' (docs/design/computed-ratings.md, step 3), from the snapshot's line: his
+ * games, seconds on the ice and points, a goalie's shots faced and saves, over 2025/26 and the season under way. Within
+ * each group (forwards, defenders, goalies), over the league's whole roster, EA's players included:
+ * - selection: his share of the club's ice time a game (a goalie's, of its minutes), the club's games being the most
+ *   any skater played;
+ * - production: points a game, or a goalie's saves above the league's save percentage a shot, shrunk toward replacement
+ *   (the rate of the quarter of the group with the least exposure) by the prior the league's regulars give (noise per
+ *   unit of exposure over talent variance, by the method of moments among the players with a quarter of the games);
+ * - value: (1 − p)·z(selection) + p·z(production), each z-score by the regulars, p the computed seasons' weight where the
+ *   source keeps ice time (BLEND.production: forwards 0.8, defenders 0.65, goalies by saves 0.5).
+ * → Map player → value.
+ */
+export function estimateValues(players) {
+  const skaters = players.filter(p => p.pos !== 'G'), goalies = players.filter(p => p.pos === 'G');
+  const games = Math.max(...skaters.map(p => p.games));
+  const shots = goalies.reduce((sum, p) => sum + p.shots, 0), saves = goalies.reduce((sum, p) => sum + p.saves, 0);
+  if (!(games > 0 && shots > 0)) throw new Error('No games or no shots to measure the league by');
+  const league = saves / shots;
+  const values = new Map();
+  for (const group of ['F', 'D', 'G']) {
+    const goalie = group === 'G';
+    const rows = players.filter(p => groupOf(p.pos) === group).map(p => ({
+      player: p, n: goalie ? p.shots : p.games, x: goalie ? p.saves - p.shots * league : p.points,
+      selection: goalie ? p.seconds / 3600 / games : p.seconds / 60 / games, regular: p.games >= games / 4,
+    }));
+    const regulars = rows.filter(r => r.regular && r.n > 0);
+    const { k } = priorFromNoise(regulars, { least: 0, unitNoise: goalie ? () => league * (1 - league) : NOISE.poisson });
+    const replacement = replacementRate(rows);
+    for (const r of rows) r.production = shrunkRate(r, k, replacement);
+    const scale = key => {
+      const list = regulars.map(r => r[key]), m = mean(list), sd = Math.sqrt(variance(list));
+      return value => (value - m) / sd;
+    };
+    const zSelection = scale('selection'), zProduction = scale('production');
+    const p = BLEND.production[group][goalie ? 'saves' : 'ice'];
+    for (const r of rows) values.set(r.player, (1 - p) * zSelection(r.selection) + p * zProduction(r.production));
+  }
+  return values;
 }
 
-/** Each player with a `rating`: EA's overall, unchanged, or an estimate marked `estimated`. */
-export function ratePlayers(players) {
-  const groups = { forward: [], defender: [], goalie: [] };
-  for (const player of players) {
-    if (player.overall !== null) continue;
-    groups[player.pos === 'G' ? 'goalie' : player.pos === 'D' ? 'defender' : 'forward'].push(player);
-  }
+/**
+ * The estimates' reference by group (F, D, G), each ascending: the shape of NHL 22, the last EA edition published whole
+ * (`edition`: its players `[name, team, pos, overall, lines]`, scripts/data/nhl-seasons/calibration.json), below its top
+ * 300: the overalls from its 300th player's down, each raised by the gap between that 300th player's and `floor` − 1,
+ * where `floor` is the lowest overall EA lists today (NHL 27's 84), so the shape tops out one point under EA's cut-off.
+ */
+export function estimateReference(edition, floor) {
+  const overalls = edition.players.map(p => p[3]).sort((a, b) => b - a);
+  if (overalls.length <= EA_TOP) throw new Error(`An edition of ${overalls.length} players has nothing below its top ${EA_TOP}`);
+  const cut = overalls[EA_TOP - 1], shift = floor - 1 - cut;
+  return Object.fromEntries(['F', 'D', 'G'].map(group => [group,
+    edition.players.filter(p => groupOf(p[2]) === group && p[3] <= cut).map(p => p[3] + shift).sort((a, b) => a - b)]));
+}
+
+/**
+ * Each player with a `rating`: EA's overall, unchanged, or an estimate marked `estimated`: the players EA leaves out, by
+ * their value's mid-rank in their group, read off `reference` (estimateReference) by linear interpolation (ratingsOf:
+ * ties share a rating, and nobody passes anybody). `squads`: the ids of the players the clubs field (rateRoster), whose
+ * estimates are ranked among themselves, as NHL 22's launch rosters were rated, so that a club's depth meets NHL 22's
+ * depth and not the fringe of a longer roster list; anyone else EA leaves out takes the estimate of the squad player in his
+ * group with the highest value not above his (the lowest of the group's below them all). Without `squads`, every player
+ * EA leaves out is ranked.
+ */
+export function ratePlayers(players, reference, squads = null) {
+  const values = estimateValues(players);
   const rating = new Map();
-  for (const [group, list] of Object.entries(groups)) {
-    const low = group === 'goalie' ? ESTIMATE_RANGE.goalie : ESTIMATE_RANGE.skater;
-    const ranked = list.map(player => [player, estimateScore(player)]).sort((a, b) => b[1] - a[1] || a[0].name.localeCompare(b[0].name));
-    ranked.forEach(([player], i) => rating.set(player, Math.round(ESTIMATE_RANGE.top - (ESTIMATE_RANGE.top - low) * i / Math.max(1, ranked.length - 1))));
+  for (const group of ['F', 'D', 'G']) {
+    const list = players.filter(p => p.overall === null && groupOf(p.pos) === group);
+    if (!list.length) continue;
+    const ranked = squads ? list.filter(p => squads.has(p.id)) : list;
+    const byValue = ratingsOf(ranked.map(p => values.get(p)), reference[group]);
+    const steps = ranked.map(p => [values.get(p), byValue.get(values.get(p))]).sort((a, b) => a[0] - b[0]);
+    for (const p of list) {
+      const value = values.get(p);
+      if (byValue.has(value) && (!squads || squads.has(p.id))) { rating.set(p, byValue.get(value)); continue; }
+      const below = steps.filter(([v]) => v <= value).at(-1);
+      rating.set(p, below ? below[1] : steps[0][1]);
+    }
   }
   return players.map(player => (player.overall !== null ? { ...player, rating: player.overall, estimated: false }
     : { ...player, rating: rating.get(player), estimated: true }));
+}
+
+/**
+ * The roster's players rated (ratePlayers) in two passes, as the computed seasons are: every estimate ranked first, so the
+ * clubs pick their squads (clubsOf, `teams`); then the squads' estimates ranked among themselves.
+ */
+export function rateRoster(players, reference, teams) {
+  const provisional = ratePlayers(players, reference);
+  const squads = new Set(clubsOf(provisional, teams).flatMap(club => club.squad.map(p => p.id)));
+  return ratePlayers(players, reference, squads);
 }
 
 /** The lineup the game picks from `pool`, then a backup goalie and the best skaters left, up to a roster of 23. */

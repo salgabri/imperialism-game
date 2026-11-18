@@ -2,6 +2,14 @@
 "source": {"id":"nhl-1965","method":"computed","kind":"hdb","retrieved":"2026-11-09"},
 "form": {"skaters":"points","goalies":"goals"},
 "leagues": {"1963":{"savePct":null,"gaa":2.973809523809524,"maxGames":70},"1964":{"savePct":null,"gaa":2.7452380952380953,"maxGames":71},"1965":{"savePct":null,"gaa":2.8452380952380953,"maxGames":70}},
+"results": {"source": "the Hockey Databank's Teams.csv", "clubs": [
+["BOS",70,21,43,6,0,0,0,166,253],
+["CHI",70,34,28,8,0,0,0,224,176],
+["DET",70,40,23,7,0,0,0,224,175],
+["MTL",70,36,23,11,0,0,0,211,185],
+["NYR",70,20,38,12,0,0,0,179,246],
+["TOR",70,30,26,14,0,0,0,204,173]
+]},
 "notes": {"renamed":[]},
 "left": [
 

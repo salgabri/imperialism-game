@@ -44,29 +44,45 @@ Petterssons and two Sebastian Ahos, so a shared name goes by team and by group (
 defender, goalie). Three rated players are on no current roster (Larkin, Barzal,
 Edvinsson): they keep EA's team.
 
-**Estimates** (`scripts/lib/nhl.mjs`). Every player EA leaves out is ranked within his
-group, and that order is spread evenly from 83, just under EA's cut-off of 84, down to 72
-for skaters and 70 for goalies.
+**Estimates** (`scripts/lib/nhl.mjs`; since 2026-11-18 by the computed seasons' value,
+[computed-ratings.md](computed-ratings.md) step 3). Every player EA leaves out is ranked within
+his group by how much his club played him and what he produced over 2025/26 and the season under
+way, and the order is read off the shape of NHL 22, the last EA edition published whole, below its
+top 300.
 
-- Forwards rank by minutes a game + 8 × points a game, defenders by minutes a game + 5 ×
-  points a game, goalies by save percentage.
-- A few games prove little: each line starts from a replacement player's numbers (ten
-  games at nine minutes and a point every ten games; 300 shots at .880).
+- *Selection*: his share of the club's ice time a game (a goalie's, of its minutes).
+- *Production*: points a game, a goalie's saves above the league's save percentage a shot, each
+  shrunk toward replacement (the rate of the quarter of the group with the least exposure) by the
+  prior the league's own regulars give: 6.3 games for forwards, 7.5 for defenders, 1,126 shots for
+  goalies.
+- *Value*: selection and production as z-scores, weighted 0.2 : 0.8 for forwards, 0.35 : 0.65 for
+  defenders, 0.5 : 0.5 for goalies: the computed seasons' weights where ice time is kept, tuned on
+  EA's editions ("Computed seasons").
+- *The shape*: NHL 22's overalls from its 300th player's (82) down, raised a point so they top out
+  at 83, just under EA's cut-off of 84: forwards 71–83 (238 players), defenders 71–83 (137),
+  goalies 78–83 (25). The clubs pick their squads first; then the squads' estimates are ranked
+  among themselves, as NHL 22's launch rosters were rated, so that a club's depth meets NHL 22's
+  depth and not the fringe of a longer roster list. Anyone else EA leaves out takes the estimate of
+  the squad player of his group with the highest value not above his.
 - EA's own ratings are never changed.
 
-The floors are a judgement: EA's depth players are not public, and 72 to 83 is where
-third- and fourth-liners have sat in the editions whose full lists have been seen. An
-order within a group is what the estimates can claim, not a number a player would get
-from EA. On the built-in rosters a club's lineup holds 4 to 13 estimates of its 19
-places, 9.7 on average.
+Until 2026-11-18 the order was spread in a straight line from 83 down to 72 (goalies 70). NHL 22's
+shape lifts the depth players (the squads' estimated forwards from 78.1 to 80.0 on average,
+defenders from 78.1 to 80.2, goalies from 77.6 to 81.9) and brings the clubs closer together: club
+strengths' standard deviation 1.09 → 0.95, as the match model plays them 1.47 → 1.18. The built-in
+season's standings spread 0.084 (0.097 before; the NHL's 0.082–0.127), its worst club winning 28 of
+82 (the NHL's 19–25). Estimates carry noise, noise evens clubs out, and a season still being played
+is not moved toward its results ([computed-ratings.md](computed-ratings.md), step 5). An order within
+a group is what the estimates can claim, not a number a player would get from EA. On the built-in
+rosters a club's lineup holds 4 to 13 estimates of its 19 places, 9.7 on average.
 
 **Clubs.** `scripts/data/nhl-teams.json` names each club, its code (the NHL's own), the
 place its territory is named after, its arena and the arena's location. New York's three
 are Manhattan, Long Island and Buffalo. `npm run build-hockey` (`scripts/build-hockey.mjs`)
 writes `src/data/clubs.hockey.js` and `src/data/rosters.hockey.js`; `--check` rebuilds both
 byte for byte. Each club fields the lineup the game picks, then a backup goalie and the
-best skaters left, up to 23. The 2026/27 build runs from Carolina's 84.5 to Vancouver's
-80.4.
+best skaters left, up to 23. The 2026/27 build runs from Carolina's 85.1 to Nashville's
+81.7 (84.5 to Vancouver's 80.4 with the straight-line estimates).
 
 **Nations.** A player EA rates plays for EA's nationality, anyone else for his birth
 country. 16 nations field players, from Canada (92) and the United States (91) down. A
@@ -361,8 +377,9 @@ the 2008 champions, the strongest of NHL 09 (78.6).
 The other 58 seasons have no game's ratings anyone published in full (decided 2026-11-09; the six from 1960/61 to
 1965/66 added 2026-11-13 by the same rule). NHL 96 to NHL 2006 and NHL 10 to NHL 21 published none; NHLRatings.net's
 NHL 23 to 26 pages are stale or partial; EA's own lists stop at its top 20 to 320 players. Their ratings are **computed
-from the players' regular-season statistics** by the rule below, labelled as computed wherever they are shown. They are
-no game's ratings.
+from the players' regular-season statistics** by the rule below, each club then moved toward its real results that
+season (since 2026-11-18, by [computed-ratings.md](computed-ratings.md)), labelled as computed wherever they are shown.
+They are no game's ratings.
 
 **Sources.** Only open sources whose sites allow this project's agents. The NHL's own statistics API (api.nhle.com,
 api-web.nhle.com), which the plan meant to use, turns away ClaudeBot, anthropic-ai and Claude-Web in its robots.txt and
@@ -384,26 +401,49 @@ asks for it word for word. raw.githubusercontent.com and peter-tanner.com have n
 robots.txt only defines Cloudflare's content signals. Every download (4 databank files, 36 MoneyPuck season summaries,
 the lookup and 30 game-by-game archives of 329 MB in all) is pinned by SHA-256 in `scripts/data/nhl-seasons-sources.json`.
 
-**The rule** (`scripts/lib/nhl-computed.mjs`, the built-in season's estimate rule carried back in time):
+**The rule** (since 2026-11-18, [computed-ratings.md](computed-ratings.md) steps 3 to 5; `seasonValues` in
+`scripts/lib/nhl-computed.mjs`, the move in `scripts/lib/nhl-reconcile.mjs`). It replaced the rule of 2026-11-09, a
+hand-weighted mean of points a game, minutes a game and save percentage over the seasons weighted 1:2:1 (`RULE`,
+`scoreOf`, kept for the back-test and the audit's comparison).
 
-- *A season's value.* A forward's is 8 × points a game, a defender's 5 × points a game, each line starting from a
-  replacement player's ten games at 0.1 points a game. Where the source keeps time on ice (MoneyPuck, from 2008/09) the
-  value adds minutes a game, the line starting from those ten games at 9 minutes.
-- *A goalie's.* 1000 × his save percentage above the league's, his line starting from 600 shots at 12 points under the
-  league's, plus 6 × his share of the season's games (the most any skater played; at most 1). Before 1982/83 no shots
-  against were kept, so a season whose three seasons are not all from 1982/83 on compares goals against instead:
-  1000 × (the league's goals against per 60 minutes − his) / 30 shots, his line starting from 1,200 minutes at 0.36 goals a
-  game over the league's (the same 600 shots at 12 points under, at 30 shots a game).
-- *The score.* The mean of the values of the season itself, the season before and the one before that, weighted 1:2:1
-  over the seasons he played; 2004/05 is skipped (2003/04 comes before 2005/06).
+- *The window.* The season itself, the season before and the one before that, weighted 3:2:1; 2004/05 is skipped
+  (2003/04 comes before 2005/06). Exposure and events are pooled over it.
+- *Selection.* His share of the club's ice time a game where the source keeps time on ice (MoneyPuck, from 2008/09),
+  else of its games; a goalie's, of its minutes; over the seasons of the window he played.
+- *Production.* Points a game; a goalie's saves above the league's save percentage a shot or, where the window is not
+  all from 1982/83 on (no shots against were kept before), his goals against under the league's an hour. Each is shrunk
+  toward the season's replacement level (the pooled rate of the quarter of its group with the least exposure) by a prior
+  measured from the season's own regulars (a quarter of the window's games): Poisson noise for points and goals against,
+  binomial for saves, over the talent variance by the method of moments. The prior counts each record's effective
+  exposure, (Σ w·e)² ÷ Σ w²·e, the exposure whose plain rate is as noisy as the weighted one: forwards' priors run 5 to
+  15 games, defencemen's 7 to 22, goalies' 8 to 58 hours, or 1,100 to 7,000 shots (in 2016/17 save percentages varied no
+  more than their noise allows, and the prior runs to 294,000 shots: goalies there rank by saves above replacement, the
+  volume and the rate together; a prior of 2,000 or 300,000 shots orders a season's regulars alike, Spearman 0.99).
+- *Value.* Selection and production as z-scores over the season's regulars, weighted selection : production 0.15 : 0.85
+  for forwards (0.2 : 0.8 by ice time), 0.25 : 0.75 for defencemen (0.35 : 0.65 by ice time), 0.5 : 0.5 for goalies by
+  saves, 0.6 : 0.4 by goals against (`BLEND`), tuned once on the five EA editions ("Calibration") and frozen.
 - *Club and position.* The club he played most games for (a tie: the later one); the position of his longest stint
   (the databank) or MoneyPuck's.
-- *Ratings.* Provisional ratings (each score's mid-rank in its group over every player of the season) let the game's
+- *Ratings.* Provisional ratings (each value's mid-rank in its group over every player of the season) let the game's
   own lineup picker choose each club's squad, as the built-in season does. Then every squad player's rating is his
-  score's mid-rank in his group over the season's squad players, read off NHL 27's built-in squads in that group (433
-  forwards, 236 defenders, 64 goalies of 2026-11-07, frozen in `computed.histograms`): every computed season plays on
-  NHL 27's scale. Ties stay ties and nobody passes anybody in a group. A nation's player outside every squad takes the
-  rating of the highest squad score in his group not above his.
+  value's mid-rank in his group over the season's squad players, read off NHL 27's built-in squads in that group (433
+  forwards, 236 defenders, 64 goalies of 2026-11-07, frozen in `computed.histograms`: EA's ratings and the straight-line
+  estimates of that day, kept when the built-in season's estimates took NHL 22's shape): every computed season plays on
+  NHL 27's scale. A player outside every squad takes the rating of the highest squad value in his group not above his.
+- *The move toward the season's results* ([computed-ratings.md](computed-ratings.md), step 5, the user's choice of
+  2026-11-17). S, each club's results strength in goals a game: the Simple Rating System of every game's score where
+  MoneyPuck keeps them (margins by least squares with a home edge, a shoot-out's goal left out), else its goal
+  differential a game, × (n − 1) ÷ n as it meets the n − 1 others and never itself, from the databank's Teams.csv (a
+  shoot-out's goal taken off both sides) or, in 2012/13 and 2020/21, whose conferences and divisions never met, from the
+  games' totals; its reliability r, from the SRS's error or from Poisson goals. m, the match model's margin a game per
+  point of a lineup's played strength (the mean of its attack and its defence as the model weighs them), measured under
+  the season's late game and overtime by `perPointOf`, each club against itself a few points up and down, at the scoring
+  level at which the clubs score the league's goals (within 2% of the factor `build:nhl-league` then solves on the moved
+  clubs); the margin a shoot-out's goal less, and to 1982/83, when the league played no overtime, regulation's. Each
+  club's target is the clubs' mean played strength + √r × S ÷ m, and every player of the club moves by one whole number,
+  the squad's best few one point more, whichever brings the squad's lineup nearest it (`clubMoveOf`): nobody passes
+  anybody in his club. r runs 0.50 (2015/16) to 0.95 (1974/75), m 0.27 goals a point (2003/04) to 0.42 (1981/82), the
+  moves −4 to +3.
 - *Nations.* The databank's birth country, a birth it files in the USSR, Czechoslovakia or Yugoslavia counting for the
   country its city is in today, and a birth city it files under a country the city is not in (Bratislava and eleven more
   Slovak cities under the Czech Republic, Ceske Budejovice and Havlickuv Brod under Slovakia, Sverdlovsk under Ukraine,
@@ -433,83 +473,107 @@ the lookup and 30 game-by-game archives of 329 MB in all) is pinned by SHA-256 i
   name with only letters put back, and stops on any other name with a run of spaces. One more, "Nathan Lgar", in no
   squad, has no such spelling and stays as MoneyPuck gives it.
 
-**Calibration**, measured 2026-11-09 against the five full EA editions (`scripts/data/nhl-seasons/calibration.json`
+**Calibration**, measured 2026-11-18 against the five full EA editions (`scripts/data/nhl-seasons/calibration.json`
 holds their players with their lines from these sources; `docs/design/hockey-seasons-audit.json` `calibration` records
-every figure). Both the edition's overalls and the computed scores are read off NHL 27's squads group by group, then
-compared: Spearman per group, the mean gap per player, and clubs as their best 12 forwards, 6 defenders and 1 goalie.
+every figure). An edition comes out before its season (NHL 22 in October 2021), so EA rated what the seasons before it
+showed: each edition is compared with the window of the season before its own (`lagWindowOf`: NHL 22 with 2020/21,
+2019/20 and 2018/19), and the fixture holds that window's lines too. Spearman's correlation within each group:
 
-| Edition | Stats | Forwards | Defenders | Goalies | Goalies by goals against | Player gap | Clubs ρ | Club gap |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| NHLPA 93 (1992/93) | databank, points | 0.84 (322) | 0.76 (168) | 0.60 (62) | 0.66 | 2.78 | 0.78 | 1.69 |
-| NHL 94 (1993/94) | databank, points | 0.90 (345) | 0.83 (202) | 0.83 (55) | 0.77 | 2.04 | 0.79 | 0.66 |
-| NHL 95 (1994/95) | databank, points | 0.88 (361) | 0.81 (195) | 0.73 (53) | 0.71 | 2.23 | 0.82 | 0.69 |
-| NHL 07 (2006/07) | databank, points | 0.90 (509) | 0.79 (259) | 0.73 (83) | 0.66 | 2.21 | 0.63 | 0.47 |
-| NHL 22 (2021/22) | MoneyPuck, minutes | 0.92 (397) | 0.89 (212) | 0.66 (64) | — | 1.88 | 0.89 | 0.45 |
-| NHL 22 (2021/22) | MoneyPuck, points only | 0.91 | 0.86 | 0.66 | — | 1.92 | 0.81 | 0.59 |
-
-The figures are within 0.01 of the research's, made from the NHL's API (NHLPA 93 0.84/0.76/0.60, NHL 22 0.92/0.89/0.67),
-except NHL 07's defenders: the databank keeps no time on ice, and minutes a game rank them better (0.87 in the research). Goals
-against rank goalies within 0.02 of save percentage on average (0.70 against 0.72), so the seasons before 1984/85 use
-them. EA's own published players, cross-checks only, within their narrow tops: NHL 27's top 300 against 2025/26 and
-2024/25 weighted 2:1, F 0.84, D 0.73, G 0.67; NHL 23's launch lists (66) against the computed 2022/23, F 0.84, D 0.55,
-G 0.22 (10 goalies); NHL 24's (120) against 2023/24, F 0.76, D 0.61, G 0.74; NHL 25's 20 against 2024/25, F 0.91; NHL
-26's first 50 against 2025/26, F 0.77, D 0.73, G 0.99 (6). These cross-checks are not in the audit: NHL 27's top 300 are
-in `scripts/data/nhl-27.json`, but the NHL 23 to 26 lists are the research's unpinned copies of EA's pages (rank
-correlations of the computed scores, re-measured 2026-11-10 for NHL 23, 24 and 27).
-
-**Results**, from the audit (`best`, `clubs`):
-
-- 1960/61 to 1965/66, the Original Six: the best forward Jean Beliveau (1960/61, with Bernie Geoffrion 95), Geoffrion,
-  Andy Bathgate, Stan Mikita (1963/64 and 1964/65) and Bobby Hull (1965/66), each at 99; Gordie Howe 91 to 95 every
-  season. Pierre Pilote the best defender from 1962/63 (before him Doug Mohns, then Boston's defender); the best goalie
-  Jacques Plante, Glenn Hall, Plante, Charlie Hodge (the Vezina winner of 1963/64), Hall and Johnny Bower. Montreal the
-  strongest club from 1960/61 to 1963/64 (85.2 in 1960/61, first that season), Toronto in 1964/65, Chicago in 1965/66;
-  Boston, last in 1960/61, comes out second (82.5) on its two seasons before. Six clubs share 149 to 182 players, so a
-  club is now and then a defender or a centre short (Chicago and Toronto in 1960/61, Chicago in 1962/63 and 1964/65)
-  and the lineup picker moves another player there. Canada alone fields a real side.
-- 1966/67: Bobby Hull 99, Stan Mikita 95; Doug Mohns and Pierre Pilote the best defenders, Bobby Orr 90 as a rookie;
-  Chicago, first that season, the strongest club (84.9).
-- 1970/71 to 1974/75: Phil Esposito the best forward, Bobby Orr the best defender every season. 1974/75: the expansion
-  Kansas City Scouts and Washington Capitals the weakest clubs (78.6, 77.9).
-- 1976/77: Guy Lafleur 99; the Canadiens, who lost 8 of 80, the strongest club.
-- 1979/80 to 1988/89: Wayne Gretzky the best player every season (Mario Lemieux in 1989/90); Paul Coffey the best
-  defender from 1983/84 to 1990/91.
-- 2019/20: Connor McDavid, Leon Draisaitl, Nathan MacKinnon.
-- Nations: Canada the strongest every season (the USA level with it from 2022/23); the USA second through the 1980s
-  and 1990s (Sweden level in 1979/80); Czechia, Russia and the USA within a point of one another behind Canada from
-  2000/01 to 2005/06 (the Jagr and Hasek years); Sweden second in 2010/11 and 2011/12.
-
-**Club spread.** The rule regresses: its clubs sit closer together than an edition's, at about 0.6 to 0.8 of their
-spread (club strengths' standard deviation 0.99 against 1.26 for NHL 22's players, 0.65 against 0.87 for NHL 07's).
-The MoneyPuck seasons, where every club's top line logs the same minutes, run 0.6 to 0.9 points of standard deviation,
-the databank's 0.7 to 2.3, widest in the 1970s (the six clubs of 1960/61 to 1965/66: 0.75 to 1.5; NHL 27 itself:
-1.09). A season's surprise club is underrated (the weights lean on the seasons before, as the games' ratings do), and
-the order at the top is loose: the 2019/20 Coyotes,
-with Darcy Kuemper in goal, come out first by 0.1. A club's squad is picked from everyone who played most of his games
-for it that season, so a club that went through many players fields stars it never had at once: the 2005/06 Penguins,
-29th of 30, come out strongest by 1.4 with Mario Lemieux and Ziggy Palffy, who retired in January, and Mark Recchi,
-traded in March. Skaters ranked by points alone (before 2010/11) undervalue a defensive club: the 1987/88 Canadiens,
-second in the league, come out last of 21.
-
-Over 20 seeded seasons of 82 games (the measures of `npm run simulation:realism` on each season's clubs; NHL range in
-brackets):
-
-| Season | Clubs | Win% spread (0.082–0.127) | Best, worst wins (55–65, 19–25) | Goals a team (3.01–3.14) | Won by five or more (5.5–6.5%) | Top scorer (52–69) |
+| Edition | Forwards | Defencemen | Goalies | Goalies by goals against | Its own season's window (F, D, G) | The rule of 2026-11-09 (F, D, G) |
 | --- | --- | --- | --- | --- | --- | --- |
-| NHL 27 (built in) | 32 | 0.099 | 58, 24 | 3.05 | 6.5% | 59 |
-| 1967/68 | 12 | 0.121 | 57, 23 | 3.11 | 6.9% | 52 |
-| 1976/77 | 18 | 0.118 | 61, 25 | 3.25 | 7.8% | 57 |
-| 1984/85 | 21 | 0.106 | 55, 23 | 3.17 | 7.2% | 56 |
-| 1999/00 | 28 | 0.110 | 55, 17 | 3.03 | 6.7% | 58 |
-| 2007/08 (NHL 08) | 30 | 0.104 | 59, 24 | 2.62 | 5.0% | 79 |
-| 2015/16 | 30 | 0.082 | 54, 26 | 3.05 | 6.0% | 59 |
-| 2025/26 | 32 | 0.088 | 56, 25 | 3.04 | 6.3% | 58 |
+| NHLPA 93 (1992/93) | 0.826 | 0.801 | 0.694 | 0.759 | 0.824, 0.773, 0.710 | 0.843, 0.760, 0.597 |
+| NHL 94 (1993/94) | 0.907 | 0.867 | 0.865 | 0.830 | 0.867, 0.822, 0.808 | 0.898, 0.829, 0.828 |
+| NHL 95 (1994/95) | 0.896 | 0.843 | 0.880 | 0.891 | 0.869, 0.821, 0.788 | 0.880, 0.807, 0.733 |
+| NHL 07 (2006/07) | 0.922 | 0.888 | 0.893 | 0.879 | 0.880, 0.804, 0.857 | 0.897, 0.786, 0.725 |
+| NHL 22 (2021/22), by ice time | 0.945 | 0.905 | 0.812 | — | 0.873, 0.859, 0.650 | 0.918, 0.888, 0.657 |
+| Mean | **0.899** | **0.861** | **0.829** | 0.840 (four) | 0.863, 0.816, 0.763 | 0.887, 0.814, 0.708 |
 
-The early seasons are allowed outside today's ranges (fewer clubs spread wider; the 1970s' blowouts), and are documented
-rather than forced. So are the closest-packed modern seasons, just under the range's floor when re-measured 2026-11-10
-(the harness's seed 20261101): 2005/06 at 0.079 and 2012/13 at 0.075 (best 55, worst 29 wins), while 1974/75 runs over
-its ceiling at 0.161 (worst 14 wins; the Capitals won 8 of 80). NHL 08 plays on NHL 07's scale, like NHL 07 (2.73
-goals a team, top scorer 80).
+- *The weights* were chosen on a grid of 0.05 for the best mean over the editions, then checked by leaving each edition
+  out: forwards, defencemen and goalies by saves chose within 0.05 of the frozen weights every time, and the editions
+  held out agree at 0.898, 0.858 and 0.825; goalies by goals against, on the four editions the databank covers, 0.4
+  (NHL 95, left out, chose 0.3; held out, 0.831). The ice-time weights have one edition to learn from, NHL 22 (forwards
+  0.945 by ice time against 0.941 by games, defencemen 0.905 against 0.892); on NHL 27's top 300, against MoneyPuck's
+  2025/26, 2024/25 and 2023/24, they lie within 0.01 of the best (forwards 0.902 against 0.910, defencemen 0.749 against
+  0.750).
+- *No group keeps the old rule*: the blend agrees better with EA in each, by 0.012 (forwards), 0.047 (defencemen) and
+  0.121 (goalies). The old rule weighted the season before twice, which suited EA's timing; read in the season's own
+  window, as the computed seasons are, the blend's figures fall by 0.03 to 0.07, as anything would against ratings made
+  before the season was played. The window weighs the season itself most because a computed season is that season as
+  it was played.
+- *Goals against* rank the databank's goalies as well as save percentage (0.840 against 0.833 on the four), so the
+  seasons before 1984/85 use them.
+- Before 2026-11-18, against the same editions in their own season's window: forwards 0.84 to 0.92, defenders 0.76 to
+  0.89, goalies 0.60 to 0.83, clubs 0.63 to 0.89 by their best 19 (the last column, `superseded` in the audit).
+
+**Results**, from the audit (`best`, `clubs`, `results`):
+
+- 1960/61 to 1965/66, the Original Six: the best forward each season its scoring champion, Bernie Geoffrion (1960/61,
+  with Jean Beliveau 96), Andy Bathgate, Gordie Howe, Stan Mikita (1963/64 and 1964/65) and Bobby Hull (1965/66), at 98
+  or 99; Gordie Howe 93 to 99 every season. Pierre Pilote the best defender but in 1962/63 (Doug Harvey, 39 points to his
+  26); the best goalie Glenn Hall but in 1964/65 (Charlie Hodge). As the match model plays them, the weakest club is
+  the one with the season's worst goal differential (Boston five times, the Rangers in 1963/64) and the strongest the one
+  with the best but in 1964/65 (Chicago, a goal behind Detroit); as shown, the strongest is the regular season's
+  first-placed club in every one of the six. Six clubs share 149 to 182 players, so a club is now and then a defender or a centre short
+  (Chicago and Toronto in 1960/61, Chicago in 1962/63 and 1964/65) and the lineup picker moves another player there.
+  Canada alone fields a real side.
+- 1966/67: Stan Mikita 99, the scoring champion, and Bobby Hull 97; Doug Mohns and Pierre Pilote the best defenders,
+  Bobby Orr 92 as a rookie; Chicago, first that season, the strongest club (85.7).
+- 1970/71 to 1974/75: Phil Esposito the best forward, Bobby Orr the best defender every season. 1974/75: the expansion
+  Washington Capitals and Kansas City Scouts the weakest clubs as played.
+- 1976/77: Guy Lafleur 99; the Canadiens, who lost 8 of 80, the strongest club (88.4).
+- 1979/80 to 1987/88: Wayne Gretzky the best player every season, Mario Lemieux in 1988/89 (199 points) and 1989/90;
+  Paul Coffey the best defender from 1982/83 to 1990/91.
+- 2019/20: Connor McDavid, Leon Draisaitl, Nikita Kucherov; the Bruins, that season's first, the strongest as played.
+- Nations: Canada the strongest every season, the USA level with it from 2022/23 (a point ahead in 2023/24); the USA
+  second from 1977/78 to 2001/02 (level with Sweden in 1979/80, with Russia in 1995/96); the USA, Czechia and Russia within
+  two points of one another behind Canada from 1999/2000 to 2002/03 (the Jagr and Hasek years), Sweden with them in
+  2003/04; Sweden second in 2009/10 and 2011/12, level with the USA in 2010/11.
+
+**Club spread and order.** Bottom-up, the rule makes clubs too even and partly misordered: noise in single ratings
+averages out within a club. Before the move, the clubs' strengths follow their real results (S) at a median Spearman of
+0.71 as shown (the lineup's mean) and 0.74 as the match model plays them; after it, 0.85 and 1.00, the remaining
+difference being how much the shown mean undervalues a goalie, who is a quarter of the played strength and a
+nineteenth of the shown one. Measured on every computed season, before the move of 2026-11-18 and after it, against
+the season's real standings (each club's win share, a tie or a shoot-out half a win):
+
+| | Before | After |
+| --- | --- | --- |
+| Clubs as played against the standings, median Spearman | 0.60 | 0.95 |
+| Clubs as shown against the standings | 0.58 | 0.81 |
+| Club strengths' standard deviation as shown, median (NHL 07 1.30, NHL 22 1.92, NHL 27 1.09 since 2026-11-18 0.95) | 1.07 | 1.53 |
+| As played (NHL 07 1.37, NHL 22 1.63) | 1.63 | 1.66 |
+| Simulated standings' spread against the real one, mean gap (each season's clubs, its own rules and game count, 20 seasons) | 0.012 | 0.008 |
+
+The old rule's failures are gone: the 2019/20 Coyotes, who came out first by 0.1 with Darcy Kuemper in goal, move to
+the middle (S +0.11); the 2005/06 Penguins, 29th of 30 but strongest by 1.4 with Mario Lemieux, Ziggy Palffy and Mark
+Recchi, who never played together all season, move down 3 points and rank 27th as played; the 1987/88 Canadiens,
+second in the league but last of 21 by points alone, move up a point and rank third. The largest moves are four points
+down, for clubs whose players' seasons promised more than the club made of them (the 1966/67 Red Wings, the 1967/68 and
+1976/77 Black Hawks, the 1970/71 Golden Seals, the 1975/76 Rangers, the 1981/82 Kings, the 1982/83 Penguins and Whalers,
+the 2022/23 Ducks), and three up (the 1970/71 Bruins, the 1981/82 and 1985/86 Canadiens, the 1982/83 Flyers, the 1995/96
+Red Wings). Across the 1,276 clubs the move averages 0.9 points of played strength.
+
+Over 20 seeded seasons of each season's games (a round robin of its clubs under its own rules, measured 2026-11-18), the
+simulated standings' spread against the real one:
+
+| Season | Clubs | Real | Before | After |
+| --- | --- | --- | --- | --- |
+| 1960/61 | 6 | 0.127 | 0.136 | 0.118 |
+| 1967/68 | 12 | 0.080 | 0.118 | 0.096 |
+| 1970/71 | 14 | 0.143 | 0.149 | 0.165 |
+| 1976/77 | 18 | 0.143 | 0.127 | 0.155 |
+| 1981/82 | 21 | 0.117 | 0.122 | 0.124 |
+| 1986/87 | 21 | 0.074 | 0.118 | 0.074 |
+| 1999/00 | 28 | 0.106 | 0.109 | 0.105 |
+| 2003/04 | 30 | 0.097 | 0.083 | 0.103 |
+| 2010/11 | 30 | 0.078 | 0.081 | 0.078 |
+| 2015/16 | 30 | 0.078 | 0.078 | 0.070 |
+| 2025/26 | 32 | 0.081 | 0.092 | 0.089 |
+
+The seasons before overtime (to 1982/83) and before the shoot-out run a little wide: their ties count half a win in the
+real standings, where the model always finds a winner. `npm run simulation:realism` plays five seasons whole on their
+own schedules: 1970/71 0.165 (the league's 0.143, just past the harness's ±0.02), 1981/82 0.119 (0.117), 2003/04 0.105
+(0.097), 2010/11 0.080 (0.083), and the built-in season 0.084 (the NHL's 0.082 to 0.127; "Estimates").
 
 **Nations before 1977/78.** A season fields nations only where at least three play a real side (`fieldedNations`: their
 own players hold at least half the lineup). By the databank's birth countries, Canada alone does from 1960/61 to
@@ -522,10 +586,18 @@ missed 1977/78 and 1978/79), and the build fails if the test and the count disag
 **Pipeline.** `node scripts/sync-nhl-seasons.mjs` (`--fetch`, `--pin`, `--check` as for the editions) reads the pinned
 downloads under `data-src/nhl-seasons/` (`hockey-databank/`, `moneypuck/`, `moneypuck-games/`) and writes each
 computed season's snapshot: the window's league figures (`leagues`: save percentage, goals against per 60, most games),
-the form (`form`: points or minutes a game, saves or goals against) and every player of the season, `[source key, name,
-club, position, country, lines]`, a line `[season, games, points, seconds on the ice]` or, a goalie's, `[season, games,
-seconds, goals against, shots against]`. `node scripts/build-nhl-seasons.mjs` computes the rule from them, so the
-snapshots (4.4 MB with the editions') are all a rebuild needs. No season waits on the NHL's own statistics: the
+the form (`form`: points or minutes a game, saves or goals against), the season's results (`results`, since
+2026-11-18: every club's `[code, games, won, lost, tied, overtime losses, shoot-out wins, shoot-out losses, goals for,
+goals against]` from the databank's Teams.csv, or every game's `[game id, home, away, home goals, away goals]` from
+MoneyPuck's game-by-game skater files, the Coyotes' home games of 2011/12 to 2013/14 mended where MoneyPuck marks both
+sides away, `homeMended`; where both sources cover a season they agree to a goalie's goal or two a club, and
+MoneyPuck's files miss 2016/17's 4 games and 2017/18's 2) and every player of the season, `[source key, name, club,
+position, country, lines]`, a line `[season, games, points, seconds on the ice]` or, a goalie's, `[season, games,
+seconds, goals against, shots against]`. `node scripts/build-nhl-seasons.mjs` computes the rule from them, the
+move included (it plays nearly four million games of the match model to measure m, in about ten seconds), so the
+snapshots (5 MB with the editions') are all a rebuild needs. Each season's move changes its clubs' goals, so
+`node scripts/build-nhl-league.mjs` solves every season's scoring again after it; the move's m never reads that
+factor, so the two builds settle in one pass. No season waits on the NHL's own statistics: the
 databank and MoneyPuck cover every one, so the `sync-nhl-stats.mjs` the plan offered as a fallback was not written. The
 NHL's API would add time on ice for 1997/98 to 2009/10 and goalies' shots against before 1982/83, if the player ever
 wants to run that download himself.
@@ -697,11 +769,17 @@ EA's lists; the name matching; the running App launching a 1993/94 nations campa
 as text under it as the player picks seasons (MoneyPuck's with the statement, MoneyPuck's alone, the
 statement, none).
 
-`scripts/hockey-computed.test.mjs`: the rule by hand (both skater forms, both goalie forms, the
-weights, 2004/05 skipped, the club by most games); the mid-rank ratings, ties and the step rule; every
-computed rating NHL 27's and every group's order kept; the stars and clubs of known seasons; the
-calibration against the five editions (F ≥ 0.84, D ≥ 0.75, G ≥ 0.59, players ≤ 2.8 and clubs ≤ 1.7
-apart; minutes a game better for NHL 22; goals against within 0.03 of save percentage); nations from
+`scripts/hockey-computed.test.mjs`: the superseded rule by hand (as the back-test still reads it), 2004/05 skipped,
+the club by most games; the mid-rank ratings, ties and the step rule; a line's facts and a player's value by hand (the
+window 3:2:1, the effective exposure, the measured prior, the regulars' z-scores, the frozen weights); results
+strength by hand (goal differential, the SRS, divisions that never met, a shoot-out's goal off); MoneyPuck's game
+scores with the Coyotes' home games mended and the databank's records; m in its range and the same for the same seed;
+every computed rating NHL 27's moved by its club's whole number (its best few one more), nobody passing anybody in his
+club; every club within reach of its target and the clubs as played following S (Spearman ≥ 0.94 each season, the
+shown strengths ≥ 0.80 in the median one); the stars and clubs of known seasons; the calibration against the five
+editions in the window EA saw (F ≥ 0.82, D ≥ 0.80, G ≥ 0.69 each; the blend above the superseded rule in every group;
+ice time better for NHL 22; goals against within 0.03 of save percentage) and the frozen weights the ones the editions
+choose, each edition left out choosing within 0.05 of them (0.1 for goalies by goals against); nations from
 1977/78; the birth-city rule; the federations of the day (tennis's table, no member listing a nation in its
 federation's years, the land held only by a real side, Stastny, Balderis, Khristich and Irbe, the names on the teams);
 the names MoneyPuck dropped letters from put back; NHL 08 and NHL 09
@@ -744,9 +822,11 @@ duel campaign with the live ticker and a hockey nations campaign.
 - The built-in season, 2026/27: EA's site shows only the current edition, and each rollover
   needs a new pull. The earlier seasons are fixed files ("Earlier seasons").
 - NHL players only, by nationality or birth country (in an earlier season, the federation of its day).
-- 58 seasons are computed, not rated by any game ("Computed seasons"): their clubs sit closer together than an
-  edition's, goalies rank worst (Spearman 0.60 to 0.83 against the editions), and before 2010/11 defenders rank by
-  points alone, so a shutdown defender rates low. No time on ice before 2008/09 and no goalies' shots against before
+- 58 seasons are computed, not rated by any game ("Computed seasons"): goalies and defencemen agree least with EA
+  (0.83 and 0.86 against the editions, forwards 0.90), and before 2010/11 skaters' selection is by games alone, so a
+  shutdown defender rates low until his club's results move it. The move follows a season's goal differential, not its
+  points: a club that won its close games ranks below its standing. As shown (the lineup's mean), a club with a great
+  goalie looks weaker than it plays. No time on ice before 2008/09 and no goalies' shots against before
   1982/83 are in the open sources; the NHL's API has both, but turns this project's agents away.
 - Terms. MoneyPuck.com's data, behind the 15 seasons from 2010/11, is free for non-commercial use only, as the NHL's own
   statistics behind the built-in season are; with ads on, the game should ask MoneyPuck. Using it was Claude's decision
