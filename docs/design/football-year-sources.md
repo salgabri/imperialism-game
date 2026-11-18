@@ -199,7 +199,7 @@ is a record of terms as published, not legal advice.
    alike ([tennis.md](tennis.md#earlier-seasons)).
 8. **Sports-Reference** (the 36 computed basketball seasons): their inputs are
    Basketball-Reference's statistics, from a Kaggle copy whose CC0 label is its
-   compiler's, not Sports-Reference's. PER, WS/48 and DWS are
+   compiler's, not Sports-Reference's. PER, DWS and team SRS are
    Basketball-Reference's own figures, and Sports-Reference's data-use terms
    forbid scraping that harms its sites, building a competing database and AI
    training with its data; nothing was fetched from basketball-reference.com.
