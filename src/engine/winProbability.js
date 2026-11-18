@@ -45,11 +45,11 @@
 //   than they move who wins. An earlier season plays its own day's drive odds, tries and overtime (its prepared match's
 //   `rules`): sudden death to 2009, where a lead in overtime has won, and from 2010 to 2021 modified sudden death, where
 //   only a first possession's field goal leaves an answer; both chains are exact too. College football
-//   (src/sports/collegeFootball.js) plays the same chart under its own rules: its possessions, tries and edge scale, and
-//   college overtime, whose chain is exact too (one toss, the first possession alternating; possessions from the 25 in
-//   the first two periods, two-point plays from the third, a decisive two-point play after the last). An earlier
-//   season's overtime is its day's: two-point tries from the third period and possessions in every one to 2018, and
-//   two-point plays from the fifth in 2019 and 2020 (the model's `twoFrom` and `playsFrom`).
+//   (src/sports/collegeFootball.js) plays the same chart under its own rules: its possessions, tries, edge scale and
+//   form, and college overtime, whose chain is exact too (one toss, the first possession alternating; possessions from
+//   the 25 in the first two periods, two-point plays from the third, a decisive two-point play after the last). An
+//   earlier season's overtime is its day's: two-point tries from the third period and possessions in every one to 2018,
+//   and two-point plays from the fifth in 2019 and 2020 (the model's `twoFrom` and `playsFrom`).
 //
 // Baseball — the model's own distributions (src/sports/baseball.js): the clock counts outs (three a half-inning, 54 in
 //   nine innings), and each half-inning's runs follow the model's distribution for the batting side's edge
@@ -480,7 +480,8 @@ function drivesModel(prepared, variation, length) {
   for (let k = 1; k <= MAX_OVERTIMES; k++) otChain.push(win + open * otChain[k - 1]);
   return {
     kind: 'drives', drives: num(prepared.drives) || DRIVES, muA: a.mean, muD: d.mean, varA: a.variance, varD: d.variance, slope,
-    formSd: variation * FORM_PER_DRAMA, driveSd: DRIVE_SD, length, ot: rules?.ot ?? OVERTIME, maxOt: MAX_OVERTIMES, otChain,
+    formSd: variation * (rules?.form ?? FORM_PER_DRAMA), driveSd: DRIVE_SD, length, ot: rules?.ot ?? OVERTIME, maxOt: MAX_OVERTIMES,
+    otChain,
     tdA: sideA.td, fgA: sideA.fg, xpA: sideA.xp, twoA: sideA.two, tdD: sideD.td, fgD: sideD.fg, xpD: sideD.xp, twoD: sideD.two,
     ...(overtime === 'both' ? {} : { overtime }),
   };
@@ -488,7 +489,7 @@ function drivesModel(prepared, variation, length) {
 
 /**
  * The live model of a college football match (drivesModel under `rules.overtime` 'college'): regulation as American
- * football's, under the college rules' possessions, tries, safeties and edge scale; overtime by collegeChain, before
+ * football's, under the college rules' possessions, tries, safeties, edge scale and form; overtime by collegeChain, before
  * form, with `maxOvertimes` periods of `ot` minutes and the decisive two-point play's odds (logistic of the edge gap
  * times DECISIVE_SLOPE and the rules' scale). An earlier season whose overtime is not today's carries its periods
  * (`twoFrom`, `playsFrom`: collegeOvertimeOf; null `playsFrom` for none).
@@ -513,7 +514,7 @@ function collegeDrivesModel(prepared, variation, length) {
   const decisive = 1 / (1 + Math.exp(-DECISIVE_SLOPE * (rules.scale ?? 1) * (prepared.edgeA - prepared.edgeD)));
   return {
     kind: 'drives', drives: num(prepared.drives), muA: a.mean, muD: d.mean, varA: a.variance, varD: d.variance, slope,
-    formSd: variation * FORM_PER_DRAMA, driveSd: DRIVE_SD, length, ot: rules.ot, maxOt: rules.maxOvertimes,
+    formSd: variation * (rules.form ?? FORM_PER_DRAMA), driveSd: DRIVE_SD, length, ot: rules.ot, maxOt: rules.maxOvertimes,
     otChain: collegeChain(sideA, sideD, rules.maxOvertimes, decisive, twoFrom, playsFrom),
     tdA: sideA.td, fgA: sideA.fg, xpA: sideA.xp, twoA: sideA.two, tdD: sideD.td, fgD: sideD.fg, xpD: sideD.xp, twoD: sideD.two,
     tdLateA: sideA.answer[6].td, tdLateD: sideD.answer[6].td, overtime: 'college',

@@ -51,7 +51,7 @@ test('the built-in season plays today\'s rules: matchSport hands back the sport 
   }
   assert.equal(collegeFootballIn({}), collegeFootball);
   assert.equal(getSport('college-football'), collegeFootball);
-  assert.equal(collegeFootball.simulationVersion, 1);
+  assert.equal(collegeFootball.simulationVersion, 2);
   assert.equal(collegeFootball.prepareMatch(builtIn[0], builtIn[1]).rules, COLLEGE_RULES);
   assert.ok(!('otTwoFrom' in COLLEGE_RULES) && !('otPlaysFrom' in COLLEGE_RULES), 'today\'s rulebook names no era');
   assert.deepEqual(collegeOvertimeOf(COLLEGE_RULES), { twoFrom: 2, playsFrom: 3 });
@@ -74,7 +74,7 @@ test('every season from 2009 plays its own day\'s rules, one sport object per se
     assert.notEqual(sport, collegeFootball, `${year}`);
     assert.equal(sport, sportOf(year), `${year}: one object, so caches keyed by it hold`);
     assert.equal(sport.id, 'college-football');
-    assert.equal(sport.simulationVersion, 2);
+    assert.equal(sport.simulationVersion, 3);
     const { rules, drives } = sport.prepareMatch(builtIn[0], builtIn[1]);
     assert.deepEqual(rules, collegeSeasonRules(year, `cfb-${year}`));
     assert.equal(drives, rules.drives);
@@ -331,14 +331,16 @@ test('the live chart follows each season\'s overtime: exact chains, two-point tr
 
 // ---------- today's draws ----------
 
-test('the built-in season and the NFL keep their draws: a rulebook naming today\'s overtime plays as one naming none', () => {
+test('the built-in season\'s draws are pinned and the NFL keeps its own: a rulebook naming today\'s overtime plays as one naming none', () => {
   const digest = value => createHash('sha256').update(JSON.stringify(value)).digest('hex').slice(0, 16);
   const named = { ...COLLEGE_RULES, otTwoFrom: 2, otPlaysFrom: 3 };
   const [a, d] = [builtIn[69], { ...builtIn[69], id: 'twin' }];
   const plain = prepareMatch(a, d, undefined, undefined, undefined, COLLEGE_RULES), explicit = prepareMatch(a, d, undefined, undefined, undefined, named);
   const draw = (prepared, seed) => { const rng = makeRng(seed); return Array.from({ length: 3000 }, () => sampleResult(rng, prepared, 6)); };
   assert.deepEqual(draw(explicit, 5), draw(plain, 5));
-  // Digests taken before the seasons' rules came in: the built-in season's games, live charts and the NFL's games.
+  // Digests: the built-in season's games and live charts as its simulation version 2 plays them (half the NFL's form,
+  // unstretched; the scale, scoring and home edge refitted to it), and the NFL's games and chart as they were before the
+  // college seasons' rules came in, which neither change touched.
   const college = getSport('college-football');
   let rng = makeRng(20261118);
   const samples = [];
@@ -347,7 +349,7 @@ test('the built-in season and the NFL keep their draws: a rulebook naming today\
     if (x === y) continue;
     samples.push(college.sampleResult(rng, college.prepareMatch(x, y, teamEff(x), teamEff(y), { home: i % 5 === 0 }), i % 13));
   }
-  assert.equal(digest(samples), '87e39c3ed5cdfb95');
+  assert.equal(digest(samples), '8f62b6825356515a');
   rng = makeRng(77);
   const games = [];
   for (let i = 0; i < 1500; i++) {
@@ -355,9 +357,9 @@ test('the built-in season and the NFL keep their draws: a rulebook naming today\
     if (x === y) continue;
     games.push(college.simulate(rng, x, y, 6, teamEff(x), teamEff(y)));
   }
-  assert.equal(digest(games), 'f08676613d24b47c');
+  assert.equal(digest(games), 'de2a20f862598c80');
   assert.equal(digest([[0, 137], [10, 20], [60, 61], [100, 30], [40, 47]].map(([i, j]) => liveModelFor(college, builtIn[i], builtIn[j], undefined, undefined, 6))),
-    'e08dcf237eb06840');
+    'a223b930a6aab0c5');
   const nfl = getSport('american-football'), clubs = NFL_CLUBS.map(club => buildClub(club, nfl));
   rng = makeRng(5);
   const nflGames = [];

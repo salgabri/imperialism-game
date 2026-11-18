@@ -3,7 +3,9 @@
 // under its own day's rules, score as their leagues did. Only what the models set out to match is held here. Matches
 // are at a neutral venue unless a campaign turns Home advantage on, so the home sides' wins are checked with it on.
 // The known gaps are reported by `npm run simulation:realism` and not tested: NBA and EuroLeague games decided by three or
-// fewer, the EuroLeague's best and worst clubs (a little too close to the middle), MLB's worst club.
+// fewer, the EuroLeague's best and worst clubs (a little too close to the middle), MLB's worst club, and college
+// football's margins (too many one-score games and games decided by 3, too few by 21 or more: the NFL's late-game
+// play-calling closes college games more than the FBS's do).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { LATEST_NBA_SEASON, NBA_LEAGUE_AVERAGES } from '../src/data/nbaLeagueAverages.js';
@@ -110,6 +112,38 @@ test('NFL and AFL seasons of other eras score as their leagues did, under their 
     near(era.fieldGoals, era.realFieldGoals, 0.15, 'field goals a team');
     near(era.xpRate, era.realXpRate, 0.015, 'extra points made');
     near(era.twoPointShare, era.realTwoPointShare, 0.02, 'touchdowns going for two');
+  }
+});
+
+test('college football: conference seasons score and spread as the FBS\'s of 2024 and 2025', () => {
+  const college = report.college, real = REAL.college;
+  assert.deepEqual([college.schools, college.conferences], [138, 10]);
+  // What the college rules were fitted to (src/sports/collegeFootball.js): touchdowns and field goals made, the points
+  // they make, and the spread of the schools' average conference margins (the scale). Overtime and the tries follow.
+  within(college.pointsPerTeam, real.pointsPerTeam, 'points a team');
+  within(college.touchdowns, real.touchdowns, 'touchdowns a team');
+  within(college.fieldGoals, real.fieldGoals, 'field goals made a team', 0.01);
+  within(college.conferenceMarginSd, real.conferenceMarginSd, 'spread of the schools\' average conference margins', 0.2);
+  within(college.overtimeRate, real.overtimeRate, 'overtime', 0.005);
+  within(college.xpRate, real.xpRate, 'extra points made', 0.002);
+  within(college.twoPointShare, real.twoPointShare, 'touchdowns going for two', 0.005);
+});
+
+test('college football: each FBS season from 2009 replayed on its own schedule spreads its standings as the real one did', () => {
+  const seasons = report.collegeSeasons;
+  assert.deepEqual(seasons.map(season => season.year), Array.from({ length: 17 }, (_, i) => 2009 + i));
+  const gaps = seasons.map(season => season.winPctSd - season.real.winPctSd);
+  // Each season within 0.02 of its own (one real season's spread is itself a draw, about 0.007 either way), and the
+  // seasons together within 0.006: before college form was halved and no longer stretched by the scale, 0.012 too even.
+  gaps.forEach((gap, i) => assert.ok(Math.abs(gap) <= 0.02, `${seasons[i].year}: win% SD ${seasons[i].winPctSd} against the real ${seasons[i].real.winPctSd}`));
+  const meanGap = gaps.reduce((sum, gap) => sum + gap, 0) / gaps.length;
+  assert.ok(Math.abs(meanGap) <= 0.006, `the standings' spread ${meanGap.toFixed(4)} from the real seasons' on average`);
+  for (const season of seasons) {
+    // The luck about each season's own SRS stays within two points of the real season's (14.3 on average; the drive
+    // model's own luck alone is about 15), its overtime and its points within reach of the real season's.
+    assert.ok(season.sigma - season.real.sigma < 2, `${season.year}: luck ${season.sigma} against ${season.real.sigma}`);
+    assert.ok(Math.abs(season.overtimeRate - season.real.overtimeRate) < 0.025, `${season.year}: overtime ${season.overtimeRate} against ${season.real.overtimeRate}`);
+    assert.ok(Math.abs(season.pointsPerTeam - season.real.pointsPerTeam) < 2, `${season.year}: ${season.pointsPerTeam} points a team against ${season.real.pointsPerTeam}`);
   }
 });
 

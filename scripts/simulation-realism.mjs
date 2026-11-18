@@ -2,7 +2,9 @@
 // measures what a fan of each league would look at: scores, draws and overtime, margins, standings, and who scores.
 // American football also plays a few earlier NFL and AFL seasons' clubs under their own day's rules (NFL_ERAS), the
 // computed ones also on their own schedules beside the real standings' spread and margins (ownSchedule), and ice
-// hockey and rugby league a few earlier seasons' clubs under theirs (NHL_ERAS, NRL_ERAS).
+// hockey and rugby league a few earlier seasons' clubs under theirs (NHL_ERAS, NRL_ERAS). College football plays the
+// built-in season's schools in conference seasons (collegeSeason) and every computed FBS season, 2009–2025, on its own
+// schedule beside the real one (collegeOwnSchedules).
 // Tennis has no league: its nations play Davis Cup ties (the women's game's, Billie Jean King Cup ties), the sixteen
 // strongest each meeting every other once a season; and a season of each earlier format the cups played, under its
 // year's rules (formatsReport: best of five sets, advantage sets, three-rubber ties). Football's extra time is a
@@ -51,6 +53,11 @@ import { NRL_LEAGUE_AVERAGES } from '../src/data/nrlLeagueAverages.js';
 import { seasonClubs as nrlSeasonClubs } from './lib/nrl-league.mjs';
 import { BUILT_IN_AMERICAN_FOOTBALL_SEASONS } from '../src/data/americanFootballSeasons.js';
 import { NFL_LEAGUE_AVERAGES } from '../src/data/nflLeagueAverages.js';
+import { CLUBS as CFB_CLUBS } from '../src/data/clubs.college-football.js';
+import { collegeFootball } from '../src/sports/collegeFootball.js';
+import { BUILT_IN_COLLEGE_FOOTBALL_SEASONS } from '../src/data/collegeFootballSeasons.js';
+import { COLLEGE_LEAGUE_AVERAGES } from '../src/data/collegeLeagueAverages.js';
+import { srsOf } from './lib/computed-ratings.mjs';
 
 const DRAMA = 6; // Balanced
 const FOOTBALL_MINUTES = FOOTBALL_MODEL.MINUTES;
@@ -448,6 +455,162 @@ function ownSchedule(id, sport, clubs, seasons, seed, venue) {
   return {
     ownSchedule: { games: games.length, winPctSd: mean(spreads), ...marginsOf(margins) },
     realOwnSchedule: { winPctSd: spreadOf(realWins, realPlayed), ...marginsOf(games.map(g => Math.abs(g.homeScore - g.awayScore))) },
+  };
+}
+
+// ---- College football (FBS) -----------------------------------------------------------------------------------
+
+/** A list of games' margins as a fan reads them: the mean, one score (≤ 8), exactly 3 and 7, and 21 or more. */
+const gridironMargins = margins => ({ marginMean: mean(margins), oneScore: share(margins, m => m <= 8), byThree: share(margins, m => m === 3),
+  bySeven: share(margins, m => m === 7), blowouts: share(margins, m => m >= 21) });
+
+/**
+ * The built-in season's schools (College Football 27's 138) in conference seasons: each conference's schools (the
+ * independents sit out) play a shuffled round robin cut to eight games a school in seven seasons of ten and nine in the
+ * rest (all of it where a conference has fewer rounds), 8.3 on average as the FBS's conference schedules of 2024 and
+ * 2025 had. Points, touchdowns and field goals made a team, overtime's included as the FBS's tables count them;
+ * overtime, margins and tries; and the spread of the schools' average conference margins, each season's own, which the
+ * college scale was fitted to (src/sports/collegeFootball.js).
+ */
+export function collegeSeason(seasons, seed, venue) {
+  const teams = CFB_CLUBS.map(club => buildClub(club, collegeFootball));
+  const eff = teams.map(teamEff);
+  const conferences = new Map();
+  teams.forEach((team, i) => { if (team.conf !== 'Independent') conferences.set(team.conf, [...(conferences.get(team.conf) ?? []), i]); });
+  const rng = makeRng(seed), prepared = new Map(), played = [], spreads = [];
+  const count = { touchdowns: 0, fieldGoals: 0, kicks: 0, kicked: 0, twos: 0 };
+  for (let s = 0; s < seasons; s++) {
+    const sum = teams.map(() => 0), games = teams.map(() => 0);
+    for (const ids of conferences.values()) {
+      const rounds = Math.min(s % 10 < 7 ? 8 : 9, ids.length % 2 ? ids.length : ids.length - 1);
+      for (const [x, y] of schedule(ids.length, rounds, rng)) {
+        const i = ids[x], j = ids[y], key = `${i}:${j}`;
+        if (!prepared.has(key)) prepared.set(key, collegeFootball.prepareMatch(teams[i], teams[j], eff[i], eff[j], venue));
+        const result = collegeFootball.sampleResult(rng, prepared.get(key), DRAMA);
+        played.push({ i, j, effI: eff[i], effJ: eff[j], ga: result.ga, gd: result.gd, tie: result.tie, winner: result.winner === teams[i].id ? i : j });
+        sum[i] += result.ga - result.gd; sum[j] += result.gd - result.ga; games[i]++; games[j]++;
+        for (const p of result.plays) {
+          // Overtime's two-point plays are neither touchdowns nor field goals; a safety is the defence's.
+          if (p.kind === 'two') continue;
+          if (p.pts === 3) count.fieldGoals++;
+          if (p.pts < 6) continue;
+          count.touchdowns++;
+          if (p.conversion === 'kick') { count.kicks++; if (p.pts === 7) count.kicked++; }
+          if (p.conversion === 'two') count.twos++;
+        }
+      }
+    }
+    spreads.push(sd(teams.map((team, i) => (games[i] ? sum[i] / games[i] : null)).filter(value => value !== null)));
+  }
+  const sides = played.length * 2;
+  return {
+    schools: teams.length, conferences: conferences.size, gamesPerSeason: played.length / seasons,
+    pointsPerTeam: mean(played.flatMap(g => [g.ga, g.gd])), touchdowns: count.touchdowns / sides, fieldGoals: count.fieldGoals / sides,
+    overtimeRate: share(played, g => g.tie), ...gridironMargins(played.map(g => Math.abs(g.ga - g.gd))),
+    conferenceMarginSd: mean(spreads), favourite: favouriteRecord(played), homeWins: share(played, g => g.winner === g.j),
+    xpRate: count.kicked / count.kicks, twoPointShare: count.twos / count.touchdowns,
+  };
+}
+
+/** The luck between a season's schools: its margins' spread about their own Simple Rating System (srsOf's sigma). */
+const srsSigma = games => srsOf(games.map(g => ({ home: g.home, away: g.away, homeScore: g.homeScore, awayScore: g.awayScore, neutral: g.neutral }))).sigma;
+/** How many of each replay the luck is measured on (an SRS a season is the slow part). */
+const SIGMA_REPLAYS = 10;
+
+/**
+ * Every computed FBS season (cfb-2009 to cfb-2025) on its own schedule, every game between two of its schools in its
+ * snapshot (scripts/data/cfb-seasons/: the games its schools' move toward their results read), `seasons` times under its
+ * own day's rules, each replay beside the real season as a fan would read one: the standings' spread (win% SD), the luck
+ * (the margins' spread about the replay's own SRS, as the real season's about its own), points a team, margins and
+ * overtime (REAL.collegeOvertime). The defender is each game's home side: at a neutral venue by default, at home with
+ * Home advantage, where a game at a neutral site stays neutral.
+ */
+export function collegeOwnSchedules(seasons, seed, venue) {
+  return BUILT_IN_COLLEGE_FOOTBALL_SEASONS.slice().sort((a, b) => a.year - b.year).map(meta => {
+    const sport = matchSport({ sport: 'college-football', layer: 'clubs', clubScope: 'domestic:cfb', dataSet: meta.id, dataYear: meta.year,
+      dataSeason: meta.season });
+    const clubs = JSON.parse(readFileSync(new URL(`../public/college-football/${meta.id}.json`, import.meta.url), 'utf8')).clubs
+      .map(club => buildClub(club, sport));
+    const at = new Map(clubs.map((club, i) => [club.id, i]));
+    const snapshot = JSON.parse(readFileSync(new URL(`./data/cfb-seasons/${meta.year}.json`, import.meta.url), 'utf8'));
+    // A game against a school that does not play the season (Idaho; New Mexico State in 2020) is left out.
+    const games = snapshot.games.filter(([home, away]) => at.has(home) && at.has(away))
+      .map(([home, away, homeScore, awayScore, neutral]) => ({ home: at.get(home), away: at.get(away), homeScore, awayScore, neutral: neutral === 1 }));
+    const played = clubs.map(() => 0), realWins = clubs.map(() => 0);
+    for (const g of games) {
+      played[g.home]++; played[g.away]++;
+      realWins[g.homeScore > g.awayScore ? g.home : g.away]++;
+    }
+    const spreadOf = wins => sd(clubs.map((club, i) => wins[i] / played[i]));
+    const eff = clubs.map(teamEff);
+    const prepared = games.map(g => sport.prepareMatch(clubs[g.away], clubs[g.home], eff[g.away], eff[g.home], g.neutral ? undefined : venue));
+    const rng = makeRng(hashStr(`${seed}:${meta.id}`));
+    const spreads = [], sigmas = [], points = [], margins = [];
+    let overtime = 0;
+    for (let s = 0; s < seasons; s++) {
+      const wins = clubs.map(() => 0), replay = [];
+      games.forEach((g, k) => {
+        const result = sport.sampleResult(rng, prepared[k], DRAMA);
+        wins[result.gd > result.ga ? g.home : g.away]++;
+        points.push(result.ga, result.gd);
+        margins.push(Math.abs(result.ga - result.gd));
+        if (result.tie) overtime++;
+        replay.push({ ...g, homeScore: result.gd, awayScore: result.ga });
+      });
+      spreads.push(spreadOf(wins));
+      if (s < SIGMA_REPLAYS) sigmas.push(srsSigma(replay));
+    }
+    const [realOvertime, realCounted] = REAL.collegeOvertime[meta.year];
+    return {
+      id: meta.id, year: meta.year, schools: clubs.length, games: games.length,
+      winPctSd: mean(spreads), sigma: mean(sigmas), pointsPerTeam: mean(points), overtimeRate: overtime / (seasons * games.length),
+      ...gridironMargins(margins),
+      real: { winPctSd: spreadOf(realWins), sigma: srsSigma(games), pointsPerTeam: mean(games.flatMap(g => [g.homeScore, g.awayScore])),
+        overtimeRate: realOvertime / realCounted, ...gridironMargins(games.map(g => Math.abs(g.homeScore - g.awayScore))) },
+    };
+  });
+}
+
+/**
+ * The FBS's 2024 and 2025 seasons, games between two FBS schools: each season's scoring as ESPN's box scores and drives
+ * give it (src/data/collegeLeagueAverages.js; cfbstats.com's tables over both: 26.5 points, 3.27 touchdowns, 1.59
+ * field-goal tries made 76.1%, extra points 98.3%, two-point tries after 8.3% of touchdowns), and its conference games'
+ * margins and the spread of its schools' average conference margins from its snapshot (scripts/data/cfb-seasons/: the
+ * regular season's games between two schools of one conference; cfbstats' tables give the spread as 10.3 and 10.7).
+ */
+function collegeReal() {
+  const range = values => [Math.min(...values), Math.max(...values)].map(x => Math.round(x * 1000) / 1000);
+  const years = [2024, 2025];
+  const figures = years.map(year => COLLEGE_LEAGUE_AVERAGES[year]);
+  const conference = years.map(year => {
+    const snapshot = JSON.parse(readFileSync(new URL(`./data/cfb-seasons/${year}.json`, import.meta.url), 'utf8'));
+    const of = id => snapshot.schools[id]?.conference;
+    const games = snapshot.games.filter(([home, away, , , , postseason]) => !postseason && of(home) && of(home) === of(away)
+      && of(home) !== 'Independent');
+    const sum = new Map(), count = new Map();
+    for (const [home, away, homeScore, awayScore] of games) {
+      for (const [school, margin] of [[home, homeScore - awayScore], [away, awayScore - homeScore]]) {
+        sum.set(school, (sum.get(school) ?? 0) + margin);
+        count.set(school, (count.get(school) ?? 0) + 1);
+      }
+    }
+    return { spread: sd([...sum].map(([school, total]) => total / count.get(school))), gamesPerSchool: mean([...count.values()]),
+      ...gridironMargins(games.map(([, , homeScore, awayScore]) => Math.abs(homeScore - awayScore))) };
+  });
+  const of = key => range(conference.map(season => season[key]));
+  return {
+    note: 'FBS seasons 2024 and 2025, games between FBS schools (scoring: ESPN\'s box scores, src/data/collegeLeagueAverages.js; '
+      + 'margins and their spread: the conference games of scripts/data/cfb-seasons/; overtime: ESPN\'s drives)',
+    pointsPerTeam: range(figures.map(s => s.points / s.games)), touchdowns: range(figures.map(s => s.td / s.games)),
+    fieldGoals: range(figures.map(s => s.fgm / s.games)),
+    // ESPN's 98.3% (2024) and 98.8% (2025), from cfbstats' 98.3% as it rounds it.
+    xpRate: [0.9825, range(figures.map(s => s.xpm / s.xpa))[1]],
+    // The touchdowns less the extra points tried, cfbstats' (8.3%) and ESPN's (8.7% in 2024, 8.4% in 2025).
+    twoPointShare: [0.083, 0.087],
+    // Conference games that went to overtime (REAL.collegeOvertime's way): 23 of 531 in 2024, 34 of 559 in 2025.
+    overtimeRate: [0.043, 0.061],
+    conferenceMarginSd: of('spread'), gamesPerSchool: of('gamesPerSchool'),
+    marginMean: of('marginMean'), oneScore: of('oneScore'), byThree: of('byThree'), bySeven: of('bySeven'), blowouts: of('blowouts'),
   };
 }
 
@@ -1042,6 +1205,13 @@ export const REAL = Object.freeze({
     // est.: about one touchdown in ten goes for two each season.
     xpRate: [0.934, 0.959], twoPointShare: [0.085, 0.11], twoPointRate: [0.4, 0.565], safetiesPerSeason: [8, 17],
   },
+  college: collegeReal(),
+  // Each FBS season's games between FBS schools that went to overtime, of those ESPN's drives cover to the fourth
+  // quarter (sportsdataverse's cfbfastR-cfb-data, cached in data-src/cfb-history/, counted 2026-11-18): a drive in a fifth
+  // period or later, the final margin within 8 (ESPN numbers a few other games' last drives past the fourth quarter).
+  collegeOvertime: Object.freeze({ 2009: [25, 696], 2010: [27, 694], 2011: [30, 703], 2012: [44, 717], 2013: [33, 736], 2014: [29, 746],
+    2015: [32, 758], 2016: [37, 745], 2017: [28, 769], 2018: [30, 763], 2019: [23, 770], 2020: [21, 528], 2021: [30, 741], 2022: [44, 747],
+    2023: [43, 785], 2024: [38, 782], 2025: [44, 807] }),
   mlb: {
     note: 'MLB regular seasons 2022–2025',
     runsPerTeam: [4.28, 4.62], extraInnings: [0.083, 0.089], oneRun: [0.278, 0.294],
@@ -1184,6 +1354,8 @@ export function realismReport({ seasons = 40, seed = 20261101, home = false } = 
     euroleague: euroleagueSeason(seasons, hashStr(`${seed}:euroleague`), venue),
     nfl: nflSeason(seasons * 4, hashStr(`${seed}:nfl`), venue),
     nflEras: NFL_ERAS.map(id => nflEra(id, seasons * 4, hashStr(`${seed}:${id}`), venue)),
+    college: collegeSeason(seasons * 4, hashStr(`${seed}:college`), venue),
+    collegeSeasons: collegeOwnSchedules(seasons, hashStr(`${seed}:college-seasons`), venue),
     mlb: mlbSeason(seasons, hashStr(`${seed}:mlb`), venue),
     mlbEras: MLB_ERAS.map(year => mlbSeason(seasons, hashStr(`${seed}:mlb:${year}`), venue, year)),
     nhl: nhlSeason(seasons, hashStr(`${seed}:nhl`), venue),
@@ -1332,6 +1504,34 @@ EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
     lines.push(`  ${`${e.league} ${e.year}`.padEnd(10)} ${pair(own.winPctSd, real.winPctSd, x => num(x, 3)).padEnd(15)}`
       + ` ${pair(own.oneScore, real.oneScore, pct).padEnd(17)} ${pair(own.byThree, real.byThree, pct).padEnd(15)} ${pair(own.bySeven, real.bySeven, pct).padEnd(15)}`);
   }
+  const c = report.college, rc = REAL.college;
+  lines.push(`\nCollege football — ${c.schools} FBS schools of College Football 27 in conference seasons, ${num(c.gamesPerSeason, 0)} games a`
+    + ` season (real: ${rc.note})`);
+  lines.push(row('points a team', c.pointsPerTeam, rc.pointsPerTeam, x => num(x, 2)));
+  lines.push(row('touchdowns a team', c.touchdowns, rc.touchdowns, x => num(x, 2)));
+  lines.push(row('field goals made a team', c.fieldGoals, rc.fieldGoals, x => num(x, 2)));
+  lines.push(row('overtime', c.overtimeRate, rc.overtimeRate, pct));
+  lines.push(row('conference margin SD (schools)', c.conferenceMarginSd, rc.conferenceMarginSd, x => num(x, 2)));
+  lines.push(row('mean margin', c.marginMean, rc.marginMean, x => num(x, 1)));
+  lines.push(row('one-score games (≤ 8)', c.oneScore, rc.oneScore, pct));
+  lines.push(row('decided by exactly 3', c.byThree, rc.byThree, pct));
+  lines.push(row('decided by exactly 7', c.bySeven, rc.bySeven, pct));
+  lines.push(row('decided by 21 or more', c.blowouts, rc.blowouts, pct));
+  lines.push(row('extra points made', c.xpRate, rc.xpRate, pct));
+  lines.push(row('touchdowns going for two', c.twoPointShare, rc.twoPointShare, pct));
+  lines.push(row('favourite wins', c.favourite.wins, null, pct));
+  lines.push('\nFBS seasons 2009–2025 on their own schedules — each season\'s computed schools under its own day\'s rules, every'
+    + ' game between two of them (real: the season\'s games)');
+  lines.push(`  ${'season'.padEnd(7)} ${'win% SD'.padEnd(15)} ${'luck (SRS σ)'.padEnd(13)} ${'points a team'.padEnd(15)} ${'mean margin'.padEnd(13)}`
+    + ` ${'one-score (≤ 8)'.padEnd(17)} ${'overtime'.padEnd(13)}`);
+  const seasonRow = (label, s, real) => `  ${label.padEnd(7)} ${pair(s.winPctSd, real.winPctSd, x => num(x, 3)).padEnd(15)}`
+    + ` ${pair(s.sigma, real.sigma, x => num(x, 1)).padEnd(13)} ${pair(s.pointsPerTeam, real.pointsPerTeam, x => num(x, 1)).padEnd(15)}`
+    + ` ${pair(s.marginMean, real.marginMean, x => num(x, 1)).padEnd(13)} ${pair(s.oneScore, real.oneScore, pct).padEnd(17)}`
+    + ` ${pair(s.overtimeRate, real.overtimeRate, pct).padEnd(13)}`;
+  for (const s of report.collegeSeasons) lines.push(seasonRow(String(s.year), s, s.real));
+  const average = key => mean(report.collegeSeasons.map(s => s[key])), realAverage = key => mean(report.collegeSeasons.map(s => s.real[key]));
+  const keys = ['winPctSd', 'sigma', 'pointsPerTeam', 'marginMean', 'oneScore', 'overtimeRate'];
+  lines.push(seasonRow('mean', Object.fromEntries(keys.map(key => [key, average(key)])), Object.fromEntries(keys.map(key => [key, realAverage(key)]))));
   const m = report.mlb, rm = REAL.mlb;
   lines.push(`\nMLB — ${m.clubs} clubs, 162 games (real: ${rm.note})`);
   lines.push(row('runs a team', m.runsPerTeam, rm.runsPerTeam));

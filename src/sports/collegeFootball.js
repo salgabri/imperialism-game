@@ -19,14 +19,22 @@ const QUARTER = 15;
  * - `drives`: possessions a side, about 10.35 a game ending in a touchdown, a field-goal try, a punt or a giveaway, and
  *   about two more on downs or at a half's end (`driveRange` the fewest and most);
  * - `td`, `fgTry`: a drive's touchdown, and a field-goal try on one that ended in none, at the average matchup, fitted so
- *   whole conference seasons score 3.27 touchdowns and 1.59 field-goal tries a team a game, as the FBS did;
+ *   whole conference seasons score 3.27 touchdowns and 1.21 field goals made a team a game (1.59 tried), overtime's
+ *   included, as the FBS did;
  * - `make`: 76.1% of field goals, `xp`: 98.3% of extra points (the college kick is from the 3), `two`: 46.1% of two-point
  *   tries, gone for after about 8% of touchdowns (`early`, with the late-game chart); `safety`: 0.030 a team a game;
  * - `scale`: each rating point of edge moves a drive's odds this many times as far as in the NFL, fitted so conference
- *   seasons spread the schools' average margins as the FBS's did (an SD of 10.3 in 2024 and 10.7 in 2025, about 8.5
+ *   seasons spread the schools' average margins as the FBS's did (an SD of 10.3 in 2024 and 10.7 in 2025, about 8.3
  *   conference games a school): EA rates the schools far closer together than they play;
+ * - `form`: match-day form, rating points of edge a point of drama (the NFL's FORM_PER_DRAMA without one): half the
+ *   NFL's form in log odds, as the scale stretches whatever moves the edge (the NFL's ÷ the scale would play as the
+ *   NFL's own). Replayed on their own schedules, the FBS seasons 2009–2025 spread their standings as the real ones did
+ *   only with little form, their drive luck alone nearly doing so: win% SD 0.003 too even with none, 0.004 with half,
+ *   0.007 with the NFL's whole form and 0.012 with it stretched by the scale (docs/design/college-football.md, "Luck and
+ *   form");
  * - `homeEdge`: rating points a home side gains (the campaign's Home advantage, off by default), set so equal sides' home
- *   side wins by about 2.5 points (56% of the time), the home edge usually quoted for college football (not fitted here);
+ *   side wins by about 2.5 points (57% of the time), the home edge usually quoted for college football and about the
+ *   FBS's own (its seasons' SRS home edge, 2.5 points on average from 2009 to 2025);
  * - college overtime (`overtime` 'college'): possessions from the opponent's 25 in the first two periods (`otTd`, `otFgTry`,
  *   `otMake`: a touchdown half the time between equals, else a field-goal try three times in four, made seven times in
  *   ten from about 42 yards; estimates, not fitted), two-point plays from the third, `maxOvertimes` periods at most, each
@@ -34,12 +42,14 @@ const QUARTER = 15;
  *   their overtime's periods (`otTwoFrom`, `otPlaysFrom`: collegeOvertimeRule); this rulebook names none, so it plays
  *   today's (collegeOvertimeOf in src/sports/americanFootball.js).
  */
+const SCALE = 1.8;
+const FORM_SHARE = 0.5;
 export const COLLEGE_RULES = Object.freeze({
   league: 'FBS', year: null, overtime: 'college', ot: 4, maxOvertimes: 8,
   drives: 12.3, driveRange: Object.freeze([9, 16]),
-  td: 0.2616, fgTry: 0.1748, edge: 0.51, kicker: 76, scale: 1.57,
+  td: 0.2599, fgTry: 0.1716, edge: 0.51, kicker: 76, scale: SCALE, form: FORM_SHARE * DRIVE_MODEL.FORM_PER_DRAMA / SCALE,
   make: 0.761, makeRange: Object.freeze([0.55, 0.95]), xp: 0.983, xpRange: Object.freeze([0.92, 0.998]),
-  two: 0.461, early: 0.076, chart: 1, safety: 0.00246, homeEdge: 0.7,
+  two: 0.461, early: 0.076, chart: 1, safety: 0.00246, homeEdge: 0.62,
   otTd: 0.5, otFgTry: 0.75, otMake: 0.7, otMakeRange: Object.freeze([0.45, 0.9]),
 });
 
@@ -107,7 +117,9 @@ function extraPointsOf(year) {
  * - its overtime (collegeOvertimeRule), its possessions from the 25 moved as its drives' and its kicks are (estimates, as
  *   today's are);
  * - two-point tries made and gone for as today: no source names them (the box scores' scoring leaves only a check:
- *   docs/design/college-football.md, "Rules by era").
+ *   docs/design/college-football.md, "Rules by era");
+ * - the edge's scale and match-day form as today, under which its schools were moved toward their results
+ *   (scripts/sync-cfb-seasons.mjs), and today's home edge.
  */
 export function collegeSeasonRules(year, dataSet) {
   if (!Number.isInteger(year) || year < FIRST_COLLEGE_SEASON) return null;
@@ -150,7 +162,8 @@ export function collegeSeasonRules(year, dataSet) {
 const collegeFootballRules = {
   ...americanFootballRules,
   id: 'college-football',
-  simulationVersion: 1,
+  // 2: half the NFL's form, which the scale no longer stretches, and the scale, scoring and home edge refitted to it.
+  simulationVersion: 2,
   name: 'College football',
   blurb: 'Eleven on offence, eleven on defence, sixty minutes. Level games go to college overtime: a possession each from the 25, then two-point plays.',
   /**
@@ -188,7 +201,7 @@ export const collegeFootball = defineSportData({ ...collegeFootballRules }, { ro
 /**
  * One sport object per earlier season ('cfb-2013@2013', its data set and year), under that season's rules
  * (collegeSeasonRules); a year before the table plays today's. Version 2: each season plays its own day's scoring and
- * overtime.
+ * overtime; 3: today's form, scale and scoring (version 2 of the built-in season's), its schools moved again by them.
  */
 const seasonSports = rulesMemo(key => {
   const [dataSet, year] = key.split('@');
@@ -196,7 +209,7 @@ const seasonSports = rulesMemo(key => {
   if (!rules) return collegeFootball;
   return defineSportData({
     ...collegeFootballRules,
-    simulationVersion: 2,
+    simulationVersion: 3,
     clock: { ...collegeFootballRules.clock, ot: rules.ot },
     prepareMatch: (attacker, defender, effA, effD, venue) => prepareMatch(attacker, defender, effA, effD, venue, rules),
 
