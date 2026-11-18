@@ -23,7 +23,7 @@ import { territories, validateReachability } from '../src/engine/campaign.js';
 import { createDuelDraw } from '../src/engine/duelDraw.js';
 import { parseCampaign } from '../src/engine/storage.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
-import { kmBetween, kmToPolys, interiorPoint, pointInPolys, polyAreaKm2, polysAreaKm2, polysOf } from './lib/domestic-partition.mjs';
+import { bboxOf, kmBetween, kmToPolys, interiorPoint, pointInPolys, polyAreaKm2, polysAreaKm2, polysOf } from './lib/domestic-partition.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
@@ -52,6 +52,16 @@ function holder(doc, point) {
   return i < 0 ? null : doc.clubs[i].id;
 }
 const CLUB_ID = name => { const club = CLUBS.find(c => c.name === name); assert.ok(club, name); return club.id; };
+/** The share of a ring's length lying against `polys`: each edge by its midpoint, within 50 m of them. */
+function edgeShare(ring, polys) {
+  let along = 0, total = 0;
+  for (let i = 1; i < ring.length; i++) {
+    const km = kmBetween(ring[i - 1], ring[i]);
+    total += km;
+    if (kmToPolys([(ring[i - 1][0] + ring[i][0]) / 2, (ring[i - 1][1] + ring[i][1]) / 2], polys) < 0.05) along += km;
+  }
+  return total ? along / total : 0;
+}
 
 const TOWNS = {
   brest: [-4.49, 48.39], strasbourg: [7.75, 48.58], marseille: [5.37, 43.3], bordeaux: [-0.58, 44.84], bastia: [9.45, 42.7],
@@ -238,6 +248,57 @@ test('clubs share a country along its regional borders: a region with one club g
   for (const doc of [TOP, ELITE]) doc.clubs.forEach((club, i) => {
     assert.ok(polysAreaKm2(polysOfSection(doc, i)) > 800, `${doc.id}: ${club.id} holds ${Math.round(polysAreaKm2(polysOfSection(doc, i)))} km²`);
   });
+});
+
+test('clubs share a country level by level, down to its communes, parishes and districts', () => {
+  // A club's land at its own ground: within half a kilometre, as a ground can stand on a border the map's simplification
+  // moves by a few dozen metres (the Estádio da Luz).
+  const atGround = (doc, name) => {
+    const i = doc.clubs.findIndex(club => club.id === CLUB_ID(name));
+    assert.ok(i >= 0, `${doc.id} has ${name}`);
+    return kmToPolys(doc.clubs[i].home, polysOfSection(doc, i)) < 0.5;
+  };
+  // Lisbon's two split the city along its parishes, each at its own ground (Benfica's stood 2 km outside its land when
+  // the city was one unit cut between them).
+  for (const name of ['SL Benfica', 'Sporting CP']) assert.ok(atGround(TOP, name), name);
+  // Prague's along its cadastral areas, Paris's along its arrondissements.
+  for (const name of ['Sparta Praha', 'SK Slavia Praha', 'Paris Saint-Germain', 'Paris FC']) assert.ok(atGround(TOP, name), name);
+  // England by its counties: Nottinghamshire, with one club, is all Nottingham Forest's.
+  for (const doc of [TOP, ELITE]) for (const town of [[-1.2, 53.14], [-0.81, 53.08], [-1.12, 53.3]]) assert.equal(holder(doc, town), CLUB_ID('Nottingham Forest'), `${doc.id}: ${town}`);
+  // Milan's comune, which Inter and AC Milan share (San Siro), is the one place cut, and between them alone.
+  for (const point of [[9.19, 45.464], [9.124, 45.478], [9.237, 45.484]]) assert.ok([CLUB_ID('Inter'), CLUB_ID('AC Milan')].includes(holder(TOP, point)), String(point));
+  // The levels behind it: France's communes, Portugal's parishes, Czechia's cadastral areas, England's counties (Natural
+  // Earth) and districts (the ONS).
+  const layers = TOP.boundaries.layers.map(layer => `${layer.iso3} ${layer.level}`);
+  for (const layer of ['FRA ADM5', 'PRT ADM3', 'CZE ADM4', 'GBR Natural Earth admin-1 region_sub', 'GBR ONS LAD 2019']) assert.ok(layers.includes(layer), layer);
+  assert.ok(!layers.includes('FRA ADM4'), 'France\'s cantons, which cross its arrondissements, are not used');
+});
+
+test('no club holds specks in another\'s land: a small piece lying against one club of its country is that club\'s', () => {
+  // A unit in pieces goes whole to one club, its detached pieces with it (Spain's municipalities; Portugal's parishes were
+  // split into theirs), and the build gives such a piece under 400 km² to the club its edge lies against for at least half
+  // its length (absorbSpecks). A club's largest piece, the piece holding its ground and an island off the coast stay.
+  // Pieces are measured here as drawn, which the map's simplification can shrink by a sixth (Real Madrid's 111 km² by
+  // Toledo drew as 95), so up to 300 km²; slivers under a square kilometre, under 3 px at the closest zoom, are not
+  // counted, and the maps of before are frozen.
+  const meets = (a, b) => a[0] <= b[2] + 0.01 && b[0] <= a[2] + 0.01 && a[1] <= b[3] + 0.01 && b[1] <= a[3] + 0.01;
+  const specks = [];
+  for (const entry of EUROPE_MAPS.filter(item => !item.replacedBy)) {
+    const doc = docOf(entry.id);
+    const land = doc.clubs.map((_, i) => polysOfSection(doc, i).map(poly => ({ poly, box: bboxOf([poly]), km2: polyAreaKm2(poly) })));
+    doc.clubs.forEach((club, c) => {
+      const largest = Math.max(...land[c].map(piece => piece.km2));
+      for (const piece of land[c]) {
+        if (piece.km2 < 1 || piece.km2 >= 300 || piece.km2 === largest || pointInPolys(club.home, [piece.poly])) continue;
+        doc.clubs.forEach((other, d) => {
+          if (d === c || other.shape !== club.shape) return;
+          const near = land[d].filter(item => meets(item.box, piece.box)).map(item => item.poly);
+          if (near.length && edgeShare(piece.poly[0], near) >= 0.5) specks.push(`${entry.id}: ${club.id}'s ${Math.round(piece.km2)} km² against ${other.id}'s land`);
+        });
+      }
+    });
+  }
+  assert.deepEqual(specks, []);
 });
 
 test('a country with no club stays grey: no section covers it, and it is drawn beneath the map', () => {

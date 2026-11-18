@@ -19,6 +19,7 @@ import { BUILT_IN_BASKETBALL_SEASONS } from '../data/basketballSeasons.js';
 import { BUILT_IN_BASEBALL_SEASONS } from '../data/baseballSeasons.js';
 import { BUILT_IN_WOMENS_SEASONS } from '../data/womensFootballSeasons.js';
 import { BUILT_IN_AMERICAN_FOOTBALL_SEASONS } from '../data/americanFootballSeasons.js';
+import { BUILT_IN_COLLEGE_FOOTBALL_SEASONS } from '../data/collegeFootballSeasons.js';
 import { BUILT_IN_TENNIS_SEASONS } from '../data/tennisSeasons.js';
 import { BUILT_IN_WOMENS_TENNIS_SEASONS } from '../data/womensTennisSeasons.js';
 import { BUILT_IN_HOCKEY_SEASONS } from '../data/hockeySeasons.js';
@@ -32,6 +33,7 @@ import { EUROPEAN_LEAGUES } from '../data/footballLeagues.js';
 import { FLAG_CODES } from '../data/flags.js';
 import { basketball } from '../sports/basketball.js';
 import { americanFootball } from '../sports/americanFootball.js';
+import { collegeFootball } from '../sports/collegeFootball.js';
 import { tennis } from '../sports/tennis.js';
 import { womensTennis } from '../sports/womensTennis.js';
 import { hockey } from '../sports/hockey.js';
@@ -106,6 +108,9 @@ const SET_KINDS = Object.freeze({
   // `pfa-<season>` / `pfa-afl-<season>`: an NFL (or, before the 1970 merger, AFL) season no game rated, computed from the
   // players' season facts (starts, positions, box scores; source.method 'computed', source.conversion), clubs only.
   pfa: { prefix: 'pfa-', id: /^pfa-(?:afl-)?\d{4}$/, sport: 'american-football', nations: false, mapped: true, calendar: true },
+  // `cfb-<season>`: an FBS college football season no game rated, computed from the players' season facts (box scores,
+  // plays, recruiting; source.method 'computed', source.conversion), its schools only, on its era's map.
+  cfb: { prefix: 'cfb-', id: /^cfb-\d{4}$/, sport: 'college-football', nations: false, mapped: true, calendar: true },
   // `tennis-<year>`: the ATP's men at the end of a year, by Elo, the Davis Cup's nations only.
   elo: { prefix: 'tennis-', id: /^tennis-\d{4}$/, sport: 'tennis', nationsOnly: /^tennis-/, calendar: true },
   // `wta-<year>`: the WTA's women at the end of a year, by Elo, the Fed Cup's nations only.
@@ -155,6 +160,8 @@ export const setHasNations = id => kindRecord(id).nations !== false && !kindReco
 /** Whether a set has clubs: every one but those with nations only (the EA editions before FIFA 07, the 1989/90 fan database,
  * the computed World Cup and national-team seasons, tennis's). */
 export const setHasClubs = id => !kindRecord(id).nationsOnly?.test(String(id));
+/** Whether a set fields the teams of a layer: its clubs for 'clubs', else its nations. */
+export const setHasLayer = (id, layer) => (layer === 'clubs' ? setHasClubs(id) : setHasNations(id));
 /** Whether a set's clubs play on a map of their era (src/data/clubMaps.js) rather than on the world. */
 export const setIsMapped = id => !!kindRecord(id).mapped;
 export const isDataYear = year => Number.isInteger(year) && year >= 1872 && year <= 2100;
@@ -275,7 +282,7 @@ export const isSeasonTheatreMap = (mapId, id) => [...EUROPE_MAPS, ...CLUB_MAPS]
 
 /** The built-in earlier seasons of every sport, newest first, as the index lists them. */
 export const BUILT_IN_SETS = listing([...BUILT_IN_SEASONS, ...BUILT_IN_WOMENS_SEASONS, ...BUILT_IN_BASKETBALL_SEASONS,
-  ...BUILT_IN_AMERICAN_FOOTBALL_SEASONS, ...BUILT_IN_BASEBALL_SEASONS, ...BUILT_IN_HOCKEY_SEASONS, ...BUILT_IN_TENNIS_SEASONS,
+  ...BUILT_IN_AMERICAN_FOOTBALL_SEASONS, ...BUILT_IN_COLLEGE_FOOTBALL_SEASONS, ...BUILT_IN_BASEBALL_SEASONS, ...BUILT_IN_HOCKEY_SEASONS, ...BUILT_IN_TENNIS_SEASONS,
   ...BUILT_IN_WOMENS_TENNIS_SEASONS, ...BUILT_IN_RUGBY_LEAGUE_SEASONS, ...BUILT_IN_ROCKET_LEAGUE_SEASONS, ...BUILT_IN_VALORANT_SEASONS]);
 
 /** The era map a basketball or baseball season's clubs play on (null for any other set). */
@@ -394,7 +401,7 @@ export function decodeFootballSet(data, id = data?.id) {
   validateFootballSet(data, String(id));
   // The federations of the day it plays (`meta.identities`, men's football only): seasonSport plays them as playsAs.
   if (data.identities !== undefined) data = { ...data, identities: frozenIdentities(data.identities) };
-  if (['nba2k', 'madden', 'tecmo', 'pfa', 'nrl'].includes(setKindOf(data.id))) {
+  if (['nba2k', 'madden', 'tecmo', 'pfa', 'cfb', 'nrl'].includes(setKindOf(data.id))) {
     const { clubs, ...meta } = data;
     // A basketball season's EuroLeague players are rated by estimate, and say so wherever they are shown (src/data/estimates.js).
     const playerOf = club => (club.league === EUROLEAGUE && setKindOf(data.id) === 'nba2k' ? player => [...player, euroleagueEstimate()] : player => [...player]);
@@ -580,6 +587,8 @@ KINDS.pfa = { size: 3,
     : src.method !== 'computed' ? 'source method must be "computed"'
       : src.rawScale !== 'value' ? 'source rawScale must be "value"'
         : !(typeof src.conversion === 'string' && src.conversion.trim()) ? 'source conversion must say how the overalls were derived' : '') };
+// An FBS season's schools, their overalls computed from the season's facts by a documented rule, as the NFL's are.
+KINDS.cfb = KINDS.pfa;
 // The same clubs, their overalls converted from Tecmo's attributes by a documented rule.
 KINDS.tecmo = { size: 3,
   source: src => (!['edition', 'compiler', 'retrieved'].every(key => typeof src[key] === 'string' && src[key].trim())
@@ -616,7 +625,7 @@ function validateFootballSet(data, id) {
   const rating = v => typeof v === 'number' && Number.isFinite(v) && v >= 1 && v <= 99;
   const nation = v => typeof v === 'string' && Object.hasOwn(NATIONS, v);
 
-  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "wc-<yyyy>", "nt-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "wwc-<yyyy>", "wol-<yyyy>", "nba-2k<nn>", "nba-stats-<yyyy>", "mlb-the-show-<nn>", "mlb-war-<yyyy>", "madden-<yyyy>", "pfa-<yyyy>", "nhl-<yyyy>", "nrl-<yyyy>", "nrl-sl-<yyyy>", "tennis-<yyyy>", "wta-<yyyy>" or "rl-<yyyy>"');
+  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "wc-<yyyy>", "nt-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "wwc-<yyyy>", "wol-<yyyy>", "nba-2k<nn>", "nba-stats-<yyyy>", "mlb-the-show-<nn>", "mlb-war-<yyyy>", "madden-<yyyy>", "pfa-<yyyy>", "cfb-<yyyy>", "nhl-<yyyy>", "nrl-<yyyy>", "nrl-sl-<yyyy>", "tennis-<yyyy>", "wta-<yyyy>" or "rl-<yyyy>"');
   if (!isObject(data)) fail('file is not a JSON object');
   if (data.format !== FOOTBALL_SET_FORMAT) fail(`unsupported format ${JSON.stringify(data.format)} (expected ${FOOTBALL_SET_FORMAT})`);
   if (data.id !== id) fail(`file id ${JSON.stringify(data.id)} does not match the requested data set`);
@@ -654,6 +663,8 @@ function validateFootballSet(data, id) {
     positions: new Set(Object.keys(rugbyLeague.formation)), least: rugbyLeague.squadSize, noun: 'an NRL season' });
   if (['madden', 'tecmo', 'pfa'].includes(setKindOf(id))) return validateClubsOnMap(data, id, fail, { sport: americanFootball, clubId: NFL_CLUB_ID,
     positions: new Set(Object.keys(americanFootball.formation)), least: americanFootball.squadSize, noun: 'an NFL season' });
+  if (setKindOf(id) === 'cfb') return validateClubsOnMap(data, id, fail, { sport: collegeFootball, clubId: CFB_CLUB_ID,
+    positions: new Set(Object.keys(collegeFootball.formation)), least: collegeFootball.squadSize, noun: 'an FBS season', leagues: FBS_CONFERENCES });
 
   // A men's EA season's nation may list computed players (isFilledPlayer) beside EA's, and then the season says how they
   // were rated (`fill`, beside EA's source): each names himself on Wikidata, his team, its Elo of the fill's day and the
@@ -1233,6 +1244,13 @@ function validateNationsAndClubsOnMap(data, id, fail, { sport, clubId, positions
 const NFL_CLUB_ID = /^nfl-[a-z0-9-]{1,62}$/;
 // The built-in rugby league clubs' `nrl-<slug>` ids, likewise.
 const NRL_CLUB_ID = /^nrl-[a-z0-9-]{1,62}$/;
+// The built-in college football schools' `cfb-<slug>` ids, likewise.
+const CFB_CLUB_ID = /^cfb-[a-z0-9-]{1,62}$/;
+// The FBS's conferences of the seasons from 2009, today's and those since gone: the Pac-10 (to 2010), the Big East (to
+// 2012) and the WAC (to 2012). A school's league is its conference of its season. They are listed here because college
+// football's built-in schools, whose leagues name today's, load only when the sport is played.
+const FBS_CONFERENCES = Object.freeze(['ACC', 'Big 12', 'Big Ten', 'Conference USA', 'Independent', 'MAC', 'Mountain West', 'Pac-12', 'SEC',
+  'Sun Belt', 'The American', 'Pac-10', 'Big East', 'WAC']);
 
 /**
  * A season of clubs only on its era's map (`map`), each player `[name, position, rating]` as the sport's built-in clubs
@@ -1241,7 +1259,7 @@ const NRL_CLUB_ID = /^nrl-[a-z0-9-]{1,62}$/;
  * merger; rugby league's premierships before the NRL, the NSWRFL's …) names its clubs' league. `least` is the lineup a
  * club must be able to name.
  */
-function validateClubsOnMap(data, id, fail, { sport, clubId, positions, least, noun }) {
+function validateClubsOnMap(data, id, fail, { sport, clubId, positions, least, noun, leagues: dayLeagues = [] }) {
   const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
   const text = v => typeof v === 'string' && v.trim().length > 0;
   const rating = v => Number.isInteger(v) && v >= 1 && v <= 99;
@@ -1250,9 +1268,12 @@ function validateClubsOnMap(data, id, fail, { sport, clubId, positions, least, n
   if (!map) fail(`map ${JSON.stringify(data.map)} is not one of ${sport.name}'s maps listing this season`);
   if (!Array.isArray(data.clubs)) fail('clubs must be a list');
   if (data.clubs.length !== map.clubs) fail(`clubs must be the ${map.clubs} of map ${map.id}, found ${data.clubs.length}`);
-  const builtInLeagues = new Set(sport.clubs.map(club => club.league));
-  const leagues = map.seasons != null && typeof map.league === 'string' && !builtInLeagues.has(map.league)
-    ? new Set([map.league]) : builtInLeagues;
+  // An era's map of another league of its day names that league. A sport whose clubs' leagues are not its maps' (college
+  // football's schools play in conferences, its maps are the FBS's) lists every league its seasons may name
+  // (`dayLeagues`: the FBS's conferences, today's and those since gone).
+  const builtInLeagues = dayLeagues.length ? null : new Set(sport.clubs.map(club => club.league));
+  const leagues = dayLeagues.length ? new Set(dayLeagues)
+    : map.seasons != null && typeof map.league === 'string' && !builtInLeagues.has(map.league) ? new Set([map.league]) : builtInLeagues;
   const ids = new Set(), codes = new Set();
   data.clubs.forEach((club, i) => {
     const at = `clubs[${i}] (${JSON.stringify(club?.name ?? club?.id)})`;
@@ -1376,6 +1397,7 @@ export function seasonSport(set) {
     sport = setKindOf(meta.id) === 'nba2k' ? { ...basketball, clubs, clubMap: meta.map, ...identity }
       : setKindOf(meta.id) === 'show' ? { ...baseball, rosters, clubs, territory, clubMap: meta.map, ...identity }
       : ['madden', 'tecmo', 'pfa'].includes(setKindOf(meta.id)) ? { ...americanFootball, clubs, clubMap: meta.map, ...identity }
+      : setKindOf(meta.id) === 'cfb' ? { ...collegeFootball, clubs, clubMap: meta.map, ...identity }
       : setKindOf(meta.id) === 'elo' ? { ...tennis, rosters, territory, ...identity }
       : setKindOf(meta.id) === 'wta' ? { ...womensTennis, rosters, territory, ...identity }
       : setKindOf(meta.id) === 'rl' ? { ...rocketLeague, rosters, territory, ...identity }

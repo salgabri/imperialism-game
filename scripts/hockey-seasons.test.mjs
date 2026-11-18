@@ -419,18 +419,26 @@ const edited = (items, edit) => {
   return JSON.stringify(data);
 };
 
-test('hockey\'s Season choice lists its seasons; a season keeps Nations, and Clubs take its era\'s map', async () => {
+test('hockey\'s Season choice lists the seasons of the teams chosen; a season keeps Nations, and Clubs take its era\'s map', async () => {
   await withApp(async ({ app }) => {
     app.pickSetup('sport', 'hockey');
-    const model = modelOf(app);
     // A computed or converted season says so on screen; an EA edition's is named by its years.
     const methodOf = id => MANIFEST.seasons.find(season => season.id === id).method;
-    assert.deepEqual(model.season.options.map(option => option.name), ['2026/27',
-      ...BUILT_IN_HOCKEY_SEASONS.map(set => (methodOf(set.id) ? `${set.season} · ${methodOf(set.id)}` : set.season))]);
-    assert.deepEqual(['nhl-2009', 'nhl-1994', 'nhl-1968'].map(id => model.season.options.find(option => option.id === id).name),
+    const nameOf = set => (methodOf(set.id) ? `${set.season} · ${methodOf(set.id)}` : set.season);
+    // Nations list the seasons from 1977/78, the first with three nations of their own; Clubs every season.
+    const withNations = BUILT_IN_HOCKEY_SEASONS.filter(set => setHasNations(set.id));
+    const model = modelOf(app);
+    assert.deepEqual(model.season.options.map(option => option.name), ['2026/27', ...withNations.map(nameOf)]);
+    assert.equal(model.season.options.at(-1).name, '1977/78 · computed');
+    assert.equal(model.season.options.length, 49, 'the built-in season and every season from 1977/78 but 2004/05');
+    app.pickSetup('layer', 'clubs');
+    const clubs = modelOf(app);
+    assert.deepEqual(clubs.season.options.map(option => option.name), ['2026/27', ...BUILT_IN_HOCKEY_SEASONS.map(nameOf)]);
+    assert.deepEqual(['nhl-2009', 'nhl-1994', 'nhl-1968'].map(id => clubs.season.options.find(option => option.id === id).name),
       ['2008/09 · converted', '1993/94', '1967/68 · computed']);
-    assert.deepEqual(model.season.options.slice(1).map(option => option.label), BUILT_IN_HOCKEY_SEASONS.map(set => `${set.season} · ${set.label}`));
-    assert.equal(model.season.options.length, 66, 'the built-in season and every season from 1960/61 but 2004/05');
+    assert.deepEqual(clubs.season.options.slice(1).map(option => option.label), BUILT_IN_HOCKEY_SEASONS.map(set => `${set.season} · ${set.label}`));
+    assert.equal(clubs.season.options.length, 66, 'the built-in season and every season from 1960/61 but 2004/05');
+    app.pickSetup('layer', 'nations');
     app.pickSetup('dataSet', 'nhl-1994');
     assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', 'nhl-1994'], 'a hockey season keeps its nations');
     app.pickSetup('layer', 'clubs');

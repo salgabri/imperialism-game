@@ -948,6 +948,28 @@ in (`LEAGUES.cfb`, `npm run build:cfb-map`, built in about three seconds by the 
 - **Empty**: Montana, South Dakota, Maine, New Hampshire, Vermont, Rhode Island and DC; Alaska is dropped. North Dakota
   is North Dakota State's (the Mountain West's from 2026).
 
+**Era maps 2009–2025** (2026-11-18): the computed FBS seasons ([college-football.md](college-football.md)) play on 14
+maps of their own, `cfb2009` to `cfb2025`, one per run of seasons with the same schools at the same stadiums (2009–2010,
+2015–2016 and 2018–2019 share one each), built with today's by `npm run build:cfb-map` from
+`scripts/data/cfb-seasons.json`: `maps` lists each map's seasons and their `schools`, `venues` the stadiums of the day
+(scripts/lib/cfb-maps.mjs reads them). A season's schools are those that played a completed game against another FBS
+school, 119 in 2009 to 136 in 2025, in today's map's order. Idaho, FBS to 2017 and kept in the manifest's `schools`,
+fields no season (its rosters are too thin), so Boise State holds all of Idaho. Each school holds the state of the
+stadium it played most of its home games in that season, counted from ESPN's schedule (sportsdataverse's
+cfbfastR-cfb-data) without neutral sites, and keeps its town's name. Where that is not today's stadium (a renamed one
+is the same), `venues` names it as it was then and places it from its English Wikipedia article at a pinned revision:
+Floyd Casey Stadium, Robertson Stadium, the Superdome, Hughes Stadium, the Georgia Dome, Aloha Stadium, Legion Field,
+Sam Boyd Stadium, Qualcomm Stadium, Ladd–Peebles Stadium. Where ESPN names no venue, flags a season away from home as
+neutral or places games wrongly, the season's own Wikipedia article settles it, noted and pinned in the manifest
+(`evidence`): Cal at AT&T Park in 2011, Washington at CenturyLink Field in 2012, Houston at Reliant Stadium in 2013,
+North Texas at Fouts Field and FAU at Lockhart Stadium in 2009–2010, San Diego State at Carson in 2020–2021 (ESPN has
+Qualcomm Stadium), Hawaii and UAB at their new stadiums from 2021, Northwestern at Martin Stadium in 2024–2025, Kansas
+at Arrowhead Stadium in 2024 (in Missouri, so Kansas State holds all of Kansas) and Sam Houston at Shell Energy
+Stadium, Houston, in 2025. UMass's three-and-three seasons of 2014–2016 go to the stadium of the season before,
+Gillette Stadium. Three schools share Los Angeles County in 2020–2021 and Harris County in 2025, cut as two are.
+`scripts/club-maps.test.mjs` holds every era map to the state rule, each school to a territory around its stadium of
+the day, and the maps to the season snapshots.
+
 ## The MLB map
 
 Status: implemented 2026-11-01. Baseball clubs ([baseball.md](baseball.md)) have one
@@ -1236,38 +1258,114 @@ seasons with clubs (the built-in one and 31 earlier) and each of the two fields:
   beneath it, grey where no club holds it, and routes go around that as around any
   neighbour. The camera frames the clubs' land (`partShape`), and simplification keeps only
   the world outline's vertices, not the regions' line across the country. Russia's ADM2
-  layer leaves out Moscow and St Petersburg, federal cities, so each is a missed piece too;
-  one holding clubs' grounds goes to the nearest of those clubs (`homes`, here only), so
-  CSKA holds Moscow on the EuroLeague's maps where Khimki's land lies nearer, and football's,
-  whose Moscow clubs all stand inside the city, are as they were (the nearest club's land
-  was already one of theirs: CSKA's, and Spartak's or Dinamo's grounds lie in it).
-- **Several clubs**: `COUNTRIES` names the country's finest geoBoundaries layer
-  (ADM2 to ADM4) and the layers that group it into regions; Russia, Switzerland, Norway and
-  Austria joined it for the earlier seasons (Switzerland and Austria by their districts, as
-  their cantons and states are not in the cache). All geometry comes from the
-  finest layer, merged on its shared arcs, so a coarse unit and its neighbour's fine
-  ones share every vertex; the coarser layers only group (`regionalUnits`):
-    - A region holding one club stays whole, for that club.
+  layer leaves out Moscow and St Petersburg, federal cities; until 2026-11-15 each was a
+  missed piece, given to the nearest club, and since then both are filled in from ADM1
+  (below), so Moscow is a unit its clubs share. A missed piece holding clubs' grounds still
+  goes to the nearest of those clubs (`homes`, here only).
+- **Several clubs** (since 2026-11-15 down to the communes): `COUNTRIES`
+  (`scripts/lib/admin-levels.mjs`) lists every European country's administrative levels,
+  coarsest first, down to the finest its sources have: regions, then provinces,
+  departments or counties, then communes (municipalities, parishes, cadastral areas).
+  France has its régions, départements, arrondissements and communes (Paris, Lyon and
+  Marseille by their municipal arrondissements); Italy its regions, provinces and comuni;
+  Portugal its districts, municipalities and parishes (freguesias); Czechia goes down to
+  its cadastral areas (Prague's Bubeneč and Vršovice), Austria to its municipalities' parts
+  (Vienna's districts), and Switzerland and Austria start from their cantons and states.
+  Every level geoBoundaries lists for a country is used or skipped with a stated reason,
+  and the build stops on one that is neither (`checkLevels`): France's cantons cross
+  arrondissement lines (9% of the land), Italy's five groups of regions are statistical,
+  Luxembourg's ADM3 is another year's communes. All 49 European nations with a world shape
+  have an entry, not only those a map divides today. The home nations have only their
+  councils in geoBoundaries, so their groups come from Natural Earth's admin-1 file
+  (`region_sub`): England's ceremonial and metropolitan counties (Greater Manchester,
+  Merseyside, Lancashire; Natural Earth's Wigan is moved into Greater Manchester), Scotland's
+  old regions (Strathclyde's parts, Lothian, Tayside), Wales's North, Mid, South and West.
+  England's districts below its two-tier counties come from the ONS (Local Authority
+  Districts, December 2019, generalised to 20 m, OGL v3, from the ONS's ArcGIS feature
+  service, which has no robots.txt; cached as `data-src/boundaries/ons/`), so Lancashire and
+  Cumbria are Preston, Burnley, Eden and the rest. The service winds its rings clockwise, the
+  other way round from geoBoundaries and polygon-clipping, so they are rewound: merged with a
+  cut piece of Liverpool, Cheshire had come out inside out, and Everton's land with it. Since
+  then the build stops when a club's territory differs from the sum of its units. England's
+  nine regions are statistical, as Italy's
+  groups are, and are left out: as top regions they shut the North West's four clubs and
+  London's six in on themselves.
+  All geometry comes from the finest layer, merged on its shared arcs, so a coarse unit and
+  its neighbour's fine ones share every vertex; the coarser layers only group, each unit by
+  its interior point (`regionalUnits`). Land the finest layer leaves out is filled in from
+  the level above it, as on the country maps (`fillParents`): Moscow and St Petersburg in
+  Russia's districts, so Moscow's clubs split their city rather than the districts around
+  it, Bursa and İzmir in Turkey's, Greek and Danish islands. A unit's fragments under
+  0.5 km² go (slivers where its coast or estuary is drawn finer than the world outline, which
+  the outline's fill gives the nearest club). Where a layer's units come in pieces they
+  should not (`pieces`: Portugal, 158 of whose parishes do), each piece is a unit of its own,
+  grouped by where it lies: as one unit, a parish touches wherever any of its pieces touches,
+  joins land that does not join and scatters its club's land in specks (Mangualde's
+  municipality came out in five pieces). Elsewhere a unit's pieces stay one unit, which keeps a
+  district on both banks of an estuary one way across it (Halton, Widnes and Runcorn across
+  the Mersey, the way from Liverpool into Cheshire). After the split, a detached piece of a
+  club's land under 400 km² whose edge lies against one other club's land for at least half
+  its length goes to that club (`absorbSpecks`). The limit was 100 km² at first, but a club
+  that takes a unit in pieces can take its neighbours through the far piece and shut them in
+  with it: Real Madrid's 111 km² of Argés, Cobisa and Layos stood inside Rayo Vallecano's
+  land by Toledo. A club's pieces that share a border are judged as one, as the map merges
+  them, so an island whose channel the world outline's coarser coast fills goes with its
+  fill. The club's largest group stays, and so does the one nearest its ground, however small:
+  Belenenses' Restelo stands just outside its parish, and without that the rule left the club
+  the Azores and Madeira alone. Only borders shared exactly count, before the map is
+  simplified: at 50 m, pieces joined across rivers (the Yare at Great Yarmouth, whose
+  district lies on both banks) and hid the specks among them. The rule runs in passes until
+  nothing moves, as one move can shut the next piece in, and finds what lies against what on
+  a grid of edges (`edgeFinder`), not polygon by polygon. The sources draw their levels
+  apart (Portugal's municipalities are a few dozen points each, its parishes thousands), so
+  the levels are made to nest (`nestLevels`): a region belongs to the parent holding most of its land, and
+  a unit whose region lies in another parent moves to the nearest region of its own. Each
+  region is then made one piece where land joins it: a part cut off from the rest of its
+  region that borders another region of the same parent joins the one it borders most (a
+  part across the water stays). Together these leave no specks of one club in another's
+  land: across the 98 maps, no piece of 1 to 400 km² as drawn lies against one other club for
+  half its edge, against 1,602 before the levels went down to the communes (the test checks
+  1 to 300 km², as simplification can shrink a piece by a sixth). Larger pieces can: 23 of
+  400 km² or more (24 before), such as Lokomotiv's Severodvinsk inside Spartak's north
+  (1,230 km², six seasons from 2001/02 to 2021/22) and Real Madrid's Cádiz beside Valencia's
+  Andalusia (about 7,400 km², four seasons from 1993/94 to 2000/01).
+    - A region holding one club stays whole, for that club. Should the club start next door
+      (boxed in by its city, below), the region goes to its parent's clubs like an empty one.
     - A region holding two or more is split one level down, and only its clubs may
-      take its land (the partition's `allowed`).
+      take its land (the partition's `allowed`). So on down: a province with one club goes
+      whole to it, and only a commune holding two or more clubs is cut (the crowd cut).
     - A region holding none stays whole unless it is larger than a club's share. A top
-      region splits above a quarter of the country's share per club (`FREE_TOP`), a
-      lower one above a whole share (`FREE_LOWER`), so one neighbour does not take
-      Castile. Its land goes to any club, or within a shared region to that region's.
+      region splits above an eighth of the country's share per club (`FREE_TOP`; a quarter
+      until 2026-11-15), a
+      lower one above half a share of the region it lies in (`FREE_LOWER`; a whole share
+      until 2026-11-15), so one neighbour does not take Castile and the districts around a
+      crowded city are shared out. Its land goes to any club, or within a shared region to
+      that region's. One next to a region holding two or more clubs at its level splits
+      one level down whatever its size (since 2026-11-18), so that crowd shares it:
+      Moscow Oblast went whole to the first Moscow club to reach it, and CSKA started
+      255 km out in 2001/02 and 2018/19; now Moscow's clubs start within 11 km of their
+      grounds.
     - A top region whose clubs would hold under a quarter of the country's share per
       club (`TINY_REGION`) joins its largest neighbouring region: Berlin and Brandenburg,
-      Bremen and Lower Saxony, Madrid and Castile. Their clubs share the joined land.
+      Bremen and Lower Saxony, Madrid and Castile, Greater Manchester and Lancashire. Their
+      clubs share the joined land.
 - **Partition**: `partitionCountry` per country, one section per club, with
   `fair: { minKm2 }`: format 1's sections, but the land rules of format 2 where they keep
   a club from being shut in (growth caps at 1.5× a fair share, fans, moved starts, the
   boxed-in retry), and no unit halved for its size, so regions stay whole. A club needs a
   tenth of its country's share per club and at least 1,200 km²: about 35 km across, 6 px
-  at the opening fit. One that cannot find it around its ground starts next door. Land the
+  at the opening fit. One that cannot find it around its ground starts next door, on land
+  its region lets it take and never on another club's home unit. Land the
   world outline leaves out (Porto Santo) is dropped first, or a club moved there would end
-  up with nothing. England and Scotland have no regions in the layers, so their clubs grow
-  over counties and council areas, and a unit with one neighbour goes with it (Blackpool
-  with Lancashire, Nottingham with its county), or whichever club took the larger one would
-  shut it in.
+  up with nothing. The fans keep to the units (`fan: 'units'`, since 2026-11-15): each
+  commune or borough of a crowded city's zone goes whole to the club whose ground it holds,
+  else to the sector its centre lies in, only as far as it joins that club's ground, and
+  only a commune two of the fan's clubs share is cut, between those two (San Siro's Inter
+  and Milan, Hammersmith and Fulham's Chelsea and Fulham). Before, the fans' wedges cut
+  through every unit near the city. A unit only reaching into the zone stays open to all.
+  A country of one level (Moldova, Montenegro) has no regions, so a unit with one neighbour
+  goes with it, or whichever club took the larger one would shut it in; England's counties
+  do this for its cities (Nottingham goes whole with Nottinghamshire).
 - **World outlines** (`fitToOutline`): each territory is clipped to the country's world
   shape, and each piece of the shape they miss joins the nearest territory. So a country
   keeps the borders the rest of the game draws, and meets its grey neighbours exactly.
@@ -1280,25 +1378,36 @@ seasons with clubs (the built-in one and 31 earlier) and each of the two fields:
   across borders and water. Sections are in rank order, `eu124-001` the strongest. The
   file adds `theatre` (`all` or `elite`), `seasons` for an earlier season's map, and a
   club row's `shape`, and `partial` for a country it holds only part of (Russia). The 64 maps
-  in play hold 149–204 KB each, 10.9 MB in all, and the 56 maps of before (below) 9.3 MB, with
+  in play hold 150–201 KB each, 10.9 MB in all, and the 62 maps of before (below) 10.3 MB, with
   `public/domestic/ATTRIBUTION-europe.txt` and the index `src/data/europeMaps.js`
   (`{ id, sport, league, name, theatre, seasons?, clubs, sections, countries, version, top?, replacedBy? }`).
 
 **Result** (built-in season). Elite 32: Paris Saint-Germain holds France; the Netherlands
 and Belgium stay grey; Bayern Munich Bavaria and RB Leipzig the east. Top 124: 17 countries
 in colour, the rest of Europe grey, Bodø/Glimt Norway, Dinamo Zagreb Croatia, Ludogorets
-Bulgaria. The smallest land is about 1,900 km² (Rayo Vallecano's, in the crowd around
-Madrid). A club's ground lies in its own land, except for clubs boxed in by their city,
-whose land starts next door: at most about 100 km away, for the Istanbul club that starts
-across the Bosphorus in Anatolia (Beşiktaş in the Top 124, Galatasaray in the Elite 32,
-which splits Turkey about evenly), since Thrace is a thirtieth of the country. Earlier
-seasons have smaller lands where a league crowds into one place: Madeira's three clubs in
-2015/16 share their island, the smallest with about 200 km². Their fields from all of Europe
-(6 to 20 countries a map) crowd Istanbul with up to four clubs, so one may start up to about
-145 km out (Kasımpaşa in 2015/16, Başakşehir in 2025/26), and Copenhagen with three, one
-starting up to about 120 km away. Russia's clubs share European Russia's 4.0 million km²: in
-2015/16's Elite 32 Zenit holds about 1.9 million and CSKA Moscow 2.1, in its Top 124 eight
-clubs 0.2 to 1.1 million each.
+Bulgaria. The smallest land is about 1,000 km² (Arsenal's, in London's crowd of clubs;
+1,900 km², Rayo Vallecano's, before the levels went down to the communes). Lisbon's two clubs
+split their city along its parishes (Benfica's ground had stood 2 km outside its land),
+Paris's along its arrondissements, Prague's along its cadastral areas; Milan's comune is
+the one place cut, between Inter and AC Milan alone. A club's ground lies in its own land,
+except for clubs boxed in by their neighbours, whose land starts next door: at most about
+100 km away, for Beşiktaş in the Top 124, which starts across the Bosphorus in Anatolia as
+Galatasaray holds Thrace, a thirtieth of the country; Panathinaikos 43 km from its ground,
+Nice 30 (Monaco holds it), Crystal Palace and Everton about 26; in the Elite 32 only Everton,
+25 km. Earlier seasons crowd more. Their fields from all of Europe (6 to 20 countries a map)
+put up to five clubs in Istanbul, so one may start up to about 200 km out (İstanbul
+Başakşehir in 2021/22, about 150 km in four other seasons), Copenhagen three, one starting up
+to about 120 km away, and the Rhine and Ruhr many, Fortuna Düsseldorf starting about 120 km
+out in 2012/13 and 2019/20; Moscow's clubs start within 11 km of their grounds. England's
+crowded seasons can leave a club little more than its borough: Everton about 115 to 126 km²
+beside Liverpool while Burnley holds all of Lancashire's county council and more (2014/15,
+2016/17, 2018/19, 2020/21, 2023/24, 2025/26), Newcastle about 200 km² in six seasons from
+1996/97 to 2008/09. Across the 98 maps, 37 club lands are under 800 km² (40 before the
+communes) and 285 grounds lie over 5 km outside their club's land (344 before; Russia's 35
+down to 4, England's 129 to 94), but 81 lie over 50 km out (74 before), two thirds of them
+Turkish clubs'. Russia's clubs share European Russia's 4.0 million km²: in 2015/16's Elite 32
+Zenit holds about 1.9 million and CSKA Moscow 2.1, in its Top 124 eight clubs 0.3 to 1.0
+million each.
 
 **Maps of before** (`replacedBy`). A saved campaign resumes only on a map with exactly its
 clubs (`fitDomesticCampaign` in `src/engine/storage.js` moves one club by club onto a rebuild,
@@ -1338,7 +1447,7 @@ replaced it. An old link's `theatre=Premier+League` is reported as not offered.
 A CM 01/02 set built on this computer has no maps, so it plays the two theatres on the
 world, dealt by `seedClubs` as all clubs once were. A season with nations only (FIFA 05,
 FIFA 06, 1989/90, the computed seasons) has no clubs to play: it keeps the plain
-theatre, `all` or `elite`, and choosing clubs goes back to the built-in season and its map.
+theatre, `all` or `elite`, and choosing clubs takes the nearest season with clubs and its map.
 
 **Checks**: `scripts/europe-maps.test.mjs`: index, files, fields and hashes; each club's
 land lies in its country and the land sums to the outlines; the only club holds its whole
@@ -1370,9 +1479,11 @@ league and over a transatlantic map that kept all 84 together.
   Arsenal at the Emirates in 2022/23, when it still played at Meadow Park.
 - **Sweden** joins `COUNTRIES` (ADM2 municipalities in ADM1 counties) for Häcken and Rosengård.
 - **Crowding**: England's 14 include seven London clubs, so as in the men's maps some start
-  hemmed in or next door: Arsenal holds about 1,200 km², Tottenham, West Ham and Charlton start
-  8–36 km from their grounds. The Basque Country's four leave Athletic Club about 2,000 km² and
-  start Eibar about 50 km out.
+  hemmed in or next door: West Ham holds about 900 km² and Chelsea 2,000, Crystal Palace starts
+  24 km from its ground (since the levels went down to the communes on 2026-11-15; before,
+  Arsenal held about 1,200 km² and Tottenham, West Ham and Charlton started 8–36 km out). The
+  Basque Country's four now hold about 17,000 to 33,000 km² each, Alavés starting about 50 km
+  out and Eibar 12 km (before, Athletic Club about 2,000 km² and Eibar about 50 km out).
 - **Seasons**: `weus<year>` and `weu32s<year>` for EA FC 26, 25 and 24; FIFA 23 rated 24
   European clubs (the WSL and D1 Arkema), so `weus2023` alone: a setup's Elite 32 or NWSL plays
   it. Each women's entry names its three strongest (`top`), seasons too.
@@ -1404,17 +1515,17 @@ none, to the season's Top 124 as before; going back to the built-in season goes
 back to today's map. The "One country · top clubs" list shows the chosen season's
 countries only.
 
-**What ships.** 963 maps over the 31 seasons with clubs, 25,065 club-seasons, 119.7 MB
-(47–249 KB a map, median 122 KB), each fetched only when chosen; the index
-`src/data/domesticSeasons.js` is about 12 KB. `docs/design/domestic-seasons-audit.json`
+**What ships.** 1,718 maps over the 31 seasons with clubs, 41,078 club-seasons, 205.4 MB
+(47–249 KB a map, median 119 KB), each fetched only when chosen; the index
+`src/data/domesticSeasons.js` is about 20 KB. `docs/design/domestic-seasons-audit.json`
 gives every map's layer, clubs, homes and size.
 
 | Seasons | Source of the clubs | Maps | Countries a season |
 | --- | --- | --- | --- |
 | 2006/07 – 2025/26 (20) | EA's editions, every division EA rates | 483 | 20 – 28 |
+| 2007/08 – 2025/26 (19) | the CM 01/02 Update Team's database of each season, for the countries EA does not rate | 826 | 28 – 71 |
 | 1993/94, 1997/98 – 2003/04 (8) | Championship Manager's databases, every club with players | 231 | 11 – 51 |
 | 1994/95 – 1996/97 (3) | SWOS's team files, every league and division SWOS has | 178 | 59 – 60 |
-| 2025/26 | the CM 01/02 Update Team's December 2025 database, for the countries EA does not rate | 71 | 71 |
 
 **The Update Team's countries** (since 17 November 2026, by the user's choice of that day:
 [football-year-permissions.md](football-year-permissions.md)). An EA season whose season
@@ -1426,15 +1537,22 @@ of and the EA edition does not: the season's fill (`updateTeamFills` in
 map is `kind: 'cm0102'` with the database's own source (provider and compiler "CM 01/02
 Update Team", version the release's label), so its players are credited to the Update Team;
 its clubs take `f-` ids after the EA maps' and never a season file club's, whose players are
-EA's. 2025/26 has its fill from the December 2025 database (archive.org item `cm-25`, only
-its Data tables read, by range requests): 71 countries, 1,468 clubs, 8.0 MB, from Brazil's
-100 and Russia's 60 to the Philippines' 10 (a country today's maps lack, so its map is a
-season's only). 30 of them had no earlier-season map at all (Egypt, Morocco, Tunisia,
-Nigeria, Ghana, Iran, Qatar, the UAE, Thailand, Vietnam, Canada, Costa Rica, Bosnia,
-Georgia, Kazakhstan…). The other EA seasons' databases (2007/08–2024/25) wait for the user to
-download them from the champman0102.co.uk forum, whose attachments need a login; 2006/07
-has none. The database also rates 23 of EA's own countries deeper (Turkey 100 clubs to EA's
-18, Argentina 100 to 30); those maps stay EA's.
+EA's. One release a season, the autumn one: November 2007, September 2008 to September 2012
+(2010 and 2011 the "ODB"), Autumn 2013, October 2014 to October 2019, November 2020, October
+2021 to October 2024, from the zips the user downloaded from the champman0102.co.uk forum
+(whose attachments need a login; `--zip=`), and December 2025 from archive.org (item `cm-25`,
+its Data tables only, by range requests); 2006/07 has none. 826 maps, 17,496 clubs, 93.7 MB:
+28 (2016/17) to 71 (2025/26) a season, from Brazil's 98 to 100 in the seasons EA lacks it (2014/15,
+2024/25, 2025/26) and Russia's 60 after 2017/18 to the Philippines' and Belize's 10 (countries
+today's maps lack, so their maps are a season's only). 35 countries that had no earlier-season
+map now have some (Egypt, Morocco, Tunisia, Nigeria, Ghana, Iran, Qatar, the UAE, Thailand,
+Vietnam, Canada, Costa Rica, Bosnia, Georgia, Kazakhstan…); 30 of today's still have none,
+the databases rating fewer than ten of their clubs in every season. The September 2010 ODB,
+October 2014 and October 2016 databases carry 164 to 232 bytes after staff.dat's last table
+(0xFF bytes, then stray 52-byte rows), which `src/data/cm0102Releases.js` records
+(`staffTrailing`), so the builder cuts exactly those from the pinned files, as it cuts CM3's
+port's 230. Each database also rates 19 to 26 of EA's own
+countries deeper (Turkey 100 clubs to EA's 18, Argentina 100 to 30); those maps stay EA's.
 
 England has 88 to 90 clubs in an EA season (the four divisions less their Welsh
 clubs), 100 in most CM seasons (the four divisions and the Conference's strongest),
@@ -1447,8 +1565,8 @@ seasons field every league it has, Europe's and the Americas', Algeria's, South
 Africa's, Japan's, Taiwan's, Australia's and New Zealand's (until 2026-11-16 only the
 seven big leagues', the other league files uncached); India's, Ghana's and Canada's
 clubs, fewer than ten, have no map, nor 1994/95's and 1995/96's United States. A
-club's home lies in its own home section for 20,674 of 24,500 located club-seasons
-(84.4%); 565 club-seasons are placed (estimates).
+club's home lies in its own home section for 32,448 of 39,717 located club-seasons
+(81.7%); 1,361 club-seasons are placed (estimates), most of them the Update Team's smaller clubs no source places.
 
 **Clubs** (`scripts/lib/season-country-clubs.mjs`, read through the season
 builders, so the players are the season file's own tuples):

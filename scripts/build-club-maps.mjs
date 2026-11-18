@@ -8,7 +8,8 @@
 // every other state and province stays empty: land, but nobody's.
 // The earlier basketball seasons (scripts/data/nba-seasons.json) play on maps of their
 // own era, built the same way from that era's teams and arenas: Seattle, Vancouver and
-// New Jersey where they played. Today's map is unchanged by them.
+// New Jersey where they played. Today's map is unchanged by them. So do the other leagues'
+// earlier seasons, the FBS's of 2009–2025 (scripts/data/cfb-seasons.json) among them.
 //
 // Usage:
 //   node scripts/build-club-maps.mjs [--league=nba|nfl|afl|mlb|nhl|nrl|nwsl|cfb] [--check | --dry-run]
@@ -28,11 +29,12 @@
 //          src/data/clubs.basketball.js, src/data/clubs.american-football.js, src/data/clubs.baseball.js,
 //          src/data/clubs.hockey.js, src/data/clubs.rugby-league.js and src/data/clubs.womens-football.js (its NWSL
 //          clubs; an earlier season's in public/womens-football/<id>.json) and src/data/clubs.college-football.js;
-//          each NBA era's teams and moved arenas in scripts/data/nba-seasons.json.
+//          each NBA era's teams and moved arenas in scripts/data/nba-seasons.json; each FBS season's schools and the
+//          stadiums they played at in scripts/data/cfb-seasons.json.
 // Outputs: public/domestic/nba.json, one public/domestic/nba<year>.json per era,
 //          public/domestic/nfl.json, public/domestic/mlb.json, public/domestic/nhl.json, public/domestic/nrl.json and
-//          public/domestic/nwsl.json (with nwsls<year>.json for each earlier season), public/domestic/cfb.json, an
-//          ATTRIBUTION-<id>.txt beside each, and src/data/clubMaps.js
+//          public/domestic/nwsl.json (with nwsls<year>.json for each earlier season), public/domestic/cfb.json (with
+//          cfb<year>.json for each earlier era), an ATTRIBUTION-<id>.txt beside each, and src/data/clubMaps.js
 //          (the setup screen's entries).
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
@@ -59,6 +61,7 @@ import { teamsOfWar, warSeasonIdOf } from './lib/mlb-war.mjs';
 import { setIdOf as nflSetIdOf, teamsOf as nflTeamsOf } from './lib/nfl.mjs';
 import { seasonIdOf as nhlSeasonIdOf, teamsOf as nhlTeamsOf } from './lib/nhl-seasons.mjs';
 import { leagueOf as nrlLeagueOf, seasonIdOf as nrlSeasonIdOf, teamsOf as nrlTeamsOf } from './lib/rugby-league-seasons.mjs';
+import { cfbSeasonIdOf, cfbTeamsOf } from './lib/cfb-maps.mjs';
 import {
   arcPoints, bboxOf, dissolve, dropOverseas, EARTH_KM, facingKm, facingSections, interiorPoint, joinRealms, kmBetween, kmToPolys,
   nodeRings, partitionCountry, pointInPolys, polysAreaKm2, polysOf, prepareUnits, quantize, sectionTopology, simplifyTopology, splitOnLand,
@@ -77,6 +80,7 @@ const nhlArenasFile = path.join(root, 'scripts/data/nhl-teams.json');
 const nrlGroundsFile = path.join(root, 'scripts/data/nrl-teams.json');
 const nwslStadiumsFile = path.join(root, 'scripts/data/nwsl-teams.json');
 const cfbStadiumsFile = path.join(root, 'scripts/data/cfb-teams.json');
+const cfbSeasonsFile = path.join(root, 'scripts/data/cfb-seasons.json');
 const womensSetFile = id => path.join(root, `public/womens-football/${id}.json`);
 const mlbSeasonsFile = path.join(root, 'scripts/data/mlb-seasons.json');
 const mlbWarSeasonsFile = path.join(root, 'scripts/data/mlb-war-seasons.json');
@@ -151,10 +155,14 @@ const LEAGUES = {
     eraVenues: 'Stadium locations: scripts/data/nwsl-teams.json, every club of the season at the stadium it played at.' },
   // College football's FBS schools (src/data/clubs.college-football.js), each holding the county or state its stadium stands
   // in: 43 states hold a school, Texas thirteen, and six counties two (Fulton, Harris, Miami-Dade, Los Angeles, Santa
-  // Clara and Washtenaw), which half a kilometre cuts between them. Hawaii stays: the Rainbow Warriors play there.
+  // Clara and Washtenaw), which half a kilometre cuts between them. Hawaii stays: the Rainbow Warriors play there. The
+  // seasons 2009–2025 play on maps of their own (scripts/data/cfb-seasons.json), each school at the stadium it played
+  // most of its home games in that season: Kansas at Arrowhead Stadium, in Missouri, in 2024; three schools share Los
+  // Angeles County in 2020–2021 (San Diego State at Carson) and Harris County in 2025 (Sam Houston at Shell Energy Stadium).
   cfb: { id: 'cfb', sport: 'college-football', league: 'FBS', name: 'USA', countries: [USA], joins: {},
     entry: { venue: 'stadium', lines: 'state' }, maxGapKm: 0.5,
-    venues: 'Stadium locations: scripts/data/cfb-teams.json (English Wikipedia\'s "List of NCAA Division I FBS football stadiums" and each stadium\'s article, CC BY-SA 4.0).' },
+    venues: 'Stadium locations: scripts/data/cfb-teams.json (English Wikipedia\'s "List of NCAA Division I FBS football stadiums" and each stadium\'s article, CC BY-SA 4.0).',
+    eraVenues: 'Stadium locations: scripts/data/cfb-teams.json (English Wikipedia\'s "List of NCAA Division I FBS football stadiums" and each stadium\'s article, CC BY-SA 4.0), and scripts/data/cfb-seasons.json for the schools of a season that played most of their home games at another stadium (counted from the season\'s schedule in sportsdataverse\'s cfbfastR-cfb-data, from ESPN, and checked against English Wikipedia\'s season articles), each such stadium named as it was then and placed from its English Wikipedia article (CC BY-SA 4.0) at the revision the manifest pins.' },
 };
 // Territories are states and provinces (REGION_LEVEL), built from their counties and
 // economic regions (UNIT_LEVEL) so that both share every border vertex for vertex.
@@ -621,14 +629,30 @@ async function nwslSpecs() {
 }
 
 /**
- * College football's map, `{ id, seasons: null, clubs: [{ id, name, city, arena, home }] }`: the FBS schools of the
- * built-in season at their stadiums (scripts/data/cfb-teams.json), strongest first.
+ * College football's maps, `{ id, seasons, clubs: [{ id, name, city, arena, home }] }`: today's from the FBS schools of the
+ * built-in season at their stadiums (scripts/data/cfb-teams.json), strongest first (`seasons` null), then one per era of
+ * scripts/data/cfb-seasons.json (`maps`), each of its seasons' schools at the stadium it played most of its home games in
+ * that season (scripts/lib/cfb-maps.mjs). An era's schools rank as today's do, and a school the built-in season lacks (the
+ * manifest's `schools`) after them, so section ids follow the same order on every map; the seasons a map serves must
+ * have the same schools at the same stadiums.
  */
 async function cfbSpecs() {
   const stadiums = JSON.parse(await readFile(cfbStadiumsFile, 'utf8')).teams;
+  const manifest = JSON.parse(await readFile(cfbSeasonsFile, 'utf8'));
   const clubs = rankedClubs(CFB_CLUBS, stadiums, 'stadium')
     .map(c => ({ id: c.id, name: c.name, city: stadiums[c.id].city, arena: stadiums[c.id].stadium, home: stadiums[c.id].home }));
-  return [{ id: LEAGUES.cfb.id, seasons: null, clubs }];
+  const specs = [{ id: LEAGUES.cfb.id, seasons: null, clubs }];
+  const order = [...clubs.map(c => c.id), ...Object.keys(manifest.schools ?? {}).filter(id => !stadiums[id])];
+  const places = teams => JSON.stringify(teams.map(t => [t.id, t.name, t.city, t.stadium, t.home]));
+  for (const map of manifest.maps ?? []) {
+    const [first, ...rest] = map.seasons;
+    const teams = cfbTeamsOf(stadiums, manifest, first, order);
+    const differs = rest.find(year => places(cfbTeamsOf(stadiums, manifest, year, order)) !== places(teams));
+    if (differs) throw new Error(`${map.id}: the schools or stadiums of ${differs} are not those of ${first}`);
+    specs.push({ id: map.id, seasons: map.seasons.map(cfbSeasonIdOf),
+      clubs: teams.map(t => ({ id: t.id, name: t.name, city: t.city, arena: t.stadium, home: t.home })) });
+  }
+  return specs;
 }
 
 async function build({ source, log, spec, league }) {
@@ -794,7 +818,7 @@ async function build({ source, log, spec, league }) {
 
 function indexModule(entries) {
   return `// GENERATED by scripts/build-club-maps.mjs from public/domestic/nba*.json, nfl*.json, mlb*.json, nhl*.json, nrl*.json,
-// nwsl*.json and cfb.json; do not edit.
+// nwsl*.json and cfb*.json; do not edit.
 // Maps a sport's clubs play on instead of the world (docs/design/domestic-campaigns.md,
 // "The NBA map", "The NFL map", "The MLB map", "The NHL map", "The NRL map", "The NWSL map", "The FBS map"): the setup offers each as its
 // sport's club theatre ('domestic:<id>'), the NWSL's beside women's football's Europe maps, and the loader fetches

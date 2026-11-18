@@ -510,7 +510,10 @@ test('the running App launches a 1989/90 nations campaign as the Soviet Union, a
     const { app, time } = fixture;
     app.pickSetup('layer', 'clubs');
     app.pickSetup('dataSet', id);
-    assert.equal(app.state.setup.layer, 'nations', 'a season with nations only takes the nations');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['clubs', null], 'a season with nations only is no choice for clubs');
+    app.pickSetup('layer', 'nations');
+    app.pickSetup('dataSet', id);
+    assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', id]);
     time.advance(200);
     await app.loadSet(id);
     await settle();

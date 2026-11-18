@@ -22,6 +22,12 @@ import {
 import { fetchFile, rawGithubUrl } from './polite-fetch.mjs';
 
 export const GB_META_URL = 'https://www.geoboundaries.org/api/current/gbOpen/ALL/ALL/';
+// England's districts, the tier below its counties that geoBoundaries' GBR layers stop at (both list the counties and
+// unitary authorities): the Office for National Statistics' Local Authority Districts (December 2019) Boundaries UK
+// GCB, generalised to 20 m and clipped to the coast, from the ONS's ArcGIS feature service (no robots.txt).
+export const ONS_LAD_URL = 'https://services1.arcgis.com/ESMARspQHYMw9BZ9/arcgis/rest/services/Local_Authority_Districts_December_2019_GCB_UK_2022/FeatureServer/0/query?where=1%3D1&outFields=lad19cd,lad19nm&outSR=4326&f=geojson';
+export const ONS_LAD_SOURCE = 'Office for National Statistics, Local Authority Districts (December 2019) Boundaries UK GCB';
+export const ONS_LAD_LICENSE = 'Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)';
 export const NE_URL = 'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/v5.1.2/geojson/ne_10m_admin_1_states_provinces.geojson';
 export const GN_DUMP = 'https://download.geonames.org/export/dump';
 export const GN_CITATION = 'GeoNames (https://www.geonames.org), CC BY 4.0';
@@ -668,6 +674,13 @@ export function createBoundarySource({ cacheDir, worldFile, offline = false, log
     return JSON.parse(await download(row.simplifiedGeometryGeoJSON, file)).features;
   }
 
+  /** The UK's local authority districts (ONS_LAD_URL), every page of them in one answer: { lad19cd, lad19nm } features. */
+  async function onsDistricts() {
+    const collection = JSON.parse(await download(ONS_LAD_URL, path.join(cacheDir, 'ons', 'LAD-2019-12-GCB-UK.geojson')));
+    if (collection.exceededTransferLimit || collection.properties?.exceededTransferLimit) throw new Error('The ONS districts came in more than one page');
+    return collection.features;
+  }
+
   let neFeatures = null;
   async function naturalEarth() {
     if (!neFeatures) neFeatures = JSON.parse(await download(NE_URL, path.join(cacheDir, 'ne', 'ne_10m_admin_1.geojson'))).features;
@@ -887,5 +900,5 @@ export function createBoundarySource({ cacheDir, worldFile, offline = false, log
     };
   }
 
-  return { meta, layers, features: gbFeatures, unitsFor, places, regions, world };
+  return { meta, layers, features: gbFeatures, fillParents, naturalEarth, onsDistricts, unitsFor, places, regions, world };
 }

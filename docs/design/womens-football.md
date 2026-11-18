@@ -128,7 +128,8 @@ to rate women. Each is `public/womens-football/eaw-<edition>.json` (kind `eaw`),
 - **National teams only before FIFA 23.** EA rated 12 to 17 national teams a year (FIFA 16's are
   the United States, France, Germany, Canada, Brazil, Sweden, Australia, China, Italy, Mexico,
   England and Spain); every other nation fields no team, as in the built-in season, so those
-  campaigns are small. Choosing Clubs with one of these seasons goes back to the built-in season.
+  campaigns are small. Only Nations list these seasons; choosing Clubs with one takes the nearest
+  season with clubs, 2022/23.
 - **Clubs of their day.** A club keeps the game's id for its EA team id, so its crest and colour
   follow it from season to season, under the name EA gave it that year: Olympique Lyonnais in
   2024/25, OL Reign and the Chicago Red Stars in 2023/24. A club EA rates with fewer than eleven

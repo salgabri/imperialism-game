@@ -354,7 +354,10 @@ test('a 1971/72 campaign plays the Netherlands\' computed eleven, saves its play
     assert.ok(app.state.footballSets.some(set => set.id === 'nt-1972' && set.label === NATIONAL_TEAMS_LABEL));
     app.pickSetup('layer', 'clubs');
     app.pickSetup('dataSet', 'nt-1972');
-    assert.equal(app.state.setup.layer, 'nations', 'a season with nations only takes the nations');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['clubs', null], 'a season with nations only is no choice for clubs');
+    app.pickSetup('layer', 'nations');
+    app.pickSetup('dataSet', 'nt-1972');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', 'nt-1972']);
     time.advance(200);
     await app.loadSet('nt-1972');
     await settle();

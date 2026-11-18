@@ -45,7 +45,9 @@ const SAFETY = 0.0022;
 // season then spreads the franchises as the NFL's do, and the rating favourite wins two games in three.
 const TD_SCALE = 0.075;
 const FG_SCALE = 0.025;
-// Match-day form in rating points, shifting both sides' edges (the attacker's up, the defender's down).
+// Match-day form in rating points a point of drama, shifting both sides' edges (the attacker's up, the defender's down).
+// A rulebook's `form` replaces it (college football's, src/sports/collegeFootball.js: its edge's scale would stretch
+// this one).
 const FORM_PER_DRAMA = 0.35;
 // Home advantage, a campaign option (off: every match is at a neutral venue): the defender's drives gain HOME_EDGE rating
 // points of edge at home and the visitors' lose as much. Equal sides then win 54% at home, as NFL home sides do.
@@ -133,7 +135,7 @@ const tryPerDrive = s => s.fga / s.games / (DRIVES - s.td / s.games);
  * matchup. To second order that is half the bend, (1 − 2p) × scale², times the variance of the season's edges beyond
  * today's (`spread`, src/data/nflLeagueAverages.js).
  */
-const spreadAllowance = (logOdds, scale, extraSpread) => -0.5 * (1 - 2 * logistic(logOdds)) * scale ** 2 * extraSpread;
+export const spreadAllowance = (logOdds, scale, extraSpread) => -0.5 * (1 - 2 * logistic(logOdds)) * scale ** 2 * extraSpread;
 
 /**
  * The rules of `league`'s `year` (an NFL season from 1960, the latest finished one's figures standing in for any later,
@@ -302,13 +304,24 @@ function overtimePeriod(rng, oddsA, oddsD, first, rules = TODAY) {
 }
 
 /**
- * A college overtime period of possessions (the NCAA's since 2021: its first and second periods), `first` the side with
- * the ball first, `oddsA`/`oddsD` each side's odds from the opponent's 25 (collegeOvertimeOdds). The first plays its possession
- * out, kicking after a touchdown in the first period and going for two in the second (\`twoOnly\`), as the rules then
- * require. The second plays to that score: level it plays for the field goal that wins (as late in a game), a field goal
- * down it plays the possession out (its touchdown wins, its field goal draws level), a touchdown down it needs one (no
- * field goal), and its touchdown is kicked, or in the second period goes for two, to win or draw level; a touchdown that
- * wins has no try. No defensive scores. → { a, d, drives: [{ side, pts, conversion? }] }
+ * The college overtime of a rulebook's day (`rules.overtime` 'college'): the first period whose touchdowns must go for two
+ * (`twoFrom`: the rulebook's `otTwoFrom`) and the first period of two-point plays (`playsFrom`: its `otPlaysFrom`, null
+ * for none). A rulebook without them plays today's, the NCAA's since 2021: two from the second period, plays from the
+ * third. Earlier seasons give their own (src/sports/collegeFootball.js, collegeOvertimeRule).
+ */
+export function collegeOvertimeOf(rules) {
+  return { twoFrom: rules.otTwoFrom ?? 2, playsFrom: rules.otPlaysFrom === undefined ? 3 : rules.otPlaysFrom };
+}
+
+/**
+ * A college overtime period of possessions (the NCAA's since 2021: its first and second periods; to 2018 every period),
+ * `first` the side with the ball first, `oddsA`/`oddsD` each side's odds from the opponent's 25 (collegeOvertimeOdds).
+ * The first plays its possession out, kicking after a touchdown, or going for two from the period the rules require it
+ * (\`twoOnly\`: the second since 2021, the third before). The second plays to that score: level it plays for the field
+ * goal that wins (as late in a game), a field goal down it plays the possession out (its touchdown wins, its field goal
+ * draws level), a touchdown down it needs one (no field goal), and its touchdown is kicked, or where the rules require
+ * goes for two, to win or draw level; a touchdown that wins has no try. No defensive scores.
+ * → { a, d, drives: [{ side, pts, conversion? }] }
  */
 function collegePossessions(rng, oddsA, oddsD, first, twoOnly) {
   const order = first === 'A' ? ['A', 'D'] : ['D', 'A'];
@@ -338,8 +351,9 @@ export function collegeAnswer(odds, behind) {
 }
 
 /**
- * A college overtime period of two-point plays (from the NCAA's third period on): one each, `first` then the other, each
- * made with its side's two-point odds → { a, d, drives: [{ side, pts: 2 or 0, kind: 'two' }] }.
+ * A college overtime period of two-point plays (from the NCAA's third period on since 2021, its fifth in 2019 and 2020):
+ * one each, `first` then the other, each made with its side's two-point odds → { a, d, drives: [{ side, pts: 2 or 0,
+ * kind: 'two' }] }.
  */
 function twoPointRound(rng, oddsA, oddsD, first) {
   const drives = [];
@@ -353,22 +367,25 @@ function twoPointRound(rng, oddsA, oddsD, first) {
 }
 
 /**
- * College overtime (the NCAA's rules since 2021) after a level regulation, under `rules.overtime` 'college': a coin toss,
- * whose loser has the ball first in the first period (its winner defends, as nearly every team does), the first
- * possession then alternating from period to period; the first two periods' possessions from the 25
- * (collegePossessions), every later period's two-point plays (twoPointRound). A period that leaves the game level leads to
- * the next; still level after `rules.maxOvertimes` periods, a last two-point play goes to either side with
- * logistic(DECISIVE_SLOPE · scale · (edgeA − edgeD)), a coin flip between equals, so a match always has a winner. Form
- * moves the overtime odds as it moves the drives'. Each play is pushed onto `plays` with its period (1, 2, …).
- * → { periods: [[a, d], …], ga, gd } (the overtime's own points).
+ * College overtime after a level regulation, under `rules.overtime` 'college' and the overtime of the rules' day
+ * (collegeOvertimeOf; today's the NCAA's since 2021): a coin toss, whose loser has the ball first in the first period (its
+ * winner defends, as nearly every team does), the first possession then alternating from period to period; possessions
+ * from the 25 (collegePossessions) until the period of two-point plays (twoPointRound: the third since 2021, the fifth in
+ * 2019 and 2020, none before). A period that leaves the game level leads to the next; still level after
+ * `rules.maxOvertimes` periods, a last two-point play goes to either side with logistic(DECISIVE_SLOPE · scale · (edgeA −
+ * edgeD)), a coin flip between equals, so a match always has a winner. Form moves the overtime odds as it moves the
+ * drives'. Each play is pushed onto `plays` with its period (1, 2, …). → { periods: [[a, d], …], ga, gd } (the
+ * overtime's own points).
  */
 function collegeOvertime(rng, prepared, rules, form, plays) {
   const oddsA = collegeOvertimeOdds(prepared.edgeA + form, prepared.kickingA, rules);
   const oddsD = collegeOvertimeOdds(prepared.edgeD - form, prepared.kickingD, rules);
+  const { twoFrom, playsFrom } = collegeOvertimeOf(rules);
   const periods = [];
   let ga = 0, gd = 0, first = rng() < 0.5 ? 'A' : 'D';
   for (let period = 1; period <= rules.maxOvertimes && ga === gd; period++) {
-    const result = period <= 2 ? collegePossessions(rng, oddsA, oddsD, first, period === 2) : twoPointRound(rng, oddsA, oddsD, first);
+    const result = playsFrom !== null && period >= playsFrom ? twoPointRound(rng, oddsA, oddsD, first)
+      : collegePossessions(rng, oddsA, oddsD, first, period >= twoFrom);
     if (period === rules.maxOvertimes && result.a === result.d) {
       const side = rng() < logistic(DECISIVE_SLOPE * (rules.scale ?? 1) * (prepared.edgeA - prepared.edgeD)) ? 'A' : 'D';
       result.drives.push({ side, pts: 2, kind: 'two' });
@@ -388,14 +405,15 @@ function collegeOvertime(rng, prepared, rules, form, plays) {
  * (its season's). Also returns the scoring sequence (`plays`: each possession in order, `{ side, pts, period,
  * conversion?, kind? }` with `side` the side that scored, period 0 being regulation, `kind` 'two' a college overtime's
  * two-point play) so the full simulation can time its events. A college rulebook (`overtime` 'college') plays college
- * overtime (collegeOvertime), with its own possessions a side (`drives`, within `driveRange`).
+ * overtime (collegeOvertime), with its own possessions a side (`drives`, within `driveRange`) and its own match-day form
+ * (`form`, rating points a point of drama; FORM_PER_DRAMA without one).
  */
 export function sampleResult(rng, prepared, drama = 6) {
   const rules = prepared.rules ?? TODAY;
   const variation = Number.isFinite(drama) ? clamp(drama, 0, 12) : 6;
   const [fewest, most] = rules.driveRange ?? DRIVE_RANGE;
   const drives = Math.round(clamp(prepared.drives + gauss(rng) * DRIVE_SD, fewest, most));
-  const form = gauss(rng) * variation * FORM_PER_DRAMA;
+  const form = gauss(rng) * variation * (rules.form ?? FORM_PER_DRAMA);
   const oddsA = driveOdds(prepared.edgeA + form, prepared.kickingA, rules);
   const oddsD = driveOdds(prepared.edgeD - form, prepared.kickingD, rules);
   const first = rng() < 0.5 ? 'A' : 'D';
@@ -616,7 +634,9 @@ export function americanFootballProfile(lineup) {
 
 /**
  * The overtime and drive constants the live win-probability model mirrors (src/engine/winProbability.js); a season's
- * own (its safeties, overtime rule and period) ride on its prepared match's `rules`.
+ * own (its safeties, overtime rule and period) and college football's form ride on its prepared match's `rules`. The
+ * edge's slopes (TD_SCALE, FG_SCALE), an extra point's per kicking point (XP_PER_POINT) and the NFL's form
+ * (FORM_PER_DRAMA) also state college football's rules (src/sports/collegeFootball.js).
  */
 export const DRIVE_MODEL = Object.freeze({ DRIVES, DRIVE_SD, OVERTIME, MAX_OVERTIMES, SUDDEN_DEATH, OT_POSSESSIONS, FORM_PER_DRAMA,
-  SAFETY, DECISIVE_SLOPE });
+  SAFETY, DECISIVE_SLOPE, TD_SCALE, FG_SCALE, XP_PER_POINT });

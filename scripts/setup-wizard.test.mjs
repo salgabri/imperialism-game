@@ -23,13 +23,14 @@ import { politicalFill } from '../src/data/empireColours.js';
 const compiled = await build({
   stdin: { contents: `
     export {default as SetupOverlay, PACING_OPTIONS, PACING_HELP, RESOLUTION_OPTIONS, campaignPreview, domesticDescription} from './src/components/SetupOverlay.jsx';
+    export { peekPlace } from './src/components/SetupMap.jsx';
   `, resolveDir: fileURLToPath(new URL('../', import.meta.url)), loader: 'jsx' },
   bundle: true, write: false, platform: 'node', format: 'cjs', external: ['react'],
   loader: { '.css': 'empty' }, define: { 'import.meta.env.BASE_URL': '"/"' }, logLevel: 'silent',
 });
 const module = { exports: {} };
 new Function('require', 'module', 'exports', compiled.outputFiles[0].text)(createRequire(import.meta.url), module, module.exports);
-const { SetupOverlay, PACING_OPTIONS, PACING_HELP, RESOLUTION_OPTIONS, campaignPreview, domesticDescription } = module.exports;
+const { SetupOverlay, PACING_OPTIONS, PACING_HELP, RESOLUTION_OPTIONS, campaignPreview, domesticDescription, peekPlace } = module.exports;
 
 const dom = new JSDOM('<!doctype html><html><body></body></html>', { url: 'http://localhost' });
 globalThis.window = dom.window;
@@ -1119,12 +1120,17 @@ const cameraOf = card => {
   const [x, y, w, h] = card.querySelector('svg').getAttribute('viewBox').split(' ').map(Number);
   return { x, y, w, h };
 };
-/** The card's land is drawing only: hidden from assistive technology, never territory; its only controls are buttons. */
-function assertCardDrawing(card) {
+/**
+ * The card's land is drawing only: hidden from assistive technology, never territory; its only controls are buttons.
+ * Held land names its team (`data-team`) for a pointer's preview, which step 3's wall gives a keyboard.
+ */
+function assertCardDrawing(card, preview) {
   const svg = card.querySelector('svg');
   assert.equal(svg.getAttribute('aria-hidden'), 'true', 'the drawing stays out of the accessibility tree');
-  assert.equal(svg.querySelectorAll('[data-country], [role], [tabindex]').length, 0, 'never territory, never interactive');
+  assert.equal(svg.querySelectorAll('[data-country], [role], [tabindex]').length, 0, 'never territory, never a tab stop');
   assert.equal(card.getAttribute('aria-hidden'), null, 'the card itself is not hidden: it holds buttons');
+  assert.deepEqual([...svg.querySelectorAll('.setup-map__sections path')].map(path => path.dataset.team ?? null),
+    preview.sections.map(section => section.owner ?? null), 'each section names the team a click on it previews');
 }
 
 test('country card: sections in their kick-off pastels over the neighbouring land, a map that zooms', async t => {
@@ -1141,12 +1147,13 @@ test('country card: sections in their kick-off pastels over the neighbouring lan
   const backdrop = [{ id: '250', d: 'M-5,-5L0,-5L0,0Z', rings: [] }];
   const preview = countryMapPreview(map, backdrop);
   assert.equal(preview.viewBox, '-0.8 -0.8 21.6 11.6', 'framed on the opening focus, 4% margin');
-  assert.deepEqual(preview.sections.map(section => [section.id, section.fill]),
-    [['s1', politicalFill('d999-1')], ['s2', politicalFill('d999-2')], ['s3', '#e8e9e4']], 'no startOwners (format 1): home sections only');
-  // Format 2: every section of a club's starting group takes its pastel, not just the home.
+  assert.deepEqual(preview.sections.map(section => [section.id, section.fill, section.owner]),
+    [['s1', politicalFill('d999-1'), 'd999-1'], ['s2', politicalFill('d999-2'), 'd999-2'], ['s3', '#e8e9e4', null]],
+    'no startOwners (format 1): home sections only');
+  // Format 2: every section of a club's starting group takes its pastel, not just the home, and previews that club.
   const grouped = countryMapPreview({ ...map, startOwners: { s1: 'd999-1', s2: 'd999-2', s3: 'd999-1' } }, backdrop);
-  assert.deepEqual(grouped.sections.map(section => [section.id, section.fill]),
-    [['s1', politicalFill('d999-1')], ['s2', politicalFill('d999-2')], ['s3', politicalFill('d999-1')]]);
+  assert.deepEqual(grouped.sections.map(section => [section.id, section.fill, section.owner]),
+    [['s1', politicalFill('d999-1'), 'd999-1'], ['s2', politicalFill('d999-2'), 'd999-2'], ['s3', politicalFill('d999-1'), 'd999-1']]);
   assert.deepEqual(preview.backdrop, [{ id: '250', d: 'M-5,-5L0,-5L0,0Z' }]);
   assert.equal(countryMapPreview(map, backdrop), preview, 'memoised per map, paths and backdrop');
   assert.notEqual(countryMapPreview(map, [...backdrop]), preview);
@@ -1163,19 +1170,23 @@ test('country card: sections in their kick-off pastels over the neighbouring lan
   assert.equal(real.sections.length, ENGLAND.clubs);
   const home = new Map(decoded.clubs.map(club => [club.homeSection, club.id]));
   assert.ok(real.sections.every(section => section.fill === politicalFill(home.get(section.id))));
+  assert.ok(real.sections.every(section => section.owner === home.get(section.id)), 'a click on a section previews its club');
   assert.ok(real.viewBox.split(' ').map(Number).every(Number.isFinite));
-  // Fiji: 16 clubs on 100 sections, every section painted as the club starting there.
+  // Fiji: 16 clubs on 100 sections, every section painted as the club starting there, and previewing it.
   const fiji = decodeDomestic(JSON.parse(readFileSync(new URL('../public/domestic/242.json', import.meta.url), 'utf8')), '242');
   const fijiCard = countryMapPreview(fiji, []);
   assert.equal(fijiCard.sections.length, 100);
   assert.ok(fiji.clubs.length < 100);
   assert.ok(fijiCard.sections.every(section => section.fill === politicalFill(fiji.startOwners[section.id])), 'no neutral section');
+  assert.ok(fijiCard.sections.every(section => section.owner === fiji.startOwners[section.id]));
   assert.equal(new Set(fijiCard.sections.map(section => fiji.startOwners[section.id])).size, fiji.clubs.length);
+  assert.deepEqual(new Set(fijiCard.sections.map(section => section.owner)), new Set(fiji.clubs.map(club => club.id)),
+    'every club previews from its own land');
 
   const view = await mount(t, { setup: COUNTRY, domestic: { state: 'ready', message: null, onRetry() {}, preview } });
   const card = view.q('.setup-step[data-step="1"] .setup-side > .setup-map');
   assert.ok(card, 'the card leads the side column of step 1');
-  assertCardDrawing(card);
+  assertCardDrawing(card, preview);
   // The camera opens on the board (here at the closest zoom the 960-unit chart allows: 60 units across).
   const camera = cameraOf(card);
   assert.ok(camera.x <= 0 && camera.y <= 0 && camera.x + camera.w >= 20 && camera.y + camera.h >= 12, 'every section in view');
@@ -1202,7 +1213,8 @@ test('world card: a theatre opening board in kick-off pastels over unclaimed lan
   const own = { a: 'a', b: 'b', c: 'a' };
   const frameIds = ['a', 'b'];
   const preview = theatreMapPreview({ countries, basePaths, own, frameIds });
-  assert.deepEqual(preview.sections.map(section => [section.id, section.fill]), [['a', politicalFill('a')], ['b', politicalFill('b')], ['c', politicalFill('a')]]);
+  assert.deepEqual(preview.sections.map(section => [section.id, section.fill, section.owner]),
+    [['a', politicalFill('a'), 'a'], ['b', politicalFill('b'), 'b'], ['c', politicalFill('a'), 'a']], 'overseas land previews its holder');
   assert.deepEqual(preview.backdrop, [{ id: 'n', d: 'M50,50h10v10h-10Z' }], 'unclaimed land is drawn; shapes without a path are not');
   assert.equal(preview.viewBox, '-0.8 -0.8 21.6 11.6', 'framed on the starting land, 4% margin');
   assert.equal(preview.teams, 2);
@@ -1218,7 +1230,7 @@ test('world card: a theatre opening board in kick-off pastels over unclaimed lan
   const nations = await mount(t, { setup: { scope: 'UEFA' }, theatreMap: preview });
   const card = nations.q('.setup-step[data-step="1"] .setup-side > .setup-map[data-kind="world"]');
   assert.ok(card, 'every world theatre leads step 1 with its map');
-  assertCardDrawing(card);
+  assertCardDrawing(card, preview);
   const camera = cameraOf(card);
   assert.ok(camera.x <= 0 && camera.y <= 0 && camera.x + camera.w >= 20 && camera.y + camera.h >= 10, 'the starting land in view');
   assert.equal(card.querySelectorAll('.setup-map__backdrop path').length, 1);
@@ -1314,6 +1326,148 @@ test('the map card zooms like the campaign map, and its Political / Flags switch
   await flags.click(flags.button('Political', flagged));
   assert.deepEqual(modes, ['flags', 'political']);
   assert.deepEqual([...view.errors, ...ignored.errors, ...flags.errors], []);
+});
+
+test('the map preview’s card: a team of the field by id, its rank, tier and best players, as step 3 shows them', () => {
+  const managerTeams = [
+    { id: '250', name: 'France', rating: 86.1, players: [{ pos: 'FW', name: 'K. Mbappé', rating: 91.2 }, { pos: 'MF', name: 'M. Olise', rating: 89.6 }] },
+    { id: '348', name: 'Hungary', rating: 76.4, players: [] }, { id: '380', name: 'Italy', rating: 84.2 }, { id: '724', name: 'Spain', rating: 85.0 },
+  ];
+  const setup = { ...BASE, scope: 'world' };
+  const hungary = buildSetupModel(setup, { managerTeams, peek: '348' }).peek;
+  assert.deepEqual([hungary.id, hungary.name, hungary.meta, hungary.ratingText, hungary.rankText, hungary.tier, hungary.isClub],
+    ['348', 'Hungary', 'UEFA · Football nation', '76.4', '4 / 4', 'Long shot', false]);
+  assert.deepEqual(hungary.players, [], 'no players listed, none shown');
+  const france = buildSetupModel(setup, { managerTeams, peek: '250' });
+  assert.deepEqual([france.peek.rankText, france.peek.tier], ['1 / 4', 'Favourite']);
+  assert.deepEqual(france.peek.players.map(player => [player.pos, player.name, player.ratingText]), [['FW', 'K. Mbappé', '91'], ['MF', 'M. Olise', '90']]);
+  assert.equal(france.managed, null, 'a spectator previews without picking');
+  // The card a manager's own team shows on step 3, less its fronts and the Suggested mark.
+  const managing = buildSetupModel({ ...setup, role: 'manager', managedTeamId: '250' }, { managerTeams, peek: '250' });
+  const { fronts, suggested, ...picked } = managing.managed;
+  assert.deepEqual(managing.peek, picked);
+  assert.deepEqual([fronts, suggested], [null, false]);
+  assert.equal(managing.managedId, '250', 'previewing never changes the pick');
+  assert.equal(buildSetupModel({ ...setup, role: 'manager' }, { managerTeams, peek: '724' }).managedId, '250', 'nor the suggestion');
+  assert.equal(buildSetupModel(setup, { managerTeams, peek: 'zzz' }).peek, null, 'a team the field lacks previews nothing');
+  assert.equal(buildSetupModel(setup, { managerTeams }).peek, null);
+});
+
+test('the preview opens away from the click: across a wide map, along a narrow one, halfway to the controls', () => {
+  const chart = { left: 100, top: 50, width: 800, height: 600 };
+  assert.deepEqual(peekPlace(chart, 150, 100), { x: 'right', y: 'bottom' }, 'a click at the top left: the card goes right, or down');
+  assert.deepEqual(peekPlace(chart, 850, 600), { x: 'left', y: 'top' });
+  // The zoom group (its left edge at 840) and the switch (its top at 610) end the card's room: each axis splits there.
+  const controls = { zoom: { left: 840, top: 470, width: 36, height: 108 }, modes: { left: 750, top: 610, width: 146, height: 31 } };
+  assert.deepEqual(peekPlace(chart, 465, 325, controls), { x: 'right', y: 'bottom' });
+  assert.deepEqual(peekPlace(chart, 475, 335, controls), { x: 'left', y: 'top' });
+  // A hidden group (a phone's zoom buttons) measures 0×0: that axis splits at the map's middle.
+  assert.deepEqual(peekPlace(chart, 495, 345, { zoom: { left: 0, top: 0, width: 0, height: 0 }, modes: controls.modes }),
+    { x: 'right', y: 'top' });
+  assert.deepEqual(peekPlace({ left: 0, top: 0, width: 0, height: 0 }, 5, 5), { x: 'left', y: 'top' }, 'nothing measured: top left');
+});
+
+test('a click on a team’s land previews it over the map, outlined, until a click elsewhere, ×, Escape or another theatre', async t => {
+  const square = (x, y, size) => `M${x},${y}h${size}v${size}h-${size}Z`;
+  // France holds its mainland and Corsica, Spain one shape; beyond them lies land nobody holds.
+  const preview = { viewBox: '100 50 400 300', teams: 2, backdrop: [{ id: 'n', d: square(450, 300, 40) }],
+    sections: [
+      { id: '250', d: square(100, 50, 100), fill: politicalFill('250'), owner: '250' },
+      { id: 'corsica', d: square(220, 60, 20), fill: politicalFill('250'), owner: '250' },
+      { id: '724', d: square(100, 200, 100), fill: politicalFill('724'), owner: '724' },
+    ] };
+  const managerTeams = [
+    { id: '250', name: 'France', rating: 86.1, players: [{ pos: 'FW', name: 'K. Mbappé', rating: 91 }, { pos: 'MF', name: 'M. Olise', rating: 90.4 }] },
+    { id: '348', name: 'Hungary', rating: 76.4 }, { id: '380', name: 'Italy', rating: 84.2 }, { id: '724', name: 'Spain', rating: 85.0, players: [] },
+  ];
+  const view = await mount(t, { setup: { scope: 'world' }, theatreMap: preview, managerTeams });
+  const card = view.q('.setup-map');
+  const land = id => card.querySelector(`.setup-map__sections path[data-team="${id}"]`);
+  const fire = (target, type, init = {}) => act(async () => {
+    const Event = type.startsWith('pointer') ? dom.window.PointerEvent : dom.window.MouseEvent;
+    target.dispatchEvent(new Event(type, { bubbles: true, cancelable: true, button: 0, ...init }));
+  });
+  // Never assert.equal a jsdom node: a failing diff inspects the whole document and runs out of memory.
+  const peek = () => card.querySelector('.setup-map__overlay > .setup-peek');
+  const open = () => !!peek();
+  const name = () => peek()?.querySelector('#setup-peek-name').textContent ?? null;
+  const outline = () => card.querySelector('.setup-map__peek');
+  const stats = () => [...peek().querySelectorAll('.setup-peek__stats > div')].map(row => [row.firstChild.textContent, row.lastChild.textContent]);
+  assert.equal(card.dataset.peekable, '', 'held land takes a click');
+  assert.equal(open(), false, 'the map alone until a click');
+
+  await fire(land('250'), 'click');
+  assert.equal(name(), 'France');
+  assert.equal(peek().getAttribute('aria-labelledby'), 'setup-peek-name');
+  assert.equal(peek().querySelector('.setup-peek__meta').textContent, 'UEFA · Football nation');
+  assert.deepEqual(stats(), [['Strength', '86.1'], ['Rank', '1 / 4'], ['Tier', 'Favourite']]);
+  assert.deepEqual([...peek().querySelectorAll('.setup-player')].map(row => [...row.children].map(cell => cell.textContent)),
+    [['FW', 'K. Mbappé', '91'], ['MF', 'M. Olise', '90']]);
+  assert.equal(outline().dataset.peek, '250');
+  assert.deepEqual([...outline().querySelectorAll('.setup-map__peek-line path')].map(path => path.getAttribute('d')),
+    [square(100, 50, 100), square(220, 60, 20)], 'all its land outlined, Corsica too');
+  assert.deepEqual({ ...card.querySelector('.setup-map__overlay').dataset }, { x: 'left', y: 'top' }, 'nothing measured: top left');
+  assert.equal(card.querySelector('.setup-map__overlay').getAttribute('title'), '', 'the map’s caption stays off the card');
+
+  await fire(land('724'), 'click');
+  assert.equal(name(), 'Spain', 'another team’s land previews that team');
+  assert.deepEqual(stats(), [['Strength', '85.0'], ['Rank', '2 / 4'], ['Tier', 'Contender']]);
+  assert.equal(!!peek().querySelector('.setup-peek__players'), false, 'no players listed, no list');
+  assert.equal(outline().dataset.peek, '724');
+  await fire(card.querySelector('.setup-map__backdrop path'), 'click');
+  assert.deepEqual([open(), !!outline()], [false, false], 'land nobody holds closes it');
+  await fire(land('250'), 'click');
+  await fire(card.querySelector('svg'), 'click');
+  assert.equal(open(), false, 'so does the sea');
+  await fire(land('250'), 'click');
+  await view.click(view.q('.setup-peek__close'));
+  assert.equal(open(), false, '× closes it');
+  await fire(land('250'), 'click');
+  const dialog = document.createElement('div');
+  dialog.setAttribute('aria-modal', 'true');
+  document.body.append(dialog);
+  await view.key(document.body, 'Escape');
+  assert.equal(open(), true, 'a dialog’s Escape is its own');
+  dialog.remove();
+  await view.key(document.body, 'Escape');
+  assert.equal(open(), false, 'Escape closes it, wherever focus is');
+
+  // A pan's release is no click; the card is no handle for the map, and a double-click on it is no reset.
+  await fire(land('724'), 'click');
+  const pointer = { pointerId: 1, pointerType: 'mouse' };
+  await fire(land('250'), 'pointerdown', { clientX: 10, clientY: 10, ...pointer });
+  await fire(card, 'pointermove', { clientX: 40, clientY: 10, ...pointer });
+  assert.equal(card.dataset.panning, 'true');
+  await fire(card, 'pointerup', { clientX: 40, clientY: 10, ...pointer });
+  await fire(land('250'), 'click', { clientX: 40, clientY: 10 });
+  assert.equal(name(), 'Spain', 'a pan previews nothing');
+  await fire(peek(), 'pointerdown', { clientX: 10, clientY: 10, ...pointer });
+  await fire(card, 'pointermove', { clientX: 60, clientY: 10, ...pointer });
+  assert.equal(card.dataset.panning, undefined);
+  await fire(card, 'pointerup', { clientX: 60, clientY: 10, ...pointer });
+  await view.click(view.q('.setup-map button[aria-label="Zoom in"]'));
+  const zoomed = cameraOf(card);
+  await fire(peek(), 'dblclick');
+  assert.deepEqual(cameraOf(card), zoomed);
+  await fire(land('250'), 'pointerdown', { clientX: 10, clientY: 10, ...pointer });
+  await fire(card, 'pointerup', { clientX: 10, clientY: 10, ...pointer });
+  await fire(land('250'), 'click', { clientX: 10, clientY: 10 });
+  assert.equal(name(), 'France', 'a click after a pan previews again');
+
+  // Another theatre is another board: the preview goes, and coming back shows the map alone.
+  const theatre = label => view.qa('.setup-theatre').find(radio => radio.dataset.name === label);
+  const world = view.qa('.setup-theatre').find(radio => radio.getAttribute('aria-checked') === 'true');
+  await view.click(theatre('Europe'));
+  assert.equal(open(), false);
+  await view.click(world);
+  assert.equal(open(), false, 'coming back shows the map alone');
+  assert.deepEqual(view.errors, []);
+
+  // The card never scrolls: on a short map its players give way, then its figures (setup.css).
+  const css = readFileSync(new URL('../src/components/setup.css', import.meta.url), 'utf8');
+  assert.match(css, /\.setup-peek \{[^}]*overflow:hidden/);
+  assert.match(css, /@container \(max-height:309\.98px\) \{ \.setup-peek__players \{ display:none; \} \}/);
+  assert.match(css, /@container \(max-height:139\.98px\) \{ \.setup-peek__stats \{ display:none; \} \}/);
 });
 
 test('a pressed segment keeps its white label on hover (Teams toggle, history kinds, squad view)', () => {

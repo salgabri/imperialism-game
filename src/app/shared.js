@@ -4,7 +4,7 @@ import { DEFAULT_SPORT, getSport } from '../sports/index.js';
 import { domesticScope, domesticScopeId } from '../engine/domestic.js';
 import { clubMapScope, countryMapOf, countryOfEntry, domesticEntry, hasTheatreMaps, isCountryScope, isEuropeScope, theatreMapsOf,
   theatreOf } from '../data/domesticScope.js';
-import { BUILT_IN_SETS, getLoadedFootballSet, seasonMapOf, setHasClubs, setHasNations, setSportOf } from '../engine/footballSets.js';
+import { BUILT_IN_SETS, builtInSeasonOf, getLoadedFootballSet, seasonMapOf, setHasClubs, setHasLayer, setHasNations, setSportOf } from '../engine/footballSets.js';
 
 export const LOG_CAP = 220;
 export const FEED_CAP = 90;
@@ -65,6 +65,23 @@ export function mapYearOf(settings) {
   if (Number.isInteger(settings.dataYear)) return settings.dataYear;
   const year = BUILT_IN_SETS.find(set => set.id === id)?.year ?? getLoadedFootballSet(id)?.meta.year;
   return Number.isInteger(year) ? year : null;
+}
+
+/**
+ * The season a setup plays once its teams become `layer`'s ('nations' or 'clubs'): its own when it fields them, else
+ * the nearest season of its sport that does, a set listed in `sets` or the built-in season (null), the later of two as
+ * near. Another source's set of the same season is the nearest of all: 1993/94's World Cup, nations only, gives way to
+ * CM 93/94's 1993/94 for clubs. Pure.
+ */
+export function seasonForLayer(setup, layer, sets = BUILT_IN_SETS) {
+  const id = setup?.dataSet ?? null, sport = getSport(setup?.sport).id;
+  if (id == null || setSportOf(id) !== sport) return null;
+  if (setHasLayer(id, layer)) return id;
+  const year = sets.find(set => set.id === id)?.year ?? getLoadedFootballSet(id)?.meta.year;
+  if (!Number.isInteger(year)) return null;
+  const away = set => Math.abs(set.year - year);
+  return [{ id: null, year: builtInSeasonOf(sport).year }, ...sets.filter(set => setSportOf(set.id) === sport && setHasLayer(set.id, layer))]
+    .reduce((best, set) => (away(set) < away(best) || (away(set) === away(best) && set.year > best.year) ? set : best)).id;
 }
 
 /**
