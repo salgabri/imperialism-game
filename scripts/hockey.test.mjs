@@ -25,7 +25,7 @@ import { buildSquad, sourceLabel, sourceTitle } from '../src/viewModels/squad.js
 import { conquestOptions } from '../src/viewModels/conquest.js';
 import { buildFeedRows, scorersLine } from '../src/viewModels/match.js';
 import { kmToPolys, pointInPolys } from './lib/domestic-partition.mjs';
-import { ESTIMATE_RANGE, estimateScore, playerOf, ratePlayers } from './lib/nhl.mjs';
+import { ESTIMATE_RANGE, estimateValues, playerOf, ratePlayers } from './lib/nhl.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
@@ -79,22 +79,26 @@ test('EA\'s ratings stay as they are, and every other rating is an estimate belo
   assert.ok(tuples.some(([, , , source]) => source.source === 'estimate') && tuples.some(([, , , source]) => source.source === 'ea-nhl'));
 });
 
-test('the estimates rank players by ice time and scoring, and a few games prove little', () => {
-  const skater = (over = {}) => ({ pos: 'C', games: 80, seconds: 80 * 15 * 60, points: 40, shots: 0, saves: 0, ...over });
-  assert.ok(estimateScore(skater({ seconds: 80 * 18 * 60 })) > estimateScore(skater()), 'more minutes');
-  assert.ok(estimateScore(skater({ points: 60 })) > estimateScore(skater()), 'more points');
-  assert.ok(estimateScore(skater({ games: 3, seconds: 3 * 22 * 60, points: 6 })) < estimateScore(skater({ seconds: 80 * 20 * 60, points: 70 })),
+test('the estimates blend ice time and scoring (a goalie\'s minutes and saves), a few games prove little, and they run in a straight line', () => {
+  const league = SNAPSHOT.players.map(playerOf);
+  const skater = (over = {}) => ({ id: -1, name: 'Test', team: 'ANA', pos: 'C', nation: null, overall: null, games: 80, seconds: 80 * 15 * 60, points: 40,
+    shots: 0, saves: 0, ...over });
+  const goalie = (games, shots, saves) => skater({ pos: 'G', games, seconds: games * 3600, points: 0, shots, saves });
+  // Each in the league's company: its regulars set the prior, the replacement level and the z-scores.
+  const value = player => estimateValues([...league, player]).get(player);
+  assert.ok(value(skater({ seconds: 80 * 18 * 60 })) > value(skater()), 'more minutes');
+  assert.ok(value(skater({ points: 60 })) > value(skater()), 'more points');
+  assert.ok(value(skater({ games: 3, seconds: 3 * 22 * 60, points: 6 })) < value(skater({ seconds: 80 * 20 * 60, points: 70 })),
     'a three-game burst does not beat a full season of the same');
-  const goalie = (shots, saves) => ({ pos: 'G', games: 40, seconds: 0, points: 0, shots, saves });
-  assert.ok(estimateScore(goalie(1000, 915)) > estimateScore(goalie(1000, 880)));
-  assert.ok(estimateScore(goalie(30, 29)) < estimateScore(goalie(1500, 1400)), 'a good night is not a good season');
-  // Who the league uses most ranks first among the players EA leaves out, in each group.
-  const rated = ratePlayers(SNAPSHOT.players.map(playerOf)).filter(player => player.estimated);
-  for (const group of [p => p.pos === 'D', p => p.pos === 'C' || p.pos === 'LW' || p.pos === 'RW', p => p.pos === 'G']) {
-    const list = rated.filter(group);
-    assert.equal(Math.max(...list.map(p => p.rating)), ESTIMATE_RANGE.top);
-    const best = list.filter(p => p.rating === ESTIMATE_RANGE.top)[0], last = list.reduce((low, p) => (p.rating < low.rating ? p : low));
-    assert.ok(estimateScore(best) > estimateScore(last));
+  assert.ok(value(goalie(40, 1000, 915)) > value(goalie(40, 1000, 880)), 'a better save percentage');
+  assert.ok(value(goalie(1, 30, 29)) < value(goalie(50, 1500, 1400)), 'a good night is not a good season');
+  // The value ranks the players EA leaves out, in each group, and the order runs evenly from 83 down to 72 (goalies 70).
+  const rated = ratePlayers(league).filter(player => player.estimated);
+  const values = estimateValues(league), valueOf = new Map(league.map(p => [p.id, values.get(p)]));
+  for (const [group, low] of [['F', ESTIMATE_RANGE.skater], ['D', ESTIMATE_RANGE.skater], ['G', ESTIMATE_RANGE.goalie]]) {
+    const list = rated.filter(p => groupOf(p.pos) === group).sort((a, b) => valueOf.get(b.id) - valueOf.get(a.id) || a.name.localeCompare(b.name));
+    assert.deepEqual([list[0].rating, list.at(-1).rating], [ESTIMATE_RANGE.top, low], `${group}: from 83 down`);
+    list.forEach((p, i) => assert.equal(p.rating, Math.round(ESTIMATE_RANGE.top - (ESTIMATE_RANGE.top - low) * i / (list.length - 1)), `${group}: ${p.name}`));
   }
 });
 

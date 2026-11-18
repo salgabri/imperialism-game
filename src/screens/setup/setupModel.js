@@ -370,7 +370,9 @@ export const SEASON_NOTES = Object.freeze({
     + 'Cam F\'s and Simon Treanor\'s), with Europe\'s 124 strongest clubs, and a map of '
     + 'each country whose clubs that season\'s source rates, ten or more, holding its top clubs of that season (from 2007/08, '
     + 'the countries EA does not rate: the CM 01/02 Update Team\'s ratings of that season). A nation with fewer than six rated players '
-    + 'fields no team, and one without eleven starts short-handed. 2005/06, 2004/05 and 1989/90 have nations only. '
+    + 'fields no team, and one without eleven starts short-handed, except in EA\'s seasons, where the places EA leaves empty go '
+    + 'to players capped for it that season on Wikidata, as far as it names them, rated from its World Football Elo and '
+    + 'marked as estimates. 2005/06, 2004/05 and 1989/90 have nations only. '
     + '1960/61, the World Cups of 1961/62 to 1993/94 and the seasons between them are computed and have nations only: each '
     + 'nation rated from its Elo, its eleven from its World Cup squad or, in the other seasons, from its players\' caps on '
     + 'Wikidata.',
@@ -380,13 +382,14 @@ export const SEASON_NOTES = Object.freeze({
     + 'tournaments of 1996 and 2004 to 2012 are computed and have their finalists only: each rated from its Elo, its eleven '
     + 'those of its squad who played most.',
   hockey: 'EA publishes NHL 27 ratings for its top 300 players only. Everyone else\'s is an estimate from ice time and '
-    + 'scoring, marked as one. Rosters as of 7 November 2026. Five earlier seasons use EA\'s ratings of that season, nothing '
+    + 'scoring (a goalie\'s minutes and saves), marked as one. Rosters as of 7 November 2026. Five earlier seasons use '
+    + 'EA\'s ratings of that season, nothing '
     + 'estimated: NHL 22 as NHLRatings.net lists them, NHL 07 from IGN\'s pages, NHL 95, NHL \'94 and NHLPA \'93 from the '
     + 'cartridges (NHLPA \'93\'s overall by NHL \'94\'s formula), the 1990s rescaled onto NHL 27\'s ratings. NHL 08 and '
     + 'NHL 09 are EA\'s attributes, the overall converted by us. Every other season back to 1960/61 is computed from the '
-    + 'players\' statistics, not a game\'s ratings: to 2009/10 from the Hockey Databank, after from MoneyPuck.com. Clubs '
-    + 'play on the map of their day. Nations field the NHL players of each country, only where they hold at least half '
-    + 'the lineup, and none before 1977/78.',
+    + 'players\' statistics, not a game\'s ratings: to 2009/10 from the Hockey Databank, after from MoneyPuck.com, each '
+    + 'club then moved by its results that season. Clubs play on the map of their day. Nations field the NHL players of '
+    + 'each country, only where they hold at least half the lineup, and none before 1977/78.',
   'rugby-league': 'Rugby League 26 ratings from Big Ant Studios, as Zero Tackle listed them at the game\'s release in '
     + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace, and only where they hold at '
     + 'least half a matchday 17. No game rated 1960–2007 or 2009–2024: they are computed, each player\'s NRL.com match '

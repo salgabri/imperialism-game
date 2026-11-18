@@ -40,17 +40,17 @@
   "age-unusual": {
    "severity": "warning",
    "about": "a player younger than 16 or older than 40 when the season starts",
-   "count": 45
+   "count": 50
   },
   "name-unusual": {
    "severity": "warning",
    "about": "a name with punctuation other than hyphens, apostrophes and full stops: a birth-year tag telling namesakes apart, or a source's quotes or brackets (an esport's gamer tags are not checked)",
-   "count": 100
+   "count": 101
   },
   "namesakes-in-team": {
    "severity": "warning",
    "about": "two players of one name in one squad (real namesakes; the match shows both alike)",
-   "count": 86
+   "count": 80
   },
   "spelling-variant": {
    "severity": "warning",
@@ -65,7 +65,7 @@
   "lineup-gap": {
    "severity": "warning",
    "about": "a team the game fields whose lineup has an empty place or a player out of position in goal: its source rates too few of its players",
-   "count": 709
+   "count": 444
   },
   "strength-mismatch": {
    "severity": "warning",
@@ -75,12 +75,12 @@
   "birth-date-disagreement": {
    "severity": "warning",
    "about": "a player (by an id that names one person in every season: EA's, Wikidata's) born here more than a month from the date most seasons give: one of the source's editions has it wrong",
-   "count": 214
+   "count": 209
   },
   "rating-jump": {
    "severity": "warning",
    "about": "a player (by EA id) rated 15 or more points apart in editions a year apart: a breakthrough, a fall, or a record joined to the wrong person",
-   "count": 24
+   "count": 22
   }
  },
  "errors": [],
@@ -139,6 +139,18 @@
      "nation:United States — age-unusual: 41 when the season starts (born 1975-06-24), a starter"
     ]
    },
+   "ea-fifa-17": {
+    "count": 1,
+    "examples": [
+     "nation:Armenia — age-unusual: 41 when the season starts (born 1974-08-05), a starter"
+    ]
+   },
+   "ea-fifa-16": {
+    "count": 1,
+    "examples": [
+     "nation:Luxembourg — age-unusual: 15 when the season starts (born 2000-02-04), a starter"
+    ]
+   },
    "wwc-2015": {
     "count": 1,
     "examples": [
@@ -146,8 +158,9 @@
     ]
    },
    "ea-fifa-15": {
-    "count": 2,
+    "count": 3,
     "examples": [
+     "nation:Zimbabwe — age-unusual: 15 when the season starts (born 1998-12-19), a starter",
      "nation:Egypt — age-unusual: 41 when the season starts (born 1973-01-15), a starter",
      "nation:Australia — age-unusual: 41 when the season starts (born 1972-10-06), a starter"
     ]
@@ -176,6 +189,18 @@
     "count": 1,
     "examples": [
      "club:Feyenoord — age-unusual: 41 when the season starts (born 1969-01-15), a starter"
+    ]
+   },
+   "ea-fifa-08": {
+    "count": 1,
+    "examples": [
+     "nation:Tunisia — age-unusual: 41 when the season starts (born 1966-04-13), a starter"
+    ]
+   },
+   "ea-fifa-06": {
+    "count": 1,
+    "examples": [
+     "nation:Sierra Leone — age-unusual: 15 when the season starts (born 1989-10-24), a starter"
     ]
    },
    "ea-fifa-05": {
@@ -351,11 +376,11 @@
     ]
    },
    "ea-fifa-20": {
-    "count": 6,
+    "count": 5,
     "examples": [
      "nation:Cyprus — namesakes-in-team: FW 52 and another A. Georgiou",
-     "nation:Cyprus — namesakes-in-team: MF 48 and another H. Kyprianou",
-     "nation:Gambia — namesakes-in-team: FW 69 and another M. Barrow"
+     "nation:Gambia — namesakes-in-team: FW 69 and another M. Barrow",
+     "nation:Iran — namesakes-in-team: FW 71 and another M. Mohammadi"
     ]
    },
    "ea-fifa-19": {
@@ -388,7 +413,7 @@
     ]
    },
    "ea-fifa-16": {
-    "count": 4,
+    "count": 3,
     "examples": [
      "nation:Guinea — namesakes-in-team: MF 68 and another I. Sylla",
      "nation:Mauritania — namesakes-in-team: DF 64 and another A. Ba",
@@ -396,11 +421,11 @@
     ]
    },
    "ea-fifa-15": {
-    "count": 4,
+    "count": 3,
     "examples": [
-     "nation:Estonia — namesakes-in-team: FW 54 and another H. Anier",
      "nation:Mauritania — namesakes-in-team: DF 63 and another A. Ba",
-     "nation:Sierra Leone — namesakes-in-team: FW 59 and another A. Kamara"
+     "nation:Sierra Leone — namesakes-in-team: FW 59 and another A. Kamara",
+     "nation:Burkina Faso — namesakes-in-team: FW 73 and another A. Traoré"
     ]
    },
    "ea-fifa-14": {
@@ -410,16 +435,14 @@
     ]
    },
    "ea-fifa-13": {
-    "count": 2,
+    "count": 1,
     "examples": [
-     "nation:Gambia — namesakes-in-team: MF 60 and another S. Nyassi",
-     "nation:Sierra Leone — namesakes-in-team: MF 55 and another A. Kamara"
+     "nation:Gambia — namesakes-in-team: MF 60 and another S. Nyassi"
     ]
    },
    "ea-fifa-12": {
-    "count": 2,
+    "count": 1,
     "examples": [
-     "nation:Sierra Leone — namesakes-in-team: MF 52 and another A. Kamara",
      "nation:Burkina Faso — namesakes-in-team: FW 71 and another A. Traoré"
     ]
    },
@@ -452,11 +475,11 @@
     ]
    },
    "ea-fifa-07": {
-    "count": 4,
+    "count": 3,
     "examples": [
-     "nation:Guinea — namesakes-in-team: FW 71 and another I. Bangoura",
      "nation:Mali — namesakes-in-team: MF 74 and another S. Keita",
-     "nation:Senegal — namesakes-in-team: DF 76 and another P. Diop"
+     "nation:Senegal — namesakes-in-team: DF 76 and another P. Diop",
+     "club:FC Schalke 04 — namesakes-in-team: MF 77 and another H. Altintop"
     ]
    },
    "ea-fifa-05": {
@@ -562,7 +585,7 @@
     "count": 30,
     "examples": [
      "nation:Congo — lineup-gap: S. Ganvoula in goal",
-     "nation:Benin — lineup-gap: empty GK, MF",
+     "nation:Benin — lineup-gap: S. Mounié in goal",
      "nation:Dominican Rep. — lineup-gap: empty MF, MF"
     ]
    },
@@ -575,11 +598,11 @@
     ]
    },
    "ea-fc-25": {
-    "count": 28,
+    "count": 23,
     "examples": [
      "nation:Congo — lineup-gap: Gabriel Charpentier in goal",
      "nation:Benin — lineup-gap: Steve Mounié in goal",
-     "nation:Eq. Guinea — lineup-gap: empty DF, MF, FW, FW"
+     "nation:Estonia — lineup-gap: empty FW"
     ]
    },
    "eaw-fc-24": {
@@ -591,7 +614,7 @@
     ]
    },
    "ea-fc-24": {
-    "count": 29,
+    "count": 27,
     "examples": [
      "nation:Central African Rep. — lineup-gap: empty DF, DF, MF",
      "nation:Congo — lineup-gap: S. Ganvoula in goal",
@@ -607,11 +630,11 @@
     ]
    },
    "ea-fifa-23": {
-    "count": 24,
+    "count": 20,
     "examples": [
      "nation:El Salvador — lineup-gap: empty DF, DF, MF, FW, FW",
-     "nation:Eq. Guinea — lineup-gap: empty FW, FW",
-     "nation:Estonia — lineup-gap: empty DF"
+     "nation:Gabon — lineup-gap: A. Poko in goal",
+     "nation:Gambia — lineup-gap: M. Barrow in goal"
     ]
    },
    "nhl-2022": {
@@ -623,147 +646,129 @@
     ]
    },
    "ea-fifa-22": {
-    "count": 26,
+    "count": 22,
     "examples": [
      "nation:Burundi — lineup-gap: empty GK, DF",
-     "nation:Benin — lineup-gap: empty DF",
-     "nation:Gabon — lineup-gap: Y. Musavu-King in goal"
+     "nation:Gabon — lineup-gap: Y. Musavu-King in goal",
+     "nation:Gambia — lineup-gap: A. Manneh in goal"
     ]
    },
    "ea-fifa-21": {
-    "count": 23,
+    "count": 21,
     "examples": [
      "nation:Burundi — lineup-gap: empty GK, DF, DF, DF",
-     "nation:Cyprus — lineup-gap: empty GK, DF, FW, FW",
-     "nation:Eq. Guinea — lineup-gap: empty GK, DF, DF, DF, FW"
+     "nation:Cyprus — lineup-gap: empty FW",
+     "nation:Eq. Guinea — lineup-gap: empty DF, DF"
     ]
    },
    "ea-fifa-20": {
-    "count": 24,
+    "count": 20,
     "examples": [
-     "nation:Cyprus — lineup-gap: H. Kyprianou in goal",
      "nation:Eq. Guinea — lineup-gap: empty DF, DF, DF, FW, FW",
-     "nation:Estonia — lineup-gap: empty MF, MF, MF, FW, FW"
+     "nation:Estonia — lineup-gap: empty MF, FW",
+     "nation:Gambia — lineup-gap: B. Trawally in goal"
     ]
    },
    "ea-fifa-19": {
-    "count": 19,
+    "count": 15,
     "examples": [
-     "nation:Cyprus — lineup-gap: empty GK, MF, MF",
-     "nation:Eq. Guinea — lineup-gap: empty DF, DF, DF, FW, FW",
-     "nation:Guinea — lineup-gap: F. Kamano in goal"
+     "nation:Eq. Guinea — lineup-gap: empty DF",
+     "nation:Guinea — lineup-gap: F. Kamano in goal",
+     "nation:Haiti — lineup-gap: D. Etienne Jr. in goal"
     ]
    },
    "ea-fifa-18": {
-    "count": 23,
+    "count": 15,
     "examples": [
-     "nation:Belarus — lineup-gap: empty FW, FW",
-     "nation:Cyprus — lineup-gap: C. Shelis in goal",
-     "nation:Eq. Guinea — lineup-gap: empty DF, DF, MF, FW, FW"
+     "nation:Estonia — lineup-gap: empty FW, FW; K. Kallaste in goal",
+     "nation:Gambia — lineup-gap: P. Dibba in goal",
+     "nation:Guinea — lineup-gap: F. Kamano in goal"
     ]
    },
    "ea-fifa-17": {
-    "count": 22,
+    "count": 13,
     "examples": [
      "nation:Central African Rep. — lineup-gap: empty DF, DF, DF, MF",
-     "nation:Eq. Guinea — lineup-gap: empty DF, MF, MF, FW",
-     "nation:Estonia — lineup-gap: empty MF"
+     "nation:Gambia — lineup-gap: P. Dibba in goal",
+     "nation:Haiti — lineup-gap: empty GK"
     ]
    },
    "ea-fifa-16": {
-    "count": 22,
+    "count": 12,
     "examples": [
      "nation:Central African Rep. — lineup-gap: empty DF, DF, MF, MF, MF",
-     "nation:Eq. Guinea — lineup-gap: empty DF, DF, MF, MF, FW",
-     "nation:Estonia — lineup-gap: empty MF, FW, FW"
+     "nation:Gambia — lineup-gap: A. Sowe in goal",
+     "nation:Guinea — lineup-gap: I. Traoré in goal"
     ]
    },
    "ea-fifa-15": {
-    "count": 22,
+    "count": 10,
     "examples": [
      "nation:Central African Rep. — lineup-gap: empty DF, DF, MF, MF",
-     "nation:Estonia — lineup-gap: empty DF, DF",
-     "nation:Georgia — lineup-gap: L. Mchedlidze in goal"
+     "nation:Gambia — lineup-gap: A. Sowe in goal",
+     "nation:Honduras — lineup-gap: B. García in goal"
     ]
    },
    "ea-fifa-14": {
-    "count": 24,
+    "count": 6,
     "examples": [
-     "nation:Ecuador — lineup-gap: R. Ibarra in goal",
-     "nation:Estonia — lineup-gap: empty MF",
-     "nation:Gabon — lineup-gap: empty FW"
+     "nation:Gambia — lineup-gap: T. Jaiteh in goal",
+     "nation:Honduras — lineup-gap: J. Claros in goal",
+     "nation:Jordan — lineup-gap: Ahmad Hayel in goal"
     ]
    },
    "ea-fifa-13": {
-    "count": 25,
+    "count": 2,
     "examples": [
-     "nation:Central African Rep. — lineup-gap: empty MF, MF, MF, MF, FW",
-     "nation:Benin — lineup-gap: empty MF, MF",
-     "nation:Ecuador — lineup-gap: A. Valencia in goal"
+     "nation:Gambia — lineup-gap: Ibou in goal",
+     "nation:Honduras — lineup-gap: W. Palacios in goal"
     ]
    },
    "ea-fifa-12": {
-    "count": 14,
+    "count": 1,
     "examples": [
-     "nation:Central African Rep. — lineup-gap: empty DF, MF, MF, MF, MF",
-     "nation:Benin — lineup-gap: empty GK, MF, MF, MF, FW",
-     "nation:Ecuador — lineup-gap: F. Caicedo in goal"
+     "nation:Gambia — lineup-gap: A. Sanyang in goal"
     ]
    },
    "ea-fifa-11": {
-    "count": 17,
+    "count": 2,
     "examples": [
-     "nation:China — lineup-gap: empty GK, DF, DF",
-     "nation:DR Congo — lineup-gap: D. Mbokani in goal",
-     "nation:Ecuador — lineup-gap: empty DF, DF; F. Borja in goal"
+     "nation:Honduras — lineup-gap: W. Palacios in goal",
+     "nation:Sierra Leone — lineup-gap: K. Kamara in goal"
     ]
    },
    "ea-fifa-10": {
-    "count": 18,
+    "count": 3,
     "examples": [
-     "nation:China — lineup-gap: empty GK, DF, MF, FW",
-     "nation:DR Congo — lineup-gap: D. Mbokani in goal",
-     "nation:Costa Rica — lineup-gap: G. Badilla in goal"
+     "nation:Honduras — lineup-gap: R. Espinoza in goal",
+     "nation:Montenegro — lineup-gap: M. Vučinić in goal",
+     "nation:Sierra Leone — lineup-gap: empty GK"
     ]
    },
    "ea-fifa-09": {
-    "count": 28,
+    "count": 1,
     "examples": [
-     "nation:Congo — lineup-gap: M. Mbayo in goal",
-     "nation:Costa Rica — lineup-gap: R. Azofeifa in goal",
-     "nation:Benin — lineup-gap: empty GK, DF, MF, MF, FW"
-    ]
-   },
-   "ea-fifa-08": {
-    "count": 30,
-    "examples": [
-     "nation:China — lineup-gap: empty DF, DF, DF, MF, MF; J. Shi in goal",
-     "nation:Congo — lineup-gap: R. Makondele in goal",
-     "nation:Costa Rica — lineup-gap: P. Wanchope in goal"
+     "nation:Sierra Leone — lineup-gap: P. Kpaka in goal"
     ]
    },
    "ea-fifa-07": {
-    "count": 25,
+    "count": 1,
     "examples": [
-     "nation:Congo — lineup-gap: D. Tsoumou in goal",
-     "nation:Costa Rica — lineup-gap: empty GK, DF",
-     "nation:Ecuador — lineup-gap: empty GK, DF, MF, FW"
+     "nation:Guinea-Bissau — lineup-gap: Adilson in goal"
     ]
    },
    "ea-fifa-06": {
-    "count": 21,
+    "count": 2,
     "examples": [
-     "nation:Chile — lineup-gap: Sebastián González in goal",
-     "nation:Congo — lineup-gap: Shabani Nonda in goal",
-     "nation:Georgia — lineup-gap: empty MF; Mamija Dżikija in goal"
+     "nation:Sierra Leone — lineup-gap: Paul Kpaka in goal",
+     "nation:Zambia — lineup-gap: Collins Mbesuma in goal"
     ]
    },
    "ea-fifa-05": {
-    "count": 19,
+    "count": 2,
     "examples": [
      "nation:Congo — lineup-gap: René Muzola Makondele in goal",
-     "nation:Ecuador — lineup-gap: empty GK, MF, MF, MF",
-     "nation:Gabon — lineup-gap: empty GK, DF"
+     "nation:Sierra Leone — lineup-gap: Kewullay Conteh in goal"
     ]
    },
    "cm0102-2003-10": {
@@ -1042,10 +1047,11 @@
     ]
    },
    "nhl-2026": {
-    "count": 2,
+    "count": 3,
     "examples": [
      "nation:Sweden — name-unusual: \"Elias Pettersson (1998)\"",
-     "club:Vancouver Canucks — name-unusual: \"Elias Pettersson (1998)\""
+     "club:Vancouver Canucks — name-unusual: \"Elias Pettersson (1998)\"",
+     "club:Vancouver Canucks — name-unusual: \"Elias Pettersson (2004)\""
     ]
    },
    "nhl-2025": {
@@ -1064,6 +1070,14 @@
     ]
    },
    "nhl-2023": {
+    "count": 4,
+    "examples": [
+     "nation:Finland — name-unusual: \"Sebastian Aho (1997)\"",
+     "club:Toronto Maple Leafs — name-unusual: \"Matt Murray (1994)\"",
+     "club:Carolina Hurricanes — name-unusual: \"Sebastian Aho (1997)\""
+    ]
+   },
+   "nhl-2021": {
     "count": 3,
     "examples": [
      "nation:Finland — name-unusual: \"Sebastian Aho (1997)\"",
@@ -1071,19 +1085,11 @@
      "club:New York Islanders — name-unusual: \"Sebastian Aho (1996)\""
     ]
    },
-   "nhl-2021": {
+   "nhl-2018": {
     "count": 2,
     "examples": [
      "nation:Finland — name-unusual: \"Sebastian Aho (1997)\"",
      "club:Carolina Hurricanes — name-unusual: \"Sebastian Aho (1997)\""
-    ]
-   },
-   "nhl-2018": {
-    "count": 3,
-    "examples": [
-     "nation:Finland — name-unusual: \"Sebastian Aho (1997)\"",
-     "club:Carolina Hurricanes — name-unusual: \"Sebastian Aho (1997)\"",
-     "club:New York Islanders — name-unusual: \"Sebastian Aho (1996)\""
     ]
    },
    "madden-2011": {
@@ -1099,17 +1105,15 @@
     ]
    },
    "nhl-2006": {
-    "count": 3,
+    "count": 2,
     "examples": [
      "nation:Czechia — name-unusual: \"Petr Sykora (1976)\"",
-     "club:New York Rangers — name-unusual: \"Petr Sykora (1976)\"",
-     "club:Washington Capitals — name-unusual: \"Petr Sykora (1978)\""
+     "club:New York Rangers — name-unusual: \"Petr Sykora (1976)\""
     ]
    },
    "nhl-2001": {
-    "count": 2,
+    "count": 1,
     "examples": [
-     "club:Toronto Maple Leafs — name-unusual: \"Petr Svoboda (1980)\"",
      "club:Tampa Bay Lightning — name-unusual: \"Petr Svoboda (1966)\""
     ]
    },
@@ -1156,8 +1160,9 @@
     ]
    },
    "nhl-1990": {
-    "count": 1,
+    "count": 2,
     "examples": [
+     "club:Detroit Red Wings — name-unusual: \"Greg Adams (1960)\"",
      "club:Vancouver Canucks — name-unusual: \"Greg Adams (1963)\""
     ]
    },
@@ -1165,8 +1170,8 @@
     "count": 5,
     "examples": [
      "nation:Great Britain — name-unusual: \"Steve Smith (1963-04-30)\"",
-     "club:Edmonton Oilers — name-unusual: \"Greg Adams (1960)\"",
-     "club:Edmonton Oilers — name-unusual: \"Steve Smith (1963-04-30)\""
+     "club:Vancouver Canucks — name-unusual: \"Greg Adams (1963)\"",
+     "club:Edmonton Oilers — name-unusual: \"Greg Adams (1960)\""
     ]
    },
    "nt-1988": {
@@ -1181,7 +1186,7 @@
     "examples": [
      "nation:Great Britain — name-unusual: \"Steve Smith (1963-04-30)\"",
      "club:Edmonton Oilers — name-unusual: \"Steve Smith (1963-04-30)\"",
-     "club:Minnesota North Stars — name-unusual: \"Ron Wilson (1955)\""
+     "club:Washington Capitals — name-unusual: \"Greg Adams (1960)\""
     ]
    },
    "nt-1987": {
@@ -1196,23 +1201,23 @@
     "examples": [
      "nation:Great Britain — name-unusual: \"Steve Smith (1963-04-30)\"",
      "club:Edmonton Oilers — name-unusual: \"Steve Smith (1963-04-30)\"",
-     "club:Quebec Nordiques — name-unusual: \"Alain Cote (1957)\""
+     "club:Washington Capitals — name-unusual: \"Greg Adams (1960)\""
     ]
    },
    "nhl-1986": {
-    "count": 9,
+    "count": 8,
     "examples": [
      "nation:Great Britain — name-unusual: \"Steve Smith (1963-04-30)\"",
      "club:Edmonton Oilers — name-unusual: \"Steve Smith (1963-04-30)\"",
-     "club:Boston Bruins — name-unusual: \"Alain Cote (1967)\""
+     "club:Washington Capitals — name-unusual: \"David Jensen (1965)\""
     ]
    },
    "nhl-1985": {
-    "count": 5,
+    "count": 4,
     "examples": [
      "nation:Great Britain — name-unusual: \"Steve Smith (1963-04-30)\"",
-     "club:Minnesota North Stars — name-unusual: \"Ron Wilson (1955)\"",
-     "club:Washington Capitals — name-unusual: \"Greg Adams (1960)\""
+     "club:Winnipeg Jets — name-unusual: \"Ron Wilson (1956)\"",
+     "club:Minnesota North Stars — name-unusual: \"Ron Wilson (1955)\""
     ]
    },
    "nhl-1980": {
@@ -1225,8 +1230,8 @@
    "nhl-1979": {
     "count": 3,
     "examples": [
-     "club:Philadelphia Flyers — name-unusual: \"Bob Kelly (1950)\"",
      "club:Atlanta Flames — name-unusual: \"Bob Murdoch (1946)\"",
+     "club:Philadelphia Flyers — name-unusual: \"Bob Kelly (1950)\"",
      "club:St. Louis Blues — name-unusual: \"Bob Murdoch (1954)\""
     ]
    },
@@ -1234,8 +1239,8 @@
     "count": 4,
     "examples": [
      "club:Philadelphia Flyers — name-unusual: \"Bob Kelly (1950)\"",
-     "club:Los Angeles Kings — name-unusual: \"Bob Murdoch (1946)\"",
-     "club:Cleveland Barons — name-unusual: \"Bob Murdoch (1954)\""
+     "club:Chicago Black Hawks — name-unusual: \"Bob Kelly (1946)\"",
+     "club:Los Angeles Kings — name-unusual: \"Bob Murdoch (1946)\""
     ]
    },
    "nhl-1977": {
@@ -1243,15 +1248,15 @@
     "examples": [
      "club:Philadelphia Flyers — name-unusual: \"Bob Kelly (1950)\"",
      "club:Pittsburgh Penguins — name-unusual: \"Bob Kelly (1946)\"",
-     "club:Chicago Black Hawks — name-unusual: \"Bob Murray (1954)\""
+     "club:Los Angeles Kings — name-unusual: \"Bob Murdoch (1946)\""
     ]
    },
    "nhl-1976": {
-    "count": 4,
+    "count": 6,
     "examples": [
      "club:Philadelphia Flyers — name-unusual: \"Bob Kelly (1950)\"",
      "club:Pittsburgh Penguins — name-unusual: \"Bob Kelly (1946)\"",
-     "club:Los Angeles Kings — name-unusual: \"Bob Murdoch (1946)\""
+     "club:Vancouver Canucks — name-unusual: \"Bob Murray (1948)\""
     ]
    },
    "nhl-1975": {
@@ -1454,7 +1459,7 @@
     ]
    },
    "ea-fifa-11": {
-    "count": 13,
+    "count": 12,
     "examples": [
      "club:Levante Unión Deportiva — birth-date-disagreement: C. Stuani born 1986-12-12 here, 1986-10-12 in 5 other seasons",
      "club:Sunderland — birth-date-disagreement: S. Mignolet born 1988-08-06 here, 1988-03-06 in 12 other seasons",
@@ -1485,20 +1490,12 @@
      "nation:Gabon — birth-date-disagreement: A. Biyogho Poko born 1993-03-07 here, 1993-01-01 in 10 other seasons"
     ]
    },
-   "ea-fifa-05": {
-    "count": 8,
-    "examples": [
-     "nation:Angola — birth-date-disagreement: Lourenço born 1983-06-05 here, 1986-11-17 in 11 other seasons",
-     "nation:Paraguay — birth-date-disagreement: Paulo Da Silva born 1978-07-25 here, 1980-02-01 in 6 other seasons",
-     "nation:Netherlands — birth-date-disagreement: Clarence Seedorf born 1976-08-16 here, 1976-04-01 in 4 other seasons"
-    ]
-   },
    "ea-fifa-07": {
     "count": 19,
     "examples": [
      "nation:Canada — birth-date-disagreement: A. Hutchinson born 1982-03-01 here, 1983-02-08 in 13 other seasons",
      "club:Palermo — birth-date-disagreement: A. Barzagli born 1981-08-05 here, 1981-05-08 in 12 other seasons",
-     "nation:Burkina Faso — birth-date-disagreement: A. Traoré born 1988-12-31 here, 1988-01-01 in 6 other seasons"
+     "nation:Burkina Faso — birth-date-disagreement: A. Traoré born 1988-12-31 here, 1988-01-01 in 5 other seasons"
     ]
    },
    "ea-fifa-08": {
@@ -1510,11 +1507,11 @@
     ]
    },
    "ea-fifa-09": {
-    "count": 15,
+    "count": 12,
     "examples": [
      "nation:Canada — birth-date-disagreement: A. Hutchinson born 1982-03-01 here, 1983-02-08 in 13 other seasons",
      "nation:Uruguay — birth-date-disagreement: M. Cáceres born 1988-03-17 here, 1987-04-07 in 12 other seasons",
-     "nation:Ghana — birth-date-disagreement: K. Asamoah born 1988-09-09 here, 1988-12-09 in 10 other seasons"
+     "nation:Paraguay — birth-date-disagreement: C. Riveros born 1982-03-15 here, 1982-10-16 in 7 other seasons"
     ]
    },
    "ea-fifa-06": {
@@ -1532,6 +1529,14 @@
      "nation:Angola — birth-date-disagreement: Djalma born 1985-04-25 here, 1987-05-30 in 7 other seasons",
      "nation:Gabon — birth-date-disagreement: D. Ovono born 1983-03-23 here, 1983-01-23 in 8 other seasons"
     ]
+   },
+   "ea-fifa-05": {
+    "count": 7,
+    "examples": [
+     "nation:Paraguay — birth-date-disagreement: Paulo Da Silva born 1978-07-25 here, 1980-02-01 in 6 other seasons",
+     "nation:Netherlands — birth-date-disagreement: Clarence Seedorf born 1976-08-16 here, 1976-04-01 in 4 other seasons",
+     "nation:Colombia — birth-date-disagreement: Iván Córdoba born 1976-12-20 here, 1976-08-11 in 5 other seasons"
+    ]
    }
   },
   "rating-jump": {
@@ -1541,14 +1546,6 @@
      "club:FC Schalke 04 — rating-jump: M. Neuer 64 in ea-fifa-07, 80 here (+16)",
      "nation:South Africa — rating-jump: R. Fernandez 58 in ea-fifa-07, 73 here (+15)",
      "nation:Gambia — rating-jump: E. Sonko 68 in ea-fifa-07, 52 here (-16)"
-    ]
-   },
-   "ea-fifa-06": {
-    "count": 7,
-    "examples": [
-     "nation:Peru — rating-jump: Jefferson Farfán 48 in ea-fifa-05, 69 here (+21)",
-     "nation:DR Congo — rating-jump: Barel Mouko 43 in ea-fifa-05, 62 here (+19)",
-     "nation:Guinea — rating-jump: Dianbobo Baldé 88 in ea-fifa-05, 73 here (-15)"
     ]
    },
    "ea-fifa-12": {
@@ -1567,10 +1564,9 @@
     ]
    },
    "ea-fifa-10": {
-    "count": 2,
+    "count": 1,
     "examples": [
-     "nation:Niger — rating-jump: O. Maâzou 58 in ea-fifa-09, 74 here (+16)",
-     "nation:Togo — rating-jump: J. Ayité 49 in ea-fifa-09, 65 here (+16)"
+     "nation:Niger — rating-jump: O. Maâzou 58 in ea-fifa-09, 74 here (+16)"
     ]
    },
    "ea-fifa-09": {
@@ -1579,6 +1575,14 @@
      "club:U.C. Sampdoria — rating-jump: H. Campagnaro 59 in ea-fifa-08, 79 here (+20)",
      "nation:Armenia — rating-jump: Edel 47 in ea-fifa-08, 64 here (+17)",
      "club:U.C. Sampdoria — rating-jump: P. Accardi 65 in ea-fifa-08, 80 here (+15)"
+    ]
+   },
+   "ea-fifa-06": {
+    "count": 6,
+    "examples": [
+     "nation:DR Congo — rating-jump: Barel Mouko 43 in ea-fifa-05, 62 here (+19)",
+     "nation:Guinea — rating-jump: Dianbobo Baldé 88 in ea-fifa-05, 73 here (-15)",
+     "nation:Egypt — rating-jump: Mohamed Zidan 66 in ea-fifa-05, 81 here (+15)"
     ]
    }
   }
@@ -1845,12 +1849,12 @@
    "clubs": 32,
    "ratings": {
     "players": 931,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
    "findings": {
-    "name-unusual": 2
+    "name-unusual": 3
    }
   },
   {
@@ -1902,7 +1906,7 @@
    "fielded": 112,
    "clubs": 124,
    "ratings": {
-    "players": 2617,
+    "players": 2624,
     "min": 49,
     "median": 76,
     "max": 91
@@ -1993,7 +1997,7 @@
    "clubs": 32,
    "ratings": {
     "players": 930,
-    "min": 71,
+    "min": 70,
     "median": 82,
     "max": 99
    },
@@ -2083,13 +2087,13 @@
    "fielded": 105,
    "clubs": 124,
    "ratings": {
-    "players": 2574,
+    "players": 2586,
     "min": 50,
     "median": 76,
     "max": 91
    },
    "findings": {
-    "lineup-gap": 28,
+    "lineup-gap": 23,
     "birth-date-disagreement": 1
    }
   },
@@ -2189,7 +2193,7 @@
    "clubs": 32,
    "ratings": {
     "players": 930,
-    "min": 71,
+    "min": 70,
     "median": 82,
     "max": 99
    },
@@ -2280,13 +2284,13 @@
    "fielded": 106,
    "clubs": 124,
    "ratings": {
-    "players": 2583,
+    "players": 2597,
     "min": 49,
     "median": 76,
     "max": 91
    },
    "findings": {
-    "lineup-gap": 29,
+    "lineup-gap": 27,
     "namesakes-in-team": 3,
     "birth-date-disagreement": 3
    }
@@ -2387,12 +2391,12 @@
    "clubs": 32,
    "ratings": {
     "players": 928,
-    "min": 71,
+    "min": 68,
     "median": 82,
     "max": 99
    },
    "findings": {
-    "name-unusual": 3
+    "name-unusual": 4
    }
   },
   {
@@ -2478,13 +2482,13 @@
    "fielded": 109,
    "clubs": 124,
    "ratings": {
-    "players": 2596,
+    "players": 2607,
     "min": 50,
     "median": 76,
     "max": 91
    },
    "findings": {
-    "lineup-gap": 24,
+    "lineup-gap": 20,
     "namesakes-in-team": 3,
     "birth-date-disagreement": 1
    }
@@ -2654,13 +2658,13 @@
    "fielded": 107,
    "clubs": 124,
    "ratings": {
-    "players": 2578,
+    "players": 2599,
     "min": 49,
     "median": 76,
     "max": 93
    },
    "findings": {
-    "lineup-gap": 26,
+    "lineup-gap": 22,
     "namesakes-in-team": 3,
     "birth-date-disagreement": 5
    }
@@ -2744,12 +2748,12 @@
    "clubs": 31,
    "ratings": {
     "players": 905,
-    "min": 71,
+    "min": 70,
     "median": 82,
     "max": 99
    },
    "findings": {
-    "name-unusual": 2
+    "name-unusual": 3
    }
   },
   {
@@ -2832,13 +2836,13 @@
    "fielded": 106,
    "clubs": 124,
    "ratings": {
-    "players": 2576,
+    "players": 2598,
     "min": 49,
     "median": 76,
     "max": 93
    },
    "findings": {
-    "lineup-gap": 23,
+    "lineup-gap": 21,
     "namesakes-in-team": 2,
     "age-unusual": 1,
     "birth-date-disagreement": 4
@@ -2923,7 +2927,7 @@
    "clubs": 31,
    "ratings": {
     "players": 912,
-    "min": 71,
+    "min": 68,
     "median": 82,
     "max": 99
    },
@@ -3009,14 +3013,14 @@
    "fielded": 104,
    "clubs": 124,
    "ratings": {
-    "players": 2553,
-    "min": 48,
+    "players": 2569,
+    "min": 50,
     "median": 76,
     "max": 94
    },
    "findings": {
-    "namesakes-in-team": 6,
-    "lineup-gap": 24,
+    "namesakes-in-team": 5,
+    "lineup-gap": 20,
     "age-unusual": 1,
     "birth-date-disagreement": 7
    }
@@ -3100,7 +3104,7 @@
    "clubs": 31,
    "ratings": {
     "players": 906,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
@@ -3184,14 +3188,14 @@
    "fielded": 101,
    "clubs": 124,
    "ratings": {
-    "players": 2547,
+    "players": 2567,
     "min": 50,
     "median": 76,
     "max": 94
    },
    "findings": {
     "namesakes-in-team": 2,
-    "lineup-gap": 19,
+    "lineup-gap": 15,
     "age-unusual": 2,
     "birth-date-disagreement": 7
    }
@@ -3275,12 +3279,12 @@
    "clubs": 31,
    "ratings": {
     "players": 908,
-    "min": 71,
+    "min": 69,
     "median": 82,
-    "max": 99
+    "max": 98
    },
    "findings": {
-    "name-unusual": 3
+    "name-unusual": 2
    }
   },
   {
@@ -3361,14 +3365,14 @@
    "fielded": 104,
    "clubs": 124,
    "ratings": {
-    "players": 2551,
+    "players": 2584,
     "min": 50,
-    "median": 77,
+    "median": 76,
     "max": 94
    },
    "findings": {
-    "lineup-gap": 23,
     "namesakes-in-team": 5,
+    "lineup-gap": 15,
     "birth-date-disagreement": 5
    }
   },
@@ -3451,9 +3455,9 @@
    "clubs": 30,
    "ratings": {
     "players": 886,
-    "min": 71,
+    "min": 70,
     "median": 82,
-    "max": 99
+    "max": 98
    },
    "findings": {}
   },
@@ -3539,14 +3543,15 @@
    "fielded": 102,
    "clubs": 124,
    "ratings": {
-    "players": 2542,
+    "players": 2558,
     "min": 52,
     "median": 77,
     "max": 94
    },
    "findings": {
-    "lineup-gap": 22,
+    "lineup-gap": 13,
     "namesakes-in-team": 5,
+    "age-unusual": 1,
     "birth-date-disagreement": 9
    }
   },
@@ -3629,7 +3634,7 @@
    "clubs": 30,
    "ratings": {
     "players": 887,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
@@ -3715,14 +3720,15 @@
    "fielded": 101,
    "clubs": 124,
    "ratings": {
-    "players": 2532,
+    "players": 2557,
     "min": 52,
     "median": 76,
     "max": 94
    },
    "findings": {
-    "lineup-gap": 22,
-    "namesakes-in-team": 4,
+    "lineup-gap": 12,
+    "namesakes-in-team": 3,
+    "age-unusual": 1,
     "birth-date-disagreement": 11
    }
   },
@@ -3807,9 +3813,9 @@
    "clubs": 30,
    "ratings": {
     "players": 885,
-    "min": 71,
+    "min": 69,
     "median": 82,
-    "max": 99
+    "max": 98
    },
    "findings": {}
   },
@@ -3874,15 +3880,15 @@
    "fielded": 97,
    "clubs": 124,
    "ratings": {
-    "players": 2485,
+    "players": 2526,
     "min": 48,
     "median": 74,
     "max": 93
    },
    "findings": {
-    "lineup-gap": 22,
-    "namesakes-in-team": 4,
-    "age-unusual": 2,
+    "lineup-gap": 10,
+    "namesakes-in-team": 3,
+    "age-unusual": 3,
     "birth-date-disagreement": 8
    }
   },
@@ -3948,8 +3954,8 @@
    "clubs": 30,
    "ratings": {
     "players": 880,
-    "min": 71,
-    "median": 82,
+    "min": 70,
+    "median": 83,
     "max": 99
    },
    "findings": {}
@@ -4019,13 +4025,13 @@
    "fielded": 94,
    "clubs": 124,
    "ratings": {
-    "players": 2452,
+    "players": 2491,
     "min": 48,
     "median": 74,
     "max": 94
    },
    "findings": {
-    "lineup-gap": 24,
+    "lineup-gap": 6,
     "namesakes-in-team": 1,
     "birth-date-disagreement": 11
    }
@@ -4109,8 +4115,8 @@
    "clubs": 30,
    "ratings": {
     "players": 882,
-    "min": 71,
-    "median": 82,
+    "min": 68,
+    "median": 83,
     "max": 99
    },
    "findings": {}
@@ -4178,14 +4184,14 @@
    "fielded": 94,
    "clubs": 124,
    "ratings": {
-    "players": 2445,
+    "players": 2496,
     "min": 46,
     "median": 75,
     "max": 94
    },
    "findings": {
-    "lineup-gap": 25,
-    "namesakes-in-team": 2,
+    "namesakes-in-team": 1,
+    "lineup-gap": 2,
     "age-unusual": 1,
     "birth-date-disagreement": 12
    }
@@ -4252,8 +4258,8 @@
    "clubs": 30,
    "ratings": {
     "players": 881,
-    "min": 71,
-    "median": 82,
+    "min": 69,
+    "median": 83,
     "max": 99
    },
    "findings": {}
@@ -4321,14 +4327,14 @@
    "fielded": 89,
    "clubs": 124,
    "ratings": {
-    "players": 2411,
+    "players": 2439,
     "min": 49,
     "median": 75,
     "max": 94
    },
    "findings": {
-    "lineup-gap": 14,
-    "namesakes-in-team": 2,
+    "lineup-gap": 1,
+    "namesakes-in-team": 1,
     "age-unusual": 1,
     "birth-date-disagreement": 12,
     "rating-jump": 2
@@ -4415,7 +4421,7 @@
    "clubs": 30,
    "ratings": {
     "players": 884,
-    "min": 71,
+    "min": 70,
     "median": 82,
     "max": 99
    },
@@ -4488,16 +4494,16 @@
    "fielded": 84,
    "clubs": 124,
    "ratings": {
-    "players": 2370,
+    "players": 2390,
     "min": 47,
     "median": 75,
     "max": 90
    },
    "findings": {
-    "lineup-gap": 17,
     "namesakes-in-team": 2,
+    "lineup-gap": 2,
     "age-unusual": 1,
-    "birth-date-disagreement": 13
+    "birth-date-disagreement": 12
    }
   },
   {
@@ -4562,8 +4568,8 @@
    "clubs": 30,
    "ratings": {
     "players": 892,
-    "min": 71,
-    "median": 83,
+    "min": 69,
+    "median": 82,
     "max": 99
    },
    "findings": {
@@ -4635,17 +4641,17 @@
    "fielded": 85,
    "clubs": 124,
    "ratings": {
-    "players": 2372,
+    "players": 2392,
     "min": 42,
     "median": 75,
     "max": 90
    },
    "findings": {
-    "lineup-gap": 18,
     "namesakes-in-team": 2,
+    "lineup-gap": 3,
     "strength-mismatch": 1,
     "birth-date-disagreement": 15,
-    "rating-jump": 2
+    "rating-jump": 1
    }
   },
   {
@@ -4796,15 +4802,15 @@
    "fielded": 86,
    "clubs": 124,
    "ratings": {
-    "players": 2338,
+    "players": 2384,
     "min": 39,
-    "median": 74,
+    "median": 75,
     "max": 91
    },
    "findings": {
-    "lineup-gap": 28,
     "namesakes-in-team": 1,
-    "birth-date-disagreement": 15,
+    "lineup-gap": 1,
+    "birth-date-disagreement": 12,
     "rating-jump": 3
    }
   },
@@ -4956,14 +4962,14 @@
    "fielded": 84,
    "clubs": 124,
    "ratings": {
-    "players": 2313,
+    "players": 2362,
     "min": 41,
     "median": 75,
     "max": 91
    },
    "findings": {
     "namesakes-in-team": 3,
-    "lineup-gap": 30,
+    "age-unusual": 1,
     "strength-mismatch": 1,
     "rating-jump": 3,
     "birth-date-disagreement": 28
@@ -5102,14 +5108,14 @@
    "fielded": 80,
    "clubs": 124,
    "ratings": {
-    "players": 2260,
+    "players": 2321,
     "min": 45,
     "median": 76,
     "max": 92
    },
    "findings": {
-    "lineup-gap": 25,
-    "namesakes-in-team": 4,
+    "namesakes-in-team": 3,
+    "lineup-gap": 1,
     "birth-date-disagreement": 19,
     "rating-jump": 7
    }
@@ -5176,12 +5182,12 @@
    "clubs": 30,
    "ratings": {
     "players": 898,
-    "min": 71,
+    "min": 69,
     "median": 83,
     "max": 99
    },
    "findings": {
-    "name-unusual": 3
+    "name-unusual": 2
    }
   },
   {
@@ -5247,15 +5253,16 @@
    "fielded": 76,
    "clubs": 0,
    "ratings": {
-    "players": 903,
+    "players": 940,
     "min": 42,
     "median": 75,
     "max": 95
    },
    "findings": {
-    "lineup-gap": 21,
-    "rating-jump": 7,
-    "birth-date-disagreement": 6
+    "age-unusual": 1,
+    "lineup-gap": 2,
+    "birth-date-disagreement": 6,
+    "rating-jump": 6
    }
   },
   {
@@ -5389,16 +5396,16 @@
    "fielded": 78,
    "clubs": 0,
    "ratings": {
-    "players": 908,
+    "players": 949,
     "min": 41,
     "median": 75,
     "max": 97
    },
    "findings": {
-    "lineup-gap": 19,
+    "lineup-gap": 2,
     "namesakes-in-team": 1,
     "age-unusual": 1,
-    "birth-date-disagreement": 8
+    "birth-date-disagreement": 7
    }
   },
   {
@@ -5480,7 +5487,7 @@
    "clubs": 30,
    "ratings": {
     "players": 896,
-    "min": 71,
+    "min": 68,
     "median": 83,
     "max": 99
    },
@@ -5621,7 +5628,7 @@
    "clubs": 30,
    "ratings": {
     "players": 891,
-    "min": 71,
+    "min": 70,
     "median": 83,
     "max": 99
    },
@@ -5762,9 +5769,9 @@
    "clubs": 30,
    "ratings": {
     "players": 891,
-    "min": 71,
+    "min": 68,
     "median": 83,
-    "max": 99
+    "max": 98
    },
    "findings": {}
   },
@@ -5904,12 +5911,12 @@
    "clubs": 30,
    "ratings": {
     "players": 894,
-    "min": 71,
+    "min": 68,
     "median": 83,
     "max": 99
    },
    "findings": {
-    "name-unusual": 2
+    "name-unusual": 1
    }
   },
   {
@@ -6205,7 +6212,7 @@
    "clubs": 27,
    "ratings": {
     "players": 794,
-    "min": 71,
+    "min": 69,
     "median": 83,
     "max": 99
    },
@@ -6349,8 +6356,8 @@
    "clubs": 26,
    "ratings": {
     "players": 770,
-    "min": 71,
-    "median": 82,
+    "min": 69,
+    "median": 83,
     "max": 99
    },
    "findings": {}
@@ -6541,9 +6548,9 @@
    "clubs": 26,
    "ratings": {
     "players": 765,
-    "min": 71,
+    "min": 69,
     "median": 82,
-    "max": 99
+    "max": 98
    },
    "findings": {}
   },
@@ -6680,8 +6687,8 @@
    "clubs": 26,
    "ratings": {
     "players": 762,
-    "min": 71,
-    "median": 83,
+    "min": 70,
+    "median": 82,
     "max": 99
    },
    "findings": {}
@@ -7298,8 +7305,8 @@
    "clubs": 22,
    "ratings": {
     "players": 639,
-    "min": 71,
-    "median": 82,
+    "min": 70,
+    "median": 83,
     "max": 99
    },
    "findings": {}
@@ -7436,7 +7443,7 @@
    "clubs": 21,
    "ratings": {
     "players": 606,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
@@ -7572,12 +7579,12 @@
    "clubs": 21,
    "ratings": {
     "players": 603,
-    "min": 71,
+    "min": 69,
     "median": 82,
-    "max": 99
+    "max": 98
    },
    "findings": {
-    "name-unusual": 1
+    "name-unusual": 2
    }
   },
   {
@@ -7732,7 +7739,7 @@
    "clubs": 21,
    "ratings": {
     "players": 597,
-    "min": 71,
+    "min": 68,
     "median": 82,
     "max": 99
    },
@@ -7873,7 +7880,7 @@
    "clubs": 21,
    "ratings": {
     "players": 589,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
@@ -8015,7 +8022,7 @@
    "ratings": {
     "players": 589,
     "min": 71,
-    "median": 82,
+    "median": 83,
     "max": 99
    },
    "findings": {
@@ -8152,12 +8159,12 @@
    "clubs": 21,
    "ratings": {
     "players": 590,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
    "findings": {
-    "name-unusual": 9
+    "name-unusual": 8
    }
   },
   {
@@ -8292,12 +8299,12 @@
    "clubs": 21,
    "ratings": {
     "players": 592,
-    "min": 71,
+    "min": 70,
     "median": 82,
     "max": 99
    },
    "findings": {
-    "name-unusual": 5
+    "name-unusual": 4
    }
   },
   {
@@ -8432,8 +8439,8 @@
    "clubs": 21,
    "ratings": {
     "players": 584,
-    "min": 71,
-    "median": 82,
+    "min": 68,
+    "median": 83,
     "max": 99
    },
    "findings": {}
@@ -8572,7 +8579,7 @@
    "clubs": 21,
    "ratings": {
     "players": 592,
-    "min": 71,
+    "min": 68,
     "median": 82,
     "max": 99
    },
@@ -8708,7 +8715,7 @@
    "clubs": 21,
    "ratings": {
     "players": 585,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
@@ -8844,7 +8851,7 @@
    "clubs": 21,
    "ratings": {
     "players": 575,
-    "min": 71,
+    "min": 70,
     "median": 82,
     "max": 99
    },
@@ -8980,7 +8987,7 @@
    "clubs": 21,
    "ratings": {
     "players": 568,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
@@ -9118,7 +9125,7 @@
    "clubs": 17,
    "ratings": {
     "players": 465,
-    "min": 71,
+    "min": 68,
     "median": 82,
     "max": 99
    },
@@ -9256,7 +9263,7 @@
    "clubs": 18,
    "ratings": {
     "players": 480,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
@@ -9394,8 +9401,8 @@
    "clubs": 18,
    "ratings": {
     "players": 412,
-    "min": 71,
-    "median": 82,
+    "min": 67,
+    "median": 81,
     "max": 99
    },
    "findings": {
@@ -9534,12 +9541,12 @@
    "clubs": 18,
    "ratings": {
     "players": 411,
-    "min": 71,
-    "median": 82,
+    "min": 69,
+    "median": 81,
     "max": 99
    },
    "findings": {
-    "name-unusual": 4
+    "name-unusual": 6
    }
   },
   {
@@ -9672,8 +9679,8 @@
    "clubs": 18,
    "ratings": {
     "players": 411,
-    "min": 71,
-    "median": 82,
+    "min": 69,
+    "median": 81,
     "max": 99
    },
    "findings": {
@@ -9810,8 +9817,8 @@
    "clubs": 16,
    "ratings": {
     "players": 367,
-    "min": 71,
-    "median": 82,
+    "min": 69,
+    "median": 81,
     "max": 99
    },
    "findings": {
@@ -9948,8 +9955,8 @@
    "clubs": 16,
    "ratings": {
     "players": 365,
-    "min": 71,
-    "median": 82,
+    "min": 68,
+    "median": 81,
     "max": 99
    },
    "findings": {}
@@ -10086,8 +10093,8 @@
    "clubs": 14,
    "ratings": {
     "players": 319,
-    "min": 71,
-    "median": 82,
+    "min": 69,
+    "median": 81,
     "max": 99
    },
    "findings": {}
@@ -10224,8 +10231,8 @@
    "clubs": 14,
    "ratings": {
     "players": 319,
-    "min": 71,
-    "median": 82,
+    "min": 67,
+    "median": 81,
     "max": 99
    },
    "findings": {}
@@ -10361,7 +10368,7 @@
    "ratings": {
     "players": 274,
     "min": 71,
-    "median": 82,
+    "median": 81,
     "max": 99
    },
    "findings": {}
@@ -10515,8 +10522,8 @@
    "clubs": 12,
    "ratings": {
     "players": 274,
-    "min": 71,
-    "median": 82,
+    "min": 69,
+    "median": 81,
     "max": 99
    },
    "findings": {}
@@ -10668,9 +10675,9 @@
    "clubs": 12,
    "ratings": {
     "players": 274,
-    "min": 71,
-    "median": 82,
-    "max": 99
+    "min": 69,
+    "median": 81,
+    "max": 96
    },
    "findings": {}
   },
@@ -10821,7 +10828,7 @@
    "clubs": 6,
    "ratings": {
     "players": 137,
-    "min": 71,
+    "min": 67,
     "median": 81,
     "max": 99
    },
@@ -10974,9 +10981,9 @@
    "clubs": 6,
    "ratings": {
     "players": 138,
-    "min": 71,
-    "median": 82,
-    "max": 99
+    "min": 69,
+    "median": 81,
+    "max": 98
    },
    "findings": {}
   },
@@ -11282,8 +11289,8 @@
    "clubs": 6,
    "ratings": {
     "players": 136,
-    "min": 71,
-    "median": 82,
+    "min": 68,
+    "median": 81,
     "max": 99
    },
    "findings": {}
@@ -11435,7 +11442,7 @@
    "clubs": 6,
    "ratings": {
     "players": 135,
-    "min": 71,
+    "min": 70,
     "median": 81,
     "max": 99
    },
@@ -11571,7 +11578,7 @@
    "clubs": 6,
    "ratings": {
     "players": 134,
-    "min": 71,
+    "min": 70,
     "median": 81,
     "max": 99
    },
@@ -11709,8 +11716,8 @@
    "clubs": 6,
    "ratings": {
     "players": 134,
-    "min": 71,
-    "median": 82,
+    "min": 70,
+    "median": 81,
     "max": 99
    },
    "findings": {}

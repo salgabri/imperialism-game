@@ -28,8 +28,12 @@ import { colourFor } from './lib/club-identity.mjs';
 import { nationsOf, nationStrength } from './lib/nhl.mjs';
 import { clubSquadOf, federationLands, federationOf, mapOf, nationOf, quantileRescale, ratingsOf, teamsOf } from './lib/nhl-seasons.mjs';
 import {
-  RULE, attributeMean, calibrationOf, groupOf, groupRatings, ratingsOfHistogram, scoreOf, stepRating, windowOf,
+  BLEND, attributeMean, calibrationOf, groupOf, groupRatings, lagWindowOf, ratingsOfHistogram, scoreOf, seasonBefore, seasonValues,
+  stepRating, windowOf,
 } from './lib/nhl-computed.mjs';
+import { reconcileClubs } from './lib/nhl-reconcile.mjs';
+import { spearman, variance } from './lib/computed-ratings.mjs';
+import { NHL_LEAGUE_AVERAGES } from '../src/data/nhlLeagueAverages.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const outDir = path.join(root, 'public/hockey');
@@ -106,24 +110,41 @@ function buildSeason(entry, snapshot, manifest) {
 
 const histogramText = histogram => Object.entries(histogram).map(([r, n]) => `${r}×${n}`).join(' ');
 
+const label = year => `${year - 1}/${String(year % 100).padStart(2, '0')}`;
+const fixed = (value, digits) => Number(value.toFixed(digits));
+const sd = list => Math.sqrt(variance(list));
+
 /** A computed season's rule, its constants and its form, as its source states it (source.conversion). */
-function computedConversion(entry, snapshot, manifest, counts) {
+function computedConversion(entry, snapshot, manifest, counts, values, reconciled) {
   const { form } = snapshot;
-  const [year, before, beforeThat] = windowOf(entry.year);
-  const skater = form.skaters === 'minutes'
-    ? `a forward's value is minutes a game + ${RULE.pointWeight.F} × points a game, a defender's minutes a game + ${RULE.pointWeight.D} × points a game`
-    : `a forward's value is ${RULE.pointWeight.F} × points a game, a defender's ${RULE.pointWeight.D} × points a game (the source keeps no time on ice)`;
-  const goalie = form.goalies === 'saves'
-    ? `a goalie's is 1000 × (his save percentage − the league's), his line starting from ${RULE.goalie.shots} shots at ${RULE.goalie.below} under the league's`
-    : `a goalie's is 1000 × (the league's goals against per 60 minutes − his) / ${RULE.goals.shotsPer60} (no shots against were kept), his line starting from ${RULE.goals.minutes} minutes at ${RULE.goals.above} goals a game over the league's`;
-  return `computed from each player's regular seasons ${year - 1}/${String(year % 100).padStart(2, '0')}, `
-    + `${before - 1}/${String(before % 100).padStart(2, '0')} and ${beforeThat - 1}/${String(beforeThat % 100).padStart(2, '0')} (weighted ${RULE.weights.join(':')}, over the seasons he played): `
-    + `${skater}, every line starting from a replacement player's ${RULE.prior.games} games at ${RULE.prior.points} points${form.skaters === 'minutes' ? ` and ${RULE.prior.minutes} minutes` : ''} a game; `
-    + `${goalie}, plus ${RULE.goalie.workload} × his share of the season's games (at most 1). A player plays for the club he played most games for (a tie: the later one). `
-    + `Each club's squad is picked by provisional ratings (each score's mid-rank in its group over the season's ${counts.players} players); then every squad player's rating is his score's mid-rank in his group `
+  const window = windowOf(entry.year);
+  const group = (g, noun) => {
+    const v = values.groups[g];
+    return `${noun} ${fixed(1 - v.production, 2)}:${fixed(v.production, 2)} (prior ${fixed(v.prior, g === 'G' && form.goalies === 'saves' ? 0 : 1)}, `
+      + `replacement ${fixed(v.replacement, g === 'G' ? 4 : 3)}, ${v.regulars} regulars of ${v.players})`;
+  };
+  const { strength, perPoint, scoring } = reconciled;
+  const results = strength.kind === 'srs'
+    ? `the Simple Rating System of its ${strength.games} games' scores from MoneyPuck.com's game files (margins by least squares with a home edge of ${fixed(strength.homeEdge, 2)}, a shoot-out's goal left out)`
+    : snapshot.results.games
+      ? `each club's goal differential a game over its ${strength.games} games from MoneyPuck.com's game files, which met only within their divisions (a shoot-out's goal left out; × (n − 1) ÷ n, n − 1 the clubs a club met)`
+      : 'each club\'s goal differential a game from the Hockey Databank\'s Teams.csv (a shoot-out\'s goal taken off both sides; × (n − 1) ÷ n, a club meeting the other n − 1), its reliability from Poisson goals';
+  return `computed from each player's regular seasons ${window.map(label).join(', ')} (weighted ${BLEND.weights.join(':')}; docs/design/computed-ratings.md, steps 3 to 5): `
+    + `a player's value is selection and production as z-scores over the season's regulars (a quarter of the window's games), weighted selection:production `
+    + `${group('F', 'forwards')}, ${group('D', 'defencemen')}, ${group('G', 'goalies')}, tuned once on EA's NHLPA 93, NHL 94, NHL 95, NHL 07 and NHL 22. `
+    + `Selection is his share of the club's ${form.skaters === 'minutes' ? 'ice time a game' : 'games'} (a goalie's: of its minutes) over the seasons of the window he played. `
+    + 'Production is points a game for skaters and, for goalies, '
+    + `${form.goalies === 'saves' ? 'saves above the league\'s save percentage a shot' : 'goals against under the league\'s an hour (no shots against were kept for the whole window)'}, `
+    + 'pooled over the window and shrunk toward replacement (the pooled rate of the quarter of the group with the least exposure) by the prior, the noise per unit of exposure over the regulars\' talent variance, '
+    + 'on each record\'s effective exposure (Σw·e)²/Σw²·e. A player plays for the club he played most games for (a tie: the later one). '
+    + `Each club's squad is picked by provisional ratings (each value's mid-rank in its group over the season's ${counts.players} players); then every squad player's rating is his value's mid-rank in his group `
     + `over the season's ${counts.squad} squad players, read off NHL 27's squads in that group (scripts/data/nhl-seasons.json computed.histograms: forwards ${counts.reference.F}, defenders ${counts.reference.D}, goalies ${counts.reference.G}); `
-    + 'ties stay ties and nobody passes anybody in a group. A player outside the squads takes the rating of the highest squad score in his group not above his. '
-    + `Every player's lines are in scripts/data/nhl-seasons/${entry.id}.json.`;
+    + 'ties stay ties and nobody passes anybody in a group. A player outside the squads takes the rating of the highest squad value in his group not above his. '
+    + `Then every club is moved toward its real results: S is ${results}, reliability r ${fixed(strength.reliability, 3)}; `
+    + `m, the match model's margin a game per point of a lineup's played strength (the mean of its attack and defence) under the season's rules, is ${fixed(perPoint, 4)} goals `
+    + `(at scoring ${fixed(scoring, 4)}); each club's target is the clubs' mean before the move + √r × S ÷ m, and every player of the club moves by one whole number, its best few one point more, `
+    + 'whichever brings its lineup nearest the target (no player passes one rated above him in his club). '
+    + `Every player's lines and the season's results are in scripts/data/nhl-seasons/${entry.id}.json.`;
 }
 
 /** The computed season `entry` of the manifest: its data set document and its audit row. */
@@ -132,9 +153,10 @@ function buildComputed(entry, snapshot, manifest) {
   if (snapshot.source.id !== id || snapshot.source.method !== 'computed') throw new Error(`scripts/data/nhl-seasons/${id}.json is not ${id}'s computed snapshot`);
   const src = manifest.computed.sources[entry.source.kind];
   const histograms = manifest.computed.histograms;
-  const players = snapshot.players.map(([key, name, team, pos, born, lines]) => ({ key, name, team, pos, born, lines, nation: federationOf(nationOf(born), year),
-    score: scoreOf({ pos, lines }, year, snapshot.leagues, snapshot.form) }));
-  if (players.some(p => p.score === null)) throw new Error(`${id}: a player without a line of the season`);
+  const players = snapshot.players.map(([key, name, team, pos, born, lines]) => ({ key, name, team, pos, born, lines, nation: federationOf(nationOf(born), year) }));
+  // Step 3: each player's value (the field `score` here, as the rating steps read it).
+  const values = seasonValues(players, year, snapshot.leagues, snapshot.form);
+  for (const p of players) p.score = values.values.get(p);
   // Provisional ratings over every player of the season pick each club's squad (the game's own lineup picker); the final
   // ratings rank the squads' players only, so every club's depth reads off NHL 27's squads as theirs do.
   const provisional = groupRatings(players, 'score', histograms);
@@ -149,13 +171,25 @@ function buildComputed(entry, snapshot, manifest) {
   const final = groupRatings(squadPlayers, 'score', histograms);
   const finalOf = new Map(squadPlayers.map(p => [p, final.get(p)]));
   const rated = squadPlayers.map(p => ({ pos: p.pos, score: p.score, rating: finalOf.get(p) }));
-  const all = players.map(p => ({ ...p, provisional: p.rating, rating: finalOf.get(p) ?? stepRating(p, rated) }));
+  const unmoved = new Map(players.map(p => [p, finalOf.get(p) ?? stepRating(p, rated)]));
+  // Step 5: every club moved toward its real results, each of its players by the club's move.
+  const entryOf = p => ({ name: p.name, pos: p.pos, rating: unmoved.get(p), value: p.score, player: p });
+  const reconciled = reconcileClubs({
+    clubs: picked.map(({ team, pool, squad }) => ({ id: team.id, code: team.code, squad: squad.map(entryOf).sort(byPlace),
+      others: pool.filter(p => !squad.includes(p)).map(entryOf) })),
+    results: snapshot.results, year, goals: NHL_LEAGUE_AVERAGES[label(year)].goals, seed: `nhl-move|${id}`,
+  });
+  const movedOf = new Map(reconciled.clubs.flatMap(club => [...club.squad, ...club.others].map(p => [p.player, p.rating])));
+  const all = players.map(p => ({ ...p, provisional: p.rating, unmoved: unmoved.get(p), rating: movedOf.get(p) }));
   const ratingOf = new Map(players.map((p, i) => [p, all[i]]));
+  const moveOf = new Map(reconciled.clubs.map(club => [club.code, club]));
   const clubs = picked.map(({ team, pool, squad }) => {
     const listed = squad.map(p => ratingOf.get(p));
     const lineup = selectLineup({ sport: 'hockey', squad: listed });
+    const before = selectLineup({ sport: 'hockey', squad: listed.map(p => ({ ...p, rating: p.unmoved })) }).rating;
     return { id: team.id, name: team.name, code: team.code, country: team.country, col: colours.get(team.id) ?? colourFor(team.id),
-      str: lineup.rating, squad: listed, players: pool.length, open: lineup.slots.filter(slot => !slot.player || slot.penalty > 4).map(slot => slot.position) };
+      str: lineup.rating, before, move: moveOf.get(team.code), squad: listed, players: pool.length,
+      open: lineup.slots.filter(slot => !slot.player || slot.penalty > 4).map(slot => slot.position) };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
   const nations = nationsOf(all, year);
   const realSides = realSidesOf(nations);
@@ -165,7 +199,7 @@ function buildComputed(entry, snapshot, manifest) {
   const doc = {
     format: 1, kind: 'nhl', id, version: '', year, season: seasonLabel(year), label: entry.label, local: false,
     source: { provider: src.provider, edition: src.edition, compiler: src.compiler, url: src.url, retrieved: entry.retrieved, method: 'computed',
-      rawScale: 'value', conversion: computedConversion(entry, snapshot, manifest, counts), licence: src.licence, attribution: src.attribution, nation: src.nation },
+      rawScale: 'value', conversion: computedConversion(entry, snapshot, manifest, counts, values, reconciled), licence: src.licence, attribution: src.attribution, nation: src.nation },
     map: mapOf(manifest, year),
     // Before 1977/78 fewer than three nations field a real side: clubs only (src/engine/footballSets.js clubsOnly).
     nations: hasNations ? Object.fromEntries(nations.map(n => [n.id, [n.str, n.squad.length, n.squad.map(tupleOf)]])) : {},
@@ -178,11 +212,33 @@ function buildComputed(entry, snapshot, manifest) {
   const range = list => { const s = list.slice().sort((a, b) => a - b); return { lowest: s[0], median: s[s.length >> 1], highest: s.at(-1) }; };
   const top = group => all.filter(p => groupOf(p.pos) === group)
     .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name)).slice(0, 3).map(p => `${p.name} (${p.team}) ${p.rating}`);
+  // Step 5's figures: the results strength, the move of every club, and how the clubs' strengths spread and follow the
+  // results before the move and after it.
+  const { strength } = reconciled;
+  const real = clubs.map(c => strength.ratings[c.code]);
+  const signed = v => `${v >= 0 ? '+' : '−'}${Math.abs(v).toFixed(2)}`;
+  const moveText = ({ shift, plus }) => `${shift >= 0 ? '+' : '−'}${Math.abs(shift)}${plus ? `, ${plus} of them +1 more` : ''}`;
   const audit = {
     id, version: doc.version, season: doc.season, label: entry.label, method: 'computed', source: entry.source.kind, map: doc.map, form: snapshot.form,
     players: players.length, squads: squadPlayers.length, ratings: range(clubs.flatMap(c => c.squad.map(p => p.rating))),
+    values: Object.fromEntries(Object.entries(values.groups).map(([g, v]) => [g, { players: v.players, regulars: v.regulars,
+      prior: fixed(v.prior, g === 'G' && snapshot.form.goalies === 'saves' ? 0 : 2), replacement: fixed(v.replacement, 4), production: v.production }])),
     best: { forwards: top('F'), defenders: top('D'), goalies: top('G') },
-    clubs: clubs.map(c => `${c.name} ${c.str} (${c.players} players${c.open.length ? `; the game fills ${c.open.join(' ')}` : ''})`),
+    results: {
+      kind: strength.kind, games: strength.games, reliability: fixed(strength.reliability, 3),
+      ...(strength.kind === 'srs' ? { homeEdge: fixed(strength.homeEdge, 3), sigma: fixed(strength.sigma, 3) } : {}),
+      ...(snapshot.results.games ? { homeMended: snapshot.results.homeMended, oneSided: snapshot.results.oneSided } : {}),
+      perPoint: fixed(reconciled.perPoint, 4), scoring: reconciled.scoring, mean: fixed(reconciled.mean, 2),
+      // The clubs' strengths' spread and their Spearman correlation with S: as shown (the lineup's mean) and as played.
+      spread: { before: fixed(sd(clubs.map(c => c.before)), 2), after: fixed(sd(clubs.map(c => c.str)), 2),
+        playedBefore: fixed(sd(clubs.map(c => c.move.before)), 2), playedAfter: fixed(sd(clubs.map(c => c.move.after)), 2),
+        target: fixed(sd(clubs.map(c => c.move.target)), 2) },
+      agreement: { before: fixed(spearman(clubs.map(c => c.before), real), 3), after: fixed(spearman(clubs.map(c => c.str), real), 3),
+        playedBefore: fixed(spearman(clubs.map(c => c.move.before), real), 3), playedAfter: fixed(spearman(clubs.map(c => c.move.after), real), 3) },
+      moves: clubs.map(c => `${c.name}: S ${signed(strength.ratings[c.code])}, played ${c.move.before.toFixed(2)} → ${c.move.after.toFixed(2)} `
+        + `(target ${c.move.target.toFixed(2)}), ${moveText(c.move)}`),
+    },
+    clubs: clubs.map(c => `${c.name} ${c.str} (${c.before} before the move; ${c.players} players${c.open.length ? `; the game fills ${c.open.join(' ')}` : ''})`),
     nations: hasNations ? nations.map(n => `${n.name} ${n.str} (${n.squad.length}${n.open.length ? `; the game fills ${n.open.join(' ')}` : ''})`) : 'clubs only',
     realSides,
     noNation: players.filter(p => p.nation === null).map(p => `${p.name} (${p.team})`),
@@ -270,15 +326,47 @@ function buildConverted(entry, snapshot, manifest) {
   return { doc, text: serializeFootballSet(doc), audit };
 }
 
-/** The computed rule against the full editions (scripts/data/nhl-seasons/calibration.json), as the audit records it. */
+/**
+ * The computed rule's values against an edition's overalls, Spearman's correlation within each group: the values of the
+ * season ending in `year` (seasonValues, its window's lines only) over the edition's players with a line in that window.
+ * `form`: the edition's, its goalies by save percentage where every season of the window kept shots against unless told.
+ */
+export function blendAgreement(edition, year, form) {
+  const window = windowOf(year);
+  const players = edition.players.map(([name, team, pos, overall, lines]) => ({ name, pos, overall, lines: lines.filter(l => window.includes(l[0])) }))
+    .filter(p => p.lines.length);
+  const goalies = form.goalies ?? (window.every(season => edition.leagues[season].savePct != null) ? 'saves' : 'goals');
+  const { values } = seasonValues(players, year, edition.leagues, { skaters: form.skaters, goalies });
+  return Object.fromEntries(['F', 'D', 'G'].map(g => {
+    const members = players.filter(p => groupOf(p.pos) === g);
+    return [g, { rho: fixed(spearman(members.map(p => values.get(p)), members.map(p => p.overall)), 3), players: members.length }];
+  }));
+}
+
+/**
+ * The computed rule against the full editions (scripts/data/nhl-seasons/calibration.json), as the audit records it: the
+ * blend against each edition in the window of the season before its own (`lagWindowOf`: the seasons EA saw before the
+ * edition came out) and in its own season's, with its goalies by goals against too (the databank's editions) and its
+ * skaters by games too (NHL 22, which MoneyPuck times); and the superseded rule of 2026-11-09 (`superseded`) as it was
+ * measured, in the season's own window.
+ */
 function calibrationAudit(manifest, fixture) {
   return fixture.editions.map(e => {
+    const before = seasonBefore(e.year);
+    const variants = [
+      ['lag', before, e.form], ['own', e.year, e.form],
+      e.kind === 'hdb' ? ['lag, goalies by goals against', before, { ...e.form, goalies: 'goals' }] : ['lag, skaters by games', before, { ...e.form, skaters: 'points' }],
+    ];
     const forms = [e.form, ...(e.kind === 'hdb' ? [{ ...e.form, goalies: 'goals' }] : [{ ...e.form, skaters: 'points' }])];
-    return { id: e.id, source: e.kind, unmatched: e.unmatched.length, forms: forms.map(form => {
-      const players = e.players.map(([name, team, pos, overall, lines]) => ({ name, team, pos, overall,
-        score: lines.length ? scoreOf({ pos, lines }, e.year, e.leagues, form) : null }));
-      return { form, ...calibrationOf(players, manifest.computed.histograms) };
-    }) };
+    return {
+      id: e.id, source: e.kind, unmatched: e.unmatched.length, lagWindow: lagWindowOf(e.year),
+      blend: variants.map(([frame, year, form]) => ({ frame, window: windowOf(year), ...blendAgreement(e, year, form) })),
+      superseded: forms.map(form => {
+        const players = e.players.map(([name, team, pos, overall, lines]) => ({ name, team, pos, overall,
+          score: lines.some(l => windowOf(e.year).includes(l[0])) ? scoreOf({ pos, lines }, e.year, e.leagues, form) : null }));
+        return { form, ...calibrationOf(players, manifest.computed.histograms) };
+      }),
+    };
   });
 }
 
@@ -423,11 +511,16 @@ async function main() {
   const fixture = JSON.parse(await readFile(path.join(root, 'scripts/data/nhl-seasons/calibration.json'), 'utf8'));
   const calibration = calibrationAudit(manifest, fixture);
   for (const e of calibration) {
-    for (const f of e.forms) {
-      console.log(`calibration ${e.id} (${f.form.skaters}, ${f.form.goalies}): F ${f.F.rho} D ${f.D.rho} G ${f.G.rho}, players ${f.playerGap} apart; `
-        + `clubs ${f.clubs.rho}, ${f.clubs.gap} apart`);
-    }
+    for (const b of e.blend) console.log(`calibration ${e.id}, blend (${b.frame}, ${b.window.join('-')}): F ${b.F.rho} D ${b.D.rho} G ${b.G.rho}`);
+    const f = e.superseded[0];
+    console.log(`calibration ${e.id}, superseded rule (${f.form.skaters}, ${f.form.goalies}): F ${f.F.rho} D ${f.D.rho} G ${f.G.rho}`);
   }
+  const computedSeasons = results.filter(r => r.audit.results);
+  const median = list => { const s = list.slice().sort((a, b) => a - b); return s.length % 2 ? s[s.length >> 1] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2; };
+  const medianOf = (part, key) => fixed(median(computedSeasons.map(r => r.audit.results[part][key])), 3);
+  console.log(`results: clubs against S, median Spearman as shown ${medianOf('agreement', 'before')} before the move, ${medianOf('agreement', 'after')} after, `
+    + `as played ${medianOf('agreement', 'playedBefore')} → ${medianOf('agreement', 'playedAfter')}; club SD median as shown ${medianOf('spread', 'before')} → `
+    + `${medianOf('spread', 'after')}, as played ${medianOf('spread', 'playedBefore')} → ${medianOf('spread', 'playedAfter')}`);
   const outputs = [
     ...results.map(({ doc, text }) => [path.join(outDir, `${doc.id}.json`), text]),
     [path.join(outDir, 'ATTRIBUTION.txt'), attributionText(manifest, results.map(r => r.doc), credits)],

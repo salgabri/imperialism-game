@@ -216,6 +216,59 @@ export function moneypuckStints(rows, year) {
   return new Map([...games].map(([id, byClub]) => [id, [...byClub]]));
 }
 
+/**
+ * Every regular-season game's score from MoneyPuck's game-by-game skater rows of the season ending in `year` (situation
+ * 'all', a regular-season game id having 02 after the year; each row `{ gameId, playerTeam, opposingTeam, home_or_away,
+ * I_F_goals }`): a side's goals are its skaters' (a shoot-out's are nobody's here, so a game decided by one reads level;
+ * a goalie's own goal, about one a season, is left out with the goalies). MoneyPuck's files of 2011/12 to 2013/14 mark
+ * the Coyotes' home games with both sides away, the Coyotes' rows naming the Coyotes as their own opponent: in a game where
+ * both sides read away and one names itself, that side is at home (`homeMended`, counted). → `{ games: [[gameId, home,
+ * away, home goals, away goals]] by game id, homeMended, oneSided }`, a game the rows hold for one side only (or none at
+ * home) left out and counted.
+ */
+export function moneypuckGameScores(rows, year) {
+  const byGame = new Map();
+  for (const row of rows) {
+    if (row.situation !== 'all' || !/^\d{4}02\d{4}$/.test(row.gameId)) continue;
+    const sides = byGame.get(row.gameId) ?? new Map();
+    const code = mpCode(row.playerTeam, year);
+    const side = sides.get(code) ?? { goals: 0, home: row.home_or_away === 'HOME', self: mpCode(row.opposingTeam, year) === code };
+    if (side.home !== (row.home_or_away === 'HOME')) throw new Error(`MoneyPuck game ${row.gameId}: ${code} both home and away`);
+    side.goals += int(row.I_F_goals, `MoneyPuck game ${row.gameId} ${row.playerTeam}`);
+    sides.set(code, side);
+    byGame.set(row.gameId, sides);
+  }
+  const games = [];
+  let oneSided = 0, homeMended = 0;
+  for (const [gameId, sides] of [...byGame].sort((a, b) => Number(a[0]) - Number(b[0]))) {
+    const list = [...sides];
+    let home = list.filter(([, side]) => side.home);
+    if (list.length === 2 && !home.length && list.filter(([, side]) => side.self).length === 1) {
+      home = list.filter(([, side]) => side.self);
+      homeMended++;
+    }
+    if (list.length !== 2 || home.length !== 1) { oneSided++; continue; }
+    const away = list.find(entry => entry !== home[0]);
+    games.push([Number(gameId), home[0][0], away[0], home[0][1].goals, away[1].goals]);
+  }
+  return { games, homeMended, oneSided };
+}
+
+/**
+ * The NHL clubs' records of the season ending in `year` from the Hockey Databank's Teams.csv: `[code, games, won, lost,
+ * tied, overtime losses, shoot-out wins, shoot-out losses, goals for, goals against]` each, a blank count 0. Its goals
+ * count a shoot-out's winner one goal that nobody scored, as the NHL does (scripts/lib/nhl-league.mjs databankLeagueGoals).
+ */
+export function hdbTeamRecords(text, year) {
+  const hdbYear = String(year - 1);
+  return csvRecords(text).filter(row => row.lgID === 'NHL' && row.year === hdbYear).map(row => {
+    const where = `Teams ${row.tmID} ${row.year}`;
+    const count = value => (value === '' ? 0 : int(value, where));
+    return [hdbCode(row.tmID), int(row.G, where), count(row.W), count(row.L), count(row.T), count(row.OTL), count(row.SoW), count(row.SoL),
+      int(row.GF, where), int(row.GA, where)];
+  });
+}
+
 /** MoneyPuck's player lookup: Map NHL id → `{ name, nationality (ISO 3166 alpha-3) or null, birthDate }`. */
 export function moneypuckLookup(text) {
   return new Map(csvRecords(text).map(row => {

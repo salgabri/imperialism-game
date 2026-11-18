@@ -1,0 +1,338 @@
+{
+  "about": "The computed players that fill national XIs no source rates in full (docs/design/football-years.md, \"Computed fills\"): the EA seasons' fielded nations short of a natural XI, and Tonga, Samoa and the Cook Islands in the built-in season. Every source pinned and every constant of the method. npm run sync:football-fills reads the sources from data-src/ into the committed facts (scripts/data/football-fills/), which npm run build:ea-seasons and npm run build-rosters read. elo, strength.perHundredElo, xi, profile and positions are the computed national-team seasons' (scripts/data/national-team-seasons.json), equal by test.",
+  "decided": "2026-11-17: the user adopted docs/design/computed-ratings.md, whose \"Where it applies now\" lists two football gaps: the EA seasons' fielded nations short of a full XI (FIFA 05–09 furthest from Elo) and the nations no source rates (Tonga, Samoa, the Cook Islands). The coordinating session asked this one to fill them by the document's method: real players capped for the nation around the season (Wikidata P54 through QLever, ranked by caps in the window, positions from Wikidata), rated so the XI meets the strength World Football Elo gives on the season's ratings date by the computed seasons' line (3.2 points per 100 Elo below the season's best), EA-rated players keeping EA's ratings, the added players marked as estimates. Claude chose the rest: the line's level from each season's own full EA XIs (not the computed seasons' 87), a natural 4-4-2 (an EA player out of position gives his place to a capped player of that position), a stint with neither end nor caps covering its first year, and each added rating held where a member of an XI at T can be. The fill ships only on the user's own go-ahead.",
+  "retrieved": "2026-11-17",
+  "sources": {
+    "wikidata": {
+      "name": "Wikidata: the men's national association football teams (instances of Q135408445) and their players' memberships (P54) with start (P580), end (P582), matches played (P1350) and goals (P1351), for every membership that began in 1970 or later and ended in 2003 or later, or has no end; the players' names, dates of birth (P569), English Wikipedia articles, positions (P413) and sex or gender (P21)",
+      "url": "https://www.wikidata.org/",
+      "endpoint": "https://qlever.dev/api/wikidata",
+      "endpointNote": "QLever (University of Freiburg) answers SPARQL over the whole Wikidata dump; qlever.dev has no robots.txt. The Wikidata Query Service and Wikidata's API are disallowed for every agent by their robots.txt (scripts/lib/wikidata-sparql.mjs).",
+      "licence": "CC0 1.0",
+      "licenceUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "folder": "wikidata-football-fills",
+      "queries": {
+        "teams": "SELECT ?team ?teamLabel WHERE {\n  ?team wdt:P31 wd:Q135408445 .\n  OPTIONAL { ?team rdfs:label ?teamLabel . FILTER(LANG(?teamLabel) = \"en\") }\n}",
+        "stints": "SELECT ?player ?team ?st ?rank ?start ?end ?caps ?goals WHERE {\n  ?team wdt:P31 wd:Q135408445 .\n  ?player p:P54 ?st .\n  ?st ps:P54 ?team ;\n    wikibase:rank ?rank ;\n    pq:P580 ?start .\n  OPTIONAL { ?st pq:P582 ?end }\n  OPTIONAL { ?st pq:P1350 ?caps }\n  OPTIONAL { ?st pq:P1351 ?goals }\n  FILTER(YEAR(?start) >= 1970 && (!BOUND(?end) || isBlank(?end) || YEAR(?end) >= 2003))\n}",
+        "players": "SELECT ?player (SAMPLE(?en) AS ?label) (SAMPLE(?mul) AS ?mulLabel) (MIN(?born) AS ?birth) (SAMPLE(?article) AS ?enwiki) WHERE {\n  { SELECT DISTINCT ?player WHERE {\n    ?team wdt:P31 wd:Q135408445 .\n    ?player p:P54 ?st .\n    ?st ps:P54 ?team ;\n      pq:P580 ?start .\n    OPTIONAL { ?st pq:P582 ?end }\n    FILTER(YEAR(?start) >= 1970 && (!BOUND(?end) || isBlank(?end) || YEAR(?end) >= 2003))\n  } }\n  OPTIONAL { ?player rdfs:label ?en . FILTER(LANG(?en) = \"en\") }\n  OPTIONAL { ?player rdfs:label ?mul . FILTER(LANG(?mul) = \"mul\") }\n  OPTIONAL { ?player wdt:P569 ?born }\n  OPTIONAL { ?article schema:about ?player ; schema:isPartOf <https://en.wikipedia.org/> }\n} GROUP BY ?player",
+        "positions": "SELECT DISTINCT ?player ?position WHERE {\n  { SELECT DISTINCT ?player WHERE {\n    ?team wdt:P31 wd:Q135408445 .\n    ?player p:P54 ?st .\n    ?st ps:P54 ?team ;\n      pq:P580 ?start .\n    OPTIONAL { ?st pq:P582 ?end }\n    FILTER(YEAR(?start) >= 1970 && (!BOUND(?end) || isBlank(?end) || YEAR(?end) >= 2003))\n  } }\n  ?player wdt:P413 ?position .\n}",
+        "sexes": "SELECT DISTINCT ?player ?sex WHERE {\n  { SELECT DISTINCT ?player WHERE {\n    ?team wdt:P31 wd:Q135408445 .\n    ?player p:P54 ?st .\n    ?st ps:P54 ?team ;\n      pq:P580 ?start .\n    OPTIONAL { ?st pq:P582 ?end }\n    FILTER(YEAR(?start) >= 1970 && (!BOUND(?end) || isBlank(?end) || YEAR(?end) >= 2003))\n  } }\n  ?player wdt:P21 ?sex .\n}"
+      },
+      "files": [
+        {
+          "name": "teams.json",
+          "query": "teams",
+          "sha256": "0d0c234dee4ef1e39698b3a41779a29e517f95ef7c886102afe7fdb6ce0603bb",
+          "bytes": 58901
+        },
+        {
+          "name": "stints.json",
+          "query": "stints",
+          "sha256": "75afee27af8090aca9e2ec9e37f515c3324971ac72a4e639dfe1c070c3c54880",
+          "bytes": 15304431
+        },
+        {
+          "name": "players.json",
+          "query": "players",
+          "sha256": "ee8a30338b745707832d983900cfb089f868eaff3938bb2a9085354e287be17b",
+          "bytes": 8409634
+        },
+        {
+          "name": "positions.json",
+          "query": "positions",
+          "sha256": "911037bf695c4697b03eb9c55b8c5cef3b92b6d231be8fe24b98fcf11d4c9bde",
+          "bytes": 3812203
+        },
+        {
+          "name": "sexes.json",
+          "query": "sexes",
+          "sha256": "f619ebcdddf9f29474e83501b82d70ee128c3803750057afdda1c95e0b00e79d",
+          "bytes": 3536156
+        }
+      ]
+    },
+    "results": {
+      "name": "International football results from 1872 (martj42/international_results)",
+      "author": "martj42",
+      "url": "https://github.com/martj42/international_results",
+      "commit": "b0948cb558c927c357db4067eac5b37b96d0e4bb",
+      "committed": "2026-10-31",
+      "licence": "CC0-1.0",
+      "folder": "martj42-results",
+      "download": "https://raw.githubusercontent.com/martj42/international_results/b0948cb558c927c357db4067eac5b37b96d0e4bb/",
+      "files": [
+        {
+          "name": "results.csv",
+          "sha256": "09aac809e317f3004c69720a38addb656c49ebb19f1937deab96f96e3362257a",
+          "bytes": 3764347
+        }
+      ]
+    }
+  },
+  "elo": {
+    "formula": "R' = R + K × G × (W − We), We = 1 / (1 + 10^(−dr / 400)), dr = R_home − R_away + home (none at a neutral venue); W is 1, ½ or 0, a match level after extra time a draw",
+    "home": 100,
+    "start": {
+      "early": 1500,
+      "late": 1300,
+      "lateAfter": 1930,
+      "rule": "A team starts at 1500, or at 1300 when its first match in the results is in a year after 1930."
+    },
+    "k": {
+      "worldCup": [
+        "FIFA World Cup"
+      ],
+      "worldCupK": 60,
+      "continental": [
+        "UEFA Euro",
+        "Copa América",
+        "African Cup of Nations",
+        "AFC Asian Cup",
+        "Gold Cup",
+        "CONCACAF Championship",
+        "Oceania Nations Cup",
+        "Confederations Cup",
+        "CONMEBOL–UEFA Cup of Champions"
+      ],
+      "continentalK": 50,
+      "qualifierSuffix": " qualification",
+      "qualifier": [
+        "UEFA Nations League",
+        "CONCACAF Nations League"
+      ],
+      "qualifierK": 40,
+      "friendly": [
+        "Friendly"
+      ],
+      "friendlyK": 20,
+      "otherK": 30
+    },
+    "goals": "G is 1 for a margin of 0 or 1, 1.5 for 2, 1.75 for 3 and 1.75 + (N − 3) / 8 for N of 4 or more",
+    "date": "The ratings the day after the final: every match up to and including the final's day",
+    "activeYears": 4
+  },
+  "strength": {
+    "perHundredElo": 3.2,
+    "rule": "T = L − perHundredElo × (E_best − E) / 100: E the nation's Elo on the season's ratings date, E_best the best Elo of the teams that played in the four years before, and L the line's level at E_best, the median over the season's own full EA XIs (eleven EA players, each in a natural position) of their mean + perHundredElo × (E_best − E) / 100. perHundredElo is the computed seasons' (scripts/data/national-team-seasons.json); L puts the line where the season's EA-rated nations of the same Elo sit."
+  },
+  "xi": {
+    "GK": 1,
+    "DF": 4,
+    "MF": 4,
+    "FW": 2
+  },
+  "profile": [
+    5.3,
+    3.3,
+    2.1,
+    1,
+    0,
+    -0.4,
+    -1,
+    -1.7,
+    -2.1,
+    -2.7,
+    -3.9
+  ],
+  "profileSource": "The mean sorted deviation from the XI's mean of the 32 strongest built-in XIs (2026/27), to one decimal.",
+  "selection": {
+    "openCapsPerYear": 8,
+    "ages": {
+      "least": 14,
+      "most": 45,
+      "why": "A player younger than 14 or older than 45 on 1 July of Y − 1, when the season starts, is in no pool: his Wikidata stint and his date of birth cannot both be right. The roster audit (scripts/audit-rosters.mjs) found three: Óscar Ulloa (Q8078877, born 1986) for El Salvador from 1988, Rusdi Suparman (born 1973) for Malaysia from 1986, and Antoine Tassy (born 1924), Haiti's coach, as its player from 1965 to 1976."
+    },
+    "rule": "A nation's candidates for the season ending in Y: the players of its team with a Wikidata stint covering Y − 1 or Y, each with his stint's caps a year, caps / (end − start + 1), halved when the stint covers only one of the two years (the computed national-team seasons' figure). A stint Wikidata has not closed ends as its caps would run out at 8 a year (start + ⌈caps / 8⌉ − 1); one with neither end nor caps covers its first year only, its start being the debut. A player under 14 or over 45 when the season starts (the national-team seasons' ages), a player with 0 caps on the stint, or who is one of the edition's EA players (born the same day with a name word in common, or a name that agrees and the same nation or birth year), is no candidate. A nation is filled when it fields a side (its EA players hold at least half the lineup), has an Elo and is short of a natural XI: each role (1 GK, 4 DF, 4 MF, 2 FW) EA's natural part leaves short takes the candidates of that position, the most caps a year first (then the caps for the nation by the season's end, then the lower Wikidata id); a place still empty keeps EA's own player out of position, and only then takes a candidate out of position. The added players are rated, ordered by the same claim, so the XI's ratings sum to round(11 × T), each R + d_j (d the profile read at m evenly spaced places of the eleven and centred), their mean R and each rating held within T + min D and T + max D."
+  },
+  "positions": {
+    "Q201330": "GK",
+    "Q172964": "GK",
+    "Q336286": "DF",
+    "Q90173132": "DF",
+    "Q268258": "DF",
+    "Q1489923": "DF",
+    "Q1109563": "DF",
+    "Q904289": "DF",
+    "Q3522468": "DF",
+    "Q124355618": "DF",
+    "Q107213256": "DF",
+    "Q12366105": "DF",
+    "Q193592": "MF",
+    "Q8025128": "MF",
+    "Q18691898": "MF",
+    "Q90326494": "MF",
+    "Q6008848": "MF",
+    "Q1201458": "MF",
+    "Q114358125": "MF",
+    "Q280658": "FW",
+    "Q6037916": "FW",
+    "Q3446915": "FW",
+    "Q9731197": "FW",
+    "Q11681748": "FW",
+    "Q114358150": "FW",
+    "Q114358158": "FW",
+    "Q1642283": "FW",
+    "Q1369558": "FW",
+    "Q114358123": "MF",
+    "Q124650007": "DF",
+    "Q16501245": "MF",
+    "Q21707087": "FW"
+  },
+  "positionsNote": "The computed national-team seasons' map (scripts/data/national-team-seasons.json), equal by test, plus the association football positions (P641 Q2736) these answers hold beyond it, read 2026-11-17: Q114358123 right midfielder (MF), Q124650007 left back (DF), Q16501245 wide midfielder (MF), Q21707087 inverted winger (FW, as winger is). Left out as other sports' or no position: Q3664517 centre back, Q65658786 left-back, Q65658788 right back and Q66115689 left wing (handball), Q1317534 goaltender, Q18451027 right winger and Q2827965 winger (ice hockey), Q161358 wing, Q20760317 \"Defensa\" and Q36925649 \"Portero\" (no sport stated), Q467, Q526301 (utility player) and Q763388.",
+  "names": {
+    "teamSuffix": " (?:men's )?(?:national )?(?:association )?(?:football|soccer) team$",
+    "ignoreTeams": [
+      "Q1516237",
+      "Q922698",
+      "Q775352",
+      "Q918214",
+      "Q1413794",
+      "Q738846"
+    ],
+    "ignoreTeamsNote": "Q1516237 the pre-1950 IFA Ireland team (not the Republic of Ireland), Q922698 Italy's under-21s, Q775352 the \"Golden Team\" (Hungary's 1950s side, not a team of its own), Q918214 Great Britain's Olympic team, Q1413794 the FLN team (1958–1962, no FIFA member), Q738846 the Basque Country's regional side (no FIFA member): classed as men's national teams on Wikidata, but none is a FIFA member's full national team.",
+    "countries": {
+      "Canadian": "Canada",
+      "Cuban": "Cuba",
+      "Emirates": "United Arab Emirates"
+    },
+    "nations": {
+      "aliases": {
+        "Republic of Ireland": "372",
+        "Ivory Coast": "384",
+        "Central African Republic": "140",
+        "Dominican Republic": "214",
+        "Equatorial Guinea": "226",
+        "Trinidad and Tobago": "780",
+        "North Macedonia": "807",
+        "Bosnia and Herzegovina": "070",
+        "Serbia and Montenegro": "688"
+      },
+      "noTeam": [
+        "Malta",
+        "San Marino",
+        "Faroe Islands",
+        "Liechtenstein",
+        "Singapore"
+      ]
+    },
+    "nationsNote": "The computed national-team seasons' aliases and no-team list, plus Serbia and Montenegro, which Wikidata keeps as a team of its own (2003–2006) and which played as Serbia's shape (688) until Montenegro's own team (src/data/footballFederations.js)."
+  },
+  "seasons": [
+    {
+      "id": "builtin",
+      "year": 2027,
+      "date": "2026-11-01",
+      "note": "The built-in season (src/data/rosters.js), its ratings date the gate's D_Y (scripts/data/football-gate.json): only Tonga, Samoa and the Cook Islands are filled."
+    },
+    {
+      "id": "ea-fc-26",
+      "year": 2026,
+      "date": "2025-09-19"
+    },
+    {
+      "id": "ea-fc-25",
+      "year": 2025,
+      "date": "2024-09-26"
+    },
+    {
+      "id": "ea-fc-24",
+      "year": 2024,
+      "date": "2023-09-22"
+    },
+    {
+      "id": "ea-fifa-23",
+      "year": 2023,
+      "date": "2022-09-26"
+    },
+    {
+      "id": "ea-fifa-22",
+      "year": 2022,
+      "date": "2021-09-23"
+    },
+    {
+      "id": "ea-fifa-21",
+      "year": 2021,
+      "date": "2020-09-23"
+    },
+    {
+      "id": "ea-fifa-20",
+      "year": 2020,
+      "date": "2019-09-19"
+    },
+    {
+      "id": "ea-fifa-19",
+      "year": 2019,
+      "date": "2018-08-21"
+    },
+    {
+      "id": "ea-fifa-18",
+      "year": 2018,
+      "date": "2017-09-18"
+    },
+    {
+      "id": "ea-fifa-17",
+      "year": 2017,
+      "date": "2016-09-20"
+    },
+    {
+      "id": "ea-fifa-16",
+      "year": 2016,
+      "date": "2015-09-21"
+    },
+    {
+      "id": "ea-fifa-15",
+      "year": 2015,
+      "date": "2014-09-18"
+    },
+    {
+      "id": "ea-fifa-14",
+      "year": 2014,
+      "date": "2014-09-19"
+    },
+    {
+      "id": "ea-fifa-13",
+      "year": 2013,
+      "date": "2013-09-20"
+    },
+    {
+      "id": "ea-fifa-12",
+      "year": 2012,
+      "date": "2012-02-22"
+    },
+    {
+      "id": "ea-fifa-11",
+      "year": 2011,
+      "date": "2010-08-30"
+    },
+    {
+      "id": "ea-fifa-10",
+      "year": 2010,
+      "date": "2009-08-30"
+    },
+    {
+      "id": "ea-fifa-09",
+      "year": 2009,
+      "date": "2008-08-30"
+    },
+    {
+      "id": "ea-fifa-08",
+      "year": 2008,
+      "date": "2007-08-30"
+    },
+    {
+      "id": "ea-fifa-07",
+      "year": 2007,
+      "date": "2006-08-30"
+    },
+    {
+      "id": "ea-fifa-06",
+      "year": 2006,
+      "date": "2005-09-30"
+    },
+    {
+      "id": "ea-fifa-05",
+      "year": 2005,
+      "date": "2004-10-08"
+    }
+  ]
+}

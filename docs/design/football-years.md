@@ -20,7 +20,9 @@ October 2003 update of SI's CM 01/02, built 2026-11-09 and shipped by the user's
 between the World Cups, 1962/63 to 1992/93, computed from Wikidata's national-team records, 2026-11-13
 ([Computed national-team seasons](#computed-national-team-seasons)), so that every year has a season; 1960/61,
 computed alike, with the federations of its day (the United Arab Republic among them), and 1996/97's clubs, read from
-SWOS 96/97's own team files, 2026-11-14 ([Sensible World of Soccer 96/97](#sensible-world-of-soccer-9697-199697)). The CM 01/02
+SWOS 96/97's own team files, 2026-11-14 ([Sensible World of Soccer 96/97](#sensible-world-of-soccer-9697-199697)); the EA
+seasons' national XIs that EA leaves short, filled with players capped for their nation that season and rated from its
+Elo, 2026-11-18 ([Computed fills](#computed-fills)). The CM 01/02
 path now runs on real databases (SI's own and the CM3 port); the community's
 still need a forum login. Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
@@ -488,8 +490,11 @@ How a season is made:
   small states); their players still play for their clubs. Scotland, Wales and
   Northern Ireland have shapes and teams. Any other unmapped name stops the build. Each nation fields
   its best natural XI with the squad pick the built-in rosters use. EA rates
-  only part of the world, so 73–82 nations a season field a full XI and the rest
-  keep the players they have (an empty nation plays at 40).
+  only part of the world, so 73–82 nations a season have a full XI of EA's own and the rest
+  keep the players they have (an empty nation plays at 40). Since 2026-11-18 a nation that
+  fields a side but is short of a natural XI has the places EA leaves empty taken by players
+  capped for it that season, rated from its Elo and marked as estimates, as far as Wikidata
+  names them ([Computed fills](#computed-fills)).
 - **Clubs by competition id.** The export names each club's league as it is in a
   later edition (FIFA 15's Burnley is in "Championship"), but its `league_id` is
   the edition's own, so clubs are taken by id from every European first division the
@@ -718,6 +723,148 @@ lists the reused ids and names the best players left out. Full XIs: 54 in each o
 FIFA 06 and FIFA 05 of 173, against 49–52 for FIFA 07–09; 119 and 116 nations have
 at least one player. FIFA 06 takes 8,131 nationalities from later editions and
 1,275 from Wikidata, FIFA 05 7,569 and 2,111. Each file is about 75 KB.
+
+### Computed fills
+
+Built 2026-11-18 under [computed-ratings.md](computed-ratings.md), which the user adopted on 2026-11-17: its "Where it
+applies now" lists the EA seasons' short national XIs as a gap ("fill from capped players by step 1 and Elo, labelled
+computed"). EA rates only part of the world, so a nation can field a side (its EA players hold at least half the
+lineup) and still be short of eleven: it played its empty places at 40 and an outfielder in goal at −12. Those XIs agreed
+with World Football Elo at only 0.74–0.82 in FIFA 05–09, against 0.82–0.90 over the full XIs, so the gap was coverage,
+not EA's ratings. Now each place EA leaves empty in such a nation's natural XI goes to a real player capped for it
+that season, rated so the XI meets the strength its Elo gives, and marked as an estimate wherever he is shown. Every EA
+player keeps EA's rating; nothing is generated. The coordinating session set the method (Wikidata caps through QLever,
+caps in the window, positions from Wikidata, the computed seasons' 3.2 points per 100 Elo, the marking); Claude chose the
+line's level, the natural 4-4-2, the first-year rule and the hold below, and the user has not yet confirmed them.
+
+| Season | Short nations | Filled | Players added | EA players out of position who lost their place | Fielded XIs under eleven, before → after | Spearman against Elo, before → after |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2004/05 FIFA 05 | 24 | 23 | 67 | 26 | 13 → 0 | 0.802 → 0.879 |
+| 2005/06 FIFA 06 | 22 | 22 | 73 | 36 | 12 → 0 | 0.817 → 0.904 |
+| 2006/07 FIFA 07 | 28 | 28 | 109 | 48 | 18 → 0 | 0.762 → 0.893 |
+| 2007/08 FIFA 08 | 34 | 34 | 103 | 54 | 14 → 0 | 0.744 → 0.887 |
+| 2008/09 FIFA 09 | 37 | 37 | 102 | 56 | 14 → 0 | 0.760 → 0.900 |
+| 2009/10 FIFA 10 | 25 | 23 | 59 | 39 | 8 → 1 | 0.790 → 0.834 |
+| 2010/11 FIFA 11 | 20 | 19 | 39 | 19 | 10 → 0 | 0.779 → 0.805 |
+| 2011/12 FIFA 12 | 20 | 19 | 47 | 19 | 8 → 0 | 0.835 → 0.834 |
+| 2012/13 FIFA 13 | 27 | 25 | 78 | 27 | 14 → 0 | 0.794 → 0.866 |
+| 2013/14 FIFA 14 | 30 | 25 | 59 | 20 | 14 → 0 | 0.819 → 0.854 |
+| 2014/15 FIFA 15 | 24 | 18 | 58 | 17 | 12 → 1 | 0.831 → 0.853 |
+| 2015/16 FIFA 16 | 25 | 18 | 43 | 18 | 11 → 4 | 0.845 → 0.884 |
+| 2016/17 FIFA 17 | 25 | 16 | 32 | 16 | 15 → 9 | 0.876 → 0.898 |
+| 2017/18 FIFA 18 | 27 | 16 | 40 | 7 | 15 → 7 | 0.856 → 0.868 |
+| 2018/19 FIFA 19 | 23 | 8 | 22 | 2 | 12 → 9 | 0.877 → 0.879 |
+| 2019/20 FIFA 20 | 26 | 12 | 22 | 6 | 14 → 12 | 0.876 → 0.881 |
+| 2020/21 FIFA 21 | 29 | 14 | 27 | 5 | 16 → 13 | 0.889 → 0.899 |
+| 2021/22 FIFA 22 | 29 | 11 | 22 | 1 | 18 → 13 | 0.882 → 0.886 |
+| 2022/23 FIFA 23 | 27 | 9 | 14 | 3 | 15 → 9 | 0.871 → 0.875 |
+| 2023/24 EA FC 24 | 31 | 10 | 17 | 3 | 12 → 10 | 0.863 → 0.869 |
+| 2024/25 EA FC 25 | 30 | 9 | 16 | 4 | 14 → 11 | 0.800 → 0.814 |
+| 2025/26 EA FC 26 | 32 | 4 | 8 | 1 | 17 → 16 | 0.832 → 0.845 |
+
+"Short" is a fielded nation without a natural XI of EA's own (595 nation-seasons); 400 are filled with 1,057 players.
+The Spearman is every fielded nation's XI strength against eloratings.net's Elo on 1 July of the season's first year,
+as the roster audit's `npm run validate:football-elo` scores it (on the unmerged branch
+`claude/roster-validation-quality-0702ce`; measured here with its code and its cached tables, outside the build). The fill
+reaches far fewer nations after 2015: Wikidata's dated national-team records thin out there (a cliff after 2015/16 in
+the stints that have a start), and the goalkeeper is the place it most often cannot fill.
+
+How a season is filled (`scripts/lib/football-fills.mjs`, called by `assembleEaSeason` with the season's facts):
+
+- **Who is short.** A nation the season fields (its EA players hold at least half the lineup, `fieldsRealSide`'s rule),
+  that takes part that year, has an Elo, and whose EA players do not make a natural XI. A nation EA rates too thinly to
+  field stays out: the fill completes sides, it does not make new ones.
+- **Candidates.** The players of the nation's teams with a Wikidata stint (P54) covering the season's end year or the
+  year before, each with his caps a year, halved when the stint covers only one of the two (the computed national-team
+  seasons' figure, `seasonPools`). A stint Wikidata has not closed ends as its caps would run out at 8 a year; one with
+  neither end nor caps, which national-team seasons leave out, covers its first year, its start being the debut
+  (`wikidataTables`' `openFirstYear`: 8,971 of the 22,702 stints kept have no caps). A typed year such as 112020 is no
+  day, so its stint has no start. A stint with 0 caps is no cap, and a player under 14 or over 45 when the season starts
+  is in no pool (the national-team seasons' ages: his stint and his birth cannot both be right). A player Wikidata records
+  as a woman (sex or gender, P21) is no candidate: her membership of a men's team is Wikidata's error (17 in the
+  answers, among them three of Haiti's women's internationals filed under its men's team, who would have played for
+  it in 2014/15 to 2021/22). Nobody EA rates in that edition is a candidate: one
+  born the same day with a name word in common, or whose name agrees (`namesAgree`) and who plays for the same nation
+  or was born the same year, is EA's player already. Serbia and Montenegro, a team of its own on Wikidata, plays as
+  Serbia's shape (688).
+- **The XI.** A natural 4-4-2. EA's natural part stays (the squad pick's own: the most players in natural positions,
+  then the highest ratings); each role it leaves short takes the candidates of that position, the most caps a year
+  first (then caps for the nation by the season's end, then the lower Wikidata id). A place still empty keeps EA's own
+  player out of position, as the unfilled squad had him, and only then takes a candidate out of position. So an EA
+  player who played out of position gives his place to a capped player of that position: 427 over the 22 seasons, the
+  formation's surplus (a third forward, a fifth midfielder, a second goalkeeper), among them Paolo Guerrero for Peru
+  and Amr Zaki for Egypt in 2008/09. A squad stays at most eleven, as every EA season's does.
+- **Target.** T = L − 3.2 × (E_best − E) / 100: E the nation's World Football Elo on the season's ratings date (EA's
+  roster date, `ratingsDate` where the season has one: the date the gate reads, D_Y), computed by
+  `scripts/lib/football-elo.mjs` from martj42's results at the computed seasons' pinned commit; E_best the best of the
+  teams active in the four years before; 3.2 the computed seasons' points per 100 Elo, which gives the match engine
+  Elo's expected score. L is the line's level at E_best on the season's own scale: the median, over its full EA XIs, of
+  their mean + 3.2 × (E_best − E) / 100. The computed seasons anchor at 87, the built-in's strongest nation, but EA's
+  XIs sit at L = 87.0–91.3 (EA's scale narrows in the later editions), and an anchor of 87 would put every filled
+  nation up to 4.3 points below EA's nations of the same Elo.
+- **Ratings.** The m added players' ratings sum to what brings the XI to round(11 × T), ordered by the same claim as the
+  candidates, each R + d_j: d the computed seasons' XI profile D (+5.3 … −3.9) read at m evenly spaced places of the
+  eleven, by straight lines, less their mean; rounded so they sum exactly (largest remainders) and never invert. Their
+  mean R, and each rating, are held within T + min D and T + max D (T − 3.9 to T + 5.3), where a member of an XI at T
+  can be: one place beside ten EA players far below the line would otherwise ask 99 of its player (Ivan Ivanov for
+  Bulgaria in 2008/09), and far above it 36 (Algeria's keeper). The hold binds in 297 of the 400 filled nations, 222 of
+  them because EA's own players sit below the line; filled XIs end a median 1.5 points below T (quartiles −4.0 and
+  0.0), from 7.9 before.
+- **Marking.** A computed player is `[name, position, rating, source]` beside EA's tuples: his source names him
+  (`wd:Q…`, linked to his English Wikipedia article, else his Wikidata item), `source: 'estimate'`, `league:
+  'International football'` (src/data/estimates.js gives the words: "Estimated rating: EA rated too few of this nation's
+  players for an XI, so this one comes from his caps for it that season and its World Football Elo"), the edition
+  ("2008/09 national team, computed"), his team, its Elo and the day, and his stint (`from`, `to`, `caps`, `goals`,
+  `toEstimated` where the end is the rule's). The season gains `fill`, beside EA's `source` (which its country maps
+  credit unchanged): `method: 'computed'`, `rawScale: 'Elo'`, the day, the rule with its constants and L
+  (`conversion`), and the pinned answers and results. `coverage.computed` counts the players. The loader
+  (`validateFootballSet`) takes a computed player only in a men's EA season's nation, with `fill` present, and only with
+  every field above; saves keep him whole, as the computed seasons' players are.
+
+Tonga, Samoa and the Cook Islands, the other gap computed-ratings.md lists, stay out. The built-in season fields every
+nation but them, and the method would field them where caps give eleven with a goalkeeper; but Wikidata holds 150
+memberships of their three national teams in all, and none starts after 2015 (asked of QLever on 2026-11-17, dated or
+not). The EA seasons field none of them either, having no player of theirs, and the fill makes no new sides.
+
+Sources:
+
+| Source | Pinned | Use | Licence |
+| --- | --- | --- | --- |
+| Wikidata, through QLever (`https://qlever.dev/api/wikidata`) | five answers by SHA-256, saved 2026-11-17 (22:36–22:40 UTC, a minute apart, and the players' sex or gender at 23:44) | The men's national teams (instances of Q135408445); every membership (P54) that began in 1970 or later and ended in 2003 or later or has no end, with start, end, caps and goals; the players' names, births, English Wikipedia articles, positions (P413) and sex or gender (P21) | CC0 1.0 |
+| [martj42/international_results](https://github.com/martj42/international_results), `results.csv` | the computed seasons' commit `b0948cb` | Every men's full international to 2026-10-06, for the Elo | CC0-1.0 |
+| eloratings.net's yearly tables | not pinned; the cached copies the roster audit and the gate read | The before and after check above only, never an input | none stated |
+
+Both inputs are CC0, so the season files need no attribution beyond their own credits.
+
+```bash
+npm run sync:football-fills -- --fetch   # download what data-src/wikidata-football-fills/ lacks (QLever a minute apart), then sync
+npm run sync:football-fills -- --pin     # record the SHA-256 of each answer after a deliberate new download
+npm run sync:football-fills              # data-src/ → scripts/data/football-fills/{wikidata,elo}.json (--check compares)
+npm run build:ea-seasons                 # reads the facts, fills each season, writes it (--check)
+```
+
+- `scripts/data/football-fills.json`: the manifest (the queries and pins, the constants, equal by test to the computed
+  national-team seasons' where they share them, the four position items they lack, the rule, and every season with its
+  ratings date: the EA seasons and the built-in's, kept for the islands).
+- `scripts/data/football-fills/wikidata.json`: the teams, players and stints of 2004–2027 (CC0); `elo.json` each
+  season's Elo of every team active then. The build reads only these and the manifest, so it rebuilds offline.
+- `docs/design/football-seasons-audit.json`: per season `fill` with L, the full XIs it rests on, and per short nation its
+  Elo, T, strength before and after, the players added (rating, caps, stint, figure), the EA players who lost their
+  place, the hold, the places still out of position or empty, and why a nation could not be filled.
+- `scripts/football-fills.test.mjs`: the rule on invented players, the constants and dates, every computed player
+  against the facts (capped that season for that nation, listed once, no EA player of the season, within his hold),
+  FIFA 05–09 with no fielded XI under eleven, the loader's refusals, a 2008/09 campaign that shows Egypt's computed
+  players as estimates and saves and resumes them, the facts rebuilt byte for byte where data-src/ has the answers.
+
+The roster audit (`npm run audit:rosters`, [roster-audit.md](roster-audit.md)) finds no error in the filled seasons;
+its lineup gaps fall from 709 to 444, and five computed players are among its unusual ages (under 16 or over 40 when
+the season starts: Roman Berezovsky, Armenia's keeper at 41 in 2016/17, and Vincent Thill, Luxembourg's at 15 in
+2015/16, as they played). `npm run validate:football-elo` rescored football-elo-agreement.json from the same cached
+tables: the 35 seasons' median rises from 0.852 to 0.869, and FIFA 11 (0.805) is now the lowest.
+
+The gate (`npm run validate:football`) scores the 2025/26 file, EA FC 26: its four filled nations take it from 0.8457
+to 0.8577 against Elo (still below the 0.90 bar it failed before) and its forecast log loss from 0.9169 to 0.9077. The
+built-in season is unchanged (0.9291, pass).
 
 ## Seasons before FIFA 05
 

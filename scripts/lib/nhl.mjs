@@ -2,11 +2,13 @@
 // national teams, each with the lineup the game itself picks and a club's depth. No I/O here.
 //
 // EA publishes only NHL 27's top 300 players, 84 and up, and a club's lineup needs nineteen. Everyone else on an NHL
-// roster gets an estimate, always shown as one (`sourceInfo.source` 'estimate'): the players EA leaves out are put in
-// order by what they do on the ice, within their group, and that order is spread evenly from 83, just under EA's
-// cut-off, down to the bottom of the league (ESTIMATE_RANGE). Forwards and defenders rank by minutes a game and points
-// a game, goalies by save percentage. A few games prove little, so each line starts from a replacement player's
-// numbers (PRIOR). EA's own ratings are never changed.
+// roster gets an estimate, always shown as one (`sourceInfo.source` 'estimate'), by the computed seasons' value
+// (docs/design/computed-ratings.md, step 3; `estimateValues`): how much his club played him (his share of its ice time,
+// a goalie's of its minutes) blended with what he produced (points a game, a goalie's saves above the league's), each
+// rate shrunk toward replacement by a prior measured from the league's own players, with the weights tuned on EA's
+// editions (scripts/lib/nhl-computed.mjs BLEND). The players EA leaves out are ranked by it within their group, and that
+// order is spread evenly from 83, just under EA's cut-off, down to the bottom of the league (ESTIMATE_RANGE). EA's own
+// ratings are never changed.
 //
 // A nation fields every player of its own: by EA's nationality for a player EA rates, else by the country the NHL says
 // he was born in. A place a nation cannot fill is the game's to fill with a generated player at the nation's strength,
@@ -14,19 +16,15 @@
 import { NATIONS, nationIdentity, selectLineup } from '../../src/data/teams.js';
 import { BASELINE, hockey } from '../../src/sports/hockey.js';
 import { namesOfTheDay } from '../../src/data/namesOfTheDay.js';
+import { NOISE, mean, priorFromNoise, replacementRate, shrunkRate, variance } from './computed-ratings.mjs';
+import { BLEND, groupOf } from './nhl-computed.mjs';
 
 const SPORT = 'hockey';
 export const ROSTER_SIZE = 23;
 const ORDER = ['C', 'LW', 'RW', 'D', 'G'];
-const FORWARDS = new Set(['C', 'LW', 'RW']);
 
 /** The estimates' ranges, in rating points: the best player EA leaves out, and the last of his group. */
 export const ESTIMATE_RANGE = Object.freeze({ top: 83, skater: 72, goalie: 70 });
-// A replacement player's line, added to each player's own: ten games at nine minutes and a point every ten games; 300
-// shots faced at .880.
-const PRIOR = Object.freeze({ games: 10, minutes: 9, points: 0.1, shots: 300, savePct: 0.88 });
-// What a point a game is worth against minutes on the ice: forwards are there to score, defenders much less.
-const POINT_WEIGHT = { forward: 8, defender: 5 };
 
 /** Where a player EA rates comes from, by EA's nationality; every nation that holds one is here. */
 const NATION_OF_EA = {
@@ -57,27 +55,62 @@ export function playerOf([id, name, team, pos, born, eaNation, overall, games, s
   return { id, name, team, pos, nation, overall, games, seconds, points, shots, saves };
 }
 
-/** How a player EA leaves out ranks in his group: minutes and points a game for a skater, save percentage for a goalie. */
-export function estimateScore({ pos, games, seconds, points, shots, saves }) {
-  if (pos === 'G') return (saves + PRIOR.shots * PRIOR.savePct) / (shots + PRIOR.shots);
-  const played = games + PRIOR.games;
-  const minutes = (seconds / 60 + PRIOR.games * PRIOR.minutes) / played;
-  const perGame = (points + PRIOR.games * PRIOR.points) / played;
-  return minutes + (FORWARDS.has(pos) ? POINT_WEIGHT.forward : POINT_WEIGHT.defender) * perGame;
+/**
+ * Every player's value, the computed seasons' (docs/design/computed-ratings.md, step 3), from the snapshot's line: his
+ * games, seconds on the ice and points, a goalie's shots faced and saves, over 2025/26 and the season under way. Within
+ * each group (forwards, defenders, goalies), over the league's whole roster, EA's players included:
+ * - selection: his share of the club's ice time a game (a goalie's, of its minutes), the club's games being the most
+ *   any skater played;
+ * - production: points a game, or a goalie's saves above the league's save percentage a shot, shrunk toward replacement
+ *   (the rate of the quarter of the group with the least exposure) by the prior the league's regulars give (noise per
+ *   unit of exposure over talent variance, by the method of moments among the players with a quarter of the games);
+ * - value: (1 − p)·z(selection) + p·z(production), each z-score by the regulars, p the computed seasons' weight where the
+ *   source keeps ice time (BLEND.production: forwards 0.8, defenders 0.65, goalies by saves 0.5).
+ * → Map player → value.
+ */
+export function estimateValues(players) {
+  const skaters = players.filter(p => p.pos !== 'G'), goalies = players.filter(p => p.pos === 'G');
+  const games = Math.max(...skaters.map(p => p.games));
+  const shots = goalies.reduce((sum, p) => sum + p.shots, 0), saves = goalies.reduce((sum, p) => sum + p.saves, 0);
+  if (!(games > 0 && shots > 0)) throw new Error('No games or no shots to measure the league by');
+  const league = saves / shots;
+  const values = new Map();
+  for (const group of ['F', 'D', 'G']) {
+    const goalie = group === 'G';
+    const rows = players.filter(p => groupOf(p.pos) === group).map(p => ({
+      player: p, n: goalie ? p.shots : p.games, x: goalie ? p.saves - p.shots * league : p.points,
+      selection: goalie ? p.seconds / 3600 / games : p.seconds / 60 / games, regular: p.games >= games / 4,
+    }));
+    const regulars = rows.filter(r => r.regular && r.n > 0);
+    const { k } = priorFromNoise(regulars, { least: 0, unitNoise: goalie ? () => league * (1 - league) : NOISE.poisson });
+    const replacement = replacementRate(rows);
+    for (const r of rows) r.production = shrunkRate(r, k, replacement);
+    const scale = key => {
+      const list = regulars.map(r => r[key]), m = mean(list), sd = Math.sqrt(variance(list));
+      return value => (value - m) / sd;
+    };
+    const zSelection = scale('selection'), zProduction = scale('production');
+    const p = BLEND.production[group][goalie ? 'saves' : 'ice'];
+    for (const r of rows) values.set(r.player, (1 - p) * zSelection(r.selection) + p * zProduction(r.production));
+  }
+  return values;
 }
 
-/** Each player with a `rating`: EA's overall, unchanged, or an estimate marked `estimated`. */
+/**
+ * Each player with a `rating`: EA's overall, unchanged, or an estimate marked `estimated`: the players EA leaves out,
+ * ranked within their group by their value (estimateValues; a tie by name), spread evenly from ESTIMATE_RANGE.top down
+ * to the group's floor (72 for skaters, 70 for goalies). The user chose this straight line on 2026-11-18 over NHL 22's
+ * shape below its top 300, which packs the depth players into 77 to 83 and brings the clubs closer together than the
+ * NHL's are (docs/design/hockey.md, "Data").
+ */
 export function ratePlayers(players) {
-  const groups = { forward: [], defender: [], goalie: [] };
-  for (const player of players) {
-    if (player.overall !== null) continue;
-    groups[player.pos === 'G' ? 'goalie' : player.pos === 'D' ? 'defender' : 'forward'].push(player);
-  }
+  const values = estimateValues(players);
   const rating = new Map();
-  for (const [group, list] of Object.entries(groups)) {
-    const low = group === 'goalie' ? ESTIMATE_RANGE.goalie : ESTIMATE_RANGE.skater;
-    const ranked = list.map(player => [player, estimateScore(player)]).sort((a, b) => b[1] - a[1] || a[0].name.localeCompare(b[0].name));
-    ranked.forEach(([player], i) => rating.set(player, Math.round(ESTIMATE_RANGE.top - (ESTIMATE_RANGE.top - low) * i / Math.max(1, ranked.length - 1))));
+  for (const group of ['F', 'D', 'G']) {
+    const low = group === 'G' ? ESTIMATE_RANGE.goalie : ESTIMATE_RANGE.skater;
+    const ranked = players.filter(p => p.overall === null && groupOf(p.pos) === group)
+      .sort((x, y) => values.get(y) - values.get(x) || x.name.localeCompare(y.name));
+    ranked.forEach((player, i) => rating.set(player, Math.round(ESTIMATE_RANGE.top - (ESTIMATE_RANGE.top - low) * i / Math.max(1, ranked.length - 1))));
   }
   return players.map(player => (player.overall !== null ? { ...player, rating: player.overall, estimated: false }
     : { ...player, rating: rating.get(player), estimated: true }));
