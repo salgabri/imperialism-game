@@ -17,6 +17,7 @@ Pick your sport at kick-off:
 | Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings (each half from 2020 with a runner on second) |
 | Ice hockey | four lines, three pairs and the goalie | 60 minutes | sudden-death overtime, then a shoot-out |
 | Tennis, and women's tennis | a Davis Cup (or Billie Jean King Cup) team: No. 1 and No. 2 in the singles, a doubles pair | five rubbers, first to three, each best of three sets; an earlier season plays its year's ([format by year](#tennis-seasons)) | none: a tie always has a winner |
+| Rugby (union) | the matchday 23: fifteen and eight replacements | 80 minutes | extra time in sudden death: the first score wins, and after twenty minutes a last drop goal |
 | Rugby league | the matchday 17: thirteen and four on the bench | 80 minutes | golden point (in earlier seasons the rules of their day: before 2003 the finals' twenty minutes of extra time, played in full) |
 | Rocket League | three a side, a nation's best of its five | best of seven five-minute games | sudden-death overtime in a level game; a series always has a winner |
 | Counter-Strike | five a side, a nation's best of its seven | best of three maps, each first to 13 rounds | overtimes of six rounds from 12–12; a series always has a winner |
@@ -34,7 +35,7 @@ And pick who fights:
   source rates ([Pacific islands](docs/design/pacific-islands.md)). A nation fields a team
   only with a **real side**, its own rated players holding at least half the lineup, and
   every other nation's land stays neutral: 173 nations play football, 63 Valorant, 57 Rocket League, 52
-  tennis, 45 women's tennis, 47 basketball, 40 Counter-Strike, 40 League of Legends, 36 women's football, 12
+  tennis, 45 women's tennis, 47 basketball, 40 Counter-Strike, 40 League of Legends, 36 women's football, 13 rugby, 12
   baseball, 7 ice hockey and 6 rugby league. No team is made up of generated players or nearly empty.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs (Europe's 68
@@ -44,7 +45,8 @@ And pick who fights:
   franchises on [theirs](#the-nfl-map) of the USA, all 138 FBS college football schools on [theirs](#the-fbs-map) of
   the USA, Hawaii included, all 30 MLB clubs on
   [theirs](#the-mlb-map) of the USA and Canada, all 32 NHL clubs on
-  [theirs](#the-nhl-map), or all 17 NRL clubs on [theirs](#the-nrl-map) of Australia and New Zealand. Real Madrid annexes territory
+  [theirs](#the-nhl-map), the 36 European rugby clubs of the Premiership, the Top 14 and the URC on [theirs](#the-rugby-europe-map) of
+  Europe, or all 17 NRL clubs on [theirs](#the-nrl-map) of Australia and New Zealand. Real Madrid annexes territory
   exactly the way Spain does. American football and college football are played by clubs only, tennis,
   women's tennis and the esports by nations only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
@@ -62,7 +64,10 @@ own match clock (half-innings, not minutes) and nations by birthplace
 ([design notes](docs/design/baseball.md)). Ice hockey's ratings are partly estimates, each
 marked as one ([design notes](docs/design/hockey.md)), women's football plays
 under football's rulebook with its own players ([design notes](docs/design/womens-football.md)), and rugby league plays
-Rugby League 26's NRL in five-minute slices to golden point ([design notes](docs/design/rugby-league.md)).
+Rugby League 26's NRL in five-minute slices to golden point ([design notes](docs/design/rugby-league.md)). Rugby, union,
+plays the same slices under union's points (a try five, a penalty goal and a drop goal three) and sudden-death extra time,
+its Six Nations and Europe's Premiership, Top 14 and URC clubs computed from RugbyPass's team sheets and match stats, as no
+game publishes union ratings, every rating marked an estimate ([design notes](docs/design/rugby-union.md)).
 Tennis plays Davis Cup ties between nations, its players rated by their Elo
 ([design notes](docs/design/tennis.md)), and women's tennis the Billie Jean King Cup's, the WTA's players
 by their Elo, with the WTA's serve ([design notes](docs/design/womens-tennis.md)). Rocket League, the first esport, plays
@@ -159,6 +164,8 @@ npm run sync:nhl         # snapshot EA's NHL 27 ratings and the NHL's rosters an
 npm run build-hockey     # rebuild the NHL clubs and the hockey nations from that snapshot (--check compares byte for byte)
 npm run build:nhl-map    # rebuild the NHL's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
 npm run build:nhl-league # each earlier NHL season's goals and scoring factor, and the playoff overtimes (--fetch saves missing NHL.com pages; --check compares byte for byte)
+npm run sync:rugby-union # snapshot RugbyPass's games of 2023/24–2025/26 (the Premiership, Top 14, URC, both European cups and every Test) into scripts/data/rugby-union-2025-26.json (--fetch downloads what data-src/rugby-union/ lacks; network, cached)
+npm run build-rugby-union # compute rugby union's clubs, nations and audit from that snapshot (--check compares byte for byte)
 npm run sync:nrl         # snapshot Rugby League 26's NRL ratings, Zero Tackle's profiles and NRL.com's 2025 team lists into scripts/data/rugby-league-26.json (network, cached)
 npm run build-rugby-league # rebuild the NRL clubs and the rugby league nations from that snapshot (--check compares byte for byte)
 npm run build:nrl-map    # rebuild the NRL's map of Australia and New Zealand (seconds; --check compares byte for byte)
@@ -356,13 +363,16 @@ manager of the theatre's favourite, with decisions from the first match.
    neither tennis game nor women's football has Africa, and an earlier season can offer
    fewer still. A choice the sport doesn't offer plays its heartland, the confederation
    with the most real sides (rugby league's Asia & Oceania), and comes back with a sport
-   that offers it. Basketball's nations also offer **EuroBasket**, the 24 nations of EuroBasket 2025.
+   that offers it. Basketball's nations also offer **EuroBasket**, the 24 nations of EuroBasket 2025, and rugby's
+   (union's) the **Six Nations**: England, France, Ireland, Italy, Scotland and Wales, framed on Europe; rugby offers the world,
+   Europe and the Six Nations.
    Football club campaigns offer Europe's 124 strongest clubs or its
    Elite 32 on [the map of Europe](#the-europe-maps); basketball clubs play the NBA on its own
    map of the USA and Canada or [the EuroLeague](#the-euroleague-map) on its map of Europe, American football (clubs only: choosing it
    switches Teams to clubs and disables Nations) the NFL on its map of the USA, college football (its schools only, the same
    way) the FBS on its own map of the USA,
-   baseball clubs MLB on its map of the USA and Canada, ice hockey clubs the NHL on its own and rugby league clubs the NRL
+   baseball clubs MLB on its map of the USA and Canada, ice hockey clubs the NHL on its own, rugby clubs
+   [Europe's](#the-rugby-europe-map) Premiership, Top 14 and URC on their map of Europe, and rugby league clubs the NRL
    on its map of Australia and New Zealand. Tennis and women's tennis are nations only
    (choosing either switches Teams to nations and disables Clubs). Women's football's clubs
    offer every European club or its Elite 32 on [maps of Europe](#womens-football-on-the-europe-maps), or the NWSL
@@ -874,9 +884,9 @@ Each key names a setup choice, and a key left at its default is left out:
 
 | Key | Setup choice | Values | Left out when |
 | --- | --- | --- | --- |
-| `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey`, `tennis`, `womens-tennis`, `rugby-league` | football |
+| `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey`, `tennis`, `womens-tennis`, `rugby-union` (Rugby), `rugby-league` | football |
 | `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, college football, an NBA season); tennis and women's tennis are nations only |
-| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite` where the sport offers it, and `eurobasket` in basketball; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), women's football's maps (`domestic:weu32`, `domestic:nwsl`; `all`, `elite` and `NWSL` still open on them), or the EuroLeague's (`domestic:euroleague`; an earlier season's, `domestic:el2010`, which with another season becomes that season's own) | Europe for nations, the Top 124 for football clubs, Europe for women's football clubs, the NBA's for basketball clubs, a sport's own map (NFL, FBS, MLB, NHL) |
+| `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite` where the sport offers it, `eurobasket` in basketball and `six-nations` in rugby; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), women's football's maps (`domestic:weu32`, `domestic:nwsl`; `all`, `elite` and `NWSL` still open on them), rugby's (`domestic:rugbyeurope`), or the EuroLeague's (`domestic:euroleague`; an earlier season's, `domestic:el2010`, which with another season becomes that season's own) | Europe for nations, the Top 124 for football clubs, Europe for women's football clubs, the NBA's for basketball clubs, a sport's own map (NFL, FBS, MLB, NHL) |
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`, `mlb-the-show-24`) | the built-in season |
 | `draw` | The draw | `random`, `round-robin`, `blitz`, `chaos` | Random draw |
 | `opponent` | Who picks your opponent | `player` (You choose), `compass` | Compass, and whenever launch would drop it (a spectator, a pairing draw) |
@@ -1023,7 +1033,7 @@ compares the squads offline with World Football Elo
 with martj42's international results (CC0).
 
 This project is not affiliated with, endorsed or sponsored by Electronic Arts
-(EA SPORTS FC, FIFA, Madden NFL, EA SPORTS College Football, EA SPORTS NHL), Sports Interactive and SEGA (Football Manager),
+(EA SPORTS FC, FIFA, Madden NFL, EA SPORTS College Football, EA SPORTS NHL), World Rugby (RugbyPass), Sports Interactive and SEGA (Football Manager),
 2K (NBA 2K), Sony Interactive Entertainment (MLB The Show), Big Ant Studios (Rugby League 26), Psyonix and Epic Games (Rocket
 League and the RLCS), Valve (Counter-Strike), Riot Games (Valorant, League of Legends and the VCT), Liquipedia, vlr.gg, Game of
 Legends (gol.gg), the NBA, the NFL, the NCAA, MLB, the NHL, the NRL, or the clubs, schools, leagues, conferences, organisers
@@ -1091,6 +1101,18 @@ published on 2026-11-02, with each player's country from its WTA rankings report
 (`scripts/data/womens-tennis-elo.json`, 505 players), on the same scale (Rybakina's 2159 is 90). Nothing is
 estimated: 45 nations have the two a tie needs, and the rest, Denmark and the Philippines among them with one
 player each, stay neutral. See the [design notes](docs/design/womens-tennis.md).
+
+**Rugby (union)** — `src/data/clubs.rugby-union.js` and `src/data/rosters.rugby-union.js`, computed: no game or site publishes
+rugby union ratings. RugbyPass's match centre (World Rugby's own site) gives every game of the Premiership, the Top 14, the URC, the
+Champions Cup, the Challenge Cup and every Test of 2023/24 to 2025/26, both team sheets and each player's stats
+(`scripts/data/rugby-union-2025-26.json`, 1,999 games and 1,947 players). Each player's value, by the method of
+[computed ratings](docs/design/computed-ratings.md), weighs his share of his club's minutes, his Test minutes and his
+production (RugbyPass's stats at the Six Nations' own game-for-fans points table) by their year-to-year stability, ranked within
+his position onto the default shape of a sport no game rates; then each club moves by its 2025/26 results and each
+nation the clubs' players cover (the Six Nations' and Argentina) by its Tests. The 36 European clubs field their
+matchday 23 and keep up to 30; nations field the clubs' players (the URC's four South African sides among them) by their
+latest Test side, thirteen holding at least half a matchday 23. Every rating is marked an estimate. See the
+[design notes](docs/design/rugby-union.md).
 
 **Rugby league** — `src/data/clubs.rugby-league.js` and `src/data/rosters.rugby-league.js`, from Big Ant's Rugby League 26
 ratings of every NRL player as Zero Tackle listed them on the game's release (17 July 2025), Zero Tackle's player profiles
@@ -1192,7 +1214,7 @@ another's. Getting this wrong first time ranked England third at basketball.
 
 A team's **strength** is the mean effective rating of its best positional lineup.
 An assignment optimizer fills all eleven football, five basketball, 23 American
-football, 13 baseball, 19 ice hockey or 17 rugby league slots. Tennis picks its team instead: the two best in the singles, the next two
+football, 13 baseball, 19 ice hockey, 23 rugby or 17 rugby league slots. Tennis picks its team instead: the two best in the singles, the next two
 in the doubles (a team of two or three plays its singles players there too), its strength weighing each place by the
 rubbers it plays. Playing outside a natural position costs 12 rating
 points (25 in American football, 20 in baseball, where a hitter pitching or a pitcher
@@ -1661,6 +1683,16 @@ New Jersey, stays with its own state's nearest club. The map is `public/domestic
 npm run build:nhl-map                      # boundaries + arenas → public/domestic/nhl.json and its index entry (about 2 minutes)
 npm run build:nhl-map -- --check           # offline rebuild must match the committed files byte for byte
 ```
+
+### The rugby Europe map
+
+Rugby's (union's) clubs have one theatre, **European clubs**: the Premiership's ten, the Top 14's fourteen and the URC's twelve
+European sides on a map of Europe, each on land in its own country, divided between a country's clubs as the football
+Europe maps divide theirs ([the Europe maps](#the-europe-maps)): England among ten, France among fourteen, Ireland among
+three and Ulster on Northern Ireland, Wales among four, Scotland and Italy among two each; every other country stays grey.
+The URC's four South African sides are rated (their players play for South Africa) but play on no map. The map is
+`public/domestic/rugbyeurope.json`; clubs, grounds and homes are in `scripts/data/rugby-union-clubs.json`, built by
+`npm run build:europe-maps` ([design notes](docs/design/rugby-union.md#the-map)).
 
 ### The NRL map
 
@@ -3291,8 +3323,8 @@ vercel.json            cache headers for the deployed site
 
 ## Verification
 
-`npm run smoke` boots the real component tree under jsdom and plays **thirty full
-campaigns** across all three pacings, both resolution modes, all fourteen sports, and
+`npm run smoke` boots the real component tree under jsdom and plays **thirty-two full
+campaigns** across all three pacings, both resolution modes, all fifteen sports, and
 national, club and domestic teams; two of them are England's top 100 clubs on
 their own map, one is Fiji's 16 clubs, each starting on a group of its 100
 sections, one the NFL's 32 franchises on theirs, with the live ticker, one MLB's 30
@@ -3301,8 +3333,8 @@ their map, live, one hockey's nations of Europe, one the women's nations of Euro
 tennis's Davis Cup nations of Europe, live, one women's tennis's Billie Jean King Cup nations of the world, one the NRL's 17
 clubs on their map, live, one rugby league's nations of
 Asia and Oceania, one Rocket League's nations of Europe, live, one Counter-Strike's nations of the world, one college
-football's 138 FBS schools on their map, live, one Valorant's nations of Europe, live, and one League of Legends' nations of
-the world. A **manager campaign** (Italy, Europe, round robin × *You
+football's 138 FBS schools on their map, live, one Valorant's nations of Europe, live, one League of Legends' nations of
+the world, one rugby's Six Nations and one its 36 European clubs on their map of Europe. A **manager campaign** (Italy, Europe, round robin × *You
 choose*, live ticker) is driven only through the primary action. It covers
 target choices, tactical gates, Finish match, signings on the conquest screen,
 the automatic switch to Match and back, and Continue as spectator after

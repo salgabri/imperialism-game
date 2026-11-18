@@ -18,6 +18,7 @@ import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
 import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { CLUBS as CFB_CLUBS } from '../src/data/clubs.college-football.js';
+import { CLUBS as RUGBY_UNION_CLUBS } from '../src/data/clubs.rugby-union.js';
 import { DOMESTIC } from '../src/data/domestic.js';
 import { withDom } from './lib/app-harness.mjs';
 
@@ -49,7 +50,7 @@ const sources = readFileSync(new URL('public/club-logos/SOURCES.tsv', root), 'ut
   .filter(line => line && !line.startsWith('#')).slice(1).map(line => line.split('\t'));
 const domesticIds = DOMESTIC.flatMap(entry => JSON.parse(readFileSync(new URL(`public/domestic/${entry.id}.json`, root), 'utf8')).clubs.map(club => club.id));
 const allClubIds = [...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...EUROLEAGUE_CLUBS, ...NFL_CLUBS, ...CFB_CLUBS, ...MLB_CLUBS, ...NHL_CLUBS, ...NRL_CLUBS,
-  ...WOMENS_CLUBS].map(club => club.id).concat(domesticIds);
+  ...RUGBY_UNION_CLUBS, ...WOMENS_CLUBS].map(club => club.id).concat(domesticIds);
 const withCrest = allClubIds.filter(id => clubLogoFile(id));
 // The File namespace's name on each Wikipedia a crest's file page comes from.
 const FILE_NAMESPACES = new Set(['File', 'Fichier', 'Dosya', 'Ficheiro', 'Archivo', 'Fayl', 'Файл', 'Датотека', 'ملف', 'קובץ', 'پرونده',

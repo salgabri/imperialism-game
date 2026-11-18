@@ -47,11 +47,11 @@ test('the stable chunk imports nothing outside itself', () => {
   }
 });
 
-test('every sport but football loads later: the eleven smaller ones in one chunk, women\'s and college football each in its own', () => {
+test('every sport but football loads later: the twelve smaller ones in one chunk, women\'s and college football each in its own', () => {
   assert.deepEqual(lazyStarts.map(input => [path.basename(input), chunk(input) ?? 'own chunk']).sort(), [
     ['american-football.js', 'sports'], ['baseball.js', 'sports'], ['basketball.js', 'sports'], ['college-football.js', 'own chunk'],
     ['counter-strike.js', 'sports'], ['hockey.js', 'sports'], ['league-of-legends.js', 'sports'],
-    ['rocket-league.js', 'sports'], ['rugby-league.js', 'sports'], ['tennis.js', 'sports'], ['valorant.js', 'sports'],
+    ['rocket-league.js', 'sports'], ['rugby-league.js', 'sports'], ['rugby-union.js', 'sports'], ['tennis.js', 'sports'], ['valorant.js', 'sports'],
     ['womens-football.js', 'own chunk'], ['womens-tennis.js', 'sports'],
   ]);
   // Their players load only on demand (src/sports/sportData.lazy.js), never with the first download.

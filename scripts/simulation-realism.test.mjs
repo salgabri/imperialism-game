@@ -3,7 +3,9 @@
 // under its own day's rules, score as their leagues did. Only what the models set out to match is held here. Matches
 // are at a neutral venue unless a campaign turns Home advantage on, so the home sides' wins are checked with it on.
 // The known gaps are reported by `npm run simulation:realism` and not tested: NBA and EuroLeague games decided by three or
-// fewer, the EuroLeague's best and worst clubs (a little too close to the middle), MLB's worst club.
+// fewer, the EuroLeague's best and worst clubs (a little too close to the middle), MLB's worst club, and college
+// football's margins (too many one-score games and games decided by 3, too few by 21 or more: the NFL's late-game
+// play-calling closes college games more than the FBS's do).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { LATEST_NBA_SEASON, NBA_LEAGUE_AVERAGES } from '../src/data/nbaLeagueAverages.js';
@@ -113,6 +115,38 @@ test('NFL and AFL seasons of other eras score as their leagues did, under their 
   }
 });
 
+test('college football: conference seasons score and spread as the FBS\'s of 2024 and 2025', () => {
+  const college = report.college, real = REAL.college;
+  assert.deepEqual([college.schools, college.conferences], [138, 10]);
+  // What the college rules were fitted to (src/sports/collegeFootball.js): touchdowns and field goals made, the points
+  // they make, and the spread of the schools' average conference margins (the scale). Overtime and the tries follow.
+  within(college.pointsPerTeam, real.pointsPerTeam, 'points a team');
+  within(college.touchdowns, real.touchdowns, 'touchdowns a team');
+  within(college.fieldGoals, real.fieldGoals, 'field goals made a team', 0.01);
+  within(college.conferenceMarginSd, real.conferenceMarginSd, 'spread of the schools\' average conference margins', 0.2);
+  within(college.overtimeRate, real.overtimeRate, 'overtime', 0.005);
+  within(college.xpRate, real.xpRate, 'extra points made', 0.002);
+  within(college.twoPointShare, real.twoPointShare, 'touchdowns going for two', 0.005);
+});
+
+test('college football: each FBS season from 2009 replayed on its own schedule spreads its standings as the real one did', () => {
+  const seasons = report.collegeSeasons;
+  assert.deepEqual(seasons.map(season => season.year), Array.from({ length: 17 }, (_, i) => 2009 + i));
+  const gaps = seasons.map(season => season.winPctSd - season.real.winPctSd);
+  // Each season within 0.02 of its own (one real season's spread is itself a draw, about 0.007 either way), and the
+  // seasons together within 0.006: before college form was halved and no longer stretched by the scale, 0.012 too even.
+  gaps.forEach((gap, i) => assert.ok(Math.abs(gap) <= 0.02, `${seasons[i].year}: win% SD ${seasons[i].winPctSd} against the real ${seasons[i].real.winPctSd}`));
+  const meanGap = gaps.reduce((sum, gap) => sum + gap, 0) / gaps.length;
+  assert.ok(Math.abs(meanGap) <= 0.006, `the standings' spread ${meanGap.toFixed(4)} from the real seasons' on average`);
+  for (const season of seasons) {
+    // The luck about each season's own SRS stays within two points of the real season's (14.3 on average; the drive
+    // model's own luck alone is about 15), its overtime and its points within reach of the real season's.
+    assert.ok(season.sigma - season.real.sigma < 2, `${season.year}: luck ${season.sigma} against ${season.real.sigma}`);
+    assert.ok(Math.abs(season.overtimeRate - season.real.overtimeRate) < 0.025, `${season.year}: overtime ${season.overtimeRate} against ${season.real.overtimeRate}`);
+    assert.ok(Math.abs(season.pointsPerTeam - season.real.pointsPerTeam) < 2, `${season.year}: ${season.pointsPerTeam} points a team against ${season.real.pointsPerTeam}`);
+  }
+});
+
 test('MLB: runs, close games, extra innings and the standings look like an MLB season', () => {
   const mlb = report.mlb, real = REAL.mlb;
   within(mlb.runsPerTeam, real.runsPerTeam, 'runs a team');
@@ -188,6 +222,21 @@ test('NRL eras: each earlier season scores as its league did, under its own day\
   }
 });
 
+test('rugby union: the three leagues\' points, tries, kicks, draws and who scores the tries', () => {
+  // REAL.union is computed from the committed RugbyPass snapshot (scripts/lib/rugby-union.mjs `realFigures`). The margins
+  // and the table are checked with Home advantage on, as the leagues play (below); games won by seven or fewer and teams held
+  // scoreless are known gaps (docs/design/rugby-union.md), reported by `npm run simulation:realism`.
+  const union = report.union, real = REAL.union;
+  assert.equal(union.clubs, 36);
+  within(union.pointsPerTeam, real.pointsPerTeam, 'rugby union points a team');
+  within(union.triesPerTeam, real.triesPerTeam, 'rugby union tries a team');
+  within(union.conversionRate, real.conversionRate, 'rugby union conversions made', 0.005);
+  within(union.penaltyGoalsPerTeam, real.penaltyGoalsPerTeam, 'rugby union penalty goals a team', 0.02);
+  within(union.dropGoalsPerGame, real.dropGoalsPerGame, 'rugby union drop goals a game', 0.006);
+  within(union.draws, real.draws, 'rugby union games level after eighty', 0.006);
+  for (const place of Object.keys(real.tryShares)) within(union.tryShares[place] || 0, real.tryShares[place], `rugby union tries by ${place}`, 0.012);
+});
+
 test('NRL: points, tries, goals, margins, golden point, the standings and who scores the tries', () => {
   const nrl = report.nrl, real = REAL.nrl;
   within(nrl.pointsPerTeam, real.pointsPerTeam, 'points a team');
@@ -261,6 +310,7 @@ test('League of Legends: a game\'s length, kills and Barons as in the real games
 test('home sides: half the decided games at a neutral venue, their league\'s share with Home advantage on', () => {
   for (const [label, share, n] of [['NBA', report.nba.homeWins], ['EuroLeague', report.euroleague.homeWins], ['NFL', report.nfl.homeWins], ['MLB', report.mlb.homeWins], ['NHL', report.nhl.homeWins],
     ['Davis Cup', report.davisCup.homeWins], ['Billie Jean King Cup', report.billieJeanKingCup.homeWins], ['NRL', report.nrl.homeWins],
+    ['rugby union', report.union.homeWins],
     ...(report.rocketLeague ? [['Rocket League', report.rocketLeague.homeWins, report.rocketLeague.series]] : []),
     ...(report.counterStrike ? [['Counter-Strike', report.counterStrike.homeWins, report.counterStrike.series]] : []),
     ...(report.valorant ? [['Valorant', report.valorant.homeWins, report.valorant.series]] : []),
@@ -285,6 +335,13 @@ test('home sides: half the decided games at a neutral venue, their league\'s sha
   within(home.davisCup.homeWins, REAL.davisCup.homeWins, 'Davis Cup host wins');
   within(home.billieJeanKingCup.homeWins, REAL.billieJeanKingCup.homeWins, 'Billie Jean King Cup host wins');
   within(home.nrl.homeWins, REAL.nrl.homeWins, 'NRL home wins');
+  // Rugby union's leagues play with a large home edge (home sides win about 68%), which also keeps their tables close:
+  // the margins and the spread of the table are its with Home advantage on.
+  within(home.union.homeWins, REAL.union.homeWins, 'rugby union home wins', 0.012);
+  within(home.union.winPctSd, REAL.union.winPctSd, 'rugby union spread of the table', 0.01);
+  within(home.union.marginMean, REAL.union.marginMean, 'rugby union mean margin', 1);
+  within(home.union.byThirtyPlus, REAL.union.byThirtyPlus, 'rugby union games won by thirty or more', 0.02);
+  within(home.union.fortyPlusRate, REAL.union.fortyPlusRate, 'rugby union teams scoring forty or more', 0.012);
   if (home.rocketLeague && REAL.rocketLeague?.homeWins) within(home.rocketLeague.homeWins, REAL.rocketLeague.homeWins, 'Rocket League home wins');
   if (home.valorant && REAL.valorant?.homeWins) within(home.valorant.homeWins, REAL.valorant.homeWins, 'Valorant host wins at a LAN');
 });

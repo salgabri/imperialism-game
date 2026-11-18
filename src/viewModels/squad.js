@@ -9,6 +9,7 @@ import { baseballProfile } from '../sports/baseball.js';
 import { hockeyProfile } from '../sports/hockey.js';
 import { tennisProfile } from '../sports/tennis.js';
 import { rugbyLeagueProfile } from '../sports/rugbyLeague.js';
+import { rugbyUnionProfile } from '../sports/rugbyUnion.js';
 import { rocketLeagueProfile } from '../sports/rocketLeague.js';
 import { counterStrikeProfile } from '../sports/counterStrike.js';
 import { valorantProfile } from '../sports/valorant.js';
@@ -38,6 +39,8 @@ const SPORT_ORDER = { baseball: { C: 0, '1B': 1, '2B': 2, '3B': 3, SS: 4, LF: 5,
   'womens-tennis': { SGL: 0, DBL: 1 },
   // Rugby league numbers its thirteen from the back: the fullback, the outside backs, the halves, then the pack.
   'rugby-league': { FB: 0, WG: 1, CE: 2, FE: 3, HB: 4, PR: 5, HK: 6, SR: 7, LK: 8 },
+  // Rugby union numbers its fifteen from the front: the front row, the locks, the back row, the halves, then the backs.
+  'rugby-union': { PR: 0, HK: 1, LK: 2, FL: 3, N8: 4, SH: 5, FH: 6, CE: 7, WG: 8, FB: 9 },
   // Rocket League's three have no positions, nor Counter-Strike's five or Valorant's.
   'rocket-league': { PLR: 0 },
   'counter-strike': { PLR: 0 },
@@ -52,6 +55,8 @@ const SPORT_GROUPS = {
   'womens-tennis': { SGL: 'Singles', DBL: 'Doubles' },
   'rugby-league': { FB: 'Outside backs', WG: 'Outside backs', CE: 'Outside backs', FE: 'Halves', HB: 'Halves', PR: 'Front row',
     HK: 'Front row', SR: 'Back row', LK: 'Back row' },
+  'rugby-union': { PR: 'Front row', HK: 'Front row', LK: 'Second row', FL: 'Back row', N8: 'Back row', SH: 'Halves', FH: 'Halves',
+    CE: 'Centres', WG: 'Back three', FB: 'Back three' },
   'rocket-league': { PLR: 'Players' },
   'counter-strike': { PLR: 'Players' },
   valorant: { PLR: 'Players' },
@@ -104,6 +109,14 @@ const SLOTS = {
     PR: [[31, 15], [69, 15], [39, 92], [61, 92]], HK: [[50, 15], [17, 92]], SR: [[19, 31], [81, 31]], LK: [[50, 32], [83, 92]],
     HB: [[38, 47]], FE: [[62, 47]], CE: [[28, 60], [72, 60]], WG: [[8, 64], [92, 64]], FB: [[50, 74]],
   },
+  // Rugby union's pack up front, attacking the try line at the top: the front row, the locks behind it and the back row
+  // on its flanks and at its base, then the halves, the centres and wings across the field and the fullback at the back.
+  // The eight replacements sit along the foot of the box in their numbers' order (16 to 23).
+  'rugby-union': {
+    PR: [[31, 13], [69, 13], [21, 92], [33, 92]], HK: [[50, 13], [9, 92]], LK: [[40, 24], [60, 24], [45, 92]], FL: [[19, 29], [81, 29], [57, 92]],
+    N8: [[50, 35]], SH: [[40, 46], [69, 92]], FH: [[62, 49], [81, 92]], CE: [[30, 59], [70, 59], [93, 92]], WG: [[8, 64], [92, 64]],
+    FB: [[50, 75]],
+  },
   // Rocket League's rotation, attacking the goal at the top: the best player up front as first man, the others behind him.
   'rocket-league': { PLR: [[50, 28], [27, 60], [73, 60]] },
   // Counter-Strike's five holding a map as its defenders do: two at the A site, one in mid, two at the B site, the best
@@ -130,6 +143,7 @@ const LAYOUTS = {
   tennis: { layout: 'tennis', viewLabel: 'Court' },
   'womens-tennis': { layout: 'tennis', viewLabel: 'Court' },
   'rugby-league': { layout: 'rugby', viewLabel: 'Field' },
+  'rugby-union': { layout: 'rugby', viewLabel: 'Field' },
   'rocket-league': { layout: 'arena', viewLabel: 'Arena' },
   // Not "Map": the campaign's own Map tab sits beside the squad screen's tabs.
   'counter-strike': { layout: 'site', viewLabel: 'Sites' },
@@ -208,7 +222,7 @@ export function profileSegments(value) {
 /**
  * Attack / Defence / Goalkeeping (football), Offence / Defence (basketball), Offence / Defence / Kicking (American
  * football), Batting / Pitching / Fielding (baseball), Attack / Defence / Goaltending (ice hockey), Singles / Doubles
- * (tennis), Backs / Halves / Forwards (rugby league) or Team / Best player (the esports) from the sports engines' profiles
+ * (tennis), Backs / Halves / Forwards (both rugby codes) or Team / Best player (the esports) from the sports engines' profiles
  * of the lineup (ED§4c;
  * no match-day offset), with the C1 segment count.
  */
@@ -223,8 +237,8 @@ export function strengthProfile(lineup, sportId) {
           ? (({ attack, defence, goaltending }) => [['attack', 'Attack', attack], ['defence', 'Defence', defence], ['goaltending', 'Goaltending', goaltending]])(hockeyProfile(lineup))
           : isTennisSport(sportId)
             ? (({ singles, doubles }) => [['singles', 'Singles', singles], ['doubles', 'Doubles', doubles]])(tennisProfile(lineup))
-          : sportId === 'rugby-league'
-            ? (({ backs, halves, forwards }) => [['backs', 'Backs', backs], ['halves', 'Halves', halves], ['forwards', 'Forwards', forwards]])(rugbyLeagueProfile(lineup))
+          : sportId === 'rugby-league' || sportId === 'rugby-union'
+            ? (({ backs, halves, forwards }) => [['backs', 'Backs', backs], ['halves', 'Halves', halves], ['forwards', 'Forwards', forwards]])((sportId === 'rugby-union' ? rugbyUnionProfile : rugbyLeagueProfile)(lineup))
           : sportId === 'rocket-league'
             ? (({ team, best }) => [['team', 'Team', team], ['best', 'Best player', best]])(rocketLeagueProfile(lineup))
           : sportId === 'counter-strike'

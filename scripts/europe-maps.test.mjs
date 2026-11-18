@@ -77,11 +77,14 @@ test('the index lists a built-in pair of maps and one for each earlier season wi
   const seasons = [null, ...CLUB_SEASONS.map(season => season.id)];
   assert.equal(FOOTBALL_MAPS.length, seasons.length * 2);
   // Basketball's EuroLeague (scripts/euroleague.test.mjs) has the maps of Europe with no theatre of their own: the built-in
-  // season's and one for each run of earlier seasons with the same clubs.
-  const leagueMaps = EUROPE_MAPS.filter(entry => !entry.theatre);
+  // season's and one for each run of earlier seasons with the same clubs. Rugby union's European clubs have one more, the
+  // built-in season's.
+  const leagueMaps = EUROPE_MAPS.filter(entry => !entry.theatre && entry.sport === 'basketball');
   assert.deepEqual(leagueMaps[0], EUROPE_MAPS.find(entry => entry.id === 'euroleague'));
-  assert.ok(leagueMaps.every(entry => entry.sport === 'basketball' && entry.league === 'EuroLeague' && /^(euroleague|el\d{4})$/.test(entry.id)));
+  assert.ok(leagueMaps.every(entry => entry.league === 'EuroLeague' && /^(euroleague|el\d{4})$/.test(entry.id)));
   assert.equal(leagueMaps.length, 25);
+  assert.deepEqual(EUROPE_MAPS.filter(entry => !entry.theatre && entry.sport !== 'basketball').map(entry => [entry.id, entry.sport, entry.league, entry.clubs, entry.seasons]),
+    [['rugbyeurope', 'rugby-union', 'European clubs', 36, undefined]]);
   for (const season of seasons) {
     assert.deepEqual(europeMapsOf(season).map(map => [map.league, map.clubs, map.theatre]),
       [[`Top ${TOP_CLUBS}`, TOP_CLUBS, 'all'], [`Elite ${ELITE_CLUBS}`, ELITE_CLUBS, 'elite']], String(season));

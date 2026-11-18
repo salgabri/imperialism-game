@@ -45,7 +45,9 @@ const SAFETY = 0.0022;
 // season then spreads the franchises as the NFL's do, and the rating favourite wins two games in three.
 const TD_SCALE = 0.075;
 const FG_SCALE = 0.025;
-// Match-day form in rating points, shifting both sides' edges (the attacker's up, the defender's down).
+// Match-day form in rating points a point of drama, shifting both sides' edges (the attacker's up, the defender's down).
+// A rulebook's `form` replaces it (college football's, src/sports/collegeFootball.js: its edge's scale would stretch
+// this one).
 const FORM_PER_DRAMA = 0.35;
 // Home advantage, a campaign option (off: every match is at a neutral venue): the defender's drives gain HOME_EDGE rating
 // points of edge at home and the visitors' lose as much. Equal sides then win 54% at home, as NFL home sides do.
@@ -403,14 +405,15 @@ function collegeOvertime(rng, prepared, rules, form, plays) {
  * (its season's). Also returns the scoring sequence (`plays`: each possession in order, `{ side, pts, period,
  * conversion?, kind? }` with `side` the side that scored, period 0 being regulation, `kind` 'two' a college overtime's
  * two-point play) so the full simulation can time its events. A college rulebook (`overtime` 'college') plays college
- * overtime (collegeOvertime), with its own possessions a side (`drives`, within `driveRange`).
+ * overtime (collegeOvertime), with its own possessions a side (`drives`, within `driveRange`) and its own match-day form
+ * (`form`, rating points a point of drama; FORM_PER_DRAMA without one).
  */
 export function sampleResult(rng, prepared, drama = 6) {
   const rules = prepared.rules ?? TODAY;
   const variation = Number.isFinite(drama) ? clamp(drama, 0, 12) : 6;
   const [fewest, most] = rules.driveRange ?? DRIVE_RANGE;
   const drives = Math.round(clamp(prepared.drives + gauss(rng) * DRIVE_SD, fewest, most));
-  const form = gauss(rng) * variation * FORM_PER_DRAMA;
+  const form = gauss(rng) * variation * (rules.form ?? FORM_PER_DRAMA);
   const oddsA = driveOdds(prepared.edgeA + form, prepared.kickingA, rules);
   const oddsD = driveOdds(prepared.edgeD - form, prepared.kickingD, rules);
   const first = rng() < 0.5 ? 'A' : 'D';
@@ -631,9 +634,9 @@ export function americanFootballProfile(lineup) {
 
 /**
  * The overtime and drive constants the live win-probability model mirrors (src/engine/winProbability.js); a season's
- * own (its safeties, overtime rule and period) ride on its prepared match's `rules`. The edge's slopes (TD_SCALE,
- * FG_SCALE) and an extra point's per kicking point (XP_PER_POINT) also state college football's seasons
- * (src/sports/collegeFootball.js, collegeSeasonRules).
+ * own (its safeties, overtime rule and period) and college football's form ride on its prepared match's `rules`. The
+ * edge's slopes (TD_SCALE, FG_SCALE), an extra point's per kicking point (XP_PER_POINT) and the NFL's form
+ * (FORM_PER_DRAMA) also state college football's rules (src/sports/collegeFootball.js).
  */
 export const DRIVE_MODEL = Object.freeze({ DRIVES, DRIVE_SD, OVERTIME, MAX_OVERTIMES, SUDDEN_DEATH, OT_POSSESSIONS, FORM_PER_DRAMA,
   SAFETY, DECISIVE_SLOPE, TD_SCALE, FG_SCALE, XP_PER_POINT });

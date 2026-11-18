@@ -12,6 +12,7 @@ import { baseballProfile } from '../sports/baseball.js';
 import { hockeyProfile } from '../sports/hockey.js';
 import { tennisProfile } from '../sports/tennis.js';
 import { rugbyLeagueProfile } from '../sports/rugbyLeague.js';
+import { rugbyUnionProfile } from '../sports/rugbyUnion.js';
 import { rocketLeagueProfile } from '../sports/rocketLeague.js';
 import { counterStrikeProfile } from '../sports/counterStrike.js';
 import { valorantProfile } from '../sports/valorant.js';
@@ -517,8 +518,9 @@ function tapeRows(sportId, lineupA, lineupD, copy) {
     } else if (isTennisSport(sportId)) {
       const pA = tennisProfile(lineupA), pD = tennisProfile(lineupD);
       rows = [['singles', 'Singles', pA.singles, pD.singles], ['doubles', 'Doubles', pA.doubles, pD.doubles]];
-    } else if (sportId === 'rugby-league') {
-      const pA = rugbyLeagueProfile(lineupA), pD = rugbyLeagueProfile(lineupD);
+    } else if (sportId === 'rugby-league' || sportId === 'rugby-union') {
+      const profile = sportId === 'rugby-union' ? rugbyUnionProfile : rugbyLeagueProfile;
+      const pA = profile(lineupA), pD = profile(lineupD);
       rows = [['backs', 'Backs', pA.backs, pD.backs], ['halves', 'Halves', pA.halves, pD.halves],
         ['forwards', 'Forwards', pA.forwards, pD.forwards]];
     } else if (sportId === 'rocket-league' || sportId === 'valorant' || sportId === 'league-of-legends') {

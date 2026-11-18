@@ -11,7 +11,7 @@ import { CLUB_MAPS } from '../src/data/clubMaps.js';
 import { CLUBS, SOURCE } from '../src/data/clubs.college-football.js';
 import { buildClub, isGridironSport, makeRng, outOfPositionPenalty, selectLineup, teamEff, teamSportId } from '../src/data/teams.js';
 import { getSport, matchSport, overtimeShort, SPORT_LIST } from '../src/sports/index.js';
-import { americanFootball, americanFootballProfile, collegeAnswer, collegeOvertimeOdds, driveOdds } from '../src/sports/americanFootball.js';
+import { americanFootball, americanFootballProfile, collegeAnswer, collegeOvertimeOdds, DRIVE_MODEL, driveOdds } from '../src/sports/americanFootball.js';
 import { COLLEGE_RULES } from '../src/sports/collegeFootball.js';
 import { estimateWinProbability } from '../src/engine/odds.js';
 import { chartDomain, isLiveModel, liveModelFor, winProbabilityAt } from '../src/engine/winProbability.js';
@@ -88,15 +88,23 @@ test('positions are the NFL\'s, as specialised: an emergency starter costs 25 po
 
 test('college rules: more possessions, the college game\'s kicking and tries, and the NFL\'s model otherwise', () => {
   assert.equal(matchSport({ sport: 'college-football' }), sport, 'one season, one rulebook');
-  assert.equal(sport.simulationVersion, 1);
+  assert.equal(sport.simulationVersion, 2);
   assert.equal(sport.prepareMatch(teams[0], teams[1]).drives, 12.3);
   assert.equal(americanFootball.prepareMatch(teams[0], teams[1]).drives, 11, 'the NFL keeps its eleven');
   const even = driveOdds(COLLEGE_RULES.edge, COLLEGE_RULES.kicker, COLLEGE_RULES);
-  assert.ok(Math.abs(even.td - 0.2616) < 1e-9 && Math.abs(even.xp - 0.983) < 1e-9 && Math.abs(even.two - 0.461) < 1e-9 && Math.abs(even.make - 0.761) < 1e-9);
+  assert.ok(Math.abs(even.td - 0.2599) < 1e-9 && Math.abs(even.xp - 0.983) < 1e-9 && Math.abs(even.two - 0.461) < 1e-9 && Math.abs(even.make - 0.761) < 1e-9);
   // The college scale steepens the edge's effect: the same five points move a college drive further than an NFL one.
   const nflGain = driveOdds(5, 80).td - driveOdds(0, 80).td;
   const collegeGain = driveOdds(COLLEGE_RULES.edge + 5, 76, COLLEGE_RULES).td - even.td;
-  assert.ok(collegeGain > 1.4 * nflGain, `${collegeGain} v ${nflGain}`);
+  assert.ok(collegeGain > 1.6 * nflGain, `${collegeGain} v ${nflGain}`);
+  // Match-day form, which the scale would stretch, is half the NFL's in log odds: a point of drama moves a drive's
+  // touchdown odds half as far as in the NFL. The NFL's rulebooks name no form of their own.
+  assert.ok(Math.abs(COLLEGE_RULES.form * COLLEGE_RULES.scale - 0.5 * DRIVE_MODEL.FORM_PER_DRAMA) < 1e-12);
+  const formGain = rules => driveOdds(rules.edge + (rules.form ?? DRIVE_MODEL.FORM_PER_DRAMA), rules.kicker, rules).td;
+  const logit = p => Math.log(p / (1 - p));
+  const nflRules = americanFootball.prepareMatch(teams[0], teams[1]).rules;
+  assert.equal(nflRules.form, undefined);
+  assert.ok(Math.abs((logit(formGain(COLLEGE_RULES)) - logit(even.td)) / (logit(formGain(nflRules)) - logit(nflRules.td)) - 0.5) < 1e-9);
   // From the 25 in overtime: a touchdown half the time between equals, and a touchdown down no field goal at all.
   const ot = collegeOvertimeOdds(COLLEGE_RULES.edge, COLLEGE_RULES.kicker, COLLEGE_RULES);
   assert.ok(Math.abs(ot.td - 0.5) < 1e-9 && Math.abs(ot.make - 0.7) < 1e-9);

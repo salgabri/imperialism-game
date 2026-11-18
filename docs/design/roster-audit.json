@@ -60,7 +60,7 @@
   "rating-conflict": {
    "severity": "warning",
    "about": "a name in a national squad and a club of one season at different ratings, with no record of the club layer at the national rating: one player rated twice, or two namesakes",
-   "count": 8
+   "count": 276
   },
   "lineup-gap": {
    "severity": "warning",
@@ -1282,6 +1282,14 @@
    }
   },
   "rating-conflict": {
+   "builtin:rugby-union": {
+    "count": 268,
+    "examples": [
+     "nation:Canada — rating-conflict: 74 for Canada, 76 as Tyler Ardron (Castres Olympique)",
+     "nation:Chile — rating-conflict: 86 for Chile, 85 as Diego Escobar (Racing 92)",
+     "nation:Fiji — rating-conflict: 90 for Fiji, 89 as Eroni Mawi (Saracens)"
+    ]
+   },
    "mlb-the-show-25": {
     "count": 1,
     "examples": [
@@ -1752,6 +1760,25 @@
     "max": 90
    },
    "findings": {}
+  },
+  {
+   "id": "builtin:rugby-union",
+   "sport": "rugby-union",
+   "year": 2026,
+   "season": "2025/26",
+   "label": "built-in",
+   "nations": 24,
+   "fielded": 13,
+   "clubs": 36,
+   "ratings": {
+    "players": 1440,
+    "min": 61,
+    "median": 80,
+    "max": 96
+   },
+   "findings": {
+    "rating-conflict": 268
+   }
   },
   {
    "id": "builtin:rugby-league",

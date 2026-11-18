@@ -2,18 +2,21 @@
 // TOP_CLUBS and one for the strongest ELITE_CLUBS, for the built-in season and for each earlier season with clubs; and the
 // women's game's, one for every European club and one for its ELITE_CLUBS strongest, likewise; and the ones the
 // EuroLeague's basketball clubs play on (docs/design/euroleague.md), all of its clubs, by the same rules: the built-in
-// season's, and one for each run of earlier seasons with the same clubs, 2000/01 to 2025/26. A club holds land only in
-// its own country. A country's only club holds all of it; several clubs share it along its administrative borders, level
-// by level (scripts/lib/admin-levels.mjs): a region goes whole to one club unless it holds two or more, and then its
-// provinces, departments or counties are split between them the same way, and theirs down to the communes; a country with
-// no club is not on the map at all, so it stays grey beneath it, like any neighbour of a country map.
+// season's, and one for each run of earlier seasons with the same clubs, 2000/01 to 2025/26; and the one rugby union's
+// European clubs of 2025/26 play on (docs/design/rugby-union.md), the Premiership's, the Top 14's and the URC's European
+// sides. A club holds land only in its own country. A country's only club holds all of it; several clubs share it along
+// its administrative borders, level by level (scripts/lib/admin-levels.mjs): a region goes whole to one club unless it
+// holds two or more, and then its provinces, departments or counties are split between them the same way, and theirs down
+// to the communes; a country with no club is not on the map at all, so it stays grey beneath it, like any neighbour of a
+// country map.
 // Russia's clubs hold European Russia only (`within`), the rest of Russia lying grey beneath the map (`partial`). An
 // earlier season whose clubs come from all of Europe has maps of their own ids (eu124e2018); its seven-league maps of
 // before (eu124s2018) stay in the index, never rebuilt, for the campaigns saved on them (`replacedBy`).
 //
 // Usage:
 //   node scripts/build-europe-maps.mjs [--only=eu124,eu32] [--check | --dry-run] [--boundaries=<dir>]
-//     --only        build these maps (eu124, weu32s2025, euroleague…); the index keeps the others' entries as they are
+//     --only        build these maps (eu124, weu32s2025, euroleague, rugbyeurope…); the index keeps the others' entries as
+//                   they are
 //     --check       rebuild offline from the caches and compare every output byte for byte
 //     --dry-run     build and verify (downloading boundaries as needed) but write nothing
 //     --boundaries  the boundary cache (default data-src/boundaries), e.g. another worktree's that holds Europe's layers
@@ -22,12 +25,14 @@
 //          src/data/clubs.womens-football.js and public/womens-football/<id>.json (their European clubs), the EuroLeague's in
 //          src/data/clubs.euroleague.js and, for its earlier seasons, scripts/lib/euroleague-seasons.mjs (from
 //          scripts/data/euroleague-seasons/); where they stand, in
-//          scripts/data/europe-clubs.json; geoBoundaries gbOpen layers, Natural Earth admin-1 (the home nations'
+//          scripts/data/europe-clubs.json; rugby union's clubs and their grounds in scripts/data/rugby-union-clubs.json,
+//          strongest first by src/data/clubs.rugby-union.js once it rates them; geoBoundaries gbOpen layers, Natural Earth admin-1 (the home nations'
 //          counties) and the ONS's districts (England's), cached under the gitignored data-src/boundaries/;
 //          the game's world map public/countries-50m.json, whose outlines every country keeps, so territories meet
 //          each other and the grey neighbours on the very borders the rest of the game draws.
 // Outputs: public/domestic/eu<clubs>[s<season year>].json, the women's weu[32][s<season year>].json, the EuroLeague's
-//          euroleague.json and el<season year>.json, public/domestic/ATTRIBUTION-europe.txt and src/data/europeMaps.js.
+//          euroleague.json and el<season year>.json, rugby union's rugbyeurope.json, public/domestic/ATTRIBUTION-europe.txt
+//          and src/data/europeMaps.js.
 import { existsSync } from 'node:fs';
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -61,6 +66,8 @@ const clubsFile = path.join(root, 'scripts/data/europe-clubs.json');
 const cacheDir = path.join(root, 'data-src/boundaries');
 const worldFile = path.join(root, 'public/countries-50m.json');
 const setFile = (id, sport = 'football') => path.join(root, `public/${sport}/${id}.json`);
+const rugbyUnionFile = path.join(root, 'scripts/data/rugby-union-clubs.json');
+const rugbyUnionRatings = path.join(root, 'src/data/clubs.rugby-union.js');
 
 // Each country's levels, from its regions down to its communes, and Russia's European part: scripts/lib/admin-levels.mjs.
 // A region whose clubs would each have under this share of the country's land per club is too small to hold them (a
@@ -602,7 +609,7 @@ function landNames(clubs) {
 }
 
 async function buildMap({ source, spec, countries, splits, log }) {
-  const { id: mapId, sport, league, theatre = null, seasons, clubs } = spec;
+  const { id: mapId, sport, league, theatre = null, seasons, clubs, ranked = true } = spec;
   const n = clubs.length;
   const byCountry = new Map();
   clubs.forEach((club, i) => {
@@ -707,9 +714,11 @@ async function buildMap({ source, spec, countries, splits, log }) {
     log(`    ${shapes.get(shapeId).name}: ${list}`);
   }
   // A women's season's map serves that season alone, so it names its strongest clubs as the built-in maps do. An earlier
-  // EuroLeague's may serve two seasons, so setup names the loaded season's own strongest, as an NBA era's map does.
+  // EuroLeague's may serve two seasons, so setup names the loaded season's own strongest, as an NBA era's map does. A
+  // field not yet rated (`ranked` false: rugby union's before src/data/clubs.rugby-union.js) names none.
+  const named = ranked && !(seasons && sport !== 'womens-football');
   const entry = { id: mapId, sport, league, name: 'Europe', ...(theatre ? { theatre } : {}), ...(seasons ? { seasons } : {}), clubs: n, sections: n, countries: hosts.length,
-    version: doc.version, ...(seasons && sport !== 'womens-football' ? {} : { top: clubs.slice(0, 3).map(club => club.name) }) };
+    version: doc.version, ...(named ? { top: clubs.slice(0, 3).map(club => club.name) } : {}) };
   return { entry, doc, file: outFile(mapId), text };
 }
 
@@ -720,9 +729,11 @@ function dedupeLayers(layers) {
 }
 
 function indexModule(entries) {
-  return `// GENERATED by scripts/build-europe-maps.mjs from public/domestic/eu*.json, weu*.json and euroleague.json; do not edit.
+  return `// GENERATED by scripts/build-europe-maps.mjs from public/domestic/eu*.json, weu*.json, euroleague.json, el*.json and
+// rugbyeurope.json; do not edit.
 // The maps football clubs play on (docs/design/domestic-campaigns.md, "The Europe maps"): Europe's strongest clubs, each on
-// land in its own country; women's football's (sport 'womens-football') every European club and its elite. The setup
+// land in its own country; women's football's (sport 'womens-football') every European club and its elite; and, with no
+// \`theatre\`, basketball's EuroLeague clubs' and rugby union's European clubs' (sport 'rugby-union'). The setup
 // offers a season's maps as its club theatres ('domestic:<id>'), and the loader fetches public/domestic/<id>.json on
 // demand. A map with \`seasons\` is an earlier season's, played only with that season's clubs; one with \`replacedBy\` is an
 // earlier season's map of before its clubs came from all of Europe, kept only for the campaigns saved on it.
@@ -736,7 +747,7 @@ ${entries.map(entry => `  ${JSON.stringify(entry)},`).join('\n')}
 
 function attributionText(entries, docs) {
   const lines = [
-    'Europe maps (public/domestic/eu*.json and weu*.json)',
+    'Europe maps (public/domestic/eu*.json, weu*.json, euroleague.json, el*.json and rugbyeurope.json)',
     'Generated by scripts/build-europe-maps.mjs; do not edit.',
     '',
     `Maps: ${entries.map(entry => entry.version).join(', ')}`,
@@ -749,7 +760,9 @@ function attributionText(entries, docs) {
     '',
     'geoBoundaries (https://www.geoboundaries.org), gbOpen release, each file pinned to the commit in its URL:',
     `  ${GB_CITATION}`,
-    'Club grounds: scripts/data/europe-clubs.json (from the country maps, public/domestic/ATTRIBUTION.txt, and by hand).',
+    'Club grounds: scripts/data/europe-clubs.json (from the country maps, public/domestic/ATTRIBUTION.txt, and by hand);',
+    "rugby union's: scripts/data/rugby-union-clubs.json (each club's ground of 2025/26 by RugbyPass's fixtures, placed by",
+    'hand and checked against Wikidata, CC0).',
   ];
   for (const layer of dedupeLayers(docs.flatMap(doc => doc.boundaries.layers))) {
     lines.push('', `${layer.iso3} ${layer.level}${layer.use === 'grouping' ? ' (only groups the units into regions)' : ''}`);
@@ -764,9 +777,9 @@ function attributionText(entries, docs) {
  * The maps to build: for the built-in season and each earlier season with clubs (src/data/footballSeasons.js), its
  * strongest TOP_CLUBS and ELITE_CLUBS clubs. FIFA 05, FIFA 06, 1989/90 and the computed seasons have nations only, so no maps. Then the
  * women's game's (src/data/womensFootballSeasons.js), from FIFA 23 on: every European club ('Europe', the NWSL's play on
- * a map of their own, scripts/build-club-maps.mjs) and the ELITE_CLUBS strongest of them, where there are more. Last the
+ * a map of their own, scripts/build-club-maps.mjs) and the ELITE_CLUBS strongest of them, where there are more. Then the
  * EuroLeague's: the built-in season's, then one for each run of earlier seasons with the same clubs (el<year>, named after
- * the run's first season), serving the NBA seasons of those years.
+ * the run's first season), serving the NBA seasons of those years. Last rugby union's European clubs (rugbyUnionField).
  */
 async function mapSpecs() {
   const { clubs: places } = JSON.parse(await readFile(clubsFile, 'utf8'));
@@ -791,6 +804,7 @@ async function mapSpecs() {
     const clubs = set.clubs.filter(isEuropeanClub);
     if (clubs.length) women.push({ tag: `s${season.year}`, set: season.id, clubs });
   }
+  const rugbyUnion = await rugbyUnionField();
   return [
     ...seasons.flatMap(({ tag, set, clubs }) => [
       { id: `eu${TOP_CLUBS}${tag}`, sport: 'football', league: `Top ${TOP_CLUBS}`, theatre: 'all', seasons: set ? [set] : null, clubs: field(clubs, TOP_CLUBS) },
@@ -806,7 +820,32 @@ async function mapSpecs() {
     { id: 'euroleague', sport: 'basketball', league: 'EuroLeague', seasons: null, clubs: field(EUROLEAGUE_CLUBS, EUROLEAGUE_CLUBS.length) },
     ...euroleagueSeasons(root).maps.map(map => ({ id: map.id, sport: 'basketball', league: 'EuroLeague', seasons: map.years.map(nbaSeasonOf),
       clubs: field(map.clubs, map.clubs.length) })),
+    // Rugby union's European clubs of 2025/26, the built-in season's only.
+    { id: 'rugbyeurope', sport: 'rugby-union', league: 'European clubs', seasons: null, ranked: rugbyUnion.ranked, clubs: rugbyUnion.clubs },
   ];
+}
+
+/**
+ * Rugby union's European clubs (docs/design/rugby-union.md): every club of scripts/data/rugby-union-clubs.json but the
+ * URC's South African sides (`europe: false`), at its ground (`at`, [latitude, longitude]), its land named after its
+ * `home`. Strongest first once src/data/clubs.rugby-union.js rates them (`ranked`); until then by name, and the map names
+ * no strongest three.
+ */
+async function rugbyUnionField() {
+  const { clubs } = JSON.parse(await readFile(rugbyUnionFile, 'utf8'));
+  const places = new Map(Object.values(clubs).filter(club => club.europe !== false).map(club => [club.id, club]));
+  const rated = existsSync(rugbyUnionRatings) ? (await import(pathToFileURL(rugbyUnionRatings).href)).CLUBS : null;
+  const unrated = rated ? [...places.keys()].filter(id => !rated.some(club => club.id === id)) : [];
+  if (unrated.length) throw new Error(`${path.relative(root, rugbyUnionRatings)} rates no ${unrated.join(', ')}`);
+  const list = rated ? strongestClubs(rated.filter(club => places.has(club.id)), places.size)
+    : [...places.values()].sort((a, b) => a.name.localeCompare(b.name, 'en'));
+  return {
+    ranked: !!rated,
+    clubs: list.map(club => {
+      const { home, at, country } = places.get(club.id);
+      return { id: club.id, name: club.name, city: home, home: [at[1], at[0]], shape: country };
+    }),
+  };
 }
 
 /** The built-in NBA season a EuroLeague season is played beside (2009/10's: NBA 2K10). */

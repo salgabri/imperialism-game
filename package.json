@@ -93,6 +93,8 @@
     "build:nhl-league": "node scripts/build-nhl-league.mjs",
     "sync:nrl": "node scripts/sync-nrl.mjs",
     "build-rugby-league": "node scripts/build-rugby-league.mjs",
+    "sync:rugby-union": "node scripts/sync-rugby-union.mjs",
+    "build-rugby-union": "node scripts/build-rugby-union.mjs",
     "sync:rugby-league-seasons": "node scripts/sync-rugby-league-seasons.mjs",
     "build:rugby-league-seasons": "node scripts/build-rugby-league-seasons.mjs",
     "build:nrl-league": "node scripts/build-nrl-league.mjs",

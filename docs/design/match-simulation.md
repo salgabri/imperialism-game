@@ -532,6 +532,27 @@ often than the real best-of-fives, playoffs between closer teams.
 | Best of five won 3–0 / 3–1 / 3–2 | 45.4% / 32.0% / 22.5% | 40.0% / 34.8% / 25.2% |
 | Home sides win | 50.8% (no edge) | not measured: gol.gg gives no event's host |
 
+College football joined the harness on 2026-11-18, with its luck recalibrated the same day (simulation version 2,
+[college-football.md](college-football.md#luck-and-form)). The built-in season's 138 schools play conference seasons,
+each conference a round robin cut to 8.3 games a school as the FBS's of 2024 and 2025, beside those seasons' games
+between FBS schools (scoring: ESPN's box scores, `src/data/collegeLeagueAverages.js`, and cfbstats.com's tables;
+conference margins: the seasons' snapshots; overtime: ESPN's drives):
+
+| College football | Now | Real (2024–2025) |
+| --- | --- | --- |
+| Points / touchdowns / field goals made a team | 26.5 / 3.27 / 1.21 | 26.2–26.8 / 3.22–3.32 / 1.20–1.22 |
+| Overtime (conference games) | 5.1% | 4.3–6.1% |
+| Spread of the schools' average conference margins | 10.5 | 10.3–10.7 |
+| Mean margin / one-score games (8 or fewer) | 14.3 / 45.9% | 14.9–15.2 / 39.2–39.8% |
+| Decided by exactly 3 / exactly 7 / 21 or more | 13.6% / 7.4% / 27.5% | 8.7–11.8% / 8.4–8.7% / 30.2–30.6% |
+| Extra points made / touchdowns going for two | 98.3% / 8.6% | 98.3–98.8% / 8.3–8.7% |
+
+Every computed FBS season, 2009 to 2025, also plays its own schedule forty times, every game between two of its schools,
+beside the real season (its snapshot's games): the standings spread as the real ones did, 0.229 against 0.232 on
+average and within 0.01 in fourteen seasons of seventeen; the luck about each season's own SRS is 15.3 points against
+the real 14.3; the seasons score 1.0 point a team above their real ones and go to overtime 4.7% of the time against
+4.5% ([college-football.md](college-football.md#luck-and-form) has each season's row).
+
 Known gaps, reported but not tested:
 
 - **No home advantage by default.** Every sport plays at a neutral venue unless a
@@ -560,6 +581,10 @@ Known gaps, reported but not tested:
   Show's lowest-rated lineups sit closer to the middle than the worst real clubs.
 - **The NHL's wins by three or more** run at 38.0%, under the real 39.3–41.7%.
   Closing the gap pushes the five-goal wins out of their range.
+- **College football's games end too close.** It plays the NFL's late-game
+  play-calling, tuned on NFL margins, which closes college games more than the
+  FBS's coaches do: 46% of conference games within a score against 39%, 14% by
+  exactly 3 against 9–12%, and too few by 21 or more. Who wins hardly moves.
 - **Women's football is not calibrated.** It plays the men's model and is not in the
   harness. Its leagues draw more often than the four real ones measured (22.7–25.6%
   of games against 13.6–21.7%) and score more alike:

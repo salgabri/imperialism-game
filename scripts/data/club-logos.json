@@ -4219,6 +4219,151 @@
       "file": "FC Malisheva.svg",
       "sha256": "6af1681c52314177599f42c20255e5862b045e3ba7adf0d20f4e3164ac6cd5cc",
       "thumb": 330
+    },
+    "ru-asm-clermont-auvergne": {
+      "file": "ASMClermontLogo.svg",
+      "sha256": "6926b14d41a4b79be201f10eb652269c386727faef116f33b09b1e181f2c2db3"
+    },
+    "ru-aviron-bayonnais": {
+      "file": "AvironBayonnaisLogo2022.svg",
+      "sha256": "99d8dba82b9b6405b9d38840ef712a0b00eccf80b9c5633ee82d023864c70c12"
+    },
+    "ru-bath": {
+      "file": "Bath Rugby logo.png",
+      "sha256": "b575316b71f8cf6dc35ab3920d6cfec86fbac80b829369580415334d1e7c9e67"
+    },
+    "ru-benetton": {
+      "file": "Benetton rugby.svg",
+      "sha256": "4ba881e0aa8f284517a91df2c5df1abae47f86bd41b4748ea6902d5a6e95e834"
+    },
+    "ru-bordeaux-begles": {
+      "file": "UnionBordeauxBeglesLogo.svg",
+      "sha256": "0b2cf27f60221912e27845b430ee6f0397a3a7fc73dbd466b138da78e0adcce8"
+    },
+    "ru-bristol-bears": {
+      "file": "Bristol Bears logo.svg",
+      "sha256": "27597a709953338300de59dfedc9684f8c63f1826be20fff052f3c3587b73470"
+    },
+    "ru-cardiff-rugby": {
+      "file": "Cardiff Rugby logo (2021).svg",
+      "sha256": "c6dcd3291e5bded5525ba63a73477e035fe7d9118e41dc34b09547e1c3d2a14a",
+      "wiki": "it"
+    },
+    "ru-castres-olympique": {
+      "file": "Castres olympique badge.png",
+      "sha256": "282785926cba6bb9448f52c0d774b52c394109f37793ac5a0d760001218bf7db"
+    },
+    "ru-connacht": {
+      "file": "ConnachtRugby 2017logo.svg",
+      "sha256": "6799e927db9192c89e4cff33204aefd9127fc7c697cbce234f3e14541212c26d"
+    },
+    "ru-dragons": {
+      "file": "Dragons RFC logo.png",
+      "sha256": "4d9d5094942ac16a7a9b11e87c1101fd90c69b52dd1c2d4ced1d900b59f9a73e"
+    },
+    "ru-edinburgh": {
+      "file": "Edinburgh Rugby logo 2018.svg",
+      "sha256": "ba9f99e2f351f1bad2c7f978761da0d21a459ed972250e5b91b7a3947c79c87d"
+    },
+    "ru-exeter-chiefs": {
+      "file": "Exeter Chiefs new logo 2022.png",
+      "sha256": "0bb13e9872440ef667b71dc87308b978b38f474bc3cdf9b0e45f5c58fe57ff6b"
+    },
+    "ru-glasgow-warriors": {
+      "file": "Glasgow Warriors Logo.svg",
+      "sha256": "301d567f68e50c7a5d0be7055994a7878f5fa5b1c78641b2b6cbae9e0646e6d9"
+    },
+    "ru-gloucester": {
+      "file": "Gloucester Rugby (2018) logo.svg",
+      "sha256": "62e7aef1d9fa72ff1cbee7baa7a09d62262ed1703c4545c6dcbe1ed4390dd892"
+    },
+    "ru-harlequins": {
+      "file": "Harlequin FC logo.svg",
+      "sha256": "9ee74109e6c5ff6b180ad07684cfd9200b29b54e6fb2b30ff13d9acb71ad3970"
+    },
+    "ru-leicester-tigers": {
+      "file": "Leicester Tigers logo.svg",
+      "sha256": "f34591313841cb0691ccc6d89f3e8badc66c85252b12e3274f164351aecf31f6"
+    },
+    "ru-leinster": {
+      "file": "LeinsterRugby logo 2019.svg",
+      "sha256": "d4d00dc744f36ba4ca5d8fbb87e9192c32fd24e7f0d762a55ed7a1fb296234ac"
+    },
+    "ru-lyon-ou": {
+      "file": "Lyon Olympique Universitaire.svg",
+      "sha256": "c3eea4c160455cc20d4343e496d861f38841cb9481c2ddb51200a6159de18d95"
+    },
+    "ru-montpellier": {
+      "file": "Logo Montpellier Hérault rugby 2013.svg",
+      "sha256": "6675d31adc196117a2f11b850d4a73ce977768b8c11a8a440629f073686c6729"
+    },
+    "ru-munster": {
+      "file": "Munster Rugby logo.svg",
+      "sha256": "03a599363f694487c6ba54b380bd58a7b920b06eaf1facaef91899e044d3d466"
+    },
+    "ru-newcastle-red-bulls": {
+      "file": "Newcastle Red Bulls logo.png",
+      "sha256": "9c699ef28a9881d24d2aec0c3eff75dbc3f275d4b30b37d8e89eae1ef29cf749"
+    },
+    "ru-northampton-saints": {
+      "file": "Northampton Saints Logo.svg",
+      "sha256": "ed78766e12539619926edcc49afe39ea56d83772019ca6353b9505d1a35a9919"
+    },
+    "ru-ospreys": {
+      "file": "Ospreys Rugby logo.svg",
+      "sha256": "bbfcc4fce51197931e28507e68c95ab87dcda9dabc3597e4df1858537366571b"
+    },
+    "ru-racing-92": {
+      "file": "Racing 92 (logo).svg",
+      "sha256": "da3fc5e830fda3b7ea1de7ffbfb55645ee1dd51ab16179c3f56f2f9ee863e46d"
+    },
+    "ru-rc-toulon": {
+      "file": "RCT LOGO.png",
+      "sha256": "4476bdfcee3d58a1c3328edf11f2c9a9bb958607ffced9541faf54f62e413fc3"
+    },
+    "ru-sale-sharks": {
+      "file": "Sale Sharks logo.svg",
+      "sha256": "bc8881c38af58a0ff37abdbd3377caa4a74c95b03d50927ad9da4df4d0276839"
+    },
+    "ru-saracens": {
+      "file": "Saracens F.C. Logo.svg",
+      "sha256": "01183ea2aafc38d6dcc62a117b19ccd3970e4ccdaad38df3d16bcd1c2fb39442"
+    },
+    "ru-scarlets": {
+      "file": "Scarlets logo.svg",
+      "sha256": "f1f8f9a9573ac4c133e74f836fcdfbdc80cd729efa3b733bbb14312912e5b48c"
+    },
+    "ru-section-paloise": {
+      "file": "Section Paloise 2024.png",
+      "sha256": "46a09e7d17c9f0fb18eebff0f3f38fa714b8e5996ab3cdaa1763bcee6feeb5df"
+    },
+    "ru-stade-francais": {
+      "file": "Stade francais logo18.svg",
+      "sha256": "8056b20e31e74feea5be80ec6ee788b2744364319da54a408556fafa9cde515f"
+    },
+    "ru-stade-rochelais": {
+      "file": "StadeRochelaisLogo.svg",
+      "sha256": "220ea04618e67bc05ef618d4bb729e9365548dce0c6cc57c928ba2c71a60c437"
+    },
+    "ru-stade-toulousain": {
+      "file": "StadeToulousainLogo.svg",
+      "sha256": "35476f6f31ce910583bca040ff7b44d5e9826edfcefb00bb595c9e33e755f3fc"
+    },
+    "ru-ulster": {
+      "file": "Ulster Rugby logo.svg",
+      "sha256": "7a748db00e3d6f330d8127d16a93a5fad6e4676d7fa8b7706842759543260be0"
+    },
+    "ru-us-montauban": {
+      "file": "Us montauban.png",
+      "sha256": "03053a0ba105720385a7eb9171a946334cd7a1e078b9b0ee1e56c00c69afe4e0"
+    },
+    "ru-usa-perpignan": {
+      "file": "Usa perpignan badge.png",
+      "sha256": "7b538aeb21197ccae831d13f1e938788c7fe9d04a96265451e09352eee8b6c62"
+    },
+    "ru-zebre-parma": {
+      "file": "Zebre parma logo23.png",
+      "sha256": "c42f826d5ca2d1f4b17c176364bbeba3ec62efc6221ccdf008e5584b5b734840"
     }
   },
   "twins": {

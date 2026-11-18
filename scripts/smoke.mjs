@@ -73,6 +73,9 @@ const SCENARIOS = [
   { name: 'CLUBS · FBS · duel · ticker', ...FBS, pacing: 'duel', resolution: 'ticker' },
   { name: 'VALORANT · Europe · duel · ticker', sport: 'valorant', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
   { name: 'LEAGUE OF LEGENDS · World · blitz · instant', sport: 'league-of-legends', scope: 'world', pacing: 'blitz', resolution: 'instant' },
+  { name: 'RUGBY · Six Nations · duel · instant', sport: 'rugby-union', scope: 'six-nations', pacing: 'duel', resolution: 'instant' },
+  { name: 'RUGBY CLUBS · European clubs · blitz · instant', sport: 'rugby-union', layer: 'clubs', clubScope: 'domestic:rugbyeurope', pacing: 'blitz',
+    resolution: 'instant' },
 ];
 
 const RESUME_SCENARIOS = [
@@ -108,7 +111,8 @@ const MANAGER_SCENARIOS = [
 // baseball's nations `=12`, the NHL's `=13`, hockey's nations `=14`, the women's nations `=15` and clubs `=16`, tennis's Davis Cup nations
 // `=17`, the NRL's `=18` and rugby league's nations `=19` (counted before Europe's two club maps came in at `=5` and `=6`: add two
 // to each), Rocket League's nations `=25`, Counter-Strike's `=26`, college football's FBS schools `=27` and
-// `--resume-only=9`, Valorant's nations `=28` and League of Legends' the last, `=29`.
+// `--resume-only=9`, Valorant's nations `=28`, League of Legends' `=29`, rugby union's Six Nations `=30` and its European clubs
+// the last, `=31`.
 // `--scenarios=<text>` composes with
 // these: it narrows whatever they leave.
 function onlyIndex(name, list) {
@@ -308,6 +312,18 @@ function checkTheatres(scenario, theatre) {
   if (scenario.layer === 'clubs' && scenario.sport === 'rugby-league') {
     check('rugby league clubs play only the NRL’s own map', JSON.stringify(theatre.options) === JSON.stringify([{ value: 'domestic:nrl', text: 'NRL · 17 clubs' }]),
       JSON.stringify(theatre.options));
+    return;
+  }
+  if (scenario.layer === 'clubs' && scenario.sport === 'rugby-union') {
+    check('rugby clubs play only their European clubs’ map', JSON.stringify(theatre.options) === JSON.stringify([
+      { value: 'domestic:rugbyeurope', text: 'European clubs · 36 clubs' }]), JSON.stringify(theatre.options));
+    return;
+  }
+  // Rugby union's nations: the world, Europe, the Six Nations, and Asia & Oceania, where Fiji, Samoa, Tonga and Australia
+  // field half a matchday 23 of the clubs' players.
+  if (scenario.layer !== 'clubs' && scenario.sport === 'rugby-union') {
+    check('rugby nations offer the world, Europe, the Six Nations and Asia & Oceania', JSON.stringify(theatre.options.map(option => option.value))
+      === JSON.stringify(['world', 'UEFA', 'six-nations', 'AFC']), JSON.stringify(theatre.options));
     return;
   }
   if (scenario.sport === 'college-football') {
@@ -683,6 +699,8 @@ if (!filtered && fixedChecks) {
     'womens-football': ['Spain', 'England', 'France', 'Germany'], tennis: ['Spain', 'Italy', 'United States', 'Germany'],
     'womens-tennis': ['United States', 'Russia', 'Czechia', 'Ukraine'],
     'rugby-league': ['Australia', 'New Zealand', 'England', 'Fiji'],
+    // Rugby union's, its six moved to their Tests: France leads, England, Ireland and Scotland among the best.
+    'rugby-union': ['France', 'England', 'Ireland', 'Scotland'],
     // Rocket League's, by the Liquipedia snapshot's Elo: the United States, France, Saudi Arabia and Brazil lead it.
     'rocket-league': ['United States', 'France', 'Saudi Arabia', 'Brazil'],
     // Counter-Strike's, by its Liquipedia snapshot's Elo; Valorant's and League of Legends', by the vlr.gg and gol.gg snapshots':
@@ -714,7 +732,7 @@ if (!filtered && fixedChecks) {
       // A hockey forward may play another forward's place. Women's football invents nobody: a nation short of eleven, or
       // with no rated player and no team at all, stays short.
       // A rugby league back may play another outside place, a forward round the pack, a centre in the second row.
-      const natural = slot => slot.player && (sport.id === 'hockey' ? slot.penalty <= 4 : sport.id === 'rugby-league' ? slot.penalty <= 8 : !slot.outOfPosition);
+      const natural = slot => slot.player && (sport.id === 'hockey' ? slot.penalty <= 4 : sport.id === 'rugby-league' || sport.id === 'rugby-union' ? slot.penalty <= 8 : !slot.outOfPosition);
       // Tennis invents nobody either: a nation needs two rated players, and a team of two or three plays its singles
       // players in the doubles too.
       // Rocket League invents nobody: a nation needs three rated players and fields its best three of up to five; Counter-
@@ -758,7 +776,7 @@ if (!filtered && fixedChecks) {
 
       // NFL and MLB clubs carry backups beyond their starters; the other sports' clubs are exactly their lineup.
       // A rugby league back may play another outside place, a forward round the pack, a centre in the second row.
-      const natural = slot => slot.player && (sport.id === 'hockey' ? slot.penalty <= 4 : sport.id === 'rugby-league' ? slot.penalty <= 8 : !slot.outOfPosition);
+      const natural = slot => slot.player && (sport.id === 'hockey' ? slot.penalty <= 4 : sport.id === 'rugby-league' || sport.id === 'rugby-union' ? slot.penalty <= 8 : !slot.outOfPosition);
       const full = c => (c.squad.length > sport.squadSize ? selectLineup(c).slots.every(natural)
         : c.squad.length === sport.squadSize);
       check('every club fields a full lineup', clubs.every(full), 'short lineup');
@@ -833,7 +851,7 @@ if (!filtered && fixedChecks) {
       const [low, high] = { football: [0.6, 3.5], basketball: [60, 110], 'american-football': [15, 30], 'college-football': [15, 40], baseball: [2, 10],
         'womens-football': [0.6, 3.5], hockey: [1.5, 5.5],
         // Rubbers: the winner's three and the loser's none to two.
-        tennis: [1.5, 2.5], 'womens-tennis': [1.5, 2.5], 'rugby-league': [12, 35],
+        tennis: [1.5, 2.5], 'womens-tennis': [1.5, 2.5], 'rugby-league': [12, 35], 'rugby-union': [15, 40],
         // Games: the winner's four and the loser's none to three.
         'rocket-league': [2, 3.5],
         // Maps: the winner's two and the loser's none or one; League of Legends' games: the winner's three and the loser's

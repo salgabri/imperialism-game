@@ -178,7 +178,7 @@ export function seasonTeams(season) {
 
 // Sports that fill a nation's missing places with generated players (teams.js buildTeam): their stored strength
 // follows their builder's rule for their own players, which the filled lineup does not reproduce.
-const FILLED = new Set(['baseball', 'hockey', 'rugby-league']);
+const FILLED = new Set(['baseball', 'hockey', 'rugby-league', 'rugby-union']);
 const KEEPER = { football: 'GK', 'womens-football': 'GK', hockey: 'G' };
 
 /**

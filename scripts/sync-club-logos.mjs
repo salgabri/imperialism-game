@@ -1,6 +1,7 @@
 // Club crests for every club the game ships: the all-leagues football layer, the women's clubs, the NBA, NFL, MLB, NHL
-// and NRL franchises, the EuroLeague's clubs, college football's FBS schools and every country's domestic clubs. A club with a crest shows it wherever
-// a nation shows its flag; a club without one keeps its monogram chip.
+// and NRL franchises, the EuroLeague's clubs, college football's FBS schools, rugby union's European clubs and every
+// country's domestic clubs. A club with a crest shows it wherever a nation shows its flag; a club without one keeps its
+// monogram chip.
 //
 // Usage:
 //   node scripts/sync-club-logos.mjs [--refresh] [--pin]
@@ -76,6 +77,7 @@ import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
 import { CLUBS as CFB_CLUBS } from '../src/data/clubs.college-football.js';
+import { CLUBS as RUGBY_UNION_CLUBS } from '../src/data/clubs.rugby-union.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { cachedGz, createLimiter, DATABASE_DATE, readGzJson } from './lib/domestic-sync.mjs';
 import { norm } from './lib/domestic-locate.mjs';
@@ -404,6 +406,11 @@ for (const club of CFB_CLUBS) {
   if (!pageOverrides[club.id] && !itemOverrides[club.id]) problems.push(`${club.id}: no crest (add its file to ${path.relative(root, overridesFile)} "pages")`);
   clubs.push({ id: club.id, name: club.name, qid: null });
 }
+// Rugby union's European clubs likewise: each crest is its article's infobox crest, named in "pages".
+for (const club of RUGBY_UNION_CLUBS) {
+  if (!pageOverrides[club.id] && !itemOverrides[club.id]) problems.push(`${club.id}: no crest (add its file to ${path.relative(root, overridesFile)} "pages")`);
+  clubs.push({ id: club.id, name: club.name, qid: null });
+}
 for (const [id, qid] of Object.entries(itemOverrides)) {
   const club = clubs.find(entry => entry.id === id);
   if (!club) throw new Error(`club-logos.json names unknown club ${id}`);
@@ -582,12 +589,13 @@ const nhlClubs = clubs.filter(club => club.id.startsWith('nhl-')), womensClubs =
 const nrlClubs = clubs.filter(club => club.id.startsWith('nrl-'));
 const cfbClubs = clubs.filter(club => club.id.startsWith('cfb-'));
 const euroleagueClubs = clubs.filter(club => club.id.startsWith('el-'));
+const rugbyUnionClubs = clubs.filter(club => club.id.startsWith('ru-'));
 console.log(`Crests: ${crests.size} of ${clubs.length} clubs`);
-console.log(`  all-leagues football ${count(worldClubs)}/${worldClubs.length}, NBA ${count(nbaClubs)}/${nbaClubs.length}, NFL ${count(nflClubs)}/${nflClubs.length}, MLB ${count(mlbClubs)}/${mlbClubs.length}, NHL ${count(nhlClubs)}/${nhlClubs.length}, NRL ${count(nrlClubs)}/${nrlClubs.length}, EuroLeague ${count(euroleagueClubs)}/${euroleagueClubs.length}, college football ${count(cfbClubs)}/${cfbClubs.length}, women's ${count(womensClubs)}/${womensClubs.length}, domestic ${count(domestic)}/${domestic.length}`);
+console.log(`  all-leagues football ${count(worldClubs)}/${worldClubs.length}, NBA ${count(nbaClubs)}/${nbaClubs.length}, NFL ${count(nflClubs)}/${nflClubs.length}, MLB ${count(mlbClubs)}/${mlbClubs.length}, NHL ${count(nhlClubs)}/${nhlClubs.length}, NRL ${count(nrlClubs)}/${nrlClubs.length}, EuroLeague ${count(euroleagueClubs)}/${euroleagueClubs.length}, college football ${count(cfbClubs)}/${cfbClubs.length}, rugby union ${count(rugbyUnionClubs)}/${rugbyUnionClubs.length}, women's ${count(womensClubs)}/${womensClubs.length}, domestic ${count(domestic)}/${domestic.length}`);
 console.log(`  domestic clubs with a Wikidata item: ${domestic.filter(club => club.qid).length}`);
 for (const [reason, list] of Object.entries(rejected)) console.log(`  rejected (${reason}): ${list.length}${list.length <= 12 ? '\n    ' + list.join('\n    ') : ''}`);
-const missing = [...worldClubs, ...nbaClubs, ...nflClubs, ...mlbClubs, ...nhlClubs, ...nrlClubs, ...euroleagueClubs, ...cfbClubs, ...womensClubs].filter(club => !crests.has(club.id));
-if (missing.length) console.log(`  all-leagues, NBA, NFL, MLB, NHL, NRL, EuroLeague, college football and women's clubs without a crest:\n    ${missing.map(club => `${club.id} (${club.qid || 'no item'})`).join('\n    ')}`);
+const missing = [...worldClubs, ...nbaClubs, ...nflClubs, ...mlbClubs, ...nhlClubs, ...nrlClubs, ...euroleagueClubs, ...cfbClubs, ...rugbyUnionClubs, ...womensClubs].filter(club => !crests.has(club.id));
+if (missing.length) console.log(`  all-leagues, NBA, NFL, MLB, NHL, NRL, EuroLeague, college football, rugby union and women's clubs without a crest:\n    ${missing.map(club => `${club.id} (${club.qid || 'no item'})`).join('\n    ')}`);
 // (--pages looks up no item, so it has no problems of its own to report.)
 if (!pagesOnly) for (const problem of problems) console.log(`  ${problem}`);
 for (const [id, { crest }] of pageCrests) console.log(`  ${id}: ${crest.name} (${crest.info.licence}${crest.info.nonFree ? ', non-free' : ''}), from its file page ${crest.info.page}`);

@@ -66,16 +66,17 @@ test('they are OFC nations with a capital, a flag and a colour, drawn from the 5
   assert.equal(world.capitals['882'], undefined);
 });
 
-test('each sport fields them only with a real side: rugby league Tonga and Samoa, nobody else', () => {
+test('each sport fields them only with a real side: both rugby codes Tonga and Samoa, nobody else', () => {
   // A nation fields a team only when its own rated players hold half the lineup (fieldedNations): nobody rates the
   // islanders in football, basketball, baseball, hockey or tennis.
   const fields = Object.fromEntries(SPORT_LIST.filter(sport => !sport.clubsOnly)
     .map(sport => [sport.id, PACIFIC_ISLANDS.filter(id => fieldedNations(sport).includes(id))]));
   assert.deepEqual(fields, { football: [], 'womens-football': [], basketball: [], baseball: [], hockey: [], tennis: [],
-    'womens-tennis': [], 'rugby-league': ['776', '882'], 'rocket-league': [], 'counter-strike': [], valorant: [],
+    'womens-tennis': [], 'rugby-union': ['776', '882'], 'rugby-league': ['776', '882'], 'rocket-league': [], 'counter-strike': [], valorant: [],
     'league-of-legends': [] });
   // Rugby league's are the NRL players of their 2025 Test sides (docs/design/rugby-league.md). The Cook Islands' five
-  // fall short of half a matchday 17.
+  // fall short of half a matchday 17. Rugby union's are the Premiership's, Top 14's and URC's players of their Test sides
+  // (docs/design/rugby-union.md): Samoa's and Tonga's reach half a matchday 23.
   for (const [id, real] of [['776', 17], ['882', 17], ['184', 5]]) {
     const team = buildTeam(id, makeRng(7), getSport('rugby-league'));
     assert.ok(team.squad.filter(player => !player.gen).length >= real, `rugby league: ${team.name} fields ${real} NRL players or more`);

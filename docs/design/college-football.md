@@ -1,6 +1,7 @@
 # College football
 
-Status: implemented 2026-11-15 (simulation version 1). The twelfth sport: the 138 schools of the 2026 Football Bowl
+Status: implemented 2026-11-15 (simulation version 1); its luck recalibrated 2026-11-18 (version 2,
+[Luck and form](#luck-and-form)). The twelfth sport: the 138 schools of the 2026 Football Bowl
 Subdivision, rated by EA SPORTS College Football 27, fight over the USA, each from its own stadium, so a campaign can be a
 "138 team CFB 27 imperialism". It plays American football's drive model ([american-football.md](american-football.md))
 under college rules, with its schools only (`clubsOnly`), on its own map. Everything outside the match (territory, the
@@ -55,24 +56,115 @@ about 8.3% of touchdowns (touchdowns less extra-point tries), made 46.1%, 0.030 
 touchdown, a field-goal try, a punt or a giveaway were 10.35 a team a game; with about two more ended on downs or by a
 half's end, the model plays **12.3 possessions** a side (± 1.1, 9 to 16), against the NFL's 11.
 
-**Fitted.** Whole conference seasons, every pair of conference mates played many times on neutral ground:
+**Fitted** (2026-11-18, version 2; `npm run simulation:realism`, "College football"). Conference seasons on neutral
+ground: each conference's schools play a shuffled round robin cut to eight games a school in seven seasons of ten and
+nine in the rest, 8.3 a school as the FBS's conference schedules of 2024 and 2025 had (the independents sit out):
 
-- `td` 0.2616 and `fgTry` 0.1748, a drive's touchdown and field-goal try at the 138 schools' average matchup (their mean
-  offence less mean defence, `edge` 0.51) and average kicker (`kicker` 76), so seasons score 3.27 touchdowns and 1.21
-  field goals made a team a game, as the FBS did; 26.8 points with overtime's;
-- `early` 0.076, the share of early touchdowns that go for two, with the NFL's late-game chart, so 8.3% of touchdowns do;
-- `scale` 1.57: each rating point of edge moves a drive's touchdown, field-goal and two-point odds 1.57 times as far as in
+- `scale` 1.8: each rating point of edge moves a drive's touchdown, field-goal and two-point odds 1.8 times as far as in
   the NFL. EA rates the schools about as close together as Madden rates the NFL's franchises (offence SD 3.8, defence
-  3.6), though FBS schools differ far more than NFL franchises do; with it, conference seasons spread the schools'
-  average margins with an SD of 10.5 points (8.0 true, plus the luck of 8.5 games), as the FBS's did (10.3 in 2024, 10.7
-  in 2025).
+  3.6), though FBS schools differ far more than NFL franchises do; with it the conference seasons spread the schools'
+  average conference margins with an SD of 10.53 points, as the FBS's did (10.3 in 2024 and 10.7 in 2025 by
+  cfbstats.com's tables; 10.34 and 10.74 counted the same way from the seasons' snapshots, `scripts/data/cfb-seasons/`);
+- `form`, match-day form: half the NFL's in log odds, which the scale no longer stretches ([Luck and form](#luck-and-form));
+- `td` 0.2599 and `fgTry` 0.1716, a drive's touchdown and field-goal try at the 138 schools' average matchup (their mean
+  offence less mean defence, `edge` 0.51) and average kicker (`kicker` 76), so the seasons score 3.27 touchdowns and 1.21
+  field goals made a team a game, overtime's included, as the FBS did, and 26.5 points;
+- `early` 0.076, the share of early touchdowns that go for two, with the NFL's late-game chart: 8.6% of touchdowns go for
+  two (cfbstats' 8.3%; ESPN's box scores 8.7% in 2024, 8.4% in 2025).
 
-A conference game's margin then spreads with an SD of about 20 points, 4.9% of conference games go to overtime, and the
-best school beats the weakest more than 95% of the time.
+A conference game's margin then spreads with an SD of about 19 points, 5.1% of conference games go to overtime (the FBS's
+4.3% in 2024 and 6.1% in 2025, ESPN's drives), and the best school (Indiana, 87.4) beats the weakest (UTEP, 74.0) all but
+once in ten thousand. Version 1 (2026-11-15) had `scale` 1.57, `td` 0.2616 and `fgTry` 0.1748 and the NFL's form
+stretched by its scale. Its 10.5 was 8.0 of true spread and the luck of 8.5 games, that luck taken from a game's whole
+margin SD (20 points), which already holds the schools' own spread: played out on schedules, its conference seasons
+spread 9.9.
 
-**Home advantage** (off by default) gives the home side 0.7 rating points of edge each way: equal sides' home side wins by
-about 2.5 points, 56% of the time, the home edge usually quoted for college football (not fitted here: cfbstats' home
-splits mix in FCS visitors).
+**Home advantage** (off by default) gives the home side 0.62 rating points of edge each way: equal sides' home side wins
+by about 2.5 points, 57% of the time, the home edge usually quoted for college football and about the FBS's own (each
+season's SRS over its games between FBS schools has the home side 2.5 points better on average from 2009 to 2025, 3.0
+and 3.1 in 2024 and 2025). Not fitted: cfbstats' home splits mix in FCS visitors, and version 1's 0.7 gave the same 2.5
+points under its smaller scale.
+
+## Luck and form
+
+Status: 2026-11-18, simulation version 2 (the built-in season) and 3 (the earlier seasons, moved again by it).
+
+**The question.** Replayed on their own schedules, the computed FBS seasons ([Earlier seasons](#earlier-seasons)) were
+reported to spread their standings about a fifth too little (win% SD 0.18–0.20 against the real 0.21–0.25). That figure
+averaged each school's twenty replays before taking the spread, which takes a season's luck out of the simulated
+standings and leaves it in the real ones: replay by replay, as a real season is one, version 1 spread its standings
+0.220 against the real 0.232, 0.012 too even on average (every season too even; within 0.01 in six of seventeen).
+
+**What was too random.** Judged as a real season is, by the margins' spread about the season's own Simple Rating System
+(`srsOf`'s sigma, which allows for the ratings it fits), version 1's games had 17.1 points of luck against the real
+seasons' 14.3 (13.3 to 15.5), and its favourites lost too often, the more so the bigger the mismatch: a 21–28-point
+favourite by the season's own SRS won 94.9% of the time against the real 98.1%. Two things made it:
+
+- **Form.** Match-day form moves both sides' edges in rating points (0.35 a point of drama, 2.1 at Balanced), and
+  `driveOdds` multiplies the edge by the college `scale`, so college form was 1.57 times the NFL's in log odds: about 8
+  points of margin SD at Balanced, against the NFL's 4. The scale corrects EA's ratings, which sit closer together than
+  the schools play; it has nothing to say about a day's form.
+- **The drive model's own luck.** Without any form (Predictable) the model's games had 15.0 points of luck by the same
+  measure, a little above the real 14.3: twelve and more independent possessions a side carry most of college football's
+  luck themselves. The NFL's late-game play-calling, which college football shares, adds to it in mismatches: a heavy
+  favourite only two scores up plays safe while its opponent chases, and the margin's spread grows from 13.8 points
+  between equals to 15.7 at a 30-point gap, where without the late calls it falls from 15.1 to 14.6 (Predictable,
+  neutral ground). Who wins hardly moves (a version whose leader plays on two scores up moved the standings by 0.001), so
+  the calls stay the NFL's.
+
+The expected margins were right: the real margins against the replays' mean margins have a slope of 0.98, and the
+replays' SRS spreads the schools as the real one does (14.6 against 14.0, the replays' luck included).
+
+**The fix.** College football's rulebook carries its own form (`form`, rating points a point of drama, which
+`sampleResult` plays and the live chart's `formSd` follows; the NFL's rulebooks carry none, so its games are the same
+draw for draw): half the NFL's in log odds, `0.5 × FORM_PER_DRAMA ÷ scale`. Measured over all seventeen seasons on their
+own schedules, forty replays each (Balanced, the home side defending at home, version 1's season files):
+
+| College form | Win% SD against the real (0.232) | Seasons within 0.01 | Luck (SRS sigma; real 14.3) |
+| --- | --- | --- | --- |
+| The NFL's, stretched by the scale (version 1) | −0.012 | 6 of 17 | 17.1 |
+| The NFL's | −0.007 | 12 | 16.0 |
+| Seven tenths of the NFL's | −0.005 | 14 | 15.4 |
+| Half the NFL's (version 2) | −0.004 | 14 | 15.2 |
+| None | −0.003 | 14 | 15.0 |
+
+Less form is closer to the real seasons by every measure, down to none, where the drive model's own luck is left; half
+the NFL's costs 0.001 in the standings against none and keeps the Upsets setting a setting (Predictable plays no form,
+Wild twice Balanced's). With less luck the conference seasons spread less, so the scale was fitted again to the FBS's 10.5
+(1.57 → 1.8), and the drive odds to its scoring (`td` 0.2616 → 0.2599, `fgTry` 0.1748 → 0.1716) and the home edge to its
+2.5 points (0.7 → 0.62) under it ([The match model](#the-match-model)). A bigger scale gives more margin a rating point,
+so the computed seasons were moved toward their results again (`npm run sync:cfb-seasons`, then `npm run
+build:cfb-seasons` and `npm run build:college-scoring`): m, the margin a point of played strength gives, went from
+3.6–4.1 to 4.1–4.6, and each season's schools spread less in rating points for the same margins.
+
+**After** (`npm run simulation:realism`, forty replays a season, neutral venues as campaigns play by default; with Home
+advantage on, the home side at home: −0.003 on average, fourteen within 0.01):
+
+| Season | Win% SD (real) | Luck, SRS sigma (real) | Points a team (real) | Overtime (real) |
+| --- | --- | --- | --- | --- |
+| 2009 | 0.223 (0.232) | 15.1 (13.3) | 27.1 (26.0) | 4.5% (3.6%) |
+| 2010 | 0.236 (0.230) | 15.2 (14.3) | 27.8 (27.1) | 4.7% (3.9%) |
+| 2011 | 0.231 (0.231) | 15.5 (14.0) | 28.4 (27.3) | 4.7% (4.3%) |
+| 2012 | 0.229 (0.245) | 15.5 (13.9) | 29.1 (28.4) | 4.5% (6.1%) |
+| 2013 | 0.240 (0.251) | 15.5 (14.0) | 29.3 (28.4) | 4.3% (4.5%) |
+| 2014 | 0.220 (0.221) | 15.6 (14.5) | 29.6 (28.4) | 4.6% (3.9%) |
+| 2015 | 0.229 (0.242) | 15.5 (14.7) | 29.7 (28.4) | 4.4% (4.2%) |
+| 2016 | 0.227 (0.221) | 15.9 (15.5) | 30.1 (29.0) | 4.4% (5.0%) |
+| 2017 | 0.230 (0.227) | 15.7 (14.3) | 28.9 (28.0) | 4.5% (3.6%) |
+| 2018 | 0.230 (0.230) | 15.4 (14.7) | 29.4 (28.3) | 4.7% (3.9%) |
+| 2019 | 0.230 (0.232) | 15.0 (14.0) | 28.8 (27.9) | 4.4% (3.0%) |
+| 2020 | 0.248 (0.253) | 15.3 (14.2) | 30.4 (28.8) | 5.5% (4.0%) |
+| 2021 | 0.232 (0.233) | 15.1 (14.5) | 28.6 (27.5) | 4.5% (4.0%) |
+| 2022 | 0.220 (0.213) | 15.0 (14.4) | 28.3 (27.2) | 5.1% (5.9%) |
+| 2023 | 0.223 (0.225) | 14.7 (14.5) | 27.6 (26.7) | 4.8% (5.5%) |
+| 2024 | 0.224 (0.220) | 14.8 (14.0) | 27.6 (26.8) | 4.9% (4.9%) |
+| 2025 | 0.223 (0.230) | 14.9 (13.7) | 26.7 (26.2) | 4.8% (5.5%) |
+| All | −0.002 from the real 0.232 | 15.3 (14.3) | 1.0 above | 4.7% (4.5%) |
+
+One replay's spread is itself a draw (about 0.007 either way), and so is the real season's: fourteen seasons sit within
+0.01 of theirs; 2012, 2013 and 2015 spread 0.012–0.016 more in life than the model gives them with any form or none.
+The real overtime shares are each season's games between FBS schools that ESPN's drives carry into a fifth period
+(`REAL.collegeOvertime` in `scripts/simulation-realism.mjs`: 558 of 12,487 games, 4.5%).
 
 ## College overtime
 
@@ -234,27 +326,30 @@ only the schools those name enough players for; that is not built.
 - **The move toward results.** As the NFL's computed seasons: each school's Simple Rating System over the season's games
   between FBS schools (regular season and postseason, a bowl or playoff game at a neutral site), its reliability r (0.67
   in 2020, when conferences barely met; 0.88–0.92 otherwise), m the margin the match model gives a point of played
-  strength under the season's rules without its data set (3.6–4.1 points, over 160,000 games), and the target
-  T = μ + √r × S ÷ m; every player of the school moves by a whole number and its best few one more, never reordered,
-  and the school keeps the squad it then fields. A game against a school that does not play the season still counts
-  toward its opponent's rating.
-- **Results.** Schools spread as the built-in season's do (lineup strength SD 3.0–3.9 about 79.5, against College
-  Football 27's 3.34 about 79.5; squad players p5/p25/p50/p75/p95 68–69/73–74/77–78/82/89, against 70/74/77/81/88). Every
+  strength under the season's rules without its data set (4.1–4.6 points, over 160,000 games; 3.6–4.1 before the luck
+  recalibration of 2026-11-18, [Luck and form](#luck-and-form), whose bigger scale gives more margin a point), and the
+  target T = μ + √r × S ÷ m; every player of the school moves by a whole number and its best few one more, never
+  reordered, and the school keeps the squad it then fields. A game against a school that does not play the season still
+  counts toward its opponent's rating.
+- **Results.** Schools spread a little narrower than the built-in season's (lineup strength SD 2.4–3.2 about 79.2–80.0,
+  against College Football 27's 3.34 about 79.5; squad players p5/p25/p50/p75/p95 68–69/73–74/77–78/81–82/88–89, against
+  70/74/77/81/88): College Football 27's 2026 schools, under the scale fitted to the FBS's conference seasons of 2024 and
+  2025, play as far apart as those seasons did, and 2024's and 2025's computed schools spread 3.06 and 3.22. Every
   national champion is among its season's five strongest schools (a test holds it) and leads twelve of the seventeen:
   Alabama in 2009, 2011, 2012, 2015, 2017 and 2020, Florida State in 2013, Georgia in 2021 and 2022, Michigan in 2023,
   Ohio State in 2024 and Indiana in 2025 (15–0 against FBS schools). 2018's Clemson and 2019's LSU are second (behind
-  Alabama and Ohio State), 2014's Ohio State third and 2016's Clemson fourth; 2010's Auburn is fifth, behind Oregon,
-  Stanford, Boise State and Alabama, whose margins were wider. Replayed on its own schedule under its rules (each real
-  game 20 times, the home side defending at home), a season scores 0.4–1.3 points a team above the real one and spreads
-  its margins a little wider (SD 22–25 against 20–22), but its standings spread about a fifth too little (win% SD
-  0.18–0.20 against 0.21–0.25): the match model's luck between equal sides is the real game's
-  (a margin SD of 16.0 against 15.0–15.3 about the SRS fit), and the expected margins follow the SRS (slope 0.95–0.99),
-  so the excess is the model's luck in mismatches, which the built-in season shares (Not done). The audit
-  (`docs/design/college-football-seasons-audit.json`) lists every school with its conference, record, points, SRS and
-  move, every documented lineup gap (an option offence's tight end: Army, Navy, Georgia Tech) and the schools left out.
+  Alabama and Ohio State), 2014's Ohio State fourth (behind TCU, Alabama and Oregon) and 2016's Clemson fourth (behind
+  Alabama, Ohio State and Michigan); 2010's Auburn is fifth, behind Oregon, Stanford, Boise State and Alabama, whose
+  margins were wider. Replayed on its own schedule under its rules (`npm run simulation:realism`, forty times), a season
+  spreads its standings as the real one did (win% SD within 0.01 in fourteen seasons of seventeen, 0.002 too even on
+  average), scores 0.5–1.7 points a team above it and has a point more luck about its own SRS (15.3 against 14.3):
+  [Luck and form](#luck-and-form). The audit (`docs/design/college-football-seasons-audit.json`) lists every school with
+  its conference, record, points, SRS and move, every documented lineup gap (an option offence's tight end: Army, Navy,
+  Georgia Tech) and the schools left out.
 - **Checks.** `npm run audit:rosters -- --sport=college-football`: the 17 seasons and the built-in one, 0 errors, 0
-  warnings. Spot checks: Tim Tebow 2009 96, Ndamukong Suh 2009 96, Mark Ingram 2009 95, Marcus Mariota 2014 99, Derrick Henry 2015 98, Joe
-  Burrow 2019 98, Jeremiah Smith 2025 99; Aaron Donald 2013 79 shows the early seasons' weak defensive evidence.
+  warnings. Spot checks: Tim Tebow 2009 95, Ndamukong Suh 2009 96, Mark Ingram 2009 94, Marcus Mariota 2014 98, Derrick
+  Henry 2015 97, Joe Burrow 2019 97, Jeremiah Smith 2025 99; Aaron Donald 2013 79 shows the early seasons' weak defensive
+  evidence.
 - **Size.** The season files are 118–138 KB each (2.2 MB), loaded only when chosen and cached for offline play
   (`src/pwa.js`); the snapshots 300–340 KB each (5.4 MB, `scripts/data/cfb-seasons/`).
 
@@ -278,11 +373,12 @@ grow by them.
 
 ## Rules by era
 
-Status: built 2026-11-18 (simulation version 2, the earlier seasons only). Every earlier FBS season (data set
+Status: built 2026-11-18 (simulation version 2, the earlier seasons only; version 3 since the luck recalibration of the
+same day, [Luck and form](#luck-and-form), which made the built-in season's version 2). Every earlier FBS season (data set
 `cfb-<year>`, 2009 to 2025) plays its own day's scoring and the NCAA overtime of its day. `matchSport` asks the sport for
 a campaign's rules (`rulesFor`), and `collegeFootballIn(settings)` gives one sport object per season, under
-`collegeSeasonRules(year, dataSet)`. The built-in season (no data set) gets `collegeFootball` itself: today's rules and
-results, draw for draw (its version stays 1). The NFL's results are unchanged too.
+`collegeSeasonRules(year, dataSet)`. The built-in season (no data set) gets `collegeFootball` itself: today's rules, its
+draws unchanged by the seasons' rules coming in. The NFL's results are unchanged too, by either.
 
 **Source.** sportsdataverse's cfbfastR-cfb-data tables (ESPN-derived Parquet,
 `https://github.com/sportsdataverse/cfbfastR-cfb-data`, `cfb/<table>/parquet/`), saved in the ignored
@@ -394,8 +490,8 @@ they were, draw for draw.
 The first period's touchdowns are kicked in every era (the rules left the try to the team, and the model kicks), and
 under the 1997 rules the second's too. The 1997 rules have no shoot-out: periods of possessions go on until one decides
 the game, here at most `maxOvertimes` (8) and then the decisive two-point play, as today. Between two of 2013's average
-schools 57% of overtimes end in the first period, 24% in the second, 13% in the third and 6% go on; under today's rules
-the forced two-point try of the second period ends 32% there and only 13% reach the third.
+schools 61% of overtimes end in the first period, 24% in the second, 11% in the third and 4% go on; under today's rules
+the forced two-point try of the second period ends 31% there and only 12% reach the third.
 
 The live chart (`collegeChain`, `collegeLeadAt` in `src/engine/winProbability.js`) plays each era's overtime: a season
 whose overtime is not today's carries its periods on the live model (`twoFrom`, `playsFrom`), and its chain is exact for
@@ -420,12 +516,14 @@ two-point play levels 2.
 - The game clock no longer stopped for a first down but in each half's last two minutes, from 2023: Wikipedia, "2023 NCAA
   Division I FBS football season", `https://en.wikipedia.org/w/index.php?oldid=1377196806`.
 
-**Measured** (2026-11-18, the season files of that evening, `scripts/college-football-eras.test.mjs`): each season's own
-schools, every school against every fourth other four times (about 19,000 games), score as far from today's as their
-league did from 2024 and 2025's, within −0.16 to +0.35 points a team-game, their touchdowns within 1.5% (the test allows
-0.6 points and 3%). Over conference pairings only, as today's rules were fitted, the seasons score up to 0.6 points above
-(−0.03 to +0.64): their computed schools differ more within a conference than College Football 27's (the spread of a
-conference pairing's edge 16.5 to 25.4, against 11.6), and the allowance is for all pairings, as the NFL's is.
+**Measured** (2026-11-18, the season files as the luck recalibration moved them, `scripts/college-football-eras.test.mjs`):
+each season's own schools, every school against every fourth other four times (about 19,000 games), score as far from
+today's as their league did from 2024 and 2025's, within +0.09 to +0.47 points a team-game, their touchdowns within 2%
+(the test allows 0.6 points and 3%; −0.16 to +0.35 points before the recalibration). Over conference pairings only, as
+today's rules were fitted, the seasons score up to 1.2 points above (+0.40 to +1.17): their computed schools differ more
+within a conference than College Football 27's (the spread of a conference pairing's edge 13.3 to 20.5, against 11.4),
+and the allowance is for all pairings, as the NFL's is. On their own schedules, mostly conference games, they score 1.0
+point a team above their real seasons ([Luck and form](#luck-and-form)).
 
 **Estimated, not measured:** the overtime possessions' odds (as today's, moved with the season); two-point tries
 (today's); 2011's extra points (its neighbours'). ESPN's drives do name overtime's possessions from the 25: from 2014 to
@@ -441,30 +539,42 @@ so they are not fitted, and today's estimates stand so the built-in season's dra
   could go further back, fielding only the schools those name enough players for.
 - 2009–2013's defenders are ranked without tackles or sacks (plays before 2014 name no tacklers): by interceptions,
   recruiting and years, which order EA's ratings at 0.64–0.74 against 0.77–0.80 from 2014.
-- The match model's luck in mismatches: replayed on its own schedule a computed season's standings spread about a fifth
-  too little (win% SD 0.18–0.20 against the real 0.21–0.25), though its expected margins follow the real ones and its
-  luck between equal sides is the real game's. The built-in season shares the model, so a recalibration would touch it
-  too.
+- College games end too close: the NFL's late-game play-calling, which college football plays, closes them more than the
+  FBS's coaches do (46% of conference games within a score against 39%, 14% by exactly 3 against 9–12%, 27% by 21 or
+  more against 30%), and in a mismatch it lets a two-score lead slip a little more often than the real game does. Who
+  wins hardly moves; a college chart of its own, fitted to these margins, would also move the overtime share.
+- The drive model's own luck is a little above the real game's (15.0 points about a season's SRS with no form at all,
+  against 14.3), so Balanced keeps only half the NFL's form ([Luck and form](#luck-and-form)), and 2012, 2013 and 2015
+  spread their standings 0.012–0.016 more in life than the model gives them.
+- The computed seasons score about a point a team above their real seasons on their own schedules: the allowance for
+  their spread is for all pairings, and their conference pairings sit further apart than College Football 27's.
 - Overtime's possession odds are estimates; the edge scale and the rates are fitted to conference seasons, not to
   non-conference games, whose mismatches are wider.
-- The realism harness (`npm run simulation:realism`) and the match-simulation report do not cover college football yet.
 
 ## Tests
 
 `scripts/college-football.test.mjs`: the schools rebuild byte for byte; every school fields 23 natural starters; the
-college rules; 3,000 games with a winner, a feed that adds up and FBS-like scores; college overtime's periods, tries and
-two-point plays; favourites, upsets and the home edge; the feed copy and scorer lines, live and archived; the live chart
-against simulated odds and its overtime chain against simulated overtimes; the map (one territory per school around its
-stadium, the shared counties' cuts, Hawaii, the empty states) and a seeded campaign to a champion; setup; the squad
-screen; and the running App launching on the FBS map, saving and resuming. `scripts/club-maps.test.mjs` holds the map to
-the state rule (Hawaii is the FBS map's own); `npm run smoke` adds an FBS duel with the live ticker and an FBS resume.
+college rules, their form half the NFL's in log odds; 3,000 games with a winner, a feed that adds up and FBS-like
+scores; college overtime's periods, tries and two-point plays; favourites, upsets and the home edge; the feed copy and
+scorer lines, live and archived; the live chart against simulated odds and its overtime chain against simulated
+overtimes; the map (one territory per school around its stadium, the shared counties' cuts, Hawaii, the empty states)
+and a seeded campaign to a champion; setup; the squad screen; and the running App launching on the FBS map, saving and
+resuming. `scripts/club-maps.test.mjs` holds the map to the state rule (Hawaii is the FBS map's own); `npm run smoke`
+adds an FBS duel with the live ticker and an FBS resume.
 
-`scripts/college-football-eras.test.mjs` ([Rules by era](#rules-by-era)): the built-in season keeps today's rules and
-its draws (and the NFL its own: digests taken before the seasons' rules came in); the overtime by year; every season's
-rules, one sport object each; the scoring readers on a made-up season; the scoring table rebuilt (`--check`, byte for
-byte where `data-src/` has the tables), every point adding up and 2024–25 against cfbstats.com; every season scoring
-like its league; each era's overtime periods and tries in simulated games; the clock, ticker and setup; and the live
-chart's chain against simulated overtimes in each era, its kickoff against the odds and its leads by era.
+`scripts/college-football-eras.test.mjs` ([Rules by era](#rules-by-era)): the built-in season keeps today's rules, its
+draws pinned by digests (version 2's), and the NFL its own (digests taken before the seasons' rules came in, unchanged by
+the luck recalibration); the overtime by year; every season's rules, one sport object each; the scoring readers on a
+made-up season; the scoring table rebuilt (`--check`, byte for byte where `data-src/` has the tables), every point adding
+up and 2024–25 against cfbstats.com; every season scoring like its league; each era's overtime periods and tries in
+simulated games; the clock, ticker and setup; and the live chart's chain against simulated overtimes in each era, its
+kickoff against the odds and its leads by era.
+
+`scripts/simulation-realism.test.mjs` ([Luck and form](#luck-and-form)): the built-in season's conference seasons score
+(points, touchdowns, field goals made), spread (the schools' average conference margins), go to overtime and try for two
+as the FBS's of 2024 and 2025 did; every computed season replayed on its own schedule spreads its standings within 0.02
+of the real season's, the seventeen within 0.006 on average, its luck, overtime and points within reach of the real
+season's.
 
 `scripts/cfb-seasons.test.mjs` ([Earlier seasons](#earlier-seasons)): the readers on invented rows (positions, generic
 backs, recruiting by name and school, box-score categories, the schedule's schools, the 3:2:1 window, shrinkage, the

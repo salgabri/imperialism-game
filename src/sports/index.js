@@ -11,6 +11,7 @@ import { baseball } from './baseball.js';
 import { hockey } from './hockey.js';
 import { tennis } from './tennis.js';
 import { womensTennis } from './womensTennis.js';
+import { rugbyUnion } from './rugbyUnion.js';
 import { rugbyLeague } from './rugbyLeague.js';
 import { rocketLeague } from './rocketLeague.js';
 import { counterStrike } from './counterStrike.js';
@@ -18,10 +19,10 @@ import { valorant } from './valorant.js';
 import { leagueOfLegends } from './leagueOfLegends.js';
 
 export const SPORTS = { football, 'womens-football': womensFootball, basketball, 'american-football': americanFootball,
-  'college-football': collegeFootball, baseball, hockey, tennis, 'womens-tennis': womensTennis, 'rugby-league': rugbyLeague,
+  'college-football': collegeFootball, baseball, hockey, tennis, 'womens-tennis': womensTennis, 'rugby-union': rugbyUnion, 'rugby-league': rugbyLeague,
   'rocket-league': rocketLeague, 'counter-strike': counterStrike, valorant, 'league-of-legends': leagueOfLegends };
 export const SPORT_LIST = [football, womensFootball, basketball, americanFootball, collegeFootball, baseball, hockey, tennis, womensTennis,
-  rugbyLeague, rocketLeague, counterStrike, valorant, leagueOfLegends];
+  rugbyUnion, rugbyLeague, rocketLeague, counterStrike, valorant, leagueOfLegends];
 export const DEFAULT_SPORT = 'football';
 
 export const getSport = id => SPORTS[id] || SPORTS[DEFAULT_SPORT];
