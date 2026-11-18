@@ -172,25 +172,30 @@ and Swaziland SZ; without them 1989/90 scored no West Germany, Soviet Union or Y
 | Built-in 2026/27 (EA FC 27 with FM 26) | 0.927 (173) | 0.927 |
 | Championship Manager, 1989/90 to 2003/04 | 0.817 to 0.907 | 0.790 to 0.907 |
 | SWOS, 1994/95 to 1996/97 | 0.851 to 0.865 | the same |
-| FIFA 05 to FIFA 09 | 0.744 to 0.817 | 0.818 to 0.896 |
-| FIFA 10 to FIFA 12 | 0.779 to 0.835 | 0.762 to 0.796 |
-| FIFA 13 to EA FC 24 | 0.794 to 0.889 | 0.808 to 0.865 |
-| EA FC 25 and EA FC 26 | 0.800 and 0.832 | 0.822 and 0.816 |
+| FIFA 05 to FIFA 09 | 0.879 to 0.904 (0.744 to 0.817 before the computed fills) | 0.879 to 0.904 (0.818 to 0.896) |
+| FIFA 10 to FIFA 12 | 0.805 to 0.834 (0.779 to 0.835) | 0.805 to 0.834 (0.762 to 0.796) |
+| FIFA 13 to EA FC 24 | 0.853 to 0.899 (0.794 to 0.889) | 0.838 to 0.879 (0.808 to 0.865) |
+| EA FC 25 and EA FC 26 | 0.814 and 0.845 (0.800 and 0.832) | 0.815 and 0.819 (0.822 and 0.816) |
 
-The median is 0.852. Where EA's seasons fall short it is mostly coverage: EA rates few players of leagues it has no
-licence for, so Iran, Egypt, Iraq and Japan (and Russia and Ukraine in FIFA 08) play with empty places and rank 44 to
-66 places below their Elo, which is why FIFA 05 to FIFA 09 agree far better over full XIs only (FIFA 07 0.762 → 0.896).
+The median is 0.869 (0.852 before the computed fills). Where EA's seasons fell short it was mostly coverage: EA rates
+few players of leagues it has no licence for, so Iran, Egypt, Iraq and Japan (and Russia and Ukraine in FIFA 08) played
+with empty places and ranked 44 to 66 places below their Elo, which is why FIFA 05 to FIFA 09 agreed far better over
+full XIs only (FIFA 07 0.762 → 0.896). Since 2026-11-18 the computed fills give a fielded nation's empty places to
+players capped for it that season, rated from its Elo and marked as estimates
+([football-years.md](football-years.md#computed-fills)); the figures above are after them, those in brackets before.
+Full XIs now include the filled ones.
 The rest is EA's view of players against results: Iceland, Wales and Mali rank about 28 places above their Elo in
 FIFA 08, and Bosnia, Ghana and Suriname's Dutch-born XI about 40 in EA FC 25. The built-in season, whose gaps FM 26
 fills, agrees best.
 
-## The warnings that remain (1,268)
+## The warnings that remain (994)
 
 Each is a fact of a source or a rule the game chose, not an error:
 
-- **`lineup-gap` (709).** Football never invents a player, so a nation whose source rates fewer than eleven
-  plays short (an empty place counts 40) or with an outfield player in goal: 14 to 30 nations in each EA edition
-  (Iran fields six in EA FC 26), 4 to 13 in each of the women's, 11 to 19 in each CM database, and 9 of the 36
+- **`lineup-gap` (444; 709 before the computed fills).** Football never invents a player, so a nation whose source rates
+  fewer than eleven plays short (an empty place counts 40) or with an outfield player in goal: 1 to 30 nations in each
+  EA edition, where Wikidata names no capped player for the places (Iran fields nine in EA FC 26, six of them EA's),
+  4 to 13 in each of the women's, 11 to 19 in each CM database, and 9 of the 36
   built-in women's nations. A nation takes the field only when its own players hold half its lineup
   (`fieldsRealSide`). Ten NHL clubs (six of NHL 22's, whose source pages CommonCrawl kept incomplete, and four
   expansion clubs of NHLPA 93 and NHL 94) play one to three skaters short, by docs/design/hockey.md's rule
@@ -198,7 +203,7 @@ Each is a fact of a source or a rule the game chose, not an error:
 - **`name-unusual` (100).** The birth-year tags the NHL, MLB and national-team builders give namesakes
   ("Petr Sykora (1976)", "Pedro Martinez (1968)", "Avi Cohen (1956)"), SWOS 94/95 and 95/96's own "Joao Pinto(i)"
   and "(ii)", and Madden NFL 11's "Adam "Pacman" Jones".
-- **`namesakes-in-team` (86).** Mostly EA's short names, two players under one in a squad (Argentina's
+- **`namesakes-in-team` (80).** Mostly EA's short names, two players under one in a squad (Argentina's
   "L. Martínez", Lautaro and Lisandro; Malawi's "T. Chawinga", the sisters Tabitha and Temwa), and real namesakes
   (the 1976 Packers' two Mike McCoys, the 2017 Panthers' two Charles Johnsons, two Rocket League players tagged
   "Abdullah" for Oman). The match feed shows both alike.
@@ -207,12 +212,14 @@ Each is a fact of a source or a rule the game chose, not an error:
   club's `str` is its five's mean, by docs/design/football-years.md's rule, while play takes 12 points off the
   misplaced player, so these clubs play about 2.5 below their listed strength (2012/13's Heat start Ray Allen at
   centre). Nine football clubs are off by 1 to 1.5, where the builder's XI differs from the game's pick.
-- **`age-unusual` (45).** Real teenage debutants and veterans: Modrić, Ronaldo and Chhetri at 40 and 41 in the
-  built-in season, Yisa Sofoluwe at 15 for Nigeria in 1982/83, Vitorino Hilton at 42 for Montpellier, and five
+- **`age-unusual` (50).** Real teenage debutants and veterans: Modrić, Ronaldo and Chhetri at 40 and 41 in the
+  built-in season, five of the computed fills' players (Roman Berezovsky, Armenia's keeper, at 41 in 2016/17; Vincent
+  Thill at 15 for Luxembourg in 2015/16), Yisa Sofoluwe at 15 for Nigeria in 1982/83, Vitorino Hilton at 42 for Montpellier, and five
   players 15 on 1 July before a women's World Cup and 16 at it (Australia's, Mexico's and North Korea's in 2010/11).
 - **`rating-conflict` (8).** MLB namesakes the nation and club layers both name: three Luis Garcías, two
   Francisco Rodríguezes, two Miguel Gonzálezes, two Ryan Brauns.
-- **`birth-date-disagreement` (214)** and **`rating-jump` (24)**: EA's own changes between editions, above.
+- **`birth-date-disagreement` (209)** and **`rating-jump` (22)**: EA's own changes between editions, above (fewer since the
+  computed fills, which leave out some EA players who played out of position).
 
 ## Open questions
 
@@ -220,5 +227,5 @@ Each is a fact of a source or a rule the game chose, not an error:
 - Whether a squad with two players under one EA short name should show their full names.
 - Whether NHL 22's six short clubs should borrow the computed seasons' ratings for their missing places, which
   hockey's rule has so far refused.
-- Whether the EA seasons' short national XIs should be filled from a second rated source, as FM 26 fills the
-  built-in's: it is what keeps FIFA 05 to FIFA 09 furthest from results (Iran, Egypt, Japan).
+- Answered on 2026-11-18: the EA seasons' short national XIs are filled from Wikidata's caps and the nation's Elo
+  (docs/design/computed-ratings.md, adopted by the user on 2026-11-17; [football-years.md](football-years.md#computed-fills)).

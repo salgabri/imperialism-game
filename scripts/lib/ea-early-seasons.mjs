@@ -11,6 +11,7 @@ import { territoryFor } from '../../src/data/footballSetBuild.js';
 import { NATIONS } from '../../src/data/teams.js';
 import { EA_NATION_ALIASES, EA_NO_TEAM, SET_ID, assembleEaSeason } from './ea-seasons.mjs';
 import { isoDate, legacyPositionKeys } from './ea-legacy-seasons.mjs';
+import { nameWords, namesAgree } from './person-names.mjs';
 
 /** The ratings files of these editions hold one field more per row than their header names, after every column read. */
 export const EARLY_EXTRA_FIELDS = 1;
@@ -28,34 +29,9 @@ export const knownNationality = name => nationOf(name) != null || EA_NO_TEAM.inc
 
 // ---------- is it the same person? ----------
 
-// Letters that have no decomposition to a base letter.
-const FOLDED = { ø: 'o', æ: 'ae', œ: 'oe', ß: 'ss', ł: 'l', đ: 'd', ð: 'd', þ: 'th', ı: 'i' };
-
-/** A name's words, in lower case without accents: "Raúl M. Sørensen-Ruiz" → ['raul', 'm', 'sorensen', 'ruiz']. */
-export function nameWords(name) {
-  return String(name).toLowerCase().replace(/[øæœßłđðþı]/g, letter => FOLDED[letter]).normalize('NFD').replace(/\p{M}/gu, '')
-    .split(/[^\p{L}\p{N}]+/u).filter(Boolean);
-}
-
-// The same word, its initial ("r" for "raul") or a shortening of at least three letters ("josh" for "joshua").
-const wordsAgree = (a, b) => a === b || (a.length === 1 && b.startsWith(a)) || (b.length === 1 && a.startsWith(b))
-  || (Math.min(a.length, b.length) >= 3 && (a.startsWith(b) || b.startsWith(a)));
-
-/**
- * Whether two spellings can name one person: each word of the shorter agrees with its own word of the longer. "D. Brivio"
- * and "Pierluigi Brivio" do not, though they share a surname, and that is the point: EA gave that id to another Brivio.
- */
-export function namesAgree(a, b) {
-  const [fewer, more] = [nameWords(a), nameWords(b)].sort((x, y) => x.length - y.length);
-  if (!fewer.length) return false;
-  const left = [...more];
-  return fewer.every(word => {
-    const at = left.findIndex(other => wordsAgree(word, other));
-    if (at < 0) return false;
-    left.splice(at, 1);
-    return true;
-  });
-}
+// The name rules live in scripts/lib/person-names.mjs, which the computed fills share; FIFA 05's and FIFA 06's own
+// importers still read them from here.
+export { nameWords, namesAgree };
 
 /** Whether a later edition's player (`{ names, dob }`) is the person in this ratings row: the same birth date, or an agreeing name. */
 export function samePerson(row, later) {
@@ -191,7 +167,7 @@ const slugOf = name => nameWords(name).join('-').replace(/[^a-z0-9-]/g, '') || '
  * position code, a date that is no real day, damaged text, or a nationality with no game nation that is not listed as
  * having no team.
  */
-export function buildEarlyEaSeason({ ratings, later, entries = new Map() }, edition, { ratingsUrl, nationalities, federations = FOOTBALL_FEDERATIONS } = {}) {
+export function buildEarlyEaSeason({ ratings, later, entries = new Map() }, edition, { ratingsUrl, nationalities, federations = FOOTBALL_FEDERATIONS, assemble = assembleEaSeason } = {}) {
   const { id, fifaVersion, edition: label, released } = edition;
   if (!SET_ID.test(id)) throw new Error(`Season id ${id} is not like ea-fifa-06`);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(String(released))) throw new Error(`${label}: release date ${released} is not YYYY-MM-DD`);
@@ -258,5 +234,5 @@ export function buildEarlyEaSeason({ ratings, later, entries = new Map() }, edit
     reused, leftOutBest: best,
     mappedPositions: Object.fromEntries(Object.entries(mappedCodes).sort(([a], [b]) => (a < b ? -1 : 1))),
   };
-  return assembleEaSeason(records, { id, year, edition: label, update, source, federations, auditExtra, noClubs: true });
+  return assemble(records, { id, year, edition: label, update, source, federations, auditExtra, noClubs: true });
 }

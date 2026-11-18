@@ -1,8 +1,10 @@
 // The built-in earlier football seasons (docs/design/football-years.md): one roster of one EA FIFA / FC edition
 // becomes that season's national squads, top-flight clubs and territory, in the data set format the game loads
 // (src/engine/footballSets.js, kind 'ea'). No I/O here: scripts/build-ea-seasons.mjs reads the sources and writes the
-// files, and tests build seasons from invented rows. Every player written is EA's own record, rating unchanged; a
-// nation with fewer than eleven natural players keeps exactly the ones it has.
+// files, and tests build seasons from invented rows. Every EA player written is EA's own record, rating unchanged. A
+// nation with fewer than eleven natural players keeps the ones it has; given the computed fills' facts (`fill`), one that
+// fields a side has the places EA leaves empty filled by players capped for it that season, rated from its Elo and
+// marked as estimates (scripts/lib/football-fills.mjs).
 //
 // buildEaSeason reads the FIFA 15 – EA FC 24 export, buildSnapshotEaSeason the committed EA FC 26 snapshot and
 // scripts/lib/ea-legacy-seasons.mjs joins the FIFA 07 – FIFA 14 sources. All hand their players to assembleEaSeason,
@@ -16,6 +18,7 @@ import { TOP_CLUBS } from '../../src/data/scopes.js';
 import { pickFootballSquad } from '../../src/data/footballSquad.js';
 import { NATION_ALIASES } from './football-data.mjs';
 import { FOOTBALL_LEAGUES } from './first-divisions.mjs';
+import { fillSeason } from './football-fills.mjs';
 
 /**
  * EA's competition ids of Europe's first divisions, as the built-in club layer keys them (scripts/lib/first-divisions.mjs):
@@ -164,17 +167,18 @@ export function buildSnapshotEaSeason(players, { id, fifaVersion, edition, updat
  * `clubKey` groups a club's players and `league` is an EA_LEAGUES entry `[game league, map shape]` or null (not one of
  * Europe's first divisions). The season is `{ id, year, edition, update, source, federations }`, plus `auditExtra` (fields
  * the audit adds after the snapshot date), `everyLeague` (stop, not warn, on one of the seven big leagues left with no
- * club) and `noClubs` (a season with nations only, so a league with no club is no news). The season keeps Europe's
- * strongest TOP_CLUBS clubs. Returns `{ doc, text, audit, warnings }`.
+ * club), `noClubs` (a season with nations only, so a league with no club is no news) and `fill` (the computed fills'
+ * facts for the season: `{ elo, wikidata, manifest }`, scripts/lib/football-fills.mjs fillSeason). The season keeps
+ * Europe's strongest TOP_CLUBS clubs. Returns `{ doc, text, audit, warnings }`.
  */
-export function assembleEaSeason(records, { id, year, edition, update, source, federations = FOOTBALL_FEDERATIONS, auditExtra = {}, everyLeague = false, noClubs = false }) {
+export function assembleEaSeason(records, { id, year, edition, update, source, federations = FOOTBALL_FEDERATIONS, auditExtra = {}, everyLeague = false, noClubs = false, fill = null }) {
   const warnings = [];
   const warn = message => warnings.push(message);
   const { players, noTeam } = eaPlayersOf(records, { edition, source });
 
   const pools = new Map();
   for (const player of players) if (player.nationId) (pools.get(player.nationId) || pools.set(player.nationId, []).get(player.nationId)).push(player);
-  const nations = {}, nationAudit = [];
+  const nations = {}, nationAudit = [], picks = {};
   // Tonga, Samoa and the Cook Islands are listed only when the edition rates a player of theirs, and no edition does:
   // without them a season plays as on the map it was built for, where they field no team (src/engine/footballSets.js),
   // and every season rebuilds byte for byte.
@@ -189,8 +193,34 @@ export function assembleEaSeason(records, { id, year, edition, update, source, f
     nations[nation] = [Math.round(lineup.rating), pool.length, squad.map(player => player.tuple)];
     nationAudit.push({ id: nation, name: rec[0], pool: pool.length, players: squad.length, strength: nations[nation][0],
       naturalLineup: squad.length === CLUB_SIZE && lineup.slots.every(slot => slot.player && !slot.outOfPosition) });
+    picks[nation] = { pool, squad };
   }
-  return assembleEaClubs(players, { id, year, edition, update, source, federations, auditExtra, everyLeague, noClubs, warnings, warn, noTeam, nations, nationAudit, records });
+  let fillSource = null, fillAudit = null;
+  if (fill) {
+    const filled = fillSeason({ nations: picks, players, fill: { ...fill, year, season: seasonOf(year) }, federations });
+    for (const [nation, { players: list, strength, added }] of filled.squads) {
+      nations[nation] = [Math.round(strength), nations[nation][1] + added, list];
+      const row = nationAudit.find(entry => entry.id === nation);
+      const lineup = selectLineup({ sport: 'football', squad: list.map(expandListed) });
+      Object.assign(row, { players: list.length, strength: nations[nation][0], computed: added,
+        naturalLineup: list.length === CLUB_SIZE && lineup.slots.every(slot => slot.player && !slot.outOfPosition) });
+    }
+    if (filled.squads.size) fillSource = filled.source;
+    fillAudit = filled.audit;
+  }
+  return assembleEaClubs(players, { id, year, edition, update, source, fill: fillSource, federations,
+    auditExtra: fillAudit ? { ...auditExtra, fill: fillAudit } : auditExtra, everyLeague, noClubs, warnings, warn, noTeam, nations, nationAudit, records });
+}
+
+/** A nation's listed player as selectLineup reads him: an EA tuple, or a computed record `[name, 'DF/MF', rating, source]`. */
+function expandListed(entry) {
+  if (entry.length === 4) {
+    const [name, listed, rating] = entry;
+    const positions = listed.split('/');
+    return { name, pos: positions[0], positions, rating };
+  }
+  const [name, pos, rating, sourceInfo] = expandEaTuple(entry, { edition: '', update: 0, snapshotDate: '', roster: '000000' });
+  return { name, pos, positions: sourceInfo.positions, rating };
 }
 
 /**
@@ -232,7 +262,7 @@ export function eaPlayersOf(records, { edition, source }) {
 }
 
 /** assembleEaSeason's clubs, territory and document, from its players and nations. */
-function assembleEaClubs(players, { id, year, edition, update, source, federations, auditExtra, everyLeague, noClubs, warnings, warn, noTeam, nations, nationAudit, records }) {
+function assembleEaClubs(players, { id, year, edition, update, source, fill = null, federations, auditExtra, everyLeague, noClubs, warnings, warn, noTeam, nations, nationAudit, records }) {
   const byClub = new Map();
   for (const player of players) {
     const { league } = player;
@@ -264,13 +294,20 @@ function assembleEaClubs(players, { id, year, edition, update, source, federatio
   for (const club of clubs) leagueAudit.get(club.league).kept++;
 
   const territory = territoryFor(federations, year);
-  const written = new Set([...Object.values(nations).flatMap(([, , squad]) => squad), ...clubs.flatMap(club => club.squad)].map(tuple => tuple[0]));
+  // A computed player (`[name, position, rating, source]`) is no EA record: `computed` counts them, where a season has any.
+  const isEa = tuple => tuple.length !== 4;
+  const listed = Object.values(nations).flatMap(([, , squad]) => squad);
+  const written = new Set([...listed.filter(isEa), ...clubs.flatMap(club => club.squad)].map(tuple => tuple[0]));
+  const computed = listed.filter(tuple => !isEa(tuple)).length;
   const coverage = {
     players: written.size, nations: nationAudit.filter(n => n.players).length,
     completeXIs: nationAudit.filter(n => n.naturalLineup).length, clubs: clubs.length, leagues: new Set(clubs.map(club => club.league)).size,
+    ...(computed ? { computed } : {}),
   };
   const doc = { format: FOOTBALL_SET_FORMAT, kind: 'ea', id, version: '', year, season: seasonOf(year), label: edition, local: false,
-    source, nations, clubs, territory, coverage };
+    // The computed fills' rule and inputs, where the season lists any (scripts/lib/football-fills.mjs): beside EA's source, which
+    // the season's country maps credit as it is.
+    source, ...(fill ? { fill } : {}), nations, clubs, territory, coverage };
   doc.version = `${id}-${contentHash(doc)}`;
   // The nations short of a natural XI, as "id name (players)": the rest is in the season file itself.
   const shortNations = nationAudit.filter(n => !n.naturalLineup).map(n => `${n.id} ${n.name} (${n.players})`);

@@ -439,7 +439,7 @@
       "sources": "EA FC 26",
       "ratingsDate": "2025-09-19",
       "informationDate": "2025-09-19",
-      "contentHash": "ea-fc-26-5f4200db",
+      "contentHash": "ea-fc-26-ef694992",
       "gate": "provisional",
       "verdict": "fail",
       "verdicts": {
@@ -550,28 +550,28 @@
         "missing": [],
         "unknownIds": [],
         "wrongShirtCount": [],
-        "shortXIs": 17,
+        "shortXIs": 16,
         "badRatings": [],
         "badStrength": [],
         "badNationStatus": [],
-        "contentHash": "ea-fc-26-5f4200db",
+        "contentHash": "ea-fc-26-ef694992",
         "failures": []
       },
       "crossSectional": {
         "verdict": "fail",
         "gateSet": {
           "n": 111,
-          "spearman": 0.8457,
-          "pearson": 0.8154,
+          "spearman": 0.8577,
+          "pearson": 0.8401,
           "spearmanCi95": [
-            0.7643,
-            0.8976
+            0.7875,
+            0.9024
           ]
         },
         "gateSetWithoutOfc": {
           "n": 110,
-          "spearman": 0.8465,
-          "pearson": 0.8153
+          "spearman": 0.8586,
+          "pearson": 0.8401
         },
         "ofc": {
           "n": 1,
@@ -580,17 +580,17 @@
         },
         "allNations": {
           "n": 112,
-          "spearman": 0.8413,
-          "pearson": 0.8127
+          "spearman": 0.853,
+          "pearson": 0.8371
         },
         "withinConfederation": {
-          "weightedSpearman": 0.8131,
+          "weightedSpearman": 0.8341,
           "weighting": "n-weighted mean of the per-confederation Spearman values over the gate set",
           "byConfederation": {
             "UEFA": {
               "n": 46,
-              "spearman": 0.9568,
-              "pearson": 0.9169
+              "spearman": 0.9569,
+              "pearson": 0.9224
             },
             "CONMEBOL": {
               "n": 10,
@@ -599,13 +599,13 @@
             },
             "CAF": {
               "n": 30,
-              "spearman": 0.7651,
-              "pearson": 0.7152
+              "spearman": 0.781,
+              "pearson": 0.7261
             },
             "AFC": {
               "n": 12,
-              "spearman": 0.4366,
-              "pearson": 0.2937
+              "spearman": 0.5891,
+              "pearson": 0.6096
             },
             "CONCACAF": {
               "n": 12,
@@ -621,13 +621,13 @@
         },
         "top50ByElo": {
           "n": 50,
-          "spearman": 0.7833,
-          "pearson": 0.6818
+          "spearman": 0.7885,
+          "pearson": 0.7533
         },
         "eaOnlyXIs": {
-          "n": 94,
-          "spearman": 0.8316,
-          "pearson": 0.8295,
+          "n": 93,
+          "spearman": 0.8296,
+          "pearson": 0.8291,
           "note": "Gate nations whose 11 shirts are all EA FC players"
         },
         "excludedNations": [
@@ -695,21 +695,21 @@
           ],
           "squadBelowElo": [
             {
-              "id": "364",
-              "name": "Iran",
-              "confederation": "AFC",
-              "strength": 57,
-              "strengthRank": 103.5,
-              "eloRank": 32,
-              "rankGap": -71.5
-            },
-            {
               "id": "591",
               "name": "Panama",
               "confederation": "CONCACAF",
               "strength": 68,
-              "strengthRank": 81.5,
+              "strengthRank": 82.5,
               "eloRank": 35,
+              "rankGap": -47.5
+            },
+            {
+              "id": "364",
+              "name": "Iran",
+              "confederation": "AFC",
+              "strength": 69,
+              "strengthRank": 78.5,
+              "eloRank": 32,
               "rankGap": -46.5
             },
             {
@@ -717,32 +717,32 @@
               "name": "Egypt",
               "confederation": "CAF",
               "strength": 67,
-              "strengthRank": 87,
+              "strengthRank": 88.5,
               "eloRank": 50,
-              "rankGap": -37
+              "rankGap": -38.5
             },
             {
               "id": "068",
               "name": "Bolivia",
               "confederation": "CONMEBOL",
               "strength": 68,
-              "strengthRank": 81.5,
+              "strengthRank": 82.5,
               "eloRank": 48,
-              "rankGap": -33.5
+              "rankGap": -34.5
             },
             {
               "id": "188",
               "name": "Costa Rica",
               "confederation": "CONCACAF",
               "strength": 68,
-              "strengthRank": 81.5,
+              "strengthRank": 82.5,
               "eloRank": 49,
-              "rankGap": -32.5
+              "rankGap": -33.5
             }
           ]
         },
         "reasons": [
-          "Gate-set Spearman 0.8457 is below 0.9"
+          "Gate-set Spearman 0.8577 is below 0.9"
         ]
       },
       "linking": {
@@ -960,8 +960,8 @@
         },
         "strengthScale": {
           "roster": {
-            "mean": 72.3166,
-            "sd": 8.1241
+            "mean": 72.5333,
+            "sd": 7.8345
           },
           "note": "Z = (value − mean) / population SD over every nation fielding a side; Elo scale stays offline"
         },
@@ -1045,27 +1045,27 @@
               "roster"
             ],
             "n": 600,
-            "logLoss": 0.9169,
-            "rps": 0.1783,
-            "brier": 0.543,
+            "logLoss": 0.9077,
+            "rps": 0.1757,
+            "brier": 0.5375,
             "competitive": {
               "n": 393,
-              "logLoss": 0.9011,
-              "rps": 0.1755,
-              "brier": 0.5343
+              "logLoss": 0.8909,
+              "rps": 0.1728,
+              "brier": 0.5282
             },
             "friendlies": {
               "n": 207,
-              "logLoss": 0.9469,
-              "rps": 0.1835,
-              "brier": 0.5594
+              "logLoss": 0.9394,
+              "rps": 0.1811,
+              "brier": 0.5552
             },
             "fitAllMatches": {
               "beta": [
-                1.0564
+                1.1004
               ],
-              "h": 0.2698,
-              "c": 0.671,
+              "h": 0.2699,
+              "c": 0.6814,
               "converged": true
             },
             "folds": [
@@ -1074,10 +1074,10 @@
                 "trainMatches": 457,
                 "testMatches": 143,
                 "beta": [
-                  1.1074
+                  1.166
                 ],
-                "h": 0.294,
-                "c": 0.714,
+                "h": 0.2849,
+                "c": 0.7269,
                 "converged": true
               },
               {
@@ -1085,10 +1085,10 @@
                 "trainMatches": 494,
                 "testMatches": 106,
                 "beta": [
-                  1.0363
+                  1.044
                 ],
-                "h": 0.2436,
-                "c": 0.677,
+                "h": 0.2466,
+                "c": 0.6818,
                 "converged": true
               },
               {
@@ -1096,10 +1096,10 @@
                 "trainMatches": 494,
                 "testMatches": 106,
                 "beta": [
-                  1.0776
+                  1.14
                 ],
-                "h": 0.2504,
-                "c": 0.677,
+                "h": 0.25,
+                "c": 0.69,
                 "converged": true
               },
               {
@@ -1107,10 +1107,10 @@
                 "trainMatches": 494,
                 "testMatches": 106,
                 "beta": [
-                  1.0876
+                  1.1125
                 ],
-                "h": 0.2527,
-                "c": 0.6737,
+                "h": 0.2552,
+                "c": 0.6818,
                 "converged": true
               },
               {
@@ -1118,18 +1118,18 @@
                 "trainMatches": 461,
                 "testMatches": 139,
                 "beta": [
-                  0.9806
+                  1.0515
                 ],
-                "h": 0.3197,
-                "c": 0.6166,
+                "h": 0.3231,
+                "c": 0.6305,
                 "converged": true
               }
             ],
             "excludedStatusMatches": {
               "n": 10,
-              "logLoss": 0.793,
-              "rps": 0.1391,
-              "brier": 0.4614
+              "logLoss": 0.8881,
+              "rps": 0.1638,
+              "brier": 0.5244
             }
           },
           "eloAtR": {
@@ -1232,28 +1232,28 @@
               "roster"
             ],
             "n": 600,
-            "logLoss": 0.8781,
-            "rps": 0.1678,
-            "brier": 0.5211,
+            "logLoss": 0.8765,
+            "rps": 0.1672,
+            "brier": 0.5198,
             "competitive": {
               "n": 393,
-              "logLoss": 0.8556,
-              "rps": 0.1631,
-              "brier": 0.5069
+              "logLoss": 0.8539,
+              "rps": 0.1626,
+              "brier": 0.506
             },
             "friendlies": {
               "n": 207,
-              "logLoss": 0.9209,
-              "rps": 0.1766,
-              "brier": 0.5479
+              "logLoss": 0.9195,
+              "rps": 0.1759,
+              "brier": 0.546
             },
             "fitAllMatches": {
               "beta": [
-                0.8369,
-                0.5089
+                0.7782,
+                0.567
               ],
-              "h": 0.247,
-              "c": 0.7166,
+              "h": 0.2487,
+              "c": 0.7187,
               "converged": true
             },
             "folds": [
@@ -1262,11 +1262,11 @@
                 "trainMatches": 457,
                 "testMatches": 143,
                 "beta": [
-                  0.8744,
-                  0.5294
+                  0.807,
+                  0.5995
                 ],
-                "h": 0.2525,
-                "c": 0.7733,
+                "h": 0.2507,
+                "c": 0.7751,
                 "converged": true
               },
               {
@@ -1274,11 +1274,11 @@
                 "trainMatches": 494,
                 "testMatches": 106,
                 "beta": [
-                  0.7722,
-                  0.5129
+                  0.7428,
+                  0.536
                 ],
-                "h": 0.2236,
-                "c": 0.712,
+                "h": 0.2263,
+                "c": 0.7133,
                 "converged": true
               },
               {
@@ -1286,11 +1286,11 @@
                 "trainMatches": 494,
                 "testMatches": 106,
                 "beta": [
-                  0.8483,
-                  0.5484
+                  0.7763,
+                  0.625
                 ],
-                "h": 0.2059,
-                "c": 0.7261,
+                "h": 0.2095,
+                "c": 0.7291,
                 "converged": true
               },
               {
@@ -1298,11 +1298,11 @@
                 "trainMatches": 494,
                 "testMatches": 106,
                 "beta": [
-                  0.8268,
-                  0.5195
+                  0.7817,
+                  0.5568
                 ],
-                "h": 0.269,
-                "c": 0.7149,
+                "h": 0.27,
+                "c": 0.7158,
                 "converged": true
               },
               {
@@ -1310,50 +1310,50 @@
                 "trainMatches": 461,
                 "testMatches": 139,
                 "beta": [
-                  0.8655,
-                  0.4465
+                  0.7885,
+                  0.5286
                 ],
-                "h": 0.2886,
-                "c": 0.6628,
+                "h": 0.2927,
+                "c": 0.6662,
                 "converged": true
               }
             ],
             "excludedStatusMatches": {
               "n": 10,
-              "logLoss": 0.8501,
-              "rps": 0.1552,
-              "brier": 0.4986
+              "logLoss": 0.9067,
+              "rps": 0.1718,
+              "brier": 0.5384
             }
           }
         },
         "rosterVsElo": {
-          "meanDifference": 0.0234,
-          "seByMatchWindow": 0.0126,
+          "meanDifference": 0.0141,
+          "seByMatchWindow": 0.0084,
           "seMethodByMatchWindow": "cluster bootstrap",
           "matchWindows": 19,
-          "seByTeamPair": 0.0181,
+          "seByTeamPair": 0.0174,
           "seMethodByTeamPair": "cluster bootstrap",
           "teamPairs": 534,
-          "sePerMatch": 0.018,
-          "se": 0.0181,
+          "sePerMatch": 0.0171,
+          "se": 0.0174,
           "seUsed": "team pair",
           "critical": 2,
           "criticalRule": "2·SE: 19 clusters, at least 8",
           "gate": "roster log loss ≤ Elo-at-R_Y log loss + 2·SE, and roster β > 0",
-          "margin": 0.0362,
-          "rosterBeta": 1.0564,
+          "margin": 0.0348,
+          "rosterBeta": 1.1004,
           "pass": true
         },
         "eloPlusRosterVsElo": {
-          "meanDifference": -0.0154,
-          "seByMatchWindow": 0.0048,
+          "meanDifference": -0.017,
+          "seByMatchWindow": 0.0042,
           "seMethodByMatchWindow": "cluster bootstrap",
           "matchWindows": 19,
-          "seByTeamPair": 0.0078,
+          "seByTeamPair": 0.0084,
           "seMethodByTeamPair": "cluster bootstrap",
           "teamPairs": 534,
-          "sePerMatch": 0.0076,
-          "se": 0.0078,
+          "sePerMatch": 0.008,
+          "se": 0.0084,
           "seUsed": "team pair",
           "critical": 2,
           "criticalRule": "2·SE: 19 clusters, at least 8"
@@ -1405,10 +1405,9 @@
         "verdict": "pass",
         "source": "public/football/ea-fc-26.json",
         "nationsWithPlayers": 144,
-        "completeNaturalXIs": 80,
+        "completeNaturalXIs": 81,
         "incompleteFieldedXIs": [
           "051",
-          "204",
           "214",
           "233",
           "266",

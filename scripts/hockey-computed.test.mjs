@@ -1,25 +1,29 @@
 // Ice hockey's computed and converted seasons (docs/design/hockey.md, "Computed seasons", "NHL 08 and NHL 09", "Eras"):
-// the rule by hand, its calibration against the five full EA editions (the committed fixture), the ratings read off the
-// frozen histograms with every order kept, NHL 08 and NHL 09 converted onto NHL 07's overalls, the eras and their maps,
-// clubs only before 1977/78, the loader's refusals, and the App playing a 1960/61 and a 1967/68 clubs campaign, a 1985/86
-// nations campaign and resuming a 2006/07 and a 1966/67 campaign saved on the map before it served more seasons.
+// the rule by hand (each player's value, docs/design/computed-ratings.md step 3, and each club's move toward its real
+// results, step 5), its calibration against the five full EA editions (the committed fixture), the ratings read off the
+// frozen histograms with every club's order kept, NHL 08 and NHL 09 converted onto NHL 07's overalls, the eras and their
+// maps, clubs only before 1977/78, the loader's refusals, and the App playing a 1960/61 and a 1967/68 clubs campaign, a
+// 1985/86 nations campaign and resuming a 2006/07 and a 1966/67 campaign saved on the map before it served more seasons.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { SAVE_KEY } from '../src/config.js';
 import { BUILT_IN_HOCKEY_SEASONS } from '../src/data/hockeySeasons.js';
 import { CLUB_MAPS } from '../src/data/clubMaps.js';
-import { nationIdentity, selectLineup } from '../src/data/teams.js';
+import { buildClub, nationIdentity, selectLineup } from '../src/data/teams.js';
 import { namesOfTheDay } from '../src/data/namesOfTheDay.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import { BUILT_IN_SETS, decodeFootballSet, seasonSport, setHasClubs, setHasNations } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
 import { pointInPolys } from './lib/domestic-partition.mjs';
+import { hockeyProfile } from '../src/sports/hockey.js';
 import {
-  RULE, attributeMean, calibrationOf, clubOfStints, goalieValue, groupOf, groupRatings, midRankRatings, ratingsOfHistogram, scoreOf,
-  seasonBefore, skaterValue, spearman, stepRating, windowOf,
+  BLEND, RULE, attributeMean, calibrationOf, clubOfStints, goalDifferentialOf, goalieValue, groupOf, groupRatings, lagWindowOf, lineFacts, midRankRatings,
+  ratingsOfHistogram, resultsStrengthOf, scoreOf, seasonBefore, seasonValues, skaterValue, spearman, stepRating, windowOf,
 } from './lib/nhl-computed.mjs';
-import { hdbBirthCountry, hdbPosition, moneypuckStints } from './lib/nhl-stats.mjs';
+import { LAST_WITHOUT_OVERTIME, marginPerPoint, playedStrength } from './lib/nhl-reconcile.mjs';
+import { mean, priorFromNoise, replacementRate, shrunkRate } from './lib/computed-ratings.mjs';
+import { hdbBirthCountry, hdbPosition, hdbTeamRecords, moneypuckGameScores, moneypuckStints } from './lib/nhl-stats.mjs';
 import { FEDERATIONS, mapOf, parseIgnAttributes, teamsOf } from './lib/nhl-seasons.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
@@ -44,7 +48,7 @@ const playerOf = (id, name) => {
 
 // ---------- the rule ----------
 
-test('a line\'s value by hand: points a game, minutes a game, save percentage and goals against', () => {
+test('the superseded rule of 2026-11-09 by hand, as the back-test still compares it: points a game, minutes a game, save percentage and goals against', () => {
   // A forward of the points era: 8 × (60 points + 1) / (70 games + 10).
   assert.ok(close(skaterValue([1980, 70, 60, null], 'F', false), 8 * 61 / 80));
   // A defender of the minutes era: (1,600 minutes + 90) / 92 + 5 × (40 + 1) / 92.
@@ -64,11 +68,14 @@ test('a line\'s value by hand: points a game, minutes a game, save percentage an
   assert.deepEqual(RULE.weights, [1, 2, 1]);
 });
 
-test('the score weighs the season 1, the one before 2, the one before that 1, over the seasons played; 2004/05 is skipped', () => {
+test('the superseded score weighs the season 1, the one before 2, the one before that 1, over the seasons played; 2004/05 is skipped', () => {
   assert.deepEqual(windowOf(1980), [1980, 1979, 1978]);
   assert.deepEqual(windowOf(2006), [2006, 2004, 2003], '2004/05 was cancelled');
   assert.deepEqual(windowOf(2007), [2007, 2006, 2004]);
   assert.equal(seasonBefore(2006), 2004);
+  // An edition comes out before its season: it is compared with the window of the season before.
+  assert.deepEqual(lagWindowOf(2022), [2021, 2020, 2019]);
+  assert.deepEqual(lagWindowOf(2007), [2006, 2004, 2003]);
   const form = { skaters: 'points', goalies: 'saves' };
   const leagues = { 1980: {}, 1979: {}, 1978: {} };
   const v = (games, points) => skaterValue([0, games, points, null], 'F', false);
@@ -111,80 +118,308 @@ test('ratings come from a frozen histogram by mid-rank: ties stay ties, nobody p
   assert.deepEqual(ratingsOfHistogram({ 72: 2, 80: 1 }), [72, 72, 80]);
 });
 
+test('a line\'s facts: points over games, the share of the club\'s ice time or games, saves above the league or goals against under it', () => {
+  const league = { savePct: 0.91, gaa: 2.7, maxGames: 82 };
+  const minutes = { skaters: 'minutes', goalies: 'saves' }, points = { skaters: 'points', goalies: 'goals' };
+  assert.deepEqual(lineFacts([2016, 80, 60, 80 * 18 * 60], 'F', league, minutes), { exposure: 80, events: 60, share: 80 * 18 / 82 });
+  assert.deepEqual(lineFacts([1980, 80, 60, null], 'D', league, points), { exposure: 80, events: 60, share: 80 / 82 });
+  assert.throws(() => lineFacts([2016, 80, 60, null], 'F', league, minutes), /time on ice/);
+  // A goalie of 1,800 shots and 160 goals against in 3,500 minutes: saves above the league's .910, his share of the minutes.
+  const saves = lineFacts([2016, 60, 3500 * 60, 160, 1800], 'G', league, minutes);
+  assert.ok(close(saves.exposure, 1800) && close(saves.events, 1640 - 1800 * 0.91) && close(saves.share, 3500 / 60 / 82));
+  // Before shots against were kept: goals against under the league's 3.3 an hour, over his 50 hours.
+  const old = { savePct: null, gaa: 3.3, maxGames: 78 };
+  const goals = lineFacts([1975, 52, 3000 * 60, 140, null], 'G', old, points);
+  assert.ok(close(goals.exposure, 50) && close(goals.events, 3.3 * 50 - 140) && close(goals.share, 50 / 78));
+  assert.throws(() => lineFacts([1975, 52, 3000 * 60, 140, null], 'G', old, { ...points, goalies: 'saves' }), /shots against/);
+});
+
+test('a player\'s value: the window 3:2:1, production shrunk by the season\'s own prior, selection over the seasons played, z-scores by the regulars', () => {
+  assert.deepEqual(BLEND.weights, [3, 2, 1]);
+  const leagues = { 1980: { maxGames: 80 }, 1979: { maxGames: 80 }, 1978: { maxGames: 80 } };
+  const form = { skaters: 'points', goalies: 'goals' };
+  // Twelve forwards of 58 to 80 games a season at 0.2 to 1.3 points a game; a rookie at 0.8 in his one season of 80
+  // games; a call-up who scored four in four games (and 80 in 1976/77, outside the window).
+  const regulars = Array.from({ length: 12 }, (_, i) => ({ pos: 'C',
+    lines: [1980, 1979, 1978].map(y => [y, 58 + 2 * i, Math.round((58 + 2 * i) * (0.2 + 0.1 * i)), null]) }));
+  const rookie = { pos: 'LW', lines: [[1980, 80, 64, null]] }, callUp = { pos: 'RW', lines: [[1980, 4, 4, null], [1977, 80, 80, null]] };
+  const players = [...regulars, rookie, callUp];
+  const { values, groups } = seasonValues(players, 1980, leagues, form);
+  // By hand: the window pooled 3:2:1 (his 1976/77 line is outside it), each record on its effective exposure.
+  const record = p => {
+    let n = 0, x = 0, squares = 0;
+    [1980, 1979, 1978].forEach((season, k) => {
+      const line = p.lines.find(l => l[0] === season);
+      if (line) { n += [3, 2, 1][k] * line[1]; x += [3, 2, 1][k] * line[2]; squares += [3, 2, 1][k] ** 2 * line[1]; }
+    });
+    return { n, x, effective: n * n / squares };
+  };
+  const records = players.map(record);
+  assert.deepEqual([records[12].n, records[12].effective, records[13].n, records[13].effective], [240, 80, 12, 4]);
+  // The regulars hold a quarter of the window's games (6 × 80 ÷ 4): the twelve and the rookie, not the call-up.
+  assert.deepEqual([groups.F.players, groups.F.regulars], [14, 13]);
+  const effective = r => ({ n: r.effective, x: r.x / r.n * r.effective });
+  const { k } = priorFromNoise(records.slice(0, 13).map(effective), { least: 0, unitNoise: rate => rate });
+  const replacement = replacementRate(records.map(r => ({ n: r.n, x: r.x })));
+  assert.ok(close(groups.F.prior, k) && close(groups.F.replacement, replacement) && k > 0);
+  const production = records.map(r => shrunkRate(effective(r), k, replacement));
+  // Selection over the seasons he played: the rookie's one full season is a full share, the call-up's four games a twentieth.
+  const selection = [...regulars.map((_, i) => (58 + 2 * i) / 80), 1, 4 / 80];
+  const z = list => { const regular = list.slice(0, 13), m = mean(regular), sd = Math.sqrt(mean(regular.map(v => (v - m) ** 2))); return list.map(v => (v - m) / sd); };
+  const zs = z(selection), zp = z(production), p = BLEND.production.F.games;
+  players.forEach((player, i) => assert.ok(close(values.get(player), (1 - p) * zs[i] + p * zp[i]), `player ${i}`));
+  // More points a game ranks higher; the rookie's one season is shrunk more than three of the same rate would be; four
+  // points in four games prove little.
+  assert.ok(regulars.every((player, i) => i === 0 || values.get(player) > values.get(regulars[i - 1])));
+  const veteran = shrunkRate(effective(record({ lines: [1980, 1979, 1978].map(y => [y, 80, 64, null]) })), k, replacement);
+  assert.ok(production[12] < veteran && production[12] > replacement);
+  assert.ok(values.get(callUp) < values.get(rookie) && production[13] < production[12], 'four in four games prove less than 64 in 80');
+  // Where the source keeps time on ice, selection is ice time and its weight the ice-time one.
+  const timed = players.map(pl => ({ ...pl, lines: pl.lines.map(([y, g, pts]) => [y, g, pts, g * 15 * 60]) }));
+  assert.equal(seasonValues(timed, 1980, leagues, { skaters: 'minutes', goalies: 'saves' }).groups.F.production, BLEND.production.F.ice);
+});
+
+test('results strength: goal differential a game with Poisson reliability, the SRS of game scores, divisions that never met', () => {
+  const records = [{ club: 'A', games: 80, goalsFor: 300, goalsAgainst: 220 }, { club: 'B', games: 80, goalsFor: 260, goalsAgainst: 260 },
+    { club: 'C', games: 80, goalsFor: 220, goalsAgainst: 300 }];
+  const gd = goalDifferentialOf(records);
+  // Differentials of +1, 0 and −1 a game, centred and × 2/3: each club meets the other two and never itself.
+  assert.ok(close(gd.ratings.A, 2 / 3) && close(gd.ratings.B, 0) && close(gd.ratings.C, -2 / 3));
+  // Poisson noise, (for + against) ÷ games², against the differentials' variance.
+  assert.ok(close(gd.reliability, 1 - (520 / 6400) / (2 / 3)));
+  // The databank's records: a shoot-out's goal comes off both sides (A won 5 and lost 3 of them).
+  const databank = resultsStrengthOf({ clubs: [['A', 82, 45, 30, 0, 7, 5, 3, 250, 220], ['B', 82, 30, 45, 0, 7, 3, 5, 220, 250]] });
+  assert.equal(databank.kind, 'goals');
+  assert.ok(close(databank.ratings.A, (28 / 82) / 2) && close(databank.ratings.B, -(28 / 82) / 2));
+  // Game scores that join every club: the SRS, with its home edge.
+  const games = [[1, 'A', 'B', 3, 1], [2, 'B', 'C', 2, 2], [3, 'C', 'A', 1, 4], [4, 'B', 'A', 2, 3], [5, 'C', 'B', 0, 1], [6, 'A', 'C', 5, 2]];
+  const srs = resultsStrengthOf({ games });
+  assert.equal(srs.kind, 'srs');
+  assert.ok(srs.ratings.A > srs.ratings.B && srs.ratings.B > srs.ratings.C && Number.isFinite(srs.homeEdge));
+  // Two divisions that never met (2012/13, 2020/21): the games' goal differentials, each club having met one other.
+  const apart = resultsStrengthOf({ games: [[1, 'A', 'B', 3, 1], [2, 'B', 'A', 1, 2], [3, 'C', 'D', 2, 2], [4, 'D', 'C', 0, 1]] });
+  assert.equal(apart.kind, 'goals');
+  // A scored 5 and let in 2 over two games: +1.5 a game, × 1/2.
+  assert.ok(close(apart.ratings.A, 0.75) && close(apart.ratings.D, -0.25), 'centred, × 1/2');
+});
+
+test('the results in the snapshots: MoneyPuck\'s games with the Coyotes\' home games mended, the databank\'s records', () => {
+  const row = (gameId, playerTeam, opposingTeam, home, goals, situation = 'all') => ({ gameId, playerTeam, opposingTeam, home_or_away: home, I_F_goals: String(goals), situation });
+  const scores = moneypuckGameScores([
+    row('2011020745', 'ANA', 'ARI', 'AWAY', 1), row('2011020745', 'ARI', 'ARI', 'AWAY', 2),
+    row('2011020746', 'BOS', 'MTL', 'HOME', 3), row('2011020746', 'MTL', 'BOS', 'AWAY', 0), row('2011020746', 'BOS', 'MTL', 'HOME', 9, '5on5'),
+    row('2011020747', 'TOR', 'OTT', 'HOME', 1), row('2011030111', 'BOS', 'MTL', 'HOME', 4),
+  ], 2012);
+  assert.deepEqual(scores, { games: [[2011020745, 'PHX', 'ANA', 2, 1], [2011020746, 'BOS', 'MTL', 3, 0]], homeMended: 1, oneSided: 1 });
+  const teams = 'year,lgID,tmID,franchID,confID,divID,rank,playoff,G,W,L,T,OTL,Pts,SoW,SoL,GF,GA,name\n'
+    + '1985,NHL,EDM,EDM,,,1,,80,56,17,7,,119,,,426,310,Edmonton Oilers\n2005,NHL,PHO,PHO,,,1,,82,38,39,,5,81,6,4,246,271,Phoenix Coyotes\n';
+  assert.deepEqual(hdbTeamRecords(teams, 1986), [['EDM', 80, 56, 17, 7, 0, 0, 0, 426, 310]]);
+  assert.deepEqual(hdbTeamRecords(teams, 2006), [['PHX', 82, 38, 39, 0, 5, 6, 4, 246, 271]]);
+  for (const entry of COMPUTED) {
+    const { results } = snapshotOf(entry.id);
+    const codes = teamsOf(MANIFEST, entry.year).map(team => team.code).sort();
+    if (entry.source.kind === 'hdb') assert.deepEqual(results.clubs.map(r => r[0]).sort(), codes, `${entry.id}: every club's record`);
+    else {
+      assert.deepEqual([...new Set(results.games.flatMap(g => [g[1], g[2]]))].sort(), codes, `${entry.id}: every club's games`);
+      assert.ok(results.oneSided <= 1 && (results.homeMended === 0 || [2012, 2013, 2014].includes(entry.year)), entry.id);
+    }
+  }
+  // The Coyotes' home games of 2011/12 to 2013/14 (82, 48 and 82 games) are all there.
+  assert.deepEqual(['nhl-2012', 'nhl-2013', 'nhl-2014'].map(id => snapshotOf(id).results.games.filter(g => g[1] === 'PHX').length), [41, 24, 41]);
+});
+
+test('m, the match model\'s margin a point of played strength, under each season\'s rules', () => {
+  assert.equal(LAST_WITHOUT_OVERTIME, 1983, 'the league played no overtime to 1982/83');
+  const clubsOf = id => {
+    const set = decodeFootballSet(seasonFile(id), id), sport = seasonSport(set);
+    return set.clubs.map(club => ({ id: club.id, sport: 'hockey', squad: buildClub(club, sport).squad }));
+  };
+  const modern = marginPerPoint({ clubs: clubsOf('nhl-2016'), year: 2016, goals: 2.67, seed: 'test' });
+  const eighties = marginPerPoint({ clubs: clubsOf('nhl-1986'), year: 1986, goals: 3.97, seed: 'test' });
+  // About 0.1 of a club's goals a point: more goals, a wider margin.
+  assert.ok(modern.perPoint > 0.25 && modern.perPoint < 0.33, `2015/16: ${modern.perPoint}`);
+  assert.ok(eighties.perPoint > 0.36 && eighties.perPoint < 0.45, `1985/86: ${eighties.perPoint}`);
+  assert.deepEqual(marginPerPoint({ clubs: clubsOf('nhl-2016'), year: 2016, goals: 2.67, seed: 'test' }), modern, 'the same seed, the same m');
+  // The played strength: the mean of attack and defence as the match model weighs them, the goalie a quarter of it.
+  const lineup = selectLineup(clubsOf('nhl-2016')[0]);
+  const { attack, defence, goaltending } = hockeyProfile(lineup);
+  assert.ok(close(playedStrength(lineup), attack / 2 + goaltending / 4 + defence / 4));
+});
+
 // ---------- the computed seasons ----------
 
-test('the computed seasons: every squad rating NHL 27\'s, the order of every group kept, the source saying how', () => {
+/** A season's values by `name|club`, as the build computes them from its snapshot. */
+function valuesOf(entry) {
+  const snapshot = snapshotOf(entry.id);
+  const players = snapshot.players.map(([, name, team, pos, , lines]) => ({ name, team, pos, lines }));
+  const { values } = seasonValues(players, entry.year, snapshot.leagues, snapshot.form);
+  return new Map(players.map(p => [`${p.name}|${p.team}`, values.get(p)]));
+}
+
+test('the computed seasons: every squad rating NHL 27\'s moved by its club, nobody passing anybody in his club, the source saying how', () => {
   assert.equal(COMPUTED.length, 58);
   assert.deepEqual(MANIFEST.seasons.map(s => s.year).sort((a, b) => a - b),
     Array.from({ length: 66 }, (_, i) => 1961 + i).filter(year => year !== 2005), 'every season from 1960/61 to 2025/26 but 2004/05');
   const reference = Object.fromEntries(['F', 'D', 'G'].map(g => [g, new Set(ratingsOfHistogram(MANIFEST.computed.histograms[g]))]));
   for (const entry of COMPUTED) {
-    const doc = seasonFile(entry.id), snapshot = snapshotOf(entry.id);
+    const doc = seasonFile(entry.id), snapshot = snapshotOf(entry.id), audit = auditOf(entry.id);
     assert.equal(doc.source.method, 'computed');
-    assert.match(doc.source.conversion, /weighted 1:2:1/);
+    assert.match(doc.source.conversion, /weighted 3:2:1/);
+    assert.match(doc.source.conversion, /moved toward its real results/);
     assert.equal(doc.label, 'Computed from statistics');
     assert.equal(snapshot.source.kind, entry.source.kind);
     assert.equal(snapshot.form.skaters, entry.year >= 2011 ? 'minutes' : 'points', `${entry.id}: minutes a game only where MoneyPuck keeps time on ice`);
     assert.equal(snapshot.form.goalies, entry.year >= 1985 ? 'saves' : 'goals', `${entry.id}: save percentage once the whole window kept shots against`);
     assert.equal(doc.source.provider, entry.year <= 2010 ? 'the Hockey Databank project' : 'MoneyPuck.com');
-    const leagues = snapshot.leagues;
-    const scores = new Map(snapshot.players.map(([, name, team, pos, , lines]) => [`${name}|${team}`, scoreOf({ pos, lines }, entry.year, leagues, snapshot.form)]));
-    const squad = doc.clubs.flatMap(club => club.squad.map(([name, pos, rating]) => ({ name, pos, rating, score: scores.get(`${name}|${club.code}`) })));
-    for (const group of ['F', 'D', 'G']) {
-      const list = squad.filter(p => groupOf(p.pos) === group).sort((a, b) => a.score - b.score);
-      assert.ok(list.every(p => reference[group].has(p.rating)), `${entry.id} ${group}: every rating is NHL 27's`);
-      assert.ok(list.every((p, i) => i === 0 || p.rating >= list[i - 1].rating), `${entry.id} ${group}: nobody passes anybody`);
-    }
+    const values = valuesOf(entry);
+    // Each club's move, as the audit records it: a whole number for all, one more for its best few.
+    const moves = new Map(audit.results.moves.map(line => {
+      const [, name, sign, shift, plus] = line.match(/^(.+?): S .*, ([+−])(\d+)(?:, (\d+) of them \+1 more)?$/);
+      return [name, { shift: (sign === '−' ? -1 : 1) * Number(shift), plus: Number(plus ?? 0) }];
+    }));
     for (const club of doc.clubs) {
+      const { shift, plus } = moves.get(club.name);
+      const squad = club.squad.map(([name, pos, rating]) => ({ name, pos, rating, value: values.get(`${name}|${club.code}`) }));
+      assert.ok(squad.every(p => Number.isFinite(p.value)), `${entry.id} ${club.name}: every player has a value`);
+      assert.ok(squad.filter(p => !reference[groupOf(p.pos)].has(p.rating - shift)).length <= plus
+        && squad.every(p => reference[groupOf(p.pos)].has(p.rating - shift) || reference[groupOf(p.pos)].has(p.rating - shift - 1) || p.rating === 99 || p.rating === 1),
+      `${entry.id} ${club.name}: NHL 27's ratings moved by ${shift}, ${plus} of them one more`);
+      for (const group of ['F', 'D', 'G']) {
+        const list = squad.filter(p => groupOf(p.pos) === group).sort((a, b) => a.value - b.value);
+        assert.ok(list.every((p, i) => i === 0 || p.rating >= list[i - 1].rating), `${entry.id} ${club.name} ${group}: nobody passes anybody`);
+      }
       const lineup = selectLineup({ sport: 'hockey', squad: club.squad.map(([name, pos, rating]) => ({ name, pos, rating })) });
       assert.equal(lineup.rating, club.str, `${entry.id} ${club.name}'s strength is its lineup's`);
     }
   }
 });
 
+test('every computed season\'s clubs moved toward their real results: as the match model plays them, they follow S', () => {
+  const rows = COMPUTED.map(entry => auditOf(entry.id).results);
+  for (const [i, r] of rows.entries()) {
+    const id = COMPUTED[i].id;
+    assert.ok(r.reliability > 0.4 && r.reliability < 1, `${id}: reliability ${r.reliability}`);
+    assert.ok(r.perPoint > 0.25 && r.perPoint < 0.45, `${id}: m ${r.perPoint}`);
+    assert.equal(r.kind, COMPUTED[i].source.kind === 'hdb' || ['nhl-2013', 'nhl-2021'].includes(id) ? 'goals' : 'srs', `${id}: S by ${r.kind}`);
+    assert.ok(r.agreement.playedAfter >= 0.94, `${id}: the clubs as played against S, ${r.agreement.playedAfter}`);
+    // Every club within a point of its target: a whole number for all and one more for the best few reach it.
+    for (const line of r.moves) {
+      const [, after, target] = line.match(/→ ([\d.]+) \(target ([\d.]+)\)/).map(Number);
+      assert.ok(Math.abs(after - target) < 0.6, `${id}: ${line}`);
+    }
+  }
+  const median = list => { const s = list.slice().sort((a, b) => a - b); return (s[(s.length - 1) >> 1] + s[s.length >> 1]) / 2; };
+  // The design's check (docs/design/computed-ratings.md, step 6): clubs against the season's results, Spearman at least
+  // 0.80 in the median season; before the move they reached 0.71 as shown.
+  assert.ok(median(rows.map(r => r.agreement.after)) >= 0.8, `as shown, median ${median(rows.map(r => r.agreement.after))}`);
+  assert.ok(median(rows.map(r => r.agreement.before)) < 0.75);
+});
+
 test('known history: the stars of their day on top, the strongest and weakest clubs of a few seasons', () => {
-  // The Original Six, 1960/61 to 1965/66: the Canadiens first in 1960/61; Mikita the scoring champion of 1963/64 and
-  // 1964/65, Hull of 1965/66 (54 goals); Pilote the Norris winner of 1962/63 to 1964/65, Hodge the Vezina winner of 1963/64.
-  assert.deepEqual(auditOf('nhl-1961').best.forwards.slice(0, 2), ['Jean Beliveau (MTL) 99', 'Bernie Geoffrion (MTL) 95'], 'Beliveau and Geoffrion, 1960/61');
+  // The Original Six, 1960/61 to 1965/66: Geoffrion the scoring champion of 1960/61, the Canadiens first; Howe the
+  // scoring champion of 1962/63; Mikita of 1963/64 and 1964/65, Hull of 1965/66 (54 goals); Pilote the Norris winner of
+  // 1963/64 and 1964/65.
+  assert.deepEqual(auditOf('nhl-1961').best.forwards.slice(0, 2), ['Bernie Geoffrion (MTL) 99', 'Jean Beliveau (MTL) 96'], 'Geoffrion and Beliveau, 1960/61');
   assert.match(auditOf('nhl-1961').clubs[0], /^Montreal Canadiens/, 'Montreal, first in 1960/61');
+  assert.deepEqual(playerOf('nhl-1963', 'Gordie Howe'), ['DET', 'RW', 99]);
   for (const id of ['nhl-1964', 'nhl-1965']) assert.match(auditOf(id).best.forwards[0], /^Stan Mikita \(CHI\) 99$/, `${id}: Mikita first`);
-  assert.match(auditOf('nhl-1966').best.forwards[0], /^Bobby Hull \(CHI\) 99$/, 'Hull first, 1965/66');
-  for (const id of ['nhl-1963', 'nhl-1964', 'nhl-1965']) assert.match(auditOf(id).best.defenders[0], /^Pierre Pilote \(CHI\)/, `${id}: Pilote the best defender`);
-  assert.match(auditOf('nhl-1964').best.goalies[0], /^Charlie Hodge \(MTL\)/, 'Hodge the best goalie, 1963/64');
-  assert.deepEqual(playerOf('nhl-1963', 'Gordie Howe'), ['DET', 'RW', 95]);
+  assert.match(auditOf('nhl-1966').best.forwards[0], /^Bobby Hull \(CHI\)/, 'Hull first, 1965/66');
+  for (const id of ['nhl-1964', 'nhl-1965']) assert.match(auditOf(id).best.defenders[0], /^Pierre Pilote \(CHI\)/, `${id}: Pilote the best defender`);
+  // The goalie who played most and best over three seasons: Hall in 1963/64, Hodge, after his first full season, in 1964/65.
+  assert.match(auditOf('nhl-1964').best.goalies[0], /^Glenn Hall \(CHI\)/);
+  assert.match(auditOf('nhl-1965').best.goalies[0], /^Charlie Hodge \(MTL\)/);
   assert.deepEqual(auditOf('nhl-1961').realSides, ['Canada'], 'the Original Six: Canada alone fields a real side');
-  assert.deepEqual(auditOf('nhl-1967').best.forwards.slice(0, 2), ['Bobby Hull (CHI) 99', 'Stan Mikita (CHI) 95'], 'Hull and Mikita, 1966/67');
+  // 1966/67: Mikita the scoring champion, Hull beside him, Chicago first.
+  assert.deepEqual(auditOf('nhl-1967').best.forwards.slice(0, 2), ['Stan Mikita (CHI) 99', 'Bobby Hull (CHI) 97'], 'Mikita and Hull, 1966/67');
   assert.match(auditOf('nhl-1967').clubs[0], /^Chicago Black Hawks/, 'Chicago, first in 1966/67');
   for (const id of ['nhl-1971', 'nhl-1972', 'nhl-1973', 'nhl-1974', 'nhl-1975']) assert.match(auditOf(id).best.defenders[0], /^Bobby Orr/, `${id}: Orr the best defender`);
-  for (let year = 1980; year <= 1989; year++) assert.match(auditOf(`nhl-${year}`).best.forwards[0], /^Wayne Gretzky \((?:EDM|LAK)\) 99$/, `${year}: Gretzky first`);
-  assert.match(auditOf('nhl-1990').best.forwards[0], /^Mario Lemieux/, 'Lemieux in 1989/90');
+  for (let year = 1980; year <= 1988; year++) assert.match(auditOf(`nhl-${year}`).best.forwards[0], /^Wayne Gretzky \((?:EDM|LAK)\) 99$/, `${year}: Gretzky first`);
+  // Lemieux's 199 points of 1988/89, and his points a game of 1989/90.
+  for (const id of ['nhl-1989', 'nhl-1990']) assert.match(auditOf(id).best.forwards[0], /^Mario Lemieux/, `${id}: Lemieux first`);
   assert.match(auditOf('nhl-1977').clubs[0], /^Montreal Canadiens/, 'the 1976/77 Canadiens strongest');
-  assert.deepEqual(auditOf('nhl-1975').clubs.slice(-2).map(line => line.replace(/ \d.*/, '')), ['Kansas City Scouts', 'Washington Capitals'], 'the 1974/75 expansion clubs weakest');
+  // The 1974/75 expansion clubs the weakest as the match model plays them (the Capitals won 8 of 80, the Scouts 15).
+  const played = auditOf('nhl-1975').results.moves.map(line => [line.replace(/:.*/, ''), Number(line.match(/→ ([\d.]+)/)[1])]).sort((a, b) => a[1] - b[1]);
+  assert.deepEqual(played.slice(0, 2).map(([name]) => name).sort(), ['Kansas City Scouts', 'Washington Capitals'], 'the 1974/75 expansion clubs weakest');
   assert.match(auditOf('nhl-2020').best.forwards[0], /^Connor McDavid/);
   assert.deepEqual(playerOf('nhl-1986', 'Wayne Gretzky'), ['EDM', 'C', 99]);
 });
 
-test('calibration: the rule against the five full editions, from the permitted sources', () => {
+/**
+ * The blend's agreement with an edition, Spearman's correlation within each group: the values of the season ending in
+ * `year` (its window's lines only) over the edition's players with a line in it, under `weights` (BLEND.production unless
+ * told).
+ */
+function blendAgreement(e, year, form, weights = BLEND.production) {
+  const window = windowOf(year);
+  const players = e.players.map(([, , pos, overall, lines]) => ({ pos, overall, lines: lines.filter(l => window.includes(l[0])) })).filter(p => p.lines.length);
+  const { values } = seasonValues(players, year, e.leagues, form, weights);
+  return Object.fromEntries(['F', 'D', 'G'].map(g => {
+    const members = players.filter(p => groupOf(p.pos) === g);
+    return [g, spearman(members.map(p => values.get(p)), members.map(p => p.overall))];
+  }));
+}
+const round3 = v => Math.round(v * 1000) / 1000;
+
+test('calibration: the blend against the five full editions, each in the window its makers saw, beats the superseded rule in every group', () => {
   assert.deepEqual(FIXTURE.editions.map(e => [e.id, e.kind]), [['nhl-1993', 'hdb'], ['nhl-1994', 'hdb'], ['nhl-1995', 'hdb'], ['nhl-2007', 'hdb'], ['nhl-2022', 'moneypuck']]);
-  const measured = e => calibrationOf(e.players.map(([name, team, pos, overall, lines]) => ({ name, team, pos, overall,
-    score: lines.length ? scoreOf({ pos, lines }, e.year, e.leagues, e.form) : null })), MANIFEST.computed.histograms);
+  const superseded = e => calibrationOf(e.players.map(([name, team, pos, overall, lines]) => ({ name, team, pos, overall,
+    score: lines.some(l => windowOf(e.year).includes(l[0])) ? scoreOf({ pos, lines }, e.year, e.leagues, e.form) : null })), MANIFEST.computed.histograms);
+  const means = { blend: { F: [], D: [], G: [] }, superseded: { F: [], D: [], G: [] } };
   for (const e of FIXTURE.editions) {
-    const m = measured(e);
-    assert.ok(m.F.rho >= 0.84 && m.D.rho >= 0.75 && m.G.rho >= 0.59, `${e.id}: F ${m.F.rho}, D ${m.D.rho}, G ${m.G.rho}`);
-    assert.ok(m.playerGap <= 2.8 && m.clubs.gap <= 1.7, `${e.id}: players ${m.playerGap} apart, clubs ${m.clubs.gap}`);
     assert.ok(e.unmatched.length <= 7, `${e.id}: ${e.unmatched.length} of the edition's players without a line`);
-    const recorded = AUDIT.calibration.find(row => row.id === e.id).forms[0];
-    assert.deepEqual([recorded.F.rho, recorded.D.rho, recorded.G.rho], [m.F.rho, m.D.rho, m.G.rho], 'the audit records it');
+    // Every line of the window before the edition's season is in the fixture.
+    assert.ok(lagWindowOf(e.year).every(season => e.leagues[season]), `${e.id}: the leagues of ${lagWindowOf(e.year).join(', ')}`);
+    const lag = blendAgreement(e, seasonBefore(e.year), e.form);
+    assert.ok(lag.F >= 0.82 && lag.D >= 0.8 && lag.G >= 0.69, `${e.id}: F ${lag.F}, D ${lag.D}, G ${lag.G}`);
+    const old = superseded(e);
+    const recorded = AUDIT.calibration.find(row => row.id === e.id);
+    assert.deepEqual(['F', 'D', 'G'].map(g => recorded.blend[0][g].rho), ['F', 'D', 'G'].map(g => round3(lag[g])), 'the audit records the blend');
+    assert.deepEqual(['F', 'D', 'G'].map(g => recorded.superseded[0][g].rho), ['F', 'D', 'G'].map(g => old[g].rho), 'and the superseded rule');
+    for (const g of ['F', 'D', 'G']) { means.blend[g].push(lag[g]); means.superseded[g].push(old[g].rho); }
   }
-  // Minutes a game: NHL 22's defenders and clubs rank better with it than by points alone.
+  // The rule is kept for no group: the blend agrees better with EA in each (forwards 0.899 against 0.887, defencemen 0.861
+  // against 0.814, goalies 0.829 against 0.708).
+  for (const g of ['F', 'D', 'G']) assert.ok(mean(means.blend[g]) > mean(means.superseded[g]), `${g}: ${mean(means.blend[g])} against ${mean(means.superseded[g])}`);
+  // Ice time: NHL 22's skaters rank better by it than by games.
   const nhl22 = FIXTURE.editions.find(e => e.id === 'nhl-2022');
-  const points = measured({ ...nhl22, form: { ...nhl22.form, skaters: 'points' } }), minutes = measured(nhl22);
-  assert.ok(minutes.D.rho > points.D.rho && minutes.clubs.gap < points.clubs.gap);
-  // Goals against before 1982/83: on the editions that have both, within 0.03 of save percentage on average.
+  const byIce = blendAgreement(nhl22, 2021, nhl22.form), byGames = blendAgreement(nhl22, 2021, { ...nhl22.form, skaters: 'points' });
+  assert.ok(byIce.F > byGames.F && byIce.D > byGames.D, `F ${byIce.F} / ${byGames.F}, D ${byIce.D} / ${byGames.D}`);
+  // Goals against, the seasons before shots against were kept: on the databank's editions within 0.03 of save percentage.
   const hdb = FIXTURE.editions.filter(e => e.kind === 'hdb');
-  const mean = list => list.reduce((s, v) => s + v, 0) / list.length;
-  const bySaves = mean(hdb.map(e => measured(e).G.rho)), byGoals = mean(hdb.map(e => measured({ ...e, form: { ...e.form, goalies: 'goals' } }).G.rho));
+  const bySaves = mean(hdb.map(e => blendAgreement(e, seasonBefore(e.year), e.form).G));
+  const byGoals = mean(hdb.map(e => blendAgreement(e, seasonBefore(e.year), { ...e.form, goalies: 'goals' }).G));
   assert.ok(byGoals > bySaves - 0.03, `goals against ${byGoals.toFixed(3)}, save percentage ${bySaves.toFixed(3)}`);
+});
+
+test('the blend\'s frozen weights are the ones the editions choose, and every edition left out chooses within 0.05 of them', () => {
+  const grid = Array.from({ length: 21 }, (_, i) => i / 20);
+  const at = w => ({ F: { games: w, ice: w }, D: { games: w, ice: w }, G: { saves: w, goals: w } });
+  // One curve per edition and group: the agreement at every weight on the grid.
+  const curves = (editions, form) => editions.map(e => {
+    const rows = grid.map(w => blendAgreement(e, seasonBefore(e.year), form(e), at(w)));
+    return Object.fromEntries(['F', 'D', 'G'].map(g => [g, rows.map(row => row[g])]));
+  });
+  const best = list => grid[list.indexOf(Math.max(...list))];
+  const check = (tables, group, frozen, label, within = 0.05) => {
+    const meanCurve = grid.map((_, i) => mean(tables.map(t => t[group][i])));
+    assert.equal(best(meanCurve), frozen, `${label}: the editions choose ${best(meanCurve)}`);
+    if (tables.length < 2) return;
+    tables.forEach((_, out) => {
+      const chosen = best(grid.map((__, i) => mean(tables.filter((___, k) => k !== out).map(t => t[group][i]))));
+      assert.ok(Math.abs(chosen - frozen) <= within + 1e-9, `${label}: leaving edition ${out} out chooses ${chosen}`);
+    });
+  };
+  const all = FIXTURE.editions, hdb = all.filter(e => e.kind === 'hdb'), nhl22 = all.filter(e => e.kind === 'moneypuck');
+  // Forwards and defencemen by games, goalies by saves: all five (NHL 22's skaters by games too).
+  const byGames = curves(all, () => ({ skaters: 'points', goalies: 'saves' }));
+  check(byGames, 'F', BLEND.production.F.games, 'forwards by games');
+  check(byGames, 'D', BLEND.production.D.games, 'defencemen by games');
+  check(byGames, 'G', BLEND.production.G.saves, 'goalies by saves');
+  // Goalies by goals against on the databank's four: NHL 95, left out, chooses 0.3.
+  check(curves(hdb, () => ({ skaters: 'points', goalies: 'goals' })), 'G', BLEND.production.G.goals, 'goalies by goals against', 0.1);
+  const byIce = curves(nhl22, e => e.form);
+  check(byIce, 'F', BLEND.production.F.ice, 'forwards by ice time');
+  check(byIce, 'D', BLEND.production.D.ice, 'defencemen by ice time');
 });
 
 test('nations only from 1977/78, the first season with three real sides; clubs only before', () => {

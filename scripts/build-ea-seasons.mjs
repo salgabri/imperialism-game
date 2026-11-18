@@ -23,6 +23,7 @@ import { EARLY_EXTRA_FIELDS, buildEarlyEaSeason, nationalityEntries } from './li
 import { LEGACY_POSITIONS, readRatingsRows } from './lib/ea-legacy-seasons.mjs';
 import { pinned, readExport, readLaterEditions } from './lib/ea-season-files.mjs';
 import { buildClubSeasons } from './lib/ea-season-builds.mjs';
+import { assembleEaSeason } from './lib/ea-seasons.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
@@ -37,8 +38,22 @@ function parseArgs(argv) {
   return args;
 }
 
+/**
+ * assembleEaSeason with each season's computed fills (scripts/lib/football-fills.mjs): the facts of
+ * scripts/data/football-fills/ and its manifest, read once.
+ */
+async function fillingAssemble() {
+  const fills = JSON.parse(await readFile(path.join(root, 'scripts/data/football-fills.json'), 'utf8'));
+  const wikidata = JSON.parse(await readFile(path.join(root, 'scripts/data/football-fills/wikidata.json'), 'utf8'));
+  const { seasons: elo } = JSON.parse(await readFile(path.join(root, 'scripts/data/football-fills/elo.json'), 'utf8'));
+  return (records, season) => {
+    if (!elo[season.id]) throw new Error(`${season.id}: no Elo in scripts/data/football-fills/elo.json; add the season to scripts/data/football-fills.json and sync`);
+    return assembleEaSeason(records, { ...season, fill: { elo: elo[season.id], wikidata, manifest: fills } });
+  };
+}
+
 /** FIFA 05 and FIFA 06: each edition's ratings, with nationalities from the later editions and Wikidata (scripts/lib/ea-early-seasons.mjs). */
-async function buildEarlySeasons(manifest, dataDir, rows) {
+async function buildEarlySeasons(manifest, dataDir, rows, assemble) {
   const { early, legacy } = manifest;
   const later = await readLaterEditions(manifest, dataDir, rows);
   const entries = nationalityEntries(JSON.parse(await pinned(path.join(root, early.nationalities.file), early.nationalities.sha256, 'early nationalities')));
@@ -47,7 +62,7 @@ async function buildEarlySeasons(manifest, dataDir, rows) {
     const file = path.join(dataDir, legacy.ratings.folder, edition.ratings.file);
     const ratings = readRatingsRows(await pinned(file, edition.ratings.sha256, `${edition.edition} ratings file`), { extraFields: EARLY_EXTRA_FIELDS });
     results.push(buildEarlyEaSeason({ ratings, later, entries }, edition, { ratingsUrl: legacy.ratings.url,
-      nationalities: `The same EA id in the nearest later edition, else ${early.nationalities.name.split(',')[0]}` }));
+      nationalities: `The same EA id in the nearest later edition, else ${early.nationalities.name.split(',')[0]}`, assemble }));
   }
   return results;
 }
@@ -59,7 +74,8 @@ async function main() {
   const csv = path.resolve(args.csv ?? path.join(dataDir, 'ea-leone', manifest.dataset.file));
   const rows = await readExport(manifest.dataset, csv);
 
-  const results = [...await buildClubSeasons(manifest, { root, dataDir, rows }), ...await buildEarlySeasons(manifest, dataDir, rows)];
+  const assemble = await fillingAssemble();
+  const results = [...await buildClubSeasons(manifest, { root, dataDir, rows, assemble }), ...await buildEarlySeasons(manifest, dataDir, rows, assemble)];
   for (const { doc, text, audit } of results) {
     const { coverage } = doc;
     console.log(`${doc.id} ${doc.season} ${doc.label} (${audit.snapshotDate}, ${audit.rows} players): `

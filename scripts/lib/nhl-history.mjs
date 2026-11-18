@@ -2,11 +2,11 @@
 // NHL 09"), and the calibration fixture: assembled from the pinned downloads that scripts/sync-nhl-seasons.mjs reads
 // (`io.text(file)`, `io.buffer(file)`). No other I/O here.
 import { strFromU8, unzipSync } from 'fflate';
-import { attributeMean, clubOfStints, groupOf, windowOf } from './nhl-computed.mjs';
+import { attributeMean, clubOfStints, groupOf, lagWindowOf, windowOf } from './nhl-computed.mjs';
 import { COUNTRY_CODE, IGN08_POSITION, findPlayer, norm, parseIgnAttributes, teamsOf } from './nhl-seasons.mjs';
 import {
-  hdbBirthCountry, hdbName, hdbPosition, hdbSeason, hockeyDatabank, moneypuckLookup, moneypuckSeason, moneypuckStints,
-  plainCsvColumns, seasonPlayers,
+  hdbBirthCountry, hdbName, hdbPosition, hdbSeason, hdbTeamRecords, hockeyDatabank, moneypuckGameScores, moneypuckLookup,
+  moneypuckSeason, moneypuckStints, plainCsvColumns, seasonPlayers,
 } from './nhl-stats.mjs';
 
 const memo = new Map();
@@ -25,19 +25,28 @@ const moneypuck = (io, year) => once(`mp-${year}`, async () => moneypuckSeason(a
   await io.text(`moneypuck/${year - 1}-goalies.csv`), year));
 const lookup = io => once('mp-lookup', async () => moneypuckLookup(await io.text('moneypuck/allPlayersLookup.csv')));
 
-/** Each player's games per club in MoneyPuck's game-by-game files of the season ending in `year`. */
-async function moneypuckClubs(io, year) {
-  const rows = [];
+/**
+ * MoneyPuck's game-by-game files of the season ending in `year`: each player's games per club (`stints`), and every game's
+ * score from its skaters' goals (`scores`, moneypuckGameScores).
+ */
+async function moneypuckGames(io, year) {
+  const rows = [], skaterRows = [];
   for (const kind of ['skaters', 'goalies']) {
     const files = unzipSync(new Uint8Array(await io.buffer(`moneypuck-games/${kind}-${year - 1}.zip`)));
     const names = Object.keys(files).filter(name => name.endsWith('.csv'));
     if (names.length !== 1) throw new Error(`moneypuck-games/${kind}-${year - 1}.zip holds ${names.length} CSV files`);
-    for (const row of plainCsvColumns(strFromU8(files[names[0]]), ['playerId', 'gameId', 'gameDate', 'playerTeam', 'situation'])) {
-      if (row.situation === 'all') rows.push(row);
+    const columns = ['playerId', 'gameId', 'gameDate', 'playerTeam', 'situation', ...(kind === 'skaters' ? ['opposingTeam', 'home_or_away', 'I_F_goals'] : [])];
+    for (const row of plainCsvColumns(strFromU8(files[names[0]]), columns)) {
+      if (row.situation !== 'all') continue;
+      rows.push(row);
+      if (kind === 'skaters') skaterRows.push(row);
     }
   }
-  return moneypuckStints(rows, year);
+  return { stints: moneypuckStints(rows, year), scores: moneypuckGameScores(skaterRows, year) };
 }
+
+/** The Hockey Databank's Teams.csv, as text (read once). */
+const databankTeams = io => once('hdb-teams', () => io.text('hockey-databank/Teams.csv'));
 
 /**
  * Two players of a season who share a name are told apart by their birth year, or their birth date where that is shared
@@ -94,9 +103,12 @@ function moneypuckName(key, raw, listed) {
 }
 
 /**
- * A computed season's snapshot parts: `{ form, leagues, players, left, notes }` from the Hockey Databank (`source.kind`
- * 'hdb': no time on ice; goalies by save percentage once every season of the window kept shots against, else by goals
- * against) or MoneyPuck ('moneypuck': minutes and points a game, goalies by save percentage).
+ * A computed season's snapshot parts: `{ form, leagues, results, players, left, notes }` from the Hockey Databank
+ * (`source.kind` 'hdb': no time on ice; goalies by save percentage once every season of the window kept shots against,
+ * else by goals against) or MoneyPuck ('moneypuck': minutes and points a game, goalies by save percentage). `results`, the
+ * season's real results its clubs are reconciled with (docs/design/computed-ratings.md, step 5): every club's record and
+ * goals from the databank's Teams.csv (`clubs`, hdbTeamRecords), or every game's score from MoneyPuck's game files
+ * (`games`, moneypuckGameScores).
  */
 export async function assembleComputed(season, io, manifest) {
   const { year } = season;
@@ -124,9 +136,11 @@ export async function assembleComputed(season, io, manifest) {
     });
     parts.notes = { renamed: namesApart(parts.players, key => isoDate(master(key).birthYear, master(key).birthMon, master(key).birthDay)) };
     parts.form = { skaters: 'points', goalies: windowOf(year).every(y => seasons.get(y).league.savePct != null) ? 'saves' : 'goals' };
+    parts.results = { source: "the Hockey Databank's Teams.csv", clubs: hdbTeamRecords(await databankTeams(io), year) };
   } else if (season.source.kind === 'moneypuck') {
     for (const y of windowOf(year)) seasons.set(y, await moneypuck(io, y));
-    const clubs = await moneypuckClubs(io, year);
+    const played = await moneypuckGames(io, year);
+    const clubs = played.stints;
     const people = await lookup(io);
     const fromSummary = [], fromDatabank = [], restored = [];
     // A name MoneyPuck dropped letters from, put back (moneypuckName).
@@ -172,20 +186,36 @@ export async function assembleComputed(season, io, manifest) {
       clubFromSummary: fromSummary, birthFromDatabank: fromDatabank, noNationality: parts.players.filter(p => p[4] == null).map(p => `${p[1]} (${p[2]})`),
       ...(restored.length ? { lettersPutBack: restored } : {}) };
     parts.form = { skaters: 'minutes', goalies: 'saves' };
+    const { games, homeMended, oneSided } = played.scores;
+    parts.results = { source: "MoneyPuck.com's game-by-game skater files", homeMended, oneSided, games };
   } else throw new Error(`${season.id}: no statistics source ${season.source.kind}`);
   const codes = new Set(teamsOf(manifest, year).map(team => team.code));
   const strays = [...new Set(parts.players.map(p => p[2]))].filter(code => !codes.has(code));
   if (strays.length) throw new Error(`${season.id}: players of clubs the season does not have: ${strays.join(', ')}`);
+  // Every club of the season has its results, and no other club does.
+  const { clubs: records, games } = parts.results;
+  const resulted = records ? records.map(row => row[0]) : games.flatMap(game => [game[1], game[2]]);
+  const unlike = [...codes].filter(code => !resulted.includes(code)).concat([...new Set(resulted)].filter(code => !codes.has(code)));
+  if (unlike.length || (records && records.length !== codes.size)) {
+    throw new Error(`${season.id}: the results' clubs are not the season's (${unlike.join(', ') || 'a club twice'})`);
+  }
   return parts;
 }
 
-/** A computed season's snapshot text: one line per player, its club's players together in the season's club order. */
-export function computedSnapshotText(season, manifest, { form, leagues, players, left, notes }) {
+/**
+ * A computed season's snapshot text: one line per player, its club's players together in the season's club order; one
+ * line per club record, in that order, or per game.
+ */
+export function computedSnapshotText(season, manifest, { form, leagues, results, players, left, notes }) {
   const order = teamsOf(manifest, season.year).map(team => team.code);
   const sorted = players.slice().sort((a, b) => order.indexOf(a[2]) - order.indexOf(b[2]) || a[1].localeCompare(b[1]) || String(a[0]).localeCompare(String(b[0])));
   const leftSorted = left.slice().sort((a, b) => a[1].localeCompare(b[1]) || a[0].localeCompare(b[0]));
   const source = { id: season.id, method: 'computed', kind: season.source.kind, retrieved: season.retrieved };
-  return `{\n"source": ${JSON.stringify(source)},\n"form": ${JSON.stringify(form)},\n"leagues": ${JSON.stringify(leagues)},\n"notes": ${JSON.stringify(notes)},\n`
+  const key = results.clubs ? 'clubs' : 'games';
+  const rows = results.clubs ? results.clubs.slice().sort((a, b) => order.indexOf(a[0]) - order.indexOf(b[0])) : results.games;
+  const head = Object.entries(results).filter(([name]) => name !== key).map(([name, value]) => `${JSON.stringify(name)}: ${JSON.stringify(value)}, `).join('');
+  return `{\n"source": ${JSON.stringify(source)},\n"form": ${JSON.stringify(form)},\n"leagues": ${JSON.stringify(leagues)},\n`
+    + `"results": {${head}"${key}": [\n${rows.map(row => JSON.stringify(row)).join(',\n')}\n]},\n"notes": ${JSON.stringify(notes)},\n`
     + `"left": [\n${leftSorted.map(row => JSON.stringify(row)).join(',\n')}\n],\n"players": [\n${sorted.map(row => JSON.stringify(row)).join(',\n')}\n]\n}\n`;
 }
 
@@ -317,13 +347,17 @@ export function convertedSnapshotText(season, manifest, { players, left, notes }
  * The five full editions' players (their committed snapshots) with their stat lines from the permitted sources, for the
  * computed rule's calibration: NHLPA 93, NHL 94, NHL 95 and NHL 07 from the Hockey Databank (joined by name on the
  * edition's club, then anywhere in the window), NHL 22 from MoneyPuck (by NHL id). Each edition `{ id, year, form,
- * leagues, players: [[name, team, pos, overall, lines]], unmatched }`.
+ * leagues, players: [[name, team, pos, overall, lines]], unmatched }`. A player's lines cover the season's window and the
+ * window of the season before (`lagWindowOf`): an edition comes out before its season, so EA rated what the seasons before
+ * it showed. `unmatched`: the players with no line in the season's own window.
  */
 export async function assembleCalibration(editions, io, snapshotOf) {
   const out = [];
   for (const { id, year, kind } of editions) {
     const snapshot = await snapshotOf(id);
     const seasons = new Map();
+    // The seasons a player's lines cover: the season's window, then the one season more that the window before adds.
+    const covered = [...new Set([...windowOf(year), ...lagWindowOf(year)])].sort((a, b) => b - a);
     let lineOf, unmatched = [], form;
     if (kind === 'hdb') {
       const db = await databank(io);
@@ -349,8 +383,10 @@ export async function assembleCalibration(editions, io, snapshotOf) {
       }
       lineOf = row => keyOf.get(row) ?? null;
       form = { skaters: 'points', goalies: windowOf(year).every(y => seasons.get(y).league.savePct != null) ? 'saves' : 'goals' };
+      // The lag window's earliest season is read for lines only: the players are matched on the seasons above.
+      for (const y of covered) if (!seasons.has(y)) seasons.set(y, hdbSeason(db, y));
     } else {
-      for (const y of windowOf(year)) seasons.set(y, await moneypuck(io, y));
+      for (const y of covered) seasons.set(y, await moneypuck(io, y));
       lineOf = row => row[5];
       form = { skaters: 'minutes', goalies: 'saves' };
     }
@@ -358,15 +394,15 @@ export async function assembleCalibration(editions, io, snapshotOf) {
     for (const row of snapshot.players) {
       const key = lineOf(row);
       const goalie = row[2] === 'G';
-      const lines = key == null ? [] : windowOf(year).map(y => {
+      const lines = key == null ? [] : covered.map(y => {
         const e = (goalie ? seasons.get(y).goalies : seasons.get(y).skaters).get(key);
         if (!e || e.games === 0) return null;
         return goalie ? [y, e.games, e.seconds, e.goals, e.shots] : [y, e.games, e.points, kind === 'hdb' ? null : e.seconds];
       }).filter(Boolean);
-      if (!lines.length) unmatched.push(`${row[0]} (${row[1]})`);
+      if (!lines.some(line => windowOf(year).includes(line[0]))) unmatched.push(`${row[0]} (${row[1]})`);
       players.push([row[0], row[1], row[2], row[3], lines]);
     }
-    const leagues = Object.fromEntries(windowOf(year).map(y => [y, seasons.get(y).league]));
+    const leagues = Object.fromEntries(covered.map(y => [y, seasons.get(y).league]));
     out.push({ id, year, kind, form, leagues, players, unmatched });
   }
   return out;
@@ -374,7 +410,7 @@ export async function assembleCalibration(editions, io, snapshotOf) {
 
 /** The calibration fixture's text. */
 export function calibrationText(editions) {
-  return `{\n"note": "The full EA editions' players with their stat lines from the permitted sources (the Hockey Databank; MoneyPuck for NHL 22), for the computed rule's calibration (docs/design/hockey.md, \\"Computed seasons\\"). Written by node scripts/sync-nhl-seasons.mjs.",\n"editions": [\n`
+  return `{\n"note": "The full EA editions' players with their stat lines from the permitted sources (the Hockey Databank; MoneyPuck for NHL 22), for the computed rule's calibration (docs/design/hockey.md, \\"Computed seasons\\"): the lines of the edition's season's window and of the window before it, which EA saw. Written by node scripts/sync-nhl-seasons.mjs.",\n"editions": [\n`
     + editions.map(e => `{"id": ${JSON.stringify(e.id)}, "year": ${e.year}, "kind": ${JSON.stringify(e.kind)}, "form": ${JSON.stringify(e.form)}, "leagues": ${JSON.stringify(e.leagues)}, "unmatched": ${JSON.stringify(e.unmatched)},\n"players": [\n${e.players.map(p => JSON.stringify(p)).join(',\n')}\n]}`).join(',\n')
     + '\n]\n}\n';
 }

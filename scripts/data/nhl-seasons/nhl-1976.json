@@ -2,6 +2,26 @@
 "source": {"id":"nhl-1976","method":"computed","kind":"hdb","retrieved":"2026-11-09"},
 "form": {"skaters":"points","goalies":"goals"},
 "leagues": {"1974":{"savePct":null,"gaa":3.153846153846154,"maxGames":78},"1975":{"savePct":null,"gaa":3.3729166666666663,"maxGames":80},"1976":{"savePct":null,"gaa":3.3645833333333335,"maxGames":80}},
+"results": {"source": "the Hockey Databank's Teams.csv", "clubs": [
+["AFM",80,35,33,12,0,0,0,262,237],
+["BOS",80,48,15,17,0,0,0,313,237],
+["BUF",80,46,21,13,0,0,0,339,240],
+["CGS",80,27,42,11,0,0,0,250,278],
+["CHI",80,32,30,18,0,0,0,254,261],
+["DET",80,26,44,10,0,0,0,226,300],
+["KCS",80,12,56,12,0,0,0,190,351],
+["LAK",80,38,33,9,0,0,0,263,265],
+["MNS",80,20,53,7,0,0,0,195,303],
+["MTL",80,58,11,11,0,0,0,337,174],
+["NYI",80,42,21,17,0,0,0,297,190],
+["NYR",80,29,42,9,0,0,0,262,333],
+["PHI",80,51,13,16,0,0,0,348,209],
+["PIT",80,35,33,12,0,0,0,339,303],
+["STL",80,29,37,14,0,0,0,249,290],
+["TOR",80,34,31,15,0,0,0,294,276],
+["VAN",80,33,32,15,0,0,0,271,272],
+["WSH",80,11,59,10,0,0,0,224,394]
+]},
 "notes": {"renamed":["Bob Kelly (PHI, LW) as Bob Kelly (1950)","Bob Kelly (PIT, LW) as Bob Kelly (1946)","Bob Murdoch (LAK, D) as Bob Murdoch (1946)","Bob Murdoch (CGS, LW) as Bob Murdoch (1954)","Bob Murray (VAN, D) as Bob Murray (1948)","Bob Murray (CHI, D) as Bob Murray (1954)"]},
 "left": [
 

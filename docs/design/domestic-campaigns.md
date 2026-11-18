@@ -1302,9 +1302,9 @@ seasons with clubs (the built-in one and 31 earlier) and each of the two fields:
   region that borders another region of the same parent joins the one it borders most (a
   part across the water stays). Together these leave no specks of one club in another's
   land: across the 98 maps, no piece of 1 to 400 km² as drawn lies against one other club for
-  half its edge, against 1,601 before the levels went down to the communes (the test checks
+  half its edge, against 1,602 before the levels went down to the communes (the test checks
   1 to 300 km², as simplification can shrink a piece by a sixth). Larger pieces can: 23 of
-  400 km² or more (21 before), such as Lokomotiv's Severodvinsk inside Spartak's north
+  400 km² or more (24 before), such as Lokomotiv's Severodvinsk inside Spartak's north
   (1,230 km², six seasons from 2001/02 to 2021/22) and Real Madrid's Cádiz beside Valencia's
   Andalusia (about 7,400 km², four seasons from 1993/94 to 2000/01).
     - A region holding one club stays whole, for that club. Should the club start next door
@@ -1381,8 +1381,8 @@ crowded seasons can leave a club little more than its borough: Everton about 115
 beside Liverpool while Burnley holds all of Lancashire's county council and more (2014/15,
 2016/17, 2018/19, 2020/21, 2023/24, 2025/26), Newcastle about 200 km² in six seasons from
 1996/97 to 2008/09. Across the 98 maps, 37 club lands are under 800 km² (40 before the
-communes) and 285 grounds lie over 5 km outside their club's land (347 before; Russia's 35
-down to 4, England's 129 to 94), but 80 lie over 50 km out (76 before), two thirds of them
+communes) and 285 grounds lie over 5 km outside their club's land (344 before; Russia's 35
+down to 4, England's 129 to 94), but 81 lie over 50 km out (74 before), two thirds of them
 Turkish clubs'. Russia's clubs share European Russia's 4.0 million km²: in 2015/16's Elite 32
 Zenit holds about 1.9 million and CSKA Moscow 2.1, in its Top 124 eight clubs 0.3 to 1.0
 million each.

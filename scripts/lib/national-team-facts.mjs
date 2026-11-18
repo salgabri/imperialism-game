@@ -77,12 +77,13 @@ export function teamCountry(label, names) {
  * position) and `names`. Keeps the stints of `years` (`[first, last]`, the seasons' calendar years) that have a start;
  * a stint Wikidata has not closed (no end: Paolo Maldini's for Italy, 1988–) ends as its caps would run out at
  * `openCapsPerYear` a year, start + ⌈caps / openCapsPerYear⌉ − 1, and is marked so; one with neither end nor caps is
- * left out, as no season can tell whether it covers it. Deprecated statements are left out. Returns `{ teams: [[qid,
- * country]], players: [[qid, name, born, title, positions]], stints: [[player, team, from, to, caps, goals, ended]],
- * audit }`, each sorted, with only the teams and players the stints name; `ended` is 0 for an end of Wikidata's, 1 for
- * one the rule gave.
+ * left out, as no season can tell whether it covers it, unless `openFirstYear` is set: then it covers its first year
+ * only (its start is the debut, a cap), as the computed fills read it (scripts/lib/football-fills.mjs). Deprecated
+ * statements are left out. Returns `{ teams: [[qid, country]], players: [[qid, name, born, title, positions]], stints:
+ * [[player, team, from, to, caps, goals, ended]], audit }`, each sorted, with only the teams and players the stints name;
+ * `ended` is 0 for an end of Wikidata's, 1 for one the caps rule gave and 2 for a first year only.
  */
-export function wikidataTables({ teams, stints, players, positions }, { positions: positionOf, names, years: [first, last], openCapsPerYear }) {
+export function wikidataTables({ teams, stints, players, positions }, { positions: positionOf, names, years: [first, last], openCapsPerYear, openFirstYear = false }) {
   if (!(openCapsPerYear > 0)) throw new Error('openCapsPerYear must be a number of caps');
   const countryOf = new Map();
   for (const row of teams) {
@@ -93,6 +94,7 @@ export function wikidataTables({ teams, stints, players, positions }, { position
     countryOf.set(qid, teamCountry(row.teamLabel, names));
   }
   const audit = { multiValued: 0, deprecated: 0, noStart: 0, noEnd: 0, ended: 0, reversed: 0, noCaps: 0, conceded: 0, ignoredTeams: names.ignoreTeams.length, otherPositions: {} };
+  if (openFirstYear) audit.firstYearOnly = 0;
   const kept = [];
   // A statement with two values of a qualifier comes back as a row for each: one stint, from the earliest start to the
   // latest end, with the most caps and goals any of its rows gives.
@@ -124,17 +126,19 @@ export function wikidataTables({ teams, stints, players, positions }, { position
     if (from == null) { audit.noStart++; continue; }
     const caps = count(known(row.caps), `Caps of ${statement}`);
     const end = yearOf(known(row.end));
-    if (end == null && !caps) { audit.noEnd++; continue; }
-    const to = end ?? from + Math.ceil(caps / openCapsPerYear) - 1;
+    const firstYear = end == null && !caps && openFirstYear;
+    if (end == null && !caps && !firstYear) { audit.noEnd++; continue; }
+    const to = end ?? (firstYear ? from : from + Math.ceil(caps / openCapsPerYear) - 1);
     if (to < from) { audit.reversed++; continue; }
     if (to < first || from > last) continue;
-    if (end == null) audit.ended++;
+    if (firstYear) audit.firstYearOnly++;
+    else if (end == null) audit.ended++;
     if (caps == null) audit.noCaps++;
     // Wikidata writes a goalkeeper's goals conceded as negative goals: not goals he scored, so none are kept.
     const conceded = known(row.goals) != null && Number(row.goals) < 0;
     if (conceded) audit.conceded++;
     const goals = conceded ? null : count(known(row.goals), `Goals of ${statement}`);
-    kept.push([entityId(row.player), team, from, to, caps, goals, end == null ? 1 : 0]);
+    kept.push([entityId(row.player), team, from, to, caps, goals, end != null ? 0 : firstYear ? 2 : 1]);
   }
   const wanted = new Set(kept.map(stint => stint[0]));
   const roles = new Map();

@@ -1700,9 +1700,12 @@ the game: pick one under **Season** in setup. Each is a file in
   2005/06 and 2004/05 have nations only. A club EA filed under Rest of World for want of
   a licence (FIFA 20's Olympiacos, Spartak Moscow and Shakhtar Donetsk) plays in the league
   the same club is in in the nearest other edition. Ratings are EA's overalls, unchanged.
-  EA rates only part of the world, so 49–82 nations field a full XI each season (fewer in the older
-  editions). A nation with at least six rated players, half an XI, fields the players it has, short-handed
-  below eleven; one with fewer fields no team, and its land stays neutral. Scotland, Wales and Northern Ireland field their own
+  EA rates only part of the world, so 49–82 nations have a full XI of EA's own each season (fewer in the older
+  editions). A nation with at least six rated players, half an XI, fields a side; the places EA leaves empty in
+  its natural XI go to players capped for it that season on Wikidata, rated from its World Football Elo and
+  marked as estimates ([computed fills](docs/design/football-years.md#computed-fills)), and it starts
+  short-handed only where Wikidata names nobody (FIFA 05–09: none). One with fewer fields no team, and its land
+  stays neutral. Scotland, Wales and Northern Ireland field their own
   teams; places with no shape on the map (Malta, the Faroe Islands, …) have
   none, and their players still play for their clubs.
 - **Rosters:** EA FC 26 is update 4 of 19 September 2025, the snapshot the
