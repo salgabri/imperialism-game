@@ -70,7 +70,7 @@
   "strength-mismatch": {
    "severity": "warning",
    "about": "a team whose stored strength differs by more than one point from the lineup the game fields from its squad",
-   "count": 81
+   "count": 78
   },
   "birth-date-disagreement": {
    "severity": "warning",
@@ -874,7 +874,7 @@
    "nba-2k16": {
     "count": 1,
     "examples": [
-     "club:Dinamo Sassari — strength-mismatch: stored 73, fields 70.4 (Brent Petway at PG)"
+     "club:Dinamo Sassari — strength-mismatch: stored 71, fields 68.8 (Marquez Haynes at PG)"
     ]
    },
    "nba-2k14": {
@@ -967,14 +967,13 @@
     ]
    },
    "nba-2k04": {
-    "count": 2,
+    "count": 1,
     "examples": [
-     "club:Miami Heat — strength-mismatch: stored 77, fields 74.8 (Brian Grant at C)",
-     "club:Partizan — strength-mismatch: stored 76, fields 73.2 (Djuro Ostojic at PF)"
+     "club:Miami Heat — strength-mismatch: stored 77, fields 74.8 (Brian Grant at C)"
     ]
    },
    "nba-2k03": {
-    "count": 8,
+    "count": 7,
     "examples": [
      "club:Milwaukee Bucks — strength-mismatch: stored 81, fields 79 (Toni Kukoc at C)",
      "club:New York Knicks — strength-mismatch: stored 79, fields 76.6 (Kurt Thomas at C)",
@@ -990,11 +989,11 @@
     ]
    },
    "nba-2k01": {
-    "count": 4,
+    "count": 3,
     "examples": [
      "club:Portland Trail Blazers — strength-mismatch: stored 87, fields 85 (Dale Davis at C)",
      "club:Phoenix Suns — strength-mismatch: stored 86, fields 83.6 (Rodney Rogers at C)",
-     "club:Baskonia — strength-mismatch: stored 79, fields 76.8 (Fabricio Oberto at SG)"
+     "club:Spirou Charleroi — strength-mismatch: stored 80, fields 77.6 (John Jerome at C)"
     ]
    },
    "nba-2k00": {
@@ -1644,7 +1643,7 @@
    "clubs": 50,
    "ratings": {
     "players": 485,
-    "min": 62,
+    "min": 59,
     "median": 76,
     "max": 97
    },
@@ -1869,7 +1868,7 @@
    "clubs": 50,
    "ratings": {
     "players": 250,
-    "min": 66,
+    "min": 69,
     "median": 82,
     "max": 98
    },
@@ -2017,7 +2016,7 @@
    "clubs": 48,
    "ratings": {
     "players": 240,
-    "min": 68,
+    "min": 67,
     "median": 83,
     "max": 98
    },
@@ -2411,7 +2410,7 @@
    "clubs": 48,
    "ratings": {
     "players": 240,
-    "min": 69,
+    "min": 67,
     "median": 80,
     "max": 97
    },
@@ -2768,8 +2767,8 @@
    "clubs": 48,
    "ratings": {
     "players": 240,
-    "min": 67,
-    "median": 79,
+    "min": 64,
+    "median": 80,
     "max": 97
    },
    "findings": {}
@@ -2945,7 +2944,7 @@
    "clubs": 48,
    "ratings": {
     "players": 240,
-    "min": 70,
+    "min": 69,
     "median": 79,
     "max": 97
    },
@@ -3122,7 +3121,7 @@
    "clubs": 46,
    "ratings": {
     "players": 230,
-    "min": 68,
+    "min": 67,
     "median": 79,
     "max": 98
    },
@@ -3299,8 +3298,8 @@
    "clubs": 46,
    "ratings": {
     "players": 230,
-    "min": 70,
-    "median": 78,
+    "min": 64,
+    "median": 79,
     "max": 97
    },
    "findings": {}
@@ -3473,7 +3472,7 @@
    "clubs": 46,
    "ratings": {
     "players": 230,
-    "min": 71,
+    "min": 65,
     "median": 78,
     "max": 96
    },
@@ -3831,7 +3830,7 @@
    "clubs": 54,
    "ratings": {
     "players": 270,
-    "min": 68,
+    "min": 64,
     "median": 78,
     "max": 98
    },
@@ -3973,7 +3972,7 @@
    "ratings": {
     "players": 270,
     "min": 61,
-    "median": 77,
+    "median": 78,
     "max": 99
    },
    "findings": {
@@ -4134,7 +4133,7 @@
    "ratings": {
     "players": 270,
     "min": 60,
-    "median": 77,
+    "median": 78,
     "max": 98
    },
    "findings": {
@@ -4277,7 +4276,7 @@
    "ratings": {
     "players": 270,
     "min": 61,
-    "median": 76,
+    "median": 77,
     "max": 98
    },
    "findings": {
@@ -4439,8 +4438,8 @@
    "clubs": 54,
    "ratings": {
     "players": 270,
-    "min": 64,
-    "median": 76,
+    "min": 63,
+    "median": 77,
     "max": 97
    },
    "findings": {
@@ -4752,7 +4751,7 @@
    "ratings": {
     "players": 270,
     "min": 67,
-    "median": 79,
+    "median": 80,
     "max": 99
    },
    "findings": {
@@ -4911,7 +4910,7 @@
    "clubs": 54,
    "ratings": {
     "players": 270,
-    "min": 66,
+    "min": 67,
     "median": 79,
     "max": 98
    },
@@ -5055,7 +5054,7 @@
    "clubs": 54,
    "ratings": {
     "players": 270,
-    "min": 67,
+    "min": 65,
     "median": 79,
     "max": 98
    },
@@ -5202,8 +5201,8 @@
    "clubs": 54,
    "ratings": {
     "players": 270,
-    "min": 65,
-    "median": 79,
+    "min": 64,
+    "median": 80,
     "max": 99
    },
    "findings": {
@@ -5346,7 +5345,7 @@
    "ratings": {
     "players": 270,
     "min": 65,
-    "median": 78,
+    "median": 79,
     "max": 99
    },
    "findings": {
@@ -5506,11 +5505,11 @@
    "ratings": {
     "players": 265,
     "min": 62,
-    "median": 78,
+    "median": 77,
     "max": 99
    },
    "findings": {
-    "strength-mismatch": 2
+    "strength-mismatch": 1
    }
   },
   {
@@ -5651,7 +5650,7 @@
     "max": 98
    },
    "findings": {
-    "strength-mismatch": 8
+    "strength-mismatch": 7
    }
   },
   {
@@ -5787,7 +5786,7 @@
    "clubs": 61,
    "ratings": {
     "players": 305,
-    "min": 64,
+    "min": 57,
     "median": 80,
     "max": 99
    },
@@ -5931,12 +5930,12 @@
    "clubs": 53,
    "ratings": {
     "players": 265,
-    "min": 62,
-    "median": 79,
+    "min": 60,
+    "median": 80,
     "max": 99
    },
    "findings": {
-    "strength-mismatch": 4
+    "strength-mismatch": 3
    }
   },
   {

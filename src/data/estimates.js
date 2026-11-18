@@ -1,8 +1,10 @@
 // A rating the game estimated rather than read: every place that shows one says so, in its league's words. Hockey's
-// (scripts/lib/nhl.mjs) fill in below EA's top 300; the EuroLeague's (scripts/lib/euroleague.mjs) are all estimates.
+// (scripts/lib/nhl.mjs) fill in below EA's top 300; the EuroLeague's (scripts/lib/euroleague-ratings.mjs) are all
+// estimates.
 const REASONS = Object.freeze({
   NHL: Object.freeze({ reason: "EA publishes only NHL 27's top 300 players", basis: 'ice time and scoring' }),
-  EuroLeague: Object.freeze({ reason: 'no game rates EuroLeague players', basis: 'his EuroLeague box scores (PIR a game)' }),
+  EuroLeague: Object.freeze({ reason: 'no game rates EuroLeague players',
+    basis: "his EuroLeague minutes and PIR, ranked on NBA 2K27's scale (a past season's also moved toward his club's results)" }),
   // Football's computed fills (scripts/lib/football-fills.mjs): an EA season's nation short of an XI, its empty places
   // taken by players capped for it that season.
   'International football': Object.freeze({ reason: 'EA rated too few of this nation\'s players for an XI',

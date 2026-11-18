@@ -19,11 +19,12 @@ const nbaRules = ({ pace, rating }) => Object.freeze({ minutes: 48, quarter: 12,
 // The EuroLeague plays FIBA's rules at its own pace and scoring rate: 74.2 possessions a game and 86.2 points a team in
 // 2025/26, its last full season (the EuroLeague's API: scripts/data/euroleague-2026-27.json, `league`). Its clubs' fives
 // are the game's estimates (src/data/clubs.euroleague.js), and `scoring` brings them to that, as an NBA season's league
-// rate does its franchises. EuroLeague home sides win more often than the NBA's, 63.7% of the regular season's games
-// (61–66% in each season since 2021/22), so its home edge (`home`, as HOME_EFFICIENCY) is larger. Fewer of its games go
-// to overtime, 3.3–5.2% a season, so fewer one- and two-point deficits are levelled at the buzzer (`buzzer`, as
-// BUZZER_LEVEL): about 4% of its games then go to overtime.
-const EUROLEAGUE = Object.freeze({ minutes: 40, quarter: 10, pace: 74.2, paceRange: [56, 95], scoring: 1.03, home: 0.06,
+// rate does its franchises: 1.025 since the estimates were read off NBA 2K27's starters (2026-11-18), whose fives
+// average 1.6 points more than the straight line's did. EuroLeague home sides win more often than the NBA's, 63.7% of
+// the regular season's games (61–66% in each season since 2021/22), so its home edge (`home`, as HOME_EFFICIENCY) is
+// larger. Fewer of its games go to overtime, 3.3–5.2% a season, so fewer one- and two-point deficits are levelled at
+// the buzzer (`buzzer`, as BUZZER_LEVEL): about 4% of its games then go to overtime.
+const EUROLEAGUE = Object.freeze({ minutes: 40, quarter: 10, pace: 74.2, paceRange: [56, 95], scoring: 1.025, home: 0.06,
   buzzer: Object.freeze([0.1, 0.05]) });
 // An earlier season's EuroLeague (2000/01 on) plays at its own pace and scoring rate (src/data/euroleagueLeagueAverages.js:
 // 70 to 75 possessions, 74 to 86 points a team): its clubs' fives are rated on 2025/26's level, so its `scoring` is the
@@ -391,11 +392,12 @@ export const isEuroleagueScope = scope => scope === EUROLEAGUE_SCOPE || /^domest
 
 /**
  * Basketball between EuroLeague clubs: FIBA's forty minutes, at the EuroLeague's pace and scoring rate and with its
- * home edge. Club campaigns on the EuroLeague's map play it (`matchSport` in src/sports/index.js). Version 6.
+ * home edge. Club campaigns on the EuroLeague's map play it (`matchSport` in src/sports/index.js). Version 7: version 6
+ * scored 1.03 a possession, for the fives of the old straight-line estimates.
  */
 export const euroleagueBasketball = defineSportData({
   ...basketballRules,
-  simulationVersion: 6,
+  simulationVersion: 7,
   clock: { length: EUROLEAGUE.minutes, msPerUnit: basketballRules.clock.msPerUnit },
   formatEvent: eventFormat(EUROLEAGUE),
   prepareMatch: (attacker, defender, effA, effD, venue) => prepareMatch(attacker, defender, effA, effD, venue, EUROLEAGUE),
@@ -409,7 +411,7 @@ const euroleagueSeasons = new Map();
 
 /**
  * Basketball between EuroLeague clubs in an earlier `season` ('2009/10'): the built-in's rules at that season's pace and
- * scoring rate. The built-in season, and a season without league figures, plays `euroleagueBasketball`. Version 6, as
+ * scoring rate. The built-in season, and a season without league figures, plays `euroleagueBasketball`. Version 7, as
  * the built-in's: the same model.
  */
 export function euroleagueBasketballIn(season) {
@@ -418,7 +420,7 @@ export function euroleagueBasketballIn(season) {
     const rules = euroleagueRules(EUROLEAGUE_LEAGUE_AVERAGES[season]);
     euroleagueSeasons.set(season, defineSportData({
       ...basketballRules,
-      simulationVersion: 6,
+      simulationVersion: 7,
       clock: { length: rules.minutes, msPerUnit: basketballRules.clock.msPerUnit },
       formatEvent: eventFormat(rules),
       prepareMatch: (attacker, defender, effA, effD, venue) => prepareMatch(attacker, defender, effA, effD, venue, rules),
