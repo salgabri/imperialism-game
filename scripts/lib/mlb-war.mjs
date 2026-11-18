@@ -8,7 +8,10 @@
 // A player's score is his WAR per playing time over the season and the two before it, weighted toward the latest and
 // regressed toward a level below replacement, so that playing time counts. Each role's scores are then put on MLB The
 // Show's scale rank for rank: the k-th best score of a season of T clubs takes the overall a player at the same depth
-// per club held in MLB The Show 18 to 24.
+// per club held in MLB The Show 18 to 24. Each club then moves toward its real record (`resultsMove`,
+// docs/design/computed-ratings.md, step 5), every player of it by the same whole number and its best few by one more.
+import { makeRng } from '../../src/data/teams.js';
+import { clubMoveOf, mean, perPointOf, resultsTargets, winShareOf } from './computed-ratings.mjs';
 
 /** The data set id of the computed season of `year`: 'mlb-war-1961'. */
 export const warSeasonIdOf = year => `mlb-war-${year}`;
@@ -126,4 +129,65 @@ export function aliasesOf(group) {
   const years = group.map(p => p.born);
   if (years.every(Boolean) && new Set(years).size === group.length) return new Map(group.map(p => [p.id, `${displayNameOf(p)} (${p.born})`]));
   return new Map();
+}
+
+// ---------- each club's move toward its real record ----------
+
+/** The match variation the engine's per-point measure plays at: the game's balanced setting, as the realism harness plays. */
+export const MEASURE_DRAMA = 6;
+/** Games played at each of perPointOf's gaps (±2 and ±4 points): the slope comes to within about 1.6%. */
+export const MEASURE_GAMES = 40000;
+
+/**
+ * What the engine gives a club for a point of strength (src/sports/baseball.js baseballStrength), in win share: the
+ * slope perPointOf measures over games between two copies of one of the season's clubs (`clubs`, as buildClub makes
+ * them, drawn at random), every player of the first raised and of the second lowered by half the gap, at a neutral
+ * venue, the first batting first half the time. `sport` plays the season's rules (baseballOfSeason); `seed` fixes the
+ * draw, so the season rebuilds byte for byte.
+ */
+export function perPointOfSeason(clubs, sport, seed, games = MEASURE_GAMES) {
+  const moved = (club, by) => ({ ...club, squad: club.squad.map(player => ({ ...player, rating: player.rating + by })) });
+  const prepared = new Map();
+  const matchOf = (index, delta, firstBats) => {
+    const key = `${index}|${delta}|${firstBats}`;
+    if (!prepared.has(key)) {
+      const first = moved(clubs[index], delta / 2), second = moved(clubs[index], -delta / 2);
+      prepared.set(key, firstBats ? sport.prepareMatch(first, second, undefined, undefined, { home: false })
+        : sport.prepareMatch(second, first, undefined, undefined, { home: false }));
+    }
+    return prepared.get(key);
+  };
+  const play = (delta, rng) => {
+    const index = Math.floor(rng() * clubs.length), firstBats = rng() < 0.5;
+    const { ga, gd } = sport.sampleResult(rng, matchOf(index, delta, firstBats), MEASURE_DRAMA);
+    return (firstBats ? ga > gd : gd > ga) ? 1 : 0;
+  };
+  return perPointOf({ play, rng: makeRng(seed), games, base: 0.5 });
+}
+
+/**
+ * Each club's move toward its real record (docs/design/computed-ratings.md, step 5). `clubs`: `[{ id, league, w, l,
+ * pool }]`, `pool` the club's players best first by `order`. Its results strength is its win share less a half
+ * (winShareOf), as strength above its league's mean: a club never plays itself, so among the n clubs of a league that
+ * play each other its share measures (n − 1)/n of its gap to them all, as a balanced schedule's Simple Rating System
+ * reads its margins. Its target is the season's mean strength before the move plus √reliability × that ÷ `perPoint`
+ * (resultsTargets), and every player of the club moves by one whole number, its best few by one more (clubMoveOf), so
+ * that `strengthOf(pool)`, the strength the engine plays, comes nearest it. The best few are those of the lineup the
+ * club plays (`lineupOf(pool)`, their ids), best first by `order`, then the rest: a point more for a player on the bench
+ * would only move him into that lineup out of his position, a starting pitcher into the bullpen. Nobody passes a
+ * teammate. → `{ level, reliability, scale, moves: [{ id, target, before, after, shift, plus, pool }] }`.
+ */
+export function resultsMove(clubs, { perPoint, strengthOf, order, lineupOf }) {
+  const level = mean(clubs.map(club => strengthOf(club.pool)));
+  const { ratings, reliability } = winShareOf(Object.fromEntries(clubs.map(club => [club.id, { w: club.w, l: club.l }])));
+  const size = new Map();
+  for (const club of clubs) size.set(club.league, (size.get(club.league) ?? 0) + 1);
+  const above = Object.fromEntries(clubs.map(club => [club.id, ratings[club.id] * (size.get(club.league) - 1) / size.get(club.league)]));
+  const { scale, targets } = resultsTargets({ ratings: above, reliability }, { mean: level, perPoint });
+  const moves = clubs.map(club => {
+    const lineup = lineupOf(club.pool);
+    const bestFirst = (a, b) => (lineup.has(b.id) ? 1 : 0) - (lineup.has(a.id) ? 1 : 0) || order(a, b);
+    return { id: club.id, target: targets[club.id], ...clubMoveOf(club.pool, targets[club.id], strengthOf, { bestFirst }) };
+  });
+  return { level, reliability, scale, moves };
 }

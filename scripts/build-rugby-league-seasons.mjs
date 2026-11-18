@@ -3,8 +3,9 @@
 //   node scripts/build-rugby-league-seasons.mjs             writes public/rugby-league/<id>.json, src/data/rugbyLeagueSeasons.js
 //                                                           and docs/design/rugby-league-seasons-audit.json
 //   node scripts/build-rugby-league-seasons.mjs --check     builds every file and compares it byte for byte, writes nothing
-//   node scripts/build-rugby-league-seasons.mjs --realism   also plays 40 seeded seasons of each season's clubs and prints
-//                                                           them beside the real season (writes nothing more)
+//   node scripts/build-rugby-league-seasons.mjs --realism   also plays 40 seeded seasons of each season's clubs, under its own
+//                                                           day's rules (rugbyLeagueIn), and prints them beside the real
+//                                                           season (writes nothing more)
 //
 // Each season is its committed snapshot (scripts/data/rugby-league-seasons/<id>.json, node
 // scripts/sync-rugby-league-seasons.mjs): its NRL clubs, as scripts/data/rugby-league-seasons.json names them that
@@ -21,14 +22,18 @@
 // the overall computed from his match stats and his club's shift. So are the seasons before 1998 (`basis` "selection",
 // 1960–1997, two in 1997), from the Rugby League Project's lists of who started, where and how often, and his tries.
 // Clubs only, as 2008; the clubs that no club of today's continues (the manifest's `defunct`) play in colours of their own.
+// Every club names its season's league (`leagueOf`: the NSWRFL to 1983, the NSWRL, the ARL, Super League's 1997, then the
+// NRL), as its era map does, so the setup and the campaign name the competition of the day.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { CLUBS } from '../src/data/clubs.rugby-league.js';
+import { NRL_LEAGUE_AVERAGES } from '../src/data/nrlLeagueAverages.js';
 import { contentHash, serializeFootballSet } from '../src/data/footballSetBuild.js';
+import { rugbyLeagueIn } from '../src/sports/rugbyLeague.js';
 import { colourFor } from './lib/club-identity.mjs';
-import { clubSquadOf, mapOf, nationSquadOf, playSeasons, seasonKeyOf, spearman, teamsOf } from './lib/rugby-league-seasons.mjs';
+import { bestFirst, clubSquadOf, expectedWins, leagueOf, mapOf, modelStrengthOf, nationSquadOf, playSeasons, seasonKeyOf, spearman, teamsOf } from './lib/rugby-league-seasons.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const outDir = path.join(root, 'public/rugby-league');
@@ -68,6 +73,7 @@ function buildSeason(entry, snapshot, manifest) {
   // The World Cup nations as their checked squads would field them at their attribute overalls (a club's shift is the
   // club's), for the audit only.
   const clubIndexes = new Set(snapshot.clubs.flatMap(club => club.players.map(([index]) => index)));
+  const league = leagueOf(manifest, year);
   const nations = snapshot.nations.map(row => {
     const pool = row.players.map(([index]) => ({ ...player.get(index), rating: player.get(index).overall }));
     const all = nationSquadOf(row.id, pool), nrl = pool.some(p => clubIndexes.has(p.index)) ? nationSquadOf(row.id, pool.filter(p => clubIndexes.has(p.index))) : null;
@@ -78,7 +84,7 @@ function buildSeason(entry, snapshot, manifest) {
     source: { provider: entry.provider, edition: entry.edition, compiler: entry.compiler, url: entry.url, retrieved: entry.retrieved, rawScale: 10,
       conversion: snapshot.conversion.formula },
     map: mapOf(manifest, year),
-    clubs: clubs.map(c => ({ id: c.id, name: c.name, code: c.code, league: 'NRL', country: c.country, col: c.col, str: c.str, squad: c.squad.map(tupleOf) })),
+    clubs: clubs.map(c => ({ id: c.id, name: c.name, code: c.code, league, country: c.country, col: c.col, str: c.str, squad: c.squad.map(tupleOf) })),
     coverage: { players: clubIndexes.size, clubs: clubs.length, left: snapshot.left.filter(([team]) => snapshot.clubs.some(club => club.list === team)).length },
   };
   doc.version = `${id}-${contentHash(doc)}`;
@@ -145,20 +151,25 @@ function buildComputedSeason(entry, snapshot, manifest) {
     if (!row) throw new Error(`${id}: the snapshot has no ${team.name}`);
     const pool = players.filter(p => p.club === team.id);
     if (pool.length < 17) throw new Error(`${id}: ${team.name} has ${pool.length} players`);
-    if (pool.some(p => p.shift !== row.team.shift)) throw new Error(`${id}: ${team.name}'s players do not all carry its shift`);
+    // Its move: every player its whole number, its `plus` best (overall, then value, then id) one more.
+    const best = new Set(pool.map(p => ({ id: p.nrlId, rating: p.overall, value: p.value })).sort(bestFirst).slice(0, row.team.plus).map(p => p.id));
+    if (pool.some(p => p.shift !== row.team.shift + (best.has(p.nrlId) ? 1 : 0))) throw new Error(`${id}: ${team.name}'s players do not carry its move`);
     const { squad, lineup, open } = clubSquadOf(pool);
-    if (lineup.rating !== row.team.shifted) throw new Error(`${id}: ${team.name}'s lineup is ${lineup.rating}, not the snapshot's ${row.team.shifted}`);
+    if (lineup.rating !== row.team.rating) throw new Error(`${id}: ${team.name}'s lineup is ${lineup.rating}, not the snapshot's ${row.team.rating}`);
+    if (modelStrengthOf(pool) !== row.team.shifted) throw new Error(`${id}: ${team.name}'s model strength is ${modelStrengthOf(pool)}, not the snapshot's ${row.team.shifted}`);
     if (!colours.has(team.franchise)) throw new Error(`${id}: ${team.name}'s franchise ${team.franchise} is no club of the game's`);
     return { id: team.id, name: team.name, code: team.code, country: team.country, col: colours.get(team.franchise), str: lineup.rating,
       team: row.team, games: row.games, squad: squad.slice().sort(byPlace), open, listed: pool.length, outOfPosition: lineup.slots.filter(slot => slot.outOfPosition)
         .map(slot => `${slot.player.name} (${slot.player.pos}) at ${slot.position}`) };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
+  // Each club in its season's league, the NSWRFL from 1960 to the NRL from 1998, which its era map names too.
+  const league = leagueOf(manifest, key);
   const doc = {
     format: 1, kind: 'nrl', id, version: '', year, season: String(year), label: entry.label, local: false,
     source: { provider: entry.provider, edition: entry.edition, compiler: entry.compiler, url: entry.url, retrieved: entry.retrieved, method: 'computed',
       metric: snapshot.conversion.metric, conversion: snapshot.conversion.formula },
     map: mapOf(manifest, key),
-    clubs: clubs.map(c => ({ id: c.id, name: c.name, code: c.code, league: 'NRL', country: c.country, col: c.col, str: c.str, squad: c.squad.map(tupleOf) })),
+    clubs: clubs.map(c => ({ id: c.id, name: c.name, code: c.code, league, country: c.country, col: c.col, str: c.str, squad: c.squad.map(tupleOf) })),
     coverage: { players: players.length, clubs: clubs.length, left: snapshot.left.length },
   };
   doc.version = `${id}-${contentHash(doc)}`;
@@ -187,10 +198,14 @@ function buildComputedSeason(entry, snapshot, manifest) {
         + `${c.outOfPosition.length ? `; out of position: ${c.outOfPosition.join(', ')}` : ''}; ${year}: ${r.won}–${r.drawn}–${r.lost}, ${r.scored}–${r.conceded})`;
     }),
     clubShift: clubs.slice().sort((a, b) => b.team.srs - a.team.srs || a.name.localeCompare(b.name)).map(c => `${c.name}: SRS ${signed(c.team.srs)}, `
-      + `target ${c.team.target}, shift ${signed(c.team.shift)}, strength ${c.team.strength} → ${c.team.shifted}`),
+      + `target ${c.team.target}, move ${signed(c.team.shift)}${c.team.plus ? ` and ${c.team.plus} best +1` : ''}, model strength `
+      + `${c.team.strength} → ${c.team.shifted}, rating ${c.team.rating}`),
     homeEdge: snapshot.conversion.clubShift.homeEdge,
-    // A check only: how the clubs' strengths from the stats alone, and shifted by the season's results, rank against its wins.
-    strengthAndResults: Object.fromEntries([['stats', c => c.team.strength], ['shifted', c => c.str]].map(([key, value]) => [key,
+    // How far apart the season's clubs play: its ratings' reliability, the points a point of strength is worth, the scale.
+    spread: Object.fromEntries(['sigma', 'reliability', 'tries', 'margin', 'scale'].map(key => [key, snapshot.conversion.clubShift[key]])),
+    // A check only: how the clubs' model strengths from the stats alone and moved by the season's results, and the moved
+    // matchday 17's rating the season shows, rank against its wins.
+    strengthAndResults: Object.fromEntries([['stats', c => c.team.strength], ['shifted', c => c.team.shifted], ['rating', c => c.str]].map(([key, value]) => [key,
       Math.round(spearman(clubs.map(value), clubs.map(wins)) * 1000) / 1000])),
     placedByRlp: snapshot.players.filter(row => row[4] === 'RLP').map(([nrlId, name, club, pos]) => `${club}: ${name}: ${pos} (RLP ${snapshot.rlp[nrlId]})`),
     left: snapshot.left.map(([, name, club, games, reason]) => `${club}: ${name} (${games} game${games === 1 ? '' : 's'}): ${reason}`),
@@ -216,16 +231,28 @@ ${rows.join('\n')}
 `;
 }
 
-/** 40 seeded seasons of a season's clubs beside the real season's figures, as text. */
+/**
+ * 40 seeded seasons of a season's clubs under its own rules (`rugbyLeagueIn`) beside the real season's figures, as text:
+ * before golden point (2003) scores count at full time, as the league counted them, and `level` is its draws.
+ */
 function realismText(doc, snapshot) {
-  const report = playSeasons(doc.clubs, { seasons: 40, seed: 20261108 });
+  const sport = rugbyLeagueIn({ dataSet: doc.id, dataYear: doc.year });
+  const report = playSeasons(doc.clubs, { seasons: 40, seed: 20261108, sport });
   // The real records as wins of 24, where a season had another length (2020's twenty rounds).
   const played = snapshot.real.ladder.reduce((sum, [, won, drawn, lost]) => sum + won + drawn + lost, 0) / snapshot.real.ladder.length;
-  const real = { ...snapshot.real.figures, bestWins: snapshot.real.figures.bestWins * 24 / played, worstWins: snapshot.real.figures.worstWins * 24 / played };
+  const league = NRL_LEAGUE_AVERAGES[doc.id] ?? {};
+  const real = { ...snapshot.real.figures, bestWins: snapshot.real.figures.bestWins * 24 / played, worstWins: snapshot.real.figures.worstWins * 24 / played,
+    level: snapshot.real.figures.draws / snapshot.real.figures.games };
+  const { tryPoints, fieldGoalPoints, golden } = sport.rules;
   const pct = x => `${(100 * x).toFixed(1)}%`;
-  const line = (label, model, actual, format) => `  ${label.padEnd(30)} ${format(model).padStart(8)}   ${format(actual)}`;
-  const lines = [`${doc.id}: ${doc.clubs.length} clubs, 24 games, 40 seasons at a neutral venue (model, then the real ${doc.season} regular season)`,
+  const line = (label, model, actual, format) => `  ${label.padEnd(30)} ${format(model).padStart(8)}   ${actual == null ? '—' : format(actual)}`;
+  const lines = [`${doc.id}: ${doc.clubs.length} clubs, 24 games, 40 seasons at a neutral venue (model, then the real ${doc.season} regular season); `
+    + `a try ${tryPoints}, a field goal ${fieldGoalPoints}, ${golden ? 'golden point' : 'extra time (level at full time a draw in the league)'}`,
     line('points a team', report.pointsPerTeam, real.pointsPerTeam, x => x.toFixed(1)),
+    line('tries a team', report.triesPerTeam, league.tries, x => x.toFixed(2)),
+    line('field goals a team', report.fieldGoalsPerTeam, league.fieldGoals, x => x.toFixed(3)),
+    line('penalty goals a team', report.penaltyGoalsPerTeam, null, x => x.toFixed(2)),
+    line(golden ? 'golden point' : 'level at full time (draws)', report.level, golden ? null : real.level, pct),
     line('team points SD', report.teamPointsSd, real.teamPointsSd, x => x.toFixed(1)),
     line('mean margin', report.marginMean, real.marginMean, x => x.toFixed(1)),
     line('won by 1', report.byOne, real.byOne, pct), line('won by 1–6', report.withinSix, real.withinSix, pct),
@@ -235,8 +262,11 @@ function realismText(doc, snapshot) {
     line('best record (wins of 24)', report.bestWins, real.bestWins, x => x.toFixed(1)), line('worst record (wins of 24)', report.worstWins, real.worstWins, x => x.toFixed(1)),
     '  each club, its mean wins of 24 in the model, then its real record:'];
   const ladder = new Map(snapshot.real.ladder.map(([club, won, drawn, lost, scored, conceded]) => [club, `${won}–${drawn}–${lost}, ${scored}–${conceded}`]));
+  const realWins = new Map(snapshot.real.ladder.map(([club, won]) => [club, won]));
   for (const club of report.clubs) lines.push(`    ${club.name.padEnd(30)} ${club.str.toFixed(1)}  ${club.wins.toFixed(1).padStart(5)} wins, ${club.pointsFor.toFixed(1)}–${club.pointsAgainst.toFixed(1)} a game   real ${ladder.get(club.id)}`);
-  lines.push(`  rank correlation of model wins and real wins: ${spearman(report.clubs.map(c => c.wins), report.clubs.map(c => Number(ladder.get(c.id).split('–')[0]))).toFixed(3)}`);
+  const expected = expectedWins(doc.clubs, { sport, seed: doc.id });
+  lines.push(`  rank correlation of model wins and real wins: ${spearman(report.clubs.map(c => c.wins), report.clubs.map(c => realWins.get(c.id))).toFixed(3)}`
+    + ` over these seasons, ${spearman(expected.map(c => c.wins), expected.map(c => realWins.get(c.id))).toFixed(3)} by each club's expected wins`);
   return lines.join('\n');
 }
 

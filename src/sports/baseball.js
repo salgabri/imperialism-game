@@ -184,7 +184,7 @@ function profile(lineup, premium = PITCHING_PREMIUM) {
 /**
  * A season's pitching premium, from its clubs (teams as buildClub makes them): how far their defence rates above their
  * batting on average, to the hundredth, so that its average lineup facing its average staff is an even edge whatever its
- * ratings' balance (MLB The Show 19's clubs 1.53, the 1972 season computed from WAR 2.61). npm run build:mlb-seasons
+ * ratings' balance (MLB The Show 19's clubs 1.53, the 1972 season computed from WAR 2.79). npm run build:mlb-seasons
  * lists each season's (src/data/baseballSeasonPremiums.js).
  */
 export function seasonPremium(clubs) {
@@ -193,6 +193,17 @@ export function seasonPremium(clubs) {
     return PITCHING_SHARE * pitching + (1 - PITCHING_SHARE) * fielding - batting;
   });
   return Math.round(mean(gaps) * 100) / 100;
+}
+
+/**
+ * The strength the match model plays, on the rating scale: the mean of a lineup's batting and its defence (75% pitching,
+ * 25% fielding), before the season's pitching premium. A game's odds follow the gap between two sides' strengths
+ * (prepareMatch: the attacker's edge less the defender's is twice that gap), and moving every player of a lineup by a point
+ * moves it by a point. The seasons computed from WAR move their clubs toward their real records in it.
+ */
+export function baseballStrength(lineup) {
+  const { batting, pitching, fielding } = profile(lineup, 0);
+  return (batting + PITCHING_SHARE * pitching + (1 - PITCHING_SHARE) * fielding) / 2;
 }
 
 /** A side's half-inning at `edge` = its batting minus the opposing defence: its chance to score, regulation and extra. */
@@ -469,8 +480,14 @@ export function baseballIn(settings) {
   const year = rulesYear(settings);
   if (year == null) return baseball;
   const premium = Object.hasOwn(BASEBALL_SEASON_PREMIUMS, settings.dataSet) ? BASEBALL_SEASON_PREMIUMS[settings.dataSet] : PITCHING_PREMIUM;
-  return eraSport(`${year}|${premium}`);
+  return baseballOfSeason(year, premium);
 }
+
+/**
+ * Baseball under the rules of MLB's regular season `year` with a pitching `premium` (seasonPremium): what baseballIn
+ * plays a built-in earlier season under, for a season still being built, whose premium is not listed yet.
+ */
+export const baseballOfSeason = (year, premium) => eraSport(`${year}|${premium}`);
 
 /**
  * Squad-screen strength profile: the batting, pitching and fielding the match model weighs → { batting, pitching,

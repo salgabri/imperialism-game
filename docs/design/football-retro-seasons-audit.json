@@ -94,7 +94,7 @@
           "sha256": "b705168377f9e9ae0014b7976093fc358b1d83da639bd5130f88644730154216"
         }
       ],
-      "version": "cm0102-2003-10-ee19ed8f",
+      "version": "cm0102-2003-10-f7d8ad32",
       "coverage": {
         "players": 2511,
         "nations": 162,
@@ -105,7 +105,7 @@
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2003-10",
-        "version": "cm0102-2003-10-ee19ed8f",
+        "version": "cm0102-2003-10-f7d8ad32",
         "database": {
           "known": true,
           "label": "October 2003 by Alex Sawczuk, fan-made",
@@ -260,7 +260,7 @@
         },
         "players": {
           "read": 140223,
-          "eligible": 79803,
+          "eligible": 79787,
           "written": 2511,
           "dropped": {
             "nameless": 0,
@@ -268,7 +268,8 @@
             "noPositions": 24251,
             "noNationality": 14,
             "unmapped": 0,
-            "duplicates": 10
+            "duplicates": 10,
+            "tooYoung": 16
           }
         },
         "unmapped": {},
@@ -1100,7 +1101,7 @@
           {
             "id": "356",
             "name": "India",
-            "pool": 214,
+            "pool": 213,
             "players": 11,
             "strength": 34,
             "goalkeeper": true,
@@ -1514,7 +1515,7 @@
           {
             "id": "578",
             "name": "Norway",
-            "pool": 1755,
+            "pool": 1753,
             "players": 11,
             "strength": 77,
             "goalkeeper": true,
@@ -1550,7 +1551,7 @@
           {
             "id": "600",
             "name": "Paraguay",
-            "pool": 354,
+            "pool": 353,
             "players": 11,
             "strength": 75,
             "goalkeeper": true,
@@ -1559,7 +1560,7 @@
           {
             "id": "604",
             "name": "Peru",
-            "pool": 407,
+            "pool": 406,
             "players": 11,
             "strength": 71,
             "goalkeeper": true,
@@ -1793,7 +1794,7 @@
           {
             "id": "752",
             "name": "Sweden",
-            "pool": 4398,
+            "pool": 4394,
             "players": 11,
             "strength": 79,
             "goalkeeper": true,
@@ -1883,7 +1884,7 @@
           {
             "id": "792",
             "name": "Turkey",
-            "pool": 3951,
+            "pool": 3950,
             "players": 11,
             "strength": 80,
             "goalkeeper": true,
@@ -2072,7 +2073,7 @@
           {
             "id": "NIR",
             "name": "Northern Ireland",
-            "pool": 1584,
+            "pool": 1583,
             "players": 11,
             "strength": 70,
             "goalkeeper": true,
@@ -2081,7 +2082,7 @@
           {
             "id": "056",
             "name": "Belgium",
-            "pool": 2880,
+            "pool": 2875,
             "players": 11,
             "strength": 75,
             "goalkeeper": true,
@@ -2259,7 +2260,7 @@
         "sha256": "1ec5e59d438e026c86bc9af4e34e57fa85299ad8ea1b84a51be4f41b6ca7ec83",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/patched_data.zip"
       },
-      "version": "cm0102-2002-11-193b951c",
+      "version": "cm0102-2002-11-44129a8d",
       "coverage": {
         "players": 2500,
         "nations": 162,
@@ -2270,7 +2271,7 @@
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2002-11",
-        "version": "cm0102-2002-11-193b951c",
+        "version": "cm0102-2002-11-44129a8d",
         "database": {
           "known": true,
           "label": "3.9.68",
@@ -2423,7 +2424,7 @@
         },
         "players": {
           "read": 139769,
-          "eligible": 79444,
+          "eligible": 79341,
           "written": 2500,
           "dropped": {
             "nameless": 0,
@@ -2431,7 +2432,8 @@
             "noPositions": 24088,
             "noNationality": 10,
             "unmapped": 0,
-            "duplicates": 9
+            "duplicates": 9,
+            "tooYoung": 103
           }
         },
         "unmapped": {},
@@ -2443,7 +2445,7 @@
           "Cape Verde Islands": 30,
           "São Tomé & Principe": 3,
           "Barbados": 8,
-          "Hong Kong": 380,
+          "Hong Kong": 372,
           "Mauritius": 4,
           "St Vincent & The Grenadines": 5,
           "St Kitts & Nevis": 6,
@@ -2846,7 +2848,7 @@
           {
             "id": "100",
             "name": "Bulgaria",
-            "pool": 715,
+            "pool": 710,
             "players": 11,
             "strength": 72,
             "goalkeeper": true,
@@ -2873,7 +2875,7 @@
           {
             "id": "112",
             "name": "Belarus",
-            "pool": 772,
+            "pool": 770,
             "players": 11,
             "strength": 67,
             "goalkeeper": true,
@@ -2945,7 +2947,7 @@
           {
             "id": "156",
             "name": "China",
-            "pool": 953,
+            "pool": 952,
             "players": 11,
             "strength": 59,
             "goalkeeper": true,
@@ -3134,7 +3136,7 @@
           {
             "id": "246",
             "name": "Finland",
-            "pool": 1538,
+            "pool": 1536,
             "players": 11,
             "strength": 71,
             "goalkeeper": true,
@@ -3143,7 +3145,7 @@
           {
             "id": "250",
             "name": "France",
-            "pool": 2377,
+            "pool": 2374,
             "players": 11,
             "strength": 88,
             "goalkeeper": true,
@@ -3215,7 +3217,7 @@
           {
             "id": "300",
             "name": "Greece",
-            "pool": 1373,
+            "pool": 1371,
             "players": 11,
             "strength": 70,
             "goalkeeper": true,
@@ -3287,7 +3289,7 @@
           {
             "id": "356",
             "name": "India",
-            "pool": 214,
+            "pool": 211,
             "players": 11,
             "strength": 34,
             "goalkeeper": true,
@@ -3296,7 +3298,7 @@
           {
             "id": "360",
             "name": "Indonesia",
-            "pool": 412,
+            "pool": 408,
             "players": 11,
             "strength": 38,
             "goalkeeper": true,
@@ -3341,7 +3343,7 @@
           {
             "id": "380",
             "name": "Italy",
-            "pool": 5157,
+            "pool": 5155,
             "players": 11,
             "strength": 88,
             "goalkeeper": true,
@@ -3368,7 +3370,7 @@
           {
             "id": "392",
             "name": "Japan",
-            "pool": 1074,
+            "pool": 1070,
             "players": 11,
             "strength": 68,
             "goalkeeper": true,
@@ -3638,7 +3640,7 @@
           {
             "id": "528",
             "name": "Netherlands",
-            "pool": 1238,
+            "pool": 1235,
             "players": 11,
             "strength": 83,
             "goalkeeper": true,
@@ -3701,7 +3703,7 @@
           {
             "id": "578",
             "name": "Norway",
-            "pool": 1751,
+            "pool": 1749,
             "players": 11,
             "strength": 76,
             "goalkeeper": true,
@@ -3737,7 +3739,7 @@
           {
             "id": "600",
             "name": "Paraguay",
-            "pool": 354,
+            "pool": 353,
             "players": 11,
             "strength": 75,
             "goalkeeper": true,
@@ -3746,7 +3748,7 @@
           {
             "id": "604",
             "name": "Peru",
-            "pool": 407,
+            "pool": 404,
             "players": 11,
             "strength": 71,
             "goalkeeper": true,
@@ -3854,7 +3856,7 @@
           {
             "id": "686",
             "name": "Senegal",
-            "pool": 127,
+            "pool": 126,
             "players": 11,
             "strength": 67,
             "goalkeeper": true,
@@ -3863,7 +3865,7 @@
           {
             "id": "688",
             "name": "Serbia",
-            "pool": 3887,
+            "pool": 3886,
             "players": 11,
             "strength": 76,
             "goalkeeper": true,
@@ -3980,7 +3982,7 @@
           {
             "id": "752",
             "name": "Sweden",
-            "pool": 4397,
+            "pool": 4387,
             "players": 11,
             "strength": 76,
             "goalkeeper": true,
@@ -4070,7 +4072,7 @@
           {
             "id": "792",
             "name": "Turkey",
-            "pool": 3950,
+            "pool": 3945,
             "players": 11,
             "strength": 75,
             "goalkeeper": true,
@@ -4097,7 +4099,7 @@
           {
             "id": "804",
             "name": "Ukraine",
-            "pool": 704,
+            "pool": 703,
             "players": 11,
             "strength": 69,
             "goalkeeper": true,
@@ -4124,7 +4126,7 @@
           {
             "id": "826",
             "name": "England",
-            "pool": 4610,
+            "pool": 4608,
             "players": 11,
             "strength": 85,
             "goalkeeper": true,
@@ -4223,7 +4225,7 @@
           {
             "id": "076",
             "name": "Brazil",
-            "pool": 6014,
+            "pool": 6012,
             "players": 11,
             "strength": 88,
             "goalkeeper": true,
@@ -4241,7 +4243,7 @@
           {
             "id": "SCO",
             "name": "Scotland",
-            "pool": 1807,
+            "pool": 1806,
             "players": 11,
             "strength": 73,
             "goalkeeper": true,
@@ -4259,7 +4261,7 @@
           {
             "id": "NIR",
             "name": "Northern Ireland",
-            "pool": 1582,
+            "pool": 1579,
             "players": 11,
             "strength": 67,
             "goalkeeper": true,
@@ -4268,7 +4270,7 @@
           {
             "id": "056",
             "name": "Belgium",
-            "pool": 2875,
+            "pool": 2844,
             "players": 11,
             "strength": 75,
             "goalkeeper": true,
@@ -4376,7 +4378,7 @@
           {
             "id": "036",
             "name": "Australia",
-            "pool": 1248,
+            "pool": 1247,
             "players": 11,
             "strength": 74,
             "goalkeeper": true,
@@ -4446,7 +4448,7 @@
         "sha256": "f3a5a9097e7e8d959b75550b4775c1ce4687d004187836ce095ce25e4ff0235c",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/original_data.zip"
       },
-      "version": "cm0102-2001-09-8fa30968",
+      "version": "cm0102-2001-09-71741cda",
       "coverage": {
         "players": 2349,
         "nations": 143,
@@ -4457,7 +4459,7 @@
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2001-09",
-        "version": "cm0102-2001-09-8fa30968",
+        "version": "cm0102-2001-09-71741cda",
         "database": {
           "known": true,
           "label": "3.9.60",
@@ -4604,7 +4606,7 @@
         },
         "players": {
           "read": 109940,
-          "eligible": 64487,
+          "eligible": 64428,
           "written": 2349,
           "dropped": {
             "nameless": 0,
@@ -4612,7 +4614,8 @@
             "noPositions": 17360,
             "noNationality": 40,
             "unmapped": 0,
-            "duplicates": 4
+            "duplicates": 4,
+            "tooYoung": 59
           }
         },
         "unmapped": {},
@@ -4623,7 +4626,7 @@
           "Grenada": 1,
           "Singapore": 61,
           "Cape Verde Islands": 27,
-          "Hong Kong": 173,
+          "Hong Kong": 172,
           "Barbados": 7,
           "Mauritius": 4,
           "São Tomé & Principe": 3,
@@ -5030,7 +5033,7 @@
           {
             "id": "100",
             "name": "Bulgaria",
-            "pool": 280,
+            "pool": 279,
             "players": 11,
             "strength": 71,
             "goalkeeper": true,
@@ -5147,7 +5150,7 @@
           {
             "id": "170",
             "name": "Colombia",
-            "pool": 746,
+            "pool": 745,
             "players": 11,
             "strength": 74,
             "goalkeeper": true,
@@ -5219,7 +5222,7 @@
           {
             "id": "203",
             "name": "Czechia",
-            "pool": 666,
+            "pool": 665,
             "players": 11,
             "strength": 78,
             "goalkeeper": true,
@@ -5237,7 +5240,7 @@
           {
             "id": "208",
             "name": "Denmark",
-            "pool": 818,
+            "pool": 814,
             "players": 11,
             "strength": 75,
             "goalkeeper": true,
@@ -5300,7 +5303,7 @@
           {
             "id": "233",
             "name": "Estonia",
-            "pool": 153,
+            "pool": 152,
             "players": 11,
             "strength": 57,
             "goalkeeper": true,
@@ -5318,7 +5321,7 @@
           {
             "id": "246",
             "name": "Finland",
-            "pool": 1442,
+            "pool": 1440,
             "players": 11,
             "strength": 70,
             "goalkeeper": true,
@@ -5399,7 +5402,7 @@
           {
             "id": "300",
             "name": "Greece",
-            "pool": 1194,
+            "pool": 1193,
             "players": 11,
             "strength": 72,
             "goalkeeper": true,
@@ -5444,7 +5447,7 @@
           {
             "id": "340",
             "name": "Honduras",
-            "pool": 78,
+            "pool": 77,
             "players": 11,
             "strength": 63,
             "goalkeeper": true,
@@ -5471,7 +5474,7 @@
           {
             "id": "356",
             "name": "India",
-            "pool": 144,
+            "pool": 141,
             "players": 11,
             "strength": 38,
             "goalkeeper": true,
@@ -5507,7 +5510,7 @@
           {
             "id": "372",
             "name": "Ireland",
-            "pool": 1029,
+            "pool": 1027,
             "players": 11,
             "strength": 77,
             "goalkeeper": true,
@@ -5525,7 +5528,7 @@
           {
             "id": "380",
             "name": "Italy",
-            "pool": 4851,
+            "pool": 4850,
             "players": 11,
             "strength": 89,
             "goalkeeper": true,
@@ -5597,7 +5600,7 @@
           {
             "id": "410",
             "name": "South Korea",
-            "pool": 386,
+            "pool": 385,
             "players": 11,
             "strength": 65,
             "goalkeeper": true,
@@ -6101,7 +6104,7 @@
           {
             "id": "710",
             "name": "South Africa",
-            "pool": 609,
+            "pool": 608,
             "players": 11,
             "strength": 70,
             "goalkeeper": true,
@@ -6119,7 +6122,7 @@
           {
             "id": "724",
             "name": "Spain",
-            "pool": 2115,
+            "pool": 2114,
             "players": 11,
             "strength": 82,
             "goalkeeper": true,
@@ -6164,7 +6167,7 @@
           {
             "id": "752",
             "name": "Sweden",
-            "pool": 4499,
+            "pool": 4480,
             "players": 11,
             "strength": 78,
             "goalkeeper": true,
@@ -6254,7 +6257,7 @@
           {
             "id": "792",
             "name": "Turkey",
-            "pool": 3862,
+            "pool": 3856,
             "players": 11,
             "strength": 75,
             "goalkeeper": true,
@@ -6281,7 +6284,7 @@
           {
             "id": "804",
             "name": "Ukraine",
-            "pool": 336,
+            "pool": 335,
             "players": 11,
             "strength": 72,
             "goalkeeper": true,
@@ -6308,7 +6311,7 @@
           {
             "id": "826",
             "name": "England",
-            "pool": 3994,
+            "pool": 3993,
             "players": 11,
             "strength": 85,
             "goalkeeper": true,
@@ -6398,7 +6401,7 @@
           {
             "id": "032",
             "name": "Argentina",
-            "pool": 2061,
+            "pool": 2060,
             "players": 11,
             "strength": 85,
             "goalkeeper": true,
@@ -6407,7 +6410,7 @@
           {
             "id": "076",
             "name": "Brazil",
-            "pool": 5772,
+            "pool": 5767,
             "players": 11,
             "strength": 86,
             "goalkeeper": true,
@@ -6425,7 +6428,7 @@
           {
             "id": "SCO",
             "name": "Scotland",
-            "pool": 1780,
+            "pool": 1779,
             "players": 11,
             "strength": 75,
             "goalkeeper": true,
@@ -6452,7 +6455,7 @@
           {
             "id": "056",
             "name": "Belgium",
-            "pool": 2272,
+            "pool": 2271,
             "players": 11,
             "strength": 73,
             "goalkeeper": true,
@@ -6560,7 +6563,7 @@
           {
             "id": "036",
             "name": "Australia",
-            "pool": 936,
+            "pool": 934,
             "players": 11,
             "strength": 72,
             "goalkeeper": true,
@@ -6723,7 +6726,7 @@
           "md5": "a79d766a3869490bc2ec4e60b1e01b58"
         }
       ],
-      "version": "cm-0001-c934e384",
+      "version": "cm-0001-1d33b3c1",
       "coverage": {
         "players": 2182,
         "nations": 134,
@@ -6734,7 +6737,7 @@
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm-0001",
-        "version": "cm-0001-c934e384",
+        "version": "cm-0001-1d33b3c1",
         "database": {
           "known": true,
           "label": "3.81",
@@ -6877,7 +6880,7 @@
         },
         "players": {
           "read": 71641,
-          "eligible": 40728,
+          "eligible": 40700,
           "written": 2182,
           "dropped": {
             "nameless": 0,
@@ -6885,14 +6888,15 @@
             "noPositions": 7867,
             "noNationality": 14,
             "unmapped": 0,
-            "duplicates": 8
+            "duplicates": 8,
+            "tooYoung": 28
           }
         },
         "unmapped": {},
         "noTeam": {
           "Bermuda": 3,
           "Cape Verde Islands": 20,
-          "Hong Kong": 94,
+          "Hong Kong": 93,
           "Malta": 63,
           "Mauritius": 4,
           "São Tomé & Principe": 2,
@@ -7556,7 +7560,7 @@
           {
             "id": "246",
             "name": "Finland",
-            "pool": 935,
+            "pool": 934,
             "players": 11,
             "strength": 66,
             "goalkeeper": true,
@@ -7637,7 +7641,7 @@
           {
             "id": "300",
             "name": "Greece",
-            "pool": 987,
+            "pool": 986,
             "players": 11,
             "strength": 71,
             "goalkeeper": true,
@@ -7745,7 +7749,7 @@
           {
             "id": "372",
             "name": "Ireland",
-            "pool": 738,
+            "pool": 736,
             "players": 11,
             "strength": 75,
             "goalkeeper": true,
@@ -7763,7 +7767,7 @@
           {
             "id": "380",
             "name": "Italy",
-            "pool": 2199,
+            "pool": 2198,
             "players": 11,
             "strength": 90,
             "goalkeeper": true,
@@ -8123,7 +8127,7 @@
           {
             "id": "578",
             "name": "Norway",
-            "pool": 810,
+            "pool": 809,
             "players": 11,
             "strength": 76,
             "goalkeeper": true,
@@ -8195,7 +8199,7 @@
           {
             "id": "620",
             "name": "Portugal",
-            "pool": 981,
+            "pool": 980,
             "players": 11,
             "strength": 80,
             "goalkeeper": true,
@@ -8402,7 +8406,7 @@
           {
             "id": "752",
             "name": "Sweden",
-            "pool": 3895,
+            "pool": 3893,
             "players": 11,
             "strength": 76,
             "goalkeeper": true,
@@ -8546,7 +8550,7 @@
           {
             "id": "826",
             "name": "England",
-            "pool": 3344,
+            "pool": 3340,
             "players": 11,
             "strength": 82,
             "goalkeeper": true,
@@ -8645,7 +8649,7 @@
           {
             "id": "076",
             "name": "Brazil",
-            "pool": 4965,
+            "pool": 4962,
             "players": 11,
             "strength": 86,
             "goalkeeper": true,
@@ -8681,7 +8685,7 @@
           {
             "id": "NIR",
             "name": "Northern Ireland",
-            "pool": 802,
+            "pool": 800,
             "players": 11,
             "strength": 68,
             "goalkeeper": true,
@@ -8690,7 +8694,7 @@
           {
             "id": "056",
             "name": "Belgium",
-            "pool": 1384,
+            "pool": 1383,
             "players": 11,
             "strength": 71,
             "goalkeeper": true,
@@ -8798,7 +8802,7 @@
           {
             "id": "036",
             "name": "Australia",
-            "pool": 391,
+            "pool": 383,
             "players": 11,
             "strength": 71,
             "goalkeeper": true,
@@ -8961,7 +8965,7 @@
           "md5": "a59c383419664cbd4e236936a7532979"
         }
       ],
-      "version": "cm-9900-b683bc9d",
+      "version": "cm-9900-7899ae7e",
       "coverage": {
         "players": 2101,
         "nations": 123,
@@ -8972,7 +8976,7 @@
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm-9900",
-        "version": "cm-9900-b683bc9d",
+        "version": "cm-9900-7899ae7e",
         "database": {
           "known": true,
           "label": "3.70",
@@ -9113,7 +9117,7 @@
         },
         "players": {
           "read": 46460,
-          "eligible": 22939,
+          "eligible": 22931,
           "written": 2101,
           "dropped": {
             "nameless": 0,
@@ -9121,7 +9125,8 @@
             "noPositions": 5076,
             "noNationality": 1,
             "unmapped": 0,
-            "duplicates": 4
+            "duplicates": 4,
+            "tooYoung": 8
           }
         },
         "unmapped": {},
@@ -9754,7 +9759,7 @@
           {
             "id": "380",
             "name": "Italy",
-            "pool": 1816,
+            "pool": 1815,
             "players": 11,
             "strength": 89,
             "goalkeeper": true,
@@ -10114,7 +10119,7 @@
           {
             "id": "578",
             "name": "Norway",
-            "pool": 588,
+            "pool": 587,
             "players": 11,
             "strength": 74,
             "goalkeeper": true,
@@ -10348,7 +10353,7 @@
           {
             "id": "724",
             "name": "Spain",
-            "pool": 1545,
+            "pool": 1544,
             "players": 11,
             "strength": 84,
             "goalkeeper": true,
@@ -10528,7 +10533,7 @@
           {
             "id": "826",
             "name": "England",
-            "pool": 2751,
+            "pool": 2750,
             "players": 11,
             "strength": 82,
             "goalkeeper": true,
@@ -10546,7 +10551,7 @@
           {
             "id": "840",
             "name": "United States",
-            "pool": 184,
+            "pool": 183,
             "players": 11,
             "strength": 66,
             "goalkeeper": true,
@@ -10636,7 +10641,7 @@
           {
             "id": "SCO",
             "name": "Scotland",
-            "pool": 798,
+            "pool": 796,
             "players": 11,
             "strength": 72,
             "goalkeeper": true,
@@ -10645,7 +10650,7 @@
           {
             "id": "WAL",
             "name": "Wales",
-            "pool": 190,
+            "pool": 189,
             "players": 11,
             "strength": 68,
             "goalkeeper": true,
@@ -10841,7 +10846,7 @@
         "sha256": "702c85d69c1b806f3980c9dd8a864800e51ad8058421311edf2fe9eeb04e0c26",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/cm3_data.zip"
       },
-      "version": "cm0102-2020-11-cm3-6b812ea2",
+      "version": "cm0102-2020-11-cm3-85a355b1",
       "coverage": {
         "players": 1964,
         "nations": 113,
@@ -10852,7 +10857,7 @@
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2020-11-cm3",
-        "version": "cm0102-2020-11-cm3-6b812ea2",
+        "version": "cm0102-2020-11-cm3-85a355b1",
         "database": {
           "known": true,
           "label": "98/99 for CM 01/02",
@@ -10989,7 +10994,7 @@
         },
         "players": {
           "read": 28511,
-          "eligible": 15245,
+          "eligible": 15229,
           "written": 1964,
           "dropped": {
             "nameless": 0,
@@ -10997,7 +11002,8 @@
             "noPositions": 2723,
             "noNationality": 0,
             "unmapped": 0,
-            "duplicates": 8
+            "duplicates": 8,
+            "tooYoung": 16
           }
         },
         "unmapped": {},
@@ -12884,7 +12890,7 @@
           {
             "id": "528",
             "name": "Netherlands",
-            "pool": 644,
+            "pool": 643,
             "players": 11,
             "strength": 84,
             "goalkeeper": true,
@@ -12938,7 +12944,7 @@
           {
             "id": "566",
             "name": "Nigeria",
-            "pool": 76,
+            "pool": 75,
             "players": 11,
             "strength": 72,
             "goalkeeper": true,
@@ -13118,7 +13124,7 @@
           {
             "id": "694",
             "name": "Sierra Leone",
-            "pool": 12,
+            "pool": 11,
             "players": 11,
             "strength": 41,
             "goalkeeper": false,
@@ -13226,7 +13232,7 @@
           {
             "id": "752",
             "name": "Sweden",
-            "pool": 754,
+            "pool": 753,
             "players": 11,
             "strength": 74,
             "goalkeeper": true,
@@ -13361,7 +13367,7 @@
           {
             "id": "826",
             "name": "England",
-            "pool": 2610,
+            "pool": 2606,
             "players": 11,
             "strength": 82,
             "goalkeeper": true,
@@ -13469,7 +13475,7 @@
           {
             "id": "SCO",
             "name": "Scotland",
-            "pool": 776,
+            "pool": 771,
             "players": 11,
             "strength": 72,
             "goalkeeper": true,
@@ -13478,7 +13484,7 @@
           {
             "id": "WAL",
             "name": "Wales",
-            "pool": 177,
+            "pool": 175,
             "players": 11,
             "strength": 68,
             "goalkeeper": true,
@@ -13496,7 +13502,7 @@
           {
             "id": "056",
             "name": "Belgium",
-            "pool": 367,
+            "pool": 366,
             "players": 11,
             "strength": 74,
             "goalkeeper": true,
@@ -17317,18 +17323,18 @@
         "sha256": "91632a6f626789ac3471892bd965956e4b9ae41b0168c2008c91028ad4251a26",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/cm93_data.zip"
       },
-      "version": "cm0102-2020-11-cm93-73e1baa4",
+      "version": "cm0102-2020-11-cm93-01be5661",
       "coverage": {
-        "players": 2148,
-        "nations": 124,
-        "completeXIs": 77,
+        "players": 2119,
+        "nations": 121,
+        "completeXIs": 75,
         "clubs": 124,
         "leagues": 20
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2020-11-cm93",
-        "version": "cm0102-2020-11-cm93-73e1baa4",
+        "version": "cm0102-2020-11-cm93-01be5661",
         "database": {
           "known": true,
           "label": "93/94 by Cam F, fan-made",
@@ -17466,30 +17472,31 @@
         },
         "players": {
           "read": 39781,
-          "eligible": 24541,
-          "written": 2148,
+          "eligible": 21395,
+          "written": 2119,
           "dropped": {
             "nameless": 0,
             "noAbility": 11697,
             "noPositions": 3485,
             "noNationality": 5,
             "unmapped": 0,
-            "duplicates": 53
+            "duplicates": 53,
+            "tooYoung": 3146
           }
         },
         "unmapped": {},
         "noTeam": {
           "Saint Lucia": 2,
-          "Bermuda": 3,
           "Barbados": 3,
+          "Bermuda": 2,
           "St Kitts & Nevis": 1,
           "St Vincent & The Grenadines": 1,
           "Malta": 27,
           "Faroe Islands": 32,
           "Mauritius": 1,
-          "Cape Verde Islands": 19,
+          "Cape Verde Islands": 18,
           "São Tomé & Principe": 1,
-          "Andorra": 17,
+          "Andorra": 15,
           "Liechtenstein": 15,
           "Singapore": 2
         },
@@ -17595,7 +17602,7 @@
               },
               {
                 "name": "Gençlerbirligi",
-                "players": 3
+                "players": 2
               },
               {
                 "name": "Göztepe A.S.",
@@ -17633,7 +17640,7 @@
             "competition": "Belgian First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 5,
+            "kept": 6,
             "short": []
           },
           {
@@ -17728,7 +17735,7 @@
               },
               {
                 "name": "SK Slavia Prague",
-                "players": 7
+                "players": 6
               },
               {
                 "name": "FC Slovan Liberec",
@@ -17758,9 +17765,13 @@
             "country": "208",
             "competition": "Danish Premier Division",
             "members": 12,
-            "clubs": 10,
+            "clubs": 9,
             "kept": 1,
             "short": [
+              {
+                "name": "Akademisk Boldklub",
+                "players": 8
+              },
               {
                 "name": "Herfølge Boldklub",
                 "players": 7
@@ -17776,12 +17787,12 @@
             "country": "578",
             "competition": "Norwegian Premier Division",
             "members": 14,
-            "clubs": 8,
+            "clubs": 7,
             "kept": 2,
             "short": [
               {
                 "name": "Bryne FK",
-                "players": 5
+                "players": 2
               },
               {
                 "name": "Fyllingen Fotball",
@@ -17789,7 +17800,7 @@
               },
               {
                 "name": "Kongsvinger IL",
-                "players": 9
+                "players": 8
               },
               {
                 "name": "Lillestrøm SK",
@@ -17801,7 +17812,11 @@
               },
               {
                 "name": "Odd Grenland",
-                "players": 9
+                "players": 7
+              },
+              {
+                "name": "Viking FK",
+                "players": 10
               }
             ]
           },
@@ -17810,7 +17825,7 @@
             "country": "191",
             "competition": "Croatian First Division",
             "members": 16,
-            "clubs": 5,
+            "clubs": 4,
             "kept": 0,
             "short": [
               {
@@ -17831,7 +17846,7 @@
               },
               {
                 "name": "NK Marsonia",
-                "players": 4
+                "players": 3
               },
               {
                 "name": "NK Pomorac",
@@ -17850,6 +17865,10 @@
                 "players": 0
               },
               {
+                "name": "NK Varteks",
+                "players": 10
+              },
+              {
                 "name": "NK Zadar",
                 "players": 9
               },
@@ -17864,16 +17883,20 @@
             "country": "616",
             "competition": "Polish First Division",
             "members": 16,
-            "clubs": 3,
+            "clubs": 2,
             "kept": 1,
             "short": [
               {
                 "name": "Amica Wronki",
-                "players": 6
+                "players": 5
               },
               {
                 "name": "GKS Katowice",
                 "players": 1
+              },
+              {
+                "name": "Gornik Zabrze",
+                "players": 10
               },
               {
                 "name": "Groclin Grodzisk",
@@ -17977,9 +18000,14 @@
             "country": "752",
             "competition": "Swedish Premier Division",
             "members": 14,
-            "clubs": 14,
-            "kept": 2,
-            "short": []
+            "clubs": 13,
+            "kept": 1,
+            "short": [
+              {
+                "name": "BK Häcken",
+                "players": 6
+              }
+            ]
           },
           {
             "league": "Veikkausliiga",
@@ -17995,7 +18023,7 @@
               },
               {
                 "name": "FC Haka Valkeakoski",
-                "players": 4
+                "players": 3
               },
               {
                 "name": "FC Jokerit",
@@ -18091,7 +18119,7 @@
               },
               {
                 "name": "Chernomorets Novorossiysk",
-                "players": 6
+                "players": 5
               },
               {
                 "name": "Fakel Voronezh",
@@ -18177,7 +18205,7 @@
               },
               {
                 "name": "Vojvodina Novi Sad",
-                "players": 10
+                "players": 9
               },
               {
                 "name": "Zeleznik Belgrade",
@@ -18185,7 +18213,7 @@
               },
               {
                 "name": "Zemun",
-                "players": 5
+                "players": 4
               },
               {
                 "name": "Zeta Golubovci",
@@ -18237,7 +18265,7 @@
             "short": [
               {
                 "name": "Aberystwyth Town",
-                "players": 3
+                "players": 2
               },
               {
                 "name": "Afan Lido",
@@ -18395,7 +18423,7 @@
           {
             "id": "100",
             "name": "Bulgaria",
-            "pool": 81,
+            "pool": 80,
             "players": 11,
             "strength": 73,
             "goalkeeper": true,
@@ -18440,7 +18468,7 @@
           {
             "id": "120",
             "name": "Cameroon",
-            "pool": 85,
+            "pool": 66,
             "players": 11,
             "strength": 65,
             "goalkeeper": true,
@@ -18449,7 +18477,7 @@
           {
             "id": "124",
             "name": "Canada",
-            "pool": 77,
+            "pool": 76,
             "players": 11,
             "strength": 51,
             "goalkeeper": true,
@@ -18458,9 +18486,9 @@
           {
             "id": "140",
             "name": "Central African Rep.",
-            "pool": 1,
-            "players": 1,
-            "strength": 39,
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
             "goalkeeper": false,
             "naturalLineup": false
           },
@@ -18485,7 +18513,7 @@
           {
             "id": "152",
             "name": "Chile",
-            "pool": 66,
+            "pool": 63,
             "players": 11,
             "strength": 65,
             "goalkeeper": true,
@@ -18494,8 +18522,8 @@
           {
             "id": "156",
             "name": "China",
-            "pool": 5,
-            "players": 5,
+            "pool": 3,
+            "players": 3,
             "strength": 44,
             "goalkeeper": false,
             "naturalLineup": false
@@ -18521,16 +18549,16 @@
           {
             "id": "178",
             "name": "Congo",
-            "pool": 11,
-            "players": 11,
-            "strength": 33,
+            "pool": 9,
+            "players": 9,
+            "strength": 36,
             "goalkeeper": true,
             "naturalLineup": false
           },
           {
             "id": "180",
             "name": "DR Congo",
-            "pool": 54,
+            "pool": 48,
             "players": 11,
             "strength": 51,
             "goalkeeper": true,
@@ -18539,16 +18567,16 @@
           {
             "id": "188",
             "name": "Costa Rica",
-            "pool": 10,
-            "players": 10,
-            "strength": 42,
+            "pool": 9,
+            "players": 9,
+            "strength": 45,
             "goalkeeper": true,
             "naturalLineup": false
           },
           {
             "id": "191",
             "name": "Croatia",
-            "pool": 240,
+            "pool": 214,
             "players": 11,
             "strength": 72,
             "goalkeeper": true,
@@ -18575,7 +18603,7 @@
           {
             "id": "203",
             "name": "Czechia",
-            "pool": 70,
+            "pool": 69,
             "players": 11,
             "strength": 71,
             "goalkeeper": true,
@@ -18584,16 +18612,16 @@
           {
             "id": "204",
             "name": "Benin",
-            "pool": 9,
-            "players": 9,
-            "strength": 29,
+            "pool": 7,
+            "players": 7,
+            "strength": 32,
             "goalkeeper": false,
             "naturalLineup": false
           },
           {
             "id": "208",
             "name": "Denmark",
-            "pool": 381,
+            "pool": 348,
             "players": 11,
             "strength": 75,
             "goalkeeper": true,
@@ -18611,7 +18639,7 @@
           {
             "id": "218",
             "name": "Ecuador",
-            "pool": 35,
+            "pool": 34,
             "players": 11,
             "strength": 58,
             "goalkeeper": true,
@@ -18674,16 +18702,16 @@
           {
             "id": "246",
             "name": "Finland",
-            "pool": 159,
+            "pool": 127,
             "players": 11,
-            "strength": 63,
+            "strength": 62,
             "goalkeeper": true,
             "naturalLineup": true
           },
           {
             "id": "250",
             "name": "France",
-            "pool": 1759,
+            "pool": 1405,
             "players": 11,
             "strength": 84,
             "goalkeeper": true,
@@ -18701,27 +18729,27 @@
           {
             "id": "266",
             "name": "Gabon",
-            "pool": 5,
-            "players": 5,
-            "strength": 38,
+            "pool": 4,
+            "players": 4,
+            "strength": 39,
             "goalkeeper": false,
             "naturalLineup": false
           },
           {
             "id": "268",
             "name": "Georgia",
-            "pool": 18,
+            "pool": 15,
             "players": 11,
-            "strength": 54,
+            "strength": 52,
             "goalkeeper": true,
             "naturalLineup": true
           },
           {
             "id": "270",
             "name": "Gambia",
-            "pool": 4,
-            "players": 4,
-            "strength": 35,
+            "pool": 3,
+            "players": 3,
+            "strength": 38,
             "goalkeeper": false,
             "naturalLineup": false
           },
@@ -18737,7 +18765,7 @@
           {
             "id": "276",
             "name": "Germany",
-            "pool": 1459,
+            "pool": 1326,
             "players": 11,
             "strength": 86,
             "goalkeeper": true,
@@ -18746,16 +18774,16 @@
           {
             "id": "288",
             "name": "Ghana",
-            "pool": 67,
+            "pool": 44,
             "players": 11,
-            "strength": 57,
-            "goalkeeper": true,
-            "naturalLineup": true
+            "strength": 59,
+            "goalkeeper": false,
+            "naturalLineup": false
           },
           {
             "id": "300",
             "name": "Greece",
-            "pool": 205,
+            "pool": 203,
             "players": 11,
             "strength": 72,
             "goalkeeper": true,
@@ -18773,9 +18801,9 @@
           {
             "id": "324",
             "name": "Guinea",
-            "pool": 23,
+            "pool": 17,
             "players": 11,
-            "strength": 45,
+            "strength": 44,
             "goalkeeper": true,
             "naturalLineup": true
           },
@@ -18791,9 +18819,9 @@
           {
             "id": "332",
             "name": "Haiti",
-            "pool": 2,
-            "players": 2,
-            "strength": 39,
+            "pool": 1,
+            "players": 1,
+            "strength": 41,
             "goalkeeper": false,
             "naturalLineup": false
           },
@@ -18809,7 +18837,7 @@
           {
             "id": "348",
             "name": "Hungary",
-            "pool": 102,
+            "pool": 101,
             "players": 11,
             "strength": 66,
             "goalkeeper": true,
@@ -18818,9 +18846,9 @@
           {
             "id": "352",
             "name": "Iceland",
-            "pool": 63,
+            "pool": 53,
             "players": 11,
-            "strength": 62,
+            "strength": 61,
             "goalkeeper": true,
             "naturalLineup": true
           },
@@ -18845,9 +18873,9 @@
           {
             "id": "364",
             "name": "Iran",
-            "pool": 27,
+            "pool": 26,
             "players": 11,
-            "strength": 48,
+            "strength": 46,
             "goalkeeper": true,
             "naturalLineup": true
           },
@@ -18863,7 +18891,7 @@
           {
             "id": "372",
             "name": "Ireland",
-            "pool": 317,
+            "pool": 281,
             "players": 11,
             "strength": 71,
             "goalkeeper": true,
@@ -18881,7 +18909,7 @@
           {
             "id": "380",
             "name": "Italy",
-            "pool": 2002,
+            "pool": 1758,
             "players": 11,
             "strength": 90,
             "goalkeeper": true,
@@ -18890,7 +18918,7 @@
           {
             "id": "384",
             "name": "Côte d'Ivoire",
-            "pool": 53,
+            "pool": 42,
             "players": 11,
             "strength": 50,
             "goalkeeper": true,
@@ -18899,7 +18927,7 @@
           {
             "id": "388",
             "name": "Jamaica",
-            "pool": 31,
+            "pool": 26,
             "players": 11,
             "strength": 52,
             "goalkeeper": true,
@@ -18908,7 +18936,7 @@
           {
             "id": "392",
             "name": "Japan",
-            "pool": 557,
+            "pool": 455,
             "players": 11,
             "strength": 60,
             "goalkeeper": true,
@@ -18953,7 +18981,7 @@
           {
             "id": "410",
             "name": "South Korea",
-            "pool": 34,
+            "pool": 32,
             "players": 11,
             "strength": 52,
             "goalkeeper": true,
@@ -19007,7 +19035,7 @@
           {
             "id": "428",
             "name": "Latvia",
-            "pool": 24,
+            "pool": 22,
             "players": 11,
             "strength": 58,
             "goalkeeper": true,
@@ -19016,18 +19044,18 @@
           {
             "id": "430",
             "name": "Liberia",
-            "pool": 23,
+            "pool": 19,
             "players": 11,
-            "strength": 43,
+            "strength": 44,
             "goalkeeper": true,
             "naturalLineup": false
           },
           {
             "id": "434",
             "name": "Libya",
-            "pool": 1,
-            "players": 1,
-            "strength": 38,
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
             "goalkeeper": false,
             "naturalLineup": false
           },
@@ -19079,9 +19107,9 @@
           {
             "id": "466",
             "name": "Mali",
-            "pool": 13,
-            "players": 11,
-            "strength": 24,
+            "pool": 6,
+            "players": 6,
+            "strength": 29,
             "goalkeeper": true,
             "naturalLineup": false
           },
@@ -19133,9 +19161,9 @@
           {
             "id": "504",
             "name": "Morocco",
-            "pool": 74,
+            "pool": 67,
             "players": 11,
-            "strength": 62,
+            "strength": 61,
             "goalkeeper": true,
             "naturalLineup": true
           },
@@ -19160,9 +19188,9 @@
           {
             "id": "516",
             "name": "Namibia",
-            "pool": 3,
-            "players": 3,
-            "strength": 38,
+            "pool": 2,
+            "players": 2,
+            "strength": 40,
             "goalkeeper": false,
             "naturalLineup": false
           },
@@ -19178,7 +19206,7 @@
           {
             "id": "528",
             "name": "Netherlands",
-            "pool": 886,
+            "pool": 806,
             "players": 11,
             "strength": 83,
             "goalkeeper": true,
@@ -19223,25 +19251,25 @@
           {
             "id": "562",
             "name": "Niger",
-            "pool": 8,
-            "players": 8,
-            "strength": 25,
+            "pool": 2,
+            "players": 2,
+            "strength": 39,
             "goalkeeper": false,
             "naturalLineup": false
           },
           {
             "id": "566",
             "name": "Nigeria",
-            "pool": 109,
+            "pool": 83,
             "players": 11,
-            "strength": 65,
+            "strength": 64,
             "goalkeeper": true,
             "naturalLineup": true
           },
           {
             "id": "578",
             "name": "Norway",
-            "pool": 356,
+            "pool": 323,
             "players": 11,
             "strength": 70,
             "goalkeeper": true,
@@ -19277,7 +19305,7 @@
           {
             "id": "600",
             "name": "Paraguay",
-            "pool": 72,
+            "pool": 69,
             "players": 11,
             "strength": 66,
             "goalkeeper": true,
@@ -19304,7 +19332,7 @@
           {
             "id": "616",
             "name": "Poland",
-            "pool": 191,
+            "pool": 182,
             "players": 11,
             "strength": 74,
             "goalkeeper": true,
@@ -19313,7 +19341,7 @@
           {
             "id": "620",
             "name": "Portugal",
-            "pool": 711,
+            "pool": 654,
             "players": 11,
             "strength": 73,
             "goalkeeper": true,
@@ -19322,9 +19350,9 @@
           {
             "id": "624",
             "name": "Guinea-Bissau",
-            "pool": 11,
-            "players": 11,
-            "strength": 37,
+            "pool": 9,
+            "players": 9,
+            "strength": 41,
             "goalkeeper": true,
             "naturalLineup": false
           },
@@ -19358,7 +19386,7 @@
           {
             "id": "642",
             "name": "Romania",
-            "pool": 130,
+            "pool": 122,
             "players": 11,
             "strength": 75,
             "goalkeeper": true,
@@ -19367,7 +19395,7 @@
           {
             "id": "643",
             "name": "Russia",
-            "pool": 280,
+            "pool": 267,
             "players": 11,
             "strength": 76,
             "goalkeeper": true,
@@ -19394,16 +19422,16 @@
           {
             "id": "686",
             "name": "Senegal",
-            "pool": 41,
+            "pool": 31,
             "players": 11,
-            "strength": 50,
+            "strength": 49,
             "goalkeeper": true,
             "naturalLineup": true
           },
           {
             "id": "688",
             "name": "Serbia",
-            "pool": 286,
+            "pool": 277,
             "players": 11,
             "strength": 76,
             "goalkeeper": true,
@@ -19412,8 +19440,8 @@
           {
             "id": "694",
             "name": "Sierra Leone",
-            "pool": 15,
-            "players": 11,
+            "pool": 10,
+            "players": 10,
             "strength": 36,
             "goalkeeper": false,
             "naturalLineup": false
@@ -19421,7 +19449,7 @@
           {
             "id": "703",
             "name": "Slovakia",
-            "pool": 40,
+            "pool": 39,
             "players": 11,
             "strength": 66,
             "goalkeeper": true,
@@ -19439,7 +19467,7 @@
           {
             "id": "705",
             "name": "Slovenia",
-            "pool": 29,
+            "pool": 28,
             "players": 11,
             "strength": 66,
             "goalkeeper": true,
@@ -19457,7 +19485,7 @@
           {
             "id": "710",
             "name": "South Africa",
-            "pool": 61,
+            "pool": 56,
             "players": 11,
             "strength": 59,
             "goalkeeper": true,
@@ -19475,7 +19503,7 @@
           {
             "id": "724",
             "name": "Spain",
-            "pool": 1462,
+            "pool": 1300,
             "players": 11,
             "strength": 80,
             "goalkeeper": true,
@@ -19520,7 +19548,7 @@
           {
             "id": "752",
             "name": "Sweden",
-            "pool": 1876,
+            "pool": 1519,
             "players": 11,
             "strength": 72,
             "goalkeeper": true,
@@ -19529,7 +19557,7 @@
           {
             "id": "756",
             "name": "Switzerland",
-            "pool": 421,
+            "pool": 407,
             "players": 11,
             "strength": 68,
             "goalkeeper": true,
@@ -19565,9 +19593,9 @@
           {
             "id": "768",
             "name": "Togo",
-            "pool": 14,
-            "players": 11,
-            "strength": 34,
+            "pool": 10,
+            "players": 10,
+            "strength": 35,
             "goalkeeper": false,
             "naturalLineup": false
           },
@@ -19592,7 +19620,7 @@
           {
             "id": "788",
             "name": "Tunisia",
-            "pool": 32,
+            "pool": 31,
             "players": 11,
             "strength": 52,
             "goalkeeper": true,
@@ -19601,7 +19629,7 @@
           {
             "id": "792",
             "name": "Turkey",
-            "pool": 156,
+            "pool": 131,
             "players": 11,
             "strength": 67,
             "goalkeeper": true,
@@ -19628,7 +19656,7 @@
           {
             "id": "804",
             "name": "Ukraine",
-            "pool": 78,
+            "pool": 71,
             "players": 11,
             "strength": 72,
             "goalkeeper": true,
@@ -19637,7 +19665,7 @@
           {
             "id": "807",
             "name": "N. Macedonia",
-            "pool": 47,
+            "pool": 45,
             "players": 11,
             "strength": 65,
             "goalkeeper": true,
@@ -19646,7 +19674,7 @@
           {
             "id": "818",
             "name": "Egypt",
-            "pool": 19,
+            "pool": 18,
             "players": 11,
             "strength": 45,
             "goalkeeper": true,
@@ -19655,7 +19683,7 @@
           {
             "id": "826",
             "name": "England",
-            "pool": 3092,
+            "pool": 2563,
             "players": 11,
             "strength": 81,
             "goalkeeper": true,
@@ -19673,7 +19701,7 @@
           {
             "id": "840",
             "name": "United States",
-            "pool": 289,
+            "pool": 283,
             "players": 11,
             "strength": 65,
             "goalkeeper": true,
@@ -19682,16 +19710,16 @@
           {
             "id": "854",
             "name": "Burkina Faso",
-            "pool": 2,
-            "players": 2,
-            "strength": 37,
+            "pool": 0,
+            "players": 0,
+            "strength": 40,
             "goalkeeper": false,
             "naturalLineup": false
           },
           {
             "id": "858",
             "name": "Uruguay",
-            "pool": 108,
+            "pool": 103,
             "players": 11,
             "strength": 75,
             "goalkeeper": true,
@@ -19727,25 +19755,25 @@
           {
             "id": "894",
             "name": "Zambia",
-            "pool": 19,
+            "pool": 17,
             "players": 11,
-            "strength": 33,
+            "strength": 35,
             "goalkeeper": true,
-            "naturalLineup": true
+            "naturalLineup": false
           },
           {
             "id": "032",
             "name": "Argentina",
-            "pool": 790,
+            "pool": 667,
             "players": 11,
-            "strength": 81,
+            "strength": 80,
             "goalkeeper": true,
             "naturalLineup": true
           },
           {
             "id": "076",
             "name": "Brazil",
-            "pool": 1300,
+            "pool": 1198,
             "players": 11,
             "strength": 86,
             "goalkeeper": true,
@@ -19763,7 +19791,7 @@
           {
             "id": "SCO",
             "name": "Scotland",
-            "pool": 1413,
+            "pool": 1166,
             "players": 11,
             "strength": 75,
             "goalkeeper": true,
@@ -19772,7 +19800,7 @@
           {
             "id": "WAL",
             "name": "Wales",
-            "pool": 252,
+            "pool": 211,
             "players": 11,
             "strength": 70,
             "goalkeeper": true,
@@ -19781,7 +19809,7 @@
           {
             "id": "NIR",
             "name": "Northern Ireland",
-            "pool": 231,
+            "pool": 209,
             "players": 11,
             "strength": 61,
             "goalkeeper": true,
@@ -19790,7 +19818,7 @@
           {
             "id": "056",
             "name": "Belgium",
-            "pool": 584,
+            "pool": 472,
             "players": 11,
             "strength": 72,
             "goalkeeper": true,
@@ -19799,7 +19827,7 @@
           {
             "id": "040",
             "name": "Austria",
-            "pool": 67,
+            "pool": 66,
             "players": 11,
             "strength": 71,
             "goalkeeper": true,
@@ -19808,7 +19836,7 @@
           {
             "id": "070",
             "name": "Bosnia & Herz.",
-            "pool": 62,
+            "pool": 59,
             "players": 11,
             "strength": 61,
             "goalkeeper": true,
@@ -19817,7 +19845,7 @@
           {
             "id": "008",
             "name": "Albania",
-            "pool": 38,
+            "pool": 35,
             "players": 11,
             "strength": 52,
             "goalkeeper": true,
@@ -19844,7 +19872,7 @@
           {
             "id": "031",
             "name": "Azerbaijan",
-            "pool": 13,
+            "pool": 12,
             "players": 11,
             "strength": 36,
             "goalkeeper": true,
@@ -19853,7 +19881,7 @@
           {
             "id": "012",
             "name": "Algeria",
-            "pool": 33,
+            "pool": 29,
             "players": 11,
             "strength": 55,
             "goalkeeper": true,
@@ -19898,7 +19926,7 @@
           {
             "id": "036",
             "name": "Australia",
-            "pool": 77,
+            "pool": 68,
             "players": 11,
             "strength": 60,
             "goalkeeper": true,
@@ -20093,18 +20121,18 @@
         "sha256": "3c9b81ac432a2c0ec9de93e5e188b8d9120237829f1f2f11fa4d05e860a33e1a",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/cm89_data.zip"
       },
-      "version": "cm0102-2017-04-cm89-20e6ef32",
+      "version": "cm0102-2017-04-cm89-8b439b71",
       "coverage": {
-        "players": 1216,
+        "players": 1203,
         "nations": 138,
-        "completeXIs": 89,
+        "completeXIs": 88,
         "clubs": 0,
         "leagues": 0
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2017-04-cm89",
-        "version": "cm0102-2017-04-cm89-20e6ef32",
+        "version": "cm0102-2017-04-cm89-8b439b71",
         "database": {
           "known": true,
           "label": "89/90 by Simon Treanor, fan-made",
@@ -20265,36 +20293,37 @@
         },
         "players": {
           "read": 104435,
-          "eligible": 62191,
-          "written": 1216,
+          "eligible": 58638,
+          "written": 1203,
           "dropped": {
             "nameless": 0,
             "noAbility": 23483,
             "noPositions": 18739,
             "noNationality": 2,
             "unmapped": 0,
-            "duplicates": 20
+            "duplicates": 18,
+            "tooYoung": 3555
           }
         },
         "unmapped": {},
         "noTeam": {
-          "Malta": 278,
+          "Malta": 275,
           "Grenada": 2,
-          "Faroe Islands": 105,
-          "Singapore": 140,
-          "Andorra": 19,
-          "Cape Verde Islands": 26,
+          "Faroe Islands": 86,
+          "Singapore": 139,
+          "Andorra": 15,
+          "Cape Verde Islands": 21,
           "Saint Lucia": 5,
           "São Tomé & Principe": 1,
-          "Barbados": 8,
-          "Liechtenstein": 18,
-          "Hong Kong": 317,
+          "Barbados": 7,
+          "Liechtenstein": 16,
+          "Hong Kong": 300,
           "Mauritius": 5,
           "St Kitts & Nevis": 7,
           "Bermuda": 5,
           "St Vincent & The Grenadines": 2,
           "Bahrain": 2,
-          "San Marino": 12,
+          "San Marino": 11,
           "Macau": 1,
           "Dominica": 2,
           "Antigua & Barbuda": 1,
@@ -20327,7 +20356,7 @@
             "short": [
               {
                 "name": "C.D. Castellón",
-                "players": 10
+                "players": 9
               },
               {
                 "name": "C.D. Logroñés",
@@ -20380,9 +20409,13 @@
             "country": "620",
             "competition": "Portuguese Premier League",
             "members": 18,
-            "clubs": 10,
+            "clubs": 9,
             "kept": 0,
             "short": [
+              {
+                "name": "Sport Clube Beira-Mar",
+                "players": 10
+              },
               {
                 "name": "Grupo Desportivo de Chaves",
                 "players": 9
@@ -20397,7 +20430,7 @@
               },
               {
                 "name": "Clube Desportivo Nacional",
-                "players": 9
+                "players": 8
               },
               {
                 "name": "Futebol Clube de Penafiel",
@@ -20427,7 +20460,7 @@
             "short": [
               {
                 "name": "Adana Demirspor",
-                "players": 2
+                "players": 1
               },
               {
                 "name": "Adanaspor A.S.",
@@ -20439,7 +20472,7 @@
               },
               {
                 "name": "MKE Ankaragücü",
-                "players": 6
+                "players": 3
               },
               {
                 "name": "Boluspor",
@@ -20455,7 +20488,7 @@
               },
               {
                 "name": "Göztepe A.S.",
-                "players": 3
+                "players": 2
               },
               {
                 "name": "Kombassan Konyaspor",
@@ -20463,7 +20496,7 @@
               },
               {
                 "name": "Malatyaspor",
-                "players": 5
+                "players": 4
               },
               {
                 "name": "Sakaryaspor A.S.",
@@ -20471,7 +20504,7 @@
               },
               {
                 "name": "Samsunspor",
-                "players": 8
+                "players": 7
               },
               {
                 "name": "Sariyer Spor Kulübü",
@@ -20493,11 +20526,11 @@
             "short": [
               {
                 "name": "Beerschot VAC",
-                "players": 10
+                "players": 9
               },
               {
                 "name": "KSV Zulte Waregem",
-                "players": 9
+                "players": 8
               }
             ]
           },
@@ -20506,7 +20539,7 @@
             "country": "300",
             "competition": "Greek National A Division",
             "members": 16,
-            "clubs": 8,
+            "clubs": 7,
             "kept": 0,
             "short": [
               {
@@ -20514,12 +20547,16 @@
                 "players": 0
               },
               {
+                "name": "Apollon Athens",
+                "players": 9
+              },
+              {
                 "name": "Aris Salonika",
-                "players": 8
+                "players": 7
               },
               {
                 "name": "Iraklis Salonika",
-                "players": 8
+                "players": 7
               },
               {
                 "name": "Larisa",
@@ -20535,11 +20572,11 @@
               },
               {
                 "name": "Panionios",
-                "players": 10
+                "players": 9
               },
               {
                 "name": "Skoda Xanthi",
-                "players": 8
+                "players": 5
               }
             ]
           },
@@ -20548,7 +20585,7 @@
             "country": "203",
             "competition": "Czech First Division",
             "members": 16,
-            "clubs": 11,
+            "clubs": 10,
             "kept": 0,
             "short": [
               {
@@ -20565,7 +20602,11 @@
               },
               {
                 "name": "FK Teplice",
-                "players": 2
+                "players": 1
+              },
+              {
+                "name": "FC Viktoria Plzen",
+                "players": 7
               },
               {
                 "name": "FC Vitkovice",
@@ -20600,11 +20641,11 @@
               },
               {
                 "name": "Næstved Boldklub",
-                "players": 9
+                "players": 8
               },
               {
                 "name": "Silkeborg Idræts Forening",
-                "players": 5
+                "players": 4
               }
             ]
           },
@@ -20618,15 +20659,15 @@
             "short": [
               {
                 "name": "Molde FK",
-                "players": 7
+                "players": 6
               },
               {
                 "name": "Moss FK",
-                "players": 9
+                "players": 7
               },
               {
                 "name": "Odd Grenland",
-                "players": 2
+                "players": 1
               },
               {
                 "name": "Sogndal IL",
@@ -20643,7 +20684,7 @@
             "country": "191",
             "competition": "Croatian First Division",
             "members": 16,
-            "clubs": 9,
+            "clubs": 8,
             "kept": 0,
             "short": [
               {
@@ -20652,11 +20693,11 @@
               },
               {
                 "name": "HNK Dubrovnik",
-                "players": 2
+                "players": 0
               },
               {
                 "name": "NK INKER",
-                "players": 7
+                "players": 5
               },
               {
                 "name": "NK Istra",
@@ -20673,6 +20714,10 @@
               {
                 "name": "HNK Segesta",
                 "players": 3
+              },
+              {
+                "name": "HNK Sibenik",
+                "players": 10
               }
             ]
           },
@@ -20686,7 +20731,7 @@
             "short": [
               {
                 "name": "Jagiellonia Bialystok",
-                "players": 7
+                "players": 5
               },
               {
                 "name": "Lodzki Klub Sportowy",
@@ -20694,7 +20739,7 @@
               },
               {
                 "name": "Motor Lublin",
-                "players": 5
+                "players": 4
               },
               {
                 "name": "Olimpia Poznan",
@@ -20714,7 +20759,7 @@
               },
               {
                 "name": "Wisla Krakow",
-                "players": 6
+                "players": 5
               },
               {
                 "name": "Zaglebie Sosnowiec",
@@ -20776,7 +20821,7 @@
             "short": [
               {
                 "name": "IK Brage",
-                "players": 6
+                "players": 5
               },
               {
                 "name": "Göteborgs AIS",
@@ -20796,11 +20841,11 @@
               },
               {
                 "name": "Örebro SK",
-                "players": 10
+                "players": 9
               },
               {
                 "name": "Västra Frölunda IF",
-                "players": 8
+                "players": 6
               }
             ]
           },
@@ -20809,24 +20854,28 @@
             "country": "246",
             "competition": "Finnish Premier Division",
             "members": 12,
-            "clubs": 6,
+            "clubs": 5,
             "kept": 0,
             "short": [
               {
                 "name": "FC Haka Valkeakoski",
-                "players": 10
+                "players": 8
               },
               {
                 "name": "FC Ilves Tampere",
-                "players": 9
+                "players": 7
               },
               {
                 "name": "FC Jazz",
-                "players": 5
+                "players": 2
               },
               {
                 "name": "FF Jaro",
-                "players": 4
+                "players": 3
+              },
+              {
+                "name": "Kuopion Palloseura",
+                "players": 10
               },
               {
                 "name": "Oulun Työväen Palloilijat",
@@ -20834,7 +20883,7 @@
               },
               {
                 "name": "Jalkapallo TPS",
-                "players": 10
+                "players": 7
               }
             ]
           },
@@ -20843,16 +20892,20 @@
             "country": "372",
             "competition": "Irish Premier Division",
             "members": 12,
-            "clubs": 6,
+            "clubs": 5,
             "kept": 0,
             "short": [
               {
+                "name": "Cork City",
+                "players": 10
+              },
+              {
                 "name": "Drogheda United",
-                "players": 9
+                "players": 7
               },
               {
                 "name": "Dundalk F.C.",
-                "players": 10
+                "players": 9
               },
               {
                 "name": "Galway United",
@@ -20860,15 +20913,15 @@
               },
               {
                 "name": "Limerick F.C.",
-                "players": 6
+                "players": 5
               },
               {
                 "name": "Shelbourne F.C.",
-                "players": 10
+                "players": 9
               },
               {
                 "name": "University College Dublin",
-                "players": 7
+                "players": 5
               }
             ]
           },
@@ -20877,16 +20930,16 @@
             "country": "643",
             "competition": "Russian Premier Division",
             "members": 16,
-            "clubs": 6,
+            "clubs": 5,
             "kept": 0,
             "short": [
               {
                 "name": "Alania Vladikavkaz",
-                "players": 9
+                "players": 7
               },
               {
                 "name": "Krylja Sovetov Samara",
-                "players": 4
+                "players": 2
               },
               {
                 "name": "Luch Vladivostok",
@@ -20894,7 +20947,7 @@
               },
               {
                 "name": "Rostselmash Rostov-na-Donu",
-                "players": 9
+                "players": 6
               },
               {
                 "name": "SC Rotor Volgograd",
@@ -20917,6 +20970,10 @@
                 "players": 1
               },
               {
+                "name": "Zenith St. Petersburg",
+                "players": 10
+              },
+              {
                 "name": "Zvezda Moscow",
                 "players": 4
               }
@@ -20927,12 +20984,12 @@
             "country": "688",
             "competition": "Yugoslav First Division",
             "members": 18,
-            "clubs": 8,
+            "clubs": 7,
             "kept": 0,
             "short": [
               {
                 "name": "Borac Cacak",
-                "players": 3
+                "players": 2
               },
               {
                 "name": "Macva Sabac",
@@ -20944,7 +21001,7 @@
               },
               {
                 "name": "Napredak Krusevac",
-                "players": 9
+                "players": 7
               },
               {
                 "name": "Pristina",
@@ -20952,7 +21009,11 @@
               },
               {
                 "name": "Radnicki Kragujevac",
-                "players": 4
+                "players": 2
+              },
+              {
+                "name": "Radnicki Nis",
+                "players": 10
               },
               {
                 "name": "Sloboda Uzice",
@@ -20960,7 +21021,7 @@
               },
               {
                 "name": "Spartak Subotica",
-                "players": 9
+                "players": 8
               },
               {
                 "name": "Zemun",
@@ -21065,7 +21126,7 @@
             "country": "442",
             "competition": "Luxembourg National Division",
             "members": 12,
-            "clubs": 1,
+            "clubs": 0,
             "kept": 0,
             "short": [
               {
@@ -21087,6 +21148,10 @@
               {
                 "name": "CS Grevenmacher",
                 "players": 3
+              },
+              {
+                "name": "AS La Jeunesse d'Esch-Alzette",
+                "players": 10
               },
               {
                 "name": "Progrès Niedercorn",
@@ -21184,29 +21249,29 @@
           },
           "pooled": {
             "203": {
-              "703": 191
+              "703": 168
             },
             "643": {
-              "112": 600,
-              "233": 118,
-              "268": 77,
-              "398": 17,
+              "112": 586,
+              "233": 116,
+              "268": 74,
+              "398": 15,
               "417": 3,
-              "428": 48,
-              "440": 65,
-              "498": 25,
-              "762": 8,
+              "428": 45,
+              "440": 60,
+              "498": 23,
+              "762": 7,
               "795": 7,
-              "804": 528,
-              "860": 263,
-              "031": 21,
-              "051": 26
+              "804": 506,
+              "860": 254,
+              "031": 17,
+              "051": 24
             },
             "688": {
-              "191": 611,
-              "705": 108,
-              "807": 228,
-              "070": 235
+              "191": 562,
+              "705": 88,
+              "807": 209,
+              "070": 219
             }
           }
         },
@@ -21214,7 +21279,7 @@
           {
             "id": "100",
             "name": "Bulgaria",
-            "pool": 598,
+            "pool": 574,
             "players": 11,
             "strength": 70,
             "goalkeeper": true,
@@ -21259,7 +21324,7 @@
           {
             "id": "120",
             "name": "Cameroon",
-            "pool": 120,
+            "pool": 114,
             "players": 11,
             "strength": 64,
             "goalkeeper": true,
@@ -21268,7 +21333,7 @@
           {
             "id": "124",
             "name": "Canada",
-            "pool": 89,
+            "pool": 77,
             "players": 11,
             "strength": 56,
             "goalkeeper": true,
@@ -21277,9 +21342,9 @@
           {
             "id": "140",
             "name": "Central African Rep.",
-            "pool": 13,
+            "pool": 12,
             "players": 11,
-            "strength": 13,
+            "strength": 12,
             "goalkeeper": true,
             "naturalLineup": false
           },
@@ -21304,7 +21369,7 @@
           {
             "id": "152",
             "name": "Chile",
-            "pool": 280,
+            "pool": 275,
             "players": 11,
             "strength": 68,
             "goalkeeper": true,
@@ -21313,7 +21378,7 @@
           {
             "id": "156",
             "name": "China",
-            "pool": 730,
+            "pool": 721,
             "players": 11,
             "strength": 56,
             "goalkeeper": true,
@@ -21331,7 +21396,7 @@
           {
             "id": "170",
             "name": "Colombia",
-            "pool": 660,
+            "pool": 644,
             "players": 11,
             "strength": 71,
             "goalkeeper": true,
@@ -21340,7 +21405,7 @@
           {
             "id": "178",
             "name": "Congo",
-            "pool": 16,
+            "pool": 15,
             "players": 11,
             "strength": 45,
             "goalkeeper": true,
@@ -21349,7 +21414,7 @@
           {
             "id": "180",
             "name": "DR Congo",
-            "pool": 84,
+            "pool": 73,
             "players": 11,
             "strength": 58,
             "goalkeeper": true,
@@ -21367,7 +21432,7 @@
           {
             "id": "188",
             "name": "Costa Rica",
-            "pool": 147,
+            "pool": 145,
             "players": 11,
             "strength": 64,
             "goalkeeper": true,
@@ -21385,7 +21450,7 @@
           {
             "id": "192",
             "name": "Cuba",
-            "pool": 26,
+            "pool": 25,
             "players": 11,
             "strength": 52,
             "goalkeeper": true,
@@ -21394,7 +21459,7 @@
           {
             "id": "196",
             "name": "Cyprus",
-            "pool": 26,
+            "pool": 23,
             "players": 11,
             "strength": 50,
             "goalkeeper": true,
@@ -21403,7 +21468,7 @@
           {
             "id": "203",
             "name": "Czechia",
-            "pool": 687,
+            "pool": 623,
             "players": 11,
             "strength": 73,
             "goalkeeper": true,
@@ -21412,16 +21477,16 @@
           {
             "id": "204",
             "name": "Benin",
-            "pool": 9,
-            "players": 9,
-            "strength": 24,
+            "pool": 8,
+            "players": 8,
+            "strength": 28,
             "goalkeeper": true,
             "naturalLineup": false
           },
           {
             "id": "208",
             "name": "Denmark",
-            "pool": 704,
+            "pool": 679,
             "players": 11,
             "strength": 76,
             "goalkeeper": true,
@@ -21439,7 +21504,7 @@
           {
             "id": "218",
             "name": "Ecuador",
-            "pool": 235,
+            "pool": 234,
             "players": 11,
             "strength": 66,
             "goalkeeper": true,
@@ -21448,7 +21513,7 @@
           {
             "id": "222",
             "name": "El Salvador",
-            "pool": 73,
+            "pool": 72,
             "players": 11,
             "strength": 57,
             "goalkeeper": true,
@@ -21493,16 +21558,16 @@
           {
             "id": "242",
             "name": "Fiji",
-            "pool": 3,
-            "players": 3,
-            "strength": 33,
+            "pool": 2,
+            "players": 2,
+            "strength": 35,
             "goalkeeper": true,
             "naturalLineup": false
           },
           {
             "id": "246",
             "name": "Finland",
-            "pool": 1007,
+            "pool": 970,
             "players": 11,
             "strength": 60,
             "goalkeeper": true,
@@ -21511,7 +21576,7 @@
           {
             "id": "250",
             "name": "France",
-            "pool": 1526,
+            "pool": 1365,
             "players": 11,
             "strength": 78,
             "goalkeeper": true,
@@ -21547,9 +21612,9 @@
           {
             "id": "270",
             "name": "Gambia",
-            "pool": 6,
-            "players": 6,
-            "strength": 30,
+            "pool": 4,
+            "players": 4,
+            "strength": 36,
             "goalkeeper": false,
             "naturalLineup": false
           },
@@ -21565,7 +21630,7 @@
           {
             "id": "276",
             "name": "Germany",
-            "pool": 2805,
+            "pool": 2508,
             "players": 11,
             "strength": 85,
             "goalkeeper": true,
@@ -21574,7 +21639,7 @@
           {
             "id": "278",
             "name": "East Germany",
-            "pool": 1431,
+            "pool": 1400,
             "players": 11,
             "strength": 69,
             "goalkeeper": true,
@@ -21583,7 +21648,7 @@
           {
             "id": "288",
             "name": "Ghana",
-            "pool": 96,
+            "pool": 68,
             "players": 11,
             "strength": 56,
             "goalkeeper": true,
@@ -21592,7 +21657,7 @@
           {
             "id": "300",
             "name": "Greece",
-            "pool": 1028,
+            "pool": 978,
             "players": 11,
             "strength": 65,
             "goalkeeper": true,
@@ -21610,7 +21675,7 @@
           {
             "id": "324",
             "name": "Guinea",
-            "pool": 26,
+            "pool": 22,
             "players": 11,
             "strength": 47,
             "goalkeeper": true,
@@ -21628,16 +21693,16 @@
           {
             "id": "332",
             "name": "Haiti",
-            "pool": 12,
-            "players": 11,
-            "strength": 19,
+            "pool": 8,
+            "players": 8,
+            "strength": 27,
             "goalkeeper": true,
             "naturalLineup": false
           },
           {
             "id": "340",
             "name": "Honduras",
-            "pool": 65,
+            "pool": 61,
             "players": 11,
             "strength": 59,
             "goalkeeper": true,
@@ -21646,7 +21711,7 @@
           {
             "id": "348",
             "name": "Hungary",
-            "pool": 351,
+            "pool": 301,
             "players": 11,
             "strength": 66,
             "goalkeeper": true,
@@ -21655,7 +21720,7 @@
           {
             "id": "352",
             "name": "Iceland",
-            "pool": 140,
+            "pool": 132,
             "players": 11,
             "strength": 63,
             "goalkeeper": true,
@@ -21664,7 +21729,7 @@
           {
             "id": "356",
             "name": "India",
-            "pool": 172,
+            "pool": 168,
             "players": 11,
             "strength": 31,
             "goalkeeper": true,
@@ -21673,7 +21738,7 @@
           {
             "id": "360",
             "name": "Indonesia",
-            "pool": 340,
+            "pool": 336,
             "players": 11,
             "strength": 38,
             "goalkeeper": true,
@@ -21682,7 +21747,7 @@
           {
             "id": "364",
             "name": "Iran",
-            "pool": 40,
+            "pool": 35,
             "players": 11,
             "strength": 54,
             "goalkeeper": true,
@@ -21700,7 +21765,7 @@
           {
             "id": "372",
             "name": "Ireland",
-            "pool": 703,
+            "pool": 644,
             "players": 11,
             "strength": 74,
             "goalkeeper": true,
@@ -21709,7 +21774,7 @@
           {
             "id": "376",
             "name": "Israel",
-            "pool": 80,
+            "pool": 65,
             "players": 11,
             "strength": 62,
             "goalkeeper": true,
@@ -21718,7 +21783,7 @@
           {
             "id": "380",
             "name": "Italy",
-            "pool": 3743,
+            "pool": 3428,
             "players": 11,
             "strength": 86,
             "goalkeeper": true,
@@ -21727,7 +21792,7 @@
           {
             "id": "384",
             "name": "Côte d'Ivoire",
-            "pool": 58,
+            "pool": 51,
             "players": 11,
             "strength": 61,
             "goalkeeper": true,
@@ -21736,7 +21801,7 @@
           {
             "id": "388",
             "name": "Jamaica",
-            "pool": 44,
+            "pool": 35,
             "players": 11,
             "strength": 49,
             "goalkeeper": true,
@@ -21745,7 +21810,7 @@
           {
             "id": "392",
             "name": "Japan",
-            "pool": 514,
+            "pool": 446,
             "players": 11,
             "strength": 61,
             "goalkeeper": true,
@@ -21790,7 +21855,7 @@
           {
             "id": "410",
             "name": "South Korea",
-            "pool": 333,
+            "pool": 318,
             "players": 11,
             "strength": 64,
             "goalkeeper": true,
@@ -21826,7 +21891,7 @@
           {
             "id": "422",
             "name": "Lebanon",
-            "pool": 31,
+            "pool": 30,
             "players": 11,
             "strength": 37,
             "goalkeeper": true,
@@ -21880,7 +21945,7 @@
           {
             "id": "442",
             "name": "Luxembourg",
-            "pool": 71,
+            "pool": 66,
             "players": 11,
             "strength": 49,
             "goalkeeper": true,
@@ -21898,9 +21963,9 @@
           {
             "id": "454",
             "name": "Malawi",
-            "pool": 4,
-            "players": 4,
-            "strength": 41,
+            "pool": 3,
+            "players": 3,
+            "strength": 43,
             "goalkeeper": true,
             "naturalLineup": false
           },
@@ -21916,11 +21981,11 @@
           {
             "id": "466",
             "name": "Mali",
-            "pool": 12,
+            "pool": 11,
             "players": 11,
             "strength": 38,
             "goalkeeper": true,
-            "naturalLineup": true
+            "naturalLineup": false
           },
           {
             "id": "478",
@@ -21934,7 +21999,7 @@
           {
             "id": "484",
             "name": "Mexico",
-            "pool": 361,
+            "pool": 327,
             "players": 11,
             "strength": 71,
             "goalkeeper": true,
@@ -21970,7 +22035,7 @@
           {
             "id": "504",
             "name": "Morocco",
-            "pool": 150,
+            "pool": 142,
             "players": 11,
             "strength": 63,
             "goalkeeper": true,
@@ -21979,7 +22044,7 @@
           {
             "id": "508",
             "name": "Mozambique",
-            "pool": 21,
+            "pool": 17,
             "players": 11,
             "strength": 42,
             "goalkeeper": true,
@@ -21997,9 +22062,9 @@
           {
             "id": "516",
             "name": "Namibia",
-            "pool": 7,
-            "players": 7,
-            "strength": 42,
+            "pool": 6,
+            "players": 6,
+            "strength": 44,
             "goalkeeper": true,
             "naturalLineup": false
           },
@@ -22015,7 +22080,7 @@
           {
             "id": "528",
             "name": "Netherlands",
-            "pool": 944,
+            "pool": 843,
             "players": 11,
             "strength": 83,
             "goalkeeper": true,
@@ -22042,7 +22107,7 @@
           {
             "id": "554",
             "name": "New Zealand",
-            "pool": 110,
+            "pool": 103,
             "players": 11,
             "strength": 48,
             "goalkeeper": true,
@@ -22069,7 +22134,7 @@
           {
             "id": "566",
             "name": "Nigeria",
-            "pool": 356,
+            "pool": 336,
             "players": 11,
             "strength": 63,
             "goalkeeper": true,
@@ -22078,7 +22143,7 @@
           {
             "id": "578",
             "name": "Norway",
-            "pool": 1356,
+            "pool": 1323,
             "players": 11,
             "strength": 68,
             "goalkeeper": true,
@@ -22114,7 +22179,7 @@
           {
             "id": "600",
             "name": "Paraguay",
-            "pool": 267,
+            "pool": 259,
             "players": 11,
             "strength": 68,
             "goalkeeper": true,
@@ -22123,7 +22188,7 @@
           {
             "id": "604",
             "name": "Peru",
-            "pool": 322,
+            "pool": 313,
             "players": 11,
             "strength": 67,
             "goalkeeper": true,
@@ -22141,7 +22206,7 @@
           {
             "id": "616",
             "name": "Poland",
-            "pool": 1131,
+            "pool": 1085,
             "players": 11,
             "strength": 68,
             "goalkeeper": true,
@@ -22150,7 +22215,7 @@
           {
             "id": "620",
             "name": "Portugal",
-            "pool": 1193,
+            "pool": 1124,
             "players": 11,
             "strength": 76,
             "goalkeeper": true,
@@ -22159,7 +22224,7 @@
           {
             "id": "624",
             "name": "Guinea-Bissau",
-            "pool": 14,
+            "pool": 12,
             "players": 11,
             "strength": 32,
             "goalkeeper": true,
@@ -22195,7 +22260,7 @@
           {
             "id": "642",
             "name": "Romania",
-            "pool": 477,
+            "pool": 430,
             "players": 11,
             "strength": 73,
             "goalkeeper": true,
@@ -22204,7 +22269,7 @@
           {
             "id": "643",
             "name": "Russia",
-            "pool": 2563,
+            "pool": 2463,
             "players": 11,
             "strength": 78,
             "goalkeeper": true,
@@ -22231,7 +22296,7 @@
           {
             "id": "686",
             "name": "Senegal",
-            "pool": 75,
+            "pool": 63,
             "players": 11,
             "strength": 62,
             "goalkeeper": true,
@@ -22240,7 +22305,7 @@
           {
             "id": "688",
             "name": "Serbia",
-            "pool": 3785,
+            "pool": 3608,
             "players": 11,
             "strength": 77,
             "goalkeeper": true,
@@ -22294,7 +22359,7 @@
           {
             "id": "710",
             "name": "South Africa",
-            "pool": 629,
+            "pool": 610,
             "players": 11,
             "strength": 62,
             "goalkeeper": true,
@@ -22312,7 +22377,7 @@
           {
             "id": "724",
             "name": "Spain",
-            "pool": 1796,
+            "pool": 1630,
             "players": 11,
             "strength": 80,
             "goalkeeper": true,
@@ -22339,9 +22404,9 @@
           {
             "id": "740",
             "name": "Suriname",
-            "pool": 11,
-            "players": 11,
-            "strength": 22,
+            "pool": 9,
+            "players": 9,
+            "strength": 28,
             "goalkeeper": false,
             "naturalLineup": false
           },
@@ -22357,7 +22422,7 @@
           {
             "id": "752",
             "name": "Sweden",
-            "pool": 3284,
+            "pool": 3225,
             "players": 11,
             "strength": 74,
             "goalkeeper": true,
@@ -22366,7 +22431,7 @@
           {
             "id": "756",
             "name": "Switzerland",
-            "pool": 176,
+            "pool": 153,
             "players": 11,
             "strength": 67,
             "goalkeeper": true,
@@ -22375,9 +22440,9 @@
           {
             "id": "760",
             "name": "Syria",
-            "pool": 10,
-            "players": 10,
-            "strength": 38,
+            "pool": 9,
+            "players": 9,
+            "strength": 41,
             "goalkeeper": false,
             "naturalLineup": false
           },
@@ -22402,9 +22467,9 @@
           {
             "id": "768",
             "name": "Togo",
-            "pool": 13,
+            "pool": 11,
             "players": 11,
-            "strength": 34,
+            "strength": 33,
             "goalkeeper": false,
             "naturalLineup": false
           },
@@ -22420,7 +22485,7 @@
           {
             "id": "780",
             "name": "Trinidad & Tobago",
-            "pool": 36,
+            "pool": 30,
             "players": 11,
             "strength": 48,
             "goalkeeper": true,
@@ -22438,7 +22503,7 @@
           {
             "id": "788",
             "name": "Tunisia",
-            "pool": 129,
+            "pool": 126,
             "players": 11,
             "strength": 56,
             "goalkeeper": true,
@@ -22447,7 +22512,7 @@
           {
             "id": "792",
             "name": "Turkey",
-            "pool": 2949,
+            "pool": 2866,
             "players": 11,
             "strength": 66,
             "goalkeeper": true,
@@ -22492,7 +22557,7 @@
           {
             "id": "818",
             "name": "Egypt",
-            "pool": 75,
+            "pool": 67,
             "players": 11,
             "strength": 63,
             "goalkeeper": true,
@@ -22501,7 +22566,7 @@
           {
             "id": "826",
             "name": "England",
-            "pool": 4791,
+            "pool": 4417,
             "players": 11,
             "strength": 81,
             "goalkeeper": true,
@@ -22519,7 +22584,7 @@
           {
             "id": "840",
             "name": "United States",
-            "pool": 485,
+            "pool": 422,
             "players": 11,
             "strength": 62,
             "goalkeeper": true,
@@ -22528,16 +22593,16 @@
           {
             "id": "854",
             "name": "Burkina Faso",
-            "pool": 11,
-            "players": 11,
-            "strength": 33,
+            "pool": 10,
+            "players": 10,
+            "strength": 35,
             "goalkeeper": true,
             "naturalLineup": false
           },
           {
             "id": "858",
             "name": "Uruguay",
-            "pool": 486,
+            "pool": 458,
             "players": 11,
             "strength": 73,
             "goalkeeper": true,
@@ -22555,7 +22620,7 @@
           {
             "id": "862",
             "name": "Venezuela",
-            "pool": 159,
+            "pool": 158,
             "players": 11,
             "strength": 63,
             "goalkeeper": true,
@@ -22591,7 +22656,7 @@
           {
             "id": "032",
             "name": "Argentina",
-            "pool": 1470,
+            "pool": 1386,
             "players": 11,
             "strength": 80,
             "goalkeeper": true,
@@ -22600,7 +22665,7 @@
           {
             "id": "076",
             "name": "Brazil",
-            "pool": 4155,
+            "pool": 3994,
             "players": 11,
             "strength": 82,
             "goalkeeper": true,
@@ -22609,7 +22674,7 @@
           {
             "id": "068",
             "name": "Bolivia",
-            "pool": 171,
+            "pool": 169,
             "players": 11,
             "strength": 66,
             "goalkeeper": true,
@@ -22618,7 +22683,7 @@
           {
             "id": "SCO",
             "name": "Scotland",
-            "pool": 1844,
+            "pool": 1749,
             "players": 11,
             "strength": 75,
             "goalkeeper": true,
@@ -22627,7 +22692,7 @@
           {
             "id": "WAL",
             "name": "Wales",
-            "pool": 455,
+            "pool": 414,
             "players": 11,
             "strength": 71,
             "goalkeeper": true,
@@ -22636,7 +22701,7 @@
           {
             "id": "NIR",
             "name": "Northern Ireland",
-            "pool": 1237,
+            "pool": 1204,
             "players": 11,
             "strength": 64,
             "goalkeeper": true,
@@ -22645,7 +22710,7 @@
           {
             "id": "056",
             "name": "Belgium",
-            "pool": 1861,
+            "pool": 1786,
             "players": 11,
             "strength": 76,
             "goalkeeper": true,
@@ -22654,7 +22719,7 @@
           {
             "id": "040",
             "name": "Austria",
-            "pool": 321,
+            "pool": 307,
             "players": 11,
             "strength": 68,
             "goalkeeper": true,
@@ -22672,7 +22737,7 @@
           {
             "id": "008",
             "name": "Albania",
-            "pool": 333,
+            "pool": 325,
             "players": 11,
             "strength": 50,
             "goalkeeper": true,
@@ -22708,7 +22773,7 @@
           {
             "id": "012",
             "name": "Algeria",
-            "pool": 351,
+            "pool": 345,
             "players": 11,
             "strength": 64,
             "goalkeeper": true,
@@ -22717,7 +22782,7 @@
           {
             "id": "024",
             "name": "Angola",
-            "pool": 60,
+            "pool": 52,
             "players": 11,
             "strength": 56,
             "goalkeeper": true,
@@ -22753,7 +22818,7 @@
           {
             "id": "036",
             "name": "Australia",
-            "pool": 803,
+            "pool": 716,
             "players": 11,
             "strength": 58,
             "goalkeeper": true,

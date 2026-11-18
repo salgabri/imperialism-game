@@ -302,7 +302,8 @@ test('the CM 01/02 seasons are SI\'s own databases, the CM3 port with its birth 
 // ---------- SI's CM 99/00 and CM 00/01 ----------
 
 test('CM 99/00\'s own names, its sponsor\'s Eredivisie and Burkino Faso, are read on an invented folder', () => {
-  const db = sampleDatabase();
+  // Born two years before the fixture's usual, 1968 to 1982, everyone is 16 by 1 July 1999 (MIN_PLAYING_AGE).
+  const db = sampleDatabase({ birthYearShift: 2 });
   db.clubComps.find(comp => comp.name === 'Dutch Premier Division').name = 'Dutch KPN-Telecompetition';
   const nation = db.nations.push({ name: 'Burkino Faso', short: 'Burkino Faso', code: 'BFA', continent: 0 }) - 1;
   db.people.push({ first: 'Fakeo', second: 'Burkinotest', dob: { year: 1978, month: 11, day: 3 }, nation, club: -1, job: 11,

@@ -91,6 +91,23 @@ test('text is windows-1252: accents, 0x80-0x9F letters, line breaks and padding'
   assert.equal(parsed.counts.clubs, 11);
 });
 
+test('a name record is one line with single spaces: a second copy after a line break and doubled spaces go', () => {
+  // CM3's "Masashi\r\nMasashi" before "Nakayama", CM 99/00's "Abdel  Hady" (src/data/cm0102.js nameTable).
+  const db = sampleDatabase();
+  const egypt = db.nations.findIndex(n => n.name === 'Sudan');
+  db.people.push({ first: 'Masashi\r\nMasashi', second: 'Nakayamafake', dob: { year: 1967, month: 9, day: 23, leap: 0 }, nation: 0, club: -1,
+    job: 11, player: { ca: 120, ratings: { f: 20, centre: 20 } } });
+  db.people.push({ first: 'Medhat', second: 'Abdel  Hadyfake', common: ' Medo\t ', dob: { year: 1974, month: 1, day: 2, leap: 0 },
+    nation: egypt, club: -1, job: 11, player: { ca: 110, ratings: { d: 20, centre: 20 } } });
+  const parsed = read(writeCm0102Files(db));
+  const [masashi] = playerNamed(parsed, 'Masashi Nakayamafake');
+  assert.equal(masashi?.firstName, 'Masashi');
+  const [medhat] = playerNamed(parsed, 'Medhat Abdel Hadyfake');
+  assert.equal(medhat?.secondName, 'Abdel Hadyfake');
+  assert.equal(medhat.commonName, 'Medo');
+  assert.ok(!parsed.players.some(p => [p.name, p.fullName].some(name => /\s\s|[\r\n\t]/.test(name))));
+});
+
 test('nations, clubs and competitions resolve their links, with negatives and strays as none', () => {
   const parsed = read(sample());
   const nation = name => parsed.nations.find(n => n.name === name);

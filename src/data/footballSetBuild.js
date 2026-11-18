@@ -32,6 +32,12 @@ export const LAST_YEAR = 2100;
 export const NO_TEAM = 'noTeam';
 const DEFAULT_PROVIDER = 'CM 01/02 Update Team';
 const CLUB_SIZE = 11;
+/**
+ * The youngest a database's player can be when its season starts (1 July of its first year) to play in it. A fan's
+ * back-dated database keeps later players as children: Cam F's 1993/94 one has a twelve-year-old in Nigeria's XI and at
+ * Wisła Kraków, and six of Niger's XI are 14 or 15. SI's own databases have no one this young in any XI.
+ */
+export const MIN_PLAYING_AGE = 16;
 
 // Europe's first divisions as the game names them (src/data/footballLeagues.js), with their map shapes, so a club theatre
 // means the same in every set: the seven big leagues, then every other one a CM database holds. Each is found by its
@@ -513,8 +519,10 @@ export function buildFootballSet(files, {
     url: database.url, rawScale: CM_SCALE, conversion: CM_CONVERSION, dobShift, ...sourceExtra,
   };
 
-  // Eligible players: a CA on the 1-200 scale, natural positions, and a nation that is mapped or deliberately teamless.
-  const dropped = { nameless: 0, noAbility: 0, noPositions: 0, noNationality: 0, unmapped: 0, duplicates: 0 };
+  // Eligible players: a CA on the 1-200 scale, natural positions, a nation that is mapped or deliberately teamless, and
+  // MIN_PLAYING_AGE by the season's start (a player born after `youngest` is younger).
+  const dropped = { nameless: 0, noAbility: 0, noPositions: 0, noNationality: 0, unmapped: 0, duplicates: 0, tooYoung: 0 };
+  const youngest = `${database.year - 1 - MIN_PLAYING_AGE}-07-01`;
   const unmapped = {}, noTeam = {};
   const kept = new Map();
   for (const [row, player] of parsed.players.entries()) {
@@ -526,6 +534,7 @@ export function buildFootballSet(files, {
     const nation = nationRows[player.nation];
     if (nation.unmapped) { dropped.unmapped++; unmapped[nation.name] = (unmapped[nation.name] || 0) + 1; continue; }
     const dateOfBirth = decodeCmDate(player.dob, dobShift) || '';
+    if (dateOfBirth > youngest) { dropped.tooYoung++; continue; }
     const stateless = !!noNationClubs && nation.name === noNationAt.nationality && noNationClubs.has(player.club);
     const candidate = { player, keys, nation, dateOfBirth, stateless };
     // The same person can be stored twice, with or without diacritics, or once at a club and once unattached. Without

@@ -204,7 +204,8 @@ test('NHL 95: nhl-95.com\'s Genesis overall, the Rangers\' skaters Segathon\'s',
 test('the 1990s seasons are rescaled onto NHL 27\'s ratings rank for rank; NHL 07 and NHL 22 keep EA\'s own numbers', () => {
   // The reference is NHL 27's built-in clubs as the game fielded them on 2026-11-07, frozen in the manifest: EA's 300
   // ratings, which the squads still hold, and the estimates of that day, spread in a straight line from 83 down to 72 (to
-  // 70 for goalies), which the built-in season replaced on 2026-11-18 by NHL 22's shape (scripts/lib/nhl.mjs).
+  // 70 for goalies). Since 2026-11-18 the built-in season ranks its estimates by the computed seasons' value
+  // (scripts/lib/nhl.mjs) on the same straight line, so its squads hold a few other players, a rating or two apart.
   const reference = ratingsOf(MANIFEST.rescale.histogram);
   assert.equal(reference.length, 733);
   if (builtInSeasonOf('hockey').season === '2026/27') {

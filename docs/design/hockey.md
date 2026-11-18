@@ -44,11 +44,10 @@ Petterssons and two Sebastian Ahos, so a shared name goes by team and by group (
 defender, goalie). Three rated players are on no current roster (Larkin, Barzal,
 Edvinsson): they keep EA's team.
 
-**Estimates** (`scripts/lib/nhl.mjs`; since 2026-11-18 by the computed seasons' value,
-[computed-ratings.md](computed-ratings.md) step 3). Every player EA leaves out is ranked within
-his group by how much his club played him and what he produced over 2025/26 and the season under
-way, and the order is read off the shape of NHL 22, the last EA edition published whole, below its
-top 300.
+**Estimates** (`scripts/lib/nhl.mjs`). Every player EA leaves out is ranked within his group, and
+that order is spread evenly from 83, just under EA's cut-off of 84, down to 72 for skaters and 70
+for goalies. Since 2026-11-18 the order is the computed seasons' value
+([computed-ratings.md](computed-ratings.md) step 3), over 2025/26 and the season under way:
 
 - *Selection*: his share of the club's ice time a game (a goalie's, of its minutes).
 - *Production*: points a game, a goalie's saves above the league's save percentage a shot, each
@@ -58,31 +57,35 @@ top 300.
 - *Value*: selection and production as z-scores, weighted 0.2 : 0.8 for forwards, 0.35 : 0.65 for
   defenders, 0.5 : 0.5 for goalies: the computed seasons' weights where ice time is kept, tuned on
   EA's editions ("Computed seasons").
-- *The shape*: NHL 22's overalls from its 300th player's (82) down, raised a point so they top out
-  at 83, just under EA's cut-off of 84: forwards 71–83 (238 players), defenders 71–83 (137),
-  goalies 78–83 (25). The clubs pick their squads first; then the squads' estimates are ranked
-  among themselves, as NHL 22's launch rosters were rated, so that a club's depth meets NHL 22's
-  depth and not the fringe of a longer roster list. Anyone else EA leaves out takes the estimate of
-  the squad player of his group with the highest value not above his.
 - EA's own ratings are never changed.
 
-Until 2026-11-18 the order was spread in a straight line from 83 down to 72 (goalies 70). NHL 22's
-shape lifts the depth players (the squads' estimated forwards from 78.1 to 80.0 on average,
-defenders from 78.1 to 80.2, goalies from 77.6 to 81.9) and brings the clubs closer together: club
-strengths' standard deviation 1.09 → 0.95, as the match model plays them 1.47 → 1.18. The built-in
-season's standings spread 0.084 (0.097 before; the NHL's 0.082–0.127), its worst club winning 28 of
-82 (the NHL's 19–25). Estimates carry noise, noise evens clubs out, and a season still being played
-is not moved toward its results ([computed-ratings.md](computed-ratings.md), step 5). An order within
-a group is what the estimates can claim, not a number a player would get from EA. On the built-in
-rosters a club's lineup holds 4 to 13 estimates of its 19 places, 9.7 on average.
+Until 2026-11-18 forwards ranked by minutes a game + 8 × points a game, defenders by minutes a game
++ 5 × points a game and goalies by save percentage, each line starting from a replacement player's
+numbers. The value moves 262 of the 409 estimated squad players who were there before by a point or
+more, five at most either way. Goalies now rank by how much they played as well as by their save
+percentage, so a club's estimated starter rates higher and the clubs sit a little closer: club
+strengths' standard deviation 1.08 (1.09 before), as the match model plays them 1.33 (1.47). The
+built-in season's standings spread 0.089 (0.097 before; the NHL's 0.082–0.127), its worst club winning
+27 of 82 (24 before; the NHL's 19–25), its clubs scoring 3.01 goals a game (3.05; the NHL's
+3.01–3.14).
+
+The floors are a judgement: EA's depth players are not public, and 72 to 83 is where third- and
+fourth-liners have sat in the editions whose full lists have been seen. The shape of NHL 22's full
+edition below its top 300 was tried on 2026-11-18 and set aside by the user's choice: it packs the
+depth players into 77 to 83 (the squads' estimated forwards 78.1 → 80.0 on average, goalies 77.6 →
+81.9) and brought the clubs closer still (standings spread 0.084, the worst club winning 28 of 82).
+Estimates carry noise, noise evens clubs out, and a season still being played is not moved toward
+its results ([computed-ratings.md](computed-ratings.md), step 5). An order within a group is what the
+estimates can claim, not a number a player would get from EA. On the built-in rosters a club's lineup
+holds 4 to 13 estimates of its 19 places, 9.7 on average.
 
 **Clubs.** `scripts/data/nhl-teams.json` names each club, its code (the NHL's own), the
 place its territory is named after, its arena and the arena's location. New York's three
 are Manhattan, Long Island and Buffalo. `npm run build-hockey` (`scripts/build-hockey.mjs`)
 writes `src/data/clubs.hockey.js` and `src/data/rosters.hockey.js`; `--check` rebuilds both
 byte for byte. Each club fields the lineup the game picks, then a backup goalie and the
-best skaters left, up to 23. The 2026/27 build runs from Carolina's 85.1 to Nashville's
-81.7 (84.5 to Vancouver's 80.4 with the straight-line estimates).
+best skaters left, up to 23. The 2026/27 build runs from Carolina's 84.6 to Nashville's
+80.4 (84.5 to Vancouver's 80.4 before the estimates took the computed seasons' order).
 
 **Nations.** A player EA rates plays for EA's nationality, anyone else for his birth
 country. 16 nations field players, from Canada (92) and the United States (91) down. A
@@ -428,7 +431,7 @@ hand-weighted mean of points a game, minutes a game and save percentage over the
   own lineup picker choose each club's squad, as the built-in season does. Then every squad player's rating is his
   value's mid-rank in his group over the season's squad players, read off NHL 27's built-in squads in that group (433
   forwards, 236 defenders, 64 goalies of 2026-11-07, frozen in `computed.histograms`: EA's ratings and the straight-line
-  estimates of that day, kept when the built-in season's estimates took NHL 22's shape): every computed season plays on
+  estimates of that day, the shape the built-in season keeps): every computed season plays on
   NHL 27's scale. A player outside every squad takes the rating of the highest squad value in his group not above his.
 - *The move toward the season's results* ([computed-ratings.md](computed-ratings.md), step 5, the user's choice of
   2026-11-17). S, each club's results strength in goals a game: the Simple Rating System of every game's score where
@@ -540,7 +543,7 @@ the season's real standings (each club's win share, a tie or a shoot-out half a 
 | --- | --- | --- |
 | Clubs as played against the standings, median Spearman | 0.60 | 0.95 |
 | Clubs as shown against the standings | 0.58 | 0.81 |
-| Club strengths' standard deviation as shown, median (NHL 07 1.30, NHL 22 1.92, NHL 27 1.09 since 2026-11-18 0.95) | 1.07 | 1.53 |
+| Club strengths' standard deviation as shown, median (NHL 07 1.30, NHL 22 1.92, NHL 27 1.08) | 1.07 | 1.53 |
 | As played (NHL 07 1.37, NHL 22 1.63) | 1.63 | 1.66 |
 | Simulated standings' spread against the real one, mean gap (each season's clubs, its own rules and game count, 20 seasons) | 0.012 | 0.008 |
 
@@ -573,7 +576,7 @@ simulated standings' spread against the real one:
 The seasons before overtime (to 1982/83) and before the shoot-out run a little wide: their ties count half a win in the
 real standings, where the model always finds a winner. `npm run simulation:realism` plays five seasons whole on their
 own schedules: 1970/71 0.165 (the league's 0.143, just past the harness's ±0.02), 1981/82 0.119 (0.117), 2003/04 0.105
-(0.097), 2010/11 0.080 (0.083), and the built-in season 0.084 (the NHL's 0.082 to 0.127; "Estimates").
+(0.097), 2010/11 0.080 (0.083), and the built-in season 0.089 (the NHL's 0.082 to 0.127; "Estimates").
 
 **Nations before 1977/78.** A season fields nations only where at least three play a real side (`fieldedNations`: their
 own players hold at least half the lineup). By the databank's birth countries, Canada alone does from 1960/61 to

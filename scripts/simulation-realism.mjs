@@ -1,6 +1,8 @@
 // Plays whole league seasons with the built-in clubs, each of football's five leagues whole (leagueClubs), and
 // measures what a fan of each league would look at: scores, draws and overtime, margins, standings, and who scores.
-// American football also plays a few earlier NFL and AFL seasons' clubs under their own day's rules (NFL_ERAS).
+// American football also plays a few earlier NFL and AFL seasons' clubs under their own day's rules (NFL_ERAS), the
+// computed ones also on their own schedules beside the real standings' spread and margins (ownSchedule), and ice
+// hockey and rugby league a few earlier seasons' clubs under theirs (NHL_ERAS, NRL_ERAS).
 // Tennis has no league: its nations play Davis Cup ties (the women's game's, Billie Jean King Cup ties), the sixteen
 // strongest each meeting every other once a season; and a season of each earlier format the cups played, under its
 // year's rules (formatsReport: best of five sets, advantage sets, three-rubber ties). Football's extra time is a
@@ -44,6 +46,9 @@ import { leagueOfLegends } from '../src/sports/leagueOfLegends.js';
 import { decodeFootballSet, seasonSport } from '../src/engine/footballSets.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { onField, rugbyLeague, scoreKind, SLICE_MODEL } from '../src/sports/rugbyLeague.js';
+import { BUILT_IN_RUGBY_LEAGUE_SEASONS } from '../src/data/rugbyLeagueSeasons.js';
+import { NRL_LEAGUE_AVERAGES } from '../src/data/nrlLeagueAverages.js';
+import { seasonClubs as nrlSeasonClubs } from './lib/nrl-league.mjs';
 import { BUILT_IN_AMERICAN_FOOTBALL_SEASONS } from '../src/data/americanFootballSeasons.js';
 import { NFL_LEAGUE_AVERAGES } from '../src/data/nflLeagueAverages.js';
 
@@ -394,6 +399,7 @@ function nflEra(id, seasons, seed, venue) {
   const sides = played.length * 2;
   const level = meta.year < 1974 ? scoring.ties / (real.games / 2) : scoring.nflverse ? scoring.nflverse.overtime / (real.games / 2) : null;
   return {
+    ...ownSchedule(id, sport, clubs, seasons, hashStr(`${seed}:schedule`), venue),
     id, league, year: meta.year, clubs: clubs.length, games, overtimeRule: sport.prepareMatch(clubs[0], clubs[1]).rules.overtime,
     pointsPerTeam: mean(played.flatMap(g => [g.ga, g.gd])), realPoints: real.points / real.games,
     touchdowns: count.touchdowns / sides, realTouchdowns: real.td / real.games,
@@ -403,6 +409,45 @@ function nflEra(id, seasons, seed, venue) {
     safeties: count.safeties / sides, realSafeties: real.safeties / real.games,
     overtimeRate: share(played, g => g.tie), realLevel: level,
     marginMean: mean(played.map(g => Math.abs(g.ga - g.gd))),
+  };
+}
+
+/**
+ * A computed season (pfa-*) played on its own schedule, every game of its snapshot's (scripts/data/pfa-seasons/, the
+ * games its clubs' move toward their results read), `seasons` times: the standings' spread (win% SD) and the margins
+ * (one-score games, by exactly 3 and by exactly 7), each beside the real season's. A schedule keeps the real spread
+ * comparable: the 1960s clubs met their own conference twelve times in fourteen. Empty for any other season.
+ */
+function ownSchedule(id, sport, clubs, seasons, seed, venue) {
+  const key = id.startsWith('pfa-afl-') ? `afl-${id.slice(8)}` : id.startsWith('pfa-') ? id.slice(4) : null;
+  const file = key && new URL(`./data/pfa-seasons/${key}.json`, import.meta.url);
+  const snapshot = file && existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null;
+  if (!snapshot?.games?.length) return {};
+  const at = new Map(Object.entries(snapshot.teams).map(([franchise, team]) => [franchise, clubs.findIndex(club => club.id === team.era)]));
+  const games = snapshot.games.map(([, home, away, homeScore, awayScore]) => ({ home: at.get(home), away: at.get(away), homeScore, awayScore }));
+  const marginsOf = list => ({ oneScore: share(list, m => m <= 8), byThree: share(list, m => m === 3), bySeven: share(list, m => m === 7) });
+  const spreadOf = (wins, played) => sd(wins.map((w, i) => w / played[i]));
+  const realWins = clubs.map(() => 0), realPlayed = clubs.map(() => 0);
+  for (const g of games) {
+    realPlayed[g.home]++; realPlayed[g.away]++;
+    realWins[g.home] += g.homeScore > g.awayScore ? 1 : g.homeScore === g.awayScore ? 0.5 : 0;
+    realWins[g.away] += g.awayScore > g.homeScore ? 1 : g.homeScore === g.awayScore ? 0.5 : 0;
+  }
+  const rng = makeRng(seed), eff = clubs.map(teamEff), prepared = new Map(), margins = [], spreads = [];
+  for (let s = 0; s < seasons; s++) {
+    const wins = clubs.map(() => 0);
+    for (const g of games) {
+      const key2 = `${g.away}:${g.home}`;
+      if (!prepared.has(key2)) prepared.set(key2, sport.prepareMatch(clubs[g.away], clubs[g.home], eff[g.away], eff[g.home], venue));
+      const result = sport.sampleResult(rng, prepared.get(key2), DRAMA);
+      wins[result.ga > result.gd ? g.away : g.home]++;
+      margins.push(Math.abs(result.ga - result.gd));
+    }
+    spreads.push(spreadOf(wins, realPlayed));
+  }
+  return {
+    ownSchedule: { games: games.length, winPctSd: mean(spreads), ...marginsOf(margins) },
+    realOwnSchedule: { winPctSd: spreadOf(realWins, realPlayed), ...marginsOf(games.map(g => Math.abs(g.homeScore - g.awayScore))) },
   };
 }
 
@@ -894,6 +939,44 @@ export function nrlSeason(seasons, seed, venue) {
   };
 }
 
+/** The earlier NRL seasons played whole beside today's, each under its own rules (src/sports/rugbyLeague.js `rugbyLeagueIn`). */
+export const NRL_ERAS = Object.freeze(['nrl-1968', 'nrl-1977', 'nrl-1986', 'nrl-1995', 'nrl-2005']);
+
+/**
+ * An earlier NRL season's clubs (public/rugby-league/<id>.json) over its own season's games, under its own points,
+ * scoring and extra time: scores count as its league counted them, before golden point (2003) at full time, a level
+ * game a draw (`level`), the campaign's extra time deciding only who wins. An odd number of clubs adds a bye, as for
+ * today's seventeen.
+ */
+function nrlEraSeason(id, seasons, seed, venue) {
+  const { year } = BUILT_IN_RUGBY_LEAGUE_SEASONS.find(entry => entry.id === id);
+  const sport = matchSport({ sport: 'rugby-league', layer: 'clubs', dataSet: id, dataYear: year });
+  const clubs = nrlSeasonClubs(fileURLToPath(new URL('..', import.meta.url)), id);
+  const { games } = REAL.nrlEras[id];
+  const rounds = clubs.length % 2 ? Math.ceil(games * (clubs.length + 1) / clubs.length) : games;
+  const { played, tables } = playSeasons({ sport, teams: clubs, games: rounds, seasons, seed, venue });
+  const counted = sport.rules.golden ? (g => [g.ga, g.gd]) : (g => [g.regA, g.regD]);
+  const teamPoints = played.flatMap(counted);
+  const events = played.flatMap(g => g.ev.filter(e => sport.rules.golden || e.m <= SLICE_MODEL.MINUTES));
+  const spreads = [], best = [], worst = [];
+  for (const { table } of tables) {
+    const values = table.map(t => (t.w + t.d / 2) / Math.max(1, t.w + t.d + t.l));
+    spreads.push(sd(values));
+    best.push(Math.max(...values) * games);
+    worst.push(Math.min(...values) * games);
+  }
+  return {
+    id, year, clubs: clubs.length, games, golden: sport.rules.golden, points: [sport.rules.tryPoints, sport.rules.fieldGoalPoints],
+    league: NRL_LEAGUE_AVERAGES[id].points,
+    pointsPerTeam: mean(teamPoints), triesPerTeam: events.filter(e => scoreKind(e) === 'try').length / teamPoints.length,
+    fieldGoalsPerTeam: events.filter(e => scoreKind(e) === 'field').length / teamPoints.length,
+    penaltyGoalsPerTeam: events.filter(e => scoreKind(e) === 'penalty').length / teamPoints.length,
+    level: share(played, g => g.tie), marginMean: mean(played.map(g => Math.abs(counted(g)[0] - counted(g)[1]))),
+    longest: Math.max(0, ...played.filter(g => g.tie).map(g => g.tie.periods.length)),
+    winPctSd: mean(spreads), bestWins: mean(best), worstWins: mean(worst),
+  };
+}
+
 // ---- Real leagues ---------------------------------------------------------------------------------------------
 
 /**
@@ -1060,6 +1143,23 @@ export const REAL = Object.freeze({
     tryShares: { WG: [0.292, 0.3], CE: [0.155, 0.184], FB: [0.086, 0.114], SR: [0.104, 0.111], FE: [0.062, 0.066],
       HB: [0.048, 0.054], PR: [0.038, 0.04], HK: [0.029, 0.034], LK: [0.015, 0.025], BENCH: [0.111, 0.134] },
   },
+  // The earlier seasons NRL_ERAS plays, from their snapshots (scripts/data/rugby-league-seasons/<id>.json: the Rugby
+  // League Project's results to 1997, NRL.com's draw from 1998) and src/data/nrlLeagueAverages.js: the games a club
+  // played; points a team a game; tries and field goals a team a game; the share of games drawn (level at full time
+  // before golden point; 2005's, still level after its ten minutes); the mean margin; the spread of the clubs' win shares
+  // and the best and worst records in wins.
+  nrlEras: {
+    'nrl-1968': { games: 22, pointsPerTeam: 14.818, triesPerTeam: 2.189, fieldGoalsPerTeam: 0.743, draws: 0.03, marginMean: 9.5,
+      winPctSd: 0.199, bestWins: 16, worstWins: 2 },
+    'nrl-1977': { games: 22, pointsPerTeam: 15.811, triesPerTeam: 2.914, fieldGoalsPerTeam: 0.04, draws: 0.023, marginMean: 12.227,
+      winPctSd: 0.236, bestWins: 19, worstWins: 2 },
+    'nrl-1986': { games: 24, pointsPerTeam: 15.997, triesPerTeam: 2.517, fieldGoalsPerTeam: 0.233, draws: 0.032, marginMean: 11.853,
+      winPctSd: 0.125, bestWins: 16, worstWins: 7 },
+    'nrl-1995': { games: 22, pointsPerTeam: 21.066, triesPerTeam: 3.685, fieldGoalsPerTeam: 0.102, draws: 0.014, marginMean: 17.941,
+      winPctSd: 0.234, bestWins: 20, worstWins: 2 },
+    'nrl-2005': { games: 24, pointsPerTeam: 23.494, triesPerTeam: 4.14, fieldGoalsPerTeam: 0.077, draws: 0.006, marginMean: 15.756,
+      winPctSd: 0.104, bestWins: 16, worstWins: 8 },
+  },
 });
 
 const row = (label, value, range, format = num) => {
@@ -1091,6 +1191,7 @@ export function realismReport({ seasons = 40, seed = 20261101, home = false } = 
     davisCup: davisCup(seasons, hashStr(`${seed}:davis-cup`), venue),
     billieJeanKingCup: davisCup(seasons, hashStr(`${seed}:billie-jean-king-cup`), venue, womensTennis),
     nrl: nrlSeason(seasons, hashStr(`${seed}:nrl`), venue),
+    nrlEras: NRL_ERAS.map(id => nrlEraSeason(id, seasons, hashStr(`${seed}:${id}`), venue)),
     rocketLeague: rlcs(seasons, hashStr(`${seed}:rocket-league`), venue),
     counterStrike: csMajor(seasons, hashStr(`${seed}:counter-strike`), venue),
     valorant: vct(seasons, hashStr(`${seed}:valorant`), venue),
@@ -1223,6 +1324,13 @@ EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
       + ` ${pair(e.touchdowns, e.realTouchdowns, x => num(x, 2)).padEnd(13)} ${pair(e.fieldGoals, e.realFieldGoals, x => num(x, 2)).padEnd(13)}`
       + ` ${pair(e.xpRate, e.realXpRate, pct).padEnd(15)} ${pair(e.twoPointShare, e.realTwoPointShare, pct).padEnd(15)}`
       + ` ${pair(e.overtimeRate, e.realLevel, pct).padEnd(14)}`);
+  }
+  lines.push('  the computed seasons on their own schedules (real: the season\'s games)');
+  lines.push(`  ${'season'.padEnd(10)} ${'win% SD'.padEnd(15)} ${'one-score (≤ 8)'.padEnd(17)} ${'by exactly 3'.padEnd(15)} ${'by exactly 7'.padEnd(15)}`);
+  for (const e of report.nflEras.filter(era => era.ownSchedule)) {
+    const own = e.ownSchedule, real = e.realOwnSchedule;
+    lines.push(`  ${`${e.league} ${e.year}`.padEnd(10)} ${pair(own.winPctSd, real.winPctSd, x => num(x, 3)).padEnd(15)}`
+      + ` ${pair(own.oneScore, real.oneScore, pct).padEnd(17)} ${pair(own.byThree, real.byThree, pct).padEnd(15)} ${pair(own.bySeven, real.bySeven, pct).padEnd(15)}`);
   }
   const m = report.mlb, rm = REAL.mlb;
   lines.push(`\nMLB — ${m.clubs} clubs, 162 games (real: ${rm.note})`);
@@ -1398,6 +1506,22 @@ EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
   lines.push(row('favourite wins', r.favourite.wins, rr.favouriteWins, pct));
   for (const position of ['WG', 'CE', 'FB', 'SR', 'FE', 'HB', 'PR', 'HK', 'LK', 'BENCH']) {
     lines.push(row(`tries by ${position}`, r.tryShares[position] || 0, rr.tryShares[position], pct));
+  }
+  // Each earlier season beside its own record, within what a season's sampling allows.
+  const close = (value, tolerance) => [value - tolerance, value + tolerance];
+  for (const era of report.nrlEras) {
+    const real = REAL.nrlEras[era.id];
+    const rules = `a try ${era.points[0]}, a field goal ${era.points[1]}, ${era.golden ? 'golden point' : 'extra time (a draw at full time in the league)'}`;
+    lines.push(`\nNRL ${era.year} — ${era.clubs} clubs, ${era.games} games, ${rules} (real: the season's snapshot)`);
+    lines.push(row('points a team', era.pointsPerTeam, close(real.pointsPerTeam, 0.4), x => num(x, 1)));
+    lines.push(row('tries a team', era.triesPerTeam, close(real.triesPerTeam, 0.1)));
+    lines.push(row('field goals a team', era.fieldGoalsPerTeam, close(real.fieldGoalsPerTeam, 0.04), x => num(x, 3)));
+    lines.push(row('penalty goals a team', era.penaltyGoalsPerTeam, null));
+    lines.push(row(era.golden ? 'golden point' : 'level at full time (draws)', era.level, era.golden ? null : close(real.draws, 0.02), pct));
+    lines.push(row('mean margin', era.marginMean, close(real.marginMean, 1.5), x => num(x, 1)));
+    lines.push(row('win% SD', era.winPctSd, close(real.winPctSd, 0.04), x => num(x, 3)));
+    lines.push(row(`best record (wins of ${era.games})`, era.bestWins, close(real.bestWins, 3), x => num(x, 1)));
+    lines.push(row(`worst record (wins of ${era.games})`, era.worstWins, close(real.worstWins, 3), x => num(x, 1)));
   }
   return lines.join('\n');
 }

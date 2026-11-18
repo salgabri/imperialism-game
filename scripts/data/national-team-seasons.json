@@ -382,6 +382,11 @@
     "cutoff": "07-01",
     "least": 11,
     "openCapsPerYear": 8,
+    "ages": {
+      "least": 14,
+      "most": 45,
+      "why": "A player younger than 14 or older than 45 on 1 July of Y − 1, when the season starts, is in no pool: his Wikidata stint and his date of birth cannot both be right. The roster audit (scripts/audit-rosters.mjs) found three: Óscar Ulloa (Q8078877, born 1986) for El Salvador from 1988, Rusdi Suparman (born 1973) for Malaysia from 1986, and Antoine Tassy (born 1924), Haiti's coach, as its player from 1965 to 1976."
+    },
     "rule": "A nation's pool for the season ending in Y: the players of its team with a Wikidata stint covering Y − 1 or Y (a stint Wikidata has not closed, such as Paolo Maldini's for Italy from 1988, ends as its caps would run out at 8 a year: start + ⌈caps / 8⌉ − 1; one with neither end nor caps is left out), each with his stint's caps a year, caps / (end − start + 1), halved when the stint covers only one of the two years. A player in two nations' pools plays for the one where that figure is higher. The XI: for each role (1 GK, 4 DF, 4 MF, 2 FW) the pool's players of that position, the highest figure first (then the most caps for the team by then, then the lower Wikidata id); a role short of them takes the highest figures left. A nation fields a team when its pool holds at least 11 players with a position, one a goalkeeper, it played a full international in the four years before, and its shape takes part that year. The XI's order: Ballon d'Or points of the season's two years, then the caps for the team by the season's end (each stint's caps spread evenly over its years), then the figure, then the lower Wikidata id."
   },
   "positions": {

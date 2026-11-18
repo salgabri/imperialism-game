@@ -1,7 +1,7 @@
 // A rating the game estimated rather than read: every place that shows one says so, in its league's words. Hockey's
 // (scripts/lib/nhl.mjs) fill in below EA's top 300; the EuroLeague's (scripts/lib/euroleague.mjs) are all estimates.
 const REASONS = Object.freeze({
-  NHL: Object.freeze({ reason: "EA publishes only NHL 27's top 300 players", basis: "ice time and scoring (a goalie's minutes and saves) on the scale of EA's NHL 22" }),
+  NHL: Object.freeze({ reason: "EA publishes only NHL 27's top 300 players", basis: "ice time and scoring (a goalie's minutes and saves)" }),
   EuroLeague: Object.freeze({ reason: 'no game rates EuroLeague players', basis: 'his EuroLeague box scores (PIR a game)' }),
 });
 const reasonOf = player => REASONS[player?.sourceInfo?.league] || REASONS.NHL;

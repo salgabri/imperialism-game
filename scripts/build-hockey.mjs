@@ -7,7 +7,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { colourFor } from './lib/club-identity.mjs';
-import { clubsOf, estimateReference, nationsOf, playerOf, rateRoster, tupleOf } from './lib/nhl.mjs';
+import { clubsOf, nationsOf, playerOf, ratePlayers, tupleOf } from './lib/nhl.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const clubsFile = path.join(root, 'src/data/clubs.hockey.js');
@@ -15,11 +15,22 @@ const rostersFile = path.join(root, 'src/data/rosters.hockey.js');
 const snapshot = JSON.parse(await readFile(path.join(root, 'scripts/data/nhl-27.json'), 'utf8'));
 const { teams } = JSON.parse(await readFile(path.join(root, 'scripts/data/nhl-teams.json'), 'utf8'));
 const { source } = snapshot;
-// The estimates' shape: NHL 22's full edition below its top 300 (the calibration fixture holds its players).
-const calibration = JSON.parse(await readFile(path.join(root, 'scripts/data/nhl-seasons/calibration.json'), 'utf8'));
-const reference = estimateReference(calibration.editions.find(edition => edition.id === 'nhl-2022'), source.floor);
 
-const players = rateRoster(snapshot.players.map(playerOf), reference, teams);
+// Two players of one name (Vancouver's two Elias Petterssons) are told apart as the NHL seasons tell them apart: each
+// takes the birth-year tag the newest season's snapshot gives his NHL id (scripts/lib/nhl-history.mjs namesApart), so
+// a squad never names one player twice and the built-in season spells them as 2025/26 does.
+const NEWEST_SEASON = 'scripts/data/nhl-seasons/nhl-2026.json';
+const tags = new Map(JSON.parse(await readFile(path.join(root, NEWEST_SEASON), 'utf8')).players.map(([id, name]) => [id, name]));
+const named = snapshot.players.map(playerOf);
+for (const [name, same] of Map.groupBy(named, p => p.name)) {
+  if (same.length < 2) continue;
+  for (const p of same) {
+    const tagged = tags.get(p.id);
+    if (!tagged || !tagged.startsWith(`${name} (`)) throw new Error(`${name} (${p.id}) shares his name, and ${NEWEST_SEASON} gives him no tag`);
+    p.name = tagged;
+  }
+}
+const players = ratePlayers(named);
 const clubs = clubsOf(players, teams);
 const rosters = nationsOf(players);
 const tuple = p => JSON.stringify(tupleOf(p));

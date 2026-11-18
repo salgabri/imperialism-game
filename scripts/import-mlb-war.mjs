@@ -3,6 +3,9 @@
 //
 //   npm run import:mlb-war             writes scripts/data/mlb-war-seasons/<year>.json and scripts/data/mlb-war-reference.json
 //   npm run import:mlb-war -- --check  rebuilds both from the caches and compares them byte for byte, writes nothing
+//   npm run import:mlb-war -- --blend  prints whether a blend of selection and production rates the calibration seasons
+//                                      better than the WAR score, each season left out (docs/design/computed-ratings.md,
+//                                      step 3; docs/design/baseball.md); writes nothing
 //
 // It never fetches. Its sources (scripts/data/mlb-war-seasons.json `sources`) are cached in the ignored data-src/mlb-war/
 // and pinned by SHA-256: JEFFBAGWELL's WAR by player, season and stint (Neil Paine, MIT; the average of Baseball-Reference's
@@ -23,6 +26,7 @@ import path from 'node:path';
 import { MLB_LEAGUE_TOTALS } from '../src/data/mlbLeagueAverages.js';
 import { editionOf, nameKey, rosterOf } from './lib/mlb.mjs';
 import { FIELD_POSITIONS, WAR_ROLES, aliasesOf, displayNameOf, rateByRank, roundTo, warScoreOf } from './lib/mlb-war.mjs';
+import { priorFromReliability, replacementRate, shrunkRate } from './lib/computed-ratings.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const manifestFile = path.join(root, 'scripts/data/mlb-war-seasons.json');
@@ -324,6 +328,84 @@ function leaveOneOut(calibration, records) {
   };
 }
 
+// ---------- the blend back-test (docs/design/computed-ratings.md, step 3) ----------
+
+/**
+ * Whether a blend of selection and production rates the calibration seasons better than the WAR score does, each season
+ * left out in turn and rated rank for rank against the other six seasons' reference, as `leaveOneOut` rates the WAR
+ * score. Selection is the window's (the season 3, the one before 2, then 1) weighted share of the club's games, in plate
+ * appearances or innings a scheduled game (a season not played counting none); production the strategy's WAR rate,
+ * pooled over that window and shrunk toward replacement (the quarter with the least playing time) by a prior from its
+ * year-to-year reliability; each blend is w × z(selection) + (1 − w) × z(the other), w tuned on the six seasons left in
+ * (a grid of 0, 0.025, …, 1) and frozen for the one left out. → each measure's Spearman with the Show's overall, by
+ * role, over the 9,674 cards.
+ */
+function blendBacktest(calibration) {
+  const WINDOW = [3, 2, 1], LEAST = { H: 200, SP: 60, RP: 25 }, GRID = Array.from({ length: 41 }, (_, i) => i / 40);
+  // Scheduled games a club: the league's team-games over its 30 clubs (2016 to 2024; 2020 played 60).
+  const perClub = year => MLB_LEAGUE_TOTALS[year].games / 30;
+  const z = values => {
+    const m = mean(values), sd = Math.sqrt(mean(values.map(v => (v - m) ** 2)));
+    return values.map(v => (sd ? (v - m) / sd : 0));
+  };
+  // Each season's z-scored measures by role, over its whole pool.
+  const folds = calibration.map(({ year, pool, matches }) => {
+    const roles = {};
+    for (const role of WAR_ROLES) {
+      const players = pool.filter(p => p.role === role);
+      const pooledOf = p => WINDOW.reduce((acc, w, k) => (p.use[k] == null ? acc
+        : { n: acc.n + w * p.use[k], x: acc.x + w * (p.war[k] ?? 0), u: acc.u + w * p.use[k] / perClub(year - k) }), { n: 0, x: 0, u: 0 });
+      const windows = players.map(pooledOf);
+      const both = players.filter(p => p.use[0] >= LEAST[role] && p.use[1] >= LEAST[role]);
+      const k = priorFromReliability(spearman(both.map(p => p.war[0] / p.use[0]), both.map(p => p.war[1] / p.use[1])),
+        mean(both.flatMap(p => [p.use[0], p.use[1]])));
+      const replacement = replacementRate(windows);
+      roles[role] = { ids: players.map(p => p.id), war: z(players.map(p => p.score)), selection: z(windows.map(w => w.u / 6)),
+        production: z(windows.map(w => shrunkRate(w, k, replacement))) };
+    }
+    return { year, matches, roles };
+  });
+  const referenceOfFolds = list => referenceOf(list.flatMap(f => f.matches.map(m => ({ role: WAR_ROLES.find(r => f.roles[r].ids.includes(m.season.id)), overall: m.overall }))));
+  const references = new Map(folds.map(f => [f.year, referenceOfFolds(folds.filter(o => o !== f))]));
+  // One role's (rating, overall) pairs over `list`, each fold rated against the reference without it (`against`).
+  const pairs = (list, role, valueOf, against) => {
+    const out = { rated: [], overall: [] };
+    for (const f of list) {
+      const { ids } = f.roles[role];
+      const ratings = rateByRank(ids.map((id, i) => ({ id, role, score: valueOf(f.roles[role], i) })), against(f), 30, 30 * (folds.length - 1));
+      for (const m of f.matches) if (ratings.has(m.season.id)) { out.rated.push(ratings.get(m.season.id)); out.overall.push(m.overall); }
+    }
+    return out;
+  };
+  const rho = ({ rated, overall }) => r3(spearman(rated, overall));
+  const own = f => references.get(f.year);
+  const single = key => Object.fromEntries(WAR_ROLES.map(role => [role, rho(pairs(folds, role, (r, i) => r[key][i], own))]));
+  // A blend's weight is tuned on the six seasons left in, by the rank correlation of its values (z-scores within each
+  // season) with the overalls of their cards, and the season left out is then rated by it.
+  const tuned = other => Object.fromEntries(WAR_ROLES.map(role => {
+    const held = { rated: [], overall: [] }, weights = [];
+    for (const f of folds) {
+      const rest = folds.filter(o => o !== f);
+      let best = null;
+      for (const w of GRID) {
+        const values = [], overall = [];
+        for (const g of rest) {
+          const r = g.roles[role], at = new Map(r.ids.map((id, i) => [id, i]));
+          for (const m of g.matches) if (at.has(m.season.id)) { const i = at.get(m.season.id); values.push(w * r.selection[i] + (1 - w) * r[other][i]); overall.push(m.overall); }
+        }
+        const score = spearman(values, overall);
+        if (!best || score > best.score + 1e-12) best = { w, score };
+      }
+      weights.push(best.w);
+      const one = pairs([f], role, (r, i) => best.w * r.selection[i] + (1 - best.w) * r[other][i], own);
+      held.rated.push(...one.rated); held.overall.push(...one.overall);
+    }
+    return [role, { spearman: rho(held), selectionWeight: [Math.min(...weights), Math.max(...weights)] }];
+  }));
+  return { war: single('war'), selection: single('selection'), production: single('production'),
+    productionAndSelection: tuned('production'), warAndSelection: tuned('war') };
+}
+
 // ---------- the snapshots ----------
 
 const SUFFIX = / (Jr\.|Sr\.|II|III|IV)$/;
@@ -344,8 +426,8 @@ function referenceText(doc) {
 }
 
 async function main() {
-  const check = process.argv.includes('--check');
-  const unknown = process.argv.slice(2).filter(arg => arg !== '--check');
+  const check = process.argv.includes('--check'), blend = process.argv.includes('--blend');
+  const unknown = process.argv.slice(2).filter(arg => arg !== '--check' && arg !== '--blend');
   if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
   const manifest = JSON.parse(await readFile(manifestFile, 'utf8'));
   const { method, sources } = manifest;
@@ -400,6 +482,20 @@ async function main() {
   const reference = referenceOf(calibration.flatMap(c => c.matches));
   const teamSeasons = method.calibration.clubs * calibration.length;
   const loso = leaveOneOut(calibration, records);
+  if (blend) {
+    const result = blendBacktest(calibration);
+    const row = (label, measure) => console.log(`  ${label.padEnd(44)} ${WAR_ROLES.map(role => {
+      const value = measure[role];
+      return typeof value === 'number' ? value.toFixed(3) : `${value.spearman.toFixed(3)} (w ${[...new Set(value.selectionWeight)].join('–')})`;
+    }).join('   ')}`);
+    console.log(`Each of ${calibration.map(c => c.year).join(', ')} left out, Spearman with MLB The Show's overall (${WAR_ROLES.join(', ')}):`);
+    row('WAR score (the rule the seasons use)', result.war);
+    row('selection only', result.selection);
+    row('production only (shrunk WAR rate)', result.production);
+    row('production and selection, w tuned', result.productionAndSelection);
+    row('WAR score and selection, w tuned', result.warAndSelection);
+    return;
+  }
   const referenceDoc = {
     note: 'The scale the computed seasons\' scores are mapped onto (npm run import:mlb-war; docs/design/baseball.md, "Seasons before 2018: computed from WAR"): the overalls of MLB The Show 18 to 24\'s Live cards matched to their season\'s WAR (by name, then role, then club), grouped by the role the WAR file gives the player, strongest first. `teamSeasons` is the club-seasons they come from. `leaveOneOut` rates each calibration season against the other six seasons\' reference and compares it with MLB The Show\'s own overalls, its own clubs (lineups built by the game\'s rule) and the real records (`winShare`, from the Baseball Databank, whose seasons end with 2022: null for 2023 and 2024).',
     years: method.calibration.years, teamSeasons,
