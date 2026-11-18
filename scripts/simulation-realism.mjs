@@ -49,6 +49,10 @@ import { onField, rugbyLeague, scoreKind, SLICE_MODEL } from '../src/sports/rugb
 import { BUILT_IN_RUGBY_LEAGUE_SEASONS } from '../src/data/rugbyLeagueSeasons.js';
 import { NRL_LEAGUE_AVERAGES } from '../src/data/nrlLeagueAverages.js';
 import { seasonClubs as nrlSeasonClubs } from './lib/nrl-league.mjs';
+import { CLUBS as UNION_CLUBS } from '../src/data/clubs.rugby-union.js';
+import { onField as unionOnField, rugbyUnion, scoreKind as unionScoreKind, SLICE_MODEL as UNION_SLICE_MODEL } from '../src/sports/rugbyUnion.js';
+import { realFigures as unionRealFigures } from './lib/rugby-union.mjs';
+import UNION_SNAPSHOT from './data/rugby-union-2025-26.json' with { type: 'json' };
 import { BUILT_IN_AMERICAN_FOOTBALL_SEASONS } from '../src/data/americanFootballSeasons.js';
 import { NFL_LEAGUE_AVERAGES } from '../src/data/nflLeagueAverages.js';
 
@@ -939,6 +943,50 @@ export function nrlSeason(seasons, seed, venue) {
   };
 }
 
+// ---- Rugby union (the Premiership, the Top 14, the URC) ----------------------------------------------------------------
+
+/**
+ * Each league's regular season, rounds a club: the Premiership's ten clubs play 18, the Top 14's fourteen 26, and the URC's
+ * twelve European clubs (its four South African sides play on no map) the URC's 18.
+ */
+export const UNION_LEAGUES = Object.freeze({ Premiership: 18, 'Top 14': 26, URC: 18 });
+
+/** Rugby union's three leagues, each its own clubs over its regular season, their games pooled; each league's spread. */
+export function unionSeason(seasons, seed, venue) {
+  const played = [], spreads = [], positions = new Map();
+  for (const [league, rounds] of Object.entries(UNION_LEAGUES)) {
+    const clubs = UNION_CLUBS.filter(c => c.league === league).map(c => buildClub(c, rugbyUnion));
+    const run = playSeasons({ sport: rugbyUnion, teams: clubs, games: rounds, seasons, seed: hashStr(`${seed}:${league}`), venue });
+    played.push(...run.played);
+    for (const { table } of run.tables) spreads.push(sd(table.map(t => (t.w + t.d / 2) / Math.max(1, t.w + t.d + t.l))));
+    // Each player's place: the fifteen by position, the replacements as the bench, as RugbyPass's team sheets count them.
+    for (const c of clubs) {
+      const { starters, bench } = unionOnField(selectLineup(c));
+      positions.set(c.id, new Map([...starters.map(slot => [slot.player.name, slot.position]), ...bench.map(slot => [slot.player.name, 'BENCH'])]));
+    }
+  }
+  const teamPoints = played.flatMap(g => [g.regA, g.regD]);
+  const margins = played.map(g => Math.abs(g.regA - g.regD));
+  const events = played.flatMap(g => g.ev).filter(e => e.m <= UNION_SLICE_MODEL.MINUTES);
+  const tries = events.filter(e => unionScoreKind(e) === 'try');
+  const tryShares = {};
+  for (const e of tries) {
+    const position = positions.get(e.tid).get(e.name) || 'other';
+    tryShares[position] = (tryShares[position] || 0) + 1 / tries.length;
+  }
+  return {
+    clubs: UNION_CLUBS.length, games: played.length,
+    pointsPerTeam: mean(teamPoints), teamPointsSd: sd(teamPoints), triesPerTeam: tries.length / teamPoints.length,
+    conversionRate: tries.filter(e => e.pts === 7).length / Math.max(1, tries.length),
+    penaltyGoalsPerTeam: events.filter(e => unionScoreKind(e) === 'penalty').length / teamPoints.length,
+    dropGoalsPerGame: events.filter(e => unionScoreKind(e) === 'field').length / played.length,
+    draws: share(played, g => g.tie), marginMean: mean(margins), byOneToSeven: share(margins, m => m > 0 && m <= 7),
+    byFifteenPlus: share(margins, m => m >= 15), byThirtyPlus: share(margins, m => m >= 30),
+    nilRate: share(teamPoints, p => p === 0), fortyPlusRate: share(teamPoints, p => p >= 40),
+    homeWins: share(played, g => g.winner === g.j), winPctSd: mean(spreads), favourite: favouriteRecord(played), tryShares,
+  };
+}
+
 /** The earlier NRL seasons played whole beside today's, each under its own rules (src/sports/rugbyLeague.js `rugbyLeagueIn`). */
 export const NRL_ERAS = Object.freeze(['nrl-1968', 'nrl-1977', 'nrl-1986', 'nrl-1995', 'nrl-2005']);
 
@@ -985,6 +1033,25 @@ function nrlEraSeason(id, seasons, seed, venue) {
  * Analyst, RSSSF and the NFL margin data for 1999–2025. Ranges marked "est." are estimates, not sourced figures; a
  * figure no source gave has no range and is reported only.
  */
+/**
+ * Rugby union's real figures: each the range of its three leagues' pooled seasons 2023/24–2025/26, computed from the
+ * committed snapshot (scripts/data/rugby-union-2025-26.json, scripts/lib/rugby-union.mjs `realFigures`), so a resync moves
+ * them with it. The model is tuned to 2025/26, the built-in season (`latest`).
+ */
+function unionReal() {
+  const seasons = unionRealFigures(UNION_SNAPSHOT);
+  const range = values => [Math.min(...values), Math.max(...values)].map(x => Math.round(x * 1000) / 1000);
+  const keys = ['pointsPerTeam', 'teamPointsSd', 'triesPerTeam', 'conversionRate', 'penaltyGoalsPerTeam', 'dropGoalsPerGame', 'draws', 'marginMean',
+    'byOneToSeven', 'byFifteenPlus', 'byThirtyPlus', 'nilRate', 'fortyPlusRate', 'homeWins', 'winPctSd'];
+  const places = [...new Set(seasons.flatMap(s => Object.keys(s.tryShares)))];
+  return {
+    note: "the Premiership, Top 14 and URC seasons 2023/24–2025/26, pooled, from RugbyPass's match centre (scripts/lib/rugby-union.mjs)",
+    ...Object.fromEntries(keys.map(key => [key, range(seasons.map(s => s[key]))])),
+    tryShares: Object.fromEntries(places.map(place => [place, range(seasons.map(s => s.tryShares[place] ?? 0))])),
+    latest: seasons[0],
+  };
+}
+
 export const REAL = Object.freeze({
   rocketLeague: rocketLeagueReal(),
   counterStrike: counterStrikeReal(),
@@ -1129,6 +1196,7 @@ export const REAL = Object.freeze({
     'fed-cup-three': { years: '1980–1994', decided: [0.576, 0.424], deciders: 0.238, reachedSixAll: 0.072, past: [0.386, 0.243, 0.371] },
     'fed-cup-five': { years: '1995–2017', decided: [0.385, 0.34, 0.275], deciders: 0.316, reachedSixAll: 0.103, past: [0.386, 0.243, 0.371] },
   },
+  union: unionReal(),
   nrl: {
     note: "NRL regular seasons 2021–2025, computed 2026-11-08 from every game in NRL.com's draw and match centre "
       + '(scripts/lib/nrl-seasons.mjs)',
@@ -1190,6 +1258,7 @@ export function realismReport({ seasons = 40, seed = 20261101, home = false } = 
     nhlEras: NHL_ERAS.map(id => nhlEraSeason(id, seasons, hashStr(`${seed}:${id}`), venue)),
     davisCup: davisCup(seasons, hashStr(`${seed}:davis-cup`), venue),
     billieJeanKingCup: davisCup(seasons, hashStr(`${seed}:billie-jean-king-cup`), venue, womensTennis),
+    union: unionSeason(seasons, hashStr(`${seed}:union`), venue),
     nrl: nrlSeason(seasons, hashStr(`${seed}:nrl`), venue),
     nrlEras: NRL_ERAS.map(id => nrlEraSeason(id, seasons, hashStr(`${seed}:${id}`), venue)),
     rocketLeague: rlcs(seasons, hashStr(`${seed}:rocket-league`), venue),
@@ -1480,6 +1549,27 @@ EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
     }
     lines.push(row('favourite wins', lol.favourite.wins, null, pct));
     lines.push(row('home (defending) side wins', lol.homeWins, null, pct));
+  }
+  const u = report.union, ur = REAL.union;
+  lines.push(`\nRugby union — ${u.clubs} clubs, three leagues (real: ${ur.note})`);
+  lines.push(row('points a team', u.pointsPerTeam, ur.pointsPerTeam, x => num(x, 1)));
+  lines.push(row('team points SD', u.teamPointsSd, ur.teamPointsSd, x => num(x, 1)));
+  lines.push(row('tries a team', u.triesPerTeam, ur.triesPerTeam));
+  lines.push(row('conversions made', u.conversionRate, ur.conversionRate, pct));
+  lines.push(row('penalty goals a team', u.penaltyGoalsPerTeam, ur.penaltyGoalsPerTeam));
+  lines.push(row('drop goals a game', u.dropGoalsPerGame, ur.dropGoalsPerGame, x => num(x, 3)));
+  lines.push(row('level after eighty', u.draws, ur.draws, pct));
+  lines.push(row('mean margin', u.marginMean, ur.marginMean, x => num(x, 1)));
+  lines.push(row('won by 1–7', u.byOneToSeven, ur.byOneToSeven, pct));
+  lines.push(row('won by 15 or more', u.byFifteenPlus, ur.byFifteenPlus, pct));
+  lines.push(row('won by 30 or more', u.byThirtyPlus, ur.byThirtyPlus, pct));
+  lines.push(row('nil (per team game)', u.nilRate, ur.nilRate, pct));
+  lines.push(row('40 or more (per team game)', u.fortyPlusRate, ur.fortyPlusRate, pct));
+  lines.push(row('home (defending) side wins', u.homeWins, ur.homeWins, pct));
+  lines.push(row('win% SD', u.winPctSd, ur.winPctSd, x => num(x, 3)));
+  lines.push(row('favourite wins', u.favourite.wins, null, pct));
+  for (const position of ['WG', 'CE', 'FB', 'FL', 'N8', 'HK', 'SH', 'LK', 'PR', 'FH', 'BENCH']) {
+    lines.push(row(`tries by ${position}`, u.tryShares[position] || 0, ur.tryShares[position], pct));
   }
   const r = report.nrl, rr = REAL.nrl;
   lines.push(`\nNRL — ${r.clubs} clubs, ${NRL_GAMES} games (real: ${rr.note})`);

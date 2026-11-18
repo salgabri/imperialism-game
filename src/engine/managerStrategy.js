@@ -23,6 +23,9 @@ const SUPPORT = {
   // The outside backs and halves make tries, the forwards and centres stop them; a hooker does both.
   'rugby-league': { FB: [1, .4], WG: [1, .2], CE: [.65, .65], FE: [1, .3], HB: [1, .3], HK: [.5, .6], PR: [.2, 1], SR: [.4, 1],
     LK: [.3, 1] },
+  // Rugby union's backs and halves make tries, its pack wins the ball and stops them; a number eight and a hooker do both.
+  'rugby-union': { PR: [.2, 1], HK: [.4, .8], LK: [.3, 1], FL: [.4, 1], N8: [.5, .9], SH: [.9, .4], FH: [1, .3], CE: [.7, .6],
+    WG: [1, .2], FB: [1, .4] },
   basketball: { PG: [.75, .25], SG: [1, 0], SF: [1, .4], PF: [0, 1], C: [0, 1] },
   'american-football': GRIDIRON_SUPPORT,
   // College football's squads are the NFL's shape.

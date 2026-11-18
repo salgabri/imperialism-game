@@ -7,6 +7,7 @@ import { estimateTitle, isEstimated } from '../data/estimates.js';
 import { BENCH } from '../sports/basketball.js';
 import { PERIOD_MODEL } from '../sports/hockey.js';
 import { scoreKind } from '../sports/rugbyLeague.js';
+import { scoreKind as unionScoreKind } from '../sports/rugbyUnion.js';
 import { liveModelFor } from '../engine/winProbability.js';
 import { roman, historyRound, formatOddsPair, ratingTier, shortName, memo } from './format.js';
 import { idleTurnCopy } from './turns.js';
@@ -21,6 +22,7 @@ const GROUPS = {
   tennis: ['SGL', 'DBL'],
   'womens-tennis': ['SGL', 'DBL'],
   'rugby-league': ['FB', 'WG', 'CE', 'FE', 'HB', 'PR', 'HK', 'SR', 'LK'],
+  'rugby-union': ['PR', 'HK', 'LK', 'FL', 'N8', 'SH', 'FH', 'CE', 'WG', 'FB'],
   'rocket-league': ['PLR'],
   'counter-strike': ['PLR'],
   valorant: ['PLR'],
@@ -81,20 +83,22 @@ export function scorersLine(shown, teamId, teams, sport = 'football') {
     for (const e of own) if (shootoutAt == null || Number(e.m) < shootoutAt) totals.set(e.name, (totals.get(e.name) || 0) + 1);
     return [...totals.entries()].sort((x, y) => y[1] - x[1]).slice(0, 2).map(([name, goals]) => `${shortName(name)} ${goals} G`).join(' · ');
   }
-  if (sportId === 'rugby-league') {
-    // Each kind of score at its season's points (a try three and a field goal two in the 1960s), today's unless told.
+  if (sportId === 'rugby-league' || sportId === 'rugby-union') {
+    // Each kind of score at its season's points (a try three and a field goal two in the 1960s), today's unless told. A
+    // union side's drop goal reads DG, rugby league's field goal FG.
     const values = (typeof sport === 'object' && sport?.scoreValues) || getSport(sportId).scoreValues;
+    const kindOf = sportId === 'rugby-union' ? unionScoreKind : scoreKind, kick = sportId === 'rugby-union' ? 'DG' : 'FG';
     const totals = new Map();
     for (const e of own) {
       const row = totals.get(e.name) || { pts: 0, tries: 0, penalty: 0, field: 0 };
-      const kind = scoreKind(e);
+      const kind = kindOf(e);
       if (kind === 'try') row.tries++; else if (kind === 'penalty') row.penalty++; else row.field++;
       row.pts += values[kind];
       totals.set(e.name, row);
     }
     return [...totals.entries()].sort((x, y) => y[1].pts - x[1].pts).slice(0, 2)
       .map(([name, { tries, penalty, field }]) => `${shortName(name)} ${[tries && `${tries} ${tries === 1 ? 'try' : 'tries'}`, penalty && `${penalty} PG`,
-        field && `${field} FG`].filter(Boolean).join(', ')}`).join(' · ');
+        field && `${field} ${kick}`].filter(Boolean).join(', ')}`).join(' · ');
   }
   if (sportId === 'baseball') {
     const totals = new Map();

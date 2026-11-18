@@ -14,6 +14,8 @@ import { ROSTERS as HOCKEY } from '../data/rosters.hockey.js';
 import { CLUBS as NHL_CLUBS } from '../data/clubs.hockey.js';
 import { ROSTERS as TENNIS } from '../data/rosters.tennis.js';
 import { ROSTERS as WOMENS_TENNIS } from '../data/rosters.womens-tennis.js';
+import { ROSTERS as RUGBY_UNION } from '../data/rosters.rugby-union.js';
+import { CLUBS as RUGBY_UNION_CLUBS } from '../data/clubs.rugby-union.js';
 import { ROSTERS as RUGBY_LEAGUE } from '../data/rosters.rugby-league.js';
 import { CLUBS as NRL_CLUBS } from '../data/clubs.rugby-league.js';
 import { ROSTERS as ROCKET_LEAGUE } from '../data/rosters.rocket-league.js';
@@ -32,6 +34,7 @@ export const EAGER = {
   hockey: { rosters: HOCKEY, clubs: NHL_CLUBS },
   tennis: { rosters: TENNIS },
   'womens-tennis': { rosters: WOMENS_TENNIS },
+  'rugby-union': { rosters: RUGBY_UNION, clubs: RUGBY_UNION_CLUBS },
   'rugby-league': { rosters: RUGBY_LEAGUE, clubs: NRL_CLUBS },
   'rocket-league': { rosters: ROCKET_LEAGUE },
   'counter-strike': { rosters: COUNTER_STRIKE },

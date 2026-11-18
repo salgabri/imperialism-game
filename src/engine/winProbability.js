@@ -90,6 +90,11 @@
 //   one's level end left to the deciding field goal). Match-day form, which moves both try rates, is integrated over its
 //   normal spread with seven-point Gauss–Hermite quadrature.
 //
+// Rugby union ("Rugby"; `code: 'union'`) — the same tables from its own model's slices (src/sports/rugbyUnion.js): a try
+//   five points, seven converted at its own rate, a penalty goal and a drop goal three, its own score effects
+//   (sliceMeans), and level after eighty its sudden-death extra time, whose first score wins and whose last quarter ends
+//   with a drop goal (goldenRate, deciderOdds).
+//
 // Rocket League — exact, from the model's own games (src/sports/rocketLeague.js): a series is best of seven, each game won
 //   with Elo's odds for the gap (gameOdds) and played in ten thirty-second slices at the rates that make it so (gameRates,
 //   at an earlier season's goal rate where the model names one), with the sport's late game (sliceMeans) and sudden-death
@@ -131,6 +136,8 @@ import { collegeAnswer, collegeOvertimeOdds, DRIVE_MODEL, driveMoments, driveOdd
 import { INNING_MODEL, inningOdds, runMasses } from '../sports/baseball.js';
 import { lateOf, overtimeMeans, PERIOD_MODEL, shootoutOdds, sliceMeans } from '../sports/hockey.js';
 import { deciderOdds, extraSlice, goldenRate, POINTS, RULES_TODAY as RUGBY_TODAY, SLICE_MODEL, sliceMeans as rugbySliceMeans } from '../sports/rugbyLeague.js';
+import { deciderOdds as unionDeciderOdds, goldenRate as unionGoldenRate, POINTS as UNION_POINTS, RULES_TODAY as UNION_TODAY,
+  SLICE_MODEL as UNION_SLICE_MODEL, sliceMeans as unionSliceMeans } from '../sports/rugbyUnion.js';
 import { bestOfFive, bestOfThree, daySetChances, matchOdds, RUBBER_MODEL } from '../sports/tennis.js';
 import { chanceFrom, gameOdds, gameRates, gameTable, overtimeOdds, SERIES_MODEL } from '../sports/rocketLeague.js';
 import { mapChance, mapOdds, mapState, mapTable, MAPS_MODEL, roundsChance, strengthFor } from '../sports/counterStrike.js';
@@ -290,6 +297,15 @@ export function liveModelFor(sport, attacker, defender, effA, effD, drama, home 
       kind: 'innings', edgeA: num(prepared.edgeA), edgeD: num(prepared.edgeD), formSd: variation * INNING_MODEL.FORM_PER_DRAMA,
       length: INNING_MODEL.LENGTH, ot: INNING_MODEL.INNING, maxOt: rules ? rules.maxExtra : INNING_MODEL.MAX_EXTRA,
       ...(rules ? { score: rules.score, extra: rules.extra, more: rules.more } : {}),
+    };
+  }
+  if (model.tieBreak === 'overtime' && positive(prepared.triesA) && positive(prepared.triesD) && prepared.code === 'union') {
+    // Rugby union (src/sports/rugbyUnion.js): its own points, kicks and sudden-death extra time, one season's.
+    const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
+    return {
+      kind: 'tries', code: 'union', triesA: num(prepared.triesA), triesD: num(prepared.triesD), golden: num(prepared.golden) || 0,
+      formSd: UNION_SLICE_MODEL.FORM_AT_BALANCED * (variation / 6) ** 2, length: UNION_SLICE_MODEL.MINUTES,
+      ot: UNION_SLICE_MODEL.GOLDEN, maxOt: UNION_SLICE_MODEL.MAX_GOLDEN,
     };
   }
   if (model.tieBreak === 'overtime' && positive(prepared.triesA) && positive(prepared.triesD)) {
@@ -560,7 +576,9 @@ export function isLiveModel(model) {
         && model.points.every(value => Number.isInteger(value) && value >= 1 && value <= 4)
         && Array.isArray(model.kicks) && model.kicks.length === 3
         && model.kicks.every(value => typeof value === 'number' && Number.isFinite(value) && value >= 0) && model.kicks[1] <= 1))
-      && (model.extra === undefined || (model.extra === true && era.length === 2));
+      && (model.extra === undefined || (model.extra === true && era.length === 2))
+      // Rugby union's model is one season's: no era of its own.
+      && (model.code === undefined || (model.code === 'union' && era.length === 0 && model.extra === undefined));
   }
   if (model.kind === 'series') {
     return ['gap', 'formSd', 'length', 'ot'].every(finite) && model.formSd >= 0 && model.length > 0 && model.ot > 0
@@ -997,6 +1015,17 @@ const POINTS_CAP = 72;
 const SLICE_POINTS = 40;
 const tryTables = new WeakMap();
 
+/**
+ * The two rugby codes' slice models: rugby league's (a model with no `code`) and rugby union's (`code: 'union'`), each its
+ * own score effects, points, conversion rate, sudden-death rate and last kick.
+ */
+const RUGBY_CODES = Object.freeze({
+  league: Object.freeze({ sliceMeans: rugbySliceMeans, goldenRate, deciderOdds, points: POINTS, conversion: SLICE_MODEL.CONVERSION_RATE, today: RUGBY_TODAY }),
+  union: Object.freeze({ sliceMeans: unionSliceMeans, goldenRate: unionGoldenRate, deciderOdds: unionDeciderOdds, points: UNION_POINTS,
+    conversion: UNION_SLICE_MODEL.CONVERSION_RATE, today: UNION_TODAY }),
+});
+const rugbyCode = model => (model.code === 'union' ? RUGBY_CODES.union : RUGBY_CODES.league);
+
 /** Poisson(λ) masses for 0…cap, the last one holding the rest. */
 function poissonMasses(lambda, cap) {
   const masses = new Array(cap + 1).fill(0);
@@ -1016,21 +1045,21 @@ function poissonMasses(lambda, cap) {
  * `left`, the share of the slice still to play. A try and a field goal count at `rules`' points: a try three before 1983,
  * a field goal two before 1971.
  */
-function slicePoints({ tries, penalties, fieldGoals, open = 0 }, left, rules = RUGBY_TODAY) {
+function slicePoints({ tries, penalties, fieldGoals, open = 0 }, left, rules = RUGBY_TODAY, code = RUGBY_CODES.league) {
   const points = new Array(SLICE_POINTS + 1).fill(0);
   const tryMasses = poissonMasses(tries * left, 8), penaltyMasses = poissonMasses(penalties * left, 6);
   const openMasses = open > 0 ? poissonMasses(open * left, 4) : [1];
-  const convert = SLICE_MODEL.CONVERSION_RATE, field = clamp01(fieldGoals * left), kick = rules.fieldGoalPoints;
+  const convert = code.conversion, field = clamp01(fieldGoals * left), kick = rules.fieldGoalPoints;
   for (let k = 0; k < tryMasses.length; k++) {
     if (!tryMasses[k]) continue;
     // k tries, c of them converted: Binomial(k, convert).
     let binomial = (1 - convert) ** k;
     for (let c = 0; c <= k; c++) {
-      const fromTries = rules.tryPoints * k + POINTS.CONVERSION * c;
+      const fromTries = rules.tryPoints * k + code.points.CONVERSION * c;
       for (let j = 0; j < penaltyMasses.length; j++) {
         for (let o = 0; o < openMasses.length; o++) {
           const base = tryMasses[k] * binomial * penaltyMasses[j] * openMasses[o];
-          const at = fromTries + POINTS.PENALTY_GOAL * j + kick * o;
+          const at = fromTries + code.points.PENALTY_GOAL * j + kick * o;
           points[Math.min(SLICE_POINTS, at)] += base * (1 - field);
           points[Math.min(SLICE_POINTS, at + kick)] += base * field;
         }
@@ -1061,7 +1090,7 @@ function goldenChance(node, halves, left) {
 
 /** A rugby league model's rules: an earlier season's points and kicks (`points`, `kicks`, `extra`), else today's. */
 function rugbyRules(model) {
-  if (!model.points) return RUGBY_TODAY;
+  if (!model.points) return rugbyCode(model).today;
   const [tryPoints, fieldGoalPoints] = model.points, [penalties, fieldGoals, openFieldGoals] = model.kicks;
   return { ...RUGBY_TODAY, tryPoints, fieldGoalPoints, penalties, fieldGoals, openFieldGoals, golden: !model.extra };
 }
@@ -1076,14 +1105,14 @@ function rugbyRules(model) {
 function rugbyTables(model) {
   if (tryTables.has(model)) return tryTables.get(model);
   const { SLICES, EXTRA_SLICES } = SLICE_MODEL;
-  const rules = rugbyRules(model);
-  const decider = deciderOdds(model.golden);
+  const rules = rugbyRules(model), code = rugbyCode(model);
+  const decider = code.deciderOdds(model.golden);
   const end = SLICES + (model.extra ? EXTRA_SLICES * model.maxOt : 0);
   const margins = fill => Array.from({ length: 2 * POINTS_CAP + 1 }, (_, i) => fill(i - POINTS_CAP));
   const nodes = HERMITE.map(([t, weight]) => {
     const form = Math.exp(t * model.formSd);
     const triesA = model.triesA * form, triesD = model.triesD / form;
-    const node = { weight, triesA, triesD, goldenA: goldenRate(triesA), goldenD: goldenRate(triesD), decider, rules, from: new Array(end + 1),
+    const node = { weight, triesA, triesD, goldenA: code.goldenRate(triesA), goldenD: code.goldenRate(triesD), decider, rules, code, from: new Array(end + 1),
       deltas: new Map() };
     node.from[end] = margins(margin => step(margin, model.extra ? decider : goldenChance(node, model.maxOt, 1)));
     for (let s = end - 1; s >= SLICES; s--) {
@@ -1106,11 +1135,11 @@ function rugbyTables(model) {
 function tryChance(node, s, margin, left) {
   const { SLICES, EXTRA_SLICES } = SLICE_MODEL;
   const at = s < SLICES ? s : extraSlice((s - SLICES) % EXTRA_SLICES);
-  const a = rugbySliceMeans(node.triesA, margin, at, node.rules), d = rugbySliceMeans(node.triesD, -margin, at, node.rules);
+  const a = node.code.sliceMeans(node.triesA, margin, at, node.rules), d = node.code.sliceMeans(node.triesD, -margin, at, node.rules);
   const key = `${at}|${left}|${a.tries}|${a.penalties}|${a.fieldGoals}|${a.open}|${d.tries}|${d.penalties}|${d.fieldGoals}|${d.open}`;
   let delta = node.deltas.get(key);
   if (!delta) {
-    delta = marginMasses(slicePoints(a, left, node.rules), slicePoints(d, left, node.rules));
+    delta = marginMasses(slicePoints(a, left, node.rules, node.code), slicePoints(d, left, node.rules, node.code));
     node.deltas.set(key, delta);
   }
   const next = node.from[s + 1];

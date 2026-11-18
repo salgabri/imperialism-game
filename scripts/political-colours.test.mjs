@@ -19,6 +19,7 @@ import { CLUBS as NFL } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB } from '../src/data/clubs.baseball.js';
 import { CLUBS as NHL } from '../src/data/clubs.hockey.js';
 import { CLUBS as NRL } from '../src/data/clubs.rugby-league.js';
+import { CLUBS as RUGBY_UNION } from '../src/data/clubs.rugby-union.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { SEASON_COUNTRY_MAPS } from '../src/data/domesticScope.js';
 import { WorldGeometry } from '../src/engine/geo.js';
@@ -145,7 +146,7 @@ test('every correction names a club the game ships', () => {
   const countryMapClubs = SEASON_COUNTRY_MAPS.flatMap(entry => JSON.parse(readFileSync(new URL(`../public/domestic/${entry.id}.json`, import.meta.url), 'utf8')).clubs);
   const euroleague = JSON.parse(readFileSync(new URL('./data/euroleague-teams.json', import.meta.url), 'utf8'));
   const pastEuroleague = [...Object.values(euroleague.history), ...Object.values(euroleague.eras).flat()];
-  const ids = new Set([...CLUBS, ...NBA, ...EUROLEAGUE, ...NFL, ...MLB, ...NHL, ...NRL, ...seasonClubs, ...countryMapClubs, ...pastEuroleague].map(club => club.id));
+  const ids = new Set([...CLUBS, ...NBA, ...EUROLEAGUE, ...NFL, ...MLB, ...NHL, ...NRL, ...RUGBY_UNION, ...seasonClubs, ...countryMapClubs, ...pastEuroleague].map(club => club.id));
   for (const [id, colour] of Object.entries(colours)) {
     assert.ok(ids.has(id) || /^d[0-9A-Za-z]+-\d+$/.test(id), id);
     assert.equal(clubColour(id), colour.toLowerCase(), `${id} applied`);

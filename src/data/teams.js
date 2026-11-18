@@ -390,13 +390,19 @@ export function buildTeam(id, rng, sport) {
     for (const slot of selectLineup({ sport: sport.id, squad }).slots) {
       if (!slot.player || slot.outOfPosition) squad.push(genPlayer(rng, culture, slot.position, str));
     }
-  } else if (sport.id === 'hockey' || sport.id === 'rugby-league') {
+  } else if (sport.id === 'hockey' || sport.id === 'rugby-league' || sport.id === 'rugby-union') {
     // As in baseball, except that a move within a group is no gap (a forward on another forward's line; in rugby league
-    // a back to another outside place, a forward round the pack, a centre to the second row): only a place left empty,
-    // or held by a player out of his own group, gets a generated player.
+    // a back to another outside place, a forward round the pack, a centre to the second row; in rugby union a flanker at
+    // number eight, a lock in the back row, a fly-half at centre): only a place left empty, or held by a player out of
+    // his own group, gets a generated player.
     const gap = sport.id === 'hockey' ? outOfPositionPenalty(sport.id) : RUGBY_NEAR_PENALTY;
-    for (const slot of selectLineup({ sport: sport.id, squad }).slots) {
-      if (!slot.player || slot.penalty > gap) squad.push(genPlayer(rng, culture, slot.position, str));
+    // Rugby union looks again once the fill is in: picked anew, the lineup can move a real player out of his group to make
+    // room (a prop to lock, once the backs it lacked arrive), so it fills until none is, a few rounds at most. Hockey and
+    // rugby league fill once, as they always have.
+    for (let round = 0; round < (sport.id === 'rugby-union' ? 4 : 1); round++) {
+      const gaps = selectLineup({ sport: sport.id, squad }).slots.filter(slot => !slot.player || slot.penalty > gap);
+      if (!gaps.length) break;
+      for (const slot of gaps) squad.push(genPlayer(rng, culture, slot.position, str));
     }
   } else if (!REAL_PLAYERS_ONLY.has(sport.id)) {
     const have = p => squad.filter(x => x.pos === p).length;
@@ -459,7 +465,8 @@ export const OUT_OF_POSITION_PENALTY = 12;
 // league back between the outside places, or a forward round the pack (RUGBY_UNIT below). A League of Legends player out of
 // his role (a mid laner at support) plays a champion pool and a lane he does not know: a professional is not a club player
 // there, but he is far from his best.
-const PENALTY_OF = { 'american-football': 25, 'college-football': 25, baseball: 20, hockey: 4, 'rugby-league': 4, 'league-of-legends': 15 };
+const PENALTY_OF = { 'american-football': 25, 'college-football': 25, baseball: 20, hockey: 4, 'rugby-league': 4, 'rugby-union': 4,
+  'league-of-legends': 15 };
 /** Rating points a starter loses outside his natural positions, in a sport ('football', 'basketball', …). */
 export const outOfPositionPenalty = sportId => PENALTY_OF[sportId] ?? OUT_OF_POSITION_PENALTY;
 // A baseball hitter on the mound, or a pitcher in the field or at the plate, is no rotation at all. Nor is a hockey
@@ -480,6 +487,20 @@ const RUGBY_NEAR = new Set(['CE>SR', 'SR>CE', 'FE>FB', 'HB>FB', 'FB>FE', 'FE>HK'
   'HK>LK', 'PR>HK', 'SR>HK', 'LK>HK']);
 export const RUGBY_NEAR_PENALTY = 8;
 export const RUGBY_CROSSING_PENALTY = 15;
+// Rugby union's units: the props, the hooker, the locks, the back row, each half, the centres and the back three. A move
+// within a unit costs the sport's 4 points (a flanker at number eight, a wing at fullback); these moves between units are
+// common and cost 8 (a lock in the back row, a prop and a hooker covering each other, a fly-half at centre or fullback, a
+// centre on the wing, the halves swapping); any other, a wing in the front row, say, is an emergency.
+const UNION_UNIT = { PR: 'prop', HK: 'hooker', LK: 'lock', FL: 'backrow', N8: 'backrow', SH: 'scrumhalf', FH: 'flyhalf', CE: 'centre',
+  WG: 'back3', FB: 'back3' };
+const UNION_NEAR = new Set(['LK>FL', 'FL>LK', 'LK>N8', 'N8>LK', 'HK>PR', 'PR>HK', 'FH>CE', 'CE>FH', 'FH>FB', 'FB>FH', 'CE>WG', 'WG>CE',
+  'CE>FB', 'FB>CE', 'SH>FH', 'FH>SH']);
+// Union's places are more specialised than league's: a move beyond a player's unit and the near moves above (a prop at
+// lock, a wing at fly-half, a prop at centre) costs 25, so the lineup takes a generated player of the nation's level
+// before it.
+export const UNION_CROSSING_PENALTY = 25;
+// Codes only rugby union uses: a squad holding one is union's, whatever it shares with rugby league (PR, HK, LK, CE, WG, FB).
+const UNION_ONLY = new Set(['FL', 'N8', 'SH', 'FH']);
 /** The sports played by tennis's rules: the men's Davis Cup and the women's Billie Jean King Cup (src/sports/tennis.js). */
 export const TENNIS_SPORTS = Object.freeze(['tennis', 'womens-tennis']);
 /** Whether a sport id plays tennis's lineup, squad and match views: the men's game or the women's. */
@@ -514,6 +535,11 @@ const LINEUP_PLANS = {
   // The matchday 17: the thirteen (fullback, wings, centres, halves, the front row, the back row) and an interchange bench
   // of a utility hooker, two props and a lock.
   'rugby-league': ['FB', 'WG', 'WG', 'CE', 'CE', 'FE', 'HB', 'PR', 'HK', 'PR', 'SR', 'SR', 'LK', 'HK', 'PR', 'PR', 'LK'],
+  // Rugby union's matchday 23: the fifteen by their numbers (the front row, the locks, the back row, the halves, a wing,
+  // the centres, the other wing and the fullback) and eight replacements: a hooker, two props, a lock, a back-rower, a
+  // scrum-half, a fly-half and a centre.
+  'rugby-union': ['PR', 'HK', 'PR', 'LK', 'LK', 'FL', 'FL', 'N8', 'SH', 'FH', 'WG', 'CE', 'CE', 'WG', 'FB', 'HK', 'PR', 'PR', 'LK', 'FL',
+    'SH', 'FH', 'CE'],
   // Rocket League's three, who rotate through every place on the field: no positions, so nobody is ever out of one.
   'rocket-league': ['PLR', 'PLR', 'PLR'],
   // Counter-Strike's five, each of whom plays every role a round asks of him: no positions either.
@@ -550,6 +576,12 @@ function slotPenalty(sportId, player, position) {
       : RUGBY_NEAR.has(`${code}>${position}`) ? RUGBY_NEAR_PENALTY : RUGBY_CROSSING_PENALTY);
     return own.length ? Math.min(...own.map(cost)) : RUGBY_CROSSING_PENALTY;
   }
+  if (sportId === 'rugby-union') {
+    const own = [player.pos, ...(player.positions || [])].filter(code => UNION_UNIT[code]);
+    const cost = code => (UNION_UNIT[code] === UNION_UNIT[position] ? outOfPositionPenalty(sportId)
+      : UNION_NEAR.has(`${code}>${position}`) ? RUGBY_NEAR_PENALTY : UNION_CROSSING_PENALTY);
+    return own.length ? Math.min(...own.map(cost)) : UNION_CROSSING_PENALTY;
+  }
   return outOfPositionPenalty(sportId);
 }
 
@@ -561,6 +593,8 @@ export function teamSportId(team) {
   if (team?.squad?.some(player => player.pos === 'PLR')) return 'rocket-league';
   if (team?.squad?.some(player => LOL_POSITIONS.has(player.pos))) return 'league-of-legends';
   if (team?.squad?.some(player => BASEBALL_POSITIONS.has(player.pos))) return 'baseball';
+  // Rugby union always carries its sport (no save predates it); a squad with one of its own codes is union's.
+  if (team?.squad?.some(player => UNION_ONLY.has(player.pos))) return 'rugby-union';
   // Rugby league's codes are its own.
   if (team?.squad?.some(player => RUGBY_POSITIONS.has(player.pos))) return 'rugby-league';
   // Basketball's centre and the offensive line never share a code: 'C' is basketball's, 'OL' American football's.
@@ -706,6 +740,13 @@ export const EUROBASKET_2025 = Object.freeze(['428', '688', '792', '203', '233',
 const EUROBASKET = new Set(EUROBASKET_2025);
 
 /**
+ * The Six Nations Championship's sides, rugby union's own European theatre: England (826), France, Ireland (the whole
+ * island, as rugby union plays it), Italy, Scotland and Wales.
+ */
+export const SIX_NATIONS = Object.freeze(['826', '250', '372', '380', 'SCO', 'WAL']);
+const SIX_NATIONS_SET = new Set(SIX_NATIONS);
+
+/**
  * Nation theatres. One naming `sports` is offered in those sports only, the rest in every sport; each only where its sport
  * is played (data/scopes.js `nationTheatres`).
  */
@@ -714,6 +755,8 @@ export const SCOPES = [
   { id: 'UEFA', name: 'Europe', desc: 'UEFA members battle for the continent.', filter: t => t.conf === 'UEFA' },
   { id: 'eurobasket', name: 'EuroBasket', desc: 'The 24 nations of EuroBasket 2025, the European Championship.', filter: t => EUROBASKET.has(t.id),
     sports: Object.freeze(['basketball']) },
+  { id: 'six-nations', name: 'Six Nations', desc: 'England, France, Ireland, Italy, Scotland and Wales: the Six Nations Championship.',
+    filter: t => SIX_NATIONS_SET.has(t.id), sports: Object.freeze(['rugby-union']) },
   { id: 'CONMEBOL', name: 'South America', desc: 'CONMEBOL. Ten nations, one crown.', filter: t => t.conf === 'CONMEBOL' },
   { id: 'CAF', name: 'Africa', desc: 'CAF, the deepest map in the game.', filter: t => t.conf === 'CAF' },
   { id: 'AFC', name: 'Asia & Oceania*', desc: 'AFC plus OFC — the whole east.', filter: t => t.conf === 'AFC' || t.conf === 'OFC' },
@@ -721,5 +764,5 @@ export const SCOPES = [
   { id: 'elite', name: 'Elite 32', desc: 'The 32 strongest nations on Earth.', filter: null }, // handled specially
 ];
 
-/** Whether a nation theatre is a European one, framed on the continent: the UEFA members, or EuroBasket's field. */
-export const isEuropeanScope = scope => scope === 'UEFA' || scope === 'eurobasket';
+/** Whether a nation theatre is a European one, framed on the continent: the UEFA members, EuroBasket's or the Six Nations' field. */
+export const isEuropeanScope = scope => scope === 'UEFA' || scope === 'eurobasket' || scope === 'six-nations';

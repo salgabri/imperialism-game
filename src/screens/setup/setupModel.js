@@ -390,6 +390,12 @@ export const SEASON_NOTES = Object.freeze({
     + 'players\' statistics, not a game\'s ratings: to 2009/10 from the Hockey Databank, after from MoneyPuck.com, each '
     + 'club then moved by its results that season. Clubs play on the map of their day. Nations field the NHL players of '
     + 'each country, only where they hold at least half the lineup, and none before 1977/78.',
+  'rugby-union': 'No game publishes rugby union ratings, so every rating here is computed and marked as an estimate: from '
+    + 'RugbyPass\'s team sheets and match stats of 2023/24 to 2025/26, each player\'s share of his club\'s minutes, his Test '
+    + 'minutes and his production (scored by the points table of the Six Nations\' own game for fans), ranked within his position, each club '
+    + 'then moved by its 2025/26 results and each nation by its Tests. The 2025/26 season: the Premiership\'s, the Top 14\'s '
+    + 'and the URC\'s European clubs, each on its own country\'s land. Nations field these clubs\' players (the URC\'s four '
+    + 'South African sides among them) by their latest Test side, only where they hold at least half a matchday 23.',
   'rugby-league': 'Rugby League 26 ratings from Big Ant Studios, as Zero Tackle listed them at the game\'s release in '
     + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace, and only where they hold at '
     + 'least half a matchday 17. No game rated 1960–2007 or 2009–2024: they are computed, each player\'s NRL.com match '
@@ -628,6 +634,7 @@ export const SPORT_NOTES = Object.freeze({
   hockey: 'Nations · 32 NHL clubs',
   tennis: 'Nations',
   'womens-tennis': 'Nations',
+  'rugby-union': 'Nations · 36 clubs from 3 leagues',
   'rugby-league': 'Nations · 17 NRL clubs',
   'rocket-league': 'Nations',
   'counter-strike': 'Nations',

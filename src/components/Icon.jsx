@@ -39,6 +39,8 @@ const PATHS = {
   // A racket, its strings crossed, and a ball. Women's tennis plays with the same racket.
   tennis: <><ellipse cx="9.5" cy="9.5" rx="5.2" ry="6.4" transform="rotate(-45 9.5 9.5)" /><path d="M13.2 13.2 20 20M6.6 9.5h5.8M9.5 6.6v5.8" /><circle cx="18.5" cy="5.5" r="2" /></>,
   'womens-tennis': <><ellipse cx="9.5" cy="9.5" rx="5.2" ry="6.4" transform="rotate(-45 9.5 9.5)" /><path d="M13.2 13.2 20 20M6.6 9.5h5.8M9.5 6.6v5.8" /><circle cx="18.5" cy="5.5" r="2" /></>,
+  // Rugby union's ball: its oval, the seam along it and the laces across.
+  'rugby-union': <><ellipse cx="12" cy="12" rx="9.4" ry="5.4" transform="rotate(-45 12 12)" /><path d="M6.6 17.4 17.4 6.6M9.75 12.55l1.7 1.7M11.15 11.15l1.7 1.7M12.55 9.75l1.7 1.7" /></>,
   // The H of the posts, and a ball going over the crossbar.
   'rugby-league': <><path d="M7 3v18M17 3v18M7 14h10" /><ellipse cx="12" cy="8" rx="3.6" ry="2.3" transform="rotate(-30 12 8)" /></>,
   // A car side on, nose to the right, and the ball above it.

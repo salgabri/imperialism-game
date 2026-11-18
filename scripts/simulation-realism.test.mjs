@@ -188,6 +188,21 @@ test('NRL eras: each earlier season scores as its league did, under its own day\
   }
 });
 
+test('rugby union: the three leagues\' points, tries, kicks, draws and who scores the tries', () => {
+  // REAL.union is computed from the committed RugbyPass snapshot (scripts/lib/rugby-union.mjs `realFigures`). The margins
+  // and the table are checked with Home advantage on, as the leagues play (below); games won by seven or fewer and teams held
+  // scoreless are known gaps (docs/design/rugby-union.md), reported by `npm run simulation:realism`.
+  const union = report.union, real = REAL.union;
+  assert.equal(union.clubs, 36);
+  within(union.pointsPerTeam, real.pointsPerTeam, 'rugby union points a team');
+  within(union.triesPerTeam, real.triesPerTeam, 'rugby union tries a team');
+  within(union.conversionRate, real.conversionRate, 'rugby union conversions made', 0.005);
+  within(union.penaltyGoalsPerTeam, real.penaltyGoalsPerTeam, 'rugby union penalty goals a team', 0.02);
+  within(union.dropGoalsPerGame, real.dropGoalsPerGame, 'rugby union drop goals a game', 0.006);
+  within(union.draws, real.draws, 'rugby union games level after eighty', 0.006);
+  for (const place of Object.keys(real.tryShares)) within(union.tryShares[place] || 0, real.tryShares[place], `rugby union tries by ${place}`, 0.012);
+});
+
 test('NRL: points, tries, goals, margins, golden point, the standings and who scores the tries', () => {
   const nrl = report.nrl, real = REAL.nrl;
   within(nrl.pointsPerTeam, real.pointsPerTeam, 'points a team');
@@ -261,6 +276,7 @@ test('League of Legends: a game\'s length, kills and Barons as in the real games
 test('home sides: half the decided games at a neutral venue, their league\'s share with Home advantage on', () => {
   for (const [label, share, n] of [['NBA', report.nba.homeWins], ['EuroLeague', report.euroleague.homeWins], ['NFL', report.nfl.homeWins], ['MLB', report.mlb.homeWins], ['NHL', report.nhl.homeWins],
     ['Davis Cup', report.davisCup.homeWins], ['Billie Jean King Cup', report.billieJeanKingCup.homeWins], ['NRL', report.nrl.homeWins],
+    ['rugby union', report.union.homeWins],
     ...(report.rocketLeague ? [['Rocket League', report.rocketLeague.homeWins, report.rocketLeague.series]] : []),
     ...(report.counterStrike ? [['Counter-Strike', report.counterStrike.homeWins, report.counterStrike.series]] : []),
     ...(report.valorant ? [['Valorant', report.valorant.homeWins, report.valorant.series]] : []),
@@ -285,6 +301,13 @@ test('home sides: half the decided games at a neutral venue, their league\'s sha
   within(home.davisCup.homeWins, REAL.davisCup.homeWins, 'Davis Cup host wins');
   within(home.billieJeanKingCup.homeWins, REAL.billieJeanKingCup.homeWins, 'Billie Jean King Cup host wins');
   within(home.nrl.homeWins, REAL.nrl.homeWins, 'NRL home wins');
+  // Rugby union's leagues play with a large home edge (home sides win about 68%), which also keeps their tables close:
+  // the margins and the spread of the table are its with Home advantage on.
+  within(home.union.homeWins, REAL.union.homeWins, 'rugby union home wins', 0.012);
+  within(home.union.winPctSd, REAL.union.winPctSd, 'rugby union spread of the table', 0.01);
+  within(home.union.marginMean, REAL.union.marginMean, 'rugby union mean margin', 1);
+  within(home.union.byThirtyPlus, REAL.union.byThirtyPlus, 'rugby union games won by thirty or more', 0.02);
+  within(home.union.fortyPlusRate, REAL.union.fortyPlusRate, 'rugby union teams scoring forty or more', 0.012);
   if (home.rocketLeague && REAL.rocketLeague?.homeWins) within(home.rocketLeague.homeWins, REAL.rocketLeague.homeWins, 'Rocket League home wins');
   if (home.valorant && REAL.valorant?.homeWins) within(home.valorant.homeWins, REAL.valorant.homeWins, 'Valorant host wins at a LAN');
 });
