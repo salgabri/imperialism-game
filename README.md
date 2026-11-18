@@ -1505,14 +1505,21 @@ own country.
 - **A country's only club holds all of it**, on the outline the world map gives it:
   Bodø/Glimt holds Norway, Dinamo Zagreb Croatia, and in the Elite 32 Paris
   Saint-Germain holds France.
-- **Clubs that share a country split it along its regional borders.** A region with
-  one club goes whole to it, and one with two or more is split one level down,
-  between them only (Bavaria's clubs share Bavaria along its districts). A region
-  with no club goes to whichever neighbour reaches it, whole unless it is larger
-  than a club's share. A city-state is too small for its clubs and shares its largest
-  neighbour's land too (Berlin and Brandenburg, Madrid and Castile). Where clubs
-  are crowded into one city, it is cut into wedges so each has a way out, and a
-  club boxed in by the others may start next door: Beşiktaş plays out of Anatolia.
+- **Clubs that share a country split it along its administrative borders, level by
+  level, down to the communes.** A region with one club goes whole to it, and one with
+  two or more is split one level down, between them only, and so on: Bavaria's clubs
+  share Bavaria along its districts, Lisbon's split the city along its parishes, Paris's
+  along its arrondissements, Prague's along its cadastral areas. Every European
+  country has its levels (`scripts/lib/admin-levels.mjs`), England its counties,
+  councils and districts. A region with no club goes to whichever neighbour reaches it,
+  whole unless it is large for a club's share or borders a crowded region, whose clubs
+  then share it a level down (Moscow Oblast around Moscow's clubs). A city-state is too
+  small for its clubs and shares its largest neighbour's land too (Berlin and
+  Brandenburg, Madrid and Castile). Only a commune two clubs share is ever cut (Milan's
+  San Siro). Where clubs are crowded into one city, its communes are dealt out around it
+  so each has a way out, and a club boxed in by the others may start next door:
+  Beşiktaş plays out of Anatolia. A stray piece of a club's land under 400 km² that
+  lies inside another's goes to that club.
 - **A country with no club stays grey**: it is not on the map, only drawn beneath it
   as any country map's neighbours are. It is never territory, and attacks go around
   it, by sea if need be. The Elite 32 has no Dutch club, so the Netherlands stays grey.
