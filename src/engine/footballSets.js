@@ -171,6 +171,12 @@ const EA_KINDS = new Set(['ea', 'eaw']);
 // Kinds of computed nations-only seasons, each nation its XI of `[name, position, rating, source]`: men's football's
 // World Cups and the seasons between them, women's football's World Cups and Olympic tournaments.
 const COMPUTED_NATION_KINDS = new Set(['wc', 'nt', 'wwc', 'wol']);
+// A computed player an EA season's nation lists beside EA's (scripts/lib/football-fills.mjs): `[name, 'DF/MF', rating,
+// source]`, a real player capped for the nation that season, rated from its Elo and marked as an estimate
+// (src/data/estimates.js) of international football's. EA's tuples have nine fields.
+const FILL_LEAGUE = 'International football';
+const FILL_ROLES = new Set(['GK', 'DF', 'MF', 'FW']);
+const isFilledPlayer = tuple => Array.isArray(tuple) && tuple.length === 4;
 
 // What build-rosters writes for a nation with no players.
 const EMPTY_STRENGTH = 40;
@@ -438,11 +444,14 @@ export function decodeFootballSet(data, id = data?.id) {
     };
   }
   const englandHolds = beforeHomeNations(nations);
+  // An EA season's nation can list computed players beside EA's (scripts/lib/football-fills.mjs): plain records, as the
+  // computed national-team seasons' are.
+  const nationPlayer = tuple => (isFilledPlayer(tuple) ? [tuple[0], tuple[1], tuple[2], { ...tuple[3] }] : expand(tuple));
   return {
     meta,
     rosters: Object.fromEntries(Object.keys(NATIONS).map(nation => {
       const [str, pool, players] = nations[nation] || [EMPTY_STRENGTH, 0, []];
-      return [nation, [str, pool, players.map(expand)]];
+      return [nation, [str, pool, players.map(nationPlayer)]];
     })),
     clubs: clubs.map(club => ({ ...club, squad: club.squad.map(expand) })),
     territory: { merged: { ...territory.merged, ...(englandHolds ? Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])) : {}) },
@@ -644,13 +653,40 @@ function validateFootballSet(data, id) {
   if (['madden', 'tecmo', 'pfa'].includes(setKindOf(id))) return validateClubsOnMap(data, id, fail, { sport: americanFootball, clubId: NFL_CLUB_ID,
     positions: new Set(Object.keys(americanFootball.formation)), least: americanFootball.squadSize, noun: 'an NFL season' });
 
+  // A men's EA season's nation may list computed players (isFilledPlayer) beside EA's, and then the season says how they
+  // were rated (`fill`, beside EA's source): each names himself on Wikidata, his team, its Elo of the fill's day and the
+  // stint that covers the season, and is marked as an estimate of international football's.
+  const fill = data.fill;
+  const filling = setKindOf(id) === 'ea' && fill !== undefined;
+  if (fill !== undefined && (setKindOf(id) !== 'ea' || !isObject(fill) || fill.method !== 'computed' || fill.computed !== true
+    || !text(fill.conversion) || fill.rawScale !== 'Elo' || !/^\d{4}-\d{2}-\d{2}$/.test(String(fill.snapshotDate)))) {
+    fail('fill must say its players are computed (method "computed"), from Elo of which day and by what rule');
+  }
+  const filledPlayer = (where, [name, listed, value, info]) => {
+    const roles = String(listed).split('/');
+    if (!text(name) || !roles.every(role => FILL_ROLES.has(role)) || new Set(roles).size !== roles.length || !Number.isInteger(value)
+      || !rating(value)) fail(`${where} is not a computed player [name, position, rating, source]`);
+    if (!isObject(info) || info.source !== 'estimate' || info.league !== FILL_LEAGUE || !/^wd:Q\d+$/.test(String(info.id))
+      || !text(info.edition) || !text(info.team) || !Number.isFinite(info.teamElo) || info.snapshotDate !== fill.snapshotDate
+      || !Number.isInteger(info.from) || !Number.isInteger(info.to) || info.from > info.to
+      || typeof info.url !== 'string' || !/^https:\/\/(?:en\.wikipedia\.org\/wiki\/|www\.wikidata\.org\/wiki\/Q\d+$)\S*$/.test(info.url)) {
+      fail(`${where} must name the computed player on Wikidata, his team, its Elo of ${fill.snapshotDate} and his stint, as an estimate of ${FILL_LEAGUE}`);
+    }
+  };
+
   // The builder writes only tuples that rebuild exactly, so anything else (an unknown or repeated position key, a
   // full name equal to the name, a malformed date) is a file it did not write.
-  const players = (at, tuples) => {
+  const players = (at, tuples, { nation: inNation = false } = {}) => {
     if (!Array.isArray(tuples)) fail(`${at} must be a list of players`);
     const ids = new Set();
     tuples.forEach((tuple, j) => {
       const where = `${at}[${j}]`;
+      if (inNation && filling && isFilledPlayer(tuple)) {
+        filledPlayer(where, tuple);
+        if (ids.has(tuple[3].id)) fail(`${where} repeats player ${tuple[3].id}`);
+        ids.add(tuple[3].id);
+        return;
+      }
       if (!Array.isArray(tuple) || tuple.length !== kind.size) fail(`${where} is not ${TUPLE_NAMES[setKindOf(id)] ?? 'a CM'} player tuple`);
       const [playerId, , , , positions, , , dateOfBirth] = tuple;
       if (ids.has(playerId)) fail(`${where} repeats player ${playerId}`);
@@ -688,7 +724,7 @@ function validateFootballSet(data, id) {
     if (!Array.isArray(entry) || entry.length !== 3) fail(`${at} must be [strength, poolSize, players]`);
     const [str, pool, list] = entry;
     if (!rating(str)) fail(`${at} strength must be a rating 1-99`);
-    players(at, list);
+    players(at, list, { nation: true });
     if (!Number.isInteger(pool) || pool < list.length) fail(`${at} poolSize must be an integer of at least its ${list.length} players`);
     if (women && !list.length) fail(`${at} has no players: a nation with none is inactive, not listed`);
     // A nation the map has only in earlier years (East Germany) plays only in a season of its years.

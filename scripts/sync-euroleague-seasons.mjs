@@ -21,6 +21,8 @@
 // games and minutes by club (`extra.clubs`: { club: [games, minutes] }). His position is the one his club's roster gives
 // him that season (else another roster's, the nearest season first); height and nationality are his person record's.
 // `extra.alias` and `extra.abbr` are EuroLeague's accented spelling and own mixed-case surname, as in the built-in season.
+// `games` is every game the season played, with its phase, clubs, score and venue: the results each club's strength is
+// moved toward (docs/design/euroleague.md, "The results").
 import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -162,6 +164,11 @@ for (const [year, season] of seasons) {
   const clubs = season.clubs.map(club => ({ code: club.code, name: club.name, country: club.country.code, city: club.city, tv: club.tvCode,
     wins: records.get(club.code).all[0], games: records.get(club.code).all[1], regular: records.get(club.code).regular }))
     .sort((a, b) => a.code.localeCompare(b.code));
+  // Every game of the season, in the order played: [phase, local club, road club, local score, road score, venue], and a
+  // last 1 where the API marks the venue neutral. scripts/lib/euroleague-ratings.mjs reads who was at home from the venue.
+  const gameRows = season.games.slice().sort((a, b) => a.date.localeCompare(b.date) || a.gameCode - b.gameCode)
+    .map(game => [game.phaseType.code, game.local.club.code, game.road.club.code, game.local.score, game.road.score, game.venue?.code ?? null,
+      ...(game.isNeutralVenue ? [1] : [])]);
   const retrieved = [...season.dates].sort().at(-1);
   const label = `EuroLeague ${year}-${String(year + 1).slice(2)}`;
   const source = {
@@ -169,7 +176,7 @@ for (const [year, season] of seasons) {
     rosters: `${API}/v2/competitions/E/seasons/${season.code}/clubs/{club}/people`, stats: urls.allPlayers(season.code), split: `${API}/v2/people/{player}/stats`,
     terms: "EuroLeague's public data API, as its own site reads it; the rosters and box-score statistics are facts, the ratings the game's own estimate",
   };
-  const text = `{\n"source": ${JSON.stringify(source)},\n"league": ${JSON.stringify(league)},\n"clubs": [\n${clubs.map(club => JSON.stringify(club)).join(',\n')}\n],\n"players": [\n${players.map(row => JSON.stringify(row)).join(',\n')}\n]\n}\n`;
+  const text = `{\n"source": ${JSON.stringify(source)},\n"league": ${JSON.stringify(league)},\n"clubs": [\n${clubs.map(club => JSON.stringify(club)).join(',\n')}\n],\n"players": [\n${players.map(row => JSON.stringify(row)).join(',\n')}\n],\n"games": [\n${gameRows.map(row => JSON.stringify(row)).join(',\n')}\n]\n}\n`;
   await writeFile(path.join(outDir, `${season.code}.json`), text);
   const movers = players.filter(row => row[7]?.clubs).length, unlisted = players.filter(row => !row[3]).length;
   report.push(`${label}: ${clubs.length} clubs, ${players.length} players (${movers} for two clubs, ${unlisted} on no roster), ${regular.length} regular-season games; `

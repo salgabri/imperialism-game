@@ -13,48 +13,48 @@ export const ROSTERS = {
   '120': [70,5,[["Christian Koloko",'C',71],["Jeremiah Hill",'SG/PG',70],["Paul Eboua",'PF',70],["Samir Gbetkom",'PG',69],["Tamenang Choh",'SF/SG',69]]], // Cameroon
   '124': [82,5,[["Shai Gilgeous-Alexander",'PG/SG',97],["Jamal Murray",'PG/SG',89],["R.J. Barrett",'SF/SG',82],["Kelly Olynyk",'PF/C',75],["Dwight Powell",'C/PF',67]]], // Canada
   '156': [71,5,[["Zhou Qi",'C',73],["Zhao Rui",'SG/PG',72],["Cui Yongxi",'SG',70],["Zhu Junlong",'SF',70],["Wang Junjie",'PF',69]]], // China
-  '191': [76,5,[["Ivica Zubac",'C',84],["Dario Šarić",'PF/C',78],["Mario Hezonja",'SF/SG',74],["Jaleen Smith",'PG',72],["Roko Prkacin",'PF/SF',71]]], // Croatia
+  '191': [76,5,[["Ivica Zubac",'C',84],["Dario Šarić",'PF/C',81],["Mario Hezonja",'SF/SG',74],["Jaleen Smith",'PG',72],["Roko Prkacin",'PF/SF',71]]], // Croatia
   '196': [65,5,[["Darral Willis",'PF/C',70],["Filippos Tigkas",'PG',65],["Konstantinos Simitzis",'SG/PG',64],["Nikolaos Stylianou",'SF',63],["Michalis Koumis",'C',62]]], // Cyprus
   '203': [72,5,[["Tomas Satoransky",'PG/SG',74],["Vít Krejčí",'PG/SG',74],["Jaromir Bohacik",'SF',71],["Ondrej Balvin",'C',71],["Martin Peterka",'PF/C',70]]], // Czechia
-  '214': [75,5,[["Karl-Anthony Towns",'C/PF',93],["Andres Feliz",'PG/SG',71],["Angel Delgado",'PF/C',71],["Victor Liz",'SG/PG',70],["David Jones-Garcia",'SF/SG',70]]], // Dominican Rep.
+  '214': [75,5,[["Karl-Anthony Towns",'C/PF',93],["Andres Feliz",'PG/SG',73],["Angel Delgado",'PF/C',71],["Victor Liz",'SG/PG',70],["David Jones-Garcia",'SF/SG',70]]], // Dominican Rep.
   '233': [70,5,[["Kristian Kullamae",'PG/SG',71],["Henri Drell",'SF/PF',70],["Artur Konontsuk",'SF/PF',70],["Matthias Tass",'C',69],["Janari Joesaar",'SG/SF',68]]], // Estonia
-  '246': [73,5,[["Lauri Markkanen",'PF/SF',86],["Edon Maxhuni",'PG/SG',70],["Miro Little",'SG/PG',70],["Mikael Jantunen",'SF/PF',70],["Olivier Nkamhoua",'PF/C',68]]], // Finland
-  '250': [81,5,[["Victor Wembanyama",'C/PF',97],["Sylvain Francisco",'PG',83],["Bilal Coulibaly",'SF/SG',78],["Evan Fournier",'SG/SF',73],["Guerschon Yabusele",'PF/C',72]]], // France
-  '268': [72,5,[["Sandro Mamukelashvili",'PF/C',76],["Goga Bitadze",'C',74],["Duda Sanadze",'SG/SF',71],["Rati Andronikashvili",'PG',70],["Kamar Baldwin",'PG/SG',69]]], // Georgia
+  '246': [73,5,[["Lauri Markkanen",'PF/SF',86],["Olivier Nkamhoua",'PF/C',71],["Edon Maxhuni",'PG/SG',70],["Miro Little",'SG/PG',70],["Mikael Jantunen",'SF/PF',70]]], // Finland
+  '250': [82,5,[["Victor Wembanyama",'C/PF',97],["Sylvain Francisco",'PG',87],["Bilal Coulibaly",'SF/SG',78],["Guerschon Yabusele",'PF/C',75],["Evan Fournier",'SG/SF',73]]], // France
+  '268': [71,5,[["Sandro Mamukelashvili",'PF/C',76],["Goga Bitadze",'C',74],["Duda Sanadze",'SG/SF',71],["Rati Andronikashvili",'PG',70],["Kamar Baldwin",'PG/SG',62]]], // Georgia
   '276': [77,5,[["Franz Wagner",'SF/PF',85],["Dennis Schröder",'PG/SG',76],["Daniel Theis",'PF/C',76],["Moritz Wagner",'C/PF',74],["Andreas Obst",'SG',73]]], // Germany
-  '300': [78,5,[["Giannis Antetokounmpo",'PF/C',96],["Nick Calathes",'PG',78],["Kostas Sloukas",'PG/SG',77],["Kostas Antetokounmpo",'C/PF',71],["Thanasis Antetokounmpo",'SF/PF',69]]], // Greece
+  '300': [79,5,[["Giannis Antetokounmpo",'PF/C',96],["Kostas Sloukas",'PG/SG',79],["Nick Calathes",'PG',78],["Kostas Antetokounmpo",'C/PF',71],["Thanasis Antetokounmpo",'SF/PF',69]]], // Greece
   '352': [68,5,[["Tryggvi Hlinason",'C',70],["Elvar Fridriksson",'PG',69],["Martin Hermannsson",'SG/PG',69],["Jon Axel Gudmundsson",'SG/SF',67],["Kristinn Palsson",'SF/PF',66]]], // Iceland
   '364': [70,5,[["Behnam Yakhchali",'PG/SG',71],["Mohammad Jamshidi",'SF/SG',70],["Arsalan Kazemi",'PF',70],["Hasan Aliakbari",'C',70],["Navid Rezaeifar",'SF/SG',69]]], // Iran
-  '376': [75,5,[["Deni Avdija",'SF/SG',88],["Yam Madar",'PG',77],["Roman Sorkin",'C/PF',77],["Khadeen Carrington",'SG',67],["Tomer Ginat",'PF',67]]], // Israel
-  '380': [71,5,[["Simone Fontecchio",'SF/SG',74],["Marco Spissu",'PG/SG',73],["Nicolo Melli",'PF/C',72],["Alessandro Pajola",'PG/SG',70],["Giampaolo Ricci",'PF',66]]], // Italy
+  '376': [73,5,[["Deni Avdija",'SF/SG',88],["Roman Sorkin",'C/PF',82],["Yam Madar",'PG',70],["Tomer Ginat",'PF',65],["Khadeen Carrington",'SG',59]]], // Israel
+  '380': [71,5,[["Simone Fontecchio",'SF/SG',74],["Marco Spissu",'PG/SG',73],["Nicolo Melli",'PF/C',73],["Alessandro Pajola",'PG/SG',67],["Giampaolo Ricci",'PF',66]]], // Italy
   '384': [70,5,[["Solo Diabate",'PG/SG',71],["Bazou Kone",'PG/SG',71],["Matt Costello",'C/PF',71],["Vafessa Fofana",'SF',70],["Amadou Sidibe",'PF',69]]], // Côte d'Ivoire
   '392': [73,5,[["Rui Hachimura",'PF/SF',79],["Yuta Watanabe",'SF/PF',72],["Josh Hawkinson",'PF/C',72],["Yuki Kawamura",'PG',70],["Yudai Baba",'SG/SF',70]]], // Japan
-  '428': [73,5,[["Kristaps Porziņģis",'C/PF',81],["Arturs Zagars",'PG',77],["Arturs Kurucs",'SG',71],["Rodions Kurucs",'SF/PF',70],["Davis Bertans",'PF',67]]], // Latvia
-  '440': [77,5,[["Domantas Sabonis",'PF/C',85],["Jonas Valančiūnas",'C',83],["Rokas Jokubaitis",'PG/SG',76],["Ignas Brazdeikis",'SF/SG',73],["Deividas Sirvydis",'SF/SG',68]]], // Lithuania
+  '428': [73,5,[["Kristaps Porziņģis",'C/PF',81],["Arturs Zagars",'PG',77],["Arturs Kurucs",'SG',71],["Rodions Kurucs",'SF/PF',69],["Davis Bertans",'PF',66]]], // Latvia
+  '440': [78,5,[["Jonas Valančiūnas",'C',91],["Domantas Sabonis",'PF/C',85],["Rokas Jokubaitis",'PG/SG',78],["Ignas Brazdeikis",'SF/SG',73],["Deividas Sirvydis",'SF/SG',65]]], // Lithuania
   '484': [70,5,[["Karim López",'SF',72],["Paul Stoll",'PG',70],["Pako Cruz",'SG',70],["Fabian Jaimes",'PF/SF',69],["Israel Gutierrez",'C/PF',69]]], // Mexico
   '499': [71,5,[["Kendrick Perry",'PG',73],["Andrija Slavkovic",'SG/SF',71],["Marko Simonovic",'C',71],["Emir Hadzibegovic",'SF/PF',70],["Nemanja Radovic",'PF',70]]], // Montenegro
   '528': [70,5,[["Yannick Franke",'SG',71],["Yannick Kraag",'SG/SF',71],["Keye van der Vuurst",'PG',70],["David N'Guessan",'PF',70],["Nathan Kuta",'C',69]]], // Netherlands
   '554': [70,5,[["Sam Mennenga",'PF/C',71],["Shea Ili",'PG/SG',70],["Finn Delany",'SF/PF',70],["Reuben Te Rangi",'SG/SF',69],["Tohi Smith-Milner",'PF/SF',69]]], // New Zealand
-  '566': [74,5,[["Chima Moneke",'PF',83],["Josh Okogie",'SG/SF',74],["Ike Iroegbu",'PG',73],["Ebuka Izundu",'C',72],["Caleb Agada",'SG/PG',70]]], // Nigeria
+  '566': [76,5,[["Chima Moneke",'PF',87],["Ebuka Izundu",'C',75],["Josh Okogie",'SG/SF',74],["Ike Iroegbu",'PG',73],["Caleb Agada",'SG/PG',70]]], // Nigeria
   '608': [71,5,[["Justin Brownlee",'SF/PF',72],["Scottie Thompson",'PG/SG',71],["CJ Perez",'SG/PG',70],["Dwight Ramos",'SF/SG',70],["Kai Sotto",'C',70]]], // Philippines
-  '616': [73,5,[["Mateusz Ponitka",'PG/SG',76],["Jordan Loyd",'SG/PG',74],["Michal Sokolowski",'SF/SG',72],["Jeremy Sochan",'PF/SF',71],["Dominik Olejniczak",'C',70]]], // Poland
+  '616': [72,5,[["Mateusz Ponitka",'PG/SG',76],["Jordan Loyd",'SG/PG',73],["Michal Sokolowski",'SF/SG',72],["Jeremy Sochan",'PF/SF',71],["Dominik Olejniczak",'C',70]]], // Poland
   '620': [70,5,[["Neemias Queta",'C',80],["Travante Williams",'SF/SG',70],["Rafael Lisboa",'PG',68],["Diogo Brito",'SG',67],["Miguel Queiroz",'PF',67]]], // Portugal
   '630': [72,5,[["Jose Alvarado",'PG',77],["Gian Clavell",'SG',71],["Isaiah Pineiro",'SF/PF',70],["George Conditt",'PF/C',70],["Ismael Romero",'C/PF',70]]], // Puerto Rico
-  '686': [71,5,[["Brancou Badio",'SG/PG',72],["Ibrahima Faye",'PF/C',71],["Jean Jacques Boissy",'PG',70],["Pape Moustapha Diop",'SF/PF',70],["Youssoupha Ndoye",'C',70]]], // Senegal
+  '686': [71,5,[["Brancou Badio",'SG/PG',73],["Ibrahima Faye",'PF/C',71],["Jean Jacques Boissy",'PG',70],["Pape Moustapha Diop",'SF/PF',70],["Youssoupha Ndoye",'C',70]]], // Senegal
   '688': [80,5,[["Nikola Jokić",'C',97],["Filip Petrušev",'PF/C',79],["Vasilije Micić",'PG/SG',76],["Bogdan Bogdanović",'SG/SF',73],["Nikola Jović",'SF/PF',73]]], // Serbia
-  '705': [76,5,[["Luka Dončić",'PG/SG',96],["Mike Tobey",'C',74],["Edo Muric",'PF/SF',73],["Gregor Hrovat",'SF/SG',71],["Klemen Prepelic",'SG/PG',66]]], // Slovenia
-  '724': [77,5,[["Lorenzo Brown",'PG',79],["Santi Aldama",'PF/C',78],["Juancho Hernangómez",'SF/PF',77],["Willy Hernangomez",'C',75],["Alberto Diaz",'PG/SG',74]]], // Spain
-  '728': [73,5,[["Carlik Jones",'PG/SG',81],["Khaman Maluach",'C',73],["Nuni Omot",'SF/PF',70],["Marial Shayok",'SG/SF',70],["Wenyen Gabriel",'PF/SF',69]]], // South Sudan
+  '705': [75,5,[["Luka Dončić",'PG/SG',96],["Mike Tobey",'C',74],["Edo Muric",'PF/SF',73],["Gregor Hrovat",'SF/SG',71],["Klemen Prepelic",'SG/PG',61]]], // Slovenia
+  '724': [77,5,[["Lorenzo Brown",'PG',79],["Juancho Hernangómez",'SF/PF',79],["Santi Aldama",'PF/C',78],["Willy Hernangomez",'C',75],["Alberto Diaz",'PG/SG',74]]], // Spain
+  '728': [72,5,[["Carlik Jones",'PG/SG',79],["Khaman Maluach",'C',73],["Nuni Omot",'SF/PF',70],["Wenyen Gabriel",'PF/SF',70],["Marial Shayok",'SG/SF',70]]], // South Sudan
   '752': [72,5,[["Pelle Larsson",'SG/SF',78],["Ludvig Hakanson",'PG',71],["Melwin Pantzar",'PG/SG',70],["Simon Birgander",'C',70],["Viktor Gaddefors",'PF/SF',69]]], // Sweden
-  '792': [76,5,[["Alperen Şengün",'C/PF',87],["Shane Larkin",'PG/SG',75],["Adem Bona",'C/PF',75],["Cedi Osman",'SF/SG',74],["Furkan Korkmaz",'SG/SF',67]]], // Turkey
+  '792': [75,5,[["Alperen Şengün",'C/PF',87],["Adem Bona",'C/PF',75],["Cedi Osman",'SF/SG',74],["Shane Larkin",'PG/SG',73],["Furkan Korkmaz",'SG/SF',65]]], // Turkey
   '804': [71,5,[["Sviatoslav Mykhailiuk",'SG/SF',73],["Artem Pustovyi",'C',71],["Vitaliy Zotov",'PG',70],["Issuf Sanon",'SG',70],["Artem Kovalov",'PF',69]]], // Ukraine
   '818': [70,5,[["Ehab Amin",'PG/SG',71],["Assem Marei",'PF/C',71],["Amr Gendy",'PG/SG',70],["Anas Mahmoud",'C/PF',70],["Ibrahim Zahran",'SF/SG',69]]], // Egypt
   '826': [68,5,[["Akwasi Yeboah",'PF/SF',70],["Carl Wheatle",'SG/SF',69],["Luke Nelson",'PG',68],["Myles Hesson",'SF/PF',67],["Jubrile Belo",'C',67]]], // England
   '840': [93,5,[["Anthony Edwards",'SG/SF',95],["Stephen Curry",'PG/SG',93],["Jayson Tatum",'SF/PF',93],["Kevin Durant",'PF/SF',93],["Anthony Davis",'C/PF',90]]], // United States
   '862': [70,5,[["Michael Carrera",'SF/PF',71],["David Cubillan",'PG',70],["Pedro Chourio",'SG',70],["Nestor Colmenares",'PF',70],["Windi Graterol",'C',70]]], // Venezuela
   '036': [78,5,[["Josh Giddey",'PG/SG',84],["Dyson Daniels",'SG/PG',81],["Jock Landale",'C/PF',75],["Duop Reath",'C/PF',75],["Joe Ingles",'SF/PF',73]]], // Australia
-  '032': [73,5,[["Facundo Campazzo",'PG',80],["Luca Vildoza",'PG/SG',72],["Gabriel Deck",'SF/PF',72],["Nicolas Brussino",'SF/PF',71],["Francisco Caffaro",'C',70]]], // Argentina
-  '070': [72,5,[["Jusuf Nurkić",'C',76],["Dzanan Musa",'SF/SG',75],["John Roberson",'PG/SG',70],["Amar Alibegovic",'PF/SF',70],["Adin Vrabac",'PF/SF',70]]], // Bosnia & Herz.
+  '032': [74,5,[["Facundo Campazzo",'PG',82],["Luca Vildoza",'PG/SG',73],["Gabriel Deck",'SF/PF',73],["Nicolas Brussino",'SF/PF',71],["Francisco Caffaro",'C',70]]], // Argentina
+  '070': [73,5,[["Dzanan Musa",'SF/SG',77],["Jusuf Nurkić",'C',76],["John Roberson",'PG/SG',70],["Amar Alibegovic",'PF/SF',70],["Adin Vrabac",'PF/SF',70]]], // Bosnia & Herz.
   '024': [71,5,[["Bruno Fernando",'C',74],["Silvio de Sousa",'PF/C',71],["Childe Dundao",'PG',70],["Milton Valente",'SF/SG',70],["Gerson Goncalves",'SG',69]]], // Angola
   '056': [69,5,[["Ismael Bako",'C',71],["Manu Lecomte",'PG',70],["Hans Vanwijn",'PF',69],["Loic Schwartz",'SG/SF',68],["Mamadou Guisse",'SF',68]]], // Belgium
 };

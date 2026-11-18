@@ -20,7 +20,9 @@ October 2003 update of SI's CM 01/02, built 2026-11-09 and shipped by the user's
 between the World Cups, 1962/63 to 1992/93, computed from Wikidata's national-team records, 2026-11-13
 ([Computed national-team seasons](#computed-national-team-seasons)), so that every year has a season; 1960/61,
 computed alike, with the federations of its day (the United Arab Republic among them), and 1996/97's clubs, read from
-SWOS 96/97's own team files, 2026-11-14 ([Sensible World of Soccer 96/97](#sensible-world-of-soccer-9697-199697)). The CM 01/02
+SWOS 96/97's own team files, 2026-11-14 ([Sensible World of Soccer 96/97](#sensible-world-of-soccer-9697-199697)); the EA
+seasons' national XIs that EA leaves short, filled with players capped for their nation that season and rated from its
+Elo, 2026-11-18 ([Computed fills](#computed-fills)). The CM 01/02
 path now runs on real databases (SI's own and the CM3 port); the community's
 still need a forum login. Sources and terms are in
 [football-year-sources.md](football-year-sources.md); the permission requests in
@@ -488,8 +490,11 @@ How a season is made:
   small states); their players still play for their clubs. Scotland, Wales and
   Northern Ireland have shapes and teams. Any other unmapped name stops the build. Each nation fields
   its best natural XI with the squad pick the built-in rosters use. EA rates
-  only part of the world, so 73–82 nations a season field a full XI and the rest
-  keep the players they have (an empty nation plays at 40).
+  only part of the world, so 73–82 nations a season have a full XI of EA's own and the rest
+  keep the players they have (an empty nation plays at 40). Since 2026-11-18 a nation that
+  fields a side but is short of a natural XI has the places EA leaves empty taken by players
+  capped for it that season, rated from its Elo and marked as estimates, as far as Wikidata
+  names them ([Computed fills](#computed-fills)).
 - **Clubs by competition id.** The export names each club's league as it is in a
   later edition (FIFA 15's Burnley is in "Championship"), but its `league_id` is
   the edition's own, so clubs are taken by id from every European first division the
@@ -718,6 +723,148 @@ lists the reused ids and names the best players left out. Full XIs: 54 in each o
 FIFA 06 and FIFA 05 of 173, against 49–52 for FIFA 07–09; 119 and 116 nations have
 at least one player. FIFA 06 takes 8,131 nationalities from later editions and
 1,275 from Wikidata, FIFA 05 7,569 and 2,111. Each file is about 75 KB.
+
+### Computed fills
+
+Built 2026-11-18 under [computed-ratings.md](computed-ratings.md), which the user adopted on 2026-11-17: its "Where it
+applies now" lists the EA seasons' short national XIs as a gap ("fill from capped players by step 1 and Elo, labelled
+computed"). EA rates only part of the world, so a nation can field a side (its EA players hold at least half the
+lineup) and still be short of eleven: it played its empty places at 40 and an outfielder in goal at −12. Those XIs agreed
+with World Football Elo at only 0.74–0.82 in FIFA 05–09, against 0.82–0.90 over the full XIs, so the gap was coverage,
+not EA's ratings. Now each place EA leaves empty in such a nation's natural XI goes to a real player capped for it
+that season, rated so the XI meets the strength its Elo gives, and marked as an estimate wherever he is shown. Every EA
+player keeps EA's rating; nothing is generated. The coordinating session set the method (Wikidata caps through QLever,
+caps in the window, positions from Wikidata, the computed seasons' 3.2 points per 100 Elo, the marking); Claude chose the
+line's level, the natural 4-4-2, the first-year rule and the hold below, and the user has not yet confirmed them.
+
+| Season | Short nations | Filled | Players added | EA players out of position who lost their place | Fielded XIs under eleven, before → after | Spearman against Elo, before → after |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2004/05 FIFA 05 | 24 | 23 | 67 | 26 | 13 → 0 | 0.802 → 0.879 |
+| 2005/06 FIFA 06 | 22 | 22 | 73 | 36 | 12 → 0 | 0.817 → 0.904 |
+| 2006/07 FIFA 07 | 28 | 28 | 109 | 48 | 18 → 0 | 0.762 → 0.893 |
+| 2007/08 FIFA 08 | 34 | 34 | 103 | 54 | 14 → 0 | 0.744 → 0.887 |
+| 2008/09 FIFA 09 | 37 | 37 | 102 | 56 | 14 → 0 | 0.760 → 0.900 |
+| 2009/10 FIFA 10 | 25 | 23 | 59 | 39 | 8 → 1 | 0.790 → 0.834 |
+| 2010/11 FIFA 11 | 20 | 19 | 39 | 19 | 10 → 0 | 0.779 → 0.805 |
+| 2011/12 FIFA 12 | 20 | 19 | 47 | 19 | 8 → 0 | 0.835 → 0.834 |
+| 2012/13 FIFA 13 | 27 | 25 | 78 | 27 | 14 → 0 | 0.794 → 0.866 |
+| 2013/14 FIFA 14 | 30 | 25 | 59 | 20 | 14 → 0 | 0.819 → 0.854 |
+| 2014/15 FIFA 15 | 24 | 18 | 58 | 17 | 12 → 1 | 0.831 → 0.853 |
+| 2015/16 FIFA 16 | 25 | 18 | 43 | 18 | 11 → 4 | 0.845 → 0.884 |
+| 2016/17 FIFA 17 | 25 | 16 | 32 | 16 | 15 → 9 | 0.876 → 0.898 |
+| 2017/18 FIFA 18 | 27 | 16 | 40 | 7 | 15 → 7 | 0.856 → 0.868 |
+| 2018/19 FIFA 19 | 23 | 8 | 22 | 2 | 12 → 9 | 0.877 → 0.879 |
+| 2019/20 FIFA 20 | 26 | 12 | 22 | 6 | 14 → 12 | 0.876 → 0.881 |
+| 2020/21 FIFA 21 | 29 | 14 | 27 | 5 | 16 → 13 | 0.889 → 0.899 |
+| 2021/22 FIFA 22 | 29 | 11 | 22 | 1 | 18 → 13 | 0.882 → 0.886 |
+| 2022/23 FIFA 23 | 27 | 9 | 14 | 3 | 15 → 9 | 0.871 → 0.875 |
+| 2023/24 EA FC 24 | 31 | 10 | 17 | 3 | 12 → 10 | 0.863 → 0.869 |
+| 2024/25 EA FC 25 | 30 | 9 | 16 | 4 | 14 → 11 | 0.800 → 0.814 |
+| 2025/26 EA FC 26 | 32 | 4 | 8 | 1 | 17 → 16 | 0.832 → 0.845 |
+
+"Short" is a fielded nation without a natural XI of EA's own (595 nation-seasons); 400 are filled with 1,057 players.
+The Spearman is every fielded nation's XI strength against eloratings.net's Elo on 1 July of the season's first year,
+as the roster audit's `npm run validate:football-elo` scores it (on the unmerged branch
+`claude/roster-validation-quality-0702ce`; measured here with its code and its cached tables, outside the build). The fill
+reaches far fewer nations after 2015: Wikidata's dated national-team records thin out there (a cliff after 2015/16 in
+the stints that have a start), and the goalkeeper is the place it most often cannot fill.
+
+How a season is filled (`scripts/lib/football-fills.mjs`, called by `assembleEaSeason` with the season's facts):
+
+- **Who is short.** A nation the season fields (its EA players hold at least half the lineup, `fieldsRealSide`'s rule),
+  that takes part that year, has an Elo, and whose EA players do not make a natural XI. A nation EA rates too thinly to
+  field stays out: the fill completes sides, it does not make new ones.
+- **Candidates.** The players of the nation's teams with a Wikidata stint (P54) covering the season's end year or the
+  year before, each with his caps a year, halved when the stint covers only one of the two (the computed national-team
+  seasons' figure, `seasonPools`). A stint Wikidata has not closed ends as its caps would run out at 8 a year; one with
+  neither end nor caps, which national-team seasons leave out, covers its first year, its start being the debut
+  (`wikidataTables`' `openFirstYear`: 8,971 of the 22,702 stints kept have no caps). A typed year such as 112020 is no
+  day, so its stint has no start. A stint with 0 caps is no cap, and a player under 14 or over 45 when the season starts
+  is in no pool (the national-team seasons' ages: his stint and his birth cannot both be right). A player Wikidata records
+  as a woman (sex or gender, P21) is no candidate: her membership of a men's team is Wikidata's error (17 in the
+  answers, among them three of Haiti's women's internationals filed under its men's team, who would have played for
+  it in 2014/15 to 2021/22). Nobody EA rates in that edition is a candidate: one
+  born the same day with a name word in common, or whose name agrees (`namesAgree`) and who plays for the same nation
+  or was born the same year, is EA's player already. Serbia and Montenegro, a team of its own on Wikidata, plays as
+  Serbia's shape (688).
+- **The XI.** A natural 4-4-2. EA's natural part stays (the squad pick's own: the most players in natural positions,
+  then the highest ratings); each role it leaves short takes the candidates of that position, the most caps a year
+  first (then caps for the nation by the season's end, then the lower Wikidata id). A place still empty keeps EA's own
+  player out of position, as the unfilled squad had him, and only then takes a candidate out of position. So an EA
+  player who played out of position gives his place to a capped player of that position: 427 over the 22 seasons, the
+  formation's surplus (a third forward, a fifth midfielder, a second goalkeeper), among them Paolo Guerrero for Peru
+  and Amr Zaki for Egypt in 2008/09. A squad stays at most eleven, as every EA season's does.
+- **Target.** T = L − 3.2 × (E_best − E) / 100: E the nation's World Football Elo on the season's ratings date (EA's
+  roster date, `ratingsDate` where the season has one: the date the gate reads, D_Y), computed by
+  `scripts/lib/football-elo.mjs` from martj42's results at the computed seasons' pinned commit; E_best the best of the
+  teams active in the four years before; 3.2 the computed seasons' points per 100 Elo, which gives the match engine
+  Elo's expected score. L is the line's level at E_best on the season's own scale: the median, over its full EA XIs, of
+  their mean + 3.2 × (E_best − E) / 100. The computed seasons anchor at 87, the built-in's strongest nation, but EA's
+  XIs sit at L = 87.0–91.3 (EA's scale narrows in the later editions), and an anchor of 87 would put every filled
+  nation up to 4.3 points below EA's nations of the same Elo.
+- **Ratings.** The m added players' ratings sum to what brings the XI to round(11 × T), ordered by the same claim as the
+  candidates, each R + d_j: d the computed seasons' XI profile D (+5.3 … −3.9) read at m evenly spaced places of the
+  eleven, by straight lines, less their mean; rounded so they sum exactly (largest remainders) and never invert. Their
+  mean R, and each rating, are held within T + min D and T + max D (T − 3.9 to T + 5.3), where a member of an XI at T
+  can be: one place beside ten EA players far below the line would otherwise ask 99 of its player (Ivan Ivanov for
+  Bulgaria in 2008/09), and far above it 36 (Algeria's keeper). The hold binds in 297 of the 400 filled nations, 222 of
+  them because EA's own players sit below the line; filled XIs end a median 1.5 points below T (quartiles −4.0 and
+  0.0), from 7.9 before.
+- **Marking.** A computed player is `[name, position, rating, source]` beside EA's tuples: his source names him
+  (`wd:Q…`, linked to his English Wikipedia article, else his Wikidata item), `source: 'estimate'`, `league:
+  'International football'` (src/data/estimates.js gives the words: "Estimated rating: EA rated too few of this nation's
+  players for an XI, so this one comes from his caps for it that season and its World Football Elo"), the edition
+  ("2008/09 national team, computed"), his team, its Elo and the day, and his stint (`from`, `to`, `caps`, `goals`,
+  `toEstimated` where the end is the rule's). The season gains `fill`, beside EA's `source` (which its country maps
+  credit unchanged): `method: 'computed'`, `rawScale: 'Elo'`, the day, the rule with its constants and L
+  (`conversion`), and the pinned answers and results. `coverage.computed` counts the players. The loader
+  (`validateFootballSet`) takes a computed player only in a men's EA season's nation, with `fill` present, and only with
+  every field above; saves keep him whole, as the computed seasons' players are.
+
+Tonga, Samoa and the Cook Islands, the other gap computed-ratings.md lists, stay out. The built-in season fields every
+nation but them, and the method would field them where caps give eleven with a goalkeeper; but Wikidata holds 150
+memberships of their three national teams in all, and none starts after 2015 (asked of QLever on 2026-11-17, dated or
+not). The EA seasons field none of them either, having no player of theirs, and the fill makes no new sides.
+
+Sources:
+
+| Source | Pinned | Use | Licence |
+| --- | --- | --- | --- |
+| Wikidata, through QLever (`https://qlever.dev/api/wikidata`) | five answers by SHA-256, saved 2026-11-17 (22:36–22:40 UTC, a minute apart, and the players' sex or gender at 23:44) | The men's national teams (instances of Q135408445); every membership (P54) that began in 1970 or later and ended in 2003 or later or has no end, with start, end, caps and goals; the players' names, births, English Wikipedia articles, positions (P413) and sex or gender (P21) | CC0 1.0 |
+| [martj42/international_results](https://github.com/martj42/international_results), `results.csv` | the computed seasons' commit `b0948cb` | Every men's full international to 2026-10-06, for the Elo | CC0-1.0 |
+| eloratings.net's yearly tables | not pinned; the cached copies the roster audit and the gate read | The before and after check above only, never an input | none stated |
+
+Both inputs are CC0, so the season files need no attribution beyond their own credits.
+
+```bash
+npm run sync:football-fills -- --fetch   # download what data-src/wikidata-football-fills/ lacks (QLever a minute apart), then sync
+npm run sync:football-fills -- --pin     # record the SHA-256 of each answer after a deliberate new download
+npm run sync:football-fills              # data-src/ → scripts/data/football-fills/{wikidata,elo}.json (--check compares)
+npm run build:ea-seasons                 # reads the facts, fills each season, writes it (--check)
+```
+
+- `scripts/data/football-fills.json`: the manifest (the queries and pins, the constants, equal by test to the computed
+  national-team seasons' where they share them, the four position items they lack, the rule, and every season with its
+  ratings date: the EA seasons and the built-in's, kept for the islands).
+- `scripts/data/football-fills/wikidata.json`: the teams, players and stints of 2004–2027 (CC0); `elo.json` each
+  season's Elo of every team active then. The build reads only these and the manifest, so it rebuilds offline.
+- `docs/design/football-seasons-audit.json`: per season `fill` with L, the full XIs it rests on, and per short nation its
+  Elo, T, strength before and after, the players added (rating, caps, stint, figure), the EA players who lost their
+  place, the hold, the places still out of position or empty, and why a nation could not be filled.
+- `scripts/football-fills.test.mjs`: the rule on invented players, the constants and dates, every computed player
+  against the facts (capped that season for that nation, listed once, no EA player of the season, within his hold),
+  FIFA 05–09 with no fielded XI under eleven, the loader's refusals, a 2008/09 campaign that shows Egypt's computed
+  players as estimates and saves and resumes them, the facts rebuilt byte for byte where data-src/ has the answers.
+
+The roster audit (`npm run audit:rosters`, [roster-audit.md](roster-audit.md)) finds no error in the filled seasons;
+its lineup gaps fall from 709 to 444, and five computed players are among its unusual ages (under 16 or over 40 when
+the season starts: Roman Berezovsky, Armenia's keeper at 41 in 2016/17, and Vincent Thill, Luxembourg's at 15 in
+2015/16, as they played). `npm run validate:football-elo` rescored football-elo-agreement.json from the same cached
+tables: the 35 seasons' median rises from 0.852 to 0.869, and FIFA 11 (0.805) is now the lowest.
+
+The gate (`npm run validate:football`) scores the 2025/26 file, EA FC 26: its four filled nations take it from 0.8457
+to 0.8577 against Elo (still below the 0.90 bar it failed before) and its forecast log loss from 0.9169 to 0.9077. The
+built-in season is unchanged (0.9291, pass).
 
 ## Seasons before FIFA 05
 
@@ -1954,18 +2101,24 @@ year>`, labelled 'Basketball-Reference (computed)'. 1983/84, 1991/92 and 1998/99
 keep their games' ratings (Claude's decision). No BAA, no ABA, no 1959/60.
 Claude's decisions here and below were taken that day under the user's request
 to cover every missing season; the user approved them with the release of 2026-11-10.
+On 2026-11-17 the 36 seasons were re-rated by the method the user adopted that
+day ([computed-ratings.md](computed-ratings.md)): each player's value pooled
+over the season and the one before (the user's choice of 2026-11-18 over the
+method's three seasons, **Which window** below), shrunk by priors the data
+measure and given his share of his club's minutes (steps 3 and 4 below), then
+each club moved toward its real results (step 5, **Toward results** below).
 
 - **Source.** Sumitro Datta's 'NBA Stats (1947-present)' on Kaggle, version 57
   (updated 1 November 2026): a CC0 copy of Basketball-Reference's regular
   seasons, downloaded anonymously from Kaggle's API on 2026-11-09. The
   manifest's `computed.files` pins seven of its tables by SHA-256 in
   `data-src/research-gaps/basketball/kaggle-sumitrodatta-v57/` (ignored):
-  Advanced (position, games, minutes, PER, WS/48, DWS), Player Totals (points,
+  Advanced (position, games, minutes, PER, DWS), Player Totals (points,
   rebounds, assists; the file `check` pins too), All-Star Selections, End of
   Season Teams (All-NBA), Player Career Info (career position), Team Summaries
-  (team names, SRS, the league's pace and offensive rating) and Team Stats Per
-  Game (the league's points a game). Nothing was fetched from
-  basketball-reference.com. PER, WS/48 and DWS are Basketball-Reference's own
+  (team names, records and SRS, the league's pace and offensive rating) and
+  Team Stats Per Game (the league's points a game). Nothing was fetched from
+  basketball-reference.com. PER, DWS and SRS are Basketball-Reference's own
   calculations, and Sports-Reference's data-use terms forbid scraping that harms
   its sites, building a competing database and AI training with its data, and
   say facts are not copyrightable; Claude chose on 2026-11-09 to use them,
@@ -1977,33 +2130,61 @@ to cover every missing season; the user approved them with the release of 2026-1
   (1947-present), Kaggle, CC0, version 57', url, rawScale: 99, method:
   'computed', conversion }`, `conversion` stating the whole rule; the loader
   requires `conversion` of an `nba-stats` season.
-- **The score.** One formula for every season, on inputs that exist from
-  1951/52: score = −1.91373 + 0.0541565 × PER′ + 0.342456 × WS/48′ +
-  0.00592352 × MPG + 0.00000972204 × MPG² + 0.0683889 × PPG + 0.0254284 × RPG +
-  0.0709854 × APG + 0.264524 × All-Star + 0.0486592 × All-NBA + 0.111944 × DWS.
-  PER′ and WS/48′ are shrunk toward a bench player's 11 and 0.050 by 400
-  minutes ((value × minutes + prior × 400) / (minutes + 400)), so a few good
-  minutes count for little; All-Star is 1 if picked, All-NBA 3, 2 or 1 for the
-  first, second or third team; every input is the player's whole season. Every
-  coefficient is positive.
+- **The score.** One formula for every season, by step 3 of the method
+  ([computed-ratings.md](computed-ratings.md#3-each-players-value)), on inputs
+  that exist from 1951/52: score = −2.23989 + 0.0737916 × PER + 0.0793501 ×
+  PPG + 0.0641312 × APG + 16.1826 × DWS/G + 0.396823 × minutes share +
+  0.19311 × All-Star + 0.0159819 × All-NBA.
+  - **Production.** PER (a rate a minute), points, assists and defensive win
+    shares a game, each pooled over the season and the one before it, weighted
+    3:1 (`score.window`; the method's is 3:2:1, see **Which window** below): Σ
+    weight × events ÷ Σ weight × exposure, a season he did not play adding
+    nothing, so four games count for little beside a full season.
+  - **Shrinkage.** Each pooled rate is shrunk toward the season's replacement
+    level, the pooled rate of the quarter of its players with the least
+    exposure (`replacementRate`: a PER of 9 to 12, 4 to 8 points a game), by a
+    prior the data measure: k = n̄(1 − rel) ÷ rel (`priorFromReliability`), rel
+    the rate's rank correlation between the season and the one before among the
+    players with a quarter of each season's games, n̄ their mean exposure. k is
+    one season's evidence, so it counts at the season's weight (× 3): a player
+    with nothing but the season is shrunk exactly as one season's record. In
+    1997/98 it is 2,157 minutes for PER (rel 0.70), 43 games for points (0.82),
+    24 for assists (0.89) and 87 for defensive win shares (0.70); in 1960/61,
+    735 minutes and 39, 33 and 35 games. Nothing is set by hand any more (the
+    one-season score shrank PER and WS/48 toward 11 and 0.050 by 400 minutes and
+    its rates a game not at all).
+  - **Selection.** His share of his club's minutes, minutes ÷ (48 × the club's
+    games), pooled over the same window, not shrunk.
+  - **Honours.** All-Star is 1 if picked, All-NBA 3, 2 or 1 for the first,
+    second or third team: the season's own.
+  - Every coefficient is positive. The one-season score's WS/48, rebounds and
+    minutes a game are gone: beside PER and defensive win shares their weights
+    turned negative, and dropping them cost nothing left out.
 - **Its fit.** The coefficients are the least-squares fit of NBA 2K's overall,
-  as a z-score within each edition, on those inputs from each player's season
-  before (2K rates a season's players from the season before): 2K Archive's NBA
-  2K (1999/00) to NBA 2K26 (2025/26), its own NBA 2K12 included, players matched
-  by name and, where two share one, by club: 9,970 pairs. In sample the score
-  correlates 0.904 with the z-scores (Spearman 0.876). The manifest fixes the
-  coefficients, the training editions (2000 to 2026), the spread's edition
-  (2027) and its 390 ratings (`spread.counts`); the build fits the score again
-  and stops if a coefficient differs at six significant figures or the spread
-  has moved, so a later copy of 2K Archive's page cannot move a season unseen.
-  The research pass measured it leaving each edition out in turn (its scratch
-  scripts, in `data-src/research-gaps/basketball/_scratch/`, reproduce every
-  figure): Spearman 0.882, Pearson 0.906, 2.51 points mean error (2.26 for each
-  club's top five), weakest on 2004/05 (0.81). Against the same season's launch
-  ratings it does worse (0.78, 3.38 points): launch ratings come before the
-  season they rate. A score on BPM gained nothing and cannot go before 1973/74;
-  age terms gained nothing and learn 2K's ageing; box-score facts alone (no PER,
-  WS or DWS) reach 0.871 but order clubs worse (0.53 to 0.66 against SRS).
+  as a z-score within each edition, on those inputs as of each player's season
+  before (the window ending there: 2K rates a season's players from the seasons
+  before): 2K Archive's NBA 2K (1999/00) to NBA 2K26 (2025/26), its own NBA
+  2K12 included, players matched by name and, where two share one, by club:
+  9,970 pairs. In sample the score correlates 0.914 with the z-scores (Spearman
+  0.891). The manifest fixes the coefficients, the window, the training editions
+  (2000 to 2026), the spread's edition (2027) and its 390 ratings
+  (`spread.counts`); the build fits the score again and stops if a coefficient
+  differs at six significant figures or the spread has moved, so a later copy of
+  2K Archive's page cannot move a season unseen.
+  - **Left out one edition at a time** (the build measures it, and the audit
+    keeps it as `fit.leaveOneEditionOut`): Spearman 0.896, Pearson 0.917,
+    weakest on 2001/02, 2004/05 and 2025/26 (0.84). The one-season score this
+    replaced reached 0.882 and 0.906 (weakest 2004/05, 0.81), as the research
+    pass of 2026-11-09 measured it. Each change was adopted because it did not
+    lower that figure: the window alone took it to 0.891, shrinkage by measured
+    priors to 0.896; the minutes share kept it there.
+  - **Earlier pass.** The research pass of 2026-11-09 found that a score against
+    the same season's launch ratings does worse (0.78, 3.38 points; launch ratings
+    come before the season they rate), that a score on BPM gained nothing and
+    cannot go before 1973/74, that age terms gained nothing and learn 2K's
+    ageing, and that box-score facts alone (no PER, WS or DWS) reached 0.871 but
+    ordered clubs worse (0.53 to 0.66 against SRS). Its scratch scripts are in
+    `data-src/research-gaps/basketball/_scratch/`.
 - **The ratings.** Each season, each club's 13 players with the most minutes
   are rated. A player traded during the season counts once, for the club he
   played the most minutes for (then the most games, then the earlier club):
@@ -2012,13 +2193,52 @@ to cover every missing season; the user approved them with the release of 2026-1
   player at rank quantile (rank − 0.5) / N takes NBA 2K27's rating at that
   quantile of its ratings of each club's 13 best (2K Archive's 2026/27 table: 390
   ratings from 69 to 97; 72 at 5%, 74 at 25%, 78 at the median, 81 at 75%, 90 at
-  95%). No player passes another, and every season has NBA 2K27's spread, as the
-  1990s hockey seasons have NHL 27's. No input is a team's result: no SRS,
-  record or point margin (Claude's decision of 2026-11-09: a team-results term
-  ordered clubs a little better, 0.75 to 0.87 against SRS, but would choose
-  ratings by real results). Basketball-Reference's defensive win shares, and so
-  WS/48, do start from each club's points allowed, so some of a club's defence
-  reaches its players' scores.
+  95%), as the 1990s hockey seasons take NHL 27's. Then each club moves toward
+  its results (next).
+- **Toward results.** By the user's decision of 2026-11-17 (the full results
+  shift, [computed-ratings.md](computed-ratings.md#decisions)), which replaces
+  Claude's rule of 2026-11-09 that no input be a team's result, every computed
+  season, each a completed one, moves its clubs toward their real results by
+  step 5 of the method (`resultsMove`):
+  - **Results strength.** S is Basketball-Reference's SRS (Team Summaries). The
+    copy keeps no game results, so `srsOf` cannot be fitted on games, and the
+    reliability is an approximation: r = 1 − (σ² ÷ games) ÷ Var(SRS), as if each
+    club's SRS were the mean of its games' margins about the fit, each with
+    spread σ. σ = 10.9 points, one figure fitted to the records of all 36
+    seasons (`marginSigmaOf`: each club's wins against Φ((SRS_i − SRS_j) ÷ σ)
+    averaged over the rest of its league, by binomial likelihood; a balanced
+    schedule is assumed and the home edge folds into σ). Fitted season by season
+    it jumps between 9 and 14 points from one season to the next, more than the
+    game changes, so a season's own fit is mostly noise. r runs from 0.70 in
+    1975/76, whose clubs' SRS spread least, to 0.96 in 1971/72.
+  - **Engine units.** m is the match engine's margin a lineup point under the
+    season's own rules (pace and offensive rating), measured by playing two
+    fives of 80s, one 2 or 4 points better or worse on every slot, 20,000 times
+    at each gap on a generator seeded by the season (`enginePerPoint`, with
+    `perPointOf`): from 2.05 points in 1966/67 to 1.65 in 1997/98.
+  - **Target.** T = μ + √r × S ÷ m (`resultsTargets`), μ the season's mean
+    strength before the move, so the league's level stays NBA 2K27's.
+  - **The strength moved** is the one the engine plays: the five `selectLineup`
+    picks from the club's 13, at its net efficiency (its offence lifts its own
+    points a possession, its defence lowers the other side's) against a five of
+    74s, in lineup points (`engineStrengthOf`). It differs from the five's mean
+    where its ratings differ by position: a point at a guard counts 0.21, at
+    small forward 0.20, at centre 0.20, at power forward 0.18.
+  - **Move.** Every player of the club by one whole number, and its best few
+    (by rating, then by score) one more, whichever brings that strength nearest
+    T (`clubMoveOf`); no player passes a teammate he was rated or scored below.
+    Every club ends within 0.18 of its target. Of the 703 clubs, 231 do not
+    move, 300 move one point either way and 135 two; 25 fall 3, 4 fall 4 and
+    one 5; 6 rise 3 and one 4. The largest falls: the 1980/81 Lakers −5 (Magic
+    Johnson played 37 games and is rated on 1979/80 too; 54–28), then −4 the
+    1964/65 Warriors (Wilt Chamberlain's half season, 17–63), the 1968/69
+    Lakers, the 1982/83 Jazz and the 1990/91 Nuggets (20–62). The largest rise:
+    the 1971/72 Bucks +4 (63–19, SRS 10.70), then +3 the Bulls of 1995/96
+    (72–10) and 1996/97, the 1993/94 Spurs, the SuperSonics of 1990/91 and
+    1992/93 and the 1975/76 Cavaliers.
+  - A starter's rating now runs from 73 to 99 (NBA 2K27's 69 to 97, moved, and
+    held to 99): Kareem Abdul-Jabbar is 99 in 1971/72, Wilt Chamberlain 93 for
+    the 1964/65 Warriors (97 before their −4).
 - **Positions and fives.** A player's first position is the season's
   (Basketball-Reference lists PG, SG, SF, PF or C), else the first his career
   position implies (G is PG/SG, F SF/PF, C C, G-F SG/SF, F-G SF/SG, F-C PF/C,
@@ -2034,34 +2254,50 @@ to cover every missing season; the user approved them with the release of 2026-1
   its league averages (pace, offensive rating and points a game) those of
   `src/data/nbaLeagueAverages.js`; the build stops otherwise. The audit gives
   how many players each season rates (its clubs' 13s by minutes, 8,884 player
-  seasons in all), every traded player and his club, each five with each
-  player's score, the season's league
-  averages, and how its clubs' strengths follow its real SRS. Run end to end on
-  the two seasons NBA 2K27's MyNBA Eras rate, the rule rates them as 2K does:
-  1983/84's 233 players whom both rate at Spearman 0.95, 1.94 points mean error
-  and 1.40 points too high on average; 1991/92's 297 at 0.94, 2.10 and 1.85. The
-  research pass found the same on 378 players of 2K27's 34 classic teams from
-  1964/65 to 1999/2000 (0.91 and 2.82 points; before 1980, 0.93 and 2.42): Jerry
-  West 93 against 2K's 93 in 1964/65, Kareem Abdul-Jabbar 97 against 97 in
-  1970/71. The bias is mostly bench players: 2K27's spread starts at 69, and the
+  seasons in all), every traded player and his club, the priors its rates were
+  shrunk by, its move (σ, r, m, μ, and each club's SRS, target and strength
+  before and after), each five with each player's score, the season's league
+  averages, and how its clubs' strengths follow its SRS and spread, before the
+  move and after. Run end to end on the two seasons NBA 2K27's MyNBA Eras rate
+  (before any move), the rule rates them as 2K does: 1983/84's 233 players whom
+  both rate at Spearman 0.95, 1.94 points mean error and 1.41 points too high on
+  average; 1991/92's 297 at 0.94, 2.08 and 1.82 (the one-season score: 0.95 and
+  0.94, 1.94 and 2.10). On 378 players of 2K27's 34 classic teams from 1964/65
+  to 1999/2000 it reaches 0.92 (0.93 before 1980; the one-season score 0.91 and
+  0.93). The bias is mostly bench players: 2K27's spread starts at 69, and the
   eras' benches reach the low 70s.
-- **Clubs.** A club's strength follows its season's SRS at 0.79 on average,
-  from 0.51 in 1964/65 (Wilt Chamberlain counts for the Warriors, who traded him
-  in January) and 0.56 in 1975/76 and 1976/77 to 0.93 in 1963/64 and 1966/67.
-  Strengths spread less than the games' seasons do (a standard deviation of 1.37
-  to 2.37 a season, against 1.80 to 3.70), so computed seasons play a little
-  more evenly. Spot checks, each the season's best record: the strongest clubs
-  are the 1961/62 Celtics (86, Bill Russell 93), the 1967/68 76ers (87, Wilt
-  Chamberlain 97), the 1971/72 Lakers (88: Jerry West 96, Chamberlain 91, Gail
-  Goodrich 90), the 1972/73 Celtics (89: Dave Cowens 96, John Havlicek 95) and
-  the 1982/83 76ers (88: Moses Malone 97, Julius Erving 94); Oscar Robertson is
-  92 as a rookie in 1960/61, and Kareem Abdul-Jabbar 97 in 1971/72.
+- **Which window.** The method's window is 3:2:1 (the season, the one before,
+  the one before that). For the NBA, with its score fitted the same way, it
+  measured worse than 3:1 on every check of 2026-11-17: left out 0.895 against
+  0.896, the eras 0.94 and 0.93 against 0.95 and 0.94, classic teams 0.91
+  against 0.92 (before 1980 0.92 against 0.93), clubs against SRS before the
+  move 0.79 against 0.82, larger moves (one each of −6 and −5 and eight of −4,
+  against one −5, four −4 and one +4) and 84 starters who played under 40% of
+  their season's games against 60. The third season mostly carried injured
+  stars and the champions of two years before into a season they did not play
+  (David Robinson 90 in 1996/97, Larry Bird 91 in 1988/89, the 1976/77 Celtics
+  −5). On 2026-11-18 the user chose 3:1 for the NBA ("Switch to 3:1").
+- **Clubs.** Before the move a club's strength follows its season's SRS at 0.82
+  on average (Pearson's r), from 0.57 in 1975/76 and 0.58 in 1976/77 to 0.95 in
+  1972/73, where the one-season score's did at 0.79 (from 0.51 to 0.93); after
+  it, at 0.99 (0.97 to 1.00). Strengths spread by a standard deviation of 1.24
+  to 3.32 a season (1.44 to 2.46 before the move, the one-season score's 1.37 to
+  2.37), against the games' 1.80 to 3.70: each season now spreads as its
+  results did, so 1975/76 to 1978/79, whose records were close, stay narrow
+  (1.24 to 1.59), and 1971/72 and 1997/98 are the widest. Spot checks: the club
+  with the season's best SRS plays strongest (in 1984/85 the Bucks within 0.01
+  of the next): the 1961/62 Celtics (87: Bill Russell 94, Bob Cousy 88), the
+  1967/68 76ers (87: Wilt Chamberlain 98, Hal Greer 90), the 1971/72 Lakers
+  (89: Jerry West 97, Chamberlain 94, Gail Goodrich 91), the 1972/73 Lakers
+  (88, SRS 8.16: the 68–14 Celtics' was 7.35), the 1982/83 76ers (87: Moses
+  Malone 96, Julius Erving 94), and the 72–10 Bulls of 1995/96 (90: Michael
+  Jordan and Scottie Pippen 99); Oscar Robertson is 90 as a rookie in 1960/61.
 - They play at their own league averages (127.7 possessions and 118.1 points a
   game in 1960/61, 115.1 and 112.4 in 1970/71, 90.3 and 95.6 in 1997/98), from
   the same CC0 copy (Team Summaries' League Average pace and ORtg, Team Stats Per
   Game's points), which the build checks against `src/data/nbaLeagueAverages.js`.
-  Played every pairing four times, their clubs score from 1.3 points a game
-  under the league (1960/61) to 1.6 over (1987/88), 0.7 over on average; the
+  Played every pairing four times, their clubs score from 0.1 points a game
+  under the league (1964/65) to 1.9 over (1970/71), 1.0 over on average; the
   games' seasons run from 2.1 under to 1.9 over. The match engine is unchanged
   (Claude's decision): see [Known limits](#known-limits).
 
@@ -2340,27 +2576,30 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
 - Basketball seasons have no national teams, and none before 1960/61 (the
   user's floor; no BAA or ABA). 36 of them are computed, not a game's ratings
   ([Computed seasons](#computed-seasons-196061-to-199798)), and their limits are
-  the score's:
+  the score's and the move's:
   - Specialists rate low and scorers on weak clubs high, as PER and win shares
     see them: in 1995/96 Dennis Rodman is not in the Bulls' five (Toni Kukoč
-    starts), so the 72–10 Bulls are only the fourth-strongest club (86, behind
-    Orlando's 89); in 1996/97 (69–13) four clubs match their 86, behind Houston
-    and Seattle; and nine clubs rate above the 63–19 champion Pistons of
-    1988/89 (84).
+    starts). Since 2026-11-17 each club's move toward its results sets its
+    level, so the 72–10 Bulls are the strongest club anyway (90; 86 and fourth
+    under the one-season score), but inside a club the order is still the
+    score's.
+  - Clubs follow SRS, not wins: the 60–22 Lakers of 1972/73 (SRS 8.16) play
+    stronger than the 68–14 Celtics (7.35), and the 63–19 champion Pistons of
+    1988/89 (6.24) level with the Lakers, behind Cleveland and Phoenix.
   - A player traded during a season counts only for the club he played the most
     minutes for, 5.6% of all starters: Wilt Chamberlain plays 1964/65 for the
     San Francisco Warriors, not the 76ers he finished it with; Clyde Drexler
     1994/95 for Portland, not the champion Rockets; Bob McAdoo 1976/77 for the
-    Knicks.
+    Knicks. The move pulls such a club toward its record with him in it: the
+    17–63 Warriors fall 4 points, Chamberlain to 93.
   - A club's 13 by minutes can hold a player who missed most of the season, and
-    he is rated on the games he played (PER and WS/48 are shrunk by minutes, his
-    points, rebounds and assists a game are not), so he starts all season: 56 of
-    the 3,515 starters played under 40% of the season's games, among them Bob
-    Rule (4 games in 1970/71, rated 85), Larry Bird (6 in 1988/89, 83) and David
-    Robinson (6 in 1996/97, 82).
-  - Club strengths spread less than the games' seasons (standard deviation 1.37
-    to 2.37 against 1.80 to 3.70), and follow real results least in 1964/65,
-    1975/76, 1976/77 and 1977/78 (0.51 to 0.61 against SRS).
+    the window rates him on the season before too, as NBA 2K rates an injured
+    player on his talent, so he starts all season: 60 of the 3,515 starters
+    played under 40% of the season's games (56 under the one-season score, 84
+    under the method's three-season window), among them Bob Rule (4 games in
+    1970/71, rated 81), Larry Bird (6 in 1988/89, 87) and David Robinson (6 in
+    1996/97, 86). The club's move then takes his teammates down with the club:
+    the 1996/97 Spurs' whole roster by 3 points.
   - Positions are Basketball-Reference's modern labels given retroactively, and
     the second position is derived. Names are Basketball-Reference's too, each
     player's latest: Kareem Abdul-Jabbar in 1969/70 and 1970/71, when he played

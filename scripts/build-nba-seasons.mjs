@@ -12,8 +12,9 @@
 // MyNBA Eras pages, NBA Live 99's roster files), and each player of the eras and of NBA Live 99 is checked against
 // Basketball-Reference's seasons (the manifest's `check`, Sumitro Datta's CC0 copy). The computed seasons come from
 // the pinned tables of the same copy (data-src/research-gaps/basketball/kaggle-sumitrodatta-v57/): the score is fitted
-// again and must be the manifest's, and each season's league averages must be src/data/nbaLeagueAverages.js's. Each
-// season names the era map it plays on; npm run build:nba-map builds those maps from the same manifest.
+// again and must be the manifest's, each season's league averages must be src/data/nbaLeagueAverages.js's, and its
+// clubs move toward their real results (SRS) by the match engine's own margin a point, measured on a seeded generator.
+// Each season names the era map it plays on; npm run build:nba-map builds those maps from the same manifest.
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -96,15 +97,18 @@ async function main() {
     }
     if (audit.population != null) {
       console.log(`  ${audit.population} players by minutes, ${audit.rated} rated, ${audit.noPosition.length} without a position, `
-        + `${audit.traded.length} traded; clubs against SRS r = ${audit.clubsAgainstSRS}`);
+        + `${audit.traded.length} traded; clubs against SRS r = ${audit.clubsAgainstSRSBeforeMove} → ${audit.clubsAgainstSRS} after the move `
+        + `(r ${audit.results.reliability}, m ${audit.results.perPoint}), strength SD ${audit.strengthSd.beforeMove} → ${audit.strengthSd.afterMove}`);
     }
     for (const note of audit.outOfPosition ?? []) if (audit.sourceRows != null || audit.population != null) console.log(`  out of position: ${note}`);
     for (const warning of audit.warnings) console.log(`  warning: ${warning}`);
   }
   if (computed) {
-    const { fit, checks } = computed.summary;
-    console.log(`Computed seasons: the score refits on ${fit.pairs} pairs of ${fit.editions} editions (r = ${fit.correlation}); `
-      + Object.entries(checks).map(([id, check]) => `${id} ${check.matched} players, Spearman ${check.rankCorrelation}, mean error ${check.meanError}`).join('; '));
+    const { fit, checks, marginSigma } = computed.summary;
+    console.log(`Computed seasons: the score refits on ${fit.pairs} pairs of ${fit.editions} editions (r = ${fit.correlation}; each edition left out, `
+      + `Spearman ${fit.leaveOneEditionOut.rankCorrelation}); `
+      + Object.entries(checks).map(([id, check]) => `${id} ${check.matched} players, Spearman ${check.rankCorrelation}, mean error ${check.meanError}`).join('; ')
+      + `; game margins spread ${marginSigma.points} points over ${marginSigma.seasons} seasons' records`);
   }
   const audit = { generatedBy: 'scripts/build-nba-seasons.mjs', source: manifest.source, extra: manifest.extra, check: manifest.check,
     ...(computed ? { computed: { ...manifest.computed, ...computed.summary } } : {}), skipped: manifest.skipped, seasons: results.map(result => result.audit) };

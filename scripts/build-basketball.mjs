@@ -19,6 +19,7 @@ import path from 'node:path';
 import { CONF_META, NATIONS, selectLineup } from '../src/data/teams.js';
 import { colourFor } from './lib/club-identity.mjs';
 import { euroleagueClubs } from './lib/euroleague.mjs';
+import { playerRecords, readSnapshots } from './lib/euroleague-seasons.mjs';
 import { editionOf, readArchive } from './lib/nba-seasons.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -48,8 +49,8 @@ if (!Array.isArray(nba)) throw new Error(`2K Archive has no ${manifest.builtIn.e
 
 // Each player plays under the name and at the rating the built-in season's clubs give him, so a national five and a
 // club never show one man two ways: an NBA player's are NBA 2K's (its spelling, "Nikola Jokić"), a EuroLeague
-// player's the built-in EuroLeague's estimate for every rostered player (scripts/lib/euroleague.mjs, the clubs'
-// rule). A name two of a source's players share resolves to neither.
+// player's the built-in EuroLeague's estimate for every rostered player (scripts/lib/euroleague-ratings.mjs, the
+// clubs' rule, its window reading the earlier seasons' snapshots). A name two of a source's players share resolves to neither.
 const byName = (players, nameOf) => {
   const map = new Map();
   for (const p of players) map.set(norm(nameOf(p)), map.has(norm(nameOf(p))) ? null : p);
@@ -59,7 +60,7 @@ const nbaByName = byName(nba, p => p.n);
 const snapshot = JSON.parse(await readFile(path.join(root, 'scripts', 'data', 'euroleague-2026-27.json'), 'utf8'));
 const identity = JSON.parse(await readFile(path.join(root, 'scripts', 'data', 'euroleague-teams.json'), 'utf8'));
 const euroleagueTeams = Object.fromEntries(Object.entries(identity.clubs).map(([code, team]) => [code, { ...team, col: colourFor(team.id) }]));
-const euroleagueByName = byName(euroleagueClubs(snapshot, euroleagueTeams, identity.names).players, p => p.name);
+const euroleagueByName = byName(euroleagueClubs(snapshot, euroleagueTeams, identity.names, playerRecords(readSnapshots(root))).players, p => p.name);
 // A listed NBA player who has left the league since keeps his latest NBA 2K rating, the newest earlier edition first.
 const earlierYears = Object.keys(years).map(Number).filter(year => year < manifest.builtIn.year).sort((a, b) => b - a);
 function lastNbaRating(name) {

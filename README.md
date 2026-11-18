@@ -1693,9 +1693,12 @@ the game: pick one under **Season** in setup. Each is a file in
   2005/06 and 2004/05 have nations only. A club EA filed under Rest of World for want of
   a licence (FIFA 20's Olympiacos, Spartak Moscow and Shakhtar Donetsk) plays in the league
   the same club is in in the nearest other edition. Ratings are EA's overalls, unchanged.
-  EA rates only part of the world, so 49–82 nations field a full XI each season (fewer in the older
-  editions). A nation with at least six rated players, half an XI, fields the players it has, short-handed
-  below eleven; one with fewer fields no team, and its land stays neutral. Scotland, Wales and Northern Ireland field their own
+  EA rates only part of the world, so 49–82 nations have a full XI of EA's own each season (fewer in the older
+  editions). A nation with at least six rated players, half an XI, fields a side; the places EA leaves empty in
+  its natural XI go to players capped for it that season on Wikidata, rated from its World Football Elo and
+  marked as estimates ([computed fills](docs/design/football-years.md#computed-fills)), and it starts
+  short-handed only where Wikidata names nobody (FIFA 05–09: none). One with fewer fields no team, and its land
+  stays neutral. Scotland, Wales and Northern Ireland field their own
   teams; places with no shape on the map (Malta, the Faroe Islands, …) have
   none, and their players still play for their clubs.
 - **Rosters:** EA FC 26 is update 4 of 19 September 2025, the snapshot the
@@ -1964,19 +1967,26 @@ the map of its era.
 - **Computed seasons:** 1960/61 to 1982/83, 1984/85 to 1990/91 and 1992/93 to
   1997/98, labelled 'Basketball-Reference (computed)'. One score per player
   season from Basketball-Reference's statistics in Sumitro Datta's copy on
-  Kaggle, whose CC0 label is the compiler's: PER, WS/48 and DWS are
+  Kaggle, whose CC0 label is the compiler's: PER, DWS and SRS are
   Basketball-Reference's own figures, under Sports-Reference's data-use terms
   ([Rights and terms](docs/design/football-year-sources.md#rights-and-terms)).
-  The score weighs PER and WS/48 shrunk by minutes, minutes, points, rebounds and
-  assists a game, All-Star and All-NBA picks and defensive win shares, its
-  weights fitted by least squares to NBA 2K's overalls of 1999/00 to 2025/26;
-  each club's 13 players with the most minutes are ranked by it and given NBA
-  2K27's ratings rank for rank. A player traded during a season plays for the
-  club he played the most minutes for. Rated this way, 1983/84 and 1991/92 match
-  NBA 2K27's own ratings of them at a rank correlation of 0.95 and 0.94 (about 2
-  points out). Specialists rate low (Dennis Rodman does not start for the
-  1995/96 Bulls), and the engine plays every season with today's rules at that
-  season's pace.
+  The score weighs PER, points, assists and defensive win shares a game, each
+  pooled over the season and the one before it (3:1, the user's choice for the
+  NBA over the method's 3:2:1) and shrunk toward the season's replacement level
+  by a prior the data measure, the player's share of his club's minutes, and
+  All-Star and All-NBA picks, its weights fitted by least squares to NBA 2K's
+  overalls of 1999/00 to 2025/26 (0.896 rank correlation on an edition left
+  out); each club's 13 players with the most
+  minutes are ranked by it and given NBA 2K27's ratings rank for rank. Then each
+  club moves toward its real results (Basketball-Reference's SRS, at the match
+  engine's margin a rating point), by the user's decision of 2026-11-17
+  ([computed-ratings.md](docs/design/computed-ratings.md)): clubs follow their
+  season's SRS at 0.99. A player traded during a season plays for the club he
+  played the most minutes for. Rated this way before the move, 1983/84 and
+  1991/92 match NBA 2K27's own ratings of them at a rank correlation of 0.95 and
+  0.94 (about 2 points out). Specialists rate low (Dennis Rodman does not start
+  for the 1995/96 Bulls), and the engine plays every season with today's rules
+  at that season's pace.
 - **What is missing:** any national team (NBA 2K rates NBA players only), and
   any season before 1960/61 (no BAA or ABA).
 - **Source:** [2K Archive](https://2karchive.com/), a fan compilation of every

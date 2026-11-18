@@ -3,62 +3,49 @@
 // reads the files and tests feed invented players. docs/design/euroleague.md explains the choices.
 //
 // No source rates EuroLeague players: NBA 2K has carried no EuroLeague teams since 2K17, and no other public dataset
-// rates them. Every rating here is the game's estimate, on NBA 2K's scale, from a player's EuroLeague box scores, and is
+// rates them. Every rating here is the game's estimate, on NBA 2K's scale, from a player's EuroLeague minutes and PIR
+// (scripts/lib/euroleague-ratings.mjs, the method every computed season follows: docs/design/computed-ratings.md), and is
 // marked as one wherever it is shown (src/data/estimates.js).
 import { selectLineup } from '../../src/data/teams.js';
+import { LEVEL, rateSeason, recordOf, startingFive, valuesOf } from './euroleague-ratings.mjs';
 
+export { startingFive };
 export const FIVE = 5;
 const POSITIONS = ['PG', 'SG', 'SF', 'PF', 'C'];
 
 // ---- Ratings --------------------------------------------------------------------------------------------------------
 
-/**
- * A rating is linear in the player's PIR (the EuroLeague's Performance Index Rating) a game, `RATING_AT_LEVEL` at
- * `LEVEL_PIR` and `RATING_PER_PIR` more for each point above it.
- * - The level: a EuroLeague player with a PIR of 9 a game rates 73, between the two references. The 47 players on
- *   this season's rosters who played in the NBA lately rated 72.5 in their last NBA 2K (2K24–2K27) at a PIR of 8.4, and
- *   the 30 EuroLeague players among the national fives (scripts/fiba-squads.json) carry 73.6 at 9.2.
- * - The slope: a club's five then rates as its players play, and the league's clubs spread as the real ones do. At 1.3
- *   a point of PIR, a simulated season of these 20 fives has its clubs' records as far apart as the EuroLeague's last
- *   five regular seasons (the standard deviation of their winning shares 0.139; real 0.126–0.159), its margins as wide
- *   (10.3 points a game; real 10.2–10.8) and as many close games and blowouts. Neither reference can give the slope:
- *   NBA 2K rates the league's fringe, which is where EuroLeague players come from, close together.
- */
-export const LEVEL_PIR = 9;
-export const RATING_AT_LEVEL = 73;
-export const RATING_PER_PIR = 1.3;
-export const RATING_RANGE = Object.freeze([60, 88]);
-/**
- * A player's PIR a game over the seasons he played, the season under way counting one and a half times a game, the
- * last full season once and the one before half: form now, but a season hurt or a slow start does not sink him.
- */
-export const SEASON_WEIGHTS = Object.freeze([0.5, 1, 1.5]);
-/**
- * Few games say little: a player's PIR is drawn towards a bench player's (`PRIOR_PIR`) as if he had also played
- * `PRIOR_GAMES` games at it. A player with no EuroLeague game in the three seasons rates there: about 66.
- */
-export const PRIOR_PIR = 4;
-export const PRIOR_GAMES = 4;
-
 // A line is [games, minutes, points, rebounds, assists, three-point attempts, PIR], per game.
-const G = 0, MIN = 1, REB = 3, AST = 4, TPA = 5, PIR = 6;
+const G = 0, MIN = 1, REB = 3, AST = 4, TPA = 5;
 
-/** The player's PIR a game over `lines` (one per season, oldest first, null for a season he did not play), shrunk. */
-export function blendedPir(lines) {
-  let weight = 0, total = 0;
-  lines.forEach((line, s) => {
-    if (!line || !line[G]) return;
-    const w = SEASON_WEIGHTS[s] * line[G];
-    weight += w;
-    total += w * line[PIR];
+/**
+ * The built-in season's players as the ratings read them: `{ code, club, nationality, name, positions, group, window,
+ * games }`, `window` his records of the season under way (from the snapshot, his club's games the most any of its players
+ * has played), of the season before and of the one before that (`earlier.records`, scripts/lib/euroleague-seasons.mjs
+ * playerRecords: every player with a game, on 2025/26's level, where the snapshot read the leaderboard's alone).
+ */
+export function builtInPlayers(snapshot, names = {}, earlier) {
+  const seasons = snapshot.source.seasons.length;
+  const years = snapshot.source.seasons.map(code => Number(code.slice(1)));
+  const current = seasons - 1;
+  for (const year of years.slice(0, current)) {
+    if (!earlier?.records?.[year]) throw new Error(`The built-in season's window needs EuroLeague ${year}'s records`);
+  }
+  const clubGames = new Map();
+  for (const row of snapshot.players) {
+    const line = row[6 + current];
+    if (line?.[G]) clubGames.set(row[2], Math.max(clubGames.get(row[2]) ?? 0, line[G]));
+  }
+  return snapshot.players.map(row => {
+    const [code, name, club, position, height, nationality, ...rest] = row;
+    const lines = rest.slice(0, seasons);
+    const extra = rest[seasons] ?? {};
+    const window = years.map((year, s) => (s === current
+      ? recordOf({ club, group: position, line: lines[s], clubGames: clubGames.get(club) })
+      : earlier.records[year].get(code) ?? null)).reverse();
+    return { code, club, nationality, name: displayName(name, extra, names[code]), positions: positionsOf(position, height, lines), group: position,
+      window, games: window.reduce((sum, record) => sum + (record?.games ?? 0), 0) };
   });
-  return (total + PRIOR_GAMES * PRIOR_PIR) / (weight + PRIOR_GAMES);
-}
-
-/** The game's rating of a player with these lines, a whole number in RATING_RANGE. */
-export function estimateRating(lines) {
-  const raw = RATING_AT_LEVEL + RATING_PER_PIR * (blendedPir(lines) - LEVEL_PIR);
-  return Math.max(RATING_RANGE[0], Math.min(RATING_RANGE[1], Math.round(raw)));
 }
 
 // ---- Positions ------------------------------------------------------------------------------------------------------
@@ -144,49 +131,42 @@ export function displayName(name, { alias = null, abbr = null } = {}, override =
 
 // ---- Clubs ----------------------------------------------------------------------------------------------------------
 
-/** A pool's best five: the strongest lineup its players' positions allow, strongest first (as the NBA clubs'). */
-export function startingFive(pool) {
-  const byRating = pool.slice().sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name));
-  return selectLineup({ sport: 'basketball', squad: byRating }).starters
-    .map(starter => byRating[starter.originalIndex])
-    .sort((a, b) => b.rating - a.rating || a.name.localeCompare(b.name));
-}
-
 /** What every estimated rating carries (src/data/estimates.js reads `source` and `league`). */
 export const ESTIMATE = Object.freeze({ source: 'estimate', edition: 'Estimated', league: 'EuroLeague' });
 
 /**
  * The EuroLeague's clubs, strongest first: `snapshot` is the synced file, `teams` the game's identity for each club by
- * EuroLeague code ({ id, name, code, country, col }) and `names` the spellings that override EuroLeague's, by player code.
- * Each club fields its best five as `[name, 'PG/SG', rating, ESTIMATE]`; `str` is the five's mean, rounded. Returns
- * `{ clubs, players, warnings }`, `players` every rostered player as rated (for the audit and tests).
+ * EuroLeague code ({ id, name, code, country, col }), `names` the spellings that override EuroLeague's, by player code,
+ * and `earlier` the earlier seasons' records and shared constants (scripts/lib/euroleague-seasons.mjs playerRecords).
+ * Every rostered player is rated by the computed-ratings method (scripts/lib/euroleague-ratings.mjs) at the `level`
+ * below NBA 2K27; a season under way is not moved toward its results. Each club fields its best five as
+ * `[name, 'PG/SG', rating, ESTIMATE]`; `str` is the five's mean, rounded. Returns `{ clubs, players, warnings, groups }`,
+ * `players` every rostered player as rated (for the audit and tests), with his `selection`, `production`, `value` and
+ * `exact` (unrounded) rating, and `groups` each position group's replacement level and blend weights.
  */
-export function euroleagueClubs(snapshot, teams, names = {}) {
+export function euroleagueClubs(snapshot, teams, names = {}, earlier, { level = LEVEL } = {}) {
   const warnings = [];
   const codes = snapshot.clubs.map(club => club.code);
   const missing = codes.filter(code => !teams[code]);
   if (missing.length) throw new Error(`No identity for EuroLeague clubs ${missing.join(', ')}`);
   const extra = Object.keys(teams).filter(code => !codes.includes(code));
   if (extra.length) warnings.push(`identities for clubs not in the season: ${extra.join(', ')}`);
-  const seasons = snapshot.source.seasons.length;
-  const players = snapshot.players.map(row => {
-    const [code, name, club, position, height, nationality, ...rest] = row;
-    const lines = rest.slice(0, seasons);
-    const extra = rest[seasons] ?? {};
-    if (!codes.includes(club)) throw new Error(`${name} plays for ${club}, which is not in the season`);
-    const positions = positionsOf(position, height, lines);
-    return { code, club, nationality, name: displayName(name, extra, names[code]), positions, rating: estimateRating(lines),
-      pir: blendedPir(lines), games: lines.reduce((sum, line) => sum + (line?.[G] ?? 0), 0) };
-  });
+  const players = builtInPlayers(snapshot, names, earlier);
+  for (const player of players) {
+    if (!codes.includes(player.club)) throw new Error(`${player.name} plays for ${player.club}, which is not in the season`);
+  }
   const seen = new Map();
   for (const player of players) {
     const key = `${player.club}|${player.name}`;
     if (seen.has(key)) throw new Error(`Two players called ${player.name} at ${player.club}`);
     seen.set(key, player);
   }
+  const { values, groups } = valuesOf(players, earlier.constants);
+  for (const player of players) Object.assign(player, values.get(player.code));
+  const rated = rateSeason(players, codes, { level });
+  for (const player of players) Object.assign(player, { rating: rated.ratings.get(player.code), exact: rated.exact.get(player.code) });
   const clubs = codes.map(code => {
-    const pool = players.filter(player => player.club === code).map(p => ({ ...p, pos: p.positions[0] }));
-    const five = startingFive(pool);
+    const five = rated.fives.get(code);
     if (five.length < FIVE) throw new Error(`${teams[code].name} has ${five.length} players`);
     const lineup = selectLineup({ sport: 'basketball', squad: five });
     const stretched = lineup.slots.filter(slot => slot.outOfPosition).map(slot => `${slot.player.name} at ${slot.position}`);
@@ -199,5 +179,5 @@ export function euroleagueClubs(snapshot, teams, names = {}) {
   for (const p of players) {
     if (!POSITIONS.includes(p.positions[0])) throw new Error(`${p.name}: position ${p.positions.join('/')}`);
   }
-  return { clubs, players, warnings };
+  return { clubs, players, warnings, groups };
 }
