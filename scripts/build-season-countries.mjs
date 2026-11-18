@@ -229,8 +229,8 @@ const HOMES_ABOUT = 'Where each club of the earlier seasons\' country maps stand
 // ---- Building ----
 
 // The GeoNames country of a nation a season rates ten clubs of but today's maps do not have (SWOS's Suriname, the Update
-// Team's 2025/26 Philippines); Scotland, Wales and Northern Ireland take theirs from LOCATE_REGIONS.
-const UNMAPPED_GEONAMES = Object.freeze({ 740: { country: 'SR', admin1: null }, 608: { country: 'PH', admin1: null } });
+// Team's Philippines and Belize); Scotland, Wales and Northern Ireland take theirs from LOCATE_REGIONS.
+const UNMAPPED_GEONAMES = Object.freeze({ 740: { country: 'SR', admin1: null }, 608: { country: 'PH', admin1: null }, '084': { country: 'BZ', admin1: null } });
 
 /** The GeoNames country and region of a nation, as its snapshot names them (Scotland's: the United Kingdom's, Scotland's region). */
 async function geonamesOf(country) {

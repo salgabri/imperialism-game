@@ -1419,10 +1419,11 @@ source rates, ten or more of them: England's of 2010/11 holds FIFA 11's 89 Engli
 league clubs, its 2003/04 map CM 01/02's top 100 English clubs down to the
 Conference, and Scotland, Wales and Northern Ireland get maps wherever a season rates
 ten of their clubs. In an EA season, the countries EA does not rate come from the CM 01/02
-Update Team's database of that season, credited to them: so far 2025/26's, from their
-December 2025 database (71 more countries, Brazil, Greece, Croatia, Egypt and Iran among
-them); the other seasons' databases come from the champman0102.co.uk forum, behind its
-login (`node scripts/sync-cm0102-updates.mjs --zip=<downloaded release>`). With **Clubs** and an earlier season chosen, **One country · top
+Update Team's database of that season, credited to them, from 2007/08 on: 28 to 71 more
+countries a season (826 maps), Greece, Croatia, Serbia, Egypt and Iran among them, and Brazil
+and Russia in the seasons EA lacks them. Their databases come from the champman0102.co.uk
+forum, behind its login (`node scripts/sync-cm0102-updates.mjs --zip=<downloaded release>`),
+and December 2025's from archive.org (`node scripts/sync-cm0102-updates.mjs`). With **Clubs** and an earlier season chosen, **One country · top
 clubs** lists that season's countries; a country chosen before stays chosen, on that
 season's map of it, and a season with none plays its Europe maps. The clubs are the
 season's own (EA's editions from 2006/07, Championship Manager's databases and SWOS's
