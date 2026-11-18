@@ -45,7 +45,7 @@
   "name-unusual": {
    "severity": "warning",
    "about": "a name with punctuation other than hyphens, apostrophes and full stops: a birth-year tag telling namesakes apart, or a source's quotes or brackets (an esport's gamer tags are not checked)",
-   "count": 100
+   "count": 101
   },
   "namesakes-in-team": {
    "severity": "warning",
@@ -1047,10 +1047,11 @@
     ]
    },
    "nhl-2026": {
-    "count": 2,
+    "count": 3,
     "examples": [
      "nation:Sweden — name-unusual: \"Elias Pettersson (1998)\"",
-     "club:Vancouver Canucks — name-unusual: \"Elias Pettersson (1998)\""
+     "club:Vancouver Canucks — name-unusual: \"Elias Pettersson (1998)\"",
+     "club:Vancouver Canucks — name-unusual: \"Elias Pettersson (2004)\""
     ]
    },
    "nhl-2025": {
@@ -1069,6 +1070,14 @@
     ]
    },
    "nhl-2023": {
+    "count": 4,
+    "examples": [
+     "nation:Finland — name-unusual: \"Sebastian Aho (1997)\"",
+     "club:Toronto Maple Leafs — name-unusual: \"Matt Murray (1994)\"",
+     "club:Carolina Hurricanes — name-unusual: \"Sebastian Aho (1997)\""
+    ]
+   },
+   "nhl-2021": {
     "count": 3,
     "examples": [
      "nation:Finland — name-unusual: \"Sebastian Aho (1997)\"",
@@ -1076,19 +1085,11 @@
      "club:New York Islanders — name-unusual: \"Sebastian Aho (1996)\""
     ]
    },
-   "nhl-2021": {
+   "nhl-2018": {
     "count": 2,
     "examples": [
      "nation:Finland — name-unusual: \"Sebastian Aho (1997)\"",
      "club:Carolina Hurricanes — name-unusual: \"Sebastian Aho (1997)\""
-    ]
-   },
-   "nhl-2018": {
-    "count": 3,
-    "examples": [
-     "nation:Finland — name-unusual: \"Sebastian Aho (1997)\"",
-     "club:Carolina Hurricanes — name-unusual: \"Sebastian Aho (1997)\"",
-     "club:New York Islanders — name-unusual: \"Sebastian Aho (1996)\""
     ]
    },
    "madden-2011": {
@@ -1104,17 +1105,15 @@
     ]
    },
    "nhl-2006": {
-    "count": 3,
+    "count": 2,
     "examples": [
      "nation:Czechia — name-unusual: \"Petr Sykora (1976)\"",
-     "club:New York Rangers — name-unusual: \"Petr Sykora (1976)\"",
-     "club:Washington Capitals — name-unusual: \"Petr Sykora (1978)\""
+     "club:New York Rangers — name-unusual: \"Petr Sykora (1976)\""
     ]
    },
    "nhl-2001": {
-    "count": 2,
+    "count": 1,
     "examples": [
-     "club:Toronto Maple Leafs — name-unusual: \"Petr Svoboda (1980)\"",
      "club:Tampa Bay Lightning — name-unusual: \"Petr Svoboda (1966)\""
     ]
    },
@@ -1161,8 +1160,9 @@
     ]
    },
    "nhl-1990": {
-    "count": 1,
+    "count": 2,
     "examples": [
+     "club:Detroit Red Wings — name-unusual: \"Greg Adams (1960)\"",
      "club:Vancouver Canucks — name-unusual: \"Greg Adams (1963)\""
     ]
    },
@@ -1170,8 +1170,8 @@
     "count": 5,
     "examples": [
      "nation:Great Britain — name-unusual: \"Steve Smith (1963-04-30)\"",
-     "club:Edmonton Oilers — name-unusual: \"Greg Adams (1960)\"",
-     "club:Edmonton Oilers — name-unusual: \"Steve Smith (1963-04-30)\""
+     "club:Vancouver Canucks — name-unusual: \"Greg Adams (1963)\"",
+     "club:Edmonton Oilers — name-unusual: \"Greg Adams (1960)\""
     ]
    },
    "nt-1988": {
@@ -1186,7 +1186,7 @@
     "examples": [
      "nation:Great Britain — name-unusual: \"Steve Smith (1963-04-30)\"",
      "club:Edmonton Oilers — name-unusual: \"Steve Smith (1963-04-30)\"",
-     "club:Minnesota North Stars — name-unusual: \"Ron Wilson (1955)\""
+     "club:Washington Capitals — name-unusual: \"Greg Adams (1960)\""
     ]
    },
    "nt-1987": {
@@ -1201,23 +1201,23 @@
     "examples": [
      "nation:Great Britain — name-unusual: \"Steve Smith (1963-04-30)\"",
      "club:Edmonton Oilers — name-unusual: \"Steve Smith (1963-04-30)\"",
-     "club:Quebec Nordiques — name-unusual: \"Alain Cote (1957)\""
+     "club:Washington Capitals — name-unusual: \"Greg Adams (1960)\""
     ]
    },
    "nhl-1986": {
-    "count": 9,
+    "count": 8,
     "examples": [
      "nation:Great Britain — name-unusual: \"Steve Smith (1963-04-30)\"",
      "club:Edmonton Oilers — name-unusual: \"Steve Smith (1963-04-30)\"",
-     "club:Boston Bruins — name-unusual: \"Alain Cote (1967)\""
+     "club:Washington Capitals — name-unusual: \"David Jensen (1965)\""
     ]
    },
    "nhl-1985": {
-    "count": 5,
+    "count": 4,
     "examples": [
      "nation:Great Britain — name-unusual: \"Steve Smith (1963-04-30)\"",
-     "club:Minnesota North Stars — name-unusual: \"Ron Wilson (1955)\"",
-     "club:Washington Capitals — name-unusual: \"Greg Adams (1960)\""
+     "club:Winnipeg Jets — name-unusual: \"Ron Wilson (1956)\"",
+     "club:Minnesota North Stars — name-unusual: \"Ron Wilson (1955)\""
     ]
    },
    "nhl-1980": {
@@ -1230,8 +1230,8 @@
    "nhl-1979": {
     "count": 3,
     "examples": [
-     "club:Philadelphia Flyers — name-unusual: \"Bob Kelly (1950)\"",
      "club:Atlanta Flames — name-unusual: \"Bob Murdoch (1946)\"",
+     "club:Philadelphia Flyers — name-unusual: \"Bob Kelly (1950)\"",
      "club:St. Louis Blues — name-unusual: \"Bob Murdoch (1954)\""
     ]
    },
@@ -1239,8 +1239,8 @@
     "count": 4,
     "examples": [
      "club:Philadelphia Flyers — name-unusual: \"Bob Kelly (1950)\"",
-     "club:Los Angeles Kings — name-unusual: \"Bob Murdoch (1946)\"",
-     "club:Cleveland Barons — name-unusual: \"Bob Murdoch (1954)\""
+     "club:Chicago Black Hawks — name-unusual: \"Bob Kelly (1946)\"",
+     "club:Los Angeles Kings — name-unusual: \"Bob Murdoch (1946)\""
     ]
    },
    "nhl-1977": {
@@ -1248,15 +1248,15 @@
     "examples": [
      "club:Philadelphia Flyers — name-unusual: \"Bob Kelly (1950)\"",
      "club:Pittsburgh Penguins — name-unusual: \"Bob Kelly (1946)\"",
-     "club:Chicago Black Hawks — name-unusual: \"Bob Murray (1954)\""
+     "club:Los Angeles Kings — name-unusual: \"Bob Murdoch (1946)\""
     ]
    },
    "nhl-1976": {
-    "count": 4,
+    "count": 6,
     "examples": [
      "club:Philadelphia Flyers — name-unusual: \"Bob Kelly (1950)\"",
      "club:Pittsburgh Penguins — name-unusual: \"Bob Kelly (1946)\"",
-     "club:Los Angeles Kings — name-unusual: \"Bob Murdoch (1946)\""
+     "club:Vancouver Canucks — name-unusual: \"Bob Murray (1948)\""
     ]
    },
    "nhl-1975": {
@@ -1849,12 +1849,12 @@
    "clubs": 32,
    "ratings": {
     "players": 931,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
    "findings": {
-    "name-unusual": 2
+    "name-unusual": 3
    }
   },
   {
@@ -1997,7 +1997,7 @@
    "clubs": 32,
    "ratings": {
     "players": 930,
-    "min": 71,
+    "min": 70,
     "median": 82,
     "max": 99
    },
@@ -2193,7 +2193,7 @@
    "clubs": 32,
    "ratings": {
     "players": 930,
-    "min": 71,
+    "min": 70,
     "median": 82,
     "max": 99
    },
@@ -2391,12 +2391,12 @@
    "clubs": 32,
    "ratings": {
     "players": 928,
-    "min": 71,
+    "min": 68,
     "median": 82,
     "max": 99
    },
    "findings": {
-    "name-unusual": 3
+    "name-unusual": 4
    }
   },
   {
@@ -2748,12 +2748,12 @@
    "clubs": 31,
    "ratings": {
     "players": 905,
-    "min": 71,
+    "min": 70,
     "median": 82,
     "max": 99
    },
    "findings": {
-    "name-unusual": 2
+    "name-unusual": 3
    }
   },
   {
@@ -2927,7 +2927,7 @@
    "clubs": 31,
    "ratings": {
     "players": 912,
-    "min": 71,
+    "min": 68,
     "median": 82,
     "max": 99
    },
@@ -3104,7 +3104,7 @@
    "clubs": 31,
    "ratings": {
     "players": 906,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
@@ -3279,12 +3279,12 @@
    "clubs": 31,
    "ratings": {
     "players": 908,
-    "min": 71,
+    "min": 69,
     "median": 82,
-    "max": 99
+    "max": 98
    },
    "findings": {
-    "name-unusual": 3
+    "name-unusual": 2
    }
   },
   {
@@ -3455,9 +3455,9 @@
    "clubs": 30,
    "ratings": {
     "players": 886,
-    "min": 71,
+    "min": 70,
     "median": 82,
-    "max": 99
+    "max": 98
    },
    "findings": {}
   },
@@ -3634,7 +3634,7 @@
    "clubs": 30,
    "ratings": {
     "players": 887,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
@@ -3813,9 +3813,9 @@
    "clubs": 30,
    "ratings": {
     "players": 885,
-    "min": 71,
+    "min": 69,
     "median": 82,
-    "max": 99
+    "max": 98
    },
    "findings": {}
   },
@@ -3954,8 +3954,8 @@
    "clubs": 30,
    "ratings": {
     "players": 880,
-    "min": 71,
-    "median": 82,
+    "min": 70,
+    "median": 83,
     "max": 99
    },
    "findings": {}
@@ -4115,8 +4115,8 @@
    "clubs": 30,
    "ratings": {
     "players": 882,
-    "min": 71,
-    "median": 82,
+    "min": 68,
+    "median": 83,
     "max": 99
    },
    "findings": {}
@@ -4258,8 +4258,8 @@
    "clubs": 30,
    "ratings": {
     "players": 881,
-    "min": 71,
-    "median": 82,
+    "min": 69,
+    "median": 83,
     "max": 99
    },
    "findings": {}
@@ -4421,7 +4421,7 @@
    "clubs": 30,
    "ratings": {
     "players": 884,
-    "min": 71,
+    "min": 70,
     "median": 82,
     "max": 99
    },
@@ -4568,8 +4568,8 @@
    "clubs": 30,
    "ratings": {
     "players": 892,
-    "min": 71,
-    "median": 83,
+    "min": 69,
+    "median": 82,
     "max": 99
    },
    "findings": {
@@ -5182,12 +5182,12 @@
    "clubs": 30,
    "ratings": {
     "players": 898,
-    "min": 71,
+    "min": 69,
     "median": 83,
     "max": 99
    },
    "findings": {
-    "name-unusual": 3
+    "name-unusual": 2
    }
   },
   {
@@ -5487,7 +5487,7 @@
    "clubs": 30,
    "ratings": {
     "players": 896,
-    "min": 71,
+    "min": 68,
     "median": 83,
     "max": 99
    },
@@ -5628,7 +5628,7 @@
    "clubs": 30,
    "ratings": {
     "players": 891,
-    "min": 71,
+    "min": 70,
     "median": 83,
     "max": 99
    },
@@ -5769,9 +5769,9 @@
    "clubs": 30,
    "ratings": {
     "players": 891,
-    "min": 71,
+    "min": 68,
     "median": 83,
-    "max": 99
+    "max": 98
    },
    "findings": {}
   },
@@ -5911,12 +5911,12 @@
    "clubs": 30,
    "ratings": {
     "players": 894,
-    "min": 71,
+    "min": 68,
     "median": 83,
     "max": 99
    },
    "findings": {
-    "name-unusual": 2
+    "name-unusual": 1
    }
   },
   {
@@ -6212,7 +6212,7 @@
    "clubs": 27,
    "ratings": {
     "players": 794,
-    "min": 71,
+    "min": 69,
     "median": 83,
     "max": 99
    },
@@ -6356,8 +6356,8 @@
    "clubs": 26,
    "ratings": {
     "players": 770,
-    "min": 71,
-    "median": 82,
+    "min": 69,
+    "median": 83,
     "max": 99
    },
    "findings": {}
@@ -6548,9 +6548,9 @@
    "clubs": 26,
    "ratings": {
     "players": 765,
-    "min": 71,
+    "min": 69,
     "median": 82,
-    "max": 99
+    "max": 98
    },
    "findings": {}
   },
@@ -6687,8 +6687,8 @@
    "clubs": 26,
    "ratings": {
     "players": 762,
-    "min": 71,
-    "median": 83,
+    "min": 70,
+    "median": 82,
     "max": 99
    },
    "findings": {}
@@ -7305,8 +7305,8 @@
    "clubs": 22,
    "ratings": {
     "players": 639,
-    "min": 71,
-    "median": 82,
+    "min": 70,
+    "median": 83,
     "max": 99
    },
    "findings": {}
@@ -7443,7 +7443,7 @@
    "clubs": 21,
    "ratings": {
     "players": 606,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
@@ -7579,12 +7579,12 @@
    "clubs": 21,
    "ratings": {
     "players": 603,
-    "min": 71,
+    "min": 69,
     "median": 82,
-    "max": 99
+    "max": 98
    },
    "findings": {
-    "name-unusual": 1
+    "name-unusual": 2
    }
   },
   {
@@ -7739,7 +7739,7 @@
    "clubs": 21,
    "ratings": {
     "players": 597,
-    "min": 71,
+    "min": 68,
     "median": 82,
     "max": 99
    },
@@ -7880,7 +7880,7 @@
    "clubs": 21,
    "ratings": {
     "players": 589,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
@@ -8022,7 +8022,7 @@
    "ratings": {
     "players": 589,
     "min": 71,
-    "median": 82,
+    "median": 83,
     "max": 99
    },
    "findings": {
@@ -8159,12 +8159,12 @@
    "clubs": 21,
    "ratings": {
     "players": 590,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
    "findings": {
-    "name-unusual": 9
+    "name-unusual": 8
    }
   },
   {
@@ -8299,12 +8299,12 @@
    "clubs": 21,
    "ratings": {
     "players": 592,
-    "min": 71,
+    "min": 70,
     "median": 82,
     "max": 99
    },
    "findings": {
-    "name-unusual": 5
+    "name-unusual": 4
    }
   },
   {
@@ -8439,8 +8439,8 @@
    "clubs": 21,
    "ratings": {
     "players": 584,
-    "min": 71,
-    "median": 82,
+    "min": 68,
+    "median": 83,
     "max": 99
    },
    "findings": {}
@@ -8579,7 +8579,7 @@
    "clubs": 21,
    "ratings": {
     "players": 592,
-    "min": 71,
+    "min": 68,
     "median": 82,
     "max": 99
    },
@@ -8715,7 +8715,7 @@
    "clubs": 21,
    "ratings": {
     "players": 585,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
@@ -8851,7 +8851,7 @@
    "clubs": 21,
    "ratings": {
     "players": 575,
-    "min": 71,
+    "min": 70,
     "median": 82,
     "max": 99
    },
@@ -8987,7 +8987,7 @@
    "clubs": 21,
    "ratings": {
     "players": 568,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
@@ -9125,7 +9125,7 @@
    "clubs": 17,
    "ratings": {
     "players": 465,
-    "min": 71,
+    "min": 68,
     "median": 82,
     "max": 99
    },
@@ -9263,7 +9263,7 @@
    "clubs": 18,
    "ratings": {
     "players": 480,
-    "min": 71,
+    "min": 69,
     "median": 82,
     "max": 99
    },
@@ -9401,8 +9401,8 @@
    "clubs": 18,
    "ratings": {
     "players": 412,
-    "min": 71,
-    "median": 82,
+    "min": 67,
+    "median": 81,
     "max": 99
    },
    "findings": {
@@ -9541,12 +9541,12 @@
    "clubs": 18,
    "ratings": {
     "players": 411,
-    "min": 71,
-    "median": 82,
+    "min": 69,
+    "median": 81,
     "max": 99
    },
    "findings": {
-    "name-unusual": 4
+    "name-unusual": 6
    }
   },
   {
@@ -9679,8 +9679,8 @@
    "clubs": 18,
    "ratings": {
     "players": 411,
-    "min": 71,
-    "median": 82,
+    "min": 69,
+    "median": 81,
     "max": 99
    },
    "findings": {
@@ -9817,8 +9817,8 @@
    "clubs": 16,
    "ratings": {
     "players": 367,
-    "min": 71,
-    "median": 82,
+    "min": 69,
+    "median": 81,
     "max": 99
    },
    "findings": {
@@ -9955,8 +9955,8 @@
    "clubs": 16,
    "ratings": {
     "players": 365,
-    "min": 71,
-    "median": 82,
+    "min": 68,
+    "median": 81,
     "max": 99
    },
    "findings": {}
@@ -10093,8 +10093,8 @@
    "clubs": 14,
    "ratings": {
     "players": 319,
-    "min": 71,
-    "median": 82,
+    "min": 69,
+    "median": 81,
     "max": 99
    },
    "findings": {}
@@ -10231,8 +10231,8 @@
    "clubs": 14,
    "ratings": {
     "players": 319,
-    "min": 71,
-    "median": 82,
+    "min": 67,
+    "median": 81,
     "max": 99
    },
    "findings": {}
@@ -10368,7 +10368,7 @@
    "ratings": {
     "players": 274,
     "min": 71,
-    "median": 82,
+    "median": 81,
     "max": 99
    },
    "findings": {}
@@ -10522,8 +10522,8 @@
    "clubs": 12,
    "ratings": {
     "players": 274,
-    "min": 71,
-    "median": 82,
+    "min": 69,
+    "median": 81,
     "max": 99
    },
    "findings": {}
@@ -10675,9 +10675,9 @@
    "clubs": 12,
    "ratings": {
     "players": 274,
-    "min": 71,
-    "median": 82,
-    "max": 99
+    "min": 69,
+    "median": 81,
+    "max": 96
    },
    "findings": {}
   },
@@ -10828,7 +10828,7 @@
    "clubs": 6,
    "ratings": {
     "players": 137,
-    "min": 71,
+    "min": 67,
     "median": 81,
     "max": 99
    },
@@ -10981,9 +10981,9 @@
    "clubs": 6,
    "ratings": {
     "players": 138,
-    "min": 71,
-    "median": 82,
-    "max": 99
+    "min": 69,
+    "median": 81,
+    "max": 98
    },
    "findings": {}
   },
@@ -11289,8 +11289,8 @@
    "clubs": 6,
    "ratings": {
     "players": 136,
-    "min": 71,
-    "median": 82,
+    "min": 68,
+    "median": 81,
     "max": 99
    },
    "findings": {}
@@ -11442,7 +11442,7 @@
    "clubs": 6,
    "ratings": {
     "players": 135,
-    "min": 71,
+    "min": 70,
     "median": 81,
     "max": 99
    },
@@ -11578,7 +11578,7 @@
    "clubs": 6,
    "ratings": {
     "players": 134,
-    "min": 71,
+    "min": 70,
     "median": 81,
     "max": 99
    },
@@ -11716,8 +11716,8 @@
    "clubs": 6,
    "ratings": {
     "players": 134,
-    "min": 71,
-    "median": 82,
+    "min": 70,
+    "median": 81,
     "max": 99
    },
    "findings": {}
