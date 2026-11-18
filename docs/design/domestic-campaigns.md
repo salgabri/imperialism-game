@@ -1493,17 +1493,17 @@ none, to the season's Top 124 as before; going back to the built-in season goes
 back to today's map. The "One country · top clubs" list shows the chosen season's
 countries only.
 
-**What ships.** 963 maps over the 31 seasons with clubs, 25,065 club-seasons, 119.7 MB
-(47–249 KB a map, median 122 KB), each fetched only when chosen; the index
-`src/data/domesticSeasons.js` is about 12 KB. `docs/design/domestic-seasons-audit.json`
+**What ships.** 1,718 maps over the 31 seasons with clubs, 41,078 club-seasons, 205.4 MB
+(47–249 KB a map, median 119 KB), each fetched only when chosen; the index
+`src/data/domesticSeasons.js` is about 20 KB. `docs/design/domestic-seasons-audit.json`
 gives every map's layer, clubs, homes and size.
 
 | Seasons | Source of the clubs | Maps | Countries a season |
 | --- | --- | --- | --- |
 | 2006/07 – 2025/26 (20) | EA's editions, every division EA rates | 483 | 20 – 28 |
+| 2007/08 – 2025/26 (19) | the CM 01/02 Update Team's database of each season, for the countries EA does not rate | 826 | 28 – 71 |
 | 1993/94, 1997/98 – 2003/04 (8) | Championship Manager's databases, every club with players | 231 | 11 – 51 |
 | 1994/95 – 1996/97 (3) | SWOS's team files, every league and division SWOS has | 178 | 59 – 60 |
-| 2025/26 | the CM 01/02 Update Team's December 2025 database, for the countries EA does not rate | 71 | 71 |
 
 **The Update Team's countries** (since 17 November 2026, by the user's choice of that day:
 [football-year-permissions.md](football-year-permissions.md)). An EA season whose season
@@ -1515,15 +1515,22 @@ of and the EA edition does not: the season's fill (`updateTeamFills` in
 map is `kind: 'cm0102'` with the database's own source (provider and compiler "CM 01/02
 Update Team", version the release's label), so its players are credited to the Update Team;
 its clubs take `f-` ids after the EA maps' and never a season file club's, whose players are
-EA's. 2025/26 has its fill from the December 2025 database (archive.org item `cm-25`, only
-its Data tables read, by range requests): 71 countries, 1,468 clubs, 8.0 MB, from Brazil's
-100 and Russia's 60 to the Philippines' 10 (a country today's maps lack, so its map is a
-season's only). 30 of them had no earlier-season map at all (Egypt, Morocco, Tunisia,
-Nigeria, Ghana, Iran, Qatar, the UAE, Thailand, Vietnam, Canada, Costa Rica, Bosnia,
-Georgia, Kazakhstan…). The other EA seasons' databases (2007/08–2024/25) wait for the user to
-download them from the champman0102.co.uk forum, whose attachments need a login; 2006/07
-has none. The database also rates 23 of EA's own countries deeper (Turkey 100 clubs to EA's
-18, Argentina 100 to 30); those maps stay EA's.
+EA's. One release a season, the autumn one: November 2007, September 2008 to September 2012
+(2010 and 2011 the "ODB"), Autumn 2013, October 2014 to October 2019, November 2020, October
+2021 to October 2024, from the zips the user downloaded from the champman0102.co.uk forum
+(whose attachments need a login; `--zip=`), and December 2025 from archive.org (item `cm-25`,
+its Data tables only, by range requests); 2006/07 has none. 826 maps, 17,496 clubs, 93.7 MB:
+28 (2016/17) to 71 (2025/26) a season, from Brazil's 98 to 100 in the seasons EA lacks it (2014/15,
+2024/25, 2025/26) and Russia's 60 after 2017/18 to the Philippines' and Belize's 10 (countries
+today's maps lack, so their maps are a season's only). 35 countries that had no earlier-season
+map now have some (Egypt, Morocco, Tunisia, Nigeria, Ghana, Iran, Qatar, the UAE, Thailand,
+Vietnam, Canada, Costa Rica, Bosnia, Georgia, Kazakhstan…); 30 of today's still have none,
+the databases rating fewer than ten of their clubs in every season. The September 2010 ODB,
+October 2014 and October 2016 databases carry 164 to 232 bytes after staff.dat's last table
+(0xFF bytes, then stray 52-byte rows), which `src/data/cm0102Releases.js` records
+(`staffTrailing`), so the builder cuts exactly those from the pinned files, as it cuts CM3's
+port's 230. Each database also rates 19 to 26 of EA's own
+countries deeper (Turkey 100 clubs to EA's 18, Argentina 100 to 30); those maps stay EA's.
 
 England has 88 to 90 clubs in an EA season (the four divisions less their Welsh
 clubs), 100 in most CM seasons (the four divisions and the Conference's strongest),
@@ -1536,8 +1543,8 @@ seasons field every league it has, Europe's and the Americas', Algeria's, South
 Africa's, Japan's, Taiwan's, Australia's and New Zealand's (until 2026-11-16 only the
 seven big leagues', the other league files uncached); India's, Ghana's and Canada's
 clubs, fewer than ten, have no map, nor 1994/95's and 1995/96's United States. A
-club's home lies in its own home section for 20,674 of 24,500 located club-seasons
-(84.4%); 565 club-seasons are placed (estimates).
+club's home lies in its own home section for 32,448 of 39,717 located club-seasons
+(81.7%); 1,361 club-seasons are placed (estimates), most of them the Update Team's smaller clubs no source places.
 
 **Clubs** (`scripts/lib/season-country-clubs.mjs`, read through the season
 builders, so the players are the season file's own tuples):
