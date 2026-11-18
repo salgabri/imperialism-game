@@ -1338,7 +1338,7 @@ replaced it. An old link's `theatre=Premier+League` is reported as not offered.
 A CM 01/02 set built on this computer has no maps, so it plays the two theatres on the
 world, dealt by `seedClubs` as all clubs once were. A season with nations only (FIFA 05,
 FIFA 06, 1989/90, the computed seasons) has no clubs to play: it keeps the plain
-theatre, `all` or `elite`, and choosing clubs goes back to the built-in season and its map.
+theatre, `all` or `elite`, and choosing clubs takes the nearest season with clubs and its map.
 
 **Checks**: `scripts/europe-maps.test.mjs`: index, files, fields and hashes; each club's
 land lies in its country and the land sums to the outlines; the only club holds its whole

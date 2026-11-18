@@ -8,7 +8,7 @@ import { CLUB_SCOPES, TOP_CLUBS, nationTheatre, nationTheatres, strongestClubs a
 import { nationPriority } from '../../data/domesticTiers.js';
 import { clubMapOf, countryMapsOf, countryOfEntry, domesticEntry, domesticLabel, isDomesticScope, isTheatreMap, theatreMapsOf } from '../../data/domesticScope.js';
 import { SPORT_LIST, getSport, matchSport } from '../../sports/index.js';
-import { builtInSeasonOf, fieldedNations, setHasClubs, setHasNations, setSportOf } from '../../engine/footballSets.js';
+import { builtInSeasonOf, fieldedNations, setHasLayer, setHasNations, setSportOf } from '../../engine/footballSets.js';
 import { V4, ratingTierOf } from '../../theme.js';
 import { politicalFill } from '../../data/empireColours.js';
 
@@ -457,7 +457,7 @@ export const seasonTagOf = label => SEASON_TAGS.find(([, words]) => words.test(S
 
 /**
  * The Season choice (docs/design/football-years.md): the sport's built-in season, then each of its listed data sets
- * newest first, as `{ id, key, season, source, label, name, credit, checked }`. `credit` is the plain text the set's
+ * (`sets`: those fielding the teams chosen) newest first, as `{ id, key, season, source, label, name, credit, checked }`. `credit` is the plain text the set's
  * listing asks to be shown with it ('' for none). `sport` names a chosen set the listing no longer has.
  */
 function seasonOptions(sets, dataSet, sport) {
@@ -745,8 +745,8 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const sportId = getSport(setup.sport).id;
   // A chosen data set plays with its own nations and clubs once it has loaded; a basketball season with clubs only, and
   // FIFA 05 and FIFA 06 with nations only.
-  const dataSet = setup.dataSet != null && setSportOf(setup.dataSet) === sportId && (setHasNations(setup.dataSet) || setup.layer === 'clubs')
-    && (setHasClubs(setup.dataSet) || setup.layer !== 'clubs') ? setup.dataSet : null;
+  const dataSet = setup.dataSet != null && setSportOf(setup.dataSet) === sportId
+    && setHasLayer(setup.dataSet, setup.layer === 'clubs' ? 'clubs' : 'nations') ? setup.dataSet : null;
   const seasonCtx = ctx.season || {};
   const sport = dataSet != null && seasonCtx.sport?.dataSet === dataSet ? seasonCtx.sport : getSport(setup.sport);
   // Until then no figure from the built-in season stands in for the set's.
@@ -772,7 +772,9 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const preview = pending ? PENDING_PREVIEW : campaignPreview(count, sport, setup);
   const rules = rulesOf(setup);
   const showMatches = showMatchesOf(setup);
-  const seasonSets = Array.isArray(seasonCtx.sets) ? seasonCtx.sets.filter(set => setSportOf(set.id) === sportId) : NO_ROWS;
+  // The Season choice lists only the seasons that field the teams chosen: on Clubs, no FIFA 05; on Nations, no NBA season.
+  const seasonSets = Array.isArray(seasonCtx.sets)
+    ? seasonCtx.sets.filter(set => setSportOf(set.id) === sportId && setHasLayer(set.id, clubLayer ? 'clubs' : 'nations')) : NO_ROWS;
   const seasonRows = seasonOptions(seasonSets, dataSet, sport);
   const chosenSeason = seasonRows.find(row => row.checked && row.id != null) || null;
   // Summaries use the label: the "*" footnote is only drawn under the theatre list in step 1.

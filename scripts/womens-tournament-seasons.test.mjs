@@ -366,7 +366,10 @@ test('a 2012/13 campaign plays Great Britain\'s computed eleven, saves its playe
     assert.ok(app.state.footballSets.some(set => set.id === 'wol-2012' && set.label === 'Computed · 2012 Olympics'));
     app.pickSetup('layer', 'clubs');
     app.pickSetup('dataSet', 'wol-2012');
-    assert.equal(app.state.setup.layer, 'nations', 'a season with nations only takes the nations');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['clubs', null], 'a season with nations only is no choice for clubs');
+    app.pickSetup('layer', 'nations');
+    app.pickSetup('dataSet', 'wol-2012');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', 'wol-2012']);
     time.advance(200);
     await app.loadSet('wol-2012');
     await settle();

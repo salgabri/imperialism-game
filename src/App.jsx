@@ -12,7 +12,7 @@ import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomestic
   retainDomestic } from './engine/domestic.js';
 import { domesticEntry, domesticLabel, hasTheatreMaps, isCountryScope } from './data/domesticScope.js';
 import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
-  loadFootballSetIndex, retainFootballSets, seasonSport, setHasClubs, setHasNations, setSportOf, sportOf } from './engine/footballSets.js';
+  loadFootballSetIndex, retainFootballSets, seasonSport, setHasClubs, setHasLayer, setSportOf, sportOf } from './engine/footballSets.js';
 import { FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
 import { getSport, matchSport } from './sports/index.js';
 import { loadSportData, sportDataLoaded } from './sports/sportData.js';
@@ -38,7 +38,7 @@ import { politicalFill } from './data/empireColours.js';
 import { flagUrl } from './data/flags.js';
 import { crestUrl } from './data/crests.js';
 import { SeasonYear } from './components/seasonYear.js';
-import { DEFAULT_SETUP, LOG_CAP, dataSetOf, domesticIdOf, mapYearOf, setClubScope } from './app/shared.js';
+import { DEFAULT_SETUP, LOG_CAP, dataSetOf, domesticIdOf, mapYearOf, seasonForLayer, setClubScope } from './app/shared.js';
 import * as mapM from './app/mapMethods.jsx';
 import * as colM from './app/columnMethods.jsx';
 import * as matchM from './app/matchMethods.jsx';
@@ -227,6 +227,9 @@ export default class App extends React.Component {
     // setup's chosen one loading (UI-only, like the country map's), and Retry this setup loading a season campaign's
     // set: { elimination, state: 'loading' | 'error', message }.
     footballSets: BUILT_IN_SETS, footballSetLoad: { id: null, state: 'idle', message: null }, retrySetup: null,
+    // The season a Teams switch replaced, given back if the player switches straight back (pickSetup):
+    // { sport, layer, from, to }, or null.
+    seasonSwap: null,
     // The challenge link setup was filled in from (README §Sharing a campaign): its seed and the keys it could not use.
     challenge: null,
   };
@@ -1008,7 +1011,14 @@ export default class App extends React.Component {
   pickSetup(key, value) {
     if (key === 'sport' && !this.pickSport(getSport(value).id)) return;
     this.setState(state => {
+      // The Season choice lists the seasons that field the teams chosen (nations or clubs), so a season never changes
+      // them: one without them is not on offer.
+      const sportBefore = getSport(state.setup.sport);
+      const layerBefore = sportBefore.clubsOnly ? 'clubs' : sportBefore.nationsOnly ? 'nations' : state.setup.layer;
+      if (key === 'dataSet' && value != null && setSportOf(value) === sportBefore.id && !setHasLayer(value, layerBefore)) return null;
       const setup = { ...state.setup, [key]: value };
+      // A Teams switch undone straight away gets back the season it replaced; choosing a season or a sport forgets it.
+      let seasonSwap = key === 'dataSet' || key === 'sport' ? null : state.seasonSwap;
       const domestic = isDomesticScope(setup.clubScope), country = isCountryScope(setup.clubScope);
       if (key === 'preset') {
         setup.scope = value === 'short' ? 'elite' : value === 'world' ? 'world' : 'UEFA';
@@ -1021,18 +1031,25 @@ export default class App extends React.Component {
       // from every club (basketball's then take the NBA's map, also in setClubScope).
       if (key === 'sport' && (domestic ? !hasTheatreMaps(getSport(value).id) && (domesticEntry(setup.clubScope)?.sport ?? 'football') !== getSport(value).id
         : !CLUB_SCOPES(getSport(value)).some(s => s.id === setup.clubScope))) setup.clubScope = 'all';
-      // A data set plays in its own sport and brings its own clubs. A season with clubs only (an NBA season) takes the
-      // clubs, and choosing nations goes back to the built-in season.
+      // A data set plays in its own sport.
       if (setup.dataSet != null && setSportOf(setup.dataSet) !== getSport(setup.sport).id) setup.dataSet = null;
-      if (setup.dataSet != null && !setHasNations(setup.dataSet)) {
-        if (key === 'layer' && value !== 'clubs') setup.dataSet = null;
-        else setup.layer = 'clubs';
+      // Choosing nations or clubs keeps the season if it fields them, else takes the nearest season that does (an NBA
+      // season's clubs, choosing nations, take the built-in season; FIFA 05's nations, choosing clubs, 2003/04's). Choosing
+      // back before choosing another season gets the season back.
+      if (key === 'layer' && value !== layerBefore) {
+        const sportId = getSport(setup.sport).id, swap = state.seasonSwap;
+        if (swap && swap.sport === sportId && swap.layer === value && swap.to === setup.dataSet && setHasLayer(swap.from, value)) {
+          setup.dataSet = swap.from;
+          seasonSwap = null;
+        } else {
+          const season = seasonForLayer(setup, value, state.footballSets);
+          seasonSwap = season !== setup.dataSet ? { sport: sportId, layer: layerBefore, from: setup.dataSet, to: season } : null;
+          setup.dataSet = season;
+        }
       }
-      // A football season with nations only is the same the other way round.
-      if (setup.dataSet != null && !setHasClubs(setup.dataSet)) {
-        if (key === 'layer' && value === 'clubs') setup.dataSet = null;
-        else setup.layer = 'nations';
-      }
+      // A setup made elsewhere plays its season's teams, as a challenge link does: a season with clubs only (an NBA
+      // season) plays clubs, one with nations only (FIFA 05) nations.
+      if (setup.dataSet != null && !setHasLayer(setup.dataSet, setup.layer)) setup.layer = setHasClubs(setup.dataSet) ? 'clubs' : 'nations';
       // A sport with clubs only (American football: the NFL's) has no nations to choose.
       if (getSport(setup.sport).clubsOnly) setup.layer = 'clubs';
       // A sport with nations only (tennis: the Davis Cup's) has no clubs to choose.
@@ -1043,7 +1060,7 @@ export default class App extends React.Component {
       // preset leaves a chosen country's club theatre (and its clubs) as it was.
       const sameField = key === 'preset' && country && setup.layer === 'clubs';
       if (['sport', 'layer', 'scope', 'clubScope', 'preset', 'dataSet'].includes(key) && !sameField) setup.managedTeamId = '';
-      return { setup };
+      return { setup, seasonSwap };
     }, () => {
       if (this.state.phase !== 'setup') return;
       this.showSetupMap();
@@ -1752,6 +1769,7 @@ export default class App extends React.Component {
       phase: 'setup',
       setupStep: step,
       setupSuggest: suggest !== false,
+      seasonSwap: null,
       skipAhead: null, ...this.handBackSpeed(),
       confirmNew: false,
       autoplay: false,

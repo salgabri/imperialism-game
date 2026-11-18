@@ -178,7 +178,8 @@ chart is within half a point of the fixture's simulated odds.
 - **Setup.** A sport card, "Nations · 32 NHL clubs". Clubs have one theatre, **NHL · USA
   and Canada**. The note under Season (the choice's title and description) says which ratings are
   estimates, which seasons are converted or computed and from what, and that nations play from 1977/78.
-  A season to 1976/77 has clubs only: choosing it takes the clubs. A season the Hockey Databank or
+  A season to 1976/77 has clubs only, so only Clubs list it, and choosing Nations with one takes 1977/78,
+  the nearest season with nations. A season the Hockey Databank or
   MoneyPuck.com feeds shows its credit as text under the choice ("Credits").
 - **Squad.** A rink: the goalie in his crease, three pairs below the blue line, four lines
   above it. Groups read Centres, Wings, Defence and Goalie; the profile Attack, Defence and

@@ -13,8 +13,9 @@ import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
 import { HISTORIC_NATIONS, NATIONS, selectLineup } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { parseCampaign } from '../src/engine/storage.js';
-import { BUILT_IN_SETS, setSportOf } from '../src/engine/footballSets.js';
+import { BUILT_IN_SETS, setHasClubs, setHasLayer, setSportOf } from '../src/engine/footballSets.js';
 import { buildSetupModel, seasonTagOf } from '../src/screens/setup/setupModel.js';
+import { seasonForLayer } from '../src/app/shared.js';
 import { bundleComponents, findElement, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
 // One bundle, so the test clears the very data set caches the App reads.
@@ -324,13 +325,21 @@ test('the Season choice names a season by its years, and says on screen when its
   const tagOf = id => (FAN_MADE.includes(id) ? 'fan-made' : NHL_CONVERTED.includes(id) ? 'converted'
     : /^(?:wc|nt|wwc|wol|nba-stats|pfa|mlb-war)-/.test(id) || (/^nrl-/.test(id) && id !== 'nrl-2008') || (/^nhl-/.test(id) && !NHL_EDITIONS.includes(id))
       ? 'computed' : null);
+  // Each lists the seasons that field the teams chosen, and names them among those: on Clubs, football's 1993/94 is
+  // CM 93/94's alone, named by its years.
   for (const sport of new Set(BUILT_IN_SETS.map(set => setSportOf(set.id)))) {
-    const own = BUILT_IN_SETS.filter(set => setSportOf(set.id) === sport);
-    const shared = season => own.filter(set => set.season === season).length > 1;
-    const model = buildSetupModel({ ...setup, sport, scope: 'world' }, { season: { sets: BUILT_IN_SETS, state: 'idle' } });
-    assert.deepEqual(model.season.options.slice(1).map(option => option.name), own.map(set => (shared(set.season) ? `${set.season} · ${set.label}`
-      : tagOf(set.id) ? `${set.season} · ${tagOf(set.id)}` : set.season)), `${sport}'s seasons`);
+    for (const layer of ['nations', 'clubs'].filter(layer => !(layer === 'clubs' ? getSport(sport).nationsOnly : getSport(sport).clubsOnly))) {
+      const own = BUILT_IN_SETS.filter(set => setSportOf(set.id) === sport && setHasLayer(set.id, layer));
+      const shared = season => own.filter(set => set.season === season).length > 1;
+      const model = buildSetupModel({ ...setup, sport, layer, scope: 'world' }, { season: { sets: BUILT_IN_SETS, state: 'idle' } });
+      assert.deepEqual(model.season.options.slice(1).map(option => option.name), own.map(set => (shared(set.season) ? `${set.season} · ${set.label}`
+        : tagOf(set.id) ? `${set.season} · ${tagOf(set.id)}` : set.season)), `${sport}'s seasons of ${layer}`);
+    }
   }
+  const footballOf = layer => buildSetupModel({ ...setup, layer }, { season: { sets: BUILT_IN_SETS, state: 'idle' } }).season.options;
+  assert.deepEqual(footballOf('clubs').filter(option => option.season === '1993/94').map(option => [option.id, option.name]),
+    [['cm0102-2020-11-cm93', '1993/94 · fan-made']]);
+  assert.deepEqual(footballOf('nations').filter(option => option.season === '1993/94').map(option => option.id), ['wc-1994', 'cm0102-2020-11-cm93']);
 });
 
 test('while a chosen set loads, step 1 shows none of the built-in season\'s figures or leagues', async () => {
@@ -625,10 +634,11 @@ const EARLY_ID = 'ea-fifa-06';
 const EARLY_URL = `/football/${EARLY_ID}.json`;
 const EARLY_SET = JSON.parse(readFileSync(new URL(`../public${EARLY_URL}`, import.meta.url), 'utf8'));
 
-test('a season with nations only takes the nations, and choosing clubs goes back to the built-in season', async () => {
+test('Clubs list no season with nations only, a season keeps the teams, and Clubs take the nearest season with clubs', async () => {
   await withSetup({ [EARLY_URL]: EARLY_SET }, async ({ app, time }) => {
     const setup = () => app.state.setup;
     const modelOf = () => buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), season: app.seasonStatus() });
+    const offered = () => modelOf().season.options.map(option => option.id);
     await app.requestSeasons();
     assert.deepEqual(EARLIER.filter(season => season >= '1989/90').slice(-20), ['2006/07', '2005/06', '2004/05', '2003/04', '2002/03', '2001/02',
       '2000/01', '1999/00', '1998/99', '1997/98', '1996/97', '1995/96', '1994/95', '1993/94', '1993/94', '1992/93', '1991/92', '1990/91',
@@ -640,12 +650,22 @@ test('a season with nations only takes the nations, and choosing clubs goes back
     assert.match(modelOf().season.note, /2005\/06, 2004\/05 and 1989\/90 have nations only/);
     assert.match(modelOf().season.note, /1960\/61, the World Cups of 1961\/62 to 1993\/94 and the seasons between them are computed and have nations only/);
 
-    // From clubs: the season takes the nations. It has no maps of Europe, so the theatre is kept as the plain elite
-    // for when clubs come back.
+    // Clubs list the built-in season and the seasons with clubs. A season with nations only, picked anyway (the
+    // dropdown offers no way to), changes nothing: no season changes the teams.
     app.pickSetup('layer', 'clubs');
     app.pickSetup('clubScope', 'domestic:eu32');
     app.pickSetup('role', 'manager');
     app.pickSetup('managedTeamId', 'f-arsenal');
+    assert.deepEqual(offered(), [null, ...footballSetIds(app).filter(id => setHasClubs(id))]);
+    assert.ok(['ea-fifa-07', 'cm0102-2003-10', 'cm0102-2020-11-cm93'].every(id => offered().includes(id)));
+    assert.ok(!['ea-fifa-06', 'ea-fifa-05', 'wc-1994', 'nt-1976', 'cm0102-2017-04-cm89'].some(id => offered().includes(id)));
+    app.pickSetup('dataSet', EARLY_ID);
+    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope, setup().managedTeamId], ['clubs', null, 'domestic:eu32', 'f-arsenal']);
+
+    // Nations list every season, and the season stays with them. It has no maps of Europe, so the theatre is kept as the
+    // plain elite for when clubs come back.
+    app.pickSetup('layer', 'nations');
+    assert.deepEqual(offered(), [null, ...footballSetIds(app)], 'every football season has nations');
     app.pickSetup('dataSet', EARLY_ID);
     assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope, setup().managedTeamId], ['nations', EARLY_ID, 'elite', '']);
     assert.equal(modelOf().canLaunch, false, 'Launch waits for the season');
@@ -665,18 +685,71 @@ test('a season with nations only takes the nations, and choosing clubs goes back
     app.pickSetup('scope', 'AFC');
     assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['nations', EARLY_ID, 'elite']);
 
-    // Clubs: the built-in season, on its map of the elite.
+    // Clubs: the nearest season with clubs, FIFA 07 (a year on; 2003/04's is two back), on its map of the elite.
     app.pickSetup('layer', 'clubs');
-    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['clubs', null, 'domestic:eu32']);
-    assert.deepEqual([modelOf().layer, modelOf().season.id], ['clubs', null]);
+    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['clubs', 'ea-fifa-07', 'domestic:eu32e2007']);
+    assert.deepEqual([modelOf().layer, modelOf().season.id], ['clubs', 'ea-fifa-07']);
+    // Nations straight back give FIFA 06 back, and Clubs again FIFA 07.
+    app.pickSetup('layer', 'nations');
+    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['nations', EARLY_ID, 'elite']);
+    app.pickSetup('layer', 'clubs');
+    assert.deepEqual([setup().layer, setup().dataSet], ['clubs', 'ea-fifa-07']);
 
-    // Back again, and a season with clubs lets them stay, on its own map.
-    app.pickSetup('dataSet', EARLY_ID);
-    assert.equal(setup().layer, 'nations');
+    // A season chosen in between stays, with either teams.
+    app.pickSetup('dataSet', 'cm0102-2003-10');
+    app.pickSetup('layer', 'nations');
+    assert.deepEqual([setup().layer, setup().dataSet], ['nations', 'cm0102-2003-10']);
     app.pickSetup('dataSet', 'ea-fifa-07');
     assert.equal(setup().layer, 'nations', 'the player chooses clubs again if they want them');
     app.pickSetup('layer', 'clubs');
     assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['clubs', 'ea-fifa-07', 'domestic:eu32e2007']);
+  });
+});
+
+test('a Teams switch keeps a season that fields the teams, else takes the nearest that does, the later of two as near', () => {
+  const of = (sport, dataSet, layer, sets) => seasonForLayer({ sport, dataSet }, layer, sets);
+  assert.equal(of('football', 'ea-fifa-18', 'clubs'), 'ea-fifa-18', 'a season with clubs keeps them');
+  assert.equal(of('football', 'ea-fifa-05', 'clubs'), 'cm0102-2003-10', 'FIFA 05 (2004/05): 2003/04, a year back');
+  assert.equal(of('football', 'ea-fifa-06', 'clubs'), 'ea-fifa-07', 'FIFA 06 (2005/06): 2006/07, a year on');
+  assert.equal(of('football', 'wc-1994', 'clubs'), 'cm0102-2020-11-cm93', 'the same season from another source');
+  assert.equal(of('football', 'nt-1961', 'clubs'), 'cm0102-2020-11-cm93', 'the earliest season with clubs');
+  assert.equal(of('hockey', 'nhl-1966', 'nations'), 'nhl-1978', 'the first season with three nations');
+  assert.equal(of('womens-football', 'eaw-fifa-19', 'clubs'), 'eaw-fifa-23', 'the first season EA rated clubs in');
+  assert.equal(of('basketball', 'nba-stats-1986', 'nations'), null, 'only the built-in season has nations');
+  assert.equal(of('football', null, 'clubs'), null, 'the built-in season has both');
+  const sets = [{ id: 'cm0102-2005-08-x', year: 2006 }, { id: 'ea-fifa-05', year: 2005 }, { id: 'cm0102-2003-10', year: 2004 }];
+  assert.equal(of('football', 'ea-fifa-05', 'clubs', sets), 'cm0102-2005-08-x', 'a year back and a year on: the later');
+  assert.equal(of('football', 'ea-fifa-05', 'clubs', []), null, 'a season neither listed nor loaded: the built-in one');
+});
+
+test('on screen, Nations and Clubs each list their seasons, a season keeps them, and a switch back restores the season', async () => {
+  await withSetup({}, async ({ app }) => {
+    await app.requestSeasons();
+    await withDom(async ({ document, mount }) => {
+      const view = await mountPart(app, mount, 'SetupOverlay');
+      const radio = name => [...document.querySelectorAll('.setup-segmented [role=radio]')].find(button => button.textContent === name);
+      const choose = async name => { await act(async () => radio(name).click()); await view.refresh(); };
+      const offered = () => [...seasonPicker(document).options].map(option => option.value);
+      const checked = () => document.querySelector('.setup-segmented [aria-checked=true]').textContent;
+      assert.deepEqual(offered(), ['', ...footballSetIds(app)], 'Nations: every season');
+      await choose('Clubs');
+      assert.deepEqual(offered(), ['', ...footballSetIds(app).filter(id => setHasClubs(id))], 'Clubs: the seasons with clubs');
+      for (const teams of ['Clubs', 'Nations']) {
+        await choose(teams);
+        for (const id of offered()) {
+          await pickSeason(document, id);
+          await view.refresh();
+          assert.deepEqual([checked(), seasonPicker(document).value], [teams, id], `${id || 'the built-in season'} keeps ${teams}`);
+        }
+      }
+
+      // FIFA 05 has no clubs: Clubs take the nearest season with them, 2003/04, and Nations straight back FIFA 05.
+      await pickSeason(document, 'ea-fifa-05');
+      await choose('Clubs');
+      assert.deepEqual([checked(), seasonPicker(document).value], ['Clubs', 'cm0102-2003-10']);
+      await choose('Nations');
+      assert.deepEqual([checked(), seasonPicker(document).value], ['Nations', 'ea-fifa-05']);
+    });
   });
 });
 

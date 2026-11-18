@@ -416,9 +416,13 @@ manager of the theatre's favourite, with decisions from the first match.
    Legends its 2026 (the Elo of gol.gg's results to November).
    The Season list names a season by its years, adding "· computed", "· converted"
    or "· fan-made" where its label calls its ratings so ("1969/70 · computed"); a
-   year with two seasons (football's 1993/94 and 1989/90, the NFL's and AFL's of
+   year with two seasons in the list (football's 1993/94 and 1989/90, the NFL's and AFL's of
    the 1960s, rugby league's ARL and Super League of 1997) names each by its whole
-   label instead. Only ice hockey's seasons
+   label instead. The list holds only the seasons that field the Teams chosen (with
+   Clubs, no season of nations only; with Nations, no NBA, NRL or early NHL season),
+   so choosing a season never changes Teams. Choosing Nations or Clubs keeps the
+   season if it fields them, else takes the nearest season that does, and choosing
+   back straight away gives the season back. Only ice hockey's seasons
    carry a credit, the Hockey Databank's and MoneyPuck.com's as their sources ask,
    shown whole as small text under the Season choice. A one-line quick-resume
    strip (**Resume**, the save, ✕) appears when a save exists, and a page opened
@@ -1927,9 +1931,10 @@ every season from 1999/00 to 2025/26, each from that season's NBA 2K (NBA 2K to
 NBA 2K26), three before them from other games (below: 1998/99 from NBA Live 99,
 1991/92 and 1983/84 from NBA 2K27's MyNBA Eras), and the 36 others back to
 1960/61, which no game rated, computed from Basketball-Reference's statistics
-(below). Pick
-one under **Season** in setup; it plays clubs only, so it switches Teams to
-clubs: the NBA's of that season and, from 2000/01, the EuroLeague's. Each season
+(below). Choose
+**Clubs** and pick one under **Season** in setup (with Nations it lists only the
+built-in season): it plays clubs only, the NBA's of that season and, from
+2000/01, the EuroLeague's. Each season
 is a file in `public/basketball/` (3 to 20 KB) that loads only when chosen, with
 the map of its era.
 

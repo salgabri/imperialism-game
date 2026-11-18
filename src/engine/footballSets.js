@@ -153,6 +153,8 @@ export const setHasNations = id => kindRecord(id).nations !== false && !kindReco
 /** Whether a set has clubs: every one but those with nations only (the EA editions before FIFA 07, the 1989/90 fan database,
  * the computed World Cup and national-team seasons, tennis's). */
 export const setHasClubs = id => !kindRecord(id).nationsOnly?.test(String(id));
+/** Whether a set fields the teams of a layer: its clubs for 'clubs', else its nations. */
+export const setHasLayer = (id, layer) => (layer === 'clubs' ? setHasClubs(id) : setHasNations(id));
 /** Whether a set's clubs play on a map of their era (src/data/clubMaps.js) rather than on the world. */
 export const setIsMapped = id => !!kindRecord(id).mapped;
 export const isDataYear = year => Number.isInteger(year) && year >= 1872 && year <= 2100;

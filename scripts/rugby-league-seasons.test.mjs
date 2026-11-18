@@ -1272,9 +1272,14 @@ async function withApp(fn) {
 }
 const modelOf = app => buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), domestic: app.domesticStatus(), season: app.seasonStatus() });
 
-test('rugby league\'s Season choice lists 2024 to 1960, and 2008 takes the clubs onto the map of 2008', async () => {
+test('rugby league\'s Season choice lists 2024 to 1960 on Clubs, and 2008 takes them onto the map of 2008', async () => {
   await withApp(async ({ app }) => {
     app.pickSetup('sport', 'rugby-league');
+    // Nations: only the built-in season has them, and a season of clubs is no choice.
+    assert.deepEqual(modelOf(app).season.options.map(option => option.name), ['2025']);
+    app.pickSetup('dataSet', 'nrl-2008');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', null]);
+    app.pickSetup('layer', 'clubs');
     const model = modelOf(app);
     const competition = year => (year <= 1983 ? 'NSWRFL' : year <= 1994 ? 'NSWRL' : 'ARL');
     assert.deepEqual(model.season.options.map(option => option.label), ['2025 · built in',
@@ -1296,6 +1301,7 @@ test('rugby league\'s Season choice lists 2024 to 1960, and 2008 takes the clubs
 test('a 2008 clubs campaign launches on the map of 2008, saves, and resumes without the season file', async () => {
   await withApp(async ({ app, time, items, calls }) => {
     app.pickSetup('sport', 'rugby-league');
+    app.pickSetup('layer', 'clubs');
     app.pickSetup('dataSet', 'nrl-2008');
     time.advance(200);
     await Promise.all([app.loadCountry('nrl2008'), app.loadSet('nrl-2008')]);
@@ -1336,6 +1342,7 @@ test('a computed 2015 clubs campaign launches on the map of 2012–2019, saves, 
   const doc = DOCS.get('nrl-2015');
   await withApp(async ({ app, time, items, calls }) => {
     app.pickSetup('sport', 'rugby-league');
+    app.pickSetup('layer', 'clubs');
     app.pickSetup('dataSet', 'nrl-2015');
     assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:nrl2012']);
     time.advance(200);
@@ -1367,6 +1374,7 @@ test('a computed 1998 clubs campaign launches on the map of 1998 with its twenty
   const doc = DOCS.get('nrl-1998');
   await withApp(async ({ app, time, items, calls }) => {
     app.pickSetup('sport', 'rugby-league');
+    app.pickSetup('layer', 'clubs');
     app.pickSetup('dataSet', 'nrl-1998');
     assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:nrl1998']);
     time.advance(200);
@@ -1403,6 +1411,7 @@ test('a 1975 clubs campaign launches on the map of 1973–1976 with its twelve c
   const doc = SELECTED_DOCS.get('nrl-1975');
   await withApp(async ({ app, time, items, calls }) => {
     app.pickSetup('sport', 'rugby-league');
+    app.pickSetup('layer', 'clubs');
     app.pickSetup('dataSet', 'nrl-1975');
     assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:nrl1973']);
     time.advance(200);
@@ -1439,6 +1448,7 @@ test('a 1975 clubs campaign launches on the map of 1973–1976 with its twelve c
   const sl = SELECTED_DOCS.get('nrl-sl-1997');
   await withApp(async ({ app, time }) => {
     app.pickSetup('sport', 'rugby-league');
+    app.pickSetup('layer', 'clubs');
     app.pickSetup('dataSet', 'nrl-sl-1997');
     assert.equal(app.state.setup.clubScope, 'domestic:sl1997');
     time.advance(200);
@@ -1459,6 +1469,7 @@ test('the setup and the campaign name each season\'s premiership: the NSWRFL\'s 
     const season = id.match(/\d{4}$/)[0];
     await withApp(async ({ app, time }) => {
       app.pickSetup('sport', 'rugby-league');
+      app.pickSetup('layer', 'clubs');
       app.pickSetup('dataSet', id);
       time.advance(200);
       await Promise.all([app.loadCountry(map), app.loadSet(id)]);
@@ -1483,6 +1494,7 @@ test('a computed 2023 clubs campaign plays on today\'s map, with the Dolphins', 
   const doc = DOCS.get('nrl-2023');
   await withApp(async ({ app, time }) => {
     app.pickSetup('sport', 'rugby-league');
+    app.pickSetup('layer', 'clubs');
     app.pickSetup('dataSet', 'nrl-2023');
     assert.equal(app.state.setup.clubScope, 'domestic:nrl');
     time.advance(200);

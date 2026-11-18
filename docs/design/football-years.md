@@ -643,8 +643,9 @@ two ways: they have no clubs, and a player's nationality comes from elsewhere.
 
 - **Nations only.** Nothing here says which club anyone played for that season, so
   `clubs` is empty. `setHasClubs` knows these seasons by their ids, so the setup
-  needs no file to tell. Choosing one takes Nations, and choosing Clubs goes back
-  to the built-in season, as an NBA season does the other way round.
+  needs no file to tell. Only Nations list them. Choosing Clubs with one takes
+  the nearest season with clubs (FIFA 05's 2003/04, FIFA 06's 2006/07), as
+  choosing Nations with an NBA season takes the built-in season.
 - **Nationality from the nearest later edition.** This is the one place a season
   takes a field from another edition, and FIFA 07 to FIFA 14 still take nothing.
   The same EA id in FIFA 07 or later gives the nationality. Nationality rarely
@@ -2428,21 +2429,27 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
     eleven rated players start short-handed.
   - Picking a set loads it, with the same loading, error and Retry block as a
     country map, and Launch waits for it.
-  - A season with nations only (2005/06, 2004/05, 1989/90 and the computed
-    seasons) takes Nations when chosen, and choosing Clubs goes back to the built-in
-    season. With no Europe maps it keeps the plain theatre (`all` or `elite`), so
-    Clubs opens on the built-in season's map of it. A challenge link that asks
-    for clubs with such a season has its `teams` ignored.
+  - The dropdown lists only the seasons that field the teams chosen
+    (`setHasLayer`), so choosing a season never changes Teams: Clubs leave out
+    the seasons with nations only (2005/06, 2004/05, 1989/90 and the computed
+    seasons). Choosing Clubs with one of them takes the nearest season with
+    clubs, the same season's other set first (1993/94's World Cup gives way to
+    CM 93/94), the later of two as near (`seasonForLayer`). Choosing Nations
+    straight back, with no season chosen in between, gives back the season it
+    replaced. With no Europe maps a season with nations only keeps the plain
+    theatre (`all` or `elite`), so Clubs open on that theatre's map of the
+    season they take. A challenge link that asks for clubs with such a season
+    has its `teams` ignored.
   - Country maps are built from the built-in FM data, so the "One country" group
     is not offered for another set.
   - Basketball has its own Season dropdown: the built-in 2026/27, then its
     earlier seasons ("2007/08"), with a note that they use 2K Archive's NBA 2K
     ratings, that those no game rated, back to 1960/61, are computed from
     Basketball-Reference's statistics, fitted to NBA 2K and put on NBA 2K27's
-    scale, and that they have NBA clubs only. Picking one switches Teams
-    to clubs and the theatre to its map (`domestic:nba2008`); picking nations
-    goes back to the built-in season. The map and the set load side by side, and
-    Launch waits for both.
+    scale, and that they have NBA clubs only. Only Clubs list them; picking one
+    moves the theatre to its map (`domestic:nba2008`), and choosing Nations
+    takes the built-in season, the only one with nations. The map and the set
+    load side by side, and Launch waits for both.
   - Changing sport resets a set of the other sport.
   - Setup caches key on the set version.
 - **Launch**: `opening()` builds teams from `sportOf(setup)` and applies
