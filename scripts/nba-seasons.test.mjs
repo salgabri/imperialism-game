@@ -1,7 +1,8 @@
 // The built-in earlier basketball seasons (docs/design/football-years.md, "Earlier basketball seasons"): the builder
 // on invented players (scripts/lib/nba-seasons.mjs), the readers of the seasons before NBA 2K (a 2kratings MyNBA Eras
 // page, NBA Live 99's dBase tables, Basketball-Reference's player seasons) and NBA Live 99's line on invented data, the
-// computed seasons' score, ranking and positions on invented statistics, the shipped seasons against their era maps,
+// computed seasons' value, score, ranking, positions and their clubs' move toward results on invented statistics, the
+// shipped seasons against their era maps,
 // the manifest and the audit, the loader's checks, and the running App: a season's Season row, its era's map, a launch
 // with its fives, and a save that resumes as it was played.
 import test from 'node:test';
@@ -18,10 +19,12 @@ import { BUILT_IN_SETS, builtInSeasonOf, clearFootballSetIndex, decodeFootballSe
   setSportOf, sportOf } from '../src/engine/footballSets.js';
 import { parseCampaign } from '../src/engine/storage.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
-import { brefPlayerSeasons, brefPositions, buildNbaSeason, checkScore, checkSpread, computedConversion, computedSeasonPlayers, editionOf, extractYears,
-  fitLine, isComputed, labelOf, leastSquares, leftOutNotes, listedPositions, liveScale, mapOf, nameKey, notListed, onLine, parseCsv,
-  parseErasPage, parseLive99, positionsOf, rateComputedSeason, ratingSpread, readDbf, readPlayerSeasons, readTable, realPlayers,
-  SCORE_INPUTS, scoreInputs, scoreOf, seasonIdOf, setIdOf, teamsOf, trainingPairs } from './lib/nba-seasons.mjs';
+import { brefPlayerSeasons, brefPositions, buildNbaSeason, checkScore, checkSpread, clubGamesOf, computedConversion, computedSeasonPlayers, editionOf,
+  enginePerPoint, engineStrengthOf, extractYears, fitLine, isComputed, labelOf, leastSquares, leaveOneEditionOut, leftOutNotes, listedPositions,
+  liveScale, mapOf, marginSigmaOf, nameKey, normalCdf, notListed, onLine, parseCsv, parseErasPage, parseLive99, positionsOf, rateComputedSeason,
+  ratingSpread, readDbf, readPlayerSeasons, readTable, realPlayers, resultsMove, SCORE_INPUTS, scoreOf, seasonIdOf, setIdOf, srsReliabilityOf,
+  teamsOf, trainingPairs, valueInputs } from './lib/nba-seasons.mjs';
+import { pooled, priorFromReliability, replacementRate, shrunkRate } from './lib/computed-ratings.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
@@ -302,20 +305,79 @@ test('Basketball-Reference\'s player seasons are read as data: a traded player\'
     /an All-NBA team "4th"/);
 });
 
-test('the score\'s inputs shrink PER and WS/48 toward a bench player\'s by minutes, and the score sums them', () => {
-  const [star, , , bench] = brefPlayerSeasons(BREF, ALL_NBA);
-  const shrink = { minutes: 400, per: 11, ws48: 0.05 };
-  const inputs = scoreInputs(star, { shrink });
-  assert.deepEqual(Object.keys(inputs), SCORE_INPUTS);
-  assert.equal(inputs.per, (25 * 3200 + 11 * 400) / 3600);
-  assert.equal(inputs.ws48, (0.25 * 3200 + 0.05 * 400) / 3600);
-  assert.deepEqual([inputs.mpg, inputs.mpg2, inputs.ppg, inputs.rpg, inputs.apg, inputs.allStar, inputs.allNba, inputs.dws], [40, 1600, 25, 15, 3, 1, 3, 6]);
-  // Forty minutes at a PER of 30 count for little.
-  assert.ok(scoreInputs(bench, { shrink }).per < 13);
-  assert.equal(scoreInputs({ ...star, per: null }, { shrink }), null, 'a season without PER has no score');
-  assert.equal(scoreInputs({ ...star, games: 0 }, { shrink }), null);
+/**
+ * An invented league of three seasons (1969 to 1971), two clubs of 82 games: thirty players whose rates and playing time
+ * follow a talent of their own plus a season's noise, every one playing all three seasons, and three more, `rule` (an All-Star whose last
+ * season lasted four games, as Bob Rule's 1970/71), `rookie` (four games, his first season) and `regular` (a rookie of
+ * full seasons). Records in brefPlayerSeasons' shape.
+ */
+function inventedLeague() {
+  let seed = 11;
+  const next = () => (seed = (seed * 48271) % 2147483647) / 2147483647;
+  const records = [];
+  const line = (season, id, team, games, minutes, per, ppg, apg, dwsg, honours = {}) => records.push({ season, id, name: id, pos: 'SF', team,
+    stints: [{ team, minutes, games }], games, minutes, per, ws48: 0.1, dws: dwsg * games, points: ppg * games, rebounds: 3 * games,
+    assists: apg * games, allStar: 0, allNba: 0, ...honours });
+  for (let i = 0; i < 30; i++) {
+    const talent = next();
+    for (const season of [1969, 1970, 1971]) {
+      const games = 21 + Math.round(40 * talent + 21 * next()), mpg = 10 + 25 * talent;
+      line(season, `p${i}`, i % 2 ? 'AAA' : 'BBB', games, Math.round(games * mpg), 8 + 12 * talent + 3 * next(), 4 + 20 * talent + 4 * next(),
+        1 + 5 * talent + next(), 0.02 + 0.06 * talent + 0.02 * next());
+    }
+  }
+  line(1969, 'rule', 'AAA', 80, 3000, 20, 25, 2, 0.05);
+  line(1970, 'rule', 'AAA', 80, 3100, 21, 28, 2, 0.05, { allStar: 1 });
+  line(1971, 'rule', 'AAA', 4, 140, 30, 30, 3, 0.1);
+  line(1971, 'rookie', 'BBB', 4, 140, 30, 30, 3, 0.1);
+  line(1971, 'regular', 'BBB', 80, 3000, 30, 30, 3, 0.1, { allNba: 2 });
+  const clubGames = clubGamesOf([1969, 1970, 1971].flatMap(season => ['AAA', 'BBB'].map(abbreviation => ({ season: String(season), team: abbreviation,
+    abbreviation, w: '41', l: '41' }))));
+  return { records, clubGames };
+}
+
+test('a player\'s value pools his rates over the window, shrunk toward the season\'s replacement level by a prior the data measure', () => {
+  const { records, clubGames } = inventedLeague();
+  assert.equal(clubGames.get('1971|AAA'), 82);
+  assert.equal(clubGamesOf([{ season: '1971', team: 'League Average', abbreviation: '', w: '', l: '' }]).size, 0, 'the league average is no club');
+  const window = [3, 2, 1];
+  const { inputsOf, priorsOf } = valueInputs(records, { window, clubGames });
+  const of = (id, season = 1971) => records.find(r => r.id === id && r.season === season);
+  const priors = priorsOf(1971);
+  // Each rate's prior is its reliability's (the season against the one before, among the thirty regulars), counted at
+  // the season's weight; its replacement level is the pooled rate of the least-exposed quarter of the season's players.
+  for (const [name, events, exposure] of [['per', r => r.per * r.minutes, r => r.minutes], ['ppg', r => r.points, r => r.games],
+    ['apg', r => r.assists, r => r.games], ['dws', r => r.dws, r => r.games]]) {
+    const { prior, reliability, typical, regulars, replacement } = priors[name];
+    assert.ok(reliability > 0 && reliability < 1, `${name}: reliability ${reliability}`);
+    assert.equal(regulars, 30, `${name}: only the thirty played a quarter of both seasons`);
+    assert.equal(prior, priorFromReliability(reliability, typical) * 3);
+    const pools = records.filter(r => r.season === 1971).map(r => pooled([0, 1, 2].map(back => {
+      const season = records.find(s => s.id === r.id && s.season === 1971 - back);
+      return season ? { exposure: exposure(season), events: events(season) } : null;
+    }), window));
+    assert.equal(replacement, replacementRate(pools));
+  }
+  // Four games after two full seasons: his points a game are mostly the seasons before (Bob Rule's case).
+  const rule = inputsOf(of('rule'));
+  const ppg = priors.ppg;
+  assert.equal(rule.ppg, shrunkRate({ n: 3 * 4 + 2 * 80 + 80, x: 3 * 120 + 2 * 2240 + 2000 }, ppg.prior, ppg.replacement));
+  assert.ok(rule.ppg > 20 && rule.ppg < 30);
+  // The same four games with nothing before them count for little: a rookie is shrunk toward replacement.
+  const rookie = inputsOf(of('rookie')), regular = inputsOf(of('regular'));
+  assert.equal(rookie.ppg, shrunkRate({ n: 12, x: 360 }, ppg.prior, ppg.replacement));
+  assert.ok(rookie.ppg < regular.ppg - 5 && rookie.per < regular.per - 3, 'a full season at the same rates counts for more');
+  // Selection: his share of his club's minutes, pooled the same way, never shrunk.
+  assert.equal(rule.share, (3 * 140 + 2 * 3100 + 3000) / (6 * 48 * 82));
+  assert.equal(rookie.share, 140 / (48 * 82));
+  // Honours are the season's own.
+  assert.deepEqual([rule.allStar, rule.allNba, regular.allNba], [0, 0, 2]);
+  assert.deepEqual(Object.keys(rule), SCORE_INPUTS);
+  assert.equal(inputsOf({ ...of('regular'), per: null }), null, 'a season without PER has no score');
+  assert.equal(inputsOf({ ...of('regular'), games: 0 }), null);
+  assert.throws(() => valueInputs(records, { window: [3, 0], clubGames }), /positive weights/);
   const coefficients = Object.fromEntries(SCORE_INPUTS.map((name, i) => [name, i + 1]));
-  assert.equal(scoreOf({ intercept: -1, coefficients })(Object.fromEntries(SCORE_INPUTS.map(name => [name, 1]))), -1 + 55);
+  assert.equal(scoreOf({ intercept: -1, coefficients })(Object.fromEntries(SCORE_INPUTS.map(name => [name, 1]))), -1 + 28);
 });
 
 /** Invented pairs whose z is exactly the score `score` gives their inputs. */
@@ -324,7 +386,8 @@ function invented(score, count = 40) {
   const next = () => (seed = (seed * 48271) % 2147483647) / 2147483647;
   return Array.from({ length: count }, (_, i) => {
     const inputs = Object.fromEntries(SCORE_INPUTS.map(name => [name, next() * 10]));
-    return { edition: 2000 + (i % 3), inputs, z: scoreOf(score)(inputs) };
+    const z = scoreOf(score)(inputs);
+    return { edition: 2000 + (i % 3), inputs, z, rating: z };
   });
 }
 
@@ -337,15 +400,19 @@ test('the score is the least-squares fit, fixed in the manifest: the build fits 
   const fit = checkScore(invented(score), score);
   assert.deepEqual([fit.pairs, fit.editions, fit.correlation], [40, 3, 1]);
   assert.deepEqual(fit.coefficients, { intercept: -1.5, ...score.coefficients });
-  assert.throws(() => checkScore(invented(score), { ...score, coefficients: { ...score.coefficients, dws: 0.5 } }),
-    /fitted on the 40 pairs is not the manifest's: dws 1\.25, not 0\.5/);
+  assert.throws(() => checkScore(invented(score), { ...score, coefficients: { ...score.coefficients, allNba: 0.5 } }),
+    /fitted on the 40 pairs is not the manifest's: allNba 0\.875, not 0\.5/);
   const { per, ...short } = score.coefficients;
-  assert.throws(() => checkScore(invented(score), { ...score, coefficients: { ...short, per } }), /inputs must be per, ws48/);
+  assert.throws(() => checkScore(invented(score), { ...score, coefficients: { ...short, per } }), /inputs must be per, ppg/);
+  // Each edition left out in turn is predicted by the others' fit: exactly, when the score is exact.
+  assert.deepEqual(fit.leaveOneEditionOut, { editions: 3, rankCorrelation: 1, correlation: 1,
+    weakest: ['NBA 2K (1999/00) 1', 'NBA 2K1 (2000/01) 1', 'NBA 2K2 (2001/02) 1'] });
+  assert.deepEqual(leaveOneEditionOut(invented(score)), fit.leaveOneEditionOut);
 });
 
 test('the score is fitted on each 2K rating beside the player\'s season before, matched by name and club', () => {
   const records = brefPlayerSeasons(BREF, ALL_NBA);
-  const inputsOf = record => scoreInputs(record, { shrink: { minutes: 400, per: 11, ws48: 0.05 } });
+  const inputsOf = record => (record.per == null ? null : { per: record.per });
   const years = { 1972: [{ n: 'Star Centre', o: 90, p: 'C', t: 'MOV' }, { n: 'Traded Wing', o: 80, p: 'SF', t: 'MOV' },
     { n: 'Nobody Matched', o: 70, p: 'PG', t: 'NEW' }, { n: 'Unrated', o: null, p: 'PG', t: 'NEW' }] };
   const pairs = trainingPairs(years, records, { editions: [1972, 1972], lag: 1 }, inputsOf);
@@ -403,19 +470,28 @@ test('a computed season\'s players take the manifest\'s codes; a teammate\'s nam
   assert.equal(out.scores.get('PHX|Moved Man'), 8);
 });
 
-test('a computed season names its id, label and maker, and its source says how it was computed', () => {
+test('a computed season names its id, label and maker, and its source says how it was computed and moved', () => {
   const coefficients = Object.fromEntries(SCORE_INPUTS.map((name, i) => [name, (i + 1) / 100]));
   const computed = { label: 'Test Stats (computed)', provider: 'Test Reference', name: 'A Test Copy, CC0', url: 'https://example.test/stats', seasons: [2001],
-    score: { intercept: -2, coefficients, shrink: { minutes: 400, per: 11, ws48: 0.05 }, allNba: ALL_NBA, training: { editions: [2000, 2026], lag: 1 } },
+    score: { intercept: -2, coefficients, window: [3, 2, 1], allNba: ALL_NBA, training: { editions: [2000, 2026], lag: 1 } },
     roster: 13, spread: { edition: 2027, perClub: 13 } };
   const manifest = { ...TEST_MANIFEST, computed };
   assert.deepEqual([isComputed(manifest, 2001), isComputed(manifest, 2002), setIdOf(manifest, 2001), labelOf(manifest, 2001), setIdOf(manifest, 2002)],
     [true, false, 'nba-stats-2001', 'Test Stats (computed)', 'nba-2k02']);
-  const conversion = computedConversion(computed);
-  assert.match(conversion, /^computed: score = -2 \+ 0\.01 \* PER \+ 0\.02 \* WS\/48 \+ 0\.03 \* MPG \+ 0\.04 \* MPG\^2 .* \+ 0\.1 \* DWS, PER and WS\/48 shrunk toward 11 and 0\.05 by 400 minutes/);
-  assert.match(conversion, /NBA 2K to NBA 2K26, 2K Archive\) against each player's season before; each club's 13 players with the most minutes ranked by score and given NBA 2K27's ratings of each club's 13 best, rank for rank$/);
+  const rule = computedConversion(computed);
+  assert.match(rule, /^computed: score = -2 \+ 0\.01 \* PER \+ 0\.02 \* PPG \+ 0\.03 \* APG \+ 0\.04 \* DWS\/G \+ 0\.05 \* minutes share \+ 0\.06 \* All-Star \+ 0\.07 \* All-NBA; PER, PPG, APG and DWS\/G pooled over the season and the two before it, weighted 3:2:1, and shrunk toward the season's replacement level/);
+  assert.match(computedConversion({ ...computed, score: { ...computed.score, window: [3, 1] } }), /pooled over the season and the season before, weighted 3:1,/);
+  assert.match(rule, /NBA 2K to NBA 2K26, 2K Archive\) against each player's seasons before; each club's 13 players with the most minutes ranked by score and given NBA 2K27's ratings of each club's 13 best, rank for rank$/);
+  // A completed season says how its clubs moved, with its own constants.
+  const move = { sigma: 10.9, games: 82, reliability: 0.9, perPoint: 1.8, level: 77, scale: Math.sqrt(0.9) / 1.8,
+    clubs: [['MOV', 5, 79.64, 82, 79.6, -2, 3], ['NEW', -5, 74.36, 72, 74.4, 2, 2]] };
+  const conversion = computedConversion(computed, move);
+  assert.ok(conversion.startsWith(`${rule}; then each club moved toward its results: target = 77.00 + sqrt(0.900) * SRS / 1.800 (`), conversion);
+  assert.match(conversion, /SRS's reliability 1 - \(10\.90\^2 \/ 82\) \/ Var\(SRS\)/);
+  assert.match(conversion, /every player shifted by a whole number and the best few one more, whichever brings the five the engine plays nearest its target$/);
   const players = [...five('MOV', 80), ...five('NEW', 70)];
-  const source = { computed: true, players, rows: 12, rated: 12, unscored: ['Short Season (NEW)'], noPosition: [], namesakes: [], traded: ['MOV Point (NEW 10 min, MOV 900 min): MOV'],
+  const source = { computed: true, players, ranked: players, move, priors: { per: { replacement: 10, prior: 900, reliability: 0.8, regulars: 40 } },
+    rows: 12, rated: 12, unscored: ['Short Season (NEW)'], noPosition: [], namesakes: [], traded: ['MOV Point (NEW 10 min, MOV 900 min): MOV'],
     scores: new Map(players.map(p => [`${p.t}|${p.n}`, p.o / 50])), srs: new Map([['MOV', 5], ['NEW', -5]]), averages: { pace: 100, rating: 105, points: 105 } };
   const arenas = { 'b-boston-celtics': { city: 'Boston', arena: 'TD Garden', home: [-71.06, 42.37] } };
   const { doc, audit } = buildNbaSeason({ 2001: players }, 2001, manifest, { arenas, source });
@@ -423,10 +499,89 @@ test('a computed season names its id, label and maker, and its source says how i
   assert.deepEqual(doc.source, { provider: 'Test Reference', edition: '2000/01 NBA regular season', compiler: 'A Test Copy, CC0', url: 'https://example.test/stats',
     rawScale: 99, method: 'computed', conversion });
   assert.equal(doc.version, `nba-stats-2001-${contentHash(doc)}`);
-  assert.deepEqual([audit.label, audit.population, audit.rated, audit.unscored, audit.traded, audit.clubsAgainstSRS],
-    ['Test Stats (computed)', 12, 12, ['Short Season (NEW)'], source.traded, 1]);
+  assert.deepEqual([audit.label, audit.population, audit.rated, audit.unscored, audit.traded, audit.clubsAgainstSRS, audit.clubsAgainstSRSBeforeMove],
+    ['Test Stats (computed)', 12, 12, ['Short Season (NEW)'], source.traded, 1, 1]);
+  assert.deepEqual(audit.priors, source.priors);
+  assert.deepEqual(audit.results, { sigma: 10.9, games: 82, reliability: 0.9, perPoint: 1.8, level: 77, pointsPerSrs: 0.527 });
+  assert.deepEqual(audit.strengthSd, { beforeMove: 7.07, afterMove: 7.07 });
+  assert.deepEqual(audit.moves, ['Old Town Movers: SRS +5.00, target 79.64; plays 82.00 → 79.60 (-2, 3 best +1 more)',
+    'New City Testers: SRS -5.00, target 74.36; plays 72.00 → 74.40 (+2, 2 best +1 more)']);
   assert.equal(audit.fives[0], 'Old Town Movers 82: MOV Point PG 84 (1.680), MOV Shooter SG/SF 83 (1.660), MOV Wing SF 82 (1.640), MOV Forward PF/C 81 (1.620), MOV Centre C 80 (1.600)');
   assert.equal(audit.namesakes, undefined, 'no namesakes, no line');
+});
+
+// ---------- step 5: each club's move toward its results ----------
+
+const POSITIONS_IN_ORDER = ['PG', 'SG', 'SF', 'PF', 'C'];
+
+test('a season\'s game margins are measured from its records, and its SRS is as reliable as their spread over their luck', () => {
+  assert.ok(Math.abs(normalCdf(0) - 0.5) < 1e-7 && Math.abs(normalCdf(1.959964) - 0.975) < 1e-6 && Math.abs(normalCdf(-1) - 0.158655) < 1e-6);
+  assert.ok(Math.abs(normalCdf(0.7) + normalCdf(-0.7) - 1) < 1e-12, 'symmetric');
+  // Three seasons of twelve clubs whose wins are what an 11-point spread gives their SRS gaps: the fit finds about 11.
+  const season = shift => {
+    const srs = Array.from({ length: 12 }, (_, i) => -8 + (16 * i) / 11 + shift);
+    return srs.map(own => {
+      const share = srs.reduce((sum, other) => (other === own ? sum : sum + normalCdf((own - other) / 11)), 0) / 11;
+      return { srs: own, w: Math.round(82 * share), l: 82 - Math.round(82 * share) };
+    });
+  };
+  const sigma = marginSigmaOf([season(0), season(0.5), season(-0.5)]);
+  assert.ok(Math.abs(sigma - 11) < 0.3, `σ ${sigma}`);
+  assert.throws(() => marginSigmaOf([[{ srs: 0, w: 41, l: 41 }]]), /two clubs/);
+  // r = 1 − (σ² ÷ games) ÷ Var(SRS): SRS of −6, −2, 2 and 6 vary by 20.
+  const clubs = [-6, -2, 2, 6].map(srs => ({ srs, w: 41, l: 41 }));
+  assert.equal(srsReliabilityOf(clubs, 11), 1 - (121 / 82) / 20);
+  assert.equal(srsReliabilityOf(clubs.map(club => ({ ...club, srs: 0 })), 11), 0, 'no spread, no reliability');
+});
+
+test('the engine\'s strength of a five and its margin for a lineup point, under a season\'s own rules', () => {
+  const fiveOf = ratings => POSITIONS_IN_ORDER.map((pos, i) => ({ name: `${pos} player`, positions: [pos], rating: ratings[i] }));
+  assert.ok(Math.abs(engineStrengthOf(fiveOf([80, 80, 80, 80, 80])) - 80) < 1e-9);
+  assert.ok(Math.abs(engineStrengthOf(fiveOf([81, 81, 81, 81, 81])) - 81) < 1e-9, 'a point on every slot is a point');
+  // Ten points more at one slot: a guard's count most in offence, a centre's in defence, a power forward's least.
+  const guard = engineStrengthOf(fiveOf([90, 80, 80, 80, 80])), centre = engineStrengthOf(fiveOf([80, 80, 80, 80, 90]));
+  const power = engineStrengthOf(fiveOf([80, 80, 80, 90, 80]));
+  assert.ok(power < centre && centre < guard && guard < 82.2 && power > 81.7, `${power} ${centre} ${guard}`);
+  // About a point and two thirds of margin a lineup point at 1997/98's pace, two at 1960/61's faster one.
+  const late = enginePerPoint('1997/98'), early = enginePerPoint('1960/61');
+  assert.equal(enginePerPoint('1997/98'), late, 'seeded: the same every build');
+  assert.ok(late > 1.55 && late < 1.75 && early > 1.95 && early < 2.15, `${late} ${early}`);
+});
+
+test('a completed season\'s clubs move toward their results by whole points, none passing a teammate', () => {
+  // Three clubs of eight: equal on paper, their SRS +6, 0 and −6. Each club's shooting guard and small forward share a
+  // rating; the forward scored higher.
+  const starters = [84, 83, 83, 81, 80];
+  const club = t => POSITIONS_IN_ORDER.flatMap((pos, i) => [{ n: `${t} ${pos}`, o: starters[i], p: pos, t },
+    ...(i < 3 ? [{ n: `${t} ${pos} backup`, o: 75 - i, p: pos, t }] : [])]);
+  const players = [...club('AAA'), ...club('BBB'), ...club('CCC')];
+  const scores = new Map(players.map(player => [`${player.t}|${player.n}`, player.o + (/ SF$/.test(player.n) ? 0.5 : 0)]));
+  const records = new Map([['AAA', { srs: 6, w: 58, l: 24 }], ['BBB', { srs: 0, w: 41, l: 41 }], ['CCC', { srs: -6, w: 24, l: 58 }]]);
+  const { players: moved, move } = resultsMove(players, records, '1997/98', 10.9, scores);
+  assert.equal(move.reliability, srsReliabilityOf([...records.values()], 10.9));
+  assert.equal(move.perPoint, enginePerPoint('1997/98'));
+  assert.equal(move.scale, Math.sqrt(move.reliability) / move.perPoint);
+  assert.deepEqual(move.clubs.map(([code]) => code), ['AAA', 'BBB', 'CCC'], 'best target first');
+  for (const [code, srs, target, before, after, shift] of move.clubs) {
+    assert.ok(Math.abs(target - (move.level + move.scale * srs)) < 1e-9);
+    assert.ok(Math.abs(after - target) < 0.3, `${code} plays ${after} for ${target}`);
+    assert.equal(Math.sign(shift), Math.sign(srs), `${code} moves toward its results`);
+    assert.ok(Math.abs(before - move.level) < 1e-9, 'equal on paper');
+  }
+  // Every player keeps his place inside his club, ties going by score, and his name, positions and club.
+  const score = player => scores.get(`${player.t}|${player.n}`);
+  for (const code of records.keys()) {
+    const pairs = players.map((player, i) => [player, moved[i]]).filter(([player]) => player.t === code);
+    assert.ok(pairs.every(([player, after]) => after.n === player.n && after.p === player.p && after.t === player.t));
+    for (const [a, movedA] of pairs) {
+      for (const [b, movedB] of pairs) if (a.o > b.o || (a.o === b.o && score(a) > score(b))) assert.ok(movedA.o >= movedB.o, `${a.n} and ${b.n}`);
+    }
+  }
+  // The weakest club's two points more go to its guard and to the forward who scored higher, not to his equal by minutes.
+  assert.deepEqual(move.clubs.at(-1).slice(5), [-4, 2]);
+  assert.deepEqual(['CCC SG', 'CCC SF'].map(name => moved.find(player => player.n === name).o), [79, 80]);
+  assert.throws(() => resultsMove(players, new Map([...records].slice(0, 2)), '1997/98', 10.9), /no record for CCC/);
+  assert.throws(() => resultsMove(players, records, '1997/98', 10.9, new Map()), /no score for AAA PG/);
 });
 
 // ---------- the shipped seasons ----------
@@ -562,7 +717,7 @@ test('franchises that moved play where they played then', () => {
     ['Detroit Olympia', 'Cobo Arena', 'Pontiac Silverdome']);
 });
 
-test('the computed seasons are computed by the manifest\'s rule, and say so', () => {
+test('the computed seasons are computed by the manifest\'s rule, moved toward their results, and say so', () => {
   const audit = JSON.parse(read('docs/design/basketball-seasons-audit.json'));
   const { computed } = audit;
   assert.match(MANIFEST.computed.terms, /CC0/);
@@ -571,7 +726,10 @@ test('the computed seasons are computed by the manifest\'s rule, and say so', ()
   assert.ok(Object.values(MANIFEST.computed.score.coefficients).every(value => value > 0), 'every input counts for a player');
   assert.equal(computed.fit.pairs, 9970);
   assert.ok(computed.fit.correlation > 0.85, `in-sample r ${computed.fit.correlation}`);
-  // End to end, the rule rates the seasons NBA 2K27's MyNBA Eras rate as 2K does.
+  // Fitted on every edition but one, it ranks that one at least as well as the one-season score it replaced did (0.882).
+  assert.equal(computed.fit.leaveOneEditionOut.editions, 27);
+  assert.ok(computed.fit.leaveOneEditionOut.rankCorrelation >= 0.882, `left out: ${JSON.stringify(computed.fit.leaveOneEditionOut)}`);
+  // End to end, the rule (before any move) rates the seasons NBA 2K27's MyNBA Eras rate as 2K does.
   for (const id of ['nba-eras-1984', 'nba-eras-1992']) {
     const check = computed.checks[id];
     assert.ok(check.matched > 200 && check.rankCorrelation >= 0.94 && check.meanError < 2.5, `${id}: ${JSON.stringify(check)}`);
@@ -580,43 +738,65 @@ test('the computed seasons are computed by the manifest\'s rule, and say so', ()
     ['NBA 2K27', 390, 69, 97]);
   const counts = Object.entries(MANIFEST.computed.spread.counts).map(([rating, count]) => [Number(rating), count]);
   assert.deepEqual([counts.reduce((sum, [, count]) => sum + count, 0), counts[0][0], counts.at(-1)[0]], [390, 69, 97], 'the manifest pins all 390');
-  const conversion = computedConversion(MANIFEST.computed);
+  // One game-margin spread for every season, from their records: the NBA's games end about eleven points from form.
+  assert.ok(computed.marginSigma.seasons === 36 && computed.marginSigma.points > 9 && computed.marginSigma.points < 13, JSON.stringify(computed.marginSigma));
+  const rule = computedConversion(MANIFEST.computed);
   for (const listed of BUILT_IN_BASKETBALL_SEASONS.filter(set => isComputed(MANIFEST, set.year))) {
     const doc = seasonFile(listed.id);
-    assert.deepEqual(doc.source, { provider: 'Basketball-Reference', edition: `${doc.season} NBA regular season`, compiler: MANIFEST.computed.name,
-      url: MANIFEST.computed.url, rawScale: 99, method: 'computed', conversion }, `${listed.id} says how it was computed`);
     const entry = audit.seasons.find(season => season.id === listed.id);
+    const { conversion, ...source } = doc.source;
+    assert.deepEqual(source, { provider: 'Basketball-Reference', edition: `${doc.season} NBA regular season`, compiler: MANIFEST.computed.name,
+      url: MANIFEST.computed.url, rawScale: 99, method: 'computed' }, `${listed.id} says where it comes from`);
+    // Its conversion states the rule, then the season's own move: μ, r, m and σ, as the audit has them.
+    assert.ok(conversion.startsWith(`${rule}; then each club moved toward its results: target = `), `${listed.id} says how it was computed`);
+    const [, level, reliability, perPoint, sigma, games] = /target = ([\d.]+) \+ sqrt\(([\d.]+)\) \* SRS \/ ([\d.]+) \(.* 1 - \(([\d.]+)\^2 \/ (\d+)\)/
+      .exec(conversion).map(Number);
+    const { results } = entry;
+    assert.ok(Math.abs(level - results.level) < 0.006 && Math.abs(reliability - results.reliability) < 0.0006
+      && Math.abs(perPoint - results.perPoint) < 0.0006 && Math.abs(sigma - computed.marginSigma.points) < 0.006 && games === results.games,
+    `${listed.id}: ${conversion.slice(rule.length)} against ${JSON.stringify(results)}`);
+    assert.equal(results.sigma, computed.marginSigma.points);
     assert.equal(entry.fives.length, doc.clubs.length);
-    // Each five as the audit gives it: the season's own players, rated by their scores, none passing another.
-    const scored = [];
+    // Each five as the audit gives it: the season's own players, rated by their scores, none passing a teammate.
     for (const text of entry.fives) {
       const [, clubName, str, players] = /^(.+) (\d+): (.+)$/.exec(text);
       const club = doc.clubs.find(item => item.name === clubName);
       assert.equal(club.str, Number(str));
-      players.split(', ').forEach((player, i) => {
+      const scored = players.split(', ').map((player, i) => {
         const [, name, positions, rating, score] = /^(.+) ([A-Z]{1,2}(?:\/[A-Z]{1,2})?) (\d+) \((-?\d+\.\d{3})\)$/.exec(player);
         assert.deepEqual(club.squad[i], [name, positions, Number(rating)]);
-        scored.push([Number(score), Number(rating)]);
-      });
+        return [Number(score), Number(rating)];
+      }).sort((a, b) => a[0] - b[0]);
+      assert.ok(scored.every(([score, rating], i) => i === 0 || score === scored[i - 1][0] || rating >= scored[i - 1][1]), `${clubName}: no player passes a teammate`);
     }
-    scored.sort((a, b) => a[0] - b[0]);
-    assert.ok(scored.every(([score, rating], i) => i === 0 || score === scored[i - 1][0] || rating >= scored[i - 1][1]), `${listed.id}: no player passes another`);
-    assert.ok(doc.clubs.every(club => club.squad.every(([, , rating]) => rating >= 69 && rating <= 97)), 'on NBA 2K27\'s spread');
+    // NBA 2K27's spread, each club moved by a few points: Kareem Abdul-Jabbar's 97 meets the top in 1971/72.
+    assert.ok(doc.clubs.every(club => club.squad.every(([, , rating]) => rating >= 60 && rating <= 99)), `${listed.id}: ratings 60-99`);
     assert.ok(entry.population >= doc.clubs.length * 10 && entry.rated === entry.population, `${listed.id}: every club's rotation is rated`);
-    assert.ok(entry.clubsAgainstSRS > 0.45, `${listed.id}: clubs against SRS ${entry.clubsAgainstSRS}`);
+    // Moved, the clubs follow their season's SRS and spread as their results did.
+    assert.ok(entry.clubsAgainstSRSBeforeMove > 0.4 && entry.clubsAgainstSRS >= 0.95, `${listed.id}: clubs against SRS ${entry.clubsAgainstSRSBeforeMove} → ${entry.clubsAgainstSRS}`);
+    assert.equal(entry.moves.length, doc.clubs.length);
+    for (const move of entry.moves) {
+      const [, target, after] = /target ([\d.]+); plays [\d.]+ → ([\d.]+)/.exec(move).map(Number);
+      assert.ok(Math.abs(after - target) < 0.4, `${listed.id}: ${move}`);
+    }
+    assert.ok(entry.strengthSd.afterMove > 1.2 && entry.strengthSd.afterMove < 3.7, `${listed.id}: SD ${JSON.stringify(entry.strengthSd)}`);
     assert.deepEqual(entry.leagueAverages, NBA_LEAGUE_AVERAGES[doc.season], 'played at its league\'s averages');
   }
-  // The strongest of a few seasons, as history has them (each its season's best record).
-  const top = id => { const [first, second] = seasonFile(id).clubs; assert.ok(first.str > second.str, id); return first.name; };
+  // The club with the season's best SRS plays strongest (the audit lists the moves best target first).
+  const top = id => {
+    const moves = audit.seasons.find(season => season.id === id).moves.map(move => [/^(.+): SRS/.exec(move)[1], Number(/→ ([\d.]+)/.exec(move)[1])]);
+    assert.ok(moves.every(([, after]) => after <= moves[0][1]), id);
+    return moves[0][0];
+  };
   assert.deepEqual(['nba-stats-1962', 'nba-stats-1968', 'nba-stats-1972', 'nba-stats-1973', 'nba-stats-1983'].map(top),
-    ['Boston Celtics', 'Philadelphia 76ers', 'Los Angeles Lakers', 'Boston Celtics', 'Philadelphia 76ers']);
+    ['Boston Celtics', 'Philadelphia 76ers', 'Los Angeles Lakers', 'Los Angeles Lakers', 'Philadelphia 76ers']);
   const player = (id, club, name) => seasonFile(id).clubs.find(item => item.name === club).squad.find(([who]) => who === name);
-  assert.deepEqual(player('nba-stats-1962', 'Philadelphia Warriors', 'Wilt Chamberlain'), ['Wilt Chamberlain', 'C', 97]);
-  assert.deepEqual(player('nba-stats-1965', 'San Francisco Warriors', 'Wilt Chamberlain'), ['Wilt Chamberlain', 'C', 97],
-    'traded in January 1965, he plays for the club he played the most minutes for');
-  assert.deepEqual(player('nba-stats-1972', 'Milwaukee Bucks', 'Kareem Abdul-Jabbar'), ['Kareem Abdul-Jabbar', 'C', 97]);
+  assert.deepEqual(player('nba-stats-1962', 'Philadelphia Warriors', 'Wilt Chamberlain'), ['Wilt Chamberlain', 'C', 98]);
+  assert.deepEqual(player('nba-stats-1965', 'San Francisco Warriors', 'Wilt Chamberlain'), ['Wilt Chamberlain', 'C', 93],
+    'traded in January 1965, he plays for the club he played the most minutes for, moved with it toward its 17-63 record');
+  assert.deepEqual(player('nba-stats-1972', 'Milwaukee Bucks', 'Kareem Abdul-Jabbar'), ['Kareem Abdul-Jabbar', 'C', 99]);
   // 1988/89's Bullets had two Charles Joneses: the one with more minutes plays.
-  assert.deepEqual(audit.seasons.find(season => season.id === 'nba-stats-1989').namesakes, ['Charles Jones (WSB, 74, 516 min; Basketball-Reference\'s jonesch02)']);
+  assert.deepEqual(audit.seasons.find(season => season.id === 'nba-stats-1989').namesakes, ['Charles Jones (WSB, 73, 516 min; Basketball-Reference\'s jonesch02)']);
 });
 
 test('the seasons before NBA 2K come from their own pinned sources: every player real, every rating the source\'s', () => {
