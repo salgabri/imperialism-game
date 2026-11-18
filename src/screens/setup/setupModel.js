@@ -395,7 +395,9 @@ export const SEASON_NOTES = Object.freeze({
     + 'minutes and his production (scored by the points table of the Six Nations\' own game for fans), ranked within his position, each club '
     + 'then moved by its 2025/26 results and each nation by its Tests. The 2025/26 season: the Premiership\'s, the Top 14\'s '
     + 'and the URC\'s European clubs, each on its own country\'s land. Nations field these clubs\' players (the URC\'s four '
-    + 'South African sides among them) by their latest Test side, only where they hold at least half a matchday 23.',
+    + 'South African sides among them) and Super Rugby Pacific\'s and Japan\'s League One\'s, each league rated within itself '
+    + 'and set on the same scale by its nations\' Tests, by their latest Test side, only where they hold at least half a '
+    + 'matchday 23.',
   'rugby-league': 'Rugby League 26 ratings from Big Ant Studios, as Zero Tackle listed them at the game\'s release in '
     + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace, and only where they hold at '
     + 'least half a matchday 17. No game rated 1960–2007 or 2009–2024: they are computed, each player\'s NRL.com match '

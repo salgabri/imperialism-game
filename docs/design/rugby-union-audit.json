@@ -4,91 +4,91 @@
   "groups": {
    "PR": {
     "players": 348,
-    "regulars": 129,
-    "reliability": {
-     "selection": 0.32308810375670843,
-     "tests": 0.6764334491174513,
-     "production": 0.6556574239713775
-    },
-    "weights": [
-     0.14646750928840782,
-     0.4433654808898931,
-     0.410167009821699
-    ],
-    "prior": 5.21,
-    "typical": 9.92,
-    "replacement": 14.723
-   },
-   "HK": {
-    "players": 169,
-    "regulars": 63,
-    "reliability": {
-     "selection": 0.4470526113671275,
-     "tests": 0.746727913415555,
-     "production": 0.635752688172043
-    },
-    "weights": [
-     0.17755915254266386,
-     0.5010042633698597,
-     0.32143658408747644
-    ],
-    "prior": 5.92,
-    "typical": 10.33,
-    "replacement": 24.543
-   },
-   "LK": {
-    "players": 245,
-    "regulars": 117,
-    "reliability": {
-     "selection": 0.3719522246699336,
-     "tests": 0.7583948961474897,
-     "production": 0.6377212306493428
-    },
-    "weights": [
-     0.14322891537539637,
-     0.5316445924358396,
-     0.3251264921887641
-    ],
-    "prior": 7.38,
-    "typical": 12.98,
-    "replacement": 15.481
-   },
-   "FL": {
-    "players": 263,
     "regulars": 131,
     "reliability": {
-     "selection": 0.4026637484652752,
-     "tests": 0.7846140452370245,
-     "production": 0.7583302193989216
+     "selection": 0.29465648854961835,
+     "tests": 0.6882185371766465,
+     "production": 0.6411519777931992
     },
     "weights": [
-     0.12101699992844386,
-     0.4684946630711608,
-     0.4104883370003952
+     0.1359272397757588,
+     0.4699612623981221,
+     0.39411149782611915
     ],
-    "prior": 4.28,
+    "prior": 5.55,
+    "typical": 9.92,
+    "replacement": 14.706
+   },
+   "HK": {
+    "players": 167,
+    "regulars": 64,
+    "reliability": {
+     "selection": 0.4523809523809524,
+     "tests": 0.7522485207100592,
+     "production": 0.6157051282051282
+    },
+    "weights": [
+     0.18139766993188836,
+     0.5170380553343801,
+     0.30156427473373154
+    ],
+    "prior": 6.45,
+    "typical": 10.33,
+    "replacement": 24.377
+   },
+   "LK": {
+    "players": 244,
+    "regulars": 118,
+    "reliability": {
+     "selection": 0.36812273801306705,
+     "tests": 0.7591297778987862,
+     "production": 0.6347660315756029
+    },
+    "weights": [
+     0.1420667149018554,
+     0.535184645077964,
+     0.3227486400201805
+    ],
+    "prior": 7.47,
+    "typical": 12.98,
+    "replacement": 15.566
+   },
+   "FL": {
+    "players": 261,
+    "regulars": 132,
+    "reliability": {
+     "selection": 0.41577747282849736,
+     "tests": 0.7818075923051436,
+     "production": 0.7576192389370372
+    },
+    "weights": [
+     0.1261780946702373,
+     0.4632784444953871,
+     0.4105434608343756
+    ],
+    "prior": 4.3,
     "typical": 13.44,
-    "replacement": 20.511
+    "replacement": 20.834
    },
    "N8": {
     "players": 93,
-    "regulars": 46,
+    "regulars": 48,
     "reliability": {
-     "selection": 0.2895467160037003,
-     "tests": 0.6237055548313815,
-     "production": 0.7407338883749615
+     "selection": 0.2090751194094659,
+     "tests": 0.6282010734245932,
+     "production": 0.7606382978723404
     },
     "weights": [
-     0.1226405393533775,
-     0.33983824691988485,
-     0.5375212137267377
+     0.09099160894587946,
+     0.3355263332923083,
+     0.5734820577618122
     ],
-    "prior": 4.63,
+    "prior": 4.16,
     "typical": 13.23,
-    "replacement": 25.786
+    "replacement": 26.294
    },
    "SH": {
-    "players": 150,
+    "players": 149,
     "regulars": 59,
     "reliability": {
      "selection": 0.49532437171244886,
@@ -102,75 +102,75 @@
     ],
     "prior": 5.22,
     "typical": 11.36,
-    "replacement": 18.045
+    "replacement": 17.509
    },
    "FH": {
-    "players": 112,
+    "players": 111,
     "regulars": 50,
     "reliability": {
-     "selection": 0.3865066026410564,
+     "selection": 0.3852581032412965,
      "tests": 0.8429085722791299,
      "production": 0.6755822328931572
     },
     "weights": [
-     0.10790507736175682,
-     0.6223161380203742,
-     0.26977878461786897
+     0.10755415607577003,
+     0.622560937059022,
+     0.26988490686520794
     ],
     "prior": 7.17,
     "typical": 14.94,
-    "replacement": 21.601
+    "replacement": 21.856
    },
    "CE": {
-    "players": 231,
-    "regulars": 115,
+    "players": 229,
+    "regulars": 121,
     "reliability": {
-     "selection": 0.40254083484573505,
-     "tests": 0.7646868297670902,
-     "production": 0.5660932691548962
+     "selection": 0.3552093212301856,
+     "tests": 0.7710902171300043,
+     "production": 0.5805649640970059
     },
     "weights": [
-     0.1630707018681538,
-     0.570656498106141,
-     0.266272800025705
+     0.1405383028384906,
+     0.5832564114970273,
+     0.2762052856644821
     ],
-    "prior": 11.49,
+    "prior": 10.83,
     "typical": 14.99,
-    "replacement": 17.125
+    "replacement": 17.099
    },
    "WG": {
     "players": 234,
     "regulars": 102,
     "reliability": {
-     "selection": 0.24928894945462565,
+     "selection": 0.2416893316973045,
      "tests": 0.7237558886690376,
-     "production": 0.6111302735070766
+     "production": 0.6037794527596677
     },
     "weights": [
-     0.1155657135426458,
-     0.5351226410301054,
-     0.34931164542724885
+     0.11395659180954043,
+     0.5413285138212073,
+     0.34471489436925234
     ],
-    "prior": 8.64,
+    "prior": 8.92,
     "typical": 13.59,
-    "replacement": 18.756
+    "replacement": 19.061
    },
    "FB": {
     "players": 102,
-    "regulars": 54,
+    "regulars": 56,
     "reliability": {
-     "selection": 0.347284162378502,
-     "tests": 0.8046663298660657,
-     "production": 0.6260720411663808
+     "selection": 0.3583048530416951,
+     "tests": 0.805698753615022,
+     "production": 0.592822966507177
     },
     "weights": [
-     0.1186219396920929,
-     0.6033613508210156,
-     0.27801670948689156
+     0.1253211169247254,
+     0.6206366611214964,
+     0.2540422219537782
     ],
-    "prior": 8.18,
+    "prior": 9.41,
     "typical": 13.7,
-    "replacement": 16.271
+    "replacement": 16.281
    }
   },
   "srs": {
@@ -180,38 +180,78 @@
   },
   "perPoint": 3.8765166666666664,
   "scale": 0.24050027733172916,
-  "level": 80.68431306747078,
+  "level": 80.67778547940463,
   "moves": {
+   "1056": {
+    "srs": -3.33,
+    "target": 80.85,
+    "shift": -2,
+    "plus": 12,
+    "before": 82.21,
+    "after": 80.84
+   },
+   "1154": {
+    "srs": -0.49,
+    "target": 79.77,
+    "shift": 3,
+    "plus": 6,
+    "before": 76.42,
+    "after": 79.78
+   },
    "1229": {
     "srs": 2.84,
-    "target": 81.12,
+    "target": 81.11,
     "shift": -2,
-    "plus": 18,
-    "before": 82.27,
-    "after": 81.14
+    "plus": 12,
+    "before": 82.47,
+    "after": 81.1
+   },
+   "1314": {
+    "srs": 17.48,
+    "target": 84.13,
+    "shift": 1,
+    "plus": 25,
+    "before": 82.16,
+    "after": 84.11
    },
    "1405": {
     "srs": 0.49,
-    "target": 80.55,
-    "shift": -2,
-    "plus": 28,
-    "before": 81.57,
+    "target": 80.54,
+    "shift": -1,
+    "plus": 0,
+    "before": 81.55,
     "after": 80.55
+   },
+   "1525": {
+    "srs": 16.94,
+    "target": 84,
+    "shift": 3,
+    "plus": 8,
+    "before": 80.62,
+    "after": 84
    },
    "1527": {
     "srs": 3.15,
-    "target": 81.19,
+    "target": 81.18,
     "shift": 0,
-    "plus": 5,
-    "before": 80.91,
-    "after": 81.2
+    "plus": 3,
+    "before": 81.01,
+    "after": 81.19
+   },
+   "1546": {
+    "srs": -4.96,
+    "target": 80.46,
+    "shift": -1,
+    "plus": 13,
+    "before": 80.8,
+    "after": 80.46
    },
    "1574": {
     "srs": 11.45,
-    "target": 83.19,
+    "target": 83.18,
     "shift": 1,
-    "plus": 2,
-    "before": 82.06,
+    "plus": 8,
+    "before": 81.73,
     "after": 83.17
    },
    "1641": {
@@ -219,48 +259,72 @@
     "target": 78.87,
     "shift": -2,
     "plus": 18,
-    "before": 80.09,
-    "after": 78.85
+    "before": 79.99,
+    "after": 78.86
+   },
+   "1652": {
+    "srs": -11.73,
+    "target": 77.04,
+    "shift": -1,
+    "plus": 14,
+    "before": 77.32,
+    "after": 77.04
    },
    "1711": {
     "srs": 10.44,
     "target": 82.94,
     "shift": 0,
-    "plus": 3,
-    "before": 82.8,
-    "after": 82.97
+    "plus": 5,
+    "before": 82.66,
+    "after": 82.95
    },
    "1783": {
     "srs": -9.68,
     "target": 78.1,
     "shift": -1,
     "plus": 6,
-    "before": 78.75,
-    "after": 78.11
+    "before": 78.77,
+    "after": 78.12
+   },
+   "1886": {
+    "srs": -1.16,
+    "target": 79.61,
+    "shift": -1,
+    "plus": 0,
+    "before": 80.61,
+    "after": 79.61
+   },
+   "2008": {
+    "srs": -7.06,
+    "target": 78.18,
+    "shift": -1,
+    "plus": 14,
+    "before": 78.47,
+    "after": 78.18
    },
    "2019": {
     "srs": -4.49,
     "target": 79.35,
     "shift": -6,
-    "plus": 19,
-    "before": 84.5,
+    "plus": 26,
+    "before": 84.4,
     "after": 79.36
    },
    "2038": {
     "srs": -18.64,
-    "target": 75.95,
+    "target": 75.94,
     "shift": 1,
-    "plus": 19,
-    "before": 74.14,
-    "after": 75.95
+    "plus": 12,
+    "before": 74.36,
+    "after": 75.96
    },
    "2068": {
     "srs": -32.24,
-    "target": 72.68,
+    "target": 72.67,
     "shift": 0,
-    "plus": 1,
-    "before": 72.65,
-    "after": 72.71
+    "plus": 2,
+    "before": 72.58,
+    "after": 72.69
    },
    "2129": {
     "srs": 5.78,
@@ -272,235 +336,721 @@
    },
    "2448": {
     "srs": 15.31,
-    "target": 84.12,
+    "target": 84.11,
     "shift": 0,
-    "plus": 8,
-    "before": 83.71,
-    "after": 84.12
+    "plus": 4,
+    "before": 83.87,
+    "after": 84.1
    },
    "2581": {
     "srs": 14.04,
-    "target": 83.81,
+    "target": 83.8,
     "shift": -2,
-    "plus": 7,
-    "before": 85.39,
-    "after": 83.78
+    "plus": 10,
+    "before": 85.29,
+    "after": 83.82
    },
    "2806": {
     "srs": -4.44,
     "target": 79.36,
     "shift": -3,
     "plus": 5,
-    "before": 82.07,
-    "after": 79.35
+    "before": 82.09,
+    "after": 79.36
    },
    "2861": {
     "srs": -2.04,
     "target": 79.94,
     "shift": -3,
-    "plus": 10,
-    "before": 82.44,
-    "after": 79.95
+    "plus": 8,
+    "before": 82.53,
+    "after": 79.92
+   },
+   "2907": {
+    "srs": 3.34,
+    "target": 82.46,
+    "shift": 1,
+    "plus": 31,
+    "before": 80.44,
+    "after": 82.44
+   },
+   "2982": {
+    "srs": 8.8,
+    "target": 83.77,
+    "shift": -1,
+    "plus": 28,
+    "before": 83.81,
+    "after": 83.79
    },
    "3094": {
     "srs": -0.64,
-    "target": 80.28,
+    "target": 80.27,
     "shift": 1,
-    "plus": 9,
-    "before": 78.8,
-    "after": 80.28
+    "plus": 10,
+    "before": 78.72,
+    "after": 80.25
    },
    "3098": {
     "srs": 7.34,
-    "target": 82.2,
+    "target": 82.19,
     "shift": -3,
-    "plus": 0,
-    "before": 85.22,
+    "plus": 1,
+    "before": 85.17,
     "after": 82.22
+   },
+   "3122": {
+    "srs": -10.05,
+    "target": 79.24,
+    "shift": -4,
+    "plus": 5,
+    "before": 82.95,
+    "after": 79.22
+   },
+   "3342": {
+    "srs": -7.93,
+    "target": 77.97,
+    "shift": -3,
+    "plus": 9,
+    "before": 80.44,
+    "after": 77.94
+   },
+   "3384": {
+    "srs": -5.16,
+    "target": 80.42,
+    "shift": 0,
+    "plus": 17,
+    "before": 79.59,
+    "after": 80.44
    },
    "3436": {
     "srs": 14.03,
-    "target": 83.81,
+    "target": 83.8,
     "shift": 0,
-    "plus": 2,
-    "before": 83.73,
-    "after": 83.84
+    "plus": 1,
+    "before": 83.74,
+    "after": 83.8
+   },
+   "3459": {
+    "srs": 14.3,
+    "target": 83.36,
+    "shift": 0,
+    "plus": 5,
+    "before": 83.07,
+    "after": 83.35
    },
    "3514": {
     "srs": -6.16,
     "target": 78.95,
     "shift": -1,
-    "plus": 13,
-    "before": 79.27,
-    "after": 78.93
+    "plus": 14,
+    "before": 79.23,
+    "after": 78.94
    },
    "3528": {
     "srs": 7.33,
-    "target": 82.2,
+    "target": 82.19,
     "shift": 3,
-    "plus": 19,
-    "before": 78.35,
-    "after": 82.18
+    "plus": 11,
+    "before": 78.67,
+    "after": 82.2
    },
    "3533": {
     "srs": -7.95,
     "target": 78.52,
     "shift": 0,
-    "plus": 6,
-    "before": 78.16,
-    "after": 78.49
+    "plus": 9,
+    "before": 78.05,
+    "after": 78.52
+   },
+   "3908": {
+    "srs": 4.22,
+    "target": 80.92,
+    "shift": -2,
+    "plus": 15,
+    "before": 82.14,
+    "after": 80.94
    },
    "3964": {
     "srs": 1.1,
-    "target": 80.7,
+    "target": 80.69,
     "shift": -1,
-    "plus": 7,
-    "before": 81.31,
+    "plus": 8,
+    "before": 81.26,
     "after": 80.71
    },
    "3994": {
     "srs": 8.2,
-    "target": 82.41,
+    "target": 82.4,
     "shift": 4,
-    "plus": 10,
-    "before": 77.86,
-    "after": 82.4
+    "plus": 8,
+    "before": 77.93,
+    "after": 82.39
+   },
+   "3999": {
+    "srs": 11.44,
+    "target": 84.4,
+    "shift": 2,
+    "plus": 8,
+    "before": 81.97,
+    "after": 84.39
    },
    "4003": {
     "srs": 6.3,
-    "target": 81.95,
+    "target": 81.94,
     "shift": 1,
     "plus": 11,
-    "before": 80.4,
-    "after": 81.95
+    "before": 80.39,
+    "after": 81.92
    },
    "4036": {
     "srs": -7.44,
     "target": 78.64,
     "shift": 0,
     "plus": 7,
-    "before": 78.27,
-    "after": 78.67
+    "before": 78.21,
+    "after": 78.61
+   },
+   "4125": {
+    "srs": 22.52,
+    "target": 87.07,
+    "shift": 3,
+    "plus": 1,
+    "before": 84.04,
+    "after": 87.09
    },
    "4188": {
     "srs": 15.93,
-    "target": 84.27,
+    "target": 84.26,
     "shift": -2,
-    "plus": 3,
-    "before": 86.11,
-    "after": 84.29
+    "plus": 2,
+    "before": 86.14,
+    "after": 84.27
    },
    "4293": {
     "srs": -3.36,
     "target": 79.62,
     "shift": 1,
-    "plus": 2,
-    "before": 78.52,
-    "after": 79.64
+    "plus": 4,
+    "before": 78.38,
+    "after": 79.61
    },
    "4377": {
     "srs": 2.56,
-    "target": 81.05,
+    "target": 81.04,
     "shift": 2,
-    "plus": 5,
-    "before": 78.72,
+    "plus": 11,
+    "before": 78.47,
     "after": 81.02
    },
    "4471": {
     "srs": -1.7,
-    "target": 80.03,
+    "target": 80.02,
     "shift": 0,
     "plus": 10,
-    "before": 79.51,
-    "after": 80.03
+    "before": 79.52,
+    "after": 80.05
    },
    "4474": {
     "srs": -13.01,
     "target": 77.3,
     "shift": -2,
-    "plus": 4,
-    "before": 79.12,
-    "after": 77.32
+    "plus": 3,
+    "before": 79.17,
+    "after": 77.31
    },
    "4581": {
     "srs": 6.66,
-    "target": 82.04,
+    "target": 82.03,
     "shift": -2,
-    "plus": 1,
-    "before": 83.97,
-    "after": 82.03
+    "plus": 6,
+    "before": 83.7,
+    "after": 82.04
+   },
+   "4749": {
+    "srs": -2.77,
+    "target": 79.22,
+    "shift": -2,
+    "plus": 8,
+    "before": 80.78,
+    "after": 79.24
+   },
+   "4788": {
+    "srs": -15.34,
+    "target": 76.17,
+    "shift": -3,
+    "plus": 4,
+    "before": 78.94,
+    "after": 76.17
    },
    "5057": {
     "srs": -4.42,
-    "target": 79.37,
+    "target": 79.36,
     "shift": 0,
-    "plus": 9,
-    "before": 78.84,
-    "after": 79.36
+    "plus": 5,
+    "before": 79.07,
+    "after": 79.37
    },
    "5092": {
     "srs": 0.44,
-    "target": 80.54,
+    "target": 80.53,
     "shift": 3,
     "plus": 12,
-    "before": 76.92,
-    "after": 80.53
+    "before": 76.91,
+    "after": 80.52
    },
    "5356": {
     "srs": 10.04,
-    "target": 82.85,
+    "target": 82.84,
     "shift": -5,
-    "plus": 3,
-    "before": 87.68,
-    "after": 82.86
+    "plus": 2,
+    "before": 87.72,
+    "after": 82.84
    },
    "5483": {
     "srs": 5.03,
     "target": 81.64,
     "shift": 1,
     "plus": 6,
-    "before": 80.29,
-    "after": 81.63
+    "before": 80.32,
+    "after": 81.65
    },
    "5586": {
     "srs": 5.76,
-    "target": 81.82,
+    "target": 81.81,
     "shift": -1,
-    "plus": 16,
-    "before": 82.01,
-    "after": 81.83
+    "plus": 12,
+    "before": 82.15,
+    "after": 81.79
+   },
+   "5748": {
+    "srs": -2.3,
+    "target": 81.1,
+    "shift": -1,
+    "plus": 6,
+    "before": 81.76,
+    "after": 81.1
+   },
+   "5856": {
+    "srs": -3.46,
+    "target": 80.82,
+    "shift": 0,
+    "plus": 24,
+    "before": 79.84,
+    "after": 80.82
    },
    "5872": {
     "srs": 3.44,
-    "target": 81.26,
+    "target": 81.25,
     "shift": 1,
-    "plus": 4,
-    "before": 80.04,
-    "after": 81.27
+    "plus": 5,
+    "before": 80,
+    "after": 81.28
    },
    "5979": {
     "srs": 8.82,
     "target": 82.55,
     "shift": -1,
-    "plus": 6,
-    "before": 83.23,
-    "after": 82.57
+    "plus": 4,
+    "before": 83.3,
+    "after": 82.54
    },
    "6198": {
     "srs": 1.46,
     "target": 80.78,
     "shift": 0,
-    "plus": 21,
-    "before": 79.89,
+    "plus": 17,
+    "before": 79.96,
     "after": 80.77
    },
    "6294": {
     "srs": -3.56,
-    "target": 79.58,
+    "target": 79.57,
     "shift": 2,
-    "plus": 13,
-    "before": 76.99,
-    "after": 79.56
+    "plus": 17,
+    "before": 76.84,
+    "after": 79.54
+   },
+   "6343": {
+    "srs": -6.44,
+    "target": 78.33,
+    "shift": 0,
+    "plus": 12,
+    "before": 77.71,
+    "after": 78.31
+   },
+   "6501": {
+    "srs": -16.84,
+    "target": 77.61,
+    "shift": -4,
+    "plus": 19,
+    "before": 80.8,
+    "after": 77.62
+   }
+  },
+  "pools": {
+   "super-rugby": {
+    "groups": {
+     "PR": {
+      "players": 74,
+      "regulars": 7,
+      "reliability": {
+       "selection": 0.5,
+       "tests": 0.5,
+       "production": 0.5
+      },
+      "weights": [
+       0.3333333333333333,
+       0.3333333333333333,
+       0.3333333333333333
+      ],
+      "prior": 8.33,
+      "typical": 8.33,
+      "replacement": 17.317
+     },
+     "HK": {
+      "players": 37,
+      "regulars": 3,
+      "reliability": {
+       "selection": 0.5,
+       "tests": 0.5,
+       "production": 0.5
+      },
+      "weights": [
+       0.3333333333333333,
+       0.3333333333333333,
+       0.3333333333333333
+      ],
+      "prior": 9.72,
+      "typical": 9.72,
+      "replacement": 29.923
+     },
+     "LK": {
+      "players": 50,
+      "regulars": 20,
+      "reliability": {
+       "selection": 0.2,
+       "tests": 0.8567415730337079,
+       "production": 0.38646616541353385
+      },
+      "weights": [
+       0.06958709552183014,
+       0.8042821712626754,
+       0.12613073321549437
+      ],
+      "prior": 17.67,
+      "typical": 11.13,
+      "replacement": 22.103
+     },
+     "FL": {
+      "players": 57,
+      "regulars": 15,
+      "reliability": {
+       "selection": 0.01,
+       "tests": 0.5793650793650794,
+       "production": 0.6785714285714286
+      },
+      "weights": [
+       0.022580401161892055,
+       0.4045178412510539,
+       0.572901757587054
+      ],
+      "prior": 5.07,
+      "typical": 10.71,
+      "replacement": 25.414
+     },
+     "N8": {
+      "players": 19,
+      "regulars": 7,
+      "reliability": {
+       "selection": 0.5,
+       "tests": 0.5,
+       "production": 0.5
+      },
+      "weights": [
+       0.3333333333333333,
+       0.3333333333333333,
+       0.3333333333333333
+      ],
+      "prior": 10.13,
+      "typical": 10.13,
+      "replacement": 23.375
+     },
+     "SH": {
+      "players": 37,
+      "regulars": 8,
+      "reliability": {
+       "selection": 0.35714285714285715,
+       "tests": 0.01,
+       "production": 0.4523809523809524
+      },
+      "weights": [
+       0.41154758289468873,
+       0.04471758592528636,
+       0.5437348311800249
+      ],
+      "prior": 9.19,
+      "typical": 7.59,
+      "replacement": 19.68
+     },
+     "FH": {
+      "players": 30,
+      "regulars": 6,
+      "reliability": {
+       "selection": 0.5,
+       "tests": 0.5,
+       "production": 0.5
+      },
+      "weights": [
+       0.3333333333333333,
+       0.3333333333333333,
+       0.3333333333333333
+      ],
+      "prior": 10.42,
+      "typical": 10.42,
+      "replacement": 16.276
+     },
+     "CE": {
+      "players": 52,
+      "regulars": 14,
+      "reliability": {
+       "selection": 0.31868131868131866,
+       "tests": 0.7745382348193249,
+       "production": 0.6615384615384615
+      },
+      "weights": [
+       0.11612564325871065,
+       0.5470772497247454,
+       0.33679710701654403
+      ],
+      "prior": 5.58,
+      "typical": 10.91,
+      "replacement": 22.913
+     },
+     "WG": {
+      "players": 53,
+      "regulars": 18,
+      "reliability": {
+       "selection": 0.01,
+       "tests": 0.6291082088197258,
+       "production": 0.32301341589267285
+      },
+      "weights": [
+       0.03280550975914007,
+       0.6945402832776892,
+       0.2726542069631706
+      ],
+      "prior": 23.55,
+      "typical": 11.23,
+      "replacement": 21.919
+     },
+     "FB": {
+      "players": 20,
+      "regulars": 5,
+      "reliability": {
+       "selection": 0.5,
+       "tests": 0.5,
+       "production": 0.5
+      },
+      "weights": [
+       0.3333333333333333,
+       0.3333333333333333,
+       0.3333333333333333
+      ],
+      "prior": 12.12,
+      "typical": 12.12,
+      "replacement": 23.292
+     }
+    },
+    "offset": 0.7,
+    "srs": {
+     "homeEdge": 6.252340022868356,
+     "sigma": 15.94376510195731,
+     "reliability": 0.8682494575048214
+    },
+    "scale": 0.24037018892047032,
+    "level": 81.65468282150526
+   },
+   "japan-rugby-league-one": {
+    "groups": {
+     "PR": {
+      "players": 80,
+      "regulars": 24,
+      "reliability": {
+       "selection": 0.5982608695652174,
+       "tests": 0.5595113000189289,
+       "production": 0.4017391304347826
+      },
+      "weights": [
+       0.4111376394969392,
+       0.36262332321223967,
+       0.22623903729082115
+      ],
+      "prior": 13.6,
+      "typical": 9.13,
+      "replacement": 14.254
+     },
+     "HK": {
+      "players": 46,
+      "regulars": 11,
+      "reliability": {
+       "selection": 0.7363636363636363,
+       "tests": 0.836986850008719,
+       "production": 0.09090909090909091
+      },
+      "weights": [
+       0.3538410023489066,
+       0.6101041516373084,
+       0.03605484601378501
+      ],
+      "prior": 96.09,
+      "typical": 9.61,
+      "replacement": 19.971
+     },
+     "LK": {
+      "players": 61,
+      "regulars": 22,
+      "reliability": {
+       "selection": 0.6521739130434783,
+       "tests": 0.38334585358755563,
+       "production": 0.6600790513833992
+      },
+      "weights": [
+       0.40619249241808025,
+       0.17565724241020778,
+       0.4181502651717119
+      ],
+      "prior": 5.81,
+      "typical": 11.28,
+      "replacement": 20.313
+     },
+     "FL": {
+      "players": 63,
+      "regulars": 24,
+      "reliability": {
+       "selection": 0.7017391304347826,
+       "tests": 0.7881279838607821,
+       "production": 0.7573913043478261
+      },
+      "weights": [
+       0.2653162139748041,
+       0.3958193293751846,
+       0.3388644566500114
+      ],
+      "prior": 4.11,
+      "typical": 12.82,
+      "replacement": 23.361
+     },
+     "N8": {
+      "players": 25,
+      "regulars": 11,
+      "reliability": {
+       "selection": 0.7363636363636363,
+       "tests": 0.7953491610161697,
+       "production": 0.24545454545454545
+      },
+      "weights": [
+       0.39361524545511967,
+       0.5269828006930857,
+       0.07940195385179478
+      ],
+      "prior": 37.73,
+      "typical": 12.28,
+      "replacement": 27.181
+     },
+     "SH": {
+      "players": 44,
+      "regulars": 10,
+      "reliability": {
+       "selection": 0.6484848484848484,
+       "tests": 0.5883484054145521,
+       "production": 0.5757575757575758
+      },
+      "weights": [
+       0.38549223507879543,
+       0.31354310546854647,
+       0.30096465945265816
+      ],
+      "prior": 8.2,
+      "typical": 11.12,
+      "replacement": 13.536
+     },
+     "FH": {
+      "players": 26,
+      "regulars": 13,
+      "reliability": {
+       "selection": 0.4010989010989011,
+       "tests": 0.850657446010003,
+       "production": 0.5054945054945055
+      },
+      "weights": [
+       0.12195485975278621,
+       0.7122332832352516,
+       0.16581185701196224
+      ],
+      "prior": 12.86,
+      "typical": 13.15,
+      "replacement": 22.098
+     },
+     "CE": {
+      "players": 54,
+      "regulars": 27,
+      "reliability": {
+       "selection": 0.04700854700854701,
+       "tests": 0.3252759245218535,
+       "production": 0.43772893772893773
+      },
+      "weights": [
+       0.10113940623613432,
+       0.3757688230149101,
+       0.5230917707489555
+      ],
+      "prior": 16.83,
+      "typical": 13.1,
+      "replacement": 22.694
+     },
+     "WG": {
+      "players": 63,
+      "regulars": 23,
+      "reliability": {
+       "selection": 0.04841897233201581,
+       "tests": 0.5077748413795239,
+       "production": 0.7282608695652174
+      },
+      "weights": [
+       0.04798134291149062,
+       0.3003877180943072,
+       0.6516309389942022
+      ],
+      "prior": 5.14,
+      "typical": 13.77,
+      "replacement": 20.843
+     },
+     "FB": {
+      "players": 26,
+      "regulars": 9,
+      "reliability": {
+       "selection": 0.03333333333333333,
+       "tests": 0.8406055240472927,
+       "production": 0.01
+      },
+      "weights": [
+       0.031259840112552326,
+       0.9520219825259715,
+       0.01671817736147618
+      ],
+      "prior": 261.55,
+      "typical": 13.77,
+      "replacement": 27.238
+     }
+    },
+    "offset": -1.2,
+    "srs": {
+     "homeEdge": 3.2007702245120147,
+     "sigma": 16.86853663896851,
+     "reliability": 0.8861233367250907
+    },
+    "scale": 0.24283172870123707,
+    "level": 79.89130801182203
    }
   },
   "tests": {
@@ -508,69 +1058,191 @@
    "sigma": 15.662100049663014,
    "reliability": 0.9379370932404999,
    "covered": 0.75,
+   "anchor": [
+    "250",
+    "SCO",
+    "372",
+    "826",
+    "WAL",
+    "380",
+    "032"
+   ],
+   "line": {
+    "level": 88.56,
+    "centre": 32.47,
+    "slope": 0.0325,
+    "solves": 3
+   },
+   "offsets": {
+    "super-rugby": 0.7,
+    "japan-rugby-league-one": -1.2
+   },
    "moves": {
+    "242": {
+     "srs": 3.64,
+     "coverage": 0.929,
+     "share": {
+      "europe": 0.347,
+      "super-rugby": 0.596,
+      "japan-rugby-league-one": 0.056
+     },
+     "stands": 87.62,
+     "target": 81.36,
+     "shift": -5,
+     "plus": 13,
+     "before": 85.71,
+     "after": 81.35
+    },
     "250": {
      "srs": 46.81,
      "coverage": 1.008,
-     "target": 92.09,
+     "share": {
+      "europe": 1
+     },
+     "stands": 89.03,
+     "target": 92.14,
      "shift": 4,
-     "plus": 9,
-     "before": 87.65,
-     "after": 92.09
+     "plus": 8,
+     "before": 87.72,
+     "after": 92.14
     },
     "372": {
      "srs": 37.37,
      "coverage": 1.004,
-     "target": 89.73,
+     "share": {
+      "europe": 1
+     },
+     "stands": 88.72,
+     "target": 89.78,
      "shift": 0,
-     "plus": 24,
-     "before": 88.79,
-     "after": 89.74
+     "plus": 25,
+     "before": 88.84,
+     "after": 89.79
     },
     "380": {
      "srs": 19.28,
      "coverage": 1.001,
-     "target": 85.22,
+     "share": {
+      "europe": 1
+     },
+     "stands": 88.13,
+     "target": 85.27,
      "shift": -3,
-     "plus": 11,
-     "before": 87.66,
-     "after": 85.23
+     "plus": 8,
+     "before": 87.81,
+     "after": 85.26
+    },
+    "392": {
+     "srs": 15.12,
+     "coverage": 0.967,
+     "share": {
+      "super-rugby": 0.056,
+      "japan-rugby-league-one": 0.944
+     },
+     "stands": 88,
+     "target": 84.23,
+     "shift": -4,
+     "plus": 1,
+     "before": 88.19,
+     "after": 84.25
+    },
+    "554": {
+     "srs": 44.64,
+     "coverage": 0.941,
+     "share": {
+      "europe": 0.051,
+      "super-rugby": 0.813,
+      "japan-rugby-league-one": 0.136
+     },
+     "stands": 88.96,
+     "target": 91.6,
+     "shift": 1,
+     "plus": 17,
+     "before": 89.82,
+     "after": 91.62
+    },
+    "710": {
+     "srs": 51.93,
+     "coverage": 0.977,
+     "share": {
+      "europe": 0.713,
+      "japan-rugby-league-one": 0.323
+     },
+     "stands": 89.19,
+     "target": 93.42,
+     "shift": 4,
+     "plus": 19,
+     "before": 88.53,
+     "after": 93.43
     },
     "826": {
      "srs": 38.37,
      "coverage": 1.005,
-     "target": 89.99,
-     "shift": -1,
-     "plus": 23,
-     "before": 90.06,
-     "after": 89.98
+     "share": {
+      "europe": 1
+     },
+     "stands": 88.75,
+     "target": 90.03,
+     "shift": 0,
+     "plus": 0,
+     "before": 90.01,
+     "after": 90.01
     },
     "SCO": {
      "srs": 33.93,
      "coverage": 0.996,
-     "target": 88.87,
+     "share": {
+      "europe": 1
+     },
+     "stands": 88.61,
+     "target": 88.92,
      "shift": 0,
-     "plus": 3,
-     "before": 88.72,
-     "after": 88.89
+     "plus": 4,
+     "before": 88.68,
+     "after": 88.91
+    },
+    "036": {
+     "srs": 39.19,
+     "coverage": 0.991,
+     "share": {
+      "europe": 0.147,
+      "super-rugby": 0.835,
+      "japan-rugby-league-one": 0.018
+     },
+     "stands": 88.78,
+     "target": 90.24,
+     "shift": 0,
+     "plus": 22,
+     "before": 89.29,
+     "after": 90.23
     },
     "WAL": {
      "srs": 18.35,
      "coverage": 0.978,
-     "target": 84.98,
+     "share": {
+      "europe": 1
+     },
+     "stands": 88.1,
+     "target": 85.03,
      "shift": -3,
-     "plus": 8,
-     "before": 87.55,
-     "after": 85.01
+     "plus": 6,
+     "before": 87.69,
+     "after": 85.03
     },
     "032": {
      "srs": 33.2,
-     "coverage": 0.868,
-     "target": 88.69,
+     "coverage": 0.948,
+     "share": {
+      "europe": 0.961,
+      "super-rugby": 0.02,
+      "japan-rugby-league-one": 0.056
+     },
+     "stands": 88.58,
+     "target": 88.74,
      "shift": -1,
-     "plus": 10,
-     "before": 89.15,
-     "after": 88.7
+     "plus": 7,
+     "before": 89.36,
+     "after": 88.76
     }
    }
   },
@@ -582,205 +1254,328 @@
  },
  "clubs": [
   {
+   "id": "ru-hurricanes",
+   "name": "Hurricanes",
+   "league": "Super Rugby Pacific",
+   "europe": false,
+   "str": 85.7,
+   "strength": 87.09,
+   "crossing": [],
+   "srs": 22.52,
+   "target": 87.07,
+   "shift": 3,
+   "plus": 1,
+   "before": 84.04,
+   "after": 87.09
+  },
+  {
    "id": "ru-stade-toulousain",
    "name": "Stade Toulousain",
-   "str": 83.6,
-   "strength": 84.29,
+   "league": "Top 14",
+   "str": 83.7,
+   "strength": 84.27,
    "crossing": [],
    "srs": 15.93,
-   "target": 84.27,
+   "target": 84.26,
    "shift": -2,
-   "plus": 3,
-   "before": 86.11,
-   "after": 84.29
+   "plus": 2,
+   "before": 86.14,
+   "after": 84.27
+  },
+  {
+   "id": "ru-kobelco-kobe-steelers",
+   "name": "Kobelco Kobe Steelers",
+   "league": "League One",
+   "europe": false,
+   "str": 83.2,
+   "strength": 84.11,
+   "crossing": [],
+   "srs": 17.48,
+   "target": 84.13,
+   "shift": 1,
+   "plus": 25,
+   "before": 82.16,
+   "after": 84.11
+  },
+  {
+   "id": "ru-chiefs",
+   "name": "Chiefs",
+   "league": "Super Rugby Pacific",
+   "europe": false,
+   "str": 83.1,
+   "strength": 84.28,
+   "crossing": [],
+   "srs": 11.44,
+   "target": 84.4,
+   "shift": 2,
+   "plus": 8,
+   "before": 81.97,
+   "after": 84.39
   },
   {
    "id": "ru-bath",
    "name": "Bath",
-   "str": 83.1,
-   "strength": 84.12,
+   "league": "Premiership",
+   "str": 83,
+   "strength": 84.1,
    "crossing": [],
    "srs": 15.31,
-   "target": 84.12,
+   "target": 84.11,
    "shift": 0,
+   "plus": 4,
+   "before": 83.87,
+   "after": 84.1
+  },
+  {
+   "id": "ru-crusaders",
+   "name": "Crusaders",
+   "league": "Super Rugby Pacific",
+   "europe": false,
+   "str": 82.9,
+   "strength": 83.79,
+   "crossing": [],
+   "srs": 8.8,
+   "target": 83.77,
+   "shift": -1,
+   "plus": 28,
+   "before": 83.81,
+   "after": 83.79
+  },
+  {
+   "id": "ru-kubota-spears",
+   "name": "Kubota Spears",
+   "league": "League One",
+   "europe": false,
+   "str": 82.7,
+   "strength": 84,
+   "crossing": [],
+   "srs": 16.94,
+   "target": 84,
+   "shift": 3,
    "plus": 8,
-   "before": 83.71,
-   "after": 84.12
+   "before": 80.62,
+   "after": 84
+  },
+  {
+   "id": "ru-saitama-wild-knights",
+   "name": "Saitama Wild Knights",
+   "league": "League One",
+   "europe": false,
+   "str": 82.5,
+   "strength": 83.35,
+   "crossing": [],
+   "srs": 14.3,
+   "target": 83.36,
+   "shift": 0,
+   "plus": 5,
+   "before": 83.07,
+   "after": 83.35
   },
   {
    "id": "ru-northampton-saints",
    "name": "Northampton Saints",
-   "str": 82.4,
-   "strength": 83.84,
+   "league": "Premiership",
+   "str": 82.3,
+   "strength": 83.8,
    "crossing": [],
    "srs": 14.03,
-   "target": 83.81,
+   "target": 83.8,
    "shift": 0,
-   "plus": 2,
-   "before": 83.73,
-   "after": 83.84
+   "plus": 1,
+   "before": 83.74,
+   "after": 83.8
   },
   {
    "id": "ru-saracens",
    "name": "Saracens",
-   "str": 82.1,
-   "strength": 83.78,
+   "league": "Premiership",
+   "str": 82.2,
+   "strength": 83.82,
    "crossing": [],
    "srs": 14.04,
-   "target": 83.81,
+   "target": 83.8,
    "shift": -2,
-   "plus": 7,
-   "before": 85.39,
-   "after": 83.78
+   "plus": 10,
+   "before": 85.29,
+   "after": 83.82
+  },
+  {
+   "id": "ru-blues",
+   "name": "Blues",
+   "league": "Super Rugby Pacific",
+   "europe": false,
+   "str": 81.7,
+   "strength": 82.44,
+   "crossing": [],
+   "srs": 3.34,
+   "target": 82.46,
+   "shift": 1,
+   "plus": 31,
+   "before": 80.44,
+   "after": 82.44
   },
   {
    "id": "ru-leinster",
    "name": "Leinster",
+   "league": "URC",
    "str": 81.7,
-   "strength": 83.03,
+   "strength": 83.04,
    "crossing": [],
    "srs": 10.04,
-   "target": 82.85,
+   "target": 82.84,
    "shift": -5,
-   "plus": 3,
-   "before": 87.68,
-   "after": 82.86
+   "plus": 2,
+   "before": 87.72,
+   "after": 82.84
   },
   {
    "id": "ru-glasgow-warriors",
    "name": "Glasgow Warriors",
+   "league": "URC",
    "str": 81.4,
    "strength": 82.22,
    "crossing": [],
    "srs": 7.34,
-   "target": 82.2,
+   "target": 82.19,
    "shift": -3,
-   "plus": 0,
-   "before": 85.22,
+   "plus": 1,
+   "before": 85.17,
    "after": 82.22
-  },
-  {
-   "id": "ru-leicester-tigers",
-   "name": "Leicester Tigers",
-   "str": 81.3,
-   "strength": 82.97,
-   "crossing": [],
-   "srs": 10.44,
-   "target": 82.94,
-   "shift": 0,
-   "plus": 3,
-   "before": 82.8,
-   "after": 82.97
   },
   {
    "id": "ru-montpellier",
    "name": "Montpellier Hérault Rugby",
-   "str": 81.3,
-   "strength": 82.15,
+   "league": "Top 14",
+   "str": 81.4,
+   "strength": 82.2,
    "crossing": [],
    "srs": 7.33,
-   "target": 82.2,
+   "target": 82.19,
    "shift": 3,
-   "plus": 19,
-   "before": 78.35,
-   "after": 82.18
+   "plus": 11,
+   "before": 78.67,
+   "after": 82.2
+  },
+  {
+   "id": "ru-leicester-tigers",
+   "name": "Leicester Tigers",
+   "league": "Premiership",
+   "str": 81.3,
+   "strength": 82.95,
+   "crossing": [],
+   "srs": 10.44,
+   "target": 82.94,
+   "shift": 0,
+   "plus": 5,
+   "before": 82.66,
+   "after": 82.95
   },
   {
    "id": "ru-bordeaux-begles",
    "name": "Union Bordeaux Bègles",
+   "league": "Top 14",
    "str": 81.3,
-   "strength": 82.57,
+   "strength": 82.54,
    "crossing": [],
    "srs": 8.82,
    "target": 82.55,
    "shift": -1,
-   "plus": 6,
-   "before": 83.23,
-   "after": 82.57
+   "plus": 4,
+   "before": 83.3,
+   "after": 82.54
   },
   {
    "id": "ru-exeter-chiefs",
    "name": "Exeter Chiefs",
+   "league": "Premiership",
    "str": 81.2,
-   "strength": 83.17,
+   "strength": 83.11,
    "crossing": [],
    "srs": 11.45,
-   "target": 83.19,
+   "target": 83.18,
    "shift": 1,
-   "plus": 2,
-   "before": 82.06,
+   "plus": 8,
+   "before": 81.73,
    "after": 83.17
   },
   {
    "id": "ru-bristol-bears",
    "name": "Bristol Bears",
+   "league": "Premiership",
    "str": 80.9,
-   "strength": 82.03,
+   "strength": 82.04,
    "crossing": [],
    "srs": 6.66,
-   "target": 82.04,
+   "target": 82.03,
    "shift": -2,
-   "plus": 1,
-   "before": 83.97,
-   "after": 82.03
+   "plus": 6,
+   "before": 83.7,
+   "after": 82.04
   },
   {
    "id": "ru-stade-francais",
    "name": "Stade Français Paris",
+   "league": "Top 14",
    "str": 80.8,
-   "strength": 81.95,
+   "strength": 81.92,
    "crossing": [],
    "srs": 6.3,
-   "target": 81.95,
+   "target": 81.94,
    "shift": 1,
    "plus": 11,
-   "before": 80.4,
-   "after": 81.95
+   "before": 80.39,
+   "after": 81.92
   },
   {
    "id": "ru-connacht",
    "name": "Connacht",
-   "str": 80.5,
-   "strength": 81.63,
+   "league": "URC",
+   "str": 80.7,
+   "strength": 81.65,
    "crossing": [],
    "srs": 5.03,
    "target": 81.64,
    "shift": 1,
    "plus": 6,
-   "before": 80.29,
-   "after": 81.63
+   "before": 80.32,
+   "after": 81.65
   },
   {
    "id": "ru-stormers",
    "name": "Stormers",
+   "league": "URC",
+   "europe": false,
    "str": 80.5,
-   "strength": 82.43,
+   "strength": 82.46,
    "crossing": [],
    "srs": 8.2,
-   "target": 82.41,
+   "target": 82.4,
    "shift": 4,
-   "plus": 10,
-   "before": 77.86,
-   "after": 82.4
+   "plus": 8,
+   "before": 77.93,
+   "after": 82.39
   },
   {
    "id": "ru-bulls",
    "name": "Bulls",
-   "str": 80.4,
-   "strength": 81.83,
+   "league": "URC",
+   "europe": false,
+   "str": 80.3,
+   "strength": 81.79,
    "crossing": [],
    "srs": 5.76,
-   "target": 81.82,
+   "target": 81.81,
    "shift": -1,
-   "plus": 16,
-   "before": 82.01,
-   "after": 81.83
+   "plus": 12,
+   "before": 82.15,
+   "after": 81.79
   },
   {
    "id": "ru-ulster",
    "name": "Ulster",
+   "league": "URC",
    "str": 80.3,
-   "strength": 81.77,
+   "strength": 81.78,
    "crossing": [],
    "srs": 5.78,
    "target": 81.82,
@@ -790,323 +1585,610 @@
    "after": 81.81
   },
   {
-   "id": "ru-harlequins",
-   "name": "Harlequins",
-   "str": 79.9,
-   "strength": 81.14,
-   "crossing": [],
-   "srs": 2.84,
-   "target": 81.12,
-   "shift": -2,
-   "plus": 18,
-   "before": 82.27,
-   "after": 81.14
-  },
-  {
    "id": "ru-racing-92",
    "name": "Racing 92",
-   "str": 79.9,
+   "league": "Top 14",
+   "str": 80,
    "strength": 80.55,
    "crossing": [],
    "srs": 0.49,
-   "target": 80.55,
-   "shift": -2,
-   "plus": 28,
-   "before": 81.57,
+   "target": 80.54,
+   "shift": -1,
+   "plus": 0,
+   "before": 81.55,
    "after": 80.55
+  },
+  {
+   "id": "ru-harlequins",
+   "name": "Harlequins",
+   "league": "Premiership",
+   "str": 79.9,
+   "strength": 81.1,
+   "crossing": [],
+   "srs": 2.84,
+   "target": 81.11,
+   "shift": -2,
+   "plus": 12,
+   "before": 82.47,
+   "after": 81.1
   },
   {
    "id": "ru-stade-rochelais",
    "name": "Stade Rochelais",
+   "league": "Top 14",
    "str": 79.8,
-   "strength": 81.27,
+   "strength": 81.28,
    "crossing": [],
    "srs": 3.44,
-   "target": 81.26,
+   "target": 81.25,
    "shift": 1,
-   "plus": 4,
-   "before": 80.04,
-   "after": 81.27
-  },
-  {
-   "id": "ru-lions",
-   "name": "Lions",
-   "str": 79.5,
-   "strength": 80.66,
-   "crossing": [],
-   "srs": 0.44,
-   "target": 80.54,
-   "shift": 3,
-   "plus": 12,
-   "before": 76.92,
-   "after": 80.53
-  },
-  {
-   "id": "ru-sale-sharks",
-   "name": "Sale Sharks",
-   "str": 79.5,
-   "strength": 80.71,
-   "crossing": [],
-   "srs": 1.1,
-   "target": 80.7,
-   "shift": -1,
-   "plus": 7,
-   "before": 81.31,
-   "after": 80.71
+   "plus": 5,
+   "before": 80,
+   "after": 81.28
   },
   {
    "id": "ru-munster",
    "name": "Munster",
-   "str": 79.4,
-   "strength": 80.87,
+   "league": "URC",
+   "str": 79.7,
+   "strength": 81.09,
    "crossing": [],
    "srs": 2.56,
-   "target": 81.05,
+   "target": 81.04,
    "shift": 2,
-   "plus": 5,
-   "before": 78.72,
+   "plus": 11,
+   "before": 78.47,
    "after": 81.02
+  },
+  {
+   "id": "ru-reds",
+   "name": "Reds",
+   "league": "Super Rugby Pacific",
+   "europe": false,
+   "str": 79.7,
+   "strength": 80.84,
+   "crossing": [],
+   "srs": -3.33,
+   "target": 80.85,
+   "shift": -2,
+   "plus": 12,
+   "before": 82.21,
+   "after": 80.84
+  },
+  {
+   "id": "ru-force",
+   "name": "Force",
+   "league": "Super Rugby Pacific",
+   "europe": false,
+   "str": 79.6,
+   "strength": 80.82,
+   "crossing": [],
+   "srs": -3.46,
+   "target": 80.82,
+   "shift": 0,
+   "plus": 24,
+   "before": 79.84,
+   "after": 80.82
+  },
+  {
+   "id": "ru-sale-sharks",
+   "name": "Sale Sharks",
+   "league": "Premiership",
+   "str": 79.5,
+   "strength": 80.71,
+   "crossing": [],
+   "srs": 1.1,
+   "target": 80.69,
+   "shift": -1,
+   "plus": 8,
+   "before": 81.26,
+   "after": 80.71
+  },
+  {
+   "id": "ru-lions",
+   "name": "Lions",
+   "league": "URC",
+   "europe": false,
+   "str": 79.4,
+   "strength": 80.52,
+   "crossing": [],
+   "srs": 0.44,
+   "target": 80.53,
+   "shift": 3,
+   "plus": 12,
+   "before": 76.91,
+   "after": 80.52
   },
   {
    "id": "ru-section-paloise",
    "name": "Section Paloise",
+   "league": "Top 14",
    "str": 79.3,
    "strength": 80.77,
    "crossing": [],
    "srs": 1.46,
    "target": 80.78,
    "shift": 0,
-   "plus": 21,
-   "before": 79.89,
+   "plus": 17,
+   "before": 79.96,
    "after": 80.77
   },
   {
    "id": "ru-sharks",
    "name": "Sharks",
+   "league": "URC",
+   "europe": false,
    "str": 79.2,
-   "strength": 81.2,
+   "strength": 81.19,
    "crossing": [],
    "srs": 3.15,
-   "target": 81.19,
+   "target": 81.18,
    "shift": 0,
-   "plus": 5,
-   "before": 80.91,
-   "after": 81.2
+   "plus": 3,
+   "before": 81.01,
+   "after": 81.19
+  },
+  {
+   "id": "ru-tokyo-sungoliath",
+   "name": "Tokyo Sungoliath",
+   "league": "League One",
+   "europe": false,
+   "str": 79.2,
+   "strength": 80.94,
+   "crossing": [],
+   "srs": 4.22,
+   "target": 80.92,
+   "shift": -2,
+   "plus": 15,
+   "before": 82.14,
+   "after": 80.94
+  },
+  {
+   "id": "ru-brumbies",
+   "name": "Brumbies",
+   "league": "Super Rugby Pacific",
+   "europe": false,
+   "str": 78.9,
+   "strength": 81.1,
+   "crossing": [],
+   "srs": -2.3,
+   "target": 81.1,
+   "shift": -1,
+   "plus": 6,
+   "before": 81.76,
+   "after": 81.1
+  },
+  {
+   "id": "ru-waratahs",
+   "name": "Waratahs",
+   "league": "Super Rugby Pacific",
+   "europe": false,
+   "str": 78.9,
+   "strength": 80.46,
+   "crossing": [],
+   "srs": -4.96,
+   "target": 80.46,
+   "shift": -1,
+   "plus": 13,
+   "before": 80.8,
+   "after": 80.46
   },
   {
    "id": "ru-asm-clermont-auvergne",
    "name": "ASM Clermont Auvergne",
-   "str": 78.8,
-   "strength": 80.28,
+   "league": "Top 14",
+   "str": 78.7,
+   "strength": 80.25,
    "crossing": [],
    "srs": -0.64,
-   "target": 80.28,
+   "target": 80.27,
    "shift": 1,
-   "plus": 9,
-   "before": 78.8,
-   "after": 80.28
+   "plus": 10,
+   "before": 78.72,
+   "after": 80.25
   },
   {
    "id": "ru-cardiff-rugby",
    "name": "Cardiff Rugby",
+   "league": "URC",
    "str": 78.7,
-   "strength": 80.03,
+   "strength": 80.05,
    "crossing": [],
    "srs": -1.7,
-   "target": 80.03,
+   "target": 80.02,
    "shift": 0,
    "plus": 10,
-   "before": 79.51,
-   "after": 80.03
+   "before": 79.52,
+   "after": 80.05
   },
   {
    "id": "ru-rc-toulon",
    "name": "RC Toulon",
+   "league": "Top 14",
    "str": 78.7,
-   "strength": 79.95,
+   "strength": 79.92,
    "crossing": [],
    "srs": -2.04,
    "target": 79.94,
    "shift": -3,
-   "plus": 10,
-   "before": 82.44,
-   "after": 79.95
+   "plus": 8,
+   "before": 82.53,
+   "after": 79.92
   },
   {
    "id": "ru-castres-olympique",
    "name": "Castres Olympique",
+   "league": "Top 14",
    "str": 78.3,
-   "strength": 79.56,
+   "strength": 79.54,
    "crossing": [],
    "srs": -3.56,
-   "target": 79.58,
+   "target": 79.57,
    "shift": 2,
-   "plus": 13,
-   "before": 76.99,
-   "after": 79.56
+   "plus": 17,
+   "before": 76.84,
+   "after": 79.54
+  },
+  {
+   "id": "ru-highlanders",
+   "name": "Highlanders",
+   "league": "Super Rugby Pacific",
+   "europe": false,
+   "str": 78.3,
+   "strength": 80.44,
+   "crossing": [],
+   "srs": -5.16,
+   "target": 80.42,
+   "shift": 0,
+   "plus": 17,
+   "before": 79.59,
+   "after": 80.44
+  },
+  {
+   "id": "ru-blackrams-tokyo",
+   "name": "BlackRams Tokyo",
+   "league": "League One",
+   "europe": false,
+   "str": 78.2,
+   "strength": 79.78,
+   "crossing": [],
+   "srs": -0.49,
+   "target": 79.77,
+   "shift": 3,
+   "plus": 6,
+   "before": 76.42,
+   "after": 79.78
+  },
+  {
+   "id": "ru-fijian-drua",
+   "name": "Fijian Drua",
+   "league": "Super Rugby Pacific",
+   "europe": false,
+   "str": 78.1,
+   "strength": 79.22,
+   "crossing": [],
+   "srs": -10.05,
+   "target": 79.24,
+   "shift": -4,
+   "plus": 5,
+   "before": 82.95,
+   "after": 79.22
   },
   {
    "id": "ru-gloucester",
    "name": "Gloucester",
+   "league": "Premiership",
    "str": 78.1,
-   "strength": 79.64,
+   "strength": 79.61,
    "crossing": [],
    "srs": -3.36,
    "target": 79.62,
    "shift": 1,
-   "plus": 2,
-   "before": 78.52,
-   "after": 79.64
+   "plus": 4,
+   "before": 78.38,
+   "after": 79.61
+  },
+  {
+   "id": "ru-toyota-verblitz",
+   "name": "Toyota Verblitz",
+   "league": "League One",
+   "europe": false,
+   "str": 78.1,
+   "strength": 79.61,
+   "crossing": [],
+   "srs": -1.16,
+   "target": 79.61,
+   "shift": -1,
+   "plus": 0,
+   "before": 80.61,
+   "after": 79.61
   },
   {
    "id": "ru-benetton",
    "name": "Benetton",
+   "league": "URC",
    "str": 78,
    "strength": 79.36,
    "crossing": [],
    "srs": -4.49,
    "target": 79.35,
    "shift": -6,
-   "plus": 19,
-   "before": 84.5,
+   "plus": 26,
+   "before": 84.4,
    "after": 79.36
   },
   {
    "id": "ru-lyon-ou",
    "name": "Lyon OU",
+   "league": "Top 14",
    "str": 78,
-   "strength": 79.35,
+   "strength": 79.36,
    "crossing": [],
    "srs": -4.44,
    "target": 79.36,
    "shift": -3,
    "plus": 5,
-   "before": 82.07,
-   "after": 79.35
+   "before": 82.09,
+   "after": 79.36
   },
   {
    "id": "ru-ospreys",
    "name": "Ospreys",
+   "league": "URC",
    "str": 78,
-   "strength": 79.36,
+   "strength": 79.37,
    "crossing": [],
    "srs": -4.42,
-   "target": 79.37,
+   "target": 79.36,
    "shift": 0,
-   "plus": 9,
-   "before": 78.84,
-   "after": 79.36
+   "plus": 5,
+   "before": 79.07,
+   "after": 79.37
   },
   {
    "id": "ru-scarlets",
    "name": "Scarlets",
+   "league": "URC",
    "str": 77.7,
-   "strength": 78.93,
+   "strength": 78.94,
    "crossing": [],
    "srs": -6.16,
    "target": 78.95,
    "shift": -1,
-   "plus": 13,
-   "before": 79.27,
-   "after": 78.93
+   "plus": 14,
+   "before": 79.23,
+   "after": 78.94
+  },
+  {
+   "id": "ru-shizuoka-bluerevs",
+   "name": "Shizuoka BlueRevs",
+   "league": "League One",
+   "europe": false,
+   "str": 77.7,
+   "strength": 79.24,
+   "crossing": [],
+   "srs": -2.77,
+   "target": 79.22,
+   "shift": -2,
+   "plus": 8,
+   "before": 80.78,
+   "after": 79.24
   },
   {
    "id": "ru-edinburgh",
    "name": "Edinburgh",
+   "league": "URC",
    "str": 77.5,
-   "strength": 78.85,
+   "strength": 78.86,
    "crossing": [],
    "srs": -6.49,
    "target": 78.87,
    "shift": -2,
    "plus": 18,
-   "before": 80.09,
-   "after": 78.85
+   "before": 79.99,
+   "after": 78.86
+  },
+  {
+   "id": "ru-mie-honda-heat",
+   "name": "Mie Honda Heat",
+   "league": "League One",
+   "europe": false,
+   "str": 77.3,
+   "strength": 78.31,
+   "crossing": [],
+   "srs": -6.44,
+   "target": 78.33,
+   "shift": 0,
+   "plus": 12,
+   "before": 77.71,
+   "after": 78.31
   },
   {
    "id": "ru-dragons",
    "name": "Dragons RFC",
+   "league": "URC",
    "str": 77.2,
-   "strength": 78.49,
+   "strength": 78.52,
    "crossing": [],
    "srs": -7.95,
    "target": 78.52,
    "shift": 0,
-   "plus": 6,
-   "before": 78.16,
-   "after": 78.49
+   "plus": 9,
+   "before": 78.05,
+   "after": 78.52
   },
   {
    "id": "ru-aviron-bayonnais",
    "name": "Aviron Bayonnais",
-   "str": 77.1,
-   "strength": 78.67,
+   "league": "Top 14",
+   "str": 77,
+   "strength": 78.61,
    "crossing": [],
    "srs": -7.44,
    "target": 78.64,
    "shift": 0,
    "plus": 7,
-   "before": 78.27,
-   "after": 78.67
+   "before": 78.21,
+   "after": 78.61
+  },
+  {
+   "id": "ru-yokohama-canon-eagles",
+   "name": "Yokohama Canon Eagles",
+   "league": "League One",
+   "europe": false,
+   "str": 76.8,
+   "strength": 78.26,
+   "crossing": [],
+   "srs": -7.06,
+   "target": 78.18,
+   "shift": -1,
+   "plus": 14,
+   "before": 78.47,
+   "after": 78.18
   },
   {
    "id": "ru-usa-perpignan",
    "name": "USA Perpignan",
-   "str": 76.6,
-   "strength": 78.07,
+   "league": "Top 14",
+   "str": 76.7,
+   "strength": 78.17,
    "crossing": [],
    "srs": -9.68,
    "target": 78.1,
    "shift": -1,
    "plus": 6,
-   "before": 78.75,
-   "after": 78.11
+   "before": 78.77,
+   "after": 78.12
+  },
+  {
+   "id": "ru-moana-pasifika",
+   "name": "Moana Pasifika",
+   "league": "Super Rugby Pacific",
+   "europe": false,
+   "str": 76.2,
+   "strength": 77.62,
+   "crossing": [],
+   "srs": -16.84,
+   "target": 77.61,
+   "shift": -4,
+   "plus": 19,
+   "before": 80.8,
+   "after": 77.62
+  },
+  {
+   "id": "ru-toshiba-brave-lupus-tokyo",
+   "name": "Toshiba Brave Lupus Tokyo",
+   "league": "League One",
+   "europe": false,
+   "str": 76.1,
+   "strength": 77.94,
+   "crossing": [],
+   "srs": -7.93,
+   "target": 77.97,
+   "shift": -3,
+   "plus": 9,
+   "before": 80.44,
+   "after": 77.94
   },
   {
    "id": "ru-zebre-parma",
    "name": "Zebre Parma",
+   "league": "URC",
    "str": 75.9,
-   "strength": 77.32,
+   "strength": 77.31,
    "crossing": [],
    "srs": -13.01,
    "target": 77.3,
    "shift": -2,
+   "plus": 3,
+   "before": 79.17,
+   "after": 77.31
+  },
+  {
+   "id": "ru-mitsubishi-sagamihara-dynaboars",
+   "name": "Mitsubishi Sagamihara Dynaboars",
+   "league": "League One",
+   "europe": false,
+   "str": 75.8,
+   "strength": 77.04,
+   "crossing": [],
+   "srs": -11.73,
+   "target": 77.04,
+   "shift": -1,
+   "plus": 14,
+   "before": 77.32,
+   "after": 77.04
+  },
+  {
+   "id": "ru-urayasu-d-rocks",
+   "name": "Urayasu D-Rocks",
+   "league": "League One",
+   "europe": false,
+   "str": 75.1,
+   "strength": 76.31,
+   "crossing": [],
+   "srs": -15.34,
+   "target": 76.17,
+   "shift": -3,
    "plus": 4,
-   "before": 79.12,
-   "after": 77.32
+   "before": 78.94,
+   "after": 76.17
   },
   {
    "id": "ru-newcastle-red-bulls",
    "name": "Newcastle Red Bulls",
-   "str": 74.8,
-   "strength": 75.95,
+   "league": "Premiership",
+   "str": 74.7,
+   "strength": 75.96,
    "crossing": [],
    "srs": -18.64,
-   "target": 75.95,
+   "target": 75.94,
    "shift": 1,
-   "plus": 19,
-   "before": 74.14,
-   "after": 75.95
+   "plus": 12,
+   "before": 74.36,
+   "after": 75.96
   },
   {
    "id": "ru-us-montauban",
    "name": "US Montauban",
+   "league": "Top 14",
    "str": 71.6,
-   "strength": 72.67,
+   "strength": 72.69,
    "crossing": [],
    "srs": -32.24,
-   "target": 72.68,
+   "target": 72.67,
    "shift": 0,
-   "plus": 1,
-   "before": 72.65,
-   "after": 72.71
+   "plus": 2,
+   "before": 72.58,
+   "after": 72.69
   }
  ],
  "nations": [
   {
+   "id": "710",
+   "name": "South Africa",
+   "str": 93,
+   "players": 30,
+   "open": []
+  },
+  {
    "id": "250",
    "name": "France",
    "str": 92,
+   "players": 30,
+   "open": []
+  },
+  {
+   "id": "554",
+   "name": "New Zealand",
+   "str": 91,
+   "players": 30,
+   "open": []
+  },
+  {
+   "id": "036",
+   "name": "Australia",
+   "str": 90,
    "players": 30,
    "open": []
   },
@@ -1139,16 +2221,16 @@
    "open": []
   },
   {
-   "id": "710",
-   "name": "South Africa",
-   "str": 87,
+   "id": "380",
+   "name": "Italy",
+   "str": 85,
    "players": 30,
    "open": []
   },
   {
-   "id": "380",
-   "name": "Italy",
-   "str": 85,
+   "id": "392",
+   "name": "Japan",
+   "str": 84,
    "players": 30,
    "open": []
   },
@@ -1162,15 +2244,23 @@
   {
    "id": "242",
    "name": "Fiji",
-   "str": 72,
-   "players": 23,
-   "open": [
-    "HK",
-    "SH",
-    "HK",
-    "PR",
-    "SH"
-   ]
+   "str": 80,
+   "players": 30,
+   "open": []
+  },
+  {
+   "id": "776",
+   "name": "Tonga",
+   "str": 79,
+   "players": 30,
+   "open": []
+  },
+  {
+   "id": "882",
+   "name": "Samoa",
+   "str": 77,
+   "players": 27,
+   "open": []
   },
   {
    "id": "268",
@@ -1183,57 +2273,6 @@
     "CE",
     "WG",
     "FB",
-    "SH",
-    "FH",
-    "CE"
-   ]
-  },
-  {
-   "id": "882",
-   "name": "Samoa",
-   "str": 65,
-   "players": 17,
-   "open": [
-    "LK",
-    "SH",
-    "WG",
-    "FB",
-    "LK",
-    "SH",
-    "FH",
-    "CE"
-   ]
-  },
-  {
-   "id": "776",
-   "name": "Tonga",
-   "str": 65,
-   "players": 14,
-   "open": [
-    "N8",
-    "SH",
-    "FH",
-    "HK",
-    "PR",
-    "PR",
-    "LK",
-    "SH",
-    "FH"
-   ]
-  },
-  {
-   "id": "036",
-   "name": "Australia",
-   "str": 64,
-   "players": 13,
-   "open": [
-    "SH",
-    "FB",
-    "HK",
-    "PR",
-    "PR",
-    "LK",
-    "FL",
     "SH",
     "FH",
     "CE"
@@ -1306,34 +2345,6 @@
     "CE",
     "CE",
     "WG",
-    "HK",
-    "PR",
-    "PR",
-    "LK",
-    "FL",
-    "SH",
-    "FH",
-    "CE"
-   ]
-  },
-  {
-   "id": "554",
-   "name": "New Zealand",
-   "str": 49,
-   "players": 3,
-   "open": [
-    "HK",
-    "PR",
-    "LK",
-    "LK",
-    "FL",
-    "FL",
-    "N8",
-    "SH",
-    "CE",
-    "CE",
-    "WG",
-    "FB",
     "HK",
     "PR",
     "PR",
@@ -1446,36 +2457,6 @@
     "FL",
     "N8",
     "SH",
-    "FH",
-    "WG",
-    "CE",
-    "CE",
-    "WG",
-    "FB",
-    "HK",
-    "PR",
-    "PR",
-    "LK",
-    "FL",
-    "SH",
-    "FH",
-    "CE"
-   ]
-  },
-  {
-   "id": "392",
-   "name": "Japan",
-   "str": 47,
-   "players": 1,
-   "open": [
-    "PR",
-    "HK",
-    "PR",
-    "LK",
-    "LK",
-    "FL",
-    "FL",
-    "N8",
     "FH",
     "WG",
     "CE",
