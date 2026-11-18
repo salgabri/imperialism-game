@@ -792,6 +792,10 @@ test('setupMapPreview: the step-1 map card shows the board a world theatre opens
     // Greenland comes with Denmark, as at launch; the starting land alone sets the frame.
     assert.deepEqual(preview.sections.map(section => [section.id, section.fill]),
       [['208', politicalFill('208')], ['276', politicalFill('276')], ['250', politicalFill('250')], ['304', politicalFill('208')]]);
+    // A click on any of it previews its holder, a team of the wizard's own list: Greenland previews Denmark.
+    assert.deepEqual(preview.sections.map(section => section.owner), ['208', '276', '250', '208']);
+    const listed = new Set(app.setupTeams(setup).map(team => team.id));
+    assert.ok(preview.sections.every(section => listed.has(section.owner)));
     assert.deepEqual(preview.backdrop.map(shape => shape.id), ['999']);
     assert.equal(preview.viewBox, '70.4 70.4 259.2 59.2', 'the tiny atlas homes at x 80–320, y 80–120, 4% margin');
     assert.equal(preview.teams, app.setupTeams(setup).length);

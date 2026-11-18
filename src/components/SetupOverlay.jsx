@@ -121,6 +121,24 @@ function TeamRowMark({ team, width = 24 }) {
   );
 }
 
+/** A team card's "Best players": up to five, strongest first, each with its position and rating. */
+function BestPlayers({ id, className, players }) {
+  return (
+    <div className={className}>
+      <Kicker id={id} title="Best players" />
+      <ol className="setup-players" aria-labelledby={id}>
+        {players.map(player => (
+          <li className="setup-player" key={`${player.name}-${player.pos}`}>
+            <span className="setup-player__pos">{player.pos}</span>
+            <span className="setup-player__name">{player.name}</span>
+            <span className="rating-box setup-player__rating" data-tier={player.tier}>{player.ratingText}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 function SelectedTeam({ team, noun }) {
   return (
     <section className="setup-pick" aria-labelledby="setup-pick-name">
@@ -138,20 +156,7 @@ function SelectedTeam({ team, noun }) {
         <div><dt>Rank</dt><dd className="num">{team.rankText}</dd></div>
         <div><dt>Tier</dt><dd className="setup-pick__tier">{team.tier}</dd></div>
       </dl>
-      {team.players.length ? (
-        <div className="setup-pick__players">
-          <Kicker id="setup-pick-players" title="Best players" />
-          <ol className="setup-players" aria-labelledby="setup-pick-players">
-            {team.players.map(player => (
-              <li className="setup-player" key={`${player.name}-${player.pos}`}>
-                <span className="setup-player__pos">{player.pos}</span>
-                <span className="setup-player__name">{player.name}</span>
-                <span className="rating-box setup-player__rating" data-tier={player.tier}>{player.ratingText}</span>
-              </li>
-            ))}
-          </ol>
-        </div>
-      ) : null}
+      {team.players.length ? <BestPlayers id="setup-pick-players" className="setup-pick__players" players={team.players} /> : null}
       {team.fronts ? (
         <div className="setup-pick__fronts">
           <Kicker id="setup-pick-fronts" title="Fronts" aside={team.fronts.countText} />
@@ -169,6 +174,36 @@ function SelectedTeam({ team, noun }) {
           ) : <p className="setup-fronts__empty">{team.fronts.emptyText}</p>}
         </div>
       ) : null}
+    </section>
+  );
+}
+
+/**
+ * Step 1's preview of the team whose land was clicked on the map (SetupMap), over the map away from the click: who it
+ * is, its strength, rank and tier in the field, and its best players. A short map keeps the head and figures
+ * (setup.css). × closes it, and so does Escape (the wizard's own listener, wherever focus is).
+ */
+function TeamPeek({ team, onClose }) {
+  return (
+    <section className="setup-peek" aria-labelledby="setup-peek-name">
+      <div className="setup-peek__head">
+        <span className="setup-peek__mark" aria-hidden="true">
+          <TeamMark id={team.flagId ?? team.id} teamId={team.id} code={team.code} isClub={team.isClub} width={40} />
+        </span>
+        <div className="setup-peek__id">
+          <p className="setup-peek__meta" title={team.meta}>{team.meta}</p>
+          <h3 className="setup-peek__name" id="setup-peek-name">{team.name}</h3>
+        </div>
+        <button type="button" className="icon-button setup-peek__close" title="Close" onClick={onClose}>
+          <Icon name="close" size={16} /><span className="sr-only">{`Close ${team.name}`}</span>
+        </button>
+      </div>
+      <dl className="setup-peek__stats">
+        <div><dt>Strength</dt><dd className="num">{team.ratingText}</dd></div>
+        <div><dt>Rank</dt><dd className="num">{team.rankText}</dd></div>
+        <div><dt>Tier</dt><dd className="setup-peek__tier">{team.tier}</dd></div>
+      </dl>
+      {team.players.length ? <BestPlayers id="setup-peek-players" className="setup-peek__players" players={team.players} /> : null}
     </section>
   );
 }
@@ -203,7 +238,8 @@ function theatreCaption(model, preview) {
  * `launching` (App prepares a country campaign) and `restoring` (a saved country campaign waits for its map).
  * `theatreMap` is App's `setupMapPreview()`: a world theatre's opening board for step 1's map card (SetupMap), or null.
  * The card's `mapMode` ('political' | 'flags') is App's, set through `onMapMode`; `mapFlags` is App's
- * `setupMapFlags()` for the board on show, while the card is in Flags mode.
+ * `setupMapFlags()` for the board on show, while the card is in Flags mode. A click on a team's land previews that team
+ * of `managerTeams` over the map (TeamPeek), until a click elsewhere on the map, ×, Escape or another board.
  * `season` is App's `seasonStatus()` ({ sets, state, message, sport, onRetry }) for the earlier seasons.
  * `initialStep` (1–3) is the step it opens on: Your role (3) for "Another team" after a defeat. `suggestTeam` (default
  * true) lets a manager with no team picked launch the suggested one; "Another team" turns it off.
@@ -233,6 +269,31 @@ export default function SetupOverlay({
   const mapModeRef = useRef(onMapMode);
   mapModeRef.current = onMapMode;
   const chooseMapMode = useCallback(mode => mapModeRef.current?.(mode), []);
+  // Step 1's map preview: the team whose land was clicked, on the board it was clicked on. Another sport, layer, theatre
+  // or season is another board, which closes it.
+  const [peek, setPeek] = useState(null);
+  const board = [setup.sport, setup.layer, setup.scope, setup.clubScope, setup.dataSet ?? ''].join('\u0000');
+  const boardRef = useRef(board);
+  boardRef.current = board;
+  const peekId = peek?.board === board ? peek.id : null;
+  const choosePeek = useCallback(id => setPeek(current => (id == null ? null
+    : current?.id === id && current.board === boardRef.current ? current : { id, board: boardRef.current })), []);
+  const closePeek = useCallback(() => setPeek(null), []);
+  // A preview left on another board goes for good: coming back to that board shows its map alone.
+  useEffect(() => { if (peek && peek.board !== board) setPeek(null); }, [peek, board]);
+  // Escape closes the preview wherever focus is (a click on the map leaves it on the page), unless a dialog holds the
+  // keyboard or a control used the key itself.
+  const peeking = peekId != null;
+  useEffect(() => {
+    if (!peeking || typeof document === 'undefined') return undefined;
+    function onKeyDown(event) {
+      if (event.key !== 'Escape' || event.defaultPrevented || document.querySelector('[aria-modal="true"]')) return;
+      event.preventDefault();
+      setPeek(null);
+    }
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [peeking]);
   // App passes a fresh `domestic` object (with a fresh `onRetry`) every render: the model keys on its values only.
   const mapState = domestic?.state || 'idle';
   const mapMessage = domestic?.message || null;
@@ -246,10 +307,13 @@ export default function SetupOverlay({
   const model = useMemo(() => setupModel.buildSetupModel(setup, {
     managerTeams, domestic: { state: mapState, message: mapMessage, top: mapTop ? mapTop.split('\u0000') : null }, launching,
     season: { sets: seasonSets, state: seasonState, message: seasonMessage, sport: seasonSport }, suggest: suggestTeam,
-    sportLoad: { id: sportLoadId, state: sportLoadState, message: sportLoadMessage },
+    sportLoad: { id: sportLoadId, state: sportLoadState, message: sportLoadMessage }, peek: peekId,
   }), [setup, managerTeams, mapState, mapMessage, mapTop, launching, seasonSets, seasonState, seasonMessage, seasonSport, suggestTeam,
-    sportLoadId, sportLoadState, sportLoadMessage]);
+    sportLoadId, sportLoadState, sportLoadMessage, peekId]);
   const { rules } = model;
+  // The map card is memoised: its preview changes only with the team on show.
+  const peekCard = useMemo(() => (model.peek ? <TeamPeek team={model.peek} onClose={closePeek} /> : null), [model.peek, closePeek]);
+  const peekShown = model.peek?.id ?? null;
   const manager = model.role === 'manager';
   /** Football clubs also offer one country's own top clubs: more than a hundred, so they are a dropdown under Europe's theatres. */
   const countries = model.domesticScopes.length > 0;
@@ -710,9 +774,11 @@ export default function SetupOverlay({
                     : model.country.countries ? `${model.country.name} · ${model.country.clubs} clubs in ${model.country.countries} countries`
                       : `${model.country.name} · ${domestic.preview.sections.length} sections, `
                         + (model.country.sections === model.country.clubs ? 'one per club' : `${model.country.clubs} clubs`)}
-                  mode={mapMode} onMode={chooseMapMode} flags={mapFlags} clubs resetKey={model.scopeId} />
+                  mode={mapMode} onMode={chooseMapMode} flags={mapFlags} clubs resetKey={model.scopeId}
+                  peekId={peekShown} onTeam={choosePeek}>{peekCard}</SetupMap>
               ) : theatreMap ? <SetupMap kind="world" preview={theatreMap} caption={theatreCaption(model, theatreMap)}
-                mode={mapMode} onMode={chooseMapMode} flags={mapFlags} clubs={model.layer === 'clubs'} resetKey={model.scopeId} />
+                mode={mapMode} onMode={chooseMapMode} flags={mapFlags} clubs={model.layer === 'clubs'} resetKey={model.scopeId}
+                peekId={peekShown} onTeam={choosePeek}>{peekCard}</SetupMap>
                 : <div className="setup-side__empty" aria-hidden="true" />}
             </div>
           </div>

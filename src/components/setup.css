@@ -290,6 +290,64 @@ strong.setup-save__text { font-weight:600; }
 @media (max-width:699.98px) { .setup-map__zoom { display:none; } }
 @container (max-height:229.98px) { .setup-map__zoom { display:none; } }
 
+/* A click on a team's land previews it (SetupMap, the wizard's TeamPeek). Held land takes a pointer and, like the
+   campaign map's, darkens a touch under it; the team on show is outlined, a panel-coloured halo under an ink line, clear
+   on any banner in either theme. Its card floats in the half of the map away from the click (SetupMap's data-x/data-y):
+   - a map at least 500px wide: at the top left, or at the top right beside the zoom group and above the switch's row;
+   - a narrower map: across it, above the switch's row, at the top or the bottom.
+   On a short map its players give way, then its figures, so it never scrolls or covers a control (measured: the whole
+   card is 275px tall, 282px under a finger; its head and figures 103px, 110px). */
+.setup-map[data-peekable] .setup-map__sections path[data-team] { cursor:pointer; }
+.setup-map[data-peekable][data-panning] .setup-map__sections path[data-team] { cursor:grabbing; }
+.setup-map[data-peekable] .setup-map__sections path[data-team]:hover { filter:brightness(.97); }
+:root[data-theme=dark] .setup-map[data-peekable] .setup-map__sections path[data-team]:hover { filter:brightness(1.15); }
+.setup-map__peek path { stroke-linejoin:round; vector-effect:non-scaling-stroke; }
+.setup-map__peek-halo path { stroke:var(--panel); stroke-width:4px; }
+.setup-map__peek-line path { stroke:var(--ink); stroke-width:2px; }
+.setup-map__overlay {
+  position:absolute; z-index:2; left:var(--setup-map-inset); top:var(--setup-map-inset);
+  width:min(300px, calc(100% - var(--setup-map-inset) * 2)); max-height:calc(100% - var(--setup-map-inset) * 2);
+  display:flex; flex-direction:column; cursor:default;
+}
+.setup-map__overlay[data-x=right] {
+  left:auto; right:calc(var(--setup-map-inset) + var(--setup-map-zoom) + 8px);
+  max-height:calc(100% - var(--setup-map-inset) * 2 - var(--setup-map-mode-h) - 8px);
+}
+@container (max-width:499.98px) {
+  .setup-map__overlay, .setup-map__overlay[data-x=right] {
+    left:var(--setup-map-inset); right:auto; max-height:calc(100% - var(--setup-map-inset) * 2 - var(--setup-map-mode-h) - 8px);
+  }
+  .setup-map__overlay[data-y=bottom] { top:auto; bottom:calc(var(--setup-map-inset) + var(--setup-map-mode-h) + 8px); }
+}
+.setup-peek { min-height:0; overflow:hidden; background:var(--panel); box-shadow:var(--shadow-float); }
+.setup-peek__head { display:flex; align-items:center; gap:10px; padding:8px 4px 8px 14px; }
+.setup-peek__mark { display:flex; flex:none; }
+.setup-peek__id { flex:1 1 auto; min-width:0; }
+.setup-peek__meta {
+  margin:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:700 11px/1.2 var(--font-narrow); letter-spacing:.14em; text-transform:uppercase; color:var(--muted);
+}
+.setup-peek__name {
+  margin:2px 0 0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:700 20px/1.1 var(--font-sans); letter-spacing:-.02em; color:var(--ink);
+}
+.setup-peek__close { align-self:flex-start; color:var(--muted); }
+.setup-peek__close:hover:not(:disabled) { color:var(--ink); }
+.setup-peek__stats { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); margin:0; border-top:1px solid var(--rule); }
+.setup-peek__stats > div { min-width:0; padding:7px 0 7px 14px; }
+.setup-peek__stats > div + div { padding-left:10px; border-left:1px solid var(--rule); }
+.setup-peek__stats dd { margin:2px 0 0; font:600 18px/1.1 var(--font-narrow); color:var(--ink); white-space:nowrap; }
+.setup-peek__stats .setup-peek__tier { margin-top:3px; font:700 15px/1.1 var(--font-narrow); }
+.setup-peek__players { padding:8px 14px 4px; border-top:1px solid var(--rule); }
+.setup-peek__players .setup-kicker { margin-bottom:2px; }
+@container (max-height:309.98px) { .setup-peek__players { display:none; } }
+@container (max-height:139.98px) { .setup-peek__stats { display:none; } }
+/* Above the switch's row (a narrow map, or the right of a wide one) the card has 52px less, 64px under a finger. */
+@container (max-width:499.98px) and (max-height:359.98px) { .setup-peek__players { display:none; } }
+@container (max-width:499.98px) and (max-height:189.98px) { .setup-peek__stats { display:none; } }
+@container (max-height:359.98px) { .setup-map__overlay[data-x=right] .setup-peek__players { display:none; } }
+@container (max-height:189.98px) { .setup-map__overlay[data-x=right] .setup-peek__stats { display:none; } }
+
 .setup-side__empty { flex:1 1 0; min-height:120px; background:var(--sea); }
 
 /* The field, its matches and its length, at the controls' foot */
@@ -297,7 +355,7 @@ strong.setup-save__text { font-weight:600; }
 .setup-stats { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); margin:0; }
 .setup-stat { min-width:0; padding:2px 0; }
 .setup-stat + .setup-stat { padding-left:16px; border-left:1px solid var(--rule); }
-.setup-stat dt, .setup-pick__stats dt {
+.setup-stat dt, .setup-pick__stats dt, .setup-peek__stats dt {
   white-space:nowrap; font:700 11px/1.2 var(--font-narrow); letter-spacing:.12em; text-transform:uppercase; color:var(--muted);
 }
 .setup-stat dd { margin:2px 0 0; font:600 24px/1.1 var(--font-narrow); color:var(--ink); white-space:nowrap; }
