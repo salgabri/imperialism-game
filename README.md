@@ -128,6 +128,7 @@ npm run build-clubs      # regenerate the club layer for both sports
 npm run sync:domestic-clubs # country club snapshots from the cache (EFEM requests need permission)
 npm run sync:club-logos  # club crests: Wikidata via QLever (network, cached), Wikipedia's answers from the pinned cache only
 npm run sync:club-logos -- --pages # only the crests club-logos.json "pages" names, from their file pages (network, cached)
+npm run build:club-colours # re-read each club's colour from its crest after a crest or correction changes (--check to verify)
 npm run build:domestic   # rebuild country maps from snapshots and boundaries (about 5 minutes)
 npm run test:domestic    # country maps, sections and seeded country campaigns
 npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned EA export in data-src/ea-leone/
@@ -2910,6 +2911,13 @@ Saint-Malo's women's sides, and Union Berlin's all-leagues club). Since an earli
 season's club wears its twin's crest (`src/data/crests.js`), 394 more club-seasons on
 the earlier seasons' maps show one too. The worker's image cache now holds 8,000
 files, enough for the 5,400 flags and crests.
+
+A club's land on the political map takes its crest's colour, so a crest added, redrawn
+or removed also needs `npm run build:club-colours`, as does a change to the colour
+corrections in `scripts/data/club-colours.json`. `src/data/clubColours.js` records a
+digest of every crest and correction it was read from, and `scripts/club-colours.test.mjs`
+fails until it matches (`-- --check` tells the same without reading a pixel). The 748
+crests above kept hash pastels until the colours were read again the next day.
 
 Crests are the clubs' trademarks, and most are non-free files that Wikipedia
 hosts under its non-free content policy. `public/club-logos/SOURCES.tsv` records
