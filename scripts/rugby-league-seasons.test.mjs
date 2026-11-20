@@ -398,7 +398,7 @@ test('the nations are not fielded: Super League\'s players are rated on a kinder
 test('the loader refuses an NRL season that is not the builder\'s', () => {
   const broken = edit => { const copy = JSON.parse(TEXT); edit(copy); return () => decodeFootballSet(copy, copy.id); };
   assert.throws(broken(d => { delete d.source.conversion; }), /source conversion must say how the overalls were derived/);
-  assert.throws(broken(d => { d.map = 'nhl2007'; }), /map "nhl2007" is not one of Rugby league's maps listing this season/);
+  assert.throws(broken(d => { d.map = 'nhl2007'; }), /map "nhl2007" is not one of Rugby's maps listing this season/);
   assert.throws(broken(d => { d.map = 'nrl'; }), /clubs must be the 17 of map nrl, found 16/, "today's map is today's clubs'");
   assert.throws(broken(d => { d.season = '2007/08'; }), /season "2007\/08" must be "2008"/);
   assert.throws(broken(d => { d.clubs[0].squad[0][1] = 'QB'; }), /is not one of the sport's/);
@@ -1231,7 +1231,7 @@ test('the loader takes a computed NRL season and refuses one without its metric 
   assert.throws(broken(d => { delete d.source.conversion; }), /source conversion must say how the overalls were derived/);
   assert.throws(broken(d => { d.source.method = 'estimated'; }), /source method must be "computed" or absent/);
   assert.throws(broken(d => { delete d.source.method; }), /source rawScale must be a number/, 'not computed: a game\'s scale, as 2008');
-  assert.throws(broken(d => { d.map = 'nrl2008'; }), /map "nrl2008" is not one of Rugby league's maps listing this season/);
+  assert.throws(broken(d => { d.map = 'nrl2008'; }), /map "nrl2008" is not one of Rugby's maps listing this season/);
   assert.throws(broken(d => { d.season = '2015/16'; }), /season "2015\/16" must be "2016"/);
   const today = JSON.parse(read('public/rugby-league/nrl-2024.json'));
   assert.doesNotThrow(() => decodeFootballSet(today, 'nrl-2024'), '2024 plays on today\'s map');
@@ -1272,14 +1272,11 @@ async function withApp(fn) {
 }
 const modelOf = app => buildSetupModel(app.state.setup, { managerTeams: app.setupTeams(), domestic: app.domesticStatus(), season: app.seasonStatus() });
 
-test('rugby league\'s Season choice lists 2024 to 1960 on Clubs, and 2008 takes them onto the map of 2008', async () => {
+test('rugby league\'s Season choice lists 2024 to 1960, its clubs only, and 2008 takes them onto the map of 2008', async () => {
   await withApp(async ({ app }) => {
     app.pickSetup('sport', 'rugby-league');
-    // Nations: only the built-in season has them, and a season of clubs is no choice.
-    assert.deepEqual(modelOf(app).season.options.map(option => option.name), ['2025']);
-    app.pickSetup('dataSet', 'nrl-2008');
-    assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', null]);
-    app.pickSetup('layer', 'clubs');
+    // Clubs only (Rugby's nations are union's): every season of the NRL's is a choice at once.
+    assert.equal(app.state.setup.layer, 'clubs');
     const model = modelOf(app);
     const competition = year => (year <= 1983 ? 'NSWRFL' : year <= 1994 ? 'NSWRL' : 'ARL');
     assert.deepEqual(model.season.options.map(option => option.label), ['2025 · built in',
@@ -1475,15 +1472,18 @@ test('the setup and the campaign name each season\'s premiership: the NSWRFL\'s 
       await Promise.all([app.loadCountry(map), app.loadSet(id)]);
       await settle();
       const model = modelOf(app);
-      // The sport card counts the season's clubs, the theatre is its premiership's, and the map card names it.
-      assert.equal(model.sports.find(sport => sport.id === 'rugby-league').note, `${count} ${league} clubs`, id);
-      assert.deepEqual(model.scopes.map(row => [row.id, row.label, row.count]), [[`domestic:${map}`, league, count]], id);
+      // Rugby's card names both codes' clubs; the theatre is the season's premiership, after union's European clubs, and
+      // the map card names it.
+      assert.deepEqual(model.sports.filter(sport => sport.selected).map(sport => [sport.id, sport.note]),
+        [['rugby-union', 'Nations · European and NRL clubs']], id);
+      assert.deepEqual(model.scopes.map(row => [row.id, row.label, row.count]),
+        [['domestic:rugbyeurope', 'European clubs', 36], [`domestic:${map}`, league, count]], id);
       assert.equal(model.scopeName, `${league} · Australia and New Zealand`, id);
       assert.match(model.countryNote, new RegExp(` lead the ${count} ${league} clubs fighting over Australia and New Zealand, `), id);
       app.startCampaign();
       const st = app.state;
       assert.equal(st.phase, 'playing', id);
-      assert.equal(st.campaignName, `Rugby league ${season} · ${league} · Australia and New Zealand`, id);
+      assert.equal(st.campaignName, `Rugby ${season} · ${league} · Australia and New Zealand`, id);
       assert.equal(app.mapOverlaysModel().titleCard.title, `${league} · Australia and New Zealand · ${season}`, id);
       assert.ok(Object.values(st.teams).every(team => team.conf === league), `${id}: every club in the ${league}`);
     });

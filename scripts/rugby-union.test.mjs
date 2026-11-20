@@ -11,7 +11,8 @@ import { ROSTERS } from '../src/data/rosters.rugby-union.js';
 import { buildClub, buildTeam, fieldsRealSide, isEuropeanScope, makeRng, NATIONS, RUGBY_CROSSING_PENALTY, RUGBY_NEAR_PENALTY,
   SCOPES, selectLineup, SIX_NATIONS, teamEff, teamSportId, UNION_CROSSING_PENALTY } from '../src/data/teams.js';
 import { nationTheatre, nationTheatres } from '../src/data/scopes.js';
-import { clockLabel, clockTick, getSport, matchSport, overtimeEnd, overtimePeriodsOf, overtimeShort, overtimeText, SPORT_LIST } from '../src/sports/index.js';
+import { CARD_LIST, cardSports, clockLabel, clockTick, getSport, matchSport, overtimeEnd, overtimePeriodsOf, overtimeShort, overtimeText, SPORT_LIST }
+  from '../src/sports/index.js';
 import { BASELINE, deciderOdds, goldenRate, marginOfGap, onField, POINTS, rugbyUnionProfile, rugbyUnionStrength, SLICE_MODEL,
   sliceMeans } from '../src/sports/rugbyUnion.js';
 import { estimateWinProbability } from '../src/engine/odds.js';
@@ -321,18 +322,25 @@ test('the live win probability starts at the fixture odds, follows the score and
 
 // ---------- the setup and the squad ----------
 
-test('setup lists Rugby, union, before rugby league, with nations and 36 clubs from three leagues, on its built-in 2025/26 season', () => {
+test('setup has one Rugby card: union\'s nations and 36 European clubs beside rugby league\'s NRL, on its built-in 2025/26 season', () => {
   const ids = SPORT_LIST.map(item => item.id);
   assert.equal(ids.indexOf('rugby-union') + 1, ids.indexOf('rugby-league'));
   assert.equal(sport.name, 'Rugby');
-  assert.equal(getSport('rugby-league').name, 'Rugby league');
+  // Rugby league plays under the same card and name, its NRL on league's own rules.
+  assert.deepEqual(cardSports('rugby-union').map(item => [item.id, item.name]), [['rugby-union', 'Rugby'], ['rugby-league', 'Rugby']]);
+  assert.deepEqual(CARD_LIST.filter(item => item.name === 'Rugby').map(item => item.id), ['rugby-union']);
   assert.equal(sportNote(sport), 'Nations · 36 clubs from 3 leagues');
-  assert.equal(SPORT_NOTES['rugby-union'], sportNote(sport));
+  assert.equal(SPORT_NOTES['rugby-union'], 'Nations · European and NRL clubs');
   assert.deepEqual(builtInSeasonOf('rugby-union'), { year: 2026, season: '2025/26' });
   const clubs = buildSetupModel({ sport: 'rugby-union', layer: 'clubs', clubScope: 'domestic:rugbyeurope' }, {});
-  assert.deepEqual(clubs.scopes.map(scope => [scope.id, scope.label, scope.count]), [['domestic:rugbyeurope', 'European clubs', 36]]);
+  assert.deepEqual(clubs.scopes.map(scope => [scope.id, scope.label, scope.count]), [['domestic:rugbyeurope', 'European clubs', 36], ['domestic:nrl', 'NRL', 17]]);
+  assert.deepEqual([clubs.scopeId, clubs.sportPick, clubs.clubsOnly], ['domestic:rugbyeurope', 'rugby-union', null]);
+  assert.deepEqual(clubs.sports.filter(card => card.selected).map(card => [card.id, card.note]), [['rugby-union', 'Nations · European and NRL clubs']]);
   assert.deepEqual(clubs.season.options.map(option => option.name), ['2025/26']);
   assert.match(clubs.season.note, /RugbyPass/);
+  assert.equal(clubs.campaignSummary, 'Rugby · Clubs · European clubs · Europe');
+  const nations = buildSetupModel({ sport: 'rugby-union', layer: 'nations', scope: 'six-nations' }, {});
+  assert.deepEqual(nations.scopes.map(scope => scope.id), ['world', 'UEFA', 'six-nations', 'AFC'], 'no club map among the nations');
   assert.equal(BASELINE, 45);
 });
 

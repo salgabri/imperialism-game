@@ -28,6 +28,18 @@ export const DEFAULT_SPORT = 'football';
 export const getSport = id => SPORTS[id] || SPORTS[DEFAULT_SPORT];
 
 /**
+ * The setup card a sport is chosen under: its own, or the card it shares (`card`). Rugby is one card of two sports:
+ * union's nations and European clubs, and rugby league's NRL, which keeps its own rules (src/sports/rugbyLeague.js).
+ */
+export const cardOf = id => getSport(id).card ?? getSport(id).id;
+
+/** The sports one card offers, the card's own first: Rugby's union, then rugby league. */
+export const cardSports = id => SPORT_LIST.filter(sport => (sport.card ?? sport.id) === id);
+
+/** The setup's sport cards, in SPORT_LIST's order: every sport but one chosen under another's card. */
+export const CARD_LIST = Object.freeze(SPORT_LIST.filter(sport => !sport.card));
+
+/**
  * The sport a campaign's matches are played under, from its settings or a setup (`sport`, `layer`, `clubScope`,
  * `dataSet`, `dataYear`, `dataSeason`): the rules of its season's day (eras.js). A sport whose rules changed over the
  * years gives them by season (`rulesFor(settings)`, one object per set of rules); the built-in current season plays

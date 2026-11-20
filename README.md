@@ -17,8 +17,8 @@ Pick your sport at kick-off:
 | Baseball | the batting order's nine (with a designated hitter), the starter and three relievers | 9 innings | extra innings (each half from 2020 with a runner on second) |
 | Ice hockey | four lines, three pairs and the goalie | 60 minutes | sudden-death overtime, then a shoot-out |
 | Tennis, and women's tennis | a Davis Cup (or Billie Jean King Cup) team: No. 1 and No. 2 in the singles, a doubles pair | five rubbers, first to three, each best of three sets; an earlier season plays its year's ([format by year](#tennis-seasons)) | none: a tie always has a winner |
-| Rugby (union) | the matchday 23: fifteen and eight replacements | 80 minutes | extra time in sudden death: the first score wins, and after twenty minutes a last drop goal |
-| Rugby league | the matchday 17: thirteen and four on the bench | 80 minutes | golden point (in earlier seasons the rules of their day: before 2003 the finals' twenty minutes of extra time, played in full) |
+| Rugby: nations and European clubs (union) | the matchday 23: fifteen and eight replacements | 80 minutes | extra time in sudden death: the first score wins, and after twenty minutes a last drop goal |
+| Rugby: NRL clubs (rugby league) | the matchday 17: thirteen and four on the bench | 80 minutes | golden point (in earlier seasons the rules of their day: before 2003 the finals' twenty minutes of extra time, played in full) |
 | Rocket League | three a side, a nation's best of its five | best of seven five-minute games | sudden-death overtime in a level game; a series always has a winner |
 | Counter-Strike | five a side, a nation's best of its seven | best of three maps, each first to 13 rounds | overtimes of six rounds from 12–12; a series always has a winner |
 | Valorant | five a side, a nation's best of its seven | best of three maps, each first to 13 rounds | two clear rounds in overtime from 12–12; a series always has a winner |
@@ -36,7 +36,7 @@ And pick who fights:
   only with a **real side**, its own rated players holding at least half the lineup, and
   every other nation's land stays neutral: 173 nations play football, 63 Valorant, 57 Rocket League, 52
   tennis, 45 women's tennis, 47 basketball, 40 Counter-Strike, 40 League of Legends, 36 women's football, 13 rugby, 12
-  baseball, 7 ice hockey and 6 rugby league. No team is made up of generated players or nearly empty.
+  baseball and 7 ice hockey. No team is made up of generated players or nearly empty.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs (Europe's 68
   on [their maps of Europe](#womens-football-on-the-europe-maps), the NWSL's 16 on [theirs](#the-nwsl-map) of the USA), all 30 NBA
@@ -45,8 +45,8 @@ And pick who fights:
   franchises on [theirs](#the-nfl-map) of the USA, all 138 FBS college football schools on [theirs](#the-fbs-map) of
   the USA, Hawaii included, all 30 MLB clubs on
   [theirs](#the-mlb-map) of the USA and Canada, all 32 NHL clubs on
-  [theirs](#the-nhl-map), the 36 European rugby clubs of the Premiership, the Top 14 and the URC on [theirs](#the-rugby-europe-map) of
-  Europe, or all 17 NRL clubs on [theirs](#the-nrl-map) of Australia and New Zealand. Real Madrid annexes territory
+  [theirs](#the-nhl-map), and rugby's: the 36 European clubs of the Premiership, the Top 14 and the URC on [theirs](#the-rugby-europe-map)
+  of Europe, playing union, or all 17 NRL clubs on [theirs](#the-nrl-map) of Australia and New Zealand, playing rugby league. Real Madrid annexes territory
   exactly the way Spain does. American football and college football are played by clubs only, tennis,
   women's tennis and the esports by nations only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
@@ -63,11 +63,12 @@ college overtime ([design notes](docs/design/college-football.md)). Baseball add
 own match clock (half-innings, not minutes) and nations by birthplace
 ([design notes](docs/design/baseball.md)). Ice hockey's ratings are partly estimates, each
 marked as one ([design notes](docs/design/hockey.md)), women's football plays
-under football's rulebook with its own players ([design notes](docs/design/womens-football.md)), and rugby league plays
-Rugby League 26's NRL in five-minute slices to golden point ([design notes](docs/design/rugby-league.md)). Rugby, union,
-plays the same slices under union's points (a try five, a penalty goal and a drop goal three) and sudden-death extra time,
-its Six Nations and Europe's Premiership, Top 14 and URC clubs computed from RugbyPass's team sheets and match stats, as no
-game publishes union ratings, every rating marked an estimate ([design notes](docs/design/rugby-union.md)).
+under football's rulebook with its own players ([design notes](docs/design/womens-football.md)), and rugby is one sport of
+two codes, as basketball's NBA and EuroLeague each keep their own rules. Its NRL clubs play rugby league, Rugby League 26's
+NRL in five-minute slices to golden point ([design notes](docs/design/rugby-league.md)); its nations (the Six Nations
+among them) and Europe's Premiership, Top 14 and URC clubs play union, the same slices under union's points (a try five, a
+penalty goal and a drop goal three) and sudden-death extra time, computed from RugbyPass's team sheets and match stats, as
+no game publishes union ratings, every rating marked an estimate ([design notes](docs/design/rugby-union.md)).
 Tennis plays Davis Cup ties between nations, its players rated by their Elo
 ([design notes](docs/design/tennis.md)), and women's tennis the Billie Jean King Cup's, the WTA's players
 by their Elo, with the WTA's serve ([design notes](docs/design/womens-tennis.md)). Rocket League, the first esport, plays
@@ -357,22 +358,22 @@ manager of the theatre's favourite, with decisions from the first match.
    choices are the whole world (173 nations in football), another confederation, or the
    Elite 32. A sport offers a confederation only where it is played: once at least four
    of its nations field a real side, their own rated players holding at least half the
-   lineup, and the Elite 32 once 32 nations do. Rugby league offers the world and Asia &
+   lineup, and the Elite 32 once 32 nations do. Rugby offers the world, Europe and Asia &
    Oceania, baseball the world and N. & C. America, ice hockey the world and Europe;
    neither tennis game nor women's football has Africa, and an earlier season can offer
    fewer still. A choice the sport doesn't offer plays its heartland, the confederation
-   with the most real sides (rugby league's Asia & Oceania), and comes back with a sport
+   with the most real sides (ice hockey's Europe), and comes back with a sport
    that offers it. Basketball's nations also offer **EuroBasket**, the 24 nations of EuroBasket 2025, and rugby's
-   (union's) the **Six Nations**: England, France, Ireland, Italy, Scotland and Wales, framed on Europe; rugby offers the world,
-   Europe and the Six Nations.
+   the **Six Nations**: England, France, Ireland, Italy, Scotland and Wales, framed on Europe. Rugby's nations play union.
    Football club campaigns offer Europe's 124 strongest clubs or its
    Elite 32 on [the map of Europe](#the-europe-maps); basketball clubs play the NBA on its own
    map of the USA and Canada or [the EuroLeague](#the-euroleague-map) on its map of Europe, American football (clubs only: choosing it
    switches Teams to clubs and disables Nations) the NFL on its map of the USA, college football (its schools only, the same
    way) the FBS on its own map of the USA,
    baseball clubs MLB on its map of the USA and Canada, ice hockey clubs the NHL on its own, rugby clubs
-   [Europe's](#the-rugby-europe-map) Premiership, Top 14 and URC on their map of Europe, and rugby league clubs the NRL
-   on its map of Australia and New Zealand. Tennis and women's tennis are nations only
+   [Europe's](#the-rugby-europe-map) Premiership, Top 14 and URC on their map of Europe, playing union, or the NRL on its
+   map of Australia and New Zealand, playing rugby league: Rugby is one card of two codes, so choosing the NRL, or
+   Nations or European clubs from it, changes code, and the Season choice lists the chosen code's seasons. Tennis and women's tennis are nations only
    (choosing either switches Teams to nations and disables Clubs). Women's football's clubs
    offer every European club or its Elite 32 on [maps of Europe](#womens-football-on-the-europe-maps), or the NWSL
    on [its map of the USA](#the-nwsl-map). The step opens on a map of the chosen theatre:
@@ -422,7 +423,7 @@ manager of the theatre's favourite, with decisions from the first match.
    edition published them, else converted or computed from the players'
    statistics), nations or clubs on the map of their day, tennis its 2026 (Elo of 2 November) then its
    [earlier seasons](#tennis-seasons) 2025 back to 1960, women's tennis its 2026 (Elo of
-   2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1963, rugby league its built-in 2025
+   2 November) then its [earlier seasons](#womens-tennis-seasons) 2025 back to 1963, rugby's NRL (rugby league) its built-in 2025
    (Rugby League 26) then [its earlier seasons](#rugby-league-seasons) 2024 back to 1960 (computed from
    NRL.com's match statistics, but 2008: Rugby League 2, the overall ours; before 1998 from the Rugby League
    Project's team lists), the premiership's clubs on the map of their day, Rocket League its 2026 then its
@@ -883,7 +884,7 @@ Each key names a setup choice, and a key left at its default is left out:
 
 | Key | Setup choice | Values | Left out when |
 | --- | --- | --- | --- |
-| `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey`, `tennis`, `womens-tennis`, `rugby-union` (Rugby), `rugby-league` | football |
+| `sport` | Sport | `football`, `womens-football`, `basketball`, `american-football`, `baseball`, `hockey`, `tennis`, `womens-tennis`, `rugby-union` (Rugby), `rugby-league` (Rugby's NRL clubs, playing rugby league) | football |
 | `teams` | Teams | `nations`, `clubs` | nations, or clubs-only (American football, college football, an NBA season); tennis and women's tennis are nations only |
 | `theatre` | Theatre | `world`, `UEFA`, `CONMEBOL`, `CAF`, `AFC`, `CONCACAF`, `elite` where the sport offers it, `eurobasket` in basketball and `six-nations` in rugby; for clubs a map of Europe (`domestic:eu32`; `all` and `elite` still open on them), a country (`domestic:826`), women's football's maps (`domestic:weu32`, `domestic:nwsl`; `all`, `elite` and `NWSL` still open on them), rugby's (`domestic:rugbyeurope`), or the EuroLeague's (`domestic:euroleague`; an earlier season's, `domestic:el2010`, which with another season becomes that season's own) | Europe for nations, the Top 124 for football clubs, Europe for women's football clubs, the NBA's for basketball clubs, a sport's own map (NFL, FBS, MLB, NHL) |
 | `season` | Season | a built-in earlier season (`ea-fifa-18`, `nba-2k09`, `mlb-the-show-24`) | the built-in season |
@@ -904,7 +905,7 @@ sets up Nigeria's basketball five against Africa under round robin.
 
 A value this version doesn't offer stays at its default: an unknown sport, draw or
 seed, a theatre or season no longer built in, a theatre the sport doesn't offer
-(rugby league in Africa; with a season, setup falls back once it has loaded), a CM 01/02 season built on another
+(ice hockey in Africa; with a season, setup falls back once it has loaded), a CM 01/02 season built on another
 computer, a country map with an earlier season, team strengths outside basketball,
 a team for a spectator. A manager's team is checked once its theatre's teams are
 known, after a country map or season has loaded. If the team doesn't play there,
@@ -1120,7 +1121,8 @@ positions are each player's most-started place in 2025, with Zero Tackle's kept 
 matchday 17 and keep up to 24. Nations field the NRL's players, by their 2025 Test side, else birthplace. Eight have them,
 Australia, New Zealand, Samoa, Tonga, England, Fiji, Papua New Guinea and the Cook Islands; the first six hold at least half
 a matchday 17 and field a team, while Papua New Guinea's six and the Cook Islands' five fall short and their land stays
-neutral. See the
+neutral. Rugby's card sets up rugby league's clubs only (its nations are union's): these nations play only the campaigns
+saved with them. See the
 [design notes](docs/design/rugby-league.md).
 
 **Rocket League** — `src/data/rosters.rocket-league.js`, from every 3v3 series Liquipedia records (CC BY-SA 3.0),
@@ -1685,8 +1687,8 @@ npm run build:nhl-map -- --check           # offline rebuild must match the comm
 
 ### The rugby Europe map
 
-Rugby's (union's) clubs have one theatre, **European clubs**: the Premiership's ten, the Top 14's fourteen and the URC's twelve
-European sides on a map of Europe, each on land in its own country, divided between a country's clubs as the football
+Rugby's clubs have two theatres: **European clubs**, playing union, and [the NRL](#the-nrl-map), playing rugby league.
+European clubs are the Premiership's ten, the Top 14's fourteen and the URC's twelve European sides on a map of Europe, each on land in its own country, divided between a country's clubs as the football
 Europe maps divide theirs ([the Europe maps](#the-europe-maps)): England among ten, France among fourteen, Ireland among
 three and Ulster on Northern Ireland, Wales among four, Scotland and Italy among two each; every other country stays grey.
 The URC's four South African sides are rated (their players play for South Africa) but play on no map. The map is
@@ -1695,7 +1697,7 @@ The URC's four South African sides are rated (their players play for South Afric
 
 ### The NRL map
 
-Rugby league clubs have one theatre, **NRL**: the 17 clubs fight over Australia and New Zealand, each holding the state,
+Rugby's other club theatre is the **NRL**, playing rugby league: the 17 clubs fight over Australia and New Zealand, each holding the state,
 territory or region its ground stands in and nothing else. New South Wales (ten clubs, eight of them in Sydney) and
 Queensland (four) are divided between their clubs; the Storm hold Victoria, the Raiders the Australian Capital Territory
 and the Warriors the Auckland Region, and every other state and region stays empty. The map is `public/domestic/nrl.json`
@@ -2525,7 +2527,7 @@ and [the design notes](docs/design/womens-football.md#computed-seasons) describe
 
 ## Rugby league seasons
 
-Rugby league can be played on sixty-six earlier seasons, every premiership
+Rugby's NRL, rugby league, can be played on sixty-six earlier seasons, every premiership
 season from 1960, as well as the built-in 2025: 2008, from Rugby League 2: World
 Cup Edition's own database (Sidhe, 2008), extracted by Wouldubeinta and kept by
 the Wayback Machine's copy of rugbyleaguemods.net; 1998 to 2007 and 2009 to 2024,
@@ -2533,7 +2535,7 @@ which no game rated, computed from NRL.com's match centre (below); and before
 1998, the NSWRFL's premierships from 1960, the NSWRL's from 1984 and the ARL's
 from 1995, with Super League's beside the ARL's in 1997, computed from the Rugby
 League Project's record of who started, where and how often (below). Pick one
-under **Season** in setup; it plays the clubs of that season, clubs only, on the
+under **Season** in setup, the NRL chosen; it plays the clubs of that season, clubs only, on the
 map of their day: Sydney's ten of the 1960s, twelve from 1967 (Cronulla-Sutherland,
 Penrith), Canberra and Illawarra from 1982, Brisbane, the Gold Coast and Newcastle
 from 1988, the ARL's twenty of 1995 and 1996, the ARL's twelve and Super League's

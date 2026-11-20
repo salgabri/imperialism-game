@@ -7,7 +7,7 @@ import { NATIONS, SCOPES, isTennisSport, nationIdentity } from '../../data/teams
 import { CLUB_SCOPES, TOP_CLUBS, nationTheatre, nationTheatres, strongestClubs as topClubs } from '../../data/scopes.js';
 import { nationPriority } from '../../data/domesticTiers.js';
 import { clubMapOf, countryMapsOf, countryOfEntry, domesticEntry, domesticLabel, isDomesticScope, isTheatreMap, theatreMapsOf } from '../../data/domesticScope.js';
-import { SPORT_LIST, getSport, matchSport } from '../../sports/index.js';
+import { CARD_LIST, cardOf, cardSports, getSport, matchSport } from '../../sports/index.js';
 import { builtInSeasonOf, fieldedNations, setHasLayer, setHasNations, setSportOf } from '../../engine/footballSets.js';
 import { V4, ratingTierOf } from '../../theme.js';
 import { politicalFill } from '../../data/empireColours.js';
@@ -308,6 +308,26 @@ function mapTheatres(sportId, dataSet = null) {
   return mapRows.get(key);
 }
 
+const cardRows = new WeakMap();
+/**
+ * The club theatres of a sport's card (`cardSports`): its own rows (`own`), and each other sport's of the card on the
+ * maps of its built-in season, in the card's order. Rugby's clubs choose between union's European clubs and the NRL,
+ * which plays rugby league; choosing the other's map changes sport (App's `cardPick`). A sport alone on its card keeps
+ * its own rows.
+ */
+function cardTheatres(sport, own) {
+  const sports = cardSports(cardOf(sport.id));
+  if (sports.length < 2) return own;
+  if (!cardRows.has(own)) {
+    cardRows.set(own, Object.freeze(sports.flatMap(item => {
+      if (item.id === sport.id) return own;
+      const map = clubMapOf(item.id);
+      return map ? clubMapTheatre(map) : mapTheatres(item.id);
+    })));
+  }
+  return cardRows.get(own);
+}
+
 /** Theatre rows for the active layer: [{ id, name, label, count, note }] (counts as in HEAD's setup). */
 export function theatreOptions(sport, clubLayer) {
   if (clubLayer) {
@@ -397,8 +417,7 @@ export const SEASON_NOTES = Object.freeze({
     + 'and the URC\'s European clubs, each on its own country\'s land. Nations field these clubs\' players (the URC\'s four '
     + 'South African sides among them) by their latest Test side, only where they hold at least half a matchday 23.',
   'rugby-league': 'Rugby League 26 ratings from Big Ant Studios, as Zero Tackle listed them at the game\'s release in '
-    + 'July 2025: the 2025 NRL season. Nations field NRL players only, by their 2025 Test side, else by birthplace, and only where they hold at '
-    + 'least half a matchday 17. No game rated 1960–2007 or 2009–2024: they are computed, each player\'s NRL.com match '
+    + 'July 2025: the 2025 NRL season. No game rated 1960–2007 or 2009–2024: they are computed, each player\'s NRL.com match '
     + 'stats (fewer before 2003), or before 1998 the Rugby League Project\'s record of who started, where and how often, '
     + 'his Test and state selections and his tries, ranked at his position onto Rugby League 26\'s ratings, each club then '
     + 'moved by its results that season. 2008 comes from Rugby League 2: World Cup Edition\'s database, every player checked '
@@ -628,6 +647,7 @@ export function sportNote(sport, { clubsOnly = false } = {}) {
  * Each sport card's note for its built-in season: `sportNote` of each sport, written out so the cards need no sport's
  * players but the chosen one's (every other sport's load only when it is played, sportData.js). A roster rebuild that
  * changes a club count fails npm test (scripts/sport-data.test.mjs) until this follows; the build scripts do not write it.
+ * Rugby's card is two sports' (`cardSports`), so its note names both, uncounted, as basketball's names its two leagues.
  */
 export const SPORT_NOTES = Object.freeze({
   football: 'Nations · 124 clubs from 17 leagues',
@@ -639,8 +659,7 @@ export const SPORT_NOTES = Object.freeze({
   hockey: 'Nations · 32 NHL clubs',
   tennis: 'Nations',
   'womens-tennis': 'Nations',
-  'rugby-union': 'Nations · 36 clubs from 3 leagues',
-  'rugby-league': 'Nations · 17 NRL clubs',
+  'rugby-union': 'Nations · European and NRL clubs',
   'rocket-league': 'Nations',
   'counter-strike': 'Nations',
   valorant: 'Nations',
@@ -766,7 +785,9 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const clubLayer = setup.layer === 'clubs' && !sport.nationsOnly;
   const noun = clubLayer ? 'club' : 'nation';
   const nouns = `${noun}s`;
-  const scopes = pending ? pendingTheatres(sport, clubLayer, setup.clubScope) : theatreOptions(sport, clubLayer);
+  const ownScopes = pending ? pendingTheatres(sport, clubLayer, setup.clubScope) : theatreOptions(sport, clubLayer);
+  // Rugby's clubs list union's European clubs and rugby league's NRL, whichever of the two is set up.
+  const scopes = clubLayer ? cardTheatres(sport, ownScopes) : ownScopes;
   // One country's own top clubs: football clubs only, listed after the leagues.
   const domesticOn = domesticOffered(sport, clubLayer, dataSet);
   const domesticScopes = domesticOn ? domesticTheatres(dataSet) : NO_ROWS;
@@ -864,12 +885,14 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   return {
     sport: { id: sport.id, name: sport.name },
     // The chosen set's card counts its own clubs.
-    sports: SPORT_LIST.map(item => ({ id: item.id, name: item.name,
-      note: item.id !== sport.id ? SPORT_NOTES[item.id] : pending ? sportNote(NO_CLUBS)
+    // One card per sport, but Rugby's two (`cardOf`): its note names both, whichever is set up.
+    sports: CARD_LIST.map(item => ({ id: item.id, name: item.name,
+      note: item.id !== sport.id || cardSports(item.id).length > 1 ? SPORT_NOTES[item.id] : pending ? sportNote(NO_CLUBS)
         : sportNote(sport, { clubsOnly: dataSet != null && !setHasNations(dataSet) }),
-      selected: item.id === sportPick.id, busy: !!sportLoad && !sportFailed && item.id === sportPick.id })),
-    // The sport the cards show as picked, and the wait for one picked before its players loaded (null for none).
-    sportPick: sportPick.id,
+      selected: item.id === cardOf(sportPick.id), busy: !!sportLoad && !sportFailed && item.id === cardOf(sportPick.id) })),
+    // The card the cards show as picked (rugby league's is Rugby's), and the wait for a sport picked before its players
+    // loaded (null for none).
+    sportPick: cardOf(sportPick.id),
     sportLoad: sportLoad ? { id: sportPick.id, name: sportPick.name, state: sportFailed ? 'error' : 'loading', note: sportWait } : null,
     season: {
       id: dataSet, options: seasonRows, state: seasonState, note: SEASON_NOTES[sportId] || '', loading: setLoading,
@@ -879,8 +902,9 @@ export function buildSetupModel(setup = {}, ctx = {}) {
       credit: chosenSeason?.credit || '',
     },
     layer: clubLayer ? 'clubs' : 'nations', clubLayer, noun, nouns,
-    // A sport with clubs only names its league ('NFL'): the Nations choice is off.
-    clubsOnly: sport.clubsOnly ? sport.clubLeague ?? [...new Set(sport.clubs.map(club => club.league))].join(' and ') : null,
+    // A sport with clubs only names its league ('NFL'): the Nations choice is off. Rugby league's is on: Rugby's nations
+    // are union's (App's `cardPick`).
+    clubsOnly: sport.clubsOnly && !sport.card ? sport.clubLeague ?? [...new Set(sport.clubs.map(club => club.league))].join(' and ') : null,
     clubsNoun: sport.clubNoun ?? 'clubs',
     // A sport with nations only (tennis) has no clubs: the Clubs choice is off.
     nationsOnly: !!sport.nationsOnly,

@@ -8,6 +8,16 @@ Rugby"**: a new 15-a-side sport card, "Rugby", with a Six Nations theatre and th
 clubs, ratings computed from real match statistics, while the NRL sport stays as it was, named "Rugby league". Sport id
 `rugby-union`; it sits before rugby league in the sport list.
 
+**One Rugby card (2026-11-19).** Shipped that way, the user asked "why did you separate rugby and rugby league???" and
+chose **"One Rugby card"**: one card, Rugby, whose nations play union (the Six Nations among them) and whose clubs offer
+two maps, Europe's clubs playing union and the NRL playing rugby league's own rules, as basketball's NBA and EuroLeague
+each keep theirs. Rugby league's NRL seasons back to 1960 stay. Its nations are no longer set up, since a second
+"Australia" under other rules would confuse; the campaigns saved with them still play, and a setup made from one (a
+retry's, Another team's) opens on the NRL (`offeredSetup`, src/app/shared.js). The codes stay two sports underneath, as
+their lineups, positions, match models and seasons differ: rugby league is named "Rugby" too, clubs only
+(`clubsOnly`), and shown on union's card (`card: 'rugby-union'`; `cardOf`, `cardSports` and `CARD_LIST` in
+src/sports/index.js). Sport ids, saves and challenge links are unchanged (`?sport=rugby-league` opens the NRL).
+
 Everything outside the match (territory, the draw, targeting, conquest, signings, saves) is the game's own, unchanged.
 
 **No game rates union players.** Big Ant's Rugby 25 keeps its ratings in the game and no site publishes them (the 2026-11-01
@@ -190,15 +200,19 @@ kicks (`RUGBY_CODES`). At kick-off the chart is within two points of the fixture
 
 ## Interface
 
-- **Setup.** A sport card, "Rugby", "Nations · 36 clubs from 3 leagues", before "Rugby league". Its season is 2025/26 and
-  its note says where the ratings come from. Nations offer the world, Europe and the **Six Nations** (a SCOPES entry of
-  rugby union alone, `six-nations`, framed on Europe like EuroBasket); clubs offer the European clubs' map.
+- **Setup.** One sport card, "Rugby", "Nations · European and NRL clubs" (`SPORT_NOTES`: two sports', so uncounted, as
+  basketball's names its two leagues). Its season is 2025/26 and its note says where the ratings come from. Nations offer
+  the world, Europe, the **Six Nations** (a SCOPES entry of rugby union alone, `six-nations`, framed on Europe like
+  EuroBasket) and Asia & Oceania. Clubs list **European clubs**, union's map, then the **NRL**, rugby league's
+  (`cardTheatres` in src/screens/setup/setupModel.js). Choosing the NRL sets up rugby league, its players loading first
+  while the card stays picked; Nations or European clubs from the NRL set up union again (App's `cardPick`). The Season
+  choice lists the chosen code's seasons: union's 2025/26, or the NRL's 2025 back to 1960.
 - **Squad.** The field, rugby league's: the pack up front attacking the try line at the top, the halves, the centres and wings
   across it, the fullback at the back, the eight replacements along the foot in their numbers' order. Groups read Front row,
   Second row, Back row, Halves, Centres and Back three; the profile Backs, Halves and Forwards.
 - **Feed.** "TRY — Louis Bielle-Biarrey (FRA)", "PENALTY GOAL — Thomas Ramos (FRA)", "DROP GOAL — …"; a conversion is the
   try's. The scorers' line: "Bielle-Biarrey 2 tries · Ramos 2 PG, 1 DG".
-- **Icon.** A rugby ball with its seam and laces (rugby league keeps the posts).
+- **Icon.** A rugby ball with its seam and laces, the card's (rugby league keeps its posts icon, which no card shows now).
 
 ## The map
 

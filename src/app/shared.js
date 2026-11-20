@@ -120,6 +120,17 @@ export function setClubScope(setup) {
   return map ? domesticScope(map.id) : era ? domesticScope(era) : theatre === 'elite' ? 'elite' : 'all';
 }
 
+/**
+ * A setup as its sport sets one up now: a sport with clubs only plays clubs, on its map. Rugby league's nations, which
+ * Rugby's card no longer offers (its nations are union's), still play the campaigns saved with them, and a setup made
+ * from one (a retry's, Another team's) opens on the NRL. Any other setup is returned as it is.
+ */
+export function offeredSetup(setup) {
+  if (!getSport(setup?.sport).clubsOnly || setup.layer === 'clubs') return setup;
+  const clubs = { ...setup, layer: 'clubs', managedTeamId: '' };
+  return { ...clubs, clubScope: setClubScope(clubs) };
+}
+
 /** A rating delta as an explicitly signed string, plus the colour to show it in. */
 export function signed(delta) {
   const rounded = Math.round(delta * 10) / 10;

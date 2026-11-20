@@ -12,7 +12,9 @@ import { CLUBS, SOURCE } from '../src/data/clubs.rugby-league.js';
 import { ROSTERS } from '../src/data/rosters.rugby-league.js';
 import { buildClub, buildTeam, makeRng, outOfPositionPenalty, RUGBY_CROSSING_PENALTY, RUGBY_NEAR_PENALTY, selectLineup, teamEff,
   teamSportId } from '../src/data/teams.js';
-import { clockLabel, clockTick, getSport, matchSport, overtimeEnd, overtimePeriodsOf, overtimeShort, overtimeText, SPORT_LIST } from '../src/sports/index.js';
+import { CARD_LIST, cardOf, clockLabel, clockTick, getSport, matchSport, overtimeEnd, overtimePeriodsOf, overtimeShort, overtimeText, SPORT_LIST }
+  from '../src/sports/index.js';
+import { offeredSetup } from '../src/app/shared.js';
 import { BASELINE, deciderOdds, goldenRate, marginPerStrength, onField, POINTS, rugbyLeagueIn, rugbyLeagueProfile, rugbyLeagueStrength,
   rugbyLeagueWith, RULES_TODAY, rulesIn, rulesOf, SLICE_MODEL, sliceMeans } from '../src/sports/rugbyLeague.js';
 import { NRL_LEAGUE_AVERAGES } from '../src/data/nrlLeagueAverages.js';
@@ -299,7 +301,8 @@ test('each season plays its own day\'s points, scoring and extra time; the built
   const sixties = matchSport(seasonSettings('nrl-1965'));
   assert.notEqual(sixties, sport);
   assert.equal(sixties, matchSport(seasonSettings('nrl-1965')), 'one rules object a season');
-  assert.deepEqual([sixties.id, sixties.simulationVersion, sixties.tieBreak, sixties.name], ['rugby-league', 2, 'overtime', 'Rugby league']);
+  assert.deepEqual([sixties.id, sixties.simulationVersion, sixties.tieBreak, sixties.name, sixties.card], ['rugby-league', 2, 'overtime', 'Rugby',
+    'rugby-union']);
   assert.deepEqual(sixties.rules, { ...RULES_TODAY, tryPoints: 3, fieldGoalPoints: 2, golden: false, season: 'nrl-1965',
     ...NRL_LEAGUE_AVERAGES['nrl-1965'].scoring });
   assert.deepEqual(sixties.scoreValues, { try: 3, penalty: 2, field: 2 });
@@ -533,18 +536,31 @@ test('seeded duel campaigns on the NRL map reach a champion, across the Tasman t
 
 // ---------- setup and the squad screen ----------
 
-test('setup lists rugby league with nations and the NRL clubs, on its built-in 2025 season', () => {
+test('setup offers rugby league on Rugby\'s card: the NRL\'s clubs beside union\'s European clubs, on its built-in 2025 season', () => {
   assert.equal(SPORT_LIST[9].id, 'rugby-union', 'rugby union, "Rugby", first of the two codes');
   assert.equal(SPORT_LIST[10].id, 'rugby-league', 'the last of the sports, before the esports');
   assert.equal(SPORT_LIST[11].id, 'rocket-league', 'the first esport');
-  assert.equal(sportNote(sport), 'Nations · 17 NRL clubs');
+  // One card, Rugby's: rugby league's clubs only, its nations union's.
+  assert.deepEqual([sport.name, sport.card, sport.clubsOnly, cardOf(sport.id)], ['Rugby', 'rugby-union', true, 'rugby-union']);
+  assert.ok(!CARD_LIST.includes(sport), 'no card of its own');
+  assert.equal(sportNote(sport), '17 NRL clubs');
   const clubs = buildSetupModel({ sport: 'rugby-league', layer: 'clubs', clubScope: 'domestic:nrl' }, {});
-  assert.equal(clubs.clubsOnly, null);
-  assert.deepEqual(clubs.scopes.map(scope => [scope.id, scope.label, scope.count]), [['domestic:nrl', 'NRL', 17]]);
+  assert.equal(clubs.clubsOnly, null, 'Nations stays on: union\'s');
+  assert.equal(clubs.sportPick, 'rugby-union');
+  assert.deepEqual(clubs.sports.filter(card => card.selected).map(card => [card.id, card.name, card.note]),
+    [['rugby-union', 'Rugby', 'Nations · European and NRL clubs']]);
+  assert.ok(!clubs.sports.some(card => card.id === 'rugby-league'));
+  assert.deepEqual(clubs.scopes.map(scope => [scope.id, scope.label, scope.count]), [['domestic:rugbyeurope', 'European clubs', 36], ['domestic:nrl', 'NRL', 17]]);
+  assert.equal(clubs.scopeId, 'domestic:nrl');
   assert.equal(clubs.scopeName, 'NRL · Australia and New Zealand');
+  assert.equal(clubs.campaignSummary, 'Rugby · Clubs · NRL · Australia and New Zealand');
   assert.deepEqual(clubs.season.options.map(option => option.name), ['2025']);
   assert.match(clubs.season.note, /Rugby League 26/);
-  assert.equal(buildSetupModel({ sport: 'rugby-league', layer: 'nations', scope: 'world' }, {}).layer, 'nations');
+  // A setup of its nations (from a campaign saved with them) opens on the NRL.
+  assert.deepEqual(offeredSetup({ sport: 'rugby-league', layer: 'nations', scope: 'AFC', clubScope: 'all', managedTeamId: '036' }),
+    { sport: 'rugby-league', layer: 'clubs', scope: 'AFC', clubScope: 'domestic:nrl', managedTeamId: '' });
+  const union = { sport: 'rugby-union', layer: 'nations', scope: 'six-nations' };
+  assert.equal(offeredSetup(union), union, 'any other setup as it is');
 });
 
 test('the squad screen draws the field and its bench, and profiles the backs, halves and forwards', () => {
@@ -604,7 +620,7 @@ const B = await bundleComponents({
 }, { jsx: 'automatic' });
 const settle = () => new Promise(resolve => setImmediate(resolve));
 
-test('rugby league sets up with clubs on the NRL map or with nations, launches and saves', async () => {
+test('rugby league sets up its NRL clubs on Rugby\'s card, launches and saves; union\'s map and Nations switch to union', async () => {
   const calls = [];
   const prior = Object.getOwnPropertyDescriptor(globalThis, 'fetch');
   Object.defineProperty(globalThis, 'fetch', { configurable: true, writable: true, value: async url => {
@@ -619,7 +635,7 @@ test('rugby league sets up with clubs on the NRL map or with nations, launches a
   try {
     const { app, time } = f;
     app.pickSetup('sport', 'rugby-league');
-    assert.equal(app.state.setup.layer, 'nations', 'rugby league has nations');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:nrl'], "clubs only, on the NRL's one map");
     app.pickSetup('layer', 'clubs');
     assert.equal(app.state.setup.clubScope, 'domestic:nrl', "the NRL's one theatre");
     time.advance(200);
@@ -632,7 +648,7 @@ test('rugby league sets up with clubs on the NRL map or with nations, launches a
     const { state } = app;
     assert.equal(state.phase, 'playing');
     assert.equal(state.aliveIds.length, 17);
-    assert.equal(state.campaignName, 'Rugby league · NRL · Australia and New Zealand');
+    assert.equal(state.campaignName, 'Rugby · NRL · Australia and New Zealand');
     assert.ok(Object.values(state.teams).every(team => team.sport === 'rugby-league' && state.own[team.home] === team.id));
     assert.equal(app.territoryName(state.teams['nrl-new-zealand-warriors'].home), 'Auckland');
     const saved = parseCampaign(exportCampaign(state));
@@ -642,6 +658,20 @@ test('rugby league sets up with clubs on the NRL map or with nations, launches a
       'a save keeps who kicks the goals');
 
     app.openSetup();
+    const chosen = () => [app.state.setup.sport, app.state.setup.layer, app.state.setup.clubScope];
+    // Rugby's card: union's European clubs are union's, Nations too (rugby league's nations are no longer set up).
+    app.pickSetup('clubScope', 'domestic:rugbyeurope');
+    assert.deepEqual(chosen(), ['rugby-union', 'clubs', 'domestic:rugbyeurope']);
+    app.pickSetup('clubScope', 'domestic:nrl');
+    assert.deepEqual(chosen(), ['rugby-league', 'clubs', 'domestic:nrl']);
+    app.pickSetup('layer', 'nations');
+    assert.deepEqual(chosen().slice(0, 2), ['rugby-union', 'nations']);
+    app.pickSetup('layer', 'clubs');
+    assert.deepEqual(chosen(), ['rugby-union', 'clubs', 'domestic:rugbyeurope']);
+    // A campaign of rugby league's nations, saved before, leads back to a setup of the NRL's clubs.
+    app.setState({ setup: { ...app.state.setup, sport: 'rugby-league', layer: 'nations', scope: 'AFC', managedTeamId: '036' } });
+    app.openSetup();
+    assert.deepEqual([...chosen(), app.state.setup.managedTeamId], ['rugby-league', 'clubs', 'domestic:nrl', '']);
     app.pickSetup('sport', 'football');
     assert.equal(app.state.setup.clubScope, 'domestic:eu124', "the NRL's map is no football theatre");
   } finally {

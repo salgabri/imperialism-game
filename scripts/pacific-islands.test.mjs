@@ -69,7 +69,8 @@ test('they are OFC nations with a capital, a flag and a colour, drawn from the 5
 test('each sport fields them only with a real side: both rugby codes Tonga and Samoa, nobody else', () => {
   // A nation fields a team only when its own rated players hold half the lineup (fieldedNations): nobody rates the
   // islanders in football, basketball, baseball, hockey or tennis.
-  const fields = Object.fromEntries(SPORT_LIST.filter(sport => !sport.clubsOnly)
+  // Rugby league's nations are no longer set up (Rugby's card offers union's) but still play the campaigns saved with them.
+  const fields = Object.fromEntries(SPORT_LIST.filter(sport => !sport.clubsOnly || sport.id === 'rugby-league')
     .map(sport => [sport.id, PACIFIC_ISLANDS.filter(id => fieldedNations(sport).includes(id))]));
   assert.deepEqual(fields, { football: [], 'womens-football': [], basketball: [], baseball: [], hockey: [], tennis: [],
     'womens-tennis': [], 'rugby-union': ['776', '882'], 'rugby-league': ['776', '882'], 'rocket-league': [], 'counter-strike': [], valorant: [],

@@ -14,7 +14,7 @@ import { domesticEntry, domesticLabel, hasTheatreMaps, isCountryScope } from './
 import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
   loadFootballSetIndex, retainFootballSets, seasonSport, setHasClubs, setHasLayer, setSportOf, sportOf } from './engine/footballSets.js';
 import { FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
-import { getSport, matchSport } from './sports/index.js';
+import { cardOf, getSport, matchSport } from './sports/index.js';
 import { loadSportData, sportDataLoaded } from './sports/sportData.js';
 import { drawBlitzPairs, drawChaosPairs, empireNeighbors, seedClubs } from './engine/campaign.js';
 import { clearSave, writeSave, parseCampaign, exportCampaign, inspectSave, listCampaigns, deleteCampaign,
@@ -38,7 +38,7 @@ import { politicalFill } from './data/empireColours.js';
 import { flagUrl } from './data/flags.js';
 import { crestUrl } from './data/crests.js';
 import { SeasonYear } from './components/seasonYear.js';
-import { DEFAULT_SETUP, LOG_CAP, dataSetOf, domesticIdOf, mapYearOf, seasonForLayer, setClubScope } from './app/shared.js';
+import { DEFAULT_SETUP, LOG_CAP, dataSetOf, domesticIdOf, mapYearOf, offeredSetup, seasonForLayer, setClubScope } from './app/shared.js';
 import * as mapM from './app/mapMethods.jsx';
 import * as colM from './app/columnMethods.jsx';
 import * as matchM from './app/matchMethods.jsx';
@@ -1008,15 +1008,34 @@ export default class App extends React.Component {
       && last.rngState === this.turnFrom && last.rngState !== (this.rng?.getState?.() ?? this.state.rngState);
   }
 
-  pickSetup(key, value) {
-    if (key === 'sport' && !this.pickSport(getSport(value).id)) return;
+  /**
+   * A choice on Rugby's card that is the other sport's (src/sports/index.js `cardOf`): the NRL's map while union is set
+   * up, union's European clubs while rugby league is, or Nations from rugby league, whose nations are union's. It changes
+   * sport, with that choice: { sport, then }. Null for any other choice.
+   */
+  cardPick(key, value) {
+    const sport = getSport(this.state.setup.sport);
+    if (key === 'layer' && value === 'nations' && sport.clubsOnly && sport.card) return { sport: sport.card, then: { layer: 'nations' } };
+    const owner = key === 'clubScope' ? domesticEntry(value)?.sport : null;
+    return owner && owner !== sport.id && getSport(owner).id === owner && cardOf(owner) === cardOf(sport.id)
+      ? { sport: owner, then: { layer: 'clubs', clubScope: value } } : null;
+  }
+
+  /**
+   * A setup choice: `key` set to `value`. A sport's (`key` 'sport') may bring others with it (`then`: Rugby's card
+   * changing sport for a theatre or Teams choice, `cardPick`), set once its players are here.
+   */
+  pickSetup(key, value, then = null) {
+    const card = this.cardPick(key, value);
+    if (card) return this.pickSetup('sport', card.sport, card.then);
+    if (key === 'sport' && !this.pickSport(getSport(value).id, then)) return;
     this.setState(state => {
       // The Season choice lists the seasons that field the teams chosen (nations or clubs), so a season never changes
       // them: one without them is not on offer.
       const sportBefore = getSport(state.setup.sport);
       const layerBefore = sportBefore.clubsOnly ? 'clubs' : sportBefore.nationsOnly ? 'nations' : state.setup.layer;
       if (key === 'dataSet' && value != null && setSportOf(value) === sportBefore.id && !setHasLayer(value, layerBefore)) return null;
-      const setup = { ...state.setup, [key]: value };
+      const setup = { ...state.setup, [key]: value, ...(key === 'sport' ? then : null) };
       // A Teams switch undone straight away gets back the season it replaced; choosing a season or a sport forgets it.
       let seasonSwap = key === 'dataSet' || key === 'sport' ? null : state.seasonSwap;
       const domestic = isDomesticScope(setup.clubScope), country = isCountryScope(setup.clubScope);
@@ -1076,7 +1095,7 @@ export default class App extends React.Component {
    * its steps and Launch. A pick made while another loads waits SETUP_LOAD_DELAY_MS first, so arrow keys stepping
    * through the cards load only the sport the player stays on.
    */
-  pickSport(id) {
+  pickSport(id, then = null) {
     const token = ++this.sportToken, waiting = this.state.sportLoad.id != null;
     clearTimeout(this.sportLoadTimer);
     if (sportDataLoaded(id)) {
@@ -1086,7 +1105,7 @@ export default class App extends React.Component {
     this.setState({ sportLoad: { id, state: 'loading', message: null } });
     const current = () => token === this.sportToken && this.state.phase === 'setup';
     // Here, the pick applies as any pick of a loaded sport does, which also ends the wait.
-    const load = () => loadSportData(id).then(() => { if (current()) this.pickSetup('sport', id); }, error => {
+    const load = () => loadSportData(id).then(() => { if (current()) this.pickSetup('sport', id, then); }, error => {
       if (current()) this.setState({ sportLoad: { id, state: 'error', message: `${getSport(id).name} could not be loaded. ${error?.message || error}` } });
     });
     if (waiting) this.sportLoadTimer = setTimeout(() => { if (current()) load(); }, SETUP_LOAD_DELAY_MS);
@@ -1763,10 +1782,13 @@ export default class App extends React.Component {
     this.openingSeed = Date.now() >>> 0;
     this.challengeTeam = null;
     this.setupTeamsCache = null;
-    this.showSetupMap(this.state.setup, true);
+    // A setup of teams no longer set up (rugby league's nations, from a campaign saved with them) opens on its sport's.
+    const setup = offeredSetup(this.state.setup);
+    this.showSetupMap(setup, true);
     this.showSetupSet();
     this.setState({
       phase: 'setup',
+      ...(setup !== this.state.setup ? { setup } : {}),
       setupStep: step,
       setupSuggest: suggest !== false,
       seasonSwap: null,

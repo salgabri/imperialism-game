@@ -13,7 +13,8 @@ import { challengeQuery, readChallenge } from '../src/screens/setup/challenge.js
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
 const ids = sport => nationTheatres(sport).map(scope => scope.id);
-const NATION_SPORTS = SPORT_LIST.filter(sport => !sport.clubsOnly);
+// Rugby league's nations are no longer set up (Rugby's card offers union's) but still play the campaigns saved with them.
+const NATION_SPORTS = SPORT_LIST.filter(sport => !sport.clubsOnly || sport.id === 'rugby-league');
 const inScope = (scope, id) => scope.filter({ id, conf: NATIONS[id][2] });
 // A competition of one sport (basketball's EuroBasket) is a theatre of that sport alone.
 const playedIn = (scope, sport) => !scope.sports || scope.sports.includes(sport.id);
@@ -75,11 +76,11 @@ test('a theatre the sport lacks gives way to its heartland, the continent with t
 });
 
 test('setup lists only the offered theatres, and a choice the sport lacks shows as its heartland until it is offered again', () => {
-  const setup = { sport: 'rugby-league', layer: 'nations', scope: 'CAF' };
-  const rugby = buildSetupModel(setup, {});
-  assert.deepEqual(rugby.scopes.map(scope => scope.id), ['world', 'AFC']);
-  assert.equal(rugby.scopeId, 'AFC');
-  assert.match(rugby.campaignSummary, /Rugby league · Nations · Asia & Oceania/);
+  const setup = { sport: 'hockey', layer: 'nations', scope: 'CAF' };
+  const hockey = buildSetupModel(setup, {});
+  assert.deepEqual(hockey.scopes.map(scope => scope.id), ['world', 'UEFA']);
+  assert.equal(hockey.scopeId, 'UEFA');
+  assert.match(hockey.campaignSummary, /Ice hockey · Nations · Europe/);
   const football = buildSetupModel({ ...setup, sport: 'football' }, {});
   assert.equal(football.scopeId, 'CAF', 'football offers Africa, so the choice comes back');
 });
@@ -101,11 +102,14 @@ test('a season decides its theatres once it has loaded: women\'s FIFA 16 has no 
 });
 
 test('a challenge link names only a theatre the sport offers, and writes the one it plays', () => {
-  const africa = readChallenge('?sport=rugby-league&theatre=CAF');
+  const africa = readChallenge('?sport=baseball&theatre=CAF');
   assert.deepEqual(africa.ignored, ['theatre']);
-  assert.equal(buildSetupModel(africa.setup, {}).scopeId, 'AFC');
-  assert.deepEqual(readChallenge('?sport=rugby-league&theatre=AFC').ignored, []);
-  assert.match(challengeQuery({ sport: 'rugby-league', layer: 'nations', scope: 'CAF' }, 3), /theatre=AFC/);
+  assert.equal(buildSetupModel(africa.setup, {}).scopeId, 'CONCACAF');
+  assert.deepEqual(readChallenge('?sport=baseball&theatre=CONCACAF').ignored, []);
+  assert.match(challengeQuery({ sport: 'baseball', layer: 'nations', scope: 'CAF' }, 3), /theatre=CONCACAF/);
+  // Rugby league's nations are no longer set up: its link plays the NRL's clubs, and a nation theatre is not one of theirs.
+  const league = readChallenge('?sport=rugby-league&theatre=AFC');
+  assert.deepEqual([league.ignored, league.setup.layer, buildSetupModel(league.setup, {}).scopeId], [['theatre'], 'clubs', 'domestic:nrl']);
   // A season's nations are known once it loads: its link keeps the theatre, and setup falls back then.
   assert.deepEqual(readChallenge('?sport=womens-football&season=eaw-fifa-16&theatre=CAF').ignored, []);
 });

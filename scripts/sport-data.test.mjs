@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import React from 'react';
 import { build } from 'esbuild';
 import { JSDOM } from 'jsdom';
-import { SPORT_LIST, getSport } from '../src/sports/index.js';
+import { CARD_LIST, SPORT_LIST, cardSports, getSport } from '../src/sports/index.js';
 import { EAGER, LOADERS } from '../src/sports/sportData.eager.js';
 import * as lazy from '../src/sports/sportData.lazy.js';
 import { SPORT_NOTES, sportNote } from '../src/screens/setup/setupModel.js';
@@ -41,9 +41,11 @@ test('Node has every sport\'s players at once; the page has football\'s and a lo
   }
 });
 
-test('the sport cards say what each sport holds without its players: SPORT_NOTES is each sport\'s sportNote', () => {
-  assert.deepEqual(Object.keys(SPORT_NOTES).sort(), [...IDS].sort());
-  for (const sport of SPORT_LIST) {
+test('the sport cards say what each sport holds without its players: SPORT_NOTES is each card\'s sportNote', () => {
+  assert.deepEqual(Object.keys(SPORT_NOTES).sort(), CARD_LIST.map(sport => sport.id).sort());
+  for (const sport of CARD_LIST) {
+    // Rugby's card is two sports': its note names both (scripts/rugby-union.test.mjs).
+    if (cardSports(sport.id).length > 1) continue;
     assert.equal(SPORT_NOTES[sport.id], sportNote(sport), `${sport.id}'s clubs changed: SPORT_NOTES must follow sportNote`);
   }
 });
@@ -320,7 +322,7 @@ test('a first visit sets up football without any other sport\'s players, and eve
   try {
     await setUp(view);
     assert.deepEqual(view.control.requested(), [], 'no other sport\'s players are asked for');
-    for (const sport of SPORT_LIST) {
+    for (const sport of CARD_LIST) {
       assert.equal(view.document.getElementById(`setup-sport-${sport.id}-note`).textContent, SPORT_NOTES[sport.id], sport.id);
     }
     assert.equal(view.card('football').getAttribute('aria-checked'), 'true');
@@ -414,6 +416,38 @@ test('a sport whose players will not load says so, offers Retry and Reload, and 
     await until(() => view.control.requested().length === 2, 'Retry asks again');
     view.control.release('hockey');
     await until(() => view.app.state.setup.sport === 'hockey' && !view.document.querySelector('.setup-sport__error'), 'hockey is set up');
+  } finally { await view.close(); }
+});
+
+test('Rugby is one card: the NRL\'s map loads rugby league\'s players and sets it up, the card staying picked, and Nations is union\'s', async () => {
+  const view = await openPage();
+  try {
+    await setUp(view);
+    const layer = name => [...view.document.querySelectorAll('.setup-segmented button')].find(button => button.textContent === name);
+    const theatre = () => view.document.getElementById('setup-theatre');
+    view.card('rugby-union').click();
+    await until(() => view.control.requested().length === 1, 'union is asked for');
+    view.control.release('rugby-union');
+    await until(() => view.app.state.setup.sport === 'rugby-union' && !view.next().disabled, 'union is set up');
+    assert.equal(view.card('rugby-league'), null, 'rugby league has no card of its own');
+    layer('Clubs').click();
+    await until(() => view.app.state.setup.layer === 'clubs', 'Clubs');
+    assert.deepEqual([...theatre().options].map(option => option.value), ['domestic:rugbyeurope', 'domestic:nrl']);
+    theatre().value = 'domestic:nrl';
+    theatre().dispatchEvent(new view.window.Event('change', { bubbles: true }));
+    await until(() => view.control.requested().includes('rugby-league'), 'rugby league is asked for');
+    assert.equal(view.card('rugby-union').getAttribute('aria-checked'), 'true', 'Rugby stays picked');
+    assert.equal(view.card('rugby-union').getAttribute('aria-busy'), 'true');
+    assert.equal(view.app.state.setup.sport, 'rugby-union', 'setup keeps union until the NRL\'s players are here');
+    view.control.release('rugby-league');
+    await until(() => view.app.state.setup.sport === 'rugby-league', 'rugby league is set up');
+    assert.deepEqual([view.app.state.setup.layer, view.app.state.setup.clubScope], ['clubs', 'domestic:nrl']);
+    await until(() => !view.card('rugby-union').hasAttribute('aria-busy'), 'the wait is over');
+    assert.equal(view.card('rugby-union').getAttribute('aria-checked'), 'true');
+    assert.equal(layer('Nations').disabled, false, 'Nations stays on: union\'s');
+    layer('Nations').click();
+    await until(() => view.app.state.setup.sport === 'rugby-union' && view.app.state.setup.layer === 'nations', 'union\'s nations');
+    assert.deepEqual(view.control.requested(), ['rugby-union', 'rugby-league'], 'union\'s players were here already');
   } finally { await view.close(); }
 });
 

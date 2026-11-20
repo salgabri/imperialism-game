@@ -16,7 +16,7 @@ import { domesticEntry, domesticLabel } from '../src/data/domesticScope.js';
 import { domesticIdOf, mapYearOf } from '../src/app/shared.js';
 // Same module instance as the bundled App, so clearing it really empties the app's cache.
 import { clearDomesticCache, decodeDomestic, domesticScope, domesticScopeId } from '../src/engine/domestic.js';
-import { getSport } from '../src/sports/index.js';
+import { cardOf, getSport } from '../src/sports/index.js';
 import { fieldedNations, sportOf } from '../src/engine/footballSets.js';
 import { EMPIRE_PASTELS } from '../src/theme.js';
 import { politicalFill } from '../src/data/empireColours.js';
@@ -1049,7 +1049,8 @@ async function launch(mounted, { sport = 'football', layer = 'nations', scope = 
   await setState(mounted.app, { mapMode: 'flags' });
   const setupFlags = expectedFlagsShown(mounted.app);
   await setState(mounted.app, { mapMode: 'political' });
-  button(getSport(sport).name).click();
+  // Rugby league's NRL is chosen on Rugby's card, union's (`cardOf`), by its map below.
+  button(getSport(cardOf(sport)).name).click();
   await sleep(20);
   button(layer === 'clubs' ? 'Clubs' : 'Nations').click();
   await sleep(20);

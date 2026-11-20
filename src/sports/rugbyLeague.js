@@ -393,7 +393,12 @@ const WORDS = Object.freeze({ kickoff: 'Kick-off', end: 'Full time', lineup: 'Ma
 const rugbyLeagueRules = {
   id: 'rugby-league',
   simulationVersion: 1,
-  name: 'Rugby league',
+  // One sport card, Rugby (src/sports/index.js `cardOf`): its clubs are the NRL's, beside union's European clubs, and
+  // play league's own rules, as basketball's NBA and EuroLeague each play theirs. Union's are Rugby's nations, so a new
+  // setup fields rugby league's clubs only; its nations still play the campaigns saved with them.
+  name: 'Rugby',
+  card: 'rugby-union',
+  clubsOnly: true,
   blurb: 'Thirteen a side and four on the bench, eighty minutes. Tries, goals and field goals — level games go to golden point.',
   // Read from the sport's players (sportData.js), once they have loaded.
   rosters: undefined,

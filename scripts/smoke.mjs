@@ -35,7 +35,8 @@ const FBS = { sport: 'college-football', layer: 'clubs', clubScope: 'domestic:cf
 const MLB = { sport: 'baseball', layer: 'clubs', clubScope: 'domestic:mlb' };
 // Ice hockey clubs: the 32 NHL clubs on their own map of the USA and Canada.
 const NHL = { sport: 'hockey', layer: 'clubs', clubScope: 'domestic:nhl' };
-// Rugby league clubs: the 17 NRL clubs on their own map of Australia and New Zealand.
+// Rugby league clubs: the 17 NRL clubs on their own map of Australia and New Zealand, chosen on Rugby's card beside union's
+// European clubs.
 const NRL = { sport: 'rugby-league', layer: 'clubs', clubScope: 'domestic:nrl' };
 // Football clubs: Europe's strongest, each on land in its own country.
 const TOP = { layer: 'clubs', clubScope: 'domestic:eu124' };
@@ -67,7 +68,8 @@ const SCENARIOS = [
   { name: 'TENNIS · Europe · duel · ticker', sport: 'tennis', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
   { name: "WOMEN'S TENNIS · World · blitz · instant", sport: 'womens-tennis', scope: 'world', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · NRL · duel · ticker', ...NRL, pacing: 'duel', resolution: 'ticker' },
-  { name: 'RUGBY LEAGUE · Asia & Oceania · blitz · instant', sport: 'rugby-league', scope: 'AFC', pacing: 'blitz', resolution: 'instant' },
+  // Rugby's nations are union's: rugby league's are no longer set up.
+  { name: 'RUGBY · Asia & Oceania · blitz · instant', sport: 'rugby-union', scope: 'AFC', pacing: 'blitz', resolution: 'instant' },
   { name: 'ROCKET LEAGUE · Europe · duel · ticker', sport: 'rocket-league', scope: 'UEFA', pacing: 'duel', resolution: 'ticker' },
   { name: 'COUNTER-STRIKE · World · blitz · instant', sport: 'counter-strike', scope: 'world', pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · FBS · duel · ticker', ...FBS, pacing: 'duel', resolution: 'ticker' },
@@ -109,7 +111,7 @@ const MANAGER_SCENARIOS = [
 // The country scenarios come next to last, so they are `--campaign-only=7` (England duel, with the setup checks), `=8`
 // (England blitz), `=9` (Fiji duel) and `--resume-only=4` (England), `=5` (Fiji); the NFL's are `=10` and `=6`, MLB's `=11` and `=7`,
 // baseball's nations `=12`, the NHL's `=13`, hockey's nations `=14`, the women's nations `=15` and clubs `=16`, tennis's Davis Cup nations
-// `=17`, the NRL's `=18` and rugby league's nations `=19` (counted before Europe's two club maps came in at `=5` and `=6`: add two
+// `=17`, the NRL's `=18` and rugby union's Asia & Oceania `=19` (counted before Europe's two club maps came in at `=5` and `=6`: add two
 // to each), Rocket League's nations `=25`, Counter-Strike's `=26`, college football's FBS schools `=27` and
 // `--resume-only=9`, Valorant's nations `=28`, League of Legends' `=29`, rugby union's Six Nations `=30` and its European clubs
 // the last, `=31`.
@@ -289,7 +291,7 @@ function checkMapScope(label, snapshot, options) {
  * Football clubs offer every shipped country, grouped apart from the leagues; women's football clubs Europe's two maps
  * and the NWSL's; basketball clubs the NBA's map and the EuroLeague's, American football (clubs only) the NFL's, college football
  * (its schools only) the FBS's, baseball clubs MLB's,
- * hockey clubs the NHL's and rugby league clubs the NRL's.
+ * hockey clubs the NHL's, and Rugby's clubs union's European clubs and rugby league's NRL, either set up.
  */
 function checkTheatres(scenario, theatre) {
   const countries = theatre.options.filter(option => option.value.startsWith('domestic:'));
@@ -309,14 +311,11 @@ function checkTheatres(scenario, theatre) {
       JSON.stringify(theatre.options));
     return;
   }
-  if (scenario.layer === 'clubs' && scenario.sport === 'rugby-league') {
-    check('rugby league clubs play only the NRL’s own map', JSON.stringify(theatre.options) === JSON.stringify([{ value: 'domestic:nrl', text: 'NRL · 17 clubs' }]),
-      JSON.stringify(theatre.options));
-    return;
-  }
-  if (scenario.layer === 'clubs' && scenario.sport === 'rugby-union') {
-    check('rugby clubs play only their European clubs’ map', JSON.stringify(theatre.options) === JSON.stringify([
-      { value: 'domestic:rugbyeurope', text: 'European clubs · 36 clubs' }]), JSON.stringify(theatre.options));
+  // One Rugby card: its clubs choose union's European clubs or rugby league's NRL (the list is drawn on union, the card's
+  // own, before the NRL's map is chosen).
+  if (scenario.layer === 'clubs' && (scenario.sport === 'rugby-league' || scenario.sport === 'rugby-union')) {
+    check('Rugby’s clubs play union’s European clubs or the NRL, each on its own map', JSON.stringify(theatre.options) === JSON.stringify([
+      { value: 'domestic:rugbyeurope', text: 'European clubs · 36 clubs' }, { value: 'domestic:nrl', text: 'NRL · 17 clubs' }]), JSON.stringify(theatre.options));
     return;
   }
   // Rugby union's nations: the world, Europe, the Six Nations, and Asia & Oceania, where Fiji, Samoa, Tonga and Australia
@@ -343,11 +342,6 @@ function checkTheatres(scenario, theatre) {
   }
   if (scenario.layer !== 'clubs' || (scenario.sport || 'football') !== 'football') {
     check('only football clubs offer single-country theatres', countries.length === 0, countries.map(option => option.text).join(', '));
-    // Nations play only where their sport is: rugby league's real sides are all in Asia & Oceania but England's.
-    if (scenario.layer !== 'clubs' && scenario.sport === 'rugby-league') {
-      check('rugby league nations offer only the world and Asia & Oceania', JSON.stringify(theatre.options.map(option => option.value))
-        === JSON.stringify(['world', 'AFC']), JSON.stringify(theatre.options));
-    }
     return;
   }
   const europe = theatre.groups.find(group => group.label === 'Europe');
@@ -710,8 +704,9 @@ if (!filtered && fixedChecks) {
     'league-of-legends': ['South Korea', 'China', 'United States'] };
 
   for (const sport of SPORT_LIST) {
-    // A sport with clubs only (American football) fields no nations: its clubs are checked below.
-    if (sport.clubsOnly) continue;
+    // A sport with clubs only (American football) fields no nations: its clubs are checked below. Rugby league's nations
+    // are no longer set up (Rugby's are union's) but still play the campaigns saved with them.
+    if (sport.clubsOnly && sport.id !== 'rugby-league') continue;
     console.log(`\n  Squad rosters — ${sport.name}`);
     try {
       const rng = makeRng(20260802);

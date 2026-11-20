@@ -5,6 +5,10 @@ own map, each holding its own state, territory or region
 ([domestic-campaigns.md](domestic-campaigns.md#the-nrl-map)), and the nations field the NRL's players of each country.
 Everything outside the match (territory, the draw, targeting, conquest, signings, saves) is the game's own, unchanged.
 
+**On Rugby's card (2026-11-19).** The user chose one Rugby card ([rugby-union.md](rugby-union.md)): the NRL is chosen on
+it, beside union's European clubs, and rugby league is named "Rugby", clubs only. Its nations (below) are no longer set
+up, as Rugby's nations are union's, but still play the campaigns saved with them; a setup made from one opens on the NRL.
+
 **Why rugby league and not union.** Asked for "rugby", the player chose league on 2026-11-08: no game or site publishes
 player ratings for rugby union (Big Ant's Rugby 25 keeps its own in the game), while Rugby League 26's are public for
 every NRL player. Nothing here is estimated or invented: every rating is the game's.
@@ -143,8 +147,9 @@ plays its own points, kicks and extra time ("Rules by era").
 
 ## Interface
 
-- **Setup.** A sport card, "Nations · 17 NRL clubs". Clubs have one theatre, **NRL · Australia and New Zealand**. The
-  note under Season names Rugby League 26 and the 2025 season, and how nations are picked.
+- **Setup.** Rugby's card (2026-11-19; until then a card of its own, "Nations · 17 NRL clubs"): Clubs list union's
+  European clubs, then **NRL · Australia and New Zealand**, which sets up rugby league, clubs only. The note under Season
+  names Rugby League 26 and the 2025 season.
 - **Squad.** The field: the half the side attacks, the posts at the top, the pack up front, the halves, centres and
   wings across it and the fullback at the back, and the interchange bench below halfway. Groups read Outside backs,
   Halves, Front row and Back row; the profile Backs, Halves and Forwards. A player's source reads "Rugby League 26".
@@ -870,8 +875,8 @@ recompute every value, overall and shift.
   O'Connor, Addo-Carr; a particle in lower case, "de", stays so).
 - **The premiership of the day** (2026-11-14), as the AFL's seasons of the 1960s name theirs: each season's clubs and its
   map name its competition, the manifest's `competition` (`leagueOf` in `scripts/lib/rugby-league-seasons.mjs`; the NRL
-  from 1998), so a 1962 setup reads "10 NSWRFL clubs" on the NSWRFL's theatre and its campaign "NSWRFL · Australia and
-  New Zealand · 1962"; the NSWRL from 1984, the ARL from 1995, and Super League for its 1997. The seasons from 1998 and
+  from 1998), so a 1962 setup lists the NSWRFL's theatre of ten clubs (its card read "10 NSWRFL clubs" until
+  the NRL moved onto Rugby's card) and its campaign "NSWRFL · Australia and New Zealand · 1962"; the NSWRL from 1984, the ARL from 1995, and Super League for its 1997. The seasons from 1998 and
   today's map keep "NRL". A map's seasons share one competition, which `nrlSpecs` checks; `LEAGUES.nrl.eraLeagues`
   lists the four, so building another league's maps keeps their index entries.
 
@@ -1176,8 +1181,8 @@ model plays, its attack and defence's mean, moving point for point with every pl
 first-order margin at any scoring.
 `scripts/simulation-realism.test.mjs` holds the NRL ranges above and its home sides, five earlier seasons played whole
 (`NRL_ERAS`) within their record's points, tries, field goals, draws, margins and standings' spread, `scripts/home-advantage.test.mjs` the edge and the live chart at home, `scripts/club-maps.test.mjs`
-the map's state rule with Australian and New Zealand towns. `npm run smoke` adds an NRL duel with the live ticker and a
-rugby league nations blitz of Asia and Oceania.
+the map's state rule with Australian and New Zealand towns. `npm run smoke` adds an NRL duel with the live ticker, its map
+chosen on Rugby's card (until 2026-11-19 it also ran a rugby league nations blitz of Asia and Oceania, now union's).
 
 `scripts/rugby-league-seasons.test.mjs` covers the earlier seasons: all sixty-six rebuild byte for byte, and their
 snapshots from the pinned inputs when `data-src/rugby-league-seasons/` is present. For 2008, the reader, the naming
