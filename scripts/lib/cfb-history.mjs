@@ -1,14 +1,15 @@
 // The earlier college football seasons' facts and ratings (docs/design/college-football.md, "Earlier seasons"): the FBS
-// seasons 2009 to 2025, which no game rated, computed from the facts sportsdataverse publishes. No I/O here: the sync
+// seasons 2004 to 2025, which no game rated, computed from the facts sportsdataverse publishes. No I/O here: the sync
 // (scripts/sync-cfb-seasons.mjs) reads the files and hands their rows in.
 //
 // Sources (sportsdataverse, https://github.com/sportsdataverse):
 //   - cfbfastR-data's season rosters (rosters/csv/cfb_rosters_<year>.csv, CollegeFootballData.com's): every rostered
-//     player of a school with his ESPN athlete id, position, weight and, from about 2017, his class;
+//     player of a school with his ESPN athlete id, position, weight and, from about 2017, his class (in full from 2009);
 //   - cfbfastR-cfb-data's tables (ESPN-derived Parquet, scripts/lib/parquet.mjs): every game's schedule row
-//     (cfb_schedules), every player's box score (player_box: passing, rushing, receiving, interceptions, kicking; the
-//     defence's tackles only from 2023), each play's participants from 2014 (play_participants: tacklers, sacks, passes
-//     defended, fumbles forced), and the 247Sports composite of every recruiting class (cfb_recruits).
+//     (cfb_schedules), every player's box score from 2004 (player_box: passing, rushing, receiving, interceptions,
+//     kicking; the defence's tackles only from 2023), each play's participants from 2014 (play_participants: tacklers,
+//     sacks, passes defended, fumbles forced), and the 247Sports composite of every recruiting class from 2002
+//     (cfb_recruits).
 //
 // A player's season is his school's (the roster's), his position the roster's (a generic "DB" a corner or a safety by his
 // recruiting position, else by weight), his value a weighted sum of standardised signals of his position (his share of
@@ -16,16 +17,23 @@
 // goals; his recruiting grade and his years in college), pooled over the season and the two before it 3:2:1. The
 // weights were fitted once, by least squares, to College Football 27's launch ratings of the players of 2025 who
 // returned in 2026 (VALUE_WEIGHTS; scripts/sync-cfb-seasons.mjs --tune), and are frozen; the seasons before 2014, which
-// have no play participants, use weights fitted without them.
+// have no play participants, use weights fitted without them. The seasons before 2009, which no roster lists in full,
+// play rosters rebuilt from the box scores and the recruiting classes (rebuiltRoster).
 
-export const FIRST_SEASON = 2009;
+export const FIRST_SEASON = 2004;
 export const LAST_SEASON = 2025;
+/** The first season CollegeFootballData.com's rosters list in full (about 100 a school, with positions); before it, rebuiltRoster. */
+export const ROSTERS_FROM = 2009;
+/** The first season of ESPN's box scores (player_box). */
+export const FIRST_BOX = 2004;
 /** The first season whose plays name their tacklers, pass rushers and pass defenders (play_participants). */
 export const PARTICIPANTS_FROM = 2014;
 /** The window's weights: the season itself, the one before, the one before that (docs/design/computed-ratings.md). */
 export const WINDOW = Object.freeze([3, 2, 1]);
-/** The first recruiting class the sources rate (247Sports' composite; sportsdataverse measured it rates too few before). */
-export const FIRST_CLASS = 2004;
+/** The first recruiting class the sources list (247Sports' composite; cfbfastR-cfb-data has none for 2000 or 2001). */
+export const FIRST_CLASS = 2002;
+/** The seasons a recruiting class can play after its first: four, a redshirt year included (classes s − 4 to s play in s). */
+export const CLASS_SPAN = 4;
 
 /** The game's positions (scripts/lib/nfl.mjs), the order squads list them in. */
 export const POSITIONS = Object.freeze(['QB', 'RB', 'WR', 'TE', 'OL', 'DL', 'LB', 'CB', 'S', 'K']);
@@ -62,9 +70,12 @@ export const SOURCE_NAMES = Object.freeze({ 'UConn': 'cfb-connecticut', 'Miami (
   'San José State': 'cfb-san-jose-state', 'California': 'cfb-cal', "Hawai'i": 'cfb-hawaii', 'South Florida': 'cfb-usf', 'Florida Atlantic': 'cfb-fau',
   'Florida International': 'cfb-fiu', 'Massachusetts': 'cfb-umass', 'App State': 'cfb-appalachian-state', 'Idaho': 'cfb-idaho' });
 
-/** A name as the sources are matched on: no accents, case, punctuation or generational suffix. */
+/**
+ * A name as the sources are matched on: no accents, case, punctuation, generational suffix or bracketed tag (the
+ * recruiting classes' "Joe (player) Cox", the box scores' "Omowale (Wally) Dada").
+ */
 export const plain = text => String(text ?? '').normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
-  .replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z]/g, '');
+  .replace(/\([^)]*\)/g, '').replace(/\b(jr|sr|ii|iii|iv|v)\b\.?/g, '').replace(/[^a-z]/g, '');
 
 /** A CSV text's rows (RFC 4180 quoting), the header first. */
 export function parseCsv(text) {
@@ -131,6 +142,7 @@ export function rosterOf(text, schoolOf) {
  */
 export function cleanName(text) {
   return String(text ?? '')
+    .replace(/\([^)]*\)/g, ' ').replace(/_/g, ' ')
     .replace(/[`‘ʻ]/g, "'")
     .replace(/\s*,\s*(jr|sr|ii|iii|iv|v)\.?$/i, (_, suffix) => ` ${suffix.length === 2 && /^[js]r$/i.test(suffix) ? `${suffix[0].toUpperCase()}r.` : suffix.toUpperCase()}`)
     .replace(/ ([JS])r$/, ' $1r.')
@@ -144,17 +156,19 @@ const blankBox = () => ({ games: new Set(), passAtt: 0, passCmp: 0, passYds: 0, 
   rec: 0, recYds: 0, recTd: 0, int: 0, fgm: 0, fga: 0, xpm: 0, xpa: 0, returns: 0, names: new Set() });
 
 /**
- * A season's box scores (player_box rows) of the games `games` keeps (a Set of game ids; all if null) as Map athlete
- * id → `{ team, games, passAtt, passCmp, passYds, passTd, passInt, rushAtt, rushYds, rushTd, rec, recYds, recTd, int,
- * fgm, fga, xpm, xpa, returns, names }`, its team the ESPN team he played most of those games for. Only the categories every
- * season's box scores have are read (BOX_CATEGORIES): the defence's own rows (tackles, sacks), which exist only from 2023,
- * and the fumbles', from 2016, are not, so every season is measured alike.
+ * A season's box scores (player_box rows) of the games `games` keeps (a Set of game ids; all if null) and `drop` does
+ * not (a Set of game ids: the schedule's twins, scheduleOf) as Map athlete id → `{ team, games, passAtt, passCmp,
+ * passYds, passTd, passInt, rushAtt, rushYds, rushTd, rec, recYds, recTd, int, fgm, fga, xpm, xpa, returns, names }`, its
+ * team the ESPN team he played most of those games for. Only the categories every season's box scores have are read
+ * (BOX_CATEGORIES): the defence's own rows (tackles, sacks), which exist only from 2023, and the fumbles', from 2016, are
+ * not, so every season is measured alike.
  */
-export function boxOf(rows, games = null) {
+export function boxOf(rows, games = null, drop = null) {
   const out = new Map();
   const teamGames = new Map();
   for (const r of rows) {
     if (games && !games.has(r.game_id)) continue;
+    if (drop?.has(r.game_id)) continue;
     if (!BOX_CATEGORIES.has(r.category)) continue;
     const id = r.athlete_id;
     if (!Number.isInteger(id)) continue;
@@ -228,7 +242,7 @@ export function participantsOf(rows, games = null) {
  * the season's schools: those of them that played at least one such game (New Mexico State of 2020 played none).
  */
 export function scheduleOf(rows) {
-  const fbs = new Set(), conference = new Map(), games = [];
+  const fbs = new Set(), conference = new Map(), all = [];
   for (const g of rows) {
     for (const side of ['home', 'away']) {
       if (g[`${side}_division`] !== 'fbs') continue;
@@ -239,16 +253,60 @@ export function scheduleOf(rows) {
   for (const g of rows) {
     if (!fbs.has(g.home_id) || !fbs.has(g.away_id) || g.home_points == null || g.away_points == null) continue;
     if (g.completed === false) continue;
-    games.push({ id: g.game_id, home: g.home_id, away: g.away_id, homeScore: g.home_points, awayScore: g.away_points,
-      neutral: !!g.neutral_site, postseason: g.season_type !== 'regular' });
+    all.push({ id: g.game_id, home: g.home_id, away: g.away_id, homeScore: g.home_points, awayScore: g.away_points,
+      neutral: !!g.neutral_site, postseason: g.season_type !== 'regular', day: dayOf(g.start_date), week: g.week ?? null });
   }
   for (const id of fbs) if (!conference.has(id)) {
     const any = rows.find(g => (g.home_id === id && g.home_conference) || (g.away_id === id && g.away_conference));
     if (any) conference.set(id, any.home_id === id ? any.home_conference : any.away_conference);
   }
-  games.sort((a, b) => a.id - b.id);
+  all.sort((a, b) => a.id - b.id);
+  // ESPN lists a few games twice under two ids (2004's Florida Atlantic at Florida A&M, two of 2008's, seven of 2012's,
+  // two of 2013's bowls): the same two schools with the same points on the same day (or the next, a late kick-off's
+  // date in UTC). The first id is kept; its twin is dropped (`twins`), and the box scores drop its rows (boxOf).
+  const games = [], twins = new Set(), byResult = new Map();
+  for (const g of all) {
+    const [low, high] = g.home < g.away ? [g.home, g.away] : [g.away, g.home];
+    const key = [low, high, g.home === low ? g.homeScore : g.awayScore, g.home === low ? g.awayScore : g.homeScore].join('|');
+    const twin = (byResult.get(key) ?? []).some(e => (e.day != null && g.day != null ? Math.abs(e.day - g.day) <= 1 : e.week != null && e.week === g.week));
+    if (twin) { twins.add(g.id); continue; }
+    if (!byResult.has(key)) byResult.set(key, []);
+    byResult.get(key).push(g);
+    games.push(g);
+  }
+  for (const g of games) { delete g.day; delete g.week; }
   const schools = new Set(games.flatMap(g => [g.home, g.away]));
-  return { fbs, conference, games, schools };
+  return { fbs, conference, games, schools, twins };
+}
+/** A schedule's start date (an ISO date-time) as a day number, or null. */
+const dayOf = value => { const t = Date.parse(value ?? ''); return Number.isFinite(t) ? Math.floor(t / 86400000) : null; };
+
+/** The recruiting classes' team names the source files under no team in any class, as the game's schools. */
+export const RECRUIT_TEAM_NAMES = Object.freeze({ 'Hawaii Rainbow Warriors': 'cfb-hawaii' });
+
+/**
+ * The recruiting classes (Map class → cfb_recruits rows) with each row's team id repaired: the source files some rows
+ * under team id 0 (Hawaii's in every class; UAB's of 2015 and 2016, UConn's and Old Dominion's of 2020, South Alabama's
+ * and Georgia State's of 2009 and 2010, Kennesaw State's of 2014, Charlotte's of 2011 and 2012, and FCS and lower schools'),
+ * so such a row takes the id the other classes give its team's name most often, else RECRUIT_TEAM_NAMES' school's
+ * (`espnOf`: school → ESPN id). → a new Map of new rows; a row the repair cannot place keeps id 0.
+ */
+export function repairedClasses(classes, espnOf) {
+  const usual = new Map();
+  for (const rows of classes.values()) {
+    for (const r of rows) {
+      const id = Number(r.team_id);
+      if (!id || !r.team) continue;
+      if (!usual.has(r.team)) usual.set(r.team, new Map());
+      usual.get(r.team).set(id, (usual.get(r.team).get(id) ?? 0) + 1);
+    }
+  }
+  const idOf = new Map([...usual].map(([team, ids]) => [team, [...ids].sort((a, b) => b[1] - a[1] || a[0] - b[0])[0][0]]));
+  for (const [team, school] of Object.entries(RECRUIT_TEAM_NAMES)) {
+    if (espnOf[school] == null) throw new Error(`No ESPN id for ${school}`);
+    if (!idOf.has(team)) idOf.set(team, espnOf[school]);
+  }
+  return new Map([...classes].map(([c, rows]) => [c, rows.map(r => (Number(r.team_id) || !idOf.has(r.team) ? r : { ...r, team_id: String(idOf.get(r.team)) }))]));
 }
 
 /**
@@ -566,9 +624,18 @@ const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
  * Every rostered player of season `data.season`'s FBS schools, with his position, years in college, recruiting grade,
  * weight and raw signals. `data`: `{ season, espnOf: { school: ESPN id }, rosters: Map year → rosterOf, boxes: Map year →
  * boxOf, participants: Map year → participantsOf (from PARTICIPANTS_FROM), totals: Map year → teamTotalsOf, fbs: Map
- * year → Set of FBS ESPN ids, recruits: recruitsOf, firstSeen: Map athlete id → first year seen }`. A player on two
- * schools' rosters counts for the one he has more box-score games with (then the first listed). Players nothing places
- * (positionOf) and punters, long snappers and returners are left out. → `{ players, left }`, `left` counting those left out.
+ * year → Set of FBS ESPN ids, recruits: recruitsOf, firstSeen: Map athlete id → first year seen, rebuilt: whether the
+ * season's roster is rebuiltRoster's, classFrom: the first recruiting class `recruits` holds, boxFrom: the first season of
+ * `boxes` }`. A player on two schools' rosters counts for the one he has more box-score games with (then the first
+ * listed). Players nothing places (positionOf) and punters, long snappers and returners are left out. → `{ players, left }`,
+ * `left` counting those left out.
+ *
+ * A rebuilt season whose oldest class predates the first the sources list (2004 and 2005, whose seniors signed in 2000
+ * and 2001) knows less of a player no class lists: he may be a recruit of an unlisted class, so he is graded as a recruit
+ * the source lists without a grade (RECRUIT_UNGRADED_QUANTILE), and, first seen in the first box-score season, he may have
+ * been in college before it, so his years in college are unknown (the position's median). Rebuilding 2010 and 2012 as
+ * 2004 would have to be (as scripts/sync-cfb-seasons.mjs --validate does), this brought the schools' order 0.01–0.03 of
+ * Spearman closer to their real rosters' order.
  */
 export function seasonPlayers(data) {
   const { season: s, espnOf, rosters, boxes, participants, totals, fbs, recruits, firstSeen } = data;
@@ -621,11 +688,130 @@ export function seasonPlayers(data) {
         part: named ? participants.get(year).get(e.id) ?? null : null, participants: named };
     });
     const exp = recruit ? clamp(s - recruit.class + 1, 1, MAX_EXPERIENCE) : clamp(s - (firstSeen.get(e.id) ?? s) + 1, 1, MAX_EXPERIENCE);
-    const signals = rawSignals(pooledWindow(window), { grade: recruit?.grade ?? null, recruited: !!recruit, exp, weight: e.weight });
+    const unlisted = !recruit && data.rebuilt && s - CLASS_SPAN < data.classFrom;
+    const signals = rawSignals(pooledWindow(window), { grade: recruit?.grade ?? null, recruited: !!recruit || unlisted,
+      exp: unlisted && (firstSeen.get(e.id) ?? s) <= data.boxFrom ? null : exp, weight: e.weight });
     players.push({ id: e.id, name: e.name, school: e.school, position, exp, grade: recruit?.grade ?? null, recruitClass: recruit?.class ?? null,
-      weight: e.weight, signals, box: boxNow.get(e.id) ?? null });
+      weight: e.weight, signals, box: boxNow.get(e.id) ?? null, rebuilt: e.rebuilt ?? null });
   }
   return { players, left };
+}
+
+// ---------- a season no roster lists ----------
+
+/**
+ * Season `season`'s roster rebuilt where no roster lists its players in full (the seasons before ROSTERS_FROM), as
+ * rosterOf's entries `{ id, name, school, position: null, weight, height, classYear: null, rebuilt }`, `rebuilt` saying how
+ * the player was placed. `sources`: `{ boxes: Map year → boxOf, rosters: Map year → rosterOf, classes: Map class →
+ * cfb_recruits rows, espnOf: { school: ESPN id }, schools: Set of the season's FBS ESPN ids, needs: the lineup's places
+ * by position }`; the evidence is whatever those maps hold. A school's players:
+ *   - 'box': every player with a box-score line for it in the season (the school he played most of its games for);
+ *   - 'confirmed': a recruit it signed in the season's class or the CLASS_SPAN before it whom a later season places at the
+ *     school again (a box-score line, a roster);
+ *   - 'signed': a recruit of the season's class or the one before whom no record places elsewhere by the season (another
+ *     school's box score or roster, another school's later class) and who has no earlier record at the school (one with a
+ *     line there before and none since has left);
+ *   - 'filled': while the school is still short of a place of `needs`, its other recruits of those classes at the place's
+ *     position (their recruiting's) that no record places elsewhere and that have no earlier record at the school, the
+ *     latest class first, then the best graded.
+ * A recruit's id is the ESPN athlete id his records at the school carry, else his recruiting id negated; a player's
+ * weight and height are those of the nearest roster that lists his id.
+ */
+export function rebuiltRoster(season, { boxes, rosters, classes, espnOf, schools, needs }) {
+  const s = season;
+  const schoolOfEspn = new Map(Object.entries(espnOf).map(([school, espn]) => [espn, school]));
+  // Every record of a name: its box-score lines and roster entries, by ESPN team, year and athlete id.
+  const records = new Map();
+  const note = (name, team, year, id) => {
+    const key = plain(name);
+    if (!key || team == null) return;
+    if (!records.has(key)) records.set(key, []);
+    records.get(key).push({ team, year, id });
+  };
+  for (const [year, box] of boxes) for (const [id, p] of box) for (const name of p.names) note(name, p.team, year, id);
+  for (const [year, roster] of rosters) for (const e of roster) note(e.name, espnOf[e.school], year, e.id);
+  // Each athlete's nearest roster entry and his roster codes, nearest season first.
+  const nearest = new Map(), codes = new Map();
+  for (const year of [...rosters.keys()].sort((a, b) => Math.abs(a - s) - Math.abs(b - s) || a - b)) {
+    for (const e of rosters.get(year)) {
+      if (!nearest.has(e.id)) nearest.set(e.id, e);
+      if (!codes.has(e.id)) codes.set(e.id, []);
+      codes.get(e.id).push(e.position);
+    }
+  }
+  // The classes' signings: every school's of each name (to find a recruit another school signed later), and the season's
+  // schools' of its window, the latest class first, then the best graded.
+  const signedBy = new Map(), window = [];
+  for (const [c, rows] of classes) {
+    for (const r of rows) {
+      const key = plain(r.player_name), team = Number(r.team_id);
+      if (!key) continue;
+      if (!signedBy.has(key)) signedBy.set(key, []);
+      signedBy.get(key).push({ class: c, team });
+      if (c < s - CLASS_SPAN || c > s || !schools.has(team) || !schoolOfEspn.has(team)) continue;
+      const recruitId = Number(r.recruit_id);
+      if (!Number.isInteger(recruitId) || recruitId <= 0) throw new Error(`${c}: a recruit without a recruiting id: ${r.player_name}`);
+      window.push({ key, team, class: c, name: r.player_name, grade: Number.isFinite(r.grade) ? r.grade : null, recruitId,
+        position: RECRUIT_POSITION[r.position] ?? null });
+    }
+  }
+  window.sort((a, b) => b.class - a.class || (b.grade ?? -1) - (a.grade ?? -1) || a.recruitId - b.recruitId);
+  const signingOf = new Map();
+  for (const g of window) if (!signingOf.has(`${g.key}|${g.team}`)) signingOf.set(`${g.key}|${g.team}`, g);
+
+  const out = [], placed = new Set(), ids = new Set();
+  const add = (entry, keys) => { out.push(entry); ids.add(entry.id); for (const key of keys) placed.add(key); };
+  const physique = id => ({ weight: nearest.get(id)?.weight ?? null, height: nearest.get(id)?.height ?? null });
+  // A name ESPN lists under two athlete ids at one school (Navy's Blake Carter of 2008) is one player, as rosterOf keeps
+  // one: the id with more of the season's games, then the lower.
+  const lines = [...(boxes.get(s) ?? new Map())].filter(([, p]) => schools.has(p.team) && schoolOfEspn.has(p.team) && cleanName([...p.names][0]))
+    .sort((a, b) => b[1].games.size - a[1].games.size || a[0] - b[0]);
+  for (const [id, p] of lines) {
+    const name = cleanName([...p.names][0]);
+    if (placed.has(`${plain(name)}|${p.team}`)) continue;
+    add({ id, name, school: schoolOfEspn.get(p.team), position: null, ...physique(id), classYear: null, rebuilt: 'box' },
+      [...p.names].map(n => `${plain(n)}|${p.team}`));
+  }
+  const candidates = [];
+  for (const g of window) {
+    const at = `${g.key}|${g.team}`;
+    if (placed.has(at)) continue;
+    const seen = records.get(g.key) ?? [];
+    const here = seen.filter(e => e.team === g.team);
+    const later = here.some(e => e.year > s), before = here.some(e => e.year < s);
+    const away = seen.some(e => e.team !== g.team && e.year <= s)
+      || (signedBy.get(g.key) ?? []).some(e => e.class > g.class && e.class <= s && e.team !== g.team);
+    const how = later ? 'confirmed' : away || before ? null : s - g.class <= 1 ? 'signed' : 'candidate';
+    if (!how) continue;
+    if (how === 'candidate') { candidates.push(g); continue; }
+    // His id: the one his records at the school carry most often (the lowest of equals), else his recruiting id negated.
+    const counts = new Map();
+    for (const e of here) if (e.id != null) counts.set(e.id, (counts.get(e.id) ?? 0) + 1);
+    const id = [...counts].sort((a, b) => b[1] - a[1] || a[0] - b[0])[0]?.[0] ?? -g.recruitId;
+    if (ids.has(id)) continue;
+    add({ id, name: cleanName(g.name), school: schoolOfEspn.get(g.team), position: null, ...physique(id), classYear: null, rebuilt: how }, [at]);
+  }
+  // The places each school is still short of, by the positions seasonPlayers will give its players.
+  const count = new Map();
+  for (const e of out) {
+    const team = espnOf[e.school];
+    const signing = signingOf.get(`${plain(e.name)}|${team}`);
+    const position = positionOf({ code: null, others: codes.get(e.id) ?? [], recruit: signing ? { position: signing.position } : null,
+      box: boxes.get(s)?.get(e.id) ?? null, weight: e.weight });
+    if (!position) continue;
+    if (!count.has(e.school)) count.set(e.school, {});
+    count.get(e.school)[position] = (count.get(e.school)[position] ?? 0) + 1;
+  }
+  for (const g of candidates) {
+    const school = schoolOfEspn.get(g.team);
+    const at = `${g.key}|${g.team}`;
+    if (!g.position || !count.has(school) || placed.has(at)) continue;
+    const have = count.get(school);
+    if ((have[g.position] ?? 0) >= (needs[g.position] ?? 0)) continue;
+    have[g.position] = (have[g.position] ?? 0) + 1;
+    add({ id: -g.recruitId, name: cleanName(g.name), school, position: null, weight: null, height: null, classYear: null, rebuilt: 'filled' }, [at]);
+  }
+  return out;
 }
 
 /** EA's players per school at each position in College Football 27 (Week 10 Ratings), rounded: each school's population. */
@@ -660,10 +846,14 @@ const bestFirst = (a, b) => b.value - a.value || b.exp - a.exp || (b.grade ?? 0)
 /**
  * Each school's DEPTH best players at each position by value, ranked across the season's schools and read off the
  * reference (`reference[position]`: College Football 27's ratings at that position, each school's best DEPTH, ascending;
- * computed-ratings.mjs referenceOf) by their mid-rank (ratingsOf). → the rated players (`rating`, `rank` 1 = the
- * best), each school's in best-first order, and the population size at each position.
+ * computed-ratings.mjs referenceOf) by their mid-rank (ratingsOf). With `schools` (a rebuilt season's: the number of its
+ * FBS schools) each position is read as if every school carried DEPTH players there, those the rebuild cannot name
+ * ranking below all it can: a rebuilt roster lacks most of a school's walk-ons and backups (in 2004 it fills about half
+ * of the line's and the secondary's places, against 75–99% from a 2009 roster), and read among themselves its players
+ * would rate as far below their peers of other seasons as their depth is thinner. → the rated players (`rating`, `rank`
+ * 1 = the best), each school's in best-first order, and the population size at each position.
  */
-export function rateSeason(players, reference, ratingsOf) {
+export function rateSeason(players, reference, ratingsOf, { schools = null } = {}) {
   const rated = [], population = {};
   for (const position of POSITIONS) {
     const bySchool = new Map();
@@ -674,7 +864,8 @@ export function rateSeason(players, reference, ratingsOf) {
     const chosen = [...bySchool.values()].flatMap(list => list.sort(bestFirst).slice(0, DEPTH[position]));
     population[position] = chosen.length;
     if (!chosen.length) continue;
-    const ratings = ratingsOf(chosen.map(p => p.value), reference[position]);
+    const ratings = ratingsOf(chosen.map(p => p.value), reference[position],
+      schools == null ? {} : { population: Math.max(chosen.length, schools * DEPTH[position]) });
     const order = chosen.slice().sort(bestFirst);
     order.forEach((p, i) => { p.rank = i + 1; p.rating = ratings.get(p.value); });
     rated.push(...chosen);

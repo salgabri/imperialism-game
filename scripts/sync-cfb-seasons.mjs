@@ -1,4 +1,4 @@
-// Snapshot the FBS college football seasons 2009 to 2025, which no game rated, computed from the facts sportsdataverse
+// Snapshot the FBS college football seasons 2004 to 2025, which no game rated, computed from the facts sportsdataverse
 // publishes (docs/design/college-football.md, "Earlier seasons"), into scripts/data/cfb-seasons/<season>.json
 // (committed), for scripts/build-cfb-seasons.mjs to build the seasons from.
 //
@@ -19,13 +19,19 @@
 // https://github.com/sportsdataverse/cfbfastR-data and https://github.com/sportsdataverse/cfbfastR-cfb-data through
 // raw.githubusercontent.com.
 //
-// Usage: node scripts/sync-cfb-seasons.mjs [--season=<year>] [--check] [--fetch [--pin]] [--tune]
+// The seasons before 2009, which no roster lists in full, play rosters rebuilt from the box scores and the recruiting
+// classes (scripts/lib/cfb-history.mjs rebuiltRoster); --validate measures that rebuild on 2010 and 2012, rebuilt as the
+// seasons before 2009 would have to be, against their real rosters (scripts/data/cfb-seasons/rebuild-check.json).
+//
+// Usage: node scripts/sync-cfb-seasons.mjs [--season=<year>] [--check] [--fetch [--pin]] [--tune] [--validate [--write]]
 //   --season  one season only
 //   --check   rebuild the snapshots and the calibration and compare them byte for byte; writes nothing
 //   --fetch   download the pinned source files that data-src/cfb-history/ lacks; with --pin, first pin each source
 //             repository's current commit (GitHub's API) and every file's SHA-256
 //   --tune    fit the weights again and print them with their agreement; with --write, record them in
 //             scripts/data/cfb-seasons/calibration.json
+//   --validate measure the rebuild of the seasons before 2009; with --write, record it in
+//             scripts/data/cfb-seasons/rebuild-check.json; with --check, compare it byte for byte
 import { existsSync } from 'node:fs';
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -34,8 +40,9 @@ import path from 'node:path';
 import { politeFetch } from './lib/polite-fetch.mjs';
 import { parquetMetadata, readParquet } from './lib/parquet.mjs';
 import {
-  boxOf, DEPTH, FIRST_CLASS, FIRST_SEASON, fitWeights, LAST_SEASON, PARTICIPANTS_FROM, participantsOf, plain, POSITIONS, rateSeason,
-  recruitsOf, regimeOf, rosterOf, scheduleOf, seasonPlayers, SIGNALS, SOURCE_NAMES, standardise, teamTotalsOf, valueSeason, shrinkSignals,
+  boxOf, CLASS_SPAN, DEPTH, FIRST_BOX, FIRST_CLASS, FIRST_SEASON, fitWeights, LAST_SEASON, PARTICIPANTS_FROM, participantsOf, plain, POSITIONS,
+  rateSeason, rebuiltRoster, recruitsOf, repairedClasses, regimeOf, ROSTERS_FROM, rosterOf, scheduleOf, seasonPlayers, SIGNALS, SOURCE_NAMES, standardise,
+  teamTotalsOf, valueSeason, shrinkSignals,
 } from './lib/cfb-history.mjs';
 import { clubMoveOf, mean, perPointOf, ratingsOf, referenceOf, resultsTargets, spearman, srsOf } from './lib/computed-ratings.mjs';
 import { FORMATION, POSITION_OF, shortOf, squadOf } from './lib/nfl.mjs';
@@ -101,10 +108,10 @@ export function sourceFiles() {
   const cfb = (dataset, years) => years.map(year => ({ repo: 'cfbfastR-cfb-data', path: `cfb/${dataset}/parquet/${dataset}_${year}.parquet`,
     local: `cfbfastR-cfb-data/${dataset}/${dataset}_${year}.parquet` }));
   return [
-    ...range(FIRST_SEASON, LAST_SEASON).map(year => ({ repo: 'cfbfastR-data', path: `rosters/csv/cfb_rosters_${year}.csv`,
+    ...range(ROSTERS_FROM, LAST_SEASON).map(year => ({ repo: 'cfbfastR-data', path: `rosters/csv/cfb_rosters_${year}.csv`,
       local: `cfbfastR-data/rosters/cfb_rosters_${year}.csv` })),
-    ...cfb('cfb_schedules', range(FIRST_SEASON - 2, LAST_SEASON)),
-    ...cfb('player_box', range(FIRST_CLASS, LAST_SEASON)),
+    ...cfb('cfb_schedules', range(FIRST_BOX, LAST_SEASON)),
+    ...cfb('player_box', range(FIRST_BOX, LAST_SEASON)),
     ...cfb('play_participants', range(PARTICIPANTS_FROM, LAST_SEASON)),
     ...cfb('cfb_recruits', range(FIRST_CLASS, LAST_SEASON)),
   ];
@@ -167,13 +174,13 @@ async function pinned(local) {
 const once = (key, make) => { if (!cache.has(key)) cache.set(key, make()); return cache.get(key); };
 // The columns each table is read for (the others' pages are never decoded); parsed rows are not kept, only what is made of them.
 const COLUMNS = {
-  cfb_schedules: ['game_id', 'season', 'season_type', 'completed', 'neutral_site', 'home_id', 'home_division', 'home_conference', 'home_points',
-    'away_id', 'away_division', 'away_conference', 'away_points'],
+  cfb_schedules: ['game_id', 'season', 'week', 'start_date', 'season_type', 'completed', 'neutral_site', 'home_id', 'home_division', 'home_conference',
+    'home_points', 'away_id', 'away_division', 'away_conference', 'away_points'],
   player_box: ['game_id', 'team_id', 'athlete_id', 'athlete_name', 'category', 'completions/passingAttempts', 'passingYards', 'passingTouchdowns',
     'interceptions', 'rushingAttempts', 'rushingYards', 'rushingTouchdowns', 'receptions', 'receivingYards', 'receivingTouchdowns',
     'fieldGoalsMade/fieldGoalAttempts', 'extraPointsMade/extraPointAttempts', 'kickReturns', 'puntReturns'],
   play_participants: ['game_id', 'tackler_player_id', 'assisted_by_player_id', 'sacked_by_player_id', 'pass_defender_player_id', 'forced_by_player_id'],
-  cfb_recruits: ['player_name', 'grade', 'stars', 'position', 'team_id'],
+  cfb_recruits: ['player_name', 'grade', 'stars', 'position', 'team_id', 'team', 'recruit_id'],
 };
 // A table's file may lack a column no row of its season fills (2004's box scores have no kick returns): those are skipped.
 const parquet = async (dataset, year) => {
@@ -188,52 +195,75 @@ async function context() {
     const teams = JSON.parse(await readFile(teamsFile, 'utf8')).teams;
     const espnOf = manifest.espn;
     const schoolOfEspn = new Map(Object.entries(espnOf).map(([school, espn]) => [espn, school]));
-    // The rosters name schools as CollegeFootballData.com does: by the game's label, or as SOURCE_NAMES has them.
+    // The rosters name schools as CollegeFootballData.com does: by the game's label, or as SOURCE_NAMES has them. A school
+    // the manifest marks `rosters: false` (Florida A&M, FBS only in 2004, before the rosters) has its rosters unread, as
+    // every other FCS school's are.
     const byLabel = new Map(Object.entries(teams).map(([id, t]) => [t.label, id]));
-    for (const [id, school] of Object.entries(manifest.schools ?? {})) byLabel.set(school.name, id);
+    for (const [id, school] of Object.entries(manifest.schools ?? {})) if (school.rosters !== false) byLabel.set(school.name, id);
     const schoolOf = name => byLabel.get(name) ?? SOURCE_NAMES[name] ?? null;
     return { manifest, teams, espnOf, schoolOfEspn, schoolOf };
   });
 }
 
-/** Everything season `s` is computed from (scripts/lib/cfb-history.mjs seasonPlayers). */
+// Each source table of a year, read once (`once`): a season's schedule; its box scores without the schedule's twin games
+// (scheduleOf); its plays' participants; its roster; and every recruiting class, its team ids repaired (repairedClasses).
+const scheduleFor = year => once(`schedule/${year}`, async () => scheduleOf(await parquet('cfb_schedules', year)));
+const boxFor = year => once(`box/${year}`, async () => boxOf(await parquet('player_box', year), null, (await scheduleFor(year)).twins));
+const totalsFor = year => once(`totals/${year}`, async () => teamTotalsOf(await boxFor(year)));
+const participantsFor = year => once(`participants/${year}`, async () => participantsOf(await parquet('play_participants', year)));
+const rosterFor = year => once(`roster/${year}`, async () => rosterOf((await pinned(`cfbfastR-data/rosters/cfb_rosters_${year}.csv`)).toString('utf8'), (await context()).schoolOf));
+const classesFor = () => once('classes', async () => {
+  const raw = new Map();
+  for (const year of range(FIRST_CLASS, LAST_SEASON)) raw.set(year, await parquet('cfb_recruits', year));
+  return repairedClasses(raw, (await context()).espnOf);
+});
+
+/**
+ * Everything season `s` is computed from (scripts/lib/cfb-history.mjs seasonPlayers): every roster (from ROSTERS_FROM),
+ * the box scores of the season and the two before it, every recruiting class to the season; a season before
+ * ROSTERS_FROM plays a roster rebuilt from every season's box scores and rosters and its window's classes (rebuiltRoster).
+ */
 async function seasonData(s) {
-  const { espnOf, schoolOf } = await context();
-  const rosters = new Map(), boxes = new Map(), participants = new Map(), totals = new Map(), fbs = new Map();
-  for (const year of range(FIRST_SEASON, LAST_SEASON)) {
-    rosters.set(year, await once(`roster/${year}`, async () => rosterOf((await pinned(`cfbfastR-data/rosters/cfb_rosters_${year}.csv`)).toString('utf8'), schoolOf)));
+  const rosters = new Map(), boxes = new Map(), classes = new Map();
+  for (const year of range(ROSTERS_FROM, LAST_SEASON)) rosters.set(year, await rosterFor(year));
+  for (const year of range(FIRST_BOX, s < ROSTERS_FROM ? LAST_SEASON : s)) boxes.set(year, await boxFor(year));
+  for (const year of range(FIRST_CLASS, s)) classes.set(year, (await classesFor()).get(year));
+  return assemble(s, { rosters, boxes, classes, classFrom: FIRST_CLASS, boxFrom: FIRST_BOX, rebuilt: s < ROSTERS_FROM });
+}
+
+/**
+ * Season `s`'s seasonPlayers data from the evidence given: `rosters` (Map year → rosterOf), `boxes` (Map year → boxOf),
+ * `classes` (Map class → cfb_recruits rows), the first class and box-score season they hold; with `rebuilt`, the
+ * season's roster is rebuilt from them (rebuiltRoster). The validation (validateRebuild) hands in less than a season of
+ * 2004–2008 has, as such a season would.
+ */
+async function assemble(s, { rosters, boxes, classes, classFrom, boxFrom, rebuilt }) {
+  const { espnOf } = await context();
+  const schedule = await scheduleFor(s);
+  const fbs = new Map(), window = new Map(), totals = new Map(), participants = new Map();
+  for (const year of range(Math.max(boxFrom, s - 2), s)) {
+    fbs.set(year, (await scheduleFor(year)).fbs);
+    if (!boxes.has(year)) continue;
+    window.set(year, boxes.get(year));
+    totals.set(year, await totalsFor(year));
+    if (year >= PARTICIPANTS_FROM) participants.set(year, await participantsFor(year));
   }
-  for (const year of range(s - 2, s)) {
-    const schedule = await once(`schedule/${year}`, async () => scheduleOf(await parquet('cfb_schedules', year)));
-    fbs.set(year, schedule.fbs);
-    const box = await once(`box/${year}`, async () => boxOf(await parquet('player_box', year)));
-    boxes.set(year, box);
-    totals.set(year, await once(`totals/${year}`, async () => teamTotalsOf(box)));
-    if (year >= PARTICIPANTS_FROM) participants.set(year, await once(`participants/${year}`, async () => participantsOf(await parquet('play_participants', year))));
+  const seasonRosters = new Map([...rosters].filter(([year]) => year !== s || !rebuilt));
+  if (rebuilt) {
+    seasonRosters.set(s, rebuiltRoster(s, { boxes, rosters: new Map([...rosters].filter(([year]) => year !== s)), classes, espnOf,
+      schools: schedule.schools, needs: FORMATION }));
   }
-  const recruits = await once(`recruits/${s}`, async () => recruitsOf(await Promise.all(range(FIRST_CLASS, s).map(async year => [year, await parquet('cfb_recruits', year)]))));
-  const firstSeen = await once(`first/${s}`, async () => {
-    const out = new Map();
-    for (const year of range(FIRST_CLASS, s)) {
-      const box = await once(`box/${year}`, async () => boxOf(await parquet('player_box', year)));
-      for (const id of box.keys()) if (!out.has(id)) out.set(id, year);
-      if (year >= FIRST_SEASON) for (const e of rosters.get(year)) if (!out.has(e.id)) out.set(e.id, year);
-    }
-    return out;
-  });
-  // Every school each athlete played for, by year: his box scores' (any division's) and his rosters' (the game's schools).
-  const history = await once(`history/${s}`, async () => {
-    const out = new Map();
-    const add = (id, year, team) => { if (team == null) return; if (!out.has(id)) out.set(id, []); out.get(id).push([year, team]); };
-    for (const year of range(FIRST_CLASS, s)) {
-      const box = await once(`box/${year}`, async () => boxOf(await parquet('player_box', year)));
-      for (const [id, p] of box) add(id, year, p.team);
-      if (year >= FIRST_SEASON) for (const e of rosters.get(year)) add(e.id, year, espnOf[e.school]);
-    }
-    return out;
-  });
-  const schools = (await once(`schedule/${s}`, async () => scheduleOf(await parquet('cfb_schedules', s)))).schools;
-  return { season: s, espnOf, rosters, boxes, participants, totals, fbs, schools, recruits, firstSeen, history };
+  const recruits = recruitsOf([...classes].filter(([year]) => year >= classFrom && year <= s));
+  // When each athlete was first seen, and every school he played for by year: his box scores' (any division's) and his
+  // rosters' (the game's schools).
+  const firstSeen = new Map(), history = new Map();
+  const add = (id, year, team) => { if (team == null) return; if (!history.has(id)) history.set(id, []); history.get(id).push([year, team]); };
+  for (const year of range(boxFrom, s)) {
+    for (const [id, p] of boxes.get(year) ?? new Map()) { if (!firstSeen.has(id)) firstSeen.set(id, year); add(id, year, p.team); }
+    if (year !== s || !rebuilt) for (const e of rosters.get(year) ?? []) { if (!firstSeen.has(e.id)) firstSeen.set(e.id, year); add(e.id, year, espnOf[e.school]); }
+  }
+  return { season: s, espnOf, rosters: seasonRosters, boxes: window, participants, totals, fbs, schools: schedule.schools, recruits, firstSeen,
+    history, rebuilt, classFrom, boxFrom };
 }
 
 /** College Football 27's ratings at each game position, each school's (Week 10 Ratings, the built-in season). */
@@ -353,22 +383,23 @@ const recordOf = (school, games) => {
   return { record: t ? `${w}–${l}–${t}` : `${w}–${l}`, for: pf, against: pa, games: w + l + t };
 };
 
-async function snapshotOf(s, weights) {
-  const { espnOf, schoolOfEspn, manifest } = await context();
-  const data = await seasonData(s);
+/**
+ * Season `s`'s rated players and each school's squad before the move (snapshotOf, validateRebuild) → `{ players, left,
+ * rated, population, schools, pools, gaps }`: `schools` those that play the season (its FBS schools the game knows),
+ * `pools` each one's squad (scripts/lib/nfl.mjs squadOf, college football's lineup), `gaps` the places a school is short
+ * of, left to the game (an option offence's tight end). A school whose roster leaves more than MAX_GAPS places short
+ * (Idaho's of 2009–2015 list 26–34 players and no linemen) does not play the season (`left.schools`).
+ */
+async function fieldOf(s, data, weights) {
+  const { schoolOfEspn } = await context();
   const { players, left } = seasonPlayers(data);
-  const regime = regimeOf(s);
-  valueSeason(players, weights, regime);
-  const { reference, source: referenceSource } = await referenceClubs();
-  const { rated, population } = rateSeason(players, reference, ratingsOf);
-  // The season's schools: its FBS schools the game knows.
-  const schedule = await once(`schedule/${s}`, async () => scheduleOf(await parquet('cfb_schedules', s)));
-  const schools = [...schedule.schools].map(espn => schoolOfEspn.get(espn)).filter(Boolean).sort();
-  const unknown = [...schedule.schools].filter(espn => !schoolOfEspn.has(espn));
+  valueSeason(players, weights, regimeOf(s));
+  const { reference } = await referenceClubs();
+  // A rebuilt season reads each position as if every one of its schools carried College Football 27's depth there.
+  const { rated, population } = rateSeason(players, reference, ratingsOf, data.rebuilt ? { schools: data.schools.size } : {});
+  const schools = [...data.schools].map(espn => schoolOfEspn.get(espn)).filter(Boolean).sort();
+  const unknown = [...data.schools].filter(espn => !schoolOfEspn.has(espn));
   if (unknown.length) throw new Error(`${s}: FBS schools with no game id: ESPN ${unknown.join(', ')}`);
-  // Each school's squad (scripts/lib/nfl.mjs squadOf, college football's lineup), a place it is short of left to the game
-  // (an option offence's tight end); a school whose roster leaves more than MAX_GAPS places short (Idaho's of 2009–2015
-  // list 26–34 players and no linemen) does not play the season.
   const pools = {}, gaps = {};
   left.schools = [];
   for (const school of schools.slice()) {
@@ -382,6 +413,16 @@ async function snapshotOf(s, weights) {
     if (Object.keys(short).length) gaps[school] = short;
     pools[school] = squadOf(pool, `${s} ${school}`, { gaps: short, sport: SPORT }).squad;
   }
+  return { players, left, rated, population, schools, pools, gaps };
+}
+
+async function snapshotOf(s, weights) {
+  const { espnOf, schoolOfEspn, manifest } = await context();
+  const data = await seasonData(s);
+  const regime = regimeOf(s);
+  const { source: referenceSource } = await referenceClubs();
+  const { players, left, rated, population, schools, pools, gaps } = await fieldOf(s, data, weights);
+  const schedule = await scheduleFor(s);
   // The move: S from the season's games between FBS schools, m under the season's rules.
   const games = schedule.games.map(g => ({ home: schoolOfEspn.get(g.home), away: schoolOfEspn.get(g.away), homeScore: g.homeScore, awayScore: g.awayScore,
     neutral: g.neutral, postseason: g.postseason }));
@@ -407,18 +448,23 @@ async function snapshotOf(s, weights) {
       after: rounded(move.after, 2), shift: move.shift, plus: move.plus };
   }
   const byId = new Map(rated.map(p => [p.id, p]));
+  // A rebuilt season's players by how the rebuild placed them (rebuiltRoster): its roster's and its squads'.
+  const placed = list => Object.fromEntries(REBUILT_KINDS.map(kind => [kind, list.filter(how => how === kind).length]));
+  const rebuilt = data.rebuilt ? { roster: placed(data.rosters.get(s).map(e => e.rebuilt)),
+    squads: placed(schools.flatMap(school => moved[school].map(p => byId.get(p.id).rebuilt))) } : null;
   const conferenceOf = school => manifest.conferences[schedule.conference.get(espnOf[school])] ?? schedule.conference.get(espnOf[school]);
   const snapshot = {
     note: `The ${s} FBS season, computed (scripts/sync-cfb-seasons.mjs; docs/design/college-football.md, "Earlier seasons"): each school's squad as [name, position, years in college, recruiting grade or null, value, rank at the position, rating before the move, rating]; its conference, record and points against FBS schools, its Simple Rating System and its move; and the season's games between FBS schools as [home, away, home points, away points, neutral, postseason].`,
     source: { season: s, league: 'FBS', regime, retrieved: pins.retrieved,
       repos: Object.fromEntries(Object.entries(pins.repos).map(([key, repo]) => [key, `${repo.url}/tree/${repo.commit}`])) },
     conversion: {
-      overall: conversionText(s, regime, perPoint, srs, level),
+      overall: conversionText(s, regime, perPoint, srs, level, data.rebuilt),
       weights: weights[regime], reference: `${referenceSource.edition}, ${referenceSource.iteration.label}`, depth: DEPTH, population,
       move: { srs: { reliability: rounded(srs.reliability, 3), homeEdge: rounded(srs.homeEdge, 2), sigma: rounded(srs.sigma, 2) },
         perPoint, mean: rounded(level, 3), scale: rounded(scale, 4) },
     },
     left,
+    ...(rebuilt ? { rebuilt } : {}),
     schools: Object.fromEntries(schools.map(school => [school, { espn: espnOf[school], conference: conferenceOf(school), ...recordOf(school, games) }])),
     lineup: { needs: FORMATION, gaps },
     squads: Object.fromEntries(schools.map(school => [school, moved[school].map(p => {
@@ -431,10 +477,76 @@ async function snapshotOf(s, weights) {
   return snapshot;
 }
 
-function conversionText(s, regime, perPoint, srs, level) {
+// ---------- the rebuild's validation ----------
+
+/** The seasons the rebuild is checked on: seasons with real rosters, the rosters and box scores around them complete. */
+export const VALIDATION_SEASONS = Object.freeze([2010, 2012]);
+const VALIDATION_NOTE = "How well rebuiltRoster rebuilds a season (scripts/sync-cfb-seasons.mjs --validate), measured where the real roster is known: each of `seasons` rebuilt as each season before 2009 would have to be (`as`: box scores only from as many seasons before as that season has, recruiting classes likewise, rosters only from as many seasons after it as 2009 is; the classes before 2009 list fewer recruits, so a later class is cut to their mean size, its lowest grades first), fielded as the sync fields a season and compared with the season fielded from its real roster. `schools`: the schools that field a squad (`real`: from the real rosters); `onRoster`: the share of the rebuilt squads' players on their school's real roster (`linemen`: of their offensive and defensive linemen); `recovered`: the share of the real squads' players the rebuilt squads hold; `spearman`: the schools' played strength before the move, rebuilt against real; `placed`: the rebuilt squads' players by how the rebuild placed them.";
+
+/**
+ * How well rebuiltRoster rebuilds a season, measured where the real roster is known (VALIDATION_NOTE): each of
+ * VALIDATION_SEASONS rebuilt as each season before ROSTERS_FROM would have to be, fielded (fieldOf) and compared with the
+ * season fielded from its real roster. → one row a season and stand-in.
+ */
+async function validateRebuild(weights) {
+  const rosters = new Map(), boxes = new Map(), classes = new Map();
+  for (const year of range(ROSTERS_FROM, LAST_SEASON)) rosters.set(year, await rosterFor(year));
+  for (const year of range(FIRST_BOX, LAST_SEASON)) boxes.set(year, await boxFor(year));
+  for (const year of range(FIRST_CLASS, LAST_SEASON)) classes.set(year, (await classesFor()).get(year));
+  const early = range(FIRST_CLASS, ROSTERS_FROM - 1).map(c => classes.get(c).length);
+  const size = Math.round(early.reduce((t, n) => t + n, 0) / early.length);
+  const cut = c => (c < ROSTERS_FROM ? classes.get(c)
+    : classes.get(c).slice().sort((a, b) => (b.grade ?? -1) - (a.grade ?? -1) || Number(a.recruit_id) - Number(b.recruit_id)).slice(0, size));
+  const within = (map, from, to = Infinity) => new Map([...map].filter(([year]) => year >= from && year <= to));
+  const share = (n, d) => (d ? rounded(n / d, 3) : null);
+  const rows = [];
+  for (const season of VALIDATION_SEASONS) {
+    const real = await fieldOf(season, await assemble(season, { rosters, boxes: within(boxes, FIRST_BOX, season), classes: within(classes, FIRST_CLASS, season),
+      classFrom: FIRST_CLASS, boxFrom: FIRST_BOX, rebuilt: false }), weights);
+    const onRoster = new Map();
+    for (const e of rosters.get(season)) {
+      if (!onRoster.has(e.school)) onRoster.set(e.school, new Set());
+      onRoster.get(e.school).add(plain(e.name));
+    }
+    for (let as = FIRST_SEASON; as < ROSTERS_FROM; as++) {
+      const boxFrom = season - (as - FIRST_BOX), rosterFrom = season + (ROSTERS_FROM - as), classFrom = season - (as - FIRST_CLASS);
+      const data = await assemble(season, { rosters: within(rosters, rosterFrom), boxes: within(boxes, boxFrom),
+        classes: new Map(range(classFrom, season).map(c => [c, cut(c)])), classFrom, boxFrom, rebuilt: true });
+      const got = await fieldOf(season, data, weights);
+      const byId = new Map(got.rated.map(p => [p.id, p]));
+      const placed = Object.fromEntries(REBUILT_KINDS.map(kind => [kind, 0]));
+      let players = 0, on = 0, linemen = 0, linemenOn = 0, realPlayers = 0, recovered = 0;
+      const rebuiltStrength = [], realStrength = [];
+      for (const school of got.schools) {
+        const names = new Set(got.pools[school].map(p => plain(p.name)));
+        for (const p of got.pools[school]) {
+          const hit = onRoster.get(school)?.has(plain(p.name)) ? 1 : 0;
+          players++; on += hit;
+          if (p.pos === 'OL' || p.pos === 'DL') { linemen++; linemenOn += hit; }
+          placed[byId.get(p.id).rebuilt]++;
+        }
+        if (!real.pools[school]) continue;
+        for (const p of real.pools[school]) { realPlayers++; if (names.has(plain(p.name))) recovered++; }
+        rebuiltStrength.push(playedStrength(got.pools[school]));
+        realStrength.push(playedStrength(real.pools[school]));
+      }
+      rows.push({ season, as, schools: got.schools.length, real: real.schools.length, onRoster: share(on, players), linemen: share(linemenOn, linemen),
+        recovered: share(recovered, realPlayers), spearman: rounded(spearman(rebuiltStrength, realStrength), 3), placed });
+    }
+  }
+  return rows;
+}
+
+/** How rebuiltRoster places a player, in its order. */
+const REBUILT_KINDS = Object.freeze(['box', 'confirmed', 'signed', 'filled']);
+
+function conversionText(s, regime, perPoint, srs, level, rebuilt) {
   const signals = regime === 'full' ? 'their share of their school\'s passes, carries and catches, their yards, the tackles, sacks and passes defended their plays name, their interceptions and field goals'
     : 'their share of their school\'s passes, carries and catches, their yards, interceptions and field goals (plays before 2014 name no tacklers)';
-  return `Computed: each player's value is a weighted sum of standardised signals of his position (${signals}, his 247Sports recruiting grade and his years in college), pooled over ${s} and the two seasons before it 3:2:1; the weights were fitted to College Football 27's launch ratings of the players of 2025 who returned in 2026 and frozen. Each school's best at each position (College Football 27's depth) are ranked across the season's FBS schools and read off College Football 27's ratings at that position (Week 10 Ratings). Each school then moves toward its results: its Simple Rating System over the season's games between FBS schools (reliability ${rounded(srs.reliability, 3)}), times √reliability ÷ ${perPoint} points a game per point of played strength, about the schools' mean ${rounded(level, 2)}; every player of the school by a whole number and its best few one more, never reordered.`;
+  const window = s - FIRST_BOX >= 2 ? `${s} and the two seasons before it 3:2:1` : s === FIRST_BOX ? `${s} alone (ESPN's box scores begin with it)`
+    : `${s} and ${s - 1} 3:2 (ESPN's box scores begin with ${FIRST_BOX})`;
+  const roster = rebuilt ? "No roster lists the season's players, so each school's are rebuilt: those with a box-score line for it, the recruits it signed in the season's class or the four before whom a later season places there again, and those of the season's class or the one before whom no record places elsewhere; a school still short of a starting place takes its other such recruits at that position; each position is then read as if every school carried College Football 27's depth there, the players the rebuild cannot name ranking below all it can. " : '';
+  return `Computed: ${roster}each player's value is a weighted sum of standardised signals of his position (${signals}, his 247Sports recruiting grade and his years in college), pooled over ${window}; the weights were fitted to College Football 27's launch ratings of the players of 2025 who returned in 2026 and frozen. Each school's best at each position (College Football 27's depth) are ranked across the season's FBS schools and read off College Football 27's ratings at that position (Week 10 Ratings). Each school then moves toward its results: its Simple Rating System over the season's games between FBS schools (reliability ${rounded(srs.reliability, 3)}), times √reliability ÷ ${perPoint} points a game per point of played strength, about the schools' mean ${rounded(level, 2)}; every player of the school by a whole number and its best few one more, never reordered.`;
 }
 
 function serialize(snapshot) {
@@ -449,6 +561,24 @@ async function main() {
   const arg = name => args.find(a => a.startsWith(`--${name}=`))?.slice(name.length + 3);
   const check = args.includes('--check');
   if (args.includes('--fetch')) { await fetchSources(args.includes('--pin')); return; }
+  if (args.includes('--validate')) {
+    const rows = await validateRebuild(VALUE_WEIGHTS);
+    for (const r of rows) {
+      console.log(`${r.season} as ${r.as}: ${r.schools} schools field a squad (real ${r.real}), ${r.onRoster} of the squads on the real roster (linemen ${r.linemen}), `
+        + `${r.recovered} of the real squads recovered, Spearman ${r.spearman}; placed ${JSON.stringify(r.placed)}`);
+    }
+    const file = path.join(outDir, 'rebuild-check.json');
+    const text = `${JSON.stringify({ note: VALIDATION_NOTE, seasons: VALIDATION_SEASONS, rows }, null, 2)}\n`;
+    if (check) {
+      const current = existsSync(file) ? (await readFile(file, 'utf8')).replace(/\r\n/g, '\n') : null;
+      if (current !== text) throw new Error(`differs: ${path.relative(root, file)}`);
+      console.log(`Verified ${path.relative(root, file)} byte for byte.`);
+    } else if (args.includes('--write')) {
+      await writeFile(file, text);
+      console.log(`Wrote ${path.relative(root, file)}`);
+    }
+    return;
+  }
   if (args.includes('--tune')) {
     const result = await tune();
     for (const [regime, positions] of Object.entries(result.regimes)) {

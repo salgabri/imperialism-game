@@ -129,9 +129,9 @@ test('college football: conference seasons score and spread as the FBS\'s of 202
   within(college.twoPointShare, real.twoPointShare, 'touchdowns going for two', 0.005);
 });
 
-test('college football: each FBS season from 2009 replayed on its own schedule spreads its standings as the real one did', () => {
+test('college football: each FBS season from 2004 replayed on its own schedule spreads its standings as the real one did', () => {
   const seasons = report.collegeSeasons;
-  assert.deepEqual(seasons.map(season => season.year), Array.from({ length: 17 }, (_, i) => 2009 + i));
+  assert.deepEqual(seasons.map(season => season.year), Array.from({ length: 22 }, (_, i) => 2004 + i));
   const gaps = seasons.map(season => season.winPctSd - season.real.winPctSd);
   // Each season within 0.02 of its own (one real season's spread is itself a draw, about 0.007 either way), and the
   // seasons together within 0.006: before college form was halved and no longer stretched by the scale, 0.012 too even.

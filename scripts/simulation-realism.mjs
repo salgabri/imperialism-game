@@ -3,7 +3,7 @@
 // American football also plays a few earlier NFL and AFL seasons' clubs under their own day's rules (NFL_ERAS), the
 // computed ones also on their own schedules beside the real standings' spread and margins (ownSchedule), and ice
 // hockey and rugby league a few earlier seasons' clubs under theirs (NHL_ERAS, NRL_ERAS). College football plays the
-// built-in season's schools in conference seasons (collegeSeason) and every computed FBS season, 2009–2025, on its own
+// built-in season's schools in conference seasons (collegeSeason) and every computed FBS season, 2004–2025, on its own
 // schedule beside the real one (collegeOwnSchedules).
 // Tennis has no league: its nations play Davis Cup ties (the women's game's, Billie Jean King Cup ties), the sixteen
 // strongest each meeting every other once a season; and a season of each earlier format the cups played, under its
@@ -522,7 +522,7 @@ const srsSigma = games => srsOf(games.map(g => ({ home: g.home, away: g.away, ho
 const SIGMA_REPLAYS = 10;
 
 /**
- * Every computed FBS season (cfb-2009 to cfb-2025) on its own schedule, every game between two of its schools in its
+ * Every computed FBS season (cfb-2004 to cfb-2025) on its own schedule, every game between two of its schools in its
  * snapshot (scripts/data/cfb-seasons/: the games its schools' move toward their results read), `seasons` times under its
  * own day's rules, each replay beside the real season as a fan would read one: the standings' spread (win% SD), the luck
  * (the margins' spread about the replay's own SRS, as the real season's about its own), points a team, margins and
@@ -1274,9 +1274,11 @@ export const REAL = Object.freeze({
   },
   college: collegeReal(),
   // Each FBS season's games between FBS schools that went to overtime, of those ESPN's drives cover to the fourth
-  // quarter (sportsdataverse's cfbfastR-cfb-data, cached in data-src/cfb-history/, counted 2026-11-18): a drive in a fifth
-  // period or later, the final margin within 8 (ESPN numbers a few other games' last drives past the fourth quarter).
-  collegeOvertime: Object.freeze({ 2009: [25, 696], 2010: [27, 694], 2011: [30, 703], 2012: [44, 717], 2013: [33, 736], 2014: [29, 746],
+  // quarter (sportsdataverse's cfbfastR-cfb-data, cached in data-src/cfb-history/, counted 2026-11-18, 2004–2008 on
+  // 2026-11-20): a drive in a fifth period or later, the final margin within 8 (ESPN numbers a few other games' last
+  // drives past the fourth quarter).
+  collegeOvertime: Object.freeze({ 2004: [21, 441], 2005: [32, 562], 2006: [31, 624], 2007: [30, 622], 2008: [29, 685], 2009: [25, 696],
+    2010: [27, 694], 2011: [30, 703], 2012: [44, 717], 2013: [33, 736], 2014: [29, 746],
     2015: [32, 758], 2016: [37, 745], 2017: [28, 769], 2018: [30, 763], 2019: [23, 770], 2020: [21, 528], 2021: [30, 741], 2022: [44, 747],
     2023: [43, 785], 2024: [38, 782], 2025: [44, 807] }),
   mlb: {
@@ -1589,7 +1591,7 @@ EuroLeague — ${e.clubs} clubs, ${e.games} games (real: ${re.note})`);
   lines.push(row('extra points made', c.xpRate, rc.xpRate, pct));
   lines.push(row('touchdowns going for two', c.twoPointShare, rc.twoPointShare, pct));
   lines.push(row('favourite wins', c.favourite.wins, null, pct));
-  lines.push('\nFBS seasons 2009–2025 on their own schedules — each season\'s computed schools under its own day\'s rules, every'
+  lines.push('\nFBS seasons 2004–2025 on their own schedules — each season\'s computed schools under its own day\'s rules, every'
     + ' game between two of them (real: the season\'s games)');
   lines.push(`  ${'season'.padEnd(7)} ${'win% SD'.padEnd(15)} ${'luck (SRS σ)'.padEnd(13)} ${'points a team'.padEnd(15)} ${'mean margin'.padEnd(13)}`
     + ` ${'one-score (≤ 8)'.padEnd(17)} ${'overtime'.padEnd(13)}`);

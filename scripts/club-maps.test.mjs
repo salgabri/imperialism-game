@@ -115,19 +115,19 @@ for (const entry of CLUB_MAPS) {
   });
 }
 
-// ---------- college football: the FBS seasons 2009–2025 (scripts/data/cfb-seasons.json) ----------
+// ---------- college football: the FBS seasons 2004–2025 (scripts/data/cfb-seasons.json) ----------
 
 const CFB_TEAMS = JSON.parse(read('scripts/data/cfb-teams.json')).teams;
 const CFB = JSON.parse(read('scripts/data/cfb-seasons.json'));
-const FBS_YEARS = Array.from({ length: 17 }, (_, i) => 2009 + i);
+const FBS_YEARS = Array.from({ length: 22 }, (_, i) => 2004 + i);
 // Today's schools as today's map ranks them (strongest first), then the schools the built-in season lacks.
 const CFB_ORDER = [...JSON.parse(read('public/domestic/cfb.json')).clubs.map(club => club.id), ...Object.keys(CFB.schools)];
 // The contiguous states, and Hawaii.
 const inUSA = ([lon, lat]) => (lon > -125 && lon < -66.9 && lat > 24.5 && lat < 49.4) || (lon > -160.3 && lon < -154.8 && lat > 18.9 && lat < 22.3);
 
-test('the FBS seasons 2009–2025: each on one era map of its schools, each venue era a stadium of seasons its school played', () => {
+test('the FBS seasons 2004–2025: each on one era map of its schools, each venue era a stadium of seasons its school played', () => {
   const { maps, venues, schools, espn } = CFB;
-  assert.deepEqual(maps.flatMap(map => map.seasons), FBS_YEARS, 'the maps serve 2009 to 2025, each season once, in order');
+  assert.deepEqual(maps.flatMap(map => map.seasons), FBS_YEARS, 'the maps serve 2004 to 2025, each season once, in order');
   const placesOf = (map, year = map.seasons[0]) => JSON.stringify(cfbTeamsOf(CFB_TEAMS, CFB, year, CFB_ORDER));
   maps.forEach((map, i) => {
     assert.equal(map.id, `cfb${map.seasons[0]}`);
@@ -142,7 +142,12 @@ test('the FBS seasons 2009–2025: each on one era map of its schools, each venu
   for (const [id, school] of Object.entries(schools)) {
     assert.ok(!CFB_TEAMS[id], `${id} is a school of the built-in season`);
     assert.ok(school.name && /^[A-Z]{3}$/.test(school.code) && school.city && school.stadium && inUSA(school.home), `${id}: named, coded and placed`);
-    assert.ok(!Object.values(CFB_TEAMS).some(team => team.code === school.code || team.city === school.city), `${id}: its code and town its own`);
+    assert.ok(!Object.values(CFB_TEAMS).some(team => team.code === school.code), `${id}: its code its own`);
+    // A map names each school by its town, so a town is its own on every map the school plays on (Florida A&M, of
+    // Tallahassee as Florida State is, plays none: its 2004 cannot field).
+    for (const map of maps.filter(item => item.schools.includes(id))) {
+      assert.ok(!map.schools.some(other => other !== id && (CFB_TEAMS[other] ?? schools[other]).city === school.city), `${id}: its town its own on ${map.id}`);
+    }
   }
   for (const [id, eras] of Object.entries(venues)) {
     const today = CFB_TEAMS[id] ?? schools[id];
@@ -195,7 +200,7 @@ for (const entry of CLUB_MAPS.filter(item => item.sport === 'college-football' &
   });
 }
 
-test('an FBS season\'s map holds a school where it played: Kansas City in 2024, Carson, Foxborough, Houston; Idaho Boise State\'s', () => {
+test('an FBS season\'s map holds a school where it played: Kansas City in 2024, Carson, Foxborough, the Orange Bowl; Idaho its own to 2008', () => {
   const ownerAt = (mapId, point) => {
     const { clubs, geo } = decodeDomestic(JSON.parse(read(`public/domestic/${mapId}.json`)), mapId);
     const section = geo.countries.find(item => pointInPolys(point, item.polys))?.id;
@@ -211,8 +216,13 @@ test('an FBS season\'s map holds a school where it played: Kansas City in 2024, 
   assert.equal(ownerAt('cfb2025', [-95.35, 29.75]), 'cfb-sam-houston', 'Sam Houston at Shell Energy Stadium, Houston');
   assert.equal(ownerAt('cfb2011', [-122.44, 37.76]), 'cfb-cal', 'Cal at AT&T Park, San Francisco');
   assert.equal(ownerAt('cfb2013', [-84.4, 33.76]), 'cfb-georgia-state', 'Georgia State at the Georgia Dome');
-  // Idaho, FBS to 2017, fields no season (its rosters are too thin): Boise State holds the whole state.
+  assert.equal(ownerAt('cfb2005', [-80.22, 25.778]), 'cfb-miami', 'Miami at the Orange Bowl to 2007');
+  assert.equal(ownerAt('cfb2005', [-81.403, 28.539]), 'cfb-ucf', 'UCF at the Florida Citrus Bowl to 2006');
+  assert.equal(ownerAt('cfb2006', [-81.456, 41.039]), 'cfb-akron', 'Akron at the Rubber Bowl to 2008');
+  // Idaho, FBS to 2017, fields 2004–2008 on rosters rebuilt from its signings and no season after (its rosters list no
+  // linemen): Moscow is its own on those seasons' maps, Boise State's on the rest.
   for (const entry of CLUB_MAPS.filter(item => item.sport === 'college-football')) {
-    assert.equal(ownerAt(entry.id, moscow), 'cfb-boise-state', `${entry.id}: Moscow, Idaho is Boise State's`);
+    const idaho = (entry.seasons ?? []).some(id => Number(id.slice(4)) < 2009);
+    assert.equal(ownerAt(entry.id, moscow), idaho ? 'cfb-idaho' : 'cfb-boise-state', `${entry.id}: Moscow, Idaho`);
   }
 });

@@ -1,7 +1,8 @@
-// The earlier college football seasons (docs/design/college-football.md, "Earlier seasons"): the FBS seasons 2009 to
-// 2025, computed from sportsdataverse's facts. The library's readers and value on invented rows (scripts/lib/cfb-history.mjs);
-// every committed snapshot's invariants (its schools, squads, ratings, SRS and moves recomputed from the snapshot alone)
-// and the frozen weights; the snapshots rebuilt byte for byte where data-src/ holds the pinned sources (CI has none);
+// The earlier college football seasons (docs/design/college-football.md, "Earlier seasons"): the FBS seasons 2004 to
+// 2025, computed from sportsdataverse's facts, those before 2009 on rosters rebuilt from their box scores and recruiting
+// classes. The library's readers, rebuild and value on invented rows (scripts/lib/cfb-history.mjs); every committed
+// snapshot's invariants (its schools, squads, ratings, SRS and moves recomputed from the snapshot alone), the frozen weights
+// and the rebuild's validation; the snapshots rebuilt byte for byte where data-src/ holds the pinned sources (CI has none);
 // every season built from its snapshot onto its era's map, its listing and audit; the loader's refusals; and the running
 // App choosing a season, launching its schools on their era's map, saving and resuming.
 import test from 'node:test';
@@ -9,12 +10,12 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import {
-  boxOf, DEPTH, fitWeights, participantsOf, PARTICIPANTS_FROM, pooledWindow, positionOf, POSITIONS, rateSeason, rawSignals,
-  recruitsOf, regimeOf, scheduleOf, shrinkSignals, SIGNALS, standardise,
+  boxOf, DEPTH, FIRST_SEASON, fitWeights, participantsOf, PARTICIPANTS_FROM, pooledWindow, positionOf, POSITIONS, rateSeason, rawSignals,
+  cleanName, plain, rebuiltRoster, recruitsOf, regimeOf, repairedClasses, ROSTERS_FROM, scheduleOf, seasonPlayers, shrinkSignals, SIGNALS, standardise,
 } from './lib/cfb-history.mjs';
 import { ratingsOf, spearman, srsOf } from './lib/computed-ratings.mjs';
 import { FORMATION, shortOf, squadOf } from './lib/nfl.mjs';
-import { MAX_GAPS, VALUE_WEIGHTS } from './sync-cfb-seasons.mjs';
+import { MAX_GAPS, VALIDATION_SEASONS, VALUE_WEIGHTS } from './sync-cfb-seasons.mjs';
 
 const root = new URL('../', import.meta.url);
 const read = file => readFileSync(new URL(file, root), 'utf8');
@@ -40,6 +41,16 @@ test('a roster position is the game\'s; a generic defensive back a corner or a s
   assert.equal(positionOf({ code: null, box: { passAtt: 30, rushAtt: 5, rec: 0, fga: 0, xpa: 0 } }), 'QB');
   assert.equal(positionOf({ code: null, box: { passAtt: 0, rushAtt: 2, rec: 9, fga: 0, xpa: 0 } }), 'WR');
   assert.equal(positionOf({ code: 'ATH' }), null, 'nothing places him');
+});
+
+test('a name loses the sources\' tags: a generational suffix\'s comma, a bracketed tag, an underscore', () => {
+  assert.equal(cleanName('Dante Fowler, Jr.'), 'Dante Fowler Jr.');
+  assert.equal(cleanName('Joe (player) Cox'), 'Joe Cox', 'the recruiting classes\' namesake tag');
+  assert.equal(cleanName('Travian Robertson (player)'), 'Travian Robertson');
+  assert.equal(cleanName('Omowale (Wally) Dada'), 'Omowale Dada', 'a box score\'s nickname');
+  assert.equal(cleanName('Jake_ Matthews_'), 'Jake Matthews');
+  assert.equal(plain('Joe (player) Cox'), plain('Joe Cox'), 'and he is matched as his rosters name him');
+  assert.equal(plain('Vernon Hargreaves III'), 'vernonhargreaves');
 });
 
 test('recruits are found by name and school, a name two recruits share by neither', () => {
@@ -80,6 +91,74 @@ test('a season\'s schools are the FBS schools that played one another; its games
   assert.deepEqual([...schools].sort(), [1, 2], 'school 3 played no FBS school (New Mexico State in 2020)');
   assert.deepEqual(games.map(x => [x.id, x.neutral, x.postseason]), [[1, false, false], [3, true, true]], 'an unplayed game is left out');
   assert.equal(conference.get(3), 'A');
+});
+
+test('a game ESPN lists twice under two ids counts once, and its twin\'s box-score rows not at all', () => {
+  const g = (game_id, home_id, away_id, home_points, away_points, start_date, extra = {}) => ({ game_id, season_type: 'regular', completed: true,
+    neutral_site: false, home_id, away_id, home_points, away_points, home_division: 'fbs', away_division: 'fbs', home_conference: 'A', away_conference: 'B',
+    start_date, week: 6, ...extra });
+  const { games, twins } = scheduleOf([g(282780025, 25, 9, 24, 14, '2008-10-04T23:00Z'), g(400361396, 25, 9, 24, 14, '2008-10-05T02:00Z'),
+    g(333550309, 309, 2433, 21, 24, '2013-12-22T01:00Z', { neutral_site: true }), g(400520954, 2433, 309, 24, 21, '2013-12-22T01:00Z'),
+    g(5, 25, 9, 24, 14, '2008-11-29T20:00Z'), g(6, 1, 2, 10, 7, null, { week: 3 }), g(7, 1, 2, 10, 7, null, { week: 9 })]);
+  assert.deepEqual(games.map(x => x.id), [5, 6, 7, 282780025, 333550309], 'the same score on another day, or another week, is a game of its own');
+  assert.deepEqual([...twins].sort((a, b) => a - b), [400361396, 400520954], 'the later id goes, the home side swapped or not');
+  assert.ok(games.every(x => !('day' in x) && !('week' in x)));
+  const rush = game_id => ({ game_id, team_id: 25, athlete_id: 1, athlete_name: 'A Back', category: 'rushing', rushingAttempts: '10', rushingYards: '50', rushingTouchdowns: '0' });
+  const box = boxOf([rush(282780025), rush(400361396)], null, twins);
+  assert.deepEqual([box.get(1).games.size, box.get(1).rushYds], [1, 50]);
+});
+
+test('a recruiting row the source files under no team takes its team\'s id from the other classes, Hawaii\'s from the game', () => {
+  const row = (player_name, team_id, team) => ({ player_name, team_id: String(team_id), team, position: 'OT', grade: 80, stars: 3, recruit_id: '1' });
+  const classes = new Map([[2015, [row('A', 5, 'UAB Blazers'), row('B', 0, 'UAB Blazers')]],
+    [2016, [row('C', 0, 'UAB Blazers'), row('D', 0, 'Hawaii Rainbow Warriors'), row('E', 0, 'Wayne State Warriors')]]]);
+  const fixed = repairedClasses(classes, { 'cfb-hawaii': 62 });
+  assert.deepEqual([...fixed.values()].flat().map(r => r.team_id), ['5', '5', '5', '62', '0'], 'a school no class names keeps none');
+  assert.equal(classes.get(2015)[1].team_id, '0', 'the rows as read are left alone');
+});
+
+test('a season no roster lists is rebuilt from its box scores, the recruits later seasons confirm, its newest signings and, where short, older ones', () => {
+  const espnOf = { 'cfb-a': 1, 'cfb-b': 2 };
+  const line = (team, name, extra = {}) => ({ team, names: new Set([name]), games: new Set([1]), passAtt: 0, rushAtt: 0, rec: 0, fga: 0, xpa: 0, int: 0, ...extra });
+  const boxes = new Map([[2005, new Map([[103, line(1, 'Old Hand')]])], [2006, new Map([[101, line(1, 'Box Back', { rushAtt: 40 })], [102, line(2, 'Gone Away')],
+      [107, { ...line(1, 'Box Back'), games: new Set() }]])],
+    [2008, new Map([[104, line(1, 'Later Line')], [106, line(1, 'Too Old')]])]]);
+  const rosters = new Map([[2009, [{ id: 105, name: 'Rostered Later', school: 'cfb-a', position: 'OT', weight: 310, height: 77 }]]]);
+  const r = (player_name, team_id, position, recruit_id, grade = 85) => ({ player_name, team_id: String(team_id), position, grade, stars: 3, recruit_id: String(recruit_id) });
+  const classes = new Map([
+    [2001, [r('Too Old', 1, 'OT', 1)]],
+    [2002, [r('Later Line', 1, 'WR', 2), r('Rostered Later', 1, 'OT', 3), r('Old Lineman', 1, 'OT', 4, 80), r('Older Lineman', 1, 'OT', 5, 90)]],
+    [2004, [r('Old Hand', 1, 'RB', 6), r('Spare Lineman', 1, 'OT', 12, 99)]],
+    [2005, [r('Moved On', 1, 'DT', 7), r('Gone Away', 1, 'CB', 8)]],
+    [2006, [r('New Signee', 1, 'OG', 9), r('Box Back', 1, 'RB', 10), r('Moved On', 2, 'DT', 11)]],
+  ]);
+  const roster = rebuiltRoster(2006, { boxes, rosters, classes, espnOf, schools: new Set([1, 2]), needs: { OL: 4 } });
+  const of = name => roster.filter(e => e.name === name);
+  assert.deepEqual(of('Box Back').map(e => [e.rebuilt, e.id, e.school]), [['box', 101, 'cfb-a']],
+    'his box-score line places him (his second ESPN id, of fewer games, and his signing add no one)');
+  assert.deepEqual(of('Gone Away').map(e => e.school), ['cfb-b'], 'he plays where his box score is, not where he signed');
+  assert.deepEqual(of('Later Line').map(e => [e.rebuilt, e.id]), [['confirmed', 104]], 'a later season\'s line confirms a recruit of four classes before, its id his');
+  assert.deepEqual(of('Rostered Later').map(e => [e.rebuilt, e.id, e.weight, e.height]), [['confirmed', 105, 310, 77]], 'and a later roster, with his weight');
+  assert.deepEqual(of('New Signee').map(e => [e.rebuilt, e.id]), [['signed', -9]], 'the season\'s own signing whom nothing places elsewhere');
+  assert.deepEqual(of('Moved On').map(e => [e.rebuilt, e.school]), [['signed', 'cfb-b']], 'a later class of another school takes him from his first');
+  assert.deepEqual(of('Old Hand'), [], 'a line at the school before and none since: he has left');
+  assert.deepEqual(of('Too Old'), [], 'a class more than CLASS_SPAN before the season');
+  // cfb-a has two linemen (New Signee, Rostered Later): its two best older signings at the position fill the places, the latest class first.
+  assert.deepEqual(roster.filter(e => e.rebuilt === 'filled').map(e => [e.name, e.school, e.id]), [['Spare Lineman', 'cfb-a', -12], ['Older Lineman', 'cfb-a', -5]]);
+});
+
+test('a rebuilt season whose oldest classes the sources lack reads a player no class lists as an unrated recruit of unknown years', () => {
+  const box = { team: 1, names: new Set(['Senior Back']), games: new Set([1, 2]), passAtt: 0, passCmp: 0, passYds: 0, passTd: 0, passInt: 0, rushAtt: 30,
+    rushYds: 150, rushTd: 1, rec: 0, recYds: 0, recTd: 0, int: 0, fgm: 0, fga: 0, xpm: 0, xpa: 0, returns: 0 };
+  const data = season => ({ season, espnOf: { 'cfb-a': 1 }, rosters: new Map([[season, [{ id: 7, name: 'Senior Back', school: 'cfb-a', position: null, weight: null, rebuilt: 'box' }]]]),
+    boxes: new Map([[season, new Map([[7, box]])]]), participants: new Map(),
+    totals: new Map([[season, new Map([[1, { games: new Set([1, 2]), passAtt: 0, rushAtt: 60, rec: 0, recYds: 0 }]])]]), fbs: new Map([[season, new Set([1])]]),
+    schools: new Set([1]), recruits: recruitsOf([]), firstSeen: new Map([[7, 2004]]), history: new Map(), rebuilt: true, classFrom: 2002, boxFrom: 2004 });
+  const [early] = seasonPlayers(data(2004)).players;
+  assert.deepEqual([early.position, early.exp, early.signals.recruited, early.signals.exp, early.rebuilt], ['RB', 1, true, null, 'box'],
+    '2004\'s seniors signed in 2000 and 2001, classes the sources lack');
+  const [later] = seasonPlayers(data(2006)).players;
+  assert.deepEqual([later.exp, later.signals.recruited, later.signals.exp], [3, false, 3], 'from 2006 every class a player could be of is listed');
 });
 
 test('a player\'s window pools three seasons 3:2:1 by his school\'s games; the plays\' signals only where they are named', () => {
@@ -146,12 +225,26 @@ test('each school\'s best at a position are rated by their rank across the seaso
   for (let i = 1; i < order.length; i++) assert.ok(order[i].rating <= order[i - 1].rating, 'a higher value never rates lower');
 });
 
+test('a rebuilt season reads each position as the best of its schools\' full depth, those it cannot name ranking below', () => {
+  const reference = Array.from({ length: 100 }, (_, i) => i);
+  assert.deepEqual([...ratingsOf([1, 2, 3, 4], reference).values()], [12, 37, 62, 87], 'read among themselves');
+  assert.deepEqual([...ratingsOf([1, 2, 3, 4], reference, { population: 100 }).values()], [96, 97, 98, 99], 'the best four of a hundred');
+  assert.throws(() => ratingsOf([1, 2, 3, 4], reference, { population: 3 }), /A population of 3 for 4 values/);
+  const players = ['a', 'b'].flatMap(school => [0, 1].map(i => ({ id: school + i, name: school + i, school, position: 'QB',
+    value: school === 'a' ? 2 - i : -i, exp: 1, grade: null })));
+  const qb = { QB: [60, 65, 70, 75, 80, 85, 90, 95] };
+  const ratings = options => rateSeason(structuredClone(players), qb, ratingsOf, options).rated.map(p => p.rating).sort((x, y) => x - y);
+  assert.deepEqual(ratings(), [63, 73, 83, 93]);
+  assert.deepEqual(ratings({ schools: 2 }), [80, 85, 90, 95], 'two schools of four quarterbacks each (DEPTH): the four it has are the best of eight');
+});
+
 // ---------- the committed snapshots ----------
 
 const SEASONS = manifest.seasons;
 
-test('the seasons are 2009 to 2025, their regimes as the plays name their tacklers from 2014', () => {
-  assert.deepEqual(SEASONS, Array.from({ length: 17 }, (_, i) => 2009 + i));
+test('the seasons are 2004 to 2025, their regimes as the plays name their tacklers from 2014', () => {
+  assert.deepEqual(SEASONS, Array.from({ length: 22 }, (_, i) => 2004 + i));
+  assert.equal(FIRST_SEASON, 2004);
   for (const year of SEASONS) assert.equal(snapshotOf(year).source.regime, year >= PARTICIPANTS_FROM ? 'full' : 'early');
   assert.equal(regimeOf(2013), 'early');
   assert.equal(regimeOf(2014), 'full');
@@ -170,6 +263,45 @@ test('the frozen weights are the calibration\'s, and order College Football 27\'
     }
   }
   assert.ok(!SIGNALS.early.LB.some(signal => ['tacklesPG', 'sacksPG', 'pdPG', 'appearShare'].includes(signal)), 'the early seasons read no named plays');
+});
+
+test('the seasons before 2009 play rebuilt rosters, each snapshot counting how its players were placed', () => {
+  for (const year of SEASONS) {
+    const s = snapshotOf(year);
+    if (year >= ROSTERS_FROM) {
+      assert.ok(!('rebuilt' in s), `${year} plays its roster`);
+      assert.ok(!s.conversion.overall.includes('No roster lists'));
+      continue;
+    }
+    const squads = Object.values(s.squads).flat().length;
+    assert.deepEqual(Object.keys(s.rebuilt.squads), ['box', 'confirmed', 'signed', 'filled']);
+    assert.equal(Object.values(s.rebuilt.squads).reduce((t, n) => t + n, 0), squads, `${year}: every squad player placed`);
+    assert.ok(s.rebuilt.squads.box + s.rebuilt.squads.confirmed > squads * 0.5, `${year}: most of the squads have a record of their season or a later one`);
+    assert.ok(s.rebuilt.squads.filled < squads * 0.02, `${year}: few places filled from older classes`);
+    assert.ok(s.conversion.overall.startsWith('Computed: No roster lists the season\'s players, so each school\'s are rebuilt'));
+  }
+  assert.match(snapshotOf(2004).conversion.overall, /pooled over 2004 alone \(ESPN's box scores begin with it\)/);
+  assert.match(snapshotOf(2005).conversion.overall, /pooled over 2005 and 2004 3:2/);
+  // ESPN files no FBS school's recruits under Florida A&M, FBS only in 2004: it cannot field, and says so.
+  assert.ok(snapshotOf(2004).left.schools.some(left => left.school === 'cfb-florida-am'));
+});
+
+test('the rebuild\'s validation: 2010 and 2012 rebuilt as each season before 2009 would be, against their real rosters', () => {
+  const check = JSON.parse(read('scripts/data/cfb-seasons/rebuild-check.json'));
+  assert.deepEqual(check.seasons, [...VALIDATION_SEASONS]);
+  assert.deepEqual(check.rows.map(row => [row.season, row.as]), VALIDATION_SEASONS.flatMap(season => SEASONS.filter(as => as < ROSTERS_FROM).map(as => [season, as])));
+  for (const row of check.rows) {
+    const label = `${row.season} as ${row.as}`;
+    assert.ok(row.schools >= row.real - 8, `${label}: ${row.schools} of ${row.real} schools field a squad`);
+    assert.ok(row.onRoster >= 0.85, `${label}: ${row.onRoster} of its squads on the real roster`);
+    assert.ok(row.linemen >= 0.75, `${label}: linemen ${row.linemen}`);
+    assert.ok(row.spearman >= (row.as >= 2006 ? 0.9 : 0.78), `${label}: the schools ordered at ${row.spearman}`);
+  }
+  // The more of the later seasons' records a season has, the closer its rebuild.
+  for (const season of VALIDATION_SEASONS) {
+    const rows = check.rows.filter(row => row.season === season);
+    for (let i = 1; i < rows.length; i++) assert.ok(rows[i].recovered > rows[i - 1].recovered, `${season} as ${rows[i].as} recovers more than as ${rows[i - 1].as}`);
+  }
 });
 
 test('every snapshot\'s squads are the game\'s lineup and backups of its rated players, its gaps documented', () => {
@@ -202,7 +334,7 @@ test('every school moves toward its results: the SRS recomputed from the snapsho
     assert.equal(Math.round(srs.reliability * 1000) / 1000, s.conversion.move.srs.reliability, `${year}'s reliability`);
     const scale = Math.sqrt(srs.reliability) / s.conversion.move.perPoint;
     for (const [school, m] of Object.entries(s.moves)) {
-      assert.equal(m.srs, Math.round(srs.ratings[school] * 100) / 100, `${year} ${school}'s SRS`);
+      assert.equal(m.srs, Math.round(srs.ratings[school] * 100) / 100 + 0, `${year} ${school}'s SRS (a JSON file has no −0)`);
       assert.ok(Math.abs(m.target - (s.conversion.move.mean + scale * srs.ratings[school])) < 0.02, `${year} ${school}'s target`);
       assert.ok(Math.abs(m.after - m.target) <= 0.25 || m.after >= 98, `${year} ${school} lands at ${m.after} for ${m.target}`);
     }
@@ -212,8 +344,8 @@ test('every school moves toward its results: the SRS recomputed from the snapsho
   }
 });
 
-// Each season's national champion (the BCS's to 2013, the College Football Playoff's since).
-const CHAMPIONS = { 2009: 'alabama', 2010: 'auburn', 2011: 'alabama', 2012: 'alabama', 2013: 'florida-state', 2014: 'ohio-state', 2015: 'alabama',
+// Each season's national champion (the BCS's to 2013, the College Football Playoff's since; USC's of 2004 later vacated).
+const CHAMPIONS = { 2004: 'usc', 2005: 'texas', 2006: 'florida', 2007: 'lsu', 2008: 'florida', 2009: 'alabama', 2010: 'auburn', 2011: 'alabama', 2012: 'alabama', 2013: 'florida-state', 2014: 'ohio-state', 2015: 'alabama',
   2016: 'clemson', 2017: 'alabama', 2018: 'clemson', 2019: 'lsu', 2020: 'alabama', 2021: 'georgia', 2022: 'georgia', 2023: 'michigan',
   2024: 'ohio-state', 2025: 'indiana' };
 
@@ -231,7 +363,7 @@ test('every season\'s national champion is among its five strongest schools', ()
 
 test('the snapshots rebuild byte for byte from the pinned sources (where data-src/ has them)', { skip: !existsSync(new URL('data-src/cfb-history/cfbfastR-cfb-data/player_box/player_box_2025.parquet', root)) && 'data-src/cfb-history/ is not here' }, async () => {
   const { execFileSync } = await import('node:child_process');
-  for (const season of [2011, 2025]) {
+  for (const season of [2006, 2011, 2025]) {
     execFileSync(process.execPath, [fileURLToPath(new URL('scripts/sync-cfb-seasons.mjs', root)), `--season=${season}`, '--check'], { stdio: 'pipe', timeout: 600000 });
   }
 });
@@ -258,7 +390,7 @@ test('every season, its listing and audit rebuild byte for byte from the committ
     new RegExp(`Verified the ${SEASONS.length} college football seasons`));
 });
 
-test('the built-in seasons are 2025 back to 2009, newest first, each labelled computed and on its era\'s map', () => {
+test('the built-in seasons are 2025 back to 2004, newest first, each labelled computed and on its era\'s map', () => {
   assert.deepEqual(BUILT_IN_COLLEGE_FOOTBALL_SEASONS.map(set => set.id), SEASONS.slice().reverse().map(seasonIdOf));
   assert.deepEqual(builtInSeasonOf(SPORT), { year: 2026, season: '2026' }, 'the built-in season stays the current one');
   for (const listed of BUILT_IN_COLLEGE_FOOTBALL_SEASONS) {
@@ -305,6 +437,10 @@ test('every season loads and fits its era\'s map: its schools, named, coloured a
     assert.ok(snapshotOf(year).left.schools.some(left => left.school === 'cfb-idaho' && left.short.OL >= 4), `${year}'s snapshot says why`);
   }
   assert.ok(!seasonFile('cfb-2020').clubs.some(club => club.id === 'cfb-new-mexico-state'), 'New Mexico State played no FBS school in 2020');
+  for (const year of [2004, 2006, 2008]) {
+    assert.ok(seasonFile(`cfb-${year}`).clubs.some(club => club.id === 'cfb-idaho'), `Idaho plays ${year} on its signings, rebuilt`);
+    assert.ok(seasonFile(`cfb-${year}`).clubs.some(club => club.id === 'cfb-hawaii'), `Hawaii, its recruits filed under no team, plays ${year}`);
+  }
 });
 
 test('the loader refuses an FBS season that is not the builder\'s', () => {

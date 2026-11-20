@@ -35,7 +35,9 @@
 // - Possessions: regulation's drives of at least one offensive play. ESPN's drive lists also hold kick and turnover
 //   returns as drives of no play (a kick-off return touchdown, an interception return, before 2014 a punt return's twin of
 //   the punting team's drive) and, before 2014, a half that ended before the receiving side's first snap; none is a
-//   possession of the model's, and leaving out every drive of no play counts the same in every season.
+//   possession of the model's, and leaving out every drive of no play counts the same in every season. 2004's lists also
+//   log each kickoff as a drive of one play ('KICKOFF', with no description: about eight a game), which is no possession
+//   either; every later 'KICKOFF' drive has its plays described and stands.
 // - Field goals and extra points: the kickers' rows of the box score, overtime's included. 2011's rows name no missed
 //   extra point (each reads n/n, a miss counting as no try: `unrecorded`), so its extra points are unknown; its
 //   touchdowns still add up (a miss reads as a failed two-point try). Safeties: those the scoring counts, less any of
@@ -54,8 +56,8 @@ const MODULE = path.join(root, 'src/data/collegeLeagueAverages.js');
 const SEASON_FILES = path.join(root, 'public/college-football');
 const REPO = 'https://github.com/sportsdataverse/cfbfastR-cfb-data';
 
-/** The seasons the table holds: the FBS's 2009 (ESPN's first drives) to 2025. */
-export const SEASONS = Object.freeze(Array.from({ length: 17 }, (_, i) => 2009 + i));
+/** The seasons the table holds: the FBS's 2004 (ESPN's first box scores and drives) to 2025. */
+export const SEASONS = Object.freeze(Array.from({ length: 22 }, (_, i) => 2004 + i));
 /** The seasons College Football 27's rules were fitted on: every other season's rates move from theirs. */
 export const REFERENCE_SEASONS = Object.freeze([2024, 2025]);
 const TABLES = Object.freeze(['cfb_schedules', 'drives', 'player_box']);
@@ -70,6 +72,8 @@ const shootoutFrom = year => (year >= 2021 ? 3 : year >= 2019 ? 5 : null);
 export const isTouchdown = result => typeof result === 'string' && (/(^| )TD$/.test(result) || result === 'INT RETURN TOUCH');
 /** A drive result that is a field-goal try, made or missed ('FG', 'FG GOOD', 'MISSED FG', 'FG MISSED', a missed one returned 'MISSED FG TD' …). */
 export const isFieldGoalTry = result => typeof result === 'string' && /^(FG|FG GOOD|MISSED FG|FG MISSED)( TD)?$/.test(result);
+/** A kickoff ESPN's drive list logs as a drive of its own (2004's): 'KICKOFF' with no description of its plays. */
+export const isLoggedKickoff = drive => drive.result === 'KICKOFF' && drive.description == null;
 /** "made/tried" as two numbers, or null. */
 const madeOf = text => {
   const match = /^(\d+)\/(\d+)$/.exec(text ?? '');
@@ -121,7 +125,7 @@ export function seasonFigures(year, { schedule, drives, box }) {
   const shootout = shootoutFrom(year);
   for (const game of games) {
     const all = drivesOf.get(game.game_id) ?? [];
-    const possessions = all.filter(d => d.start_period >= 1 && d.start_period <= 4 && d.offensive_plays >= 1);
+    const possessions = all.filter(d => d.start_period >= 1 && d.start_period <= 4 && d.offensive_plays >= 1 && !isLoggedKickoff(d));
     if (![1, 2, 3, 4].every(quarter => possessions.some(d => d.start_period === quarter))) { out.left.drives++; continue; }
     if (shootout && all.some(d => d.start_period >= 4 + shootout)) { out.left.shootout++; continue; }
     const overtime = all.filter(d => d.start_period >= 5);
