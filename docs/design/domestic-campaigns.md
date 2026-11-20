@@ -948,13 +948,15 @@ in (`LEAGUES.cfb`, `npm run build:cfb-map`, built in about three seconds by the 
 - **Empty**: Montana, South Dakota, Maine, New Hampshire, Vermont, Rhode Island and DC; Alaska is dropped. North Dakota
   is North Dakota State's (the Mountain West's from 2026).
 
-**Era maps 2009–2025** (2026-11-18): the computed FBS seasons ([college-football.md](college-football.md)) play on 14
-maps of their own, `cfb2009` to `cfb2025`, one per run of seasons with the same schools at the same stadiums (2009–2010,
-2015–2016 and 2018–2019 share one each), built with today's by `npm run build:cfb-map` from
+**Era maps 2004–2025** (2026-11-18; 2004–2008 2026-11-20): the computed FBS seasons ([college-football.md](college-football.md))
+play on 19 maps of their own, `cfb2004` to `cfb2025`, one per run of seasons with the same schools at the same stadiums
+(2009–2010, 2015–2016 and 2018–2019 share one each; 2004 to 2008 each have one), built with today's by `npm run build:cfb-map` from
 `scripts/data/cfb-seasons.json`: `maps` lists each map's seasons and their `schools`, `venues` the stadiums of the day
 (scripts/lib/cfb-maps.mjs reads them). A season's schools are those that played a completed game against another FBS
-school, 119 in 2009 to 136 in 2025, in today's map's order. Idaho, FBS to 2017 and kept in the manifest's `schools`,
-fields no season (its rosters are too thin), so Boise State holds all of Idaho. Each school holds the state of the
+school and field a squad, 112 in 2004 to 136 in 2025, in today's map's order. Idaho, FBS to 2017 and kept in the
+manifest's `schools`, fields 2004–2008 on rosters rebuilt from its signings and no season after (its rosters are too
+thin), so Moscow is its own to 2008 and Boise State holds all of Idaho from 2009; Florida A&M, in the manifest for ESPN's
+2004, fields none. Each school holds the state of the
 stadium it played most of its home games in that season, counted from ESPN's schedule (sportsdataverse's
 cfbfastR-cfb-data) without neutral sites, and keeps its town's name. Where that is not today's stadium (a renamed one
 is the same), `venues` names it as it was then and places it from its English Wikipedia article at a pinned revision:
@@ -962,7 +964,10 @@ Floyd Casey Stadium, Robertson Stadium, the Superdome, Hughes Stadium, the Georg
 Sam Boyd Stadium, Qualcomm Stadium, Ladd–Peebles Stadium. Where ESPN names no venue, flags a season away from home as
 neutral or places games wrongly, the season's own Wikipedia article settles it, noted and pinned in the manifest
 (`evidence`): Cal at AT&T Park in 2011, Washington at CenturyLink Field in 2012, Houston at Reliant Stadium in 2013,
-North Texas at Fouts Field and FAU at Lockhart Stadium in 2009–2010, San Diego State at Carson in 2020–2021 (ESPN has
+North Texas at Fouts Field 2004–2010 and FAU at Lockhart Stadium 2008–2010, Akron at the Rubber Bowl and Minnesota at the
+Metrodome to 2008, Miami at the Orange Bowl to 2007 (FIU too in 2007), UCF at the Florida Citrus Bowl to 2006, Tulane at
+the Superdome through 2005, when Hurricane Katrina spread its home games over six grounds, Temple at Lincoln Financial
+Field in 2004 (ESPN has Franklin Field), San Diego State at Carson in 2020–2021 (ESPN has
 Qualcomm Stadium), Hawaii and UAB at their new stadiums from 2021, Northwestern at Martin Stadium in 2024–2025, Kansas
 at Arrowhead Stadium in 2024 (in Missouri, so Kansas State holds all of Kansas) and Sam Houston at Shell Energy
 Stadium, Houston, in 2025. UMass's three-and-three seasons of 2014–2016 go to the stadium of the season before,

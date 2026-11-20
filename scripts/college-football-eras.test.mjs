@@ -1,4 +1,4 @@
-// College football by era (docs/design/college-football.md, "Rules by era"): each FBS season from 2009 (data set
+// College football by era (docs/design/college-football.md, "Rules by era"): each FBS season from 2004 (data set
 // cfb-<year>) plays its day's scoring and the NCAA overtime of its day (src/sports/collegeFootball.js,
 // collegeSeasonRules), read through matchSport, and scores as its league did (src/data/collegeLeagueAverages.js); the
 // built-in season keeps today's rules, draw for draw, and so does the NFL.
@@ -56,17 +56,17 @@ test('the built-in season plays today\'s rules: matchSport hands back the sport 
   assert.ok(!('otTwoFrom' in COLLEGE_RULES) && !('otPlaysFrom' in COLLEGE_RULES), 'today\'s rulebook names no era');
   assert.deepEqual(collegeOvertimeOf(COLLEGE_RULES), { twoFrom: 2, playsFrom: 3 });
   // A season before the table plays today's rules.
-  assert.equal(collegeSeasonRules(2008, 'cfb-2008'), null);
-  assert.equal(matchSport(settingsOf(2008)), collegeFootball);
+  assert.equal(collegeSeasonRules(2003, 'cfb-2003'), null);
+  assert.equal(matchSport(settingsOf(2003)), collegeFootball);
 });
 
 test('the NCAA\'s overtime by year: the 1997 rules to 2018, two-point plays from the fifth period in 2019 and 2020, today\'s from 2021', () => {
-  assert.deepEqual([2009, 2013, 2018].map(collegeOvertimeRule), Array(3).fill({ otTwoFrom: 3, otPlaysFrom: null }));
+  assert.deepEqual([2004, 2009, 2013, 2018].map(collegeOvertimeRule), Array(4).fill({ otTwoFrom: 3, otPlaysFrom: null }));
   assert.deepEqual([2019, 2020].map(collegeOvertimeRule), Array(2).fill({ otTwoFrom: 3, otPlaysFrom: 5 }));
   assert.deepEqual([2021, 2025, 2026].map(collegeOvertimeRule), Array(3).fill({ otTwoFrom: 2, otPlaysFrom: 3 }));
 });
 
-test('every season from 2009 plays its own day\'s rules, one sport object per season', () => {
+test('every season from 2004 plays its own day\'s rules, one sport object per season', () => {
   const ruled = new Set(['simulationVersion', 'clock', 'prepareMatch', 'simulate']);
   const reference = totals(COLLEGE_REFERENCE_SEASONS);
   for (const year of YEARS) {
@@ -97,10 +97,15 @@ test('every season from 2009 plays its own day\'s rules, one sport object per se
     assert.deepEqual(Object.keys(sport), Object.keys(collegeFootball));
     for (const key of Object.keys(collegeFootball)) if (!ruled.has(key)) assert.equal(sport[key], collegeFootball[key], `${year} ${key}`);
   }
-  // The 2010s' faster game: 2014 had more possessions than any season, 2025 the fewest.
+  // Before the 40-second play clock of 2008 a game had more possessions, 2007 the most of any season, except 2006, whose
+  // clock started on the kick-off and on a change of possession; since 2008 2014 had the most, 2025 the fewest.
   const drives = YEARS.map(year => sportOf(year).prepareMatch(builtIn[0], builtIn[1]).drives);
-  assert.equal(YEARS[drives.indexOf(Math.max(...drives))], 2014);
+  const at = year => drives[YEARS.indexOf(year)];
+  assert.equal(YEARS[drives.indexOf(Math.max(...drives))], 2007);
   assert.equal(YEARS[drives.indexOf(Math.min(...drives))], 2025);
+  assert.ok(at(2006) < Math.min(at(2005), at(2007)), 'the 2006 clock rules');
+  const since = YEARS.filter(year => year >= 2008);
+  assert.equal(since.reduce((best, year) => (at(year) > at(best) ? year : best)), 2014);
   // 2011's box scores name no missed extra point: it kicks as 2010 and 2012 did between them.
   const xp = year => collegeSeasonRules(year, `cfb-${year}`).xp;
   assert.equal(COLLEGE_LEAGUE_AVERAGES[2011].xpa, null);
@@ -156,7 +161,8 @@ test('the scoring table rebuilds, every point adds up, and 2024 and 2025 agree w
     // Every point: six a touchdown, its extra point or two-point try, three a field goal, two a safety.
     assert.equal(s.points, 6 * s.td + s.xpm + 2 * s.twoMade + 3 * s.fgm + 2 * s.safeties, year);
     assert.equal(s.td, s.xpa + s.twoAtt, `${year}: a try or a walk-off for every touchdown`);
-    assert.ok(s.games / 2 >= 0.95 * s.fbs, `${year}: ${s.games / 2} of its ${s.fbs} games count`);
+    // ESPN's drives cover fewer games before 2009: 65% of 2004's, 80–86% of 2005–2007's, 94.6% of 2008's; since, 95% and more.
+    assert.ok(s.games / 2 >= (Number(year) >= 2009 ? 0.95 : 0.6) * s.fbs, `${year}: ${s.games / 2} of its ${s.fbs} games count`);
     assert.equal(s.games / 2 + s.left.drives + s.left.scoring + s.left.shootout, s.fbs, year);
     assert.ok(s.otTd < 0.02 * s.td && s.otFga < 0.03 * s.fga, `${year}: overtime is a small part`);
     assert.equal(!!s.unrecorded, Number(year) === 2011, `${year}: only 2011's box scores name no missed extra point`);
@@ -209,9 +215,9 @@ test('every season scores like its league, against today\'s: 26.1 points a team-
     const want = today.points * perGame(figures, 'points') / perGame(reference, 'points');
     const got = scoring(sportOf(year), schoolsOf(year));
     // A season's schools score as far from today's as its league did from 2024 and 2025's, across their pairings (its
-    // own schools where it has a file: their spread allowed for), within about a third of a point
-    // (docs/design/college-football.md, "Rules by era").
-    if (Math.abs(got.points - want) >= 0.6) misses.push(`${year}: ${got.points.toFixed(2)} points against ${want.toFixed(2)}`);
+    // own schools where it has a file: their spread allowed for), within about half a point: +0.1 to +0.5 from 2009, +0.4
+    // to +0.6 for 2004–2008, whose rates sit furthest from today's (docs/design/college-football.md, "Rules by era").
+    if (Math.abs(got.points - want) >= 0.7) misses.push(`${year}: ${got.points.toFixed(2)} points against ${want.toFixed(2)}`);
     const wantTd = today.touchdowns * perGame(figures, 'td') / perGame(reference, 'td');
     if (Math.abs(got.touchdowns / wantTd - 1) >= 0.03) misses.push(`${year}: ${got.touchdowns.toFixed(3)} touchdowns against ${wantTd.toFixed(3)}`);
   }

@@ -7,6 +7,11 @@
 // and rates a possession move College Football 27's rules (fitted on 2024 and 2025) by as far as they sit from 2024 and
 // 2025's (src/sports/collegeFootball.js, collegeSeasonRules).
 export const COLLEGE_LEAGUE_AVERAGES = Object.freeze({
+  2004: Object.freeze({ games: 856, points: 21728, td: 2729, otTd: 13, possessions: 11387, fga: 1342, otFga: 1, fgm: 893, xpa: 2570, xpm: 2463, safeties: 35 }),
+  2005: Object.freeze({ games: 1068, points: 27811, td: 3481, otTd: 26, possessions: 14095, fga: 1679, otFga: 14, fgm: 1166, xpa: 3248, xpm: 3117, safeties: 53 }),
+  2006: Object.freeze({ games: 1228, points: 29021, td: 3627, otTd: 16, possessions: 14723, fga: 1764, otFga: 6, fgm: 1246, xpa: 3386, xpm: 3239, safeties: 51 }),
+  2007: Object.freeze({ games: 1218, points: 33342, td: 4135, otTd: 32, possessions: 16228, fga: 2064, otFga: 22, fgm: 1494, xpa: 3887, xpm: 3748, safeties: 44 }),
+  2008: Object.freeze({ games: 1356, points: 35519, td: 4454, otTd: 12, possessions: 16892, fga: 2104, otFga: 24, fgm: 1480, xpa: 4268, xpm: 4115, safeties: 59 }),
   2009: Object.freeze({ games: 1382, points: 36133, td: 4480, otTd: 13, possessions: 17192, fga: 2222, otFga: 15, fgm: 1634, xpa: 4215, xpm: 4047, safeties: 50 }),
   2010: Object.freeze({ games: 1382, points: 37507, td: 4721, otTd: 33, possessions: 17313, fga: 2058, otFga: 18, fgm: 1525, xpa: 4508, xpm: 4348, safeties: 43 }),
   2011: Object.freeze({ games: 1396, points: 38137, td: 4815, otTd: 35, possessions: 17728, fga: 2097, otFga: 28, fgm: 1508, xpa: null, xpm: null, safeties: 48 }),
@@ -27,7 +32,7 @@ export const COLLEGE_LEAGUE_AVERAGES = Object.freeze({
 });
 
 /** The first and latest seasons in the table. */
-export const FIRST_COLLEGE_SEASON = 2009;
+export const FIRST_COLLEGE_SEASON = 2004;
 export const LATEST_COLLEGE_SEASON = 2025;
 
 /** The seasons College Football 27's rules were fitted on, whose figures every other season's are measured from. */
@@ -40,21 +45,26 @@ export const COLLEGE_REFERENCE_SEASONS = Object.freeze([2024, 2025]);
 // average matchup, and allow for its spread beyond the built-in season's.
 export const COLLEGE_SEASON_MATCHUPS = Object.freeze({
   'built-in': Object.freeze({ edge: 0.511, kicking: 76, spread: 27.56 }),
-  'cfb-2009': Object.freeze({ edge: 1.193, kicking: 77.034, spread: 21.478 }),
-  'cfb-2010': Object.freeze({ edge: 1.251, kicking: 77.017, spread: 24.499 }),
-  'cfb-2011': Object.freeze({ edge: 1.174, kicking: 77.193, spread: 19.724 }),
-  'cfb-2012': Object.freeze({ edge: 1.283, kicking: 76.959, spread: 18.746 }),
-  'cfb-2013': Object.freeze({ edge: 1.021, kicking: 77.21, spread: 24.07 }),
-  'cfb-2014': Object.freeze({ edge: 0.521, kicking: 76.976, spread: 23.367 }),
+  'cfb-2004': Object.freeze({ edge: 1.124, kicking: 77.089, spread: 22.636 }),
+  'cfb-2005': Object.freeze({ edge: 0.758, kicking: 76.776, spread: 22.6 }),
+  'cfb-2006': Object.freeze({ edge: 0.949, kicking: 76.881, spread: 23.354 }),
+  'cfb-2007': Object.freeze({ edge: 1.004, kicking: 77.254, spread: 18.939 }),
+  'cfb-2008': Object.freeze({ edge: 1.003, kicking: 77.345, spread: 21.441 }),
+  'cfb-2009': Object.freeze({ edge: 1.192, kicking: 77.042, spread: 21.375 }),
+  'cfb-2010': Object.freeze({ edge: 1.251, kicking: 77.017, spread: 24.465 }),
+  'cfb-2011': Object.freeze({ edge: 1.171, kicking: 77.185, spread: 19.712 }),
+  'cfb-2012': Object.freeze({ edge: 1.29, kicking: 76.943, spread: 18.57 }),
+  'cfb-2013': Object.freeze({ edge: 1.028, kicking: 77.21, spread: 24.111 }),
+  'cfb-2014': Object.freeze({ edge: 0.52, kicking: 76.976, spread: 23.356 }),
   'cfb-2015': Object.freeze({ edge: 0.357, kicking: 77.118, spread: 24.36 }),
   'cfb-2016': Object.freeze({ edge: 0.37, kicking: 77.346, spread: 21.757 }),
-  'cfb-2017': Object.freeze({ edge: 0.241, kicking: 77.24, spread: 24.803 }),
-  'cfb-2018': Object.freeze({ edge: 0.202, kicking: 77.177, spread: 23.509 }),
-  'cfb-2019': Object.freeze({ edge: 0.34, kicking: 77.315, spread: 26.819 }),
-  'cfb-2020': Object.freeze({ edge: 0.394, kicking: 76.992, spread: 18.723 }),
-  'cfb-2021': Object.freeze({ edge: 0.409, kicking: 77.354, spread: 21.891 }),
-  'cfb-2022': Object.freeze({ edge: 0.386, kicking: 77.229, spread: 23.019 }),
-  'cfb-2023': Object.freeze({ edge: 0.476, kicking: 77.391, spread: 21.112 }),
-  'cfb-2024': Object.freeze({ edge: 0.515, kicking: 77.418, spread: 24.326 }),
-  'cfb-2025': Object.freeze({ edge: 0.656, kicking: 77.272, spread: 26.307 }),
+  'cfb-2017': Object.freeze({ edge: 0.24, kicking: 77.24, spread: 24.868 }),
+  'cfb-2018': Object.freeze({ edge: 0.2, kicking: 77.192, spread: 23.514 }),
+  'cfb-2019': Object.freeze({ edge: 0.342, kicking: 77.308, spread: 26.814 }),
+  'cfb-2020': Object.freeze({ edge: 0.4, kicking: 76.992, spread: 18.725 }),
+  'cfb-2021': Object.freeze({ edge: 0.41, kicking: 77.354, spread: 21.885 }),
+  'cfb-2022': Object.freeze({ edge: 0.384, kicking: 77.229, spread: 23.033 }),
+  'cfb-2023': Object.freeze({ edge: 0.475, kicking: 77.391, spread: 21.127 }),
+  'cfb-2024': Object.freeze({ edge: 0.518, kicking: 77.425, spread: 24.314 }),
+  'cfb-2025': Object.freeze({ edge: 0.657, kicking: 77.272, spread: 26.31 }),
 });

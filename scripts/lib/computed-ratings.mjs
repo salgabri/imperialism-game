@@ -191,17 +191,19 @@ export function referenceOf(clubs, quota) {
 /**
  * Each value's rating: its mid-rank percentile among `values` (ties sharing one), read off `reference` (ascending) by
  * linear interpolation, rounded and held to 1–99. A higher value never gets a lower rating. → Map value → rating.
- * As scripts/lib/nfl-reference.mjs's overallsOf.
+ * As scripts/lib/nfl-reference.mjs's overallsOf. `population` (at least the values' count) reads them as the best of
+ * that many, the others ranking below every one of them (a rebuilt college season's players the records cannot name).
  */
-export function ratingsOf(values, reference) {
+export function ratingsOf(values, reference, { population = values.length } = {}) {
   if (!reference.length) throw new Error('No reference ratings');
+  if (!(population >= values.length)) throw new Error(`A population of ${population} for ${values.length} values`);
   const sorted = [...values].sort((a, b) => a - b);
-  const n = sorted.length, m = reference.length;
+  const n = sorted.length, m = reference.length, below = population - n;
   const out = new Map();
   for (let i = 0; i < n;) {
     let j = i;
     while (j + 1 < n && sorted[j + 1] === sorted[i]) j++;
-    const p = ((i + j) / 2 + 0.5) / n;
+    const p = (below + (i + j) / 2 + 0.5) / population;
     const h = Math.min(Math.max(p * m - 0.5, 0), m - 1);
     const lo = Math.floor(h), hi = Math.ceil(h);
     out.set(sorted[i], Math.min(99, Math.max(1, Math.round(reference[lo] + (reference[hi] - reference[lo]) * (h - lo)))));

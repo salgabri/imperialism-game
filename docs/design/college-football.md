@@ -237,43 +237,56 @@ Club colours follow from the crests (`npm run build:club-colours`).
 ## Earlier seasons
 
 Status: built 2026-11-18, on the user's request that day ("add seasons as far back as you can go in the past of college
-football"). Seventeen seasons ship beside the built-in 2026: the FBS seasons 2009 to 2025 (data sets `cfb-<season>`,
-kind `cfb`, labelled "FBS (computed)", so the Season list says "2013 · computed"). No game rates them for this game:
-EA's ratings site keeps only its current edition, and the one full copy of College Football 26 found (a fan site's)
-forbids automated copying. So each is computed from what its players did, by the method of
-[computed-ratings.md](computed-ratings.md), with College Football 27's ratings as the scale. They play their own day's
-scoring and overtime ([Rules by era](#rules-by-era)) on maps of their own
-([domestic-campaigns.md](domestic-campaigns.md), "The FBS map": era maps 2009–2025).
+football"), and taken back from 2009 to 2004 on 2026-11-20 ("continue this"). Twenty-two seasons ship beside the
+built-in 2026: the FBS seasons 2004 to 2025 (data sets `cfb-<season>`, kind `cfb`, labelled "FBS (computed)", so the
+Season list says "2013 · computed"). No game rates them for this game: EA's ratings site keeps only its current edition,
+and the one full copy of College Football 26 found (a fan site's) forbids automated copying. So each is computed from
+what its players did, by the method of [computed-ratings.md](computed-ratings.md), with College Football 27's ratings as
+the scale; 2004 to 2008, which no roster lists in full, on rosters rebuilt from their box scores and recruiting classes
+([Rebuilt rosters](#rebuilt-rosters)). They play their own day's scoring and overtime ([Rules by era](#rules-by-era)) on
+maps of their own ([domestic-campaigns.md](domestic-campaigns.md), "The FBS map": era maps 2004–2025).
 
-**Why 2009.** A season needs every school's players with their positions. CollegeFootballData.com's rosters hold them
-(about 100 a school, positions for 91–99%) from 2009; its 2004–2008 rosters list only the players with a box-score line
-(26–28 a school: no linemen, few defenders), and nothing earlier names a school's players season by season (College
-Football Reference is off limits; stats.ncaa.org, ESPN's site and footballdb refuse Anthropic's agents). Earlier
-seasons would need another kind of source — each school's NFL draft picks and all-conference players — and could field
-only the schools those name enough players for; that is not built.
+**Why 2004.** A season needs every school's players with their positions. CollegeFootballData.com's rosters hold them
+(about 100 a school, positions for 91–99%) from 2009. Its 2004–2008 rosters list only the players with a box-score line
+(26–28 a school: no linemen, few defenders), so those five seasons are rebuilt from the box scores and the recruiting
+classes ([Rebuilt rosters](#rebuilt-rosters)). Before 2004 nothing names a school's players season by season: ESPN's box
+scores begin with 2004, College Football Reference is off limits, and stats.ncaa.org, ESPN's site and footballdb refuse
+Anthropic's agents. A season before 2004 would need another kind of source — each school's NFL draft picks and
+all-conference players — and could field only the schools those name enough players for; that is not built.
 
 - **Sources.** sportsdataverse (https://github.com/sportsdataverse), each repository pinned at one commit in
   `scripts/data/cfb-seasons-sources.json` (cfbfastR-data at 3fac3565, cfbfastR-cfb-data at 83ff6d04, read
-  2026-11-18), every file by SHA-256, fetched from raw.githubusercontent.com (no robots.txt) into the ignored
+  2026-11-18; the 2002 and 2003 recruiting classes and the 2004–2006 schedules pinned at the same commits 2026-11-20),
+  every file by SHA-256, fetched from raw.githubusercontent.com (no robots.txt) into the ignored
   `data-src/cfb-history/` by `npm run sync:cfb-seasons -- --fetch` (`--pin` first asks GitHub's API for each repository's
   current commit and pins every file again):
   - cfbfastR-data's season rosters (`rosters/csv/cfb_rosters_<year>.csv`, CollegeFootballData.com's; CC BY 4.0): every
     rostered player with his ESPN athlete id, position, weight and, from about 2017, class;
-  - cfbfastR-cfb-data's Parquet tables (ESPN-derived): every game's schedule row (`cfb_schedules`, from 2007), every
+  - cfbfastR-cfb-data's Parquet tables (ESPN-derived): every game's schedule row (`cfb_schedules`, from 2004), every
     player's box score (`player_box`, from 2004: passing, rushing, receiving, interceptions, kicking and returns; the
     defence's own rows exist only from 2023 and are not read, so every season is measured alike), each play's
     participants from 2014 (`play_participants`: the tackler and the assisting one, the sacker, the pass defender, the
-    fumble forcer), and every recruiting class's 247Sports composite grade (`cfb_recruits`, from 2004). They are read by
+    fumble forcer), and every recruiting class's 247Sports composite grade (`cfb_recruits`, from 2002, the first class
+    it lists; a row it files under no team, as it does Hawaii's in every class and UAB's, UConn's, Old Dominion's, South
+    Alabama's, Georgia State's, Kennesaw State's and Charlotte's in a class or two, takes the team its other classes give
+    the team's name, Hawaii's the game's: `repairedClasses`). They are read by
     `scripts/lib/parquet.mjs`, a small reader of flat Parquet files (Thrift metadata, dictionary and data pages of both
     versions, zstd and gzip through node:zlib), written for these files rather than adding a dependency and tested on
     files a minimal writer makes (`scripts/parquet.test.mjs`).
 - **The season's schools.** The FBS schools that played at least one completed game against another FBS school that
-  season (`scheduleOf`, `schools`): 119 in 2009–2011, 123 in 2012, 124 in 2013, 127 in 2014–2016, 129 in 2017, 130 in
-  2018–2019, 127 in 2020 (New Mexico State's only games of 2020 were against non-FBS sides; UConn and Old Dominion did
-  not play), 130, 131, 133, 134 and 136 in 2025. A school whose roster leaves more than two lineup places short does not
-  play (`MAX_GAPS`): Idaho, FBS to 2017, plays no season, its rosters listing 19–44 rated players and no offensive
-  linemen. Each school's league is its conference of that season as the schedule names it (the Pac-10 to 2010, the Big
-  East and the WAC to 2012, The American from 2013).
+  season (`scheduleOf`, `schools`), those of them that field a squad playing it: 112 in 2004 (of 119, Florida A&M among
+  them, which ESPN's 2004 schedule lists as an FBS independent, its one such season), 116 in 2005, 118 in 2006 and 2007,
+  119 in 2008–2011, 123 in 2012, 124 in 2013, 127 in 2014–2016, 129 in 2017, 130 in 2018–2019, 127 in 2020 (New Mexico
+  State's only games of 2020 were against non-FBS sides; UConn and Old Dominion did not play), 130, 131, 133, 134 and 136
+  in 2025. A school whose roster leaves more than two lineup places short does not play (`MAX_GAPS`): Idaho, FBS to 2017,
+  plays 2004–2008 on rosters rebuilt from its signings but none of 2009–2017, its rosters listing 19–44 rated players and
+  no offensive linemen; and in the rebuilt seasons the schools whose recruits the classes barely list: Air Force, Army,
+  Navy, FAU, Florida A&M, Iowa (whose 2002 and 2004 classes the source all but lacks) and UTEP in 2004, Air Force, FAU and
+  FIU in 2005, FAU in 2006 and 2007, Western Kentucky, new to the FBS, in 2008. Each school's league is its conference of
+  that season as the schedule names it (the Pac-10 to 2010, the Big East and the WAC to 2012, The American from 2013). A
+  game ESPN lists twice under two ids (one of 2004's, two of 2008's, seven of 2012's and two of 2013's bowls: the same
+  two schools with the same points on the same day) counts once, and its twin's box-score rows not at all (2012's
+  Temple–Army had both); the 2012–2014 seasons counted them twice until 2026-11-20.
 - **The players.** Every rostered player of a season's school, once: one a school lists twice under two ids
   (CollegeFootballData.com gives some two) is kept where he has an ESPN id, then a position. His position is the
   roster's, grouped into the game's ten as the built-in season groups EA's (DE, DT, NT and EDGE are DL; OT, G and C are
@@ -304,8 +317,10 @@ only the schools those name enough players for; that is not built.
   Football 27's launch ratings (EA SPORTS' ratings site, iteration 1-base, retrieved 2026-11-18, cached in
   `data-src/college-football/1-base/`) of the players of 2025 who returned in 2026, 7,469 matched by name at their school
   or uniquely by name (a transfer), then frozen (`npm run sync:cfb-seasons -- --tune --write` refits them into
-  `scripts/data/cfb-seasons/calibration.json`, which a test holds `VALUE_WEIGHTS` to). How they order the launch ratings,
-  Spearman within position, each half of the schools valued by weights fitted on the other:
+  `scripts/data/cfb-seasons/calibration.json`, which a test holds `VALUE_WEIGHTS` to). Refitted since the recruiting
+  classes' team ids were repaired (2026-11-20), only the corners' weights move, by 0.001; the frozen weights stand. How
+  they order the launch ratings, Spearman within position, each half of the schools valued by weights fitted on the
+  other:
 
   | | QB | RB | WR | TE | OL | DL | LB | CB | S | K |
   | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -326,39 +341,100 @@ only the schools those name enough players for; that is not built.
 - **The move toward results.** As the NFL's computed seasons: each school's Simple Rating System over the season's games
   between FBS schools (regular season and postseason, a bowl or playoff game at a neutral site), its reliability r (0.67
   in 2020, when conferences barely met; 0.88–0.92 otherwise), m the margin the match model gives a point of played
-  strength under the season's rules without its data set (4.1–4.6 points, over 160,000 games; 3.6–4.1 before the luck
-  recalibration of 2026-11-18, [Luck and form](#luck-and-form), whose bigger scale gives more margin a point), and the
-  target T = μ + √r × S ÷ m; every player of the school moves by a whole number and its best few one more, never
-  reordered, and the school keeps the squad it then fields. A game against a school that does not play the season still
+  strength under the season's rules without its data set (4.1–4.6 points from 2009 and 3.9–4.5 in 2004–2008, 2006's
+  3.9 its clock rules' fewer possessions, over 160,000 games; 3.6–4.1 before the luck recalibration of 2026-11-18, [Luck
+  and form](#luck-and-form), whose bigger scale gives more margin a point), and the target T = μ + √r × S ÷ m; every
+  player of the school moves by a whole number and its best few one more, never reordered, and the school keeps the
+  squad it then fields. A game against a school that does not play the season still
   counts toward its opponent's rating.
 - **Results.** Schools spread a little narrower than the built-in season's (lineup strength SD 2.4–3.2 about 79.2–80.0,
-  against College Football 27's 3.34 about 79.5; squad players p5/p25/p50/p75/p95 68–69/73–74/77–78/81–82/88–89, against
+  against College Football 27's 3.34 about 79.5; squad players p5/p25/p50/p75/p95 68–70/73–75/77–78/81–82/88–89, against
   70/74/77/81/88): College Football 27's 2026 schools, under the scale fitted to the FBS's conference seasons of 2024 and
   2025, play as far apart as those seasons did, and 2024's and 2025's computed schools spread 3.06 and 3.22. Every
-  national champion is among its season's five strongest schools (a test holds it) and leads twelve of the seventeen:
-  Alabama in 2009, 2011, 2012, 2015, 2017 and 2020, Florida State in 2013, Georgia in 2021 and 2022, Michigan in 2023,
-  Ohio State in 2024 and Indiana in 2025 (15–0 against FBS schools). 2018's Clemson and 2019's LSU are second (behind
-  Alabama and Ohio State), 2014's Ohio State fourth (behind TCU, Alabama and Oregon) and 2016's Clemson fourth (behind
-  Alabama, Ohio State and Michigan); 2010's Auburn is fifth, behind Oregon, Stanford, Boise State and Alabama, whose
-  margins were wider. Replayed on its own schedule under its rules (`npm run simulation:realism`, forty times), a season
-  spreads its standings as the real one did (win% SD within 0.01 in fourteen seasons of seventeen, 0.002 too even on
-  average), scores 0.5–1.7 points a team above it and has a point more luck about its own SRS (15.3 against 14.3):
-  [Luck and form](#luck-and-form). The audit (`docs/design/college-football-seasons-audit.json`) lists every school with
+  national champion is among its season's five strongest schools (a test holds it) and leads fifteen of the twenty-two:
+  USC in 2004 (a title since vacated), Texas in 2005, Florida in 2008, Alabama in 2009, 2011, 2012, 2015, 2017 and 2020,
+  Florida State in 2013, Georgia in 2021 and 2022, Michigan in 2023, Ohio State in 2024 and Indiana in 2025 (15–0 against
+  FBS schools). 2018's Clemson and 2019's LSU are second (behind Alabama and Ohio State), 2007's LSU fourth (behind West
+  Virginia, Oklahoma and Missouri), 2014's Ohio State fourth (behind TCU, Alabama and Oregon) and 2016's Clemson fourth
+  (behind Alabama, Ohio State and Michigan); 2006's Florida is fifth, behind USC, Ohio State, LSU and Louisville, and
+  2010's Auburn fifth, behind Oregon, Stanford, Boise State and Alabama, whose margins were wider. Replayed on its own
+  schedule under its rules (`npm run simulation:realism`, forty times), a season spreads its standings as the real one did
+  (win% SD within 0.01 in twenty seasons of twenty-two, 2004–2008 among them, 0.001 too even on average), scores 0.3–1.6
+  points a team above it and has a point more luck about its own SRS (15.2 against 14.2): [Luck and form](#luck-and-form). The audit (`docs/design/college-football-seasons-audit.json`) lists every school with
   its conference, record, points, SRS and move, every documented lineup gap (an option offence's tight end: Army, Navy,
   Georgia Tech) and the schools left out.
-- **Checks.** `npm run audit:rosters -- --sport=college-football`: the 17 seasons and the built-in one, 0 errors, 0
-  warnings. Spot checks: Tim Tebow 2009 95, Ndamukong Suh 2009 96, Mark Ingram 2009 94, Marcus Mariota 2014 98, Derrick
+- **Checks.** `npm run audit:rosters -- --sport=college-football`: the 22 seasons and the built-in one, 0 errors, 0
+  warnings (names lose the sources' bracketed tags and underscores: "Joe (player) Cox", "John_ Mackey"). Spot checks: Tim Tebow 2009 95, Ndamukong Suh 2009 96, Mark Ingram 2009 94, Marcus Mariota 2014 98, Derrick
   Henry 2015 97, Joe Burrow 2019 97, Jeremiah Smith 2025 99; Aaron Donald 2013 79 shows the early seasons' weak defensive
   evidence.
-- **Size.** The season files are 118–138 KB each (2.2 MB), loaded only when chosen and cached for offline play
-  (`src/pwa.js`); the snapshots 300–340 KB each (5.4 MB, `scripts/data/cfb-seasons/`).
+- **Size.** The season files are 107–138 KB each (2.7 MB), loaded only when chosen and cached for offline play
+  (`src/pwa.js`); the snapshots 270–340 KB each (6.7 MB, `scripts/data/cfb-seasons/`).
+
+### Rebuilt rosters
+
+The seasons 2004 to 2008 have no roster that lists every player (CollegeFootballData.com's name only those with a
+box-score line), so each school's is rebuilt from the box scores of every season from 2004, the rosters from 2009 and
+the recruiting classes from 2002 (`rebuiltRoster`, scripts/lib/cfb-history.mjs):
+
+- **Its box-score players:** everyone with a line for the school that season (the school he played most of its games
+  for), by his ESPN athlete id.
+- **Its recruits a later season confirms:** a recruit it signed in the season's class or the four before it whom a later
+  season places at the school again (a box-score line, a roster), his id the one those records carry.
+- **Its newest signings:** a recruit of the season's class or the one before whom no record places elsewhere by the
+  season (another school's box score or roster, another school's later class) and who has no earlier record at the school
+  (a player with a line there before and none since has left), his id his recruiting id negated.
+- **Its gaps filled:** while the school is still short of a starting place, its other recruits of those classes at the
+  place's position that nothing places elsewhere, the latest class first, then the best graded.
+
+A player's position, weight, years and grade then come as in a roster's season (positions from a later roster where he has
+one, else his recruiting or his box score's; weight from his nearest roster). In 2004 and 2005, whose seniors signed in
+2000 and 2001, classes the source lacks, a player no class lists is read as a recruit without a grade and, first seen in
+2004's box scores, with years in college unknown (the position's median). And a rebuilt roster lacks most walk-ons and
+backups: in 2004 it fills about half of the line's and the secondary's places College Football 27 carries a school
+(`DEPTH`), against 75–99% from a 2009 roster, so its players would rate as far below their peers of other seasons as their
+depth is thinner. Each position is read as if every school carried that depth, those the rebuild cannot name ranking
+below all it can (`rateSeason`'s `schools`; `ratingsOf`'s `population`): the seasons' schools average 79.9–80.1, as the
+later seasons' 79.2–80.0.
+
+**Validated** (`npm run sync:cfb-seasons -- --validate`, recorded in `scripts/data/cfb-seasons/rebuild-check.json`): 2010
+and 2012, whose real rosters are known, rebuilt as each early season would have to be (box scores and classes only from
+as far back as that season has them, rosters only from as far ahead as 2009 is; a later class cut to the early classes'
+size, its lowest grades first), fielded as a season is and compared with the season fielded from its real roster:
+
+| Rebuilt as | Schools fielded (real) | Squad players on the real roster | Its linemen | Real squads' players held | Schools' strength order (Spearman) |
+| --- | --- | --- | --- | --- | --- |
+| 2004 | 114 (119), 116 (123) | 87% | 79–81% | 38–43% | 0.79–0.83 |
+| 2005 | 116, 119 | 88% | 79–81% | 44–50% | 0.87–0.89 |
+| 2006 | 118, 121 | 88–89% | 80–81% | 48–53% | 0.94 |
+| 2007 | 118, 121 | 90% | 83% | 54–60% | 0.94–0.95 |
+| 2008 | 118, 121 | 92–93% | 87–88% | 66–73% | 0.95–0.96 |
+
+So about one rebuilt squad player in eight (one lineman in five) was not on his school's roster that season, mostly a
+signing who never enrolled or had left, and the further back the season, the fewer of its real squads' players it holds:
+2004 and 2005 keep their box-score players (passers, runners, receivers, kickers) but few of their senior linemen. The
+schools' strength order before the move agrees with the real rosters' at 0.79–0.96, and the move toward results sets their
+strength after it in any case. The seasons' squads hold:
+
+| Season | Box-score players | Confirmed recruits | Newest signings | Gaps filled |
+| --- | --- | --- | --- | --- |
+| 2004 | 1,408 | 455 | 1,695 | 44 |
+| 2005 | 1,652 | 676 | 1,410 | 47 |
+| 2006 | 1,788 | 1,033 | 1,004 | 38 |
+| 2007 | 1,904 | 1,362 | 636 | 32 |
+| 2008 | 1,944 | 1,655 | 367 | 24 |
+
+They play their day's stadiums: Minnesota the Metrodome to 2008, Miami the Orange Bowl to 2007 (FIU there too in 2007),
+UCF the Florida Citrus Bowl to 2006, Akron the Rubber Bowl to 2008, and Tulane the Superdome, kept there for 2005, when
+Hurricane Katrina sent its six home games to six grounds; ESPN's schedule places Temple's 2004 home games at Franklin
+Field, its season's article at Lincoln Financial Field, where the map has them ([domestic-campaigns.md](domestic-campaigns.md),
+"The FBS map").
 
 ## Interface
 
 - **Setup.** The fifth sport tile, "College football", a helmet, after American football: "138 FBS schools". Choosing it
   switches Teams to clubs and disables Nations ("College football is played by FBS schools only": a sport may name its
   division and its word for its clubs, `clubLeague` and `clubNoun`); the one theatre is **FBS · USA**, the Season list
-  holds the built-in 2026 and the [earlier seasons](#earlier-seasons) 2025 back to 2009 ("2013 · computed"), each on its
+  holds the built-in 2026 and the [earlier seasons](#earlier-seasons) 2025 back to 2004 ("2013 · computed"), each on its
   era's map. Twelve sports (Counter-Strike came in the same day) still sit in three rows of four; measured in Chromium, setup's steps fit without
   scrolling at 360×640, 390×664, 390×844, 768×1024, 1024×768 and 1440×900.
 - **Squad, match, ledger.** American football's field, units, profile (Offence, Defence, Kicking) and feed, through
@@ -375,14 +451,14 @@ grow by them.
 
 Status: built 2026-11-18 (simulation version 2, the earlier seasons only; version 3 since the luck recalibration of the
 same day, [Luck and form](#luck-and-form), which made the built-in season's version 2). Every earlier FBS season (data set
-`cfb-<year>`, 2009 to 2025) plays its own day's scoring and the NCAA overtime of its day. `matchSport` asks the sport for
+`cfb-<year>`, 2004 to 2025; 2004–2008 since 2026-11-20) plays its own day's scoring and the NCAA overtime of its day. `matchSport` asks the sport for
 a campaign's rules (`rulesFor`), and `collegeFootballIn(settings)` gives one sport object per season, under
 `collegeSeasonRules(year, dataSet)`. The built-in season (no data set) gets `collegeFootball` itself: today's rules, its
 draws unchanged by the seasons' rules coming in. The NFL's results are unchanged too, by either.
 
 **Source.** sportsdataverse's cfbfastR-cfb-data tables (ESPN-derived Parquet,
 `https://github.com/sportsdataverse/cfbfastR-cfb-data`, `cfb/<table>/parquet/`), saved in the ignored
-`data-src/cfb-history/cfbfastR-cfb-data/` on 2026-11-18 and read by `scripts/lib/parquet.mjs`: each season's schedule
+`data-src/cfb-history/cfbfastR-cfb-data/` on 2026-11-18 (2004–2008's on 2026-11-20) and read by `scripts/lib/parquet.mjs`: each season's schedule
 (`cfb_schedules`: the schools, their divisions, the final score), drives (`drives`: each possession's team, quarter,
 offensive plays and ending) and box scores (`player_box`: each kicker's field goals and extra points, "made/tried").
 `npm run build:college-scoring` (`scripts/build-college-scoring.mjs`) writes `scripts/data/college-scoring.json` (each
@@ -391,8 +467,9 @@ rebuilds both byte for byte where `data-src/` has the tables, else the module fr
 season's average matchup against its schools either way; `--report` prints each season's figures a team-game.
 
 **What is counted.** A season's games between two FBS schools, regular season and bowls. A game counts when its drives
-cover all four quarters and both schools' points add up from their box scores: 95% to 100% of each season's do (2021 and
-2022 have no drives for 29 games each; 2025 leaves out two of 808).
+cover all four quarters and both schools' points add up from their box scores: 95% to 100% of each season's do from 2009
+(2021 and 2022 have no drives for 29 games each; 2025 leaves out two of 808), fewer before, whose drives ESPN lists for
+fewer games: 65% of 2004's, 80% of 2005's, 86% of 2006's and 2007's, 95% of 2008's.
 
 - Touchdowns: from each school's points less its extra points and field goals made and its safeties. What is left is six
   a touchdown beyond those whose extra point was tried and two a two-point try made, and the fewest tries that add up
@@ -401,7 +478,9 @@ cover all four quarters and both schools' points add up from their box scores: 9
 - Possessions: regulation's drives of a play or more. ESPN lists kick and turnover returns as drives of no play (a
   kick-off return touchdown; before 2014 an interception or punt return beside the drive it ended) and, before 2014, a
   half that ended before the receiving side's first snap. None is a possession of the model's, and leaving out every
-  drive of no play counts every season alike.
+  drive of no play counts every season alike. 2004's lists also log each kickoff as a drive of one play ('KICKOFF', with
+  no description: about eight a game), which is no possession either; every later 'KICKOFF' drive describes its plays
+  and stands.
 - Field goals and extra points tried and made: the kickers' rows, overtime's included; overtime's field-goal tries are
   its drives'.
 - Safeties: the drives that ended in one, and those the points need that the drives do not name (two points no try
@@ -427,6 +506,11 @@ regulation; two-point tries as the scoring leaves them, a check only), the posse
 
 | Season | Games | Points | Touchdowns | Possessions | TD a possession | FG tries | FG made | XP made | Safeties | Two-point tries | Possessions a side | Overtime |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 2004 | 428 of 663 | 25.38 | 3.19 | 13.30 | 0.239 | 1.57 | 66.5% | 95.8% | 0.041 | 5.8% | 13.95 | 1997 |
+| 2005 | 534 of 664 | 26.04 | 3.26 | 13.20 | 0.245 | 1.57 | 69.4% | 96.0% | 0.050 | 6.7% | 13.84 | 1997 |
+| 2006 | 614 of 714 | 23.63 | 2.95 | 11.99 | 0.245 | 1.44 | 70.6% | 95.7% | 0.042 | 6.6% | 12.57 | 1997 |
+| 2007 | 609 of 712 | 27.37 | 3.40 | 13.32 | 0.253 | 1.70 | 72.4% | 96.4% | 0.036 | 6.0% | 13.97 | 1997 |
+| 2008 | 678 of 717 | 26.19 | 3.29 | 12.46 | 0.263 | 1.55 | 70.3% | 96.4% | 0.044 | 4.2% | 13.06 | 1997 |
 | 2009 | 691 of 714 | 26.15 | 3.24 | 12.44 | 0.260 | 1.61 | 73.5% | 96.0% | 0.036 | 5.9% | 13.04 | 1997 |
 | 2010 | 691 of 718 | 27.14 | 3.42 | 12.53 | 0.271 | 1.49 | 74.1% | 96.5% | 0.031 | 4.5% | 13.13 | 1997 |
 | 2011 | 698 of 715 | 27.32 | 3.45 | 12.70 | 0.270 | 1.50 | 71.9% | none named | 0.034 | 8.4% | 13.31 | 1997 |
@@ -447,26 +531,30 @@ regulation; two-point tries as the scoring leaves them, a check only), the posse
 | 2024–25 | 1,583 of 1,606 | 26.48 | 3.27 | 11.73 | 0.276 | 1.59 | 76.1% | 98.6% | 0.032 | 8.6% | 12.30 | |
 
 The fast game of the 2010s shows in the possessions (13.1 a team-game in 2014 and 2015, 11.65 in 2025, the clock running
-on after a first down since 2023), more than in the touchdowns a possession.
+on after a first down since 2023), more than in the touchdowns a possession. So does the rulebook of the 2000s: 13.2–13.3
+possessions a team-game in 2004, 2005 and 2007, but 12.0 in 2006, whose clock started when a kickoff was kicked and, on a
+change of possession, when the ball was marked ready (2007 went back), and 12.5 from 2008, when a 40-second play clock came
+in and the clock restarted, outside each half's last two minutes, once a runner out of bounds was spotted. Field goals
+were made less often (66.5% in 2004 to 72.4% in 2007, 73–77% since), touchdowns a possession rarer (0.24–0.26).
 
 **How a season's figures become its rules** (`collegeSeasonRules`). The possession model is today's (late-game
 play-calling, the college scale, the home edge); only its rates move, each by as far as the season's sits from 2024 and
 2025's, measured the same way from the same tables:
 
 - **Possessions a side:** today's 12.3 times the season's possessions a team-game over 2024 and 2025's (12.2 in 2025 to
-  13.7 in 2014 and 2015), `driveRange` as wide about them as today's 9 to 16.
+  14.0 in 2004 and 2007), `driveRange` as wide about them as today's 9 to 16.
 - **Touchdowns and field-goal tries:** at its own average matchup (`COLLEGE_SEASON_MATCHUPS`: its schools' mean offence
   less mean defence, `public/college-football/cfb-<year>.json`; the built-in schools' for a season without its file), a
   drive's touchdown odds, and its field-goal-try odds when it ends in none, sit from today's at the built-in schools'
   average matchup as far, in log odds, as the season's touchdowns a regulation possession (and its field-goal tries on
   one that ended in none) sit from 2024 and 2025's; less the allowance for its schools' spread beyond today's
   (`spreadAllowance`, as the NFL's, at the college edge's slopes, 0.075 and 0.025 times the scale 1.57). The computed
-  seasons' schools average an edge of about 0.2 (2018) to 1.3 (2012) and spread about 23 to 33, against the built-in
+  seasons' schools average an edge of about 0.2 (2018) to 1.3 (2012) and spread about 19 to 27, against the built-in
   schools' 0.51 and 27.6.
 - **Field goals and extra points made:** by the season's average kicker (about 77 in every season's file, 76 for the
   built-in schools), today's 76.1% and
-  98.3% moved as far in log odds as the season's sit from 2024 and 2025's (field goals 71.9% in 2011 to 77.0% in 2022;
-  extra points 95.2% in 2009 to 98.6% in 2025), within today's ranges about them; a kicker's rating point moves extra
+  98.3% moved as far in log odds as the season's sit from 2024 and 2025's (field goals 66.5% in 2004 to 77.0% in 2022;
+  extra points 94.8% in 2006 to 98.6% in 2025), within today's ranges about them; a kicker's rating point moves extra
   points by as much more than today's 0.3 in a hundred as the season missed more (`xpSlope`).
 - **Safeties:** today's rate a possession, times the season's over 2024 and 2025's.
 - **Two-point tries:** today's, made 46.1% and gone for after about 8% of touchdowns: no source names them. The scoring's
@@ -483,7 +571,7 @@ they were, draw for draw.
 
 | Seasons | A possession each from the 25 | Touchdowns go for two | Two-point plays, one each from the 3 |
 | --- | --- | --- | --- |
-| 2009–2018 (the 1997 rules) | every period | from the third period | none |
+| 2004–2018 (the 1997 rules) | every period | from the third period | none |
 | 2019 and 2020 | the first four periods | in the third and fourth | from the fifth period |
 | 2021 on, and the built-in season | the first two periods | in the second | from the third period |
 
@@ -515,11 +603,19 @@ two-point play levels 2.
   the longest FBS game: Wikipedia, "Overtime (sports)", `https://en.wikipedia.org/w/index.php?oldid=1383118578`.
 - The game clock no longer stopped for a first down but in each half's last two minutes, from 2023: Wikipedia, "2023 NCAA
   Division I FBS football season", `https://en.wikipedia.org/w/index.php?oldid=1377196806`.
+- 2006's clock, started when a kickoff is kicked and, on a change of possession, when the ball is marked ready: Wikipedia,
+  "2006 NCAA Division I FBS football season", `https://en.wikipedia.org/w/index.php?oldid=1380681562`; both undone for
+  2007, which also moved the kickoff from the 35 to the 30: "2007 NCAA Division I FBS football season",
+  `https://en.wikipedia.org/w/index.php?oldid=1383652807`; 2008's play clock (25 seconds kept only for administrative
+  stoppages and penalties) and the clock restarting when a runner out of bounds is spotted, outside each half's last two
+  minutes: "2008 NCAA Division I FBS football season", `https://en.wikipedia.org/w/index.php?oldid=1360588758` (read
+  2026-11-20).
 
 **Measured** (2026-11-18, the season files as the luck recalibration moved them, `scripts/college-football-eras.test.mjs`):
 each season's own schools, every school against every fourth other four times (about 19,000 games), score as far from
 today's as their league did from 2024 and 2025's, within +0.09 to +0.47 points a team-game, their touchdowns within 2%
-(the test allows 0.6 points and 3%; −0.16 to +0.35 points before the recalibration). Over conference pairings only, as
+(−0.16 to +0.35 points before the recalibration); 2004–2008, whose rates sit furthest from today's, within +0.41 to
++0.61 and 2.6% (the test allows 0.7 points and 3%). Over conference pairings only, as
 today's rules were fitted, the seasons score up to 1.2 points above (+0.40 to +1.17): their computed schools differ more
 within a conference than College Football 27's (the spread of a conference pairing's edge 13.3 to 20.5, against 11.4),
 and the allowance is for all pairings, as the NFL's is. On their own schedules, mostly conference games, they score 1.0
@@ -534,9 +630,13 @@ so they are not fitted, and today's estimates stand so the built-in season's dra
 ## Not done
 
 - No game-rated season but College Football 27's. EA's site keeps only the current edition, and the one full copy of
-  College Football 26 found forbids automated copying; 2009–2025 are computed ([Earlier seasons](#earlier-seasons)).
-- No season before 2009: full rosters begin then. Seasons from each school's NFL draft picks and all-conference players
-  could go further back, fielding only the schools those name enough players for.
+  College Football 26 found forbids automated copying; 2004–2025 are computed ([Earlier seasons](#earlier-seasons)).
+- No season before 2004: ESPN's box scores begin then. Seasons from each school's NFL draft picks and all-conference
+  players could go further back, fielding only the schools those name enough players for.
+- 2004–2008 play rebuilt rosters ([Rebuilt rosters](#rebuilt-rosters)): about one squad player in eight was not on his
+  school's roster that season (a signing who never enrolled or had left), 2004's and 2005's squads hold under half the
+  players their real rosters would give (few of their senior linemen, whose classes of 2000 and 2001 the source lacks),
+  and seven schools of 2004, three of 2005, one each of 2006–2008 cannot field, their recruits too thinly listed.
 - 2009–2013's defenders are ranked without tackles or sacks (plays before 2014 name no tacklers): by interceptions,
   recruiting and years, which order EA's ratings at 0.64–0.74 against 0.77–0.80 from 2014.
 - College games end too close: the NFL's late-game play-calling, which college football plays, closes them more than the
@@ -573,16 +673,19 @@ kickoff against the odds and its leads by era.
 `scripts/simulation-realism.test.mjs` ([Luck and form](#luck-and-form)): the built-in season's conference seasons score
 (points, touchdowns, field goals made), spread (the schools' average conference margins), go to overtime and try for two
 as the FBS's of 2024 and 2025 did; every computed season replayed on its own schedule spreads its standings within 0.02
-of the real season's, the seventeen within 0.006 on average, its luck, overtime and points within reach of the real
+of the real season's, the twenty-two within 0.006 on average, its luck, overtime and points within reach of the real
 season's.
 
 `scripts/cfb-seasons.test.mjs` ([Earlier seasons](#earlier-seasons)): the readers on invented rows (positions, generic
-backs, recruiting by name and school, box-score categories, the schedule's schools, the 3:2:1 window, shrinkage, the
-standardised signals, the least-squares weights, the rating by rank); the frozen weights against the calibration;
-every snapshot's squads, gaps and left-out schools, its SRS, targets and moves recomputed from its own games; every
-national champion among its season's five strongest; the snapshots rebuilt byte for byte from the pinned sources where
-`data-src/` has them (two seasons; `npm run sync:cfb-seasons -- --check` does all); every season, its listing and audit
-rebuilt; each season on its era's map with the conferences of its day, Idaho and New Mexico State's 2020 left out; the
-loader's refusals; the sport bound to a season; and the running App listing the seasons ("2013 · computed"), launching
-2010's and 2021's schools on their era's maps, saving and resuming. `scripts/parquet.test.mjs` holds the Parquet reader
+backs, names' tags, recruiting by name and school, box-score categories, the schedule's schools and its twin games, the
+recruiting classes' repaired team ids, a rebuilt roster's four kinds of player and the 2004–2005 reading of a player no
+class lists, the 3:2:1 window, shrinkage, the standardised signals, the least-squares weights, the rating by rank and at
+full depth); the frozen weights against the calibration; the rebuilt seasons' placements and the rebuild's validation
+(`rebuild-check.json`); every snapshot's squads, gaps and left-out schools, its SRS, targets and moves recomputed from its
+own games; every national champion among its season's five strongest; the snapshots rebuilt byte for byte from the
+pinned sources where `data-src/` has them (2006, 2011 and 2025; `npm run sync:cfb-seasons -- --check` does all, and
+`-- --validate --check` the validation); every season, its listing and audit rebuilt; each season on its era's map with
+the conferences of its day, Idaho playing 2004–2008 and none after, Hawaii every season, New Mexico State's 2020 left
+out; the loader's refusals; the sport bound to a season; and the running App listing the seasons ("2013 · computed"),
+launching 2010's and 2021's schools on their era's maps, saving and resuming. `scripts/parquet.test.mjs` holds the Parquet reader
 to files a minimal writer makes; `scripts/club-maps.test.mjs` holds the era maps.

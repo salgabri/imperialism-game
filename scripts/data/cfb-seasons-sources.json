@@ -12,6 +12,8 @@
     }
   },
   "files": {
+    "cfbfastR-cfb-data/cfb_recruits/cfb_recruits_2002.parquet": "a84beafbac1edb802a80791e91017c69bdbc0b5148073b478876ebb6ff6223c0",
+    "cfbfastR-cfb-data/cfb_recruits/cfb_recruits_2003.parquet": "73ec26d65b9d24aa163c33467e824268f04c6c9473d1abc818c1909eab390b45",
     "cfbfastR-cfb-data/cfb_recruits/cfb_recruits_2004.parquet": "f0c3324b061e99150edee67c12ed8a811c3a5d9d0b5749eb8b0dab59d7db06ee",
     "cfbfastR-cfb-data/cfb_recruits/cfb_recruits_2005.parquet": "ead01ed98a59be77d9f7dbc06354c8a8bf413a2184d82e54aee65c66ec7b4c7c",
     "cfbfastR-cfb-data/cfb_recruits/cfb_recruits_2006.parquet": "0c164e912ca309162937d6cb3d1aa12db59782256eae839101f9f41cae5faff0",
@@ -34,6 +36,9 @@
     "cfbfastR-cfb-data/cfb_recruits/cfb_recruits_2023.parquet": "e785e3178057679a9b701159d3c185fb55149e33d5cb88ef0d8952f9704b1772",
     "cfbfastR-cfb-data/cfb_recruits/cfb_recruits_2024.parquet": "5f0c569b4c270b2c781ed0d07c17d733e53da8fb3ebab7c4e5342fd38848d8af",
     "cfbfastR-cfb-data/cfb_recruits/cfb_recruits_2025.parquet": "a1e1a5e6896d9b45d20f5683156e6a0084e6f88b9226989977c3e523ec254f92",
+    "cfbfastR-cfb-data/cfb_schedules/cfb_schedules_2004.parquet": "53427d39e2164a0cf14e8a834024b87747a2762ba6a7d4951c0d48b696ee661b",
+    "cfbfastR-cfb-data/cfb_schedules/cfb_schedules_2005.parquet": "0b8764cd13527ede9267323543865d5d0575b5efd458e2e563dc368a9b537a9c",
+    "cfbfastR-cfb-data/cfb_schedules/cfb_schedules_2006.parquet": "0f0c465448d35e3e3c51b9d3924ca362bc37e9ffc93987273f0e0b0e550e510c",
     "cfbfastR-cfb-data/cfb_schedules/cfb_schedules_2007.parquet": "a4d7408e3201b0b2594fc34f51e6a205583921c105f94a0720af0b404f61f98e",
     "cfbfastR-cfb-data/cfb_schedules/cfb_schedules_2008.parquet": "50ed01c5335557f7fba0a8b9a995ce38d43ccdcc8c13e08a5f93380a83d4d6ca",
     "cfbfastR-cfb-data/cfb_schedules/cfb_schedules_2009.parquet": "d52483925f374f516e8ae4e51c98c40adcb2cde03766854857b10a6d027dac85",

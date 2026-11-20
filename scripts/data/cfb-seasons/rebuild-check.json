@@ -1,0 +1,169 @@
+{
+  "note": "How well rebuiltRoster rebuilds a season (scripts/sync-cfb-seasons.mjs --validate), measured where the real roster is known: each of `seasons` rebuilt as each season before 2009 would have to be (`as`: box scores only from as many seasons before as that season has, recruiting classes likewise, rosters only from as many seasons after it as 2009 is; the classes before 2009 list fewer recruits, so a later class is cut to their mean size, its lowest grades first), fielded as the sync fields a season and compared with the season fielded from its real roster. `schools`: the schools that field a squad (`real`: from the real rosters); `onRoster`: the share of the rebuilt squads' players on their school's real roster (`linemen`: of their offensive and defensive linemen); `recovered`: the share of the real squads' players the rebuilt squads hold; `spearman`: the schools' played strength before the move, rebuilt against real; `placed`: the rebuilt squads' players by how the rebuild placed them.",
+  "seasons": [
+    2010,
+    2012
+  ],
+  "rows": [
+    {
+      "season": 2010,
+      "as": 2004,
+      "schools": 114,
+      "real": 119,
+      "onRoster": 0.869,
+      "linemen": 0.791,
+      "recovered": 0.433,
+      "spearman": 0.828,
+      "placed": {
+        "box": 1581,
+        "confirmed": 427,
+        "signed": 1583,
+        "filled": 65
+      }
+    },
+    {
+      "season": 2010,
+      "as": 2005,
+      "schools": 116,
+      "real": 119,
+      "onRoster": 0.879,
+      "linemen": 0.79,
+      "recovered": 0.495,
+      "spearman": 0.892,
+      "placed": {
+        "box": 1800,
+        "confirmed": 600,
+        "signed": 1287,
+        "filled": 65
+      }
+    },
+    {
+      "season": 2010,
+      "as": 2006,
+      "schools": 118,
+      "real": 119,
+      "onRoster": 0.887,
+      "linemen": 0.8,
+      "recovered": 0.532,
+      "spearman": 0.935,
+      "placed": {
+        "box": 1945,
+        "confirmed": 917,
+        "signed": 903,
+        "filled": 72
+      }
+    },
+    {
+      "season": 2010,
+      "as": 2007,
+      "schools": 118,
+      "real": 119,
+      "onRoster": 0.901,
+      "linemen": 0.827,
+      "recovered": 0.596,
+      "spearman": 0.945,
+      "placed": {
+        "box": 1974,
+        "confirmed": 1286,
+        "signed": 607,
+        "filled": 42
+      }
+    },
+    {
+      "season": 2010,
+      "as": 2008,
+      "schools": 118,
+      "real": 119,
+      "onRoster": 0.926,
+      "linemen": 0.878,
+      "recovered": 0.73,
+      "spearman": 0.953,
+      "placed": {
+        "box": 2005,
+        "confirmed": 1596,
+        "signed": 319,
+        "filled": 30
+      }
+    },
+    {
+      "season": 2012,
+      "as": 2004,
+      "schools": 116,
+      "real": 123,
+      "onRoster": 0.871,
+      "linemen": 0.813,
+      "recovered": 0.377,
+      "spearman": 0.794,
+      "placed": {
+        "box": 1547,
+        "confirmed": 488,
+        "signed": 1593,
+        "filled": 65
+      }
+    },
+    {
+      "season": 2012,
+      "as": 2005,
+      "schools": 119,
+      "real": 123,
+      "onRoster": 0.878,
+      "linemen": 0.807,
+      "recovered": 0.437,
+      "spearman": 0.87,
+      "placed": {
+        "box": 1757,
+        "confirmed": 703,
+        "signed": 1314,
+        "filled": 65
+      }
+    },
+    {
+      "season": 2012,
+      "as": 2006,
+      "schools": 121,
+      "real": 123,
+      "onRoster": 0.883,
+      "linemen": 0.805,
+      "recovered": 0.483,
+      "spearman": 0.942,
+      "placed": {
+        "box": 1924,
+        "confirmed": 1064,
+        "signed": 885,
+        "filled": 63
+      }
+    },
+    {
+      "season": 2012,
+      "as": 2007,
+      "schools": 121,
+      "real": 123,
+      "onRoster": 0.899,
+      "linemen": 0.829,
+      "recovered": 0.543,
+      "spearman": 0.943,
+      "placed": {
+        "box": 1982,
+        "confirmed": 1436,
+        "signed": 543,
+        "filled": 41
+      }
+    },
+    {
+      "season": 2012,
+      "as": 2008,
+      "schools": 121,
+      "real": 123,
+      "onRoster": 0.918,
+      "linemen": 0.867,
+      "recovered": 0.662,
+      "spearman": 0.963,
+      "placed": {
+        "box": 1996,
+        "confirmed": 1727,
+        "signed": 289,
+        "filled": 25
+      }
+    }
+  ]
+}

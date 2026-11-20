@@ -150,9 +150,9 @@ npm run sync:madden      # snapshot Madden NFL ratings from EA's site into scrip
 npm run build-nfl        # rebuild the NFL clubs from that snapshot (--check compares byte for byte)
 npm run sync:college-football # snapshot College Football 27 ratings from EA's site into scripts/data/college-football-27.json (network, cached)
 npm run build-college-football # rebuild the 138 FBS schools from that snapshot (--check compares byte for byte)
-npm run sync:cfb-seasons # snapshot the FBS seasons 2009–2025 from sportsdataverse's pinned files in data-src/cfb-history/ (--fetch downloads them politely, --tune refits the weights; --check compares byte for byte)
+npm run sync:cfb-seasons # snapshot the FBS seasons 2004–2025 from sportsdataverse's pinned files in data-src/cfb-history/ (--fetch downloads them politely, --tune refits the weights, --validate measures 2004–2008's rebuilt rosters; --check compares byte for byte)
 npm run build:cfb-seasons # rebuild the earlier college football seasons from those snapshots (--check compares byte for byte)
-npm run build:college-scoring # the FBS's scoring season by season, 2009–2025, from the same pinned tables, and each season's matchup (--check compares byte for byte; rerun after the seasons change)
+npm run build:college-scoring # the FBS's scoring season by season, 2004–2025, from the same pinned tables, and each season's matchup (--check compares byte for byte; rerun after the seasons change)
 npm run build:nfl-scoring # the NFL's and AFL's scoring season by season, 1960–2024, from Pro Football Archives' pages (--fetch saves missing pages politely; --check compares byte for byte)
 npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public API into scripts/data/mlb-the-show-26.json (network, cached)
 npm run build-mlb        # rebuild the MLB clubs and the baseball nations from that snapshot (--check compares byte for byte)
@@ -407,7 +407,7 @@ manager of the theatre's favourite, with decisions from the first match.
    ours) and every other season back to 1960, with the AFL's of 1960 to 1969
    (computed from Pro Football Archives' facts), NFL or AFL clubs on the map of
    their day, college football's its built-in 2026 (College Football 27), then its
-   [earlier seasons](#college-football-seasons) 2025 back to 2009 (computed from the
+   [earlier seasons](#college-football-seasons) 2025 back to 2004 (computed from the
    players' box scores, plays and recruiting), the FBS's schools on the map of their
    day, and baseball's its
    built-in 2026 (MLB The Show 26), then its [earlier seasons](#baseball-seasons)
@@ -2154,20 +2154,29 @@ file in `public/american-football/` (about 30 KB) that loads only when chosen.
 
 ## College football seasons
 
-College football can be played on 17 earlier seasons as well as the built-in 2026:
-every FBS season from 2009 to 2025. No game rated them for this game (EA's ratings
+College football can be played on 22 earlier seasons as well as the built-in 2026:
+every FBS season from 2004 to 2025. No game rated them for this game (EA's ratings
 site keeps only College Football 27), so each is computed from what its players did
 (below), labelled "FBS (computed)" and shown in the Season list as "2013 · computed".
 Pick one under **Season** in setup; it plays that season's FBS schools, each in its
 conference of the day (the Pac-10, the Big East, the WAC …), on the map of their day.
-Each season is a file in `public/college-football/` (118–138 KB) that loads only when
+Each season is a file in `public/college-football/` (107–138 KB) that loads only when
 chosen.
 
-- **What a season holds:** every FBS school that played another that season (119 in
-  2009 to 136 in 2025), each with the lineup the game picks from its rated players
-  and its best backups (34), by the built-in season's rules. Idaho, FBS to 2017, does
-  not play: its rosters list no offensive linemen; nor does New Mexico State in 2020,
-  whose only games were against non-FBS sides.
+- **What a season holds:** every FBS school that played another that season and can
+  field a squad (112 in 2004 to 136 in 2025), each with the lineup the game picks from
+  its rated players and its best backups (34), by the built-in season's rules. Idaho,
+  FBS to 2017, plays 2004–2008 but not 2009–2017, whose rosters list no offensive
+  linemen; New Mexico State does not play 2020, whose only games were against non-FBS
+  sides.
+- **2004 to 2008:** no roster lists these seasons' players in full, so each school's
+  squad is rebuilt: its players with a box-score line, the recruits it signed whom a
+  later season places there again, and its newest signings whom nothing places
+  elsewhere. Rebuilding 2010 and 2012 this way and comparing them with their real
+  rosters, 87–93% of a rebuilt squad's players were on the team, fewer the further back
+  the season (`scripts/data/cfb-seasons/rebuild-check.json`); a few schools whose
+  recruits the sources barely list cannot field (Army, Navy and Air Force in 2004, FAU
+  2004–2007 …).
 - **Where the facts come from:** [sportsdataverse](https://github.com/sportsdataverse)'s
   cfbfastR-data (season rosters, CollegeFootballData.com's; CC BY 4.0) and
   cfbfastR-cfb-data (ESPN's box scores and the plays' named tacklers, pass rushers and
@@ -2186,7 +2195,8 @@ chosen.
   FBS schools), every player by the same whole number, never reordered. Every national
   champion is among its season's five strongest schools.
 - **Rebuilding:** `npm run sync:cfb-seasons -- --fetch` (polite, pinned), `npm run sync:cfb-seasons`
-  (`--check`, `--tune`), `npm run build:cfb-seasons` and `npm run build:cfb-map`.
+  (`--check`, `--tune`, `--validate`), `npm run build:cfb-seasons`, `npm run build:cfb-map` and
+  `npm run build:college-scoring`.
 - **Rules of their day:** each season plays its own scoring (possessions, touchdowns,
   field goals and extra points made, safeties, from ESPN's drives and box scores of its
   games between FBS schools; 2024 and 2025 agree with cfbstats.com's tables the built-in
@@ -2196,13 +2206,12 @@ chosen.
   (no source counts them). `npm run build:college-scoring` writes the figures
   (`src/data/collegeLeagueAverages.js`; rerun it whenever the season files change). The
   built-in 2026 keeps today's rules. [The design notes](docs/design/college-football.md#rules-by-era) have the table.
-- **What is missing:** anything before 2009. Full rosters begin then; earlier ones list
-  only players with a box-score line, and no source names a school's players season by
-  season before 2004. College Football 25 and 26 are not used: EA's site no longer
-  serves them, and the one full copy found (a fan site's) forbids automated copying.
-  The offensive line has no statistic of its own, so linemen are ranked by recruiting,
-  years and weight; 2009–2013 name no tacklers, so their defenders are read from
-  interceptions, recruiting and years. [The design notes](docs/design/college-football.md#earlier-seasons) have the detail.
+- **What is missing:** anything before 2004: no source names a school's players season
+  by season before ESPN's box scores begin. College Football 25 and 26 are not used:
+  EA's site no longer serves them, and the one full copy found (a fan site's) forbids
+  automated copying. The offensive line has no statistic of its own, so linemen are
+  ranked by recruiting, years and weight; 2004–2013 name no tacklers, so their defenders
+  are read from interceptions, recruiting and years. [The design notes](docs/design/college-football.md#earlier-seasons) have the detail.
 
 ## Baseball seasons
 
