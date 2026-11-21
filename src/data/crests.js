@@ -19,6 +19,11 @@ export function rememberTwins(clubs) {
   for (const club of clubs) if (club.twin) twins.set(club.id, club.twin);
 }
 
+/** Club `id`'s twin on today's map of its country (rememberTwins), or null. */
+export function twinOf(id) {
+  return twins.get(id) ?? null;
+}
+
 /** The crest file club `id` wears in season year `year` (null: today's season), or null for none (its monogram). */
 export function crestFile(id, year) {
   const eras = year == null ? null : CREST_ERAS[id];

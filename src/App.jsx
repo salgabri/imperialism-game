@@ -1194,7 +1194,8 @@ export default class App extends React.Component {
     const card = buildShareCard({
       shapes, backdrop: this.domesticMap() ? this.backdrop : [], own: st.own, championId: champ.id, championName: champ.name, claimed,
       // The colour the final map gives the champion: clay when it is the team you manage.
-      fill: !st.managementEnded && st.managedTeamId === champ.id ? V4.youFill : politicalFill(champ.id),
+      fill: !st.managementEnded && st.managedTeamId === champ.id ? V4.youFill
+        : this.mapPalette(st)?.political.get(champ.id) || politicalFill(champ.id),
       frame: this.viewFocus, seed: st.seed,
       kicker: `Campaign complete · Round ${roman(st.round)}`,
       line: shareLine(victory), site: typeof window !== 'undefined' ? window.location.host : '',
@@ -1460,7 +1461,7 @@ export default class App extends React.Component {
     const scope = setup.layer === 'clubs' ? null : sport ? nationTheatre(sport, setup.scope).id : setup.scope;
     const focus = isEuropeanScope(scope) ? this.europeFocus() : null;
     return theatreMapPreview({ countries: this.geo.countries, paths: this.displayGeo?.paths, basePaths: this.geo.paths,
-      own: opening, frameIds: homes, focus });
+      palette: this.setupBoardPalette(opening), own: opening, frameIds: homes, focus });
   }
 
   setupSeed(setup = this.state.setup) {
@@ -2467,6 +2468,8 @@ export default class App extends React.Component {
       labelGeometry: this.labelGeometry || [], viewFocus: this.viewFocus || null, cache: this.vmCache,
       // A country map's section names (null on the world map), so pure view-models name sections without the loader.
       sectionNames: this.domesticMap()?.sectionNames || null,
+      // The colours the map gives the empires on this board, which the key and the ledger show too (mapPalette).
+      palette: this.mapPalette(st),
     };
   }
 
@@ -2716,6 +2719,10 @@ export default class App extends React.Component {
   mapLabels(...args) { return mapM.mapLabels.apply(this, args); }
 
   mapClaims(...args) { return mapM.mapClaims.apply(this, args); }
+
+  mapPalette(...args) { return mapM.mapPalette.apply(this, args); }
+
+  setupBoardPalette(...args) { return mapM.setupBoardPalette.apply(this, args); }
 
   mapHomes(...args) { return mapM.mapHomes.apply(this, args); }
 

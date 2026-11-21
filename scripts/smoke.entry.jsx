@@ -20,6 +20,9 @@ import { cardOf, getSport } from '../src/sports/index.js';
 import { fieldedNations, sportOf } from '../src/engine/footballSets.js';
 import { EMPIRE_PASTELS } from '../src/theme.js';
 import { politicalFill } from '../src/data/empireColours.js';
+import { CLOSE, clubRanks, empireNeighbours, empirePalette } from '../src/engine/mapPalette.js';
+import { darkFill } from '../src/theme.js';
+import { toOklch } from '../src/engine/colour.js';
 import { createEmpireLabelEngine as createLabelValidator } from '../src/engine/empireLabels.js';
 
 const SPEED = 80;
@@ -67,8 +70,23 @@ async function loadReference(id) {
     // What the map draws (src/engine/lands.js): each club's starting group as one land named by its home section, so no
     // line runs between its sections, and a section no club starts on alone.
     landIds: new Set(domesticLands(decoded).map(land => land.id)),
+    // The colours the map gives the clubs at kick-off (src/engine/mapPalette.js): each its own, unless a bordering club
+    // looks alike, worked out here from this decode, and which clubs border which.
+    palette: empirePalette({ own: decoded.startOwners, adj: decoded.geo.adj, areaOf: section => decoded.geo.surfaceOf(section).area,
+      ranks: clubRanks(decoded.clubs), teams: Object.fromEntries(decoded.clubs.map(club => [club.id, club])) }),
+    neighbours: empireNeighbours(decoded.startOwners, decoded.geo.adj),
   };
   return domesticReference;
+}
+
+/** Two political fills as painted, OKLab with lightness at 0.4, the nearer of the light and dark themes. */
+function politicalGap(a, b) {
+  const lab = colour => {
+    const [L, C, H] = toOklch(colour);
+    return [L * 0.4, C * Math.cos(H * Math.PI / 180), C * Math.sin(H * Math.PI / 180)];
+  };
+  const gap = (p, q) => Math.hypot(...lab(p).map((v, k) => v - lab(q)[k]));
+  return Math.min(gap(a, b), gap(darkFill(a), darkFill(b)));
 }
 
 /** A conquest takes everything, so each club's starting group always has one holder. */
@@ -99,8 +117,11 @@ function backdropSnapshot(app) {
   if (!group) return { present: false };
   const shapes = svg.querySelector('g.country-shapes');
   const paths = [...group.querySelectorAll('path')];
-  // Owner colours in both map modes: club colours (Flags) and the Political pastels (DEC D18).
-  const ownerColours = new Set([...Object.values(app.state.teams).flatMap(team => [team.col, politicalFill(team.id)]), ...EMPIRE_PASTELS]);
+  // Owner colours in both map modes: club colours (Flags) and the Political pastels (DEC D18), and the ones the map gives
+  // them to keep bordering empires apart (src/engine/mapPalette.js).
+  const palette = app.mapPalette(app.state);
+  const ownerColours = new Set([...Object.values(app.state.teams).flatMap(team => [team.col, politicalFill(team.id)]), ...EMPIRE_PASTELS,
+    ...(palette ? [...palette.political.values(), ...palette.flags.values()] : [])]);
   const noPointer = el => el.getAttribute('pointer-events') === 'none' || el.style?.pointerEvents === 'none';
   const fillOf = el => el.getAttribute('fill') || el.style?.fill || '';
   return {
@@ -905,14 +926,23 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   result.landsShown = shown.length === reference.landIds.size && shown.every(cid => reference.landIds.has(cid))
     && (sections > entry.clubs) === (shown.length < sections);
   // The preview paints every land as the club starting there will hold it at kickoff (DEC D18), its whole
-  // starting group in one: the club's pastel in Political (the default), the club's colour in Flags.
+  // starting group in one: the club's pastel in Political (the default), the club's colour in Flags; each as the map
+  // gives it, its own unless a bordering club looks alike (src/engine/mapPalette.js).
   const previewFills = mode => countryPaths().every(path => {
     const club = reference.clubBySection[path.dataset.country];
-    return !!club && path.getAttribute('fill') === (mode === 'flags' ? club.col : politicalFill(club.id));
+    return !!club && path.getAttribute('fill') === (mode === 'flags' ? reference.palette.flags.get(club.id) || club.col
+      : reference.palette.political.get(club.id));
   });
+  // And no two bordering clubs alike, as drawn: the user, 21 November 2026, "never put this close colors next to each
+  // other".
+  const apart = () => {
+    const fillOf = new Map(countryPaths().map(path => [reference.clubBySection[path.dataset.country]?.id, path.getAttribute('fill')]));
+    return [...reference.neighbours].every(([club, near]) => [...near].every(other =>
+      !fillOf.has(club) || !fillOf.has(other) || politicalGap(fillOf.get(club), fillOf.get(other)) >= CLOSE));
+  };
   const previousMode = app.state.mapMode;
   await setState(app, { mapMode: 'political' });
-  result.politicalPreview = previewFills('political');
+  result.politicalPreview = previewFills('political') && apart();
   await setState(app, { mapMode: 'flags' });
   result.flagsPreview = previewFills('flags');
   await setState(app, { mapMode: previousMode });
@@ -942,7 +972,7 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   // fills as a multiset), captioned with the map's sections and, unless there is one each, the clubs; a Europe map with
   // its clubs and countries.
   const cardFills = [...document.querySelectorAll('.setup-map[data-kind="country"] .setup-map__sections path')].map(path => path.getAttribute('fill')).sort();
-  const startFills = [...reference.landIds].map(land => politicalFill(reference.startOwners[land])).sort();
+  const startFills = [...reference.landIds].map(land => reference.palette.political.get(reference.startOwners[land])).sort();
   const caption = document.querySelector('.setup-map[data-kind="country"]')?.getAttribute('title') || '';
   result.countryCard = JSON.stringify(cardFills) === JSON.stringify(startFills)
     && caption === (entry.countries ? `${entry.name} · ${entry.clubs} clubs in ${entry.countries} countries`

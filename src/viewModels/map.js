@@ -169,20 +169,23 @@ export function identityFill(baseFill, { ownerId, meId, meFill, opponentId, mapM
  * preview (`preview`: the club starting in that section) in the colour it takes at kick-off, else setup nations
  * pastel, otherwise land-neutral; Flags mode → club colour (clubs fly no flag) or pastel; Strength → ramp; Fronts →
  * tint for your fronts, land-neutral elsewhere; Political → the pastel of the empire's own colour (politicalFill); then
- * identityFill().
+ * identityFill(). `palette` (engine/mapPalette.js, for the board on screen) gives the colours that keep bordering
+ * empires apart, in Political and Flags; an empire it does not know keeps its own.
  */
 export function countryFill({ countryId, ownerId = null, owner = null, mapMode = DEFAULT_MAP_MODE, hasFlagParts = false,
-  setup = false, meId = null, meFill = false, opponentId = null, strength = null, fronts = null, preview = null } = {}) {
+  setup = false, meId = null, meFill = false, opponentId = null, strength = null, fronts = null, preview = null,
+  palette = null } = {}) {
   if (hasFlagParts) return 'transparent';
+  const political = id => palette?.political.get(id) || politicalFill(id);
   if (!ownerId || !owner) {
     // Decoded club rows carry no `kind`, hence their own parameter: Flags = the club colour, Political = its pastel.
-    if (preview?.id) return mapMode === 'flags' && preview.col ? preview.col : politicalFill(preview.id);
-    return setup && NATIONS[countryId] ? politicalFill(countryId) : V4.landNeutral;
+    if (preview?.id) return mapMode === 'flags' && preview.col ? palette?.flags.get(preview.id) || preview.col : political(preview.id);
+    return setup && NATIONS[countryId] ? political(countryId) : V4.landNeutral;
   }
-  if (mapMode === 'flags') return owner.kind === 'club' && owner.col ? owner.col : politicalFill(ownerId);
-  const base = mapMode === 'strength' ? strength?.[ownerId] || politicalFill(ownerId)
+  if (mapMode === 'flags') return owner.kind === 'club' && owner.col ? palette?.flags.get(ownerId) || owner.col : political(ownerId);
+  const base = mapMode === 'strength' ? strength?.[ownerId] || political(ownerId)
     : mapMode === 'fronts' && fronts ? fronts[ownerId] || V4.landNeutral
-      : politicalFill(ownerId);
+      : political(ownerId);
   return identityFill(base, { ownerId, meId, meFill, opponentId, mapMode });
 }
 

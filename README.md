@@ -685,10 +685,29 @@ Map modes:
 
 | Mode | Shows |
 | --- | --- |
-| **Political** (default) | A flat pastel of each empire's own colour. A nation takes its own colour, a shade of it or one of its flag's, whichever keeps it apart from its neighbours: the largest nations keep theirs and smaller neighbours make room (`npm run build:nation-colours` solves the world once). A club takes its crest colour (`npm run build:club-colours`, corrected in `scripts/data/club-colours.json`) in one of three lightness steps by team id. White and black teams are grey. Your empire is clay; the next opponent turns cobalt once the fixture is known. |
+| **Political** (default) | A flat pastel of each empire's own colour. A nation takes its own colour, a shade of it or one of its flag's, whichever keeps it apart from its neighbours: the largest nations keep theirs and smaller neighbours make room (`npm run build:nation-colours` solves the world once). A club takes its crest colour (`npm run build:club-colours`, corrected in `scripts/data/club-colours.json`) in one of three lightness steps by team id; an earlier season's club the colour of the crest it wears, and a club with no crest colour its Flags colour. White and black teams are grey. Your empire is clay; the next opponent turns cobalt once the fixture is known. Two bordering empires never look alike, in either theme (see [Map colours](#map-colours)). |
 | **Strength** | Five grey steps by strength percentile; your empire keeps its colour. |
 | **Fronts** | Your fronts tinted by your win chance (green / amber / red); other land is neutral. |
-| **Flags** | Each empire's flag across its land (see [Flags](#flags)); clubs keep their colours. |
+| **Flags** | Each empire's flag across its land (see [Flags](#flags)); clubs keep their colours, apart from their neighbours'. |
+
+### Map colours
+
+Two empires that share a border are never painted in look-alike colours
+(`src/engine/mapPalette.js`, asked for on 21 November 2026). On the board on
+screen, every empire takes its own colour unless a neighbour already looks like
+it; then the weaker of the two moves to the nearest colour that stands clearly
+apart: the same hue turned a little, a nation's other flag colour, else another
+hue. Clubs choose strongest first, so the clubs people know keep their colours;
+nations by their land, largest first; your clay comes first and your neighbours
+keep clear of it. "Clearly apart" is an OKLab distance of 0.065 with lightness
+counted at 0.4 (two pastels of one hue read as one colour however light), in
+whichever theme has them nearer; Flags mode keeps clubs' colours 0.1 apart.
+
+The colours of kick-off hold all campaign long: as empires grow, an empire
+changes colour only when a conquest brings a look-alike to its border (about
+one empire a conquest, none in most). The setup previews, the map, its key, the
+ledger and the share image all read the same palette. `scripts/map-palette.test.mjs`
+checks every shipped map at kick-off, the world map, and campaigns played out.
 
 The map mode is not saved: a reloaded campaign opens on Political. The setup
 map's own Political / Flags switch does not carry into the campaign. Hovering land

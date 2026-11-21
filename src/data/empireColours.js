@@ -1,7 +1,8 @@
 // The colour each empire's political fill is drawn from (theme.js empireFill): a nation's colour chosen to fit it
 // and stand apart from its neighbours (nationColours.js, `npm run build:nation-colours`), a club's crest colour
 // (clubColours.js, `npm run build:club-colours`). Keyed by team id alone, so the setup previews, the map, the key
-// and the ledger agree before a campaign has built its teams.
+// and the ledger agree before a campaign has built its teams. The map paints these unless a bordering empire looks
+// alike: src/engine/mapPalette.js then moves the weaker of the two to another colour.
 import { NATIONS } from './teams.js';
 import { NATION_COLOURS } from './nationColours.js';
 import { clubColour } from './clubColours.js';
