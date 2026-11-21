@@ -399,7 +399,7 @@ test('the squad screen draws a rink, marks every estimate and profiles attack, d
   assert.ok(estimated.length, 'a lineup holds estimates');
   assert.ok(estimated.every(row => row.source === 'Estimated' && row.sourceTitle === ESTIMATE_TITLE && row.rating < 84));
   assert.equal(squad.pitch.filter(slot => slot.estimated).length, estimated.length, 'the rink marks the same players');
-  assert.ok(squad.notes.some(note => new RegExp(`^${estimated.length} of the 19 starting ratings are estimates`).test(note)));
+  assert.ok(squad.notes.some(note => new RegExp(`^${estimated.length} of the 19 starting ratings ${estimated.length === 1 ? "is an estimate" : "are estimates"}`).test(note)));
   const player = team.squad.find(isEstimated);
   assert.equal(sourceLabel(player), 'Estimated');
   assert.equal(sourceTitle(player), ESTIMATE_TITLE);

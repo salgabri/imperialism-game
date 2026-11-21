@@ -38,6 +38,8 @@ const NHL = { sport: 'hockey', layer: 'clubs', clubScope: 'domestic:nhl' };
 // Rugby league clubs: the 17 NRL clubs on their own map of Australia and New Zealand, chosen on Rugby's card beside union's
 // European clubs.
 const NRL = { sport: 'rugby-league', layer: 'clubs', clubScope: 'domestic:nrl' };
+// Spain's map cut to its 20 strongest clubs (src/engine/clubSplit.js): chosen as Spain, then Top 20 beside it.
+const SPAIN_20 = { layer: 'clubs', clubScope: 'domestic:724c20', clubCount: 20 };
 // Football clubs: Europe's strongest, each on land in its own country.
 const TOP = { layer: 'clubs', clubScope: 'domestic:eu124' };
 const ELITE = { layer: 'clubs', clubScope: 'domestic:eu32' };
@@ -78,6 +80,8 @@ const SCENARIOS = [
   { name: 'RUGBY · Six Nations · duel · instant', sport: 'rugby-union', scope: 'six-nations', pacing: 'duel', resolution: 'instant' },
   { name: 'RUGBY CLUBS · European clubs · blitz · instant', sport: 'rugby-union', layer: 'clubs', clubScope: 'domestic:rugbyeurope', pacing: 'blitz',
     resolution: 'instant' },
+  // Last, so the indices above keep their meaning.
+  { name: 'DOMESTIC · Spain top 20 clubs (cut) · blitz · instant', ...SPAIN_20, pacing: 'blitz', resolution: 'instant' },
 ];
 
 const RESUME_SCENARIOS = [
@@ -91,6 +95,7 @@ const RESUME_SCENARIOS = [
   { name: 'CLUBS · NFL · blitz · instant', ...NFL, pacing: 'blitz', resolution: 'instant' },
   { name: 'CLUBS · MLB · chaos · instant', ...MLB, pacing: 'chaos', resolution: 'instant' },
   { name: 'CLUBS · FBS · blitz · instant', ...FBS, pacing: 'blitz', resolution: 'instant' },
+  { name: 'DOMESTIC · Spain top 20 clubs (cut) · duel · instant', ...SPAIN_20, pacing: 'duel', resolution: 'instant', finish: true },
 ];
 
 const LABEL_SCENARIOS = [

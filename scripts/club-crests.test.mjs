@@ -78,7 +78,7 @@ test('every club of every map, season and sport shows a crest the game ships', (
     const map = json(`public/domestic/${name}`);
     if (map.replacedBy) continue;
     if (map.season != null && map.sport == null) {
-      rememberTwins(map.clubs);
+      rememberTwins(map.clubs, map.year);
       check(map.id, map.year, map.clubs);
     } else if (map.seasons) {
       for (const season of map.seasons) check(map.id, yearOf.get(season), map.clubs);
@@ -108,4 +108,18 @@ test('the retired caricatures keep their monogram, and every other club-season w
         `${id} ${from}-${through}: a monogram era outside the caricatures`);
     }
   }
+});
+
+test('a namesake club of another country and season never lends its crest: twins are remembered by season', () => {
+  // Uruguay's Nacional (1994/95) and Portugal's CD Nacional (2015/16) share the season id f-nacional. Kept by id alone,
+  // the twin was whichever map decoded last, and a map the loader serves again from its cache is not decoded again.
+  const map = name => JSON.parse(readFileSync(new URL(`../public/domestic/${name}.json`, import.meta.url), 'utf8'));
+  const uruguay = map('858y1995'), portugal = map('620y2016');
+  const twinOf = data => data.clubs.find(club => club.id === 'f-nacional')?.twin;
+  assert.deepEqual([twinOf(uruguay), twinOf(portugal)], ['d858-1921', 'd620-2433']);
+  rememberTwins(uruguay.clubs, uruguay.year);
+  rememberTwins(portugal.clubs, portugal.year);
+  assert.equal(crestFile('f-nacional', 1995), crestFile('d858-1921', 1995), 'Uruguay 1994/95 wears its own Nacional\'s crest');
+  assert.equal(crestFile('f-nacional', 2016), crestFile('d620-2433', 2016), 'Portugal 2015/16 its own');
+  assert.notEqual(crestFile('d858-1921', 1995), crestFile('d620-2433', 2016));
 });

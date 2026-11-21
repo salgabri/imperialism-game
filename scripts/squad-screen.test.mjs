@@ -152,6 +152,11 @@ test('buildSquad reproduces board C1: kicker, XI, groups, table cells, depth, pi
     ['R XVII', 'J. Oblak', 'Slovenia', '±0.0', 'muted'],
   ]);
   assert.equal(model.acquisitions.aside, '4 players · 2 of 11 starters were claimed in conquest');
+  // One claimed starter: "was".
+  const one = campaign();
+  const own = one.teams[380].squad.find(player => player.name === 'S. Milinković-Savić');
+  for (const key of ['from', 'fromId', 'joined', 'claimGain']) delete own[key];
+  assert.equal(buildSquad(one, managerCtx(), '380').acquisitions.aside, '3 players · 1 of 11 starters was claimed in conquest');
   assert.deepEqual(model.acquisitions.rows.map(row => row.status), ['Starter', 'Depth', 'Starter', 'Depth']);
   assert.equal(model.status, 'alive');
   assert.equal(model.canFollow, false, 'managers do not follow');

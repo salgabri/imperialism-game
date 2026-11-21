@@ -423,7 +423,7 @@ test('Finish match drops the kickoff notice and goal toast whose clears it cance
   } finally { f.close(); }
 });
 
-test('instant and express reveals show the final minute and give the match clock nothing to re-time', () => {
+test('instant and express reveals show the final minute when they reveal, and give the match clock nothing to re-time', () => {
   for (const [settings, extra] of [[{ resolution: 'instant' }, {}], [{}, { express: true }], [{}, { instant: true }]]) {
     const f = syncAppFixture({ settings });
     try {
@@ -433,16 +433,36 @@ test('instant and express reveals show the final minute and give the match clock
       f.app.setState({ match: liveMatch(f.app, [[10, '250']], extra) });
       f.app.minuteStore.set(3);
       f.app.presentMatch();
-      assert.equal(minute(f.app), 90, JSON.stringify({ settings, extra }));
+      // Not before: a reveal held back (the pause when your followed team kicks off) would show how long the match went.
+      assert.equal(minute(f.app), 0, JSON.stringify({ settings, extra }));
       assert.equal(f.app.minuteToken, null);
       assert.equal(pendingMatchTasks(f.app).length, 0);
       f.app.setSpeed(2);
       assert.equal(pendingMatchTasks(f.app).length, 0, 'no ticker work appears after a speed change');
       f.time.advance(10000);
       assert.equal(finished, 1);
+      assert.equal(minute(f.app), 90, 'the reveal shows the final minute');
       assert.equal(f.app.state.match.shown.length, 1);
     } finally { f.close(); }
   }
+});
+
+test('a match on the ticker keeps its speed chips when Show matches turns to Fast-forward mid-match', () => {
+  const f = syncAppFixture({ settings: { resolution: 'ticker' } });
+  try {
+    quiet(f.app);
+    f.app.setState({ match: liveMatch(f.app, [[10, '250'], [80, '276']]) });
+    f.app.presentMatch();
+    f.time.advance(450 + 30 * FOOTBALL.clock.msPerUnit);
+    assert.equal(f.app.state.match.shown.length, 1, 'the first goal is in');
+    // Fast-forward now plays only your matches live; this one already is on the ticker, so a speed change re-times it.
+    f.app.setState({ settings: { ...f.app.state.settings, express: true } });
+    const before = pendingMatchTasks(f.app).length;
+    f.app.setSpeed(4);
+    assert.ok(before > 0 && pendingMatchTasks(f.app).length > 0, 'its pending ticker work stays');
+    f.time.advance(Math.ceil(50 * FOOTBALL.clock.msPerUnit / 4) + 10);
+    assert.equal(f.app.state.match.shown.length, 2, 'the 80th-minute goal comes at 4×, not at 1×');
+  } finally { f.close(); }
 });
 
 test('a resumed ticker restarts the chain from the last revealed minute', () => {

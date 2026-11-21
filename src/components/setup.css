@@ -173,8 +173,9 @@ strong.setup-save__text { font-weight:600; }
 
 /* ---- Sports: tiles, an icon over its name; the whole tile is the radio. Up to four share a row; up to eight split into
    two even rows, nine into three, ten to twelve into three of four and thirteen or more into rows of four (--sport-cols,
-   set by SetupOverlay), since five across would squeeze "Basketball" ---- */
-.setup-sports { display:grid; grid-template-columns:repeat(var(--sport-cols, 4), minmax(0, 1fr)); gap:8px; }
+   set by SetupOverlay), since five across would squeeze "Basketball". Every row is as tall as the tallest (1fr): on a wide
+   window a row whose names all fit on one line would otherwise come out shorter than its neighbours ---- */
+.setup-sports { display:grid; grid-template-columns:repeat(var(--sport-cols, 4), minmax(0, 1fr)); grid-auto-rows:1fr; gap:8px; }
 .setup-card {
   position:relative; min-width:0; min-height:70px; padding:10px 4px 8px;
   display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:6px; text-align:center;
@@ -226,6 +227,11 @@ strong.setup-save__text { font-weight:600; }
 .setup-season__credit { margin:-6px 0 0; font:400 11px/1.3 var(--font-sans); color:var(--muted); overflow-wrap:anywhere; }
 .setup-country { margin-top:8px; }
 .setup-country[data-checked] { background:var(--you-soft); border-color:var(--you); }
+/* The country and how many of its clubs play (SetupOverlay ClubCount) share one row. */
+.setup-country-row { display:flex; gap:6px; margin-top:8px; }
+.setup-country-row > .setup-country { flex:1 1 auto; min-width:0; margin-top:0; }
+.setup-count { flex:none; width:auto; min-width:6.4em; }
+.setup-count[data-checked] { background:var(--you-soft); border-color:var(--you); }
 
 /* ---- Theatre: chips that wrap; the map beside them shows the choice and the stats count it ---- */
 .setup-theatres { display:flex; flex-wrap:wrap; gap:6px; }
@@ -656,6 +662,16 @@ strong.setup-save__text { font-weight:600; }
   /* Basketball's eight nation theatres (EuroBasket beside Europe) took a third row at 360, and step 1 scrolled with
      the resume strip shown: 2px less padding a side keeps them to two rows, as every sport's. */
   .setup-theatre { padding:0 8px; }
+}
+
+/* ---- Cancel in the header on a narrow phone (up to 419px): the row (the wordmark, three save icons, Cancel and the theme
+   toggle) was 411px wide, so the theme toggle slid 7px off a 390 screen and wholly off a 360 one. Tighter gaps and edges,
+   40px-wide icons (still 44px tall) and a 22px wordmark keep the row on screen down to 360: about 337px in 340px. ---- */
+@media (max-width:419.98px) {
+  .setup-head:has(.setup-head__cancel) { gap:4px; padding-left:10px; padding-right:10px; }
+  .setup-head:has(.setup-head__cancel) .setup-head__wordmark { font-size:22px; }
+  .setup-head:has(.setup-head__cancel) .icon-button { width:40px; }
+  .setup-head__cancel { padding:0; }
 }
 
 /* ---- A season's credit (four lines on a phone or in the controls' column, never cut) takes the room of step 1's extras

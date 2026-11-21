@@ -30,7 +30,11 @@ const TASKS = new WeakMap();
  * (`tie.end`: 120' after the whole of extra time, a golden goal's minute, 105' after a silver goal).
  */
 function lastTickOf(m, sport) {
-  const last = (m?.allEv || []).reduce((n, e) => Math.max(n, Number(e?.m) || 0), Number(sport?.clock?.length) || 0);
+  // A clock that ends with the deciding event (`clock.endsWithLastEvent`: Valorant's, which shows each map's rounds)
+  // does not run on to its length, a sweep's longest: a 2–0 in 47 rounds' time ran on to "M2 OT", never played.
+  const events = m?.allEv || [];
+  const floor = sport?.clock?.endsWithLastEvent && events.length ? 0 : Number(sport?.clock?.length) || 0;
+  const last = events.reduce((n, e) => Math.max(n, Number(e?.m) || 0), floor);
   return Math.max(last, overtimeEnd(sport, Array.isArray(m?.tie?.periods) ? m.tie.periods.length : 0), Number(m?.tie?.end) || 0);
 }
 
@@ -91,10 +95,12 @@ export function presentMatch() {
   pruneMatchTasks.call(this);
   this.stopMinuteClock();
   const lastTick = lastTickOf(m, sport);
-  // Instant and express reveals show the final minute (the store is reset at every kickoff, so no stale minute).
-  if (m.express) { this.minuteStore?.set(lastTick); this.after(18, () => this.revealAll()); return; }
+  // Instant and express reveals show the final minute when they reveal (revealAll), not before: a reveal held back
+  // (the pause when your followed team plays) showed the clock at 120' or in overtime over a 0–0, telling how long
+  // the match went before its score.
+  if (m.express) { this.minuteStore?.set(0); this.after(18, () => this.revealAll()); return; }
   // A score typed in (scores entered by you) shows at once, with no kick-off notice: its form already named the match.
-  if (m.entered) { this.minuteStore?.set(lastTick); this.after(18, () => this.revealAll()); return; }
+  if (m.entered) { this.minuteStore?.set(0); this.after(18, () => this.revealAll()); return; }
 
   const instant = !playsLive.call(this, st, m);
   this.showPopup(
@@ -119,7 +125,7 @@ export function presentMatch() {
   );
 
   if (instant) {
-    this.minuteStore?.set(lastTick);
+    this.minuteStore?.set(0);
     this.after(380, () => this.revealAll());
     return;
   }
@@ -281,7 +287,10 @@ export function matchLiveModel(sport, a, d, effA, effD, drama, home = false) {
  */
 export function rescheduleForSpeed(previousSpeed) {
   const st = this.state, m = st.match;
-  if (!m || m.applied || !st.settings || !playsLive.call(this, st, m)) return;
+  // Whether the match is on the ticker is what it has pending, not what the settings would choose now: a match kicked
+  // off live keeps its ticker when Show matches turns to Fast-forward, or another team is followed, mid-match, and the
+  // speed chips must still time it. An instant or fast-forwarded reveal has no ticker work pending (below).
+  if (!m || m.applied || !st.settings) return;
   const speed = Number(st.speed) || 1;
   if (Number(previousSpeed) === speed) return;
   const pending = pendingTasks.call(this).map(token => ({ token, ...TASKS.get(token) }));

@@ -9,6 +9,7 @@ import { politicalFill } from '../data/empireColours.js';
 import { memo, roman, historyRound, winTone } from './format.js';
 import { matchupOdds, winChanceFor } from './odds.js';
 import { reachableTargets } from '../engine/turns.js';
+import { recommendedTactic } from '../engine/managerStrategy.js';
 
 /** Switch order (README §Map rendering): Political (default, DEC D18) · Strength · Fronts · Flags. */
 export const MAP_MODES = Object.freeze(['political', 'strength', 'fronts', 'flags']);
@@ -99,8 +100,9 @@ function strengthStepOf(steps, eff) {
 
 /**
  * "Your" side of the pending fixture, exactly as the fronts table and the fixture block read it (viewModels/
- * campaign.js pendingFixture + fixtureOverride): a live match uses its own odds, the tactical gate and a locked
- * draw the default-approach estimate in the fixture's orientation; nothing while the compass still spins (D19).
+ * campaign.js pendingFixture + fixtureOverride): a live match uses its own odds, the tactical gate the recommended
+ * approach's estimate and a locked draw the balanced one's, in the fixture's orientation; nothing while the compass
+ * still spins (D19).
  * → { opponentId, p } | null
  */
 export function fixtureWinChance(st, ctx = {}, me = mapMeId(st, ctx)) {
@@ -119,9 +121,14 @@ export function fixtureWinChance(st, ctx = {}, me = mapMeId(st, ctx)) {
   if (pair.kind === 'live') {
     p = m.odds ? Number(attacking ? m.odds.a : m.odds.b) : null;
   } else {
+    // At the tactical gate, the recommended approach's odds (the approach Continue kicks off with), as the fronts table
+    // and the fixture block read them (campaign.js fixtureOdds); otherwise the balanced one's.
+    const gate = st.tacticalChoice;
+    const tactic = gate && gate.aId === pair.aId && gate.dId === pair.dId
+      ? recommendedTactic(Array.isArray(gate.options) ? gate.options : []) : 'balanced';
     const odds = memo(ctx?.cache, 'map:fixture-odds',
-      [st.teams, pair.aId, pair.dId, ctx?.managedId ?? null, ctx?.drama, ctx?.homeAdvantage, ctx?.sport],
-      () => matchupOdds(st, ctx, pair.aId, pair.dId));
+      [st.teams, pair.aId, pair.dId, ctx?.managedId ?? null, ctx?.drama, ctx?.homeAdvantage, ctx?.sport, tactic],
+      () => matchupOdds(st, ctx, pair.aId, pair.dId, { tactic }));
     p = odds ? (attacking ? odds.attacker : odds.defender) : null;
   }
   return Number.isFinite(p) ? { opponentId: attacking ? pair.dId : pair.aId, p } : null;

@@ -273,6 +273,51 @@ test('with no current match the Match view shows the last finished match from hi
   assert.equal(model.b.scorers, "Chiesa 61'");
 });
 
+test('archived matches: rugby keeps its scorer lines; a shoot-out or a second overtime tops the feed', () => {
+  const archived = (sportId, events, result = {}) => buildLiveMatch({ ...liveState(), match: null, history: [{ id: 'match-30', round: '030',
+    aId: '688', dId: '380', a: { teamId: '688', code: 'SRB', name: 'Serbia', score: 2 }, b: { teamId: '380', code: 'ITA', name: 'Italy', score: 3 },
+    events, winnerId: '380', result: { winnerId: '380', ...result } }] }, { ...ctxFor(), sport: getSport(sportId) });
+  // Rugby's copy, "TRY — Name (CODE)" and the kicks, gives the archived header the live one's lines.
+  for (const [sportId, kick] of [['rugby-league', 'FIELD GOAL'], ['rugby-union', 'DROP GOAL']]) {
+    const live = [{ m: 12, tid: '380', name: 'Nathan Cleary', pts: 4, kind: 'try' }, { m: 30, tid: '380', name: 'Nathan Cleary', pts: 2, kind: 'penalty' },
+      { m: 41, tid: '688', name: 'Jack Wighton', pts: 4, kind: 'try' }, { m: 70, tid: '688', name: 'Mitchell Moses', pts: 1, kind: 'field' }];
+    const model = archived(sportId, [{ when: "12'", text: 'TRY — Nathan Cleary (ITA)' }, { when: "30'", text: 'PENALTY GOAL — Nathan Cleary (ITA)' },
+      { when: "41'", text: 'TRY — Jack Wighton (SRB)' }, { when: "70'", text: `${kick} — Mitchell Moses (SRB)` }]);
+    for (const [side, id] of [['a', '688'], ['b', '380']]) {
+      const expected = scorersLine(live, id, teams, getSport(sportId));
+      assert.ok(expected, `${sportId}: a scorer line to keep`);
+      assert.equal(model[side].scorers, expected, `${sportId}: the archived ${side} header`);
+    }
+  }
+  // Newest first, in the order played, when a row has no minute: ice hockey's shoot-out and college football's 2OT
+  // ("2OT" is no minute 2) were sorted below the minutes.
+  const hockey = archived('hockey', [{ when: "20'", text: 'GOAL — A. One (SRB)' }, { when: "49'", text: 'GOAL — B. Two (ITA)' },
+    { when: 'SO', text: 'SHOOT-OUT — C. Three (ITA)' }], { tieText: 'In a shoot-out' });
+  assert.deepEqual(buildFeedRows(hockey, 0).slice(1).map(row => row.text.split(' — ')[0]), ['SHOOT-OUT', 'GOAL', 'GOAL', 'Puck drop']);
+  const college = archived('college-football', [{ when: 'Q2', text: 'TD — A. One (SRB)' }, { when: 'Q3', text: 'FG — B. Two (ITA)' },
+    { when: 'OT', text: 'TD — C. Three (SRB)' }, { when: '2OT', text: 'TD — D. Four (ITA)' }], { tieText: 'In 2 overtimes' });
+  assert.deepEqual(buildFeedRows(college, 0).slice(1, 5).map(row => row.minute), ['2OT', 'OT', 'Q3', 'Q2']);
+});
+
+test('a Valorant sweep ends on its last map\'s last round, not on rounds it never played ("M2 OT")', () => {
+  const valorant = getSport('valorant');
+  // 13–8 on map 1 (unit 21), 13–8 on map 2 (unit 26 + 21): the clock's length is a sweep's longest, 52 ("M2 OT").
+  const allEv = [{ m: 21, tid: '380', name: 'A. One', pts: 1, kind: 'map', own: 13, opp: 8, game: 1, map: 'ascent', score: '13–8' },
+    { m: 47, tid: '380', name: 'B. Two', pts: 1, kind: 'map', own: 13, opp: 8, game: 2, map: 'bind', score: '13–8' }];
+  const model = buildLiveMatch(liveState({ shown: allEv, allEv, ga: 0, gd: 2, finalGa: 0, finalGd: 2, winner: '380', status: 'FINAL', done: true }),
+    { ...ctxFor(), sport: valorant });
+  assert.equal(model.feedBase.finalMinute, 47);
+  assert.equal(buildFeedRows(model, 0)[0].minute, 'M2 R21');
+});
+
+test('the live chart gets Valorant\'s map in play: each event\'s rounds from its side and its kind', () => {
+  const shown = [{ m: 1, tid: '688', name: 'A. One', pts: 0, kind: 'pistol', own: 1, opp: 0 },
+    { m: 13, tid: '380', name: 'B. Two', pts: 0, kind: 'pistol', own: 7, opp: 6 }];
+  const model = buildLiveMatch(liveState({ shown, allEv: shown, ga: 0, gd: 0 }), { ...ctxFor(), sport: getSport('valorant') });
+  assert.deepEqual(model.goals, [{ m: 1, tid: '688', pts: 0, own: 1, opp: 0, kind: 'pistol' },
+    { m: 13, tid: '380', pts: 0, own: 7, opp: 6, kind: 'pistol' }]);
+});
+
 test('a settled conquest shows the kickoff XIs: the claimed player is back with the loser (live-applied and history)', () => {
   // Serbia (attacker) lost to Italy; applyConquest moved Serbia's best striker to the end of Italy's squad.
   const star = { name: 'Aleksandar Mitrović', pos: 'FW', rating: 91 };

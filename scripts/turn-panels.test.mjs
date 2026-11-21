@@ -11,7 +11,7 @@ import { makeRng, buildTeam, teamEff } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import {
   buildTurnStrip, buildReach, buildTargetPanel, buildTargetCard, buildSpectatorPanel, targetOptions, idleTurnCopy,
-  targetCardAnchor, targetChoiceSeed, TARGET_ROWS,
+  targetCardAnchor, targetChoiceSeed,
 } from '../src/viewModels/turns.js';
 import { displayRound } from '../src/viewModels/format.js';
 
@@ -228,15 +228,17 @@ test('target options: in-reach ids ranked by win chance × territories; panel ro
   assert.equal(one.count, '1 neighbour in reach');
   assert.equal(one.ctaLabel, 'Attack Serbia');
 
-  // More than six options: six rows; a map-picked selection outside the top six stays visible as the last row.
+  // More than six options: a row for each, in rank order (the panel pages what the column cannot hold); a map-picked
+  // selection is selected where it ranks.
   const many = ['348', '688', '276', '250', '008', '040', '705', '191', '756'];
   const ranked = targetOptions({ ...st, pendingTarget: pending({ optionIds: many }) }, context({ managedId: '380' }), '380');
   const outside = ranked.at(-1).teamId;
   const big = buildTargetPanel({ ...st, pendingTarget: pending({ optionIds: many, selectedId: outside }) }, context({ managedId: '380' }));
   assert.equal(big.count, '9 neighbours in reach');
-  assert.equal(big.rows.length, TARGET_ROWS);
+  assert.deepEqual(big.rows.map(row => row.teamId), ranked.map(option => option.teamId));
   assert.equal(big.rows.at(-1).teamId, outside);
   assert.equal(big.rows.at(-1).selected, true);
+  assert.equal(big.rows.filter(row => row.selected).length, 1);
   // No pending target → empty panel.
   assert.deepEqual(buildTargetPanel(state(), context()), { count: '', rows: [], selectedId: null, ctaLabel: '' });
 });

@@ -662,6 +662,9 @@ test('fourteen sport cards sit in four rows of four, compact tiles that stay 44p
     ['American football', 'College football', 'Baseball', 'Ice hockey', 'Tennis', 'Women\'s tennis', 'Rugby', 'Rocket League',
       'Counter-Strike', 'Valorant', 'League of Legends']);
   const css = readFileSync(new URL('../src/components/setup.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  // Every row of tiles as tall as the tallest: at 1920×1080 the third row (Women's tennis, Rugby, Rocket League,
+  // Counter-Strike), its names all on one line, was 49px against the others' 62px (measured in Chrome; 62px each after).
+  assert.match(css, /\.setup-sports \{ display:grid; grid-template-columns:[^;]+; grid-auto-rows:1fr;/);
   assert.match(css, /\.setup-sports\[data-rows="3"\] \.setup-card \{ min-height:44px;/);
   // Four across on a phone, the long names take two lines: a smaller icon and snug lines keep 390×664 from scrolling
   // (measured in Chrome: tiles 60px → 53px, step 1 520px of content in 510px → 510px).
@@ -1014,6 +1017,42 @@ test('football clubs offer every shipped country in a dropdown under Europe\'s t
   assert.ok(!nations.q('#setup-country'));
   assert.equal(nations.qa('#setup-theatre optgroup').length, 0);
   assert.ok(!nations.qa('#setup-theatre option').some(option => option.value.startsWith('domestic:')));
+});
+
+test('a chosen country offers how many of its clubs play beside it: its top two to all of them', async t => {
+  // England cut to 20 (src/engine/clubSplit.js): the dropdown still names England, the count beside it says 20.
+  const cut = await mount(t, { setup: { layer: 'clubs', clubScope: 'domestic:826c20', clubCount: 20 } });
+  const countries = cut.q('#setup-country');
+  assert.equal(countries.value, 'domestic:826');
+  assert.ok(countries.hasAttribute('data-checked'));
+  assert.equal(cut.q('#setup-theatre').value, 'domestic:826', 'the mirror names the country too');
+  const count = cut.q('#setup-club-count');
+  assert.equal(count.parentElement, countries.parentElement, 'one row with the country');
+  assert.equal(count.getAttribute('aria-label'), 'How many clubs play');
+  assert.equal(count.value, '20');
+  assert.ok(count.hasAttribute('data-checked'));
+  const options = [...count.options].map(option => [option.value, option.textContent]);
+  assert.equal(options.length, ENGLAND.clubs - 1);
+  assert.deepEqual(options.slice(0, 2), [[String(ENGLAND.clubs), `All ${ENGLAND.clubs}`], [String(ENGLAND.clubs - 1), `Top ${ENGLAND.clubs - 1}`]]);
+  assert.deepEqual(options.at(-1), ['2', 'Top 2']);
+  assert.match(cut.q('#setup-theatre-description').textContent, /the top 20 of England's 100 clubs fighting over its 100 sections/);
+  assert.match(cut.q('.setup-stats').textContent, /20/);
+  count.value = '30';
+  await act(async () => count.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
+  assert.deepEqual(cut.calls.picks.at(-1), ['clubCount', 30]);
+  count.value = String(ENGLAND.clubs);
+  await act(async () => count.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
+  assert.deepEqual(cut.calls.picks.at(-1), ['clubCount', null], 'all of them: the map as built');
+  assert.deepEqual(cut.errors, []);
+
+  // The full map: the count reads all of them, unmarked.
+  const full = await mount(t, { setup: COUNTRY });
+  assert.equal(full.q('#setup-club-count').value, String(ENGLAND.clubs));
+  assert.ok(!full.q('#setup-club-count').hasAttribute('data-checked'));
+  // Europe's maps: no count.
+  const europe = await mount(t, { setup: { layer: 'clubs', clubScope: 'domestic:eu124' } });
+  assert.ok(europe.q('#setup-country'));
+  assert.ok(!europe.q('#setup-club-count'));
 });
 
 test('a chosen country: description, counts, summaries, and its map load gating Launch', async t => {
@@ -1499,4 +1538,49 @@ test('a pressed segment keeps its white label on hover (Teams toggle, history ki
   assert.match(css, /\.segmented > button:hover:not\(:disabled\):not\(\[aria-pressed=true\]\):not\(\[aria-checked=true\]\) \{ color:var\(--ink\); \}/);
   assert.doesNotMatch(css, /\.segmented > button:hover:not\(:disabled\) \{/);
   assert.match(css, /\.segmented > button\[aria-pressed=true\], \.segmented > button\[aria-checked=true\] \{ background:var\(--ink\); color:var\(--on-ink\);/);
+});
+
+test('Cancel in the header on a narrow phone: tighter gaps, edges, icons and wordmark keep the theme toggle on screen', () => {
+  // The row (wordmark, three save icons, Cancel, theme toggle) was 411px wide below 420, so the toggle slid off a 390 or
+  // 360 screen whenever Cancel showed (measured in Chrome: toggle at 353..397). Without Cancel the row keeps its look.
+  const css = readFileSync(new URL('../src/components/setup.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const narrow = css.slice(css.indexOf('@media (max-width:419.98px)'));
+  assert.match(narrow, /^@media \(max-width:419\.98px\) \{\s*\.setup-head:has\(\.setup-head__cancel\) \{ gap:4px; padding-left:10px; padding-right:10px; \}/);
+  assert.match(narrow, /\.setup-head:has\(\.setup-head__cancel\) \.setup-head__wordmark \{ font-size:22px; \}/);
+  assert.match(narrow, /\.setup-head:has\(\.setup-head__cancel\) \.icon-button \{ width:40px; \}/);
+});
+
+test('while a season loads, its sport card says what it fields: clubs-only sports and seasons are not "Nations"', async () => {
+  const { DEFAULT_SETUP, setClubScope } = await import('../src/app/shared.js');
+  const { BUILT_IN_SETS } = await import('../src/engine/footballSets.js');
+  for (const [sport, layer, dataSet, note] of [['american-football', 'clubs', 'madden-2005', 'Clubs'], ['college-football', 'clubs', 'cfb-2010', 'Schools'],
+    ['basketball', 'clubs', 'nba-2k15', 'Clubs'], ['football', 'nations', 'ea-fifa-05', 'Nations']]) {
+    const base = { ...DEFAULT_SETUP, sport, layer, dataSet };
+    const model = buildSetupModel({ ...base, clubScope: setClubScope(base) }, { season: { sets: BUILT_IN_SETS, state: 'loading', sport: null } });
+    assert.equal(model.season.state, 'loading');
+    assert.equal(model.sports.find(card => card.selected).note, note, `${sport} ${dataSet}`);
+  }
+});
+
+test('theatre descriptions name a league\'s clubs once, in its sport\'s word', async () => {
+  const { CLUB_MAPS } = await import('../src/data/clubMaps.js');
+  const { EUROPE_MAPS } = await import('../src/data/europeMaps.js');
+  const rugby = [...EUROPE_MAPS, ...CLUB_MAPS].find(entry => entry.id === 'rugbyeurope');
+  const college = [...EUROPE_MAPS, ...CLUB_MAPS].find(entry => entry.id === 'cfb');
+  assert.match(modelDescription(rugby), / lead the 36 European clubs, each on land in its own country/);
+  assert.doesNotMatch(modelDescription(rugby), /clubs clubs/);
+  assert.match(modelDescription(college), / lead the 138 FBS schools fighting over the USA, .* A state with several schools is divided/);
+});
+
+test('a key that lands on the team already picked leaves no focus move armed for a later render', async t => {
+  const view = await mount(t, { setup: { role: 'manager', managedTeamId: '250' }, initialStep: 3 });
+  const flag = name => view.qa('.setup-team').find(button => button.dataset.name === name);
+  flag('France').focus();
+  const home = await view.key(flag('France'), 'Home');
+  assert.equal(home.defaultPrevented, true);
+  assert.ok(document.activeElement === flag('France'), 'the picked team keeps focus');
+  const choose = view.button('You choose');
+  choose.focus();
+  await view.click(choose);
+  assert.ok(document.activeElement === choose, 'focus stays on the control just used, not back on the team wall');
 });

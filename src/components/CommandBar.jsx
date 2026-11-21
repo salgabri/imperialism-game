@@ -148,7 +148,7 @@ export default function CommandBar(props) {
             disabled={!!primary.disabled} onClick={onPrimary}><span className="mast__cta-label">{primary.mastLabel || primary.label}</span></button>}
           {roundShort && <span className="mast__round">{roundShort}</span>}
           <div className="command-extras">
-            {saveStatus?.ok === false && <button type="button" className="command-save-warning" onClick={() => setSettingsOpen(true)} title={saveStatus.message}><span role="status">Unsaved</span></button>}
+            {saveStatus?.ok === false && !saveStatus.file && <button type="button" className="command-save-warning" onClick={() => setSettingsOpen(true)} title={saveStatus.message}><span role="status">Unsaved</span></button>}
             {completed && onResults && <button type="button" className="icon-button command-results-trigger" aria-label="Campaign results" title="Campaign results" onClick={onResults}><Icon name="trophy" size={20} /></button>}
             <div className="command-settings" ref={settingsRef}>
               <button type="button" className="icon-button" aria-label="Settings" title="Settings" aria-expanded={settingsOpen} aria-controls="campaign-settings" ref={triggerRef} onClick={() => setSettingsOpen(value => !value)}><Icon name="settings" size={20} /></button>

@@ -10,18 +10,28 @@ import { CREST_ERAS } from './clubCrestEras.js';
 
 // An earlier season's club on its country's map of that season (src/engine/domestic.js) with no crest of its own wears
 // its twin's, the same club on today's map of the country, as the Europe maps' clubs share their twins' files
-// (clubLogos.js SHARED): club id → twin id, remembered as such a map decodes. The last decoded map's twins stand, since a
-// season's `f-<name>` id names one club in it.
-const twins = new Map();
+// (clubLogos.js SHARED): club id → twin id, remembered as such a map decodes, by its season's year. A season's
+// `f-<name>` id names one club in it, but other seasons give it to namesakes in other countries (Uruguay's Nacional in
+// 1994/95, Portugal's in 2015/16): kept by id alone, the twin was whichever map decoded last, and a map served again from
+// the loader's cache is not decoded again. A lookup that names no year takes the last one remembered.
+const twins = new Map(); // `${year}|${id}` → twin id
+const latestTwins = new Map(); // id → twin id
 
-/** Remember the twins of a decoded map's clubs (`[{ id, twin }]`, twin null for none). */
-export function rememberTwins(clubs) {
-  for (const club of clubs) if (club.twin) twins.set(club.id, club.twin);
+/** Remember the twins of a decoded map's clubs (`[{ id, twin }]`, twin null for none) in its season's `year`. */
+export function rememberTwins(clubs, year = null) {
+  for (const club of clubs) {
+    if (!club.twin) continue;
+    twins.set(`${year}|${club.id}`, club.twin);
+    latestTwins.set(club.id, club.twin);
+  }
 }
 
-/** Club `id`'s twin on today's map of its country (rememberTwins), or null. */
-export function twinOf(id) {
-  return twins.get(id) ?? null;
+/**
+ * Club `id`'s twin on today's map of its country (rememberTwins), or null: the one its map of season `year` gave it, or,
+ * with no year, the last one remembered.
+ */
+export function twinOf(id, year = null) {
+  return (year == null ? latestTwins.get(id) : twins.get(`${year}|${id}`)) ?? null;
 }
 
 /** The crest file club `id` wears in season year `year` (null: today's season), or null for none (its monogram). */
@@ -29,7 +39,8 @@ export function crestFile(id, year) {
   const eras = year == null ? null : CREST_ERAS[id];
   if (eras) for (const [from, through, file] of eras) if (from <= year && year <= through) return file;
   const own = clubLogoFile(id);
-  return own || !twins.has(id) ? own : crestFile(twins.get(id), year);
+  const twin = own ? null : twinOf(id, year);
+  return twin ? crestFile(twin, year) : own;
 }
 
 /** The URL of the crest club `id` wears in season year `year`, or null when it has none (it keeps its monogram). */

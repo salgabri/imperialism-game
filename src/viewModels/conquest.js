@@ -129,14 +129,16 @@ export function conquestOptions(choice, selectedIndex = choice?.selected, sport)
   return candidates.map((candidate, position) => {
     const index = Number.isInteger(candidate.index) ? candidate.index : position;
     const replaced = replacedName(candidate);
-    const delta = signedDelta(Math.max(0, Number(candidate.gain) || 0));
+    // The gain as it is: a tennis signing can weaken a team (the players ranked third and fourth take the doubles, so a
+    // weaker newcomer can push out a stronger singles player who was doubling), and the lineup panel shows the loss.
+    const delta = signedDelta(Number(candidate.gain) || 0);
     // Every natural position: a PG/SG fits either guard spot.
     const base = `${candidate.positions?.length ? candidate.positions.join('/') : candidate.pos} · ${candidate.rating} rating${isEstimated(candidate) ? ' (estimated)' : ''}`;
     const note = replaced ? `Starts ahead of ${replaced}`
       : candidate.entersLineup ? `Starts in the ${lineup}` : `Adds depth · the ${lineup} is unchanged`;
     return {
       key: `option-${index}`, index, name: candidate.name, base, note, meta: `${base} · ${note}`,
-      gain: delta.text, tone: delta.tone === 'gain' ? 'gain' : 'muted', role: candidate.role || null,
+      gain: delta.text, tone: delta.tone, role: candidate.role || null,
       selected: candidate === selected,
     };
   });
@@ -263,11 +265,11 @@ function ordinal(n) {
 }
 
 /**
- * The closing note speaks only when the last save failed (the masthead shows "Unsaved"): it points to the export. The
- * buttons say what comes next. → { note, noteTone: 'unsaved' | null }
+ * The closing note speaks only when the last save failed (the masthead shows "Unsaved"): it points to the export. A
+ * refused import file (`file`) is no failed save. The buttons say what comes next. → { note, noteTone: 'unsaved' | null }
  */
 export function eliminationNote(saveStatus) {
-  if (saveStatus?.ok === false) {
+  if (saveStatus?.ok === false && !saveStatus.file) {
     return { note: 'Your run could not be saved. Use Export campaign in Settings to keep a copy.', noteTone: 'unsaved' };
   }
   return { note: '', noteTone: null };
@@ -323,7 +325,9 @@ export function buildElimination(st, ctx = {}) {
     const tieText = entry.result?.tieText || '';
     const kicks = tieText.match(/^(\d+)–(\d+) on penalties$/);
     if (score && kicks) score += `, ${winnerAttacked ? `${kicks[1]}–${kicks[2]}` : `${kicks[2]}–${kicks[1]}`} on penalties`;
-    else if (score && /^after/i.test(tieText)) score += ` ${tieText.replace(/^After/, 'after')}`;
+    // "after extra time", and the tie texts that read "in …": ice hockey's overtime or shoot-out, rugby's extra time or
+    // golden point.
+    else if (score && /^(after|in)\s/i.test(tieText)) score += ` ${tieText[0].toLowerCase()}${tieText.slice(1)}`;
   } else {
     // Unknown side and score: result.score is attacker-first, so stay neutral rather than guess the verb.
     sentence = `${winnerName} won the decisive match.`;

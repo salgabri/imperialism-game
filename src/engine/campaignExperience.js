@@ -61,14 +61,21 @@ export function recordMatch(state, match, extras = {}) {
   };
 }
 
+// "an 11.9-point gap": a number said with a vowel first (8, 11, 18, 80–89) takes "an" (viewModels/format.js articleFor).
+const articleFor = text => (/^(8|11(?!\d)|18(?!\d))/.test(text) ? 'an' : 'a');
+// A strength change with its sign: a tennis signing can weaken a team, which read "+-1.3".
+const signedStrength = value => (value < 0 ? `−${Math.abs(value).toFixed(1)}` : `+${value.toFixed(1)}`);
+
 export function campaignRecap(history = []) {
   const upset = history.filter(m => m.upsetGap > 0).sort((a, b) => b.upsetGap - a.upsetGap)[0];
   const impact = history.filter(m => m.result?.player).sort((a, b) => (b.result.strengthGain || 0) - (a.result.strengthGain || 0))[0];
   const final = history.at(-1);
+  const gap = upset ? upset.upsetGap.toFixed(1) : '';
   return {
-    biggestUpset: upset ? `${upset.winnerName} overturned a ${upset.upsetGap.toFixed(1)}-point strength gap` : 'No underdog wins recorded',
+    biggestUpset: upset ? `${upset.winnerName} overturned ${articleFor(gap)} ${gap}-point strength gap` : 'No underdog wins recorded',
     decisiveMatch: final ? `${final.a.name} ${final.a.score}–${final.b.score} ${final.b.name}${final.result?.tieText ? ` · ${final.result.tieText}` : ''}` : 'No matches recorded',
-    transferImpact: impact ? `${impact.result.player.name}: +${impact.result.strengthGain.toFixed(1)} strength for ${impact.winnerName}` : 'No acquisitions recorded',
+    transferImpact: impact ? `${impact.result.player.name}: ${signedStrength(impact.result.strengthGain || 0)} strength for ${impact.winnerName}`
+      : 'No acquisitions recorded',
   };
 }
 

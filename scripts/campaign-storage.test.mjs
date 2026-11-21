@@ -45,6 +45,9 @@ test('strict import rejects invalid state before it can replace the existing che
     [s => { s.aliveIds.push('250'); }, /territory/],
     [s => { s.own['276'] = 'missing'; }, /territory/],
     [s => { s.settings.sport = 'curling'; }, /setting/],
+    // A hand-edited theatre that is no name passed and then crashed the import preview (clubScope.startsWith).
+    [s => { s.settings.layer = 'clubs'; s.settings.clubScope = 5; }, /clubScope setting is unsupported/],
+    [s => { s.settings.scope = ['UEFA']; }, /scope setting is unsupported/],
     [s => { s.match = { ...match(), winner: 'missing' }; }, /match is incomplete/],
     [s => { s.match = { ...match(), allEv: [{ m: 2, tid: 'missing' }] }; }, /match is incomplete/],
     [s => { s.spin = { targetId: '276' }; }, /draw references/],

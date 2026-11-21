@@ -9,11 +9,11 @@ import TeamMark from '../../components/TeamMark.jsx';
 import './result-entry.css';
 
 /** A score field: digits only (the App keeps them, src/engine/enteredResult.js scoreText), the phone's number pad. */
-function ScoreField({ id, value, label, last, onChange }) {
+function ScoreField({ id, value, label, last, onChange, onKeyDown }) {
   return (
     <input id={id} className="result-entry__field" type="text" inputMode="numeric" pattern="[0-9]*" maxLength={3}
       autoComplete="off" spellCheck={false} enterKeyHint={last ? 'done' : 'next'} aria-label={label}
-      value={value} onChange={event => onChange(event.target.value)} />
+      value={value} onChange={event => onChange(event.target.value)} onKeyDown={onKeyDown} />
   );
 }
 
@@ -44,6 +44,13 @@ export default function ResultEntry({
     const empty = fields().find(field => field.value === '');
     empty?.focus();
   }
+  // Enter in a field: a browser submits a form by Enter only through an enabled default button, so while Confirm waits
+  // for the rest of the score the move on to the first empty field happens here. A complete score submits as usual.
+  function fieldKey(event) {
+    if (event.key !== 'Enter' || ready || event.nativeEvent?.isComposing) return;
+    event.preventDefault();
+    fields().find(field => field.value === '')?.focus();
+  }
 
   return (
     <section className="result-entry" aria-labelledby="result-entry-title">
@@ -59,9 +66,10 @@ export default function ResultEntry({
             <TeamMark id={a.flagId} teamId={a.teamId} code={a.code} color={a.color} isClub={a.isClub} width={28} height={21} />
             <span className="result-entry__code" aria-hidden="true">{a.code}</span>
           </span>
-          <ScoreField id="result-entry-a" value={draft.a ?? ''} label={`${a.name} ${unit}`} onChange={set('a')} />
+          <ScoreField id="result-entry-a" value={draft.a ?? ''} label={`${a.name} ${unit}`} onChange={set('a')} onKeyDown={fieldKey} />
           <span className="result-entry__dash" aria-hidden="true">–</span>
-          <ScoreField id="result-entry-b" value={draft.b ?? ''} label={`${b.name} ${unit}`} last={!shootout} onChange={set('b')} />
+          <ScoreField id="result-entry-b" value={draft.b ?? ''} label={`${b.name} ${unit}`} last={!shootout} onChange={set('b')}
+            onKeyDown={fieldKey} />
           <span className="result-entry__team result-entry__team--b">
             <span className="result-entry__code" aria-hidden="true">{b.code}</span>
             <TeamMark id={b.flagId} teamId={b.teamId} code={b.code} color={b.color} isClub={b.isClub} width={28} height={21} />
@@ -70,9 +78,10 @@ export default function ResultEntry({
         {shootout ? (
           <div className="result-entry__scores result-entry__scores--pens" role="group" aria-label="Penalty shoot-out">
             <span className="result-entry__pens">Penalties</span>
-            <ScoreField id="result-entry-pa" value={draft.pa ?? ''} label={`${a.name} penalties`} onChange={set('pa')} />
+            <ScoreField id="result-entry-pa" value={draft.pa ?? ''} label={`${a.name} penalties`} onChange={set('pa')} onKeyDown={fieldKey} />
             <span className="result-entry__dash" aria-hidden="true">–</span>
-            <ScoreField id="result-entry-pb" value={draft.pb ?? ''} label={`${b.name} penalties`} last onChange={set('pb')} />
+            <ScoreField id="result-entry-pb" value={draft.pb ?? ''} label={`${b.name} penalties`} last onChange={set('pb')}
+              onKeyDown={fieldKey} />
             <span className="result-entry__pens" aria-hidden="true" />
           </div>
         ) : null}

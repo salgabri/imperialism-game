@@ -16,6 +16,7 @@ import { domesticEntry, domesticLabel } from '../src/data/domesticScope.js';
 import { domesticIdOf, mapYearOf } from '../src/app/shared.js';
 // Same module instance as the bundled App, so clearing it really empties the app's cache.
 import { clearDomesticCache, decodeDomestic, domesticLands, domesticScope, domesticScopeId } from '../src/engine/domestic.js';
+import { parseSplitId, splitDomestic } from '../src/engine/clubSplit.js';
 import { cardOf, getSport } from '../src/sports/index.js';
 import { fieldedNations, sportOf } from '../src/engine/footballSets.js';
 import { EMPIRE_PASTELS } from '../src/theme.js';
@@ -57,12 +58,16 @@ let domesticReference = null;
 
 async function loadReference(id) {
   if (domesticReference?.id === id) return domesticReference;
-  const response = await fetch(`/domestic/${id}.json`);
+  // A country map cut to fewer clubs (src/engine/clubSplit.js): its full map's file, cut here as the app cuts it.
+  const split = parseSplitId(id);
+  const response = await fetch(`/domestic/${split ? split.base : id}.json`);
   if (!response.ok) throw new Error(`reference map ${id}: HTTP ${response.status}`);
-  const decoded = decodeDomestic(await response.json(), id);
+  const file = await response.json();
+  const decoded = decodeDomestic(split ? splitDomestic(file, split.clubs, id) : file, id);
   const byId = new Map(decoded.clubs.map(club => [club.id, club]));
   domesticReference = {
-    id, entry: domesticEntry(domesticScope(id)), scope: domesticScope(id), label: domesticLabel(domesticScope(id)),
+    // `file`: the map file the app fetches for it (a cut map's full map's).
+    id, file: `domestic/${split ? split.base : id}.json`, entry: domesticEntry(domesticScope(id)), scope: domesticScope(id), label: domesticLabel(domesticScope(id)),
     meta: decoded.meta, sectionNames: decoded.sectionNames, sectionIds: new Set(Object.keys(decoded.sectionNames)),
     // Every section names the club starting on it: one per club on a 100-club map, a group each otherwise.
     clubs: decoded.clubs, startOwners: decoded.startOwners,
@@ -893,7 +898,9 @@ function theatreSnapshot(sport) {
 async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   const entry = domesticEntry(domesticScope(id));
   if (!entry) throw new Error(`no shipped domestic map for ${id}`);
-  const file = `domestic/${id}.json`, plan = globalThis.__smokeFetch;
+  // A map cut to fewer clubs is chosen as its country, then the count beside it; its full map's file is fetched.
+  const split = parseSplitId(id);
+  const file = `domestic/${split ? split.base : id}.json`, plan = globalThis.__smokeFetch;
   const sectionPattern = new RegExp(`^${id}-\\d{3}$`);
   // Format-1 index entries have no `sections`: one per club.
   const sections = entry.sections ?? entry.clubs;
@@ -910,13 +917,18 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   const result = { lazy: !plan.requests.includes(file) };
   plan.delays[file] = 150;
   if (setupChecks) plan.failures.add(file);
-  await select('setup-theatre', domesticScope(id));
+  await select('setup-theatre', domesticScope(split ? split.base : id));
   result.sawLoading = await waitFor(loading, 3000);
   if (setupChecks) {
     result.errorShown = await waitFor(() => !!buttonNamed('Retry') && !!launchButton()?.disabled
       && /could not|fail|error|unable/i.test(text()), 5000);
     buttonNamed('Retry')?.click();
     result.retryLoaded = await waitFor(ready, 30000);
+  }
+  if (split) {
+    await until(`the full map of ${entry.name} on the setup screen`, () => !!document.getElementById('setup-club-count')
+      && countryPaths().some(path => path.dataset.country.startsWith(`${split.base}-`)), 30000);
+    await select('setup-club-count', String(split.clubs));
   }
   await until(`the map of ${entry.name} on the setup screen`, ready, 30000);
   delete plan.delays[file];
@@ -959,13 +971,21 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   // A Europe map tells the rules of its land; a sport's own map (the NBA's, the NFL's) names its league, each club holding
   // the state of its arena or stadium ("the USA and Canada", but "Australia and New Zealand").
   const land = /^(?:USA|United)\b/.test(entry.name || '') ? `the ${entry.name}` : entry.name;
-  // Women's football's map of every European club counts them as EA rates them; the EuroLeague's names its league.
-  const field = !entry.theatre ? `the ${entry.clubs} ${entry.league} clubs`
+  // Women's football's map of every European club counts them as EA rates them; the EuroLeague's names its league. A
+  // league's clubs are named once, in its sport's word: rugby's league is "European clubs", college football's are schools.
+  const noun = (entry.sport && getSport(entry.sport).clubNoun) || 'clubs';
+  const leagueClubs = /\bclubs$/i.test(entry.league || '') ? `${entry.clubs} ${entry.league}` : `${entry.clubs} ${entry.league} ${noun}`;
+  const field = !entry.theatre ? `the ${leagueClubs}`
     : entry.theatre === 'all' && entry.sport !== 'football' ? `the ${entry.clubs} European clubs EA rates` : `Europe's ${entry.clubs} strongest clubs`;
-  result.description = entry.top.every(name => note.includes(name)) && note.endsWith(entry.theatre || entry.countries
+  const leaders = entry.top.length ? entry.top
+    : reference.clubs.slice().sort((a, b) => b.str - a.str || a.name.localeCompare(b.name)).slice(0, 3).map(club => club.name);
+  result.description = leaders.every(name => note.includes(name)) && note.endsWith(entry.cut
+    ? `the top ${entry.clubs} of ${entry.name}'s ${entry.baseClubs} clubs fighting over its ${sections} sections drawn from its `
+      + `administrative divisions; each keeps its own land, and the land of the ${entry.baseClubs - entry.clubs} left out is shared among them, nearest first.`
+    : entry.theatre || entry.countries
     ? `${field}, each on land in its own country: alone it holds all of it, and clubs that share a country split it along its regional borders. A country with no club stays grey.`
     : entry.league
-      ? `the ${entry.clubs} ${entry.league} clubs fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${entry.lines || 'state or province'}. A state with several clubs is divided between them; one with none stays empty.`
+      ? `the ${leagueClubs} fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${entry.lines || 'state or province'}. A state with several ${noun} is divided between them; one with none stays empty.`
       : `${entry.clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`);
   result.descriptionText = note;
   // Step 1's country card: every land in its starting club's pastel, one per club (the card has no ids, so compare the
@@ -1171,7 +1191,7 @@ const saveStatusText = () => document.querySelector('.save-status')?.textContent
  */
 async function refusedCountryRestores(app, reference) {
   const saved = app.saved, name = reference.entry.name;
-  const file = `domestic/${reference.id}.json`, plan = globalThis.__smokeFetch;
+  const file = reference.file, plan = globalThis.__smokeFetch;
   const broken = JSON.parse(JSON.stringify(saved));
   const moved = Object.keys(broken.own)[0];
   broken.own[`${reference.id}-999`] = broken.own[moved];
@@ -1775,7 +1795,7 @@ export async function runResumeCheck(scenario = {}) {
       domesticSaved = { stripNamesCountry: savedText.includes(reference.label), dialogNamesCountry: listed.some(item => item.includes(reference.label)) };
     }
     let domesticRestore = null, savedBefore = null;
-    const mapFile = reference && `domestic/${reference.id}.json`, plan = globalThis.__smokeFetch;
+    const mapFile = reference?.file, plan = globalThis.__smokeFetch;
     if (reference) {
       savedBefore = JSON.parse(JSON.stringify(second.app.saved));
       domesticRestore = await refusedCountryRestores(second.app, reference);

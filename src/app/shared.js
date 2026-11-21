@@ -2,8 +2,8 @@
 import { C } from '../theme.js';
 import { DEFAULT_SPORT, getSport } from '../sports/index.js';
 import { domesticScope, domesticScopeId } from '../engine/domestic.js';
-import { clubMapScope, countryMapOf, countryOfEntry, domesticEntry, hasTheatreMaps, isCountryScope, isEuropeScope, theatreMapsOf,
-  theatreOf } from '../data/domesticScope.js';
+import { clubMapScope, countryMapOf, countryMapWith, countryOfEntry, domesticEntry, hasTheatreMaps, isCountryScope, isEuropeScope,
+  theatreMapsOf, theatreOf } from '../data/domesticScope.js';
 import { BUILT_IN_SETS, builtInSeasonOf, getLoadedFootballSet, seasonMapOf, setHasClubs, setHasLayer, setHasNations, setSportOf } from '../engine/footballSets.js';
 
 export const LOG_CAP = 220;
@@ -20,7 +20,10 @@ export const DEFAULT_SETUP = { sport: DEFAULT_SPORT, layer: 'nations', scope: 'U
   // Turn modes (DEC D1): the defaults reproduce the original random draw with compass targets.
   turnOrder: 'random', targeting: 'compass',
   // An earlier season's data set id (docs/design/football-years.md); null plays the built-in season.
-  dataSet: null };
+  dataSet: null,
+  // How many of a country map's clubs play (src/engine/clubSplit.js): its first that many, the map cut for them; null for
+  // all. Kept when the country changes, each map taking as many as it has.
+  clubCount: null };
 
 /**
  * The map a setup or saved campaign is played on instead of the world: a country's or a Europe map (football clubs), a
@@ -110,7 +113,9 @@ export function setClubScope(setup) {
     // A country no longer shipped stays chosen with the built-in data, so its save says why it cannot resume.
     if (!entry && dataSet == null) return setup.clubScope;
     const map = entry ? countryMapOf(countryOfEntry(entry), dataSet) : null;
-    if (map) return domesticScope(map.id);
+    // The number of clubs chosen (`clubCount`, null for all) cuts the map to its first that many, where it has more;
+    // a setup that names none keeps its map's.
+    if (map) return domesticScope(countryMapWith(map, setup.clubCount !== undefined ? setup.clubCount : entry.cut ?? null).id);
   }
   const chosen = domesticEntry(setup.clubScope);
   const theatre = chosen ? theatreOf(chosen) : setup.clubScope;

@@ -438,7 +438,13 @@ function countryHandlers(app, cid) {
   let handlers = cache.get(cid);
   if (!handlers) {
     handlers = {
-      onClick: () => app.selectCountry(cid),
+      onClick: () => {
+        // While you sign a player the map draws the conquest's board (mapSnapshot): the taken land is the winner's, as
+        // its label and tooltip say, so its click opens the winner's squad, not the eliminated loser's.
+        const drawn = app.state.choice ? mapSnapshot(app).own[cid] : null;
+        if (drawn) app.selectTeam(drawn);
+        else app.selectCountry(cid);
+      },
       onEnter: () => app.setState(s => (s.hoverCid === cid ? null : { hoverCid: cid })),
       // Leaving this land (or tabbing off it) drops its hover, unless another country already took it over.
       onLeave: () => app.setState(s => (s.hoverCid === cid ? { hoverCid: null } : null)),

@@ -395,6 +395,9 @@ test('signing (DEC D15): projected ownership, hatch on the taken land, the loser
     assert.equal(app.mapAttack(), null, 'no arrow while signing (App passes attack={this.mapAttack()})');
     app.setState({ hoverCid: '276' });
     assert.equal(app.tooltip(true).held, 'Held by France');
+    // Its click opens the squad the map names, the winner's, not the eliminated loser's (still `own` until the signing).
+    taken.onClick();
+    assert.equal(app.state.selected, '250', 'the taken land opens France, as its label and tooltip say');
     app.viewConquest({ territoryIds: ['826'] });
     assert.equal(app.state.focusLayout, null);
     assert.deepEqual(app.state.conquestIds, [], 'viewConquest is ignored while the signing holds the screen');
