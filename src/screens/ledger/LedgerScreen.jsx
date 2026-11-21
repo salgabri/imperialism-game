@@ -24,8 +24,11 @@ export default function LedgerScreen({
   const selectRef = useRef(onSelectTeam);
   selectRef.current = onSelectTeam;
   const selectTeam = useCallback(id => selectRef.current?.(id), []);
-  const focusIndex = rows.findIndex(team => team.you || (youId != null && team.tid === youId));
-  const paged = usePagedList(rows, { row: 'tbody tr', focusIndex });
+  // The team you opened from here (Squad's Back returns to its row), else yours; keyed by the team, so a change of rank
+  // alone never turns the page.
+  const selectedIndex = selectedTeamId != null ? rows.findIndex(team => team.tid === selectedTeamId) : -1;
+  const focusIndex = selectedIndex >= 0 ? selectedIndex : rows.findIndex(team => team.you || (youId != null && team.tid === youId));
+  const paged = usePagedList(rows, { row: 'tbody tr', focusIndex, focusKey: focusIndex >= 0 ? rows[focusIndex].tid : null });
   return (
     <section id="view-panel-ledger" className="screen screen--ledger" aria-labelledby="view-tab-ledger" tabIndex={-1} data-panel={panel}>
       <div className="ledger">

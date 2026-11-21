@@ -10,7 +10,7 @@
 // - `seasonOf`: the snapshot → the season: each player's position, club, nation, value and rating (the three leagues'
 //   players on one scale, each pool league's set on it by its offset), each club's move toward its results, the clubs'
 //   squads and the nations'.
-import { NATIONS, RUGBY_NEAR_PENALTY, makeRng, hashStr, selectLineup } from '../../src/data/teams.js';
+import { NATIONS, RUGBY_NEAR_PENALTY, buildTeam, makeRng, hashStr, selectLineup } from '../../src/data/teams.js';
 import { BASELINE, marginOfGap, rugbyUnionStrength } from '../../src/sports/rugbyUnion.js';
 import {
   blend, clubMoveOf, clubOfStints, perPointOf, pooled, priorFromReliability, ratingsOf, replacementRate, resultsTargets,
@@ -278,6 +278,32 @@ export function rosterOf(pool) {
 /** The strength the match model plays a pool at: its matchday 23's (rugbyUnionStrength). */
 const strengthOf = pool => rugbyUnionStrength(selectLineup({ sport: SPORT, squad: pool.map(fielded) }));
 
+/** A place a nation's own players cannot fill within their units: the game fields a generated player there. */
+const isOpen = slot => !slot.player || slot.penalty > RUGBY_NEAR_PENALTY;
+
+/**
+ * A nation's stored strength, its roster entry's first figure, from which the game generates its missing players (teams.js
+ * buildTeam: each at it − 3, ± 4): its lineup's mean, a place its own players cannot fill counted at `fill`, the sport's
+ * baseline unless its Tests set another (seasonOf).
+ */
+function storedStrength(lineup, fill = BASELINE) {
+  return Math.round(sum(lineup.slots.map(slot => (isOpen(slot) ? fill : slot.effectiveRating))) / lineup.slots.length);
+}
+
+// The middle of a generated player's draw: genPlayer's draws at one half give the stored strength − 3 and no jitter.
+const middleDraw = () => 0.5;
+
+/**
+ * The strength nation `id` plays at with `pool`, as the game fields it: the roster the builder writes (its open places at
+ * `fill` in its stored strength), then the game's generated players at the middle of their draw wherever its own players
+ * cannot fill a place (buildTeam itself), the lineup picked from them all (`rugbyUnionStrength`).
+ */
+function playedStrength(id, pool, fill) {
+  const { squad, lineup } = rosterOf(pool);
+  const roster = [storedStrength(lineup, fill), squad.length, squad.map(tupleOf)];
+  return rugbyUnionStrength(selectLineup(buildTeam(id, middleDraw, { id: SPORT, rosters: { [id]: roster } })));
+}
+
 /**
  * As computed-ratings.mjs's ratingsOf, unrounded: each value's mid-rank percentile among `values` (ties sharing one),
  * read off `reference` (ascending) by linear interpolation. → Map value → reading. A pool league's ratings are these
@@ -510,9 +536,9 @@ export function seasonOf(snapshot, clubs, { perPoint = null, offsets: fixed = nu
   // A nation's team plays at its Test results' level (docs/design/computed-ratings.md, "National teams drawn from many
   // leagues": the order inside from the club evidence, the team from its results): its players, at their own ratings
   // before any club moves (Leinster's internationals rest through much of its URC season, so its results say less of them
-  // than of the club), move by its 2025/26 Tests' Simple Rating System as a club moves by its season's. Only a nation whose
-  // Test minutes that season the rated players played almost all of (COVERED) is moved: another's squad is not the side
-  // its results were won with, so its players keep their own ratings.
+  // than of the club), move by its 2025/26 Tests' Simple Rating System as a club moves by its season's. A nation whose
+  // Test minutes that season the rated players played almost all of (COVERED) moves all the way. A fielded nation they
+  // covered less moves by the share of its Test side that its side as the game fields it stands for (below).
   const tests = s0Games.filter(row => teams[row[4]]?.[1] === 'test' && nationOfTeam(teams[row[4]][0]) && nationOfTeam(teams[row[5]][0]));
   const testSrs = srsOf(connectedTo(tests, 'France', teams).map(row => ({ home: teams[row[4]][0], away: teams[row[5]][0], homeScore: row[6],
     awayScore: row[7], neutral: false })));
@@ -558,7 +584,9 @@ export function seasonOf(snapshot, clubs, { perPoint = null, offsets: fixed = nu
   const europePools = nationPoolsOf(europeans);
   const anchor = coveredOf(europePools, coverageBy(europeans));
   const coverage = coverageBy(players);
-  const nationMoves = {};
+  const nationMoves = {}, partialMoves = {};
+  // The level a nation's open places count at in its stored strength, where its Tests set one (below).
+  const fillOf = new Map();
   let line = null, covered = [];
   let nationPools = nationPoolsOf(players);
   if (anchor.length >= 2) {
@@ -629,6 +657,29 @@ export function seasonOf(snapshot, clubs, { perPoint = null, offsets: fixed = nu
         share, stands: Math.round(standsAt(id) * 100) / 100, target: Math.round(targets[id] * 100) / 100, shift: move.shift, plus: move.plus,
         before: Math.round(move.before * 100) / 100, after: Math.round(move.after * 100) / 100 };
     }
+    // The fielded nations the rated players covered less (Tonga 56%, Georgia 35%, Samoa 33%) move by their Tests too, as far
+    // as their side as the game fields it (generated players included, `playedStrength`) stands for the side that played
+    // them. A side the game completes with generated players stands for its whole Test side: its own players where the data
+    // rates them, generated players in the places of the Test players it does not, and those come at its Test level (an open
+    // place counts at it in the stored strength they are drawn from, not at the baseline); it moves all the way. A side of
+    // its own players alone, though they played only part of its Test minutes, moves that part of the way (its coverage):
+    // the rest of its Test side were players the data does not rate, who are not in it.
+    for (const [id, pool] of nationPools) {
+      const name = nationName(id);
+      if (covered.includes(id) || !name || !Object.hasOwn(testSrs.ratings, name) || pool.length * 2 < 23) continue;
+      const fills = rosterOf(pool).lineup.slots.some(isOpen);
+      const fill = fills ? targets[id] : BASELINE;
+      const share = fills ? 1 : coverage(name);
+      const played = moved => playedStrength(id, moved, fill);
+      const before = played(pool);
+      const target = before + share * (targets[id] - before);
+      const move = clubMoveOf(pool, target, played, { bestFirst: (a, b) => b.rating - a.rating });
+      nationPools.set(id, move.pool);
+      if (fills) fillOf.set(id, fill);
+      partialMoves[id] = { srs: round2(testSrs.ratings[name]), coverage: Math.round(coverage(name) * 1000) / 1000,
+        share: Math.round(share * 1000) / 1000, level: round2(targets[id]), ...(fills ? { fill: round2(fill) } : {}), target: round2(target),
+        shift: move.shift, plus: move.plus, before: round2(move.before), after: round2(move.after) };
+    }
   } else {
     if (fixed) Object.assign(offsets, fixed);
     atOffsets({ round: true });
@@ -656,9 +707,8 @@ export function seasonOf(snapshot, clubs, { perPoint = null, offsets: fixed = nu
 
   const nations = [...nationPools.entries()].map(([id, pool]) => {
     const { squad, lineup } = rosterOf(pool);
-    const open = lineup.slots.filter(slot => !slot.player || slot.penalty > RUGBY_NEAR_PENALTY);
-    const filled = lineup.slots.map(slot => (slot.player && slot.penalty <= RUGBY_NEAR_PENALTY ? slot.effectiveRating : BASELINE));
-    return { id, name: NATIONS[id][0], str: Math.round(sum(filled) / filled.length), squad, open: open.map(slot => slot.position),
+    const open = lineup.slots.filter(isOpen);
+    return { id, name: NATIONS[id][0], str: storedStrength(lineup, fillOf.get(id)), squad, open: open.map(slot => slot.position),
       coverage: nationName(id) ? Math.round(coverage(nationName(id)) * 1000) / 1000 : 0 };
   }).sort((a, b) => b.str - a.str || a.name.localeCompare(b.name));
 
@@ -667,7 +717,7 @@ export function seasonOf(snapshot, clubs, { perPoint = null, offsets: fixed = nu
     report: { groups, srs: { homeEdge: europe.srs.homeEdge, sigma: europe.srs.sigma, reliability: europe.srs.reliability }, perPoint: m,
       scale: europe.scale, level: europe.level, moves, pools,
       tests: { homeEdge: testSrs.homeEdge, sigma: testSrs.sigma, reliability: testSrs.reliability, covered: COVERED, anchor, line,
-        offsets, moves: nationMoves },
+        offsets, moves: nationMoves, partial: partialMoves },
       window: WINDOW },
   };
 }
@@ -718,7 +768,10 @@ export function realFigures(snapshot, competitions = LEAGUES) {
   });
 }
 
-/** The share of a nation's Test minutes the clubs' players must have played for its Test results to move its squad. */
+/**
+ * The share of a nation's Test minutes the clubs' players must have played for its Test results to move its squad all the
+ * way; a fielded nation below it moves part of the way, or all of it where generated players complete its side (seasonOf).
+ */
 export const COVERED = 0.75;
 
 /** The games (snapshot rows) in the part of their graph that `name`'s side is in: a rating needs its sides connected. */

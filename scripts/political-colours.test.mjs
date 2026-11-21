@@ -1,7 +1,8 @@
 // Political fills come from each empire's own colour (src/data/empireColours.js): a nation's colour chosen to fit it
 // and stand apart from its neighbours (src/data/nationColours.js, `npm run build:nation-colours`), a club's crest
 // colour (src/data/clubColours.js, `npm run build:club-colours`), as a pastel that keeps the colour's hue
-// (theme.js empireFill) with its own dark-theme twin (themedPaint).
+// (theme.js empireFill) with its own dark-theme twin (themedPaint). The map then keeps every two bordering empires
+// apart as the campaign redraws it (src/engine/mapPalette.js, scripts/map-palette.test.mjs).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -10,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { EMPIRE_PASTELS, V4, empireFill, themedPaint } from '../src/theme.js';
 import { empireColour, politicalFill } from '../src/data/empireColours.js';
 import { NATION_COLOURS } from '../src/data/nationColours.js';
+import { CLOSE } from '../src/engine/mapPalette.js';
 import { clubColour } from '../src/data/clubColours.js';
 import { NATIONS, DEPENDENCIES } from '../src/data/teams.js';
 import { CLUBS } from '../src/data/clubs.football.js';
@@ -80,8 +82,9 @@ test('a team pastel paints through light-dark() with a dark twin of the same hue
 
 test('nations take a colour that fits them: their own, a shade of it, or one of their flag', () => {
   for (const id of Object.keys(NATIONS)) {
-    const [colour, step] = NATION_COLOURS[id] ?? [];
+    const [colour, step, fits] = NATION_COLOURS[id] ?? [];
     assert.ok(toOklch(colour ?? '') && [0, 1, 2].includes(step), `${NATIONS[id][0]} has a colour and a step`);
+    assert.ok(Array.isArray(fits) && fits.every(fit => toOklch(fit) && fit !== colour), `${NATIONS[id][0]}'s other fitting colours`);
     assert.equal(empireColour(id), colour);
     assert.equal(politicalFill(id), empireFill(id, colour, step));
   }
@@ -96,8 +99,9 @@ test('nations take a colour that fits them: their own, a shade of it, or one of 
   assert.ok(lch(politicalFill('276')).C < 0.005, 'Germany (white and black) is grey');
 });
 
-test('bordering nations stand apart in both themes', () => {
-  // The solver's distance (scripts/build-nation-colours.mjs): OKLab with lightness at 0.4, the nearer theme.
+test('bordering nations stand apart in both themes: never two look-alikes side by side', () => {
+  // The solver's distance (scripts/build-nation-colours.mjs, src/engine/mapPalette.js): OKLab with lightness at 0.4, the
+  // nearer theme. Since 21 November 2026 the whole of CLOSE, as the map keeps it all campaign long.
   const lab = hex => {
     const { L, C, H } = lch(hex);
     return [L * 0.4, C * Math.cos(H * Math.PI / 180), C * Math.sin(H * Math.PI / 180)];
@@ -110,7 +114,7 @@ test('bordering nations stand apart in both themes', () => {
   for (const [shape, adjacent] of Object.entries(geo.adj)) {
     for (const other of adjacent) {
       const [a, b] = [ownerOf(shape), ownerOf(other)];
-      if (a && b && a < b && distance(a, b) < 0.0325) alike.push(`${NATIONS[a][0]}–${NATIONS[b][0]}`);
+      if (a && b && a < b && distance(a, b) < CLOSE) alike.push(`${NATIONS[a][0]}–${NATIONS[b][0]}`);
     }
   }
   assert.deepEqual(alike, []);

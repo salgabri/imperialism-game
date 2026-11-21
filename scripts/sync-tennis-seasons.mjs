@@ -9,6 +9,10 @@
 //   npm run sync:womens-tennis-seasons       the same with --tour=wta: scripts/data/womens-tennis-seasons/
 //   --check                                  rebuilds them and compares byte for byte, writes nothing
 //   --refresh                                downloads every input again (still checked against its pin)
+//   --fit-regions                            fits the newcomers' region and nation levels of the seasons before 1973
+//                                            (the manifest's method.early.start.regions) on the cached inputs and prints
+//                                            them, judged on held-out seasons, with the seam of each base start near the
+//                                            manifest's; writes nothing (docs/design/tennis.md, "Regions")
 //
 // A computed season is the year-end Elo of every player with ten counted matches in it, by Tennis Abstract's published
 // method (scripts/lib/tennis-elo.mjs, the manifest's `method`), each with the nation the player played for that
@@ -23,6 +27,10 @@
 // before 1973 with the published top tens and Tennis Abstract's statements (the manifest's `checks`). The women's
 // second run (docs/design/womens-tennis.md, "1963-1967") reads the majors' and the Federation Cup's results of
 // 1960-1967 from English Wikipedia's pages instead (the manifest's `wikipedia`, scripts/lib/tennis-wikipedia.mjs).
+// The second run's newcomers of the amateur sources start at their region's and nation's level (method.early.start
+// .regions, scripts/lib/tennis-regions.mjs); validation.json's `regions` and `early.regions` hold each region's offset
+// against the others in each era's cross-region matches of the listed players, the second run's with and without
+// those levels.
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
@@ -30,6 +38,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { agreement, applyAliases, atpLevelOf, davisCupNations, earlyLevelOf, orderMatches, parseMatchFile, rateMatches, ROUND_ORDER, wtaLevelOf } from './lib/tennis-elo.mjs';
 import { codeOfDay, nationOfDay } from './lib/tennis-seasons.mjs';
+import { fitLevels, regionOfCode, regionOffsets } from './lib/tennis-regions.mjs';
 import { articlesQuery, pinnedPages, wikiFile, wikipediaMatches } from './lib/tennis-wikipedia.mjs';
 import { politeFetch } from './lib/polite-fetch.mjs';
 import { askWikidata } from './lib/wikidata-sparql.mjs';
@@ -45,9 +54,10 @@ const TOURS = {
     rank: 'WTA Rank', levelOf: wtaLevelOf, noun: "women's tennis", cup: 'Fed Cup', unresolved: 'fedCupRubbersUnresolved' },
 };
 const args = process.argv.slice(2);
-const unknown = args.filter(arg => !['--check', '--refresh'].includes(arg) && !/^--tour=/.test(arg));
+const unknown = args.filter(arg => !['--check', '--refresh', '--fit-regions'].includes(arg) && !/^--tour=/.test(arg));
 if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
-const check = args.includes('--check'), refresh = args.includes('--refresh');
+const check = args.includes('--check'), refresh = args.includes('--refresh'), fitRegions = args.includes('--fit-regions');
+if (fitRegions && refresh) throw new Error('--fit-regions reads the cached inputs only');
 const tourId = args.find(arg => arg.startsWith('--tour='))?.slice('--tour='.length) ?? 'atp';
 const tour = TOURS[tourId];
 if (!tour) throw new Error(`Unknown tour ${tourId}: atp or wta`);
@@ -67,6 +77,7 @@ async function pinned(folder, file, url, expected) {
     if (sha256(data) !== expected) throw new Error(`${path.relative(root, at)} does not match its pin; delete it to download it again`);
     return data.toString('utf8');
   }
+  if (fitRegions) throw new Error(`${path.relative(root, at)} is not cached: run the sync without --fit-regions first`);
   for (let attempt = 0; ; attempt++) {
     try {
       // fetch decodes a capture stored gzipped, so the pin is the page's own bytes.
@@ -174,7 +185,81 @@ const allSeasons = [];
 for (let season = firstComputed; season <= lastPublished; season++) allSeasons.push(season);
 const asOf = Object.fromEntries(manifest.reports.map(report => [report.season, Number(report.updated.replaceAll('-', ''))]));
 const levelOf = tour.levelOf;
-const main = rateMatches(matches, manifest.method, { seasons: allSeasons, yElo: true, levelOf });
+
+// ---------- regions (scripts/lib/tennis-regions.mjs) ----------
+
+/**
+ * A run's matches for the measure of its regions: each counted match of seasons `from`-`to` between two regions, or
+ * at a home for one side (a major's host, a cup tie's first side), with both players' Elo before it and their nations of
+ * the day (`codeOf(id, season)`). `before` is the run's hook.
+ */
+function regionRecorder(codeOf, [from, to]) {
+  const rows = [], codes = new Map();
+  const code = (id, season) => {
+    const key = `${id} ${season}`;
+    if (!codes.has(key)) codes.set(key, codeOf(id, season));
+    return codes.get(key);
+  };
+  const before = (m, w, l) => {
+    if (m.season < from || m.season > to) return;
+    const wc = code(m.winner, m.season), lc = code(m.loser, m.season);
+    const wr = regionOfCode(wc), lr = regionOfCode(lc);
+    if (!wr || !lr || (wr === lr && !(m.level === 'G' || m.level === 'D'))) return;
+    rows.push({ season: m.season, level: m.level, eventName: m.eventName, winner: m.winner, loser: m.loser, we: w.elo, le: l.elo, wc, lc });
+  };
+  return { rows, before };
+}
+/**
+ * Each era's offsets of the regions (regionOffsets) in the matches between two listed players (`listed(id, season)`: the
+ * season's rule, its counted matches or its cup's singles), keyed "1973-1979".
+ */
+const eraOffsets = (rows, eras, listed) => Object.fromEntries(eras.map(([from, to]) => [`${from}-${to}`,
+  regionOffsets(rows.filter(r => r.season >= from && r.season <= to && listed(r.winner, r.season) && listed(r.loser, r.season)))]));
+/** The eras of seasons `from`-`to`: the 1970s, the 1980s… cut at each decade. */
+function decades(from, to) {
+  const eras = [];
+  for (let start = from; start <= to; start = Math.floor(start / 10) * 10 + 10) eras.push([start, Math.min(to, Math.floor(start / 10) * 10 + 9)]);
+  return eras;
+}
+/**
+ * Whether a player is listed in a season of `run` (snapshotted): `activity(season)` counted matches in it, or one of
+ * `extra(season)` (a set of ids: the cup's singles players of the women's amateur seasons).
+ */
+function listedIn(run, activity, extra = () => null) {
+  const counts = new Map();
+  return (id, season) => {
+    if (!counts.has(season)) counts.set(season, new Map((run.snapshots[season]?.players ?? []).map(player => [player.id, player.season])));
+    return (counts.get(season).get(id) ?? 0) >= activity(season) || !!extra(season)?.has(id);
+  };
+}
+
+/**
+ * The second run with its newcomers' levels (method.early.start.regions), each newcomer's origin his region and nation
+ * of the day (`codeOf(id, season)`), and the measure of its regions in each of `eras` with the levels and without them
+ * (the same run without them). → { run, offsets, originOf }
+ */
+function earlyRegions({ earlyMatches, method, levelOf: early, codeOf, seasons, listedOf, eras }) {
+  const originOf = (id, m) => {
+    const code = codeOf(id, m.season);
+    return { region: regionOfCode(code), nation: code };
+  };
+  const recorder = regionRecorder(codeOf, [eras[0][0], eras.at(-1)[1]]);
+  const run = rateMatches(earlyMatches, method, { seasons, yElo: true, levelOf: early, originOf, before: recorder.before });
+  const listed = listedOf(run);
+  if (!method.start.regions) return { run, offsets: eraOffsets(recorder.rows, eras, listed), originOf };
+  const { regions, ...base } = method.start;
+  const without = regionRecorder(codeOf, [eras[0][0], eras.at(-1)[1]]);
+  rateMatches(earlyMatches, { ...method, start: base }, { levelOf: early, before: without.before });
+  const offsets = Object.fromEntries(eras.map(([from, to]) => {
+    const key = `${from}-${to}`;
+    return [key, { without: eraOffsets(without.rows, [[from, to]], listed)[key], with: eraOffsets(recorder.rows, [[from, to]], listed)[key] }];
+  }));
+  return { run, offsets, originOf };
+}
+
+const mainCode = (id, season) => nationOfDay({ id, ioc: people.get(id)?.ioc ?? null, davisCup: davisCup.get(id) }, season, nationRules).code;
+const mainRecorder = regionRecorder(mainCode, [firstComputed, lastComputed]);
+const main = rateMatches(matches, manifest.method, { seasons: allSeasons, yElo: true, levelOf, before: mainRecorder.before });
 // The same method dated as Tennis Abstract's reports, for the check against them.
 const dated = rateMatches(matches, manifest.method, { seasons: manifest.reports.map(report => report.season), asOf, levelOf });
 const v1 = rateMatches(matches, manifest.method.v1, { seasons: manifest.reports.filter(report => report.method === 'pre-2018').map(report => report.season), asOf, levelOf });
@@ -246,24 +331,30 @@ async function earlyRun() {
   const merged = applyAliases(all, aliasOf);
   const moved = merged.filter((m, i) => m !== all[i]).length;
   const earlyMatches = orderMatches(merged);
-  const method = { ...manifest.method, start: { ...manifest.method.start, amateur: E.start.amateur },
+  const method = { ...manifest.method, start: { ...manifest.method.start, amateur: E.start.amateur, ...(E.start.regions ? { regions: E.start.regions } : {}) },
     layoff: { ...manifest.method.layoff, from: E.layoff.from, amateurWeeks: E.layoff.amateurWeeks } };
   const [from, to] = manifest.seasons.early;
   const [, lastAmateur] = manifest.seasons.amateur;
   const seam = { from: firstComputed, to: 1980 };
   const seasons = [];
   for (let season = from; season <= seam.to; season++) seasons.push(season);
-  const run = rateMatches(earlyMatches, method, { seasons, yElo: true, levelOf: earlyLevelOf });
   const { nations: cup, unresolved: cupUnresolved } = davisCupNations(earlyMatches, (ioc, season) => (ioc ? codeOfDay(ioc, season, ioc, nationRules) : null));
+  // A man's nation of the day, by the second run's own Davis Cup rows (as his season's row has it): his newcomer's level.
+  const codeOf = (id, season) => nationOfDay({ id, ioc: people.get(id)?.ioc ?? null, davisCup: cup.get(id) }, season, nationRules).code;
+  const activityOf = season => (season <= lastAmateur ? E.activity.amateur : E.activity.open);
+  const eras = [[from, lastAmateur], [lastAmateur + 1, to]];
+  const listedOf = run => listedIn(run, activityOf);
+  const { run, offsets, originOf } = earlyRegions({ earlyMatches, method, levelOf: earlyLevelOf, codeOf, seasons, listedOf, eras });
   for (let season = from; season <= to; season++) {
-    const activity = season <= lastAmateur ? E.activity.amateur : E.activity.open;
+    const activity = activityOf(season);
     const { last, date, players } = run.snapshots[season];
     const rows = computedRows(players, season, activity, cup);
     const head = { season, kind: 'computed', run: 'early', activity, lastEvent: isoDate(last), date: isoDate(date), rated: rows.length, columns: COLUMNS };
     outputs.push([path.join(outDir, `${season}.json`), documentText(head, rows)]);
     seasonLists[season] = { rows, players, run };
   }
-  return { run, cupUnresolved, aliases: E.aliases.items, moved, seam };
+  return { run, cupUnresolved, aliases: E.aliases.items, moved, seam, offsets,
+    fitting: { earlyMatches, method, levelOf: earlyLevelOf, codeOf, originOf, listedOf, eras } };
 }
 
 // ---------- the women's seasons before 1973 ----------
@@ -298,7 +389,7 @@ async function wikipediaEarlyRun() {
   if (JSON.stringify([...wiki.articles].sort()) !== JSON.stringify(W.wikidata.articles)) throw new Error('The pages\' articles are not wikipedia.wikidata.articles: ask Wikidata again');
   const personOf = id => people.get(id) ?? wiki.women.get(id);
   const earlyMatches = orderMatches([...wiki.matches, ...matches]);
-  const method = { ...manifest.method, start: { ...manifest.method.start, amateur: E.start.amateur },
+  const method = { ...manifest.method, start: { ...manifest.method.start, amateur: E.start.amateur, ...(E.start.regions ? { regions: E.start.regions } : {}) },
     layoff: { ...manifest.method.layoff, from: E.layoff.from, amateurWeeks: E.layoff.amateurWeeks } };
   const levelOf = (m, how) => (m.file === 2 ? 'amateur' : wtaLevelOf(m, how));
   const [from, to] = manifest.seasons.early;
@@ -306,19 +397,25 @@ async function wikipediaEarlyRun() {
   const seam = { from: firstComputed, to: 1980 };
   const seasons = [];
   for (let season = from; season <= seam.to; season++) seasons.push(season);
-  const run = rateMatches(earlyMatches, method, { seasons, yElo: true, levelOf });
   const { nations: cup, unresolved: cupUnresolved } = davisCupNations(earlyMatches, (ioc, season) => (ioc ? codeOfDay(ioc, season, ioc, nationRules) : null));
   const flagRules = { ...nationRules, fixes: [], cupHow: 'flag' };
+  // A woman's nation of the day: before 1968 her draws' flag stands before the player file's.
+  const nation = (id, person, year) => {
+    const day = nationOfDay({ id, ioc: person?.ioc ?? null, davisCup: cup.get(id) }, year, nationRules);
+    if (year > lastAmateur || day.how !== 'player-file') return day;
+    const flagged = nationOfDay({ id, ioc: person?.ioc ?? null, davisCup: wiki.flags.get(id) }, year, flagRules);
+    return flagged.how === 'flag' ? flagged : day;
+  };
+  const codeOf = (id, season) => nation(id, personOf(id), season).code;
+  const amateurOf = season => season <= lastAmateur;
+  const activityOf = season => (amateurOf(season) ? E.activity.amateur : E.activity.open);
+  const cupSinglesOf = season => (amateurOf(season) && E.activity.cup ? wiki.cupSingles.get(season) ?? new Set() : new Set());
+  const eras = [[from, lastAmateur], [lastAmateur + 1, to]];
+  const listedOf = run => listedIn(run, activityOf, cupSinglesOf);
+  const { run, offsets, originOf } = earlyRegions({ earlyMatches, method, levelOf, codeOf, seasons, listedOf, eras });
   for (let season = from; season <= to; season++) {
-    const amateur = season <= lastAmateur;
-    const activity = amateur ? E.activity.amateur : E.activity.open;
-    const cupSingles = amateur && E.activity.cup ? wiki.cupSingles.get(season) ?? new Set() : new Set();
-    const nation = (id, person, year) => {
-      const day = nationOfDay({ id, ioc: person.ioc, davisCup: cup.get(id) }, year, nationRules);
-      if (!amateur || day.how !== 'player-file') return day;
-      const flagged = nationOfDay({ id, ioc: person.ioc, davisCup: wiki.flags.get(id) }, year, flagRules);
-      return flagged.how === 'flag' ? flagged : day;
-    };
+    const activity = activityOf(season);
+    const cupSingles = cupSinglesOf(season);
     const { last, date, players } = run.snapshots[season];
     const rows = computedRows(players, season, activity, cup, { personOf, nation, listed: player => player.season >= activity || cupSingles.has(player.id) });
     const head = { season, kind: 'computed', run: 'early', activity, ...(cupSingles.size ? { cup: true } : {}), lastEvent: isoDate(last), date: isoDate(date),
@@ -328,7 +425,7 @@ async function wikipediaEarlyRun() {
   }
   const women = [...wiki.women.keys()];
   const counted = wiki.matches.filter(m => !m.why);
-  return { run, cupUnresolved, seam, personOf,
+  return { run, cupUnresolved, seam, personOf, offsets, fitting: { earlyMatches, method, levelOf, codeOf, originOf, listedOf, eras },
     wikipedia: { pages: W.draws.length + W.cups.length, matches: wiki.matches.length, counted: counted.length, unplayed: wiki.unplayed,
       women: women.length, playerFile: women.filter(id => !id.startsWith('wp:')).length, byWikidata: women.filter(id => !id.startsWith('wp:')).length - E.joins.items.length,
       byReview: E.joins.items.length, aliases: E.aliases.items.length } };
@@ -349,6 +446,8 @@ const seasonCounts = season => new Map(main.snapshots[season].players.map(player
 const daysApart = (a, b) => Math.abs(Date.parse(a) - Date.parse(b)) / 864e5;
 
 const publishedChecks = {};
+// Each published season's rated players, their nation of the day and Tennis Abstract's Elo, for the regions' check.
+const publishedRegions = [];
 for (const report of manifest.reports) {
   const { season } = report;
   const html = await pinned('wayback', `elo_${report.capture}.html`, captureUrl(report.capture, report.original), report.sha256);
@@ -389,6 +488,7 @@ for (const report of manifest.reports) {
     surfaces, columns: ['key', 'name', 'nation of the day', 'how', 'born', 'elo', 'surface elos', 'elo rank', tour.rank.toLowerCase(), 'match-file id', 'matches'], left };
   outputs.push([path.join(outDir, `${season}.json`), documentText(headRow, rows)]);
   publishedChecks[season] = linked;
+  publishedRegions.push(...rows.map(([, , code, , , elo, , , , id]) => ({ season, code, elo, id })));
 }
 
 // ---------- validation ----------
@@ -442,28 +542,126 @@ function fitOf(run) {
   return { peaks, yElo, fit: { years: targets.fitYears, n: fitDiffs.length, meanDiff: mean(fitDiffs), rms: rms(fitDiffs), byDecade, after: { n: later.length, meanDiff: mean(later) } } };
 }
 const { peaks, yElo, fit } = fitOf(main);
+/**
+ * The computed Elo against Tennis Abstract's own of the same players in its year-end lists (the run dated as its
+ * reports), by region: each region's mean difference less every player's, with its standard error.
+ */
+function publishedByRegion() {
+  const diffs = publishedRegions.map(({ season, code, elo, id }) => {
+    const ours = dated.snapshots[season].players.find(player => player.id === id);
+    return ours ? { region: regionOfCode(code), diff: ours.elo - elo } : null;
+  }).filter(Boolean);
+  const overall = diffs.reduce((s, d) => s + d.diff, 0) / diffs.length;
+  const regions = {};
+  for (const region of [...new Set(diffs.map(d => d.region).filter(Boolean))].sort()) {
+    const xs = diffs.filter(d => d.region === region).map(d => d.diff - overall);
+    const m = xs.reduce((s, x) => s + x, 0) / xs.length;
+    const sd = Math.sqrt(xs.reduce((s, x) => s + (x - m) ** 2, 0) / Math.max(1, xs.length - 1));
+    regions[region] = { n: xs.length, diff: round(m), se: round(sd / Math.sqrt(xs.length)) };
+  }
+  return { seasons: [firstPublished, lastPublished], n: diffs.length, meanDiff: round(overall), regions };
+}
 const validation = {
   generatedBy: `scripts/sync-tennis-seasons.mjs${tourId === 'atp' ? '' : ` --tour=${tourId}`}`,
   matches: main.counts, [tour.unresolved]: unresolved,
   fit, peaks, yElo, published,
+  // Each region's players against the others' (scripts/lib/tennis-regions.mjs): in each era of the computed seasons, the
+  // offsets that fit the listed players' matches between regions, each by the two players' Elo before it; and the
+  // computed Elo against Tennis Abstract's lists by region.
+  regions: { eras: eraOffsets(mainRecorder.rows, decades(firstComputed, lastComputed), listedIn(main, () => manifest.method.activity)),
+    published: publishedByRegion() },
 };
 
 // The second run against the targets, and its seam with the first: over the first run's top 50 of each season from 1973
 // (ten counted matches), the second run's Elo of the same men less the first's.
-if (early) {
+function seamOf(run) {
   const seam = {};
   for (let season = early.seam.from; season <= early.seam.to; season++) {
-    const ours = new Map(early.run.snapshots[season].players.map(player => [player.id, player.elo]));
+    const ours = new Map(run.snapshots[season].players.map(player => [player.id, player.elo]));
     const top = main.snapshots[season].players.filter(player => player.season >= manifest.method.activity).slice(0, 50).filter(player => ours.has(player.id));
     const diffs = top.map(player => ours.get(player.id) - player.elo);
     seam[season] = { n: diffs.length, meanDiff: mean(diffs), meanAbsDiff: mean(diffs.map(Math.abs)), maxAbsDiff: round(Math.max(...diffs.map(Math.abs))) };
   }
+  return seam;
+}
+
+/**
+ * --fit-regions: the newcomers' levels of the second run (method.early.start.regions: its `fit` says which seasons'
+ * matches, from which season's newcomers, under which priors), fitted on every counted match of those seasons, each by
+ * the ratings before it (fitLevels); then the same fit on the even seasons judged on the odd ones and the other way
+ * round, over the amateur seasons the game lists (log loss of every match, of those between regions and within one, and
+ * the regions' offsets among the listed players, without and with the levels); then the seam and the fit to Tennis
+ * Abstract's targets of the base start and its neighbours, with the fitted levels rounded to five points. Prints only.
+ */
+function fitRegionsReport() {
+  const R = manifest.method.early.start.regions;
+  if (!R) throw new Error('--fit-regions: the manifest has no method.early.start.regions');
+  const { earlyMatches, method, levelOf: earlyLevel, originOf, listedOf, eras, codeOf } = early.fitting;
+  const [fitFrom, fitTo] = R.fit.seasons, [evalFrom, evalTo] = eras[0];
+  const upTo = earlyMatches.filter(m => m.season <= Math.max(fitTo, evalTo));
+  const atLevels = (region, nation, amateur = method.start.amateur) => ({ ...method, start: { ...method.start, amateur, regions: { ...R, region, nation } } });
+  const nations = new Set();
+  rateMatches(upTo, atLevels({}, {}), { levelOf: earlyLevel, originOf: (id, m) => {
+    const origin = originOf(id, m);
+    if (origin.region) nations.add(origin.nation);
+    return origin;
+  } });
+  const options = { levelOf: earlyLevel, originOf, nations: [...nations].sort(), sigma: R.fit.sigma, tau: R.fit.tau };
+  const inFit = m => m.season >= fitFrom && m.season <= fitTo;
+  const five = x => Math.round(x / 5) * 5;
+  const levels = fitted => ({ region: Object.fromEntries(Object.entries(fitted.region).map(([k, v]) => [k, five(v)])),
+    nation: Object.fromEntries(Object.entries(fitted.nation).map(([k, v]) => [k, five(v)]).filter(([, v]) => v)) });
+  const all = fitLevels(upTo, atLevels({}, {}), { ...options, score: inFit });
+  console.log(`${tour.noun}: newcomers' levels fitted on the ${all.n} counted matches of ${fitFrom}-${fitTo} (prior spreads: region ${R.fit.sigma}, nation ${R.fit.tau}), rounded to five points:`);
+  console.log(`  regions: ${Object.entries(all.region).map(([k, v]) => `${k} ${five(v)} ±${Math.round(all.se[k])} (${all.newcomers[k]} newcomers)`).join(', ')}`);
+  console.log(`  nations: ${JSON.stringify(levels(all).nation)}`);
+  // Held out: one fold's seasons fit, the other's judge, over the amateur seasons the game lists.
+  const judged = (theta, judge) => {
+    const loss = { all: [0, 0], between: [0, 0], within: [0, 0] };
+    const recorder = regionRecorder(codeOf, [evalFrom, evalTo]);
+    rateMatches(upTo, theta ? atLevels(theta.region, theta.nation) : atLevels({}, {}), { levelOf: earlyLevel, originOf,
+      before: (m, w, l) => {
+        if (m.season < evalFrom || m.season > evalTo || !judge(m)) return;
+        recorder.before(m, w, l);
+        const e = 1 / (1 + Math.pow(10, (l.elo - w.elo) / 400));
+        const [a, b] = [m.winner, m.loser].map(id => regionOfCode(codeOf(id, m.season)));
+        for (const key of ['all', a && b ? (a === b ? 'within' : 'between') : null]) if (key) { loss[key][0] -= Math.log(e); loss[key][1]++; }
+      } });
+    return { loss: Object.fromEntries(Object.entries(loss).map(([k, [sum, n]]) => [k, `${(sum / n).toFixed(4)} (${n})`])), rows: recorder.rows };
+  };
+  const withSeasons = rateMatches(upTo, atLevels({}, {}), { seasons: Array.from({ length: evalTo - evalFrom + 1 }, (_, i) => evalFrom + i), levelOf: earlyLevel, originOf });
+  const listed = listedOf(withSeasons);
+  const offsets = rows => Object.entries(eraOffsets(rows, [[evalFrom, evalTo]], listed)[`${evalFrom}-${evalTo}`].regions)
+    .map(([k, o]) => `${k} ${Math.round(o.elo)}±${Math.round(o.se)}`).join(', ');
+  for (const [name, fold] of [['even', m => m.season % 2 === 0], ['odd', m => m.season % 2 === 1]]) {
+    const theta = fitLevels(upTo, atLevels({}, {}), { ...options, score: m => inFit(m) && fold(m) });
+    const judge = m => !fold(m);
+    const before = judged(null, judge), after = judged(theta, judge);
+    console.log(`  fitted on the ${name} seasons, judged on the others of ${evalFrom}-${evalTo}: regions ${Object.entries(theta.region).map(([k, v]) => `${k} ${Math.round(v)}`).join(', ')}`);
+    console.log(`    log loss without → with: ${Object.keys(before.loss).map(k => `${k} ${before.loss[k]} → ${after.loss[k]}`).join('; ')}`);
+    console.log(`    listed offsets without: ${offsets(before.rows)}`);
+    console.log(`    listed offsets with:    ${offsets(after.rows)}`);
+  }
+  // The base start that keeps the run carrying on as the first: the seam and the targets of the base and its neighbours.
+  const theta = levels(all);
+  for (const amateur of [-15, -10, -5, 0, 5].map(d => method.start.amateur + d)) {
+    const run = rateMatches(earlyMatches, atLevels(theta.region, theta.nation, amateur), { seasons: Array.from({ length: early.seam.to - early.seam.from + 1 }, (_, i) => early.seam.from + i), yElo: true, levelOf: earlyLevel, originOf });
+    const seam = seamOf(run);
+    const target = fitOf(run).fit;
+    console.log(`  base ${amateur}: seam ${Object.entries(seam).map(([season, s]) => `${season} ${s.meanDiff}/${s.meanAbsDiff}`).join(', ')}; targets ${target.meanDiff}, rms ${target.rms}`);
+  }
+}
+
+if (early) {
+  const seam = seamOf(early.run);
   const kinds = {};
   for (const [, , , rule, kind] of early.aliases ?? []) kinds[kind] = (kinds[kind] || 0) + 1;
   validation.early = {
     seasons: manifest.seasons.early, matches: early.run.counts, [tour.unresolved]: early.cupUnresolved,
     ...(early.wikipedia ? { wikipedia: early.wikipedia } : { aliases: { pairs: early.aliases.length, kinds, matchesMoved: early.moved } }),
     fit: fitOf(early.run).fit, seam,
+    // Each era's offsets of the regions, with the newcomers' levels (method.early.start.regions) and without them.
+    regions: early.offsets,
   };
 }
 
@@ -522,6 +720,11 @@ if (manifest.checks) {
   };
 }
 outputs.push([path.join(outDir, 'validation.json'), `${JSON.stringify(validation, null, 1)}\n`]);
+
+if (fitRegions) {
+  fitRegionsReport();
+  process.exit(0);
+}
 
 // ---------- write or check ----------
 

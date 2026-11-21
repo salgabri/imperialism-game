@@ -834,6 +834,108 @@ is kept." (Offline, a copy of the map the service worker kept still loads it.) T
 setup no longer lists the country, and a challenge link naming it falls back to
 the Top 124 ("The Europe maps" below).
 
+## Choosing the number of clubs
+
+Status: implemented 2026-11-21. The user asked: "instead of having top N clubs could
+we decide the number of clubs and programmatically split the map?" A country map
+holds as many clubs as its tier and its source give it (Spain 100 today, 40 in
+2015/16). Beside the country dropdown, a second one now picks how many play: **All
+N**, the map as built, or **Top 2** to **Top N−1**, the first that many of its clubs
+in the map's own order (FM reputation today, the season's own order for an earlier
+season). The game works that map out when it loads, from the same file: nothing more
+is shipped or downloaded.
+
+**Ids.** A country map cut to fewer clubs is a map of its own, `<map>c<N>`:
+`724c20` is today's Spain with 20 clubs, `724y2016c20` Spain's of 2015/16
+(`src/engine/clubSplit.js` `parseSplitId`, `splitMapId`, `mapFileId`). Only country
+maps are cut (`[0-9A-Z]{3}` plus an optional `y<year>`), never a league's or a map of
+Europe, and N runs from 2 (`SPLIT_MIN_CLUBS`) to one fewer than the map's clubs. The
+scope is `domestic:724c20`, so the title ("Spain · top 20 clubs"), the save's
+`clubScope` and `domesticVersion` (`724c20-<8 hex>`), challenge links
+(`theatre=domestic:724c20`) and the map caches need nothing new.
+`domesticEntry` gives a cut map an index entry like its full map's, with `clubs: N`,
+`cut: N`, `base` and `baseClubs`; its three strongest (`top`) are known once it has
+loaded, as an earlier season's are. The setup keeps the number chosen as
+`setup.clubCount` (null for all), and `setClubScope` cuts every country map chosen
+after it, a country with fewer clubs playing all of them: Top 20 on Spain, then Fiji
+(16 clubs), then Spain again is Spain with 20, and so is Spain of another season.
+
+**Loader.** `loadDomestic('724c20')` fetches `domestic/724.json`, validates it as
+the full map, cuts it (`splitDomestic`) and decodes the result like any file. The
+last three parsed files are kept (`FILE_CACHE_LIMIT`), so trying other counts on the
+setup screen fetches and parses the file once; a campaign taking over
+(`retainDomestic(ids, 0)`) drops them all, as it drops the decoded maps it does not use.
+
+**The cut** (`splitDomestic`, deterministic: coordinates kept to a metre, no
+randomness, ties by index). The 100 sections are the pieces; none is cut again.
+
+1. **Graph.** From the topology: each section's area and centroid in a plane true
+   to scale, its land borders (shared arcs) and landmass, its coast (arcs no other
+   section uses).
+2. **Kept land.** The first N clubs keep every section they start on in the full
+   map. The others' land is free.
+3. **Regions.** A landmass with a kept club is a region; one without (an island
+   whose clubs were left out) joins the nearest landmass across the water, by a link
+   between their nearest sections (coasts sampled at up to 48 points a section).
+   The links join landmasses as a tree does, so land joined by land and links is in
+   one piece on every landmass.
+4. **Targets**, as the build's balanced land: each club's natural land V (every free
+   section to the club whose own land is nearest, grown in one piece) and its fair
+   share F of its region give F^0.7 · V^0.3, scaled to the region, never less than
+   the land it holds already. Clubs crowded in a city get less than an even share.
+5. **Growth** towards the targets, in rounds: each club short of its target takes
+   one section it borders, the clubs with the fewest to choose from first (so one
+   its neighbours could shut in takes its way out before they do), then the furthest
+   from their targets, then the strongest; the nearest within reach (1.5 times as
+   far as from the nearest kept club's land, padded by a typical section's width),
+   else the least stretched. Land no club with room reaches goes to the nearest club
+   bordering it.
+6. **Hand-overs.** Neighbours pass land (a section on their border, with any land it
+   alone joins to the giver's) wherever that brings both nearer their targets
+   (Σ (A − T)²/T falls, the build's own measure), the move that helps most first.
+7. **Polish.** A section moves to a neighbour, or two neighbours trade one each,
+   wherever their lands get more compact together (Σ area × squared distance from
+   the club's own land falls by more than a thousandth) and neither strays further
+   from its target than it was or than a sixth of it.
+8. **Output.** Sections renumbered `<id>-001` … club by club, each group home first,
+   then outward from the home, as the build numbers them; colours by the build's own
+   `colourSections` (now in `src/engine/colour.js`, which `domestic-output.mjs`
+   re-exports) over the new neighbours, facing coasts within 3 px of the opening
+   frame included; `base`, `baseVersion` and `baseClubs`; version
+   `<id>-<FNV-1a of the full map's version, N, SPLIT_RULES and the groups>`.
+
+Because the cut map is numbered as the build numbers a map, `fitDomesticCampaign`
+moves a save onto it club by club when the full map is rebuilt or `SPLIT_RULES`
+changes, exactly as for a rebuilt map.
+
+**Numbers.** All 128 of today's maps at 2, 3, 4, 8, 12, 16, 20, 30, 40, 60 and 99
+clubs (899 cuts) and all 1,718 earlier seasons' maps at 2, 5, 10, 16, 20 and 40
+(6,778): none failed, no club's land in two pieces on one landmass; the cut takes
+6–8 ms at the median and at most about 40 ms on this machine, decoding about 10–20 ms
+more. Land is at least as even as the built maps': on today's maps the smallest club
+holds 0.28 of the mean land at the median cut (the built maps: 0.04), and 18% of
+clubs hold under a fifth of it (1,929 of 10,458; the built maps: 26%). Every
+neighbouring pair of clubs on six sample cuts differs by ΔE ≥ 0.1.
+
+**What a cut cannot fix.** Sections are only regrouped, so the full map's shapes
+show through, and a club holds as many sections as its land takes (Spain at 20:
+Sevilla 11, Real Madrid 8, Atlético 3). Where the full map fanned a crowd into
+wedges, a kept club can be shut in by kept neighbours' home sections: on today's
+Spain at 20, Rayo Vallecano's wedge and Levante's both lead out only through Teruel,
+so one of them keeps its home section alone; Girona, behind Barcelona's Vallès, does
+too; on England at 20, West Ham. An island whose clubs are left out goes whole to
+the club across the strait (Sicily with Calabria to Lecce on Italy at 20), and a
+lone island club holds its island (Mallorca).
+
+**Dead ends** (don't retry): a least-cost assignment of the free sections by
+distance alone (power-diagram cells), repaired after: most clubs came out in pieces;
+equal section counts for every club, as the built maps have: impossible where fans
+share an outlet (Rayo and Levante), and in a crowd a section is a sliver while a
+province is one section; chains of single-section hand-overs: an articulation
+section blocks every chain; recombination (cutting two neighbours' joined land along
+random spanning trees): a cut of the right sizes is rare when one side is a single
+section.
+
 ## Acceptance checks (as tested)
 
 `npm test` runs every test file below; `npm run test:domestic` runs the four
@@ -884,6 +986,18 @@ the Top 124 ("The Europe maps" below).
   ownership intact, every shipped map through the runtime loader.
 - `node scripts/build-domestic.mjs --check` and a cached rerun of the sync both
   reproduce the committed files byte for byte.
+- `scripts/club-split.test.mjs` (maps cut to fewer clubs): ids; England, Spain of
+  2015/16 and Indonesia at 2, 4, 10, 20 and all but one; every map of today at 2, a
+  quarter and all but one, and every twentieth earlier season's at half, each under
+  400 ms: the first clubs whole, every section held once, each club on all of its
+  full map's sections and in one piece on each landmass, ids and order as built;
+  the same cut every time; colours of neighbours apart; the refusals; the loader
+  (one fetch per file, dropped when a campaign takes over); entries, labels and
+  season checks; the count across countries, seasons and challenge links; the setup
+  model; a save moved onto a rebuilt cut. `scripts/setup-wizard.test.mjs`: the
+  count beside the country. `npm run smoke`: Spain cut to 20, chosen as Spain then
+  Top 20, a blitz to the champion and a duel interrupted and resumed, with the
+  refused, cold and older-build restores.
 
 ## The NBA map
 

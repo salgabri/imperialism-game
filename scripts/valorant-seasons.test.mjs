@@ -89,13 +89,29 @@ test('every season decodes: five to seven players a nation, each his Elo of that
   assert.deepEqual(YEARS.map(year => seasonFile(year).coverage.nations), [61, 60, 48]);
 });
 
-test('each season is its day\'s: the United States in 2023 behind EG\'s Demon1, South Korea in 2024, Turkey in 2025', () => {
+test('each season is its day\'s: the United States in 2023 behind EG\'s Demon1 and in 2024, Turkey in 2025', () => {
   const doc = seasonFile(2023);
   assert.deepEqual(squadNames(doc, '840').slice(0, 2), ['neT', 'Demon1']);
   assert.equal(doc.nations['840'][2][1][3].team, 'Evil Geniuses', 'each player\'s team of that December');
   const top = year => Object.entries(seasonFile(year).nations).sort((a, b) => b[1][0] - a[1][0])[0][0];
-  assert.deepEqual(YEARS.map(top), ['792', '410', '840']);
+  assert.deepEqual(YEARS.map(top), ['792', '840', '840']);
   assert.equal(seasonFile(2024).nations['410'][2][0][0], 'Lakia', 'Gen.G\'s Lakia, the year Gen.G won Masters Shanghai');
+});
+
+test('each season\'s circuits are on one scale: India below France and Germany at the end of 2024, the VCT\'s levels on top', () => {
+  // Before the circuits' levels (2026-11-21) India, of Challengers South Asia, stood level with France and Germany at the end
+  // of 2024 (77.6 against 75.4 and 76.6) though South Asia's sides lost far more often than Elo expected outside their circuit.
+  const doc = seasonFile(2024);
+  const strength = id => doc.nations[id][0];
+  assert.ok(strength('356') < strength('250') && strength('356') < strength('276'), 'India below France and Germany');
+  assert.ok(strength('840') > strength('360') && strength('410') > strength('360'), 'the United States and South Korea above Indonesia');
+  const built = JSON.parse(read('scripts/data/valorant-elo.json'));
+  const levels = built.source.starts;
+  for (const region of ['Americas', 'EMEA', 'Pacific']) {
+    const vct = levels[`VCT ${region}`];
+    assert.ok(vct > Math.max(...Object.entries(levels).filter(([circuit]) => circuit.startsWith('Challengers')).map(([, level]) => level)),
+      `VCT ${region}'s newcomers start above every Challengers circuit's`);
+  }
 });
 
 // ---------- the map pool of each season ----------

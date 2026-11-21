@@ -301,6 +301,13 @@ test('"Your campaign": a fallen manager\'s placement, exit, aftermath and bigges
     assert.equal(you.team.name, teams['250'].name);
     assert.equal(you.placement, '3rd of 4');
     assert.equal(you.line, `Knocked out by ${teams['276'].name} in Round II, 0–0, 4–3 on penalties.`);
+    // A tie text reading "in …" (ice hockey's overtime or shoot-out, rugby's extra time or golden point) is kept too.
+    for (const [tieText, words] of [['In overtime', 'in overtime'], ['In golden point', 'in golden point'], ['After extra time', 'after extra time']]) {
+      const exitIn = { ...exit, a: { ...exit.a, score: 3 }, b: { ...exit.b, score: 2 }, result: { ...exit.result, tieText } };
+      f.app.setState({ history: [haul, exitIn, final] });
+      assert.equal(pure(f, () => f.app.victoryPanel(), 'victoryPanel').you.line, `Knocked out by ${teams['276'].name} in Round II, 3–2 ${words}.`);
+    }
+    f.app.setState({ history: [haul, exit, final] });
     assert.equal(you.aftermath, `${teams['276'].name} went on to win it all.`);
     assert.deepEqual(you.stats.map(stat => [stat.label, stat.value]), [['Conquests', '1'], ['Signings', '1'], ['Territories taken', '3']]);
     assert.equal(you.haul, `Biggest haul: 3 territories from ${teams['380'].name} in Round I.`);
@@ -321,4 +328,14 @@ test('"Your campaign": a fallen manager\'s placement, exit, aftermath and bigges
     assert.match(won, /Managed by you/);
     assert.doesNotMatch(won, /Your campaign/);
   } finally { f.close(); }
+});
+
+test('a champion of the Six Nations "has conquered the Six Nations", as of the Elite 32', () => {
+  for (const [settings, theatre] of [[{ sport: 'rugby-union', scope: 'six-nations' }, 'the Six Nations'], [{ scope: 'elite' }, 'the Elite 32']]) {
+    const f = syncAppFixture({ settings });
+    try {
+      f.app.setState({ phase: 'victory', aliveIds: [f.app.state.aliveIds[0]] });
+      assert.match(f.app.victoryPanel().subtitle, new RegExp(`^has conquered ${theatre} in `));
+    } finally { f.close(); }
+  }
 });

@@ -185,7 +185,12 @@ For each signal, within each position group (forwards, defencemen, goalies; hitt
    - League seasons: the Simple Rating System (SRS), margins by least squares with a home edge, ratings summing to zero.
      Its reliability r = 1 − error ÷ spread. `srsOf` on the eager-williamson branch computes it; there r runs from 0.47
      (1986) to 0.92 (1995).
-   - Sparse schedules (nations, esports): Elo at the season's date, by World Football Elo's rules for nations.
+   - Sparse schedules (nations, esports): Elo at the season's date, by World Football Elo's rules for nations, plus its
+     pool's level (its confederation, its esports region), fitted on the games between pools
+     ([One scale across regions](#one-scale-across-regions)).
+   - Leagues or conferences that meet only in part: one system wherever their games link them (one FBS-wide SRS; MLB's
+     win share through the interleague games from 1997). A group with fewer games against the rest than it has clubs
+     is loose: its level is held toward its level in the seasons either side (college football 2020).
 2. **Engine units.** Measure m, the margin (or Elo) the sport's engine gives per lineup point, by simulation. Football's
    is 31.25 Elo a point. Rugby league's is 0.9 × `marginPerStrength` (on the same branch), where 0.9 is the model's
    slope ÷ its game-noise ratio.
@@ -233,9 +238,67 @@ Three settings, one of them the user's call (see "Decisions"):
   bunch nations together, so fitting each nation to its results' line instead would charge a weak Test side's level to its
   league (League One −4.4 rather than −1.2). The movers' production ratios checked the order of the leagues, not the size.
 - **Results and team lists only.** Selection plus step 5, as in rugby league 1960–1997.
-- **Individual sports.** Elo at the season's end, read linearly (tennis).
-- **Team esports.** Player Elo built from team results (scripts/lib/liquipedia-elo.mjs).
+- **Individual sports.** Elo at the season's end, read linearly (tennis). Where the record holds pools that rarely met
+  the rest (the amateur era's majors and Davis Cup zones), a newcomer starts at his region's and nation's level, fitted
+  on the matches between regions (tennis.md, "Regions").
+- **Team esports.** Player Elo built from team results (scripts/lib/liquipedia-elo.mjs, scripts/lib/esports-elo.mjs),
+  each newcomer starting at his home region's or circuit's level, fitted jointly with every player's strength
+  (`regionLevels`, `circuitLevels`).
 - **Results with no names.** No team.
+
+## One scale across regions
+
+Checked and fixed on 2026-11-21, at the user's request: "make sure that ratings are correct and normalized, just
+because one team is a national or a country a continental champion they might still be quite weak in comparison to other
+areas. This accounts in particular for the rating you had to construe yourself".
+
+A pool whose teams mostly meet one another (a confederation, an esports region or circuit, a Davis Cup zone, a league,
+a conference) is placed by its own results. An Elo pool's mean stays where its newcomers start, a league's SRS or win
+shares centre on its own mean, a rank map gives every league's median the same rating. Its champion then rates like the
+world's best. Only the games between pools say how far apart they stand, so:
+
+1. **Measure on the games between pools, one step ahead.** Score each game with the ratings from before it, and give each
+   pool its mean residual, the offset that implies (Elo or rating points) with its standard error, and the count. A test
+   over all games hides the question: most games are played inside a pool, where its level cancels. Valorant's circuit
+   levels and Counter-Strike's regional starts had both been judged that way and turned off.
+2. **Fit the pool's level on those games** where an offset is beyond two standard errors and over a rating point:
+   maximum likelihood, a normal prior on each level, the reference pool (Europe, UEFA) at 0. Where the levels feed an
+   Elo, fit them jointly with every player's strength and start each newcomer at his pool's level. Where a finished Elo
+   is read, add the level to it. Where the pools' games allow it, rate them in one system instead: one FBS-wide SRS, or
+   MLB's win share through the interleague games.
+3. **Keep it only if it forecasts held-out games between pools better** without making the rest worse, by one rule fixed
+   before the test and the same for every season. A pool with fewer games against the rest than it has teams is loose:
+   hold its level toward the seasons either side (college football 2020).
+
+What the check found (offsets before the fix, Elo unless stated, negative meaning the pool stood above its results):
+
+| Sport | Pools | Found | Change | Held out |
+| --- | --- | --- | --- | --- |
+| Football, men's computed nations (`wc-`, `nt-`) and the EA seasons' fills | confederations | 22 of 34 decade offsets beyond 2 SE: CONCACAF −58 to −136, AFC −49 to −181, OFC −68 to −280, CAF in friendlies | confederation levels on the Elo, ±8 years, prior 100 (football-years.md, "Confederation levels") | log loss lower in every decade; on the 4,523 matches eloratings.net also rates, 0.6016 → 0.5886 (its own 0.5901) |
+| Women's football, computed 1991/92–2014/15 | confederations | AFC and OFC in 1985–95, CONCACAF and CAF in 2012–15; none in 1996–2011 | none: of 20 windows and priors, none passed the rule fixed before the run (womens-football.md) | |
+| Rugby union nations | Test coverage | Tonga +4.4 and Samoa +3.9 points above their Test level, Georgia 2.3 below | Tonga and Samoa move toward it by their coverage; Georgia's generated places stand at its Test level (rugby-union.md, "The less-covered nations") | |
+| Basketball's FIBA nations | continents of the curated players | none: Europe +0.8, Africa +1.2, Asia −0.6, the Americas −1.0 points from the NBA- and EuroLeague-rated nations' line | none: moving each five to its results forecast held-out games worse (euroleague.md) | |
+| MLB, computed 1960–2017 | AL, NL | read inside each league, both centred; the AL 1.9 ± 0.3 points ahead in 2004–17's interleague games | one win share through the interleague games from 1997; level before (no sound link) (baseball.md) | +7.6 nats on the next season's interleague games |
+| College football, FBS 2004–2025 | conferences | already one FBS-wide SRS; 2020's conference-only seasons left the MAC at +3.1 ± 10.7 | 2020's loose conferences held toward 2019 and 2021 (college-football.md) | 2020's cross-conference games, error 19.7 → 15.9 |
+| Rocket League | RLCS regions | regional starts diluted and unconverged: APAC −161, SSA −87, OCE −60 over five years | region levels fitted jointly with the players (prior 150), each earlier season on its own games only (rocket-league.md, "Regions") | between regions 0.6240 → 0.6031; earlier seasons 0.6989 → 0.6727 |
+| Counter-Strike | regions by nation | OCE −74, NA −27, Africa −108 over the whole record | region levels as Rocket League's (counter-strike.md, "Regions") | between regions 0.6557 → 0.6547 |
+| Valorant | VCT and Challengers circuits | the VCT +59 ± 12 over the Challengers; South Asia −193, Oceania −179, MENA −144, LATAM −140 | circuit levels fitted jointly (prior 100), homes by country (valorant.md, "Circuits on one scale") | between circuits 0.6525 → 0.6441 |
+| League of Legends | circuits | already levelled; none beyond 2 SE | a prior on the levels (500) for thin circuits (league-of-legends.md) | between circuits 0.6027 → 0.5973 |
+| Tennis, men's 1960–1967 and women's 1963–1967 | continents (Europe split East and West) | men's Asia −119 ± 31; women's Western Europe −41 ± 16, North America +63 ± 20 | newcomers of the amateur records start at their region's and nation's level (tennis.md and womens-tennis.md, "Regions") | lower in both halves of a split by season; from 1973 within ±12, unchanged |
+| Hockey and baseball nations' generated players | — | at the nation's own level − 3; no confederation constant reaches the field | none; basketball's leftover football constants replaced by its baseline | |
+| The AFL, EuroLeague, NHL, NBA, NRL computed seasons | leagues, groups | the AFL plays apart; the EuroLeague's groups are linked by its later rounds; no WHA, ABA or Super League mixing | none (NHL 2012/13 and 2020/21's unlinked groups: under a point, hockey.md) | |
+
+Still off after the fix, held out: men's tennis Asia 1960–1967 −79 ± 31 (India's and Japan's established players; a
+newcomer's start cannot reach them), Counter-Strike's Oceania −41 ± 19, Rocket League's Sub-Saharan Africa −51 ± 19, and
+Valorant's weakest circuits (South Asia −163 ± 65, Oceania −183 ± 67; India's sides −216 ± 88 over 28 maps, Australia's
+−181 ± 71 over 30). For the esports, a correction after the Elo (each player moved by his home region's offset, fitted on
+the games between regions before each cut-off) was tested under one rule fixed before the run: it must forecast the held-out
+games between regions better, worsen those within a region by no more than the paired change's standard error, and push
+no region beyond two errors the other way. It failed in all three: Rocket League's leftover offsets change sign from year
+to year (Sub-Saharan Africa −222, −185, −2, +36, −213), Counter-Strike's best variant gained a third of its error, and
+Valorant's gained −0.0013 ± 0.0013 between circuits while costing +0.0019 ± 0.0005 within them. Women's tennis's Eastern
+Europe 1973–1979 (+36 ± 8) is a rising cohort Elo follows late; its newcomer levels moved it little and would change 43
+seasons, so they were not adopted.
 
 ## Where it applies now
 
@@ -247,7 +310,8 @@ Three settings, one of them the user's call (see "Decisions"):
 | EuroLeague (all seasons) | linear PIR rating; clubs against the record at a median 0.62 | steps 3–5 |
 | Football, EA seasons' short national XIs (FIFA 05–09 furthest from Elo: 0.74–0.82) | the nation plays short | fill from capped players by step 1 and Elo, labelled computed |
 | Football nations no source rates (Tonga, Samoa, Cook Islands) | the land stays neutral | field them when caps give eleven with a goalkeeper |
-| Nations' lineup gaps in baseball, hockey, rugby league, basketball and the NFL | generated "F. Surname" players at confederation constants (UEFA 63 … OFC 48 in `CONF_META`) | replacement level from the data, or real players of that nation from other leagues; this is the last place ratings are made up |
+| Nations' lineup gaps in hockey, baseball, rugby union and rugby league's old saves | generated "F. Surname" players at the nation's own stored strength − 3 ± 4, an open place counted at the sport's baseline 45 (Georgia's, in rugby union, at its Test level since 2026-11-21); no confederation constant reaches the field, and basketball's fives and the NFL never field one (2026-11-21 audit: hockey 7% of fielded places, baseball 14%, always below the nation's own starters) | replacement level from the data, or real players of that nation from other leagues; this is the last place ratings are made up |
+| Basketball's curated national players (143 of the 47 fives' 235, about 70 on every continent) | a curated rating "on the same scale" | checked 2026-11-21 against 706 FIBA games of 2023–2026: no continent sits off the NBA- and EuroLeague-rated nations' line (Europe +0.8, Africa +1.2, Asia −0.6, the Americas −1.0), and moving each five to its results forecast held-out games worse, so they stay; re-check after the 2027 World Cup (euroleague.md, "The nations' level against FIBA's results") |
 | Sports no game rates (rugby union, cricket, handball, volleyball, the WNBA, the PWHL) | not built | steps 1–6 with the default scale, once a permitted source of results and team lists is found |
 
 ## Decisions

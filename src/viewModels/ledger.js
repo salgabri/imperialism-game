@@ -23,8 +23,8 @@ import { FEED_CAP, domesticIdOf } from '../app/shared.js';
 import { V4 } from '../theme.js';
 import { politicalFill } from '../data/empireColours.js';
 import {
-  campaignTitle, displayRound, formatOddsPair, historyRound, plainScopeName, memo, ratingTier, roman, routeCopy, teamChip,
-  territoryWord,
+  articleFor, campaignTitle, displayRound, formatOddsPair, historyRound, plainScopeName, memo, ratingTier, roman, routeCopy,
+  teamChip, territoryWord,
 } from './format.js';
 import { matchupOdds } from './odds.js';
 
@@ -130,9 +130,10 @@ function fallenRows(st, ctx) {
 
 /**
  * Top-`limit` share of the map. `fill` follows the map (A-7): only the managed empire is painted you-fill; a
- * spectator's followed empire keeps its pastel and is marked by the ink ring (`you`) alone.
+ * spectator's followed empire keeps its pastel and is marked by the ink ring (`you`) alone. `palette` is the map's
+ * (ctx.palette, engine/mapPalette.js), so each swatch is the colour its empire has on the map.
  */
-function shareRows(rows, youId, managedId, limit = 5) {
+function shareRows(rows, youId, managedId, palette = null, limit = 5) {
   const total = rows.reduce((sum, row) => sum + (Number(row.territories) || 0), 0);
   if (!total) return { rows: [], others: null, total: 0 };
   const sorted = rows.slice().sort((a, b) => (Number(b.territories) || 0) - (Number(a.territories) || 0) || a.rank - b.rank);
@@ -143,7 +144,7 @@ function shareRows(rows, youId, managedId, limit = 5) {
     const n = Number(row.territories) || 0;
     return { key: row.tid, teamId: row.tid, flagId: row.flagId, isClub: !!row.isClub, code: row.code, name: row.name,
       territories: n, pct: label(n), width: Math.round(pct(n) * 10) / 10, you: row.tid === youId,
-      fill: managedId != null && row.tid === managedId ? V4.youFill : politicalFill(row.tid) };
+      fill: managedId != null && row.tid === managedId ? V4.youFill : palette?.political.get(row.tid) || politicalFill(row.tid) };
   });
   const rest = total - shown.reduce((sum, row) => sum + row.territories, 0);
   const others = sorted.length > limit && rest > 0
@@ -181,7 +182,7 @@ export function buildLedger(st, ctx, powerRows) {
     fallen,
     session: sessionLine(st),
     paused: sessionPaused(st),
-    share: shareRows(rows, youId, ctx?.managedId ?? null),
+    share: shareRows(rows, youId, ctx?.managedId ?? null, ctx?.palette ?? null),
     youId,
     youLabel: ctx?.managedId ? 'You' : youId != null ? 'Following' : '',
     header: {
@@ -249,8 +250,9 @@ export function biggestUpsetLine(history) {
   }
   if (!best) return null;
   const name = best.result.winnerName || best.winnerName || 'The underdog';
+  const gap = Number.isFinite(bestGap) ? bestGap.toFixed(1) : '';
   return Number.isFinite(bestGap) && bestGap > 0
-    ? `${name} overturned a ${bestGap.toFixed(1)}-point strength gap`
+    ? `${name} overturned ${articleFor(gap)} ${gap}-point strength gap`
     : `${name} won as the underdog`;
 }
 
@@ -268,7 +270,9 @@ function winnerFirstScore(entry, winnerId) {
   const tieText = entry?.result?.tieText || '';
   const kicks = tieText.match(/^(\d+)–(\d+) on penalties$/);
   if (kicks) score += `, ${attackerWon ? `${kicks[1]}–${kicks[2]}` : `${kicks[2]}–${kicks[1]}`} on penalties`;
-  else if (/^after/i.test(tieText)) score += ` ${tieText.replace(/^After/, 'after')}`;
+  // "after extra time", and the sports whose tie text reads "in …": ice hockey's "in overtime" or "in a shoot-out",
+  // rugby union's "in extra time", rugby league's "in golden point".
+  else if (/^(after|in)\s/i.test(tieText)) score += ` ${tieText[0].toLowerCase()}${tieText.slice(1)}`;
   return score;
 }
 

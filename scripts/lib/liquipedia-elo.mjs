@@ -7,8 +7,10 @@
 // Every rating is an Elo, built game by game from every series the export holds, in date order: a team plays at the
 // mean of its players' Elo, the winner of each game takes K × (1 − E) from the loser (E, Elo's expected score for the
 // gap), and each player moves by his team's amount. A player's K shrinks with the games he has played (`kFactor`), so a
-// newcomer finds his level quickly and a veteran's rating holds. Nothing is estimated: a player is rated only from the
-// games Liquipedia records him in, and only a player who has played lately (`activeDays`) plays.
+// newcomer finds his level quickly and a veteran's rating holds. A newcomer starts at his region's level (`regionLevels`),
+// so a region whose teams mostly play each other is not rated as if it were the world's equal. Nothing is estimated: a
+// player is rated only from the games Liquipedia records him in, and only a player who has played lately (`activeDays`)
+// plays.
 import { FLAG_CODES } from '../../src/data/flags.js';
 import { HOME_NATIONS, NATIONS, nationIdentity } from '../../src/data/teams.js';
 import { isStagePage, normalTitle, personOf, plainText, rootOf, rostersOf, seriesOf, subpagesOf, teamKeys, tournamentOf }
@@ -252,8 +254,32 @@ function score(into, e, won) {
 /** A score's means: { n, logLoss, brier }. */
 export const scoreOf = into => ({ n: into.n, logLoss: into.n ? into.logLoss / into.n : null, brier: into.n ? into.brier / into.n : null });
 
+/** The key the most games give, of a Map(key → count); ties to the first in key order; null for none. */
+const mostOf = counts => [...(counts ?? new Map()).entries()].sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))[0]?.[0] ?? null;
+
 /** A player's home region: the one whose events he has played most games in, or null (international events only). */
-export const homeOf = player => [...(player?.regions ?? new Map()).entries()].sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))[0]?.[0] ?? null;
+export const homeOf = player => mostOf(player?.regions);
+
+/**
+ * A nation's region by a sport's table → id → region or null: `nations` (region → [nation ids]) first, else its
+ * confederation's in the game's own list (src/data/teams.js NATIONS: 'UEFA', 'AFC'…; `confederations`: confederation →
+ * region).
+ */
+export function regionByConfederation({ confederations, nations = {} }) {
+  const own = new Map(Object.entries(nations).flatMap(([region, ids]) => ids.map(id => [id, region])));
+  return id => (id == null ? null : own.get(id) ?? confederations[NATIONS[id]?.[2]] ?? null);
+}
+
+/**
+ * How region levels are fitted (regionLevels): a player's own strength about his region's level has a normal prior of
+ * spread OFFSET_TAU, a region's level about the players' mean one of LEVEL_TAU (so a region that has met the others in a
+ * handful of games stays near the middle), and the levels are then moved together so that ANCHOR's (Europe's) is a
+ * newcomer's old start. Both spreads were chosen on Rocket League's held-out years 2021-11 to 2026-11, each year scored
+ * with the levels fitted on the games before it (docs/design/rocket-league.md, "Regions").
+ */
+export const OFFSET_TAU = 250;
+export const LEVEL_TAU = 150;
+export const ANCHOR = 'EU';
 
 /**
  * A player's flag: of the flags his team cards file him under, the one naming a country most often (a region's, "usca" or
@@ -320,12 +346,15 @@ function distinctNames(squad) {
  *   isNationsEvent(title, tournament, rosters): whether national teams play it; nationOfTeamName(name): the nation a
  *     national team's name is (nationOfTeam by default);
  *   starters: a team card's places that start (rostersOf); gameOf: how the wiki writes a game (seriesOf);
- *   templateWords: a series' team template may name its roster by a word of its name (wordScore).
+ *   templateWords: a series' team template may name its roster by a word of its name (wordScore);
+ *   homeBy: what a player's home region is (homesOf), 'event' (the region whose events he has played most games in, else
+ *     his nation's) or 'nation' (his nation's, else that); regionOfNation(id): a nation's region (regionByConfederation).
  */
 export function createLiquipediaElo(config) {
   const { wiki, sourceId = 'liquipedia', edition = 'Liquipedia Elo', lineup, teamSize, minPlayers, minGames, activeDays,
     start = 1500, eloPerPoint, eloOffset, kScale, kFloor, position = 'PLR', skips = {}, isNationsEvent = () => false,
-    nationOfTeamName = nationOfTeam, starters = lineup, gameOf, templateWords = false } = config;
+    nationOfTeamName = nationOfTeam, starters = lineup, gameOf, templateWords = false, homeBy = 'event',
+    regionOfNation = () => null } = config;
   const readTournament = config.tournamentOf ?? (page => tournamentOf(page));
   const rosterOptions = { starters };
   const seriesOptions = gameOf ? { gameOf } : {};
@@ -457,31 +486,35 @@ export function createLiquipediaElo(config) {
   }
 
   /**
-   * Elo over `series` (seriesInOrder's), game by game. `scale`: kScale; `starts`: a region's starting Elo for a newcomer
-   * whose first game is in that region's event (`start` elsewhere); `holdout`: the date from which each game's prediction
-   * is scored, before it is played (log loss, Brier score, the same for the international events alone, and calibration
-   * by tenths of the expected score). Each international game is kept in `international` as the two sides' player keys
-   * and the first side's surprise (won − expected), for regionalStarts. `onGame(one, game, expected, sides)` is told of
-   * each game before it moves anyone, its sides' players as they stand (each one's `games` those he had played before).
-   * → { players: Map(key → player), games, scored, international, lan }
+   * Elo over `series` (seriesInOrder's), game by game. `scale`: kScale; `starts`: each region's starting Elo
+   * (regionLevels'), a newcomer's his home's (`homes`: key → region, homesOf), else his first event's region's, else
+   * `starts.world` (the world's mean, for a newcomer of no known region), else `start`; `holdout`: the date from which each
+   * game's prediction is scored, before it is played (log loss, Brier score, the same for the international events alone
+   * and, with `homes`, for the games between two regions' sides, and calibration by tenths of the expected score).
+   * `onGame(one, game, expected, sides)` is told of each game before it moves anyone, its sides' players as they stand
+   * (each one's `games` those he had played before).
+   * → { players: Map(key → player), games, scored, lan }
    */
-  function runElo(series, { scale = kScale, starts = {}, holdout = null, onGame = null } = {}) {
+  function runElo(series, { scale = kScale, starts = {}, homes = null, holdout = null, onGame = null } = {}) {
     const players = new Map();
-    const scored = { all: newScore(), international: newScore(), bins: Array.from({ length: 10 }, () => ({ n: 0, expected: 0, won: 0 })) };
-    const international = [], lan = [];
+    const scored = { all: newScore(), international: newScore(), cross: newScore(),
+      bins: Array.from({ length: 10 }, () => ({ n: 0, expected: 0, won: 0 })) };
+    const lan = [];
     let games = 0;
     const playerOfEntry = (entry, one) => {
       const key = playerKey(entry);
       let player = players.get(key);
       if (!player) {
-        player = { key, name: entry.name, elo: starts[one.region] ?? start, games: 0, wins: 0, first: one.date, last: one.date,
-          flags: new Map(), regions: new Map(), team: null };
+        player = { key, name: entry.name, elo: starts[homes?.get(key)] ?? starts[one.region] ?? starts.world ?? start, games: 0, wins: 0,
+          first: one.date, last: one.date, flags: new Map(), regions: new Map(), team: null };
         players.set(key, player);
       }
       return player;
     };
     for (const one of series) {
       const sides = one.teams.map(team => team.map(entry => playerOfEntry(entry, one)));
+      // Two regions' sides, each most of its players' home (crossRegion), for the held-out score of the games between regions.
+      const cross = homes && holdout && one.date >= holdout && crossRegion(sides.map(side => side.map(player => player.key)), homes);
       // Each player's flag, name and team as this series' rosters file him.
       one.rosters.forEach((roster, side) => {
         for (const entry of roster.players) {
@@ -495,17 +528,17 @@ export function createLiquipediaElo(config) {
           if (one.region) player.regions.set(one.region, (player.regions.get(one.region) ?? 0) + one.games.length);
         }
       });
-      const keys = one.international || one.host ? sides.map(side => side.map(player => player.key)) : null;
+      const keys = one.host ? sides.map(side => side.map(player => player.key)) : null;
       for (const game of one.games) {
         const [a, b] = sides.map(side => side.reduce((sum, player) => sum + player.elo, 0) / side.length);
         const e = expected(a - b);
         const won = game.winner === 1 ? 1 : 0;
         if (onGame) onGame(one, game, e, sides);
-        if (one.international) international.push({ keys, surprise: won - e });
         if (one.host) lan.push({ keys, host: one.host, surprise: won - e });
         if (holdout && one.date >= holdout) {
           score(scored.all, e, won);
           if (one.international) score(scored.international, e, won);
+          if (cross) score(scored.cross, e, won);
           const bin = scored.bins[Math.min(9, Math.floor(e * 10))];
           bin.n++; bin.expected += e; bin.won += won;
         }
@@ -520,7 +553,22 @@ export function createLiquipediaElo(config) {
         games++;
       }
     }
-    return { players, games, scored, international, lan };
+    return { players, games, scored, lan };
+  }
+
+  /** A side's region: the home (`homes`) of most of its players, else null. */
+  const regionOfSide = (keys, homes) => {
+    const counts = new Map();
+    for (const key of keys) {
+      const home = homes.get(key);
+      if (home) counts.set(home, (counts.get(home) ?? 0) + 1);
+    }
+    return [...counts.entries()].find(([, n]) => n >= majority)?.[0] ?? null;
+  };
+  /** The two sides' regions ([first's, second's]) when they are two regions, else null. */
+  function crossRegion(keys, homes) {
+    const [a, b] = keys.map(side => regionOfSide(side, homes));
+    return a && b && a !== b ? [a, b] : null;
   }
 
   /**
@@ -552,59 +600,121 @@ export function createLiquipediaElo(config) {
   }
 
   /**
-   * Each region's starting Elo, solved so that its teams win as often at the international events as Elo expects: run
-   * the Elo, move each region's start by its sides' mean surprise there (won − expected, on Elo's slope at an even game:
-   * 1600 / ln 10 points a unit; a side counts for the region most of its players call home), and again, `passes` times.
-   * Without it a newcomer is rated as an average player wherever he starts, and the regions meet too rarely for Elo alone
-   * to bring a whole region's players to its level.
+   * Each player's home region over the games before `until` (all of them when null), → Map(key → region): with `homeBy`
+   * 'event' the region whose events he has played most games in (homeOf), else his nation's (`regionOfNation` of
+   * `nationOf(key)`), for the players seen before `until` (one first seen later starts at his first event's region's level,
+   * runElo); with 'nation' his nation's, else the region whose events he has played most games in, for every player, as a
+   * nation is a player's whenever he plays.
    */
-  function regionalStarts(series, { scale = kScale, passes = 8, damping = 0.6, least = 10 } = {}) {
-    const starts = {};
-    for (let pass = 0; pass < passes; pass++) {
-      const { players, international } = runElo(series, { scale, starts });
-      const surprise = new Map();
-      for (const { keys, surprise: first } of international) {
-        keys.forEach((side, s) => {
-          const homes = side.map(key => homeOf(players.get(key))).filter(Boolean);
-          const counts = new Map();
-          for (const home of homes) counts.set(home, (counts.get(home) ?? 0) + 1);
-          const home = [...counts.entries()].sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]))[0]?.[0];
-          if (!home) return;
-          const row = surprise.get(home) ?? { n: 0, sum: 0 };
-          row.n++;
-          row.sum += s === 0 ? first : -first;
-          surprise.set(home, row);
-        });
-      }
-      for (const [region, { n, sum }] of surprise) {
-        if (n >= least) starts[region] = (starts[region] ?? start) + damping * (sum / n) * 1600 / Math.LN10;
+  function homesOf(series, { until = null, nationOf = () => null } = {}) {
+    const counts = new Map();
+    for (const one of series) {
+      const before = !(until && one.date >= until);
+      if (!before && homeBy !== 'nation') continue;
+      for (const team of one.teams) {
+        for (const entry of team) {
+          const key = playerKey(entry);
+          if (!counts.has(key)) counts.set(key, new Map());
+          if (before && one.region) counts.get(key).set(one.region, (counts.get(key).get(one.region) ?? 0) + one.games.length);
+        }
       }
     }
-    return Object.fromEntries(Object.entries(starts).sort().map(([region, elo]) => [region, Math.round(elo)]));
+    const homes = new Map();
+    for (const [key, played] of counts) {
+      const event = mostOf(played), nation = regionOfNation(nationOf(key));
+      const home = homeBy === 'nation' ? nation ?? event : event ?? nation;
+      if (home) homes.set(key, home);
+    }
+    return homes;
+  }
+
+  /**
+   * Each region's level, the start of a newcomer who calls it home (`homes`, homesOf's), fitted at once with every player's
+   * own strength over the games before `until` (all of them when null), as League of Legends' circuits are
+   * (scripts/lib/esports-elo.mjs, circuitLevels): a player plays at his home's level plus his own offset, which a normal
+   * prior of spread `tau` keeps near 0 where his games say little; a region's level has a normal prior of spread
+   * `levelTau` about the players' mean, so a region a handful of games against the others say little about stays near the
+   * middle; a side plays at its players' mean and wins with Elo's odds. Gradient ascent on that likelihood (Adam, steps of
+   * about `rate` points, `iterations` of them), then every level moved by one amount so that `anchor`'s is `start`.
+   * Regions meet at the international events and wherever a player of one plays in another's: too rarely for Elo alone,
+   * as a closed pool's mean stays where its newcomers start. Fitted at once, every such game counts, each for what it says.
+   * → { [region]: level, world: the players' mean, where a newcomer of no known region starts }
+   */
+  function regionLevels(series, homes, { until = null, tau = OFFSET_TAU, levelTau = LEVEL_TAU, iterations = 600, rate = 4,
+    anchor = ANCHOR } = {}) {
+    const index = new Map(), games = [];
+    for (const one of series) {
+      if (until && one.date >= until) continue;
+      const sides = one.teams.map(team => Int32Array.from(team, entry => {
+        const key = playerKey(entry);
+        if (!index.has(key)) index.set(key, index.size);
+        return index.get(key);
+      }));
+      for (const game of one.games) games.push({ sides, won: game.winner === 1 ? 1 : 0 });
+    }
+    const keys = [...index.keys()];
+    const regions = [...new Set(keys.map(key => homes.get(key)).filter(Boolean))].sort();
+    const home = Int32Array.from(keys, key => (homes.has(key) ? regions.indexOf(homes.get(key)) : -1));
+    // theta: the regions' levels, then the players' offsets.
+    const C = regions.length, P = keys.length, slope = Math.LN10 / 400;
+    const theta = new Float64Array(C + P), grad = new Float64Array(C + P);
+    const first = new Float64Array(C + P), second = new Float64Array(C + P);
+    const strength = i => (home[i] >= 0 ? theta[home[i]] : 0) + theta[C + i];
+    for (let step = 1; step <= iterations; step++) {
+      grad.fill(0);
+      for (const { sides, won } of games) {
+        let a = 0, b = 0;
+        for (const i of sides[0]) a += strength(i);
+        for (const i of sides[1]) b += strength(i);
+        const g = (won - expected(a / sides[0].length - b / sides[1].length)) * slope;
+        for (let s = 0; s < 2; s++) {
+          const side = sides[s], share = (s === 0 ? g : -g) / side.length;
+          for (const i of side) {
+            grad[C + i] += share;
+            if (home[i] >= 0) grad[home[i]] += share;
+          }
+        }
+      }
+      for (let i = 0; i < P; i++) grad[C + i] -= theta[C + i] / (tau * tau);
+      for (let c = 0; c < C; c++) grad[c] -= theta[c] / (levelTau * levelTau);
+      for (let j = 0; j < C + P; j++) {
+        first[j] = 0.9 * first[j] + 0.1 * grad[j];
+        second[j] = 0.999 * second[j] + 0.001 * grad[j] * grad[j];
+        theta[j] += rate * (first[j] / (1 - 0.9 ** step)) / (Math.sqrt(second[j] / (1 - 0.999 ** step)) + 1e-12);
+      }
+      let sum = 0, homed = 0;
+      for (let i = 0; i < P; i++) if (home[i] >= 0) { sum += theta[home[i]]; homed++; }
+      if (homed) for (let c = 0; c < C; c++) theta[c] -= sum / homed;
+    }
+    const zero = regions.includes(anchor) ? theta[regions.indexOf(anchor)] : 0;
+    return Object.fromEntries([...regions.map((region, c) => [region, Math.round(start + theta[c] - zero)]),
+      ['world', Math.round(start - zero)]].sort((x, y) => x[0].localeCompare(y[0])));
   }
 
   /**
    * The rated players of a run, strongest first: those with `minGames` behind them whose last game is within
    * `activeDays` of the export's last day (`asOf`). Each as the snapshot keeps it: his flag from his cards or his page
-   * (`people`), his nation from his national team or his flag (`national`).
+   * (`people`), his nation from his national team or his flag (`national`), his region the home his start was his
+   * region's level by (`homes`, homesOf's), else the region whose events he has played most games in.
    */
-  function ratedPlayers(players, asOf, people = new Map(), national = new Map()) {
+  function ratedPlayers(players, asOf, people = new Map(), national = new Map(), homes = null) {
     return [...players.values()]
       .filter(player => player.games >= minGames && daysBetween(player.last, asOf) <= activeDays)
       .map(player => ({ key: player.key, name: player.name, flag: flagOf(player, people), nation: nationOfPlayer(player, people, national),
         side: national.get(player.key)?.team ?? null, elo: Math.round(player.elo * 10) / 10, games: player.games, wins: player.wins,
-        last: player.last, team: player.team, region: homeOf(player) }))
+        last: player.last, team: player.team, region: homes?.get(player.key) ?? homeOf(player) }))
       .sort((a, b) => b.elo - a.elo || a.name.localeCompare(b.name));
   }
 
   /**
-   * The players rated at the end of an earlier season (`asOf`, its last day): the Elo of the games up to that day, rated as
+   * The players rated at the end of an earlier season (`asOf`, its last day): the Elo of the games up to that day, each
+   * newcomer at the level of his region then (`starts` and `homes`: regionLevels' and homesOf's over those games), rated as
    * ratedPlayers rates them then, each with the flag, nation and national team the whole record gives him (`whole`, the run
    * of every game's players): a player's country is his, whichever year it is.
    */
-  function playersAsOf(series, asOf, { starts = {}, people = new Map(), national = new Map(), whole }) {
-    const { players } = runElo(series.filter(one => one.date <= asOf), { starts });
-    return ratedPlayers(players, asOf, people, national).map(player => {
+  function playersAsOf(series, asOf, { starts = {}, homes = null, people = new Map(), national = new Map(), whole }) {
+    const { players } = runElo(series.filter(one => one.date <= asOf), { starts, homes });
+    return ratedPlayers(players, asOf, people, national, homes).map(player => {
       const all = whole.get(player.key);
       return { ...player, flag: flagOf(all, people), nation: nationOfPlayer(all, people, national) };
     });
@@ -653,6 +763,6 @@ export function createLiquipediaElo(config) {
     return { noFlag, offMap, short };
   }
 
-  return { gameRating, kFactor, readTournaments, startersOf, seriesInOrder, runElo, homeEdge, regionalStarts, ratedPlayers,
-    playersAsOf, playerOf, tupleOf, nationsOf, leftOut };
+  return { gameRating, kFactor, readTournaments, startersOf, seriesInOrder, runElo, crossRegion, homeEdge, homesOf, regionLevels,
+    ratedPlayers, playersAsOf, playerOf, tupleOf, nationsOf, leftOut };
 }

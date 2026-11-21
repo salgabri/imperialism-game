@@ -1,6 +1,7 @@
 # Rocket League
 
-Status: implemented 2026-11-14; its earlier seasons, every year from 2016 to 2025, on 2026-11-15.
+Status: implemented 2026-11-14; its earlier seasons, every year from 2016 to 2025, on 2026-11-15; each region's newcomers
+at that region's level, fitted at once with every player (below, "Regions"), 2026-11-21.
 The first esport and the tenth sport: Rocket League, as the RLCS plays its playoffs. Two nations'
 teams of three meet in a series, best of seven; each game is five minutes, and a game level at the
 end goes to sudden-death overtime. Nations only, on the world map, for now. Everything outside the
@@ -71,6 +72,8 @@ turns them into what the ratings play:
 - **Events.** 3v3 events of S-, A- and B-Tier, a school's league (Collegiate Rocket League:
   `liquipediatiertype` School) left out, its players being a pool apart. An event with no region
   is international (majors, the world championship, the Esports World Cup, the national cups).
+  The RLCS of 2021-22 split Asia-Pacific into North and South: both read as APAC (until
+  2026-11-21 they read as no region, about 5,000 games).
 - **Teams.** A series names its teams by the wiki's team templates ("nip", "kc", "flcn",
   "Genesis (South American Team)"), its event's rosters by name ("Ninjas in Pyjamas"): the
   templates are not in the export, so a template meets its event's roster by its name without a
@@ -100,24 +103,110 @@ Every series in date order, game by game, as an Elo of players: a team plays at 
 three starters' Elo, the winner of a game takes K × (1 − E) from the loser, and each player moves
 by his team's amount. A player's K shrinks with his games: 320 / (games + 5)^0.4, never below 8.
 The regions meet only at the majors and the world championship, too rarely for Elo alone to bring
-a whole region's players to its level, so a newcomer starts at his region's level, each region's
-start solved so that its teams win as often at the international events as Elo expects
-(`regionalStarts`: North America 1,580, Europe 1,578, MENA 1,525, Asia-Pacific 1,507, South
-America 1,476, Oceania 1,447, Sub-Saharan Africa 1,168).
+a whole region's players to its level, so a newcomer starts at his region's level (below,
+"Regions").
 
 K was chosen by scoring the exports' last 180 days (2,462 games), each game before it was
-played (`npm run sync:rocket-league -- --tune`): log loss 0.5996 at K 110, 0.5834 at 240, 0.5811
-at 320, 0.5817 at 400, 0.5850 at 500, regional starts on (they lower it at every K). At 320 the
-predictions are calibrated: games it gave 75% went 78%, 84% went 85%, 94.6% went 92.3%.
+played (`npm run sync:rocket-league -- --tune`). Re-run on 2026-11-21 with the regions' levels
+(fitted on the games before those days): log loss 0.5924 at K 110, 0.5815 at 180, 0.5774 at
+240, 0.5759 at 320, 0.5771 at 400, 0.5809 at 500; without the levels 0.5828 at 320 (0.6151
+between two regions' sides, 0.5846 with them). At 320 the predictions are calibrated: games it
+gave 75% went 78%, 84% went 85%, 94.9% went 92.7%.
 
 A player is rated once he has 20 games behind him and has played within a year of the export's
 last game: 817 of 4,903. On the game's scale a rating is Elo / 25 − 2: a rating point is 25 Elo
-points, as in tennis, so the match model plays Elo's own odds; the best player, dralii (Morocco),
-is 98, a newcomer at 1,500 is 58. Each nation names its five best; it needs three for a team, so
-a nation with fewer fields none and its land stays neutral. 57 nations field a team, from the
-United States (93.7: zach, Firstkiller, Chronic), France (91.3) and Saudi Arabia (90.7) down to
-Ghana and Madagascar (48.7).
+points, as in tennis, so the match model plays Elo's own odds; a European newcomer, at 1,500, is
+58, and the best players, dralii (Morocco, 2,333) and zach (United States), are 91. Each nation
+names its five best; it needs three for a team, so a nation with fewer fields none and its land
+stays neutral. 57 nations field a team, from the United States (87.7: zach, Firstkiller, Chronic),
+France (85) and Saudi Arabia (85) down to Ghana (34).
 Rocket League offers every nation theatre, the Elite 32 included.
+
+## Regions
+
+Changed 2026-11-21, at the user's request: "just because one team is a national or a country a
+continental champion they might still be quite weak in comparison to other areas".
+
+**Measured.** Each game between two regions' sides (a side is a region's when two of its three
+call it home), scored before it was played, each region's offset fitted by maximum likelihood
+against Europe's (± one standard error; 25 Elo is a rating point), each year with the starts
+fitted on the games before it. Before: the code as it was (the old reading and the old starts,
+below); after: the regions' levels.
+
+| Region | Five years to 2026-11-14: games | before | after | Last three years: games | before | after |
+| --- | --- | --- | --- | --- | --- | --- |
+| North America | 2,504 | −8 ± 8 | −5 ± 8 | 1,332 | +4 ± 11 | +3 ± 11 |
+| MENA | 1,521 | +14 ± 11 | +25 ± 11 | 1,179 | +11 ± 12 | +22 ± 12 |
+| South America | 1,388 | −6 ± 11 | +16 ± 11 | 616 | −8 ± 16 | +5 ± 16 |
+| Asia-Pacific | 645 | −161 ± 18 | −34 ± 18 | 543 | −99 ± 19 | +9 ± 20 |
+| Oceania | 598 | −60 ± 18 | −4 ± 18 | 368 | −22 ± 23 | +13 ± 23 |
+| Sub-Saharan Africa | 589 | −87 ± 19 | −51 ± 19 | 458 | −38 ± 21 | −16 ± 21 |
+
+A negative offset is a region its ratings overrate: Asia-Pacific's sides lost 6.4 points' worth
+more than their ratings said. Log loss over the five years (61,492 games, 5,381 between two
+regions): 0.6236 → 0.6202 (all), 0.6236 → 0.6218 (within a region), 0.6240 → 0.6031 (between
+two); over the last three (28,869, 3,499): 0.6038 → 0.6011, 0.6069 → 0.6052, 0.5815 → 0.5712.
+
+**Why the old starts missed.** Each region's start was moved by its sides' mean surprise at the
+international events (won − expected), eight times, by 0.6 of it. Two things kept it from the
+truth. Most of those games were between two sides of one region: the RLCS 2021-22's Asia-Pacific
+North and South read as no region, and so did the national leagues (the Saudi eLeague, Gfinity's
+UK and Australian series, RL Oceania): of Asia-Pacific's 9,157 sides at "international" games
+only 576 met another region's, so its surprise read +0.002 where its games against the others
+said −0.175, and its start stayed at 1,507. And eight damped passes stopped short: Europe's and
+North America's starts were still rising 8 to 10 a pass, Sub-Saharan Africa's falling 20 to 30.
+
+**What changed.** A newcomer starts at his region's level. His region is the RLCS region whose
+events he has played most games in, else his nation's (`regionOfNation` in
+scripts/lib/rocket-league.mjs: its confederation's, Australia with Oceania, the Arab states and
+Iran with MENA). Each region's level is fitted at once with every player's own strength, as
+League of Legends' circuits are (`regionLevels` in scripts/lib/liquipedia-elo.mjs, after
+`circuitLevels`): a player plays at his region's level plus his own offset (a normal prior of
+spread 250 Elo), a region's level has a prior of 150 Elo about the players' mean, and every game
+counts for what it says, wherever the two regions met. The levels are then moved together so that
+Europe's is 1,500, as every newcomer's once was, so the rating formula is unchanged. On every
+game of the record: Europe 1,500, North America 1,487, MENA 1,405, South America 1,298, Oceania
+1,240, Asia-Pacific 1,012, Sub-Saharan Africa 984 (a newcomer of no known region: the players'
+mean, 1,279).
+
+The level prior is for a region a handful of games place. Without it, the levels fitted before
+November 2021 put MENA at 541 and Sub-Saharan Africa at 488, from a few lopsided games, and
+MENA's sides then beat their ratings by 285 ± 33 Elo in the year after; with it, by 64 ± 30. The
+two spreads were chosen on the five years above. Between two regions: no level prior 0.6134;
+levels' spread 100, 150 and 250 (offsets' 250) 0.6038, 0.6031 and 0.6042; offsets' spread 150 and
+400 (levels' 150) 0.6041 and 0.6027, the latter 0.0002 worse within a region.
+
+**The nations.** Against the best, the United States, before → after: Japan −14.4 → −24.7
+(79.3 → 63), Pakistan −20.4 → −31.4, India −25.7 → −36.0, Malaysia −23.7 → −30.4, South Africa
+−24.4 → −27.7 (69.3 → 60), Ghana −45.0 → −53.7, New Zealand −23.0 → −26.0, Australia −13.0 →
+−14.7 (80.7 → 73), Brazil −7.4 → −8.4, Saudi Arabia −3.0 → −2.7, France −2.4 → −2.7. Finland
+and Ireland fall with Asia-Pacific (−7.7 and −3.7): their best play in its teams (Jungle Juicers,
+KINOTROPE gaming). Every rating fell, the best player's 98 → 91: Europe's newcomers start at
+1,500 as before, and Europe's and North America's best no longer gain from beating sides their
+ratings overrated.
+
+**Still there.** Sub-Saharan Africa's sides lost more than their ratings said in the last year
+(−213 ± 57 over 125 games), after doing as they said the two years before (−2 and +36). MENA's
+are about a point underrated over the five years (+25 ± 11).
+
+**A correction on top, tested and not adopted (2026-11-21).** Each player's rating plus his
+region's offset, fitted only on the games between two regions before each held-out year (maximum
+likelihood, a normal prior of 25, 50 or 100 Elo, or the prior empirical Bayes gives; on every
+earlier game, or on the year before only), held fixed through the year. The rule, set before the
+run: adopt it if the games between regions do better, those within a region no worse than the
+bootstrap error of the difference (series as clusters), and no region's offset ends beyond two
+errors the other way. Over the five years every version did worse between two regions (0.6031
+without it): every earlier game +0.0006 ± 0.0003, +0.0012 ± 0.0005 and +0.0025 ± 0.0008 at 25,
+50 and 100; the year before +0.0002, +0.0007 and +0.0022. Empirical Bayes found the offsets'
+spread inside their noise and fitted none. The earlier seasons, each frozen with offsets fitted on
+the games to its own last day, did better over the next six months (−0.0005 ± 0.0004 to −0.0009
+± 0.0006), all of it 2021's season on 2022's first half (the other seasons together +0.00005 to
++0.0001), and worse
+over the next twelve (+0.0011 ± 0.0004 to +0.0014 ± 0.0007), so the seasons keep the levels alone
+too. What the levels leave changes from year to year: Sub-Saharan Africa −222, −185, −2, +36 and
+−213 over the five years; MENA +64, +18, +28, +34, −9. Fitted on the whole record it would have
+moved Sub-Saharan Africa by −2.6 points, Asia-Pacific −1.1 and MENA −0.5, the wrong way for
+MENA.
 
 ## The match
 
@@ -168,13 +257,14 @@ Balanced, which gives 76.6%, 27.6% and 3.4% (the favourite's share alone would a
 best-of-fives ask for more (6: the favourite won 74.7% of 3,431). Form grows with the square of
 the drama, as in every sport, so Wild swings Rocket League hardest of all.
 
-The harness (`npm run simulation:realism`) plays the sixteen strongest nations twice a season:
-4.23 goals a game, 20.5% to overtime, best of seven won 4–0 / 4–1 / 4–2 / 4–3 29.1% / 29.3% /
-23.1% / 18.5% (real 30.4% / 26.7% / 22.9% / 20.0%), the favourite 74.5%.
+The harness (`npm run simulation:realism`) plays the sixteen strongest nations twice a season
+(re-run 2026-11-21, the regions' levels on): 4.22 goals a game, 19.7% to overtime, best of seven
+won 4–0 / 4–1 / 4–2 / 4–3 30.7% / 29.4% / 22.4% / 17.5% (real 30.4% / 26.7% / 22.9% / 20.0%), the
+favourite 78.0% (74.5% before: the levels spread the sixteen wider).
 
 **No home advantage.** At the exports' LANs, 1,933 games had one side of the host nation (two of
-its three players); those sides did as Elo expected, within two standard errors (+11.8 ± 7.6 Elo:
-were it real, 51.7% a game, and the first export alone gave +6.1 ± 8.3). So Rocket League offers no
+its three players); those sides did as Elo expected, within the error (+2.9 ± 7.5 Elo; +11.8 ±
+7.6 before the regions' levels, and the first export alone gave +6.1 ± 8.3). So Rocket League offers no
 Home advantage rule: the setup leaves it out, as tennis leaves out Computer signings, and a home
 venue changes nothing. Computer signings is left out too, as in tennis: any player plays any place,
 so the best-rated player is always the one who most improves a lineup (checked over every pair of
@@ -184,7 +274,9 @@ the 57 nations).
 
 Every year from 2016 to 2025 is a season of its own (`rl-2016` to `rl-2025`, chosen under Season
 in setup): its players as the Elo of Liquipedia's results stood on its last day. The sync runs the
-same Elo over the games up to 31 December only (`playersAsOf`) and keeps who was rated then by
+same Elo over the games up to 31 December only (`playersAsOf`), each newcomer at his region's
+level as those games alone measure it (since 2026-11-21: the season's own levels, its snapshot's
+`starts` and its file's `source.conversion`; no later year's result), and keeps who was rated then by
 today's rules, 20 games behind him and one within the year; each nation names its five best and
 plays its three best, as today. A player plays for the nation the whole record gives him (his
 national-team events, his flags, his page), whichever year it is: a country is a person's, and the
@@ -196,23 +288,35 @@ of games.
 
 | Season | Rated | Nations | Strongest | Real games | Goals a game | Rate | Overtime, model (real) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2016 (rough) | 71 | 9 | United States 69.3, Great Britain 69, Netherlands 69 | 516 | 4.34 | 3.97 | 20.5% (18.0%) |
-| 2017 (rough) | 142 | 11 | Netherlands 76, France 73.7, United States 73.3 | 886 | 3.96 | 3.60 | 22.1% (14.4%) |
-| 2018 | 185 | 13 | United States 76, Netherlands 75, France 73.7 | 1,631 | 4.07 | 3.70 | 21.5% (19.7%) |
-| 2019 | 375 | 18 | United States 83, Brazil 79.3, France 79 | 3,168 | 3.86 | 3.50 | 22.5% (20.1%) |
-| 2020 | 575 | 24 | Brazil 84, United States 83, France 81.3 | 5,413 | 3.90 | 3.52 | 21.9% (21.0%) |
-| 2021 | 758 | 29 | Saudi Arabia 89.3, Great Britain 83.7, United States 83.3 | 8,607 | 4.00 | 3.62 | 21.4% (20.9%) |
-| 2022 | 1,061 | 30 | United States 87.7, Japan 87, Great Britain 86.7 | 14,619 | 4.21 | 3.82 | 20.7% (19.0%) |
-| 2023 | 863 | 33 | France 92, Saudi Arabia 89.3, Brazil 89 | 9,147 | 4.22 | 3.82 | 20.6% (17.9%) |
-| 2024 | 619 | 27 | France 91.3, Saudi Arabia 90, United States 90 | 5,962 | 4.28 | 3.85 | 19.7% (20.0%) |
-| 2025 | 851 | 50 | United States 94.3, France 92.3, Saudi Arabia 90.7 | 9,044 | 4.32 | 3.88 | 19.5% (18.5%) |
+| 2016 (rough) | 71 | 9 | United States 67.7, Great Britain 67, Netherlands 66.3 | 516 | 4.34 | 3.97 | 20.5% (18.0%) |
+| 2017 (rough) | 142 | 11 | Netherlands 73, France 70.7, United States 70 | 886 | 3.96 | 3.60 | 22.0% (14.4%) |
+| 2018 | 185 | 13 | United States 73, Netherlands 72, France 70.3 | 1,631 | 4.07 | 3.69 | 21.4% (19.7%) |
+| 2019 | 375 | 18 | United States 78.7, France 74.7, Great Britain 74 | 3,168 | 3.86 | 3.50 | 22.4% (20.1%) |
+| 2020 | 575 | 24 | United States 77.7, France 76.3, Spain 76 | 5,413 | 3.90 | 3.52 | 21.8% (21.0%) |
+| 2021 | 758 | 29 | Great Britain 78, United States 77, Saudi Arabia 76 | 8,607 | 4.00 | 3.62 | 21.4% (20.9%) |
+| 2022 | 1,061 | 30 | United States 81, Great Britain 80.3, France 77.3 | 14,619 | 4.21 | 3.81 | 20.7% (19.0%) |
+| 2023 | 863 | 33 | France 85, Great Britain 81.3, Brazil 80.7 | 9,147 | 4.22 | 3.82 | 20.5% (17.9%) |
+| 2024 | 619 | 27 | France 85, Saudi Arabia 82.3, United States 82 | 5,962 | 4.28 | 3.85 | 19.6% (20.0%) |
+| 2025 | 851 | 50 | United States 88.7, France 87, Saudi Arabia 85.3 | 9,044 | 4.32 | 3.87 | 19.3% (18.5%) |
 
 The early years are thin, as the S-, A- and B-Tier events of their time were: North America,
 Europe and Oceania, nine nations in 2016 and thirteen by 2018. The fourth export's stage pages
 filled 2020 most: 5,413 games between seasoned players where the first three exports held 2,031,
 and 575 rated where they rated 425. 2021's rise to 29 is the RLCS's new regions (Saudi Arabia
-leads it), and 2025's to 50 the national-team events, which brought many smaller nations' players
+third), and 2025's to 50 the national-team events, which brought many smaller nations' players
 into the record.
+
+**Each season's regions, held out** (2026-11-21). Each season's ratings frozen as its file keeps
+them, scored on the next six months' games between two regions' sides whose six players it rates
+(2,201 games over the ten seasons): log loss 0.6989 with the old starts (fitted on the whole
+record), 0.6727 with each season's own levels; against Europe, Asia-Pacific −326 ± 40 → −26 ± 38,
+Sub-Saharan Africa −160 ± 78 → −20 ± 77, Oceania −46 ± 31 → +8 ± 31, MENA −16 ± 19 → −1 ± 19,
+South America +3 ± 19 → +20 ± 19, North America +14 ± 12 → +24 ± 12. Over the next twelve months
+(4,319 games) every season does better (0.7043 → 0.6786), but the end of 2021 still overrates the
+regions that first met the world in 2022 (Asia-Pacific −466 ± 132 and Sub-Saharan Africa −689 ±
+128 on 2022's games, the old starts −799 and −704): nothing to the end of 2021 showed it. Saudi
+Arabia led 2021 before (89.3) on the old starts, fitted on the whole record, MENA's later years
+among them; MENA's level to the end of 2021 is 1,146 and climbs every year after, to 1,392 by 2025.
 
 **Each year's scoring.** A season plays its own year's goal rate: the rate between equals that
 brings the year's real games between seasoned players (all six with 20 games behind them), each

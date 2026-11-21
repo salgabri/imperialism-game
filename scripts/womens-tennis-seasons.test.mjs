@@ -24,6 +24,7 @@ import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { readChallenge } from '../src/screens/setup/challenge.js';
 import { gameRating } from './lib/tennis.mjs';
 import { ROUND_ORDER, wtaLevelOf } from './lib/tennis-elo.mjs';
+import { REGIONS } from './lib/tennis-regions.mjs';
 import { codeOfDay, nationIdOf, nationOfDay, teamsOf } from './lib/tennis-seasons.mjs';
 import { cupTies, dateOf, drawMatches, eventStart, linkKinds, pageOf, pinnedPages, playerCell, wikiFile, wikipediaMatches } from './lib/tennis-wikipedia.mjs';
 import { womensTennis } from '../src/sports/womensTennis.js';
@@ -314,6 +315,38 @@ test('1963-1972: Court and King lead Australia and the United States, South Afri
   assert.ok(Math.abs(early.fit.meanDiff - VALIDATION.fit.meanDiff) < 1 && Math.abs(early.fit.rms - VALIDATION.fit.rms) < 1, JSON.stringify(early.fit));
   assert.deepEqual([early.wikipedia.pages, early.wikipedia.matches, early.wikipedia.counted, early.wikipedia.women, early.wikipedia.playerFile],
     [37, 1991, 1882, 547, 278]);
+});
+
+// ---------- regions ----------
+
+test('the newcomers of the pages start at their region\'s and nation\'s level: Western Europe\'s women no longer high, North America\'s less low', () => {
+  const E = MANIFEST.method.early;
+  const R = E.start.regions;
+  assert.deepEqual([R.levels, R.from, R.fit], [['amateur'], 1960, { seasons: [1960, 1967], sigma: 150, tau: 100 }]);
+  assert.deepEqual(Object.keys(R.region).sort(), [...REGIONS].sort());
+  assert.ok([...Object.values(R.region), ...Object.values(R.nation)].every(level => Number.isInteger(level) && level % 5 === 0), 'rounded to five points');
+  // The base start, fitted again with the levels so that the run carries on as the shipped one (the seam above).
+  assert.equal(E.start.amateur, 1315);
+  // The listed women of 1963-1967 against the other regions' (each match by the Elo before it): Western Europe's won as
+  // though weaker than their Elo, North America's as though stronger; with the levels both stand nearer the others.
+  const { without, with: after } = VALIDATION.early.regions['1963-1967'];
+  for (const region of ['W.Europe', 'N.America']) {
+    assert.ok(Math.abs(without.regions[region].elo) > 2 * without.regions[region].se, `${region} without: ${JSON.stringify(without.regions[region])}`);
+    assert.ok(Math.abs(after.regions[region].elo) < Math.abs(without.regions[region].elo) - 15, `${region}: ${without.regions[region].elo} → ${after.regions[region].elo}`);
+  }
+  assert.ok(Object.values(VALIDATION.early.regions['1968-1972'].with.regions).every(offset => Math.abs(offset.elo) < 30), 'the open era\'s first seasons');
+  // The computed seasons from 1973: every region within 20 Elo of the others but in 1973-1979, when Eastern Europe's
+  // rising women won as though 35 Elo stronger than their Elo (docs/design/womens-tennis.md, "Regions").
+  const { eras, published } = VALIDATION.regions;
+  for (const [era, fit] of Object.entries(eras)) {
+    for (const [region, offset] of Object.entries(fit.regions)) {
+      if (era === '1973-1979' && ['E.Europe', 'L.America'].includes(region)) continue;
+      assert.ok(Math.abs(offset.elo) < 20, `${era} ${region}: ${JSON.stringify(offset)}`);
+    }
+  }
+  assert.ok(eras['1973-1979'].regions['E.Europe'].elo > 25 && eras['1980-1989'].regions['E.Europe'].elo < 20);
+  // 2016-2025: the computed Elo less Tennis Abstract's of the same women, region by region, about the overall difference.
+  for (const [region, { n, diff }] of Object.entries(published.regions)) if (n >= 100) assert.ok(Math.abs(diff) < 8, `${region}: ${diff}`);
 });
 
 // ---------- the pages of 1960-1967 ----------

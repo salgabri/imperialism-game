@@ -28,6 +28,13 @@ export const K_SCALE = 160;
  */
 export const CIRCUIT_LEVELS = true;
 /**
+ * The circuits' levels' own prior (circuitLevels `levelSpread`): a normal spread of 500 Elo around the players' mean, since
+ * 2026-11-21. Without it a circuit tied to the rest by a few dozen games went as far as they allowed (Japan's LJL to 1098,
+ * Portugal's to 992); with it the held-out games between circuits went from 0.6027 to 0.5973 log loss and the rest from
+ * 0.6228 to 0.6190 (--tune --rolling; 300 to 700 do about as well).
+ */
+export const LEVEL_SPREAD = 500;
+/**
  * A rating point is 25 Elo points: rating = (Elo − ELO_BASE) / 25, rounded. The circuits' levels centre all of gol.gg's
  * players at 1500, two thousand of every tier, which puts the LCK's and the LPL's best near 2530: a base of 100, not
  * Rocket League's 50, keeps them at 97, under the game's 99.

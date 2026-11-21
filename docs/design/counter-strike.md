@@ -1,6 +1,7 @@
 # Counter-Strike
 
-Status: implemented 2026-11-15; its B-Tier events, the same day. The second esport and the eleventh sport: Counter-Strike 2, as its tier-one events
+Status: implemented 2026-11-15; its B-Tier events, the same day; each region's newcomers at that region's level (below,
+"Regions"), 2026-11-21. The second esport and the eleventh sport: Counter-Strike 2, as its tier-one events
 play their playoffs. Two nations' teams of five meet in a series of maps, best of three; a map is first to 13 rounds,
 twelve a half, the sides switching at half-time, and a map level at 12–12 goes to overtime: six rounds, three a half,
 first to four, another at 3–3. Nations only, on the world map, for now. Everything outside the match (territory, the
@@ -87,24 +88,91 @@ so Liquipedia it is.
 
 Rocket League's (docs/design/rocket-league.md, "Ratings"), map by map: a team plays at the mean of its five starters'
 Elo, the winner of a map takes K × (1 − E) from the loser, and each player moves by his team's amount; a player's K is
-180 / (maps + 5)^0.4, never below 8. Every newcomer starts at 1,500: Rocket League's regional starts (each region's newcomers
-at the level its teams show at the international events) foresaw no better here once the B-Tier events were in, and put the
-CIS's newcomers 380 points below Europe's.
+180 / (maps + 5)^0.4, never below 8. A newcomer starts at his region's level (below, "Regions").
 
 K was chosen by scoring the exports' last 180 days (6,487 maps), each map before it was played
 (`npm run sync:counter-strike -- --tune`): log loss 0.6502 at K 60, 0.6445 at 110, 0.6422 at 140, 0.6408 at 180, 0.6410
-at 240, 0.6436 at 320, 0.6479 at 400 (0.6408 with regional starts too). A map is a noisier test of two teams than a Rocket
-League game (0.5811 there), and Counter-Strike's K is under three fifths of its 320. At 180 the predictions are calibrated:
-maps it gave 55% went 57%, 65% went 63%, 75% went 75%, 84% went 85%.
+at 240, 0.6436 at 320, 0.6479 at 400. Re-run on 2026-11-21 with the regions' levels (fitted on the maps before those
+days): 0.6498, 0.6442, 0.6419, 0.6406, 0.6408, 0.6434 and 0.6476, so K stays 180. A map is a noisier test of two teams
+than a Rocket League game (0.5759 there), and Counter-Strike's K is under three fifths of its 320. At 180 the predictions
+are calibrated: maps it gave 55% went 56%, 65% went 63%, 75% went 76%, 84% went 85%.
 
-A player is rated once he has 20 maps behind him and has played within a year of the export's last map: 1,667 of 14,738.
-On the game's scale a rating is Elo / 25 − 2, as in Rocket League; the best player, Aleksib (Finland, 2,368), is 93, a
-newcomer at 1,500 is 58. Each nation names its seven best; it needs five for a team, so a nation with fewer fields none and
-its land stays neutral. 40 nations field a team, from Russia (84.2: Boombl4, robo, magixx, nafany, chopper), Ukraine
-(82.6), France (81.6: apEX, ZywOo, Lucky, Ex3rcice, Neityu) and Brazil (81.2) down to Mexico (59); the B-Tier events
-brought Bosnia and Herzegovina (huNter-, NiKo), South Africa, Norway, Uzbekistan and Mexico up to five. Left out: 33 rated
-players with no country (none a nation's best), two of countries off the map (Singapore, Hong Kong), and 59 of nations of
-fewer than five, Uruguay's four among them. Counter-Strike offers every nation theatre, the Elite 32 included.
+A player is rated once he has 20 maps behind him and has played within a year of the export's last map: 1,667 of 14,739.
+On the game's scale a rating is Elo / 25 − 2, as in Rocket League: a European newcomer, at 1,500, is 58, and the best
+players, huNter- (Bosnia and Herzegovina, 2,336), max (Uruguay) and Aleksib (Finland), are 91. Each nation names its
+seven best; it needs five for a team, so a nation with fewer fields none and its land stays neutral. 40 nations field a
+team, from Russia (82.8: Boombl4, magixx, robo, nafany, frontales), Ukraine (81), France (80: apEX, ZywOo, Lucky,
+Ex3rcice, Neityu) and Brazil (79.8) down to Mexico (54.8); the B-Tier events brought Bosnia and Herzegovina (huNter-,
+NiKo), South Africa, Norway, Uzbekistan and Mexico up to five. Left out: 33 rated players with no country (none a
+nation's best), two of countries off the map (Singapore, Hong Kong), and 59 of nations of fewer than five, Uruguay's four
+among them. Counter-Strike offers every nation theatre, the Elite 32 included.
+
+## Regions
+
+Changed 2026-11-21, at the user's request: "just because one team is a national or a country a continental champion
+they might still be quite weak in comparison to other areas". Until then every newcomer started at 1,500, so a scene
+whose teams mostly play each other kept its newcomers' level whatever it was worth: South Africa's best, who play South
+Africa's leagues and almost nobody else, stood with Germany's (73.2 to 74.4).
+
+**Measured.** Each map between two regions' sides (a side is a region's when three of its five are), scored before it was
+played, each region's offset fitted by maximum likelihood against Europe's, over the three years to the export's last
+map, each year scored with the levels fitted on the maps before it (14,099 of 35,437 maps; ± one standard error; 25 Elo
+is a rating point):
+
+| Region (nations) | Maps | Before | After |
+| --- | --- | --- | --- |
+| CIS (Russia, Ukraine, Kazakhstan…) | 10,645 | +8 ± 4 | +4 ± 4 |
+| South America | 2,164 | −4 ± 8 | +1 ± 8 |
+| Asia (China, Mongolia…) | 1,362 | −9 ± 11 | +25 ± 11 |
+| North America | 1,213 | −27 ± 11 | −6 ± 11 |
+| Oceania | 484 | −74 ± 19 | −41 ± 19 |
+| Middle East and North Africa | 219 | +7 ± 25 | +29 ± 25 |
+| Africa | 4 | none to measure | none to measure |
+
+A negative offset is a region its ratings overrate: Oceania's sides lost about three points' worth more than their
+ratings said, North America's one. Africa's sides met another region four times in the three years; over the whole
+record, each map scored before it was played, they did 108 ± 27 Elo worse than their ratings said (224 maps, most of
+2014–2019). Log loss over the three years: 0.6478 → 0.6468 (all maps), 0.6426 → 0.6415 (within a region), 0.6557 →
+0.6547 (between two).
+
+**What changed.** A newcomer starts at his region's level. His region is his nation's (`regionOfNation` in
+scripts/lib/counter-strike.mjs: its confederation's, with the former Soviet states the CIS's, Australia Oceania's, the
+Arab states and Iran the Middle East's), else the region whose events he played most maps in: 58% of the maps are at
+events that name no region, South Africa's leagues among them, and 97% of the players have a country. Each region's level
+is fitted at once with every player's own strength, as League of Legends' circuits are (`regionLevels` in
+scripts/lib/liquipedia-elo.mjs, after `circuitLevels`): a player plays at his region's level plus his own offset (a normal
+prior of spread 250 Elo), a region's level has a prior of 150 Elo about the players' mean (a region a handful of maps
+place stays near the middle), and every map counts for what it says. The levels are then moved together so that Europe's
+is 1,500, where every newcomer started before, so the rating formula is unchanged. On every map of the record: Europe
+1,500, the CIS 1,553, South America 1,458, North America 1,359, Asia 1,326, Middle East 1,307, Oceania 1,264, Africa
+1,231 (a newcomer of no known region: the players' mean, 1,447).
+
+Rocket League's old regional starts, each region's start moved by its sides' surprise at the international events,
+foresee almost nothing here, between two regions as overall (0.6555 against 0.6557 without them, over the same three
+years and fitted on the maps before each): that is what dropped them on 2026-11-15, and it holds on the maps between
+regions too. Their CIS 250 to 380 points below Europe was the 18 events that name the CIS (806 maps: its qualifiers and
+Minors), not its players, whose events mostly name Europe; by nation the CIS stands 53 above Europe.
+
+**The nations.** Every nation lost about a point: Europe's best had been gaining from beating sides their ratings
+overrated (the best player 93 → 91). Against Germany, before → after: South Africa −1.2 → −6.2 (73.2 → 67), Australia
+−3.6 → −5.2 (70.8 → 68), Mexico −15.4 → −18.4 (59 → 54.8), Argentina −1.4 → −1.8 (71.4), Brazil +6.8 → +6.6 (79.8),
+Mongolia +5.2 → +5.4 (78.6), China +0.2 → +0.4 (73.6), Spain −1.4 → −1.2 (72), Denmark +6.0 → +6.0 (79.2).
+
+**Still there.** Oceania's sides still lose more than their ratings say (−41 ± 19; by year −28, −40, −61): one level
+stands for 2012–2026, and Oceania's has fallen. Asia's are now a point underrated (+25 ± 11). Africa's level rests on the
+maps of 2014–2019.
+
+**A correction on top, tested and not adopted (2026-11-21).** Each player's rating plus his region's offset, fitted only
+on the maps between two regions before each held-out year (maximum likelihood, a normal prior of 25, 50 or 100 Elo, or
+the prior empirical Bayes gives; on every earlier map, or on the year before only), held fixed through the year. The rule,
+set before the run: adopt it if the maps between regions do better, those within a region no worse than the bootstrap
+error of the difference (series as clusters), and no region's offset ends beyond two errors the other way. Between two
+regions (0.6547 without it): every earlier map, +0.0001 to +0.0002 at each prior, worse; the year before, prior 25,
+−0.00002 ± 0.00006, a third of its error and the best of the eight tried, while within a region +0.00004 ± 0.00001, so it
+fails; 50 and 100 worse. Empirical Bayes finds the offsets' spread inside their noise and fits none: the levels already
+take up what the maps before each year say about a region, and what is left moves from year to year. Fitted on the whole
+record it would have moved every region by under a third of a point (every map, prior 50); the year before alone, Oceania
+−1.2, North America −0.7, Asia +0.6.
 
 ## The match
 
@@ -154,14 +222,16 @@ win it 68%. The scorelines are likeliest with match-day form of 5 rating points 
 favourite 65.0%, a 2–0 40.6% (39.0% real) and a 0–2 against it 17.9% (17.9%). Form grows with the square of the drama, as in
 every sport.
 
-The harness (`npm run simulation:realism`) plays the sixteen strongest nations twice a season: 21.39 rounds a map (real,
-the seasoned maps above, 21.77; the test's range 21.2 to 22.4), 10.9% to overtime (12.4%), 28.0% of maps won 13–5 or wider
-(26.0%) and 25.4% 13–10 or 13–11 (27.1%), 57.8% of series won 2–0 (the real best-of-threes 56.9%), the favourite 67.8%.
+The harness (`npm run simulation:realism`) plays the sixteen strongest nations twice a season (re-run 2026-11-21, the
+regions' levels on): 21.41 rounds a map (real, the seasoned maps above, 21.77; the test's range 21.2 to 22.4), 10.9% to
+overtime (12.4%), 27.7% of maps won 13–5 or wider (26.0%) and 25.3% 13–10 or 13–11 (27.1%), 58.4% of series won 2–0 (the
+real best-of-threes 56.9%), the favourite 66.7%.
 
 **No home advantage.** At the exports' LANs, 3,319 maps between seasoned players had one side of the host nation (three of
-its five players); those sides did as Elo expected, within the error (−3.0 ± 5.7 Elo). Over every LAN map (5,659) the host
-sides did worse than Elo expected (−16.4 ± 4.2): small local LANs' newcomers, who start at 1,500 and lose more than that
-says, not a crowd against them, so the edge is measured between seasoned players, as the rounds and series are. So
+its five players); those sides did as Elo expected, within the error (+4.1 ± 5.7 Elo; −3.0 ± 5.7 before the regions'
+levels). Over every LAN map (5,664) the host sides did worse than Elo expected (−10.6 ± 4.2; −16.4 before): small local
+LANs' newcomers, who lose more than their start says, not a crowd against them, so the edge is measured between seasoned
+players, as the rounds and series are. So
 Counter-Strike offers no Home advantage rule, as Rocket League offers none, and a home venue changes nothing. Computer signings is left out too: any player plays any role, so the
 best-rated player is always the one who most improves a lineup.
 
@@ -174,7 +244,9 @@ best-rated player is always the one who most improves a lineup.
 - A country is a player's page's: a player whose page the exports lack, or whose page names none, plays for nobody (33
   rated players, none of them a nation's best). A player who changed his name is two players unless an export holds his old
   name's redirect.
-- Between seasoned players the Elo is a little too sure of its favourites (CS2 maps it gave 70% went 66%), where over every
+- A newcomer's region is his nation's wherever he plays (a Brazilian in North America's events starts at South America's
+  level), and one level stands for each region from 2012 to 2026 (above, "Regions": Oceania's has fallen since).
+- Between seasoned players the Elo is a little too sure of its favourites (CS2 maps it gave 70% went 67%), where over every
   map it is calibrated: the B-Tier events' mismatches are easier to call than tier one's close maps. The series' form,
   fitted to the seasoned players' best-of-threes, takes up most of it.
 - A team's players move together, so a player's rating is his teams' results, not his own play: Aleksib, who led NAVI to a

@@ -8,7 +8,7 @@ import { build } from 'esbuild';
 import { buildTeam, makeRng, teamEff } from '../src/data/teams.js';
 import { getSport } from '../src/sports/index.js';
 import { PlaybackClock } from '../src/engine/playbackClock.js';
-import { loadSave, loadCampaign, parseCampaign, exportCampaign } from '../src/engine/storage.js';
+import { loadSave, loadCampaign, parseCampaign, exportCampaign, writeSave, campaignStorageKey, createCampaignId } from '../src/engine/storage.js';
 import { suggestedTeamId } from '../src/screens/setup/setupModel.js';
 import { SAVE_KEY } from '../src/config.js';
 
@@ -344,4 +344,94 @@ test('renaming the active slot in the same tab updates revision without self-con
     assert.equal(f.app.state.storageConflict, false); assert.equal(f.app.state.saveStatus.ok, true);
     assert.equal(loadCampaign(id).campaignName, 'My named campaign'); assert.equal(f.app.state.revision, revision + 2);
   } finally { f.close(); }
+});
+
+test('renaming a quick-resume copy another tab has played past keeps the conflict, so Resume cannot overwrite that tab', () => {
+  const first = fixture({ role: 'spectator' });
+  first.app.persist();
+  const text = first.storage.getItem(SAVE_KEY);
+  first.close();
+  const f = fixture({ role: 'spectator', savedText: text });
+  try {
+    const saved = parseCampaign(text), id = saved.campaignId;
+    f.storage.setItem(campaignStorageKey(id), text);
+    f.app.saved = loadSave();
+    f.app.setState({ phase: 'setup', hasSave: true });
+    // Another tab resumes the campaign and plays three rounds on.
+    const remote = loadCampaign(id);
+    const theirs = writeSave({ ...remote, round: remote.round + 3, log: [...remote.log, { t: 'sys', r: remote.round + 3, txt: 'TAB B' }] });
+    assert.equal(theirs.ok, true);
+    // This tab, still in setup with the older copy, renames it.
+    f.app.openStorageDialog('slots');
+    findElement(f.app.render(), 'CampaignStorageDialog').props.onRename(id, 'Renamed');
+    f.app.closeStorageDialog();
+    assert.equal(loadCampaign(id).campaignName, 'Renamed', 'the rename is written to the other tab\'s progress');
+    assert.equal(f.app.saved.revision, saved.revision, 'the older copy keeps its revision');
+    f.app.resume();
+    assert.equal(f.app.state.storageConflict, true, 'Resume raises "changed in another tab"');
+    assert.ok(loadCampaign(id).log.some(entry => entry.txt === 'TAB B'), 'the other tab\'s progress is kept');
+  } finally { f.close(); }
+});
+
+test('a refused import file reports itself without calling the campaign unsaved', async () => {
+  const f = fixture({ role: 'manager' });
+  try {
+    f.app.persist();
+    assert.equal(f.app.state.saveStatus.ok, true);
+    const text = '{"v":3,"not":"a campaign"}';
+    await f.app.importProgress({ size: text.length, text: async () => text });
+    const status = f.app.state.saveStatus;
+    assert.equal(status.ok, false); assert.equal(status.file, true); assert.match(status.message, /not a supported/);
+    assert.equal(findElement(f.app.render(), 'CommandBar').props.saveStatus, status);
+    const { eliminationNote } = await import('../src/viewModels/conquest.js');
+    assert.equal(eliminationNote(status).note, '', 'no "Your run could not be saved" for a refused file');
+    // A save that had failed stays unsaved through a refused file.
+    f.app.setState({ saveStatus: { ok: false, message: 'Browser storage is full.' } });
+    await f.app.importProgress({ size: text.length, text: async () => text });
+    assert.equal(f.app.state.saveStatus.file, false);
+  } finally { f.close(); }
+});
+
+test('a New campaign asked of one campaign is not carried to the next one loaded', () => {
+  const f = fixture({ role: 'spectator' });
+  try {
+    f.app.persist();
+    const other = f.app.state.campaignId;
+    f.app.setState({ campaignId: createCampaignId(), campaignName: 'Open campaign', revision: 0 });
+    f.app.persist();
+    f.app.newCampaign();
+    assert.equal(f.app.state.confirmNew, true, 'the first click asks');
+    f.app.openStorageDialog('slots');
+    findElement(f.app.render(), 'CampaignStorageDialog').props.onLoad(other);
+    assert.equal(f.app.state.phase, 'playing');
+    assert.equal(f.app.state.confirmNew, false, 'the loaded campaign asks again before it is left');
+  } finally { f.close(); }
+});
+
+test('Try again and Another team take the campaign\'s choices, not the stamps its launch added', () => {
+  // A setup that kept dataYear drew the old season's world (East Germany in 1985/86) for any season chosen next, as
+  // mapYearOf prefers it to the chosen season's own year.
+  const stamps = { dataYear: 1986, dataSeason: '1985/86', dataVersion: 'wc-1986-0123abcd', domesticVersion: '826-0123abcd' };
+  for (const retry of [app => app.chooseAnotherTeam(), app => app.retryManager({ newDraw: true })]) {
+    const f = fixture({ role: 'manager' });
+    try {
+      f.app.setState({ initialSettings: { ...f.app.state.initialSettings, ...stamps } });
+      retry(f.app);
+      for (const key of Object.keys(stamps)) assert.equal(key in f.app.state.setup, false, `no ${key} in the setup`);
+      assert.equal(f.app.state.setup.sport, 'football', 'the choices themselves stay');
+    } finally { f.close(); }
+  }
+});
+
+test('a blitz round of three counts its one match, and with a bye does not claim the field halves', () => {
+  for (const [ids, line] of [[['250', '276', '826'], /^BLITZ ROUND — 1 MATCH$/], [['250', '276'], /^BLITZ ROUND — 1 MATCH, FIELD HALVES$/],
+    [['250', '276', '826', '380'], /^BLITZ ROUND — 2 MATCHES, FIELD HALVES$/]]) {
+    const f = fixture({ ids, role: 'spectator', settings: { pacing: 'blitz' } });
+    try {
+      f.app.beginBlitz();
+      const blitz = f.app.state.log.find(entry => /^BLITZ ROUND/.test(entry.txt));
+      assert.match(blitz.txt, line);
+      assert.equal(f.app.state.log.some(entry => /^BYE — /.test(entry.txt)), ids.length % 2 === 1, 'a bye has its own line');
+    } finally { f.close(); }
+  }
 });

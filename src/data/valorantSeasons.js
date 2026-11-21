@@ -2,7 +2,7 @@
 // The built-in earlier Valorant seasons, newest first: each year's players by the Elo of vlr.gg's results at its end,
 // nations only. Each is public/valorant/<id>.json, loaded when a setup chooses it (src/engine/footballSets.js).
 export const BUILT_IN_VALORANT_SEASONS = Object.freeze([
-  Object.freeze({ id: 'val-2025', version: 'val-2025-2a2d1a4b', year: 2025, season: '2025', label: 'vlr.gg Elo, end of 2025' }),
-  Object.freeze({ id: 'val-2024', version: 'val-2024-2e6235f7', year: 2024, season: '2024', label: 'vlr.gg Elo, end of 2024' }),
-  Object.freeze({ id: 'val-2023', version: 'val-2023-3d5d3751', year: 2023, season: '2023', label: 'vlr.gg Elo, end of 2023' }),
+  Object.freeze({ id: 'val-2025', version: 'val-2025-7815e574', year: 2025, season: '2025', label: 'vlr.gg Elo, end of 2025' }),
+  Object.freeze({ id: 'val-2024', version: 'val-2024-400dd918', year: 2024, season: '2024', label: 'vlr.gg Elo, end of 2024' }),
+  Object.freeze({ id: 'val-2023', version: 'val-2023-1497e12c', year: 2023, season: '2023', label: 'vlr.gg Elo, end of 2023' }),
 ]);

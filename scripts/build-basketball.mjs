@@ -3,7 +3,13 @@
 // (scripts/data/nba-seasons.json; the pinned page in data-src/bball-2karchive/),
 // and the built-in EuroLeague's estimates (scripts/data/euroleague-2026-27.json).
 //
-//   npm run build-basketball
+//   npm run build-basketball               writes the rosters and docs/design/basketball-nations-audit.json
+//   npm run build-basketball -- --check    builds both and compares them byte for byte, writes nothing
+//
+// The audit reads FIBA's results (scripts/data/fiba-results.json, npm run sync:fiba-results): where each nation's
+// results put its five against the nations the NBA and the EuroLeague rate, what moving its curated players would do,
+// and how that predicts games held out (scripts/lib/fiba-nations.mjs; docs/design/euroleague.md, "The nations' level
+// against FIBA's results"). The curated ratings are not moved: no rule that moves them predicted held-out games better.
 //
 // Why the split: no public dataset carries both current basketball ratings and
 // nationality. 2K has real 1-99 overalls but no country; NBA bio datasets with a
@@ -16,11 +22,14 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { CONF_META, NATIONS, selectLineup } from '../src/data/teams.js';
+import { NATIONS, selectLineup } from '../src/data/teams.js';
+import { BASELINE } from '../src/sports/basketball.js';
 import { colourFor } from './lib/club-identity.mjs';
 import { euroleagueClubs } from './lib/euroleague.mjs';
 import { playerRecords, readSnapshots } from './lib/euroleague-seasons.mjs';
 import { editionOf, readArchive } from './lib/nba-seasons.mjs';
+import { CURATED_SHARE, YEAR_WEIGHTS, engineHomeEdge, engineMarginPerPoint, gamesOf, lineBand, nationOfName, nationsFit, regionOf, validation,
+  windowEffect } from './lib/fiba-nations.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const SQUAD_SIZE = 5; // a starting five
@@ -89,17 +98,17 @@ for (const [id, players] of Object.entries(curated)) {
     const player = { name, pos: positions[0], positions };
     const fromNba = nbaByName.get(norm(name)), fromEuroleague = euroleagueByName.get(norm(name));
     if (fromNba) {
-      squad.push({ ...player, name: fromNba.n.trim(), rating: Math.min(MAX_RATING, fromNba.o) });
+      squad.push({ ...player, name: fromNba.n.trim(), rating: Math.min(MAX_RATING, fromNba.o), source: 'nba' });
       resolved.push(name);
     } else if (fromEuroleague) {
-      squad.push({ ...player, name: fromEuroleague.name, rating: fromEuroleague.rating });
+      squad.push({ ...player, name: fromEuroleague.name, rating: fromEuroleague.rating, source: 'euroleague' });
       euroleague.push(`${NATIONS[id][0]}: ${fromEuroleague.name} ${fromEuroleague.rating} (${fromEuroleague.club})${curatedRating != null && curatedRating !== fromEuroleague.rating ? `, curated ${curatedRating}` : ''}`);
     } else if (curatedRating != null) {
-      squad.push({ ...player, rating: Math.min(MAX_RATING, curatedRating) });
+      squad.push({ ...player, rating: Math.min(MAX_RATING, curatedRating), source: 'curated' });
     } else {
       const last = lastNbaRating(norm(name));
       if (last) {
-        squad.push({ ...player, name: last.name, rating: last.rating });
+        squad.push({ ...player, name: last.name, rating: last.rating, source: 'former' });
         former.push(`${NATIONS[id][0]}: ${last.name} ${last.rating} (${last.edition})`);
       } else {
         // Listed as an NBA player but in no NBA 2K edition's ratings — usually a
@@ -117,11 +126,11 @@ for (const [id, players] of Object.entries(curated)) {
     if (slot.outOfPosition) stretched.push(`${NATIONS[id][0]}: ${slot.player.name} (${slot.player.positions.join('/')}) at ${slot.position}`);
   }
 
-  // Strength is the mean of the five, with unfilled shirts at the confederation
-  // baseline — the same assumption buildTeam makes when generating the rest.
-  const baseline = CONF_META[NATIONS[id][2]].baseStr;
+  // Strength is the mean of the five, an unfilled shirt at the sport's baseline (45, on every continent: not football's
+  // confederation constants, whose order is football's), as hockey and baseball count one; buildTeam generates the
+  // missing players from it.
   const ratings = squad.map(p => p.rating);
-  const filled = ratings.concat(Array(Math.max(0, SQUAD_SIZE - ratings.length)).fill(baseline));
+  const filled = ratings.concat(Array(Math.max(0, SQUAD_SIZE - ratings.length)).fill(BASELINE));
   const str = Math.round(filled.reduce((s, r) => s + r, 0) / filled.length);
 
   squad.sort((a, b) => b.rating - a.rating);
@@ -151,7 +160,65 @@ ${body}
 };
 `;
 
-await writeFile(path.join(root, 'src', 'data', 'rosters.basketball.js'), out);
+// ---- The nations' level against FIBA's results: measured, recorded, not applied (the audit's `decision`). ----
+const facts = JSON.parse(await readFile(path.join(root, 'scripts', 'data', 'fiba-results.json'), 'utf8'));
+const games = gamesOf(facts.games);
+const fives = Object.fromEntries(Object.entries(rosters).map(([id, r]) => [id, r.squad]));
+const names = {};
+for (const game of games) for (const name of [game.a, game.b]) { const id = nationOfName(name); if (id && fives[id]) names[id] = name; }
+const unplaced = Object.keys(fives).filter(id => !names[id]);
+if (unplaced.length) throw new Error(`FIBA's results name no game of ${unplaced.map(id => NATIONS[id][0]).join(', ')}`);
+const perPoint = engineMarginPerPoint();
+const engineHome = engineHomeEdge();
+const fit = nationsFit(games, fives, names, perPoint, { engineHome });
+const tested = validation(games, fives, names, perPoint, { fullHomeEdge: fit.srs.homeEdge, engineHome });
+const windows = windowEffect(games, fives, names);
+const r2 = (x, d = 2) => Math.round(x * 10 ** d) / 10 ** d;
+const byCompetition = {};
+for (const game of games) byCompetition[game.competition] = (byCompetition[game.competition] ?? 0) + 1;
+const audit = {
+  about: "Basketball's national fives against FIBA's men's results of 2023–2026 (scripts/build-basketball.mjs, scripts/lib/fiba-nations.mjs; "
+    + "docs/design/euroleague.md, \"The nations' level against FIBA's results\"). T is a nation's results in lineup points from the field's mean "
+    + "(√r × SRS ÷ the engine's margin a point); five is its five's strength as the engine plays it; stands is where the anchors' relation puts T; "
+    + 'gap = stands − five; move is what the method would move its curated players by. Validation scores held-out games through the engine, '
+    + 'each pair [the fives as they are, as the rule moves them].',
+  facts: { file: 'scripts/data/fiba-results.json', games: games.length, byCompetition, retrieved: facts.source.retrieved },
+  weights: { byYear: YEAR_WEIGHTS, competitions: 'the tournaments; the qualifiers only for a fielded nation no tournament rates' },
+  srs: { ...fit.srs, homeEdge: r2(fit.srs.homeEdge), sigma: r2(fit.srs.sigma), reliability: r2(fit.srs.reliability, 3) },
+  qualifierWindows: { ...windows, nations: Object.fromEntries(Object.entries(windows.nations).map(([id, w]) => [NATIONS[id][0], w])) },
+  perPoint: r2(perPoint, 3), perResultsPoint: r2(fit.perResultsPoint, 4), engineHomeEdge: r2(engineHome),
+  line: { anchors: fit.line.anchors.map(id => NATIONS[id][0]), level: r2(fit.line.level), centre: r2(fit.line.centre), slope: r2(fit.line.slope, 3),
+    residualSd: r2(fit.line.residualSd), atCuratedFives: lineBand(fit) },
+  regions: Object.fromEntries(['Europe', 'Americas', 'Africa', 'Asia'].map(region => {
+    const curated = Object.entries(fit.nations).filter(([id, n]) => regionOf(id) === region && n.share >= CURATED_SHARE).map(([, n]) => n);
+    return [region, { curatedFives: curated.length, meanGap: curated.length ? r2(curated.reduce((s, n) => s + n.gap, 0) / curated.length) : null }];
+  })),
+  nations: Object.fromEntries(Object.entries(fit.nations).sort((a, b) => b[1].T - a[1].T).map(([id, n]) => [id, {
+    name: NATIONS[id][0], fiba: names[id], region: regionOf(id), curated: fives[id].filter(p => p.source === 'curated').length, ...n,
+    ...(fit.aligned[id] ? { aligned: { ...fit.aligned[id], on: fit.aligned[id].on.map(j => NATIONS[j][0]) } } : {}) }])),
+  marginOffsets: Object.fromEntries(Object.entries(fit.marginOffsets).map(([region, d]) => [region, r2(d)])),
+  validation: tested,
+  decision: 'not applied: every rule that moves the curated players scores the held-out games worse than the ratings as they are (validation)',
+};
+const auditText = `${JSON.stringify(audit, null, 1)}\n`;
+const rostersFile = path.join(root, 'src', 'data', 'rosters.basketball.js');
+const auditFile = path.join(root, 'docs', 'design', 'basketball-nations-audit.json');
+if (process.argv.includes('--check')) {
+  let differs = false;
+  for (const [file, text] of [[rostersFile, out], [auditFile, auditText]]) {
+    let current = null;
+    try { current = (await readFile(file, 'utf8')).replace(/\r\n/g, '\n'); } catch {}
+    if (current !== text) { console.error(`differs: ${path.relative(root, file)}`); differs = true; }
+  }
+  if (differs) process.exit(1);
+  console.log("Verified the basketball rosters and the nations' audit byte for byte.");
+  process.exit(0);
+}
+await writeFile(rostersFile, out);
+await writeFile(auditFile, auditText);
+console.log(`wrote docs/design/basketball-nations-audit.json: ${games.length} FIBA games, SRS of the tournaments r ${r2(fit.srs.reliability, 3)}, `
+  + `anchors' relation ${r2(fit.line.level)} at T ${r2(fit.line.centre)}, slope ${r2(fit.line.slope, 3)}; leave-one-tournament-out log loss `
+  + `${tested.rules.nation.leaveOneOut.all.logLoss.join(' → ')} (not applied)`);
 
 const nations = Object.keys(rosters).length;
 const players = Object.values(rosters).reduce((s, r) => s + r.squad.length, 0);

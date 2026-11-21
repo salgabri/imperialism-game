@@ -17,6 +17,7 @@ import { recommendedTactic } from '../src/engine/managerStrategy.js';
 import { politicalFill } from '../src/data/empireColours.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import { mergeSharedIds } from '../src/engine/geo.js';
+import { theatreMapPreview } from '../src/screens/setup/setupModel.js';
 import { ROOT, bundleApp, bundleComponents, findElement, forceResult, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
 const BundledApp = await bundleApp();
@@ -1552,4 +1553,22 @@ test('the champion has conquered a place: "the Elite 32", "all the leagues", "th
       assert.equal(f.app.victoryPanel().subtitle, `has conquered ${place} in 2 battles`);
     } finally { f.close(); }
   }
+});
+
+test('a campaign outside Europe opens as its setup card frames it: Fiji, cut by the date line, no longer widens Asia & Oceania', async () => {
+  await withBoot(atlasOk(), async ({ app }) => {
+    app.fitMap = BundledApp.prototype.fitMap;
+    // Iran to New Zealand and Fiji, whose Vanua Levu runs from -180° to 179.4°: the fit spans the whole world width.
+    const ids = ['364', '156', '392', '036', '554', '242'];
+    app.fitMap(ids, { scope: 'AFC', layer: 'nations' });
+    const focus = app.viewFocus;
+    assert.ok(focus, 'an opening frame of its own, as Europe has');
+    const card = theatreMapPreview({ countries: app.geo.countries, paths: app.displayGeo?.paths, basePaths: app.geo.paths,
+      own: Object.fromEntries(ids.map(id => [id, id])), frameIds: ids });
+    assert.deepEqual([focus.x, focus.y, focus.w, focus.h].map(n => Number(n.toFixed(1))), card.viewBox.split(' ').map(Number),
+      'the setup card\'s frame');
+    assert.ok(focus.w < 960 * .6, `the theatre, not the world: ${focus.w.toFixed(0)} of 960`);
+    app.fitMap(ids);
+    assert.equal(app.viewFocus, null, 'a fit with no campaign settings (setup\'s) keeps no frame');
+  });
 });

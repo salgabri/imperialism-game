@@ -80,6 +80,11 @@ export function territoryWord(n) {
   return Number(n) === 1 ? 'territory' : 'territories';
 }
 
+/** The article for a number as said aloud: "an" for one read with a vowel first (8, 11, 18, 80–89: "an 11.9-point gap"). */
+export function articleFor(number) {
+  return /^(8|11(?!\d)|18(?!\d))/.test(String(number)) ? 'an' : 'a';
+}
+
 const PARTICLES = new Set(['de', 'van', 'von', 'da', 'di', 'dos', 'del', 'der', 'ter', 'ten', 'le', 'la', 'el', 'al', 'den', 'du', 'das', 'do']);
 const SUFFIXES = new Set(['jr', 'jr.', 'sr', 'sr.', 'ii', 'iii', 'iv']);
 

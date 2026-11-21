@@ -541,10 +541,11 @@ test('the live model never touches an RNG and stays pure', () => {
 test('sport profile exports: the match model\'s positional ratings, without the effective offset', () => {
   // Append-only exports: every existing export is still there and the sport objects are unchanged. Football adds its
   // knockout rules by season, the extra-time constants the live model mirrors, and the rules' variant women's football
-  // plays too (footballUnderRules).
+  // plays too (footballUnderRules). Basketball adds BASELINE (2026-11-21), the strength of an unfilled shirt that its fives'
+  // builder reads, hockey's and baseball's 45 rather than football's confederation constants.
   assert.deepEqual(Object.keys(footballModule).sort(), ['FOOTBALL_MODEL', 'football', 'footballIn', 'footballProfile', 'footballUnderRules',
     'knockoutIn', 'prepareFootballMatch', 'sampleFootballResult']);
-  assert.deepEqual(Object.keys(basketballModule).sort(), ['BASKETBALL_MODEL', 'BENCH', 'EUROLEAGUE_MAP', 'EUROLEAGUE_SCOPE', 'basketball',
+  assert.deepEqual(Object.keys(basketballModule).sort(), ['BASELINE', 'BASKETBALL_MODEL', 'BENCH', 'EUROLEAGUE_MAP', 'EUROLEAGUE_SCOPE', 'basketball',
     'basketballProfile', 'euroleagueBasketball', 'euroleagueBasketballIn', 'isEuroleagueScope', 'nbaBasketball', 'nbaBasketballIn', 'prepareMatch',
     'sampleResult']);
   assert.equal(football.prepareMatch, prepareFootballMatch);

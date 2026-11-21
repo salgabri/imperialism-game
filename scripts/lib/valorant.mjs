@@ -17,14 +17,27 @@ export const LINEUP = 5;
 export const MIN_GAMES = 20;
 /** How long since his last map a player still plays for his nation: a year. */
 export const ACTIVE_DAYS = 365;
-/** The K scale (scripts/sync-valorant.mjs --tune: 240 and 320 the best of 80…400): K = K_SCALE / (maps + 5)^0.4. */
+/** The K scale (scripts/sync-valorant.mjs --tune: 240 the best of 80…400, with the circuits' levels or without): K = K_SCALE / (maps + 5)^0.4. */
 export const K_SCALE = 240;
 /**
- * Whether a newcomer starts at his circuit's level (circuitLevels in scripts/lib/esports-elo.mjs) rather than 1500: not in
- * Valorant, where the levels predict the held-out maps worse at every K (--tune); the VCT's teams and the Challengers' meet
- * often enough (the off-season events, the promoted teams' first year) for Elo to place them itself.
+ * Whether a newcomer starts at his home circuit's level (circuitLevels in scripts/lib/esports-elo.mjs) rather than 1500: yes,
+ * since 2026-11-21. With every newcomer at 1500 each circuit's players stayed around 1500 whatever its strength: held out,
+ * the VCT's sides beat the Challengers' 49 ± 14 Elo more often than Elo expected, and India's lost 241 ± 89 Elo's worth
+ * (docs/design/valorant.md, "Circuits on one scale"). With the levels, LEVEL_SPREAD and HOMES_BY_COUNTRY, the held-out log
+ * loss of the maps between circuits went from 0.6525 to 0.6441 and of all maps from 0.6452 to 0.6446 (--tune --rolling).
  */
-export const CIRCUIT_LEVELS = false;
+export const CIRCUIT_LEVELS = true;
+/**
+ * The circuits' levels' own prior (circuitLevels `levelSpread`): a normal spread of 100 Elo around the players' mean, so a
+ * circuit whose links say little stays near it. Chosen on the held-out maps (all of them 0.6451 → 0.6446 against no prior).
+ */
+export const LEVEL_SPREAD = 100;
+/**
+ * A player who has played in no circuit's events (the off-season's invitationals and the world stage only: 3,955 of
+ * vlr.gg's 18,179, in a tenth of all maps) calls home the circuit most of his country's players call home (homesOf
+ * `byCountry`), so he starts at its level and not at 1500 (held out, the maps between circuits 0.6470 → 0.6441).
+ */
+export const HOMES_BY_COUNTRY = true;
 /** A rating point is 25 Elo points, as in Rocket League and tennis: rating = (Elo − ELO_BASE) / 25, rounded. */
 export const ELO_PER_POINT = 25;
 export const ELO_BASE = 50;

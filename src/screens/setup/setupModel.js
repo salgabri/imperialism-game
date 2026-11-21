@@ -6,12 +6,14 @@
 import { NATIONS, SCOPES, isTennisSport, nationIdentity } from '../../data/teams.js';
 import { CLUB_SCOPES, TOP_CLUBS, nationTheatre, nationTheatres, strongestClubs as topClubs } from '../../data/scopes.js';
 import { nationPriority } from '../../data/domesticTiers.js';
-import { clubMapOf, countryMapsOf, countryOfEntry, domesticEntry, domesticLabel, isDomesticScope, isTheatreMap, theatreMapsOf } from '../../data/domesticScope.js';
+import { clubMapOf, countryMapsOf, countryOfEntry, domesticEntry, domesticLabel, fullMapOf, isDomesticScope, isTheatreMap, theatreMapsOf } from '../../data/domesticScope.js';
+import { SPLIT_MIN_CLUBS } from '../../engine/clubSplit.js';
 import { CARD_LIST, cardOf, cardSports, getSport, matchSport } from '../../sports/index.js';
 import { builtInSeasonOf, fieldedNations, setHasLayer, setHasNations, setSportOf } from '../../engine/footballSets.js';
 import { domesticLands } from '../../engine/domestic.js';
 import { V4, ratingTierOf } from '../../theme.js';
 import { politicalFill } from '../../data/empireColours.js';
+import { clubRanks, empirePalette } from '../../engine/mapPalette.js';
 
 export const PACING_OPTIONS = [['duel', 'One by one'], ['blitz', 'Blitz round'], ['chaos', 'Chaos draw']];
 export const RESOLUTION_OPTIONS = [['ticker', 'Live ticker'], ['instant', 'Instant result']];
@@ -523,10 +525,13 @@ export function domesticDescription(entry) {
   const leaders = top.length > 1 ? `${top.slice(0, -1).join(', ')} and ${top.at(-1)} lead` : top.length ? `${top[0]} leads` : 'The strongest clubs lead';
   // Format-1 index entries have no `sections`: one section per club.
   const clubs = entry.clubs, sections = entry.sections ?? clubs;
+  // A league's clubs in its sport's word (college football's schools), once: rugby's league is named "European clubs".
+  const noun = (entry.sport && getSport(entry.sport).clubNoun) || 'clubs';
+  const leagueClubs = /\bclubs$/i.test(entry.league || '') ? `${clubs} ${entry.league}` : `${clubs} ${entry.league} ${noun}`;
   // A map of Europe: football's strongest clubs, women's football's every European club, or a league's (basketball's
   // EuroLeague, whose Dubai holds the Emirates).
   if (entry.theatre || entry.countries) {
-    const field = !entry.theatre ? `the ${clubs} ${entry.league} clubs`
+    const field = !entry.theatre ? `the ${leagueClubs}`
       : entry.theatre === 'all' && entry.sport !== 'football' ? `the ${clubs} European clubs EA rates` : `Europe's ${clubs} strongest clubs`;
     return `${leaders} ${field}, each on land in its own country: alone it holds all of it, and clubs that `
       + 'share a country split it along its regional borders. A country with no club stays grey.';
@@ -536,8 +541,13 @@ export function domesticDescription(entry) {
     const place = entry.lines || 'state or province';
     // "the USA and Canada", but "Australia and New Zealand".
     const land = /^(?:USA|United)\b/.test(entry.name) ? `the ${entry.name}` : entry.name;
-    return `${leaders} the ${clubs} ${entry.league} clubs fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${place}. `
-      + 'A state with several clubs is divided between them; one with none stays empty.';
+    return `${leaders} the ${leagueClubs} fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${place}. `
+      + `A state with several ${noun} is divided between them; one with none stays empty.`;
+  }
+  // A country map cut to fewer clubs (src/engine/clubSplit.js): its land shared out again, so the sections per club vary.
+  if (entry.cut) {
+    return `${leaders} the top ${clubs} of ${entry.name}'s ${entry.baseClubs} clubs fighting over its ${sections} sections drawn from its `
+      + `administrative divisions; each keeps its own land, and the land of the ${entry.baseClubs - clubs} left out is shared among them, nearest first.`;
   }
   const fewer = Math.floor(sections / clubs), more = Math.ceil(sections / clubs);
   const share = sections === clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
@@ -548,7 +558,8 @@ const countryPreviewCache = new WeakMap();
 /**
  * Step 1's static country card (the v4 form of the setup preview): a decoded country map's lands (engine/lands.js:
  * each club's starting sections as one piece, so no line runs between them), each in the pastel its starting club takes
- * at kick-off (`politicalFill(club.id)`, DEC D18), over the neighbouring land (`backdrop`: [{ id, d }], App's
+ * at kick-off (engine/mapPalette.js: its own colour unless that looks like a neighbour's, DEC D18), over the
+ * neighbouring land (`backdrop`: [{ id, d }], App's
  * `surroundings(map).shapes`). Framed on the map's opening focus, else on all sections, in the fitted 960×540 frame. A
  * land's `owner` is the club starting on it (null for none): a click on it previews that club. Pure; memoised per
  * decoded map, fitted paths and backdrop.
@@ -563,9 +574,12 @@ export function countryMapPreview(domestic, backdrop = null) {
   const starter = domestic.startOwners || Object.fromEntries((domestic.clubs || []).map(club => [club.homeSection, club.id]));
   const ids = Object.keys(domestic.sectionNames).filter(id => paths[id]?.d);
   if (!ids.length) return null;
-  // A land is named by its home section, which its club starts on.
+  // A land is named by its home section, which its club starts on; it takes the colour the campaign map gives it.
+  const clubs = Object.fromEntries((domestic.clubs || []).map(club => [club.id, club]));
+  const { political } = domestic.geo.adj ? empirePalette({ own: starter, adj: domestic.geo.adj, teams: clubs,
+    areaOf: id => domestic.geo.surfaceOf?.(id)?.area ?? 1, ranks: clubRanks(domestic.clubs) }) : { political: new Map() };
   const sections = domesticLands(domestic).map(({ id, d }) => Object.freeze({ id, d,
-    fill: starter[id] ? politicalFill(starter[id]) : V4.landNeutral, owner: starter[id] ?? null }));
+    fill: starter[id] ? political.get(starter[id]) || politicalFill(starter[id]) : V4.landNeutral, owner: starter[id] ?? null }));
   let box = domestic.focus && typeof domestic.geo.focusView === 'function' ? domestic.geo.focusView(domestic.focus) : null;
   if (!(box && box.w > 0 && box.h > 0)) {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -587,25 +601,26 @@ export function countryMapPreview(domestic, backdrop = null) {
 const theatrePreviewCache = new WeakMap();
 /**
  * Step 1's world card, the country card's counterpart for every world theatre: the opening board, each held
- * territory in its team's kick-off pastel (`politicalFill(teamId)`, DEC D18) over the land nobody holds. `countries` is the
+ * territory in its team's kick-off pastel (`palette`: the colours the campaign map gives that board, App's
+ * setupBoardPalette, so no two neighbours look alike; DEC D18) over the land nobody holds. `countries` is the
  * chart's draw order ([{ id }]); a shape comes from `paths` (the display atlas, as WorldMap draws it), else `basePaths`
  * (the topology), both fitted. `own` is territory → team at kick-off (overseas territory included): a section's `owner`,
  * the team a click on it previews. The card frames `focus` (a fitted { x, y, w, h }) when given, else the main polygons
  * of `frameIds`, the teams' starting land. Pure; memoised per opening board, paths and focus.
  * → { viewBox, teams, sections: [{ id, d, fill, owner }], backdrop: [{ id, d }] } | null
  */
-export function theatreMapPreview({ countries, paths = null, basePaths, own, frameIds = [], focus = null } = {}) {
+export function theatreMapPreview({ countries, paths = null, basePaths, palette = null, own, frameIds = [], focus = null } = {}) {
   if (!Array.isArray(countries) || !basePaths || !own) return null;
   const focusKey = focus ? [focus.x, focus.y, focus.w, focus.h].join(' ') : '';
   const hit = theatrePreviewCache.get(own);
-  if (hit && hit.countries === countries && hit.paths === paths && hit.basePaths === basePaths
+  if (hit && hit.countries === countries && hit.paths === paths && hit.basePaths === basePaths && hit.palette === palette
     && hit.frameIds === frameIds && hit.focusKey === focusKey) return hit.value;
   const pathOf = id => paths?.[id] || basePaths[id];
   const sections = [], backdrop = [];
   for (const { id } of countries) {
     const d = pathOf(id)?.d;
     if (!d) continue;
-    if (own[id]) sections.push(Object.freeze({ id, d, fill: politicalFill(own[id]), owner: own[id] }));
+    if (own[id]) sections.push(Object.freeze({ id, d, fill: palette?.political.get(own[id]) || politicalFill(own[id]), owner: own[id] }));
     else backdrop.push(Object.freeze({ id, d }));
   }
   if (!sections.length) return null;
@@ -623,7 +638,7 @@ export function theatreMapPreview({ countries, paths = null, basePaths, own, fra
   const viewBox = [box.x - pad, box.y - pad, box.w + pad * 2, box.h + pad * 2].map(n => Number(n.toFixed(1))).join(' ');
   const value = Object.freeze({ viewBox, teams: new Set(Object.values(own)).size,
     sections: Object.freeze(sections), backdrop: Object.freeze(backdrop) });
-  theatrePreviewCache.set(own, { countries, paths, basePaths, frameIds, focusKey, value });
+  theatrePreviewCache.set(own, { countries, paths, basePaths, palette, frameIds, focusKey, value });
   return value;
 }
 
@@ -753,8 +768,13 @@ function teamIdentity(sport, id, clubLayer) {
 
 const NO_ROWS = Object.freeze([]);
 // What step 1 shows for a chosen data set that has not loaded: no clubs counted, no matches or length estimated.
-const NO_CLUBS = Object.freeze({ clubs: NO_ROWS });
 const PENDING_PREVIEW = Object.freeze({ matches: '–', duration: '–' });
+/**
+ * The sport card's note while its chosen season loads: what the season fields, uncounted ("Nations", or for a season
+ * or sport with clubs only, "Clubs", college football's "Schools"), where `sportNote` counts the loaded season's clubs.
+ */
+const pendingNote = (sport, dataSet) => (sport.clubsOnly || (dataSet != null && !setHasNations(dataSet))
+  ? (sport.clubNoun ? sport.clubNoun[0].toUpperCase() + sport.clubNoun.slice(1) : 'Clubs') : 'Nations');
 
 /** Strongest first, then by name: the order of the Favourites list and the suggested team's tie-break. */
 const byRating = (a, b) => (b.rating ?? 0) - (a.rating ?? 0) || String(a.name).localeCompare(String(b.name));
@@ -806,6 +826,11 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const chosenScope = clubLayer ? setup.clubScope : pending ? setup.scope : nationTheatre(sport, setup.scope).id;
   const activeScope = scopes.find(scope => scope.id === chosenScope) || scopes[0];
   const scopeId = country ? setup.clubScope : activeScope.id;
+  // One country's own map (not a map of Europe or a league's): how many of its clubs play can be chosen, from two to all
+  // of them, the map cut for them (src/engine/clubSplit.js). The dropdown names the country by its full map.
+  const fullMap = country && !country.sport && !country.theatre && !country.league && !country.countries ? fullMapOf(country) : null;
+  const clubCount = fullMap && fullMap.clubs > SPLIT_MIN_CLUBS
+    ? { value: country.clubs, min: SPLIT_MIN_CLUBS, max: fullMap.clubs, cut: !!country.cut } : null;
   const scopeName = country ? domesticLabel(setup.clubScope) : activeScope.label;
   const count = country ? country.clubs : activeScope.count;
   const preview = pending ? PENDING_PREVIEW : campaignPreview(count, sport, setup);
@@ -893,7 +918,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     // The chosen set's card counts its own clubs.
     // One card per sport, but Rugby's two (`cardOf`): its note names both, whichever is set up.
     sports: CARD_LIST.map(item => ({ id: item.id, name: item.name,
-      note: item.id !== sport.id || cardSports(item.id).length > 1 ? SPORT_NOTES[item.id] : pending ? sportNote(NO_CLUBS)
+      note: item.id !== sport.id || cardSports(item.id).length > 1 ? SPORT_NOTES[item.id] : pending ? pendingNote(sport, dataSet)
         : sportNote(sport, { clubsOnly: dataSet != null && !setHasNations(dataSet) }),
       selected: item.id === cardOf(sportPick.id), busy: !!sportLoad && !sportFailed && item.id === cardOf(sportPick.id) })),
     // The card the cards show as picked (rugby league's is Rugby's), and the wait for a sport picked before its players
@@ -918,11 +943,15 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     scopes, scopeId, scopeName, scopeKey: clubLayer ? 'clubScope' : 'scope',
     theatreNotes: scopes.filter(scope => scope.note),
     domesticScopes, leagueGroup: LEAGUE_GROUP, domesticGroup: DOMESTIC_GROUP,
-    country: country ? { id: country.id, name: country.name, clubs: country.clubs, sections: country.sections ?? country.clubs, countries: country.countries ?? null } : null,
+    // The chosen country's full map, as the dropdown lists it ('domestic:724' for Spain cut to 20 clubs), and the number
+    // of its clubs that play (null for any other theatre).
+    countryScopeId: fullMap ? `domestic:${fullMap.id}` : null, clubCount,
+    country: country ? { id: country.id, name: country.name, clubs: country.clubs, sections: country.sections ?? country.clubs, countries: country.countries ?? null,
+      cut: country.cut ?? null } : null,
     // A basketball season's own strongest clubs lead its map, named once it has loaded. A season's map with only some of
     // its clubs (women's football's: Europe's, the NWSL's) names its own, and an earlier season's country map those its
     // decoded map holds (App's domesticStatus `top`).
-    countryNote: !country ? '' : domesticDescription(country.season ? { ...country, top: ctx.domestic?.top ?? [] }
+    countryNote: !country ? '' : domesticDescription(country.season || country.cut ? { ...country, top: ctx.domestic?.top ?? [] }
       : dataSet == null || (country.top && country.seasons?.includes(dataSet)) ? country
         : { ...country, top: pending ? [] : strongestClubs(sport, country) }),
     countryState, countryMessage: countryState === 'error' ? (ctx.domestic?.message || mapFailed) : '',

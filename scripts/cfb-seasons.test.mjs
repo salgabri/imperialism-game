@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 import {
   boxOf, DEPTH, FIRST_SEASON, fitWeights, participantsOf, PARTICIPANTS_FROM, pooledWindow, positionOf, POSITIONS, rateSeason, rawSignals,
   cleanName, plain, rebuiltRoster, recruitsOf, regimeOf, repairedClasses, ROSTERS_FROM, scheduleOf, seasonPlayers, shrinkSignals, SIGNALS, standardise,
+  CONFERENCE_DRIFT, looseConferences, srsHoldingLooseConferences, srsWithPriors,
 } from './lib/cfb-history.mjs';
 import { ratingsOf, spearman, srsOf } from './lib/computed-ratings.mjs';
 import { FORMATION, shortOf, squadOf } from './lib/nfl.mjs';
@@ -326,11 +327,21 @@ test('every snapshot\'s squads are the game\'s lineup and backups of its rated p
   }
 });
 
+/** A snapshot's games as srsOf reads them, and each of its schools' conference that season. */
+const gamesOf = s => s.games.map(([home, away, homeScore, awayScore, neutral]) => ({ home, away, homeScore, awayScore, neutral: !!neutral }));
+const conferenceOf = s => school => s.schools[school]?.conference;
+
 test('every school moves toward its results: the SRS recomputed from the snapshot\'s games, each within reach of its target', () => {
   for (const year of SEASONS) {
     const s = snapshotOf(year);
-    const games = s.games.map(([home, away, homeScore, awayScore, neutral]) => ({ home, away, homeScore, awayScore, neutral: !!neutral }));
-    const srs = srsOf(games);
+    const games = gamesOf(s);
+    // A season whose games leave conferences loose (2020) holds their levels toward the seasons either side; every other
+    // season's SRS is the games' alone.
+    const loose = looseConferences(games, conferenceOf(s));
+    const srs = loose.length
+      ? srsHoldingLooseConferences(games, conferenceOf(s), [year - 1, year + 1].map(y => ({ games: gamesOf(snapshotOf(y)), conferenceOf: conferenceOf(snapshotOf(y)) }))).srs
+      : srsOf(games);
+    assert.deepEqual(Object.keys(s.conversion.move.srs.loose ?? {}), loose.map(entry => entry.conference), `${year}'s loose conferences`);
     assert.equal(Math.round(srs.reliability * 1000) / 1000, s.conversion.move.srs.reliability, `${year}'s reliability`);
     const scale = Math.sqrt(srs.reliability) / s.conversion.move.perPoint;
     for (const [school, m] of Object.entries(s.moves)) {
@@ -342,6 +353,68 @@ test('every school moves toward its results: the SRS recomputed from the snapsho
     const after = Object.keys(s.moves);
     assert.ok(spearman(after.map(id => s.moves[id].after), after.map(id => s.moves[id].srs)) > 0.99, `${year}: played strength follows the SRS`);
   }
+});
+
+test('the SRS with priors is srsOf without them, and a prior holds a loosely linked group\'s level', () => {
+  // Every season's games: the same ratings, edge, sigma and reliability as srsOf's.
+  for (const year of [2004, 2013, 2020, 2025]) {
+    const games = gamesOf(snapshotOf(year)), a = srsOf(games), b = srsWithPriors(games);
+    assert.deepEqual([b.ratings, b.homeEdge, b.sigma, b.reliability], [a.ratings, a.homeEdge, a.sigma, a.reliability]);
+  }
+  // Two groups that met once: alone, the one game places them; a prior as precise as 50 games holds the second group's
+  // level near its own, and its standard error falls with it.
+  const games = [['a', 'b', 10, 0], ['b', 'a', 3, 7], ['c', 'd', 14, 7], ['d', 'c', 0, 7], ['a', 'c', 0, 30]]
+    .map(([home, away, homeScore, awayScore]) => ({ home, away, homeScore, awayScore, neutral: true }));
+  const alone = srsWithPriors(games), held = srsWithPriors(games, [{ members: ['c', 'd'], level: -5, weight: 50 }], { sigma2: alone.sigma ** 2 });
+  assert.ok(alone.levelOf(['c', 'd']).level > 5 && Math.abs(held.levelOf(['c', 'd']).level + 5) < 1.5, JSON.stringify(held.levelOf(['c', 'd'])));
+  assert.ok(held.levelOf(['c', 'd']).se < alone.levelOf(['c', 'd']).se);
+  // The ratings still sum to nought.
+  assert.ok(Math.abs(Object.values(held.ratings).reduce((t, r) => t + r, 0)) < 1e-9);
+});
+
+test('a conference the season\'s games leave loose is held toward the seasons either side: 2020 alone, the MAC back among the weakest', () => {
+  // Only 2020's conferences met the others fewer times than they have schools: the SEC, the Big Ten and the MAC played
+  // their conferences alone until the bowls, the Pac-12 met others three times and the Mountain West eight.
+  for (const year of SEASONS) {
+    const s = snapshotOf(year);
+    assert.deepEqual(looseConferences(gamesOf(s), conferenceOf(s)).map(entry => [entry.conference, entry.games]),
+      year === 2020 ? [['Big Ten', 5], ['MAC', 2], ['Mountain West', 8], ['Pac-12', 3], ['SEC', 9]] : [], `${year}`);
+  }
+  // CONFERENCE_DRIFT measured again from the snapshots' games: how far a conference's level strays from the mean of the
+  // seasons either side, less what the levels' own errors explain, over every conference-season with both neighbours
+  // (2019 to 2021 left out).
+  const levels = Object.fromEntries(SEASONS.map(year => {
+    const s = snapshotOf(year), fit = srsWithPriors(gamesOf(s)), by = {};
+    for (const school of Object.keys(fit.ratings)) {
+      const c = s.schools[school]?.conference;
+      if (c && c !== 'Independent') (by[c] ??= []).push(school);
+    }
+    return [year, Object.fromEntries(Object.entries(by).map(([c, members]) => [c, fit.levelOf(members)]))];
+  }));
+  let n = 0, square = 0, noise = 0;
+  for (const year of SEASONS) {
+    if ([year - 1, year, year + 1].includes(2020) || !levels[year - 1] || !levels[year + 1]) continue;
+    for (const [c, own] of Object.entries(levels[year])) {
+      const before = levels[year - 1][c], after = levels[year + 1][c];
+      if (!before || !after) continue;
+      n++;
+      square += (own.level - (before.level + after.level) / 2) ** 2;
+      noise += own.se ** 2 + (before.se ** 2 + after.se ** 2) / 4;
+    }
+  }
+  assert.equal(n, 173);
+  assert.ok(Math.abs((square - noise) / n - CONFERENCE_DRIFT) < 0.05, `δ² ${(square - noise) / n}`);
+  // 2020: the MAC met the rest of the FBS twice, two bowls it won. Alone its level read +3.1 ± 10.7, above the FBS's mean;
+  // held toward 2019's and 2021's (−12.6), it is −12.0 ± 2.1, as in every other season (−7.5 to −15.1). Its champion,
+  // Ball State (7–1), no longer plays above Texas A&M (9–1) and Oklahoma State (8–3).
+  const loose = snapshotOf(2020).conversion.move.srs.loose;
+  assert.ok(loose.MAC.alone.level > 0 && loose.MAC.alone.se > 10 && loose.MAC.held.level < -10 && loose.MAC.held.se < 2.5, JSON.stringify(loose.MAC));
+  for (const entry of Object.values(loose)) assert.ok(entry.held.se < entry.alone.se && entry.held.se < 2.5, JSON.stringify(entry));
+  const after = id => snapshotOf(2020).moves[`cfb-${id}`].after;
+  assert.ok(after('ball-state') < after('texas-am') && after('buffalo') < after('oklahoma-state'));
+  const mac = Object.entries(snapshotOf(2020).moves).filter(([id]) => snapshotOf(2020).schools[id].conference === 'MAC').map(([, m]) => m.after);
+  const all = Object.values(snapshotOf(2020).moves).map(m => m.after);
+  assert.ok(mac.reduce((t, x) => t + x, 0) / mac.length < all.reduce((t, x) => t + x, 0) / all.length - 1.5);
 });
 
 // Each season's national champion (the BCS's to 2013, the College Football Playoff's since; USC's of 2004 later vacated).

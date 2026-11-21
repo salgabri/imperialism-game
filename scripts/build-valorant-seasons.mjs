@@ -51,7 +51,8 @@ function buildSeason(snapshot) {
   const source = {
     edition: EDITION, name: 'vlr.gg', snapshotDate: snapshot.date, retrieved: snapshot.fetched, url: SITE_URL, rawScale: 'Elo',
     computed: true, method: `the Elo of every map of vlr.gg's VCT, Challengers and off-season events from ${snapshot.from} to the end`
-      + ` of ${year} (docs/design/valorant.md, "Earlier seasons")`, rated: snapshot.rated,
+      + ` of ${year}, each newcomer starting at his home circuit's level as the maps to then set it (docs/design/valorant.md,`
+      + ` "Earlier seasons" and "Circuits on one scale")`, rated: snapshot.rated,
   };
   const doc = {
     format: 1, kind: 'val', id: `val-${year}`, version: '', year, season: String(year), label, local: false, source,
@@ -107,10 +108,10 @@ function attributionText(docs) {
 =================================================
 
 The ratings in these files are computed by this project from the match results vlr.gg records (${SITE_URL}): an Elo of
-every player, built map by map from every map of its VCT, Challengers and off-season events from September 2022, as it
-stood on the last day of each year; each player's country is the one the whole record gives him (his Esports Nations
-Cup team, else the flag vlr.gg files him under). vlr.gg publishes no ratings: these are not its numbers. See
-docs/design/valorant.md, "Earlier seasons".
+every player, built map by map from every map of its VCT, Challengers and off-season events from September 2022, each
+newcomer starting at his home circuit's level, as it stood on the last day of each year; each player's country is the
+one the whole record gives him (his Esports Nations Cup team, else the flag vlr.gg files him under). vlr.gg publishes no
+ratings: these are not its numbers. See docs/design/valorant.md, "Earlier seasons".
 
 Credit: vlr.gg (${SITE_URL}); each player's source links his page there.
 `;

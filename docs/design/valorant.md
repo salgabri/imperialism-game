@@ -64,39 +64,128 @@ League of Legends) plays them:
 - **Circuits.** A circuit is a franchised league's VCT region ("VCT EMEA": its Kickoff and Stages), a Challengers league's
   subregion ("Challengers Japan", "Challengers Türkiye"), or an EMEA- or Pacific-wide Challengers stage as that region's;
   China's Evolution Series is China's second tier, and the international events (Masters, Champions, the off-season) and
-  Ascension belong to none. A player's home circuit is the one he has played most maps in. League of Legends starts each
-  newcomer at his home circuit's level, fitted at once with every player's strength (`circuitLevels`;
-  docs/design/league-of-legends.md, "Ratings"), because its leagues meet too seldom for Elo to place them. Valorant's do
-  meet: the VCT's teams play the Challengers' at the off-season's events, and a promoted team plays a VCT season on its
-  Challengers ratings. Elo places them itself, and a newcomer starting at 1500 predicts the held-out maps better than the
-  levels at every K (below), so `CIRCUIT_LEVELS` is off.
+  Ascension belong to none. A player's home circuit is the one he has played most maps in; one who has played in no
+  circuit's events (3,955 of the 18,179 players, most of them only at the off-season's invitationals) calls home the
+  circuit most of his country's players call home (`homesOf`, `byCountry`). Since 2026-11-21 a newcomer starts at his home
+  circuit's level, as in League of Legends (`circuitLevels`; docs/design/league-of-legends.md, "Ratings"), the levels held
+  by a normal prior of 100 Elo around the players' mean (`LEVEL_SPREAD`). Before, every newcomer started at 1500, and each
+  circuit's players stayed around 1500 whatever its strength (below, "Circuits on one scale").
 
-K was tuned on the last 180 days' maps, from 19 May 2026 (3,836 of them), each scored before it was played (`--tune`, the
-levels fitted on the maps before):
+K was tuned on the last 180 days' maps, from 19 May 2026 (3,836 of them, 797 between two circuits' sides), each scored
+before it was played (`--tune`, the levels fitted on the maps before):
 
-| K_SCALE | log loss | with the circuits' levels |
-| ---: | ---: | ---: |
-| 80 | 0.6539 | 0.6582 |
-| 120 | 0.6465 | 0.6503 |
-| 160 | 0.6419 | 0.6454 |
-| 200 | 0.6393 | 0.6425 |
-| 240 | **0.6379** | 0.6410 |
-| 320 | 0.6379 | 0.6408 |
-| 400 | 0.6406 | 0.6432 |
+| K_SCALE | log loss | with the circuits' levels | maps between circuits | between, with the levels |
+| ---: | ---: | ---: | ---: | ---: |
+| 80 | 0.6539 | 0.6539 | 0.6533 | 0.6411 |
+| 120 | 0.6465 | 0.6460 | 0.6500 | 0.6385 |
+| 160 | 0.6419 | 0.6414 | 0.6495 | 0.6391 |
+| 200 | 0.6393 | 0.6388 | 0.6506 | 0.6413 |
+| 240 | 0.6379 | **0.6376** | 0.6527 | 0.6443 |
+| 320 | 0.6379 | 0.6379 | 0.6584 | 0.6516 |
+| 400 | 0.6406 | 0.6407 | 0.6653 | 0.6598 |
 
-K_SCALE is 240. The two tiers looked uneven before the holdout: in their 2,057 meetings the VCT's sides beat the
-Challengers' more often than Elo expected, worth an offset of 80 Elo fitted on them. Over the held-out half-year, though,
-the VCT's sides won 271 of their 526 meetings against 284.4 expected, and that offset made those meetings' log loss worse
-(0.6825 → 0.7180): the players just up from Challengers (100 Thieves' Timotino and vora, LEVIATÁN's Neon) beat their Elo
-rather than fall short of it. So no offset between the tiers is kept. The held-out log loss is 0.6379 (Brier 0.2240), and
-Elo's odds hold by tenths: favourites at 0.55 won 0.53 of 884 maps, at 0.65 0.66 of 688, at 0.75 0.73 of 373 and at
-0.84 0.84 of 159.
+K_SCALE stays 240, the best over all the maps with the levels or without. The held-out log loss is 0.6376 with the levels
+fitted on the maps before the holdout (0.6352 with the whole record's, as the snapshot keeps it), and Elo's odds hold by
+tenths: favourites at 0.55 won 0.53 of 870 maps, at 0.65 0.66 of 689, at 0.75 0.71 of 384 and at 0.84 0.85 of 175.
 
 A player is rated once he has 20 maps behind him and has played within a year of the last map: 2,437 of the 18,179
 players vlr.gg's maps name. On the game's scale a rating is Elo / 25 − 2, so a rating point is 25 Elo points, as in
-Rocket League and tennis, and the match model plays Elo's own odds. The best are Team Heretics' RieNs (96), Team
-Vitality's PROFEK (93), LEVIATÁN's Neon and 100 Thieves' Timotino (91), then G2's jawgemo, 100 Thieves' vora, M80's Kyu
-and S8UL's SkRossi (90).
+Rocket League and tennis, and the match model plays Elo's own odds. The best are Team Heretics' RieNs (97), M80's Kyu
+(95), 100 Thieves' Timotino and vora and G2's jawgemo (94), then Team Vitality's PROFEK, LOUD's erde and LEVIATÁN's Neon
+(93).
+
+### Circuits on one scale
+
+Checked and fixed on 2026-11-21, at the user's request that a nation's rating not stand high only because its players
+dominate a weaker circuit. Every figure here is one map scored before it was played; a circuit's offset is the Elo its
+sides' edge needed in the maps against other circuits' sides to make their expected wins their wins (maximum
+likelihood, its error clustered by series), 25 Elo a rating point. A side's circuit is the home (counted over the maps
+before) of three of its five; a map is between circuits when its two sides' differ, and seasoned when each of the ten had
+20 maps behind him, as every rated player has. `npm run sync:valorant -- --tune --rolling` prints the held-out figures.
+
+**Before: every newcomer at 1500.** Over the 3,456 seasoned maps between circuits from 2023 to November 2026:
+
+- The VCT's sides beat the Challengers' more often than Elo expected in each year: +137 ± 52 Elo in 2023, +54 ± 22 in
+  2024, +68 ± 21 in 2025, +44 ± 20 in 2026, +59 ± 12 in all (1,093 maps), in the VCT leagues against the promoted teams
+  (+56 ± 16) and at the off-season's events (+76 ± 23) alike.
+- Each region's Challengers stood too high against the circuits they met: EMEA's −86 ± 24, the Pacific's −65 ± 22, the
+  Americas' −44 ± 19.
+- The weakest circuits most of all: South Asia −193 ± 56, Oceania −179 ± 64, MENA −144 ± 38, LATAM −140 ± 42, Portugal
+  −131 ± 40, Vietnam −105 ± 48. India's sides −216 ± 69 (8.6 rating points), Australia's −174 ± 67, Portugal's
+  −136 ± 40; South Korea's +49 ± 18, Turkey's +44 ± 17, the United States' +41 ± 17.
+- The regions against each other (Masters, Champions, the off-season's international events) stood within their errors
+  (China −41 ± 26, EMEA −16 ± 21, the Pacific +9 ± 18, the Americas +25 ± 19), and so did Indonesia's sides (+2 ± 25),
+  Japan's (−16 ± 28), the Philippines' (+11 ± 28), Thailand's (+18 ± 23) and France's (+4 ± 32).
+
+**The fix.** A newcomer starts at his home circuit's level, fitted at once with every player's strength, as League of
+Legends' are; the levels get a prior of their own (100 Elo); a player of no circuit takes his country's usual home
+(without it the players met only at the off-season's invitationals, in a tenth of all maps, came in at 1500 whatever their
+circuit). It was judged on each half-year from July 2024 (cut-offs 1 July 2024, 1 January and 1 July 2025, 1 January and
+19 May 2026), the levels fitted on the maps before each:
+
+| Held-out log loss | all (25,230) | between circuits (3,691) | within (21,539) | between, seasoned (2,793) | within, seasoned (8,877) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Every newcomer at 1500 | 0.6452 | 0.6525 | 0.6440 | 0.6660 | 0.6666 |
+| League of Legends' levels as they were | 0.6455 | 0.6471 | 0.6453 | 0.6604 | 0.6664 |
+| With the levels' prior | 0.6452 | 0.6470 | 0.6449 | 0.6604 | 0.6663 |
+| And homes by country (shipped) | **0.6446** | **0.6441** | 0.6447 | **0.6570** | **0.6656** |
+
+The maps within a circuit between seasoned players are better predicted too; the within column's small loss (0.6440 →
+0.6447) is all in maps with a player of fewer than 20 maps, most of it November 2026's Türkiye Kickoff qualifier and the
+North American Challengers' third stage of 2024, college teams among them, whose amateurs now start at a strong
+circuit's level. K stays 240 (200 and 320 do worse with the levels). Tried and dropped, on the same windows: a looser
+prior on the players' own offsets (400: between 0.6455, but VCT EMEA's level then fell below Challengers France's); with
+homes by country, the levels' prior at 75, 150, 200 or none and a players' prior of 250 (between 0.6436–0.6445, all maps
+0.6445–0.6451, as good as the shipped within their noise); starts chosen so that each circuit's sides come out right
+(between 0.6455, within 0.6468); levels moved by every map between circuits (between 0.6476–0.6503, within
+0.6441–0.6564); offsets added after the Elo (within, seasoned, 0.6670 or worse); and newcomers' maps moving their rivals
+less (within 0.6493 or worse).
+
+**After.** Held out, between seasoned sides, the half-years together (before → after):
+
+- The tiers: the VCT's +49 ± 14 → +24 ± 14 (849 maps), no longer beyond its error. No region's tier is: EMEA's
+  Challengers −67 ± 27 → −41 ± 27, the Americas' −49 ± 21 → −36 ± 21, the Pacific's −43 ± 23 → −10 ± 23.
+- Circuits beyond two errors: 8 of 26 → 4 (the sum of their (offset / error)² 73.6 → 40.8). Left: Oceania −197 ± 69 →
+  −183 ± 67, South Asia −200 ± 66 → −163 ± 65, Vietnam −156 ± 54 → −120 ± 57, MENA −130 ± 41 → −92 ± 40.
+- Nations: India −241 ± 89 → −216 ± 88 (28 maps), Australia −193 ± 73 → −181 ± 71 (30), South Korea +56 ± 21 →
+  +50 ± 20, the United States +34 ± 20 → +11 ± 20, Turkey +38 ± 19 → +22 ± 19, Brazil −40 ± 31 → −11 ± 30; Indonesia
+  −10 ± 26, Japan +25 ± 28, the Philippines −14 ± 31, Thailand +13 ± 24, France +8 ± 35, Germany −64 ± 48.
+
+The levels the built-in season starts newcomers at put the VCT on top: VCT Americas 1812, VCT EMEA 1803, VCT Pacific 1781,
+VCT China 1664, then Challengers North America 1645, Türkiye 1609 and Korea 1578, France 1562, Brazil 1526, Indonesia
+1491, Thailand 1478, the Philippines 1456, Japan 1395, South Asia 1375 and Vietnam 1306. At the end of 2024, the example
+that prompted the check, Indonesia went from 82.8 to 81.6 (third to fifth), Japan from 82.2 to 80.6, the Philippines from
+80.6 to 78.6, Thailand from 79.0 to 78.8 and India from 77.6 to 75.4 (thirteenth to twenty-first), while France went from
+75.4 to 76.6 and Germany from 76.6 to 78.2; the United States (86.2), South Korea (85.0) and Turkey (84.8) lead. Indonesia
+and Japan stay above France and Germany: their sides' results against other circuits are what their ratings say (above),
+and the two regions' Challengers meet only through the VCT, where the Pacific's come out no further above their results
+than EMEA's (−10 ± 23 against −41 ± 27).
+
+What the levels leave: the small, weak circuits' best sides (South Asia, Oceania, Vietnam, MENA) still lose to other
+circuits' more than their Elo says, four to seven rating points' worth on 35–103 maps each. A newcomer's start anchors a
+circuit as a whole, not the distance between its few strong teams and the rest of it.
+
+**The circuits' offsets: tested, not adopted.** Tested the same day at the coordinator's request, on the setting above:
+after the Elo, each player's Elo gets his home circuit's offset, fitted only on the maps between circuits (maximum
+likelihood, a normal prior on each offset), refitted before each cut-off and held through the half-year. The rule, fixed
+before the run and read as the other esports' audits read it: adopt if (1) the maps between circuits are better
+predicted, all and seasoned; (2) the maps within a circuit between seasoned players are worse by no more than the paired
+change's error (by series, a thousand resamples); (3) no region's tier ends beyond two errors the other way.
+
+| Held-out log loss | all (25,230) | between circuits (3,691) | within (21,539) | between, seasoned (2,793) | within, seasoned (8,877) |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| The levels (shipped) | **0.6446** | 0.6441 | **0.6447** | 0.6570 | **0.6656** |
+| Offsets, prior 25 | 0.6449 | 0.6431 | 0.6452 | 0.6559 | 0.6662 |
+| Offsets, prior 50 | 0.6456 | 0.6428 | 0.6461 | 0.6556 | 0.6674 |
+| Offsets, prior 75 | 0.6464 | 0.6432 | 0.6469 | 0.6562 | 0.6684 |
+| Offsets, prior 100 | 0.6470 | 0.6439 | 0.6475 | 0.6571 | 0.6690 |
+
+The best of them, a prior of 50, gains only −0.0013 ± 0.0013 between circuits (−0.0014 ± 0.0015 between seasoned sides)
+and costs the seasoned maps within a circuit +0.0019 ± 0.0005, a real worsening; a prior of 25 costs them
++0.0007 ± 0.0002 for −0.0010 between; 100 does not help the seasoned maps between circuits, and an empirical-Bayes prior
+shrank every offset to nothing (the free offsets spread no wider than their errors). All of them predict all the maps worse (0.6446 →
+0.6449–0.6470). So no snapshot carries offsets. They would have shrunk the gaps below a little (prior 50: South Asia −163
+→ −146, Oceania −183 → −139, MENA −92 → −42); `npm run sync:valorant -- --tune --rolling` prints the comparison.
 
 ## Nations
 
@@ -107,11 +196,13 @@ Britain plays as one, as in Rocket League and tennis. A gamer tag that is an ins
 reads "bitch, you'd better be ready" in Chinese) plays for nobody, so the game never shows it (`isOffensiveName`).
 
 Each nation names its seven best; it needs five for a team, so a nation with fewer fields none and its land stays
-neutral. 63 nations field a team. Turkey leads (88.2: RieNs, NAVI's Ruxic and the best of Challengers Türkiye), then
-Canada (87.8: Timotino, vora, Kyu), South Korea (86.2), Russia (83.6), the Philippines (83.4) and Japan (83.0); the
-United States and Brazil are ninth and tenth (81.6), their strength spread over many teams. The weakest are Jordan
-(62.0), Greece and Austria (61.4), Kuwait and Switzerland (60.2). Every theatre has its four real sides: the world,
-Europe, South America, Africa, Asia, North and Central America, and the Elite 32.
+neutral. 63 nations field a team. Canada leads (91.6: Kyu, Timotino, vora, zander), then Turkey (90.6: RieNs, LewN,
+Ruxic), South Korea (89.0), Russia (88.0), the United States (86.4) and Brazil (85.6); the Philippines are eighth (83.4),
+Indonesia fourteenth (81.8), Japan eighteenth (80.0) and France twenty-seventh (76.2). Before the circuits' levels
+(2026-11-21) Turkey led (88.2) ahead of Canada (87.8), and the Philippines (83.4) and Japan (83.0) stood fifth and sixth
+above the United States and Brazil (81.6); the United States, Brazil, Russia and China gained four to five points, Japan
+and India lost three. The weakest are Greece (61.8), Jordan (61.0) and Kuwait (58.4). Every theatre has its four real
+sides: the world, Europe, South America, Africa, Asia, North and Central America, and the Elite 32.
 
 ## The match
 
@@ -156,13 +247,16 @@ of maps to overtime (11.3%). Among the sixteen strongest nations (`npm run simul
 Match-day form (`FORM_AT_BALANCED`) was fitted by maximum likelihood on the 3,388 real best-of-threes between seasoned
 players, each at its favourite's odds a map: the favourite won 63.5% of them, no more often than a single map (63.9%), as
 in Counter-Strike. The likeliest spread is 6.5 rating points (162 Elo) at Balanced, the favourite then winning 65.4%. The
-sixteen strongest nations' series end 2–0 58.8% of the time (58.9% of the real best-of-threes) and 2–1 41.2% (41.1%).
+sixteen strongest nations' series end 2–0 58.8% of the time (58.9% of the real best-of-threes) and 2–1 41.2% (41.1%). With
+the circuits' levels (2026-11-21) the same series' favourites won 63.9% at 64.3% a map, so the fit stands.
 
 **Home advantage.** In the 1,607 maps of the LANs where one side was the host nation's, that side did 22.8 ± 8.6 Elo better
 than Elo expected: the only esport so far whose host nations show an edge beyond its error (Rocket League's +11.8 ± 7.6,
 Counter-Strike's −5.2 ± 5.5). So Valorant offers the campaign's Home advantage rule, a rating point (25 Elo, `HOME_EDGE`):
 at home an equal side wins 55% of its best-of-threes, within the real LANs' 51.2–58.6% (the edge two errors each way), and
-among the sixteen strongest nations the hosts win 53.3% of their series (49.6% at a neutral venue). Computer signings is
+among the sixteen strongest nations the hosts win 53.3% of their series (49.6% at a neutral venue). With the circuits'
+levels (2026-11-21) the hosts' edge is 15.3 ± 8.5 Elo, part of the old figure having been their region's: the real LANs'
+range is 49.6–56.9%, and `HOME_EDGE`'s 55% still lies inside it, so it stays. Computer signings is
 not offered: any player plays any place, so the best-rated player is always the one who most
 improves a lineup.
 
@@ -178,12 +272,15 @@ qualifiers, so 2023 is the first whole year and the first season.
 
 | Season | Rated | Nations | Strongest | Real maps | Rounds a map | Overtime | Map pool |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2023 | 1,810 | 48 | United States 82.8, Turkey 79.6, Canada 79.4 | 2,397 | 21.29 | 11.9% | Haven, Ascent, Lotus, Bind, Split, Sunset, Breeze |
-| 2024 | 2,437 | 60 | South Korea 84.4, Turkey 83.6, Indonesia 82.8 | 4,786 | 21.15 | 11.5% | Haven, Bind, Sunset, Ascent, Abyss, Pearl, Split |
-| 2025 | 2,277 | 61 | Turkey 88.2, South Korea 85.2, Canada 84.4 | 4,994 | 21.15 | 11.3% | Haven, Split, Bind, Sunset, Abyss, Pearl, Corrode |
+| 2023 | 1,810 | 48 | United States 86.4, Canada 81.6, Turkey 81.0 | 2,397 | 21.29 | 11.9% | Haven, Ascent, Lotus, Bind, Split, Sunset, Breeze |
+| 2024 | 2,437 | 60 | United States 86.2, South Korea 85.0, Turkey 84.8 | 4,786 | 21.15 | 11.5% | Haven, Bind, Sunset, Ascent, Abyss, Pearl, Split |
+| 2025 | 2,277 | 61 | Turkey 90.0, Canada 88.6, South Korea 88.4 | 4,994 | 21.15 | 11.3% | Haven, Split, Bind, Sunset, Abyss, Pearl, Corrode |
 
-2023's United States are The Guard's neT and Evil Geniuses' Demon1, the year EG won Champions; 2024's South Korea leads
-behind Gen.G's Lakia.
+2023's United States are The Guard's neT and Evil Geniuses' Demon1, the year EG won Champions; 2024's are M80's neT,
+RANKERS' canezerra and NRG's Verno, and South Korea's best that year is Gen.G's Lakia. Each season fits its circuits'
+levels on the maps up to its 31 December, as the built-in season does on all of them; before 2026-11-21 the seasons'
+strongest were the United States (82.8), Turkey and Canada in 2023, South Korea (84.4), Turkey and Indonesia (82.8) in
+2024, and Turkey (88.2), South Korea and Canada in 2025.
 
 **Each year's maps.** A season plays its series on its December's pool: the seven maps played most in the year's last
 thousand on vlr.gg, which hold exactly seven each year (an eighth, Lotus, appears once in 2025's). Maps come and go:
@@ -207,3 +304,7 @@ for byte.
   not draw, and those vlr.gg files under no country; 55 more are from a nation with fewer than five.
 - vlr.gg's events before VCT 2023 are not read (the cache begins with 2023's first Challengers qualifiers, in September
   2022), so the earliest season is the end of 2023.
+- The small, weak circuits' best sides still stand above their results against other circuits (held out: South Asia
+  −163 ± 65 Elo, Oceania −183 ± 67, Vietnam −120 ± 57, MENA −92 ± 40; India's and Australia's sides −216 ± 88 and
+  −181 ± 71 on 28 and 30 maps), and South Korea's below theirs (+50 ± 20). Offsets added after the Elo were tested and not
+  adopted: above, "Circuits on one scale".

@@ -106,20 +106,40 @@ export function runElo(series, { scale, starts = {}, homes = null, start = START
 
 /**
  * Each player's home circuit over the games before `until` (all of them when null): the circuit whose events he has played
- * most games in (homeOf), for those who have played in any. → Map(key → circuit)
+ * most games in (homeOf), for those who have played in any. `byCountry`: a player who has played in none (the world
+ * stage, invitationals) calls home the circuit most of his country's players call home, his country the flag his games
+ * give most; one with no flag, or of a country no one else's home gives, has none. → Map(key → circuit)
  */
-export function homesOf(series, { until = null } = {}) {
+export function homesOf(series, { until = null, byCountry = false } = {}) {
   const counts = new Map();
+  const flags = new Map();
   for (const one of series) {
     if (until && one.date >= until) break;
-    if (!one.circuit) continue;
     for (const game of one.games) for (const side of game.sides) for (const entry of side) {
+      if (byCountry && entry.flag) {
+        if (!flags.has(entry.key)) flags.set(entry.key, new Map());
+        flags.get(entry.key).set(entry.flag, (flags.get(entry.key).get(entry.flag) ?? 0) + 1);
+      }
+      if (!one.circuit) continue;
       if (!counts.has(entry.key)) counts.set(entry.key, new Map());
       const played = counts.get(entry.key);
       played.set(one.circuit, (played.get(one.circuit) ?? 0) + 1);
     }
   }
-  return new Map([...counts].map(([key, played]) => [key, mostOf(played)]));
+  const homes = new Map([...counts].map(([key, played]) => [key, mostOf(played)]));
+  if (!byCountry) return homes;
+  const byFlag = new Map();
+  for (const [key, home] of homes) {
+    const flag = mostOf(flags.get(key));
+    if (!flag) continue;
+    if (!byFlag.has(flag)) byFlag.set(flag, new Map());
+    byFlag.get(flag).set(home, (byFlag.get(flag).get(home) ?? 0) + 1);
+  }
+  for (const [key, played] of flags) {
+    const home = homes.has(key) ? null : mostOf(byFlag.get(mostOf(played)));
+    if (home) homes.set(key, home);
+  }
+  return homes;
 }
 
 /**
@@ -127,14 +147,17 @@ export function homesOf(series, { until = null } = {}) {
  * before `until` (all of them when null). A player plays at his home circuit's level (homeOf: where he has played most)
  * plus his own offset, which a normal prior of spread `tau` keeps near 0 where his games say little; a side plays at its
  * players' mean, and wins with Elo's odds of the two sides' difference. Gradient ascent on that likelihood (Adam, steps of
- * about `rate` points, `iterations` of them), the levels centred so that the players' mean is `start`.
+ * about `rate` points, `iterations` of them), the levels centred so that the players' mean is `start`. `levelSpread`, when
+ * finite, is a normal prior on the levels themselves: a circuit whose links say little stays near the players' mean
+ * instead of going as far as its few games allow (Valorant's 100, League of Legends' 500). `homes` (homesOf, byCountry)
+ * gives the home of a player who has played in no circuit's events, who otherwise plays at no circuit's level.
  *
  * Circuits meet at the international events and wherever a player of one plays in another's (a call-up, a move, a promoted
  * team), too rarely for Elo alone to bring a whole circuit to its level: Elo leaves each circuit's players around its own
  * newcomers' start. Fitted at once, every such link counts, each in proportion to what it says: a circuit is not lifted by
  * beating weaker circuits more than Elo expected when the circuits above it beat it as often as they should.
  */
-export function circuitLevels(series, { until = null, tau = 150, iterations = 600, rate = 4, start = START } = {}) {
+export function circuitLevels(series, { until = null, tau = 150, levelSpread = Infinity, homes = null, iterations = 600, rate = 4, start = START } = {}) {
   const index = new Map();
   const counts = [];
   const games = [];
@@ -155,8 +178,9 @@ export function circuitLevels(series, { until = null, tau = 150, iterations = 60
     }
   }
   const circuits = [];
-  const home = Int32Array.from(counts, played => {
-    const circuit = mostOf(played);
+  const keys = [...index.keys()];
+  const home = Int32Array.from(counts, (played, i) => {
+    const circuit = mostOf(played) ?? homes?.get(keys[i]) ?? null;
     if (!circuit) return -1;
     if (!circuits.includes(circuit)) circuits.push(circuit);
     return circuits.indexOf(circuit);
@@ -182,6 +206,7 @@ export function circuitLevels(series, { until = null, tau = 150, iterations = 60
       });
     }
     for (let i = 0; i < P; i++) grad[C + i] -= theta[C + i] / (tau * tau);
+    if (Number.isFinite(levelSpread)) for (let c = 0; c < C; c++) grad[c] -= theta[c] / (levelSpread * levelSpread);
     for (let j = 0; j < C + P; j++) {
       first[j] = 0.9 * first[j] + 0.1 * grad[j];
       second[j] = 0.999 * second[j] + 0.001 * grad[j] * grad[j];
@@ -192,6 +217,99 @@ export function circuitLevels(series, { until = null, tau = 150, iterations = 60
     if (homed) for (let c = 0; c < C; c++) theta[c] -= sum / homed;
   }
   return Object.fromEntries(circuits.map((circuit, c) => [circuit, Math.round(start + theta[c])]).sort((x, y) => x[0].localeCompare(y[0])));
+}
+
+/**
+ * The games from `from` (to `to`, when given) as runElo(series, options) scores them, each before it is played, with its two
+ * sides' circuits: a side's circuit is the home of `least` of its players or more, each player's home counted over the
+ * games before this one (null for a side with no such circuit). `seasoned`: each of the ten had `minGames` behind him.
+ * `keys`: each row also keeps its sides' players' keys.
+ * → [{ id, date, e, won, circuits: [first side's, second's], seasoned, keys? }]
+ */
+export function scoredGames(series, options, { from, to = null, least = 3, minGames = 20, keys = false } = {}) {
+  const counts = new Map();
+  const rows = [];
+  const sideCircuit = side => {
+    const tally = new Map();
+    for (const player of side) {
+      const home = mostOf(counts.get(player.key));
+      if (home) tally.set(home, (tally.get(home) ?? 0) + 1);
+    }
+    const [best] = [...tally.entries()].sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]));
+    return best && best[1] >= least ? best[0] : null;
+  };
+  runElo(series, { ...options, holdout: null, onGame: (one, game, e, sides) => {
+    if (one.date >= from && (!to || one.date < to)) {
+      rows.push({ id: one.id, date: one.date, e, won: game.winner === 1 ? 1 : 0, circuits: sides.map(sideCircuit),
+        seasoned: sides.every(side => side.every(player => player.games >= minGames)),
+        ...(keys ? { keys: sides.map(side => side.map(player => player.key)) } : {}) });
+    }
+    if (!one.circuit) return;
+    for (const side of sides) for (const player of side) {
+      if (!counts.has(player.key)) counts.set(player.key, new Map());
+      const played = counts.get(player.key);
+      played.set(one.circuit, (played.get(one.circuit) ?? 0) + 1);
+    }
+  } });
+  return rows;
+}
+
+/** The log loss and Brier score of scored games ([{ e, won }]): { n, logLoss, brier }. */
+export function scoreRows(rows) {
+  const into = newScore();
+  for (const row of rows) score(into, row.e, row.won);
+  return scoreOf(into);
+}
+
+/**
+ * A group's offset in its games against the others: the Elo added to its side's edge that makes its expected wins its wins
+ * (maximum likelihood), with a standard error clustered by series (a series' games are not independent). `rows`:
+ * [{ gap: the group's side's Elo edge as scored, won: 1 when its side won, cluster }]. → { n, series, won, expected, elo, se }
+ */
+export function groupOffset(rows) {
+  const slope = Math.LN10 / 400;
+  let elo = 0;
+  for (let step = 0; step < 50; step++) {
+    let slack = 0, curve = 0;
+    for (const row of rows) {
+      const p = expected(row.gap + elo);
+      slack += row.won - p;
+      curve += p * (1 - p) * slope;
+    }
+    const move = curve ? slack / curve : 0;
+    elo += move;
+    if (Math.abs(move) < 1e-6) break;
+  }
+  let info = 0, won = 0, expectedWins = 0;
+  const byCluster = new Map();
+  for (const row of rows) {
+    const p = expected(row.gap + elo);
+    info += p * (1 - p) * slope * slope;
+    byCluster.set(row.cluster, (byCluster.get(row.cluster) ?? 0) + (row.won - p) * slope);
+    won += row.won;
+    expectedWins += expected(row.gap);
+  }
+  const clustered = Math.sqrt([...byCluster.values()].reduce((sum, x) => sum + x * x, 0)) / info;
+  return { n: rows.length, series: byCluster.size, won, expected: Math.round(expectedWins * 10) / 10, elo: Math.round(elo),
+    se: Math.round(Math.max(clustered, 1 / Math.sqrt(info))) };
+}
+
+/**
+ * Each group's offset (groupOffset) in the games between groups among `rows` (scoredGames), a side's group `groupOf(its
+ * circuit)`; only games whose two sides both have a group, and different ones. → { group: offset }, most negative first
+ */
+export function groupOffsets(rows, groupOf = circuit => circuit) {
+  const groups = new Map();
+  for (const row of rows) {
+    const [a, b] = row.circuits.map(circuit => (circuit ? groupOf(circuit) : null));
+    if (!a || !b || a === b) continue;
+    const gap = -400 * Math.log10(1 / Math.min(1 - 1e-9, Math.max(1e-9, row.e)) - 1);
+    for (const [group, edge, won] of [[a, gap, row.won], [b, -gap, 1 - row.won]]) {
+      if (!groups.has(group)) groups.set(group, []);
+      groups.get(group).push({ gap: edge, won, cluster: row.id });
+    }
+  }
+  return Object.fromEntries([...groups.entries()].map(([group, games]) => [group, groupOffset(games)]).sort((x, y) => x[1].elo - y[1].elo));
 }
 
 /**

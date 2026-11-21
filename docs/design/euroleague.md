@@ -13,6 +13,10 @@ results.
 - **EuroBasket**: a basketball nation theatre of the 24 nations of EuroBasket 2025, the last
   European Championship played. The seven of them that had no five of their own now field the
   players who played for them there.
+- **Every nation's five against FIBA's results** (2026-11-21): 706 FIBA games of 2023–2026 read
+  from English Wikipedia; no continent's curated players stand apart from the others', and no
+  move of them predicted held-out games better, so none was made
+  ([below](#the-nations-level-against-fibas-results)).
 
 Everything outside the match and the data (the draw, targeting, conquest, signings, saves,
 challenge links) is the game's own, unchanged.
@@ -312,6 +316,20 @@ win 0.796 and 0.142 of their games against the real 0.799 and 0.137 (0.753 and 0
 the margins average 11.2 points against 11.0, and 18.4% of the games end within three against
 17.2% (20.4%).
 
+**One scale for the groups** (audited 2026-11-21, on the user's request that ratings be "normalized": a group's winner
+must not rate like the best of a stronger group because its results were read inside it; nothing changed). From 2000/01
+to 2015/16 the regular season was groups that never met each other: four of six clubs in 2000/01, four of eight in
+2001/02, three of eight to 2007/08, four of six to 2015/16; one league since. The SRS of every game puts them on one scale
+through the games after the groups: each group met the others 24 to 61 times a season (the Top 16, the playoffs and the
+Final Four), its level within 1.2 to 2.0 points (the SRS's own standard error), and in 2000/01, whose groups met only in
+the playoffs, 9 to 19 times, within 2.2 to 3.3. Held out, the regular season and Top 16 alone predict the 166 later games
+between clubs of different groups (2001/02 to 2015/16) with the stronger group's club +0.7 ± 0.9 points from its
+prediction: no group is misplaced. None met the others fewer times than it has clubs, the rule by which college football
+holds a loose conference toward the seasons either side ([college-football.md](college-football.md#one-scale-for-the-conferences)).
+2000/01's two competitions do not meet here: the season is the ULEB EuroLeague alone, FIBA's SuproLeague (Maccabi,
+Panathinaikos, CSKA, Efes) is in neither the API nor the game, and the season's clubs play only each other, so its
+champion, Kinder Virtus Bologna, rates as the best of that field, not of all Europe's.
+
 **The clubs.** 89 clubs played the EuroLeague from 2000/01 to 2025/26. Today's 20 keep their
 identity in every season (Baskonia, not Tau Cerámica; Anadolu Efes, not Efes Pilsen); the 69
 others (`scripts/data/euroleague-teams.json` `history`) are named by the EuroLeague's own
@@ -404,6 +422,111 @@ Larsson 78), the others curated on the file's scale for minor nations (62–71),
 naturalised player. Belgium's Mwema, retired from the national team in November 2025, is
 replaced by Guissé. Every EuroBasket five is real; Iceland's Kristinn Pálsson, a guard who played
 the four in Iceland's small lineups, is its power forward.
+
+## The nations' level against FIBA's results
+
+Audited 2026-11-21, nothing moved. The user asked that ratings be "correct and normalized, just because one team is a
+national or a country a continental champion they might still be quite weak in comparison to other areas". 143 of the
+fives' 235 players carry a curated rating, and those sit near 70 in every league on every continent: Europe's 76 players
+70.2 (62–79), Africa's 26 70.2 (69–73), Asia's 19 70.6 (69–73), the Americas' 17 70.1 (69–71), Oceania's 5 69.8. So the
+Philippines (70.6) stood level with Italy (70.7) and Angola (70.8) above it. The question was whether FIBA's results put
+them elsewhere against the fives the NBA and the EuroLeague rate.
+
+**The results.** `npm run sync:fiba-results` (`scripts/sync-fiba-results.mjs`, `scripts/lib/fiba-results.mjs`) reads 34
+English Wikipedia article pages (CC BY-SA 4.0; their `/wiki/` paths only, through `scripts/lib/polite-fetch.mjs`, one at a
+time on 2026-11-21, each pinned by its revision and SHA-256 in `scripts/data/fiba-results-sources.json`) into
+`scripts/data/fiba-results.json`: 706 games, each with its date, sides, score, overtimes, venue and home side. They are the
+2023 World Cup's 92 (classification included), the 2024 Olympic qualifying tournaments' 36 and Olympics' 26, the 2025
+EuroBasket's 76, AmeriCup's 26, AfroBasket's 36 and Asia Cup's 36, and 378 games of the 2027 World Cup's qualifiers and
+pre-qualifiers (February 2024 to August 2026). A tournament's hosts play at home in their own cities; a qualifier's page
+names the city alone for the first side's home game and adds the country elsewhere. `--check` rebuilds the facts byte for
+byte from the cached pages.
+
+**The method** (`scripts/lib/fiba-nations.mjs`, run by `npm run build-basketball`, which writes every figure here to
+`docs/design/basketball-nations-audit.json`; `--check` rebuilds it byte for byte):
+
+- **Results strength**: an SRS of the tournaments' 328 games (71 sides). Each game weighs by its year: 2023 1, 2024 2,
+  2025 3. Home edge fitted (5.4 points), margin spread 12.5, reliability 0.883.
+- **The qualifiers stay out.** Read against the tournaments' SRS, the fives mostly NBA- and EuroLeague-rated (curated share
+  under 0.45, 18 nations, 122 games) play their qualifier windows 2.8 points a game below their tournament level. The
+  curated fives (21 nations, 153 games) play them 2.5 above. Germany −20.6, the United States −14.7 and Lithuania −12.7
+  sit against Japan +16.0 and Mexico +14.5: the windows clash with the NBA's and the EuroLeague's seasons, so the stars'
+  nations field other players. The Netherlands and Ukraine played no tournament. Their qualifiers' SRS is set on the
+  tournaments' by the eight European curated fives rated in both (+1.4).
+- **Lineup points**: a results point is √0.883 ÷ 1.459 = 0.644 lineup points. 1.459 is the engine's margin a lineup point
+  under FIBA's rules, by simulation (`perPointOf`, 20,000 games a gap).
+- **The anchors' relation**: five strength as the engine plays it, against T, by least squares over the ten fives with at
+  most one curated player (Australia, Canada, France, Germany, Israel, Italy, Lithuania, Serbia, Turkey, the United
+  States). It gives 78.7 at T 13.4 and rises 0.616 a point. The residual spread is 5.8: the United States stand 11.1 above
+  it, Turkey 7.1 and Germany 5.7 below.
+- **The move it would make**: each nation's curated players by one amount. A five they hold three quarters of lands on
+  the relation. In a mixed five they move by its gap, so the five closes their share of it and the rest stays with its
+  rated players.
+
+**What the results say.**
+
+| Curated fives | Mean gap to the relation (points of five strength) |
+| --- | --- |
+| Europe (10) | +0.8 |
+| Africa (5) | +1.2 |
+| Asia, with Australia's and New Zealand's FIBA Asia (5) | −0.6 |
+| The Americas (3) | −1.0 |
+
+No continent's curated players stand apart from the others'. Nation by nation, the relation would put each five here:
+
+| Nation | Its five | Where its results put it |
+| --- | --- | --- |
+| Philippines | 70.6 | 69.7 |
+| Iran | 70.0 | 68.1 |
+| Japan | 72.6 | 69.2 |
+| Mexico | 70.0 | 69.2 |
+| Angola | 70.8 | 72.0 |
+| Egypt | 70.2 | 70.8 |
+| New Zealand | 69.8 | 71.3 |
+| China | 70.8 | 72.5 |
+| Italy (one curated player) | 70.7 | 75.0 |
+| Netherlands | 70.2 | 70.3 |
+| Lithuania | 78.1 | 77.0 |
+| Latvia | 73.0 | 75.2 |
+
+The extremes are Cyprus (64.7 → 59.1), Venezuela (70.2 → 65.6), Senegal (70.8 → 74.6) and Ukraine (70.6 → 77.3).
+
+Most curated fives' results sit near the field's mean (T ≈ 0), far below the anchors' (13.4). There the relation is read
+at 70.4, but resampling the ten anchors puts it anywhere from 62.4 to 79.9 (p5 to p95). The results order the curated
+nations among themselves; they cannot set the curated players' level against the rated fives' to within several points.
+
+**Held out, no move predicts better.** Each fit was made without some games, then those games (between two fielded
+nations) were scored through the engine, at Balanced, with the fives as they are and as the move leaves them:
+
+| Rule | Leave each tournament out (216 games): log loss | Brier |
+| --- | --- | --- |
+| The method's, each nation | 0.570 → 0.662 | 0.188 → 0.230 |
+| Half of it | 0.570 → 0.603 | 0.188 → 0.202 |
+| A quarter of each nation's move less the mean (the order only) | 0.570 → 0.572 | 0.188 → 0.188 |
+| One move a region | 0.570 → 0.657 | 0.188 → 0.227 |
+| A region's offset fitted straight on the margins | 0.570 → 0.586 | 0.188 → 0.192 |
+
+By date the method does no better:
+
+- Fit on the 2023 World Cup, test on 2024's Olympic events (46 games, 32 across continents): log loss 0.463 → 0.483;
+  across continents 0.441 → 0.479.
+- Fit before the Olympics, test on them: 0.406 → 0.472.
+- Fit before the 2025 championships, test on them: 0.559 → 0.628.
+
+So the curated ratings stay as they were. The FIBA facts and the audit are there for the next refresh: the 2027 World
+Cup's games will join the cross-continental evidence that now rests on 2023 and 2024.
+
+**What the audit does show.** The national game plays more evenly than FIBA's results:
+
+- At the 2025 championships, held out, Europe's curated fives lost by 8.2 points a game more than the engine expected,
+  and Europe's other fives won by 3.1 more.
+- The rated fives spread less than their results: the anchors' relation rises 0.62 a results point where the engine needs
+  1.
+- Fitted straight on the margins, the curated players would drop 5 to 8 points (Europe's 8.3, Asia's 6.3, the Americas'
+  6.0, Africa's 5.05). They would make up in their own level what the rated fives lack in spread, and that predicts the held-out
+  tournaments worse too.
+
+That is a question of the national layer's spread as a whole, not of the curated players' level.
 
 ## Known limitations
 

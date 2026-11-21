@@ -54,7 +54,7 @@ test('the seasons fill the year before the World Cups and every year between the
   for (let year = worldCupYears[0] + 1; year < worldCupYears.at(-1); year++) if (!worldCupYears.includes(year)) between.push(year);
   assert.deepEqual(years, [worldCupYears[0] - 1, ...between], '1960/61, and every season-end year from 1963 to 1993 that ends no World Cup');
   assert.equal(years.length, 25);
-  for (const key of ['elo', 'strength', 'xi', 'profile', 'profileSource']) assert.deepEqual(MANIFEST[key], WORLD_CUP[key], key);
+  for (const key of ['elo', 'strength', 'levels', 'xi', 'profile', 'profileSource']) assert.deepEqual(MANIFEST[key], WORLD_CUP[key], key);
   assert.deepEqual(MANIFEST.sources.results, WORLD_CUP.sources.results, 'the same pinned results');
   assert.deepEqual(MANIFEST.names.ballonDorNationalities, WORLD_CUP.names.ballonDorNationalities);
   for (const season of MANIFEST.seasons) assert.deepEqual(season.ballonDor, [season.year - 1, season.year]);
@@ -197,7 +197,7 @@ test('the 25 seasons are built in beside the World Cups, labelled computed, and 
     assert.deepEqual([source.provider, source.method, source.computed, source.rawScale, source.licence],
       ['Computed', 'computed', true, 'Elo', 'CC BY-SA 4.0']);
     assert.equal(source.snapshotDate, `${doc.year}-07-01`, 'the Elo of 1 July of the season\'s end year');
-    assert.match(source.conversion, /^T = 87 − 3\.2 × \(E_best − E\) \/ 100/);
+    assert.match(source.conversion, /^T = 87 − 3\.2 × \(E′_best − E′\) \/ 100, E′ = E \+ the level of the nation's confederation: /);
     assert.equal(source.results.commit, MANIFEST.sources.results.commit);
     assert.deepEqual(Object.keys(source.wikipedia.ballonDor).map(Number), [doc.year - 1, doc.year]);
   }

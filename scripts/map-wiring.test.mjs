@@ -4,7 +4,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { setTimeout as delay } from 'node:timers/promises';
-import { MAP, V4 } from '../src/theme.js';
+import { MAP, V4, empireFill } from '../src/theme.js';
 import { flagRegionIndexSteps } from '../src/engine/flagRegions.js';
 import { politicalFill } from '../src/data/empireColours.js';
 import { bundleApp, syncAppFixture, findElement } from './lib/app-harness.mjs';
@@ -395,6 +395,9 @@ test('signing (DEC D15): projected ownership, hatch on the taken land, the loser
     assert.equal(app.mapAttack(), null, 'no arrow while signing (App passes attack={this.mapAttack()})');
     app.setState({ hoverCid: '276' });
     assert.equal(app.tooltip(true).held, 'Held by France');
+    // Its click opens the squad the map names, the winner's, not the eliminated loser's (still `own` until the signing).
+    taken.onClick();
+    assert.equal(app.state.selected, '250', 'the taken land opens France, as its label and tooltip say');
     app.viewConquest({ territoryIds: ['826'] });
     assert.equal(app.state.focusLayout, null);
     assert.deepEqual(app.state.conquestIds, [], 'viewConquest is ignored while the signing holds the screen');
@@ -478,7 +481,8 @@ test('a country map: setup paints each club’s land as its starting club and na
     app.domesticMap = () => domestic;
     const paris = countryOf(app, '250');
     assert.equal(paris.name, 'Paris');
-    assert.equal(paris.fill, politicalFill(club.id), 'Political: the pastel the club takes at kick-off');
+    // A club with no crest colour takes the pastel of its map colour, the one it shows in Flags mode (engine/mapPalette.js).
+    assert.equal(paris.fill, empireFill(club.id, club.col), 'Political: the pastel the club takes at kick-off');
     assert.equal(paris.ownerId, null, 'no owner, so no tab stops behind the wizard');
     app.setState({ mapMode: 'flags' });
     assert.equal(countryOf(app, '250').fill, club.col, 'Flags: the club colour');
@@ -502,9 +506,9 @@ test('a country map: setup paints each club’s land as its starting club and na
     assert.deepEqual(app.mapCountries().countries.map(row => row.id), ['250', '826'], 'one land for the club, one for London');
     const land = countryOf(app, '250');
     assert.equal(land.name, 'Paris');
-    assert.equal(land.fill, politicalFill(club.id));
+    assert.equal(land.fill, empireFill(club.id, club.col));
     assert.equal(land.d, 'M80,120L80,80L120,80L160,80L160,120L120,120Z', 'one outline round Paris and Berlin');
-    assert.notEqual(countryOf(app, '826').fill, politicalFill(club.id), 'land nobody starts on keeps its own fill');
+    assert.notEqual(countryOf(app, '826').fill, empireFill(club.id, club.col), 'land nobody starts on keeps its own fill');
     app.setState({ hoverCid: '250' });
     assert.deepEqual(app.tooltip(false), { visible: true, name: 'Paris', held: 'Home of Paris FC', result: null, link: null });
   } finally { h.close(); }

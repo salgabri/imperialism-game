@@ -50,3 +50,54 @@ export function colourDistance(a, b) {
   const [qa, qb] = [q[1] * Math.cos(q[2] * Math.PI / 180), q[1] * Math.sin(q[2] * Math.PI / 180)];
   return Math.hypot(p[0] - q[0], pa - qa, pb - qb);
 }
+
+// The country maps' club colours (docs/design/domestic-campaigns.md, "Output"): written by the map builds
+// (scripts/lib/domestic-output.mjs) and by a map cut to fewer clubs (engine/clubSplit.js).
+// Two lightness levels over a 24-step hue wheel; greedy over the section graph so
+// neighbours (and, where possible, neighbours of neighbours) differ clearly.
+const PALETTE = [0.74, 0.6].flatMap(l => Array.from({ length: 24 }, (_, i) => ({ l, c: 0.15, h: i * 15 })));
+const lab = ({ l, c, h }) => [l, c * Math.cos(h * Math.PI / 180), c * Math.sin(h * Math.PI / 180)];
+const deltaE = (a, b) => { const p = lab(a), q = lab(b); return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]); };
+const colourText = ({ l, c, h }) => `oklch(${l.toFixed(2)} ${c.toFixed(2)} ${h})`;
+
+/**
+ * One OKLCH colour per club, greedily in rank order over `adjacency` (club index -> neighbouring club indices). With
+ * `crowdedFirst` (the country maps), the clubs with the most neighbours choose first, and a club left too close to a
+ * neighbour then takes the colour farthest from all its neighbours: the palette holds about 16 colours that all differ
+ * clearly, and a club bordering 18 (Proxy Work, across Egypt's desert) choosing last finds none of them free.
+ */
+export function colourSections(adjacency, { crowdedFirst = false } = {}) {
+  const chosen = new Array(adjacency.length).fill(-1);
+  const used = new Array(PALETTE.length).fill(0);
+  const order = adjacency.map((_, i) => i);
+  if (crowdedFirst) order.sort((a, b) => adjacency[b].length - adjacency[a].length || a - b);
+  for (const i of order) {
+    const near = adjacency[i].filter(j => chosen[j] >= 0).map(j => PALETTE[chosen[j]]);
+    const second = [...new Set(adjacency[i].flatMap(j => adjacency[j]))]
+      .filter(j => j !== i && !adjacency[i].includes(j) && chosen[j] >= 0).map(j => PALETTE[chosen[j]]);
+    let best = -1, bestKey = null;
+    PALETTE.forEach((colour, k) => {
+      const d1 = near.length ? Math.min(...near.map(o => deltaE(colour, o))) : 1;
+      const d2 = second.length ? Math.min(...second.map(o => deltaE(colour, o))) : 1;
+      // Neighbours dominate (capped: any clear difference is enough), then second
+      // neighbours, then the least-used colour; ties keep the lower palette index.
+      const key = [Math.min(d1, 0.12), Math.min(d2, 0.08), -used[k], d1];
+      const at = bestKey ? key.findIndex((v, idx) => v !== bestKey[idx]) : 0;
+      if (!bestKey || (at >= 0 && key[at] > bestKey[at])) { best = k; bestKey = key; }
+    });
+    chosen[i] = best;
+    used[best]++;
+  }
+  for (let pass = 0; crowdedFirst && pass < 3; pass++) {
+    let changed = false;
+    for (const i of order) {
+      const gap = k => (adjacency[i].length ? Math.min(...adjacency[i].map(j => deltaE(PALETTE[k], PALETTE[chosen[j]]))) : 1);
+      if (gap(chosen[i]) >= 0.1) continue;
+      let best = chosen[i];
+      PALETTE.forEach((_, k) => { if (gap(k) > gap(best)) best = k; });
+      if (best !== chosen[i]) { used[chosen[i]]--; used[best]++; chosen[i] = best; changed = true; }
+    }
+    if (!changed) break;
+  }
+  return chosen.map(k => colourText(PALETTE[k]));
+}

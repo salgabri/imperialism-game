@@ -18,9 +18,15 @@
 // The largest nations choose first; then each nation in turn takes its cheapest choice given its neighbours',
 // a nation counting only YIELD of a clash with a smaller neighbour (the smaller one makes room),
 // until no nation changes (iterated conditional modes; deterministic).
+// Then the map's rule: the map never puts two look-alikes side by side (the user, 21 November 2026), so the smaller of
+// two land neighbours still nearer than CLOSE moves to its cheapest choice clear of its land neighbours: a fitting
+// colour, one turned FAR_TURN degrees, else any hue (WHEEL).
+//
+// The map keeps neighbours apart as empires grow (src/engine/mapPalette.js, with the same CLOSE): there a nation tries
+// its colour here first, then its other fitting colours, written beside it.
 //
 // Writes:
-//   src/data/nationColours.js   NATION_COLOURS: nation id → [colour, lightness step]
+//   src/data/nationColours.js   NATION_COLOURS: nation id → [colour, lightness step, other fitting colours]
 import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -29,8 +35,9 @@ import { NATIONS, DEPENDENCIES } from '../src/data/teams.js';
 import { FLAG_CODES } from '../src/data/flags.js';
 import { WorldGeometry, closestPair } from '../src/engine/geo.js';
 import { atlasOfYear } from '../src/engine/historicMap.js';
-import { empireFill, themedPaint } from '../src/theme.js';
+import { empireFillPair } from '../src/theme.js';
 import { colourDistance, oklchHex, rgbToOklab, toOklch } from '../src/engine/colour.js';
+import { APART, CLOSE } from '../src/engine/mapPalette.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const moduleFile = path.join(root, 'src/data/nationColours.js');
@@ -38,11 +45,12 @@ const check = process.argv.includes('--check');
 
 const FLAG = 0.35, MINOR = 0.2, GREY = 0.45, NUDGE = 18, NUDGE_COST = 0.15, OFF_STEP = 0.02;
 const L_WEIGHT = 0.4;
-const CLOSE = 0.065;    // fills nearer than this read as one colour across a border
 const SEA_GAP = 0.03;   // radians of the world chart, about 190 km
 const SEA_WEIGHT = 0.3;
 const YIELD = 0.25;
 const CLASH = 2;        // the cost of two neighbours in one colour
+// The map's rule (below): a fitting colour turned FAR_TURN degrees, else any hue every 30 degrees (WHEEL).
+const FAR_TURN = 36, FAR_TURN_COST = 0.3, WHEEL = 1;
 const MIN_SHARE = 0.05; // of the flag's area
 const SAME = 0.08;      // flag pixels this close (OKLab) are one colour
 const GREY_CHROMA = 0.04;
@@ -96,7 +104,7 @@ async function fittingColours(id) {
   for (const { colour, cost } of out.slice()) {
     if (isGrey(colour)) continue;
     const [L, C, H] = toOklch(colour);
-    for (const turn of [-NUDGE, NUDGE]) out.push({ colour: oklchHex(L, C, (H + turn + 360) % 360), cost: cost + NUDGE_COST });
+    for (const turn of [-NUDGE, NUDGE]) out.push({ colour: oklchHex(L, C, (H + turn + 360) % 360), cost: cost + NUDGE_COST, nudged: true });
   }
   return out;
 }
@@ -130,17 +138,36 @@ for (let i = 0; i < shapes.length; i++) {
 
 // ---- Choices ----
 const choices = new Map();
+const spares = new Map(); // nation → its choices for the map's rule (below): fitting colours turned further, any hue
+const fits = new Map(); // nation → its fitting colours (its own and its flag's), the best first
+const wheel = Array.from({ length: 12 }, (_, i) => ({ colour: oklchHex(0.7, 0.2, i * 30), cost: WHEEL }));
+// Both themes' fills as this colour and step give them (the map measures them so: src/engine/mapPalette.js).
+const choiceOf = (id, colour, step, cost) => {
+  const { light, dark } = empireFillPair(id, colour, step);
+  return { colour, step, light: lab(light), dark: lab(dark), lightHex: light, cost: cost + (step === 1 ? 0 : OFF_STEP) };
+};
 for (const id of ids) {
-  const list = [];
-  for (const { colour, cost } of await fittingColours(id)) {
+  const list = [], spare = [];
+  const fitting = await fittingColours(id);
+  fits.set(id, fitting.filter(({ nudged }) => !nudged).map(({ colour }) => colour));
+  for (const { colour, cost } of fitting) {
     for (const step of [0, 1, 2]) {
-      const light = empireFill(id, colour, step);
-      const dark = /^light-dark\(#[0-9a-f]{6}, (#[0-9a-f]{6})\)$/.exec(themedPaint(light))?.[1] ?? light;
-      if (list.some(c => c.light === light)) continue;
-      list.push({ colour, step, light: lab(light), dark: lab(dark), lightHex: light, cost: cost + (step === 1 ? 0 : OFF_STEP) });
+      const choice = choiceOf(id, colour, step, cost);
+      if (!list.some(c => c.lightHex === choice.lightHex)) list.push(choice);
+    }
+  }
+  const turned = fitting.filter(({ nudged, colour }) => !nudged && !isGrey(colour)).flatMap(({ colour, cost }) => {
+    const [L, C, H] = toOklch(colour);
+    return [-FAR_TURN, FAR_TURN].map(turn => ({ colour: oklchHex(L, C, (H + turn + 360) % 360), cost: cost + FAR_TURN_COST }));
+  });
+  for (const { colour, cost } of [...turned, ...wheel]) {
+    for (const step of [0, 1, 2]) {
+      const choice = choiceOf(id, colour, step, cost);
+      if (![...list, ...spare].some(c => c.lightHex === choice.lightHex)) spare.push(choice);
     }
   }
   choices.set(id, list);
+  spares.set(id, spare);
 }
 const distance = (p, q) => Math.min(Math.hypot(...p.light.map((v, k) => v - q.light[k])), Math.hypot(...p.dark.map((v, k) => v - q.dark[k])));
 const clash = (p, q) => CLASH * Math.max(0, CLOSE - distance(p, q)) / CLOSE;
@@ -174,6 +201,26 @@ for (let sweep = 0, changed = true; changed && sweep < 100; sweep++) {
   }
 }
 
+// ---- The map's rule ----
+// Never two land neighbours nearer than CLOSE, kept with mapPalette's margin (APART; src/engine/mapPalette.js keeps it as
+// empires grow). The smaller of such
+// a pair moves, the largest nations first: to its cheapest choice clear of all its land neighbours (a fitting colour,
+// one turned further, else any hue), else of the larger ones (a smaller one then moves in turn).
+const landOf = id => [...neighbours.get(id)].filter(([, weight]) => weight === 1).map(([other]) => other);
+const clearOf = (id, others) => [...choices.get(id), ...spares.get(id)]
+  .filter(choice => others.every(other => distance(choice, pick.get(other)) >= APART));
+for (let sweep = 0, moved = true; moved && sweep < 20; sweep++) {
+  moved = false;
+  for (const id of order) {
+    const land = landOf(id), larger = land.filter(other => areas.get(other) > areas.get(id));
+    if (!larger.some(other => distance(pick.get(id), pick.get(other)) < APART)) continue;
+    const clear = clearOf(id, land).length ? clearOf(id, land) : clearOf(id, larger);
+    if (!clear.length) continue;
+    pick.set(id, clear.reduce((a, b) => (localCost(id, b) < localCost(id, a) - 1e-9 ? b : a)));
+    moved = true;
+  }
+}
+
 // ---- Shapes of earlier years ----
 // A nation the map draws only in earlier years (East Germany: src/engine/historicMap.js) has no shape on today's map,
 // so it has no neighbours above and changes nobody's choice. It chooses last, against its neighbours on the map of its
@@ -190,18 +237,24 @@ for (const id of ids.filter(id => !geo.countries.some(country => country.id === 
     if (closestPair(own, era.projected[country.id].flat(2)).dist < SEA_GAP) near.set(other, SEA_WEIGHT);
   }
   const cost = choice => choice.cost + [...near].reduce((sum, [other, weight]) => sum + weight * clash(choice, pick.get(other)), 0);
-  pick.set(id, choices.get(id).reduce((a, b) => (cost(b) < cost(a) - 1e-9 ? b : a)));
+  // Clear of its land neighbours of those years, as the map's rule above.
+  const land = [...near].filter(([, weight]) => weight === 1).map(([other]) => other);
+  const clear = [...choices.get(id), ...spares.get(id)].filter(choice => land.every(other => distance(choice, pick.get(other)) >= APART));
+  pick.set(id, (clear.length ? clear : choices.get(id)).reduce((a, b) => (cost(b) < cost(a) - 1e-9 ? b : a)));
   for (const [other, weight] of near) neighbours.get(id).set(other, weight);
 }
 
 // ---- Module ----
-const rows = ids.map(id => `  '${id}': ['${pick.get(id).colour}', ${pick.get(id).step}], // ${NATIONS[id][0]}`);
+// Beside each choice, the nation's other fitting colours: the map falls back on them (src/engine/mapPalette.js).
+const others = id => fits.get(id).filter(colour => colour !== pick.get(id).colour).map(colour => `'${colour}'`).join(', ');
+const rows = ids.map(id => `  '${id}': ['${pick.get(id).colour}', ${pick.get(id).step}, [${others(id)}]], // ${NATIONS[id][0]}`);
 const text = `// GENERATED by scripts/build-nation-colours.mjs; do not edit. Run \`npm run build:nation-colours\` to refresh.
 //
 // Each nation's colour on the political map and its lightness step (theme.js empireFill): its own colour or one of
-// its flag's, chosen so that neighbouring nations stand apart.
+// its flag's, chosen so that neighbouring nations stand apart; then its other fitting colours, which the map falls
+// back on when a conquest brings it a look-alike neighbour (src/engine/mapPalette.js).
 
-/** Nation id → [colour, lightness step 0–2]. */
+/** Nation id → [colour, lightness step 0–2, [its other fitting colours, the best first]]. */
 export const NATION_COLOURS = Object.freeze({
 ${rows.join('\n')}
 });
@@ -219,7 +272,7 @@ if (check) {
   const close = [];
   for (const id of ids) {
     for (const [other, weight] of neighbours.get(id)) {
-      if (id < other && weight === 1 && distance(pick.get(id), pick.get(other)) < CLOSE / 2) close.push(`${NATIONS[id][0]}–${NATIONS[other][0]}`);
+      if (id < other && weight === 1 && distance(pick.get(id), pick.get(other)) < APART) close.push(`${NATIONS[id][0]}–${NATIONS[other][0]}`);
     }
   }
   console.log(`${ids.length} nations; ${off.length} take a flag colour: ${off.map(id => NATIONS[id][0]).join(', ')}`);

@@ -73,9 +73,14 @@ scrolling panels, at desktop, tablet and phone sizes.
   rows of three, tiles trimmed to what the icon and name need but still 44px targets, and on 360×640 with a notice
   line the step's heading gives way, as step 2's does for More rules), Nations | Clubs and the season on
   one row, theatre chips (Europe's Top 124 and Elite 32 for football clubs), the One country · top clubs dropdown,
-  and the counts at the foot. The theatre's map fills the side. Under the Season choice, a season whose listing carries a
+  and the counts at the foot. The theatre's map fills the side. Below 900px wide (one column, a phone or a narrow tablet)
+  the map sits under the controls instead, so since 2026-11-21 setup.css's phone height tiers reach every one-column
+  width: up to 760px tall the map and lede give way, four rows of sports take the compact 44px tiles, and up to 660px tall
+  the heading gives way too and the controls sit 10px apart. A notice line takes the heading's place in one column and on
+  windows up to 800px tall. Football clubs' country row (the country, and how many of its clubs play) shares the line of
+  Europe's two chips in one column where it keeps 320px; on a phone it still wraps under them. Under the Season choice, a season whose listing carries a
   credit shows it whole as quiet text, never cut (since 2026-11-10: ice hockey's Hockey Databank statement and MoneyPuck's
-  credit, [hockey.md](hockey.md#credits)); the lede gives way to it on phones and on windows up to 800px tall, and the
+  credit, [hockey.md](hockey.md#credits)); the lede gives way to it in one column and on windows up to 800px tall, and the
   heading too with a notice line on a phone or two notice lines on a short window. Step 2: four short draw cards, with
   Show matches and More rules beside them. Step 3: compact role cards with the opponent choice in the same row, a flag wall strongest first
   (arrows, Home, End and type-ahead walk it across its pages), and the suggested team as a compact card. The rail's
@@ -158,6 +163,20 @@ Without the lede and heading rules four lines did not fit beside a notice line a
 coarse pointer) or at 1280×720 with a coarse pointer (15px), and pushed the map under its floor on phones 780–812px tall
 (by 5 to 59px). At 11px the credit's fourth line had 3px to spare in a 360 phone's column, hence 10.5px below 390 wide.
 
+**Narrow and short tablets** (2026-11-21). Setup's step 1 as it opens (football nations), measured with headless Chromium
+against the dev server (dark, device scale 1, a fresh context per size), without and with a challenge link's notice line.
+Three sizes scrolled: 800×600 by 134px either way (the map's 120px floor under 457px of controls in a 437px body), 700×800
+with the line by 33px (the map under its floor) and 1100×700 with the line by 43px. Now 800×600 has 72px to spare, 18px with
+the line; 700×800's map is 158px tall; 1100×700 has 30px to spare. Nothing scrolls, with or without the line, at those three
+nor at 1920×1080, 1440×900, 1280×800, 1280×720, 1920×800, 1366×800, 1024×768, 768×1024, 412×915, 390×844, 390×664,
+375×667, 360×780 and 360×640 (the phones unchanged to the pixel). Over a grid of widths 700–1280 and heights 600–860, 116 of
+220 cases scrolled before and 30 after, none in one column. The hockey credit (2024/25) also fits at every one of those
+sizes but 800×600 with the line; under a coarse pointer 1024×768 and 1280×720 with the line fit now too. Football clubs
+(`/?teams=clubs`, a challenge link, and the Clubs radio without one) scrolled on main at 8c0b4df0 at 700×800 (77px with
+the line, 19px without), 1100×700 (45px with it) and 800×600 (134px either way), and in 128 of the 220 grid cases, 80 of
+them in one column, where the country row under the chips cost the map 44px. Now none of those sizes scrolls in clubs
+either, and 30 grid cases do, none in one column; 700×800's map is 158px tall with the line, and the phones are unchanged.
+
 ## Limits
 
 - Hover titles don't exist on touch screens. Everything moved to a `title` is also in `sr-only` text or
@@ -174,6 +193,10 @@ coarse pointer) or at 1280×720 with a coarse pointer (15px), and pushed the map
 - Two notice lines at once (a save on this browser and a challenge link) were never fitted on phones: setup's step 1
   scrolls there for football clubs by 26px at 390×664 and 41px at 360×640. A hockey season's credit adds to it (2px at
   390×664, 47px at 360×640, 37px at 360×780); short desktops and tablets with two lines fit, the heading giving way.
+- Setup's step 1 still scrolls on some short windows in two columns (measured 2026-11-21): tablets
+  900–1199px wide up to 660px tall (by up to 85px) and 800px tall with a notice line (13px, where the compact tiles stop),
+  desktops up to 640px tall (42px at 600), football clubs alike. At 800×600 with a notice line the hockey credit scrolls
+  by 14px. Under a coarse pointer 1100×700 scrolls by 9px, as before.
 
 ## Verifying
 

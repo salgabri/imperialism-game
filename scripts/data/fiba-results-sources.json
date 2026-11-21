@@ -1,0 +1,385 @@
+{
+ "about": "The English Wikipedia article pages scripts/sync-fiba-results.mjs reads FIBA's men's national-team results from (scripts/data/fiba-results.json), each pinned at the revision read: npm run sync:fiba-results -- --fetch downloads a page missing from data-src/fiba-results/ (its /wiki/ path, through scripts/lib/polite-fetch.mjs), --pin records what was downloaded. A tournament's hosts are its host cities' countries, as its article names them: a host nation plays at home there, everyone else at a neutral venue.",
+ "source": {
+  "provider": "English Wikipedia",
+  "url": "https://en.wikipedia.org/",
+  "licence": "CC BY-SA 4.0 (the articles' text and tables); the results themselves are facts",
+  "terms": "robots.txt allows /wiki/ for every agent this project's requests answer to (ClaudeBot and anthropic-ai among them); read 2026-11-21 through scripts/lib/polite-fetch.mjs, one page at a time"
+ },
+ "competitions": {
+  "wc2023": {
+   "name": "2023 FIBA Basketball World Cup",
+   "kind": "tournament",
+   "hosts": {
+    "Bocaue": "Philippines",
+    "Quezon City": "Philippines",
+    "Pasay": "Philippines",
+    "Okinawa City": "Japan",
+    "Jakarta": "Indonesia"
+   }
+  },
+  "oqt2024": {
+   "name": "2024 FIBA Men's Olympic Qualifying Tournaments",
+   "kind": "tournament",
+   "hosts": {
+    "Valencia": "Spain",
+    "Riga": "Latvia",
+    "Piraeus": "Greece",
+    "San Juan": "Puerto Rico"
+   }
+  },
+  "og2024": {
+   "name": "Basketball at the 2024 Summer Olympics (men)",
+   "kind": "tournament",
+   "hosts": {
+    "Lille": "France",
+    "Paris": "France"
+   }
+  },
+  "eurobasket2025": {
+   "name": "EuroBasket 2025",
+   "kind": "tournament",
+   "hosts": {
+    "Riga": "Latvia",
+    "Tampere": "Finland",
+    "Limassol": "Cyprus",
+    "Katowice": "Poland"
+   }
+  },
+  "americup2025": {
+   "name": "2025 FIBA AmeriCup",
+   "kind": "tournament",
+   "hosts": {
+    "Managua": "Nicaragua"
+   }
+  },
+  "afrobasket2025": {
+   "name": "AfroBasket 2025",
+   "kind": "tournament",
+   "hosts": {
+    "Luanda": "Angola",
+    "Moçâmedes": "Angola"
+   }
+  },
+  "asiacup2025": {
+   "name": "2025 FIBA Asia Cup",
+   "kind": "tournament",
+   "hosts": {
+    "Jeddah": "Saudi Arabia"
+   }
+  },
+  "wcq2027": {
+   "name": "2027 FIBA Basketball World Cup qualification (and its pre-qualifiers)",
+   "kind": "qualifiers"
+  }
+ },
+ "pages": [
+  {
+   "title": "2023 FIBA Basketball World Cup Group A",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_A.html",
+   "page": "2023 FIBA Basketball World Cup Group A",
+   "revision": 1377068141,
+   "sha256": "cea2d24b87f978007848a25d9d4744294f659c14ba00c92a22ae936afa6078e5",
+   "bytes": 239139
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group B",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_B.html",
+   "page": "2023 FIBA Basketball World Cup Group B",
+   "revision": 1315309343,
+   "sha256": "e7a955d6c169078d067e39bd316f9971ac493711ba2a5b680a0cb41e078e4f5f",
+   "bytes": 234162
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group C",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_C.html",
+   "page": "2023 FIBA Basketball World Cup Group C",
+   "revision": 1315309423,
+   "sha256": "e6ff4fc178c025ab70cc2bd2d0e38a51e7a58c64dc89233eb6eef177dd3af443",
+   "bytes": 234822
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group D",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_D.html",
+   "page": "2023 FIBA Basketball World Cup Group D",
+   "revision": 1315309488,
+   "sha256": "1a46afc5b33f7dd2bce1480bc8b47831026219a1547f3b7a3bd1d3288f63be86",
+   "bytes": 224504
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group E",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_E.html",
+   "page": "2023 FIBA Basketball World Cup Group E",
+   "revision": 1315309569,
+   "sha256": "d9d9435c9819dfe9ffb3875047b66d3faafa85d9e1d7949a506044dccd0d3e69",
+   "bytes": 163067
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group F",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_F.html",
+   "page": "2023 FIBA Basketball World Cup Group F",
+   "revision": 1315309647,
+   "sha256": "0a7b8945cd58f6a4698f1306ed4eeaa1979cfaaa9ab813b8b6e8927604886deb",
+   "bytes": 161026
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group G",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_G.html",
+   "page": "2023 FIBA Basketball World Cup Group G",
+   "revision": 1315475716,
+   "sha256": "f7dd64a947fee8f43e8929502f7c982212fdbe21e168172f495a6d4856e3cf7f",
+   "bytes": 162599
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group H",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_H.html",
+   "page": "2023 FIBA Basketball World Cup Group H",
+   "revision": 1374110723,
+   "sha256": "c0547b64cd4b3513a841f18b82afd450fc8956aeff8dd8538067fe4f6de36ef0",
+   "bytes": 164371
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group I",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_I.html",
+   "page": "2023 FIBA Basketball World Cup Group I",
+   "revision": 1315589177,
+   "sha256": "f4d6a36c6b94978df67837826de2f5d5db5aefcf1f2d9d0b046b3f723fcc10ed",
+   "bytes": 148929
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group J",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_J.html",
+   "page": "2023 FIBA Basketball World Cup Group J",
+   "revision": 1315590804,
+   "sha256": "17f0316e9a80e74b862b3acd32883aa7ec80d2cfd85749a8501541ed1ef688d4",
+   "bytes": 144258
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group K",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_K.html",
+   "page": "2023 FIBA Basketball World Cup Group K",
+   "revision": 1315591903,
+   "sha256": "7df5e55fac77f2ed3ef545e008c85dcac0b9dc996c34731ed556e7c6b9313cb5",
+   "bytes": 143045
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group L",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_L.html",
+   "page": "2023 FIBA Basketball World Cup Group L",
+   "revision": 1315593202,
+   "sha256": "c3e07e0408cd594dbf0dcf560920fa49cf029812bc6d79edc2150e970604b03c",
+   "bytes": 148059
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group M",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_M.html",
+   "page": "2023 FIBA Basketball World Cup Group M",
+   "revision": 1315594451,
+   "sha256": "e7b8ae6de55e506f101e235dc4f515ea86231fa6168f2b6e09e0cb4bc2a95f9d",
+   "bytes": 153470
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group N",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_N.html",
+   "page": "2023 FIBA Basketball World Cup Group N",
+   "revision": 1315595469,
+   "sha256": "c78744ec94318ff1fb3ca326a05ce9f27c422efdfebf7c6cc5678f4badf8a18a",
+   "bytes": 143428
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group O",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_O.html",
+   "page": "2023 FIBA Basketball World Cup Group O",
+   "revision": 1315596836,
+   "sha256": "f8c8fb2653903fbe4591a4038a5751b402f73c2a2f4bff0bbedabb43cebb4e74",
+   "bytes": 141361
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup Group P",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_Group_P.html",
+   "page": "2023 FIBA Basketball World Cup Group P",
+   "revision": 1315598433,
+   "sha256": "b6f0a9053b12ab89a2d4b886b1387336f8dfa8d7eb4a8a88043b5a24407c03b1",
+   "bytes": 142227
+  },
+  {
+   "title": "2023 FIBA Basketball World Cup final round",
+   "competition": "wc2023",
+   "file": "2023_FIBA_Basketball_World_Cup_final_round.html",
+   "page": "2023 FIBA Basketball World Cup final round",
+   "revision": 1343661587,
+   "sha256": "99cc19fa5a7dd160b00acca7a4cc9fc3e29838a47edac9b718ae83ccffa54fc2",
+   "bytes": 234623
+  },
+  {
+   "title": "2024 FIBA Men's Olympic Qualifying Tournaments – Valencia",
+   "competition": "oqt2024",
+   "file": "2024_FIBA_Men_s_Olympic_Qualifying_Tournaments_-_Valencia.html",
+   "page": "2024 FIBA Men's Olympic Qualifying Tournaments – Valencia",
+   "revision": 1303559712,
+   "sha256": "a03c159a688d3d7a4ad6d7b7db9bad8cb77ea621ce49cb453a12301ea4fe23c6",
+   "bytes": 313676
+  },
+  {
+   "title": "2024 FIBA Men's Olympic Qualifying Tournaments – Riga",
+   "competition": "oqt2024",
+   "file": "2024_FIBA_Men_s_Olympic_Qualifying_Tournaments_-_Riga.html",
+   "page": "2024 FIBA Men's Olympic Qualifying Tournaments – Riga",
+   "revision": 1277613851,
+   "sha256": "839c93974ccfa9a0860e75ab50266455387ea7f64239f114b60d24d74ff91cf2",
+   "bytes": 317583
+  },
+  {
+   "title": "2024 FIBA Men's Olympic Qualifying Tournaments – Piraeus",
+   "competition": "oqt2024",
+   "file": "2024_FIBA_Men_s_Olympic_Qualifying_Tournaments_-_Piraeus.html",
+   "page": "2024 FIBA Men's Olympic Qualifying Tournaments – Piraeus",
+   "revision": 1337457144,
+   "sha256": "ccefc222e8143417b3e1c832fe2835a0458f26d2af51128f26373b182f82ffc4",
+   "bytes": 319304
+  },
+  {
+   "title": "2024 FIBA Men's Olympic Qualifying Tournaments – San Juan",
+   "competition": "oqt2024",
+   "file": "2024_FIBA_Men_s_Olympic_Qualifying_Tournaments_-_San_Juan.html",
+   "page": "2024 FIBA Men's Olympic Qualifying Tournaments – San Juan",
+   "revision": 1283530065,
+   "sha256": "72e5e69bef22bd19f6a1c635c6d1bfe37d299f922f0b3e5d5d450255cac4f6c1",
+   "bytes": 323180
+  },
+  {
+   "title": "Basketball at the 2024 Summer Olympics – Men's tournament",
+   "competition": "og2024",
+   "file": "Basketball_at_the_2024_Summer_Olympics_-_Men_s_tournament.html",
+   "page": "Basketball at the 2024 Summer Olympics – Men's tournament",
+   "revision": 1386509814,
+   "sha256": "fe1289118df3708434cd7a4c34093f08c46b657ff9660f17565c7a9ec43899f4",
+   "bytes": 711858
+  },
+  {
+   "title": "EuroBasket 2025 Group A",
+   "competition": "eurobasket2025",
+   "file": "EuroBasket_2025_Group_A.html",
+   "page": "EuroBasket 2025 Group A",
+   "revision": 1362568222,
+   "sha256": "580c418a42dfb1042cc67f223b3c9a8ca59c28b078bdfae8247f4d0c1204049f",
+   "bytes": 225341
+  },
+  {
+   "title": "EuroBasket 2025 Group B",
+   "competition": "eurobasket2025",
+   "file": "EuroBasket_2025_Group_B.html",
+   "page": "EuroBasket 2025 Group B",
+   "revision": 1311956062,
+   "sha256": "bea5cff5be65f469b37839d803dcdb7e4df491d6c969e986566f26b225e7d9e6",
+   "bytes": 230851
+  },
+  {
+   "title": "EuroBasket 2025 Group C",
+   "competition": "eurobasket2025",
+   "file": "EuroBasket_2025_Group_C.html",
+   "page": "EuroBasket 2025 Group C",
+   "revision": 1312314156,
+   "sha256": "cebbabc6bc9dae8ee4b9f9fc6ae0709eb3a5c5955f1d7f8fadb081dbb343152c",
+   "bytes": 231000
+  },
+  {
+   "title": "EuroBasket 2025 Group D",
+   "competition": "eurobasket2025",
+   "file": "EuroBasket_2025_Group_D.html",
+   "page": "EuroBasket 2025 Group D",
+   "revision": 1328921643,
+   "sha256": "db73f8d6349fa73950c6c1f8db59a251ed293b5c579dff5c7fb0ee2e054d8e36",
+   "bytes": 226458
+  },
+  {
+   "title": "EuroBasket 2025 knockout stage",
+   "competition": "eurobasket2025",
+   "file": "EuroBasket_2025_knockout_stage.html",
+   "page": "EuroBasket 2025 knockout stage",
+   "revision": 1312260979,
+   "sha256": "db759113b066ebbd92965453e539e228cdbb6b16ca3e898f25db2c2d8ff6f54a",
+   "bytes": 287483
+  },
+  {
+   "title": "2025 FIBA AmeriCup",
+   "competition": "americup2025",
+   "file": "2025_FIBA_AmeriCup.html",
+   "page": "2025 FIBA AmeriCup",
+   "revision": 1358963303,
+   "sha256": "b8f1ed35691a741c23ff4c6c105d761063a81d46b52c22a8b49c70abd68725fd",
+   "bytes": 469162
+  },
+  {
+   "title": "AfroBasket 2025",
+   "competition": "afrobasket2025",
+   "file": "AfroBasket_2025.html",
+   "page": "FIBA AfroBasket 2025",
+   "revision": 1314835605,
+   "sha256": "6ad73a06513a05d3ca27dca37f041f66fecef8d73eceadf8d566678da1af5cd0",
+   "bytes": 685292
+  },
+  {
+   "title": "2025 FIBA Asia Cup",
+   "competition": "asiacup2025",
+   "file": "2025_FIBA_Asia_Cup.html",
+   "page": "2025 FIBA Asia Cup",
+   "revision": 1374450264,
+   "sha256": "dd504b83848fcb004cae81b377676c89e3f8a42d8f5b6cebe703632bf90f1b77",
+   "bytes": 643306
+  },
+  {
+   "title": "2027 FIBA Basketball World Cup qualification (Europe)",
+   "competition": "wcq2027",
+   "file": "2027_FIBA_Basketball_World_Cup_qualification__Europe_.html",
+   "page": "2027 FIBA Basketball World Cup qualification (Europe)",
+   "revision": 1380293313,
+   "sha256": "d0633db75c2cbcfcce3af969e2a67d8cd6de4155baf8f062943d6425f6e6a7be",
+   "bytes": 2203793
+  },
+  {
+   "title": "2027 FIBA Basketball World Cup qualification (Americas)",
+   "competition": "wcq2027",
+   "file": "2027_FIBA_Basketball_World_Cup_qualification__Americas_.html",
+   "page": "2027 FIBA Basketball World Cup qualification (Americas)",
+   "revision": 1380641174,
+   "sha256": "d5f8dfb0ef937a639a0e9a456d0319fc52861b9aaa191a9cb26d86371490f45e",
+   "bytes": 1208099
+  },
+  {
+   "title": "2027 FIBA Basketball World Cup qualification (Africa)",
+   "competition": "wcq2027",
+   "file": "2027_FIBA_Basketball_World_Cup_qualification__Africa_.html",
+   "page": "2027 FIBA Basketball World Cup qualification (Africa)",
+   "revision": 1373310956,
+   "sha256": "b1f4cbdc5ab4bfb46091a14510632f6eed023c5f7e8ad9e0fa793332efb380d4",
+   "bytes": 894636
+  },
+  {
+   "title": "2027 FIBA Basketball World Cup qualification (Asia)",
+   "competition": "wcq2027",
+   "file": "2027_FIBA_Basketball_World_Cup_qualification__Asia_.html",
+   "page": "2027 FIBA Basketball World Cup qualification (Asia)",
+   "revision": 1385581289,
+   "sha256": "e307c52886f9df32180469bebcab1dea882ebd281e38506de24f4a1164283f64",
+   "bytes": 927852
+  }
+ ],
+ "retrieved": "2026-11-21"
+}

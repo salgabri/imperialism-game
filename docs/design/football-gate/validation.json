@@ -439,7 +439,7 @@
       "sources": "EA FC 26",
       "ratingsDate": "2025-09-19",
       "informationDate": "2025-09-19",
-      "contentHash": "ea-fc-26-ef694992",
+      "contentHash": "ea-fc-26-5f50fa43",
       "gate": "provisional",
       "verdict": "fail",
       "verdicts": {
@@ -554,7 +554,7 @@
         "badRatings": [],
         "badStrength": [],
         "badNationStatus": [],
-        "contentHash": "ea-fc-26-ef694992",
+        "contentHash": "ea-fc-26-5f50fa43",
         "failures": []
       },
       "crossSectional": {
@@ -960,8 +960,8 @@
         },
         "strengthScale": {
           "roster": {
-            "mean": 72.5333,
-            "sd": 7.8345
+            "mean": 72.5349,
+            "sd": 7.8322
           },
           "note": "Z = (value − mean) / population SD over every nation fielding a side; Elo scale stays offline"
         },
@@ -1045,27 +1045,27 @@
               "roster"
             ],
             "n": 600,
-            "logLoss": 0.9077,
-            "rps": 0.1757,
-            "brier": 0.5375,
+            "logLoss": 0.9079,
+            "rps": 0.1758,
+            "brier": 0.5377,
             "competitive": {
               "n": 393,
-              "logLoss": 0.8909,
+              "logLoss": 0.891,
               "rps": 0.1728,
               "brier": 0.5282
             },
             "friendlies": {
               "n": 207,
-              "logLoss": 0.9394,
-              "rps": 0.1811,
-              "brier": 0.5552
+              "logLoss": 0.9401,
+              "rps": 0.1813,
+              "brier": 0.5556
             },
             "fitAllMatches": {
               "beta": [
-                1.1004
+                1.0988
               ],
-              "h": 0.2699,
-              "c": 0.6814,
+              "h": 0.2703,
+              "c": 0.6811,
               "converged": true
             },
             "folds": [
@@ -1074,10 +1074,10 @@
                 "trainMatches": 457,
                 "testMatches": 143,
                 "beta": [
-                  1.166
+                  1.1632
                 ],
-                "h": 0.2849,
-                "c": 0.7269,
+                "h": 0.2854,
+                "c": 0.7263,
                 "converged": true
               },
               {
@@ -1085,10 +1085,10 @@
                 "trainMatches": 494,
                 "testMatches": 106,
                 "beta": [
-                  1.044
+                  1.0429
                 ],
-                "h": 0.2466,
-                "c": 0.6818,
+                "h": 0.247,
+                "c": 0.6815,
                 "converged": true
               },
               {
@@ -1096,10 +1096,10 @@
                 "trainMatches": 494,
                 "testMatches": 106,
                 "beta": [
-                  1.14
+                  1.138
                 ],
-                "h": 0.25,
-                "c": 0.69,
+                "h": 0.2506,
+                "c": 0.6896,
                 "converged": true
               },
               {
@@ -1107,10 +1107,10 @@
                 "trainMatches": 494,
                 "testMatches": 106,
                 "beta": [
-                  1.1125
+                  1.1117
                 ],
-                "h": 0.2552,
-                "c": 0.6818,
+                "h": 0.2555,
+                "c": 0.6817,
                 "converged": true
               },
               {
@@ -1118,18 +1118,18 @@
                 "trainMatches": 461,
                 "testMatches": 139,
                 "beta": [
-                  1.0515
+                  1.0502
                 ],
-                "h": 0.3231,
-                "c": 0.6305,
+                "h": 0.3235,
+                "c": 0.6302,
                 "converged": true
               }
             ],
             "excludedStatusMatches": {
               "n": 10,
-              "logLoss": 0.8881,
-              "rps": 0.1638,
-              "brier": 0.5244
+              "logLoss": 0.8843,
+              "rps": 0.1626,
+              "brier": 0.5217
             }
           },
           "eloAtR": {
@@ -1232,28 +1232,28 @@
               "roster"
             ],
             "n": 600,
-            "logLoss": 0.8765,
+            "logLoss": 0.8766,
             "rps": 0.1672,
             "brier": 0.5198,
             "competitive": {
               "n": 393,
-              "logLoss": 0.8539,
+              "logLoss": 0.8538,
               "rps": 0.1626,
-              "brier": 0.506
+              "brier": 0.5059
             },
             "friendlies": {
               "n": 207,
-              "logLoss": 0.9195,
-              "rps": 0.1759,
-              "brier": 0.546
+              "logLoss": 0.9198,
+              "rps": 0.176,
+              "brier": 0.5462
             },
             "fitAllMatches": {
               "beta": [
-                0.7782,
-                0.567
+                0.7799,
+                0.5648
               ],
-              "h": 0.2487,
-              "c": 0.7187,
+              "h": 0.2489,
+              "c": 0.7185,
               "converged": true
             },
             "folds": [
@@ -1262,11 +1262,11 @@
                 "trainMatches": 457,
                 "testMatches": 143,
                 "beta": [
-                  0.807,
-                  0.5995
+                  0.8098,
+                  0.5955
                 ],
-                "h": 0.2507,
-                "c": 0.7751,
+                "h": 0.251,
+                "c": 0.7748,
                 "converged": true
               },
               {
@@ -1274,11 +1274,11 @@
                 "trainMatches": 494,
                 "testMatches": 106,
                 "beta": [
-                  0.7428,
-                  0.536
+                  0.7444,
+                  0.5338
                 ],
-                "h": 0.2263,
-                "c": 0.7133,
+                "h": 0.2266,
+                "c": 0.7131,
                 "converged": true
               },
               {
@@ -1286,11 +1286,11 @@
                 "trainMatches": 494,
                 "testMatches": 106,
                 "beta": [
-                  0.7763,
-                  0.625
+                  0.7785,
+                  0.6222
                 ],
-                "h": 0.2095,
-                "c": 0.7291,
+                "h": 0.2098,
+                "c": 0.7289,
                 "converged": true
               },
               {
@@ -1298,10 +1298,10 @@
                 "trainMatches": 494,
                 "testMatches": 106,
                 "beta": [
-                  0.7817,
-                  0.5568
+                  0.7821,
+                  0.5562
                 ],
-                "h": 0.27,
+                "h": 0.2702,
                 "c": 0.7158,
                 "converged": true
               },
@@ -1310,24 +1310,24 @@
                 "trainMatches": 461,
                 "testMatches": 139,
                 "beta": [
-                  0.7885,
-                  0.5286
+                  0.7901,
+                  0.5268
                 ],
-                "h": 0.2927,
-                "c": 0.6662,
+                "h": 0.2929,
+                "c": 0.6661,
                 "converged": true
               }
             ],
             "excludedStatusMatches": {
               "n": 10,
-              "logLoss": 0.9067,
-              "rps": 0.1718,
-              "brier": 0.5384
+              "logLoss": 0.9049,
+              "rps": 0.1712,
+              "brier": 0.5371
             }
           }
         },
         "rosterVsElo": {
-          "meanDifference": 0.0141,
+          "meanDifference": 0.0144,
           "seByMatchWindow": 0.0084,
           "seMethodByMatchWindow": "cluster bootstrap",
           "matchWindows": 19,
@@ -1341,18 +1341,18 @@
           "criticalRule": "2·SE: 19 clusters, at least 8",
           "gate": "roster log loss ≤ Elo-at-R_Y log loss + 2·SE, and roster β > 0",
           "margin": 0.0348,
-          "rosterBeta": 1.1004,
+          "rosterBeta": 1.0988,
           "pass": true
         },
         "eloPlusRosterVsElo": {
-          "meanDifference": -0.017,
-          "seByMatchWindow": 0.0042,
+          "meanDifference": -0.0169,
+          "seByMatchWindow": 0.0041,
           "seMethodByMatchWindow": "cluster bootstrap",
           "matchWindows": 19,
           "seByTeamPair": 0.0084,
           "seMethodByTeamPair": "cluster bootstrap",
           "teamPairs": 534,
-          "sePerMatch": 0.008,
+          "sePerMatch": 0.0079,
           "se": 0.0084,
           "seUsed": "team pair",
           "critical": 2,

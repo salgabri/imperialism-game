@@ -4,10 +4,17 @@
 // map from every 5v5 series the export holds since Counter-Strike: Global Offensive began, a team playing at the mean of
 // its five; only the numbers and the wiki's reading are Counter-Strike's.
 //
+// A newcomer starts at his region's level: his nation's region (regionOfNation; Counter-Strike's events seldom name one),
+// each region's level fitted at once with every player's own strength (liquipedia-elo.mjs regionLevels), so a scene whose
+// teams mostly play each other, as South Africa's do, is not rated as the world's equal (docs/design/counter-strike.md,
+// "Regions").
+//
 // On the game's scale a rating is (Elo + ELO_OFFSET) / 25: a rating point is 25 Elo points, as in tennis and Rocket
-// League, so the match model plays Elo's own odds for each map (src/sports/counterStrike.js). A nation names its best
-// seven by Elo (TEAM_SIZE) and fields its five best; with fewer than five it fields none and its land stays neutral.
-import { baseTeamName, createLiquipediaElo, nationalTeams as sharedNationalTeams, nationOfFlag } from './liquipedia-elo.mjs';
+// League, so the match model plays Elo's own odds for each map (src/sports/counterStrike.js); the levels are anchored so
+// that Europe's newcomers start at 1,500 (58), as every newcomer once did. A nation names its best seven by Elo
+// (TEAM_SIZE) and fields its five best; with fewer than five it fields none and its land stays neutral.
+import { baseTeamName, createLiquipediaElo, nationalTeams as sharedNationalTeams, nationOfFlag, regionByConfederation }
+  from './liquipedia-elo.mjs';
 import { infoboxOf, plainText, templateIn, tournamentOf as readInfobox, truthy } from './liquipedia.mjs';
 
 export const SPORT = 'counter-strike';
@@ -34,16 +41,29 @@ const GAMES = new Set(['csgo', 'cs2', 'csgocs2']);
 
 // K per map: K_SCALE / (games + 5) ^ 0.4, never below K_FLOOR (liquipedia-elo.mjs's kFactor). K_SCALE is the one that best
 // foresaw the last 180 days of the exports of 2026-11-15 (S-, A- and B-Tier: 6,487 maps, each scored before it was
-// played): log loss 0.6502 at 60, 0.6445 at 110, 0.6422 at 140, 0.6408 at 180, 0.6410 at 240, 0.6436 at 320, 0.6479 at
-// 400. A map is a noisier test of two teams than a Rocket League game, so each moves its players less (Rocket League's K
-// is 320). Every newcomer starts at START: regional starts (Rocket League's) foresaw no better (0.6408 with them too) and
-// put the CIS's newcomers 380 points below Europe's.
+// played; the regions' levels on, fitted on the maps before): log loss 0.6498 at 60, 0.6442 at 110, 0.6419 at 140, 0.6406
+// at 180, 0.6408 at 240, 0.6434 at 320, 0.6476 at 400 (re-run 2026-11-21; without the levels 0.0002 to 0.0004 more at
+// each). A map is a noisier test of two teams than a Rocket League game, so each moves its players less (Rocket League's
+// K is 320).
 export const K_SCALE = 180;
 export const K_FLOOR = 8;
 
+/**
+ * A nation's Counter-Strike region (homesOf: a player's home is his nation's): its confederation's, with the scenes' own
+ * lines: the former Soviet states the CIS's, Australia Oceania's, the Arab states (North Africa's among them) and Iran the
+ * Middle East's; Turkey and Israel play Europe's, as their confederation does.
+ */
+export const MENA_NATIONS = Object.freeze(['682', '784', '414', '634', '048', '512', '400', '422', '760', '368', '364', '275', '887',
+  '818', '434', '788', '012', '504', '478', '736']);
+export const CIS_NATIONS = Object.freeze(['643', '804', '112', '398', '860', '417', '762', '795', '051', '031', '268', '498']);
+export const regionOfNation = regionByConfederation({
+  confederations: { UEFA: 'EU', CONMEBOL: 'SA', CONCACAF: 'NA', AFC: 'ASIA', CAF: 'AF', OFC: 'OCE' },
+  nations: { CIS: CIS_NATIONS, OCE: ['036'], MENA: MENA_NATIONS },
+});
+
 // Counter-Strike's regions as Liquipedia's pages name them (an infobox's `region`, or a segment of its title), by the
-// key the ratings use: a newcomer starts at his region's level (regionalStarts). An event that names none, or the
-// Americas' (both continents'), is international.
+// key the ratings use (regionOfNation's): a player whose nation is unknown is the region whose events he played most
+// (homesOf). An event that names none, or the Americas' (both continents'), is international.
 export const REGIONS = Object.freeze({
   EU: ['europe', 'eu', 'western europe', 'northern europe', 'southern europe', 'central europe', 'nordic', 'nordics', 'scandinavia',
     'benelux', 'balkans', 'baltics', 'iberia', 'dach', 'uk & ireland'],
@@ -184,11 +204,15 @@ const elo = createLiquipediaElo({
   gameOf: mapOf,
   // The wiki's team templates are often a word of the team's name: "eclot" for Dynamo Eclot, "unity.sk" for UNiTY esports.
   templateWords: true,
+  // A player's home is his nation's region, else the region whose events he has played most games in: most of
+  // Counter-Strike's events name no region (South Africa's leagues none), and 97% of its players have a country.
+  homeBy: 'nation',
+  regionOfNation,
 });
 
-export { binOdds, expected, homeOf, isRegionFlag, looseKey, nationOfFlag, nationOfPlayer, ODDS_BINS, oddsBin, playerKey, rowOf, scoreOf }
-  from './liquipedia-elo.mjs';
+export { ANCHOR, binOdds, expected, homeOf, isRegionFlag, LEVEL_TAU, looseKey, nationOfFlag, nationOfPlayer, ODDS_BINS, OFFSET_TAU, oddsBin,
+  playerKey, rowOf, scoreOf } from './liquipedia-elo.mjs';
 /** The nation each player last played for in a national-team event ("Team Denmark" as Denmark): liquipedia-elo.mjs's. */
 export const nationalTeams = tournaments => sharedNationalTeams(tournaments, nationOfTeamName);
-export const { gameRating, kFactor, readTournaments, startersOf, seriesInOrder, runElo, homeEdge, regionalStarts, ratedPlayers,
-  playersAsOf, playerOf, tupleOf, nationsOf, leftOut } = elo;
+export const { gameRating, kFactor, readTournaments, startersOf, seriesInOrder, runElo, crossRegion, homeEdge, homesOf, regionLevels,
+  ratedPlayers, playersAsOf, playerOf, tupleOf, nationsOf, leftOut } = elo;

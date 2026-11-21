@@ -818,3 +818,78 @@ test('the Ledger’s Fallen panel and the Chronicle’s Story panel measure thei
     assert.equal(chronicle.host.querySelector('.fi-activity .pager__pos').textContent, 'Page 1 /  of 6');
   });
 });
+
+// ---------- a focus that moves in its list is the same focus ----------
+
+function FocusKeyedList({ items, focusIndex = -1, focusKey }) {
+  const list = usePagedList(items, { row: 'li', focusIndex, focusKey });
+  return React.createElement(React.Fragment, null,
+    React.createElement('ol', { ref: list.boxRef, className: 'box' }, list.shown.map(item => React.createElement('li', { key: item }, item))),
+    React.createElement('output', { className: 'meta' }, JSON.stringify({ page: list.page, pages: list.pages })),
+    React.createElement('button', { type: 'button', className: 'turn', onClick: () => list.setPage(list.page + 1) }, 'next'));
+}
+
+test('usePagedList: a focus keyed by its item keeps the page turned to while new rows push it down the list', async () => {
+  await withDom(async ({ mount, window }) => {
+    const stub = installObserver(window);
+    const view = await mount(FocusKeyedList, { items: NAMES, focusIndex: 4, focusKey: 'Row 5' });
+    await measureList(view, stub, 310);
+    const page = () => JSON.parse(view.host.querySelector('.meta').textContent).page;
+    assert.equal(page(), 0);
+    await click(view.host.querySelector('.turn'));
+    await click(view.host.querySelector('.turn'));
+    assert.equal(page(), 2, 'the player pages to the oldest rows');
+    // Two new rows above (the newest match first, as the history lists them): the focus moves to index 6, same row.
+    await view.render({ items: ['Row 0b', 'Row 0a', ...NAMES], focusIndex: 6, focusKey: 'Row 5' });
+    assert.equal(page(), 2, 'the page stays where the player turned it');
+    await view.render({ items: ['Row 0b', 'Row 0a', ...NAMES], focusIndex: 20, focusKey: 'Row 19' });
+    assert.equal(page(), 2, 'another focus brings its page: row 21 of 27 is on the third page of ten');
+    await view.render({ items: ['Row 0b', 'Row 0a', ...NAMES], focusIndex: 1, focusKey: 'Row 0a' });
+    assert.equal(page(), 0);
+  });
+});
+
+test('the Ledger reopens on the page of the team you opened from it; the activity feed names each page\'s first round', async () => {
+  await withDom(async ({ mount, window }) => {
+    const stub = installObserver(window);
+    const rows = Array.from({ length: 30 }, (_, i) => ({ tid: `t${i}`, rank: i + 1, name: `Team ${i}`, code: `T${i}`, flagId: null, isClub: true,
+      color: '#888', territories: String(30 - i), eff: '80.0', effGain: { text: '±0.0' }, ...(i === 0 ? { you: true } : {}) }));
+    // Squad › Back remounts the Ledger: its standings open on the selected team's page, so its row can take focus.
+    const ledger = await mount(LedgerScreen, { rows, selectedTeamId: 't23', header: { kicker: 'K', title: 'Ledger', stats: [] }, onSelectTeam() {} });
+    const table = ledger.host.querySelector('.ledger-table');
+    const body = [...ledger.host.querySelectorAll('tbody tr')];
+    layOut(table, { width: 400, height: 310, top: 0, scrollHeight: 10 + 30 * body.length });
+    body.forEach(row => layOut(row, { width: 400, height: 30, top: 10 }));
+    await stub.fire();
+    assert.equal(ledger.host.querySelectorAll('tbody tr').length, 10, 'ten standings to a page');
+    assert.ok(ledger.host.querySelector('tbody [data-team-id="t23"]'), 'the selected team\'s row is on show');
+    assert.equal(ledger.host.querySelector('.ledger-main .pager__pos').textContent, 'Page 3 /  of 3');
+
+    const feed = Array.from({ length: 12 }, (_, i) => ({ round: `R${6 - Math.floor(i / 2)}`, kind: 'match', text: `Entry ${i}` }));
+    const chronicle = await mount(ChronicleScreen, { history: [], feed, header: { kicker: 'K', title: 'Chronicle', stats: [] } });
+    const activity = chronicle.host.querySelector('.fi-activity-box');
+    // Three rows a page: each round's two entries straddle the pages.
+    layOut(activity, { width: 300, height: 78, top: 0, scrollHeight: 26 * 12 });
+    activity.querySelectorAll('.fi-activity-item').forEach(row => layOut(row, { width: 300, height: 26, top: 0 }));
+    await stub.fire();
+    const labels = () => [...activity.querySelectorAll('.fi-activity-round')].map(label => label.textContent);
+    assert.deepEqual(labels(), ['Round VI', '', 'Round V']);
+    await click(chronicle.host.querySelector('.fi-activity [aria-label="Next page"]'));
+    assert.deepEqual(labels(), ['Round V', 'Round IV', ''], 'page 2 opens on round V, whose run began on page 1');
+  });
+});
+
+test('picking a match where the result takes the list\'s place moves focus to the result', async () => {
+  await withDom(async ({ mount }) => {
+    const entry = n => ({ id: `match-${n}`, round: String(n).padStart(3, '0'), aId: `a${n}`, dId: `b${n}`,
+      a: { name: `Attacker ${n}`, code: `A${n}`, score: 1 }, b: { name: `Defender ${n}`, code: `D${n}`, score: 0 },
+      winnerId: `a${n}`, winnerName: `Attacker ${n}`, result: { winnerId: `a${n}`, winnerName: `Attacker ${n}`, loserId: `b${n}`, loserName: `Defender ${n}` } });
+    const chronicle = await mount(ChronicleScreen, { history: [entry(1), entry(2), entry(3)], feed: [], header: { kicker: 'K', title: 'Chronicle', stats: [] } });
+    const row = chronicle.host.querySelector('.fi-history-list button');
+    row.focus();
+    // jsdom has no layout, so the row reads as hidden, as it is below 1200px once the Result panel shows.
+    await click(row);
+    assert.equal(chronicle.host.querySelector('.screen--chronicle').getAttribute('data-panel'), 'result');
+    assert.ok(document.activeElement === chronicle.host.querySelector('.fi-history__report'), 'focus is on the result, not the page');
+  });
+});

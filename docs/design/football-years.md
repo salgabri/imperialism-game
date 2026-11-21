@@ -741,26 +741,26 @@ line's level, the natural 4-4-2, the first-year rule and the hold below, and the
 | Season | Short nations | Filled | Players added | EA players out of position who lost their place | Fielded XIs under eleven, before → after | Spearman against Elo, before → after |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2004/05 FIFA 05 | 24 | 23 | 67 | 26 | 13 → 0 | 0.802 → 0.879 |
-| 2005/06 FIFA 06 | 22 | 22 | 73 | 36 | 12 → 0 | 0.817 → 0.904 |
-| 2006/07 FIFA 07 | 28 | 28 | 109 | 48 | 18 → 0 | 0.762 → 0.893 |
-| 2007/08 FIFA 08 | 34 | 34 | 103 | 54 | 14 → 0 | 0.744 → 0.887 |
+| 2005/06 FIFA 06 | 22 | 22 | 73 | 36 | 12 → 0 | 0.817 → 0.900 |
+| 2006/07 FIFA 07 | 28 | 28 | 109 | 48 | 18 → 0 | 0.762 → 0.889 |
+| 2007/08 FIFA 08 | 34 | 34 | 103 | 54 | 14 → 0 | 0.744 → 0.888 |
 | 2008/09 FIFA 09 | 37 | 37 | 102 | 56 | 14 → 0 | 0.760 → 0.900 |
 | 2009/10 FIFA 10 | 25 | 23 | 59 | 39 | 8 → 1 | 0.790 → 0.834 |
-| 2010/11 FIFA 11 | 20 | 19 | 39 | 19 | 10 → 0 | 0.779 → 0.805 |
+| 2010/11 FIFA 11 | 20 | 19 | 39 | 19 | 10 → 0 | 0.779 → 0.804 |
 | 2011/12 FIFA 12 | 20 | 19 | 47 | 19 | 8 → 0 | 0.835 → 0.834 |
-| 2012/13 FIFA 13 | 27 | 25 | 78 | 27 | 14 → 0 | 0.794 → 0.866 |
-| 2013/14 FIFA 14 | 30 | 25 | 59 | 20 | 14 → 0 | 0.819 → 0.854 |
-| 2014/15 FIFA 15 | 24 | 18 | 58 | 17 | 12 → 1 | 0.831 → 0.853 |
+| 2012/13 FIFA 13 | 27 | 25 | 78 | 27 | 14 → 0 | 0.794 → 0.863 |
+| 2013/14 FIFA 14 | 30 | 25 | 59 | 20 | 14 → 0 | 0.819 → 0.852 |
+| 2014/15 FIFA 15 | 24 | 18 | 58 | 17 | 12 → 1 | 0.831 → 0.852 |
 | 2015/16 FIFA 16 | 25 | 18 | 43 | 18 | 11 → 4 | 0.845 → 0.884 |
 | 2016/17 FIFA 17 | 25 | 16 | 32 | 16 | 15 → 9 | 0.876 → 0.898 |
-| 2017/18 FIFA 18 | 27 | 16 | 40 | 7 | 15 → 7 | 0.856 → 0.868 |
-| 2018/19 FIFA 19 | 23 | 8 | 22 | 2 | 12 → 9 | 0.877 → 0.879 |
+| 2017/18 FIFA 18 | 27 | 16 | 40 | 7 | 15 → 7 | 0.856 → 0.869 |
+| 2018/19 FIFA 19 | 23 | 8 | 22 | 2 | 12 → 9 | 0.877 → 0.878 |
 | 2019/20 FIFA 20 | 26 | 12 | 22 | 6 | 14 → 12 | 0.876 → 0.881 |
-| 2020/21 FIFA 21 | 29 | 14 | 27 | 5 | 16 → 13 | 0.889 → 0.899 |
-| 2021/22 FIFA 22 | 29 | 11 | 22 | 1 | 18 → 13 | 0.882 → 0.886 |
-| 2022/23 FIFA 23 | 27 | 9 | 14 | 3 | 15 → 9 | 0.871 → 0.875 |
-| 2023/24 EA FC 24 | 31 | 10 | 17 | 3 | 12 → 10 | 0.863 → 0.869 |
-| 2024/25 EA FC 25 | 30 | 9 | 16 | 4 | 14 → 11 | 0.800 → 0.814 |
+| 2020/21 FIFA 21 | 29 | 14 | 27 | 5 | 16 → 13 | 0.889 → 0.898 |
+| 2021/22 FIFA 22 | 29 | 11 | 22 | 1 | 18 → 13 | 0.882 → 0.887 |
+| 2022/23 FIFA 23 | 27 | 9 | 14 | 3 | 15 → 9 | 0.871 → 0.874 |
+| 2023/24 EA FC 24 | 31 | 10 | 17 | 3 | 12 → 10 | 0.863 → 0.868 |
+| 2024/25 EA FC 25 | 30 | 9 | 16 | 4 | 14 → 11 | 0.800 → 0.812 |
 | 2025/26 EA FC 26 | 32 | 4 | 8 | 1 | 17 → 16 | 0.832 → 0.845 |
 
 "Short" is a fielded nation without a natural XI of EA's own (595 nation-seasons); 400 are filled with 1,057 players.
@@ -795,12 +795,13 @@ How a season is filled (`scripts/lib/football-fills.mjs`, called by `assembleEaS
   player who played out of position gives his place to a capped player of that position: 427 over the 22 seasons, the
   formation's surplus (a third forward, a fifth midfielder, a second goalkeeper), among them Paolo Guerrero for Peru
   and Amr Zaki for Egypt in 2008/09. A squad stays at most eleven, as every EA season's does.
-- **Target.** T = L − 3.2 × (E_best − E) / 100: E the nation's World Football Elo on the season's ratings date (EA's
+- **Target.** T = L − 3.2 × (E′_best − E′) / 100: E′ the nation's World Football Elo on the season's ratings date (EA's
   roster date, `ratingsDate` where the season has one: the date the gate reads, D_Y), computed by
-  `scripts/lib/football-elo.mjs` from martj42's results at the computed seasons' pinned commit; E_best the best of the
-  teams active in the four years before; 3.2 the computed seasons' points per 100 Elo, which gives the match engine
-  Elo's expected score. L is the line's level at E_best on the season's own scale: the median, over its full EA XIs, of
-  their mean + 3.2 × (E_best − E) / 100. The computed seasons anchor at 87, the built-in's strongest nation, but EA's
+  `scripts/lib/football-elo.mjs` from martj42's results at the computed seasons' pinned commit, plus its
+  confederation's level on that day ([Confederation levels](#confederation-levels), since 2026-11-21); E′_best the best
+  E′ of the teams active in the four years before; 3.2 the computed seasons' points per 100 Elo, which gives the match
+  engine Elo's expected score. L is the line's level at E′_best on the season's own scale: the median, over its full EA
+  XIs, of their mean + 3.2 × (E′_best − E′) / 100. The computed seasons anchor at 87, the built-in's strongest nation, but EA's
   XIs sit at L = 87.0–91.3 (EA's scale narrows in the later editions), and an anchor of 87 would put every filled
   nation up to 4.3 points below EA's nations of the same Elo.
 - **Ratings.** The m added players' ratings sum to what brings the XI to round(11 × T), ordered by the same claim as the
@@ -808,13 +809,14 @@ How a season is filled (`scripts/lib/football-fills.mjs`, called by `assembleEaS
   eleven, by straight lines, less their mean; rounded so they sum exactly (largest remainders) and never invert. Their
   mean R, and each rating, are held within T + min D and T + max D (T − 3.9 to T + 5.3), where a member of an XI at T
   can be: one place beside ten EA players far below the line would otherwise ask 99 of its player (Ivan Ivanov for
-  Bulgaria in 2008/09), and far above it 36 (Algeria's keeper). The hold binds in 297 of the 400 filled nations, 222 of
-  them because EA's own players sit below the line; filled XIs end a median 1.5 points below T (quartiles −4.0 and
-  0.0), from 7.9 before.
+  Bulgaria in 2008/09), and far above it 36 (Algeria's keeper). The hold binds in 292 of the 400 filled nations, 221 of
+  them because EA's own players sit below the line; filled XIs end a median 1.5 points below T (quartiles −3.6 and
+  −0.1), from 7.9 before (297, 222, and −4.0 to 0.0 before the confederation levels).
 - **Marking.** A computed player is `[name, position, rating, source]` beside EA's tuples: his source names him
   (`wd:Q…`, linked to his English Wikipedia article, else his Wikidata item), `source: 'estimate'`, `league:
   'International football'` (src/data/estimates.js gives the words: "Estimated rating: EA rated too few of this nation's
-  players for an XI, so this one comes from his caps for it that season and its World Football Elo"), the edition
+  players for an XI, so this one comes from his caps for it that season and its World Football Elo, levelled across
+  confederations"), the edition
   ("2008/09 national team, computed"), his team, its Elo and the day, and his stint (`from`, `to`, `caps`, `goals`,
   `toEstimated` where the end is the rule's). The season gains `fill`, beside EA's `source` (which its country maps
   credit unchanged): `method: 'computed'`, `rawScale: 'Elo'`, the day, the rule with its constants and L
@@ -848,7 +850,8 @@ npm run build:ea-seasons                 # reads the facts, fills each season, w
   national-team seasons' where they share them, the four position items they lack, the rule, and every season with its
   ratings date: the EA seasons and the built-in's, kept for the islands).
 - `scripts/data/football-fills/wikidata.json`: the teams, players and stints of 2004–2027 (CC0); `elo.json` each
-  season's Elo of every team active then. The build reads only these and the manifest, so it rebuilds offline.
+  season's Elo of every team active then, with its confederation, and the season's confederation levels. The build
+  reads only these and the manifest, so it rebuilds offline.
 - `docs/design/football-seasons-audit.json`: per season `fill` with L, the full XIs it rests on, and per short nation its
   Elo, T, strength before and after, the players added (rating, caps, stint, figure), the EA players who lost their
   place, the hold, the places still out of position or empty, and why a nation could not be filled.
@@ -861,10 +864,13 @@ The roster audit (`npm run audit:rosters`, [roster-audit.md](roster-audit.md)) f
 its lineup gaps fall from 709 to 444, and five computed players are among its unusual ages (under 16 or over 40 when
 the season starts: Roman Berezovsky, Armenia's keeper at 41 in 2016/17, and Vincent Thill, Luxembourg's at 15 in
 2015/16, as they played). `npm run validate:football-elo` rescored football-elo-agreement.json from the same cached
-tables: the 35 seasons' median rises from 0.852 to 0.869, and FIFA 11 (0.805) is now the lowest.
+tables: the 35 seasons' median rises from 0.852 to 0.869, and FIFA 11 (0.805) is now the lowest. The confederation
+levels of 2026-11-21 moved the filled seasons' figures by −0.004 to +0.001 (the table shows them; the median 0.8686 →
+0.8688, FIFA 11 0.804).
 
 The gate (`npm run validate:football`) scores the 2025/26 file, EA FC 26: its four filled nations take it from 0.8457
-to 0.8577 against Elo (still below the 0.90 bar it failed before) and its forecast log loss from 0.9169 to 0.9077. The
+to 0.8577 against Elo (still below the 0.90 bar it failed before) and its forecast log loss from 0.9169 to 0.9077
+(0.9079 since the confederation levels, rescored 2026-11-21 from the gate's own Elo tables of 2026-11-10). The
 built-in season is unchanged (0.9291, pass).
 
 ## Seasons before FIFA 05
@@ -1551,18 +1557,21 @@ setup's Season note says those seasons are computed.
 
 | Season | Id | Finalists fielded | Identities | Theatres | Strongest (T) | Team share |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1961/62 | `wc-1962` | 16 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany | World, Europe, South America | Brazil 87, Soviet Union 81.2, Czechoslovakia 80.4 | 76% |
-| 1965/66 | `wc-1966` | 16 | Soviet Union, West Germany | World, Europe, South America | England 87, West Germany 85.4, Soviet Union 84.8 | 70% |
-| 1969/70 | `wc-1970` | 16 | Soviet Union, Czechoslovakia, West Germany | World, Europe | Brazil 87, West Germany 83.0, England 82.3 | 78% |
-| 1973/74 | `wc-1974` | 16 | Yugoslavia, West Germany, Zaire | World, Europe, South America | West Germany 87, Netherlands 84.6, Poland 84.1 | 74% |
-| 1977/78 | `wc-1978` | 16 | West Germany | World, Europe | Brazil 87, Netherlands 84.3, Argentina 83.7 | 66% |
-| 1981/82 | `wc-1982` | 24 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany | World, Europe, South America | Brazil 87, Italy 85.4, West Germany 84.4 | 70% |
-| 1985/86 | `wc-1986` | 24 | Soviet Union, West Germany | World, Europe, South America | Argentina 87, France 86.2, Brazil 86.2 | 66% |
-| 1989/90 | `wc-1990` | 24 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany | World, Europe, South America | West Germany 87, Italy 85.7, Brazil 84.7 | 70% |
-| 1993/94 | `wc-1994` | 24 | none | World, Europe, South America | Brazil 87, Italy 85.9, Germany 84.5 | 68% |
+| 1961/62 | `wc-1962` | 16 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany | World, Europe, South America | Brazil 87, Soviet Union 81.6, Czechoslovakia 80.9 | 77% |
+| 1965/66 | `wc-1966` | 16 | Soviet Union, West Germany | World, Europe, South America | England 87, West Germany 85.4, Soviet Union 84.8 | 74% |
+| 1969/70 | `wc-1970` | 16 | Soviet Union, Czechoslovakia, West Germany | World, Europe | Brazil 87, West Germany 84.0, England 83.2 | 83% |
+| 1973/74 | `wc-1974` | 16 | Yugoslavia, West Germany, Zaire | World, Europe, South America | West Germany 87, Netherlands 84.6, Poland 84.1 | 79% |
+| 1977/78 | `wc-1978` | 16 | West Germany | World, Europe | Brazil 87, Netherlands 84.5, Argentina 83.7 | 72% |
+| 1981/82 | `wc-1982` | 24 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany | World, Europe, South America | Brazil 87, Italy 85.1, West Germany 84.1 | 76% |
+| 1985/86 | `wc-1986` | 24 | Soviet Union, West Germany | World, Europe, South America | Argentina 87, Brazil 86.2, France 85.8 | 72% |
+| 1989/90 | `wc-1990` | 24 | Soviet Union, Yugoslavia, Czechoslovakia, West Germany | World, Europe, South America | West Germany 87, Italy 85.7, Brazil 84.9 | 77% |
+| 1993/94 | `wc-1994` | 24 | none | World, Europe, South America | Brazil 87, Italy 86.0, Germany 84.5 | 72% |
 
 "Team share" is the nation's part of the variance of the season's XI ratings:
-the ratings are mostly about the team.
+the ratings are mostly about the team. The strengths and shares are those of the
+[confederation levels](#confederation-levels) of 2026-11-21, which set the
+finalists of CONCACAF, the AFC, the OFC and CAF 1.2 to 3.8 points lower against
+Europe's and South America's (the shares were 66–78% before).
 
 ### Sources
 
@@ -1598,9 +1607,11 @@ CC BY-SA asks for and licenses the season files under it.
   when its first match is in a year after 1930. The Soviet Union and the CIS are
   `Russia` in the results, West Germany `Germany`, Zaire `DR Congo`.
 - **Strength.** The Elo is read the day after the final (every match up to the
-  final's day). T = 87 − 3.2 × (E_best − E) / 100: E is the nation's Elo, E_best
-  the best of the teams that played in the four years before (each season's best
-  is a finalist), and 87 today's strongest built-in nation.
+  final's day). T = 87 − 3.2 × (E′_best − E′) / 100: E′ is the nation's Elo plus
+  its confederation's level on that day ([Confederation levels](#confederation-levels),
+  since 2026-11-21; before, E itself), E′_best the best E′ of the teams that played
+  in the four years before (each season's best is a finalist), and 87 today's
+  strongest built-in nation.
 - **The XI.** From the squad of 22: one GK, four DF, four MF and two FW by the
   database's positions, of the players who played (minutes, or a start), the
   most minutes first, then the most starts, then the lower shirt number. A role
@@ -1667,7 +1678,16 @@ rollover of the built-in season changes nothing.
   found in SWOS's squads by surname (a re-check that kept only surnames one SWOS
   player of the nation has found 147, at 0.65). The computed strengths run 5.5
   points higher on average: SWOS rates Mexico, Saudi Arabia and South Korea at
-  60–65 where their results make them 77–81.
+  60–65 where their results make them 77–81. Re-measured on 2026-11-21 from the
+  season files (each finalist's T against SWOS's stored nation strength), the
+  [confederation levels](#confederation-levels) take the nations' Pearson from
+  0.76 to 0.83 and Spearman from 0.73 to 0.81; the strengths run 5.0 points
+  higher, and Mexico, Saudi Arabia and South Korea fall to 79.2, 75.1 and 74.6.
+- **Across confederations** ([Confederation levels](#confederation-levels),
+  2026-11-21): the Elo set CONCACAF's, the AFC's and the OFC's sides, and CAF's
+  before 1995, 50 to 180 Elo (1.6 to 5.8 points) above what their matches against
+  the other confederations' sides showed; each season's Elo now carries the
+  levels that undo it.
 - **How they play.** Each season's finalists, all against all (a hundred
   rounds, neutral venue, Balanced, measured 2026-11-10): 2.93–3.16 goals a
   game, 20.6–23.2% draws and 6.2–7.7% goalless, within the realism harness's
@@ -1687,10 +1707,11 @@ npm run build:world-cup-seasons           # facts → public/football/wc-<year>.
 - `scripts/data/world-cup-seasons.json`: the manifest (sources, constants, the
   reviewed spellings and Ballon d'Or names, the seasons).
 - `scripts/data/world-cup-seasons/wc-<year>.json`: the committed facts of each
-  World Cup (the finalists' Elo and rank, every squad player's minutes, starts,
-  goals, awards, Ballon d'Or points, date of birth and article, and the votes for
-  players in no squad), CC BY-SA 4.0. The sync needs `data-src/`; the build reads
-  only these and the manifest, so it rebuilds offline.
+  World Cup (the finalists' Elo, rank and confederation, the season's confederation
+  levels, every squad player's minutes, starts, goals, awards, Ballon d'Or points,
+  date of birth and article, and the votes for players in no squad), CC BY-SA 4.0.
+  The sync needs `data-src/`; the build reads only these and the manifest, so it
+  rebuilds offline.
 - `public/football/wc-<year>.json`: `nations` lists the finalists only, each
   `[strength, squad size, eleven]`, a player `[name, 'GK' | 'DF' | 'MF' | 'FW',
   rating, source]` strongest first; `clubs` is empty; `territory` and
@@ -1760,31 +1781,31 @@ England, Masopust for Czechoslovakia.
 
 | Season | Id | Nations fielded | Identities | Theatres | Strongest (T) | Team share |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1992/93 | `nt-1993` | 81 | Czechoslovakia | World, Europe, South America, Africa, Asia, North America, Elite 32 | Germany 87, Argentina 86.4, Italy 85.9 | 80% |
-| 1991/92 | `nt-1992` | 72 | Zaire, Czechoslovakia, CIS | the same | Netherlands 87, Argentina 86.7, Germany 86.4 | 81% |
-| 1990/91 | `nt-1991` | 68 | Czechoslovakia, Soviet Union, Yugoslavia | the same | Germany 87, England 85.5, Italy 85.2 | 81% |
-| 1988/89 | `nt-1989` | 68 | Czechoslovakia, West Germany, Soviet Union, Yugoslavia | the same | Netherlands 87, West Germany 85.1, Soviet Union 85 | 80% |
-| 1987/88 | `nt-1988` | 66 | the same | the same | Netherlands 87, Soviet Union 85.5, West Germany 84.4 | 78% |
-| 1986/87 | `nt-1987` | 64 | the same | the same | Brazil 87, England 85.7, Argentina 85.5 | 78% |
-| 1984/85 | `nt-1985` | 63 | the same | the same | France 87, Soviet Union 86.4, West Germany 86.2 | 77% |
-| 1983/84 | `nt-1984` | 63 | the same | the same | Soviet Union 87, France 86.9, West Germany 85.2 | 79% |
-| 1982/83 | `nt-1983` | 62 | the same | the same | Brazil 87, Soviet Union 84.1, West Germany 83.8 | 80% |
-| 1980/81 | `nt-1981` | 62 | the same | the same | Brazil 87, West Germany 86.3, Argentina 84.5 | 80% |
-| 1979/80 | `nt-1980` | 61 | the same | the same | West Germany 87, Brazil 84.9, England 84.2 | 80% |
-| 1978/79 | `nt-1979` | 57 | the same | the same | Brazil 87, Argentina 83.9, West Germany 83.3 | 80% |
-| 1976/77 | `nt-1977` | 55 | Zaire and the four above | the same | West Germany 87, Netherlands 85.4, Brazil 85.1 | 76% |
-| 1975/76 | `nt-1976` | 54 | the same | the same | West Germany 87, Brazil 86.4, Netherlands 85 | 76% |
-| 1974/75 | `nt-1975` | 53 | the same | the same | West Germany 87, Netherlands 86.8, Brazil 85.4 | 77% |
-| 1972/73 | `nt-1973` | 51 | the same | the same | Brazil 87, West Germany 85.8, Italy 81.9 | 77% |
-| 1971/72 | `nt-1972` | 49 | the same | the same | Brazil 87, West Germany 87, England 82.7 | 76% |
-| 1970/71 | `nt-1971` | 48 | Czechoslovakia, West Germany, Soviet Union, Yugoslavia | World, Europe, South America, Africa, Asia, Elite 32 | Brazil 87, England 82.4, West Germany 82.3 | 78% |
-| 1968/69 | `nt-1969` | 45 | the same | World, Europe, South America, Asia, Elite 32 | England 87, Brazil 84.8, West Germany 84.5 | 74% |
-| 1967/68 | `nt-1968` | 43 | the same | the same | England 87, West Germany 84.9, Brazil 84.3 | 72% |
-| 1966/67 | `nt-1967` | 39 | the same | the same | England 87, West Germany 85.3, Soviet Union 85.1 | 75% |
-| 1964/65 | `nt-1965` | 38 | the same | World, Europe, South America, Elite 32 | Soviet Union 87, Brazil 86.5, Hungary 86.4 | 75% |
-| 1963/64 | `nt-1964` | 37 | the same | the same | Soviet Union 87, Argentina 86.3, Hungary 85.5 | 78% |
-| 1962/63 | `nt-1963` | 38 | the same | the same | Soviet Union 87, Hungary 86.2, Brazil 85.4 | 76% |
-| 1960/61 | `nt-1961` | 39 | the same | the same | Brazil 87, Hungary 83.8, Argentina 83.5 | 80% |
+| 1992/93 | `nt-1993` | 81 | Czechoslovakia | World, Europe, South America, Africa, Asia, North America, Elite 32 | Germany 87, Argentina 86.1, Italy 85.9 | 81% |
+| 1991/92 | `nt-1992` | 72 | Zaire, Czechoslovakia, CIS | the same | Netherlands 87, Argentina 86.8, Germany 86.4 | 83% |
+| 1990/91 | `nt-1991` | 68 | Czechoslovakia, Soviet Union, Yugoslavia | the same | Germany 87, England 85.5, Italy 85.2 | 83% |
+| 1988/89 | `nt-1989` | 68 | Czechoslovakia, West Germany, Soviet Union, Yugoslavia | the same | Netherlands 87, West Germany 85.1, Soviet Union 85 | 82% |
+| 1987/88 | `nt-1988` | 66 | the same | the same | Netherlands 87, Soviet Union 85.5, Brazil 84.6 | 80% |
+| 1986/87 | `nt-1987` | 64 | the same | the same | Brazil 87, Argentina 85.5, England 85.3 | 81% |
+| 1984/85 | `nt-1985` | 63 | the same | the same | France 87, Soviet Union 86.4, West Germany 86.2 | 79% |
+| 1983/84 | `nt-1984` | 63 | the same | the same | Soviet Union 87, France 86.9, West Germany 85.2 | 81% |
+| 1982/83 | `nt-1983` | 62 | the same | the same | Brazil 87, Soviet Union 83.8, West Germany 83.5 | 82% |
+| 1980/81 | `nt-1981` | 62 | the same | the same | Brazil 87, West Germany 86.2, Argentina 84.5 | 82% |
+| 1979/80 | `nt-1980` | 61 | the same | the same | West Germany 87, Brazil 85.1, England 84.2 | 82% |
+| 1978/79 | `nt-1979` | 57 | the same | the same | Brazil 87, Argentina 83.9, West Germany 83.4 | 82% |
+| 1976/77 | `nt-1977` | 55 | Zaire and the four above | the same | West Germany 87, Netherlands 85.4, Brazil 85.1 | 79% |
+| 1975/76 | `nt-1976` | 54 | the same | the same | West Germany 87, Brazil 86.1, Netherlands 85 | 81% |
+| 1974/75 | `nt-1975` | 53 | the same | the same | West Germany 87, Netherlands 86.8, Brazil 85.1 | 81% |
+| 1972/73 | `nt-1973` | 51 | the same | the same | Brazil 87, West Germany 86.4, Italy 82.5 | 82% |
+| 1971/72 | `nt-1972` | 49 | the same | the same | West Germany 87, Brazil 86.1, England 82.7 | 80% |
+| 1970/71 | `nt-1971` | 48 | Czechoslovakia, West Germany, Soviet Union, Yugoslavia | World, Europe, South America, Africa, Asia, Elite 32 | Brazil 87, England 83.1, West Germany 83 | 81% |
+| 1968/69 | `nt-1969` | 45 | the same | World, Europe, South America, Asia, Elite 32 | England 87, West Germany 84.5, Brazil 83.7 | 78% |
+| 1967/68 | `nt-1968` | 43 | the same | the same | England 87, West Germany 84.9, Hungary 84 | 77% |
+| 1966/67 | `nt-1967` | 39 | the same | the same | England 87, West Germany 85.3, Soviet Union 85.1 | 78% |
+| 1964/65 | `nt-1965` | 38 | the same | World, Europe, South America, Elite 32 | Soviet Union 87, Hungary 86.4, Brazil 85.8 | 77% |
+| 1963/64 | `nt-1964` | 37 | the same | the same | Soviet Union 87, Hungary 85.5, Argentina 85.4 | 79% |
+| 1962/63 | `nt-1963` | 38 | the same | the same | Soviet Union 87, Hungary 86.2, Brazil 84.9 | 80% |
+| 1960/61 | `nt-1961` | 39 | the same | the same | Brazil 87, Hungary 84.7, Soviet Union 83.8 | 82% |
 
 They field far more nations than the World Cups (37 to 81 against 15 to 24), so
 they offer the Elite 32 and, from 1966/67, more continents. East Germany fields its
@@ -1857,10 +1878,12 @@ the credits and licenses the season files under CC BY-SA 4.0.
   an Elo), and whose shape takes part that year. The rest are listed with why in
   the audit (`dropped`): from 1966/67 on, Ghana, Indonesia, Guatemala and Panama
   among those with players but no goalkeeper on Wikidata.
-- **Strength.** The World Cup seasons' line: T = 87 − 3.2 × (E_best − E) / 100, E
+- **Strength.** The World Cup seasons' line: T = 87 − 3.2 × (E′_best − E′) / 100, E′
   the nation's Elo on 1 July of the season's end year (every match up to 30 June,
-  the federations' cutoff) and E_best the best of the teams that played in the
-  four years before. The Elo is the same engine on the same pinned results.
+  the federations' cutoff) plus its confederation's level on that day
+  ([Confederation levels](#confederation-levels), since 2026-11-21), and E′_best the
+  best E′ of the teams that played in the four years before. The Elo is the same
+  engine on the same pinned results, and its levels the same fit.
 - **The XI.** For each role (1 GK, 4 DF, 4 MF, 2 FW) the pool's players of that
   position, the highest figure first, then the most caps for the nation by the
   season's end, then the lower Wikidata id; a player with two positions counts for
@@ -1890,9 +1913,9 @@ the credits and licenses the season files under CC BY-SA 4.0.
 
 ### Calibration and checks
 
-- The constants are the World Cup seasons' (`elo`, `strength`, `xi`, `profile`,
-  equal by test), so the computed seasons sit on one scale: 1969/70's World Cup
-  and 1970/71's national teams both rate Brazil 87.
+- The constants are the World Cup seasons' (`elo`, `strength`, `levels`, `xi`,
+  `profile`, equal by test), so the computed seasons sit on one scale: 1969/70's
+  World Cup and 1970/71's national teams both rate Brazil 87.
 - The rule picks the sides of the day: England 1971/72 is Banks, Moore, Hughes,
   McFarland, Storey, Peters, Ball, Bell, Mullery, Chivers, Hurst; West Germany's
   Maier, Beckenbauer, Vogts, Höttges, Schwarzenbeck, Overath, Müller; Denmark
@@ -1920,7 +1943,8 @@ npm run build:national-team-seasons             # facts → public/football/nt-<
   the constants, the selection rule, the position map, the names).
 - `scripts/data/national-team-seasons/`: the committed facts. `wikidata.json` holds
   the teams, players and stints that touch 1962–1993 (CC0); `elo.json` each
-  season's Elo of every team active then; `ballon-dor.json` each year's points by
+  season's Elo of every team active then, with its confederation, and the season's
+  confederation levels; `ballon-dor.json` each year's points by
   Wikidata player and the votes matched to none. The sync needs `data-src/`; the
   build reads only these and the manifest, so it rebuilds offline.
 - `public/football/nt-<year>.json`: `nations` lists the nations that field a team,
@@ -1939,6 +1963,124 @@ npm run build:national-team-seasons             # facts → public/football/nt-<
 - `src/data/footballSeasons.js` is written alike by the four football builders
   (`scripts/lib/football-seasons-listing.mjs`), each reading the others' committed
   seasons.
+
+## Confederation levels
+
+Added 2026-11-21, when the user asked that the computed ratings be "correct and normalized, just because one team is a
+national or a country a continental champion they might still be quite weak in comparison to other areas". The computed
+World Cup seasons, the computed national-team seasons and the EA seasons' computed fills read a nation's strength off its
+World Football Elo. That Elo is zero-sum inside every match, so a confederation whose sides mostly play one another keeps
+the level its sides started from, and drifts with the sides that join it (each starts at 1300, and the weak ones feed
+the region's strongest as they sink); only its sides' matches against other confederations' sides tie it to the rest.
+Scored one step ahead, each with the Elo from before it, those matches show the ties were too loose: CONCACAF's, the
+AFC's and the OFC's sides lost far more of them than their Elo expected in every decade, and CAF's until the 1990s. A
+continental champion fattened on its region's results played like a weaker side against the world.
+
+So each season's Elo now carries a level per confederation, and a nation's strength reads its Elo plus its
+confederation's level:
+
+T = L − 3.2 × (E′_best − E′) / 100, E′ = E + the level of the nation's confederation on the Elo's day, E′_best the best
+E′ of the teams active in the four years before (L is 87 in the computed seasons, the season's own line in the fills).
+
+- **The level.** The Elo that, added to each of a confederation's sides, best predicts its sides' matches against the
+  other confederations' sides in the eight years either side of the Elo's day: p = We(dr + level_home − level_away), dr
+  the Elo's own gap from before the match with its home edge, fitted by maximum likelihood (a draw half a win) under a
+  normal prior of mean 0 and standard deviation 100 Elo, UEFA's level held at 0
+  (`scripts/lib/confederation-levels.mjs`). A level moves a whole confederation, so it changes no forecast and no order
+  inside one. The Elo itself is untouched: the facts keep World Football Elo by eloratings.net's formula, with each
+  team's confederation and the season's levels beside it (`[confederation, level, standard error, matches]`).
+- **Who belongs where.** `scripts/data/football-confederations.json` lists every FIFA member and every confederation's own
+  member by its results name, and the region's sides that play only its members (Réunion, Mayotte, Wallis and Futuna,
+  Kiribati, Tuvalu, Niue). Dated rows: Australia the OFC's to 2005 and the AFC's from 2006; Israel the AFC's to 1974 and,
+  its matches being against European sides once the AFC had expelled it, UEFA's from 1975 (it joined UEFA in 1994);
+  Chinese Taipei the OFC's from 1975 to 1988; Kazakhstan the AFC's from 1992 and UEFA's from 25 April 2002. Regional and
+  CONIFA sides, the island games' teams and the Soviet republics' matches before 1992 count for no confederation. Of
+  martj42's 49,940 men's matches to 2026-10-06, 6,849 are between two confederations' sides, 2,214 of them from 1960 to
+  1994.
+- **The window and the prior** were chosen on held-out matches: each year's matches forecast with the levels fitted on
+  the rest of its window. Log loss over 1955–1995's 2,409 matches, 0.6030 without levels: 0.5983 with two years either
+  side, 0.5948 with four, 0.5914 with eight, 0.5894 with twelve; over 1996–2026's 4,210, 0.6010: 0.5876 with eight. Eight
+  years take most of the gain without blurring a confederation that changed (CAF's sides stopped losing to their Elo around
+  2000). A prior of 60 or 150 Elo does as well (0.5923, 0.5911); 100 is about the spread of the decades' levels by
+  the method of moments (97).
+
+Measured 2026-11-21, every year's matches scored with the levels fitted without them. Each cell is the Elo a
+confederation's sides played above (+) or below (−) their Elo against UEFA's, by the joint fit with UEFA at 0, ± its
+standard error, before → after; 100 Elo is 3.2 rating points.
+
+| Decade | Matches | CONMEBOL | CONCACAF | CAF | AFC | OFC | Log loss |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1955–1964 | 278 | −5 ± 34 → +10 | −136 ± 50 → −7 | −64 ± 49 → +2 | −181 ± 46 → −68 | 6 matches, all lost | 0.5602 → 0.5411 |
+| 1965–1974 | 551 | −58 ± 25 → −36 | −125 ± 34 → −24 | −114 ± 34 → −55 | −162 ± 31 → −47 | −160 ± 45 → −74 | 0.5840 → 0.5690 |
+| 1975–1984 | 596 | +15 ± 27 → +14 | −58 ± 33 → +6 | −58 ± 34 → −9 | −106 ± 29 → 0 | −106 ± 42 → −21 | 0.6189 → 0.6125 |
+| 1985–1994 | 878 | +11 ± 21 → +6 | −74 ± 21 → −8 | −67 ± 24 → −15 | −92 ± 23 → −22 | −68 ± 38 → +18 | 0.6097 → 0.5999 |
+| 1995–2004 | 1,322 | −14 ± 20 → −12 | −74 ± 20 → −5 | −41 ± 21 → −9 | −64 ± 17 → −4 | −152 ± 35 → −28 | 0.6312 → 0.6222 |
+| 2005–2014 | 1,528 | +18 ± 18 → +13 | −68 ± 19 → −4 | −8 ± 18 → −3 | −61 ± 16 → −6 | −200 ± 40 → −11 | 0.5954 → 0.5834 |
+| 2015–2026 | 1,466 | −46 ± 19 → −26 | −93 ± 19 → −16 | +31 ± 20 → −13 | −49 ± 18 → −10 | −280 ± 42 → −64 | 0.5845 → 0.5654 |
+
+Before, 22 of the 34 offsets are beyond two standard errors (every AFC one, every CONCACAF one but 1975–1984's, every
+OFC one but 1985–1994's), and they matter in play: the significant ones run 46 to 181 Elo, 1.5 to 5.8 points, and the
+OFC's to 280 Elo, 9 points. After, none is beyond two standard errors, and the held-out log loss falls in every decade,
+competitive matches alone included (−0.0065 a match in 1955–1995, −0.0104 in 1996–2026). Inside a confederation nothing
+changes. The offsets keep their sign and about their size with a home edge fitted for each host confederation and with
+errors clustered by year or by side, and they are no one side's: in the AFC of the 1970s Iran (−227), Syria, South Korea,
+China and Iraq all lost more than their Elo said, and in the 1990s New Zealand (−194) and Australia (−116) both. CAF's
+rest mostly on friendlies: in competitive matches alone its sides played to their Elo but in the 1990s (−90 ± 35), where
+CONCACAF's, the AFC's and the OFC's fell short in every decade. Weighting the fit by the Elo's K, which counts a friendly
+a third of a World Cup match, did no better on held-out matches.
+
+Checked against three yardsticks that never saw these levels:
+
+- **eloratings.net's own forecasts.** Its results files (1989, and 1993 to 2026, the roster audit's cached copies) give each
+  match's ratings before it. On the 4,523 inter-confederation matches both hold, its forecasts leave CONCACAF −19 ± 11,
+  the AFC −5 ± 10, the OFC −78 ± 22 and CAF +44 ± 11; ours left −77 ± 11, −59 ± 9, −196 ± 21 and −2 ± 11, and, levelled,
+  leave −7 ± 11, −8 ± 9, −34 ± 22 and −4 ± 11. Log loss: eloratings.net 0.5901, ours 0.6016, ours levelled 0.5886. Its
+  fuller record had tied the confederations better than martj42's results alone do; its year-end tables mostly put
+  CONCACAF 40 to 100 Elo, and from the 1970s the OFC 100 to 280, lower against UEFA than our Elo did.
+- **EA's ratings**, which see no result. In each of the 22 EA seasons, EA's full national XIs (all eleven rated by EA)
+  agree better with the levelled Elo: Spearman 0.726–0.879 before, 0.793–0.909 after (FIFA 11 0.726 → 0.799, EA FC 26
+  0.762 → 0.841). Pooled over the seasons, CONCACAF's XIs sat 3.3 points below the fills' line, the AFC's 2.1 and the
+  OFC's 5.8 below and CAF's 1.5 above; levelled, 1.2 and 0.9 below, 0.6 and 0.7 above. CONMEBOL's sit 2.5 to 2.6 points
+  below the line either way: EA rates South America's sides lower than their results against Europe's, which the matches do
+  not support.
+- **SWOS 94/95**: 1993/94's finalists against SWOS's nation strengths, Pearson 0.76 → 0.83, Spearman 0.73 → 0.81.
+
+What it changes, the confederations' champions against the world's best (T, and in the national-team seasons the
+nation's place among those fielded):
+
+| Season | Before | After |
+| --- | --- | --- |
+| 1965/66 World Cup | North Korea 76.3, Mexico 81.1 | North Korea 72.5, Mexico 77.8 |
+| 1973/74 World Cup | Zaire 73.1, Australia 73.8, Haiti 71.1 (best 87) | Zaire 71.3, Australia 70.0, Haiti 68.3 |
+| 1981/82 World Cup | Kuwait 73.7, New Zealand 72.5, El Salvador 71.9, Algeria 75.1 | Kuwait 70.1, New Zealand 69.7, El Salvador 69.7, Algeria 73.4 |
+| 1985/86 World Cup | Mexico 82.4, Iraq 74.6, Canada 74.8, South Korea 76.0 | Mexico 80.2, Iraq 71.5, Canada 72.6, South Korea 72.9 |
+| 1989/90 World Cup | Cameroon 76.5, United Arab Emirates 69.9 | Cameroon 74.4, United Arab Emirates 67.7 |
+| 1993/94 World Cup | Mexico 81.2 (9th of 24), Nigeria 79.3, Saudi Arabia 77.0 | Mexico 79.2 (15th), Nigeria 78.1, Saudi Arabia 75.1 |
+| 1964/65 national teams | Mexico 86.1, 5th of 38 | 83.1, 10th |
+| 1972/73 national teams | Mexico 79.2, 7th of 51 | 77.1, 20th |
+| 1976/77 national teams | Iran 77.5, 16th of 55 | 74.0, 28th |
+| 1978/79 national teams | South Korea 79.8, 10th of 57 | 76.4, 19th |
+| 1982/83 national teams | Iraq 78.1, 16th of 62 | 74.4, 27th |
+| 1992/93 national teams | Australia 81.1, 18th of 81 | 78.1, 27th |
+
+The best of CONCACAF, the AFC and the OFC lose 1.5 to 4.0 points against the best in every computed season, CAF's 1.2 to
+2.2; CONMEBOL's, whose level runs from −38 to +18, move by −1.2 to +0.6, and where Brazil was the best by its Elo the
+European sides gain as much against it (West Germany 1969/70 83.0 → 84.0).
+
+In the fills the same levels, at each EA season's ratings date, run CONCACAF −58 to −88, the AFC −38 to −61, the OFC
+−150 to −252, CONMEBOL −43 to +17 and CAF −17 to +43 (CAF's sides have played above their Elo since 2015). The 400
+filled nations and their 1,057 players are the same; their ratings follow T: Panama 2016/17 77.2 → 75.1, Iran 2008/09
+78.1 → 76.4, New Zealand 2006/07 73.7 → 68.8, Tunisia 2021/22 75.5 → 77.0, Zambia 2021/22 68.4 → 70.0.
+
+Women's football's computed seasons were measured alike, their window and prior chosen on women's matches, and left as
+they were: no setting lowered their held-out log loss without making a period worse
+([womens-football.md](womens-football.md#calibration-and-checks)).
+
+Files: `scripts/lib/confederation-levels.mjs` (the fit, the resolver, the levelled best),
+`scripts/data/football-confederations.json` (who belongs where), each manifest's `levels` (equal by test in the three
+men's ones), `scripts/football-confederation-levels.test.mjs` (the table's rules, the fit on invented matches whose truth
+is known, the committed facts). The syncs write the levels (`npm run sync:world-cup-seasons`,
+`sync:national-team-seasons`, `sync:football-fills`, each with `--check`); the builders read them.
 
 ## Earlier basketball seasons
 
@@ -2633,7 +2775,7 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
 - A franchise's code and colour are the game's when it kept its id; a moved one
   gets a code and colour of its own, not its historic ones.
 - The computed World Cup seasons (1961/62 to 1993/94) rate the team more than the
-  player: the nation's Elo explains 66–78% of a season's rating variance, and the
+  player: the nation's Elo explains 72–83% of a season's rating variance, and the
   gaps inside an XI are today's average shape (D), not a measurement of the day.
   Before 1995 the Ballon d'Or voted on Europeans only, so a non-European XI is
   ordered by World Cup awards, goals a minute and minutes (Pelé, 90, follows
@@ -2651,7 +2793,15 @@ loader requires of an `mlb-war-` id), they are listed "Computed from WAR, end of
 - They field only the World Cup's 15–24 finalists, so no Elite 32, and Africa,
   Asia and North America never reach four sides. The Elo is computed from results
   alone: Asian and North American sides rate higher than SWOS's ratings of autumn
-  1994 put them, and the scale is narrower than eloratings.net's.
+  1994 put them (2 points less so since the confederation levels of 2026-11-21),
+  and the scale is narrower than eloratings.net's.
+- The Elo's own forecasts are surer than the results (measured 2026-11-21): fitted
+  one step ahead, the gap that best predicts a match is 0.83–0.90 of the Elo's gap
+  inside a confederation since 1960, and 0.65–0.88 of it between confederations
+  once levelled. The game plays the whole gap at 3.2 points per 100 Elo, so a
+  computed season's favourites win somewhat more often than the day's did. The 3.2
+  is fitted to the engine and to the built-in season's strengths, not to results;
+  shrinking it would be a decision of its own.
 - East Germany fields its 1974 finalists on its land of the day (until 2026-11-10 it had no shape, and 1973/74 had 15).
 - The computed national-team seasons (1960/61, and 1962/63 to 1992/93) know a player's years
   for his national team and his caps in all, not the matches of the season: his

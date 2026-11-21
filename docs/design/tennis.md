@@ -314,9 +314,10 @@ a women's 1985 season in three rubbers.
 
 ## Earlier seasons
 
-Status: built 2026-11-08; 1960–1972 added 2026-11-09 (Before 1973, below). The Season choice
-lists 66 earlier seasons, 2025 back to 1960, each the ATP's men at the end of a year (before
-1968 the amateurs') and the Davis Cup nations of that day, nations only (set ids
+Status: built 2026-11-08; 1960–1972 added 2026-11-09 (Before 1973, below); the regions measured
+and the amateur seasons' levelled 2026-11-21 (Regions, below). The Season choice lists 66 earlier
+seasons, 2025 back to 1960, each the ATP's men at the end of a year (before 1968 the amateurs')
+and the Davis Cup nations of that day, nations only (set ids
 `tennis-<year>`, kind `elo`, `public/tennis/tennis-<year>.json`). The user chose the
 sources (2026-11-08): Tennis Abstract's own published lists where they exist, and earlier
 years computed from Jeff Sackmann's match results by Tennis Abstract's published method, on
@@ -491,7 +492,8 @@ Thirteen seasons, `tennis-1960` to `tennis-1972`: 1960–1967 the amateurs alone
 "Amateur Elo, end of 1962 (rough)", 1968–1972 the open era, "Elo from match results, end of
 1970 (rough)". Their source says `computed`, `rough`, `amateurs` before 1968, and the method
 "Tennis Abstract's published Elo method, warmed up on Jeff Sackmann's majors and Davis Cup
-results of 1877-1967". Claude's choices (2026-11-09), under that request, approved by the user with
+results of 1877-1967" (since 2026-11-21 "…, its newcomers from 1946 starting at their region's and
+nation's level", [Regions](#regions)). Claude's choices (2026-11-09), under that request, approved by the user with
 the release of 2026-11-10: back to 1960, the floor the user set for the NBA's, MLB's, NFL's and NHL's
 computed seasons (the file would allow 1950); a run of their own, so that 1973–2025 stay byte
 for byte as shipped; every rated man in 1968–1972, contract professionals too, as from 1973;
@@ -535,13 +537,16 @@ committed.
 **The method.** `method.early`: a second run of the same engine, kept apart from the first. It
 reads the amateur file before the open era's files and changes four things:
 
-- **Newcomers of the amateur file start at 1360**, fitted to five points so that the run carries
-  on as the shipped one: on Tennis Abstract's 38 targets for 1973–2000 it comes out −2.0 Elo,
-  root mean square 15.3 (the shipped run −2.0 and 15.1), and over the shipped run's top 50 of
-  each season 1973–1980 its Elo of the same men is within 0.3 to 3.0 points on average (in all
-  −1.2 to +2.6). 1350 leaves those seasons up to 4.8 points under the shipped run, 1450 (the
-  open era's start) 18 to 30 over it. The research pass had fitted 1350 before the 24 open-era
-  aliases below; with them 1360 fits.
+- **Newcomers of the amateur file start at 1345**, those of 1946–1967 plus their region's and
+  their nation's level ([Regions](#regions), since 2026-11-21), fitted to five points so that the
+  run carries on as the shipped one: on Tennis Abstract's 38 targets for 1973–2000 it comes out
+  −2.1 Elo, root mean square 15.3 (the shipped run −2.0 and 15.1), and over the shipped run's
+  top 50 of each season 1973–1980 its Elo of the same men is within 0.2 to 3.1 points on average
+  (in all −1.1 to +2.3). With the levels 1340 leaves those seasons 1.1 to 3.7 points from the
+  shipped run, 1350 1.3 to 4.0 over it. Before the levels the start was 1360, fitted the same
+  way (1350 left those seasons up to 4.8 points under the shipped run, 1450, the open era's
+  start, 18 to 30 over it; the research pass had fitted 1350 before the 24 open-era aliases
+  below).
 - **Layoffs.** A gap that begins before 1 January 1968 is charged only when it also ends before
   it and lasts 26 weeks or more, on the shipped scale: the file holds a third of an amateur's
   matches, and the eight-week rule charges nearly all of them. Against Tingay's tens of
@@ -569,19 +574,19 @@ reads the amateur file before the open era's files and changes four things:
 
 Each season lists its men strongest first; the nations of the day come from the same run's
 Davis Cup rows, aliases applied (31 rubbers place nobody). Nothing needs a shift: the best is
-Laver's 2,269 at the end of 1970, rating 95.
+Laver's 2,271 at the end of 1970, rating 95.
 
 **Validation** (`validation.json`, `early` and `checks`):
 
 | Season | Rated | Nations | Best (rating) | Strongest three | Tingay's ten shared | Rank correlation |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1960 | 111 | 23 | Neale Fraser (85) | Australia, United States, Italy | 7 | 0.87 |
-| 1961 | 119 | 25 | Neale Fraser (84) | Australia, United States, Italy | 8 | 0.33 |
-| 1962 | 129 | 28 | Rod Laver (89) | Australia, United States, Italy | 6 | 0.73 |
+| 1960 | 111 | 23 | Neale Fraser (86) | Australia, United States, Italy | 8 | 0.83 |
+| 1961 | 119 | 25 | Neale Fraser (85) | Australia, United States, Italy | 8 | 0.36 |
+| 1962 | 129 | 28 | Rod Laver (90) | Australia, United States, Italy | 7 | 0.73 |
 | 1963 | 134 | 28 | Roy Emerson (85) | United States, Australia, Mexico | 6 | 0.81 |
-| 1964 | 119 | 27 | Roy Emerson (89) | Australia, United States, Sweden | 8 | 0.67 |
-| 1965 | 125 | 24 | Roy Emerson (88) | Australia, United States, Spain | 7 | 0.68 |
-| 1966 | 131 | 29 | Roy Emerson (87) | Australia, United States, Spain | 8 | 0.83 |
+| 1964 | 119 | 27 | Roy Emerson (89) | Australia, United States, Sweden | 8 | 0.68 |
+| 1965 | 125 | 24 | Roy Emerson (88) | Australia, United States, Spain | 8 | 0.67 |
+| 1966 | 131 | 29 | Roy Emerson (87) | Australia, United States, Spain | 8 | 0.76 |
 | 1967 | 141 | 30 | Roy Emerson (87) | Australia, United States, South Africa | 7 | 0.68 |
 | 1968 | 184 | 23 | Rod Laver (89) | Australia, United States, Spain | 6 | 0.76 |
 | 1969 | 136 | 17 | Rod Laver (94) | Australia, United States, Spain | 8 | 0.49 |
@@ -589,17 +594,18 @@ Laver's 2,269 at the end of 1970, rating 95.
 | 1971 | 156 | 20 | Rod Laver (92) | Australia, United States, Spain | 9 | 0.39 |
 | 1972 | 168 | 22 | Ilie Nastase (92) | United States, Australia, Romania | 7 | 0.81 |
 
-1960–1967 share 7.1 of Tingay's ten a season (rank correlation 0.70), 1968–1972 7.4 (0.59);
-every man on his lists is rated in his season. Without the warm-up (the first run, everyone new
-in 1968) 1968 has Ashe first, Laver second and Newcombe thirteenth, sharing four of the ten;
-with it Laver, Rosewall, Roche, Ashe, then Emerson, Newcombe sixth. Tennis Abstract's year
-ends come out Laver 1, Rosewall 2, Ashe 4, Newcombe 6 in 1968 (its 1, 2, 3, 4), Laver 1, Okker
-2, Roche 5, Newcombe 8 in 1969 (its 1, 3, 2, 4) and Laver 1, Rosewall 2 in 1970 (its order).
-Laver's peak is 2,329 (20 September 1969) against Tennis Abstract's 2,571, which counts the pro
-tours these files lack. The Davis Cup bears the nations out: Italy, third in 1960, lost that
-year's Challenge Round to Australia; Mexico (Osuna) is third in 1963 and fifth in 1962, the year
-it reached the Challenge Round; the United States and Australia lead every season; Romania,
-the finalist of 1969, 1971 and 1972, is fourth, fourth and third. In 1973–1980 one man
+1960–1967 share 7.5 of Tingay's ten a season (rank correlation 0.69), 1968–1972 7.4 (0.59);
+every man on his lists is rated in his season (before the region levels of 2026-11-21: 7.1 and
+0.70 to 1967, the same after). Without the warm-up (the first run, everyone new in 1968) 1968 has
+Ashe first, Laver second and Newcombe thirteenth, sharing four of the ten; with it Laver,
+Rosewall, Roche, Emerson, then Ashe, Newcombe sixth. Tennis Abstract's year ends come out Laver
+1, Rosewall 2, Ashe 5, Newcombe 6 in 1968 (its 1, 2, 3, 4), Laver 1, Okker 2, Roche 5, Newcombe
+8 in 1969 (its 1, 3, 2, 4) and Laver 1, Rosewall 2 in 1970 (its order). Laver's peak is 2,333
+(20 September 1969) against Tennis Abstract's 2,571, which counts the pro tours these files lack.
+The Davis Cup bears the nations out: Italy, third in 1960, lost that year's Challenge Round to
+Australia; Mexico (Osuna) is third in 1963 and fifth in 1962, the year it reached the Challenge
+Round; the United States and Australia lead every season; Romania, the finalist of 1969, 1971
+and 1972, is fifth (level with Great Britain), fourth and third. In 1973–1980 one man
 sits far from the shipped run, Tony Roche (up to 100 points in 1977): a layoff the 1900
 threshold charges in one run and not the other.
 
@@ -636,6 +642,116 @@ men to their own countries. Monaco and Hong Kong are off the map. Additions:
 - **The second run is not the first**: its 1973 differs from the shipped 1973 by about two
   points on average, so a 1972 player and his 1973 self come from two runs.
 
+### Regions
+
+Measured and fixed 2026-11-21, when the user asked that the ratings be correct and normalized: a
+nation that wins its own zone may still be weak beside the rest of the world, above all in the
+seasons whose Elo is computed here.
+
+**The measure.** The regions are continents as the IOC's continental associations group the
+nations (Israel and Turkey with Europe), Europe split at the Iron Curtain, the Americas into the
+United States and Canada and the rest (`scripts/lib/tennis-regions.mjs`). In each era, every match
+between two men the season lists (three counted matches to 1967, ten from 1968) of two regions,
+each scored by the two men's Elo before it (one step ahead), and fitted at once: each region's
+offset from the others' mean, weighted by their matches, with a home edge for a major's host and
+for a Davis Cup tie's first-named side (the files list the host first). −50 means its men won as
+though 50 Elo, two rating points, weaker than their Elo. `validation.json` holds every figure
+(`regions`, `early.regions`); before and after are the second run without and with the levels
+below.
+
+| Seasons | W. Europe | E. Europe | N. America | L. America | Asia | Oceania | Africa |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1960–1967, before | −16 ± 9 | +2 ± 18 | +1 ± 15 | +11 ± 16 | **−119 ± 31** | **+41 ± 13** | +3 ± 22 |
+| 1960–1967, after | −10 ± 9 | −3 ± 18 | +1 ± 15 | +19 ± 16 | **−79 ± 31** | +25 ± 13 | −9 ± 22 |
+| 1968–1972, before | +1 ± 5 | +22 ± 8 | +8 ± 5 | −18 ± 11 | −27 ± 20 | −11 ± 5 | −7 ± 10 |
+| 1968–1972, after | +2 ± 5 | +21 ± 8 | +8 ± 5 | −16 ± 11 | −16 ± 20 | −12 ± 5 | −8 ± 10 |
+| 1973–1979 | +1 ± 4 | −4 ± 6 | +8 ± 3 | +5 ± 6 | −3 ± 11 | −10 ± 4 | −9 ± 7 |
+| 1980–1989 | +8 ± 2 | −1 ± 5 | −4 ± 3 | −1 ± 4 | −10 ± 11 | −9 ± 5 | +4 ± 7 |
+| 1990–1999 | +2 ± 2 | +5 ± 3 | −5 ± 3 | −5 ± 3 | −12 ± 10 | +3 ± 5 | +2 ± 6 |
+| 2000–2009 | +2 ± 1 | +1 ± 2 | −1 ± 4 | +1 ± 3 | −10 ± 5 | −3 ± 6 | −7 ± 7 |
+| 2010–2015 | −2 ± 2 | +1 ± 3 | +8 ± 5 | −8 ± 4 | −3 ± 5 | +9 ± 7 | +6 ± 10 |
+
+The matches between regions of 1960–1967: Western Europe's men played 1,109, Eastern Europe's 409,
+North America's 562, Latin America's 539, Asia's 167, Oceania's 700 and Africa's 318. A Davis Cup
+host wins 82 to 93 Elo more than Elo expects from 1973 to 2015, a major's host 43 to 65. Bold: an
+offset beyond twice its standard error and over 25 Elo, a rating point. Before the fix two passed
+both, in the amateur seasons alone: Asia's men −119 ± 31 (4.8 points) and Oceania's +41 ± 13
+(1.6). Checked once with the players' ages in the fit too (bands of under 21, 21–23, 24–29, 30–33,
+over 33, and unknown; Elo lags rising and declining players everywhere) they were −124 ± 31 and
++37 ± 14. From 1973 no region stands more than 12 Elo from the others. Against Tennis Abstract's
+own lists of 2016–2025 (3,425 player-seasons, the computed Elo 26.6 above theirs overall), each
+region's difference is within 6 of the overall: Western Europe −0.7 ± 0.9, Eastern Europe −0.6 ±
+1.4, North America +1.0 ± 1.6, Latin America −0.7 ± 1.5, Asia +1.5 ± 2.2, Oceania +5.7 ± 2.4,
+Africa −3.3 ± 4.2 (43).
+
+**Why the amateur seasons.** The amateur file holds only the majors and the Davis Cup, and the
+cup's zones pair a region's nations with each other: Asia's men met mostly Asia's, in the Eastern
+Zone. With every newcomer starting at one level, a region's pool keeps the level of its newcomers
+whatever their strength, and Asia's (the Davis Cup men of Iran, Thailand, Malaysia, Sri Lanka,
+South Vietnam…) were far weaker than the majors' newcomers, so its best men stood high with them.
+The open era's tour mixes the regions week by week; the first run, from 1968, needs nothing.
+
+**The fix.** As Rocket League's regional starts and League of Legends' circuit levels: a newcomer
+whose first counted match is in the amateur file from 1946 on starts at the base start plus his
+region's level and his nation's (the nation of the day his season's row gives him;
+`method.early.start.regions`). The levels are those that best predict every counted match of
+1946–1967, each by the ratings before it (maximum likelihood, Gauss-Newton on each rating's
+derivatives in the levels, `fitLevels`), under normal priors of spread 150 Elo on a region's level
+and 100 on a nation's around its region's, averaging zero over the newcomers, rounded to five
+points; 100 predicted both tours' held-out seasons best of 0, 50, 75, 100, 150 and 250. The base
+start, fitted as before so that the run carries on as the shipped one, goes from 1360 to 1345.
+`npm run sync:tennis-seasons -- --fit-regions` fits the levels again from the cached inputs and
+prints the figures below.
+
+- **Regions:** Western Europe −75, Eastern Europe +45, North America +5, Latin America −35, Asia
+  −180, Oceania +50, Africa +40.
+- **Nations** (72), the largest: Italy and India +230, Sweden +225, West Germany and Japan +175,
+  Brazil, Mexico and the Philippines +105; Turkey −225, Luxembourg −190, Malaysia −175, Israel
+  −160, Portugal −155, Egypt −115, Sri Lanka −110. A Swedish newcomer starts at 1495, a British one
+  at 1275 and an Iranian at 1070: the majors' home draws held many local players out in the first
+  round, while a nation far from them sent its best.
+
+Judged on held-out seasons (fitted on the even seasons' matches, judged on the odd seasons of
+1960–1967, and the other way round):
+
+| Fitted on | Log loss, every match | Between regions | Within one | Asia's listed men |
+| --- | --- | --- | --- | --- |
+| The even seasons | 0.5310 → 0.5243 | 0.5300 → 0.5285 | 0.5329 → 0.5164 | −109 ± 42 → −86 ± 42 |
+| The odd seasons | 0.5157 → 0.5057 | 0.5117 → 0.5024 | 0.5238 → 0.5124 | −131 ± 46 → −74 ± 47 |
+
+Levels by region alone (a nation's spread 0) gain about a quarter as much, and fitted on the
+matches between regions alone half as much. A level fitted on one half moves with it (Asia −107
+and −205): the nation and region levels are estimates, not facts. Fitted on every match of
+1877–1967 and given to every newcomer, the levels predict the held-out seasons a little better
+within the regions but leave Asia's listed men further off (−100 and −98 on the two halves): the
+regions stood elsewhere before the war (Japan reached the Challenge Round of 1921), so only
+newcomers from 1946 take them.
+
+**What changes.** 1960–1972 only: 1973–2015 come from the first run and are byte for byte as they
+were. Over the 315 nation-seasons of 1960–1972 a nation's strength moves 0.7 points on average and
+its place 0.7. The zones' weak nations fall: Iran (1962) 56.5 → 46, South Vietnam (1965) 60 → 52
+(17th → 23rd of 24), Thailand (1961) 53.5 → 46, Luxembourg (1965) 56 → 48.5, now under Belgium,
+Portugal (1963) 53 → 46.5, Israel (1966) 56 → 50; the Philippines 2.3 points a
+season (1962 63 → 60.5, 16th → 21st), Japan 1.4. India, the zone's strongest, loses 0.8 a season
+(1966 73.2 → 72.4, still fourth: Krishnan 78 → 77). Strong nations gain a little: the
+Soviet Union of 1962 62.6 → 65.1 (18th → 12th), West Germany 0.4 a season. Australia and the United
+States stay the first two of every season.
+
+**What is left.**
+
+- **Asia's listed men of 1960–1967** still won as though 79 ± 31 Elo (3.2 points) weaker than their
+  Elo, −86 and −74 on the held-out halves: India's and Japan's men, whose nations' levels (India
+  +230, Japan +175, against Asia's −180) the fit sets mostly by their many wins within the zone.
+  Against the other regions they won less: India's 52 of their 122 matches where Elo expected 59.4
+  (63.9 before), Japan's 9 of 34 (13.3; 15.8 before). One start for a nation's newcomers cannot
+  fit both, and nothing in Tennis Abstract's method would: what remains would take a correction
+  outside it.
+- **Oceania's men of 1960–1967**, +25 ± 13 Elo (+41 before): Laver, Emerson, Stolle, Newcombe and
+  Roche rising, as rising players lag Elo everywhere (in all their matches between regions, those
+  under 23 +80 ± 21, those older +37 ± 20).
+- **Eastern Europe's men of 1968–1972**, +21 ± 8 Elo (0.8 points): Nastase, Kodes and Metreveli
+  rising most of all.
+
 ### Tests
 
 `scripts/tennis-seasons.test.mjs`: the build and (with the inputs cached) the sync rebuild byte
@@ -650,10 +766,15 @@ second run's snapshots (three or ten counted matches, no man twice), the profess
 until 1968 and Laver first in 1968–1970, the alias list, Mandarino, Mayers and Szikszay merged
 and the Ulrichs not, no nation naming one man under two spellings of his surname, South Africa
 barred 1970–1972 with Drysdale and Hewitt out, the Soviet Union from 1962, the Drobný,
-Mulligan, Hewitt and Letcher fixes, and the fit, seam and top-ten thresholds; the loader
-refusing damaged files; the running App listing the seasons, loading one, launching 1985 with
-Slovakia in Czechoslovakia's empire and 1962 with Ukraine in the Soviet Union's, and resuming
-the saves; and a challenge link to a season.
+Mulligan, Hewitt and Letcher fixes, and the fit, seam and top-ten thresholds; the regions (every
+nation of the day in one, an unknown code refused; a newcomer's start by his region and nation,
+from 1946 and at the amateur level only; the likelihood's gradient against its slope; on a
+synthetic tour, the fit finding a weaker region's level and the measure seeing its men high
+without it and not with it; the manifest's levels, Asia's men of 1960–1967 nearer their results
+with them, Luxembourg of 1965 under Belgium, 1973–2015 within 15 Elo, Tennis Abstract's lists by
+region); the loader refusing damaged files; the running App listing the seasons, loading one,
+launching 1985 with Slovakia in Czechoslovakia's empire and 1962 with Ukraine in the Soviet
+Union's, and resuming the saves; and a challenge link to a season.
 
 ### Limits
 
@@ -661,6 +782,8 @@ the saves; and a challenge link to a season.
   first run does not read the archive's amateur file), and starting them in 1970 instead moves
   the 1975 list by about 48 points and reorders it more than later seasons; 1960–1972 have
   limits of their own (Before 1973).
+- **Asia's men of 1960–1967** still stand about three rating points above their results against
+  the other regions, after the newcomers' levels ([Regions](#regions)).
 - **No surfaces for the computed seasons.** The published ones keep Tennis Abstract's surface
   Elos (2017–2018 single-surface, 2019–2025 blended); the game plays none of them.
 - **Nation changes.** A man who changed country with no Davis Cup row before the change plays

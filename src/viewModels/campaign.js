@@ -392,7 +392,11 @@ function tieSuffix(entry, ctx) {
   if (/golden goal/i.test(text)) return ' (golden goal)';
   if (/silver goal/i.test(text)) return ' (silver goal)';
   if (/extra time/i.test(text)) return ' (aet)';
-  if (/overtime/i.test(text)) return ' (OT)';
+  // A game of more overtime periods than one reads as its match card does: " (2OT)" (basketball, the NFL, playoff hockey).
+  if (/overtime/i.test(text)) {
+    const periods = overtimePeriodsOf(ctx?.sport, text);
+    return periods > 1 ? ` (${periods}OT)` : ' (OT)';
+  }
   // An ice hockey game decided after overtime.
   if (/shoot-?out/i.test(text)) return ' (SO)';
   // A rugby league game decided in golden point.
@@ -563,7 +567,8 @@ function meItem(st, ctx, mode) {
   }
   const followed = followedTeam(st, ctx);
   if (!followed) return null;
-  return { key: 'you', kind: 'swatch', label: 'Followed empire', color: mode === 'political' ? politicalFill(followed.id) : null,
+  return { key: 'you', kind: 'swatch', label: 'Followed empire',
+    color: mode === 'political' ? ctx?.palette?.political.get(followed.id) || politicalFill(followed.id) : null,
     ring: RING_INK };
 }
 

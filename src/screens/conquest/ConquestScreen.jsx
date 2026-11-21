@@ -95,7 +95,7 @@ export default function ConquestScreen(props) {
                 {option.base && option.note && <span className="conquest-option__note"> · {option.note}</span>}
               </span>
             </span>
-            <span className={`conquest-option__gain tone-${option.tone === 'gain' ? 'gain' : 'muted'}`}>{option.gain}</span>
+            <span className={`conquest-option__gain tone-${['gain', 'loss'].includes(option.tone) ? option.tone : 'muted'}`}>{option.gain}</span>
           </div>
         ))}
       </div>

@@ -249,8 +249,10 @@ test('a crash right after a fast-forwarded kickoff resumes from a checkpoint tha
   const cases = [
     // The previous result decides the kickoff: it stays the stored checkpoint, and resuming it draws the same turn.
     { label: 'a duel turn', settings: {}, until: 9, stored: 'result', crash: st => st.matches >= 5 && express(st) },
-    // A batch's draw is saved with its queue and without its first match, so that first kickoff is a checkpoint.
-    { label: "a blitz batch's first match", settings: blitz, until: 9, stored: 'kickoff',
+    // A batch's draw commits with its first kickoff, which follows the previous result as a duel's turn does: that result
+    // stays the stored checkpoint, and resuming it draws the same batch. (Saved on its own, the draw's queue had already
+    // lost the first pair, which a resume from it never played.)
+    { label: "a blitz batch's first match", settings: blitz, until: 9, stored: 'result',
       crash: st => st.matches >= 1 && express(st) && st.batchTotal > 1 && st.queue.length === st.batchTotal - 1 },
     { label: 'a queued blitz pair', settings: blitz, until: 9, stored: 'result',
       crash: st => st.matches >= 3 && express(st) && st.queue.length < st.batchTotal - 1 },
@@ -487,5 +489,34 @@ test('a write between a turn\'s timer task and React\'s commit stores that commi
       assert.equal(played(h.app), reference, `${label}: the resumed campaign plays the same matches and random state`);
       h.close();
     }
+  });
+});
+
+test('a best-of-three final\'s next game kicks off once when two turn starts fall due before React commits', async () => {
+  // Pause during the hold after an interim game, then Play near its end: the held turn and Play's own timer fire together.
+  // The series branch kicked off from a commit's callback, past the guard that stops a second turn, so the game was
+  // simulated (another than the seed's) and presented twice: a 1–1 read 2–2, and no checkpoint parsed.
+  const App = await bundleApp();
+  const settled = (aId, dId) => ({ aId, dId, winner: aId, finalGa: 1, finalGd: 0, effA: 80, effD: 79, ga: 1, gd: 0,
+    allEv: [{ m: 10, tid: aId, pts: 1, name: 'Scorer' }], shown: [{ m: 10, tid: aId, pts: 1, name: 'Scorer' }], tie: null, tieShown: null,
+    applied: true, done: true, seriesResolved: true, noConquest: true, status: FOOTBALL.labels.end, express: false });
+  const kickoff = async (env, starts) => {
+    const f = await mountCampaign(env, App, { storage: memoryStorage(), ids: ['250', '276'], seed: 4242, settings: { finale: 'best-of-three' },
+      state: { round: 3, matches: 2, autoplay: true, match: settled('250', '276'), series: { teamIds: ['250', '276'], wins: { 250: 1, 276: 0 }, games: 1 } } });
+    // The interim game's result was committed (the guard reads the random state of the last commit), then the hold ends.
+    f.app.setState({ paused: false });
+    await reactTasks();
+    for (let i = 0; i < starts; i++) f.app.nextAction(); // the timer tasks
+    await reactTasks();
+    const { match, rngState } = { ...f.app.state, rngState: f.app.rng.getState() };
+    f.close();
+    return { teams: [match?.aId, match?.dId], result: [match?.finalGa, match?.finalGd], events: match?.allEv?.length, rngState,
+      shownWithin: (match?.shown?.length ?? 0) <= (match?.allEv?.length ?? 0) };
+  };
+  await realReact(async env => {
+    const once = await kickoff(env, 1), twice = await kickoff(env, 2);
+    assert.deepEqual(once.teams, ['250', '276'], 'game 2 kicks off');
+    assert.deepEqual(twice, once, 'a second start in the same tick changes nothing: one draw, one game');
+    assert.equal(twice.shownWithin, true);
   });
 });

@@ -28,7 +28,7 @@ import { sourceLabel, sourceTitle, sourceUrl } from '../src/viewModels/squad.js'
 import { dayAfter, eloOn, expectedScore, goalFactor, kFactor, resultRows, yearsBefore } from './lib/football-elo.mjs';
 import { ballonDorVotes, factsText, worldCupLineups } from './lib/world-cup-facts.mjs';
 import {
-  attributionText, buildWorldCupSeason, elevenRatings, orderEleven, pickEleven, strengthOf,
+  attributionText, buildWorldCupSeason, elevenRatings, levelledEloOf, orderEleven, pickEleven, strengthOf,
 } from './lib/world-cup-seasons.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
@@ -220,7 +220,7 @@ test('the nine seasons are built in, after the games\' seasons, labelled compute
     assert.deepEqual([source.provider, source.method, source.computed, source.rawScale, source.licence],
       ['Computed', 'computed', true, 'Elo', 'CC BY-SA 4.0']);
     assert.equal(source.snapshotDate, facts(doc.id).elo.date, 'the Elo of the day after the final');
-    assert.match(source.conversion, /^T = 87 − 3\.2 × \(E_best − E\) \/ 100/);
+    assert.match(source.conversion, /^T = 87 − 3\.2 × \(E′_best − E′\) \/ 100, E′ = E \+ the level of the nation's confederation: /);
     assert.equal(source.squads.commit, MANIFEST.sources.worldCup.commit);
     assert.equal(source.results.commit, MANIFEST.sources.results.commit);
     assert.deepEqual(Object.keys(source.wikipedia.ballonDor).map(Number), [doc.year - 1, doc.year]);
@@ -263,7 +263,8 @@ test('each season decodes: its finalists, eleven players each, rated 1–99 stro
       assert.equal(size, team.squad.length, at);
       assert.equal(players.length, 11, at);
       assert.ok(players.every(([, , rating], k) => Number.isInteger(rating) && rating >= 1 && rating <= 99 && (!k || rating <= players[k - 1][2])), at);
-      const T = strengthOf(team.elo, own.elo.best.elo, MANIFEST.strength);
+      // T reads the finalist's Elo with its confederation's level (scripts/lib/confederation-levels.mjs) off the line.
+      const T = strengthOf(levelledEloOf(team, own).value, own.elo.levelledBest.elo, MANIFEST.strength);
       assert.ok(Math.abs(mean(players.map(([, , rating]) => rating)) - T) <= 1 / 22 + 1e-9, `${at}: T ${T}`);
       assert.equal(str, Math.round(selectLineup({ sport: 'football', squad: players.map(([name, pos, rating]) => ({ name, pos, rating })) }).rating), at);
       assert.ok(players.every(([, , , source], k) => source.xiRank === k + 1 && source.teamElo === team.elo && source.snapshotDate === own.elo.date), at);

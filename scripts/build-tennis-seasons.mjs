@@ -92,7 +92,7 @@ function buildSeason(snapshot, manifest) {
   // The seasons before 1973 say which run made them: the men's warmed up on the amateur file, the amateurs' alone to
   // 1967; the women's warmed up on Wikipedia's pages of the majors and the cup, which alone make 1963-1967.
   const method = snapshot.run === 'early'
-    ? manifest.method.early.method ?? `Tennis Abstract's published Elo method, warmed up on Jeff Sackmann's majors and Davis Cup results of 1877-1967 (docs/design/tennis.md, "Before 1973")`
+    ? manifest.method.early.method ?? `Tennis Abstract's published Elo method, warmed up on Jeff Sackmann's majors and Davis Cup results of 1877-1967, its newcomers from 1946 starting at their region's and nation's level (docs/design/tennis.md, "Before 1973" and "Regions")`
     : `Tennis Abstract's published Elo method (docs/design/${tourId === 'wta' ? 'womens-tennis' : 'tennis'}.md, "Earlier seasons")`;
   // A season of Wikipedia's pages alone cites its year's Federation Cup page, at its pinned revision.
   const cupPage = amateurs && manifest.wikipedia ? manifest.wikipedia.cups.find(([title]) => title.startsWith(`${year} `)) : null;

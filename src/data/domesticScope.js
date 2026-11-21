@@ -7,6 +7,7 @@ import { EUROPE_MAPS } from './europeMaps.js';
 import { BUILT_IN_BASKETBALL_SEASONS } from './basketballSeasons.js';
 import { NATIONS } from './teams.js';
 import { domesticScope, domesticScopeId, isDomesticScope } from '../engine/domestic.js';
+import { SPLIT_MIN_CLUBS, parseSplitId, splitMapId } from '../engine/clubSplit.js';
 
 export { isDomesticScope, domesticScopeId };
 
@@ -19,15 +20,50 @@ export const SEASON_COUNTRY_MAPS = Object.freeze(DOMESTIC_SEASON_ROWS.flatMap(([
   Object.freeze({ id: `${country}y${year}`, country, name: NATIONS[country]?.[0] ?? country, season, year, clubs, sections: 100 }))));
 const SEASON_MAP_BY_ID = new Map(SEASON_COUNTRY_MAPS.map(entry => [entry.id, entry]));
 
+const COUNTRY_MAP_BY_ID = new Map(DOMESTIC.map(entry => [entry.id, entry]));
+const cutEntries = new Map();
+
+/**
+ * A country map cut to its first `clubs` clubs (engine/clubSplit.js, docs/design/domestic-campaigns.md "Choosing the
+ * number of clubs"), as an index entry: its full map's (`base`), with its own id and club count, `cut` the count and
+ * `baseClubs` the full map's. Its strongest clubs (`top`) are known once it has loaded. Null when the count is not one
+ * the map can be cut to. One object per id.
+ */
+function cutEntry(base, clubs) {
+  if (!base || base.sport || base.theatre || !Number.isInteger(clubs) || clubs < SPLIT_MIN_CLUBS || clubs >= base.clubs) return null;
+  const id = splitMapId(base.id, clubs);
+  if (!cutEntries.has(id)) {
+    cutEntries.set(id, Object.freeze({ ...base, id, country: base.country ?? base.id, clubs, cut: clubs, base: base.id,
+      baseClubs: base.clubs, top: [], version: undefined }));
+  }
+  return cutEntries.get(id);
+}
+
 /** The index entry for a domestic scope, or null (unknown or not domestic). */
 export function domesticEntry(scope) {
   const id = domesticScopeId(scope);
-  return id ? DOMESTIC.find(entry => entry.id === id) || SEASON_MAP_BY_ID.get(id) || CLUB_MAPS.find(entry => entry.id === id)
-    || EUROPE_MAPS.find(entry => entry.id === id) || null : null;
+  if (!id) return null;
+  const split = parseSplitId(id);
+  if (split) return cutEntry(COUNTRY_MAP_BY_ID.get(split.base) || SEASON_MAP_BY_ID.get(split.base), split.clubs);
+  return COUNTRY_MAP_BY_ID.get(id) || SEASON_MAP_BY_ID.get(id) || CLUB_MAPS.find(entry => entry.id === id)
+    || EUROPE_MAPS.find(entry => entry.id === id) || null;
 }
 
 /** The nation a country map is of ('826' for today's England and for England's of 2010/11), or null for any other map. */
 export const countryOfEntry = entry => (!entry || entry.sport ? null : entry.country ?? entry.id);
+
+/** A country map's full map ('724' for Spain's cut to 20 clubs; any other map is its own). */
+export const fullMapOf = entry => (entry?.base ? domesticEntry(domesticScope(entry.base)) : entry);
+
+/**
+ * The map of a country (`entry`, a full map or one cut) holding its first `clubs` clubs: that full map cut to them, or
+ * the full map itself when `clubs` is null or holds them all (or too few to cut to). Any other map is returned as it is.
+ */
+export function countryMapWith(entry, clubs) {
+  const full = fullMapOf(entry);
+  if (!full || full.sport || full.theatre) return entry;
+  return (clubs != null && cutEntry(full, clubs)) || full;
+}
 
 /** The country maps of a season (null: today's, DOMESTIC), in their index's order. */
 export const countryMapsOf = (dataSet = null) => (dataSet == null ? DOMESTIC : SEASON_COUNTRY_MAPS.filter(entry => entry.season === dataSet));

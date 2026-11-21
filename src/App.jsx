@@ -11,6 +11,7 @@ import { requestMaps, takeMapRequests } from './mapRequests.js';
 import { clearDomesticCache, domesticLands, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
 import { domesticEntry, domesticLabel, hasTheatreMaps, isCountryScope } from './data/domesticScope.js';
+import { mapFileId } from './engine/clubSplit.js';
 import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
   loadFootballSetIndex, retainFootballSets, seasonSport, setHasClubs, setHasLayer, setSportOf, sportOf } from './engine/footballSets.js';
 import { FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
@@ -94,6 +95,16 @@ const pageFetch = () => (typeof window !== 'undefined' && window.fetch ? window.
 
 /** "Football · Europe"; a data set campaign names its season ("Football 2001/02 · Europe"). */
 const campaignLabel = (settings, scopeName) => `${getSport(settings.sport).name}${settings.dataSeason ? ` ${settings.dataSeason}` : ''} · ${scopeName}`;
+
+/**
+ * A campaign's settings as a setup to choose from again (Try again, Another team): without the stamps its launch added
+ * (startCampaign: the map's and the season's version, year and label), which describe that launch, not the choice. A
+ * setup keeping them drew the old season's world for any season chosen next (mapYearOf prefers `dataYear`).
+ */
+const choiceOf = settings => {
+  const { domesticVersion: _map, dataVersion: _set, dataYear: _year, dataSeason: _season, ...choice } = settings || {};
+  return choice;
+};
 
 /** A club map's row as one of a basketball season's clubs: the season's name, code, strength and five on the map's land. */
 const seasonClub = (row, club) => ({ ...row, name: club.name, code: club.code, league: club.league, str: club.str, squad: club.squad });
@@ -758,7 +769,27 @@ export default class App extends React.Component {
     // Russia and overseas islands remain playable, but the European opening
     // camera should show the continent. Zooming out always restores all land.
     if (isEuropeanScope(settings?.scope) && settings.layer !== 'clubs') this.viewFocus = this.europeFocus();
+    // Every other campaign opens as its setup card framed it (setupMapPreview): on each starting territory's main painted
+    // shape. The fit spans the raw rings, so an island cut by the date line (Fiji's Vanua Levu) stretched Asia &
+    // Oceania's opening camera over the whole world. Zooming out still shows all land.
+    else if (settings) this.viewFocus = this.mainlandFocus(ids);
     this.viewResetKey = (this.viewResetKey || 0) + 1;
+  }
+
+  /**
+   * The box of `ids`' main painted shapes in the current fit, padded as the setup card frames a theatre (setupModel.js
+   * theatreMapPreview: each territory's largest painted polygon, the display atlas's where it has one), or null.
+   */
+  mainlandFocus(ids) {
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const id of ids) {
+      const box = (this.displayGeo?.paths[id] || this.geo.paths[id])?.bbox;
+      if (!box) continue;
+      x0 = Math.min(x0, box.x); y0 = Math.min(y0, box.y); x1 = Math.max(x1, box.x + box.w); y1 = Math.max(y1, box.y + box.h);
+    }
+    if (!(Number.isFinite(x0) && x1 > x0 && y1 > y0)) return null;
+    const pad = Math.max(x1 - x0, y1 - y0) * .04;
+    return { x: x0 - pad, y: y0 - pad, w: x1 - x0 + pad * 2, h: y1 - y0 + pad * 2 };
   }
 
   /** The continent box the European opening camera frames, in the world chart's current fit. */
@@ -1010,10 +1041,11 @@ export default class App extends React.Component {
    * can wait for its result. The draw and the simulation take the same samples from the same random state, and
    * presentation takes none (DEC D1), so that checkpoint must be this campaign's, hold the settled match this kickoff
    * follows, and hold the random state this turn started from (nextAction's turnFrom), the kickoff's samples taken
-   * since. Kickoffs that fail this stay checkpoints: a batch's first match (startBatch saved its draw without the
-   * match), the draw a resume kicks off (restoreCampaign saves after it), and one whose turn started from another
-   * random state than that checkpoint. A write between a turn's timer task and React's commit (a Chronicle pick)
-   * holds the settled match with the random state the turn started from (committedRngState): that kickoff can wait.
+   * since; a batch's first match commits with its draw (startBatch), so it follows the last result as a duel's turn
+   * does. Kickoffs that fail this stay checkpoints: the draw a resume kicks off (restoreCampaign saves after it), and
+   * one whose turn started from another random state than that checkpoint. A write between a turn's timer task and
+   * React's commit (a Chronicle pick) holds the settled match with the random state the turn started from
+   * (committedRngState): that kickoff can wait.
    */
   expressKickoffReplays(previous) {
     const last = this.lastCheckpoint;
@@ -1041,6 +1073,10 @@ export default class App extends React.Component {
   pickSetup(key, value, then = null) {
     const card = this.cardPick(key, value);
     if (card) return this.pickSetup('sport', card.sport, card.then);
+    // Any other choice on a card whose other sport is still loading (Rugby's NRL while union is set up, or union's while
+    // rugby league is) is the latest pick: the pending one must not overwrite it once its players are here.
+    const pending = this.state.sportLoad.id;
+    if (key !== 'sport' && pending != null && cardOf(pending) === cardOf(getSport(this.state.setup.sport).id)) this.dropSportPick();
     if (key === 'sport' && !this.pickSport(getSport(value).id, then)) return;
     this.setState(state => {
       // The Season choice lists the seasons that field the teams chosen (nations or clubs), so a season never changes
@@ -1057,7 +1093,7 @@ export default class App extends React.Component {
         // A chosen country is its own theatre; a session length does not replace it. setClubScope below finds the map.
         if (!country) setup.clubScope = value === 'short' ? 'elite' : value === 'world' ? 'all'
           : CLUB_SCOPES(sportOf(setup) || getSport(setup.sport))[2]?.id || 'all';
-      } else if (['scope', 'clubScope'].includes(key)) setup.preset = 'custom';
+      } else if (['scope', 'clubScope', 'clubCount'].includes(key)) setup.preset = 'custom';
       // A map is its own sport's (a country's is football's). A sport whose clubs choose between maps finds its own for
       // the theatre in setClubScope below (football's Elite 32 becomes women's football's); another sport's clubs start
       // from every club (basketball's then take the NBA's map, also in setClubScope).
@@ -1092,6 +1128,9 @@ export default class App extends React.Component {
       // preset leaves a chosen country's club theatre (and its clubs) as it was.
       const sameField = key === 'preset' && country && setup.layer === 'clubs';
       if (['sport', 'layer', 'scope', 'clubScope', 'preset', 'dataSet'].includes(key) && !sameField) setup.managedTeamId = '';
+      // Fewer or more of a country's clubs: a cut map keeps its full map's first clubs, so the managed club stays while
+      // it is among them.
+      if (key === 'clubCount' && setup.managedTeamId && !this.keepsClub(state.setup, setup)) setup.managedTeamId = '';
       return { setup, seasonSwap };
     }, () => {
       if (this.state.phase !== 'setup') return;
@@ -1099,6 +1138,17 @@ export default class App extends React.Component {
       this.showSetupSet();
       this.requestSeasons();
     });
+  }
+
+  /**
+   * Whether a change of the number of a country's clubs (`before` → `after`) keeps the managed club: it is among the
+   * first clubs the new map holds. Known from the map on show (its clubs are its full map's first, in order).
+   */
+  keepsClub(before, after) {
+    const shown = getLoadedDomestic(domesticIdOf(before) ?? '') || getLoadedDomestic(mapFileId(domesticIdOf(before) ?? ''));
+    const at = shown ? shown.clubs.findIndex(club => club.id === before.managedTeamId) : -1;
+    const count = domesticEntry(after.clubScope)?.clubs ?? Infinity;
+    return at >= 0 && at < count;
   }
 
   /**
@@ -1115,11 +1165,16 @@ export default class App extends React.Component {
       if (waiting) this.setState({ sportLoad: IDLE_SPORT_LOAD });
       return id !== getSport(this.state.setup.sport).id;
     }
-    this.setState({ sportLoad: { id, state: 'loading', message: null } });
+    // `pickWith` (the pick's `then`) stays with it, so Retry after a failed load makes the whole choice again (Rugby's
+    // Nations, not union's clubs).
+    this.setState({ sportLoad: { id, state: 'loading', message: null, pickWith: then } });
     const current = () => token === this.sportToken && this.state.phase === 'setup';
     // Here, the pick applies as any pick of a loaded sport does, which also ends the wait.
     const load = () => loadSportData(id).then(() => { if (current()) this.pickSetup('sport', id, then); }, error => {
-      if (current()) this.setState({ sportLoad: { id, state: 'error', message: `${getSport(id).name} could not be loaded. ${error?.message || error}` } });
+      if (current()) {
+        this.setState({ sportLoad: { id, state: 'error', message: `${getSport(id).name} could not be loaded. ${error?.message || error}`,
+          pickWith: then } });
+      }
     });
     if (waiting) this.sportLoadTimer = setTimeout(() => { if (current()) load(); }, SETUP_LOAD_DELAY_MS);
     else load();
@@ -1140,7 +1195,7 @@ export default class App extends React.Component {
   sportStatus() {
     const load = this.state.sportLoad;
     if (load.id == null) return null;
-    return { ...load, onRetry: () => this.pickSetup('sport', load.id), onReload: reloadPage };
+    return { ...load, onRetry: () => this.pickSetup('sport', load.id, load.pickWith ?? null), onReload: reloadPage };
   }
 
   exportProgress() {
@@ -1194,7 +1249,8 @@ export default class App extends React.Component {
     const card = buildShareCard({
       shapes, backdrop: this.domesticMap() ? this.backdrop : [], own: st.own, championId: champ.id, championName: champ.name, claimed,
       // The colour the final map gives the champion: clay when it is the team you manage.
-      fill: !st.managementEnded && st.managedTeamId === champ.id ? V4.youFill : politicalFill(champ.id),
+      fill: !st.managementEnded && st.managedTeamId === champ.id ? V4.youFill
+        : this.mapPalette(st)?.political.get(champ.id) || politicalFill(champ.id),
       frame: this.viewFocus, seed: st.seed,
       kicker: `Campaign complete · Round ${roman(st.round)}`,
       line: shareLine(victory), site: typeof window !== 'undefined' ? window.location.host : '',
@@ -1242,7 +1298,12 @@ export default class App extends React.Component {
       const saved = parseCampaign(text);
       this.openStorageDialog('import', { campaign: saved });
     } catch (error) {
-      if (current()) this.setState({ saveStatus: { ok: false, message: error.message || 'Campaign import failed.' } });
+      // A refused file is no failed save: the campaign's last checkpoint stands, so `file` keeps the masthead's Unsaved
+      // warning and the elimination note off, unless the last save itself had failed.
+      if (current()) {
+        this.setState(state => ({ saveStatus: { ok: false, file: state.saveStatus?.ok !== false || !!state.saveStatus?.file,
+          message: error.message || 'Campaign import failed.' } }));
+      }
     }
   }
 
@@ -1295,7 +1356,7 @@ export default class App extends React.Component {
     }
     const token = ++this.flowToken;
     const entry = domesticEntry(campaign.settings.clubScope);
-    const name = entry?.name || NATIONS[id]?.[0] || 'this country';
+    const name = entry?.name || NATIONS[mapFileId(id).slice(0, 3)]?.[0] || 'this country';
     const message = `Loading the map of ${name}…`;
     this.pendingDomesticId = id;
     this.retainMaps();
@@ -1367,11 +1428,14 @@ export default class App extends React.Component {
       // A slot deleted in another tab while the dialog was open cannot be renamed: say so rather than throw.
       try { result = renameCampaign(id, name); } catch (error) { result = { ok: false, message: error.message }; }
       // The quick-resume copy (no campaign open yet after a reload) takes the new revision too, or resuming
-      // it reads as a change made in another tab.
-      if (result.ok && this.saved?.campaignId === id) {
+      // it reads as a change made in another tab, but only when it is the checkpoint the rename read (one revision
+      // back). A copy another tab has since played past keeps its revision, so resuming it still raises that conflict
+      // rather than writing the older progress over the other tab's. So does an open campaign's.
+      const renamedFrom = copy => copy?.campaignId === id && (copy.revision || 0) === result.revision - 1;
+      if (result.ok && renamedFrom(this.saved)) {
         this.saved = { ...this.saved, revision: result.revision, campaignName: result.campaignName };
       }
-      if (result.ok && id === this.state.campaignId) this.setState({ revision: result.revision, campaignName: result.campaignName });
+      if (result.ok && renamedFrom(this.state)) this.setState({ revision: result.revision, campaignName: result.campaignName });
       this.setState(state => ({ storageDialog: state.storageDialog && { ...state.storageDialog, error: result.ok ? null : result.message, notice: null } }));
     });
   }
@@ -1460,7 +1524,7 @@ export default class App extends React.Component {
     const scope = setup.layer === 'clubs' ? null : sport ? nationTheatre(sport, setup.scope).id : setup.scope;
     const focus = isEuropeanScope(scope) ? this.europeFocus() : null;
     return theatreMapPreview({ countries: this.geo.countries, paths: this.displayGeo?.paths, basePaths: this.geo.paths,
-      own: opening, frameIds: homes, focus });
+      palette: this.setupBoardPalette(opening), own: opening, frameIds: homes, focus });
   }
 
   setupSeed(setup = this.state.setup) {
@@ -1703,7 +1767,8 @@ export default class App extends React.Component {
       resultEntry: s.resultEntry || null, resultDraft: s.resultEntry ? { ...EMPTY_DRAFT } : null,
       historyFilter: s.historyFilter || '', selectedHistoryId: s.selectedHistoryId || null,
       campaignId: s.campaignId || createCampaignId(), revision: s.revision || 0, campaignName: s.campaignName || campaignLabel(s.settings, this.scopeName(s.settings)),
-      storageDialog: null, storageConflict: false,
+      // A New campaign asked of the campaign this one replaces is not this one's: it asks again before leaving it.
+      storageDialog: null, storageConflict: false, confirmNew: false,
       // clearTimers() above dropped the tasks that would clear the outgoing campaign's notice and goal toast.
       pu: null, toast: null,
       teams: s.teams,
@@ -1845,7 +1910,7 @@ export default class App extends React.Component {
    * or, with `newDraw`, a fresh one (a blank seed draws `openingSeed`, moved off the old seed).
    */
   retryManager({ newDraw = false } = {}) {
-    const setup = { ...DEFAULT_SETUP, ...(this.state.initialSettings || this.state.settings),
+    const setup = { ...DEFAULT_SETUP, ...choiceOf(this.state.initialSettings || this.state.settings),
       seed: newDraw ? '' : String(this.state.seed), managedTeamId: this.state.managedTeamId };
     // The save holds a data set campaign's players, but playing its setup again needs the set itself. The dialog
     // reports the load, not the save status: the checkpoint was saved whatever happens to the set.
@@ -1881,7 +1946,8 @@ export default class App extends React.Component {
    * suggested, so Launch waits for the pick).
    */
   chooseAnotherTeam() {
-    const setup = { ...DEFAULT_SETUP, ...(this.state.initialSettings || this.state.settings), role: 'manager', managedTeamId: '', seed: '' };
+    const setup = { ...DEFAULT_SETUP, ...choiceOf(this.state.initialSettings || this.state.settings), role: 'manager', managedTeamId: '',
+      seed: '' };
     // A campaign saved on a theatre this build no longer offers opens on the one that replaced it.
     if (setup.layer === 'clubs') setup.clubScope = setClubScope(setup);
     this.setState({ setup, retrySetup: null }, () => this.openSetup({ step: 3, suggest: false }));
@@ -1929,7 +1995,10 @@ export default class App extends React.Component {
     if (st.viewSource === 'auto') this.setState(back);
     if (st.series && st.aliveIds.length === 2) {
       const [a, b] = st.series.teamIds;
-      this.setState({ round: st.round + 1, queue: [], turnQueue: [], turnIndex: 0 }, () => this.startMatch(a, b));
+      // The next game kicks off in this task, its turn as startMatch's `decided`, as a queued pair does: the guard above
+      // sees its draw. Kicked off from a commit's callback, two starts due together (Play re-arming a held turn beside
+      // its own timer) both passed the guard, and the game was simulated and presented twice.
+      this.startMatch(a, b, {}, undefined, {}, { ...back, round: st.round + 1, queue: [], turnQueue: [], turnIndex: 0 });
       return;
     }
 
@@ -1942,8 +2011,9 @@ export default class App extends React.Component {
       return;
     }
     if (st.settings.pacing === 'duel') this.beginTurn();
-    else if (st.settings.pacing === 'blitz') this.beginBlitz();
-    else this.beginChaos();
+    // A batch's first kickoff commits with its draw, so it carries the view's return as a queued pair's does.
+    else if (st.settings.pacing === 'blitz') this.beginBlitz(back);
+    else this.beginChaos(back);
   }
 
   beginDuel(...args) { return turnM.beginDuel.apply(this, args); }
@@ -1952,20 +2022,22 @@ export default class App extends React.Component {
 
   lockDuel(...args) { return turnM.lockDuel.apply(this, args); }
 
-  beginBlitz() {
+  beginBlitz(back = {}) {
     const st = this.state;
     const { pairs, bye } = drawBlitzPairs(this.rng, this.board());
     this.markDraw();
     if (!pairs.length) return;
 
     const log = st.log.slice();
-    log.push({ t: 'sys', r: st.round + 1, txt: 'BLITZ ROUND — ' + pairs.length + ' MATCHES, FIELD HALVES', chip: C.textMute });
+    // The field halves when everyone is paired; with a bye (its own line) it does not: three teams leave two.
+    log.push({ t: 'sys', r: st.round + 1, txt: `BLITZ ROUND — ${pairs.length} ${pairs.length === 1 ? 'MATCH' : 'MATCHES'}${bye ? '' : ', FIELD HALVES'}`,
+      chip: C.textMute });
     if (bye) log.push({ t: 'sys', r: st.round + 1, txt: 'BYE — ' + st.teams[bye].name.toUpperCase() + ' SITS OUT', chip: C.textMute });
 
-    this.startBatch(pairs, log);
+    this.startBatch(pairs, log, back);
   }
 
-  beginChaos() {
+  beginChaos(back = {}) {
     const st = this.state;
     const pairs = drawChaosPairs(this.rng, this.board());
     this.markDraw();
@@ -1976,25 +2048,19 @@ export default class App extends React.Component {
       txt: 'CHAOS DRAW — ' + pairs.length + ' MATCH(ES) DRAWN BEFORE A NAME REPEATED',
       chip: C.textMute,
     });
-    this.startBatch(pairs, log);
+    this.startBatch(pairs, log, back);
   }
 
-  startBatch(pairs, log) {
+  /** `back`: nextAction's return to the map (view, viewSource), queued in the same tick and not committed yet. */
+  startBatch(pairs, log, back = {}) {
     const [first, ...rest] = pairs;
-    this.setState(
-      {
-        round: this.state.round + 1,
-        queue: rest,
-        batchTotal: pairs.length,
-        log: log.slice(-LOG_CAP),
-        match: null,
-        spin: null,
-        atk: null,
-        pu: null,
-        toast: null,
-      },
-      () => this.startMatch(first[0], first[1]),
-    );
+    // The round commits with its first kickoff (startMatch's `decided`), as a queued pair does (nextAction). Committed
+    // on its own, it was saved as a checkpoint whose queue had already lost the first pair: resuming that checkpoint
+    // (after the kickoff's save failed, or a crash) skipped the match and played another campaign than the seed's.
+    this.startMatch(first[0], first[1], {}, undefined, {}, {
+      ...back, round: this.state.round + 1, queue: rest, batchTotal: pairs.length, log: log.slice(-LOG_CAP),
+      match: null, spin: null, atk: null, pu: null, toast: null,
+    });
   }
 
   /**
@@ -2467,6 +2533,8 @@ export default class App extends React.Component {
       labelGeometry: this.labelGeometry || [], viewFocus: this.viewFocus || null, cache: this.vmCache,
       // A country map's section names (null on the world map), so pure view-models name sections without the loader.
       sectionNames: this.domesticMap()?.sectionNames || null,
+      // The colours the map gives the empires on this board, which the key and the ledger show too (mapPalette).
+      palette: this.mapPalette(st),
     };
   }
 
@@ -2716,6 +2784,10 @@ export default class App extends React.Component {
   mapLabels(...args) { return mapM.mapLabels.apply(this, args); }
 
   mapClaims(...args) { return mapM.mapClaims.apply(this, args); }
+
+  mapPalette(...args) { return mapM.mapPalette.apply(this, args); }
+
+  setupBoardPalette(...args) { return mapM.setupBoardPalette.apply(this, args); }
 
   mapHomes(...args) { return mapM.mapHomes.apply(this, args); }
 

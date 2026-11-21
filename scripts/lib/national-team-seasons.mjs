@@ -11,6 +11,7 @@ import {
   FOOTBALL_SET_FORMAT, NO_TEAM, contentHash, dayNationResolver, identitiesFor, nationResolver, serializeFootballSet, territoryFor,
 } from '../../src/data/footballSetBuild.js';
 import { elevenRatings, seasonOfYear, strengthOf } from './world-cup-seasons.mjs';
+import { levelOf, levelled, levelsText } from './confederation-levels.mjs';
 
 /** A computed player's `source`, as his record names it. */
 export const WIKIDATA_SOURCE = 'wikidata';
@@ -144,8 +145,9 @@ const plus = x => (x > 0 ? `+${x.toFixed(1)}` : x === 0 ? '0.0' : `−${(-x).toF
 export function nationalTeamsConversion(manifest, elo) {
   const { best, perHundredElo } = manifest.strength;
   const roles = Object.entries(manifest.xi).map(([role, count]) => `${count} ${role}`).join(', ');
-  return `T = ${best} − ${perHundredElo} × (E_best − E) / 100, E the nation's Elo on ${elo.date} and E_best the best of the teams active in the `
-    + `four years before (${elo.best.team}, ${elo.best.elo}); the XI (${roles}) the players of the nation's Wikidata stints covering the season `
+  return `T = ${best} − ${perHundredElo} × (E′_best − E′) / 100, E′ = E + the level of the nation's confederation: E its Elo on ${elo.date}, the `
+    + `levels ${levelsText(elo.levels)}, one step ahead, and E′_best the best E′ of the teams active in the four years before `
+    + `(${elo.levelledBest.team}, ${elo.levelledBest.elo}); the XI (${roles}) the players of the nation's Wikidata stints covering the season `
     + 'with the most caps a year, ordered by Ballon d\'Or points and caps for the team by then; its k-th player T + D_k, '
     + `D = ${manifest.profile.map(plus).join(', ')}, rounded so the XI sums to round(11 × T)`;
 }
@@ -176,7 +178,7 @@ export function buildNationalTeamSeason({ wikidata, elo, votes }, manifest, seas
   const plain = territoryFor(federations, year);
   const plainNames = identitiesFor(federations, year);
   const nameOf = nation => plainNames[nation]?.name ?? NATIONS[nation][0];
-  const eloOf = new Map(elo.ratings.map(([team, value, rank]) => [team, { value, rank }]));
+  const eloOf = new Map(elo.ratings.map(([team, value, rank, confederation]) => [team, { value, rank, confederation }]));
   const yearVotes = Object.fromEntries(season.ballonDor.map(y => [y, new Map(votes[y]?.points ?? [])]));
   if (season.ballonDor.some(y => !votes[y])) throw new Error(`${id}: no Ballon d'Or facts for ${season.ballonDor.join(', ')}`);
 
@@ -220,7 +222,10 @@ export function buildNationalTeamSeason({ wikidata, elo, votes }, manifest, seas
   const nations = {}, nationAudit = [];
   for (const nation of Object.keys(NATIONS).filter(fields)) {
     const entry = entries.find(e => e.nation === nation);
-    const strength = strengthOf(entry.elo.value, elo.best.elo, manifest.strength);
+    const level = levelOf(elo.levels, entry.elo.confederation);
+    if (level == null) throw new Error(`${id}: ${entry.country} has no confederation`);
+    const levelledElo = levelled(entry.elo.value, level);
+    const strength = strengthOf(levelledElo, elo.levelledBest.elo, manifest.strength);
     const { eleven, filled } = pickNationalEleven(entry.pool, manifest.xi);
     const order = orderNationalEleven(eleven.map(player => ({ ...player, ballonDor: ballonDorOf(player.qid, season.ballonDor, yearVotes) })));
     const ratings = elevenRatings(strength, manifest.profile);
@@ -246,7 +251,7 @@ export function buildNationalTeamSeason({ wikidata, elo, votes }, manifest, seas
     nations[nation] = [Math.round(lineup.rating), entry.pool.length, players];
     nationAudit.push({
       id: nation, name: identities[nation]?.name ?? NATIONS[nation][0], team: entry.country, qid: entry.team, elo: entry.elo.value, rank: entry.elo.rank,
-      T: round2(strength), strength: nations[nation][0], pool: entry.pool.length,
+      confederation: entry.elo.confederation, level, levelled: levelledElo, T: round2(strength), strength: nations[nation][0], pool: entry.pool.length,
       outOfPosition: lineup.slots.filter(slot => slot.outOfPosition).map(slot => `${slot.player.name} (${slot.player.pos} as ${slot.position})`),
       filled: filled.map(player => `${player.name} (${player.positions.join('/')} as ${player.role})`),
       eleven: order.map((player, k) => `${players[k][0]} ${players[k][1]} ${ratings[k]}${sumOf(player.ballonDor) ? ` BdO ${sumOf(player.ballonDor)}` : ''}`
@@ -277,7 +282,8 @@ export function buildNationalTeamSeason({ wikidata, elo, votes }, manifest, seas
   };
   doc.version = `${doc.id}-${contentHash(doc)}`;
   const audit = {
-    id: doc.id, version: doc.version, season: doc.season, elo: { date: elo.date, activeSince: elo.activeSince, active: elo.ratings.length, best: elo.best },
+    id: doc.id, version: doc.version, season: doc.season,
+    elo: { date: elo.date, activeSince: elo.activeSince, active: elo.ratings.length, best: elo.best, levels: elo.levels, levelledBest: elo.levelledBest },
     teamShare: round2(teamVariance / (teamVariance + withinVariance)), dropped,
     identities, merged: Object.keys(territory.merged).length, inactive: territory.inactive.length,
     nations: nationAudit.sort((a, b) => b.T - a.T || (a.id < b.id ? -1 : 1)),

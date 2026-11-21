@@ -7,14 +7,14 @@
 //
 // Usage: node scripts/sync-rocket-league.mjs [--tune]
 //   npm run sync:rocket-league
-//   --tune  also scores K and the regional starts on the last HOLDOUT_DAYS of games, before each is played
+//   --tune  also scores K, with and without the regions' levels, on the last HOLDOUT_DAYS of games, before each is played
 import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { readExport } from './lib/liquipedia.mjs';
-import { ACTIVE_DAYS, EDITION, K_SCALE, MIN_GAMES, ODDS_BINS, TIERS, homeEdge, isRegionFlag, leftOut, nationalTeams, nationOfPlayer,
-  nationsOf, oddsBin, playerKey, playerOf, playersAsOf, ratedPlayers, readTournaments, regionalStarts, rowOf, runElo, scoreOf,
-  seriesInOrder } from './lib/rocket-league.mjs';
+import { ACTIVE_DAYS, EDITION, K_SCALE, LEVEL_TAU, MIN_GAMES, ODDS_BINS, OFFSET_TAU, TIERS, homeEdge, homesOf, isRegionFlag, leftOut,
+  nationalTeams, nationOfPlayer, nationsOf, oddsBin, playerKey, playerOf, playersAsOf, ratedPlayers, readTournaments, regionLevels,
+  rowOf, runElo, scoreOf, seriesInOrder } from './lib/rocket-league.mjs';
 
 const args = process.argv.slice(2);
 const unknown = args.filter(arg => arg !== '--tune');
@@ -61,20 +61,31 @@ if (!series.length) process.exit(1);
 
 const last = series.at(-1).date;
 const holdout = new Date(Date.parse(last) - HOLDOUT_DAYS * 86400000).toISOString().slice(0, 10);
+// Each player's nation as the whole record gives it (his national teams, flags and page), for a home no regional event gives.
+const { players: everyone } = runElo(series);
+const nationOf = key => nationOfPlayer(everyone.get(key) ?? { key, flags: new Map() }, people, national);
 if (args.includes('--tune')) {
-  console.log(`\nScored on the ${HOLDOUT_DAYS} days from ${holdout}, each game before it is played:`);
+  console.log(`\nScored on the ${HOLDOUT_DAYS} days from ${holdout}, each game before it is played (the regions' levels and homes`
+    + ' from the games before; between two regions: games whose sides are each most of one region\'s players):');
+  // The levels do not hang on K: fitted once, on the games before the held-out ones.
+  const homesBefore = homesOf(series, { until: holdout, nationOf });
+  const levelsBefore = regionLevels(series, homesBefore, { until: holdout });
+  console.log(`  levels before ${holdout}: ${JSON.stringify(levelsBefore)}`);
   for (const scale of [60, 80, 110, 140, 180, 240, 320, 400, 500]) {
-    for (const regional of [false, true]) {
-      const starts = regional ? regionalStarts(series, { scale }) : {};
-      const { scored } = runElo(series, { scale, starts, holdout });
-      const all = scoreOf(scored.all), world = scoreOf(scored.international);
-      console.log(`  K ${String(scale).padStart(3)}${regional ? ' regional' : '         '}  log loss ${all.logLoss.toFixed(4)}`
-        + `  Brier ${all.brier.toFixed(4)}  (${all.n} games)  international ${world.logLoss?.toFixed(4) ?? '—'} (${world.n})`);
+    for (const levels of [false, true]) {
+      const { scored } = runElo(series, { scale, starts: levels ? levelsBefore : {}, homes: homesBefore, holdout });
+      const all = scoreOf(scored.all), world = scoreOf(scored.international), cross = scoreOf(scored.cross);
+      console.log(`  K ${String(scale).padStart(3)}${levels ? ' levels' : '       '}  log loss ${all.logLoss.toFixed(4)}`
+        + `  Brier ${all.brier.toFixed(4)}  (${all.n} games)  between regions ${cross.logLoss?.toFixed(4) ?? '—'} (${cross.n})`
+        + `  international ${world.logLoss?.toFixed(4) ?? '—'} (${world.n})`);
     }
   }
 }
 
-const starts = regionalStarts(series);
+// A newcomer starts at his region's level (docs/design/rocket-league.md, "Regions"): his home the RLCS region whose events
+// he has played most games in, else his nation's; each region's level fitted at once with every player's own strength.
+const homes = homesOf(series, { nationOf });
+const starts = regionLevels(series, homes);
 // Each year's real games between seasoned players (as `play` below has them), for its season's goal rate
 // (scripts/build-rocket-league-seasons.mjs): how many, their goals and overtimes, and the favourite's odds in each.
 const yearPlay = new Map();
@@ -88,10 +99,10 @@ const countYear = (one, game, e, sides) => {
   if (game.ot) row.ot++;
   row.odds[oddsBin(e)]++;
 };
-const { players, scored, lan } = runElo(series, { starts, holdout, onGame: countYear });
+const { players, scored, lan } = runElo(series, { starts, homes, holdout, onGame: countYear });
 // The home crowd at a LAN, against Elo's expectation (the sport's HOME_EDGE), each side's nation as the ratings give it.
 const home = homeEdge(lan, key => nationOfPlayer(players.get(key) ?? { key, flags: new Map() }, people, national));
-const rated = ratedPlayers(players, last, people, national);
+const rated = ratedPlayers(players, last, people, national, homes);
 const exported = pages.reduce((latest, page) => (String(page.timestamp) > latest ? String(page.timestamp) : latest), '').slice(0, 10);
 const round3 = x => Math.round(x * 1000) / 1000;
 
@@ -137,7 +148,9 @@ const snapshot = {
     name: 'Liquipedia', wiki: 'https://liquipedia.net/rocketleague/', license: 'CC BY-SA 3.0', edition: EDITION,
     exported, files: files.length, pages: pages.length, from: series[0].date, to: last, tournaments: tournaments.length,
     series: series.length, games, players: players.size, rated: rated.length, activeDays: ACTIVE_DAYS, minGames: MIN_GAMES,
-    kScale: K_SCALE, starts, holdout: { from: holdout, ...scoreOf(scored.all), international: scoreOf(scored.international), calibration },
+    kScale: K_SCALE, levels: { offsetTau: OFFSET_TAU, levelTau: LEVEL_TAU }, starts,
+    holdout: { from: holdout, ...scoreOf(scored.all), international: scoreOf(scored.international), betweenRegions: scoreOf(scored.cross),
+      calibration },
     home,
   },
   play: { ...play, goals: round3(play.goals / Math.max(1, play.games)), ot: round3(play.ot / Math.max(1, play.games)) },
@@ -149,8 +162,9 @@ await writeSnapshot(snapshotFile, head, rows);
 const asPlayers = snapshot.players.map((row, i) => playerOf(row, exported, i + 1));
 const nations = nationsOf(asPlayers);
 const { noFlag, offMap, short } = leftOut(asPlayers);
-console.log(`\nWrote ${rated.length} rated players (of ${players.size}) to ${path.relative(root, snapshotFile)}; regional starts ${JSON.stringify(starts)}`);
-console.log(`  held out from ${holdout}: log loss ${scoreOf(scored.all).logLoss?.toFixed(4)} over ${scored.all.n} games;`
+console.log(`\nWrote ${rated.length} rated players (of ${players.size}) to ${path.relative(root, snapshotFile)}; regions' levels ${JSON.stringify(starts)}`);
+console.log(`  held out from ${holdout}: log loss ${scoreOf(scored.all).logLoss?.toFixed(4)} over ${scored.all.n} games`
+  + ` (between regions ${scoreOf(scored.cross).logLoss?.toFixed(4)} over ${scored.cross.n});`
   + ` calibration ${calibration.map(([e, w, n]) => `${e}→${w} (${n})`).join(', ')}`);
 console.log(`  home sides at LANs: ${home ? `${home.games} games, ${home.elo} ± ${home.se} Elo against Elo's expectation` : 'none'}`);
 console.log(`  real games from ${playFrom} whose six players had ${MIN_GAMES} games: ${snapshot.play.games} with goals,`
@@ -167,15 +181,18 @@ if (unknownFlags.size) console.log(`  flags no nation answers to: ${[...unknownF
 console.log(`  ${people.size} player pages read for their country`);
 
 // The earlier seasons (docs/design/rocket-league.md, "Earlier seasons"): every calendar year from the first game's to the
-// one before the export's last, its players as rated on its last day (playersAsOf) and its real games between seasoned
-// players (yearPlay), for npm run build:rocket-league-seasons.
+// one before the export's last, its players as rated on its last day (playersAsOf), each newcomer at his region's level as
+// the games to that day measure it (homesOf and regionLevels over them: nothing a later year showed), and its real games
+// between seasoned players (yearPlay), for npm run build:rocket-league-seasons.
 await mkdir(seasonsDir, { recursive: true });
 const seasonRated = [];
 console.log(`\nEarlier seasons, each as rated on 31 December, to ${path.relative(root, seasonsDir)}:`);
 for (let year = Number(series[0].date.slice(0, 4)); year < Number(last.slice(0, 4)); year++) {
   const date = `${year}-12-31`;
   const upTo = series.filter(one => one.date <= date);
-  const ratedThen = playersAsOf(series, date, { starts, people, national, whole: players });
+  const homesThen = homesOf(upTo, { nationOf });
+  const startsThen = regionLevels(upTo, homesThen);
+  const ratedThen = playersAsOf(series, date, { starts: startsThen, homes: homesThen, people, national, whole: players });
   if (!ratedThen.length) {
     console.log(`  ${year}: nobody rated yet (${upTo.reduce((sum, one) => sum + one.games.length, 0)} games so far)`);
     continue;
@@ -184,11 +201,13 @@ for (let year = Number(series[0].date.slice(0, 4)); year < Number(last.slice(0, 
   const thatYear = yearPlay.get(year) ?? { games: 0, goals: 0, ot: 0, odds: new Array(ODDS_BINS).fill(0) };
   const season = { season: year, date, exported, from: series[0].date, to: upTo.at(-1).date, series: upTo.length,
     games: upTo.reduce((sum, one) => sum + one.games.length, 0), rated: ratedThen.length, activeDays: ACTIVE_DAYS, minGames: MIN_GAMES,
+    starts: startsThen,
     play: { games: thatYear.games, goals: round3(thatYear.goals / Math.max(1, thatYear.games)), ot: round3(thatYear.ot / Math.max(1, thatYear.games)),
       odds: thatYear.odds } };
   await writeSnapshot(path.join(seasonsDir, `${year}.json`), season, ratedThen.map(rowOf));
   const fielded = nationsOf(ratedThen.map((player, i) => playerOf(rowOf(player), date, i + 1)));
   console.log(`  ${year}: ${ratedThen.length} rated, ${fielded.length} nations (${fielded.slice(0, 4).map(n => `${n.name} ${n.str}`).join(', ')}…);`
+    + ` levels ${JSON.stringify(startsThen)};`
     + ` ${season.play.games} games between seasoned players, ${season.play.goals} goals a game, ${(season.play.ot * 100).toFixed(1)}% to overtime`);
 }
 
