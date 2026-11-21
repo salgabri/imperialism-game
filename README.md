@@ -35,7 +35,7 @@ And pick who fights:
   source rates ([Pacific islands](docs/design/pacific-islands.md)). A nation fields a team
   only with a **real side**, its own rated players holding at least half the lineup, and
   every other nation's land stays neutral: 173 nations play football, 63 Valorant, 57 Rocket League, 52
-  tennis, 45 women's tennis, 47 basketball, 40 Counter-Strike, 40 League of Legends, 36 women's football, 13 rugby, 12
+  tennis, 45 women's tennis, 47 basketball, 40 Counter-Strike, 40 League of Legends, 36 women's football, 15 rugby, 12
   baseball and 7 ice hockey. No team is made up of generated players or nearly empty.
 - **Clubs** — Europe's 124 strongest football clubs on [their map of
   Europe](#the-europe-maps), each on land in its own country, 84 women's clubs (Europe's 68
@@ -67,8 +67,9 @@ under football's rulebook with its own players ([design notes](docs/design/women
 two codes, as basketball's NBA and EuroLeague each keep their own rules. Its NRL clubs play rugby league, Rugby League 26's
 NRL in five-minute slices to golden point ([design notes](docs/design/rugby-league.md)); its nations (the Six Nations
 among them) and Europe's Premiership, Top 14 and URC clubs play union, the same slices under union's points (a try five, a
-penalty goal and a drop goal three) and sudden-death extra time, computed from RugbyPass's team sheets and match stats, as
-no game publishes union ratings, every rating marked an estimate ([design notes](docs/design/rugby-union.md)).
+penalty goal and a drop goal three) and sudden-death extra time. As no game publishes union ratings, union's are computed
+from RugbyPass's team sheets and match stats, the nations down to New Zealand's, Australia's and Japan's from Super Rugby
+Pacific and League One, every rating marked an estimate ([design notes](docs/design/rugby-union.md)).
 Tennis plays Davis Cup ties between nations, its players rated by their Elo
 ([design notes](docs/design/tennis.md)), and women's tennis the Billie Jean King Cup's, the WTA's players
 by their Elo, with the WTA's serve ([design notes](docs/design/womens-tennis.md)). Rocket League, the first esport, plays
@@ -164,7 +165,7 @@ npm run sync:nhl         # snapshot EA's NHL 27 ratings and the NHL's rosters an
 npm run build-hockey     # rebuild the NHL clubs and the hockey nations from that snapshot (--check compares byte for byte)
 npm run build:nhl-map    # rebuild the NHL's map of the USA and Canada (about 2 minutes; --check compares byte for byte)
 npm run build:nhl-league # each earlier NHL season's goals and scoring factor, and the playoff overtimes (--fetch saves missing NHL.com pages; --check compares byte for byte)
-npm run sync:rugby-union # snapshot RugbyPass's games of 2023/24–2025/26 (the Premiership, Top 14, URC, both European cups and every Test) into scripts/data/rugby-union-2025-26.json (--fetch downloads what data-src/rugby-union/ lacks; network, cached)
+npm run sync:rugby-union # snapshot RugbyPass's games of 2023/24–2025/26 (the Premiership, Top 14, URC, both European cups, Super Rugby Pacific, League One and every Test) into scripts/data/rugby-union-2025-26.json (--fetch downloads what data-src/rugby-union/ lacks; network, cached)
 npm run build-rugby-union # compute rugby union's clubs, nations and audit from that snapshot (--check compares byte for byte)
 npm run sync:nrl         # snapshot Rugby League 26's NRL ratings, Zero Tackle's profiles and NRL.com's 2025 team lists into scripts/data/rugby-league-26.json (network, cached)
 npm run build-rugby-league # rebuild the NRL clubs and the rugby league nations from that snapshot (--check compares byte for byte)
@@ -364,7 +365,8 @@ manager of the theatre's favourite, with decisions from the first match.
    fewer still. A choice the sport doesn't offer plays its heartland, the confederation
    with the most real sides (ice hockey's Europe), and comes back with a sport
    that offers it. Basketball's nations also offer **EuroBasket**, the 24 nations of EuroBasket 2025, and rugby's
-   the **Six Nations**: England, France, Ireland, Italy, Scotland and Wales, framed on Europe. Rugby's nations play union.
+   the **Six Nations**: England, France, Ireland, Italy, Scotland and Wales, framed on Europe. Rugby's nations play union;
+   in Asia & Oceania, New Zealand, Australia, Japan, Fiji, Tonga and Samoa field real sides.
    Football club campaigns offer Europe's 124 strongest clubs or its
    Elite 32 on [the map of Europe](#the-europe-maps); basketball clubs play the NBA on its own
    map of the USA and Canada or [the EuroLeague](#the-euroleague-map) on its map of Europe, American football (clubs only: choosing it
@@ -1104,15 +1106,17 @@ player each, stay neutral. See the [design notes](docs/design/womens-tennis.md).
 
 **Rugby (union)** — `src/data/clubs.rugby-union.js` and `src/data/rosters.rugby-union.js`, computed: no game or site publishes
 rugby union ratings. RugbyPass's match centre (World Rugby's own site) gives every game of the Premiership, the Top 14, the URC, the
-Champions Cup, the Challenge Cup and every Test of 2023/24 to 2025/26, both team sheets and each player's stats
-(`scripts/data/rugby-union-2025-26.json`, 1,999 games and 1,947 players). Each player's value, by the method of
-[computed ratings](docs/design/computed-ratings.md), weighs his share of his club's minutes, his Test minutes and his
-production (RugbyPass's stats at the Six Nations' own game-for-fans points table) by their year-to-year stability, ranked within
-his position onto the default shape of a sport no game rates; then each club moves by its 2025/26 results and each
-nation the clubs' players cover (the Six Nations' and Argentina) by its Tests. The 36 European clubs field their
-matchday 23 and keep up to 30; nations field the clubs' players (the URC's four South African sides among them) by their
-latest Test side, thirteen holding at least half a matchday 23. Every rating is marked an estimate. See the
-[design notes](docs/design/rugby-union.md).
+Champions Cup, the Challenge Cup, Super Rugby Pacific, Japan's League One and every Test of 2023/24 to 2025/26, both team
+sheets and each player's stats (`scripts/data/rugby-union-2025-26.json`, 2,584 games and 2,855 players). Each player's value,
+by the method of [computed ratings](docs/design/computed-ratings.md), weighs his share of his club's minutes, his Test
+minutes and his production (RugbyPass's stats at the Six Nations' own game-for-fans points table) by their year-to-year
+stability, ranked within his position onto the default shape of a sport no game rates: the three European leagues'
+players together, Super Rugby's and League One's each within its league, then set on the European scale by an offset
+measured from their nations' Tests (+0.7 and −1.2). Each club then moves by its 2025/26 results and each nation the rated
+players cover (the Six Nations', the Rugby Championship's four, Japan and Fiji) by its Tests. The 36 European clubs field
+their matchday 23 and keep up to 30; Super Rugby's and League One's clubs, like the URC's four South African sides, are
+rated but play on no map. Nations field the rated players by their latest Test side, fifteen holding at least half a
+matchday 23. Every rating is marked an estimate. See the [design notes](docs/design/rugby-union.md).
 
 **Rugby league** — `src/data/clubs.rugby-league.js` and `src/data/rosters.rugby-league.js`, from Big Ant's Rugby League 26
 ratings of every NRL player as Zero Tackle listed them on the game's release (17 July 2025), Zero Tackle's player profiles

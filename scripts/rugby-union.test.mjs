@@ -107,6 +107,21 @@ test('the snapshot sums each player\'s seasons from the team sheets, and keeps o
   assert.deepEqual([CORE.tries.forward, CORE.tries.back, CORE.penaltyGoals.points, CORE.yellow.points], [15, 10, 3, -3]);
 });
 
+test('the pool leagues\' players are kept; a club that meets the Lions on tour stays a club, and a nation never plays as one', () => {
+  const game = (id, competition, kind, home, away, players = { home: [], away: [] }) => ({ fixture: { id, epoch: Date.UTC(2026, 1, id) / 1000, kind, competition },
+    game: { id, date: new Date(Date.UTC(2026, 1, id)).toISOString(), venue: 'V', home, away, homeScore: 10, awayScore: 20, summary: {}, scoring: [],
+      stats: {}, players } });
+  const seasons = [{ key: '2025/26', from: Date.UTC(2025, 7, 1), to: Date.UTC(2026, 7, 1) }];
+  const force = { id: 5856, name: 'Force' }, reds = { id: 1056, name: 'Reds' }, lions = { id: 77, name: 'British & Irish Lions' };
+  const eve = { id: 5, name: 'Eve Five', uri: 'eve-five', number: 10, position: 'Fly Half', events: [], subs: [] };
+  const snapshot = snapshotOf({ seasons, competitions: {}, games: [
+    game(1, 'super-rugby', 'club', force, reds, { home: [eve], away: [] }), game(2, 'british-irish-lions', 'test', force, lions)] });
+  assert.deepEqual(snapshot.teams, { 77: ['British & Irish Lions', 'test'], 1056: ['Reds', 'club'], 5856: ['Force', 'club'] });
+  assert.deepEqual(snapshot.players.map(row => row[1]), ['Eve Five'], 'a Super Rugby club\'s player of 2025/26 is rated');
+  assert.throws(() => snapshotOf({ seasons, competitions: {}, games: [game(3, 'super-rugby', 'club', { id: 30, name: 'France' }, reds)] }),
+    /France \(30\) is a nation and plays club games/);
+});
+
 // ---------- the season ----------
 
 test('the clubs, the nations and the audit rebuild byte for byte from the committed snapshot', () => {
@@ -177,20 +192,57 @@ test('positions: a flanker at number eight is a small move, a lock in the back r
   }
 });
 
-test('nations field the clubs\' players by their latest Test side; the Six Nations and the others with half a side play', () => {
+test('nations field the rated players by their latest Test side: the Six Nations, the Rugby Championship\'s four, Japan and the Pacific\'s', () => {
   const fielded = fieldedNations(sport);
   for (const id of SIX_NATIONS) assert.ok(fielded.includes(id), `${NATIONS[id][0]} fields a team`);
-  for (const id of ['032', '710', '242', '268']) assert.ok(fielded.includes(id), `${NATIONS[id][0]} fields a team`);
-  assert.ok(!fielded.includes('554'), 'New Zealand\'s players play at home: no side of these clubs\' players');
+  for (const id of ['032', '710', '554', '036', '392', '242', '776', '882', '268']) assert.ok(fielded.includes(id), `${NATIONS[id][0]} fields a team`);
   for (const id of fielded) assert.ok(fieldsRealSide(id, sport));
-  // Each of the six plays at its Test results' level: France above Ireland and England, Italy and Wales below them all.
-  const strength = id => rugbyUnionStrength(selectLineup(buildTeam(id, makeRng(1), sport)));
-  const [fra, irl, eng, sco, ita, wal] = ['250', '372', '826', 'SCO', '380', 'WAL'].map(strength);
-  assert.ok(fra > irl && fra > eng && Math.min(irl, eng, sco) > Math.max(ita, wal), JSON.stringify({ fra, irl, eng, sco, ita, wal }));
+  // New Zealand, Australia and Japan field whole sides of their own players, most of them from Super Rugby and League One.
   const moved = AUDIT.report.tests.moves;
-  assert.deepEqual(Object.keys(moved).sort(), ['032', '250', '372', '380', '826', 'SCO', 'WAL'].sort(), 'only nations these clubs\' players cover');
-  for (const id of Object.keys(moved)) assert.ok(moved[id].coverage >= AUDIT.report.tests.covered);
+  for (const id of ['554', '036', '392']) {
+    assert.ok(selectLineup(buildTeam(id, makeRng(1), sport)).slots.every(slot => slot.player && !slot.player.gen), `${NATIONS[id][0]}: a 23 of its own`);
+    assert.equal(ROSTERS[id][2].length, 30, `${NATIONS[id][0]}: its 23 and depth`);
+  }
+  assert.ok(moved['554'].share['super-rugby'] > 0.75 && moved['036'].share['super-rugby'] > 0.75 && moved['392'].share['japan-rugby-league-one'] > 0.9,
+    JSON.stringify([moved['554'].share, moved['036'].share, moved['392'].share]));
+  // Every nation the rated players cover plays at its Test results' level, in their order: South Africa, France, New
+  // Zealand and Australia at the top, Japan and Fiji below the six's weakest.
+  assert.deepEqual(Object.keys(moved).sort(), ['032', '036', '242', '250', '372', '380', '392', '554', '710', '826', 'SCO', 'WAL'].sort(),
+    'only the nations the rated players cover');
+  for (const [id, move] of Object.entries(moved)) {
+    assert.ok(move.coverage >= AUDIT.report.tests.covered, id);
+    assert.ok(Math.abs(move.after - move.target) < 0.6, `${NATIONS[id][0]}: ${move.after} v ${move.target}`);
+  }
+  const strength = id => rugbyUnionStrength(selectLineup(buildTeam(id, makeRng(1), sport)));
+  const [rsa, fra, irl, eng, sco, ita, wal, nzl, aus, jpn, fij] = ['710', '250', '372', '826', 'SCO', '380', 'WAL', '554', '036', '392', '242'].map(strength);
+  assert.ok(fra > irl && fra > eng && Math.min(irl, eng, sco) > Math.max(ita, wal), JSON.stringify({ fra, irl, eng, sco, ita, wal }));
+  assert.ok(rsa > fra && fra > nzl && nzl > aus && Math.min(nzl, aus) > Math.max(irl, sco) && Math.min(ita, wal) > jpn && jpn > fij,
+    JSON.stringify({ rsa, fra, nzl, aus, irl, sco, ita, wal, jpn, fij }));
+  // The line is the anchor's, the seven the three leagues' players cover by themselves; the pool leagues sit a few points
+  // from Europe's scale at most.
+  assert.deepEqual(AUDIT.report.tests.anchor.slice().sort(), ['032', '250', '372', '380', '826', 'SCO', 'WAL'].sort());
+  assert.ok(Object.values(AUDIT.report.tests.offsets).every(offset => Math.abs(offset) < 3), JSON.stringify(AUDIT.report.tests.offsets));
   assert.equal(ROSTERS['250'][2].length, 30, 'a nation\'s squad: its 23 and depth');
+});
+
+test('Super Rugby Pacific\'s 11 clubs and League One\'s 12 are rated for their players and play on no map', () => {
+  const pool = Object.values(SPECS).filter(spec => ['Super Rugby Pacific', 'League One'].includes(spec.league));
+  const counts = {};
+  for (const spec of pool) counts[spec.league] = (counts[spec.league] ?? 0) + 1;
+  assert.deepEqual(counts, { 'Super Rugby Pacific': 11, 'League One': 12 });
+  assert.ok(pool.every(spec => spec.europe === false && ['554', '036', '242', '392'].includes(spec.country)));
+  assert.ok(!CLUBS.some(club => pool.some(spec => spec.id === club.id)), 'none on the map');
+  const audited = AUDIT.clubs.filter(club => club.europe === false);
+  assert.equal(audited.length, 27, 'the 23 and the URC\'s four South African sides');
+  for (const club of audited) {
+    assert.deepEqual(club.crossing, [], `${club.name} fills its 23 within its units`);
+    assert.ok(Math.abs(club.after - club.target) < 0.6, `${club.name}: ${club.after} v ${club.target}`);
+  }
+  for (const league of ['super-rugby', 'japan-rugby-league-one']) {
+    const report = AUDIT.report.pools[league];
+    assert.ok(report.srs.reliability > 0.8 && Object.keys(report.groups).length === POSITIONS.length, league);
+    assert.equal(report.offset, AUDIT.report.tests.offsets[league]);
+  }
 });
 
 test('the Six Nations is rugby union\'s own theatre, framed on Europe, beside the world and Europe\'s', () => {

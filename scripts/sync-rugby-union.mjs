@@ -1,8 +1,8 @@
 // Snapshot rugby union's built-in season, 2025/26, from RugbyPass's match centre (scripts/lib/rugbypass.mjs; the method in
-// docs/design/rugby-union.md): every game of the Premiership, the Top 14, the United Rugby Championship, the Champions Cup
-// and the Challenge Cup in 2023/24, 2024/25 and 2025/26, and every Test of those seasons, each with both team sheets,
-// its scores and each player's stats. Each reply's part read is cached in the ignored data-src/rugby-union/ (fixtures/,
-// games/), so a rerun reads the cache instead of the site; only the snapshot is committed.
+// docs/design/rugby-union.md): every game of the Premiership, the Top 14, the United Rugby Championship, the Champions Cup,
+// the Challenge Cup, Super Rugby Pacific and Japan Rugby League One in 2023/24, 2024/25 and 2025/26, and every Test of those
+// seasons, each with both team sheets, its scores and each player's stats. Each reply's part read is cached in the ignored
+// data-src/rugby-union/ (fixtures/, games/), so a rerun reads the cache instead of the site; only the snapshot is committed.
 //
 // Usage: node scripts/sync-rugby-union.mjs [--fetch] [--refresh-fixtures]
 //   --fetch             download whatever the cache lacks, then write the snapshot
@@ -25,11 +25,13 @@ const FETCH = args.has('--fetch');
 const REFRESH_FIXTURES = args.has('--refresh-fixtures');
 
 /**
- * The competitions read, by RugbyPass's address: the clubs' leagues and European cups, and the Tests (the British and
- * Irish Lions' tour among them, whose Tests are representative games).
+ * The competitions read, by RugbyPass's address: the clubs' leagues and European cups, Super Rugby Pacific and Japan
+ * Rugby League One (Division One), whose clubs are rated for their players but play on no map, and the Tests (the
+ * British and Irish Lions' tour among them, whose Tests are representative games).
  */
 export const COMPETITIONS = Object.freeze({
-  club: ['premiership', 'top-14', 'united-rugby-championship', 'european-champions-cup', 'challenge-cup'],
+  club: ['premiership', 'top-14', 'united-rugby-championship', 'european-champions-cup', 'challenge-cup', 'super-rugby',
+    'japan-rugby-league-one'],
   test: ['six-nations', 'autumn-nations-series', 'internationals', 'the-rugby-championship', 'nations-championship',
     'pacific-nations-cup', 'rugby-world-cup', 'rugby-europe-championship', 'british-irish-lions'],
 });

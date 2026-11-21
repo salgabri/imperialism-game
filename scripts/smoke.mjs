@@ -318,8 +318,8 @@ function checkTheatres(scenario, theatre) {
       { value: 'domestic:rugbyeurope', text: 'European clubs · 36 clubs' }, { value: 'domestic:nrl', text: 'NRL · 17 clubs' }]), JSON.stringify(theatre.options));
     return;
   }
-  // Rugby union's nations: the world, Europe, the Six Nations, and Asia & Oceania, where Fiji, Samoa, Tonga and Australia
-  // field half a matchday 23 of the clubs' players.
+  // Rugby union's nations: the world, Europe, the Six Nations, and Asia & Oceania, where New Zealand, Australia, Japan,
+  // Fiji, Tonga and Samoa field half a matchday 23 of the rated players.
   if (scenario.layer !== 'clubs' && scenario.sport === 'rugby-union') {
     check('rugby nations offer the world, Europe, the Six Nations and Asia & Oceania', JSON.stringify(theatre.options.map(option => option.value))
       === JSON.stringify(['world', 'UEFA', 'six-nations', 'AFC']), JSON.stringify(theatre.options));

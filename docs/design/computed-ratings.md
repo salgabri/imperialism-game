@@ -226,6 +226,12 @@ Three settings, one of them the user's call (see "Decisions"):
   Equivalencies are built. Failing that, use the leagues' clubs' results against each other. The national XI then comes
   from step 1, the team from Elo (as in `nt-*`), and the order inside the XI from each player's club evidence instead of
   the fixed profile D = [5.3 … −3.9].
+  Where no club game links the leagues at all, rugby union's Super Rugby Pacific and League One rate each league within
+  itself and move it by an offset fitted to the Tests of the nations drawn from it: the offset at which those nations'
+  players stand to their Test ratings as the reference leagues' nations' players stand to theirs (rugby-union.md, "Super
+  Rugby Pacific and League One"). Measuring against the reference nations' own relation matters: players' own ratings
+  bunch nations together, so fitting each nation to its results' line instead would charge a weak Test side's level to its
+  league (League One −4.4 rather than −1.2). The movers' production ratios checked the order of the leagues, not the size.
 - **Results and team lists only.** Selection plus step 5, as in rugby league 1960–1997.
 - **Individual sports.** Elo at the season's end, read linearly (tennis).
 - **Team esports.** Player Elo built from team results (scripts/lib/liquipedia-elo.mjs).

@@ -1,5 +1,5 @@
 {
-  "about": "Rugby union's clubs of 2025/26 (docs/design/rugby-union.md): the Premiership's, the Top 14's and the United Rugby Championship's, keyed by RugbyPass's team id. `country` is the game's nation id (Ulster's home is Northern Ireland's land, NIR); `ground` and `at` ([latitude, longitude]) are the ground each played most home games at in 2025/26 by RugbyPass's fixtures, `home` the town its land is named after. A club with `europe: false` (the URC's four South African sides) is rated, for its players and the results, but plays on no map.",
+  "about": "Rugby union's clubs of 2025/26 (docs/design/rugby-union.md): the Premiership's, the Top 14's and the United Rugby Championship's, then Super Rugby Pacific's and Japan Rugby League One's (Division One), keyed by RugbyPass's team id. `country` is the game's nation id (Ulster's home is Northern Ireland's land, NIR); `ground` is the ground each played most home games at in 2025/26 by RugbyPass's fixtures, `at` ([latitude, longitude]) where it stands and `home` the town its land is named after. A club with `europe: false` is rated, for its players and the results, but plays on no map: the URC's four South African sides, and Super Rugby's and League One's clubs, which are named with their ground alone.",
   "clubs": {
     "2448": { "id": "ru-bath", "name": "Bath", "code": "BAT", "league": "Premiership", "country": "826", "home": "Bath", "ground": "The Rec", "at": [51.3826, -2.3553] },
     "4581": { "id": "ru-bristol-bears", "name": "Bristol Bears", "code": "BRI", "league": "Premiership", "country": "826", "home": "Bristol", "ground": "Ashton Gate", "at": [51.4400, -2.6203] },
@@ -40,6 +40,29 @@
     "5586": { "id": "ru-bulls", "name": "Bulls", "code": "BUL", "league": "URC", "country": "710", "home": "Pretoria", "ground": "Loftus Versfeld", "at": [-25.7533, 28.2228], "europe": false },
     "5092": { "id": "ru-lions", "name": "Lions", "code": "LIO", "league": "URC", "country": "710", "home": "Johannesburg", "ground": "Ellis Park", "at": [-26.1975, 28.0606], "europe": false },
     "1527": { "id": "ru-sharks", "name": "Sharks", "code": "SHA", "league": "URC", "country": "710", "home": "Durban", "ground": "Kings Park", "at": [-29.8291, 31.0300], "europe": false },
-    "3994": { "id": "ru-stormers", "name": "Stormers", "code": "STO", "league": "URC", "country": "710", "home": "Cape Town", "ground": "Cape Town Stadium", "at": [-33.9035, 18.4111], "europe": false }
+    "3994": { "id": "ru-stormers", "name": "Stormers", "code": "STO", "league": "URC", "country": "710", "home": "Cape Town", "ground": "Cape Town Stadium", "at": [-33.9035, 18.4111], "europe": false },
+    "2907": { "id": "ru-blues", "name": "Blues", "code": "BLU", "league": "Super Rugby Pacific", "country": "554", "ground": "Eden Park", "europe": false },
+    "5748": { "id": "ru-brumbies", "name": "Brumbies", "code": "BRU", "league": "Super Rugby Pacific", "country": "036", "ground": "GIO Stadium", "europe": false },
+    "3999": { "id": "ru-chiefs", "name": "Chiefs", "code": "CHI", "league": "Super Rugby Pacific", "country": "554", "ground": "FMG Stadium", "europe": false },
+    "2982": { "id": "ru-crusaders", "name": "Crusaders", "code": "CRU", "league": "Super Rugby Pacific", "country": "554", "ground": "One NZ Stadium", "europe": false },
+    "3122": { "id": "ru-fijian-drua", "name": "Fijian Drua", "code": "FDR", "league": "Super Rugby Pacific", "country": "242", "ground": "Churchill Park", "europe": false },
+    "5856": { "id": "ru-force", "name": "Force", "code": "FOR", "league": "Super Rugby Pacific", "country": "036", "ground": "HBF Park", "europe": false },
+    "3384": { "id": "ru-highlanders", "name": "Highlanders", "code": "HIG", "league": "Super Rugby Pacific", "country": "554", "ground": "Forsyth Barr Stadium", "europe": false },
+    "4125": { "id": "ru-hurricanes", "name": "Hurricanes", "code": "HUR", "league": "Super Rugby Pacific", "country": "554", "ground": "Hnry Stadium", "europe": false },
+    "6501": { "id": "ru-moana-pasifika", "name": "Moana Pasifika", "code": "MOA", "league": "Super Rugby Pacific", "country": "554", "ground": "North Harbour Stadium", "europe": false },
+    "1056": { "id": "ru-reds", "name": "Reds", "code": "RED", "league": "Super Rugby Pacific", "country": "036", "ground": "Suncorp Stadium", "europe": false },
+    "1546": { "id": "ru-waratahs", "name": "Waratahs", "code": "WAR", "league": "Super Rugby Pacific", "country": "036", "ground": "Allianz Stadium", "europe": false },
+    "1154": { "id": "ru-blackrams-tokyo", "name": "BlackRams Tokyo", "code": "BRT", "league": "League One", "country": "392", "ground": "Chichibunomiya", "europe": false },
+    "1314": { "id": "ru-kobelco-kobe-steelers", "name": "Kobelco Kobe Steelers", "code": "KOB", "league": "League One", "country": "392", "ground": "Universiade Sports Park", "europe": false },
+    "1525": { "id": "ru-kubota-spears", "name": "Kubota Spears", "code": "SPE", "league": "League One", "country": "392", "ground": "Edoriki (Edogawa) Stadium", "europe": false },
+    "6343": { "id": "ru-mie-honda-heat", "name": "Mie Honda Heat", "code": "MHH", "league": "League One", "country": "392", "ground": "Suzuka Sports Garden", "europe": false },
+    "1652": { "id": "ru-mitsubishi-sagamihara-dynaboars", "name": "Mitsubishi Sagamihara Dynaboars", "code": "DYN", "league": "League One", "country": "392", "ground": "Gion (Asamizo Park) Stadium", "europe": false },
+    "3459": { "id": "ru-saitama-wild-knights", "name": "Saitama Wild Knights", "code": "SWK", "league": "League One", "country": "392", "ground": "Kumagaya Rugby Stadium", "europe": false },
+    "4749": { "id": "ru-shizuoka-bluerevs", "name": "Shizuoka BlueRevs", "code": "BRV", "league": "League One", "country": "392", "ground": "Yamaha Stadium", "europe": false },
+    "3908": { "id": "ru-tokyo-sungoliath", "name": "Tokyo Sungoliath", "code": "SUN", "league": "League One", "country": "392", "ground": "Chichibunomiya", "europe": false },
+    "3342": { "id": "ru-toshiba-brave-lupus-tokyo", "name": "Toshiba Brave Lupus Tokyo", "code": "BLT", "league": "League One", "country": "392", "ground": "Chichibunomiya", "europe": false },
+    "1886": { "id": "ru-toyota-verblitz", "name": "Toyota Verblitz", "code": "VER", "league": "League One", "country": "392", "ground": "Paloma Mizuho Rugby Field", "europe": false },
+    "4788": { "id": "ru-urayasu-d-rocks", "name": "Urayasu D-Rocks", "code": "URA", "league": "League One", "country": "392", "ground": "Chichibunomiya", "europe": false },
+    "2008": { "id": "ru-yokohama-canon-eagles", "name": "Yokohama Canon Eagles", "code": "EAG", "league": "League One", "country": "392", "ground": "Chichibunomiya", "europe": false }
   }
 }

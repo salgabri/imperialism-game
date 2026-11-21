@@ -107,7 +107,7 @@ export const EUROPE_MAPS = [
   {"id":"el2023","sport":"basketball","league":"EuroLeague","name":"Europe","seasons":["nba-2k23","nba-2k24"],"clubs":18,"sections":18,"countries":9,"version":"el2023-60cedb7e"},
   {"id":"el2025","sport":"basketball","league":"EuroLeague","name":"Europe","seasons":["nba-2k25"],"clubs":18,"sections":18,"countries":9,"version":"el2025-5f2d7882"},
   {"id":"el2026","sport":"basketball","league":"EuroLeague","name":"Europe","seasons":["nba-2k26"],"clubs":20,"sections":20,"countries":10,"version":"el2026-55b31597"},
-  {"id":"rugbyeurope","sport":"rugby-union","league":"European clubs","name":"Europe","clubs":36,"sections":36,"countries":7,"version":"rugbyeurope-d08f93e3","top":["Stade Toulousain","Bath","Northampton Saints"]},
+  {"id":"rugbyeurope","sport":"rugby-union","league":"European clubs","name":"Europe","clubs":36,"sections":36,"countries":7,"version":"rugbyeurope-beb20ff1","top":["Stade Toulousain","Bath","Northampton Saints"]},
   {"id":"eu124s1997","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["swos-9697"],"clubs":124,"sections":124,"countries":7,"version":"eu124s1997-00063557","replacedBy":"eu124e1997"},
   {"id":"eu32s1997","sport":"football","league":"Elite 32","name":"Europe","theatre":"elite","seasons":["swos-9697"],"clubs":32,"sections":32,"countries":7,"version":"eu32s1997-f939302b","replacedBy":"eu32e1997"},
   {"id":"eu124s1996","sport":"football","league":"Top 124","name":"Europe","theatre":"all","seasons":["swos-9596"],"clubs":124,"sections":124,"countries":7,"version":"eu124s1996-04bc64d1","replacedBy":"eu124e1996"},

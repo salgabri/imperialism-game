@@ -216,7 +216,7 @@ Each is a fact of a source or a rule the game chose, not an error:
   built-in season, five of the computed fills' players (Roman Berezovsky, Armenia's keeper, at 41 in 2016/17; Vincent
   Thill at 15 for Luxembourg in 2015/16), Yisa Sofoluwe at 15 for Nigeria in 1982/83, Vitorino Hilton at 42 for Montpellier, and five
   players 15 on 1 July before a women's World Cup and 16 at it (Australia's, Mexico's and North Korea's in 2010/11).
-- **`rating-conflict` (8, and 268 in rugby union).** MLB namesakes the nation and club layers both name: three Luis Garcías, two
+- **`rating-conflict` (8, and 255 in rugby union).** MLB namesakes the nation and club layers both name: three Luis Garcías, two
   Francisco Rodríguezes, two Miguel Gonzálezes, two Ryan Brauns. Rugby union's are by design (2026-11-18,
   [rugby-union.md](rugby-union.md#the-method)): a club's players move by its 2025/26 results, a nation's from their own
   ratings by its Tests, so a player can rate a point or two apart for club and country.
