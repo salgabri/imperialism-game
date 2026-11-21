@@ -173,8 +173,9 @@ strong.setup-save__text { font-weight:600; }
 
 /* ---- Sports: tiles, an icon over its name; the whole tile is the radio. Up to four share a row; up to eight split into
    two even rows, nine into three, ten to twelve into three of four and thirteen or more into rows of four (--sport-cols,
-   set by SetupOverlay), since five across would squeeze "Basketball" ---- */
-.setup-sports { display:grid; grid-template-columns:repeat(var(--sport-cols, 4), minmax(0, 1fr)); gap:8px; }
+   set by SetupOverlay), since five across would squeeze "Basketball". Every row is as tall as the tallest (1fr): on a wide
+   window a row whose names all fit on one line would otherwise come out shorter than its neighbours ---- */
+.setup-sports { display:grid; grid-template-columns:repeat(var(--sport-cols, 4), minmax(0, 1fr)); grid-auto-rows:1fr; gap:8px; }
 .setup-card {
   position:relative; min-width:0; min-height:70px; padding:10px 4px 8px;
   display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:6px; text-align:center;

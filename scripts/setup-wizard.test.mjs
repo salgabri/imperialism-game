@@ -662,6 +662,9 @@ test('fourteen sport cards sit in four rows of four, compact tiles that stay 44p
     ['American football', 'College football', 'Baseball', 'Ice hockey', 'Tennis', 'Women\'s tennis', 'Rugby', 'Rocket League',
       'Counter-Strike', 'Valorant', 'League of Legends']);
   const css = readFileSync(new URL('../src/components/setup.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  // Every row of tiles as tall as the tallest: at 1920×1080 the third row (Women's tennis, Rugby, Rocket League,
+  // Counter-Strike), its names all on one line, was 49px against the others' 62px (measured in Chrome; 62px each after).
+  assert.match(css, /\.setup-sports \{ display:grid; grid-template-columns:[^;]+; grid-auto-rows:1fr;/);
   assert.match(css, /\.setup-sports\[data-rows="3"\] \.setup-card \{ min-height:44px;/);
   // Four across on a phone, the long names take two lines: a smaller icon and snug lines keep 390×664 from scrolling
   // (measured in Chrome: tiles 60px → 53px, step 1 520px of content in 510px → 510px).
