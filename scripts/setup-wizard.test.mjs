@@ -1172,13 +1172,23 @@ test('country card: each club’s land in its kick-off pastel over the neighbour
   assert.equal(countryMapPreview(null), null);
   assert.equal(countryMapPreview({ geo: { paths: {} }, sectionNames: {} }), null);
 
-  // A real shipped map: every section, each in its own home club's pastel.
+  // A real shipped map: every section, each in the colour its home club takes at kick-off: its own pastel, unless
+  // that looks like a neighbour's (engine/mapPalette.js), and never like a neighbour's.
   const { decodeDomestic } = await import('../src/engine/domestic.js');
+  const { empirePalette, clubRanks, empireNeighbours } = await import('../src/engine/mapPalette.js');
+  const kickoff = map => empirePalette({ own: map.startOwners, adj: map.geo.adj, areaOf: id => map.geo.surfaceOf(id).area,
+    ranks: clubRanks(map.clubs), teams: Object.fromEntries(map.clubs.map(club => [club.id, club])) }).political;
   const decoded = decodeDomestic(JSON.parse(readFileSync(new URL('../public/domestic/826.json', import.meta.url), 'utf8')), '826');
   const real = countryMapPreview(decoded, []);
   assert.equal(real.sections.length, ENGLAND.clubs);
   const home = new Map(decoded.clubs.map(club => [club.homeSection, club.id]));
-  assert.ok(real.sections.every(section => section.fill === politicalFill(home.get(section.id))));
+  const colours = kickoff(decoded);
+  assert.ok(real.sections.every(section => section.fill === colours.get(home.get(section.id))));
+  assert.ok(real.sections.filter(section => section.fill === politicalFill(home.get(section.id))).length > ENGLAND.clubs / 2,
+    'most clubs keep their own pastel');
+  for (const [club, neighbours] of empireNeighbours(decoded.startOwners, decoded.geo.adj)) {
+    for (const other of neighbours) assert.notEqual(colours.get(club), colours.get(other), `${club} and ${other} apart`);
+  }
   assert.ok(real.sections.every(section => section.owner === home.get(section.id)), 'a click on a section previews its club');
   assert.ok(real.viewBox.split(' ').map(Number).every(Number.isFinite));
   // Fiji: 16 clubs on 100 sections, each club's sections drawn as one land, painted as the club starting there, and
@@ -1189,7 +1199,8 @@ test('country card: each club’s land in its kick-off pastel over the neighbour
   assert.equal(fijiCard.sections.length, fiji.clubs.length, 'one land per club');
   assert.deepEqual(fijiCard.sections.map(section => section.id).sort(), fiji.clubs.map(club => club.homeSection).sort(),
     'each land named by its club’s home section');
-  assert.ok(fijiCard.sections.every(section => section.fill === politicalFill(fiji.startOwners[section.id])), 'no neutral land');
+  const fijiColours = kickoff(fiji);
+  assert.ok(fijiCard.sections.every(section => section.fill === fijiColours.get(fiji.startOwners[section.id])), 'no neutral land');
   assert.ok(fijiCard.sections.every(section => section.owner === fiji.startOwners[section.id]));
   assert.equal(new Set(fijiCard.sections.map(section => fiji.startOwners[section.id])).size, fiji.clubs.length);
   assert.deepEqual(new Set(fijiCard.sections.map(section => section.owner)), new Set(fiji.clubs.map(club => club.id)),

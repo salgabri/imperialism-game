@@ -567,7 +567,8 @@ function meItem(st, ctx, mode) {
   }
   const followed = followedTeam(st, ctx);
   if (!followed) return null;
-  return { key: 'you', kind: 'swatch', label: 'Followed empire', color: mode === 'political' ? politicalFill(followed.id) : null,
+  return { key: 'you', kind: 'swatch', label: 'Followed empire',
+    color: mode === 'political' ? ctx?.palette?.political.get(followed.id) || politicalFill(followed.id) : null,
     ring: RING_INK };
 }
 

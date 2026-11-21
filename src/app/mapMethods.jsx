@@ -14,6 +14,7 @@ import { regionClips } from '../engine/flagClips.js';
 import { BANNER_PAD, flagFit, layoutFlagFit } from '../engine/flagFit.js';
 import { flagRegionIndexSteps } from '../engine/flagRegions.js';
 import { layoutFlagSymbol } from '../engine/flagSymbolLayout.js';
+import { clubRanks, empirePalette } from '../engine/mapPalette.js';
 import { runQuietly } from '../engine/quietTurns.js';
 import { memo } from '../viewModels/format.js';
 import * as mapVM from '../viewModels/map.js';
@@ -92,6 +93,77 @@ function paintedOwnership(app, snap) {
     for (const [id, holder] of Object.entries(snap.claims)) if (paths[id] && painted[id] == null) painted[id] = holder;
     return painted;
   });
+}
+
+// ---- Colours that keep bordering empires apart (engine/mapPalette.js) ----
+
+const worldHomes = new WeakMap(); // world geometry → its shapes' nations
+const startBoards = new WeakMap(); // decoded country map without startOwners (format 1) → home section → club
+const startOwnersOf = domestic => {
+  let board = startBoards.get(domestic);
+  if (!board) startBoards.set(domestic, board = Object.freeze(Object.fromEntries(Object.entries(homeClubs(domestic)).map(([section, club]) => [section, club.id]))));
+  return board;
+};
+const setupClubs = new WeakMap(); // decoded country map → its clubs by id
+/**
+ * The board the map's empires start on, which orders their choice of colour all campaign long: a country map's
+ * starting clubs (every section of each club's starting group), else each world shape's nation (a dependency its
+ * nation's). One object per map.
+ */
+function homeBoard(app) {
+  const domestic = app.domesticMap();
+  if (domestic?.geo && domestic.geo === app.geo) return domestic.startOwners || startOwnersOf(domestic);
+  let home = worldHomes.get(app.geo);
+  if (!home) {
+    const ownerOf = id => (NATIONS[id] ? id : DEPENDENCIES[id]?.of ?? null);
+    home = Object.freeze(Object.fromEntries(app.geo.countries.map(c => [c.id, ownerOf(c.id)]).filter(([, owner]) => owner)));
+    worldHomes.set(app.geo, home);
+  }
+  return home;
+}
+
+/**
+ * The colours of the board on screen (engine/mapPalette.js), so no two bordering empires look alike: in a campaign
+ * the board `st` as the map paints it (claimed nations as their holders' land), its managed empire clay; in setup the
+ * board the empires start on. Kept per board. → { political: Map(id → fill), flags: Map(id → colour) } | null
+ */
+export function mapPalette(st = this.state) {
+  if (!this.geo?.adj) return null;
+  const playing = isPlaying(st);
+  if (!playing) return boardPalette(this, homeBoard(this), null, null);
+  const own = paintedOwnership(this, { own: st.own || {}, claims: st.claims || NO_CLAIMS });
+  return boardPalette(this, own, st.teams || {}, st.settings ? this.managedId(st) : null);
+}
+
+/**
+ * The colours the campaign map would give board `own` (territory → team id) on the map's geometry at kick-off, no empire
+ * managed: setup's world card (screens/setup/setupModel.js theatreMapPreview). Kept per board.
+ */
+export function setupBoardPalette(own) {
+  return this.geo?.adj && own ? boardPalette(this, own, null, null) : null;
+}
+
+/**
+ * Board `own`'s palette on the map's geometry; `teams` null for setup's (a country map's decoded clubs). A country
+ * map's clubs choose strongest first, by the map's own ratings (clubRanks); a world map's nations by their land.
+ */
+function boardPalette(app, own, teams, managedId) {
+  const geo = app.geo, home = homeBoard(app);
+  const domestic = app.domesticMap();
+  const onMap = domestic?.geo === geo ? domestic : null;
+  if (!teams) {
+    teams = onMap ? setupClubs.get(onMap) : NO_CLAIMS;
+    if (!teams) setupClubs.set(onMap, teams = Object.fromEntries(onMap.clubs.map(club => [club.id, club])));
+  }
+  const ranks = onMap ? clubRanks(onMap.clubs) : null;
+  const cache = app.paletteCache ||= new WeakMap();
+  const hit = cache.get(own);
+  if (hit && hit.geo === geo && hit.home === home && hit.teams === teams && hit.managedId === managedId) return hit.value;
+  // Test atlases have no surfaces: every land then counts alike.
+  const areaOf = typeof geo.surfaceOf === 'function' ? id => geo.surfaceOf(id)?.area ?? 0 : () => 1;
+  const value = empirePalette({ own, adj: geo.adj, home, areaOf, ranks, teams, managedId });
+  cache.set(own, { geo, home, teams, managedId, value });
+  return value;
 }
 
 /**
@@ -199,12 +271,16 @@ function flagIndex(app) {
   return app.flagComponents;
 }
 
-/** What each owner flies on the campaign map (layoutBanners' `markOf`). */
-const campaignMarks = (teams, playing, year = null) => ownerId => {
+/**
+ * What each owner flies on the campaign map (layoutBanners' `markOf`). A club's colour is the one `palette` gives it
+ * (mapPalette), so clubs that come to border each other keep apart.
+ */
+const campaignMarks = (teams, playing, year = null, palette = null) => ownerId => {
   const owner = playing ? teams[ownerId] : null;
   const crest = crestOf(owner, year);
   // README §Map rendering: flag-bg behind a flag (clubs keep their colour, under the crest or monogram).
-  return { crestUrl: crest, monogram: monogramOf(owner, crest), color: owner?.col || V4.flagBg,
+  return { crestUrl: crest, monogram: monogramOf(owner, crest),
+    color: (owner?.col && palette?.flags.get(ownerId)) || owner?.col || V4.flagBg,
     nationId: playing ? owner?.flagId : NATIONS[ownerId] ? ownerId : DEPENDENCIES[ownerId]?.of };
 };
 
@@ -221,11 +297,14 @@ export function mapFlags(playing, mapMode = this.state.mapMode) {
   if (!flagIndex(this)) return NO_FLAGS;
   // While signing, the projected board: the taken land already flies the winner's banner (DEC D15). Claimed nations fly
   // their holder's banner too (paintedOwnership).
-  const components = this.flagComponents.components(playing ? paintedOwnership(this, mapSnapshot(this)) : this.setupFlagOwnership);
+  const snap = playing ? mapSnapshot(this) : null;
+  const components = this.flagComponents.components(playing ? paintedOwnership(this, snap) : this.setupFlagOwnership);
+  const palette = playing ? this.mapPalette(snap.state) : null;
   const cached = this.flagLayoutCache;
-  if (cached?.components === components && cached.teams === teams && cached.playing === playing) return cached.result;
-  const result = layoutBanners(components, campaignMarks(teams, playing, year));
-  this.flagLayoutCache = { components, teams, playing, result };
+  if (cached?.components === components && cached.teams === teams && cached.playing === playing
+    && cached.palette === palette) return cached.result;
+  const result = layoutBanners(components, campaignMarks(teams, playing, year, palette));
+  this.flagLayoutCache = { components, teams, playing, palette, result };
   return result;
 }
 
@@ -328,17 +407,20 @@ export function setupMapFlags(setup = this.state.setup) {
   const index = flagIndex(this);
   const cached = this.setupFlagCache;
   if (cached?.index === index && cached.opening === opening && cached.marks === marks) return cached.result;
+  // Each club in the colour that keeps it apart from its neighbours (engine/mapPalette.js), as at kick-off.
+  const { flags: colours } = boardPalette(this, opening, marks, null);
+  const colourOf = (ownerId, team) => (team.col && colours.get(ownerId)) || team.col;
   const result = layoutBanners(index.components(opening), ownerId => {
     const team = marks[ownerId];
     if (!team) return null;
     if (team.kind !== 'club') return { nationId: team.flagId, color: team.col || V4.flagBg };
     const crest = crestUrl(ownerId, year);
-    return { crestUrl: crest, monogram: monogramOf(team, crest), color: team.col || V4.flagBg };
+    return { crestUrl: crest, monogram: monogramOf(team, crest), color: colourOf(ownerId, team) || V4.flagBg };
   }, { idPrefix: SETUP_FLAG_PREFIX });
   const fills = new Map();
   for (const [territory, ownerId] of Object.entries(opening)) {
     const team = marks[ownerId];
-    if (team?.kind === 'club' && team.col) fills.set(territory, team.col);
+    if (team?.kind === 'club' && team.col) fills.set(territory, colourOf(ownerId, team));
   }
   const value = { ...result, fills };
   this.setupFlagCache = { index, opening, marks, result: value };
@@ -397,6 +479,7 @@ export function mapCountries() {
   const fronts = playing && mapMode === 'fronts' ? mapVM.frontsFills(snap.state, ctx) : null;
   const domestic = this.domesticMap();
   const preview = domestic && !playing ? homeClubs(domestic) : null;
+  const palette = this.mapPalette(playing ? snap.state : st);
 
   const { flagParts, flagPatterns } = this.mapFlags(playing);
   // Keyed on every input of the rows, by identity; fitMap refits geo and displayGeo in place, so on their path maps.
@@ -404,7 +487,7 @@ export function mapCountries() {
   // rows let WorldMap keep its country elements.
   const countries = memo(this.vmCache, 'map:countries', [this.geo.countries, this.geo.paths, this.displayGeo?.paths,
     domestic, preview, phase, snap.own, painted, teams, selected, flash, mapMode, identity.meId, identity.meFill,
-    identity.opponentId, strength, fronts, flagParts], () => {
+    identity.opponentId, strength, fronts, flagParts, palette], () => {
     const rows = [];
     const lands = this.drawnLands();
     for (const c of lands || this.geo.countries) {
@@ -428,7 +511,7 @@ export function mapCountries() {
         flagParts: parts,
         fill: mapVM.countryFill({ countryId: c.id, ownerId: ownerId || claimOwnerId, owner: owner || teams[claimOwnerId] || null,
           mapMode, hasFlagParts: !!parts?.length, setup: phase === 'setup', ...identity, strength, fronts,
-          preview: preview?.[c.id] || null }),
+          preview: preview?.[c.id] || null, palette }),
         stroke: 'none',
         strokeWidth: 0,
         cursor: owner ? 'pointer' : 'default',
@@ -459,13 +542,14 @@ export function mapClaims(playing) {
   const identity = mapVM.mapIdentity(snap.state, ctx);
   const strength = mapMode === 'strength' ? mapVM.strengthFills(snap.state, ctx) : null;
   const fronts = mapMode === 'fronts' ? mapVM.frontsFills(snap.state, ctx) : null;
+  const palette = this.mapPalette(snap.state);
   return memo(this.vmCache, 'map:claims', [snap.claims, land, teams, mapMode, identity.meId, identity.meFill, identity.opponentId,
-    strength, fronts, this.geo.paths], () => Object.keys(snap.claims).sort().flatMap(id => {
+    strength, fronts, this.geo.paths, palette], () => Object.keys(snap.claims).sort().flatMap(id => {
     const ownerId = snap.claims[id], owner = teams[ownerId], d = land.d.get(id);
     if (!owner || !d || this.geo.paths[id]) return [];
     const { onEnter, onLeave } = countryHandlers(this, id);
     return [{ id, ownerId, d, onEnter, onLeave,
-      fill: mapVM.countryFill({ countryId: id, ownerId, owner, mapMode, ...identity, strength, fronts }) }];
+      fill: mapVM.countryFill({ countryId: id, ownerId, owner, mapMode, ...identity, strength, fronts, palette }) }];
   }));
 }
 

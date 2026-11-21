@@ -54,7 +54,8 @@ const allClubIds = [...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...EUROLEAGUE_CLUBS,
 const withCrest = allClubIds.filter(id => clubLogoFile(id));
 // The File namespace's name on each Wikipedia a crest's file page comes from.
 const FILE_NAMESPACES = new Set(['File', 'Fichier', 'Dosya', 'Ficheiro', 'Archivo', 'Fayl', 'Файл', 'Датотека', 'ملف', 'קובץ', 'پرونده',
-  'Αρχείο', 'Tiedosto', 'Datoteka', 'Datei', 'Plik', 'Soubor', 'Bestand', 'Fil', 'Berkas', 'Tập tin', 'ファイル', '파일', 'Fișier']);
+  'Αρχείο', 'Tiedosto', 'Datoteka', 'Datei', 'Plik', 'Soubor', 'Bestand', 'Fil', 'Berkas', 'Tập tin', 'ファイル', '파일', 'Fișier', 'Vaizdas',
+  'Attēls', 'فيشي']);
 
 test('every club the list gives a crest has its file, a source row, and nothing else ships', () => {
   assert.ok(withCrest.length > 1000, `crests for ${withCrest.length} clubs`);

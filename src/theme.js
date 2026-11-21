@@ -113,7 +113,6 @@ const TEAM_PASTEL = Object.freeze({
   dark: Object.freeze({ L: [0.36, 0.43, 0.5], greyL: [0.44, 0.5, 0.56], share: 0.5, min: 0.04, max: 0.09 }),
 });
 const GREY_CHROMA = 0.04;
-const teamPastels = new Map();   // `${colour}|${step}` → light fill
 const teamPastelsDark = new Map(); // light fill → its dark-theme twin (themedPaint)
 
 function teamPastel([, C, H], step, band) {
@@ -126,19 +125,33 @@ function teamPastel([, C, H], step, band) {
  * id), else a pastel picked by hash of id.
  */
 export function empireFill(id, colour = null, step = null) {
+  return empireFillPair(id, colour, step).light;
+}
+
+const teamPastelPairs = new Map(); // `${colour}|${step}` → { light, dark }
+/**
+ * An empire's political fill (empireFill) with the dark-theme twin its own colour and step give: { light, dark }.
+ * themedPaint paints a light fill with the first twin made for it, and another colour that rounds to the same light
+ * fill can have a twin a unit or two apart; this one depends on nothing made before, for measuring fills against each
+ * other (engine/mapPalette.js, scripts/build-nation-colours.mjs).
+ */
+export function empireFillPair(id, colour = null, step = null) {
   let x = 0;
   for (const ch of String(id)) x = (x * 31 + ch.charCodeAt(0)) >>> 0;
   const lch = colour ? toOklch(colour) : null;
-  if (!lch) return EMPIRE_PASTELS[x % EMPIRE_PASTELS.length];
+  if (!lch) {
+    const light = EMPIRE_PASTELS[x % EMPIRE_PASTELS.length];
+    return { light, dark: darkFill(light) };
+  }
   const at = step === 0 || step === 1 || step === 2 ? step : x % 3;
   const key = `${colour}|${at}`;
-  let fill = teamPastels.get(key);
-  if (!fill) {
-    fill = teamPastel(lch, at, TEAM_PASTEL.light);
-    teamPastels.set(key, fill);
-    if (!teamPastelsDark.has(fill)) teamPastelsDark.set(fill, teamPastel(lch, at, TEAM_PASTEL.dark));
+  let pair = teamPastelPairs.get(key);
+  if (!pair) {
+    pair = Object.freeze({ light: teamPastel(lch, at, TEAM_PASTEL.light), dark: teamPastel(lch, at, TEAM_PASTEL.dark) });
+    teamPastelPairs.set(key, pair);
+    if (!teamPastelsDark.has(pair.light)) teamPastelsDark.set(pair.light, pair.dark);
   }
-  return fill;
+  return pair;
 }
 /** README rating tiers: 88+, 84–87, 80–83, 75–79, 70–74, <70. */
 export const RATING_TIERS = Object.freeze([[88, '88', '#8a5a00'], [84, '84', '#0f7b4d'], [80, '80', '#138a4a'],
@@ -166,4 +179,29 @@ export function themedPaint(fill) {
   if (token) return `var(${token}, ${fill})`;
   const dark = teamPastelsDark.get(fill);
   return dark ? `light-dark(${fill}, ${dark})` : fill;
+}
+
+/**
+ * Paint team pastel `light` with dark-theme twin `dark` from now on (empireFillPair's for the colour it was chosen
+ * from), so what the map measured is what it paints. Nothing for a tokened fill.
+ */
+export function paintTwin(light, dark) {
+  if (typeof light === 'string' && !PAINT_TOKENS.has(light.toLowerCase()) && teamPastelsDark.has(light)) teamPastelsDark.set(light, dark);
+}
+
+/** The dark theme's value of the tokens an empire can be painted with (tokens.css `:root[data-theme=dark]`). */
+export const DARK_TOKENS = Object.freeze({
+  '--land-neutral': '#2a2e30', '--you-fill': '#8a5543', '--opponent-fill': '#34407a',
+  '--empire-1': '#34493d', '--empire-2': '#4d4536', '--empire-3': '#353d52', '--empire-4': '#4f3439', '--empire-5': '#3f4c2e',
+  '--empire-6': '#45433a', '--empire-7': '#2f4a4f', '--empire-8': '#52402f', '--empire-9': '#413650', '--empire-10': '#3b4237',
+  '--empire-11': '#4f4a2c',
+});
+/**
+ * What a map fill (the light literal view models keep) paints in the dark theme: its token's dark value, a team
+ * pastel's dark twin (empireFill), else the fill itself. For measuring fills against each other in both themes.
+ */
+export function darkFill(fill) {
+  if (typeof fill !== 'string') return fill;
+  const token = PAINT_TOKENS.get(fill.toLowerCase());
+  return (token && DARK_TOKENS[token]) || teamPastelsDark.get(fill) || fill;
 }

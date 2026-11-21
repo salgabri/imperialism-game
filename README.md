@@ -686,10 +686,29 @@ Map modes:
 
 | Mode | Shows |
 | --- | --- |
-| **Political** (default) | A flat pastel of each empire's own colour. A nation takes its own colour, a shade of it or one of its flag's, whichever keeps it apart from its neighbours: the largest nations keep theirs and smaller neighbours make room (`npm run build:nation-colours` solves the world once). A club takes its crest colour (`npm run build:club-colours`, corrected in `scripts/data/club-colours.json`) in one of three lightness steps by team id. White and black teams are grey. Your empire is clay; the next opponent turns cobalt once the fixture is known. |
+| **Political** (default) | A flat pastel of each empire's own colour. A nation takes its own colour, a shade of it or one of its flag's, whichever keeps it apart from its neighbours: the largest nations keep theirs and smaller neighbours make room (`npm run build:nation-colours` solves the world once). A club takes its crest colour (`npm run build:club-colours`, corrected in `scripts/data/club-colours.json`) in one of three lightness steps by team id; an earlier season's club the colour of the crest it wears, and a club with no crest colour its Flags colour. White and black teams are grey. Your empire is clay; the next opponent turns cobalt once the fixture is known. Two bordering empires never look alike, in either theme (see [Map colours](#map-colours)). |
 | **Strength** | Five grey steps by strength percentile; your empire keeps its colour. |
 | **Fronts** | Your fronts tinted by your win chance (green / amber / red); other land is neutral. |
-| **Flags** | Each empire's flag across its land (see [Flags](#flags)); clubs keep their colours. |
+| **Flags** | Each empire's flag across its land (see [Flags](#flags)); clubs keep their colours, apart from their neighbours'. |
+
+### Map colours
+
+Two empires that share a border are never painted in look-alike colours
+(`src/engine/mapPalette.js`, asked for on 21 November 2026). On the board on
+screen, every empire takes its own colour unless a neighbour already looks like
+it; then the weaker of the two moves to the nearest colour that stands clearly
+apart: the same hue turned a little, a nation's other flag colour, else another
+hue. Clubs choose strongest first, so the clubs people know keep their colours;
+nations by their land, largest first; your clay comes first and your neighbours
+keep clear of it. "Clearly apart" is an OKLab distance of 0.065 with lightness
+counted at 0.4 (two pastels of one hue read as one colour however light), in
+whichever theme has them nearer; Flags mode keeps clubs' colours 0.1 apart.
+
+The colours of kick-off hold all campaign long: as empires grow, an empire
+changes colour only when a conquest brings a look-alike to its border (about
+one empire a conquest, none in most). The setup previews, the map, its key, the
+ledger and the share image all read the same palette. `scripts/map-palette.test.mjs`
+checks every shipped map at kick-off, the world map, and campaigns played out.
 
 The map mode is not saved: a reloaded campaign opens on Political. The setup
 map's own Political / Flags switch does not carry into the campaign. Hovering land
@@ -2976,14 +2995,17 @@ the game can show was counted in every sport, season and map: 3,756 football clu
 crest in some season, a fifth of the football clubs on maps, and a few dozen elsewhere.
 Each was matched to its Wikidata item and its article's infobox crest as above, every match
 read against its article by reviewers and every picture checked by eye, and 2,393 passed
-(docs/design/period-marks.md, "No club without a crest"): 46 more of today's map clubs wear
-one through `pages`, 1,633 crests of today stand for the earlier seasons' clubs in
+(docs/design/period-marks.md, "No club without a crest"). A second pass the same day read
+every Wikipedia that has a club's article (its infobox, then the crests pictured in its body),
+fetched the articles reviewers named for the clubs still missing, and matched the free logos
+Commons files by country: 401 more passed. In all, 135 more of today's map clubs wear a crest
+through `pages`, 1,905 crests of today stand for the earlier seasons' clubs in
 `crest-eras.json` (where today's map club of the same item has none to share), and the
 seasons that showed a monogram for want of a picture show the nearest one. Football's
-crest-less share fell to 4.7% of its club appearances (1,295 clubs, mostly lower divisions
+crest-less share fell to 3.2% of its club appearances (887 clubs, mostly lower divisions
 whose articles show no crest or another club's); every other sport shows a crest everywhere
 but the retired caricatures and the Saint Petersburg Lions. `scripts/club-crests.test.mjs`
-checks it all. The worker's image cache now holds 10,000 files, for the 7,200 flags and crests.
+checks it all. The worker's image cache now holds 10,000 files, for the 7,600 flags and crests.
 
 A club's land on the political map takes its crest's colour, so a crest added, redrawn
 or removed also needs `npm run build:club-colours`, as does a change to the colour

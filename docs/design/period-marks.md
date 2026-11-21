@@ -487,15 +487,32 @@ Idaho (gone from the FBS since 2018), the Perth Reds of 1997 and Farnborough Tow
 F.C.'s crest, whose article covers Farnborough Town since 2007). The UK clubs' period crests of
 that stalled session (8e88144f, 109 crests read from archived infoboxes) came in first.
 
+That left 1,295 football clubs (2,622 club appearances, 4.7%), and the user asked to do
+whatever could be done to find them ("do whatever you can to find those club logos"). A second
+pass the same day searched three more ways. Every Wikipedia that has the club's article, not
+only the first five, was read for its infobox crest or a crest pictured in the article's body
+(a gallery of badges), site, project and sponsor logos set aside (62 infobox and 114 body
+pictures passed; Lithuanian Wikipedia alone gave 87, Savoia's own crest came from German
+Wikipedia). Reviewers proposed, from what they knew, the article of each club the search had
+missed or matched to another club (the 1878 Airdrieonians, East Stirlingshire, Racing de
+Santander, Deportes Concepción for CD Concepción and Universidad de Concepción for itself), and
+each proposal was fetched and kept only when its lead was about football (217 passed). And the
+free logos Commons files by country ("Association football logos of …") were matched by name
+(8). Every match was read against its article again and every picture checked on contact
+sheets: 401 crests passed, 89 of them for today's map clubs (`pages`) and 272 drawn for the
+earlier seasons' clubs. Clubs moved to another city under a new identity keep the monogram
+(Persijatim, not Sriwijaya; Putra Samarinda, not Bali United; Sangju Sangmu, not Gimcheon).
+
 What is left. Outside football, only the caricatures and the Saint Petersburg Lions of
-2000/01, whose logo no source shows. In football, 1,295 clubs, 2,622 of the 55,214 club
-appearances (4.7%): 414 clubs of today's country maps (China's, Uzbekistan's, Senegal's lower
-divisions and the like; 41 of the 128 maps are complete, from 36) and 881 of the earlier
-seasons' maps (Italy's of 1999/2000 keeps three of its eleven), mostly lower-division and gone
+2000/01, whose logo no source shows. In football, 887 clubs, 1,755 of the 55,214 club
+appearances (3.2%): 325 clubs of today's country maps (China's, Uzbekistan's, Senegal's lower
+divisions and the like; 50 of the 128 maps are complete, from 36) and 562 of the earlier
+seasons' maps (Italy's of 1999/2000 keeps two of its eleven), mostly lower-division and gone
 clubs whose article has no crest (Brescello), whose article is now another club's (Alzano
-Virescit's is its merged successor's, Germinal Ekeren's Beerschot's) or shows only a symbol
-(Savoia's arms of the Duchy of Savoy), or which have no article at all. They keep the
-monogram; `scripts/club-crests.test.mjs` holds their number as a ceiling. The crests of today
+Virescit's is its merged successor's, Germinal Ekeren's Beerschot's), or which have no article
+or free logo at all. They keep the monogram; `scripts/club-crests.test.mjs` holds their number
+as a ceiling. Files that their Wikipedia hosts without a licence template (Serbian, Croatian,
+Azerbaijani, Fiji Hindi uploads) stay out, as before: 17 clubs. The crests of today
 standing for earlier seasons are undated: a club renamed or moved since shows its later
 identity's crest (the MetroStars the Red Bulls', Delhi Dynamos Odisha's), as the undated rule
 has it everywhere else, until a pass reads their articles' archived infoboxes season by season
@@ -505,7 +522,7 @@ as the UK clubs' were read.
 
 `scripts/club-crests.test.mjs`: every club of every map, season and sport resolves to a
 crest the game ships, but the caricatures and `NO_PICTURE` outside football and at most
-2,622 football club appearances; no monogram era outside the caricatures and `NO_PICTURE`.
+1,755 football club appearances; no monogram era outside the caricatures and `NO_PICTURE`.
 
 `scripts/period-marks.test.mjs`: the tables (every flag period in order and
 vendored, every name of the day's flag vendored, every crest era's file shipped, a

@@ -26,7 +26,13 @@ export function rememberTwins(clubs, year = null) {
   }
 }
 
-const twinOf = (id, year) => (year == null ? latestTwins.get(id) : twins.get(`${year}|${id}`)) ?? null;
+/**
+ * Club `id`'s twin on today's map of its country (rememberTwins), or null: the one its map of season `year` gave it, or,
+ * with no year, the last one remembered.
+ */
+export function twinOf(id, year = null) {
+  return (year == null ? latestTwins.get(id) : twins.get(`${year}|${id}`)) ?? null;
+}
 
 /** The crest file club `id` wears in season year `year` (null: today's season), or null for none (its monogram). */
 export function crestFile(id, year) {
