@@ -503,16 +503,43 @@ sheets: 401 crests passed, 89 of them for today's map clubs (`pages`) and 272 dr
 earlier seasons' clubs. Clubs moved to another city under a new identity keep the monogram
 (Persijatim, not Sriwijaya; Putra Samarinda, not Bali United; Sangju Sangmu, not Gimcheon).
 
+The user asked for fewer still ("we need to reduce even more"), and a third pass that evening
+found 121 more, 44 for today's map clubs and 77 for the earlier seasons' clubs. The first passes
+had read an infobox's crest from its link to the file's page, telling that link by the File
+namespace's name in each language; Lithuanian Wikipedia's "Vaizdas:" was not among them, so its
+stubs about clubs the world over (Ethiopian, Ivorian, Mozambican, Rwandan, Senegalese and Togolese
+sides among them) read as having none. Read again by the picture's own address, the clubs'
+current articles gave 41 crests, 30 of them Lithuanian Wikipedia's. The Wayback Machine's copies
+of the clubs' articles gave 53: the crest an article showed before its file was deleted or taken
+out of it (each exact address's capture index, never a wildcard query; the middle, newest and
+oldest capture read). A file still on Wikipedia comes from there (16); a deleted one from its
+archived copy (31), its licence as its archived file page stated (7) or "not recorded", as the
+earlier seasons' archived crests have it. Files their Wikipedia keeps without a licence template,
+which the second pass left out, now come the same way where an archived article showed them,
+licence "not recorded" (6: Difai's, FK Romanija's, NK Omiš's, Veternik's...). And the 111 matches the first passes had left undecided were
+read again with two paragraphs of their article, its infobox's full name, founded, ground and
+league rows and the earlier reviewers' doubts: 27 turned out to be the club ("Brisbane C.S.C." is
+the Brisbane Knights, nicknamed Brisbane Croatia, whose ground is the Croatian Sports Centre).
+Every match was read by a reviewer and every picture checked on contact sheets. A third of the
+archived pictures went: icons, photographs of teams, grounds and players, cups, league logos, a
+sportswear maker's logo; so did crests of a parent club on its farm side (Shakhtyor Soligorsk's
+on Shakhter Petrikov), of a merged successor (FC Mecklenburg Schwerin's on Eintracht Schwerin) and
+of a namesake (the Albanian KF Prishtina's on the Serbian league's FK Priština of 1995-96). A
+club moved to another city under a new identity still keeps the monogram (FC Café Opera, not
+AFC Eskilstuna).
+
 What is left. Outside football, only the caricatures and the Saint Petersburg Lions of
-2000/01, whose logo no source shows. In football, 887 clubs, 1,755 of the 55,214 club
-appearances (3.2%): 325 clubs of today's country maps (China's, Uzbekistan's, Senegal's lower
-divisions and the like; 50 of the 128 maps are complete, from 36) and 562 of the earlier
-seasons' maps (Italy's of 1999/2000 keeps two of its eleven), mostly lower-division and gone
-clubs whose article has no crest (Brescello), whose article is now another club's (Alzano
-Virescit's is its merged successor's, Germinal Ekeren's Beerschot's), or which have no article
-or free logo at all. They keep the monogram; `scripts/club-crests.test.mjs` holds their number
-as a ceiling. Files that their Wikipedia hosts without a licence template (Serbian, Croatian,
-Azerbaijani, Fiji Hindi uploads) stay out, as before: 17 clubs. The crests of today
+2000/01, whose logo no source shows. In football, 765 clubs, 1,500 of the 55,214 club
+appearances (2.7%; 887 and 1,755 before the third pass): 281 clubs of today's country maps
+(China's, Uzbekistan's, Laos's and South Africa's lower divisions and the like; 53 of the 128
+maps are complete, from 36) and 484 of the earlier seasons' maps (Italy's of 1999/2000 keeps
+two of its eleven), mostly lower-division and gone clubs whose article has no crest
+(Brescello), whose article is now another club's (Alzano Virescit's is its merged successor's,
+Germinal Ekeren's Beerschot's), or which have no article or free logo at all. They keep the
+monogram; `scripts/club-crests.test.mjs` holds their number as a ceiling. The third pass's
+Wayback search read the 250 clubs whose article shows no crest today and 48 of the 74 whose
+reviewers' articles showed none; the rest, the clubs whose match was another club or never
+found, were not searched. The crests of today
 standing for earlier seasons are undated: a club renamed or moved since shows its later
 identity's crest (the MetroStars the Red Bulls', Delhi Dynamos Odisha's), as the undated rule
 has it everywhere else, until a pass reads their articles' archived infoboxes season by season
@@ -522,7 +549,7 @@ as the UK clubs' were read.
 
 `scripts/club-crests.test.mjs`: every club of every map, season and sport resolves to a
 crest the game ships, but the caricatures and `NO_PICTURE` outside football and at most
-1,755 football club appearances; no monogram era outside the caricatures and `NO_PICTURE`.
+1,500 football club appearances; no monogram era outside the caricatures and `NO_PICTURE`.
 
 `scripts/period-marks.test.mjs`: the tables (every flag period in order and
 vendored, every name of the day's flag vendored, every crest era's file shipped, a

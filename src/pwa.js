@@ -49,7 +49,7 @@ export const RUNTIME_CACHES = Object.freeze([
   // The earlier seasons' country maps (about 730, public/domestic/<country>y<year>.json) are most of the data files.
   Object.freeze({ cacheName: 'imperialism-data', handler: 'NetworkFirst', maxEntries: 3000,
     pattern: /\/(?:football|womens-football|basketball|american-football|college-football|baseball|hockey|tennis|womens-tennis|rugby-league|rocket-league|valorant|domestic)\/[^/?#]+\.json$/ }),
-  // About 7,600 flags and crests (today's crests of 4,200 clubs, 3,100 period crests, the flags).
+  // About 7,700 flags and crests (today's crests of 4,300 clubs, 3,100 period crests, the flags).
   Object.freeze({ cacheName: 'imperialism-images', handler: 'StaleWhileRevalidate', maxEntries: 10000,
     pattern: /\/(?:flags|flags-symbols|club-logos|textures)\/[^/?#]+\.(?:svg|webp|png)$/ }),
 ]);

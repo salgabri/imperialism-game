@@ -53,7 +53,10 @@
 //     with HTTP 429 and asks for its standard thumbnails instead, so college football's 138 school crests are 330px
 //     thumbnails. So are 287 of the 748 crests the country maps' clubs gained on 17 November 2026; 86 of those came from
 //     another language's file page. A record may name the colour of a box the picture was saved on (`background`,
-//     '#ffffff'), which the drawing clears as the period crests' is. A women's club may have a record of its own.
+//     '#ffffff'), which the drawing clears as the period crests' is. A women's club may have a record of its own. A
+//     crest whose file Wikipedia has deleted since comes from the Wayback Machine's copy of the picture its article
+//     showed (`wayback`: the archived picture's im_ address, with `page`, the file page it had, `licence`, as that page
+//     stated or "not recorded", and `nonFree`), as the period crests' archived pictures do.
 //     --pages also gives a club that wears its twin's file (an all-leagues or women's club) its twin's crest, new or
 //     committed, when it has none, as the full sync would.
 //
@@ -442,7 +445,15 @@ for (const [id, record] of Object.entries(pageOverrides)) {
   // A picture saved on a solid box names the box's colour, which the drawing clears (as the period crests' do).
   if (record.background !== undefined && !/^#[0-9a-f]{6}$/.test(record.background)) throw new Error(`club-logos.json "pages" ${id}: background is a #rrggbb colour`);
   const name = fileName(record.file);
-  const info = await pageInfo(name, record.wiki ?? 'en');
+  // A file since deleted from Wikipedia comes from the Wayback Machine's copy (`wayback`: the archived picture, which
+  // its article showed as the club's crest), with the file page it had and the licence its record states.
+  if (record.wayback !== undefined) {
+    if (!/^https:\/\/web\.archive\.org\/web\/\d{4,14}im_\/https?:\/\/upload\.wikimedia\.org\//.test(record.wayback)) throw new Error(`club-logos.json "pages" ${id}: wayback is an archived upload.wikimedia.org picture`);
+    if (!/^https:\/\/(?:[a-z]{2,3}\.wikipedia|commons\.wikimedia)\.org\/wiki\//.test(record.page ?? '') || !record.licence) throw new Error(`club-logos.json "pages" ${id}: an archived crest names its file page and licence`);
+    if (record.thumb !== undefined) throw new Error(`club-logos.json "pages" ${id}: an archived crest is the picture archived, no thumbnail`);
+  }
+  const info = record.wayback !== undefined ? { original: record.wayback, page: record.page, licence: record.licence, nonFree: record.nonFree ?? true }
+    : await pageInfo(name, record.wiki ?? 'en');
   const source = record.thumb ? thumbOf(info.original, record.thumb) : info.original;
   const bytes = await download(source);
   if (sha256(bytes) !== record.sha256) {

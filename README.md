@@ -2982,10 +2982,15 @@ Commons files by country: 401 more passed. In all, 135 more of today's map clubs
 through `pages`, 1,905 crests of today stand for the earlier seasons' clubs in
 `crest-eras.json` (where today's map club of the same item has none to share), and the
 seasons that showed a monogram for want of a picture show the nearest one. Football's
-crest-less share fell to 3.2% of its club appearances (887 clubs, mostly lower divisions
-whose articles show no crest or another club's); every other sport shows a crest everywhere
-but the retired caricatures and the Saint Petersburg Lions. `scripts/club-crests.test.mjs`
-checks it all. The worker's image cache now holds 10,000 files, for the 7,600 flags and crests.
+crest-less share fell to 3.2% of its club appearances; every other sport shows a crest everywhere
+but the retired caricatures and the Saint Petersburg Lions. A third pass that evening found
+121 more: the clubs' current articles, read again by each picture's own address, gave 41 the
+first passes had missed (30 on Lithuanian Wikipedia, whose "Vaizdas:" file links they did
+not know), the Wayback Machine's copies of the clubs' articles gave the crests whose files
+were lost since (53), and a second look, with more of the article, at the matches left
+undecided settled 27. That left 2.7% (765 clubs, mostly lower divisions whose articles show
+no crest or another club's). `scripts/club-crests.test.mjs` checks it all. The worker's
+image cache now holds 10,000 files, for the 7,700 flags and crests.
 
 A club's land on the political map takes its crest's colour, so a crest added, redrawn
 or removed also needs `npm run build:club-colours`, as does a change to the colour
