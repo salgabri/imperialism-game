@@ -372,7 +372,9 @@ function countryHandlers(app, cid) {
  * Fronts win-chance tints, Flags banners (a country flies its *owner's* flag, so an empire reads as one banner);
  * then you-fill (managed only, A-7) and opponent-fill once the fixture is known. Borders come from WorldMap's mesh,
  * so the shapes carry no stroke. Setup shows the nations' pastels (or their flags) on neutral land; a previewed
- * country map paints each section in the colour its starting club takes at kick-off (`countryFill` `preview`).
+ * country map paints each land in the colour its starting club takes at kick-off (`countryFill` `preview`).
+ * A country map's shapes are its lands (engine/lands.js): a club's starting sections drawn, hovered and clicked as one
+ * piece, named by its home section, so no line or hover ever shows between them.
  * A claimed nation (app/claimMethods.js) is painted as its holder's land (`claimOwnerId`, paintedOwnership) while
  * `ownerId` stays its real holder, nobody: it takes no clicks, tab stop or target.
  */
@@ -398,8 +400,9 @@ export function mapCountries() {
     domestic, preview, phase, snap.own, painted, teams, selected, flash, mapMode, identity.meId, identity.meFill,
     identity.opponentId, strength, fronts, flagParts], () => {
     const rows = [];
-    for (const c of this.geo.countries) {
-      const p = this.displayGeo?.paths[c.id] || this.geo.paths[c.id];
+    const lands = this.drawnLands();
+    for (const c of lands || this.geo.countries) {
+      const p = lands ? c : this.displayGeo?.paths[c.id] || this.geo.paths[c.id];
       if (!p) continue;
       const ownerId = playing ? snap.own[c.id] : null;
       const owner = ownerId ? teams[ownerId] : null;
@@ -497,8 +500,7 @@ export function mapHomes(playing) {
  * Hover tooltip (README §Interactions): `{ visible, name, held, result, link }` from `mapVM.tooltipModel` —
  * "Held by Italy since Round XII" | "Capital of Italy" | "Held by Italy", "Won 2–1 against Serbia" | "Strength 84.6",
  * "Click to open the Italy squad"; unowned "Not in this theatre" (playing) / "Awaiting campaign" (setup). On a country
- * map the sections are named, "Home of Burnley" on a home section (in setup also "Burnley starts here" on the rest of
- * its starting group).
+ * map a land is named by its home section, "Home of Burnley" (a club's starting sections are one land: mapCountries).
  * Hidden while another view covers the map (App's `mapVisible` views), so a hover left over from the map never shows
  * on Squad, Match, Ledger or Chronicle; WorldMap drops that hover when the map hides or reframes.
  */

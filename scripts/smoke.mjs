@@ -271,13 +271,13 @@ function checkBackdrop(label, backdrop) {
 }
 
 /**
- * A country map: every section held and, in Flags mode, painted in its club's colour with its crest, or its monogram
- * without one.
+ * A country map: drawn as its lands (each club's starting sections as one piece), every one held and, in Flags mode,
+ * painted in its club's colour with its crest, or its monogram without one.
  */
 function checkDomesticMap(label, snapshot) {
-  check(`${label}: in Flags mode every section shows its holder's club colour, with its crest or else its monogram, and no flag`, snapshot.correct);
-  check(`${label}: every section is held, so no land is neutral`, snapshot.neutralCount === 0 && snapshot.sections === snapshot.expectedSections,
-    `${snapshot.sections}/${snapshot.expectedSections} sections, ${snapshot.neutralCount} neutral`);
+  check(`${label}: in Flags mode every land shows its holder's club colour, with its crest or else its monogram, and no flag`, snapshot.correct);
+  check(`${label}: every land is held, so none is neutral`, snapshot.neutralCount === 0 && snapshot.lands === snapshot.expectedLands,
+    `${snapshot.lands}/${snapshot.expectedLands} lands, ${snapshot.neutralCount} neutral`);
   checkEmpireFlags(label, snapshot.empireFlags);
   checkBackdrop(label, snapshot.backdrop);
 }
@@ -365,11 +365,12 @@ function checkDomesticSetup(setup, full) {
     check('a session preset keeps the managed club of that country', setup.presetKeepsClub);
     check('switching to basketball swaps the country for the NBA’s own map, beside the EuroLeague’s', setup.basketballResets);
   }
-  check('the setup map shows exactly the country’s sections', setup.sectionsShown);
-  check('setup previews each section in its starting club’s kickoff colour (Political pastel, Flags club colour)', setup.setupColours,
+  check('the setup map shows the country as its lands, one per club’s starting group', setup.landsShown);
+  check('setup previews each land in its starting club’s kickoff colour (Political pastel, Flags club colour)', setup.setupColours,
     JSON.stringify({ political: setup.politicalPreview, flags: setup.flagsPreview }));
-  check('setup tooltips name each club’s home and the rest of its starting group', setup.setupTooltips && setup.groupedPreview);
-  check('the country card shows every section in its starting club’s pastel, with sections and clubs in the caption', setup.countryCard,
+  check('setup tooltips name each club’s land by its home, with no shape for the rest of its starting group',
+    setup.setupTooltips && setup.groupedPreview);
+  check('the country card shows every land in its starting club’s pastel, with sections and clubs in the caption', setup.countryCard,
     setup.countryCardText);
   check('setup counts the country’s clubs', setup.previewCount);
   check('the theatre description names the leading clubs, the sections and each club’s share', setup.description, setup.descriptionText);

@@ -9,6 +9,7 @@ import { nationPriority } from '../../data/domesticTiers.js';
 import { clubMapOf, countryMapsOf, countryOfEntry, domesticEntry, domesticLabel, isDomesticScope, isTheatreMap, theatreMapsOf } from '../../data/domesticScope.js';
 import { CARD_LIST, cardOf, cardSports, getSport, matchSport } from '../../sports/index.js';
 import { builtInSeasonOf, fieldedNations, setHasLayer, setHasNations, setSportOf } from '../../engine/footballSets.js';
+import { domesticLands } from '../../engine/domestic.js';
 import { V4, ratingTierOf } from '../../theme.js';
 import { politicalFill } from '../../data/empireColours.js';
 
@@ -545,12 +546,13 @@ export function domesticDescription(entry) {
 
 const countryPreviewCache = new WeakMap();
 /**
- * Step 1's static country card (the v4 form of the setup preview): a decoded country map's sections, each in the
- * pastel its starting club takes at kick-off (`politicalFill(club.id)`, DEC D18), over the neighbouring land
- * (`backdrop`: [{ id, d }], App's `surroundings(map).shapes`). Framed on the map's opening focus, else on all sections,
- * in the fitted 960×540 frame. A section's `owner` is the club starting on it (null for none): a click on it previews
- * that club. Pure; memoised per decoded map, fitted paths and backdrop.
- * → { viewBox, sections: [{ id, d, fill, owner }], backdrop: [{ id, d }] } | null
+ * Step 1's static country card (the v4 form of the setup preview): a decoded country map's lands (engine/lands.js:
+ * each club's starting sections as one piece, so no line runs between them), each in the pastel its starting club takes
+ * at kick-off (`politicalFill(club.id)`, DEC D18), over the neighbouring land (`backdrop`: [{ id, d }], App's
+ * `surroundings(map).shapes`). Framed on the map's opening focus, else on all sections, in the fitted 960×540 frame. A
+ * land's `owner` is the club starting on it (null for none): a click on it previews that club. Pure; memoised per
+ * decoded map, fitted paths and backdrop.
+ * → { viewBox, sections: [{ id, d, fill, owner }] (one per land), backdrop: [{ id, d }] } | null
  */
 export function countryMapPreview(domestic, backdrop = null) {
   const paths = domestic?.geo?.paths;
@@ -561,8 +563,9 @@ export function countryMapPreview(domestic, backdrop = null) {
   const starter = domestic.startOwners || Object.fromEntries((domestic.clubs || []).map(club => [club.homeSection, club.id]));
   const ids = Object.keys(domestic.sectionNames).filter(id => paths[id]?.d);
   if (!ids.length) return null;
-  const sections = ids.map(id => Object.freeze({ id, d: paths[id].d, fill: starter[id] ? politicalFill(starter[id]) : V4.landNeutral,
-    owner: starter[id] ?? null }));
+  // A land is named by its home section, which its club starts on.
+  const sections = domesticLands(domestic).map(({ id, d }) => Object.freeze({ id, d,
+    fill: starter[id] ? politicalFill(starter[id]) : V4.landNeutral, owner: starter[id] ?? null }));
   let box = domestic.focus && typeof domestic.geo.focusView === 'function' ? domestic.geo.focusView(domestic.focus) : null;
   if (!(box && box.w > 0 && box.h > 0)) {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;

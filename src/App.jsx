@@ -8,7 +8,7 @@ import { teamMarkUrls } from './data/teamMarks.js';
 import { WorldGeometry, drawnPaths, mergeSharedIds, projPt } from './engine/geo.js';
 import { atlasOfYear, capitalsOfYear, mapEraOf } from './engine/historicMap.js';
 import { requestMaps, takeMapRequests } from './mapRequests.js';
-import { clearDomesticCache, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
+import { clearDomesticCache, domesticLands, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
 import { domesticEntry, domesticLabel, hasTheatreMaps, isCountryScope } from './data/domesticScope.js';
 import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
@@ -623,6 +623,15 @@ export default class App extends React.Component {
     return this.domesticId ? getLoadedDomestic(this.domesticId) : null;
   }
 
+  /**
+   * What the country map on screen draws (engine/lands.js): each club's starting sections as one land, so no line runs
+   * between them. Null on a world map.
+   */
+  drawnLands() {
+    const domestic = this.domesticMap();
+    return domestic?.geo && domestic.geo === this.geo ? domesticLands(domestic) : null;
+  }
+
   loadCountry(id) {
     return loadDomestic(id, { baseUrl: import.meta.env.BASE_URL, fetch: pageFetch() });
   }
@@ -717,10 +726,14 @@ export default class App extends React.Component {
     const last = this.drawnFrom;
     if (!last || last.base !== drawnFrom.base || last.display !== drawnFrom.display || last.domestic !== drawnFrom.domestic) {
       this.drawnFrom = drawnFrom;
-      this.labelGeometry = this.geo.countries.map(country => ({
-        id: country.id,
-        rings: (this.displayGeo?.paths[country.id] || this.geo.paths[country.id]).labelRings,
-      }));
+      // A country map is drawn as its lands: a club's starting sections as one piece, so its borders, labels and banners
+      // never draw a line between them.
+      const lands = this.drawnLands();
+      this.labelGeometry = lands ? lands.map(land => ({ id: land.id, rings: land.rings }))
+        : this.geo.countries.map(country => ({
+          id: country.id,
+          rings: (this.displayGeo?.paths[country.id] || this.geo.paths[country.id]).labelRings,
+        }));
       this.flagLayoutCache = null;
       // Flags mode: one banner (or club crest) per owner's land, joining pieces that lie close together. Its index is
       // built from this source in quiet moments while the campaign map shows another mode (the Flags warm-up,
@@ -1167,10 +1180,13 @@ export default class App extends React.Component {
     const key = `${st.campaignId}|${st.matches}|${champ.id}`;
     if (this.shareImage?.key === key) return this.shareImage.file;
     const victory = this.victoryPanel();
-    const shapes = this.geo.countries.map(country => {
-      const path = this.displayGeo?.paths[country.id] || this.geo.paths[country.id];
-      return path ? { id: country.id, d: path.d, bbox: path.bbox } : null;
-    }).filter(Boolean);
+    // A country map's lands, as its map draws them.
+    const lands = this.drawnLands();
+    const shapes = lands ? lands.map(land => ({ id: land.id, d: land.d, bbox: land.bbox }))
+      : this.geo.countries.map(country => {
+        const path = this.displayGeo?.paths[country.id] || this.geo.paths[country.id];
+        return path ? { id: country.id, d: path.d, bbox: path.bbox } : null;
+      }).filter(Boolean);
     // The empty land the champion claimed, as the final map shows it.
     const land = this.claimLand(st);
     const claimed = land ? Object.keys(st.claims || {}).filter(id => st.claims[id] === champ.id && land.d.has(id))

@@ -755,12 +755,32 @@ Fiji, split into 100 sections drawn from its administrative divisions; each club
 starts with 6 or 7 of them." An even split names one number, and a 100-club
 country keeps the shorter sentence. Choosing one loads it after a 120 ms pause
 (Retry on failure), and the setup wizard previews the country in step 1, every
-section (not only home sections) in the colour its starting club takes at
-kick-off (`startOwners`). The setup-phase tooltip (`tooltipModel` with
-`homeClubs`, on the inert map under the opaque wizard) reads "Home of <club>" on
-a club's home section and "<club> starts here" on the rest of its group. Session
-presets keep the country and the managed club. Launch shows a busy state while
-the map is prepared. Titles read "England · top 100 clubs".
+club's land in the colour its starting club takes at kick-off (`startOwners`),
+captioned with the index's section count. The setup-phase tooltip (`tooltipModel`
+with `homeClubs`, on the inert map under the opaque wizard) reads "Home of
+<club>" on a club's land. Session presets keep the country and the managed club.
+Launch shows a busy state while the map is prepared. Titles read "England · top
+100 clubs".
+
+**Lands** (`src/engine/lands.js`, `domesticLands(domestic)`). The map draws
+lands, not sections: each club's starting group is one land, named by its home
+section, and a section no club starts on is a land of its own. A conquest takes
+all of the loser's land and a moved save keeps groups whole, so a group never
+splits and no line is ever drawn between a club's own sections; the sections
+only decide where its outline runs. `outlineRings` keeps every edge of the
+group's painted rings except those two of its sections share (one runs each way
+along a shared edge) and chains the rest by the way they ran, so the outline
+winds as the sections do: a fill by either rule covers exactly the group's land
+(a club's land round another's keeps it as a hole), and where the outline meets
+itself at a point it turns towards the land, so each loop is a ring of its own.
+A land of one section is that section's rings and path. The setup card, the
+campaign map's shapes, its border mesh and label geometry, Flags mode's regions
+and the share image all draw lands (`App.drawnLands()`); routes, neighbours,
+saves, conquest results and the hatch keep sections (a land's id is its home
+section, which every conquest and save lists). Across all 2,229 shipped maps each
+outline's area equals its sections' to 1e-13; a few rings that rounding folded
+over themselves keep their zero-width spikes, as the sections drew them. Lands
+take about 7 ms per map, once per decoded map.
 
 **Campaign.** `own = { ...startOwners }`; `team.home` is the home section and
 home markers stay there. The map fits the sections and opens on `focus`; every
@@ -773,7 +793,11 @@ overlap sections along every border). A blocked attack sails around them;
 failing that it is `routeKind: 'foreign-transit'`, labelled "Crossing foreign
 territory", which only exclaves need (Nakhchivan, Gaza, Kaliningrad). Border
 routes aim at points just across a shared border when no anchor line reaches a
-land neighbour. The backdrop is inert. Tooltips and results use section names.
+land neighbour. The backdrop is inert. Tooltips and results use section names: a
+land's tooltip names its home section. The map draws lands, so only the borders
+between clubs show; once a club holds another's land, the old border between
+the two stays as a quiet inner seam, as a conquered nation's does on the world
+map.
 
 **Saves.** `settings.clubScope = 'domestic:<id>'`, `settings.domesticVersion`.
 Country checkpoints store FM players as `[fmId, name, CA, 'positions',

@@ -15,7 +15,7 @@ import { campaignStorageKey, exportCampaign, listCampaigns, writeSave } from '..
 import { domesticEntry, domesticLabel } from '../src/data/domesticScope.js';
 import { domesticIdOf, mapYearOf } from '../src/app/shared.js';
 // Same module instance as the bundled App, so clearing it really empties the app's cache.
-import { clearDomesticCache, decodeDomestic, domesticScope, domesticScopeId } from '../src/engine/domestic.js';
+import { clearDomesticCache, decodeDomestic, domesticLands, domesticScope, domesticScopeId } from '../src/engine/domestic.js';
 import { cardOf, getSport } from '../src/sports/index.js';
 import { fieldedNations, sportOf } from '../src/engine/footballSets.js';
 import { EMPIRE_PASTELS } from '../src/theme.js';
@@ -64,6 +64,9 @@ async function loadReference(id) {
     // Every section names the club starting on it: one per club on a 100-club map, a group each otherwise.
     clubs: decoded.clubs, startOwners: decoded.startOwners,
     clubBySection: Object.fromEntries(Object.entries(decoded.startOwners).map(([section, club]) => [section, byId.get(club)])),
+    // What the map draws (src/engine/lands.js): each club's starting group as one land named by its home section, so no
+    // line runs between its sections, and a section no club starts on alone.
+    landIds: new Set(domesticLands(decoded).map(land => land.id)),
   };
   return domesticReference;
 }
@@ -268,10 +271,10 @@ function expectedFlagsShown(app) {
   const paths = countryPaths();
   const domestic = domesticOf(app);
   if (domestic) {
-    // A country map is exactly its sections, each in its club's colour with the club's crest, or its monogram without
+    // A country map is exactly its lands, each in its club's colour with the club's crest, or its monogram without
     // one. Setup flies nothing.
     const ids = paths.map(path => path.dataset.country);
-    if (app.state.mapMode !== 'flags' || ids.length !== domestic.sectionIds.size || !ids.every(id => domestic.sectionIds.has(id))) return false;
+    if (app.state.mapMode !== 'flags' || ids.length !== domestic.landIds.size || !ids.every(id => domestic.landIds.has(id))) return false;
     if (!playing) return !countryFlagParts().length && !document.querySelector('g[id^="fi-flag-"]');
     return paths.every(path => {
       const owner = app.state.teams[app.state.own[path.dataset.country]];
@@ -460,8 +463,8 @@ function regionalFlagsSnapshot(app) {
   if (domestic) return {
     domestic: true,
     correct: expectedFlagsShown(app),
-    sections: paths.filter(path => domestic.sectionIds.has(path.dataset.country)).length,
-    expectedSections: domestic.sectionIds.size,
+    lands: paths.filter(path => domestic.landIds.has(path.dataset.country)).length,
+    expectedLands: domestic.landIds.size,
     neutralCount: neutral.length,
     flagParts: countryFlagParts().length,
     flagPatterns: document.querySelectorAll('g[id^="fi-flag-"]').length,
@@ -685,7 +688,9 @@ export async function runEmpireLabelCheck(scenario) {
       const geometry = stableGeometry.find(shape => shape.id === path.dataset.country);
       const rendered = new Set(pathPoints(path).map(point => point.join(',')));
       const supplied = new Set(geometry?.rings.flat().map(point => point.join(',')));
-      return geometry?.rings === (app.displayGeo?.paths[path.dataset.country] || app.geo.paths[path.dataset.country]).labelRings
+      // A country map draws its lands (a club's starting sections as one piece), a world map its countries.
+      const land = app.drawnLands()?.find(candidate => candidate.id === path.dataset.country);
+      return geometry?.rings === (land ? land.rings : (app.displayGeo?.paths[path.dataset.country] || app.geo.paths[path.dataset.country]).labelRings)
         && supplied.size === rendered.size && [...supplied].every(point => rendered.has(point));
     });
     const winnerId = kickoff.ids[0] || app.state.aliveIds[0];
@@ -874,9 +879,12 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   // The wizard keeps every step mounted, so step 3's Launch campaign button is always in the DOM.
   const launchButton = () => buttonNamed('Launch campaign');
   const loading = () => text().includes(`Loading the map of ${entry.name}`) && !!launchButton()?.disabled;
+  // The map draws one land per club's starting group (and per section no club starts on): the app's own count waits for
+  // it, and the reference decoded below checks which they are.
   const ready = () => {
     const ids = countryPaths().map(path => path.dataset.country);
-    return !!launchButton() && !launchButton().disabled && ids.length === sections && ids.every(cid => sectionPattern.test(cid));
+    return !!launchButton() && !launchButton().disabled && ids.length > 0 && ids.length === app.drawnLands()?.length
+      && ids.every(cid => sectionPattern.test(cid));
   };
   const result = { lazy: !plan.requests.includes(file) };
   plan.delays[file] = 150;
@@ -893,9 +901,11 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   delete plan.delays[file];
   const reference = await loadReference(id);
   const shown = countryPaths().map(path => path.dataset.country);
-  result.sectionsShown = shown.length === reference.sectionIds.size && shown.every(cid => reference.sectionIds.has(cid));
-  // The preview paints every section as the club starting there will hold it at kickoff (DEC D18), its whole
-  // starting group and not just its home: the club's pastel in Political (the default), the club's colour in Flags.
+  // One land per club, named by its home section: none of a club's other starting sections is drawn on its own.
+  result.landsShown = shown.length === reference.landIds.size && shown.every(cid => reference.landIds.has(cid))
+    && (sections > entry.clubs) === (shown.length < sections);
+  // The preview paints every land as the club starting there will hold it at kickoff (DEC D18), its whole
+  // starting group in one: the club's pastel in Political (the default), the club's colour in Flags.
   const previewFills = mode => countryPaths().every(path => {
     const club = reference.clubBySection[path.dataset.country];
     return !!club && path.getAttribute('fill') === (mode === 'flags' ? club.col : politicalFill(club.id));
@@ -928,17 +938,18 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
       ? `the ${entry.clubs} ${entry.league} clubs fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${entry.lines || 'state or province'}. A state with several clubs is divided between them; one with none stays empty.`
       : `${entry.clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`);
   result.descriptionText = note;
-  // Step 1's country card: every section in its starting club's pastel (the card has no ids, so compare the fills
-  // as a multiset), captioned with the sections and, unless there is one each, the clubs; a Europe map with its clubs and countries.
+  // Step 1's country card: every land in its starting club's pastel, one per club (the card has no ids, so compare the
+  // fills as a multiset), captioned with the map's sections and, unless there is one each, the clubs; a Europe map with
+  // its clubs and countries.
   const cardFills = [...document.querySelectorAll('.setup-map[data-kind="country"] .setup-map__sections path')].map(path => path.getAttribute('fill')).sort();
-  const startFills = Object.values(reference.startOwners).map(club => politicalFill(club)).sort();
+  const startFills = [...reference.landIds].map(land => politicalFill(reference.startOwners[land])).sort();
   const caption = document.querySelector('.setup-map[data-kind="country"]')?.getAttribute('title') || '';
   result.countryCard = JSON.stringify(cardFills) === JSON.stringify(startFills)
     && caption === (entry.countries ? `${entry.name} · ${entry.clubs} clubs in ${entry.countries} countries`
       : `${entry.name} · ${sections} sections, ${sections === entry.clubs ? 'one per club' : `${entry.clubs} clubs`}`);
-  result.countryCardText = `${caption} · ${cardFills.length} sections`;
-  // Hovering the preview names the section and the club starting there: "Home of X" on its home town's section,
-  // "X starts here" on the rest of its group (sentence case in the DOM; CSS may uppercase it).
+  result.countryCardText = `${caption} · ${cardFills.length} lands`;
+  // Hovering the preview names a land by its home section and the club starting there: "Home of X" (sentence case in
+  // the DOM; CSS may uppercase it). A club's other starting sections lie inside its land, with no shape of their own.
   const tip = async section => {
     countryPaths().find(path => path.dataset.country === section)?.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
     await waitFor(() => app.state.hoverCid === section, 2000);
@@ -953,7 +964,8 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   };
   const top = reference.clubs[0], grouped = reference.clubs.find(club => club.startSections.length > 1);
   result.setupTooltips = await tipReads(top.homeSection, `Home of ${top.name}`)
-    && (!grouped || await tipReads(grouped.startSections.at(-1), `${grouped.name} starts here`));
+    && (!grouped || (await tipReads(grouped.homeSection, `Home of ${grouped.name}`)
+      && !countryPaths().some(path => grouped.startSections.slice(1).includes(path.dataset.country))));
   result.groupedPreview = !!grouped === (sections > entry.clubs);
   await setState(app, { hoverCid: null });
   result.backdrop = backdropSnapshot(app);
@@ -2154,8 +2166,9 @@ export async function run(scenario) {
     const labelsAtKickoff = empireLabelsSnapshot(app);
     const initialHeld = countryPaths().filter(path => path.dataset.owner);
     const kickoffColors = Object.fromEntries(initialHeld.map(path => [path.dataset.owner, path.getAttribute('fill')]));
+    // A country map draws its lands (a club's starting sections as one piece), a world map every held country.
     const politicalAtStart = app.state.mapMode === 'political'
-      && initialHeld.length === Object.keys(app.state.own).length
+      && initialHeld.length === (reference ? reference.landIds.size : Object.keys(app.state.own).length)
       && initialHeld.every(path => path.dataset.owner === app.state.own[path.dataset.country] && !path.getAttribute('fill').startsWith('url('))
       && !document.querySelector('g[id^="fi-flag-"]');
 
