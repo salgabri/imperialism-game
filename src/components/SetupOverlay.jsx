@@ -233,6 +233,27 @@ function theatreCaption(model, preview) {
 }
 
 /**
+ * How many of a country's clubs play (`count`: { value, min, max }), beside the country: its top two to all of them, a
+ * native select so a phone offers its own picker. The map is cut for the number chosen (src/engine/clubSplit.js); all of
+ * them plays the map as built (`onCount(null)`).
+ */
+function ClubCount({ count, noun = 'clubs', onCount }) {
+  const { value, min, max } = count;
+  const options = [];
+  for (let n = max; n >= min; n--) options.push(n);
+  return (
+    <select id="setup-club-count" className="setup-season setup-count" aria-label={`How many ${noun} play`} value={value}
+      data-checked={value < max ? '' : undefined}
+      onChange={event => {
+        const next = Math.round(Number(event.target.value));
+        if (Number.isFinite(next) && next !== value) onCount?.(next >= max ? null : Math.max(min, next));
+      }}>
+      {options.map(n => <option value={n} key={n}>{n === max ? `All ${max}` : `Top ${n}`}</option>)}
+    </select>
+  );
+}
+
+/**
  * The setup wizard. Props are App's (HEAD) setup props plus optional `onCancel` (header Cancel, only with a save) and
  * the country-campaign props: `domestic` (App's `domesticStatus()`: { state, message, onRetry, preview? }),
  * `launching` (App prepares a country campaign) and `restoring` (a saved country campaign waits for its map).
@@ -318,7 +339,9 @@ export default function SetupOverlay({
   /** Football clubs also offer one country's own top clubs: more than a hundred, so they are a dropdown under Europe's theatres. */
   const countries = model.domesticScopes.length > 0;
   // Europe's theatres are maps too (`model.country` is set for them), so "a country is chosen" means one from the dropdown.
-  const countryChosen = countries && model.domesticScopes.some(scope => scope.id === model.scopeId);
+  // A country cut to fewer clubs is listed by its full map (`countryScopeId`).
+  const countryScope = model.countryScopeId ?? model.scopeId;
+  const countryChosen = countries && model.domesticScopes.some(scope => scope.id === countryScope);
   const theatreChecked = model.scopes.some(scope => scope.id === model.scopeId);
   // The wall reads strongest first: the favourites lead, and the long shots are where a player would look for them.
   const wallTeams = useMemo(() => model.teams.slice().sort((a, b) => (a.rank ?? Infinity) - (b.rank ?? Infinity)), [model.teams]);
@@ -726,13 +749,19 @@ export default function SetupOverlay({
                 ))}
                 {/* One country's own top clubs: more than a hundred, so a dropdown, not rows. */}
                 {countries ? (
-                  <select id="setup-country" className="setup-season setup-country" aria-label={model.domesticGroup}
-                    aria-describedby={countryChosen ? 'setup-theatre-description' : undefined}
-                    data-checked={countryChosen ? '' : undefined} value={countryChosen ? model.scopeId : ''}
-                    onChange={event => { if (event.target.value) pick(model.scopeKey, event.target.value); }}>
-                    <option value="">{model.domesticGroup}</option>
-                    {theatreChoices(model.domesticScopes)}
-                  </select>
+                  <div className="setup-country-row">
+                    <select id="setup-country" className="setup-season setup-country" aria-label={model.domesticGroup}
+                      aria-describedby={countryChosen ? 'setup-theatre-description' : undefined}
+                      data-checked={countryChosen ? '' : undefined} value={countryChosen ? countryScope : ''}
+                      onChange={event => { if (event.target.value) pick(model.scopeKey, event.target.value); }}>
+                      <option value="">{model.domesticGroup}</option>
+                      {theatreChoices(model.domesticScopes)}
+                    </select>
+                    {/* How many of the country's clubs play: its first that many, the map cut for them (src/engine/clubSplit.js). */}
+                    {model.clubCount ? (
+                      <ClubCount count={model.clubCount} noun={model.nouns} onCount={value => pick('clubCount', value)} />
+                    ) : null}
+                  </div>
                 ) : null}
                 {model.country ? (
                   <>
@@ -751,7 +780,7 @@ export default function SetupOverlay({
                   </>
                 ) : null}
                 {/* Native mirror of the theatre radios: keeps `#setup-theatre` value-bound for automation (PLAN §4.7). */}
-                <select id="setup-theatre" className="setup-mirror" aria-hidden="true" tabIndex={-1} value={model.scopeId}
+                <select id="setup-theatre" className="setup-mirror" aria-hidden="true" tabIndex={-1} value={countryScope}
                   onChange={event => pick(model.scopeKey, event.target.value)}>
                   {countries ? (
                     <>

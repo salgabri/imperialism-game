@@ -11,6 +11,7 @@ import { requestMaps, takeMapRequests } from './mapRequests.js';
 import { clearDomesticCache, domesticLands, domesticSurroundings, getLoadedDomestic, isDomesticScope, loadDomestic,
   retainDomestic } from './engine/domestic.js';
 import { domesticEntry, domesticLabel, hasTheatreMaps, isCountryScope } from './data/domesticScope.js';
+import { mapFileId } from './engine/clubSplit.js';
 import { BUILT_IN_SETS, clearFootballSetCache, fieldedNations, getLoadedFootballSet, heldShapes, loadFootballSet,
   loadFootballSetIndex, retainFootballSets, seasonSport, setHasClubs, setHasLayer, setSportOf, sportOf } from './engine/footballSets.js';
 import { FLAG_REGION_GAP_KM } from './engine/flagRegions.js';
@@ -1092,7 +1093,7 @@ export default class App extends React.Component {
         // A chosen country is its own theatre; a session length does not replace it. setClubScope below finds the map.
         if (!country) setup.clubScope = value === 'short' ? 'elite' : value === 'world' ? 'all'
           : CLUB_SCOPES(sportOf(setup) || getSport(setup.sport))[2]?.id || 'all';
-      } else if (['scope', 'clubScope'].includes(key)) setup.preset = 'custom';
+      } else if (['scope', 'clubScope', 'clubCount'].includes(key)) setup.preset = 'custom';
       // A map is its own sport's (a country's is football's). A sport whose clubs choose between maps finds its own for
       // the theatre in setClubScope below (football's Elite 32 becomes women's football's); another sport's clubs start
       // from every club (basketball's then take the NBA's map, also in setClubScope).
@@ -1127,6 +1128,9 @@ export default class App extends React.Component {
       // preset leaves a chosen country's club theatre (and its clubs) as it was.
       const sameField = key === 'preset' && country && setup.layer === 'clubs';
       if (['sport', 'layer', 'scope', 'clubScope', 'preset', 'dataSet'].includes(key) && !sameField) setup.managedTeamId = '';
+      // Fewer or more of a country's clubs: a cut map keeps its full map's first clubs, so the managed club stays while
+      // it is among them.
+      if (key === 'clubCount' && setup.managedTeamId && !this.keepsClub(state.setup, setup)) setup.managedTeamId = '';
       return { setup, seasonSwap };
     }, () => {
       if (this.state.phase !== 'setup') return;
@@ -1134,6 +1138,17 @@ export default class App extends React.Component {
       this.showSetupSet();
       this.requestSeasons();
     });
+  }
+
+  /**
+   * Whether a change of the number of a country's clubs (`before` → `after`) keeps the managed club: it is among the
+   * first clubs the new map holds. Known from the map on show (its clubs are its full map's first, in order).
+   */
+  keepsClub(before, after) {
+    const shown = getLoadedDomestic(domesticIdOf(before) ?? '') || getLoadedDomestic(mapFileId(domesticIdOf(before) ?? ''));
+    const at = shown ? shown.clubs.findIndex(club => club.id === before.managedTeamId) : -1;
+    const count = domesticEntry(after.clubScope)?.clubs ?? Infinity;
+    return at >= 0 && at < count;
   }
 
   /**
@@ -1341,7 +1356,7 @@ export default class App extends React.Component {
     }
     const token = ++this.flowToken;
     const entry = domesticEntry(campaign.settings.clubScope);
-    const name = entry?.name || NATIONS[id]?.[0] || 'this country';
+    const name = entry?.name || NATIONS[mapFileId(id).slice(0, 3)]?.[0] || 'this country';
     const message = `Loading the map of ${name}…`;
     this.pendingDomesticId = id;
     this.retainMaps();

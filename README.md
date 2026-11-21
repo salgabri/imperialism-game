@@ -50,8 +50,8 @@ And pick who fights:
   exactly the way Spain does. American football and college football are played by clubs only, tennis,
   women's tennis and the esports by nations only.
 - **One country's clubs** — a country's top football clubs (100 for the biggest
-  leagues, fewer for smaller ones) on that country's own map, split into 100
-  sections ([domestic campaigns](#domestic-campaigns)).
+  leagues, fewer for smaller ones, or as many as you choose) on that country's own
+  map, split into 100 sections ([domestic campaigns](#domestic-campaigns)).
 
 Everything outside the match — territory, the spinner, targeting, conquest,
 autosave, the map — is sport- and layer-agnostic. A sport supplies its own roster
@@ -1346,6 +1346,18 @@ Attack routes start from a point well inside each section (the home town when it
 is clear of the border), while the home marker shows the town itself. Tooltips
 and conquest results use section names, such as "Burnley" or "Verona (north-west)",
 where Hellas Verona starts.
+
+**How many clubs.** Beside the country, a second dropdown picks how many of its clubs
+play: **All 100** (the map as built) or **Top 2** to **Top 99**, the first that many in
+the map's own order. The game works that map out when it loads, from the same file
+(`src/engine/clubSplit.js`): each club keeps the land it starts on in the full map
+and takes a share of the land of the clubs left out, nearest first, balanced by land
+as the build balances it, each club's land in one piece. The 100 sections are only
+regrouped, so a club starts on as many as its land takes (Spain at 20: Sevilla 11,
+Atlético 3), and a club the full map squeezed into a city wedge can stay small. The
+number stays when the country or the season changes, each map taking as many clubs as
+it has; a save or challenge link names the cut map, such as `domestic:724c20` (Spain,
+20 clubs). Design notes: [Choosing the number of clubs](docs/design/domestic-campaigns.md#choosing-the-number-of-clubs).
 
 In the v4 interface, choosing **Clubs** in setup step 1 adds the **One country ·
 top clubs** dropdown below Europe's two theatres (football only). Picking a country shows a

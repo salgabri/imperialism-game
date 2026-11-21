@@ -6,7 +6,8 @@
 import { NATIONS, SCOPES, isTennisSport, nationIdentity } from '../../data/teams.js';
 import { CLUB_SCOPES, TOP_CLUBS, nationTheatre, nationTheatres, strongestClubs as topClubs } from '../../data/scopes.js';
 import { nationPriority } from '../../data/domesticTiers.js';
-import { clubMapOf, countryMapsOf, countryOfEntry, domesticEntry, domesticLabel, isDomesticScope, isTheatreMap, theatreMapsOf } from '../../data/domesticScope.js';
+import { clubMapOf, countryMapsOf, countryOfEntry, domesticEntry, domesticLabel, fullMapOf, isDomesticScope, isTheatreMap, theatreMapsOf } from '../../data/domesticScope.js';
+import { SPLIT_MIN_CLUBS } from '../../engine/clubSplit.js';
 import { CARD_LIST, cardOf, cardSports, getSport, matchSport } from '../../sports/index.js';
 import { builtInSeasonOf, fieldedNations, setHasLayer, setHasNations, setSportOf } from '../../engine/footballSets.js';
 import { domesticLands } from '../../engine/domestic.js';
@@ -543,6 +544,11 @@ export function domesticDescription(entry) {
     return `${leaders} the ${leagueClubs} fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${place}. `
       + `A state with several ${noun} is divided between them; one with none stays empty.`;
   }
+  // A country map cut to fewer clubs (src/engine/clubSplit.js): its land shared out again, so the sections per club vary.
+  if (entry.cut) {
+    return `${leaders} the top ${clubs} of ${entry.name}'s ${entry.baseClubs} clubs fighting over its ${sections} sections drawn from its `
+      + `administrative divisions; each keeps its own land, and the land of the ${entry.baseClubs - clubs} left out is shared among them, nearest first.`;
+  }
   const fewer = Math.floor(sections / clubs), more = Math.ceil(sections / clubs);
   const share = sections === clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
   return `${leaders} ${clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`;
@@ -820,6 +826,11 @@ export function buildSetupModel(setup = {}, ctx = {}) {
   const chosenScope = clubLayer ? setup.clubScope : pending ? setup.scope : nationTheatre(sport, setup.scope).id;
   const activeScope = scopes.find(scope => scope.id === chosenScope) || scopes[0];
   const scopeId = country ? setup.clubScope : activeScope.id;
+  // One country's own map (not a map of Europe or a league's): how many of its clubs play can be chosen, from two to all
+  // of them, the map cut for them (src/engine/clubSplit.js). The dropdown names the country by its full map.
+  const fullMap = country && !country.sport && !country.theatre && !country.league && !country.countries ? fullMapOf(country) : null;
+  const clubCount = fullMap && fullMap.clubs > SPLIT_MIN_CLUBS
+    ? { value: country.clubs, min: SPLIT_MIN_CLUBS, max: fullMap.clubs, cut: !!country.cut } : null;
   const scopeName = country ? domesticLabel(setup.clubScope) : activeScope.label;
   const count = country ? country.clubs : activeScope.count;
   const preview = pending ? PENDING_PREVIEW : campaignPreview(count, sport, setup);
@@ -932,11 +943,15 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     scopes, scopeId, scopeName, scopeKey: clubLayer ? 'clubScope' : 'scope',
     theatreNotes: scopes.filter(scope => scope.note),
     domesticScopes, leagueGroup: LEAGUE_GROUP, domesticGroup: DOMESTIC_GROUP,
-    country: country ? { id: country.id, name: country.name, clubs: country.clubs, sections: country.sections ?? country.clubs, countries: country.countries ?? null } : null,
+    // The chosen country's full map, as the dropdown lists it ('domestic:724' for Spain cut to 20 clubs), and the number
+    // of its clubs that play (null for any other theatre).
+    countryScopeId: fullMap ? `domestic:${fullMap.id}` : null, clubCount,
+    country: country ? { id: country.id, name: country.name, clubs: country.clubs, sections: country.sections ?? country.clubs, countries: country.countries ?? null,
+      cut: country.cut ?? null } : null,
     // A basketball season's own strongest clubs lead its map, named once it has loaded. A season's map with only some of
     // its clubs (women's football's: Europe's, the NWSL's) names its own, and an earlier season's country map those its
     // decoded map holds (App's domesticStatus `top`).
-    countryNote: !country ? '' : domesticDescription(country.season ? { ...country, top: ctx.domestic?.top ?? [] }
+    countryNote: !country ? '' : domesticDescription(country.season || country.cut ? { ...country, top: ctx.domestic?.top ?? [] }
       : dataSet == null || (country.top && country.seasons?.includes(dataSet)) ? country
         : { ...country, top: pending ? [] : strongestClubs(sport, country) }),
     countryState, countryMessage: countryState === 'error' ? (ctx.domestic?.message || mapFailed) : '',
