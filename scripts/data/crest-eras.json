@@ -3446,6 +3446,20 @@
    "verified": "contact sheet: red roundel with the white AaB monogram and 1885, a red ribbon across reading AALBORG BK; today's has no ribbon",
    "league": "football-d"
   },
+  "f-aberaman.2003": {
+   "club": "Aberaman",
+   "years": "2003–2004",
+   "kind": "wikipedia",
+   "title": "File:Aberdare Town FC logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Aberdare_Town_FC_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/4/41/Aberdare_Town_FC_logo.svg/330px-Aberdare_Town_FC_logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "733229ec47a48edb32fea14fdd3cb3821b55df3b225db5fe220dd011309f38dc",
+   "cache": "data-src/crest-eras/files/seasons/f-aberaman/2003-Aberdare_Town_FC_logo.png",
+   "evidence": "seasons 2003-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 72",
+   "league": "seasons"
+  },
   "f-aberdeen.1998": {
    "club": "Aberdeen",
    "years": "1998–2005",
@@ -3473,6 +3487,49 @@
    "evidence": "en.wikipedia Aberdeen F.C.: \"Two stars signifying the winning of the two European trophies in 1983 were introduced over the badge in the 2005–06 season\"; it.wikipedia gallery: this file \"Logo in uso dalla stagione 2005-2006\" (en.wikipedia's infobox today: Aberdeen_FC_stars_crest.svg, the same). The en infobox picture of 2008 still lacked the stars (Wikipedia lagging); the two large red stars are visible at chip size, so the article text is followed",
    "verified": "contact sheet: the 1997 red roundel (ABERDEEN FOOTBALL CLUB, A-goal, FC, 1903) with two red stars above it",
    "league": "football-d"
+  },
+  "f-aberdeen.2009": {
+   "club": "Aberdeen",
+   "years": "2009–2013",
+   "kind": "wayback",
+   "title": "File:Aberdeen FC logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Aberdeen_FC_logo.svg",
+   "wayback": "https://web.archive.org/web/20170602213201im_/https://upload.wikimedia.org/wikipedia/en/thumb/d/d4/Aberdeen_FC_logo.svg/200px-Aberdeen_FC_logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "0750ab552d39af45ad5825b7f46135bcd9000e68a9d00788b9ebdd7dd4ce2927",
+   "cache": "data-src/crest-eras/files/seasons/f-aberdeen/2009-Aberdeen_FC_logo.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Aberdeen_F.C. (2009-06-01, 2010-05-30, 2011-06-10, 2012-06-05, 2013-06-08): its infobox showed File:AberdeenFC crest.png / Aberdeen FC logo.svg for seasons 2009-2013",
+   "verified": "checked by eye: sheet 00 cell 0",
+   "league": "football-d"
+  },
+  "f-aberdeen.2014": {
+   "club": "Aberdeen",
+   "years": "2014–2016",
+   "kind": "wikipedia",
+   "title": "File:Aberdeen FC stars crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Aberdeen_FC_stars_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/f/fb/Aberdeen_FC_stars_crest.svg/330px-Aberdeen_FC_stars_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "a072cd1b76388d80e96d19f5170aa53338d7a46225112b02d0c42a6438196eda",
+   "cache": "data-src/crest-eras/files/seasons/f-aberdeen/2014-Aberdeen_FC_stars_crest.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Aberdeen_F.C. (2014-06-04, 2015-05-09, 2016-05-04): its infobox showed File:Aberdeen F.C. logo 2005.svg for seasons 2014-2016",
+   "verified": "checked by eye: sheet 00 cell 1",
+   "league": "football-d"
+  },
+  "f-aberystwyth-town.2003": {
+   "club": "Aberystwyth Town",
+   "years": "2003–2004",
+   "kind": "wayback",
+   "title": "File:Aberystwyth Town Logo.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Aberystwyth_Town_Logo.gif",
+   "wayback": "https://web.archive.org/web/20070710003158im_/https://upload.wikimedia.org/wikipedia/en/thumb/f/ff/Aberystwyth_Town_Logo.gif/110px-Aberystwyth_Town_Logo.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "32234d4e40052d1841b29558e3ae1bb147687d2db4dd171a1d091f67f31c7b2c",
+   "cache": "data-src/crest-eras/files/seasons/f-aberystwyth-town/2003-Aberystwyth_Town_Logo.gif",
+   "evidence": "seasons 2003-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 73",
+   "league": "seasons",
+   "background": "#ffffff"
   },
   "f-ac-ajaccio.2012": {
    "club": "AC Ajaccio",
@@ -3558,6 +3615,49 @@
    "verified": "yellow shield with a heavy black frame, black double-headed eagle holding sword and orb, Α.Ε.Κ in bold lettering on a white band at the top, F.C. at the foot; 180×235 PNG uploaded from aekfc.gr in May 2013",
    "league": "football-d"
   },
+  "f-afan-lido.2002": {
+   "club": "Afan Lido",
+   "years": "2002–2004",
+   "kind": "wikipedia",
+   "title": "File:Afan Lido FC.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Afan_Lido_FC.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/0/00/Afan_Lido_FC.svg/330px-Afan_Lido_FC.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "97cbcfa60db8276d3bf6547de336b43fafd8339b0bf830f69597b2435050615e",
+   "cache": "data-src/crest-eras/files/seasons/f-afan-lido/2002-Afan_Lido_FC.png",
+   "evidence": "seasons 2002-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 74",
+   "league": "seasons"
+  },
+  "f-airdrie-united.2003": {
+   "club": "Airdrie United",
+   "years": "2003–2004",
+   "kind": "wayback",
+   "title": "File:Airdrieunited.PNG",
+   "page": "https://en.wikipedia.org/wiki/File:Airdrieunited.PNG",
+   "wayback": "https://web.archive.org/web/20070705085631im_/https://upload.wikimedia.org/wikipedia/en/thumb/6/6d/Airdrieunited.PNG/150px-Airdrieunited.PNG",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "c2e917a806bb928e562e96c09412cde435a88cfd793d458c22559d4f13706b64",
+   "cache": "data-src/crest-eras/files/seasons/f-airdrie-united/2003-Airdrieunited.png",
+   "evidence": "seasons 2003-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 75",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
+  "f-airdrieonians.1994": {
+   "club": "Airdrieonians",
+   "years": "1994–2002",
+   "kind": "wayback",
+   "title": "File:Airdrie.PNG",
+   "page": "https://en.wikipedia.org/wiki/File:Airdrie.PNG",
+   "wayback": "https://web.archive.org/web/20130826080411im_/https://upload.wikimedia.org/wikipedia/en/thumb/5/51/Airdrie.PNG/150px-Airdrie.PNG",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "25d93f952e9004e2bc26f7c28fdfc54c309326aa1d112086c503fe02489c8840",
+   "cache": "data-src/crest-eras/files/seasons/f-airdrieonians/1994-Airdrie.png",
+   "evidence": "seasons 1994, 1999, 2001-2002: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 76",
+   "league": "seasons"
+  },
   "f-aj-auxerre.1994": {
    "club": "AJ Auxerre",
    "years": "1994–1997",
@@ -3614,6 +3714,20 @@
    "verified": "black bat with spread wings over an inverted white triangle edged in red, three red towers above a black AB monogram; matches the 100px 2005 GIF from the en.wikipedia capture",
    "league": "football-b"
   },
+  "f-albion-rovers.1994": {
+   "club": "Albion Rovers",
+   "years": "1994–2004",
+   "kind": "wikipedia",
+   "title": "File:Albion Rovers FC logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Albion_Rovers_FC_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d9/Albion_Rovers_FC_logo.svg/330px-Albion_Rovers_FC_logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "b033159adb3e546a63b315692dc2e35591c47aa72e60a3a7183be80d04ce4b2d",
+   "cache": "data-src/crest-eras/files/seasons/f-albion-rovers/1994-Albion_Rovers_FC_logo.png",
+   "evidence": "seasons 1994, 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 77",
+   "league": "seasons"
+  },
   "f-alemannia-aachen.2007": {
    "club": "Alemannia Aachen",
    "years": "2007–2007",
@@ -3627,6 +3741,20 @@
    "evidence": "de wikipedia \"Alemannia Aachen\": \"Vereinswappen von 2003-2010\" Logo_Alemannia_Aachen.svg; traditional crest returned 2010/11",
    "verified": "viewed on contact sheet: Alemannia Aachen club crest/badge (correct club, a crest not a kit or wordmark; file Logo_Alemannia_Aachen.svg)",
    "league": "football-c"
+  },
+  "f-alloa-athletic.1994": {
+   "club": "Alloa Athletic",
+   "years": "1994–2004",
+   "kind": "wayback",
+   "title": "File:Alloa.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Alloa.jpg",
+   "wayback": "https://web.archive.org/web/20070214233756im_/https://upload.wikimedia.org/wikipedia/en/b/bb/Alloa.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "b243616979d3ceeff84af13bfe64755ba125da597b20b1da5c642f2381825d02",
+   "cache": "data-src/crest-eras/files/seasons/f-alloa-athletic/1994-Alloa.jpg",
+   "evidence": "seasons 1994, 2001, 2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 78",
+   "league": "seasons"
   },
   "f-almere-city.2024": {
    "club": "Almere City",
@@ -3725,6 +3853,49 @@
    "evidence": "tr.wikipedia Ankaraspor, «Kimlik değişimi»: before 2014-15 the club became Osmanlıspor FK, purple and yellow, «logo da yenilenerek»; «Arma geçmişi»: this file captioned «Kulübün 2014 ve 2020 yılları arasında Osmanlıspor adıyla kullandığı logo», then Ankaraspor_logo.png 2020-2024 and the Sincan Belediyesi Ankaraspor logo 2024-2026 (today's crest d792-130355). The game's 2016-17 «Ankaraspor» is Osmanlıspor. The file's history: a first version of 19 August 2014, then «Yeni» on 18 December 2016 with the comment that the club's logo had changed in its report to the TFF (source ntv.com.tr «Osmanlıspor'un logosu değişti»): this December 2016 drawing, worn for the second half of 2016-17, is the one pictured; the first half wore the 2014 version, of which no picture is kept.",
    "verified": "purple ornate frame lettered OSMANLI SPOR FUTBOL KULÜBÜ around a white disc with a purple tughra-like emblem and 2014; 500×500 PNG (version of 18 December 2016)",
    "league": "football-d"
+  },
+  "f-arbroath.1994": {
+   "club": "Arbroath",
+   "years": "1994–2004",
+   "kind": "wikipedia",
+   "title": "File:Arbroath FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Arbroath_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/Arbroath_FC_crest.svg/330px-Arbroath_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "41bcd811b65ac85ca9bc8d130ea3571419619e8d3509071f2fd9371f9097eac0",
+   "cache": "data-src/crest-eras/files/seasons/f-arbroath/1994-Arbroath_FC_crest.png",
+   "evidence": "no dated source for seasons 1994, 2001-2004: today's crest (the infobox of https://en.wikipedia.org/wiki/Arbroath_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 01 cell 79",
+   "league": "seasons"
+  },
+  "f-ards.2001": {
+   "club": "Ards",
+   "years": "2001–2004",
+   "kind": "wikipedia",
+   "title": "File:Ards F.C. logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Ards_F.C._logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/0/00/Ards_F.C._logo.svg/330px-Ards_F.C._logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "386c0bada4f95d1ce2ee2e25cd90791bc9ab042b39f313b3ac824d87f597f704",
+   "cache": "data-src/crest-eras/files/seasons/f-ards/2001-Ards_F.C._logo.png",
+   "evidence": "no dated source for seasons 2001-2004: today's crest (the infobox of https://en.wikipedia.org/wiki/Ards_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 01 cell 80",
+   "league": "seasons"
+  },
+  "f-armagh-city.2003": {
+   "club": "Armagh City",
+   "years": "2003–2004",
+   "kind": "wayback",
+   "title": "File:Armaghcitybadge.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Armaghcitybadge.jpg",
+   "wayback": "https://web.archive.org/web/20060725163949im_/https://upload.wikimedia.org/wikipedia/en/5/5e/Armaghcitybadge.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "8a4f5f5a1f3ba221980aa9c778307a3b8d55979d87031901a4205af8f08c75ca",
+   "cache": "data-src/crest-eras/files/seasons/f-armagh-city/2003-Armaghcitybadge.jpg",
+   "evidence": "seasons 2003-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 81",
+   "league": "seasons",
+   "background": "#ffffff"
   },
   "f-arsenal.1994": {
    "club": "Arsenal",
@@ -4122,6 +4293,64 @@
    "verified": "shield with a rounded top and blue border, the bear and strawberry tree drawn as blue lines on the blue starred band, red and white stripes (today: the classic pointed shield, a dark bear and tree on a white field beside the starred blue band)",
    "league": "football-b"
   },
+  "f-ayr-united.1994": {
+   "club": "Ayr United",
+   "years": "1994–2004",
+   "kind": "wayback",
+   "title": "File:Ayr utd crest.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Ayr_utd_crest.gif",
+   "wayback": "https://web.archive.org/web/20070808112857im_/https://upload.wikimedia.org/wikipedia/en/f/f4/Ayr_utd_crest.gif",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "a53e5430306fe44dc1f2557064be0337e4b9ce182f730a9fb4eccf91cd2c363d",
+   "cache": "data-src/crest-eras/files/seasons/f-ayr-united/1994-Ayr_utd_crest.gif",
+   "evidence": "seasons 1994, 2000-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 82",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
+  "f-ballymena-united.2001": {
+   "club": "Ballymena United",
+   "years": "2001–2004",
+   "kind": "wayback",
+   "title": "File:Ballymena United badge.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Ballymena_United_badge.gif",
+   "wayback": "https://web.archive.org/web/20060725165025im_/https://upload.wikimedia.org/wikipedia/en/b/b8/Ballymena_United_badge.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "b2a4b2fc7b489ae9d6552fce3d3c29bc66b4f6fa7700eb0a924d37183df83aa6",
+   "cache": "data-src/crest-eras/files/seasons/f-ballymena-united/2001-Ballymena_United_badge.gif",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 83",
+   "league": "seasons"
+  },
+  "f-bangor-city.2002": {
+   "club": "Bangor City",
+   "years": "2002–2002",
+   "kind": "wayback",
+   "title": "File:Bangor City FC Logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Bangor_City_FC_Logo.png",
+   "wayback": "https://web.archive.org/web/20070710004017im_/https://upload.wikimedia.org/wikipedia/en/thumb/4/48/Bangor_City_FC_Logo.png/100px-Bangor_City_FC_Logo.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "e206b0cd7ca9d769a1cf7d87fec28a845499bcb328b15e89d011414ebc09bc0f",
+   "cache": "data-src/crest-eras/files/seasons/f-bangor-city/2002-Bangor_City_FC_Logo.png",
+   "evidence": "seasons 2002: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 84",
+   "league": "seasons"
+  },
+  "f-bangor.2001": {
+   "club": "Bangor",
+   "years": "2001–2004",
+   "kind": "wayback",
+   "title": "File:Bangor fc.png",
+   "page": "https://en.wikipedia.org/wiki/File:Bangor_fc.png",
+   "wayback": "https://web.archive.org/web/20070705085100im_/https://upload.wikimedia.org/wikipedia/en/b/b3/Bangor_fc.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "ce48e9944fa4fd771c0cc527d91f10db10be169e193f7a538a291cfc4578c30c",
+   "cache": "data-src/crest-eras/files/seasons/f-bangor/2001-Bangor_fc.png",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 85",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
   "f-bari.1995": {
    "club": "Bari",
    "years": "1995–2011",
@@ -4135,6 +4364,20 @@
    "evidence": "it.wikipedia \"Società Sportiva Calcio Bari\": stylised rooster head crest \"comparve sulle maglie a partire dalla stagione 1979-80\", \"Lo stemma in uso fino al 2014\"",
    "verified": "white oval with red rooster head and 'as bari'",
    "league": "football-b"
+  },
+  "f-barry-town.2002": {
+   "club": "Barry Town",
+   "years": "2002–2004",
+   "kind": "wayback",
+   "title": "File:Barrytownlogo.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Barrytownlogo.gif",
+   "wayback": "https://web.archive.org/web/20070710003953im_/https://upload.wikimedia.org/wikipedia/en/7/72/Barrytownlogo.gif",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "4c9665414172c1c5f8d550af01a4bc86677f8fd88975ac68618e6e536fba69c5",
+   "cache": "data-src/crest-eras/files/seasons/f-barry-town/2002-Barrytownlogo.gif",
+   "evidence": "seasons 2002-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 86",
+   "league": "seasons"
   },
   "f-bayer-04-leverkusen.1994": {
    "club": "Bayer 04 Leverkusen",
@@ -4177,6 +4420,20 @@
    "evidence": "it.wikipedia \"Benevento Calcio\", Stemma: \"Nel 2005, allorché la società venne rifondata come Benevento Calcio, lo stemma assunse la foggia di uno scudo francese antico palato giallo-rosso, chiuso superiormente da un cartiglio ricurvo di colore rosso ... una strega in volo a cavallo di un manico di scopa\"; caption \"Logo del Benevento Calcio in uso dal 2005\" (no later crest listed)",
    "verified": "yellow-red striped shield with a red scroll \"BENEVENTO CALCIO\" on top and a black witch on a broomstick",
    "league": "football-b"
+  },
+  "f-berwick-rangers.1994": {
+   "club": "Berwick Rangers",
+   "years": "1994–2004",
+   "kind": "wayback",
+   "title": "File:Berwick rangers fc badge.png",
+   "page": "https://en.wikipedia.org/wiki/File:Berwick_rangers_fc_badge.png",
+   "wayback": "https://web.archive.org/web/20060105052602im_/https://upload.wikimedia.org/wikipedia/en/7/77/Berwick_rangers_fc_badge.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "d5aa15b34ec4496699b31d91d36d923a8f30fb9a2f650aafedee789d75b04800",
+   "cache": "data-src/crest-eras/files/seasons/f-berwick-rangers/1994-Berwick_rangers_fc_badge.png",
+   "evidence": "seasons 1994, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 87",
+   "league": "seasons"
   },
   "f-besiktas-jk.1994": {
    "club": "Beşiktaş",
@@ -4318,6 +4575,20 @@
    "verified": "black B on white diamond with green field, rectangle on green background (1970-99 crest)",
    "league": "football-c"
   },
+  "f-boston-united.2001": {
+   "club": "Boston United",
+   "years": "2001–2007",
+   "kind": "wayback",
+   "title": "File:Boston Utd Badge.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Boston_Utd_Badge.gif",
+   "wayback": "https://web.archive.org/web/20061102080107im_/https://upload.wikimedia.org/wikipedia/en/6/65/Boston_Utd_Badge.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "1319619af4d8a6b15c0ab84fde198cf692cc04a4effc992c77e1c0c77fd9b692",
+   "cache": "data-src/crest-eras/files/seasons/f-boston-united/2001-Boston_Utd_Badge.gif",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Boston_United_F.C. (2006-11-02): its infobox showed File:Boston Utd Badge.gif for seasons 2007; seasons 2001, 2003-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 88",
+   "league": "seasons"
+  },
   "f-br-ndbyernes-idr-ts-forening.1994": {
    "club": "Brøndby IF",
    "years": "1994–2004",
@@ -4345,6 +4616,20 @@
    "evidence": "Wayback capture 2006-11-02 of en.wikipedia Bradford City A.F.C.: 'Stafford Heginbotham reintroduced his boar's head and shield at the start of 1985/86 season and this was retained until the end of 1990/91 when it was replaced by the current crest. In 2003/04 a crest to mark the centenary of the club was introduced ... The 1991 crest was subsequently re-used from 2004/05'; that capture's infobox crest (Brdcrest.gif) is this design, and the 2009-2023 captures show this file (Wayback serves the image capture of 2013-11-08). Today's enwiki crest is the same design redrawn",
    "verified": "contact sheet: white-and-orange bantam standing above a claret-and-amber striped shield with white 'BC' and 'AFC', amber scroll THE BANTAMS; same as the 2006 capture's Brdcrest.gif and today's enwiki SVG",
    "league": "football-a"
+  },
+  "f-brechin-city.1994": {
+   "club": "Brechin City",
+   "years": "1994–2004",
+   "kind": "wikipedia",
+   "title": "File:Brechin City FC logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Brechin_City_FC_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/0/01/Brechin_City_FC_logo.svg/330px-Brechin_City_FC_logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "782776b953f87d0d4b51a3e048e0ae0526b0e12867472673c728362e6ba37552",
+   "cache": "data-src/crest-eras/files/seasons/f-brechin-city/1994-Brechin_City_FC_logo.png",
+   "evidence": "no dated source for seasons 1994, 1999-2004: today's crest (the infobox of https://en.wikipedia.org/wiki/Brechin_City_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 01 cell 89",
+   "league": "seasons"
   },
   "f-brescia.1995": {
    "club": "Brescia",
@@ -4429,6 +4714,20 @@
    "evidence": "en.wikipedia Burnley F.C.: the town's arms reintroduced in 2009, the Latin motto replaced by 'Burnley Football Club' the following year (2010-11); 'In 2023, the crest's elements were rendered in white and placed on a claret shield'; Wayback: the infobox shows Burnley FC badge 2010.gif (2012 captures), Burnley FC badge.png (2016) and Burnley F.C. Logo.svg (uploaded 2018-06-04, redrawn 2019-05; captures 2020-03-11 to 2023-05-21), all this light-blue arms shield; today's claret shield first in the capture of 2023-11-04 and today's file was uploaded 19 June 2023 from the Premier League's resources, so 2022-23 was the old crest's last season",
    "verified": "contact sheet: the 2012 GIF, the 2016 PNG and this 2019 SVG are the same light-blue shield with a gold rim, the coloured town arms and a black scroll BURNLEY FOOTBALL CLUB (the 2010 SVG differs only by the scroll's motto, unreadable at 64 px); unlike today's claret shield with white arms",
    "league": "football-a"
+  },
+  "f-bury.1994": {
+   "club": "Bury",
+   "years": "1994–2020",
+   "kind": "wayback",
+   "title": "File:Bury FC.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Bury_FC.svg",
+   "wayback": "https://web.archive.org/web/20100228180812im_/https://upload.wikimedia.org/wikipedia/en/thumb/b/b7/Bury_FC.svg/180px-Bury_FC.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "a0455a9714a458247268140f7a4bf34abff6d6c80538427d7e1b3906e87a9eb8",
+   "cache": "data-src/crest-eras/files/seasons/f-bury/1994-Bury_FC.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Bury_F.C. (2007-02-14, 2008-05-30, 2009-04-16, 2010-02-28, 2011-05-01, 2012-02-03, 2013-06-15, 2014-04-22, 2015-05-14, 2016-06-28, 2017-03-01, 2017-12-02, 2019-06-12, 2020-06-18): its infobox showed File:Bury Badge.gif / Bury Badge.png / Bury FC.svg for seasons 2007-2020; seasons 1994-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 90",
+   "league": "seasons"
   },
   "f-c-d-alaves.1999": {
    "club": "Deportivo Alavés (listed as: C.D. Alavés)",
@@ -4542,6 +4841,34 @@
    "verified": "blue-red oval ringed by gold laurel, CAGLIARI CALCIO, Moors' heads shield, 1920",
    "league": "football-b"
   },
+  "f-canvey-island.2002": {
+   "club": "Canvey Island",
+   "years": "2002–2004",
+   "kind": "wikipedia",
+   "title": "File:Canvey Island FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Canvey_Island_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/2/2f/Canvey_Island_FC_crest.svg/330px-Canvey_Island_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "7bf9b2dbe614e13ef34381339456d0ac5668bd01fc14e70cc328e22908c5099e",
+   "cache": "data-src/crest-eras/files/seasons/f-canvey-island/2002-Canvey_Island_FC_crest.png",
+   "evidence": "no dated source for seasons 2002-2004: today's crest (the infobox of https://en.wikipedia.org/wiki/Canvey_Island_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 01 cell 91",
+   "league": "seasons"
+  },
+  "f-cardiff-city.2002": {
+   "club": "Cardiff City",
+   "years": "2002–2004",
+   "kind": "wayback",
+   "title": "File:Cardiff City crest.png",
+   "page": "https://en.wikipedia.org/wiki/File:Cardiff_City_crest.png",
+   "wayback": "https://web.archive.org/web/20051204173650im_/https://upload.wikimedia.org/wikipedia/en/thumb/a/a0/Cardiff_City_crest.png/150px-Cardiff_City_crest.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "f7beda52893cd1c89a4add8b4c7a70c41ca442c033a3fab20e6c515715525319",
+   "cache": "data-src/crest-eras/files/seasons/f-cardiff-city/2002-Cardiff_City_crest.png",
+   "evidence": "seasons 2002-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 92",
+   "league": "football-a"
+  },
   "f-cardiff-city.2013": {
    "club": "Cardiff City",
    "years": "2013–2015",
@@ -4569,6 +4896,20 @@
    "evidence": "en.wikipedia Cardiff City F.C.: March 2015 new crest with the Bluebird (infobox file; changed again in 2024); assumed worn from 2015-16",
    "verified": "contact sheet: white shield CARDIFF CITY FC with blue bird and small red dragon",
    "league": "football-a"
+  },
+  "f-carmarthen-town.2002": {
+   "club": "Carmarthen Town",
+   "years": "2002–2004",
+   "kind": "wikipedia",
+   "title": "File:Carmarthen Town FC.png",
+   "page": "https://en.wikipedia.org/wiki/File:Carmarthen_Town_FC.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/7/79/Carmarthen_Town_FC.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "b29ea254784baf79833241f145c901e56dc4b28458367bb57b0e2f07ce30d1bd",
+   "cache": "data-src/crest-eras/files/seasons/f-carmarthen-town/2002-Carmarthen_Town_FC.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Carmarthen_Town_A.F.C. (2011-06-28): its infobox showed File:Carmarthen Town FC.png for seasons 2004; seasons 2002-2003: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 94",
+   "league": "seasons"
   },
   "f-carpi.2016": {
    "club": "Carpi",
@@ -4724,6 +5065,20 @@
    "verified": "contact sheet and a 300 px comparison: blue ring with GOLD lettering CHELSEA / FOOTBALL CLUB, a gold inner ring, two-tone blue lion with staff, red roses and footballs; the game's crest of today (the 2026 logo) has WHITE lettering, no inner gold ring and a flat lion",
    "league": "football-a"
   },
+  "f-chester-city.1994": {
+   "club": "Chester City",
+   "years": "1994–2004",
+   "kind": "wikipedia",
+   "title": "File:Chester City FC.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Chester_City_FC.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4b/Chester_City_FC.svg/330px-Chester_City_FC.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "24a75feea9e5f0459a6424d7423724ad3603d8835328c5256ec936dc3b6ac7bf",
+   "cache": "data-src/crest-eras/files/seasons/f-chester-city/1994-Chester_City_FC.png",
+   "evidence": "seasons 1994-2001, 2003-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 95",
+   "league": "seasons"
+  },
   "f-chievo.2015": {
    "club": "Chievo",
    "years": "2015–2019",
@@ -4751,6 +5106,20 @@
    "evidence": "fr.wikipedia \"Clermont Foot 63\", Logos: \"Logo actuel\" (Logo_Clermont_Foot_63_2021.svg), 2013-2021 before; 2021 logo first worn 2021/22",
    "verified": "viewed on contact sheet: Clermont Foot club crest/badge (correct club, a crest not a kit or wordmark; file Logo_Clermont_Foot_63_2021.svg)",
    "league": "football-c"
+  },
+  "f-cliftonville.2001": {
+   "club": "Cliftonville",
+   "years": "2001–2004",
+   "kind": "wikipedia",
+   "title": "File:Cliftonville F.C. logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Cliftonville_F.C._logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9b/Cliftonville_F.C._logo.svg/330px-Cliftonville_F.C._logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "04bbcee5605da3a7ed4c1ab2b09e593c8c97db42489696904545549a610ca0d7",
+   "cache": "data-src/crest-eras/files/seasons/f-cliftonville/2001-Cliftonville_F.C._logo.png",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 96",
+   "league": "seasons"
   },
   "f-club-brugge-kv.1994": {
    "club": "Club Brugge",
@@ -4836,6 +5205,35 @@
    "verified": "contact sheet: white lion on a dark-green disc inside a red ship's wheel, banner \"Club Sport Marítimo\" above, \"Madeira\" box below",
    "league": "football-a"
   },
+  "f-clyde.1994": {
+   "club": "Clyde",
+   "years": "1994–2004",
+   "kind": "wikipedia",
+   "title": "File:Clyde FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Clyde_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d1/Clyde_FC_crest.svg/330px-Clyde_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "4caa7a6cc807f5396f3577c37e91536749af94cc2f0599ad66518577583ec9f2",
+   "cache": "data-src/crest-eras/files/seasons/f-clyde/1994-Clyde_FC_crest.png",
+   "evidence": "seasons 1994, 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 97",
+   "league": "seasons"
+  },
+  "f-coleraine.2001": {
+   "club": "Coleraine",
+   "years": "2001–2004",
+   "kind": "wayback",
+   "title": "File:Coleraine.png",
+   "page": "https://en.wikipedia.org/wiki/File:Coleraine.png",
+   "wayback": "https://web.archive.org/web/20070705085922im_/https://upload.wikimedia.org/wikipedia/en/thumb/a/ad/Coleraine.png/100px-Coleraine.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "6020f3ed5b6e006549ab5aab559bb33f8d75dc75a7e25271045f1a2f8b32e5fe",
+   "cache": "data-src/crest-eras/files/seasons/f-coleraine/2001-Coleraine.png",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 98",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
   "f-como.2003": {
    "club": "Como",
    "years": "2003–2003",
@@ -4851,6 +5249,21 @@
    "league": "football-b",
    "background": "#ffffff"
   },
+  "f-connah-s-quay-nomads.2003": {
+   "club": "Connah's Quay Nomads",
+   "years": "2003–2003",
+   "kind": "wayback",
+   "title": "File:Connah's Quay Nomads F.C.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Connah's_Quay_Nomads_F.C.gif",
+   "wayback": "https://web.archive.org/web/20070710003637im_/https://upload.wikimedia.org/wikipedia/en/6/64/Connah%27s_Quay_Nomads_F.C.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "663fc1cc74b9e7be8eca5ccaf97639d215f5460a2ddb315066234525498931af",
+   "cache": "data-src/crest-eras/files/seasons/f-connah-s-quay-nomads/2003-Connah_s_Quay_Nomads_F.C.gif",
+   "evidence": "seasons 2003: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 99",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
   "f-cordoba-cf.2015": {
    "club": "Córdoba CF",
    "years": "2015–2015",
@@ -4864,6 +5277,20 @@
    "evidence": "es.wikipedia \"Córdoba Club de Fútbol\" (Escudo): small changes in 1990 and 2009, then \"El cambio más significativo tuvo lugar en 2012\" (all elements stylised, four inks only); this en.wikipedia file was uploaded on 4 March 2013 and is still the article's crest; fr.wikipedia's copy (Dec 2013) cites the club's restyling PDF (restylingLogo.pdf)",
    "verified": "inverted triangle of green-white stripes, central shield with red lions and gold castles, yellow ball at the point, gold crown with red and green gems on top",
    "league": "football-b"
+  },
+  "f-cowdenbeath.1994": {
+   "club": "Cowdenbeath",
+   "years": "1994–2004",
+   "kind": "wikipedia",
+   "title": "File:CowdenbeathFC.svg",
+   "page": "https://en.wikipedia.org/wiki/File:CowdenbeathFC.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/b/bc/CowdenbeathFC.svg/330px-CowdenbeathFC.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "acb02749180cac0c7c528e4986b555bc18ad050af05a86e0a7bd599100fbef3e",
+   "cache": "data-src/crest-eras/files/seasons/f-cowdenbeath/1994-CowdenbeathFC.png",
+   "evidence": "no dated source for seasons 1994, 2002-2004: today's crest (the infobox of https://en.wikipedia.org/wiki/Cowdenbeath_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 01 cell 100",
+   "league": "seasons"
   },
   "f-cp-merida.1996": {
    "club": "CP Mérida (listed as: CP Merida / CP Mérida)",
@@ -4907,6 +5334,21 @@
    "verified": "red-blue striped oval, F.C. CROTONE on top, tripod and two sharks",
    "league": "football-b"
   },
+  "f-crusaders.2001": {
+   "club": "Crusaders",
+   "years": "2001–2004",
+   "kind": "wayback",
+   "title": "File:Crusaders.PNG",
+   "page": "https://en.wikipedia.org/wiki/File:Crusaders.PNG",
+   "wayback": "https://web.archive.org/web/20060725165523im_/https://upload.wikimedia.org/wikipedia/en/thumb/b/b0/Crusaders.PNG/100px-Crusaders.PNG",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "529b22e7534ea66309e90708518cc23128333562c395dc60a8bb0350e676d755",
+   "cache": "data-src/crest-eras/files/seasons/f-crusaders/2001-Crusaders.png",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 101",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
   "f-crystal-palace.1997": {
    "club": "Crystal Palace",
    "years": "1997–2013",
@@ -4948,6 +5390,63 @@
    "evidence": "fr.wikipedia \"Logo de 2001 à 2018\" (Logo_CS_Sedan_Ardennes_2001.svg); first worn 2001/02",
    "verified": "viewed on contact sheet: CS Sedan Ardennes club crest/badge (correct club, a crest not a kit or wordmark; file Logo_CS_Sedan_Ardennes_2001.svg)",
    "league": "football-c"
+  },
+  "f-cwmbran-town.2004": {
+   "club": "Cwmbran Town",
+   "years": "2004–2004",
+   "kind": "wikipedia",
+   "title": "File:Cwmbran Town A.F.C. (logo).jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Cwmbran_Town_A.F.C._(logo).jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/5/54/Cwmbran_Town_A.F.C._%28logo%29.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "87eb39ac593aef5f7b5fe52a42a28093f99b5a9e29c928940187ce8994865e42",
+   "cache": "data-src/crest-eras/files/seasons/f-cwmbran-town/2004-Cwmbran_Town_A.F.C._(logo).jpg",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Cwmbr%C3%A2n_Town_A.F.C. (2015-01-03): its infobox showed File:Ct large.jpg for seasons 2004",
+   "verified": "checked by eye: sheet 01 cell 102",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
+  "f-dagenham-and-redbridge.1994": {
+   "club": "Dagenham and Redbridge",
+   "years": "1994–2015",
+   "kind": "wayback",
+   "title": "File:Dagenham and Crest.png",
+   "page": "https://en.wikipedia.org/wiki/File:Dagenham_and_Crest.png",
+   "wayback": "https://web.archive.org/web/20090204120051im_/https://upload.wikimedia.org/wikipedia/en/d/d9/Dagenham_and_Crest.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "aa16be9486329054bfdceae3cb9efadffd706b88361ad16cd24e9173e0b13939",
+   "cache": "data-src/crest-eras/files/seasons/f-dagenham-and-redbridge/1994-Dagenham_and_Crest.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Dagenham_%26_Redbridge_F.C. (2008-04-09, 2009-02-04, 2010-03-28, 2011-05-06, 2012-03-02, 2012-08-18, 2013-07-23, 2015-04-10): its infobox showed File:Dag Crest.png / Dagenham and Crest.png for seasons 2008-2015; seasons 1994, 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 00 cell 8",
+   "league": "seasons"
+  },
+  "f-dagenham-and-redbridge.2016": {
+   "club": "Dagenham and Redbridge",
+   "years": "2016–2016",
+   "kind": "wayback",
+   "title": "File:Dagenham & Redbridge F.C. New Logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Dagenham_%26_Redbridge_F.C._New_Logo.png",
+   "wayback": "https://web.archive.org/web/20151205015902im_/https://upload.wikimedia.org/wikipedia/en/thumb/1/1a/Dagenham_%26_Redbridge_F.C._New_Logo.png/220px-Dagenham_%26_Redbridge_F.C._New_Logo.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "c2f1c594d42197fe7f3a60632c69238b4931d59d59a819fe16e6fa5be6151f03",
+   "cache": "data-src/crest-eras/files/seasons/f-dagenham-and-redbridge/2016-Dagenham_Redbridge_F.C._New_Logo.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Dagenham_%26_Redbridge_F.C. (2015-12-05): its infobox showed File:Dagenham & Redbridge F.C. New Logo.png for seasons 2016",
+   "verified": "checked by eye: sheet 00 cell 9",
+   "league": "seasons"
+  },
+  "f-darlington.1994": {
+   "club": "Darlington",
+   "years": "1994–2010",
+   "kind": "wikipedia",
+   "title": "File:Darlington FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Darlington_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/a/ad/Darlington_FC_crest.svg/330px-Darlington_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "df2a8951355cd326af5f58e6223c1597adb59e0be290b7423bcae7a57a3e9f4e",
+   "cache": "data-src/crest-eras/files/seasons/f-darlington/1994-Darlington_FC_crest.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Darlington_F.C. (2006-11-02, 2007-12-26, 2009-03-17, 2010-04-03): its infobox showed File:Darlo.gif / Darlo.png for seasons 2007-2010; seasons 1994-1997, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 103",
+   "league": "seasons"
   },
   "f-darmstadt-98.2016": {
    "club": "SV Darmstadt 98",
@@ -5018,6 +5517,20 @@
    "evidence": "en.wikipedia Derby County F.C. \"Crest\": \"in 2007, the badge was modified again with the ram still facing left and the text \"Est. 1884\" now in the middle of a circular frame featuring \"Derby County Football Club\" in gold lettering, with the colours being modified to the club colours of black and white in 2009\"; caption \"a version of this badge with gold trim was used from 2007 to 2009\"; fr gallery: this file \"Logo entre 2007 et 2009.\" (its file description says 2009-2012; the picture has the gold trim and gold lettering, so it is the 2007-2009 version)",
    "verified": "contact sheet: white roundel with a gold rim, DERBY COUNTY / FOOTBALL CLUB in gold lettering, black-and-white ram facing left, Est. 1884",
    "league": "football-a"
+  },
+  "f-derry-city.2001": {
+   "club": "Derry City",
+   "years": "2001–2004",
+   "kind": "wayback",
+   "title": "File:Derrycityfc.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Derrycityfc.gif",
+   "wayback": "https://web.archive.org/web/20060725163923im_/https://upload.wikimedia.org/wikipedia/en/a/a3/Derrycityfc.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "3fcdaf584312f543c3cf54197ebbfc545161dd37ec4db7740de5d3b6c8a7d999",
+   "cache": "data-src/crest-eras/files/seasons/f-derry-city/2001-Derrycityfc.gif",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 104",
+   "league": "seasons"
   },
   "f-desportivo-das-aves.2012": {
    "club": "Desportivo das Aves",
@@ -5145,6 +5658,90 @@
    "verified": "viewed on contact sheet: Arminia Bielefeld club crest/badge (correct club, a crest not a kit or wordmark; file Arminia_Bielefeld_Logo_2021–.svg)",
    "league": "football-c"
   },
+  "f-dumbarton.1994": {
+   "club": "Dumbarton",
+   "years": "1994–2004",
+   "kind": "wikipedia",
+   "title": "File:Dumbarton FC logo 2026.png",
+   "page": "https://en.wikipedia.org/wiki/File:Dumbarton_FC_logo_2026.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/a/ad/Dumbarton_FC_logo_2026.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "489d1daeef52be329903e3d8ac66bafe70025872e4b9a5169108ab01c90b4d17",
+   "cache": "data-src/crest-eras/files/seasons/f-dumbarton/1994-Dumbarton_FC_logo_2026.png",
+   "evidence": "no dated source for seasons 1994, 2002-2004: today's crest (the infobox of https://en.wikipedia.org/wiki/Dumbarton_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 01 cell 105",
+   "league": "seasons"
+  },
+  "f-dundee-united.1994": {
+   "club": "Dundee United",
+   "years": "1994–2022",
+   "kind": "wayback",
+   "title": "File:DUFCcrest.png",
+   "page": "https://en.wikipedia.org/wiki/File:DUFCcrest.png",
+   "wayback": "https://web.archive.org/web/20160623165422im_/https://upload.wikimedia.org/wikipedia/en/thumb/f/f4/DUFCcrest.png/220px-DUFCcrest.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "9bd09a298c458203302aba5dc0be154c203c166010c863df303fb40bace26133",
+   "cache": "data-src/crest-eras/files/seasons/f-dundee-united/1994-DUFCcrest.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Dundee_United_F.C. (2007-06-21, 2008-05-30, 2008-12-07, 2010-03-23, 2011-05-03, 2012-04-02, 2013-06-02, 2014-04-04, 2015-06-01, 2016-06-23, 2021-06-12, 2022-06-16): its infobox showed File:Dufc.gif / Dufc.png / Dundee United FC logo.svg / DUFCcrest.png for seasons 2007-2016, 2021-2022; seasons 1994, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 00 cell 24",
+   "league": "seasons"
+  },
+  "f-dundee-united.2023": {
+   "club": "Dundee United",
+   "years": "2023–2023",
+   "kind": "wikipedia",
+   "title": "File:Dundee United FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Dundee_United_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/b/bf/Dundee_United_FC_crest.svg/330px-Dundee_United_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "e88058b0c402aa54ec874c7e9ae3699b36fdc6cc1f0db7a62881ccdd12157118",
+   "cache": "data-src/crest-eras/files/seasons/f-dundee-united/2023-Dundee_United_FC_crest.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Dundee_United_F.C. (2023-04-28): its infobox showed File:DUFCcrest2022.png for seasons 2023",
+   "verified": "checked by eye: sheet 00 cell 25",
+   "league": "seasons"
+  },
+  "f-dundee.1994": {
+   "club": "Dundee",
+   "years": "1994–2015",
+   "kind": "wayback",
+   "title": "File:Dundee FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Dundee_FC_crest.svg",
+   "wayback": "https://web.archive.org/web/20150605155836im_/https://upload.wikimedia.org/wikipedia/en/thumb/3/37/Dundee_FC_crest.svg/175px-Dundee_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "0f6469e4e38429e237b48cfb59012e06ff7c8acfb46952aac3164391faa17f7b",
+   "cache": "data-src/crest-eras/files/seasons/f-dundee/1994-Dundee_FC_crest.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Dundee_F.C. (2015-06-05): its infobox showed File:Dundee FC crest.svg for seasons 2015; seasons 1994, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 00 cell 16",
+   "league": "seasons"
+  },
+  "f-dundee.2016": {
+   "club": "Dundee",
+   "years": "2016–2024",
+   "kind": "wikipedia",
+   "title": "File:Dundee FC 2025 Crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Dundee_FC_2025_Crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/Dundee_FC_2025_Crest.svg/330px-Dundee_FC_2025_Crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "7a2041a002379fc660470f37a4f408b162000ec102c3d0930e5a5ace244570ee",
+   "cache": "data-src/crest-eras/files/seasons/f-dundee/2016-Dundee_FC_2025_Crest.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Dundee_F.C. (2016-06-30, 2016-11-11, 2019-04-07, 2024-04-11): its infobox showed File:Dundee1617badge.png / Dundee FC logo.png for seasons 2016-2019, 2024; seasons 2022: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 00 cell 17",
+   "league": "seasons"
+  },
+  "f-dunfermline-athletic.1994": {
+   "club": "Dunfermline Athletic",
+   "years": "1994–2012",
+   "kind": "wayback",
+   "title": "File:Dunfermline Athletic FC logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Dunfermline_Athletic_FC_logo.svg",
+   "wayback": "https://web.archive.org/web/20120223195119im_/https://upload.wikimedia.org/wikipedia/en/thumb/d/d4/Dunfermline_Athletic_FC_logo.svg/150px-Dunfermline_Athletic_FC_logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "0d2c279864ef7a71d3bbb3cf83ff50af46805939f8db23b994de732cab9aed7b",
+   "cache": "data-src/crest-eras/files/seasons/f-dunfermline-athletic/1994-Dunfermline_Athletic_FC_logo.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Dunfermline_Athletic_F.C. (2007-06-29, 2012-02-23): its infobox showed File:Dunfermline Athletic logo.gif / Dunfermline Athletic FC logo.svg for seasons 2007, 2012; seasons 1994, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 106",
+   "league": "seasons"
+  },
   "f-dynamo-kyiv.2019": {
    "club": "Dynamo Kyiv",
    "years": "2019–2025",
@@ -5158,6 +5755,35 @@
    "evidence": "uk Динамо (Київ), \"Емблеми клубу\": the logo presented on 3 July 2011 for 2011/12 (the D in a rhombus, two stars) was used \"3 липня 2011–24 травня 2025\"; this file is that logo (\"Емблема ФК «Динамо» Київ\", created 3 July 2011, source fcdynamo). The third star came with the logo presented in May 2025, for 2025/26.",
    "verified": "blue-and-white rhombus with the D and КИЇВ, two gold stars above; today's has three",
    "league": "football-d"
+  },
+  "f-east-fife.1994": {
+   "club": "East Fife",
+   "years": "1994–2003",
+   "kind": "wikipedia",
+   "title": "File:East Fife FC logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:East_Fife_FC_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/6/65/East_Fife_FC_logo.svg/330px-East_Fife_FC_logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "4fb1549d84450e52dae0e3f8c65f45fbbe2cb244375587dc5fecfc42800f6c48",
+   "cache": "data-src/crest-eras/files/seasons/f-east-fife/1994-East_Fife_FC_logo.png",
+   "evidence": "no dated source for seasons 1994, 1999-2001, 2003: today's crest (the infobox of https://en.wikipedia.org/wiki/East_Fife_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 01 cell 107",
+   "league": "seasons"
+  },
+  "f-east-stirlingshire.1994": {
+   "club": "East Stirlingshire",
+   "years": "1994–2003",
+   "kind": "wayback",
+   "title": "File:Shirecrest.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Shirecrest.gif",
+   "wayback": "https://web.archive.org/web/20070705090228im_/https://upload.wikimedia.org/wikipedia/en/1/15/Shirecrest.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "0c25969494da2cbb1a3bb8c6f40e43060babe500a59da50d998da374c456d28e",
+   "cache": "data-src/crest-eras/files/seasons/f-east-stirlingshire/1994-Shirecrest.gif",
+   "evidence": "seasons 1994, 2001-2003: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 108",
+   "league": "seasons",
+   "background": "#ffffff"
   },
   "f-eintracht-braunschweig.2014": {
    "club": "Eintracht Braunschweig",
@@ -5186,6 +5812,20 @@
    "evidence": "de wikipedia: white-black stylised eagle 1977(80)-1999 (Logo_77_99); in March 1999 (centenary) the red Traditionsadler was re-adopted; 1998/99 mostly old crest",
    "verified": "black-and-white stylised eagle with red \"Eintracht\" in a white disc on black",
    "league": "football-c"
+  },
+  "f-elgin-city.2001": {
+   "club": "Elgin City",
+   "years": "2001–2004",
+   "kind": "wikipedia",
+   "title": "File:Elgin City FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Elgin_City_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/7/71/Elgin_City_FC_crest.svg/330px-Elgin_City_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "46a691bdb665e8ab19603b9604e8c3a9bed71924710b9b808bfae29a45353d2f",
+   "cache": "data-src/crest-eras/files/seasons/f-elgin-city/2001-Elgin_City_FC_crest.png",
+   "evidence": "no dated source for seasons 2001-2004: today's crest (the infobox of https://en.wikipedia.org/wiki/Elgin_City_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 01 cell 109",
+   "league": "seasons"
   },
   "f-empoli.1998": {
    "club": "Empoli",
@@ -5340,6 +5980,34 @@
    "evidence": "it.wikipedia Stichting Betaald Voetbal Excelsior 'Stemma': the club's two-circle badge changed only its lettering: 'Sportclub Excelsior' from 1984-85, 'nel 2002, dopo la scissione formale tra professionisti e dilettanti, è stata cambiata in \"S.B.V. Excelsior\"', and in 2021 'Excelsior Rotterdam'; its gallery captions this file 'Logo in uso dal 2002 al 2021' and today's 'Logo in uso dal 2021'; Commons File:Excelsior Rotterdam logo 1985.png cites the club's news of June 2021 on the logo change (excelsiorrotterdam.nl/2021/06/excelsior-voert-logowijziging-door-...), so 2020-21 was the S.B.V. logo's last season; this file was drawn for de.wikipedia (Christian Bier, 2008) when it was the club's logo",
    "verified": "contact sheet: white roundel with a black ring, disc halved black over red, S.B.V. arched above and a large EXCELSIOR below in black; today's crest reads EXCELSIOR / ROTTERDAM in smaller letters with 19 02 in red at the sides",
    "league": "football-a"
+  },
+  "f-falkirk.1994": {
+   "club": "Falkirk",
+   "years": "1994–2008",
+   "kind": "wayback",
+   "title": "File:Falkirk logo.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Falkirk_logo.gif",
+   "wayback": "https://web.archive.org/web/20051001010710im_/https://upload.wikimedia.org/wikipedia/en/7/71/Falkirk_logo.gif",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "cda260a41752e6ef44f9b2f1da5381d76906eb2377cb570fc7fa484493703168",
+   "cache": "data-src/crest-eras/files/seasons/f-falkirk/1994-Falkirk_logo.gif",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Falkirk_F.C. (2007-06-21, 2008-02-16): its infobox showed File:Falkirk logo.gif for seasons 2007-2008; seasons 1994, 1999, 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 00 cell 32",
+   "league": "seasons"
+  },
+  "f-falkirk.2009": {
+   "club": "Falkirk",
+   "years": "2009–2026",
+   "kind": "wikipedia",
+   "title": "File:Falkirk FC logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Falkirk_FC_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/Falkirk_FC_logo.svg/330px-Falkirk_FC_logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "9430b6fd3639348a3e6fe8fbf872308bbe78a22959a155486c06fd057bc08a21",
+   "cache": "data-src/crest-eras/files/seasons/f-falkirk/2009-Falkirk_FC_logo.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Falkirk_F.C. (2026-03-10): its infobox showed File:Falkirk FC logo.svg for seasons 2026; seasons 2009-2010: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 00 cell 33",
+   "league": "seasons"
   },
   "f-famalicao.1994": {
    "club": "Famalicão",
@@ -6016,6 +6684,20 @@
    "league": "football-b",
    "background": "#ffffff"
   },
+  "f-forfar-athletic.1994": {
+   "club": "Forfar Athletic",
+   "years": "1994–2004",
+   "kind": "wikipedia",
+   "title": "File:Forfar Athletic FC logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Forfar_Athletic_FC_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/8/8c/Forfar_Athletic_FC_logo.svg/330px-Forfar_Athletic_FC_logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "89955714e80904d241181b923107ec28c71af5d378e302eac2d88b9355f90930",
+   "cache": "data-src/crest-eras/files/seasons/f-forfar-athletic/1994-Forfar_Athletic_FC_logo.png",
+   "evidence": "no dated source for seasons 1994, 1999-2004: today's crest (the infobox of https://en.wikipedia.org/wiki/Forfar_Athletic_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 01 cell 111",
+   "league": "seasons"
+  },
   "f-fortuna-dusseldorf.1996": {
    "club": "Fortuna Düsseldorf",
    "years": "1996–2020",
@@ -6310,6 +6992,34 @@
    "verified": "contact sheet and a 300 px comparison: white roundel with green rings, THE CELTIC FOOTBALL & ATHLETIC COY. LTD. round a green four-leaf clover, 1888 below (today: green ring with white THE CELTIC FOOTBALL CLUB, 1888)",
    "league": "football-d"
   },
+  "f-glenavon.2001": {
+   "club": "Glenavon",
+   "years": "2001–2004",
+   "kind": "wayback",
+   "title": "File:Glenavon.png",
+   "page": "https://en.wikipedia.org/wiki/File:Glenavon.png",
+   "wayback": "https://web.archive.org/web/20070705090305im_/https://upload.wikimedia.org/wikipedia/en/d/dd/Glenavon.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "72184acd43649101e96d5b93191d949810aa61d16343694a371e72a9dd88a5f5",
+   "cache": "data-src/crest-eras/files/seasons/f-glenavon/2001-Glenavon.png",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 112",
+   "league": "seasons"
+  },
+  "f-glentoran.2001": {
+   "club": "Glentoran",
+   "years": "2001–2004",
+   "kind": "wayback",
+   "title": "File:Glentoranbadge130.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Glentoranbadge130.jpg",
+   "wayback": "https://web.archive.org/web/20060725164828im_/https://upload.wikimedia.org/wikipedia/en/thumb/5/5a/Glentoranbadge130.jpg/100px-Glentoranbadge130.jpg",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "a5f9c90574c8fb21fc4e2da63fdf1748b83a271cb4a723c8e9b58c7a63665465",
+   "cache": "data-src/crest-eras/files/seasons/f-glentoran/2001-Glentoranbadge130.jpg",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 113",
+   "league": "seasons"
+  },
   "f-granada-cf.2012": {
    "club": "Granada CF",
    "years": "2012–2014",
@@ -6338,6 +7048,21 @@
    "verified": "crimson red-and-white narrow shield, G-like band and interlaced CF, white ball outlined in red on top, plain red pomegranate without stem or leaves",
    "league": "football-b"
   },
+  "f-greenock-morton.1994": {
+   "club": "Greenock Morton",
+   "years": "1994–2004",
+   "kind": "wayback",
+   "title": "File:Mortonlogo.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Mortonlogo.gif",
+   "wayback": "https://web.archive.org/web/20070629073731im_/https://upload.wikimedia.org/wikipedia/en/thumb/6/60/Mortonlogo.gif/100px-Mortonlogo.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "bd0b47b3d731bb06dc350441e51fb50035ddc3bf3a452b314ce43390f7f5abe3",
+   "cache": "data-src/crest-eras/files/seasons/f-greenock-morton/1994-Mortonlogo.gif",
+   "evidence": "seasons 1994, 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 114",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
   "f-grenoble-foot-38.2009": {
    "club": "Grenoble Foot 38",
    "years": "2009–2010",
@@ -6351,6 +7076,20 @@
    "evidence": "fr.wikipedia \"Grenoble Foot 38\", Évolution du logo: \"2001-2018\" (Logo_Grenoble_Foot_38_-_2001.svg)",
    "verified": "viewed on contact sheet: Grenoble Foot 38 club crest/badge (correct club, a crest not a kit or wordmark; file Logo_Grenoble_Foot_38_-_2001.svg)",
    "league": "football-c"
+  },
+  "f-gretna.2004": {
+   "club": "Gretna",
+   "years": "2004–2008",
+   "kind": "wikipedia",
+   "title": "File:GretnaFC crest.png",
+   "page": "https://en.wikipedia.org/wiki/File:GretnaFC_crest.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/e/ef/GretnaFC_crest.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "6ce3961f7f946719a4caa150f53b1a6105280c08e76a425d04ef8d01abf4bb12",
+   "cache": "data-src/crest-eras/files/seasons/f-gretna/2004-GretnaFC_crest.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Gretna_F.C. (2008-02-16): its infobox showed File:Gretna logo.jpg for seasons 2008; seasons 2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 115",
+   "league": "seasons"
   },
   "f-guingamp.1996": {
    "club": "En Avant Guingamp",
@@ -6394,6 +7133,21 @@
    "verified": "viewed on contact sheet: En Avant Guingamp club crest/badge (correct club, a crest not a kit or wordmark; file En_Avant_de_Guingamp_logo.svg)",
    "league": "football-c"
   },
+  "f-halifax-town.1995": {
+   "club": "Halifax Town",
+   "years": "1995–2002",
+   "kind": "wayback",
+   "title": "File:HalifaxTownAFC.gif",
+   "page": "https://en.wikipedia.org/wiki/File:HalifaxTownAFC.gif",
+   "wayback": "https://web.archive.org/web/20071223185611im_/https://upload.wikimedia.org/wikipedia/en/f/fd/HalifaxTownAFC.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "9e6b3489b409f60be336336f6c93aa57b79d9cb2380cdf2b11ca58bbeb68f2b5",
+   "cache": "data-src/crest-eras/files/seasons/f-halifax-town/1995-HalifaxTownAFC.gif",
+   "evidence": "seasons 1995-1997, 1999-2002: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 116",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
   "f-halmstad-bk.2001": {
    "club": "Halmstads BK",
    "years": "2001–2004",
@@ -6407,6 +7161,20 @@
    "evidence": "the en.wikipedia captures of 5 Dec 2005, Nov 2007, Feb 2009 and Jun 2010 (File:Halmstads BK.png) and de.wikipedia File:Halmstads_BK.svg (23 Oct 2008) show the crest in navy and yellow; today's crest (en File:Halmstad_BK_logo.svg) is the same H.B.K. shield recoloured mid-blue and beige-gold, so it came after 2010. No source dates the crest of 2001-2004 itself; this is the earliest pictured (no other is recorded)",
    "verified": "contact sheet: shield with a yellow rim, navy field, yellow ball and H.B.K. on a white diagonal, 1914; today's is mid-blue with beige-gold rim and lettering",
    "league": "football-d"
+  },
+  "f-hamilton-academical.1994": {
+   "club": "Hamilton Academical",
+   "years": "1994–2021",
+   "kind": "wikipedia",
+   "title": "File:Hamilton Academical FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Hamilton_Academical_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/3/3f/Hamilton_Academical_FC_crest.svg/330px-Hamilton_Academical_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "f53e8b7d2a98d43aff77dcd940820285621116168f1f05d3d76afcc3e7bbb0e7",
+   "cache": "data-src/crest-eras/files/seasons/f-hamilton-academical/1994-Hamilton_Academical_FC_crest.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Hamilton_Academical_F.C. (2015-05-15, 2016-05-06, 2016-11-22, 2017-08-18, 2019-04-27, 2019-12-16, 2021-06-29): its infobox showed File:Hamilton Academical FC logo.svg for seasons 2015-2021; seasons 1994, 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 117",
+   "league": "seasons"
   },
   "f-hannover-96.2003": {
    "club": "Hannover 96",
@@ -6464,6 +7232,35 @@
    "verified": "viewed on contact sheet: Hannover 96 club crest/badge (correct club, a crest not a kit or wordmark; file Hannover_96_Logo.svg)",
    "league": "football-c"
   },
+  "f-hayes.1994": {
+   "club": "Hayes",
+   "years": "1994–1999",
+   "kind": "wayback",
+   "title": "File:Hayesfc.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Hayesfc.jpg",
+   "wayback": "https://web.archive.org/web/20080614214426im_/https://upload.wikimedia.org/wikipedia/en/f/f9/Hayesfc.jpg",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "92d4c89dcd36177ad60889a1d4bf88a5e7ef59d3e895a54b0d113b1e2f83b454",
+   "cache": "data-src/crest-eras/files/seasons/f-hayes/1994-Hayesfc.jpg",
+   "evidence": "seasons 1994, 1999: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 118",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
+  "f-heart-of-midlothian.1994": {
+   "club": "Heart of Midlothian",
+   "years": "1994–2007",
+   "kind": "wikipedia",
+   "title": "File:Heart of Midlothian FC logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Heart_of_Midlothian_FC_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/6/61/Heart_of_Midlothian_FC_logo.svg/330px-Heart_of_Midlothian_FC_logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "026ac76c64780ebd29cb301d82e52fb8e41dc21e0739f21dc1301b316db6eebb",
+   "cache": "data-src/crest-eras/files/seasons/f-heart-of-midlothian/1994-Heart_of_Midlothian_FC_logo.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Heart_of_Midlothian_F.C. (2007-06-28): its infobox showed File:HEARTS LOGO.GIF for seasons 2007; seasons 1994, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 119",
+   "league": "football-d"
+  },
   "f-heart-of-midlothian.2008": {
    "club": "Heart of Midlothian",
    "years": "2008–2008",
@@ -6477,6 +7274,20 @@
    "evidence": "en.wikipedia Heart of Midlothian F.C. \"Colours and badge\": \"The badge is a heart, based on the Heart of Midlothian mosaic on the Royal Mile\"; the only other crest it records is the 2014-15 McCrae's Battalion commemorative badge. it.wikipedia File:Hearts_FC.svg (the same design, from the club's homepage) gives the trademark as \"registrato il 02-06-2007\", i.e. registered just before 2007-08. A judgement on moderate evidence: the en article's Wayback captures of June and October 2008 show crest files (HEARTS_LOGO.GIF, Heartslogo.png) whose archived pictures could not be fetched (missing or timed out), so no capture of 2008 was seen",
    "verified": "contact sheet: maroon heart edged in gold with a grey mosaic border, a white-and-blue saltire, H M F C in gold in the quarters, a football in the centre, 1874 below; the same design as the it.wikipedia file of the club's logo",
    "league": "football-d"
+  },
+  "f-hednesford-town.1999": {
+   "club": "Hednesford Town",
+   "years": "1999–1999",
+   "kind": "wikipedia",
+   "title": "File:Hednesford Town F.C. logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Hednesford_Town_F.C._logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/Hednesford_Town_F.C._logo.svg/330px-Hednesford_Town_F.C._logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "c88ad0786db42da57b98469393e321cfd386ffab69ad4e67f202a020aad42333",
+   "cache": "data-src/crest-eras/files/seasons/f-hednesford-town/1999-Hednesford_Town_F.C._logo.png",
+   "evidence": "no dated source for seasons 1999: today's crest (the infobox of https://en.wikipedia.org/wiki/Hednesford_Town_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 02 cell 120",
+   "league": "seasons"
   },
   "f-hellas-verona-fc.1996": {
    "club": "Hellas Verona (listed as: Hellas Verona FC)",
@@ -6548,6 +7359,20 @@
    "verified": "round badge, navy and yellow rings, black profile of Hercules with a green laurel wreath on yellow, navy pennant with HCF monogram below (the 2020 logo is gold and paler blue)",
    "league": "football-b"
   },
+  "f-hereford-united.1994": {
+   "club": "Hereford United",
+   "years": "1994–2002",
+   "kind": "wikipedia",
+   "title": "File:Hereford United FC.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Hereford_United_FC.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/7/75/Hereford_United_FC.svg/330px-Hereford_United_FC.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "157ba70dff43c085e0093694ed1f50531e70dc0a8a09b9078fb09932bca36846",
+   "cache": "data-src/crest-eras/files/seasons/f-hereford-united/1994-Hereford_United_FC.png",
+   "evidence": "seasons 1994-1997, 1999, 2001-2002: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 121",
+   "league": "seasons"
+  },
   "f-herf-lge-boldklub.2000": {
    "club": "Herfølge Boldklub",
    "years": "2000–2001",
@@ -6589,6 +7414,20 @@
    "evidence": "en/de wikipedia: flag-only \"Fahne pur\" crest adopted 2012 (125th anniversary), Hertha_BSC_Logo_2012.svg; assumed first worn 2012/13 [today's crest not in game: needs image]",
    "verified": "blue-and-white flag with \"HerthaBSC\" lettering only",
    "league": "football-c"
+  },
+  "f-hibernian.1994": {
+   "club": "Hibernian",
+   "years": "1994–2001",
+   "kind": "wayback",
+   "title": "File:Hibernian FC logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Hibernian_FC_logo.svg",
+   "wayback": "https://web.archive.org/web/20260614134418im_/https://upload.wikimedia.org/wikipedia/en/thumb/3/37/Hibernian_FC_logo.svg/250px-Hibernian_FC_logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "de0c485dd174bb9adc899e5f12ba909ef248601626d003d366427d577eb55bfd",
+   "cache": "data-src/crest-eras/files/seasons/f-hibernian/1994-Hibernian_FC_logo.png",
+   "evidence": "seasons 1994, 1999-2001: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 122",
+   "league": "football-d"
   },
   "f-hibernian.2002": {
    "club": "Hibernian",
@@ -6702,6 +7541,21 @@
    "verified": "viewed on contact sheet: FC Ingolstadt 04 club crest/badge (correct club, a crest not a kit or wordmark; file FC-Ingolstadt_logo.svg)",
    "league": "football-c"
   },
+  "f-institute.2001": {
+   "club": "Institute",
+   "years": "2001–2004",
+   "kind": "wayback",
+   "title": "File:Institute.png",
+   "page": "https://en.wikipedia.org/wiki/File:Institute.png",
+   "wayback": "https://web.archive.org/web/20070705090322im_/https://upload.wikimedia.org/wikipedia/en/c/cd/Institute.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "8f93aba0f47a8ee5a2f1abae1e826cd1b25968397c305b9a644c99f2507f8ab9",
+   "cache": "data-src/crest-eras/files/seasons/f-institute/2001-Institute.png",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 123",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
   "f-inter.1995": {
    "club": "Inter",
    "years": "1995–1999",
@@ -6757,6 +7611,34 @@
    "evidence": "en.wikipedia \"Inter Milan\": rebranding of July 2014 (gallery file FC_Internazionale_Milano_2014.svg), replaced by the logo \"svelato il 30 marzo 2021\" (it.wikipedia)",
    "verified": "round blue/black/gold FCIM monogram in plain ring, no text",
    "league": "football-b"
+  },
+  "f-inverness-caledonian-thistle.1994": {
+   "club": "Inverness Caledonian Thistle",
+   "years": "1994–2008",
+   "kind": "wayback",
+   "title": "File:Inverness Caledonian Thistle logo.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Inverness_Caledonian_Thistle_logo.gif",
+   "wayback": "https://web.archive.org/web/20051022124818im_/https://upload.wikimedia.org/wikipedia/en/7/77/Inverness_Caledonian_Thistle_logo.gif",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "80af38eaaba16d17959a9183d18682352308991343a1b4f0c9db04da435c3f02",
+   "cache": "data-src/crest-eras/files/seasons/f-inverness-caledonian-thistle/1994-Inverness_Caledonian_Thistle_logo.gif",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Inverness_Caledonian_Thistle_F.C. (2007-12-19): its infobox showed File:Inverness Caledonian Thistle logo.gif for seasons 2008; seasons 1994, 1999-2004, 2007: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 00 cell 40",
+   "league": "seasons"
+  },
+  "f-inverness-caledonian-thistle.2009": {
+   "club": "Inverness Caledonian Thistle",
+   "years": "2009–2017",
+   "kind": "wikipedia",
+   "title": "File:Inverness Caledonian Thistle.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Inverness_Caledonian_Thistle.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/8/88/Inverness_Caledonian_Thistle.svg/330px-Inverness_Caledonian_Thistle.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "edab9c98f6b488eaa7deec28cff7e81a5bb0aea11ef2e6ec3f618986d7b47cdf",
+   "cache": "data-src/crest-eras/files/seasons/f-inverness-caledonian-thistle/2009-Inverness_Caledonian_Thistle.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Inverness_Caledonian_Thistle_F.C. (2010-05-26, 2011-11-18, 2013-05-20, 2013-12-29, 2015-06-05, 2016-04-03, 2016-11-16): its infobox showed File:Inverness Caledonian Thistle.svg for seasons 2011-2017; seasons 2009: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 00 cell 41",
+   "league": "seasons"
   },
   "f-ipswich-town.1994": {
    "club": "Ipswich Town",
@@ -6856,6 +7738,21 @@
    "verified": "blue disc KSC on a yellow/red/blue triangle (1998 logo)",
    "league": "football-c"
   },
+  "f-kettering-town.1994": {
+   "club": "Kettering Town",
+   "years": "1994–1999",
+   "kind": "wayback",
+   "title": "File:Ketteringtownfc.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Ketteringtownfc.jpg",
+   "wayback": "https://web.archive.org/web/20061020031007im_/https://upload.wikimedia.org/wikipedia/en/7/71/Ketteringtownfc.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "882560065a8140b3c8adc031f14608880abaf96ff0dd444878d8644cc6d58909",
+   "cache": "data-src/crest-eras/files/seasons/f-kettering-town/1994-Ketteringtownfc.jpg",
+   "evidence": "seasons 1994, 1999: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 124",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
   "f-kfc-uerdingen-05.1995": {
    "club": "KFC Uerdingen 05",
    "years": "1995–1995",
@@ -6883,6 +7780,63 @@
    "evidence": "de wikipedia gallery: \"1995-1996\" Kfc_05_uerdingen.svg; \"1996-heute\" afterwards",
    "verified": "viewed on contact sheet: KFC Uerdingen 05 club crest/badge (correct club, a crest not a kit or wordmark; file Kfc_05_uerdingen.svg)",
    "league": "football-c"
+  },
+  "f-kidderminster-harriers.1994": {
+   "club": "Kidderminster Harriers",
+   "years": "1994–2004",
+   "kind": "wayback",
+   "title": "File:Kidderminsterbadge.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Kidderminsterbadge.gif",
+   "wayback": "https://web.archive.org/web/20060725163741im_/https://upload.wikimedia.org/wikipedia/en/6/6e/Kidderminsterbadge.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "ac0cd6c6c33b91d2742b554730ee364a91a7d9a643ad64d74477ee51d4f08fea",
+   "cache": "data-src/crest-eras/files/seasons/f-kidderminster-harriers/1994-Kidderminsterbadge.gif",
+   "evidence": "seasons 1994, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 125",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
+  "f-kilmarnock.1994": {
+   "club": "Kilmarnock",
+   "years": "1994–2007",
+   "kind": "wayback",
+   "title": "File:Kilmarnock logo.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Kilmarnock_logo.gif",
+   "wayback": "https://web.archive.org/web/20050804083448im_/https://upload.wikimedia.org/wikipedia/en/d/db/Kilmarnock_logo.gif",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "05d6742bde6a7753074231403b40c0a9a2cd874b63bd6c8ed78802013ceb382e",
+   "cache": "data-src/crest-eras/files/seasons/f-kilmarnock/1994-Kilmarnock_logo.gif",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Kilmarnock_F.C. (2007-06-16): its infobox showed File:Kilmarnock logo.gif for seasons 2007; seasons 1994, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 00 cell 48",
+   "league": "seasons"
+  },
+  "f-kilmarnock.2008": {
+   "club": "Kilmarnock",
+   "years": "2008–2024",
+   "kind": "wayback",
+   "title": "File:KilmarnockLogo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:KilmarnockLogo.svg",
+   "wayback": "https://web.archive.org/web/20240417022400im_/https://upload.wikimedia.org/wikipedia/en/thumb/3/32/KilmarnockLogo.svg/180px-KilmarnockLogo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "d00faae86c3ed60a485e6519a8da6a4e4f390b12fa22b2713bb6eff0e16cb1cd",
+   "cache": "data-src/crest-eras/files/seasons/f-kilmarnock/2008-KilmarnockLogo.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Kilmarnock_F.C. (2013-05-30, 2014-03-13, 2015-05-15, 2016-05-29, 2017-03-29, 2017-10-10, 2019-06-16, 2020-05-20, 2021-02-24, 2023-03-30, 2024-04-17): its infobox showed File:KilmarnockLogo.svg for seasons 2013-2021, 2023-2024; seasons 2008-2012: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 00 cell 49",
+   "league": "seasons"
+  },
+  "f-kilmarnock.2025": {
+   "club": "Kilmarnock",
+   "years": "2025–2026",
+   "kind": "wikipedia",
+   "title": "File:Kilmarnock FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Kilmarnock_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/3/38/Kilmarnock_FC_crest.svg/330px-Kilmarnock_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "6c3880aef3a8acdd253320923963d001a8bd3f9751a1f5e6d019f2f53ebe924f",
+   "cache": "data-src/crest-eras/files/seasons/f-kilmarnock/2025-Kilmarnock_FC_crest.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Kilmarnock_F.C. (2025-06-13, 2026-06-16): its infobox showed File:Kilmarnock FC crest.svg for seasons 2025-2026",
+   "verified": "checked by eye: sheet 00 cell 50",
+   "league": "seasons"
   },
   "f-krc-genk.1999": {
    "club": "KRC Genk",
@@ -7235,6 +8189,51 @@
    "verified": "white shield with red rim, navy \"80\" monogram, \"LILLE OLYMPIQUE SPORTING CLUB 1944-2024\"",
    "league": "football-c"
   },
+  "f-limavady-united.2001": {
+   "club": "Limavady United",
+   "years": "2001–2002",
+   "kind": "wayback",
+   "title": "File:Limavady.png",
+   "page": "https://en.wikipedia.org/wiki/File:Limavady.png",
+   "wayback": "https://web.archive.org/web/20070705085418im_/https://upload.wikimedia.org/wikipedia/en/thumb/d/da/Limavady.png/100px-Limavady.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "63358d0af7e2532c89ff80e9ec46ad86de6360a7b85d303159e0b88ab8d1443b",
+   "cache": "data-src/crest-eras/files/seasons/f-limavady-united/2001-Limavady.png",
+   "evidence": "seasons 2001-2002: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 126",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
+  "f-linfield.2001": {
+   "club": "Linfield",
+   "years": "2001–2004",
+   "kind": "wayback",
+   "title": "File:Linfield.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Linfield.gif",
+   "wayback": "https://web.archive.org/web/20050827180516im_/https://upload.wikimedia.org/wikipedia/en/4/46/Linfield.gif",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "6554a2a83d077fcdb40d627fb10829c2202655f0746c3a1edd9a48307e2e8512",
+   "cache": "data-src/crest-eras/files/seasons/f-linfield/2001-Linfield.gif",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 127",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
+  "f-lisburn-distillery.2001": {
+   "club": "Lisburn Distillery",
+   "years": "2001–2004",
+   "kind": "wayback",
+   "title": "File:Distillery.png",
+   "page": "https://en.wikipedia.org/wiki/File:Distillery.png",
+   "wayback": "https://web.archive.org/web/20070705085239im_/https://upload.wikimedia.org/wikipedia/en/4/4a/Distillery.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "79bc6f52aee8a37c42145c199e7b7d23b9214eb6de56edb3e3a2721c63e1dea2",
+   "cache": "data-src/crest-eras/files/seasons/f-lisburn-distillery/2001-Distillery.png",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 128",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
   "f-liverpool.1994": {
    "club": "Liverpool",
    "years": "1994–2012",
@@ -7248,6 +8247,20 @@
    "evidence": "en.wikipedia Liverpool F.C. \"Colours and badge\": 1992 centenary badge with the Shankly Gates, flames added the next year; replaced in 2012 (picture from it.wikipedia Liverpool FC logo.svg)",
    "verified": "contact sheet: shield with Liver bird, gates arch with YOU WILL NEVER WALK ALONE, EST. 1892 ribbon and a flame at each side",
    "league": "football-a"
+  },
+  "f-livingston.1999": {
+   "club": "Livingston",
+   "years": "1999–2024",
+   "kind": "wikipedia",
+   "title": "File:Livingston FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Livingston_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/7/79/Livingston_FC_crest.svg/330px-Livingston_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "7e9cf4b0ada45990eaa520db83b48dbdf5183ebf286502d552e4413246665358",
+   "cache": "data-src/crest-eras/files/seasons/f-livingston/1999-Livingston_FC_crest.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Livingston_F.C. (2019-04-28, 2021-02-11, 2022-06-01, 2023-02-08, 2024-04-17): its infobox showed File:Livingston FC club badge new.png for seasons 2019-2024; seasons 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 129",
+   "league": "seasons"
   },
   "f-livorno.2007": {
    "club": "Livorno",
@@ -7305,6 +8318,35 @@
    "verified": "contact sheet: white viking head in a blue banner with waves, LYNGBY BK below; not today's round 2024 badge",
    "league": "football-d"
   },
+  "f-macclesfield-town.2000": {
+   "club": "Macclesfield Town",
+   "years": "2000–2008",
+   "kind": "wayback",
+   "title": "File:Macclesfield Town badge.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Macclesfield_Town_badge.gif",
+   "wayback": "https://web.archive.org/web/20061102065133im_/https://upload.wikimedia.org/wikipedia/en/e/e8/Macclesfield_Town_badge.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "c09ee3cb3d7da7101e215a3b8df22142d17a1c7ee70981e026031ce3c27b1811",
+   "cache": "data-src/crest-eras/files/seasons/f-macclesfield-town/2000-Macclesfield_Town_badge.gif",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Macclesfield_Town_F.C. (2006-11-02, 2007-12-27): its infobox showed File:Macclesfield Town badge.gif for seasons 2007-2008; seasons 2000-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 56",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
+  "f-macclesfield-town.2009": {
+   "club": "Macclesfield Town",
+   "years": "2009–2020",
+   "kind": "wikipedia",
+   "title": "File:Macclesfield Town FC.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Macclesfield_Town_FC.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/4/40/Macclesfield_Town_FC.svg/330px-Macclesfield_Town_FC.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "c9ef5ab3ac88c1e3ecdf1159845b91b5b1b56f812fb404cc8f0985b5c2808c4b",
+   "cache": "data-src/crest-eras/files/seasons/f-macclesfield-town/2009-Macclesfield_Town_FC.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Macclesfield_Town_F.C. (2010-03-12, 2012-06-10, 2019-06-26): its infobox showed File:Macclesfield Town FC.svg for seasons 2010-2012, 2019-2020; seasons 2009: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 57",
+   "league": "seasons"
+  },
   "f-manchester-city.1994": {
    "club": "Manchester City",
    "years": "1994–1997",
@@ -7360,6 +8402,20 @@
    "evidence": "tr.wikipedia Manisaspor: «2000 yılında Vestel'in sponsorluğunda Vestel Manisaspor adını aldı. 29 Ağustos 2007 tarihinde Vestel'in sponsorluktan çekilmesinin ardından takımın adı yeniden Manisaspor oldu» (Vestel Manisaspor from 2000 to 29 August 2007); this file is captioned «Kulübün adı Vestel Manisaspor iken kullandığı logo» (the logo used while the club was Vestel Manisaspor). en.wikipedia Manisaspor, «Colours and badge»: «The club changed their badge, removing the Vestel moniker and replacing it with the club's foundation year (1965)» (the badge of the club's 2008 website, az.wikipedia's file of 23 May 2009). ru.wikipedia's Vestel_Manisaspor.svg of 25 March 2010 is the same drawing.",
    "verified": "shield with a red top band carrying the white crescent and star, VESTEL in white, MANİSASPOR in white on black, yellow grape bunches either side of a black M S monogram, a football at the foot; 500×500 PNG",
    "league": "football-d"
+  },
+  "f-margate.2003": {
+   "club": "Margate",
+   "years": "2003–2004",
+   "kind": "wayback",
+   "title": "File:MargateFC.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:MargateFC.jpg",
+   "wayback": "https://web.archive.org/web/20060723144546im_/https://upload.wikimedia.org/wikipedia/en/thumb/e/e2/MargateFC.jpg/125px-MargateFC.jpg",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "4a9db5381468946d3e1ad44ed87601b244fa73ec06dea9593a1b3b7ab0231058",
+   "cache": "data-src/crest-eras/files/seasons/f-margate/2003-MargateFC.jpg",
+   "evidence": "seasons 2003-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 130",
+   "league": "seasons"
   },
   "f-maritimo.2023": {
    "club": "Marítimo",
@@ -7529,6 +8585,34 @@
    "verified": "the club roundel (white ring, \"MONTPELLIER Hérault Sport Club\", 1974, orange inner ring) with a big blue \"40\" in place of the blue-and-white stripes",
    "league": "football-c"
   },
+  "f-montrose.1994": {
+   "club": "Montrose",
+   "years": "1994–2004",
+   "kind": "wikipedia",
+   "title": "File:Montrose FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Montrose_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/2/22/Montrose_FC_crest.svg/330px-Montrose_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "7c542b588c0d082a4502a8bf0760be69f4d44ac87373f7fb65cb3024f414e99b",
+   "cache": "data-src/crest-eras/files/seasons/f-montrose/1994-Montrose_FC_crest.png",
+   "evidence": "no dated source for seasons 1994, 1999-2004: today's crest (the infobox of https://en.wikipedia.org/wiki/Montrose_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 02 cell 131",
+   "league": "seasons"
+  },
+  "f-motherwell.1994": {
+   "club": "Motherwell",
+   "years": "1994–2024",
+   "kind": "commons",
+   "title": "File:Motherwell FC crest.svg",
+   "page": "https://commons.wikimedia.org/wiki/File:Motherwell_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Motherwell_FC_crest.svg/330px-Motherwell_FC_crest.svg.png",
+   "licence": "see the file page",
+   "sha256": "efccff8063214c47c13f0999910d9865b47fe45ed06984576e44b0b1d15c3cdf",
+   "cache": "data-src/crest-eras/files/seasons/f-motherwell/1994-Motherwell_FC_crest.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Motherwell_F.C. (2007-06-15, 2008-02-16, 2009-04-24, 2010-04-23, 2011-03-02, 2012-06-22, 2013-06-08, 2014-04-28, 2015-06-04, 2016-04-03, 2016-11-14, 2017-11-28, 2019-04-07, 2020-06-18, 2021-04-18, 2022-05-03, 2023-03-14, 2024-04-20): its infobox showed File:Motherwell logo.png / Motherwell FC.svg / Motherwell FC logo.png / Motherwell FC crest.svg for seasons 2007-2024; seasons 1994, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 132",
+   "league": "seasons"
+  },
   "f-msv-duisburg.1994": {
    "club": "MSV Duisburg",
    "years": "1994–1995",
@@ -7627,6 +8711,51 @@
    "verified": "contact sheet: black-white striped shield with two sea horses, castle on top, blue NEWCASTLE UNITED ribbon",
    "league": "football-a"
   },
+  "f-newport-county.2002": {
+   "club": "Newport County",
+   "years": "2002–2004",
+   "kind": "wayback",
+   "title": "File:Newport County crest.png",
+   "page": "https://en.wikipedia.org/wiki/File:Newport_County_crest.png",
+   "wayback": "https://web.archive.org/web/20060725171953im_/https://upload.wikimedia.org/wikipedia/en/thumb/b/b0/Newport_County_crest.png/150px-Newport_County_crest.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "a5ca70ed954368cec9653fe2c4bcaf891f30985da3ac7cd428b14a4ce644ea26",
+   "cache": "data-src/crest-eras/files/seasons/f-newport-county/2002-Newport_County_crest.png",
+   "evidence": "seasons 2002-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 133",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
+  "f-newry-town.2001": {
+   "club": "Newry Town",
+   "years": "2001–2004",
+   "kind": "wayback",
+   "title": "File:Newry.png",
+   "page": "https://en.wikipedia.org/wiki/File:Newry.png",
+   "wayback": "https://web.archive.org/web/20070705085510im_/https://upload.wikimedia.org/wikipedia/en/5/5d/Newry.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "d17567344ab780b4b3fc7d75f33f0983a0417c2025f889b05cac503b1b93e605",
+   "cache": "data-src/crest-eras/files/seasons/f-newry-town/2001-Newry.png",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 134",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
+  "f-newtown-afc.2002": {
+   "club": "Newtown AFC",
+   "years": "2002–2004",
+   "kind": "wayback",
+   "title": "File:Newtown FC.PNG",
+   "page": "https://en.wikipedia.org/wiki/File:Newtown_FC.PNG",
+   "wayback": "https://web.archive.org/web/20110629110334im_/https://upload.wikimedia.org/wikipedia/en/thumb/7/70/Newtown_FC.PNG/100px-Newtown_FC.PNG",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "0f5d55a7b0b4b21ee6292d91a0d0fb115d3352aaffd71e806ff67588dad07a1a",
+   "cache": "data-src/crest-eras/files/seasons/f-newtown-afc/2002-Newtown_FC.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Newtown_A.F.C. (2011-06-29): its infobox showed File:Newtown FC.PNG for seasons 2004; seasons 2002-2003: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 135",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
   "f-nimes.2019": {
    "club": "Nîmes Olympique",
    "years": "2019–2021",
@@ -7671,6 +8800,20 @@
    "league": "football-d",
    "background": "#ffffff"
   },
+  "f-northwich-victoria.2002": {
+   "club": "Northwich Victoria",
+   "years": "2002–2004",
+   "kind": "wikipedia",
+   "title": "File:Northwich Victoria F.C. logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Northwich_Victoria_F.C._logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/5/59/Northwich_Victoria_F.C._logo.svg/330px-Northwich_Victoria_F.C._logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "28ccb05455e45af58e240c61b349790d9ec88731c6054f0fef51460fab20e0fa",
+   "cache": "data-src/crest-eras/files/seasons/f-northwich-victoria/2002-Northwich_Victoria_F.C._logo.png",
+   "evidence": "no dated source for seasons 2002-2004: today's crest (the infobox of https://en.wikipedia.org/wiki/Northwich_Victoria_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 02 cell 136",
+   "league": "seasons"
+  },
   "f-norwich-city.2012": {
    "club": "Norwich City",
    "years": "2012–2022",
@@ -7712,6 +8855,21 @@
    "evidence": "it.wikipedia \"Novara Football Club\", Stemma gallery: this Commons file \"Stemma utilizzato dal 2003 al 2021 con la Stella d'oro al Merito Sportivo\" (between the 1983-2003 crest and the 2021 refoundation's); the Commons description dates the drawing \"by 2011\", taken from the club's June 2011 magazine, the summer Novara Calcio went up to Serie A for 2011-12. Round 1 had found no picture",
    "verified": "upright oval with a blue rim: NOVARA on top and CALCIO below in white on blue, \"1908\" down both sides, a gold star over the red shield with the white cross of Novara on a light-blue field (checked as the game draws it: sharp renders this Inkscape SVG, whose ring is a masked embedded image, correctly at the game's 512 px; the small contact-sheet render came out blank)",
    "league": "football-b"
+  },
+  "f-nuneaton-borough.2000": {
+   "club": "Nuneaton Borough",
+   "years": "2000–2000",
+   "kind": "wayback",
+   "title": "File:NuneatonBorough.png",
+   "page": "https://en.wikipedia.org/wiki/File:NuneatonBorough.png",
+   "wayback": "https://web.archive.org/web/20071009025112im_/https://upload.wikimedia.org/wikipedia/en/thumb/b/b1/NuneatonBorough.png/125px-NuneatonBorough.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "45da823a1b555cd33dd8ba4ad5341912a91fdb93c8ddea74ed0ea254bb45ff6c",
+   "cache": "data-src/crest-eras/files/seasons/f-nuneaton-borough/2000-NuneatonBorough.png",
+   "evidence": "seasons 2000: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 137",
+   "league": "seasons",
+   "background": "#ffffff"
   },
   "f-odense-boldklub.2000": {
    "club": "OB",
@@ -7908,6 +9066,20 @@
    "evidence": "fr.wikipedia \"Olympique de Marseille\", section \"Logos\", gallery \"Historique des logos de l'OM\": captioned \"Logo 100e anniversaire (1998-1999)\"; used on \"Saison 1998-1999 de l'Olympique de Marseille\"",
    "verified": "purple disc with gold ring \"1899 100 1999 DROIT AU BUT\", light-blue M and white star",
    "league": "football-c"
+  },
+  "f-omagh-town.2001": {
+   "club": "Omagh Town",
+   "years": "2001–2004",
+   "kind": "wikipedia",
+   "title": "File:Omaghbadge130.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Omaghbadge130.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/4/4a/Omaghbadge130.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "8ee98e17214d3b19124bca9e2b3abcf1e92c288cb3cd913c6b2b442e626a238e",
+   "cache": "data-src/crest-eras/files/seasons/f-omagh-town/2001-Omaghbadge130.jpg",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 138",
+   "league": "seasons"
   },
   "f-paderborn.2015": {
    "club": "SC Paderborn 07",
@@ -8133,6 +9305,20 @@
    "verified": "PARMA F.C. shield with a pointed top edge, a tapered point, new lettering and a yellow border",
    "league": "football-b"
   },
+  "f-partick-thistle.1994": {
+   "club": "Partick Thistle",
+   "years": "1994–2004",
+   "kind": "wikipedia",
+   "title": "File:Partick Thistle FC logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Partick_Thistle_FC_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5c/Partick_Thistle_FC_logo.svg/330px-Partick_Thistle_FC_logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "9b10a05aec807c8569f27323221d1700191cd23e26869a5bb021676ca1dac1aa",
+   "cache": "data-src/crest-eras/files/seasons/f-partick-thistle/1994-Partick_Thistle_FC_logo.png",
+   "evidence": "seasons 1994, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 139",
+   "league": "seasons"
+  },
   "f-partizan-belgrade.2002": {
    "club": "FK Partizan",
    "years": "2002–2004",
@@ -8175,6 +9361,21 @@
    "verified": "shield: PESCARA CALCIO in white on royal blue, a white dolphin over light cyan waves, 1936 (it.wikipedia's current Pescara_Calcio.svg is navy and mid-blue)",
    "league": "football-b"
   },
+  "f-peterhead.2001": {
+   "club": "Peterhead",
+   "years": "2001–2004",
+   "kind": "wayback",
+   "title": "File:Peterheadbadge.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Peterheadbadge.jpg",
+   "wayback": "https://web.archive.org/web/20070705090324im_/https://upload.wikimedia.org/wikipedia/en/d/d5/Peterheadbadge.jpg",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "760274adc69c661b52d13f0b477fb8e248ea430a6c7a9b5cbfb03d91c6066c80",
+   "cache": "data-src/crest-eras/files/seasons/f-peterhead/2001-Peterheadbadge.jpg",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 140",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
   "f-pfc-cska-moscow.2010": {
    "club": "PFC CSKA Moscow",
    "years": "2010–2014",
@@ -8202,6 +9403,35 @@
    "evidence": "it.wikipedia \"Piacenza Calcio 1919\", Stemma: \"Nei primi anni della presidenza di Leonardo Garilli è entrato in uso lo stemma rappresentante una lupa bianca su fondo rosso\" (Garilli was president 1983-1996, it.wikipedia \"Leonardo Garilli\"); no later crest is mentioned, and the file is the trademark of Piacenza Foot-Ball Club S.p.A., the club of these seasons, whose marks the refounded club rents; the en.wikipedia \"Piacenza Calcio\" capture of 2007-02-16 (web.archive.org/web/20070216023613) shows the same diamond",
    "verified": "red diamond with white rim, white wolf's head, red \"PIACENZA CALCIO\" on the white lower edges; the 2007 en.wikipedia logo beside it is the same",
    "league": "football-b"
+  },
+  "f-port-talbot-town.2002": {
+   "club": "Port Talbot Town",
+   "years": "2002–2004",
+   "kind": "wikipedia",
+   "title": "File:Port Talbot Town FC logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Port_Talbot_Town_FC_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/1/16/Port_Talbot_Town_FC_logo.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "0e49ff64d13ea613c8b8e937d1c7a6e30df81b453bbe7a44eb85427e8348835d",
+   "cache": "data-src/crest-eras/files/seasons/f-port-talbot-town/2002-Port_Talbot_Town_FC_logo.png",
+   "evidence": "seasons 2002-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 141",
+   "league": "seasons"
+  },
+  "f-portadown.2001": {
+   "club": "Portadown",
+   "years": "2001–2004",
+   "kind": "wayback",
+   "title": "File:Portadown.png",
+   "page": "https://en.wikipedia.org/wiki/File:Portadown.png",
+   "wayback": "https://web.archive.org/web/20070705090049im_/https://upload.wikimedia.org/wikipedia/en/7/7a/Portadown.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "2168b242622afa798c3f7a550eeca8ec262e4bbb8f83b02c8fd03a0d36f91862",
+   "cache": "data-src/crest-eras/files/seasons/f-portadown/2001-Portadown.png",
+   "evidence": "seasons 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 142",
+   "league": "seasons",
+   "background": "#ffffff"
   },
   "f-portimonense-sc.2011": {
    "club": "Portimonense",
@@ -8258,6 +9488,35 @@
    "evidence": "en.wikipedia File:PSV Eindhoven.svg history: the version of 19 April 2012 (250 × 173, 54 KB) was replaced on 31 May 2020 with 'new Font since May 2020, stars part of the Logo', i.e. the two stars (for twenty league titles, en.wikipedia PSV Eindhoven) are part of the logo only from 2020-21; Wayback: the en.wikipedia infobox shows Logo psv eindhoven.png in the 2008 captures (round 3: the 2007, 2009 and 2011 thumbnails are this starless oval) and PSV Eindhoven.svg in the captures of 2013-06-17, 2013-12-11 and 2017 (three); the SVG served is the capture of 2016-06-08, the 2012 version; nl.wikipedia 'Logo': today's oval since the mid-1990s, 'EST 1913' added in the wreath in 2014 (small lettering, the same at 64 px). en.wikipedia: for the 2013 centenary 'a laurel wreath and the number \"100\" in gold were temporarily added to the crest' (no picture, season not given; left in this era)",
    "verified": "contact sheet: gold-wreathed oval of red and white stripes, white pennant on a staff with black PSV, no stars above and no EST 1913; today's crest adds two gold stars above the oval and EST 1913 in the wreath",
    "league": "football-a"
+  },
+  "f-queen-of-the-south.1994": {
+   "club": "Queen Of The South",
+   "years": "1994–2004",
+   "kind": "wayback",
+   "title": "File:Biglogo.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Biglogo.gif",
+   "wayback": "https://web.archive.org/web/20071222023942im_/https://upload.wikimedia.org/wikipedia/en/2/29/Biglogo.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "63752a1f2033351ac0574960698159dd91dbf096e3357c094aafca496d019ca2",
+   "cache": "data-src/crest-eras/files/seasons/f-queen-of-the-south/1994-Biglogo.gif",
+   "evidence": "seasons 1994, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 143",
+   "league": "seasons"
+  },
+  "f-queen-s-park.1994": {
+   "club": "Queen's Park",
+   "years": "1994–2004",
+   "kind": "wayback",
+   "title": "File:Queensparkfc.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Queensparkfc.jpg",
+   "wayback": "https://web.archive.org/web/20060105014542im_/https://upload.wikimedia.org/wikipedia/en/5/5b/Queensparkfc.jpg",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "cc9ff572ef53a8bdbef728be820f9dcb2ba1b842fa740f920a0e4862a796ff42",
+   "cache": "data-src/crest-eras/files/seasons/f-queen-s-park/1994-Queensparkfc.jpg",
+   "evidence": "seasons 1994, 2001-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 144",
+   "league": "seasons",
+   "background": "#ffffff"
   },
   "f-queens-park-rangers.1994": {
    "club": "Queens Park Rangers",
@@ -8345,6 +9604,21 @@
    "verified": "blue disc with a navy three-branch stork/spire shape and three yellow stars, navy ring text \"RACING CLUB DE STRASBOURG FOOTBALL\"",
    "league": "football-c"
   },
+  "f-raith-rovers.1994": {
+   "club": "Raith Rovers",
+   "years": "1994–2004",
+   "kind": "wayback",
+   "title": "File:Rrfc.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Rrfc.jpg",
+   "wayback": "https://web.archive.org/web/20070216104137im_/https://upload.wikimedia.org/wikipedia/en/9/92/Rrfc.jpg",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "6ad86be4d805294a66b6bf5c19a87cca3a91faa7edce5d923c3ba53a54cdc832",
+   "cache": "data-src/crest-eras/files/seasons/f-raith-rovers/1994-Rrfc.jpg",
+   "evidence": "seasons 1994, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 145",
+   "league": "seasons",
+   "background": "#ffffff"
+  },
   "f-rangers-fc.2007": {
    "club": "Rangers",
    "years": "2007–2012",
@@ -8357,6 +9631,20 @@
    "cache": "data-src/crest-eras/files/football-d/f-rangers-fc/2007-Logo_Rangers_FC_-_1991.svg",
    "evidence": "en.wikipedia Rangers F.C. \"Crest and colours\": Rangers have two official crests; the lion rampant club crest is the club's official logo (\"used by the media, on club merchandise and on official club documents\"; the RFC scroll crest is worn on the shirts); it \"was again updated slightly in the early 1990s and then once more in 2020 to the current version\"; fr.wikipedia Rangers Football Club gallery: this file captioned \"1991-2020\". The en article's infobox showed the same design in Wayback captures of 2005-10-30 (Rangers.png), 2010-12-15 and 2019-05-16 (Rangers_FC.svg, its 2014 version saved in the work folder)",
    "verified": "contact sheet: white roundel, RANGERS curved down the left and FOOTBALL CLUB round the top and right in blue, inner blue rings, red lion rampant on blue, READY below; the same as the 2005 and 2019 Wayback pictures (today: RANGERS across the top and FOOTBALL CLUB along the bottom in heavier letters, the 2020 redraw)",
+   "league": "football-d"
+  },
+  "f-rangers.2015": {
+   "club": "Rangers (listed as: Rangers)",
+   "years": "2015–2019",
+   "kind": "wayback",
+   "title": "File:Rangers FC.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Rangers_FC.svg",
+   "wayback": "https://web.archive.org/web/20150617150347im_/https://upload.wikimedia.org/wikipedia/en/thumb/4/43/Rangers_FC.svg/250px-Rangers_FC.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "ebdd10579808a82b364e00354680b4d2c889efd6ca529200e77c2b9257d9ae77",
+   "cache": "data-src/crest-eras/files/seasons/f-rangers/2015-Rangers_FC.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Rangers_F.C. (2015-06-17, 2017-06-13, 2018-03-09, 2019-05-16): its infobox showed File:Rangers FC.svg for seasons 2015, 2017-2019",
+   "verified": "checked by eye: sheet 02 cell 146",
    "league": "football-d"
   },
   "f-rangers.2022": {
@@ -8739,6 +10027,20 @@
    "verified": "maroon stylised R with a black-and-white football rolling into it and speed lines, no shield; matches the 2007 en.wikipedia capture's logo",
    "league": "football-b"
   },
+  "f-rhyl.2002": {
+   "club": "Rhyl",
+   "years": "2002–2004",
+   "kind": "wayback",
+   "title": "File:Rhyl FC Logo.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Rhyl_FC_Logo.gif",
+   "wayback": "https://web.archive.org/web/20070710003913im_/https://upload.wikimedia.org/wikipedia/en/c/cd/Rhyl_FC_Logo.gif",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "f381f98d79682c2312e5291e9d64a807d12c27f9a180e8f9ec3e8133a84f3a10",
+   "cache": "data-src/crest-eras/files/seasons/f-rhyl/2002-Rhyl_FC_Logo.gif",
+   "evidence": "seasons 2002-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 147",
+   "league": "seasons"
+  },
   "f-rkc-waalwijk.2009": {
    "club": "RKC Waalwijk",
    "years": "2009–2015",
@@ -8837,6 +10139,20 @@
    "verified": "the two-star Rosenborg crest the game showed as its crest of today until round 3 (d578-1376), which the 2024 logo without stars replaced",
    "league": "football-d"
   },
+  "f-ross-county.1999": {
+   "club": "Ross County",
+   "years": "1999–2024",
+   "kind": "wayback",
+   "title": "File:Ross County F.C. logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Ross_County_F.C._logo.png",
+   "wayback": "https://web.archive.org/web/20250531031651im_/https://upload.wikimedia.org/wikipedia/en/thumb/5/57/Ross_County_F.C._logo.png/250px-Ross_County_F.C._logo.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "f9fec47f061a95cfcd5478399e0e5ac26961eb109f48a921141059c56db6cc2d",
+   "cache": "data-src/crest-eras/files/seasons/f-ross-county/1999-Ross_County_F.C._logo.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Ross_County_F.C. (2015-06-09, 2016-06-29, 2017-03-20, 2017-07-01, 2019-12-17, 2021-04-13, 2022-05-05, 2023-02-13, 2024-05-14): its infobox showed File:Ross County F.C. logo.png for seasons 2015-2018, 2020-2024; seasons 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 148",
+   "league": "seasons"
+  },
   "f-rsc-anderlecht.1994": {
    "club": "RSC Anderlecht",
    "years": "1994–2010",
@@ -8920,6 +10236,20 @@
    "evidence": "ru \"Эмблема клуба\": a new emblem presented on 24 July 2016 (Sellout Sport System and A. Ermolaev), replaced by today's on 1 July 2019; gallery 2016—2019 is this file (uploaded 23 August 2016, from rubin-kazan.ru).",
    "verified": "white shield with a red rim, РУБИН КАЗАНЬ, a black-and-green Zilant with red, 1958; today's 2019 crest is a crimson shield with a white dragon: different",
    "league": "football-d"
+  },
+  "f-rushden-diamonds.1994": {
+   "club": "Rushden & Diamonds",
+   "years": "1994–2004",
+   "kind": "wayback",
+   "title": "File:Rushden & Diamonds badge.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Rushden_%26_Diamonds_badge.gif",
+   "wayback": "https://web.archive.org/web/20051031022203im_/https://upload.wikimedia.org/wikipedia/en/e/e3/Rushden_%26_Diamonds_badge.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "a767b5c9b6d115c8b1a18f116f29fe669d6bfe2ad28ba91e2d9c7b74e0eb0291",
+   "cache": "data-src/crest-eras/files/seasons/f-rushden-diamonds/1994-Rushden_Diamonds_badge.gif",
+   "evidence": "seasons 1994, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 149",
+   "league": "seasons"
   },
   "f-s-d-compostela.1995": {
    "club": "SD Compostela (listed as: S.D. Compostela)",
@@ -9144,6 +10474,20 @@
    "evidence": "en.wikipedia File:SC Olhanense.png uploaded 27 Feb 2010 and still the infobox crest of S.C. Olhanense; de.wikipedia's SC Olhanense Logo.svg (10 Sep 2008) and pt.wikipedia's Logo Olhanense.png (11 Dec 2011, from scolhanense.com) show the same crest",
    "verified": "shield split black / red with a white diagonal band S.C.O., gold lion on top",
    "league": "football-a"
+  },
+  "f-scarborough.1994": {
+   "club": "Scarborough",
+   "years": "1994–2003",
+   "kind": "wikipedia",
+   "title": "File:Scarborough FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Scarborough_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9a/Scarborough_FC_crest.svg/330px-Scarborough_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "491916057cf0f09f099fe8882e4765da81650e2098be0283770c1ec3ac99f30c",
+   "cache": "data-src/crest-eras/files/seasons/f-scarborough/1994-Scarborough_FC_crest.png",
+   "evidence": "seasons 1994-1997, 1999-2001, 2003: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 150",
+   "league": "seasons"
   },
   "f-sd-eibar.2015": {
    "club": "SD Eibar",
@@ -9371,6 +10715,20 @@
    "verified": "contact sheet: halo over a black-and-white football, red-and-white striped scarf, shield with a green tree over blue-white water and a white rose on red, black scroll SOUTHAMPTON FC; same design as the 2007 capture Southampton-FC.png",
    "league": "football-a"
   },
+  "f-southport.1999": {
+   "club": "Southport",
+   "years": "1999–2003",
+   "kind": "wikipedia",
+   "title": "File:Southport FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Southport_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/3/35/Southport_FC_crest.svg/330px-Southport_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "13b9c6ee60d34669ab260360cbb77de2fe90ddb95a554c1518e2f39ef94a18b4",
+   "cache": "data-src/crest-eras/files/seasons/f-southport/1999-Southport_FC_crest.png",
+   "evidence": "seasons 1999-2001, 2003: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 151",
+   "league": "seasons"
+  },
   "f-spal.2018": {
    "club": "SPAL",
    "years": "2018–2020",
@@ -9596,6 +10954,48 @@
    "verified": "viewed on contact sheet: SSV Ulm 1846 club crest/badge (correct club, a crest not a kit or wordmark; file SSV_Ulm_1846.svg)",
    "league": "football-c"
   },
+  "f-st-johnstone-fc.2025": {
+   "club": "St. Johnstone FC",
+   "years": "2025–2025",
+   "kind": "wikipedia",
+   "title": "File:St Johnstone FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:St_Johnstone_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/4/40/St_Johnstone_FC_crest.svg/330px-St_Johnstone_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "1a2fde4a02eb57b739296234c86c35eedc999bb77ab5c4d3d0d1f95cf53c64b6",
+   "cache": "data-src/crest-eras/files/seasons/f-st-johnstone-fc/2025-St_Johnstone_FC_crest.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/St_Johnstone_F.C. (2025-06-21): its infobox showed File:St Johnstone Badge.png for seasons 2025",
+   "verified": "checked by eye: sheet 01 cell 65",
+   "league": "seasons"
+  },
+  "f-st-johnstone.1994": {
+   "club": "St. Johnstone",
+   "years": "1994–2024",
+   "kind": "wayback",
+   "title": "File:StJohnstoneFC crest new.png",
+   "page": "https://en.wikipedia.org/wiki/File:StJohnstoneFC_crest_new.png",
+   "wayback": "https://web.archive.org/web/20150610231659im_/https://upload.wikimedia.org/wikipedia/en/thumb/f/f5/StJohnstoneFC_crest_new.png/175px-StJohnstoneFC_crest_new.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "885b825eb9eda67fb3395de12b09f8bab8d36dca475caddac0661f7b23225694",
+   "cache": "data-src/crest-eras/files/seasons/f-st-johnstone/1994-StJohnstoneFC_crest_new.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/St_Johnstone_F.C. (2015-06-10, 2016-06-02, 2016-11-13, 2017-09-19, 2019-04-27, 2021-06-02, 2022-06-01, 2023-05-16, 2024-05-22): its infobox showed File:StJohnstoneFC crest new.png / StJohnstoneFC Logo.svg for seasons 2015-2024; seasons 1994, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 64",
+   "league": "seasons"
+  },
+  "f-st-mirren.1994": {
+   "club": "St. Mirren",
+   "years": "1994–2026",
+   "kind": "wikipedia",
+   "title": "File:St Mirren FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:St_Mirren_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/2/27/St_Mirren_FC_crest.svg/330px-St_Mirren_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "d7adddb4a9f3585e02d9cb161f8d5719274b85c6d4583673415bba8e87539646",
+   "cache": "data-src/crest-eras/files/seasons/f-st-mirren/1994-St_Mirren_FC_crest.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/St_Mirren_F.C. (2008-03-01, 2012-12-20, 2019-03-26, 2020-03-16, 2021-05-20, 2022-06-19, 2023-03-26, 2024-04-17, 2025-06-27, 2026-06-08): its infobox showed File:Mirren.gif / St Mirren FC logo.svg / St Mirren.png / St mirren fc logo.png / St Mirren FC crest.svg for seasons 2008, 2013-2015, 2019-2026; seasons 1994, 1999-2004, 2007, 2009-2012: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 152",
+   "league": "seasons"
+  },
   "f-stade-brestois-29.2025": {
    "club": "Stade Brestois 29",
    "years": "2025–2026",
@@ -9736,6 +11136,20 @@
    "verified": "red/black octagon with the two ermines and ball, black \"STADE RENNAIS FOOTBALL CLUB\" lettering below",
    "league": "football-c"
   },
+  "f-stalybridge-celtic.2002": {
+   "club": "Stalybridge Celtic",
+   "years": "2002–2002",
+   "kind": "wikipedia",
+   "title": "File:StalybridgeCeltic.png",
+   "page": "https://en.wikipedia.org/wiki/File:StalybridgeCeltic.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/c/c7/StalybridgeCeltic.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "24cf19406120fb37ec96f29a1fb7ab584464886b9c577937f0425dd69ea25bdc",
+   "cache": "data-src/crest-eras/files/seasons/f-stalybridge-celtic/2002-StalybridgeCeltic.png",
+   "evidence": "seasons 2002: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 153",
+   "league": "seasons"
+  },
   "f-standard-de-liege.2010": {
    "club": "Standard Liège",
    "years": "2010–2013",
@@ -9750,6 +11164,34 @@
    "verified": "contact sheet: the yellow crest of 1972-2009 with a yellow star above the crown",
    "league": "football-d"
   },
+  "f-stenhousemuir.1994": {
+   "club": "Stenhousemuir",
+   "years": "1994–2004",
+   "kind": "wikipedia",
+   "title": "File:Stenhousemuir FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Stenhousemuir_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/1/1f/Stenhousemuir_FC_crest.svg/330px-Stenhousemuir_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "cbbf2f1ba90e5054e614dda310a5a461ef116d662419b761be389e391756d329",
+   "cache": "data-src/crest-eras/files/seasons/f-stenhousemuir/1994-Stenhousemuir_FC_crest.png",
+   "evidence": "no dated source for seasons 1994, 2001-2004: today's crest (the infobox of https://en.wikipedia.org/wiki/Stenhousemuir_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 02 cell 154",
+   "league": "seasons"
+  },
+  "f-stirling-albion.1994": {
+   "club": "Stirling Albion",
+   "years": "1994–2004",
+   "kind": "wayback",
+   "title": "File:Stirling albion fc badge.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Stirling_albion_fc_badge.jpg",
+   "wayback": "https://web.archive.org/web/20050817084133im_/https://upload.wikimedia.org/wikipedia/en/8/8b/Stirling_albion_fc_badge.jpg",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "45a46d7c7f6c8af92bc103e95d59e6e74b5d4da2ab6cf79c1122781c4ee74d9e",
+   "cache": "data-src/crest-eras/files/seasons/f-stirling-albion/1994-Stirling_albion_fc_badge.jpg",
+   "evidence": "seasons 1994, 1999-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 155",
+   "league": "seasons"
+  },
   "f-stoke-city.2009": {
    "club": "Stoke City",
    "years": "2009–2018",
@@ -9763,6 +11205,20 @@
    "evidence": "en.wikipedia Stoke City F.C.: \"They changed their crest in 2001 to the current version which includes their nickname The Potters\"; a new crest only from 2026-27",
    "verified": "contact sheet: red-white striped shield, STOKE CITY, THE POTTERS ribbon, 1863",
    "league": "football-a"
+  },
+  "f-stranraer.1994": {
+   "club": "Stranraer",
+   "years": "1994–2004",
+   "kind": "wikipedia",
+   "title": "File:Stranraer FC crest.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Stranraer_FC_crest.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/2/21/Stranraer_FC_crest.svg/330px-Stranraer_FC_crest.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "9bc78e0891507d034e9453ec5974c90447e539b9fac8c3a21625ade9a31c291c",
+   "cache": "data-src/crest-eras/files/seasons/f-stranraer/1994-Stranraer_FC_crest.png",
+   "evidence": "no dated source for seasons 1994, 1999-2004: today's crest (the infobox of https://en.wikipedia.org/wiki/Stranraer_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 02 cell 156",
+   "league": "seasons"
   },
   "f-sunderland.1997": {
    "club": "Sunderland",
@@ -9792,6 +11248,21 @@
    "verified": "violet oval C with a white inner oval and a violet-and-white football at its right end; the de 1978 file is the same design in magenta",
    "league": "football-d"
   },
+  "f-swansea-city.2002": {
+   "club": "Swansea City",
+   "years": "2002–2004",
+   "kind": "wayback",
+   "title": "File:Swansea city afc crest.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Swansea_city_afc_crest.gif",
+   "wayback": "https://web.archive.org/web/20051023031004im_/https://upload.wikimedia.org/wikipedia/en/3/34/Swansea_city_afc_crest.gif",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "ae6984f9a08b02fef04f295b3933465ad7301a64766eceddebd4a98930b01c15",
+   "cache": "data-src/crest-eras/files/seasons/f-swansea-city/2002-Swansea_city_afc_crest.gif",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Swansea_City_A.F.C. (2005-10-23): its infobox showed File:Swansea city afc crest.gif for seasons 2004; seasons 2002-2003: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 157",
+   "league": "football-a",
+   "background": "#ffffff"
+  },
   "f-swansea-city.2012": {
    "club": "Swansea City",
    "years": "2012–2012",
@@ -9820,6 +11291,20 @@
    "verified": "contact sheet: gold swan shield CENTENARY 1912-2012",
    "league": "football-a"
   },
+  "f-telford-united.1994": {
+   "club": "Telford United",
+   "years": "1994–2004",
+   "kind": "wikipedia",
+   "title": "File:Telford United.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Telford_United.gif",
+   "download": "https://upload.wikimedia.org/wikipedia/en/a/a9/Telford_United.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "14356b10b6ac7f2026c6287184ad98416636bf8a1c871f401a24aacb91a4f0a3",
+   "cache": "data-src/crest-eras/files/seasons/f-telford-united/1994-Telford_United.gif",
+   "evidence": "no dated source for seasons 1994, 1999-2002, 2004: today's crest (the infobox of https://en.wikipedia.org/wiki/Telford_United_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 02 cell 158",
+   "league": "seasons"
+  },
   "f-torino.1994": {
    "club": "Torino",
    "years": "1994–2005",
@@ -9833,6 +11318,20 @@
    "evidence": "it.wikipedia \"Torino Football Club\", Stemma: \"Dal 1990 fino al fallimento, lo stemma in uso richiamò quello utilizzato ai tempi del Grande Torino, con l'importante differenza che nel lato destro dell'ovale si incrociavano la lettera 'T' e 'C' (iniziali di 'Torino Calcio')\" (en.wikipedia the same); Commons description \"Torino logo 1990-2005\" (en.wikipedia captions it \"Crest of Torino (1946-1983, 1990-2005)\")",
    "verified": "gold-rimmed oval: Turin's arms (blue shield, golden bull, crown) on white at left, maroon right half with crossed T and C (today: maroon shield with a white bull, TORINO FC 1906)",
    "league": "football-b"
+  },
+  "f-torquay-united.1994": {
+   "club": "Torquay United",
+   "years": "1994–2014",
+   "kind": "wayback",
+   "title": "File:Torquay United FC.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Torquay_United_FC.svg",
+   "wayback": "https://web.archive.org/web/20100412120308im_/https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Torquay_United_FC.svg/180px-Torquay_United_FC.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "58de86ffd26ee6e60903ee3362067a2e4e1928df694011a8e907f7d2c5737b04",
+   "cache": "data-src/crest-eras/files/seasons/f-torquay-united/1994-Torquay_United_FC.png",
+   "evidence": "Wayback captures of https://en.wikipedia.org/wiki/Torquay_United_F.C. (2007-06-15, 2010-04-12, 2011-10-06, 2013-06-04): its infobox showed File:Torquay United Football Club Logo.png / Torquay United FC.svg for seasons 2007, 2010-2014; seasons 1994-1997, 2000-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 160",
+   "league": "seasons"
   },
   "f-tottenham-hotspur.1994": {
    "club": "Tottenham Hotspur",
@@ -10072,6 +11571,21 @@
    "evidence": "fr.wikipedia \"US Boulogne Côte d'Opale\", Logos: \"2009-2025\" (Logo_US_Boulogne_CO.svg)",
    "verified": "viewed on contact sheet: US Boulogne CO club crest/badge (correct club, a crest not a kit or wordmark; file Logo_US_Boulogne_CO.svg)",
    "league": "football-c"
+  },
+  "f-uwic-inter-cardiff.2002": {
+   "club": "UWIC Inter Cardiff",
+   "years": "2002–2004",
+   "kind": "wayback",
+   "title": "File:Intercardiff.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Intercardiff.jpg",
+   "wayback": "https://web.archive.org/web/20101117073517im_/https://upload.wikimedia.org/wikipedia/en/7/71/Intercardiff.jpg",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "84d51d97b2db48d08c65be66dabcdefbc6ee0a348fc200ebd0a67130d69c1dcf",
+   "cache": "data-src/crest-eras/files/seasons/f-uwic-inter-cardiff/2002-Intercardiff.jpg",
+   "evidence": "seasons 2002-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 01 cell 93",
+   "league": "seasons",
+   "background": "#ffffff"
   },
   "f-valencia-cf.2005": {
    "club": "Valencia CF",
@@ -10381,6 +11895,20 @@
    "verified": "contact sheet: red hart's head with antlers on a shield halved black and yellow, red border, WATFORD in black on a yellow bar at the top; the 2007 capture's Watford.gif is the same design",
    "league": "football-a"
   },
+  "f-welling-united.1994": {
+   "club": "Welling United",
+   "years": "1994–2000",
+   "kind": "wikipedia",
+   "title": "File:Welling United F.C. logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Welling_United_F.C._logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/3/3e/Welling_United_F.C._logo.svg/330px-Welling_United_F.C._logo.svg.png",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "ba6fa8246b60029ae00b300264169b7181d78e2f57b504c02c2cfa3a15819876",
+   "cache": "data-src/crest-eras/files/seasons/f-welling-united/1994-Welling_United_F.C._logo.png",
+   "evidence": "no dated source for seasons 1994, 2000: today's crest (the infobox of https://en.wikipedia.org/wiki/Welling_United_F.C., read 2026-11-16)",
+   "verified": "checked by eye: sheet 02 cell 161",
+   "league": "seasons"
+  },
   "f-west-bromwich-albion.2003": {
    "club": "West Bromwich Albion",
    "years": "2003–2006",
@@ -10437,6 +11965,20 @@
    "verified": "contact sheet: claret shield with crossed hammers and castle, WEST HAM UNITED ribbon",
    "league": "football-a"
   },
+  "f-weymouth.2001": {
+   "club": "Weymouth",
+   "years": "2001–2001",
+   "kind": "wayback",
+   "title": "File:Weymouthfc.gif",
+   "page": "https://en.wikipedia.org/wiki/File:Weymouthfc.gif",
+   "wayback": "https://web.archive.org/web/20070808075717im_/https://upload.wikimedia.org/wikipedia/en/9/97/Weymouthfc.gif",
+   "licence": "non-free logo, as the file page states (en.wikipedia's non-free content)",
+   "sha256": "246cf88c666cc026fee0d4c00ca1ddb5d060974a573d7fead9b7f4800a36301f",
+   "cache": "data-src/crest-eras/files/seasons/f-weymouth/2001-Weymouthfc.gif",
+   "evidence": "seasons 2001: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 162",
+   "league": "seasons"
+  },
   "f-wigan-athletic.2007": {
    "club": "Wigan Athletic",
    "years": "2007–2008",
@@ -10492,6 +12034,21 @@
    "evidence": "en.wikipedia Wimbledon F.C.: \"the club adopted its own badge on election to The Football League in 1977. Yellow replaced white in 1981, and this logo was used until 2003\" (infobox file Wimbledon FC crest.svg)",
    "verified": "contact sheet: yellow-bordered blue shield with a yellow eagle, rose and a square emblem on a blue field",
    "league": "football-a"
+  },
+  "f-wrexham.2002": {
+   "club": "Wrexham",
+   "years": "2002–2004",
+   "kind": "wayback",
+   "title": "File:Wrexham badge.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Wrexham_badge.jpg",
+   "wayback": "https://web.archive.org/web/20051023030306im_/https://upload.wikimedia.org/wikipedia/en/thumb/b/bc/Wrexham_badge.jpg/140px-Wrexham_badge.jpg",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture)",
+   "sha256": "ca7914a593a728134239b3d8ea5bf0a9c994e6edfbf838c971d33723b51cf610",
+   "cache": "data-src/crest-eras/files/seasons/f-wrexham/2002-Wrexham_badge.jpg",
+   "evidence": "seasons 2002-2004: no capture shows the crest of those seasons, so the next pictured crest stands for them (round 4's reach-back rule)",
+   "verified": "checked by eye: sheet 02 cell 163",
+   "league": "seasons",
+   "background": "#ffffff"
   },
   "f-xerez-club-deportivo.2010": {
    "club": "Xerez CD (listed as: Xerez Club Deportivo)",
@@ -16581,6 +18138,13 @@
     "d208-482"
    ]
   ],
+  "f-aberaman": [
+   [
+    2003,
+    2004,
+    "f-aberaman.2003"
+   ]
+  ],
   "f-aberdeen": [
    [
     1994,
@@ -16596,6 +18160,33 @@
     2006,
     2008,
     "f-aberdeen.2006"
+   ],
+   [
+    2009,
+    2013,
+    "f-aberdeen.2009"
+   ],
+   [
+    2014,
+    2016,
+    "f-aberdeen.2014"
+   ],
+   [
+    2017,
+    2024,
+    "f-aberdeen.2009"
+   ],
+   [
+    2025,
+    2026,
+    "f-aberdeen.2014"
+   ]
+  ],
+  "f-aberystwyth-town": [
+   [
+    2003,
+    2004,
+    "f-aberystwyth-town.2003"
    ]
   ],
   "f-ac-ajaccio": [
@@ -16652,6 +18243,13 @@
     "f-aek-athens.1994"
    ]
   ],
+  "f-afan-lido": [
+   [
+    2002,
+    2004,
+    "f-afan-lido.2002"
+   ]
+  ],
   "f-afc-ajax-amsterdam": [
    [
     1998,
@@ -16671,6 +18269,20 @@
     1999,
     2001,
     "d752-1780"
+   ]
+  ],
+  "f-airdrie-united": [
+   [
+    2003,
+    2004,
+    "f-airdrie-united.2003"
+   ]
+  ],
+  "f-airdrieonians": [
+   [
+    1994,
+    2002,
+    "f-airdrieonians.1994"
    ]
   ],
   "f-aj-auxerre": [
@@ -16722,11 +18334,25 @@
     "f-albacete-balompie.1994"
    ]
   ],
+  "f-albion-rovers": [
+   [
+    1994,
+    2004,
+    "f-albion-rovers.1994"
+   ]
+  ],
   "f-alemannia-aachen": [
    [
     2007,
     2007,
     "f-alemannia-aachen.2007"
+   ]
+  ],
+  "f-alloa-athletic": [
+   [
+    1994,
+    2004,
+    "f-alloa-athletic.1994"
    ]
   ],
   "f-almere-city": [
@@ -16819,6 +18445,27 @@
     2020,
     2024,
     "d056-262"
+   ]
+  ],
+  "f-arbroath": [
+   [
+    1994,
+    2004,
+    "f-arbroath.1994"
+   ]
+  ],
+  "f-ards": [
+   [
+    2001,
+    2004,
+    "f-ards.2001"
+   ]
+  ],
+  "f-armagh-city": [
+   [
+    2003,
+    2004,
+    "f-armagh-city.2003"
    ]
   ],
   "f-arminia-bielefeld": [
@@ -17037,11 +18684,39 @@
     "d250-824"
    ]
   ],
+  "f-ayr-united": [
+   [
+    1994,
+    2004,
+    "f-ayr-united.1994"
+   ]
+  ],
   "f-az": [
    [
     1999,
     2004,
     "d528-991"
+   ]
+  ],
+  "f-ballymena-united": [
+   [
+    2001,
+    2004,
+    "f-ballymena-united.2001"
+   ]
+  ],
+  "f-bangor": [
+   [
+    2001,
+    2004,
+    "f-bangor.2001"
+   ]
+  ],
+  "f-bangor-city": [
+   [
+    2002,
+    2002,
+    "f-bangor-city.2002"
    ]
   ],
   "f-bari": [
@@ -17056,6 +18731,13 @@
     1998,
     1998,
     null
+   ]
+  ],
+  "f-barry-town": [
+   [
+    2002,
+    2004,
+    "f-barry-town.2002"
    ]
   ],
   "f-basel": [
@@ -17117,6 +18799,13 @@
     2015,
     2024,
     "f-sl-benfica.2000"
+   ]
+  ],
+  "f-berwick-rangers": [
+   [
+    1994,
+    2004,
+    "f-berwick-rangers.1994"
    ]
   ],
   "f-besiktas": [
@@ -17256,6 +18945,13 @@
     "f-borussia-monchengladbach.1994"
    ]
   ],
+  "f-boston-united": [
+   [
+    2001,
+    2007,
+    "f-boston-united.2001"
+   ]
+  ],
   "f-br-ndby-if": [
    [
     2007,
@@ -17280,6 +18976,13 @@
     2000,
     2001,
     "f-bradford-city.2000"
+   ]
+  ],
+  "f-brechin-city": [
+   [
+    1994,
+    2004,
+    "f-brechin-city.1994"
    ]
   ],
   "f-brescia": [
@@ -17330,6 +19033,13 @@
     2010,
     2018,
     "d792-1867"
+   ]
+  ],
+  "f-bury": [
+   [
+    1994,
+    2020,
+    "f-bury.1994"
    ]
   ],
   "f-bv-09-borussia-dortmund": [
@@ -17417,7 +19127,19 @@
     "f-cagliari.2011"
    ]
   ],
+  "f-canvey-island": [
+   [
+    2002,
+    2004,
+    "f-canvey-island.2002"
+   ]
+  ],
   "f-cardiff-city": [
+   [
+    2002,
+    2004,
+    "f-cardiff-city.2002"
+   ],
    [
     2013,
     2015,
@@ -17427,6 +19149,13 @@
     2016,
     2019,
     "f-cardiff-city.2016"
+   ]
+  ],
+  "f-carmarthen-town": [
+   [
+    2002,
+    2004,
+    "f-carmarthen-town.2002"
    ]
   ],
   "f-carpi": [
@@ -17544,6 +19273,20 @@
     "f-chelsea.2007"
    ]
   ],
+  "f-chester": [
+   [
+    2007,
+    2009,
+    "f-chester-city.1994"
+   ]
+  ],
+  "f-chester-city": [
+   [
+    1994,
+    2004,
+    "f-chester-city.1994"
+   ]
+  ],
   "f-chievo": [
    [
     2015,
@@ -17563,6 +19306,13 @@
     2022,
     2024,
     "f-clermont.2022"
+   ]
+  ],
+  "f-cliftonville": [
+   [
+    2001,
+    2004,
+    "f-cliftonville.2001"
    ]
   ],
   "f-club-atletico-de-madrid": [
@@ -17634,6 +19384,20 @@
     "f-clube-sport-maritimo.2009"
    ]
   ],
+  "f-clyde": [
+   [
+    1994,
+    2004,
+    "f-clyde.1994"
+   ]
+  ],
+  "f-coleraine": [
+   [
+    2001,
+    2004,
+    "f-coleraine.2001"
+   ]
+  ],
   "f-como": [
    [
     2003,
@@ -17641,11 +19405,25 @@
     "f-como.2003"
    ]
   ],
+  "f-connah-s-quay-nomads": [
+   [
+    2003,
+    2003,
+    "f-connah-s-quay-nomads.2003"
+   ]
+  ],
   "f-cordoba-cf": [
    [
     2015,
     2015,
     "f-cordoba-cf.2015"
+   ]
+  ],
+  "f-cowdenbeath": [
+   [
+    1994,
+    2004,
+    "f-cowdenbeath.1994"
    ]
   ],
   "f-cp-merida": [
@@ -17667,6 +19445,13 @@
     2017,
     2021,
     "f-crotone.2017"
+   ]
+  ],
+  "f-crusaders": [
+   [
+    2001,
+    2004,
+    "f-crusaders.2001"
    ]
   ],
   "f-crystal-palace": [
@@ -17712,6 +19497,32 @@
     2015,
     2022,
     "f-pfc-cska-moscow.2010"
+   ]
+  ],
+  "f-cwmbran-town": [
+   [
+    2004,
+    2004,
+    "f-cwmbran-town.2004"
+   ]
+  ],
+  "f-dagenham-and-redbridge": [
+   [
+    1994,
+    2015,
+    "f-dagenham-and-redbridge.1994"
+   ],
+   [
+    2016,
+    2016,
+    "f-dagenham-and-redbridge.2016"
+   ]
+  ],
+  "f-darlington": [
+   [
+    1994,
+    2010,
+    "f-darlington.1994"
    ]
   ],
   "f-darmstadt-98": [
@@ -17776,6 +19587,13 @@
     2008,
     2009,
     "f-derby-county.2008"
+   ]
+  ],
+  "f-derry-city": [
+   [
+    2001,
+    2004,
+    "f-derry-city.2001"
    ]
   ],
   "f-desportivo-das-aves": [
@@ -17855,6 +19673,63 @@
     "f-dsc-arminia-bielefeld.2021"
    ]
   ],
+  "f-dumbarton": [
+   [
+    1994,
+    2004,
+    "f-dumbarton.1994"
+   ]
+  ],
+  "f-dundee": [
+   [
+    1994,
+    2015,
+    "f-dundee.1994"
+   ],
+   [
+    2016,
+    2024,
+    "f-dundee.2016"
+   ]
+  ],
+  "f-dundee-fc": [
+   [
+    2013,
+    2013,
+    "f-dundee.1994"
+   ],
+   [
+    2025,
+    2026,
+    "f-dundee.2016"
+   ]
+  ],
+  "f-dundee-united": [
+   [
+    1994,
+    2022,
+    "f-dundee-united.1994"
+   ],
+   [
+    2023,
+    2023,
+    "f-dundee-united.2023"
+   ]
+  ],
+  "f-dundee-united-fc": [
+   [
+    2025,
+    2026,
+    "f-dundee-united.2023"
+   ]
+  ],
+  "f-dunfermline-athletic": [
+   [
+    1994,
+    2012,
+    "f-dunfermline-athletic.1994"
+   ]
+  ],
   "f-dynamo-dresden": [
    [
     1995,
@@ -17867,6 +19742,20 @@
     2019,
     2025,
     "f-dynamo-kyiv.2019"
+   ]
+  ],
+  "f-east-fife": [
+   [
+    1994,
+    2003,
+    "f-east-fife.1994"
+   ]
+  ],
+  "f-east-stirlingshire": [
+   [
+    1994,
+    2003,
+    "f-east-stirlingshire.1994"
    ]
   ],
   "f-eintracht-braunschweig": [
@@ -17888,6 +19777,13 @@
     2015,
     2023,
     "d724-1707"
+   ]
+  ],
+  "f-elgin-city": [
+   [
+    2001,
+    2004,
+    "f-elgin-city.2001"
    ]
   ],
   "f-empoli": [
@@ -18037,6 +19933,18 @@
     "d208-505"
    ]
   ],
+  "f-falkirk": [
+   [
+    1994,
+    2008,
+    "f-falkirk.1994"
+   ],
+   [
+    2009,
+    2026,
+    "f-falkirk.2009"
+   ]
+  ],
   "f-famalicao": [
    [
     1994,
@@ -18054,6 +19962,13 @@
     2021,
     2025,
     "f-farense.2021"
+   ]
+  ],
+  "f-farnborough-town": [
+   [
+    1994,
+    2000,
+    null
    ]
   ],
   "f-fatih-karagumruk": [
@@ -18495,6 +20410,13 @@
     "d208-505"
    ]
   ],
+  "f-forfar-athletic": [
+   [
+    1994,
+    2004,
+    "f-forfar-athletic.1994"
+   ]
+  ],
   "f-fortuna-dusseldorf": [
    [
     1996,
@@ -18735,6 +20657,20 @@
     "f-rangers-fc.2007"
    ]
   ],
+  "f-glenavon": [
+   [
+    2001,
+    2004,
+    "f-glenavon.2001"
+   ]
+  ],
+  "f-glentoran": [
+   [
+    2001,
+    2004,
+    "f-glentoran.2001"
+   ]
+  ],
   "f-goztepe": [
    [
     2019,
@@ -18761,11 +20697,25 @@
     "f-granada-cf.2012"
    ]
   ],
+  "f-greenock-morton": [
+   [
+    1994,
+    2004,
+    "f-greenock-morton.1994"
+   ]
+  ],
   "f-grenoble-foot-38": [
    [
     2009,
     2010,
     "f-grenoble-foot-38.2009"
+   ]
+  ],
+  "f-gretna": [
+   [
+    2004,
+    2008,
+    "f-gretna.2004"
    ]
   ],
   "f-grupo-desportivo-estoril-praia": [
@@ -18792,11 +20742,32 @@
     "f-guingamp.2017"
    ]
   ],
+  "f-halifax-town": [
+   [
+    1995,
+    2002,
+    "f-halifax-town.1995"
+   ]
+  ],
   "f-halmstad-bk": [
    [
     2001,
     2004,
     "f-halmstad-bk.2001"
+   ]
+  ],
+  "f-hamilton-academical": [
+   [
+    1994,
+    2021,
+    "f-hamilton-academical.1994"
+   ]
+  ],
+  "f-hamilton-academical-fc": [
+   [
+    2009,
+    2011,
+    "f-hamilton-academical.1994"
    ]
   ],
   "f-hammarby-if": [
@@ -18828,11 +20799,42 @@
     "f-hannover-96.2008"
    ]
   ],
+  "f-hayes": [
+   [
+    1994,
+    1999,
+    "f-hayes.1994"
+   ]
+  ],
   "f-heart-of-midlothian": [
+   [
+    1994,
+    2007,
+    "f-heart-of-midlothian.1994"
+   ],
    [
     2008,
     2008,
     "f-heart-of-midlothian.2008"
+   ],
+   [
+    2009,
+    2014,
+    "f-heart-of-midlothian.1994"
+   ]
+  ],
+  "f-hearts": [
+   [
+    2016,
+    2026,
+    "f-heart-of-midlothian.1994"
+   ]
+  ],
+  "f-hednesford-town": [
+   [
+    1999,
+    1999,
+    "f-hednesford-town.1999"
    ]
   ],
   "f-heidenheim": [
@@ -18889,6 +20891,20 @@
     "f-hercules-cf.1997"
    ]
   ],
+  "f-hereford-f-c": [
+   [
+    2007,
+    2012,
+    "f-hereford-united.1994"
+   ]
+  ],
+  "f-hereford-united": [
+   [
+    1994,
+    2002,
+    "f-hereford-united.1994"
+   ]
+  ],
   "f-herf-lge-boldklub": [
    [
     2000,
@@ -18917,9 +20933,19 @@
   ],
   "f-hibernian": [
    [
+    1994,
+    2001,
+    "f-hibernian.1994"
+   ],
+   [
     2002,
     2002,
     "f-hibernian.2002"
+   ],
+   [
+    2003,
+    2026,
+    "f-hibernian.1994"
    ]
   ],
   "f-holstein-kiel": [
@@ -18990,6 +21016,13 @@
     "f-ingolstadt.2016"
    ]
   ],
+  "f-institute": [
+   [
+    2001,
+    2004,
+    "f-institute.2001"
+   ]
+  ],
   "f-inter": [
    [
     1995,
@@ -19022,6 +21055,18 @@
     2000,
     2004,
     "f-inter.2000"
+   ]
+  ],
+  "f-inverness-caledonian-thistle": [
+   [
+    1994,
+    2008,
+    "f-inverness-caledonian-thistle.1994"
+   ],
+   [
+    2009,
+    2017,
+    "f-inverness-caledonian-thistle.2009"
    ]
   ],
   "f-ipswich-town": [
@@ -19107,6 +21152,13 @@
     "d792-1875"
    ]
   ],
+  "f-kettering-town": [
+   [
+    1994,
+    1999,
+    "f-kettering-town.1994"
+   ]
+  ],
   "f-kfc-uerdingen-05": [
    [
     1995,
@@ -19117,6 +21169,30 @@
     1996,
     1996,
     "f-kfc-uerdingen-05.1996"
+   ]
+  ],
+  "f-kidderminster-harriers": [
+   [
+    1994,
+    2004,
+    "f-kidderminster-harriers.1994"
+   ]
+  ],
+  "f-kilmarnock": [
+   [
+    1994,
+    2007,
+    "f-kilmarnock.1994"
+   ],
+   [
+    2008,
+    2024,
+    "f-kilmarnock.2008"
+   ],
+   [
+    2025,
+    2026,
+    "f-kilmarnock.2025"
    ]
   ],
   "f-konyaspor": [
@@ -19367,11 +21443,46 @@
     "d578-1341"
    ]
   ],
+  "f-limavady-united": [
+   [
+    2001,
+    2002,
+    "f-limavady-united.2001"
+   ]
+  ],
+  "f-linfield": [
+   [
+    2001,
+    2004,
+    "f-linfield.2001"
+   ]
+  ],
+  "f-lisburn-distillery": [
+   [
+    2001,
+    2004,
+    "f-lisburn-distillery.2001"
+   ]
+  ],
   "f-liverpool": [
    [
     1994,
     2012,
     "f-liverpool.1994"
+   ]
+  ],
+  "f-livingston": [
+   [
+    1999,
+    2024,
+    "f-livingston.1999"
+   ]
+  ],
+  "f-livingston-fc": [
+   [
+    2026,
+    2026,
+    "f-livingston.1999"
    ]
   ],
   "f-livorno": [
@@ -19433,6 +21544,18 @@
     "f-lyngby-football-club.2000"
    ]
   ],
+  "f-macclesfield-town": [
+   [
+    2000,
+    2008,
+    "f-macclesfield-town.2000"
+   ],
+   [
+    2009,
+    2020,
+    "f-macclesfield-town.2009"
+   ]
+  ],
   "f-malaga": [
    [
     2015,
@@ -19485,6 +21608,13 @@
     2007,
     2007,
     "f-manisaspor.2007"
+   ]
+  ],
+  "f-margate": [
+   [
+    2003,
+    2004,
+    "f-margate.2003"
    ]
   ],
   "f-maritimo": [
@@ -19623,11 +21753,32 @@
     "f-montpellier-hsc.2025"
    ]
   ],
+  "f-montrose": [
+   [
+    1994,
+    2004,
+    "f-montrose.1994"
+   ]
+  ],
   "f-moreirense": [
    [
     2015,
     2024,
     "d620-2389"
+   ]
+  ],
+  "f-motherwell": [
+   [
+    1994,
+    2024,
+    "f-motherwell.1994"
+   ]
+  ],
+  "f-motherwell-fc": [
+   [
+    2025,
+    2026,
+    "f-motherwell.1994"
    ]
   ],
   "f-msv-duisburg": [
@@ -19753,6 +21904,27 @@
     "f-newcastle-united.1994"
    ]
   ],
+  "f-newport-county": [
+   [
+    2002,
+    2004,
+    "f-newport-county.2002"
+   ]
+  ],
+  "f-newry-town": [
+   [
+    2001,
+    2004,
+    "f-newry-town.2001"
+   ]
+  ],
+  "f-newtown-afc": [
+   [
+    2002,
+    2004,
+    "f-newtown-afc.2002"
+   ]
+  ],
   "f-nice": [
    [
     2015,
@@ -19779,6 +21951,13 @@
     "f-nk-dinamo.2001"
    ]
   ],
+  "f-northwich-victoria": [
+   [
+    2002,
+    2004,
+    "f-northwich-victoria.2002"
+   ]
+  ],
   "f-norwich-city": [
    [
     2012,
@@ -19798,6 +21977,13 @@
     2012,
     2012,
     "f-novara-calcio.2012"
+   ]
+  ],
+  "f-nuneaton-borough": [
+   [
+    2000,
+    2000,
+    "f-nuneaton-borough.2000"
    ]
   ],
   "f-nurnberg": [
@@ -19924,6 +22110,13 @@
     2000,
     2004,
     "f-olympique-marseille.1994"
+   ]
+  ],
+  "f-omagh-town": [
+   [
+    2001,
+    2004,
+    "f-omagh-town.2001"
    ]
   ],
   "f-orebro-sk": [
@@ -20070,6 +22263,20 @@
     "f-parma.2015"
    ]
   ],
+  "f-partick-thistle": [
+   [
+    1994,
+    2004,
+    "f-partick-thistle.1994"
+   ]
+  ],
+  "f-partick-thistle-fc": [
+   [
+    2014,
+    2018,
+    "f-partick-thistle.1994"
+   ]
+  ],
   "f-partizan-belgrade": [
    [
     2002,
@@ -20103,6 +22310,13 @@
     "f-pescara.2013"
    ]
   ],
+  "f-peterhead": [
+   [
+    2001,
+    2004,
+    "f-peterhead.2001"
+   ]
+  ],
   "f-pfc-cska-moscow": [
    [
     2010,
@@ -20115,6 +22329,20 @@
     1994,
     2003,
     "f-piacenza.1994"
+   ]
+  ],
+  "f-port-talbot-town": [
+   [
+    2002,
+    2004,
+    "f-port-talbot-town.2002"
+   ]
+  ],
+  "f-portadown": [
+   [
+    2001,
+    2004,
+    "f-portadown.2001"
    ]
   ],
   "f-portimonense": [
@@ -20162,6 +22390,20 @@
     1998,
     1998,
     "f-psv.1997"
+   ]
+  ],
+  "f-queen-of-the-south": [
+   [
+    1994,
+    2004,
+    "f-queen-of-the-south.1994"
+   ]
+  ],
+  "f-queen-s-park": [
+   [
+    1994,
+    2004,
+    "f-queen-s-park.1994"
    ]
   ],
   "f-queens-park-rangers": [
@@ -20261,7 +22503,19 @@
     "f-racing-club-de-santander.2004"
    ]
   ],
+  "f-raith-rovers": [
+   [
+    1994,
+    2004,
+    "f-raith-rovers.1994"
+   ]
+  ],
   "f-rangers": [
+   [
+    2015,
+    2019,
+    "f-rangers.2015"
+   ],
    [
     2020,
     2020,
@@ -20592,6 +22846,13 @@
     "d250-884"
    ]
   ],
+  "f-rhyl": [
+   [
+    2002,
+    2004,
+    "f-rhyl.2002"
+   ]
+  ],
   "f-rio-ave": [
    [
     2015,
@@ -20664,6 +22925,20 @@
     "f-rosenborg-bk.2007"
    ]
   ],
+  "f-ross-county": [
+   [
+    1999,
+    2024,
+    "f-ross-county.1999"
+   ]
+  ],
+  "f-ross-county-fc": [
+   [
+    2013,
+    2025,
+    "f-ross-county.1999"
+   ]
+  ],
   "f-royal-antwerp-fc": [
    [
     2025,
@@ -20703,6 +22978,13 @@
     2017,
     2018,
     "f-rubin-kazan.2017"
+   ]
+  ],
+  "f-rushden-diamonds": [
+   [
+    1994,
+    2004,
+    "f-rushden-diamonds.1994"
    ]
   ],
   "f-s-d-compostela": [
@@ -20850,6 +23132,13 @@
     1995,
     1998,
     "f-sport-comercio-e-salgueiros.1994"
+   ]
+  ],
+  "f-scarborough": [
+   [
+    1994,
+    2003,
+    "f-scarborough.1994"
    ]
   ],
   "f-schalke-04": [
@@ -21023,6 +23312,13 @@
     2013,
     2025,
     "f-southampton.1994"
+   ]
+  ],
+  "f-southport": [
+   [
+    1999,
+    2003,
+    "f-southport.1999"
    ]
   ],
   "f-spal": [
@@ -21222,6 +23518,32 @@
     "f-ssv-ulm-1846.2000"
    ]
   ],
+  "f-st-johnstone": [
+   [
+    1994,
+    2024,
+    "f-st-johnstone.1994"
+   ]
+  ],
+  "f-st-johnstone-fc": [
+   [
+    2010,
+    2014,
+    "f-st-johnstone.1994"
+   ],
+   [
+    2025,
+    2025,
+    "f-st-johnstone-fc.2025"
+   ]
+  ],
+  "f-st-mirren": [
+   [
+    1994,
+    2026,
+    "f-st-mirren.1994"
+   ]
+  ],
   "f-stade-brestois-29": [
    [
     2025,
@@ -21299,6 +23621,13 @@
     "f-stade-rennais-fc.1998"
    ]
   ],
+  "f-stalybridge-celtic": [
+   [
+    2002,
+    2002,
+    "f-stalybridge-celtic.2002"
+   ]
+  ],
   "f-standard-de-liege": [
    [
     2007,
@@ -21323,11 +23652,32 @@
     "d056-250"
    ]
   ],
+  "f-stenhousemuir": [
+   [
+    1994,
+    2004,
+    "f-stenhousemuir.1994"
+   ]
+  ],
+  "f-stirling-albion": [
+   [
+    1994,
+    2004,
+    "f-stirling-albion.1994"
+   ]
+  ],
   "f-stoke-city": [
    [
     2009,
     2018,
     "f-stoke-city.2009"
+   ]
+  ],
+  "f-stranraer": [
+   [
+    1994,
+    2004,
+    "f-stranraer.1994"
    ]
   ],
   "f-strasbourg": [
@@ -21353,6 +23703,11 @@
   ],
   "f-swansea-city": [
    [
+    2002,
+    2004,
+    "f-swansea-city.2002"
+   ],
+   [
     2012,
     2012,
     "f-swansea-city.2012"
@@ -21366,6 +23721,13 @@
     2014,
     2018,
     "f-swansea-city.2012"
+   ]
+  ],
+  "f-telford-united": [
+   [
+    1994,
+    2004,
+    "f-telford-united.1994"
    ]
   ],
   "f-tondela": [
@@ -21387,6 +23749,20 @@
     2007,
     2014,
     "d380-1174"
+   ]
+  ],
+  "f-torquay-united": [
+   [
+    1994,
+    2014,
+    "f-torquay-united.1994"
+   ]
+  ],
+  "f-total-network-solutions": [
+   [
+    2002,
+    2004,
+    null
    ]
   ],
   "f-tottenham-hotspur": [
@@ -21607,6 +23983,13 @@
     2010,
     2010,
     "f-us-boulogne-cote-d-opale.2010"
+   ]
+  ],
+  "f-uwic-inter-cardiff": [
+   [
+    2002,
+    2004,
+    "f-uwic-inter-cardiff.2002"
    ]
   ],
   "f-valencia": [
@@ -21840,6 +24223,13 @@
     "f-watford.2000"
    ]
   ],
+  "f-welling-united": [
+   [
+    1994,
+    2000,
+    "f-welling-united.1994"
+   ]
+  ],
   "f-werder-bremen": [
    [
     2015,
@@ -21869,6 +24259,13 @@
     1999,
     2016,
     "f-west-ham-united.1999"
+   ]
+  ],
+  "f-weymouth": [
+   [
+    2001,
+    2001,
+    "f-weymouth.2001"
    ]
   ],
   "f-wigan-athletic": [
@@ -21909,6 +24306,13 @@
     1994,
     1999,
     null
+   ]
+  ],
+  "f-wrexham": [
+   [
+    2002,
+    2004,
+    "f-wrexham.2002"
    ]
   ],
   "f-xerez-club-deportivo": [
