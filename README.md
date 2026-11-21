@@ -1034,7 +1034,15 @@ the game now holds EA FC 27's records (a checkpoint names the source editions it
 referenced, and an exported file keeps its sources inline). See
 `docs/design/football-roster-audit.json` for per-nation coverage.
 
-**Football data sources and attribution.** `scripts/data/ea-fc27.csv` holds
+**Football data sources and attribution.** The earlier seasons' fields of Europe's
+strongest clubs are ranked from the results of David Schoch's
+[football-data](https://github.com/schochastics/football-data)
+(`data/results/games.parquet`, every game of 207 top divisions and the international club
+cups), licensed under the
+[Open Data Commons Attribution License 1.0](https://opendatacommons.org/licenses/by/1-0/);
+`scripts/data/club-strength.json` names the commit and SHA-256 it reads, and
+`npm run build:club-strength -- --fetch` fetches that file into `data-src/football-results/`.
+`scripts/data/ea-fc27.csv` holds
 selected columns of every man in EA SPORTS FC 27. They come from EA's public
 ratings API (`drop-api.ea.com`, the data behind EA's ratings site), and
 `npm run sync:ea-fc` reduces it with nations, leagues and club names spelt as in
@@ -1621,34 +1629,45 @@ west of the Urals; the rest of Russia lies grey beneath the map, as a country wi
 club does, so a Moscow club never stretches to the Pacific.
 
 The earlier [football seasons](#football-seasons) play Europe's strongest clubs of
-their own year, each season's pair of maps drawn from all of Europe's first divisions
-as today's are: 11 to 31 of each season's 124 come from beyond the seven big leagues
-(Turkey, Belgium, Greece, Scotland, Russia, Denmark, Sweden, Norway, Czechia, Ukraine,
-Austria, Switzerland, Croatia, Serbia, Poland and Hungary), and up to five of its elite
-(Galatasaray and Fenerbahçe, Zenit and CSKA Moscow in FIFA 15 and 16, Celtic and
-Rangers in the Championship Manager seasons). The three SWOS seasons, 1996/97, 1995/96
-and 1994/95, read every European league file SWOS has since 17 November 2026: 28 or 29
-of their 124 come from beyond the seven big leagues (Rangers, Celtic, Anderlecht, Club
-Brugge, Spartak Moscow, Sparta Prague, Steaua, Dinamo Kiev, Galatasaray, Olympiakos and
-more), Rangers and Anderlecht in the elite. 2005/06, 2004/05, 1989/90 and the computed
-seasons have nations only, so no maps. A campaign saved on an earlier season's map of
-before (when its 124 came from the seven leagues) still resumes there; a new one plays
-the season's map of all of Europe. Football's "One country · top clubs" campaigns play
-the chosen season's own top clubs (below). A world campaign saved before these maps
+their own year **by results** (since 21 November 2026): a game's ratings rank a
+league's clubs against each other, not one league against another (FIFA 10 rated every
+Premier League and La Liga side above Salzburg, Basel and every Ukrainian club), so each
+season's clubs are ranked on one scale across every country instead. Each league's level
+comes from every UEFA cup game since 1955, fitted at once and moving smoothly from season
+to season, and each club's place in it from its own league's results and its form in
+Europe (`npm run build:club-strength`, `scripts/data/club-strength.json`, from David
+Schoch's [football-data](https://github.com/schochastics/football-data) results, Open
+Data Commons Attribution License). The 124 strongest are each season's Top 124 and the
+first 32 its Elite 32, each club with its season's squad: from the season's own source,
+or, where an EA edition lacks the club (Shakhtar before FIFA 14, Dynamo Kyiv and Dinamo
+Zagreb before FIFA 19, Red Star, Ludogorets, Zenit from FIFA 19 and every Russian club from
+FIFA 23), from the CM 01/02 Update
+Team's database of the same season, its ratings put on EA's scale by a line fitted over
+the clubs both rate. Each season now fields 20 to 27 countries (12 to 20 before); 2006/07
+has no Update Team database, so FIFA 07's leagues alone. A ranked club no source gives
+eleven players is passed over, and so are Kazakhstan's, a UEFA member in Asia. Names
+that differ between the results and a source (PSG and Paris Saint-Germain, FCSB and
+Steaua) are listed in `scripts/data/club-strength-names.json`. 2005/06, 2004/05, 1989/90
+and the computed seasons have nations only, so no maps. A campaign saved on an earlier
+season's map of before (when its 124 came from the seven leagues, or from all of Europe by
+the players' ratings) still resumes there; a new one plays the season's map by results.
+Football's "One country · top clubs" campaigns play the chosen season's own top clubs (below). A world campaign saved before these maps
 stays on the world, and resumes as it was; a CM 01/02 set built on your own computer
 has no map of Europe, so it deals its clubs onto the world.
 
-Each map is `public/domestic/eu<clubs>[<e or s><season year>].json`, fetched when chosen,
-with the index `src/data/europeMaps.js`: `eu124` and `eu32` today's, `eu124e2018` an earlier
-season's from all of Europe (64 maps in play). The 62 seven-league maps the earlier seasons
-had before (`eu124s2018`; the EA and Championship Manager seasons' until 14 November 2026,
-SWOS's until 17 November 2026) stay as they were, never rebuilt and never
-offered, for the campaigns saved on them. They follow the clubs, so rebuild them after
+Each map is `public/domestic/eu<clubs>[<r, e or s><season year>].json`, fetched when chosen,
+with the index `src/data/europeMaps.js`: `eu124` and `eu32` today's, `eu124r2018` an earlier
+season's by results (64 maps in play). The maps the earlier seasons had before stay as they
+were, never rebuilt and never offered, for the campaigns saved on them: the seven-league
+maps (`eu124s2018`; the EA and Championship Manager seasons' until 14 November 2026, SWOS's
+until 17 November 2026) and those of all of Europe by the players' ratings (`eu124e2018`,
+until 21 November 2026). They follow the clubs, so rebuild them after
 `npm run build-clubs`, `npm run build:ea-seasons`, `npm run build:retro-seasons`,
 `npm run build-womens-football` or `npm run build:womens-seasons`:
 
 ```bash
-npm run build:europe-maps                  # about 30 minutes, most of it the maps with Russian clubs; --only=eu124,eu32 builds just those
+npm run build:europe-maps                  # two to three hours, most of it the maps with Russian clubs; --only=eu124,eu32 builds just those
+npm run build:europe-maps -- --index       # after runs of disjoint --only sets side by side: the index and attribution from the maps on disk
 npm run build:europe-maps -- --check       # offline rebuild must match the committed files byte for byte
 ```
 
@@ -1888,12 +1907,11 @@ as West Germany, and a German at an East German club plays for no nation.
   outfield player's seven skills summed, a keeper's price alone) becomes
   `round(40 + value * 59 / 49)`, from an empty shirt's 40 to 99. The raw values
   stay with each player.
-- **Clubs:** Europe's 124 strongest of every first division the database holds
-  (CM 01/02 holds 26, CM 99/00 twelve), on the season's own
-  [Europe maps](#the-europe-maps). CM 99/00 rates Denmark's clubs like mid-table
-  Serie A ones, so eleven of them make 1999/00's 124; CM 01/02 puts eight or nine
-  Swedish clubs in. SWOS's team files are cached for the seven biggest leagues
-  only, so 1996/97, 1995/96 and 1994/95 hold those leagues' top divisions whole.
+- **Clubs:** Europe's 124 strongest by results (see [the Europe maps](#the-europe-maps)),
+  each with its squad in the database: its first divisions as it stores them, and every
+  other European country's top division by nation. A club the database rates with fewer
+  than eleven players (Shakhtar, Galatasaray or Basel in some of the late 1990s'
+  databases) is passed over for the next.
 - **Credits and rights:** Championship Manager is Sports Interactive's; Eidos
   made CM 01/02 free to download in December 2008 for personal, non-commercial
   use, the data's rights reserved. 3.9.60 and 3.9.68 are SI's own files as

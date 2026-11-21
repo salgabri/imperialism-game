@@ -225,8 +225,10 @@ test('generated EA clubs are excluded by 29-February births without touching rea
     ...seasonSport.clubs.map(club => buildClub(club, seasonSport))];
   const players = teams.flatMap(team => team.squad);
   assert.ok(players.length > 2000, 'the season fields its EA players');
-  // A computed player who fills a nation's empty place (scripts/lib/football-fills.mjs) is no EA record, and is marked as an estimate.
-  for (const player of players.filter(player => player.sourceInfo?.source !== 'estimate')) assert.ok(records.has(player.id), `${player.id} plays for a generated club`);
+  // A computed player who fills a nation's empty place (scripts/lib/football-fills.mjs) is no EA record, and is marked as an
+  // estimate; nor is the player of a club EA lacks, filled from the CM 01/02 Update Team's database (`fill`, its records
+  // 'cm0102': scripts/lib/europe-field.mjs).
+  for (const player of players.filter(player => !['estimate', 'cm0102'].includes(player.sourceInfo?.source))) assert.ok(records.has(player.id), `${player.id} plays for a generated club`);
 });
 
 test('the 29-February filter drops half-generated clubs and clubless players only', async () => {

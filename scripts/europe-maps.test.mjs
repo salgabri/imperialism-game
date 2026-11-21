@@ -10,7 +10,7 @@ import { createHash } from 'node:crypto';
 import { feature, neighbors } from 'topojson-client';
 import { CLUBS } from '../src/data/clubs.football.js';
 import { BUILT_IN_SEASONS } from '../src/data/footballSeasons.js';
-import { decodeFootballSet, setHasClubs } from '../src/engine/footballSets.js';
+import { decodeFootballSet, fillRating, setHasClubs } from '../src/engine/footballSets.js';
 import { EUROPE_MAPS } from '../src/data/europeMaps.js';
 import { ELITE_CLUBS, TOP_CLUBS, strongestClubs } from '../src/data/scopes.js';
 import { BIG_LEAGUES } from '../src/data/footballLeagues.js';
@@ -111,26 +111,27 @@ test('the index lists a built-in pair of maps and one for each earlier season wi
   assert.ok(read('public/domestic/ATTRIBUTION-europe.txt').includes(TOP.version), 'the attribution names the maps');
 });
 
-test('an earlier season\'s map of before its clubs came from all of Europe stays for its saves, never offered', () => {
-  // Every season with clubs: the EA and CM seasons' since 14 November 2026, SWOS's (whose other league files came later)
-  // since 17 November 2026.
-  const allEurope = CLUB_SEASONS;
-  assert.equal(RETIRED.length, allEurope.length * 2);
-  for (const season of allEurope) {
+test('an earlier season\'s maps of before its field by results stay for their saves, never offered', () => {
+  // Every season with clubs had two fields before: the seven big leagues' (`s`; the EA and CM seasons' until 14 November
+  // 2026, SWOS's, whose other league files came later, until 17 November 2026) and all of Europe's by the players'
+  // ratings (`e`, until 21 November 2026). Both name the map by results that replaced them (`r`).
+  assert.equal(RETIRED.length, CLUB_SEASONS.length * 4);
+  for (const season of CLUB_SEASONS) {
     for (const theatre of ['all', 'elite']) {
-      const current = europeMapOf(theatre, season.id), old = RETIRED.find(entry => entry.theatre === theatre && entry.seasons[0] === season.id);
-      assert.ok(old, `${season.id} ${theatre}: its old map stays`);
-      assert.equal(old.id, `eu${theatre === 'all' ? TOP_CLUBS : ELITE_CLUBS}s${season.year}`);
-      assert.equal(current.id, `eu${theatre === 'all' ? TOP_CLUBS : ELITE_CLUBS}e${season.year}`);
-      assert.equal(old.replacedBy, current.id);
-      assert.ok(isEuropeScope(`domestic:${old.id}`), 'a save names it as it did');
-      assert.equal(setClubScope({ sport: 'football', layer: 'clubs', clubScope: `domestic:${old.id}`, dataSet: season.id }), `domestic:${current.id}`,
-        'a new setup moves on to the map that replaced it');
-      // Its clubs are the season's seven-league clubs of before: in the Top 124, some of them are no longer the season's
-      // (an elite with no club from beyond the seven leagues is the same 32, on a map of another id).
-      if (theatre === 'all') assert.ok(docOf(old.id).clubs.some(club => !setOf(season.id).clubs.some(now => now.id === club.id)), `${old.id}: an older field`);
+      const clubs = theatre === 'all' ? TOP_CLUBS : ELITE_CLUBS, current = europeMapOf(theatre, season.id);
+      assert.equal(current.id, `eu${clubs}r${season.year}`);
+      for (const tag of ['s', 'e']) {
+        const old = RETIRED.find(entry => entry.id === `eu${clubs}${tag}${season.year}`);
+        assert.ok(old, `${season.id} ${theatre}: its ${tag} map stays`);
+        assert.deepEqual([old.theatre, old.seasons, old.replacedBy], [theatre, [season.id], current.id], old.id);
+        assert.ok(isEuropeScope(`domestic:${old.id}`), 'a save names it as it did');
+        assert.equal(setClubScope({ sport: 'football', layer: 'clubs', clubScope: `domestic:${old.id}`, dataSet: season.id }), `domestic:${current.id}`,
+          'a new setup moves on to the map that replaced it');
+        // Its clubs are the season's field of before: in the Top 124, some of them are no longer the season's.
+        if (theatre === 'all') assert.ok(docOf(old.id).clubs.some(club => !setOf(season.id).clubs.some(now => now.id === club.id)), `${old.id}: an older field`);
+      }
     }
-    assert.deepEqual(europeMapsOf(season.id).map(map => map.id), [`eu${TOP_CLUBS}e${season.year}`, `eu${ELITE_CLUBS}e${season.year}`], season.id);
+    assert.deepEqual(europeMapsOf(season.id).map(map => map.id), [`eu${TOP_CLUBS}r${season.year}`, `eu${ELITE_CLUBS}r${season.year}`], season.id);
   }
 });
 
@@ -146,10 +147,11 @@ test('the field is the strongest clubs of the season, from all of Europe', () =>
     assert.equal(clubs.length, TOP_CLUBS, `${season.id}: Europe's strongest`);
     assert.ok(clubs.some(club => !BIG_LEAGUES.includes(club.league)), `${season.id}: clubs beyond the seven big leagues`);
   }
-  // SWOS's seasons, from every European top division SWOS rates: the Old Firm and Anderlecht each season.
+  // SWOS's seasons, from every European top division SWOS rates: Rangers, Anderlecht, Spartak, Porto and Dynamo Kyiv each
+  // season (Celtic only in 1996/97's).
   for (const id of ['swos-9495', 'swos-9596', 'swos-9697']) {
     const names = setOf(id).clubs.map(club => club.name);
-    for (const name of ['Rangers', 'Celtic', 'Anderlecht', 'Spartak Moscow']) assert.ok(names.includes(name), `${id} has ${name}`);
+    for (const name of ['Rangers', 'Anderlecht', 'Spartak Moscow', 'FC Porto', 'Dinamo Kiev']) assert.ok(names.includes(name), `${id} has ${name}`);
   }
 });
 
@@ -326,7 +328,7 @@ test('neighbouring clubs differ in colour, and each club keeps its crest', () =>
 });
 
 // 2015/16's Elite 32 holds two Russian clubs: routes go around the rest of Russia, grey beneath the map, as around any neighbour.
-for (const [name, doc] of [['the Top 124', TOP], ['the Elite 32', ELITE], ["2015/16's Elite 32, with European Russia", docOf('eu32e2016')]]) {
+for (const [name, doc] of [['the Top 124', TOP], ['the Elite 32', ELITE], ["2015/16's Elite 32, with European Russia", docOf('eu32r2016')]]) {
   test(`seeded duel campaigns on ${name} reach a champion by land or sea, never by treaty`, () => {
     const map = decodeDomestic(JSON.parse(JSON.stringify(doc)), doc.id);
     const { geo } = map;
@@ -363,14 +365,14 @@ test('a football setup always names the map of its theatre and season', () => {
   assert.equal(setClubScope(clubs({ clubScope: 'Premier League' })), 'domestic:eu124', 'one league is no theatre now');
   assert.equal(setClubScope(clubs({ clubScope: 'domestic:826' })), 'domestic:826', 'one country stays');
   assert.equal(setClubScope(clubs({ clubScope: 'domestic:nba' })), 'domestic:eu124', "another sport's map is none of football's");
-  assert.equal(setClubScope(clubs({ clubScope: 'domestic:eu32', dataSet: 'ea-fifa-18' })), 'domestic:eu32e2018', 'the elite of the season');
-  assert.equal(setClubScope(clubs({ clubScope: 'domestic:eu124e2018', dataSet: null })), 'domestic:eu124', 'back to the built-in season');
-  assert.equal(setClubScope(clubs({ clubScope: 'domestic:eu124s2018', dataSet: 'ea-fifa-18' })), 'domestic:eu124e2018', 'on from a map another replaced');
+  assert.equal(setClubScope(clubs({ clubScope: 'domestic:eu32', dataSet: 'ea-fifa-18' })), 'domestic:eu32r2018', 'the elite of the season');
+  assert.equal(setClubScope(clubs({ clubScope: 'domestic:eu124r2018', dataSet: null })), 'domestic:eu124', 'back to the built-in season');
+  assert.equal(setClubScope(clubs({ clubScope: 'domestic:eu124s2018', dataSet: 'ea-fifa-18' })), 'domestic:eu124r2018', 'on from a map another replaced');
   // A country follows the season: its own map of that season (England's of 2017/18), or back to today's.
   assert.equal(setClubScope(clubs({ clubScope: 'domestic:826', dataSet: 'ea-fifa-18' })), 'domestic:826y2018', "the season's own England");
   assert.equal(setClubScope(clubs({ clubScope: 'domestic:826y2018', dataSet: 'ea-fifa-11' })), 'domestic:826y2011', "another season's England");
   assert.equal(setClubScope(clubs({ clubScope: 'domestic:826y2018', dataSet: null })), 'domestic:826', "today's England");
-  assert.equal(setClubScope(clubs({ clubScope: 'domestic:242', dataSet: 'ea-fifa-18' })), 'domestic:eu124e2018', 'a season with no map of a country plays its Europe maps');
+  assert.equal(setClubScope(clubs({ clubScope: 'domestic:242', dataSet: 'ea-fifa-18' })), 'domestic:eu124r2018', 'a season with no map of a country plays its Europe maps');
   assert.equal(setClubScope(clubs({ clubScope: 'domestic:826', dataSet: 'cm0102-2026-05' })), 'all', 'a set with no maps plays on the world');
   assert.equal(setClubScope(clubs({ clubScope: 'elite', dataSet: 'cm0102-2026-05' })), 'elite', 'a set with no maps plays on the world');
   assert.equal(setClubScope(clubs({ clubScope: 'domestic:eu124', dataSet: 'cm0102-2026-05' })), 'all');
@@ -378,7 +380,7 @@ test('a football setup always names the map of its theatre and season', () => {
   assert.ok(isEuropeScope('domestic:eu124') && !isEuropeScope('domestic:826') && !isEuropeScope('all'));
   assert.ok(isCountryScope('domestic:826') && isCountryScope('domestic:999') && !isCountryScope('domestic:eu32') && !isCountryScope('domestic:nba') && !isCountryScope('all'));
   // A season's Europe map keeps the season, and so does its own country map; today's country map plays the built-in data.
-  assert.equal(dataSetOf(clubs({ clubScope: 'domestic:eu124e2018', dataSet: 'ea-fifa-18' })), 'ea-fifa-18');
+  assert.equal(dataSetOf(clubs({ clubScope: 'domestic:eu124r2018', dataSet: 'ea-fifa-18' })), 'ea-fifa-18');
   assert.equal(dataSetOf(clubs({ clubScope: 'domestic:eu124s2018', dataSet: 'ea-fifa-18' })), 'ea-fifa-18', 'a save on a map another replaced keeps its season');
   assert.equal(dataSetOf(clubs({ clubScope: 'domestic:826y2018', dataSet: 'ea-fifa-18' })), 'ea-fifa-18', "a season's own country map");
   assert.equal(dataSetOf(clubs({ clubScope: 'domestic:826y2018', dataSet: 'ea-fifa-11' })), null, "another season's map is none of this one's");
@@ -460,24 +462,52 @@ test('an earlier season plays its own clubs on its own map of Europe, and saves'
     app.pickSetup('layer', 'clubs');
     app.pickSetup('clubScope', 'domestic:eu32');
     app.pickSetup('dataSet', 'ea-fifa-18');
-    assert.equal(app.state.setup.clubScope, 'domestic:eu32e2018', 'the theatre follows the season');
+    assert.equal(app.state.setup.clubScope, 'domestic:eu32r2018', 'the theatre follows the season');
     assert.deepEqual(buildSetupModel(app.state.setup, { season: app.seasonStatus() }).scopes.map(scope => [scope.id, scope.count]),
-      [['domestic:eu124e2018', 124], ['domestic:eu32e2018', 32]], 'its maps are known while the season loads');
+      [['domestic:eu124r2018', 124], ['domestic:eu32r2018', 32]], 'its maps are known while the season loads');
     time.advance(200);
     await app.loadSet('ea-fifa-18');
-    await app.loadCountry('eu32e2018');
+    await app.loadCountry('eu32r2018');
     await settle();
     app.startCampaign();
     const { state } = app;
     assert.equal(state.phase, 'playing');
     assert.equal(state.settings.dataSet, 'ea-fifa-18');
-    assert.equal(state.settings.domesticVersion, docOf('eu32e2018').version);
+    assert.equal(state.settings.domesticVersion, docOf('eu32r2018').version);
     const set = setOf('ea-fifa-18');
     const strongest = strongestClubs(set.clubs, ELITE_CLUBS);
     assert.deepEqual(Object.keys(state.teams).sort(), strongest.map(club => club.id).sort(), "the season's elite");
     const top = strongest[0];
     assert.equal(state.teams[top.id].name, top.name);
     assert.equal(state.teams[top.id].squad.length, top.squad.length, "with the season's own players");
+    assert.doesNotThrow(() => parseCampaign(JSON.stringify({ v: 2, ...checkpoint(state) })), 'a save of it passes the checks');
+  });
+});
+
+test('a club its EA season lacks plays the Update Team\'s squad of the season, on EA\'s scale', async () => {
+  await withApp(async ({ app, time }) => {
+    // FIFA 10 rates no Ukrainian club, but by results Dynamo Kyiv and Shakhtar are among 2009/10's Elite 32: they field the
+    // CM 01/02 Update Team's 2009/10 squads (`fill`), each rating put on FIFA 10's scale by the season's `clubFill.scale`.
+    app.pickSetup('layer', 'clubs');
+    app.pickSetup('clubScope', 'domestic:eu32');
+    app.pickSetup('dataSet', 'ea-fifa-10');
+    assert.equal(app.state.setup.clubScope, 'domestic:eu32r2010');
+    time.advance(200);
+    await app.loadSet('ea-fifa-10');
+    await app.loadCountry('eu32r2010');
+    await settle();
+    app.startCampaign();
+    const { state } = app;
+    assert.equal(state.phase, 'playing');
+    const set = decodeFootballSet(setOf('ea-fifa-10'));
+    const filled = strongestClubs(set.clubs, ELITE_CLUBS).filter(club => club.fill);
+    assert.deepEqual(filled.map(club => club.name).sort(), ['Dinamo Kiev', 'Shakhtar Donetsk']);
+    for (const club of filled) {
+      const team = state.teams[club.id];
+      assert.deepEqual(team.squad.map(player => [player.name, player.rating]), club.squad.map(([name, , rating]) => [name, rating]), club.name);
+      assert.ok(team.squad.every(player => player.sourceInfo.source === 'cm0102'
+        && player.rating === fillRating(player.sourceInfo.unscaledRating, set.meta.clubFill.scale)), `${club.name}: the Update Team's players`);
+    }
     assert.doesNotThrow(() => parseCampaign(JSON.stringify({ v: 2, ...checkpoint(state) })), 'a save of it passes the checks');
   });
 });
@@ -491,12 +521,14 @@ test('a campaign saved on an earlier season\'s map of before still resumes, on t
     app.pickSetup('dataSet', 'ea-fifa-18');
     time.advance(200);
     await app.loadSet('ea-fifa-18');
-    await app.loadCountry('eu32e2018');
+    await app.loadCountry('eu32r2018');
     await settle();
     app.startCampaign();
     const now = checkpoint(app.state), templates = Object.values(now.teams);
     const old = docOf('eu32s2018');
-    assert.equal(EUROPE_MAPS.find(entry => entry.id === 'eu32s2018').replacedBy, 'eu32e2018');
+    assert.equal(EUROPE_MAPS.find(entry => entry.id === 'eu32s2018').replacedBy, 'eu32r2018');
+    // The maps by rating of 14–21 November 2026 are replaced by the season's maps by results too.
+    assert.equal(EUROPE_MAPS.find(entry => entry.id === 'eu32e2018').replacedBy, 'eu32r2018');
     const teams = Object.fromEntries(old.clubs.map((club, i) => [club.id, { ...templates[i], id: club.id, name: club.name, home: club.section }]));
     const settings = { ...now.settings, clubScope: 'domestic:eu32s2018', domesticVersion: old.version };
     const saved = { ...now, teams, own: Object.fromEntries(old.clubs.map(club => [club.section, club.id])), aliveIds: old.clubs.map(club => club.id),

@@ -51,8 +51,14 @@ export function nationTheatre(sport, id) {
 export const TOP_CLUBS = 124;
 export const ELITE_CLUBS = 32;
 
+/**
+ * Which of two clubs is the stronger, for a field: an earlier season ranks its clubs by their results across Europe
+ * (`rank`, 1 the strongest: scripts/lib/europe-field.mjs), every other list by the rating of their XIs (`str`).
+ */
+export const strongerClub = (a, b) => (a.rank != null && b.rank != null ? a.rank - b.rank : b.str - a.str);
+
 /** A club list's `count` strongest. Equal strengths keep the list's order, so a list always gives the same clubs. */
-export const strongestClubs = (clubs, count) => clubs.slice().sort((a, b) => b.str - a.str).slice(0, count);
+export const strongestClubs = (clubs, count) => clubs.slice().sort(strongerClub).slice(0, count);
 
 /** Whether a club is European, by the confederation of its country: women's football's play Europe's maps, the NWSL's its own. */
 export const isEuropeanClub = club => NATIONS[club.country]?.[2] === 'UEFA';

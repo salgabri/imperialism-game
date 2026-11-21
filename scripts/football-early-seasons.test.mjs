@@ -121,15 +121,17 @@ test('every season rebuilds byte for byte from its pinned sources (when they are
 
 // Each season's coverage: what its source rates, written exactly. Its clubs are Europe's strongest 124 (TOP_CLUBS) of every first
 // division the database holds.
+// Since 21 November 2026 each season's 124 are Europe's strongest by results (scripts/lib/europe-field.mjs), from 20 to 27
+// of its first divisions.
 const COVERAGE = {
-  'cm0102-2003-10': { players: 2511, nations: 162, completeXIs: 109, clubs: 124, leagues: 18 },
-  'cm0102-2002-11': { players: 2500, nations: 162, completeXIs: 108, clubs: 124, leagues: 17 },
-  'cm0102-2001-09': { players: 2349, nations: 143, completeXIs: 96, clubs: 124, leagues: 18 },
-  'cm-0001': { players: 2182, nations: 134, completeXIs: 82, clubs: 124, leagues: 18 },
-  'cm-9900': { players: 2101, nations: 123, completeXIs: 74, clubs: 124, leagues: 12 },
-  'cm0102-2020-11-cm3': { players: 1964, nations: 113, completeXIs: 64, clubs: 124, leagues: 18 },
-  'cm-9798': { players: 1870, nations: 102, completeXIs: 52, clubs: 124, leagues: 12 },
-  'swos-9697': { players: 2827, nations: 133, completeXIs: 133, clubs: 124, leagues: 18 },
+  'cm0102-2003-10': { players: 2545, nations: 162, completeXIs: 109, clubs: 124, leagues: 26 },
+  'cm0102-2002-11': { players: 2525, nations: 162, completeXIs: 108, clubs: 124, leagues: 25 },
+  'cm0102-2001-09': { players: 2350, nations: 143, completeXIs: 96, clubs: 124, leagues: 23 },
+  'cm-0001': { players: 2178, nations: 134, completeXIs: 82, clubs: 124, leagues: 24 },
+  'cm-9900': { players: 2064, nations: 123, completeXIs: 74, clubs: 124, leagues: 21 },
+  'cm0102-2020-11-cm3': { players: 1961, nations: 113, completeXIs: 64, clubs: 124, leagues: 20 },
+  'cm-9798': { players: 1862, nations: 102, completeXIs: 52, clubs: 124, leagues: 20 },
+  'swos-9697': { players: 2827, nations: 133, completeXIs: 133, clubs: 124, leagues: 27 },
 };
 
 test('each season decodes, and fields the nations and clubs its source rates', () => {
@@ -150,11 +152,11 @@ test('each season decodes, and fields the nations and clubs its source rates', (
   }
   // Every one has clubs: SWOS 96/97 too, read from the game's own team files since 2026-11-13.
   assert.deepEqual(IDS.filter(id => !setHasClubs(id)), []);
-  // Its clubs are of the summer of 1996: Shearer at Newcastle, Zidane at Juventus, Ronaldo at Barcelona, Ravanelli at
-  // Middlesbrough, Vialli at Chelsea.
+  // Its clubs are of the summer of 1996: Shearer at Newcastle, Zidane at Juventus, Ronaldo at Barcelona, Šuker at Real
+  // Madrid, Vialli at Chelsea.
   const at = who => committed('swos-9697').clubs.filter(club => club.squad.some(tuple => tuple[1] === who)).map(club => club.name);
-  assert.deepEqual(['Alan Shearer', 'Zinedine Zidane', 'Ronaldo', 'Fabrizio Ravanelli', 'Gianluca Vialli'].map(at),
-    [['Newcastle United'], ['Juventus'], ['FC Barcelona'], ['Middlesbrough'], ['Chelsea']]);
+  assert.deepEqual(['Alan Shearer', 'Zinedine Zidane', 'Ronaldo', 'Davor Suker', 'Gianluca Vialli'].map(at),
+    [['Newcastle United'], ['Juventus'], ['FC Barcelona'], ['Real Madrid'], ['Chelsea']]);
 });
 
 test('each season with clubs plays on its own two Europe maps: its strongest 124 and 32 clubs', () => {
@@ -167,8 +169,8 @@ test('each season with clubs plays on its own two Europe maps: its strongest 124
       assert.ok(!EUROPE_MAPS.some(entry => entry.seasons?.includes(id)));
       continue;
     }
-    // A season whose clubs come from all of Europe has maps of its own ids (SWOS's too, since 17 November 2026).
-    const tag = `e${doc.year}`;
+    // A season whose field is Europe's strongest by results has maps of its own ids (eu124r…, since 21 November 2026).
+    const tag = `r${doc.year}`;
     assert.deepEqual(maps.map(map => [map.id, map.clubs, map.theatre, map.seasons]),
       [[`eu124${tag}`, TOP_CLUBS, 'all', [id]], [`eu32${tag}`, ELITE_CLUBS, 'elite', [id]]], id);
     for (const [count, map] of [[TOP_CLUBS, maps[0]], [ELITE_CLUBS, maps[1]]]) {
@@ -526,7 +528,7 @@ test('the running App plays 1996/97\'s clubs on its own maps, and launches and r
     app.pickSetup('layer', 'clubs');
     app.pickSetup('clubScope', 'domestic:eu32');
     app.pickSetup('dataSet', 'swos-9697');
-    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32e1997'], 'the theatre follows the season');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32r1997'], 'the theatre follows the season');
     app.pickSetup('layer', 'nations');
     time.advance(200);
     await app.loadSet('swos-9697');
@@ -558,16 +560,16 @@ test('the running App launches a 2001/02 clubs campaign on its own map of Europe
     app.pickSetup('layer', 'clubs');
     app.pickSetup('clubScope', 'domestic:eu32');
     app.pickSetup('dataSet', 'cm0102-2001-09');
-    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32e2002'], 'the theatre follows the season');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32r2002'], 'the theatre follows the season');
     time.advance(200);
     await app.loadSet('cm0102-2001-09');
-    await app.loadCountry('eu32e2002');
+    await app.loadCountry('eu32r2002');
     await settle();
     app.startCampaign();
     const st = app.state;
     assert.equal(st.phase, 'playing');
     assert.deepEqual([st.settings.dataSet, st.settings.dataSeason, st.settings.domesticVersion],
-      ['cm0102-2001-09', '2001/02', EUROPE_MAPS.find(entry => entry.id === 'eu32e2002').version]);
+      ['cm0102-2001-09', '2001/02', EUROPE_MAPS.find(entry => entry.id === 'eu32r2002').version]);
     const elite = strongestClubs(doc.clubs, ELITE_CLUBS);
     assert.deepEqual(Object.keys(st.teams).sort(), elite.map(club => club.id).sort(), 'the season\'s elite');
     const top = elite[0];
@@ -592,19 +594,20 @@ test('the running App offers 2000/01 and 1999/00 with clubs and nations, and pla
     app.pickSetup('layer', 'clubs');
     app.pickSetup('clubScope', 'domestic:eu32');
     app.pickSetup('dataSet', 'cm-9900');
-    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32e2000'], 'the theatre follows the season');
+    assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32r2000'], 'the theatre follows the season');
     time.advance(200);
     await app.loadSet('cm-9900');
-    await app.loadCountry('eu32e2000');
+    await app.loadCountry('eu32r2000');
     await settle();
     app.startCampaign();
     const st = app.state;
     assert.equal(st.phase, 'playing');
     assert.deepEqual([st.settings.dataSet, st.settings.dataSeason, st.settings.domesticVersion],
-      ['cm-9900', '1999/00', EUROPE_MAPS.find(entry => entry.id === 'eu32e2000').version]);
+      ['cm-9900', '1999/00', EUROPE_MAPS.find(entry => entry.id === 'eu32r2000').version]);
     const elite = strongestClubs(doc.clubs, ELITE_CLUBS);
     assert.deepEqual(Object.keys(st.teams).sort(), elite.map(club => club.id).sort(), 'the season\'s elite');
-    assert.equal(elite[0].name, 'Juventus');
+    // Europe's strongest of 1999/00 by results: Barcelona, ahead of Manchester United and Lazio.
+    assert.deepEqual(elite.slice(0, 3).map(club => club.name), ['F.C. Barcelona', 'Manchester United', 'Lazio']);
     assert.deepEqual(st.teams[elite[0].id].squad.map(player => player.name), elite[0].squad.map(tuple => tuple[1]), 'with its CM 99/00 players');
     assert.ok(st.teams[elite[0].id].squad.every(player => player.sourceInfo.edition === 'CM 99/00' && player.sourceInfo.version === '3.70'
       && player.sourceInfo.provider === 'Sports Interactive'));

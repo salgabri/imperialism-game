@@ -4,7 +4,7 @@
 // Everything here is a pure function of the setup record and the opening teams App already computes
 // (`setupTeams()` → `managerTeams`): no window/document, no RNG, no timers. Caches are keyed by immutable data.
 import { NATIONS, SCOPES, isTennisSport, nationIdentity } from '../../data/teams.js';
-import { CLUB_SCOPES, TOP_CLUBS, nationTheatre, nationTheatres, strongestClubs as topClubs } from '../../data/scopes.js';
+import { CLUB_SCOPES, TOP_CLUBS, nationTheatre, nationTheatres, strongerClub, strongestClubs as topClubs } from '../../data/scopes.js';
 import { nationPriority } from '../../data/domesticTiers.js';
 import { clubMapOf, countryMapsOf, countryOfEntry, domesticEntry, domesticLabel, fullMapOf, isDomesticScope, isTheatreMap, theatreMapsOf } from '../../data/domesticScope.js';
 import { SPLIT_MIN_CLUBS } from '../../engine/clubSplit.js';
@@ -516,7 +516,7 @@ function seasonOptions(sets, dataSet, sport) {
  */
 const strongestClubs = (sport, entry = null) => {
   const own = sport.clubs.filter(club => club.league === entry?.league);
-  return (own.length ? own : sport.clubs).slice().sort((a, b) => b.str - a.str || a.name.localeCompare(b.name)).slice(0, 3).map(club => club.name);
+  return (own.length ? own : sport.clubs).slice().sort((a, b) => strongerClub(a, b) || a.name.localeCompare(b.name)).slice(0, 3).map(club => club.name);
 };
 
 /** "Arsenal, Chelsea and Liverpool lead 100 clubs fighting over England, …" */

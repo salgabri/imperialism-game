@@ -449,6 +449,14 @@ names the provider and reads "Game rating converted from CM current ability".
 
 ## Built-in earlier seasons
 
+**Clubs by results, since 21 November 2026.** Every earlier season's 124 clubs are Europe's strongest by
+results ([the Europe maps](domestic-campaigns.md#the-europe-maps), `scripts/lib/europe-field.mjs`): its clubs ranked
+on one scale across every country from the league and European cup results of the season, each matched to its squad
+in the season's source, or in an EA season to the CM 01/02 Update Team's database of the same season where EA lacks the
+club (`fill`, its ratings on EA's scale by `clubFill.scale`). Where the sections below speak of a season keeping
+"Europe's strongest 124" of its sources' first divisions by their XIs, that is the rule of before; the clubs each
+source offers, and their squads, are as they describe.
+
 Twenty-two seasons ship with the game, every season from 2004/05 to 2025/26
 (and twelve before them, [below](#seasons-before-fifa-05)).
 [EA FC 25](#ea-fc-25) and [FIFA 07 to FIFA 14](#fifa-07-to-fifa-14) are described
@@ -500,8 +508,9 @@ How a season is made:
   the edition's own, so clubs are taken by id from every European first division the
   edition rates (`EA_LEAGUES`: the built-in club layer's 26 and Russia's, 67). A club needs
   eleven rated players, as build-clubs requires, and a season keeps Europe's strongest
-  `TOP_CLUBS` (124) of them, as the built-in season does (until 14 November 2026 the seven
-  big leagues' 132–134 clubs): they and their strongest 32 play on the season's own
+  `TOP_CLUBS` (124) by results (since 21 November 2026; until then by the XIs' ratings, as the
+  built-in season does, and until 14 November 2026 the seven big leagues' 132–134 clubs), filled
+  from the Update Team's database where EA lacks a club: they and their strongest 32 play on the season's own
   [Europe maps](domestic-campaigns.md#the-europe-maps). The seven big leagues must each have
   a club; the audit lists every league's clubs, those kept and those short. Ids, codes and
   colours come from the same `presentClubs` as the CM builder.

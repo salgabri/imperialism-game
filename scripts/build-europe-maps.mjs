@@ -10,13 +10,16 @@
 // to the communes; a country with no club is not on the map at all, so it stays grey beneath it, like any neighbour of a
 // country map.
 // Russia's clubs hold European Russia only (`within`), the rest of Russia lying grey beneath the map (`partial`). An
-// earlier season whose clubs come from all of Europe has maps of their own ids (eu124e2018); its seven-league maps of
-// before (eu124s2018) stay in the index, never rebuilt, for the campaigns saved on them (`replacedBy`).
+// earlier season whose field is Europe's strongest by results has maps of their own ids (eu124r2018); its maps of before
+// (the seven leagues' eu124s2018, the ratings' eu124e2018) stay in the index, never rebuilt, for the campaigns saved on
+// them (`replacedBy`).
 //
 // Usage:
-//   node scripts/build-europe-maps.mjs [--only=eu124,eu32] [--check | --dry-run] [--boundaries=<dir>]
+//   node scripts/build-europe-maps.mjs [--only=eu124,eu32 | --index] [--check | --dry-run] [--boundaries=<dir>]
 //     --only        build these maps (eu124, weu32s2025, euroleague, rugbyeurope…); the index keeps the others' entries as
 //                   they are
+//     --index       build no map: write the index and attribution from the maps on disk (after disjoint --only runs side
+//                   by side)
 //     --check       rebuild offline from the caches and compare every output byte for byte
 //     --dry-run     build and verify (downloading boundaries as needed) but write nothing
 //     --boundaries  the boundary cache (default data-src/boundaries), e.g. another worktree's that holds Europe's layers
@@ -794,9 +797,11 @@ async function mapSpecs() {
     if (!set.clubs.length) continue;
     // A season whose clubs come from all of Europe has maps of their own ids (eu124e2018), since 14 November 2026 (SWOS's
     // since 17 November 2026, once its other league files were read); one whose file held the seven big leagues alone
-    // would keep its seven-league maps (eu124s1995, now replaced too).
+    // would keep its seven-league maps (eu124s1995, now replaced too). Since 21 November 2026 a season's field is
+    // Europe's strongest by results (`rank`, scripts/lib/europe-field.mjs), on maps of ids again its own (eu124r2018).
+    const ranked = set.clubs.some(club => club.rank != null);
     const allEurope = set.clubs.some(club => !BIG_LEAGUES.includes(club.league));
-    seasons.push({ tag: `${allEurope ? 'e' : 's'}${season.year}`, set: season.id, clubs: set.clubs });
+    seasons.push({ tag: `${ranked ? 'r' : allEurope ? 'e' : 's'}${season.year}`, set: season.id, clubs: set.clubs });
   }
   const women = [{ tag: '', set: null, clubs: WOMENS_CLUBS.filter(isEuropeanClub) }];
   for (const season of BUILT_IN_WOMENS_SEASONS) {
@@ -858,7 +863,9 @@ function nbaSeasonOf(year) {
 async function main() {
   const argv = process.argv.slice(2), args = new Set(argv);
   const check = args.has('--check'), dryRun = args.has('--dry-run');
-  const only = argv.find(a => a.startsWith('--only='))?.slice('--only='.length).split(',') ?? null;
+  // --index builds no map: it writes the index and attribution from the maps on disk, after runs of disjoint --only
+  // sets side by side (each writes its own maps, and an index the next run's overwrites).
+  const only = args.has('--index') ? [] : argv.find(a => a.startsWith('--only='))?.slice('--only='.length).split(',') ?? null;
   const boundaries = argv.find(a => a.startsWith('--boundaries='))?.slice('--boundaries='.length);
   const log = line => console.log(line);
   const started = Date.now();
@@ -884,7 +891,19 @@ async function main() {
     if (!next) throw new Error(`${entry.id} is in the index, but no map of the specs makes it or replaces it`);
     return { ...entry, replacedBy: next.id };
   });
-  const entries = [...specs.map(spec => built.get(spec.id)?.entry ?? previous.find(entry => entry.id === spec.id)).filter(Boolean), ...retired];
+  // A map not built in this run keeps its index entry, or, new since the index was written (by a run beside this one),
+  // takes the one its file gives.
+  const onDisk = async spec => {
+    if (!existsSync(outFile(spec.id))) return null;
+    const doc = JSON.parse(await readFile(outFile(spec.id), 'utf8'));
+    const named = (spec.ranked ?? true) && !(spec.seasons && spec.sport !== 'womens-football');
+    return { id: doc.id, sport: doc.sport, league: doc.league, name: 'Europe', ...(doc.theatre ? { theatre: doc.theatre } : {}),
+      ...(doc.seasons ? { seasons: doc.seasons } : {}), clubs: doc.clubs.length, sections: doc.clubs.length, countries: doc.hosts.length,
+      version: doc.version, ...(named ? { top: doc.clubs.slice(0, 3).map(club => club.name) } : {}) };
+  };
+  const kept = [];
+  for (const spec of specs) kept.push(built.get(spec.id)?.entry ?? previous.find(entry => entry.id === spec.id) ?? await onDisk(spec));
+  const entries = [...kept.filter(Boolean), ...retired];
   outputs.set(indexFile, indexModule(entries));
   const docs = [];
   for (const entry of entries) {

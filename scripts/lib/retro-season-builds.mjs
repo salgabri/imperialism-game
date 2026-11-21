@@ -42,26 +42,26 @@ const credits = (season, retrieved) => ({ compiler: season.compiler, ...(season.
  * play for another nation of their day (`noNationAt.playsFor`: East Germany's clubs, in 1989/90) or for none (`noNationAt`), and its
  * nations alone (src/engine/footballSets.js setHasClubs).
  */
-async function buildCmZip(season, dataDir, retrieved, { everyClub = false } = {}) {
+async function buildCmZip(season, dataDir, retrieved, { everyClub = false, field = null } = {}) {
   const zip = await pinned(dataDir, season.file);
   // Only the Data folder's tables: the language and picture files are not read.
   const files = unzipSync(zip, { filter: entry => /^[^/]+\.dat$/i.test(entry.name) });
   return buildFootballSet(files, { local: false, sourceExtra: credits(season, retrieved), ...(season.birthdays ? { famous: season.birthdays } : {}),
-    ...(season.noNationAt ? { noNationAt: season.noNationAt } : {}), ...(setHasClubs(season.id) ? { topClubs: TOP_CLUBS } : { clubs: false }), everyClub });
+    ...(season.noNationAt ? { noNationAt: season.noNationAt } : {}), ...(setHasClubs(season.id) ? { topClubs: TOP_CLUBS, field } : { clubs: false }), everyClub });
 }
 
 /** A Data folder's tables, each pinned on its own (taken from a CD, scripts/sync-retro-cds.mjs), read by the CM 01/02 builder as a known release. */
-async function buildCmTables(season, dataDir, retrieved, { everyClub = false } = {}) {
+async function buildCmTables(season, dataDir, retrieved, { everyClub = false, field = null } = {}) {
   const files = {};
   for (const file of season.files) files[file.name] = new Uint8Array(await pinned(dataDir, file));
-  return buildFootballSet(files, { local: false, kind: season.kind, sourceExtra: credits(season, retrieved), topClubs: TOP_CLUBS, everyClub });
+  return buildFootballSet(files, { local: false, kind: season.kind, sourceExtra: credits(season, retrieved), topClubs: TOP_CLUBS, everyClub, field });
 }
 
-async function buildCm9798(season, dataDir, retrieved, { everyClub = false } = {}) {
+async function buildCm9798(season, dataDir, retrieved, { everyClub = false, field = null } = {}) {
   const [players, teams] = await Promise.all(season.files.map(async file => JSON.parse((await pinned(dataDir, file)).toString('utf8'))));
   const source = { provider: season.maker, edition: season.edition, version: season.version, snapshotDate: season.snapshotDate, url: season.url,
     rawScale: CM_SCALE, conversion: CM_CONVERSION, ...credits(season, retrieved) };
-  return buildCm9798Season({ players, teams }, { source, year: seasonYear(season.season), everyClub });
+  return buildCm9798Season({ players, teams }, { source, year: seasonYear(season.season), everyClub, field });
 }
 
 /**
@@ -69,7 +69,7 @@ async function buildCm9798(season, dataDir, retrieved, { everyClub = false } = {
  * strongest TOP_CLUBS clubs of the top divisions of its European league files (SWOS_EUROPE_LEAGUES), as every other
  * season's club layer; with `everyClub`, every division's clubs of every league file too.
  */
-async function buildSwosFiles(season, dataDir, retrieved, { everyClub = false } = {}) {
+async function buildSwosFiles(season, dataDir, retrieved, { everyClub = false, field = null } = {}) {
   const read = await Promise.all(season.files.map(async file => readTeamFile(await pinned(dataDir, file), file.name.replace(/^TEAM\./, ''))));
   const numbers = read.map(file => file.number).sort();
   if (JSON.stringify(numbers) !== JSON.stringify([...SWOS_NATIONAL_FILES, ...Object.keys(SWOS_LEAGUES)].sort())) {
@@ -84,7 +84,7 @@ async function buildSwosFiles(season, dataDir, retrieved, { everyClub = false } 
     .flatMap(file => swosRows({ ...file, teams: file.teams.filter(team => team.division === 0) }, 'CLUB', clamped));
   const source = { provider: season.maker, edition: season.edition, version: season.version, snapshotDate: season.snapshotDate, url: season.url,
     rawScale: SWOS_SCALE, conversion: SWOS_CONVERSION, ...credits(season, retrieved) };
-  const result = buildSwosSeason(rows, { source, year: seasonYear(season.season), prices: SWOS_PRICES, id: season.id, clubRows, topClubs: TOP_CLUBS,
+  const result = buildSwosSeason(rows, { source, year: seasonYear(season.season), prices: SWOS_PRICES, id: season.id, clubRows, topClubs: TOP_CLUBS, field,
     // Every division's clubs of every league file, for the season's own country maps.
     ...(everyClub ? { everyClubRows: leagueFiles.flatMap(file => swosRows(file, 'CLUB', [])) } : {}) });
   return { ...result, audit: { ...result.audit, clamped } };
@@ -110,7 +110,8 @@ export const BUILDERS = { cm0102: buildCmZip, cm: buildCm9798, 'swos-files': bui
 
 /**
  * One season of scripts/data/retro-seasons.json, read by its reader (`season.reader`, else its kind) from `dataDir`:
- * the CM 01/02 builder's or another reader's `{ doc, text, audit, warnings }`, and with `everyClub` its `allClubs` too.
+ * the CM 01/02 builder's or another reader's `{ doc, text, audit, warnings }`, and with `everyClub` its `allClubs` too. A `field`
+ * (scripts/lib/europe-field.mjs resultsField) picks its clubs by results.
  */
 export function buildRetroSeason(season, dataDir, retrieved, options = {}) {
   const build = BUILDERS[season.reader ?? season.kind];

@@ -10,7 +10,7 @@ import { CM_SCALE, cmNaturalPositions, cmTupleOf, expandCmTuple } from '../../sr
 import { CM0102_NATIONS } from '../../src/data/cm0102Nations.js';
 import { FOOTBALL_FEDERATIONS } from '../../src/data/footballFederations.js';
 import { FOOTBALL_SET_FORMAT, NO_TEAM, contentHash, nationResolver, presentClubs, serializeFootballSet, strongestBuilt, territoryFor } from '../../src/data/footballSetBuild.js';
-import { BIG_LEAGUES, EUROPEAN_LEAGUES } from '../../src/data/footballLeagues.js';
+import { BIG_LEAGUES, EUROPEAN_LEAGUES, firstDivisionOf } from '../../src/data/footballLeagues.js';
 import { TOP_CLUBS } from '../../src/data/scopes.js';
 import { pickFootballSquad } from '../../src/data/footballSquad.js';
 
@@ -92,7 +92,7 @@ const count = (map, key) => { map[key] = (map[key] || 0) + 1; };
  * its first record), since the extraction's own ids repeat (627 of them are shared by unrelated players). `source` is
  * the season's source block. Returns `{ doc, text, audit, warnings }`; throws on anything it does not understand.
  */
-export function buildCm9798Season({ players, teams }, { source, year, federations = FOOTBALL_FEDERATIONS, everyClub = false }) {
+export function buildCm9798Season({ players, teams }, { source, year, federations = FOOTBALL_FEDERATIONS, everyClub = false, field = null }) {
   const warnings = [];
   const warn = message => warnings.push(message);
   const resolve = nationResolver(CM9798_NATIONS);
@@ -164,13 +164,44 @@ export function buildCm9798Season({ players, teams }, { source, year, federation
       if (![team.name, team.shortName].filter(Boolean).every(name => named.get(name) === team)) throw new Error(`${division} team ${team.name} shares a name with another record`);
       const squad = pickFootballSquad(byTeam.get(team) || []);
       if (squad.length < CLUB_SIZE) { short.push({ name: team.name, players: squad.length }); continue; }
-      built.push({ name: team.name, league, country, str: Math.round(mean(squad.map(p => p.rating))), squad });
+      built.push({ name: team.name, league, country, str: Math.round(mean(squad.map(p => p.rating))), squad, team });
     }
     leagueAudit.push({ league, division, members: members.length, clubs: members.length - short.length, kept: 0, short });
   }
-  // Europe's strongest TOP_CLUBS, as every season keeps.
-  const clubs = presentClubs(strongestBuilt(built, TOP_CLUBS), warn);
-  for (const club of clubs) leagueAudit.find(entry => entry.league === club.league).kept++;
+  // Europe's strongest TOP_CLUBS, as every season keeps: by results where a `field` is given (scripts/lib/europe-field.mjs),
+  // from those divisions and every other team of a European nation with a first division the game names, as its
+  // nation's; else by their XIs.
+  let picked = null;
+  if (field) {
+    // A country whose first division CM9798_DIVISIONS reads keeps it as the database stores it; every other country's
+    // teams come by their nation.
+    const inDivisions = new Set(built.map(club => club.team)), read = new Set(built.map(club => club.country));
+    const others = [];
+    for (const team of teams) {
+      if (inDivisions.has(team) || !byTeam.has(team)) continue;
+      const country = resolve(team.nation), league = country && country !== NO_TEAM ? firstDivisionOf(country, year) : null;
+      if (!league || read.has(country)) continue;
+      const squad = pickFootballSquad(byTeam.get(team));
+      if (squad.length >= CLUB_SIZE) others.push({ name: team.name, league, country, str: Math.round(mean(squad.map(p => p.rating))), squad, division: team.division || null });
+    }
+    // Only a country's top division: the one most of its eight strongest XIs play in (the strongest's, if two tie); a
+    // nation's teams in no division are its top division where its strongest are.
+    const top = new Map();
+    for (const country of new Set(others.map(club => club.country))) {
+      const strongest = others.filter(club => club.country === country).sort((a, b) => b.str - a.str).slice(0, 8);
+      const counts = new Map();
+      for (const club of strongest) counts.set(club.division, (counts.get(club.division) || 0) + 1);
+      const most = Math.max(...counts.values());
+      top.set(country, strongest.find(club => counts.get(club.division) === most).division);
+    }
+    picked = field([...built, ...others.filter(club => top.get(club.country) === club.division)]);
+  }
+  const clubs = picked ? presentClubs(picked.clubs, warn, { ranked: true, idOf: picked.idOf, reserved: picked.reserved }) : presentClubs(strongestBuilt(built, TOP_CLUBS), warn);
+  for (const club of clubs) {
+    let entry = leagueAudit.find(row => row.league === club.league);
+    if (!entry) leagueAudit.push(entry = { league: club.league, division: null, byNation: true, members: 0, clubs: 0, kept: 0, short: [] });
+    entry.kept++;
+  }
 
   const territory = territoryFor(federations, year);
   const written = new Set([...Object.values(nations).flatMap(([, , squad]) => squad), ...clubs.flatMap(club => club.squad)].map(tuple => tuple[0]));
@@ -186,7 +217,8 @@ export function buildCm9798Season({ players, teams }, { source, year, federation
     nullAttributes: players.filter(p => Object.values(p.attributes || {}).some(value => value == null)).length };
   const audit = {
     id: CM9798_ID, version: doc.version, records: players.length, teams: teams.length, eligible: kept.length, dropped, unread, noTeam, coverage,
-    leagues: leagueAudit, territory, shortNations: nationAudit.filter(n => !n.naturalLineup).map(n => `${n.id} ${n.name} (${n.players})`), warnings,
+    leagues: leagueAudit, ...(picked ? { field: picked.audit } : {}), territory,
+    shortNations: nationAudit.filter(n => !n.naturalLineup).map(n => `${n.id} ${n.name} (${n.players})`), warnings,
   };
   // Every team of a division with players, for the season's own country maps (scripts/build-season-countries.mjs,
   // `everyClub`): its division's name, its nation as the game names it, its town, and its squad as a season file picks one.

@@ -94,18 +94,18 @@
           "sha256": "b705168377f9e9ae0014b7976093fc358b1d83da639bd5130f88644730154216"
         }
       ],
-      "version": "cm0102-2003-10-f7d8ad32",
+      "version": "cm0102-2003-10-6a0df0f4",
       "coverage": {
-        "players": 2511,
+        "players": 2545,
         "nations": 162,
         "completeXIs": 109,
         "clubs": 124,
-        "leagues": 18
+        "leagues": 26
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2003-10",
-        "version": "cm0102-2003-10-f7d8ad32",
+        "version": "cm0102-2003-10-6a0df0f4",
         "database": {
           "known": true,
           "label": "October 2003 by Alex Sawczuk, fan-made",
@@ -261,7 +261,7 @@
         "players": {
           "read": 140223,
           "eligible": 79787,
-          "written": 2511,
+          "written": 2545,
           "dropped": {
             "nameless": 0,
             "noAbility": 36145,
@@ -307,7 +307,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
-            "kept": 20,
+            "kept": 18,
             "short": []
           },
           {
@@ -316,7 +316,7 @@
             "competition": "Spanish First Division",
             "members": 20,
             "clubs": 20,
-            "kept": 16,
+            "kept": 19,
             "short": []
           },
           {
@@ -325,7 +325,7 @@
             "competition": "Italian Serie A",
             "members": 18,
             "clubs": 18,
-            "kept": 14,
+            "kept": 12,
             "short": []
           },
           {
@@ -334,7 +334,7 @@
             "competition": "German First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 18,
+            "kept": 10,
             "short": []
           },
           {
@@ -343,7 +343,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 9,
+            "kept": 15,
             "short": []
           },
           {
@@ -352,7 +352,7 @@
             "competition": "Dutch Premier Division",
             "members": 18,
             "clubs": 17,
-            "kept": 12,
+            "kept": 3,
             "short": [
               {
                 "name": "Excelsior",
@@ -375,7 +375,7 @@
             "competition": "Turkish Premier Division",
             "members": 18,
             "clubs": 18,
-            "kept": 3,
+            "kept": 5,
             "short": []
           },
           {
@@ -384,7 +384,7 @@
             "competition": "Belgian First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 3,
+            "kept": 2,
             "short": []
           },
           {
@@ -393,7 +393,7 @@
             "competition": "Greek National A Division",
             "members": 16,
             "clubs": 16,
-            "kept": 2,
+            "kept": 3,
             "short": []
           },
           {
@@ -402,7 +402,7 @@
             "competition": "Czech First Division",
             "members": 16,
             "clubs": 16,
-            "kept": 1,
+            "kept": 4,
             "short": []
           },
           {
@@ -420,7 +420,7 @@
             "competition": "Danish Premier Division",
             "members": 12,
             "clubs": 12,
-            "kept": 3,
+            "kept": 2,
             "short": []
           },
           {
@@ -429,7 +429,7 @@
             "competition": "Norwegian Premier Division",
             "members": 14,
             "clubs": 14,
-            "kept": 3,
+            "kept": 1,
             "short": []
           },
           {
@@ -438,7 +438,7 @@
             "competition": "Croatian First Division",
             "members": 16,
             "clubs": 12,
-            "kept": 0,
+            "kept": 2,
             "short": [
               {
                 "name": "NK Belisce",
@@ -464,7 +464,7 @@
             "competition": "Polish First Division",
             "members": 16,
             "clubs": 16,
-            "kept": 0,
+            "kept": 1,
             "short": []
           },
           {
@@ -473,7 +473,7 @@
             "competition": "Swiss National Division A",
             "members": 12,
             "clubs": 6,
-            "kept": 0,
+            "kept": 1,
             "short": [
               {
                 "name": "Grasshopper Club Zurich",
@@ -516,7 +516,7 @@
             "competition": "Swedish Premier Division",
             "members": 14,
             "clubs": 14,
-            "kept": 8,
+            "kept": 1,
             "short": []
           },
           {
@@ -543,7 +543,7 @@
             "competition": "Russian Premier Division",
             "members": 16,
             "clubs": 15,
-            "kept": 3,
+            "kept": 4,
             "short": [
               {
                 "name": "Terek Grozny",
@@ -557,7 +557,7 @@
             "competition": "Yugoslav First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 1,
+            "kept": 2,
             "short": []
           },
           {
@@ -644,8 +644,102 @@
                 "players": 2
               }
             ]
+          },
+          {
+            "league": "Ukrainian Premier League",
+            "country": "804",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Bulgarian First League",
+            "country": "100",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Romanian Liga I",
+            "country": "642",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Latvian Higher League",
+            "country": "428",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Israeli Premier League",
+            "country": "376",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
           }
         ],
+        "field": {
+          "passed": [
+            "Malaga CF (Spain)"
+          ],
+          "matches": [
+            "Porto (Portugal) = Futebol Clube do Porto",
+            "Olympique Lyon (France) = Olympique Lyonnais",
+            "Celtic (Scotland) = Glasgow Celtic",
+            "Inter (Italy) = Internazionale (named)",
+            "Athletic Club (Spain) = Athletic Club de Bilbao",
+            "FC Sochaux (France) = FC Sochaux-Montbéliard",
+            "Olympiakos Piraeus (Greece) = Olympiakos Piraeus (named)",
+            "Real Betis (Spain) = Real Betis Balompié",
+            "Auxerre (France) = AJ Auxerre",
+            "Celta de Vigo (Spain) = Real Club Celta de Vigo",
+            "Osasuna (Spain) = Club Atlético Osasuna",
+            "PSG (France) = Paris-Saint-Germain (named)",
+            "Benfica (Portugal) = Sport Lisboa e Benfica",
+            "Rangers (Scotland) = Glasgow Rangers (named)",
+            "Sporting CP (Portugal) = Sporting Clube de Portugal (named)",
+            "Club Brugge (Belgium) = Club Brugge KV (named)",
+            "Nantes (France) = FC Nantes Atlantique",
+            "Lens (France) = Racing Club Lens",
+            "Partizan (Serbia) = Partizan Belgrade",
+            "Albacete (Spain) = Albacete Balompié",
+            "EA Guingamp (France) = En Avant Guingamp (named)",
+            "Lille (France) = Lille Olympique SC",
+            "Rennes (France) = Stade Rennais (named)",
+            "Dinamo Zagreb (Croatia) = NK Dinamo (named)",
+            "Crvena zvezda (Serbia) = Red Star Belgrade",
+            "FCSB (Romania) = Steaua Bucharest (named)",
+            "SC Bastia (France) = Sporting Club Bastia",
+            "Brøndby (Denmark) = Brøndbyernes Idræts Forening (named)",
+            "Strasbourg (France) = Racing Club Strasbourg",
+            "Rapid Bucureşti (Romania) = Rapid Bucharest (named)",
+            "Djurgården (Sweden) = Djurgårdens IF",
+            "Skonto FC (Latvia) = FK Skonto Riga",
+            "Zenit (Russia) = Zenith St. Petersburg (named)",
+            "Hajduk Split (Croatia) = HNK Hajduk",
+            "Austria Wien (Austria) = FK Austria Vienna (named)",
+            "Dinamo Bucureşti (Romania) = Dinamo Bucharest (named)",
+            "Boavista FC (Portugal) = Boavista Futebol Clube"
+          ]
+        },
         "territory": {
           "merged": {
             "499": "688",
@@ -2260,18 +2354,18 @@
         "sha256": "1ec5e59d438e026c86bc9af4e34e57fa85299ad8ea1b84a51be4f41b6ca7ec83",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/patched_data.zip"
       },
-      "version": "cm0102-2002-11-44129a8d",
+      "version": "cm0102-2002-11-93ffa473",
       "coverage": {
-        "players": 2500,
+        "players": 2525,
         "nations": 162,
         "completeXIs": 108,
         "clubs": 124,
-        "leagues": 17
+        "leagues": 25
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2002-11",
-        "version": "cm0102-2002-11-44129a8d",
+        "version": "cm0102-2002-11-93ffa473",
         "database": {
           "known": true,
           "label": "3.9.68",
@@ -2425,7 +2519,7 @@
         "players": {
           "read": 139769,
           "eligible": 79341,
-          "written": 2500,
+          "written": 2525,
           "dropped": {
             "nameless": 0,
             "noAbility": 36218,
@@ -2471,7 +2565,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
-            "kept": 19,
+            "kept": 17,
             "short": []
           },
           {
@@ -2480,7 +2574,7 @@
             "competition": "Spanish First Division",
             "members": 20,
             "clubs": 20,
-            "kept": 17,
+            "kept": 20,
             "short": []
           },
           {
@@ -2498,7 +2592,7 @@
             "competition": "German First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 18,
+            "kept": 11,
             "short": []
           },
           {
@@ -2507,7 +2601,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 13,
+            "kept": 16,
             "short": []
           },
           {
@@ -2516,7 +2610,7 @@
             "competition": "Dutch Premier Division",
             "members": 18,
             "clubs": 17,
-            "kept": 12,
+            "kept": 3,
             "short": [
               {
                 "name": "Excelsior",
@@ -2548,7 +2642,7 @@
             "competition": "Belgian First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 4,
+            "kept": 3,
             "short": []
           },
           {
@@ -2557,7 +2651,7 @@
             "competition": "Greek National A Division",
             "members": 16,
             "clubs": 16,
-            "kept": 3,
+            "kept": 4,
             "short": []
           },
           {
@@ -2566,7 +2660,7 @@
             "competition": "Czech First Division",
             "members": 16,
             "clubs": 16,
-            "kept": 1,
+            "kept": 4,
             "short": []
           },
           {
@@ -2602,7 +2696,7 @@
             "competition": "Croatian First Division",
             "members": 16,
             "clubs": 8,
-            "kept": 0,
+            "kept": 2,
             "short": [
               {
                 "name": "NK Cakovec",
@@ -2644,7 +2738,7 @@
             "competition": "Polish First Division",
             "members": 16,
             "clubs": 16,
-            "kept": 0,
+            "kept": 2,
             "short": []
           },
           {
@@ -2653,7 +2747,7 @@
             "competition": "Swiss National Division A",
             "members": 12,
             "clubs": 6,
-            "kept": 0,
+            "kept": 1,
             "short": [
               {
                 "name": "Grasshopper Club Zurich",
@@ -2696,7 +2790,7 @@
             "competition": "Swedish Premier Division",
             "members": 14,
             "clubs": 14,
-            "kept": 8,
+            "kept": 0,
             "short": []
           },
           {
@@ -2723,7 +2817,7 @@
             "competition": "Russian Premier Division",
             "members": 16,
             "clubs": 16,
-            "kept": 2,
+            "kept": 4,
             "short": []
           },
           {
@@ -2732,7 +2826,7 @@
             "competition": "Yugoslav First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 0,
+            "kept": 2,
             "short": []
           },
           {
@@ -2831,8 +2925,106 @@
                 "players": 2
               }
             ]
+          },
+          {
+            "league": "Ukrainian Premier League",
+            "country": "804",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Bulgarian First League",
+            "country": "100",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Israeli Premier League",
+            "country": "376",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Romanian Liga I",
+            "country": "642",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Latvian Higher League",
+            "country": "428",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
           }
         ],
+        "field": {
+          "passed": [
+            "Grasshoppers (Switzerland)",
+            "Nice (France)",
+            "Strasbourg (France)",
+            "FC Superfund (Austria)",
+            "Le Havre (France)"
+          ],
+          "matches": [
+            "Inter (Italy) = Internazionale (named)",
+            "Celta de Vigo (Spain) = Real Club Celta de Vigo",
+            "Real Betis (Spain) = Real Betis Balompié",
+            "Celtic (Scotland) = Glasgow Celtic",
+            "Olympique Lyon (France) = Olympique Lyonnais",
+            "Porto (Portugal) = Futebol Clube do Porto",
+            "Olympiakos Piraeus (Greece) = Olympiakos Piraeus (named)",
+            "Lens (France) = Racing Club Lens",
+            "PSG (France) = Paris-Saint-Germain (named)",
+            "Rangers (Scotland) = Glasgow Rangers (named)",
+            "Auxerre (France) = AJ Auxerre",
+            "Rayo Vallecano (Spain) = Rayo Vallecano de Madrid",
+            "Deportivo Alavés (Spain) = C.D. Alavés",
+            "Nantes (France) = FC Nantes Atlantique",
+            "Athletic Club (Spain) = Athletic Club de Bilbao",
+            "Partizan (Serbia) = Partizan Belgrade",
+            "Club Brugge (Belgium) = Club Brugge KV (named)",
+            "Osasuna (Spain) = Club Atlético Osasuna",
+            "FC Sochaux (France) = FC Sochaux-Montbéliard",
+            "Sporting CP (Portugal) = Sporting Clube de Portugal (named)",
+            "Benfica (Portugal) = Sport Lisboa e Benfica",
+            "Lille (France) = Lille Olympique SC",
+            "SC Bastia (France) = Sporting Club Bastia",
+            "Crvena zvezda (Serbia) = Red Star Belgrade",
+            "Boavista FC (Portugal) = Boavista Futebol Clube",
+            "EA Guingamp (France) = En Avant Guingamp (named)",
+            "Dinamo Zagreb (Croatia) = NK Dinamo (named)",
+            "Rennes (France) = Stade Rennais (named)",
+            "CS Sedan (France) = CS Sedan-Ardennes",
+            "Austria Wien (Austria) = FK Austria Vienna (named)",
+            "Rapid Bucureşti (Romania) = Rapid Bucharest (named)",
+            "Skonto FC (Latvia) = FK Skonto Riga",
+            "Hajduk Split (Croatia) = HNK Hajduk",
+            "Estac Troyes (France) = Es.Troyes Aube Champagne (named)",
+            "Montpellier (France) = Montpellier Hérault SC",
+            "PAOK (Greece) = PAOK Salonika",
+            "Brøndby (Denmark) = Brøndbyernes Idræts Forening (named)"
+          ]
+        },
         "territory": {
           "merged": {
             "499": "688",
@@ -4448,18 +4640,18 @@
         "sha256": "f3a5a9097e7e8d959b75550b4775c1ce4687d004187836ce095ce25e4ff0235c",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/original_data.zip"
       },
-      "version": "cm0102-2001-09-71741cda",
+      "version": "cm0102-2001-09-10c7f900",
       "coverage": {
-        "players": 2349,
+        "players": 2350,
         "nations": 143,
         "completeXIs": 96,
         "clubs": 124,
-        "leagues": 18
+        "leagues": 23
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2001-09",
-        "version": "cm0102-2001-09-71741cda",
+        "version": "cm0102-2001-09-10c7f900",
         "database": {
           "known": true,
           "label": "3.9.60",
@@ -4607,7 +4799,7 @@
         "players": {
           "read": 109940,
           "eligible": 64428,
-          "written": 2349,
+          "written": 2350,
           "dropped": {
             "nameless": 0,
             "noAbility": 28049,
@@ -4649,7 +4841,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
-            "kept": 20,
+            "kept": 17,
             "short": []
           },
           {
@@ -4658,7 +4850,7 @@
             "competition": "Spanish First Division",
             "members": 20,
             "clubs": 20,
-            "kept": 17,
+            "kept": 20,
             "short": []
           },
           {
@@ -4667,7 +4859,7 @@
             "competition": "Italian Serie A",
             "members": 18,
             "clubs": 18,
-            "kept": 14,
+            "kept": 16,
             "short": []
           },
           {
@@ -4676,7 +4868,7 @@
             "competition": "German First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 16,
+            "kept": 12,
             "short": []
           },
           {
@@ -4685,7 +4877,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 8,
+            "kept": 16,
             "short": []
           },
           {
@@ -4694,7 +4886,7 @@
             "competition": "Dutch Premier Division",
             "members": 18,
             "clubs": 18,
-            "kept": 14,
+            "kept": 5,
             "short": []
           },
           {
@@ -4712,7 +4904,7 @@
             "competition": "Turkish Premier Division",
             "members": 18,
             "clubs": 18,
-            "kept": 4,
+            "kept": 3,
             "short": []
           },
           {
@@ -4739,7 +4931,7 @@
             "competition": "Czech First Division",
             "members": 16,
             "clubs": 16,
-            "kept": 1,
+            "kept": 4,
             "short": []
           },
           {
@@ -4748,7 +4940,7 @@
             "competition": "Scottish Premier Division",
             "members": 12,
             "clubs": 12,
-            "kept": 3,
+            "kept": 2,
             "short": []
           },
           {
@@ -4766,7 +4958,7 @@
             "competition": "Norwegian Premier Division",
             "members": 14,
             "clubs": 14,
-            "kept": 1,
+            "kept": 2,
             "short": []
           },
           {
@@ -4775,7 +4967,7 @@
             "competition": "Croatian First Division",
             "members": 16,
             "clubs": 11,
-            "kept": 0,
+            "kept": 2,
             "short": [
               {
                 "name": "NK Cakovec",
@@ -4805,7 +4997,7 @@
             "competition": "Polish First Division",
             "members": 16,
             "clubs": 16,
-            "kept": 0,
+            "kept": 1,
             "short": []
           },
           {
@@ -4872,7 +5064,7 @@
             "competition": "Austrian Premier Division",
             "members": 10,
             "clubs": 10,
-            "kept": 1,
+            "kept": 2,
             "short": []
           },
           {
@@ -4881,7 +5073,7 @@
             "competition": "Swedish Premier Division",
             "members": 14,
             "clubs": 14,
-            "kept": 9,
+            "kept": 0,
             "short": []
           },
           {
@@ -5016,8 +5208,97 @@
                 "players": 2
               }
             ]
+          },
+          {
+            "league": "Ukrainian Premier League",
+            "country": "804",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Bulgarian First League",
+            "country": "100",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Israeli Premier League",
+            "country": "376",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Romanian Liga I",
+            "country": "642",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
           }
         ],
+        "field": {
+          "passed": [
+            "Basel (Switzerland)",
+            "Grasshoppers (Switzerland)",
+            "Servette (Switzerland)",
+            "Lugano (Switzerland)",
+            "St.Gallen (Switzerland)",
+            "Inter Bratislava (Slovakia)",
+            "Fbk Kaunas (Lithuania)"
+          ],
+          "matches": [
+            "Celta de Vigo (Spain) = Real Club Celta de Vigo",
+            "Olympiakos Piraeus (Greece) = Olympiakos Piraeus (named)",
+            "Olympique Lyon (France) = Olympique Lyonnais",
+            "Inter (Italy) = Internazionale (named)",
+            "Celtic (Scotland) = Glasgow Celtic",
+            "Lille (France) = Lille Olympique SC",
+            "Real Betis (Spain) = Real Betis Balompié",
+            "Deportivo Alavés (Spain) = C.D. Alavés",
+            "Lens (France) = Racing Club Lens",
+            "Porto (Portugal) = Futebol Clube do Porto",
+            "PSG (France) = Paris-Saint-Germain (named)",
+            "Nantes (France) = FC Nantes Atlantique",
+            "Boavista FC (Portugal) = Boavista Futebol Clube",
+            "Athletic Club (Spain) = Athletic Club de Bilbao",
+            "Club Brugge (Belgium) = Club Brugge KV (named)",
+            "Partizan (Serbia) = Partizan Belgrade",
+            "Sporting CP (Portugal) = Sporting Clube de Portugal (named)",
+            "Crvena zvezda (Serbia) = Red Star Belgrade",
+            "Rangers (Scotland) = Glasgow Rangers (named)",
+            "Osasuna (Spain) = Club Atlético Osasuna",
+            "Auxerre (France) = AJ Auxerre",
+            "Estac Troyes (France) = Es.Troyes Aube Champagne (named)",
+            "FC Wacker Innsbruck (Austria) = FC Tirol Innsbruck (named)",
+            "Dinamo Zagreb (Croatia) = NK Dinamo (named)",
+            "Rayo Vallecano (Spain) = Rayo Vallecano de Madrid",
+            "CS Sedan (France) = CS Sedan-Ardennes",
+            "Hajduk Split (Croatia) = HNK Hajduk",
+            "Rennes (France) = Stade Rennais (named)",
+            "Brøndby (Denmark) = Brøndbyernes Idræts Forening (named)",
+            "SC Bastia (France) = Sporting Club Bastia",
+            "FC Sochaux (France) = FC Sochaux-Montbéliard",
+            "Lillestroem SK (Norway) = Lillestrøm SK",
+            "Dinamo Bucureşti (Romania) = Dinamo Bucharest (named)",
+            "Benfica (Portugal) = Sport Lisboa e Benfica",
+            "Montpellier (France) = Montpellier Hérault SC",
+            "Zenit (Russia) = Zenith St. Petersburg (named)"
+          ]
+        },
         "territory": {
           "merged": {
             "499": "688",
@@ -6726,18 +7007,18 @@
           "md5": "a79d766a3869490bc2ec4e60b1e01b58"
         }
       ],
-      "version": "cm-0001-1d33b3c1",
+      "version": "cm-0001-07a05986",
       "coverage": {
-        "players": 2182,
+        "players": 2178,
         "nations": 134,
         "completeXIs": 82,
         "clubs": 124,
-        "leagues": 18
+        "leagues": 24
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm-0001",
-        "version": "cm-0001-1d33b3c1",
+        "version": "cm-0001-07a05986",
         "database": {
           "known": true,
           "label": "3.81",
@@ -6881,7 +7162,7 @@
         "players": {
           "read": 71641,
           "eligible": 40700,
-          "written": 2182,
+          "written": 2178,
           "dropped": {
             "nameless": 0,
             "noAbility": 23024,
@@ -6918,7 +7199,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
-            "kept": 20,
+            "kept": 17,
             "short": []
           },
           {
@@ -6927,7 +7208,7 @@
             "competition": "Spanish First Division",
             "members": 20,
             "clubs": 20,
-            "kept": 18,
+            "kept": 20,
             "short": []
           },
           {
@@ -6945,7 +7226,7 @@
             "competition": "German First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 15,
+            "kept": 16,
             "short": []
           },
           {
@@ -6954,7 +7235,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 10,
+            "kept": 17,
             "short": []
           },
           {
@@ -6963,7 +7244,7 @@
             "competition": "Dutch Premier Division",
             "members": 18,
             "clubs": 18,
-            "kept": 13,
+            "kept": 5,
             "short": []
           },
           {
@@ -6981,7 +7262,7 @@
             "competition": "Turkish First Division",
             "members": 18,
             "clubs": 13,
-            "kept": 4,
+            "kept": 3,
             "short": [
               {
                 "name": "Bursaspor",
@@ -7072,7 +7353,7 @@
             "competition": "Danish Premier Division",
             "members": 12,
             "clubs": 11,
-            "kept": 6,
+            "kept": 0,
             "short": [
               {
                 "name": "Haderslev Fodboldklub",
@@ -7129,7 +7410,7 @@
             "competition": "Polish First Division",
             "members": 16,
             "clubs": 16,
-            "kept": 0,
+            "kept": 1,
             "short": []
           },
           {
@@ -7138,7 +7419,7 @@
             "competition": "Swedish Premier Division",
             "members": 14,
             "clubs": 14,
-            "kept": 4,
+            "kept": 2,
             "short": []
           },
           {
@@ -7165,7 +7446,7 @@
             "competition": "Russian Premier Division",
             "members": 16,
             "clubs": 16,
-            "kept": 2,
+            "kept": 3,
             "short": []
           },
           {
@@ -7174,7 +7455,7 @@
             "competition": "Yugoslavian Premier Division",
             "members": 18,
             "clubs": 18,
-            "kept": 1,
+            "kept": 3,
             "short": []
           },
           {
@@ -7255,8 +7536,122 @@
                 "players": 4
               }
             ]
+          },
+          {
+            "league": "Ukrainian Premier League",
+            "country": "804",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Bulgarian First League",
+            "country": "100",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Latvian Higher League",
+            "country": "428",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Romanian Liga I",
+            "country": "642",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Israeli Premier League",
+            "country": "376",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Hungarian NB I",
+            "country": "348",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
           }
         ],
+        "field": {
+          "passed": [
+            "Shakhtar Donetsk (Ukraine)",
+            "St.Gallen (Switzerland)",
+            "Sturm Graz (Austria)",
+            "FC Wacker Innsbruck (Austria)",
+            "Inter Bratislava (Slovakia)",
+            "Lausanne-Sport (Switzerland)",
+            "Grasshoppers (Switzerland)",
+            "Rapid (Austria)",
+            "Maribor (Slovenia)",
+            "Gaziantepspor (Turkey)",
+            "Rapid Bucureşti (Romania)",
+            "Anorthosis (Cyprus)",
+            "Slovan Bratislava (Slovakia)",
+            "Zimbru (Moldova)",
+            "Basel (Switzerland)"
+          ],
+          "matches": [
+            "Olympiakos Piraeus (Greece) = Olympiakos Piraeus (named)",
+            "Celta de Vigo (Spain) = Real Club Celta de Vigo",
+            "Olympique Lyon (France) = Olympique Lyonnais",
+            "Deportivo Alavés (Spain) = C.D. Alavés",
+            "Crvena zvezda (Serbia) = Red Star Belgrade",
+            "Athletic Club (Spain) = Athletic Club de Bilbao",
+            "Porto (Portugal) = Futebol Clube do Porto",
+            "Rayo Vallecano (Spain) = Rayo Vallecano de Madrid",
+            "Nantes (France) = FC Nantes Atlantique",
+            "Club Brugge (Belgium) = Club Brugge KV (named)",
+            "Inter (Italy) = Internazionale (named)",
+            "PSG (France) = Paris-Saint-Germain (named)",
+            "Partizan (Serbia) = Partizan Belgrade",
+            "Rangers (Scotland) = Glasgow Rangers (named)",
+            "Dinamo Zagreb (Croatia) = NK Dinamo (named)",
+            "Sporting CP (Portugal) = Sporting Clube de Portugal (named)",
+            "Lens (France) = Racing Club Lens",
+            "Celtic (Scotland) = Glasgow Celtic",
+            "CS Sedan (France) = CS Sedan-Ardennes",
+            "Lille (France) = Lille Olympique SC",
+            "SC Bastia (France) = Sporting Club Bastia",
+            "Rennes (France) = Stade Rennais (named)",
+            "Boavista FC (Portugal) = Boavista Futebol Clube",
+            "Auxerre (France) = AJ Auxerre",
+            "Osasuna (Spain) = Club Atlético Osasuna",
+            "Benfica (Portugal) = Sport Lisboa e Benfica",
+            "Estac Troyes (France) = Es.Troyes Aube Champagne (named)",
+            "EA Guingamp (France) = En Avant Guingamp (named)",
+            "Skonto FC (Latvia) = Skonto Riga",
+            "Dinamo Bucureşti (Romania) = Dinamo Bucharest (named)",
+            "FK Obilic (Serbia) = FC Obilic Belgrade",
+            "Zenit (Russia) = Zenith St. Petersburg (named)",
+            "MTK (Hungary) = MTK Hungária"
+          ]
+        },
         "territory": {
           "merged": {
             "499": "688",
@@ -8965,18 +9360,18 @@
           "md5": "a59c383419664cbd4e236936a7532979"
         }
       ],
-      "version": "cm-9900-7899ae7e",
+      "version": "cm-9900-7ba87cb0",
       "coverage": {
-        "players": 2101,
+        "players": 2064,
         "nations": 123,
         "completeXIs": 74,
         "clubs": 124,
-        "leagues": 12
+        "leagues": 21
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm-9900",
-        "version": "cm-9900-7899ae7e",
+        "version": "cm-9900-7ba87cb0",
         "database": {
           "known": true,
           "label": "3.70",
@@ -9118,7 +9513,7 @@
         "players": {
           "read": 46460,
           "eligible": 22931,
-          "written": 2101,
+          "written": 2064,
           "dropped": {
             "nameless": 0,
             "noAbility": 18440,
@@ -9154,7 +9549,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
-            "kept": 20,
+            "kept": 16,
             "short": []
           },
           {
@@ -9163,7 +9558,7 @@
             "competition": "Spanish First Division",
             "members": 20,
             "clubs": 20,
-            "kept": 18,
+            "kept": 20,
             "short": []
           },
           {
@@ -9172,7 +9567,7 @@
             "competition": "Italian Serie A",
             "members": 18,
             "clubs": 18,
-            "kept": 15,
+            "kept": 18,
             "short": []
           },
           {
@@ -9190,7 +9585,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 13,
+            "kept": 17,
             "short": []
           },
           {
@@ -9199,7 +9594,7 @@
             "competition": "Dutch KPN-Telecompetition",
             "members": 18,
             "clubs": 18,
-            "kept": 16,
+            "kept": 6,
             "short": []
           },
           {
@@ -9208,7 +9603,7 @@
             "competition": "Portuguese Premier League",
             "members": 18,
             "clubs": 18,
-            "kept": 5,
+            "kept": 4,
             "short": []
           },
           {
@@ -9235,7 +9630,7 @@
             "competition": "Danish Premier Division",
             "members": 12,
             "clubs": 12,
-            "kept": 11,
+            "kept": 1,
             "short": []
           },
           {
@@ -9244,7 +9639,7 @@
             "competition": "Norwegian Premier Division",
             "members": 14,
             "clubs": 14,
-            "kept": 1,
+            "kept": 2,
             "short": []
           },
           {
@@ -9253,10 +9648,162 @@
             "competition": "Swedish Premier Division",
             "members": 14,
             "clubs": 14,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Süper Lig",
+            "country": "792",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
             "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Greek Super League",
+            "country": "300",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 3,
+            "short": []
+          },
+          {
+            "league": "Russian Premier League",
+            "country": "643",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Ukrainian Premier League",
+            "country": "804",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Yugoslav First League",
+            "country": "688",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Croatian HNL",
+            "country": "191",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Romanian Liga I",
+            "country": "642",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Ekstraklasa",
+            "country": "616",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Latvian Higher League",
+            "country": "428",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
             "short": []
           }
         ],
+        "field": {
+          "passed": [
+            "Sparta Praha (Czech Republic)",
+            "Slavia Praha (Czech Republic)",
+            "Lokomotiv Moskva (Russia)",
+            "FK Obilic (Serbia)",
+            "Rapid Bucureşti (Romania)",
+            "Sturm Graz (Austria)",
+            "Levski Sofia (Bulgaria)",
+            "Anorthosis (Cyprus)",
+            "MTK (Hungary)",
+            "Grasshoppers (Switzerland)",
+            "CSKA Moskva (Russia)",
+            "Maribor (Slovenia)",
+            "Rapid (Austria)",
+            "Lausanne-Sport (Switzerland)",
+            "Dinamo Tbilisi (Georgia)",
+            "Omonia Nicosia (Cyprus)",
+            "FC Wacker Innsbruck (Austria)",
+            "Legia Warszawa (Poland)",
+            "Shakhtar Donetsk (Ukraine)",
+            "Zimbru (Moldova)",
+            "PFC Litex Lovech (Bulgaria)"
+          ],
+          "matches": [
+            "Olympiakos Piraeus (Greece) = Olympiakos (named)",
+            "Porto (Portugal) = Futebol Clube do Porto",
+            "Athletic Club (Spain) = Athletic Club de Bilbao",
+            "Celta de Vigo (Spain) = Real Club Celta de Vigo",
+            "Inter (Italy) = Internazionale (named)",
+            "Olympique Lyon (France) = Olympique Lyonnais",
+            "Partizan (Serbia) = Partizan Belgrade",
+            "Dinamo Zagreb (Croatia) = Croatia Zagreb (named)",
+            "Rangers (Scotland) = Glasgow Rangers (named)",
+            "Crvena zvezda (Serbia) = Red Star Belgrade",
+            "Dinamo Bucureşti (Romania) = Dinamo Bucharest (named)",
+            "Deportivo Alavés (Spain) = C.D. Alavés",
+            "Lens (France) = Racing Club Lens",
+            "PSG (France) = Paris-Saint-Germain (named)",
+            "Real Betis (Spain) = Real Betis Balompié",
+            "Nantes (France) = FC Nantes Atlantique",
+            "Rayo Vallecano (Spain) = Rayo Vallecano de Madrid",
+            "Sporting CP (Portugal) = Sporting Clube de Portugal (named)",
+            "Benfica (Portugal) = Sport Lisboa e Benfica",
+            "Rennes (France) = Stade Rennais (named)",
+            "Auxerre (France) = AJ Auxerre",
+            "AEK Athens (Greece) = AEK",
+            "Club Brugge (Belgium) = Club Brugge KV (named)",
+            "SC Bastia (France) = Sporting Club Bastia",
+            "Montpellier (France) = Montpellier Hérault SC",
+            "Celtic (Scotland) = Glasgow Celtic",
+            "Boavista FC (Portugal) = Boavista Futebol Clube",
+            "Strasbourg (France) = Racing Club Strasbourg",
+            "AIK (Sweden) = AIK Solna (named)",
+            "CS Sedan (France) = CS Sedan-Ardennes",
+            "Skonto FC (Latvia) = Skonto Riga",
+            "As Nancy (France) = AS Nancy-Lorraine",
+            "Brøndby (Denmark) = Brøndbyernes Idræts Forening (named)",
+            "Le Havre (France) = Le Havre Athletic Club",
+            "FCSB (Romania) = Steaua Bucharest (named)"
+          ]
+        },
         "territory": {
           "merged": {
             "499": "688",
@@ -10846,18 +11393,18 @@
         "sha256": "702c85d69c1b806f3980c9dd8a864800e51ad8058421311edf2fe9eeb04e0c26",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/cm3_data.zip"
       },
-      "version": "cm0102-2020-11-cm3-85a355b1",
+      "version": "cm0102-2020-11-cm3-b73e2578",
       "coverage": {
-        "players": 1964,
+        "players": 1961,
         "nations": 113,
         "completeXIs": 64,
         "clubs": 124,
-        "leagues": 18
+        "leagues": 20
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2020-11-cm3",
-        "version": "cm0102-2020-11-cm3-85a355b1",
+        "version": "cm0102-2020-11-cm3-b73e2578",
         "database": {
           "known": true,
           "label": "98/99 for CM 01/02",
@@ -10995,7 +11542,7 @@
         "players": {
           "read": 28511,
           "eligible": 15229,
-          "written": 1964,
+          "written": 1961,
           "dropped": {
             "nameless": 0,
             "noAbility": 10535,
@@ -11029,7 +11576,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
-            "kept": 20,
+            "kept": 19,
             "short": []
           },
           {
@@ -11047,7 +11594,7 @@
             "competition": "Italian Serie A",
             "members": 18,
             "clubs": 18,
-            "kept": 13,
+            "kept": 18,
             "short": []
           },
           {
@@ -11065,7 +11612,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 8,
+            "kept": 16,
             "short": []
           },
           {
@@ -11074,7 +11621,7 @@
             "competition": "Dutch Premier Division",
             "members": 18,
             "clubs": 18,
-            "kept": 15,
+            "kept": 5,
             "short": []
           },
           {
@@ -11083,7 +11630,7 @@
             "competition": "Portuguese Premier League",
             "members": 18,
             "clubs": 18,
-            "kept": 6,
+            "kept": 4,
             "short": []
           },
           {
@@ -11166,7 +11713,7 @@
             "competition": "Belgian First Division",
             "members": 18,
             "clubs": 16,
-            "kept": 4,
+            "kept": 3,
             "short": [
               {
                 "name": "RAA La Louvieroise",
@@ -11321,7 +11868,7 @@
             "competition": "Danish Premier Division",
             "members": 12,
             "clubs": 4,
-            "kept": 4,
+            "kept": 1,
             "short": [
               {
                 "name": "Aarhus Gymnastik Forening",
@@ -11363,7 +11910,7 @@
             "competition": "Norwegian Premier Division",
             "members": 14,
             "clubs": 5,
-            "kept": 1,
+            "kept": 2,
             "short": [
               {
                 "name": "Bryne FK",
@@ -11409,7 +11956,7 @@
             "competition": "Croatian First Division",
             "members": 16,
             "clubs": 3,
-            "kept": 1,
+            "kept": 2,
             "short": [
               {
                 "name": "NK Cakovec",
@@ -12089,8 +12636,111 @@
                 "players": 0
               }
             ]
+          },
+          {
+            "league": "Romanian Liga I",
+            "country": "642",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Latvian Higher League",
+            "country": "428",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
           }
         ],
+        "field": {
+          "passed": [
+            "Dynamo Kyiv (Ukraine)",
+            "Sparta Praha (Czech Republic)",
+            "Partizan (Serbia)",
+            "Fenerbahçe (Turkey)",
+            "Grasshoppers (Switzerland)",
+            "FK Obilic (Serbia)",
+            "Sturm Graz (Austria)",
+            "FK Siauliai (Lithuania)",
+            "Rapid Bucureşti (Romania)",
+            "Zimbru (Moldova)",
+            "Shakhtar Donetsk (Ukraine)",
+            "CSKA Moskva (Russia)",
+            "Slavia Praha (Czech Republic)",
+            "Lokomotiv Moskva (Russia)",
+            "Trabzonspor (Turkey)",
+            "MTK (Hungary)",
+            "Dinamo Tbilisi (Georgia)",
+            "Rotor Volgograd (Russia)",
+            "Rapid (Austria)",
+            "Anorthosis (Cyprus)",
+            "Sigma Olomouc (Czech Republic)",
+            "PAOK (Greece)",
+            "Beitar Jerusalem (Israel)",
+            "Servette (Switzerland)",
+            "Ferencváros (Hungary)",
+            "Molde (Norway)",
+            "Lausanne-Sport (Switzerland)",
+            "Levski Sofia (Bulgaria)",
+            "Zürich (Switzerland)",
+            "Legia Warszawa (Poland)",
+            "Dinamo Bucureşti (Romania)",
+            "Újpest (Hungary)",
+            "Maribor (Slovenia)",
+            "Widzew Łódź (Poland)",
+            "Stabaek If (Norway)",
+            "Grazer AK (Austria)",
+            "Omonia Nicosia (Cyprus)",
+            "Zenit (Russia)",
+            "Hapoel Haifa (Israel)",
+            "Baník Ostrava (Czech Republic)",
+            "Karpaty Lviv (Ukraine)",
+            "Alania Vladikavkaz (Russia)",
+            "Viking (Norway)",
+            "Salzburg (Austria)"
+          ],
+          "matches": [
+            "Inter (Italy) = Internazionale (named)",
+            "Olympiakos Piraeus (Greece) = Olympiakos Piraeus (named)",
+            "Celta de Vigo (Spain) = Real Club Celta de Vigo",
+            "Athletic Club (Spain) = Athletic Club de Bilbao",
+            "Porto (Portugal) = Futebol Clube do Porto",
+            "Olympique Lyon (France) = Olympique Lyonnais",
+            "Dinamo Zagreb (Croatia) = NK Dinamo (named)",
+            "Crvena zvezda (Serbia) = Red Star Belgrade",
+            "Lens (France) = Racing Club Lens",
+            "Real Betis (Spain) = Real Betis Balompié",
+            "Club Brugge (Belgium) = Club Brugge KV (named)",
+            "Nantes (France) = FC Nantes Atlantique",
+            "Auxerre (France) = AJ Auxerre",
+            "Rangers (Scotland) = Glasgow Rangers (named)",
+            "PSG (France) = Paris-St.Germain (named)",
+            "Benfica (Portugal) = Sport Lisboa e Benfica",
+            "SC Bastia (France) = Sporting Club Bastia",
+            "Brøndby (Denmark) = Brøndbyernes Idræts Forening (named)",
+            "FCSB (Romania) = Steaua Bucharest (named)",
+            "Rennes (France) = Stade Rennais (named)",
+            "Montpellier (France) = Montpellier Hérault SC",
+            "Celtic (Scotland) = Glasgow Celtic",
+            "Boavista FC (Portugal) = Boavista Futebol Clube",
+            "Strasbourg (France) = Racing Club Strasbourg",
+            "Le Havre (France) = Le Havre Athletic Club",
+            "Deportivo Alavés (Spain) = C.D. Alavés",
+            "Sporting CP (Portugal) = Sporting Clube de Portugal (named)",
+            "Hajduk Split (Croatia) = HNK Hajduk",
+            "1 FC Nuernberg (Germany) = 1.FC Nürnberg",
+            "Skonto FC (Latvia) = FK Skonto Riga",
+            "Borussia M'gladbach (Germany) = Borussia M'gladbach (named)",
+            "AIK (Sweden) = AIK Solna (named)",
+            "As Nancy (France) = AS Nancy-Lorraine"
+          ]
+        },
         "territory": {
           "merged": {
             "499": "688",
@@ -13674,7 +14324,7 @@
       "listing": "SI's Championship Manager 97/98 database as baskeyx extracted it to JSON (github.com/baskeyx/cm9798)",
       "maker": "Sports Interactive",
       "edition": "CM 97/98",
-      "version": "cm-9798-14115d7e",
+      "version": "cm-9798-49e002f5",
       "snapshotDate": "1997-10",
       "url": "https://github.com/baskeyx/cm9798",
       "compiler": "baskeyx (Dan Baskey): the cm9798 package, extracted to JSON (commit 06bdd2b, 5 October 2026)",
@@ -13697,15 +14347,15 @@
         }
       ],
       "coverage": {
-        "players": 1870,
+        "players": 1862,
         "nations": 102,
         "completeXIs": 52,
         "clubs": 124,
-        "leagues": 12
+        "leagues": 20
       },
       "audit": {
         "id": "cm-9798",
-        "version": "cm-9798-14115d7e",
+        "version": "cm-9798-49e002f5",
         "records": 19359,
         "teams": 2085,
         "eligible": 12941,
@@ -13729,11 +14379,11 @@
           "Liechtenstein": 13
         },
         "coverage": {
-          "players": 1870,
+          "players": 1862,
           "nations": 102,
           "completeXIs": 52,
           "clubs": 124,
-          "leagues": 12
+          "leagues": 20
         },
         "leagues": [
           {
@@ -13741,7 +14391,7 @@
             "division": "EPR",
             "members": 20,
             "clubs": 20,
-            "kept": 19,
+            "kept": 17,
             "short": []
           },
           {
@@ -13757,7 +14407,7 @@
             "division": "ISA",
             "members": 18,
             "clubs": 18,
-            "kept": 17,
+            "kept": 18,
             "short": []
           },
           {
@@ -13765,7 +14415,7 @@
             "division": "GD1",
             "members": 18,
             "clubs": 18,
-            "kept": 17,
+            "kept": 18,
             "short": []
           },
           {
@@ -13773,7 +14423,7 @@
             "division": "FD1",
             "members": 18,
             "clubs": 18,
-            "kept": 18,
+            "kept": 17,
             "short": []
           },
           {
@@ -13781,7 +14431,7 @@
             "division": "HD1",
             "members": 18,
             "clubs": 17,
-            "kept": 8,
+            "kept": 6,
             "short": [
               {
                 "name": "Sparta Rotterdam",
@@ -13794,7 +14444,7 @@
             "division": "PD1",
             "members": 18,
             "clubs": 13,
-            "kept": 13,
+            "kept": 5,
             "short": [
               {
                 "name": "Académica Coimbra",
@@ -13896,7 +14546,7 @@
             "division": "BD1",
             "members": 18,
             "clubs": 17,
-            "kept": 3,
+            "kept": 4,
             "short": [
               {
                 "name": "K. Sint-Truidense VV",
@@ -13909,7 +14559,7 @@
             "division": "SPR",
             "members": 10,
             "clubs": 8,
-            "kept": 3,
+            "kept": 2,
             "short": [
               {
                 "name": "Heart Of Midlothian",
@@ -13926,7 +14576,7 @@
             "division": "DD1",
             "members": 12,
             "clubs": 12,
-            "kept": 0,
+            "kept": 4,
             "short": []
           },
           {
@@ -13944,8 +14594,157 @@
             "clubs": 14,
             "kept": 4,
             "short": []
+          },
+          {
+            "league": "Russian Premier League",
+            "division": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Ukrainian Premier League",
+            "division": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Croatian HNL",
+            "division": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Greek Super League",
+            "division": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Latvian Higher League",
+            "division": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Swiss Super League",
+            "division": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Bulgarian First League",
+            "division": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
           }
         ],
+        "field": {
+          "passed": [
+            "Olympiakos Piraeus (Greece)",
+            "Sparta Praha (Czech Republic)",
+            "Rotor Volgograd (Russia)",
+            "Dinamo Moskva (Russia)",
+            "AEK Athens (Greece)",
+            "FCSB (Romania)",
+            "Slavia Praha (Czech Republic)",
+            "Fenerbahçe (Turkey)",
+            "Trabzonspor (Turkey)",
+            "Legia Warszawa (Poland)",
+            "Dinamo Tbilisi (Georgia)",
+            "Grasshoppers (Switzerland)",
+            "Sturm Graz (Austria)",
+            "Partizan (Serbia)",
+            "Widzew Łódź (Poland)",
+            "Crvena zvezda (Serbia)",
+            "Lokomotiv Moskva (Russia)",
+            "Beşiktaş (Turkey)",
+            "PAOK (Greece)",
+            "MTK (Hungary)",
+            "Hajduk Split (Croatia)",
+            "Ferencváros (Hungary)",
+            "Alania Vladikavkaz (Russia)",
+            "Zimbru (Moldova)",
+            "Újpest (Hungary)",
+            "Shakhtar Donetsk (Ukraine)",
+            "Dinamo Minsk (Belarus)",
+            "FK Siauliai (Lithuania)",
+            "Dnipro Dnipropetrovsk (Ukraine)",
+            "Anorthosis (Cyprus)",
+            "Progresul Bucuresti (Romania)",
+            "Lausanne-Sport (Switzerland)",
+            "Rapid (Austria)",
+            "Jablonec (Czech Republic)",
+            "FC Zbrojovka Brno (Czech Republic)",
+            "Chernomorets Novorossisk (Russia)",
+            "Beitar Jerusalem (Israel)",
+            "Rapid Bucureşti (Romania)",
+            "Neuchatel Xamax FCS (Switzerland)",
+            "Salzburg (Austria)",
+            "Levski Sofia (Bulgaria)",
+            "Tiligul Tiraspol (Moldova)",
+            "Sigma Olomouc (Czech Republic)",
+            "Baltika Kaliningrad (Russia)",
+            "CSKA Moskva (Russia)",
+            "Inkaras Kaunas (Lithuania)",
+            "Grazer AK (Austria)",
+            "Istanbulspor (Turkey)",
+            "Torpedo Moskva (Russia)",
+            "Neftochimik Burgas (Bulgaria)",
+            "Budapesti Vasas (Hungary)"
+          ],
+          "matches": [
+            "Inter (Italy) = Internazionale (named)",
+            "Ajax (Netherlands) = AFC Ajax Amsterdam",
+            "PSV (Netherlands) = PSV Eindhoven",
+            "Real Betis (Spain) = Real Betis Balompie",
+            "PSG (France) = Paris St.Germain FC (named)",
+            "Dinamo Zagreb (Croatia) = FC Croatia Zagreb (named)",
+            "Athletic Club (Spain) = Athletic Club de Bilbao",
+            "Auxerre (France) = AJ Auxerre",
+            "Club Brugge (Belgium) = Club Brugge KV (named)",
+            "Olympique Lyon (France) = Olympique Lyonnais",
+            "Galatasaray (Turkey) = Galatasaray Istanbul",
+            "Nantes (France) = FC Nantes Atlantique",
+            "Lens (France) = Racing Club Lens",
+            "Feyenoord (Netherlands) = Feyenoord Rotterdam",
+            "CD Tenerife (Spain) = Club Deportivo Tenerife",
+            "Sporting CP (Portugal) = Sporting Lisbon (named)",
+            "Brøndby (Denmark) = Brøndby (named)",
+            "Borussia M'gladbach (Germany) = Borussia MGB (named)",
+            "Strasbourg (France) = Racing Club de Strasbourg",
+            "Montpellier (France) = Montpellier HSC",
+            "Celtic (Scotland) = Glasgow Celtic",
+            "Rangers (Scotland) = Glasgow Rangers (named)",
+            "Arminia Bielefeld (Germany) = DSC Arminia Bielefeld",
+            "Vitesse (Netherlands) = Vitesse Arnhem",
+            "EA Guingamp (France) = En Avant Guingamp (named)",
+            "Merida Ad (Spain) = CP Merida",
+            "Rennes (France) = Stade Rennais FC (named)",
+            "Skonto FC (Latvia) = Skonto Riga",
+            "Oerebro SK (Sweden) = Örebro SK"
+          ]
+        },
         "territory": {
           "merged": {
             "499": "688",
@@ -14096,7 +14895,7 @@
       "listing": "Sensible Software's Sensible World of Soccer 96/97, its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)",
       "maker": "Sensible Software",
       "edition": "SWOS 96/97",
-      "version": "swos-9697-1478886e",
+      "version": "swos-9697-c1b0c59a",
       "snapshotDate": "1996",
       "url": "https://cern.swos.eu/data/amiga/9697/",
       "compiler": "The game's own team files: the six national team files (TEAM.080 to 085) and the seven league files (TEAM.008 England, 013 France, 014 Germany, 020 Italy, 025 Holland, 029 Portugal, 035 Spain), as the SWOS United community server keeps them for its tools (cern.swos.eu/data/amiga/9697), read by scripts/lib/swos-files.mjs",
@@ -14587,11 +15386,11 @@
         "nations": 133,
         "completeXIs": 133,
         "clubs": 124,
-        "leagues": 18
+        "leagues": 27
       },
       "audit": {
         "id": "swos-9697",
-        "version": "swos-9697-1478886e",
+        "version": "swos-9697-c1b0c59a",
         "rows": 2288,
         "teams": 143,
         "noTeam": {
@@ -14611,7 +15410,7 @@
           "nations": 133,
           "completeXIs": 133,
           "clubs": 124,
-          "leagues": 18
+          "leagues": 27
         },
         "territory": {
           "merged": {
@@ -14628,8 +15427,14 @@
             "626"
           ]
         },
-        "clubRows": 7808,
+        "clubRows": 9728,
         "leagues": [
+          {
+            "league": "Kategoria Superiore",
+            "file": "000",
+            "clubs": 16,
+            "short": []
+          },
           {
             "league": "Austrian Bundesliga",
             "file": "001",
@@ -14679,6 +15484,12 @@
             "short": []
           },
           {
+            "league": "Meistriliiga",
+            "file": "010",
+            "clubs": 12,
+            "short": []
+          },
+          {
             "league": "Veikkausliiga",
             "file": "012",
             "clubs": 12,
@@ -14709,15 +15520,39 @@
             "short": []
           },
           {
+            "league": "Besta deild",
+            "file": "017",
+            "clubs": 10,
+            "short": []
+          },
+          {
             "league": "League of Ireland",
             "file": "018",
             "clubs": 12,
             "short": []
           },
           {
+            "league": "Israeli Premier League",
+            "file": "019",
+            "clubs": 16,
+            "short": []
+          },
+          {
             "league": "Serie A",
             "file": "020",
             "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Latvian Higher League",
+            "file": "021",
+            "clubs": 10,
+            "short": []
+          },
+          {
+            "league": "A Lyga",
+            "file": "022",
+            "clubs": 12,
             "short": []
           },
           {
@@ -14775,6 +15610,12 @@
             "short": []
           },
           {
+            "league": "Slovenian PrvaLiga",
+            "file": "034",
+            "clubs": 16,
+            "short": []
+          },
+          {
             "league": "La Liga",
             "file": "035",
             "clubs": 22,
@@ -14815,14 +15656,34 @@
             "file": "041",
             "clubs": 10,
             "short": []
+          },
+          {
+            "league": "Belarusian Premier League",
+            "file": "076",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "Slovak First League",
+            "file": "078",
+            "clubs": 12,
+            "short": []
           }
         ],
         "collisions": [
+          "PERPARIM DAIU (Besa Kavaje, Besa Kavaje)",
+          "ILIR BITURKU (Besa Kavaje, Partizani Tirana)",
+          "ARIAN QYSHKA (Iliria Fushë-Krujë, Laci)",
+          "PELLUMB YZEIRI (Laci, Partizani Tirana)",
+          "NORDIK RUHI (Partizani Tirana, Partizani Tirana)",
+          "ANDREA NIKOLLA (Partizani Tirana, Partizani Tirana)",
           "ATTILA HORVATH (Austria Vienna, Zalaegerszeg)",
           "ZELJKO PAVLOVIC (FC Linz, NK Zagreb)",
           "JOSKO POPOVIC (FC Linz, NK Zagreb)",
           "BOBAN DMITROVIC (Grazer AK, Rad Belgrade)",
+          "PETER MRAZ (Niederosterreich, Inter Bratislava)",
           "RENE WAGNER (Rapid Vienna, Boby Brno)",
+          "WILLY VINCENT (Antwerp, Hapoel Beit She'an)",
           "ZSOLT PETRY (Charleroi, Genclerbirligi)",
           "GERT CLAESSENS (Club Bruges, Club Bruges)",
           "ANDERS NIELSEN (Club Bruges, Lyngby)",
@@ -14843,8 +15704,10 @@
           "KRUNOSLAV JURCIC (Croatia Zagreb, Istra Pula)",
           "ZORAN GOSPIC (Istra Pula, NK Zagreb)",
           "ZELJKO BRKIC (Marsonia Slavonski Brod, NK Zagreb)",
+          "MLADEN RUDONJA (Marsonia Slavonski Brod, Izola)",
           "KRUNOSLAV PINTURIC (NK Zagreb, Segesta Sisak)",
           "MIROSLAV BICANIC (Osijek, MSV Duisburg)",
+          "IGOR BERNOBIC (Rijeka, Optimizem)",
           "DENIS PUTNIK (Sibenik, GD Chaves)",
           "GEORGE CONSTANDINOU (AEK Larnaca, Omonia Aradippou)",
           "YIANNAKIS IOANNOU (AEL Limassol, Nea Salamina)",
@@ -14855,11 +15718,17 @@
           "PAMBOS CHARALAMBOUS (Ethnikos Akhnas, Evagoras Paphos, Olympiakos)",
           "NEBOJSA VIGNJEVIC (Paralimni, Rad Belgrade)",
           "JAN PALINEK (Boby Brno, Petra Drnovice)",
+          "VILIAM VIDUMSKY (Boby Brno, Tatran Presov)",
+          "MIROSLAV MENTEL (Kaucuk Opava, Dunajska Streda)",
           "LUBOS KUBIK (Petra Drnovice, Slavia Prague)",
+          "JAROSLAV TIMKO (Petra Drnovice, Slovan Bratislava)",
+          "ONDREJ KRISTOFIK (Slavia Prague, Slovan Bratislava)",
           "JAROMIR JINDRACEK (Slavia Prague, Union Cheb)",
           "MICHAL CALOUN (Sparta Prague, Viktoria Plzen)",
           "JENS MADSEN (AaB, Vejle)",
+          "AURELIJUS SKARBALIUS (Brondby, Zalgiris Vilnius)",
           "MARTIN NIELSEN (FC Copenhagen, Viborg)",
+          "RISTO KALLASTE (Viborg, Flora Tallinn)",
           "EMERSON (Middlesbrough, FC St. Pauli, C.F. Os Belenenses)",
           "MARCELO (Inter Turku, Olympique Lyonnais, PSV)",
           "JANNE LAHTONEN (MP, MP)",
@@ -14868,6 +15737,7 @@
           "TOMASZ WIESZCZYCKI (Le Havre AC, Legia Warsaw)",
           "ZORAN MILINKOVIC (OGC Nice, Radnicki Nis)",
           "CORNELIU PAPURA (Stade Rennais FC, Universitatea Craiova)",
+          "ALEXANDER VENCEL (Racing Club de Strasbourg, Slovan Bratislava)",
           "PAULO SOUSA (Borussia Dortmund, Boavista FC)",
           "PATRIK ANDERSSON (Borussia Mönchengladbach, Trelleborg)",
           "THOMAS WOLTER (SV Werder Bremen, SV Werder Bremen)",
@@ -14883,11 +15753,24 @@
           "FERENC HAMORI (Gyor, CS Marítimo)",
           "IGOR NICHENKO (Stadler, Krivbass)",
           "TAMAS TIEFENBACH (Ujpesti TE, St. Gallen)",
+          "ARNALDUR LOFTSSON (Breidablik, Valur)",
+          "SIGURDUR JONSSON (IA, Orebro)",
+          "EYSTEINN HAUKSSON (Keflavik, Keflavik)",
           "DEREK MURRAY (Derry City, Monaghan United)",
           "BARRY RYAN (Derry City, Limerick)",
           "PAUL DOOLIN (Shelbourne, Portadown)",
           "BOBBY BROWNE (Shelbourne, Ards)",
+          "ARIK BENADO (Beitar Jerusalem, Maccabi Haifa)",
+          "SHLOMI DAHAN (Hapoel Beit She'an, Maccabi Netanya)",
+          "ISRAEL COHEN (Hapoel Petah Tikva, Maccabi Herzliya)",
+          "YOSSI MADAR (Hapoel Tel-Aviv, Maccabi Herzliya)",
           "IGOR SIMUTENKOV (Reggiana, Dinamo Moscow)",
+          "YURGIS SAMSONOV (Olympia Riga, RAF Yelgava)",
+          "VADIMAS PETRENKA (Aras Klaipeda, Panerys Vilnius)",
+          "VAIDOTAS SLEKYS (Ekranas Panevėžys, Lugano)",
+          "EDGARAS TUMASONIS (Panerys Vilnius, Sirijus Klaipeda)",
+          "ARUNAS SUIKA (Romar Mazeikiai, Sirijus Klaipeda)",
+          "ALEKSANDR IGNATYEV (Tauras-Karsuva, Zhemchuzhina)",
           "DEJAN CUROVIC (Vitesse Arnhem, Partizan Belgrade)",
           "DEJAN GOVEDARICA (FC Volendam, Vojvodina Novi Sad)",
           "RADOSLAV SAMARDZIC (FC Volendam, Vojvodina Novi Sad)",
@@ -14896,6 +15779,7 @@
           "COLIN NUTT (Cliftonville, Larne)",
           "LINDSAY CURRY (Larne, Linfield)",
           "MAGNUS JOHANSSON (Brann, IFK Gothenburg)",
+          "VLADIMIR LOMAKO (Gornik Zabrze, Torpedo Minsk)",
           "JOAO PINTO (SL Benfica, Sporting Clube de Braga)",
           "QUIM (Sporting Clube de Braga, Vitória Futebol Clube)",
           "ARTUR JORGE (Sporting Clube de Braga, SC Espinho)",
@@ -14919,6 +15803,8 @@
           "SERGEI SHUSTIKOV (Torpedo Moscow, Racing Santander)",
           "WILLIE MILLER (Dunfermline, Hibernian)",
           "DRAGOJE LEKOVIC (Kilmarnock, Buducnost)",
+          "KADRIJA IBRANOVIC (AM Cosmos, Primorje)",
+          "MITJA JUDEZ (AM Cosmos, Mavrica)",
           "TONI (Atlético Madrid, RCD Espanyol)",
           "FRANCISCO VILLARROYA (RC Deportivo de La Coruña, Real Sporting de Gijón)",
           "DMITRI RADCHENKO (RC Deportivo de La Coruña, Rayo Vallecano)",
@@ -14944,6 +15830,42 @@
           "GARETH JONES (Newtown, Porthmadog)",
           "DRAGOSLAV JEVRIC (Red Star Belgrade, Red Star Belgrade)"
         ],
+        "field": {
+          "passed": [
+            "Dinamo Tbilisi (Georgia)",
+            "Zimbru (Moldova)",
+            "Tiligul Tiraspol (Moldova)"
+          ],
+          "matches": [
+            "PSG (France) = Paris Saint-Germain (named)",
+            "Inter (Italy) = Inter (named)",
+            "Dinamo Zagreb (Croatia) = Croatia Zagreb (named)",
+            "Auxerre (France) = AJ Auxerre",
+            "Real Betis (Spain) = Real Betis Balompié",
+            "CD Tenerife (Spain) = Club Deportivo Tenerife",
+            "Alania Vladikavkaz (Russia) = Spartak Vladikavkaz (named)",
+            "Borussia M'gladbach (Germany) = Borussia Mönchengladbach (named)",
+            "Club Brugge (Belgium) = Club Bruges (named)",
+            "Sporting CP (Portugal) = Sporting CP (named)",
+            "Rangers (Scotland) = Rangers (named)",
+            "Olympique Lyon (France) = Olympique Lyonnais",
+            "Brøndby (Denmark) = Brondby (named)",
+            "Rapid (Austria) = Rapid Vienna",
+            "Montpellier (France) = Montpellier HSC",
+            "Celta de Vigo (Spain) = RC Celta",
+            "FCSB (Romania) = Steaua Bucharest (named)",
+            "Dinamo Minsk (Belarus) = Dinamo Minsk (named)",
+            "Strasbourg (France) = Racing Club de Strasbourg",
+            "EA Guingamp (France) = En Avant Guingamp (named)",
+            "Olympiakos Piraeus (Greece) = Olympiakos (named)",
+            "Arminia Bielefeld (Germany) = DSC Arminia Bielefeld",
+            "Roda JC Kerkrade (Netherlands) = Roda JC",
+            "Fortuna Duesseldorf (Germany) = Fortuna Düsseldorf",
+            "Rennes (France) = Stade Rennais FC (named)",
+            "Partizan (Serbia) = Partizan Belgrade",
+            "Sporting Gijon (Spain) = Real Sporting de Gijón"
+          ]
+        },
         "names": [
           "EDWIN VAN DER SAR -> Edwin van der Sar",
           "ED DE GOEY -> Ed de Goey",
@@ -15118,10 +16040,22 @@
           "SOLOMON ISLANDS GEORGE KIRIAU 0 -> 1",
           "AC MILAN GEORGE WEAH 49 -> 48",
           "JUVENTUS ALESSANDRO DEL PIERO 49 -> 48",
+          "ALBPETROL PATOS ELTON MARKU 0 -> 1",
+          "BESELIDHJA LEZHE GEZIM HASKU 0 -> 1",
+          "BESELIDHJA LEZHE SHKELQIM FRASHERI 0 -> 1",
+          "BESELIDHJA LEZHE LULZIM PJETRUSHI 0 -> 1",
+          "LACI VLADIMIR GJONI 0 -> 1",
           "EVAGORAS PAPHOS DIMOS NEOPHYTOU 0 -> 1",
           "EVAGORAS PAPHOS PANIKOS PHILIOTIS 0 -> 1",
           "OMONIA ARADIPPOU GEORGE VASSILIOU 0 -> 1",
           "OMONIA ARADIPPOU SAVVAS THEODOROU 0 -> 1",
+          "DUNAMO TALLINN ALEXANDER KREIDA 0 -> 1",
+          "KALEV SILLAMAE SERGEI CHERSAKOV 0 -> 1",
+          "MERKUUR TARTU SERGEI KAVERSANOV 0 -> 1",
+          "MERKUUR TARTU ANDRE KORESHNYAK 0 -> 1",
+          "TALLINNA SADAM AIN KARUTOOM 0 -> 1",
+          "TERVIS PARNU OLEG SUKHOV 0 -> 1",
+          "TERVIS PARNU GENNADI VELIKANOV 0 -> 1",
           "COBH RAMBLERS PHILIP LONG 0 -> 1",
           "COBH RAMBLERS JOHN O'ROURKE 0 -> 1",
           "DROGHEDA UNITED MICK SHELLEY 0 -> 1",
@@ -15129,6 +16063,22 @@
           "MONAGHAN UNITED DEREK SMYTH 0 -> 1",
           "MONAGHAN UNITED NOEL MELVIN 0 -> 1",
           "MONAGHAN UNITED MICK WILSON 0 -> 1",
+          "AUSEKLIS ANDRIS TSATLAKSH 0 -> 1",
+          "AUSEKLIS SERGEY POGODIN 0 -> 1",
+          "FC DAG RIGA LEONID DVORKINS 0 -> 1",
+          "GAUYA VALMIERA ALDIS BIRKANS 0 -> 1",
+          "GAUYA VALMIERA DAINIS ANDERSONS 0 -> 1",
+          "GAUYA VALMIERA ANDRIS GRAPENS 0 -> 1",
+          "GAUYA VALMIERA ALDIS MEZHGAILIS 0 -> 1",
+          "VIDUS RIGA ANDREY ROSHKOV 0 -> 1",
+          "VIDUS RIGA YEVGENY GORYACHILOV 0 -> 1",
+          "GELEZINIS VILKAS ARNAS BALSEVICIUS 0 -> 1",
+          "GELEZINIS VILKAS ALGIS VASCENKA 0 -> 1",
+          "TAURAS-KARSUVA MIKHAIL TULIAKOV 0 -> 1",
+          "TAURAS-KARSUVA VIKTORAS JONCA 0 -> 1",
+          "TAURAS-KARSUVA DARIUS STASYS 0 -> 1",
+          "ZYDRIUS MARIJAME GEDIMINAS JANKEVICIUS 0 -> 1",
+          "ZYDRIUS MARIJAME SARUNAS LITVINAS 0 -> 1",
           "ARIS BONNEVOIE MARC SCHODER 0 -> 1",
           "BALLYCLARE C. PAUL TUMILTY 0 -> 1",
           "LARNE MICHAEL MCGARRY 0 -> 1",
@@ -15153,7 +16103,14 @@
           "MAESTEG PARK CERI RICHARDS 0 -> 1",
           "MAESTEG PARK PHIL MCNEIL 0 -> 1",
           "MAESTEG PARK COLIN WALL 0 -> 1",
-          "MOLD ALEXANDRA PAUL FOLEY 0 -> 1"
+          "MOLD ALEXANDRA PAUL FOLEY 0 -> 1",
+          "MOLDECHNO OLEG DULUB 0 -> 1",
+          "SHINNIK BOBRUISK DANIYAR KIRICHENKO 0 -> 1",
+          "SHINNIK BOBRUISK SERGEY ULEZLO 0 -> 1",
+          "STROITEL DOROGI VIKTOR IGNATIEV 0 -> 1",
+          "STROITEL DOROGI ALEXANDER VOLSKY 0 -> 1",
+          "STROITEL DOROGI ALEXANDER BARANOV 0 -> 1",
+          "STROITEL DOROGI YURY GMILIAKEVICH 0 -> 1"
         ]
       }
     },
@@ -15166,7 +16123,7 @@
       "listing": "Sensible Software's Sensible World of Soccer 95/96, its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)",
       "maker": "Sensible Software",
       "edition": "SWOS 95/96",
-      "version": "swos-9596-0fbcf999",
+      "version": "swos-9596-1e4344a9",
       "snapshotDate": "1995",
       "url": "https://cern.swos.eu/data/amiga/9596/",
       "compiler": "The game's own team files: the six national team files (TEAM.080 to 085) and the seven league files (TEAM.008 England, 013 France, 014 Germany, 020 Italy, 025 Holland, 029 Portugal, 035 Spain), as the SWOS United community server keeps them for its tools (cern.swos.eu/data/amiga/9596), read by scripts/lib/swos-files.mjs",
@@ -15657,11 +16614,11 @@
         "nations": 132,
         "completeXIs": 132,
         "clubs": 124,
-        "leagues": 18
+        "leagues": 25
       },
       "audit": {
         "id": "swos-9596",
-        "version": "swos-9596-0fbcf999",
+        "version": "swos-9596-1e4344a9",
         "rows": 2272,
         "teams": 142,
         "noTeam": {
@@ -15681,7 +16638,7 @@
           "nations": 132,
           "completeXIs": 132,
           "clubs": 124,
-          "leagues": 18
+          "leagues": 25
         },
         "territory": {
           "merged": {
@@ -15706,8 +16663,14 @@
             "flagId": "FRY"
           }
         },
-        "clubRows": 7872,
+        "clubRows": 9760,
         "leagues": [
+          {
+            "league": "Kategoria Superiore",
+            "file": "000",
+            "clubs": 16,
+            "short": []
+          },
           {
             "league": "Austrian Bundesliga",
             "file": "001",
@@ -15757,6 +16720,12 @@
             "short": []
           },
           {
+            "league": "Meistriliiga",
+            "file": "010",
+            "clubs": 12,
+            "short": []
+          },
+          {
             "league": "Veikkausliiga",
             "file": "012",
             "clubs": 14,
@@ -15787,15 +16756,39 @@
             "short": []
           },
           {
+            "league": "Besta deild",
+            "file": "017",
+            "clubs": 10,
+            "short": []
+          },
+          {
             "league": "League of Ireland",
             "file": "018",
             "clubs": 12,
             "short": []
           },
           {
+            "league": "Israeli Premier League",
+            "file": "019",
+            "clubs": 14,
+            "short": []
+          },
+          {
             "league": "Serie A",
             "file": "020",
             "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Latvian Higher League",
+            "file": "021",
+            "clubs": 10,
+            "short": []
+          },
+          {
+            "league": "A Lyga",
+            "file": "022",
+            "clubs": 12,
             "short": []
           },
           {
@@ -15853,6 +16846,12 @@
             "short": []
           },
           {
+            "league": "Slovenian PrvaLiga",
+            "file": "034",
+            "clubs": 16,
+            "short": []
+          },
+          {
             "league": "La Liga",
             "file": "035",
             "clubs": 22,
@@ -15893,14 +16892,34 @@
             "file": "041",
             "clubs": 10,
             "short": []
+          },
+          {
+            "league": "Belarusian Premier League",
+            "file": "076",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "Slovak First League",
+            "file": "078",
+            "clubs": 12,
+            "short": []
           }
         ],
         "collisions": [
+          "PERPARIM DAIU (Besa Kavaje, Besa Kavaje)",
+          "ILIR BITURKU (Besa Kavaje, Partizani Tirana)",
+          "ARIAN QYSHKA (Iliria Fushë-Krujë, Laci)",
+          "PELLUMB YZEIRI (Laci, Partizani Tirana)",
+          "PERLAT MUSTA (Partizani Tirana, Dinamo Bucharest)",
+          "NORDIK RUHI (Partizani Tirana, Partizani Tirana)",
+          "ANDREA NIKOLLA (Partizani Tirana, Partizani Tirana)",
           "DRAZEN BISKUP (Admira Wacker, NK Zagreb)",
           "LASZLO KLAUSZ (Admira Wacker, ETO Gyor)",
           "MONS IVAR MJELDE (Austria Vienna, Lillestrom)",
           "MLADEN MLADENOVIC (SV Salzburg, Rijeka)",
           "KRUNOSLAV JURCIC (Beveren, Istra Pula)",
+          "IGOR KOZLOV (Beveren, RAF Yelgava)",
           "ANDERS NIELSEN (Sint-Truiden, Lyngby)",
           "IVAN DIMITROV (Beroe Stara Zagora, Slavia Sofia)",
           "PETKO PETKOV (CSKA Sofia, Montana)",
@@ -15908,6 +16927,7 @@
           "MILEN PETKOV (CSKA Sofia, Dobrudzha)",
           "VESELIN IGNATOV (Levski Sofia, Montana)",
           "MILEN PENCHEV (Levski Sofia, Levski Sofia, Shumen)",
+          "EMIL VELEV (Levski Sofia, Irony Ashdod)",
           "GORAN VASILIJEVIC (Lokomotiv Sofia, Red Star Belgrade)",
           "TODOR PRAMATAROV (Lokomotiv Sofia, Kavala)",
           "SERGEI KUZNETSOV (Shumen, Asmaral Moscow, Rotor Volgograd)",
@@ -15927,26 +16947,42 @@
           "DIMITRIS IOANNOU (Apollon Limassol, EPA Larnaca)",
           "PAMBOS CHARALAMBOUS (Ethnikos Akhnas, Evagoras Paphos, Olympiakos)",
           "KRZYSZTOF WALCZAK (Nea Salamina, GKS Katowice)",
+          "VILIAM VIDUMSKY (Boby Brno, Tatran Presov)",
           "KAREL URBANEK (Hradec Kralove, Hradec Kralove)",
+          "JAROSLAV TIMKO (Petra Drnovice, Slovan Bratislava)",
+          "ONDREJ KRISTOFIK (Slavia Prague, Slovan Bratislava)",
           "JENS MADSEN (AaB, Vejle)",
           "MARTIN NIELSEN (AGF, Viborg)",
           "ALLAN NIELSEN (Brondby, FC Copenhagen)",
           "JAN LARSEN (Vejle, Vejle)",
+          "GUDNI BERGSSON (Bolton Wanderers, Valur)",
           "ISAIAS (Coventry City, FC Metz, Leça FC)",
           "SAMI KOSKINEN (FinnPa, TPS)",
           "ALEKSANDR KOSTIN (Ilves, Spartak Vladikavkaz)",
           "JEAN-LUC DOGON (Girondins de Bordeaux, Girondins de Bordeaux)",
           "GORAN PANDUROVIC (Stade Rennais FC, Partizan Belgrade)",
+          "ALEXANDER VENCEL (Racing Club de Strasbourg, Slovan Bratislava)",
           "PATRIK ANDERSSON (Borussia Mönchengladbach, IFK Norrkoping)",
           "YORGOS PAPADOPOULOS (Iraklis, Larissa)",
           "ILIJA IVIC (Olympiakos, Red Star Belgrade)",
           "CSABA JAKAB (Csepel, Haladas)",
+          "KRISTJAN JONSSON (Fram, Bodo Glimt)",
+          "RUNAR KRISTINSSON (KR, Orgryte)",
+          "BJARNI SIGURDSSON (Valur, Brann)",
           "DEREK MURRAY (Derry City, Monaghan United)",
           "BARRY RYAN (Derry City, Limerick)",
           "PAUL DOOLIN (Shelbourne, Portadown)",
           "BOBBY BROWNE (Shelbourne, Ards)",
+          "SERGEI KOLOTOVKIN (Beitar Jerusalem, CSKA Moscow)",
+          "ALEKSANDR PODSHIVALOV (Hapoel Haifa, Torpedo Moscow)",
+          "RAFI COHEN (Hapoel Petah Tikva, Maccabi Haifa)",
           "LUCA MONDINI (Inter, Vicenza)",
           "PAULO SOUSA (Juventus, Boavista FC)",
+          "YURGIS SAMSONOV (Olympia Riga, RAF Yelgava)",
+          "VADIMAS PETRENKA (Aras Klaipeda, Panerys Vilnius)",
+          "EDGARAS TUMASONIS (Panerys Vilnius, Sirijus Klaipeda)",
+          "ARUNAS SUIKA (Romar Mazeikiai, Sirijus Klaipeda)",
+          "ALEKSANDR IGNATYEV (Tauras-Karsuva, Zhemchuzhina)",
           "DEJAN CUROVIC (Vitesse Arnhem, Partizan Belgrade)",
           "RADOSLAV SAMARDZIC (FC Volendam, Vojvodina Novi Sad)",
           "BARRY MCCREADIE (Ballymena United, Omagh Town)",
@@ -15973,6 +17009,8 @@
           "DMITRI TYAPUSHKIN (Spartak Moscow, Niva Ternopol)",
           "SCOTT THOMSON (Aberdeen, Raith Rovers)",
           "DRAGOJE LEKOVIC (Kilmarnock, Buducnost)",
+          "KADRIJA IBRANOVIC (AM Cosmos, Primorje)",
+          "MITJA JUDEZ (AM Cosmos, Mavrica)",
           "GELI (Atlético Madrid, RC Celta)",
           "TONI (Atlético Madrid, RCD Espanyol)",
           "SRDJAN BAJCETIC (RC Celta, Vojvodina Novi Sad)",
@@ -16000,6 +17038,43 @@
           "MARK WILLIAMS (Holywell Town, Llansantffraid)",
           "GARETH JONES (Newtown, Porthmadog)"
         ],
+        "field": {
+          "passed": [
+            "Zimbru (Moldova)",
+            "Tiligul Tiraspol (Moldova)",
+            "Dinamo Tbilisi (Georgia)",
+            "Dnipro Dnipropetrovsk (Ukraine)"
+          ],
+          "matches": [
+            "PSG (France) = Paris Saint-Germain (named)",
+            "Auxerre (France) = AJ Auxerre",
+            "Real Betis (Spain) = Real Betis Balompié",
+            "Borussia M'gladbach (Germany) = Borussia Mönchengladbach (named)",
+            "Inter (Italy) = Inter (named)",
+            "Alania Vladikavkaz (Russia) = Spartak Vladikavkaz (named)",
+            "Olympique Lyon (France) = Olympique Lyonnais",
+            "Sporting CP (Portugal) = Sporting CP (named)",
+            "Dinamo Minsk (Belarus) = Dinamo Minsk (named)",
+            "FCSB (Romania) = Steaua Bucharest (named)",
+            "Club Brugge (Belgium) = Club Bruges (named)",
+            "Dinamo Zagreb (Croatia) = Croatia Zagreb (named)",
+            "Olympiakos Piraeus (Greece) = Olympiakos (named)",
+            "Strasbourg (France) = Racing Club de Strasbourg",
+            "Montpellier (France) = Montpellier HSC",
+            "Rennes (France) = Stade Rennais FC (named)",
+            "CD Tenerife (Spain) = Club Deportivo Tenerife",
+            "Brøndby (Denmark) = Brondby (named)",
+            "Chornomorets (Ukraine) = Chernomorets",
+            "Roda JC Kerkrade (Netherlands) = Roda JC",
+            "Celta de Vigo (Spain) = RC Celta",
+            "Rangers (Scotland) = Rangers (named)",
+            "Rapid (Austria) = Rapid Vienna",
+            "AaB (Denmark) = AaB (named)",
+            "EA Guingamp (France) = En Avant Guingamp (named)",
+            "Albacete (Spain) = Albacete Balompié",
+            "1 FK Drnovice (Czech Republic) = Petra Drnovice"
+          ]
+        },
         "names": [
           "ED DE GOEY -> Ed de Goey",
           "ERWIN VAN DER SAR -> Erwin van der Sar",
@@ -16019,6 +17094,7 @@
           "ANDERSON DA SILVA -> Anderson da Silva",
           "PAULO DA SILVA -> Paulo da Silva",
           "FRANS VAN ROOY -> Frans van Rooy",
+          "JUAN CARLOS DA SILVA -> Juan Carlos da Silva",
           "EDWIN VAN DER SAR -> Edwin van der Sar",
           "FRANK DE BOER -> Frank de Boer",
           "RONALD DE BOER -> Ronald de Boer",
@@ -16174,6 +17250,11 @@
           "SOLOMON ISLANDS IAN PWAHOLO 0 -> 1",
           "SOLOMON ISLANDS ROBINSON BOE 0 -> 1",
           "SOLOMON ISLANDS GEORGE KIRIAU 0 -> 1",
+          "ALBPETROL PATOS ELTON MARKU 0 -> 1",
+          "BESELIDHJA LEZHE GEZIM HASKU 0 -> 1",
+          "BESELIDHJA LEZHE SHKELQIM FRASHERI 0 -> 1",
+          "BESELIDHJA LEZHE LULZIM PJETRUSHI 0 -> 1",
+          "LACI VLADIMIR GJONI 0 -> 1",
           "APEP PITSILIAS DIMITRIS ORPHANIDIS 0 -> 1",
           "APEP PITSILIAS ZORAN KRAJICEVIC 0 -> 1",
           "EPA LARNACA ANDREAS MAVRIS 0 -> 1",
@@ -16183,6 +17264,18 @@
           "EVAGORAS PAPHOS PANIKOS PHILIOTIS 0 -> 1",
           "OMONIA ARADIPPOU NIKOS SHIKKIS 0 -> 1",
           "OMONIA ARADIPPOU SAVVAS THEODOROU 0 -> 1",
+          "DUNAMO TALLINN ALEXANDER KREIDA 0 -> 1",
+          "KALEV SILLAMAE SERGEI CHERSAKOV 0 -> 1",
+          "MERKUUR TARTU SERGEI KAVERSANOV 0 -> 1",
+          "MERKUUR TARTU ANDRE KORESHNYAK 0 -> 1",
+          "TALLINNA SADAM AIN KARUTOOM 0 -> 1",
+          "TERVIS PARNU OLEG SUKHOV 0 -> 1",
+          "TERVIS PARNU GENNADI VELIKANOV 0 -> 1",
+          "FYLKIR BERGTHOR OLAFSSON 0 -> 1",
+          "FYLKIR FRIDRIK THORSEINSSON 0 -> 1",
+          "FYLKIR HALLDOR STEINSSON 0 -> 1",
+          "IBV THORSTEINN GUNNARSSON 0 -> 1",
+          "IBV SINDRI GRETARSSON 0 -> 1",
           "COBH RAMBLERS PHILIP LONG 0 -> 1",
           "COBH RAMBLERS JOHN O'ROURKE 0 -> 1",
           "DROGHEDA UNITED MICK SHELLEY 0 -> 1",
@@ -16190,6 +17283,22 @@
           "MONAGHAN UNITED DEREK SMYTH 0 -> 1",
           "MONAGHAN UNITED NOEL MELVIN 0 -> 1",
           "MONAGHAN UNITED MICK WILSON 0 -> 1",
+          "AUSEKLIS ANDRIS TSATLAKSH 0 -> 1",
+          "AUSEKLIS SERGEY POGODIN 0 -> 1",
+          "FC DAG RIGA LEONID DVORKINS 0 -> 1",
+          "GAUYA VALMIERA ALDIS BIRKANS 0 -> 1",
+          "GAUYA VALMIERA DAINIS ANDERSONS 0 -> 1",
+          "GAUYA VALMIERA ANDRIS GRAPENS 0 -> 1",
+          "GAUYA VALMIERA ALDIS MEZHGAILIS 0 -> 1",
+          "VIDUS RIGA ANDREY ROSHKOV 0 -> 1",
+          "VIDUS RIGA YEVGENY GORYACHILOV 0 -> 1",
+          "GELEZINIS VILKAS ARNAS BALSEVICIUS 0 -> 1",
+          "GELEZINIS VILKAS ALGIS VASCENKA 0 -> 1",
+          "TAURAS-KARSUVA MIKHAIL TULIAKOV 0 -> 1",
+          "TAURAS-KARSUVA VIKTORAS JONCA 0 -> 1",
+          "TAURAS-KARSUVA DARIUS STASYS 0 -> 1",
+          "ZYDRIUS MARIJAME GEDIMINAS JANKEVICIUS 0 -> 1",
+          "ZYDRIUS MARIJAME SARUNAS LITVINAS 0 -> 1",
           "ARIS BONNEVOIE ALAIN BIREN 0 -> 1",
           "SWIFT HESPERANGE FRANCO DE PAOLA 0 -> 1",
           "SWIFT HESPERANGE RAOUL HIPPERTCHEN 0 -> 1",
@@ -16220,7 +17329,14 @@
           "MAESTEG PARK CERI RICHARDS 0 -> 1",
           "MAESTEG PARK PHIL MCNEIL 0 -> 1",
           "MAESTEG PARK COLIN WALL 0 -> 1",
-          "MOLD ALEXANDRA PAUL FOLEY 0 -> 1"
+          "MOLD ALEXANDRA PAUL FOLEY 0 -> 1",
+          "MOLDECHNO OLEG DULUB 0 -> 1",
+          "SHINNIK BOBRUISK DANIYAR KIRICHENKO 0 -> 1",
+          "SHINNIK BOBRUISK SERGEY ULEZLO 0 -> 1",
+          "STROITEL DOROGI VIKTOR IGNATIEV 0 -> 1",
+          "STROITEL DOROGI ALEXANDER VOLSKY 0 -> 1",
+          "STROITEL DOROGI ALEXANDER BARANOV 0 -> 1",
+          "STROITEL DOROGI YURY GMILIAKEVICH 0 -> 1"
         ]
       }
     },
@@ -16233,7 +17349,7 @@
       "listing": "Sensible Software's original Sensible World of Soccer (1994), its national squads and the seven leagues' top-division clubs (the game's own team files, as the SWOS United server keeps them)",
       "maker": "Sensible Software",
       "edition": "SWOS 94/95",
-      "version": "swos-9495-319aeb96",
+      "version": "swos-9495-fd13237f",
       "snapshotDate": "1994-12",
       "url": "https://cern.swos.eu/data/amiga/v1.0/",
       "compiler": "The game's own team files: the six national team files (TEAM.080 to 085) and the seven league files (TEAM.008 England, 013 France, 014 Germany, 020 Italy, 025 Holland, 029 Portugal, 035 Spain), as the SWOS United community server keeps them for its tools (cern.swos.eu/data/amiga/v1.0), read by scripts/lib/swos-files.mjs",
@@ -16724,11 +17840,11 @@
         "nations": 131,
         "completeXIs": 131,
         "clubs": 124,
-        "leagues": 18
+        "leagues": 26
       },
       "audit": {
         "id": "swos-9495",
-        "version": "swos-9495-319aeb96",
+        "version": "swos-9495-fd13237f",
         "rows": 2256,
         "teams": 141,
         "noTeam": {
@@ -16748,7 +17864,7 @@
           "nations": 131,
           "completeXIs": 131,
           "clubs": 124,
-          "leagues": 18
+          "leagues": 26
         },
         "territory": {
           "merged": {
@@ -16766,8 +17882,14 @@
             "KOS"
           ]
         },
-        "clubRows": 7808,
+        "clubRows": 9664,
         "leagues": [
+          {
+            "league": "Kategoria Superiore",
+            "file": "000",
+            "clubs": 14,
+            "short": []
+          },
           {
             "league": "Austrian Bundesliga",
             "file": "001",
@@ -16817,6 +17939,12 @@
             "short": []
           },
           {
+            "league": "Meistriliiga",
+            "file": "010",
+            "clubs": 12,
+            "short": []
+          },
+          {
             "league": "Veikkausliiga",
             "file": "012",
             "clubs": 14,
@@ -16847,15 +17975,39 @@
             "short": []
           },
           {
+            "league": "Besta deild",
+            "file": "017",
+            "clubs": 10,
+            "short": []
+          },
+          {
             "league": "League of Ireland",
             "file": "018",
             "clubs": 12,
             "short": []
           },
           {
+            "league": "Israeli Premier League",
+            "file": "019",
+            "clubs": 14,
+            "short": []
+          },
+          {
             "league": "Serie A",
             "file": "020",
             "clubs": 18,
+            "short": []
+          },
+          {
+            "league": "Latvian Higher League",
+            "file": "021",
+            "clubs": 10,
+            "short": []
+          },
+          {
+            "league": "A Lyga",
+            "file": "022",
+            "clubs": 12,
             "short": []
           },
           {
@@ -16913,6 +18065,12 @@
             "short": []
           },
           {
+            "league": "Slovenian PrvaLiga",
+            "file": "034",
+            "clubs": 16,
+            "short": []
+          },
+          {
             "league": "La Liga",
             "file": "035",
             "clubs": 20,
@@ -16953,9 +18111,22 @@
             "file": "041",
             "clubs": 10,
             "short": []
+          },
+          {
+            "league": "Belarusian Premier League",
+            "file": "076",
+            "clubs": 16,
+            "short": []
+          },
+          {
+            "league": "Slovak First League",
+            "file": "078",
+            "clubs": 12,
+            "short": []
           }
         ],
         "collisions": [
+          "ARDIAN ABAZI (SK Tirana, Teuta Durres)",
           "DRAZEN BISKUP (Admira Wacker, NK Zagreb)",
           "LASZLO KLAUSZ (Admira Wacker, ETO Gyor)",
           "MONS IVAR MJELDE (Austria Vienna, Lillestrom)",
@@ -16963,6 +18134,8 @@
           "MLADEN MLADENOVIC (SV Salzburg, Rijeka)",
           "ZBIGNIEW GRZESIAK (VfB Modling, Legia Warsaw)",
           "SLAVKO FERIC (Vorwarts Steyr, Primorac Stobrec)",
+          "ITZHAK ZOHAR (Antwerp, Maccabi Tel-Aviv)",
+          "IGOR KOZLOV (Beveren, RAF Yelgava)",
           "MIROSLAW WALIGORA (Lommel, Hutnik Krakow)",
           "KRASIMIR DIMITROV (Botev Plovdiv, Spartak Varna)",
           "MILEN PETKOV (Cherno More, Dobrudzha, Yantra Gabrovo)",
@@ -16994,20 +18167,32 @@
           "VESA HOLLI (Ilves, Jaro)",
           "ANTO DROBNJAK (SC Bastia, Red Star Belgrade)",
           "HENRIK BERTILSSON (FC Martigues, Halmstad)",
+          "ALEXANDER VENCEL (Racing Club de Strasbourg, Slovan Bratislava)",
           "MARTIN KREE (Bayer 04 Leverkusen, Borussia Dortmund)",
           "MICHAL PROBIERZ (Bayer 05 Uerdingen, Ruch Chorzow)",
           "PATRIK ANDERSSON (Borussia Mönchengladbach, IFK Norrkoping)",
+          "THORDUR GUDJONSSON (VfL Bochum, IA)",
           "YORGOS VLAHOUDIS (Kalamarias, OFI Crete)",
           "ILIJA IVIC (Olympiakos, Red Star Belgrade)",
           "KRZYSZTOF BOCIEK (PAOK, Stal Mielec)",
           "CSABA JAKAB (Csepel, Haladas)",
+          "KRISTJAN JONSSON (Fram, Bodo Glimt)",
+          "BJARNI SIGURDSSON (Valur, Brann)",
           "DEREK MURRAY (Derry City, Monaghan United)",
           "BARRY RYAN (Derry City, Limerick)",
           "PAUL DOOLIN (Shelbourne, Portadown)",
           "BOBBY BROWNE (Shelbourne, Ards)",
+          "SERGEI KOLOTOVKIN (Beitar Jerusalem, CSKA Moscow)",
+          "ALEKSANDR PODSHIVALOV (Hapoel Haifa, Torpedo Moscow)",
+          "RAFI COHEN (Hapoel Petah Tikva, Maccabi Haifa)",
           "PAULO SOUSA (Juventus, Boavista FC)",
           "IGOR SIMUTENKOV (Reggiana, Dinamo Moscow)",
           "RUI AGUAS (Reggiana, CF Estrela Amadora)",
+          "YURGIS SAMSONOV (Olympia Riga, RAF Yelgava)",
+          "VADIMAS PETRENKA (Aras Klaipeda, Panerys Vilnius)",
+          "EDGARAS TUMASONIS (Panerys Vilnius, Sirijus Klaipeda)",
+          "ARUNAS SUIKA (Romar Mazeikiai, Sirijus Klaipeda)",
+          "ALEKSANDR IGNATYEV (Tauras-Karsuva, Zhemchuzhina)",
           "BARRY MCCREADIE (Ballymena United, Omagh Town)",
           "GEOFF FERRIS (Carrick Rangers, Glenavon)",
           "COLIN NUTT (Cliftonville, Larne)",
@@ -17029,10 +18214,13 @@
           "EMERSON (FC Porto, Vitória SC)",
           "MADUREIRA (SC Salgueiros, Vitória SC)",
           "PEDRO (SC Salgueiros, SC Salgueiros, Vitória SC)",
+          "GORAN ZIVANOVIC (União da Madeira, Rudar Velenje)",
           "PREDRAG JOVANOVIC (União da Madeira, Proleter)",
           "ZOLTAN KADAR (Dinamo Bucharest, Dinamo Bucharest)",
           "SERGEI KUZNETSOV (Asmaral Moscow, Rotor Volgograd)",
           "DMITRI TYAPUSHKIN (Spartak Moscow, Niva Ternopol)",
+          "KADRIJA IBRANOVIC (AM Cosmos, Primorje)",
+          "MITJA JUDEZ (AM Cosmos, Mavrica)",
           "GELI (Atlético Madrid, Real Zaragoza)",
           "TONI (Atlético Madrid, RCD Espanyol)",
           "BENT CHRISTENSEN (S.D. Compostela, Young Boys Berne)",
@@ -17058,6 +18246,46 @@
           "MARK WILLIAMS (Holywell Town, Llansantffraid)",
           "GARETH JONES (Newtown, Porthmadog)"
         ],
+        "field": {
+          "passed": [
+            "Shakhtar Donetsk (Ukraine)",
+            "Dinamo Tbilisi (Georgia)",
+            "Dnipro Dnipropetrovsk (Ukraine)",
+            "Odense Bk (Denmark)"
+          ],
+          "matches": [
+            "PSG (France) = Paris Saint-Germain (named)",
+            "Auxerre (France) = AJ Auxerre",
+            "Borussia M'gladbach (Germany) = Borussia Mönchengladbach (named)",
+            "Dinamo Zagreb (Croatia) = Croatia Zagreb (named)",
+            "Olympique Lyon (France) = Olympique Lyonnais",
+            "Sporting CP (Portugal) = Sporting CP (named)",
+            "Inter (Italy) = Inter (named)",
+            "FCSB (Romania) = Steaua Bucharest (named)",
+            "Club Brugge (Belgium) = Club Bruges (named)",
+            "Olimpija (Slovenia) = Olimpija Ljubljana",
+            "Norrköping (Sweden) = IFK Norrkoping",
+            "Austria Wien (Austria) = Austria Vienna (named)",
+            "Dinamo Minsk (Belarus) = Dinamo Minsk (named)",
+            "Strasbourg (France) = Racing Club de Strasbourg",
+            "Montpellier (France) = Montpellier HSC",
+            "Budapest Honved (Hungary) = Kispest-Honved (named)",
+            "CD Tenerife (Spain) = Club Deportivo Tenerife",
+            "Real Betis (Spain) = Real Betis Balompié",
+            "Roda JC Kerkrade (Netherlands) = Roda JC",
+            "Oerebro SK (Sweden) = Orebro",
+            "Rennes (France) = Stade Rennais FC (named)",
+            "Chornomorets (Ukraine) = Chernomorets",
+            "Brøndby (Denmark) = Brondby (named)",
+            "Vitesse (Netherlands) = Vitesse Arnhem",
+            "Rangers (Scotland) = Rangers (named)",
+            "Olympiakos Piraeus (Greece) = Olympiakos (named)",
+            "Lillestroem SK (Norway) = Lillestrom",
+            "Alania Vladikavkaz (Russia) = Spartak Vladikavkaz (named)",
+            "Celta de Vigo (Spain) = RC Celta",
+            "Maribor (Slovenia) = Maribor Branik"
+          ]
+        },
         "names": [
           "FRANKY VAN DER ELST -> Franky Van der Elst",
           "ED DE GOEY -> Ed de Goey",
@@ -17082,6 +18310,7 @@
           "ANDERSON DA SILVA -> Anderson da Silva",
           "MARKUS VON AHLEN -> Markus von Ahlen",
           "PAULO DA SILVA -> Paulo da Silva",
+          "JUAN CARLOS DA SILVA -> Juan Carlos da Silva",
           "JOHN VAN 'T SCHIP -> John van 't Schip",
           "EDWIN VAN DER SAR -> Edwin van der Sar",
           "FRANK DE BOER -> Frank de Boer",
@@ -17256,6 +18485,12 @@
           "SOLOMON ISLANDS GEORGE KIRIAU 0 -> 1",
           "JUVENTUS ROBERTO BAGGIO 49 -> 48",
           "BARCELONA ROMARIO 49 -> 48",
+          "ALBPETROL PATOSI BIRKELOV SHABANI 0 -> 1",
+          "BESELIDHJA LEZHE GEZIM HASKU 0 -> 1",
+          "BESELIDHJA LEZHE SHKELQIM FRASHERI 0 -> 1",
+          "BESELIDHJA LEZHE ARDIAN PETRUSHI 0 -> 1",
+          "LACI BARDHYL UJKA 0 -> 1",
+          "SOPOTI LIBRAZHD FLORI HAXHIA 0 -> 1",
           "APEP PITSILIAS DIMITRIS ORPHANIDIS 0 -> 1",
           "APEP PITSILIAS ZORAN KRAJICEVIC 0 -> 1",
           "EPA LARNACA ANDREAS MAVRIS 0 -> 1",
@@ -17265,6 +18500,19 @@
           "EVAGORAS PAPHOS PANIKOS PHILIOTIS 0 -> 1",
           "OMONIA ARADIPPOU NIKOS SHIKKIS 0 -> 1",
           "OMONIA ARADIPPOU SAVVAS THEODOROU 0 -> 1",
+          "DUNAMO TALLINN ALEXANDER KREIDA 0 -> 1",
+          "KALEV SILLAMAE SERGEI CHERSAKOV 0 -> 1",
+          "KALEV SILLAMAE ROMAN SMURYGIN 0 -> 1",
+          "MERKUUR TARTU SERGEI KAVERSANOV 0 -> 1",
+          "MERKUUR TARTU ANDRE KORESHNYAK 0 -> 1",
+          "TALLINNA SADAM AIN KARUTOOM 0 -> 1",
+          "TERVIS PARNU OLEG SUKHOV 0 -> 1",
+          "TERVIS PARNU GENNADI VELIKANOV 0 -> 1",
+          "FYLKIR BERGTHOR OLAFSSON 0 -> 1",
+          "FYLKIR FRIDRIK THORSEINSSON 0 -> 1",
+          "FYLKIR HALLDOR STEINSSON 0 -> 1",
+          "IBV THORSTEINN GUNNARSSON 0 -> 1",
+          "IBV SINDRI GRETARSSON 0 -> 1",
           "COBH RAMBLERS PHILIP LONG 0 -> 1",
           "COBH RAMBLERS JOHN O'ROURKE 0 -> 1",
           "DROGHEDA UNITED MICK SHELLEY 0 -> 1",
@@ -17272,6 +18520,26 @@
           "MONAGHAN UNITED DEREK SMYTH 0 -> 1",
           "MONAGHAN UNITED NOEL MELVIN 0 -> 1",
           "MONAGHAN UNITED MICK WILSON 0 -> 1",
+          "AUSEKLIS ANDRIS TSATLAKSH 0 -> 1",
+          "AUSEKLIS ALEXEY ILYIN 0 -> 1",
+          "AUSEKLIS SERGEY POGODIN 0 -> 1",
+          "FC DAG RIGA LEONID DVORKINS 0 -> 1",
+          "GAUYA VALMIERA SERGEY SMIRNOV 0 -> 1",
+          "GAUYA VALMIERA ALDIS BIRKANS 0 -> 1",
+          "GAUYA VALMIERA DAINIS ANDERSONS 0 -> 1",
+          "GAUYA VALMIERA ANDRIS GRAPENS 0 -> 1",
+          "GAUYA VALMIERA ALDIS MEZHGAILIS 0 -> 1",
+          "VIDUS RIGA ANDREY ROSHKOV 0 -> 1",
+          "VIDUS RIGA YEVGENY GORYACHILOV 0 -> 1",
+          "GELEZINIS VILKAS RAMUNAS MERKELIS 0 -> 1",
+          "GELEZINIS VILKAS ARNAS BALSEVICIUS 0 -> 1",
+          "GELEZINIS VILKAS ALGIS VASCENKA 0 -> 1",
+          "TAURAS-KARSUVA MIKHAIL TULIAKOV 0 -> 1",
+          "TAURAS-KARSUVA VIKTORAS JONCA 0 -> 1",
+          "TAURAS-KARSUVA MARTYNAS CIKAS 0 -> 1",
+          "TAURAS-KARSUVA DARIUS STASYS 0 -> 1",
+          "ZYDRIUS MARIJAME GEDIMINAS JANKEVICIUS 0 -> 1",
+          "ZYDRIUS MARIJAME SARUNAS LITVINAS 0 -> 1",
           "ARIS BONNEVOIE CLAUDE MARK 0 -> 1",
           "BALLYCLARE C. PAUL TUMILTY 0 -> 1",
           "LARNE MICHAEL MCGARRY 0 -> 1",
@@ -17303,7 +18571,14 @@
           "MAESTEG PARK PHIL MCNEIL 0 -> 1",
           "MAESTEG PARK COLIN WALL 0 -> 1",
           "MOLD ALEXANDRA PAUL FOLEY 0 -> 1",
-          "MOLD ALEXANDRA MARK ROWELL 0 -> 1"
+          "MOLD ALEXANDRA MARK ROWELL 0 -> 1",
+          "MOLDECHNO OLEG DULUB 0 -> 1",
+          "SHINNIK BOBRUISK DANIYAR KIRICHENKO 0 -> 1",
+          "SHINNIK BOBRUISK SERGEY ULEZLO 0 -> 1",
+          "STROITEL DOROGI VIKTOR IGNATIEV 0 -> 1",
+          "STROITEL DOROGI ALEXANDER VOLSKY 0 -> 1",
+          "STROITEL DOROGI ALEXANDER BARANOV 0 -> 1",
+          "STROITEL DOROGI YURY GMILIAKEVICH 0 -> 1"
         ]
       }
     },
@@ -17323,18 +18598,18 @@
         "sha256": "91632a6f626789ac3471892bd965956e4b9ae41b0168c2008c91028ad4251a26",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/cm93_data.zip"
       },
-      "version": "cm0102-2020-11-cm93-01be5661",
+      "version": "cm0102-2020-11-cm93-7545db33",
       "coverage": {
-        "players": 2119,
+        "players": 2125,
         "nations": 121,
         "completeXIs": 75,
         "clubs": 124,
-        "leagues": 20
+        "leagues": 22
       },
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2020-11-cm93",
-        "version": "cm0102-2020-11-cm93-01be5661",
+        "version": "cm0102-2020-11-cm93-7545db33",
         "database": {
           "known": true,
           "label": "93/94 by Cam F, fan-made",
@@ -17473,7 +18748,7 @@
         "players": {
           "read": 39781,
           "eligible": 21395,
-          "written": 2119,
+          "written": 2125,
           "dropped": {
             "nameless": 0,
             "noAbility": 11697,
@@ -17507,7 +18782,7 @@
             "competition": "English Premier Division",
             "members": 20,
             "clubs": 20,
-            "kept": 19,
+            "kept": 12,
             "short": []
           },
           {
@@ -17516,7 +18791,7 @@
             "competition": "Spanish First Division",
             "members": 20,
             "clubs": 20,
-            "kept": 18,
+            "kept": 16,
             "short": []
           },
           {
@@ -17525,7 +18800,7 @@
             "competition": "Italian Serie A",
             "members": 18,
             "clubs": 18,
-            "kept": 17,
+            "kept": 18,
             "short": []
           },
           {
@@ -17534,7 +18809,7 @@
             "competition": "German First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 16,
+            "kept": 17,
             "short": []
           },
           {
@@ -17543,7 +18818,7 @@
             "competition": "French First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 12,
+            "kept": 18,
             "short": []
           },
           {
@@ -17552,7 +18827,7 @@
             "competition": "Dutch Premier Division",
             "members": 18,
             "clubs": 18,
-            "kept": 6,
+            "kept": 4,
             "short": []
           },
           {
@@ -17561,7 +18836,7 @@
             "competition": "Portuguese Premier League",
             "members": 18,
             "clubs": 18,
-            "kept": 10,
+            "kept": 4,
             "short": []
           },
           {
@@ -17640,7 +18915,7 @@
             "competition": "Belgian First Division",
             "members": 18,
             "clubs": 18,
-            "kept": 6,
+            "kept": 5,
             "short": []
           },
           {
@@ -17649,7 +18924,7 @@
             "competition": "Greek National A Division",
             "members": 14,
             "clubs": 7,
-            "kept": 3,
+            "kept": 0,
             "short": [
               {
                 "name": "Aigaleo City",
@@ -17766,7 +19041,7 @@
             "competition": "Danish Premier Division",
             "members": 12,
             "clubs": 9,
-            "kept": 1,
+            "kept": 3,
             "short": [
               {
                 "name": "Akademisk Boldklub",
@@ -17788,7 +19063,7 @@
             "competition": "Norwegian Premier Division",
             "members": 14,
             "clubs": 7,
-            "kept": 2,
+            "kept": 1,
             "short": [
               {
                 "name": "Bryne FK",
@@ -17826,7 +19101,7 @@
             "competition": "Croatian First Division",
             "members": 16,
             "clubs": 4,
-            "kept": 0,
+            "kept": 3,
             "short": [
               {
                 "name": "NK Cakovec",
@@ -17884,7 +19159,7 @@
             "competition": "Polish First Division",
             "members": 16,
             "clubs": 2,
-            "kept": 1,
+            "kept": 0,
             "short": [
               {
                 "name": "Amica Wronki",
@@ -17950,7 +19225,7 @@
             "competition": "Swiss National Division A",
             "members": 12,
             "clubs": 12,
-            "kept": 1,
+            "kept": 2,
             "short": []
           },
           {
@@ -17959,7 +19234,7 @@
             "competition": "Austrian Premier Division",
             "members": 10,
             "clubs": 2,
-            "kept": 2,
+            "kept": 1,
             "short": [
               {
                 "name": "VfB Admira Wacker Mödling",
@@ -18001,7 +19276,7 @@
             "competition": "Swedish Premier Division",
             "members": 14,
             "clubs": 13,
-            "kept": 1,
+            "kept": 3,
             "short": [
               {
                 "name": "BK Häcken",
@@ -18107,7 +19382,7 @@
             "competition": "Russian Premier Division",
             "members": 16,
             "clubs": 6,
-            "kept": 1,
+            "kept": 5,
             "short": [
               {
                 "name": "Alania Vladikavkaz",
@@ -18157,7 +19432,7 @@
             "competition": "Yugoslav First Division",
             "members": 18,
             "clubs": 2,
-            "kept": 1,
+            "kept": 0,
             "short": [
               {
                 "name": "Cukaricki Stankom Belgrade",
@@ -18390,8 +19665,117 @@
                 "players": 2
               }
             ]
+          },
+          {
+            "league": "Ukrainian Premier League",
+            "country": "804",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Romanian Liga I",
+            "country": "642",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 2,
+            "short": []
+          },
+          {
+            "league": "Bulgarian First League",
+            "country": "100",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
+          },
+          {
+            "league": "Hungarian NB I",
+            "country": "348",
+            "competition": null,
+            "byNation": true,
+            "members": 0,
+            "clubs": 0,
+            "kept": 1,
+            "short": []
           }
         ],
+        "field": {
+          "passed": [
+            "Nk Zagreb (Croatia)",
+            "Austria Wien (Austria)",
+            "Dinamo Minsk (Belarus)",
+            "Olimpija (Slovenia)",
+            "Rotor Volgograd (Russia)",
+            "Dnipro Dnipropetrovsk (Ukraine)",
+            "Tekstilshchik Kamyshin (Russia)",
+            "Dinamo Tbilisi (Georgia)",
+            "Ferencváros (Hungary)",
+            "Trabzonspor (Turkey)",
+            "Alania Vladikavkaz (Russia)",
+            "FK Ural (Russia)",
+            "Chornomorets (Ukraine)",
+            "Dunakanyar Vac FC (Hungary)",
+            "Slavia Praha (Czech Republic)",
+            "Shakhtar Donetsk (Ukraine)",
+            "Baník Ostrava (Czech Republic)",
+            "Lillestroem SK (Norway)",
+            "České Budějovice (Czech Republic)",
+            "FC Wacker Innsbruck (Austria)",
+            "FC Dinamo 93 Minsk (Belarus)",
+            "Varaždin (Croatia)",
+            "FC Admira Wacker (Austria)",
+            "Vitebsk (Belarus)",
+            "Legia Warszawa (Poland)",
+            "Slovan Liberec (Czech Republic)",
+            "Maribor (Slovenia)",
+            "Viktoria Plzeň (Czech Republic)"
+          ],
+          "matches": [
+            "Inter (Italy) = Internazionale (named)",
+            "PSG (France) = Paris-Saint-Germain (named)",
+            "Porto (Portugal) = Futebol Clube do Porto",
+            "Benfica (Portugal) = Sport Lisboa e Benfica",
+            "Dinamo Zagreb (Croatia) = NK Dinamo (named)",
+            "Auxerre (France) = AJ Auxerre",
+            "FCSB (Romania) = Steaua Bucharest (named)",
+            "Hajduk Split (Croatia) = HNK Hajduk",
+            "Nantes (France) = FC Nantes Atlantique",
+            "Rangers (Scotland) = Glasgow Rangers (named)",
+            "Sporting CP (Portugal) = Sporting Clube de Portugal (named)",
+            "Borussia M'gladbach (Germany) = Borussia M'gladbach (named)",
+            "Norrköping (Sweden) = IFK Norrköping",
+            "Lens (France) = Racing Club Lens",
+            "Montpellier (France) = Montpellier Hérault SC",
+            "Club Brugge (Belgium) = Club Brugge KV (named)",
+            "Athletic Club (Spain) = Athletic Club de Bilbao",
+            "Strasbourg (France) = Racing Club Strasbourg",
+            "Dinamo Bucureşti (Romania) = Dinamo Bucharest (named)",
+            "Grasshoppers (Switzerland) = Grasshopper Club Zurich",
+            "Boavista FC (Portugal) = Boavista Futebol Clube",
+            "Olympique Lyon (France) = Olympique Lyonnais",
+            "Albacete (Spain) = Albacete Balompié",
+            "SM Caen (France) = Stade Malherbe de Caen (named)",
+            "Budapest Honved (Hungary) = Kispest-Honvéd FC (named)",
+            "Le Havre (France) = Le Havre Athletic Club",
+            "FC Sochaux (France) = FC Sochaux-Montbéliard",
+            "Celtic (Scotland) = Glasgow Celtic",
+            "Sporting Gijon (Spain) = Real Sporting de Gijón",
+            "AIK (Sweden) = AIK (named)",
+            "Odense Bk (Denmark) = Odense Boldklub (named)",
+            "1 FC Nuernberg (Germany) = 1.FC Nürnberg",
+            "Lille (France) = Lille Olympique SC",
+            "Brøndby (Denmark) = Brøndbyernes Idræts Forening (named)",
+            "Celta de Vigo (Spain) = Real Club Celta de Vigo"
+          ]
+        },
         "territory": {
           "merged": {
             "540": "250",
