@@ -43,10 +43,10 @@ const CARICATURES = {
 const NO_PICTURE = {
   'el-st-petersburg-lions': 'a one-season club of 2000/01: no article, file or archived page in any language shows a logo',
 };
-// Football's club appearances (a club on a map in a season) with no crest, 21 November 2026: 2,622 of about 55,000, 1,295
-// clubs (414 of today's country maps, 881 of the earlier seasons'), whose articles show no crest, show another club's,
-// or do not exist. A crest found for one lowers it.
-const FOOTBALL_WITHOUT_CREST = 2622;
+// Football's club appearances (a club on a map in a season) with no crest, 21 November 2026 after the second pass: 1,755
+// of about 55,000, 887 clubs (325 of today's country maps, 562 of the earlier seasons'), whose articles show no crest,
+// show another club's, or do not exist. A crest found for one lowers it.
+const FOOTBALL_WITHOUT_CREST = 1755;
 const isFootball = id => /^(f-|d[0-9A-Z]+-)/.test(id);
 
 const SEASONS = [BUILT_IN_SEASONS, BUILT_IN_WOMENS_SEASONS, BUILT_IN_BASKETBALL_SEASONS, BUILT_IN_AMERICAN_FOOTBALL_SEASONS,
