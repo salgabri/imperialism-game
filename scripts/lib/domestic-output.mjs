@@ -11,11 +11,18 @@ const lab = ({ l, c, h }) => [l, c * Math.cos(h * Math.PI / 180), c * Math.sin(h
 const deltaE = (a, b) => { const p = lab(a), q = lab(b); return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]); };
 const colourText = ({ l, c, h }) => `oklch(${l.toFixed(2)} ${c.toFixed(2)} ${h})`;
 
-/** One OKLCH colour per club, greedily in rank order over `adjacency` (club index -> neighbouring club indices). */
-export function colourSections(adjacency) {
+/**
+ * One OKLCH colour per club, greedily in rank order over `adjacency` (club index -> neighbouring club indices). With
+ * `crowdedFirst` (the country maps), the clubs with the most neighbours choose first, and a club left too close to a
+ * neighbour then takes the colour farthest from all its neighbours: the palette holds about 16 colours that all differ
+ * clearly, and a club bordering 18 (Proxy Work, across Egypt's desert) choosing last finds none of them free.
+ */
+export function colourSections(adjacency, { crowdedFirst = false } = {}) {
   const chosen = new Array(adjacency.length).fill(-1);
   const used = new Array(PALETTE.length).fill(0);
-  for (let i = 0; i < adjacency.length; i++) {
+  const order = adjacency.map((_, i) => i);
+  if (crowdedFirst) order.sort((a, b) => adjacency[b].length - adjacency[a].length || a - b);
+  for (const i of order) {
     const near = adjacency[i].filter(j => chosen[j] >= 0).map(j => PALETTE[chosen[j]]);
     const second = [...new Set(adjacency[i].flatMap(j => adjacency[j]))]
       .filter(j => j !== i && !adjacency[i].includes(j) && chosen[j] >= 0).map(j => PALETTE[chosen[j]]);
@@ -31,6 +38,17 @@ export function colourSections(adjacency) {
     });
     chosen[i] = best;
     used[best]++;
+  }
+  for (let pass = 0; crowdedFirst && pass < 3; pass++) {
+    let changed = false;
+    for (const i of order) {
+      const gap = k => (adjacency[i].length ? Math.min(...adjacency[i].map(j => deltaE(PALETTE[k], PALETTE[chosen[j]]))) : 1);
+      if (gap(chosen[i]) >= 0.1) continue;
+      let best = chosen[i];
+      PALETTE.forEach((_, k) => { if (gap(k) > gap(best)) best = k; });
+      if (best !== chosen[i]) { used[chosen[i]]--; used[best]++; chosen[i] = best; changed = true; }
+    }
+    if (!changed) break;
   }
   return chosen.map(k => colourText(PALETTE[k]));
 }

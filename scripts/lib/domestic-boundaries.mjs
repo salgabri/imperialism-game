@@ -681,6 +681,22 @@ export function createBoundarySource({ cacheDir, worldFile, offline = false, log
     return collection.features;
   }
 
+  /**
+   * England (the game's 826) from its 317 districts (ONS_LAD_URL, codes E…). geoBoundaries' GBR layers stop at the
+   * counties and unitary authorities (ADM3 repeats ADM2): 151 units for England, so a club in the shires held a whole
+   * county while a city club held a borough. The ONS's service winds rings clockwise (Esri's order); they are wound the
+   * other way round, as geoBoundaries and polygon-clipping wind them, or a merge across them would turn a district
+   * inside out.
+   */
+  async function englandDistricts() {
+    const signed = ring => ring.reduce((sum, [x, y], i) => (i ? sum + ring[i - 1][0] * y - x * ring[i - 1][1] : 0), 0);
+    const rewound = polys => polys.map(poly => poly.map((ring, k) => ((signed(ring) > 0) === (k === 0) ? ring : [...ring].reverse())));
+    const units = toUnits((await onsDistricts()).filter(f => f.properties.lad19cd.startsWith('E')), f => f.properties.lad19nm, f => `LAD-${f.properties.lad19cd}`)
+      .map(u => ({ ...u, polys: rewound(u.polys) }));
+    const boundaries = { provider: 'ONS', iso3: 'GBR', level: 'LAD 2019', part: 'England (district codes E…)', license: ONS_LAD_LICENSE, source: ONS_LAD_SOURCE, year: '2019', url: ONS_LAD_URL };
+    return { provider: 'ONS', iso3: 'GBR', level: 'LAD 2019', units, boundaries };
+  }
+
   let neFeatures = null;
   async function naturalEarth() {
     if (!neFeatures) neFeatures = JSON.parse(await download(NE_URL, path.join(cacheDir, 'ne', 'ne_10m_admin_1.geojson'))).features;
@@ -784,6 +800,7 @@ export function createBoundarySource({ cacheDir, worldFile, offline = false, log
   }
 
   async function pickUnits(nationId, n) {
+    if (nationId === '826') return englandDistricts();
     const iso3 = ISO3[nationId];
     if (!iso3) throw new Error(`No ISO alpha-3 code for nation ${nationId}`);
     const mask = MASKS[nationId];

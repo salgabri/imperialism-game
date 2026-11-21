@@ -23,6 +23,11 @@ export const REGIONAL = 'Regional football';
 
 const MAX_BYTES = 250000;
 const POINT_TARGET = 14000; // arc points per country; lowered when the file would exceed MAX_BYTES
+// Every country map shares its land out with balanceSections (docs/design/domestic-campaigns.md, "Balanced land"): a
+// club needs a quarter of its fair share (`room`, the land rules of the maps whose clubs hold several sections: a
+// club crowded into a city with less is fanned out or starts at a town nearby), and land then passes from clubs big
+// for their share to their neighbours, towards targets 30% of the way from equal land to each club's nearest-start land.
+const BALANCE = { room: 0.25, beta: 0.3 };
 // Fewer cities1000 places than this many per extra section count as sparse.
 const SPARSE_PLACES = 3;
 // GeoNames populated places that are places today (not sections of one, abandoned, historical or destroyed).
@@ -120,7 +125,9 @@ function sectionNames({ units, seedUnit, homeOf, placed, extras = [], towns = []
     if (!/\p{L}{2}/u.test(base) || /[^\p{Script=Latin}\p{Script=Common}\p{Script=Inherited}]/u.test(base)) base = nearestTown(units[u].centroid) ?? base;
     let name = units[u].qualifier ? qualify(base, units[u].qualifier) : base;
     const h = homeOf[i];
-    const town = i < clubs && h && !placed[i] && h.unit !== u && baseOf(h.unit) !== base ? townOf(h.unit) : null;
+    let town = i < clubs && h && !placed[i] && h.unit !== u && baseOf(h.unit) !== base ? townOf(h.unit) : null;
+    // A home unit named in another script (Tunis's Bab Bhar) names the nearest readable town instead.
+    if (town && !readable(town)) town = nearestTown(h.point);
     if (town && !sameName(town, base)) name = qualify(name, `near ${town}`);
     return name;
   });
@@ -230,7 +237,7 @@ export async function buildCountry(id, snapshot, source, season = null) {
   const {
     shift, units, adjacency, topo: unitTopo, homes, homeOf, located, placed, extras, moved, fans, movedStarts, dropped, splits, sourceUnits, sourceAreaKm2,
     maxGapKm, owner: seedOf, seedUnit, seedPoint,
-  } = partitionCountry(picked.units, rawHomes, { places: inScope(cities), extraPlaces, sections: S, log });
+  } = partitionCountry(picked.units, rawHomes, { places: inScope(cities), extraPlaces, sections: S, log, balance: BALANCE });
   const isLocated = i => Boolean(homeOf[i] && !placed[i]);
 
   // Club groups: seed k < n is club k's home section, an extra seed's section joins the
@@ -349,7 +356,7 @@ export async function buildCountry(id, snapshot, source, season = null) {
     const across = facingSections(geoms.map(g => geomPolys(qtopo, g)), facingKm(meta.focus));
     const clubAdj = clubs.map(() => new Set());
     neighbors(geoms).forEach((list, p) => { for (const j of [...list, ...across[p]]) if (clubAt[j] !== clubAt[p]) clubAdj[clubAt[p]].add(clubAt[j]); });
-    const colours = colourSections(clubAdj.map(s => [...s].sort((a, b) => a - b)));
+    const colours = colourSections(clubAdj.map(s => [...s].sort((a, b) => a - b)), { crowdedFirst: true });
     rows.forEach((row, i) => { row.col = colours[i]; });
     doc = { ...meta, topology: qtopo, clubs: rows };
     doc.version = `${id}-${contentHash(doc)}`;
@@ -400,6 +407,8 @@ export async function buildCountry(id, snapshot, source, season = null) {
         areaKm2: { min: fixed(Math.min(...groupAreas)), median: fixed(quantileOf(groupAreas, 0.5)), max: fixed(Math.max(...groupAreas)) },
       },
     } : {}),
+    // With one section per club there are no groups, but clubs crowded into a city still fan out or start nearby.
+    ...(n < S ? {} : { fanned: fans.map(f => f.members.map(c => clubs[c].name)), movedStarts: movedStarts.map(c => clubs[c].name) }),
     homeInSection: inSection.length,
     displacementKm: { median: fixed(quantileOf(displacement, 0.5) ?? 0), p90: fixed(quantileOf(displacement, 0.9) ?? 0), max: fixed(Math.max(0, ...displacement)) },
     displaced: displaced.slice(0, 12),

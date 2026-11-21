@@ -135,7 +135,7 @@ npm run build-clubs      # regenerate the club layer for both sports
 npm run sync:domestic-clubs # country club snapshots from the cache (EFEM requests need permission)
 npm run sync:club-logos  # club crests: Wikidata via QLever (network, cached), Wikipedia's answers from the pinned cache only
 npm run sync:club-logos -- --pages # only the crests club-logos.json "pages" names, from their file pages (network, cached)
-npm run build:domestic   # rebuild country maps from snapshots and boundaries (about 5 minutes)
+npm run build:domestic   # rebuild country maps from snapshots and boundaries (about 3 minutes)
 npm run test:domestic    # country maps, sections and seeded country campaigns
 npm run build:ea-seasons # rebuild the built-in earlier seasons from the pinned EA export in data-src/ea-leone/
 npm run sync:early-nationalities # ask Wikidata (via QLever) for the FIFA 05 and FIFA 06 nationalities no later edition has (network, cached)
@@ -1306,7 +1306,11 @@ Colombia; 24 for smaller leagues; 16 for the smallest nations. A country with
 fewer viable sides plays with all of them (Mexico 58, the United States 81), and
 every club is real. A country with fewer than ten has no map: its campaign would
 be over in a few matches. The map is always
-split into 100 sections, built from the country's real administrative divisions.
+split into 100 sections, built from the country's real administrative divisions
+(England's from its districts). Land goes to the nearest club, then passes from
+clubs with a lot of it to their smaller neighbours, in compact shapes; clubs
+crowded into one city share the land around it in wedges, and every club starts
+in its own city.
 Each club starts on the section around its home town; with fewer than 100 clubs
 it also starts on the sections around that one, a group of 100/N rounded down or
 up (the stronger clubs take the extra ones where they have room), so Fiji's 16
@@ -1319,8 +1323,8 @@ attacks go around them, by sea if need be; only an exclave (Nakhchivan, Gaza,
 Kaliningrad) may have to cross one, labelled "Crossing foreign territory".
 Attack routes start from a point well inside each section (the home town when it
 is clear of the border), while the home marker shows the town itself. Tooltips
-and conquest results use section names, such as "Lancashire (east)", where
-Burnley starts.
+and conquest results use section names, such as "Burnley" or "Verona (north-west)",
+where Hellas Verona starts.
 
 In the v4 interface, choosing **Clubs** in setup step 1 adds the **One country ·
 top clubs** dropdown below Europe's two theatres (football only). Picking a country shows a

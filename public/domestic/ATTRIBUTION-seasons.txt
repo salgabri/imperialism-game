@@ -5,6 +5,7 @@ Each is one country's map in one earlier football season: its sections are deriv
 boundary layers as today's map of the country (public/domestic/ATTRIBUTION.txt lists their sources and licences),
 grown around that season's clubs. Scotland's, which today's maps lack, are listed below.
 geoBoundaries (https://www.geoboundaries.org), gbOpen release, files pinned to commit 9469f09: Runfola, D. et al. (2020) geoBoundaries: A global database of political administrative boundaries. PLOS ONE 15(4): e0231866. https://doi.org/10.1371/journal.pone.0231866
+England's districts (the game's 826): Office for National Statistics, Local Authority Districts (December 2019) Boundaries UK GCB, Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019).
 Clubs and players: the season's own source, as its season file credits it (public/football/<season>.json,
   docs/design/football-years.md); in an EA season, a country the EA edition rates too few clubs of takes the CM 01/02
   Update Team's database of that season (credited to the CM 01/02 Update Team, https://www.champman0102.co.uk;
@@ -98,7 +99,7 @@ Per map:
 804y2026 Ukraine ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
 807y2026 N. Macedonia ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries MKD ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
 818y2026 Egypt ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries EGY ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
-826y2026 England ea-fc-26 (EA FC 26): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2026 England ea-fc-26 (EA FC 26): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2026 United States ea-fc-26 (EA FC 26): geoBoundaries USA ADM2, Public Domain
 858y2026 Uruguay ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 860y2026 Uzbekistan ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): geoBoundaries UZB ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -161,7 +162,7 @@ WALy2026 Wales ea-fc-26 (CM 01/02, December 2025 by the CM 01/02 Update Team): g
 784y2025 United Arab Emirates ea-fc-25 (CM 01/02, October 2024 by the CM 01/02 Update Team): geoBoundaries ARE ADM1, Open Data Commons Open Database License 1.0
 792y2025 Turkey ea-fc-25 (EA FC 25): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y2025 Ukraine ea-fc-25 (CM 01/02, October 2024 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
-826y2025 England ea-fc-25 (EA FC 25): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2025 England ea-fc-25 (EA FC 25): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2025 United States ea-fc-25 (EA FC 25): geoBoundaries USA ADM2, Public Domain
 858y2025 Uruguay ea-fc-25 (CM 01/02, October 2024 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 NIRy2025 Northern Ireland ea-fc-25 (CM 01/02, October 2024 by the CM 01/02 Update Team): geoBoundaries GBR ADM2 (GB-NIR), Open Government Licence v3.0
@@ -216,7 +217,7 @@ WALy2025 Wales ea-fc-25 (CM 01/02, October 2024 by the CM 01/02 Update Team): ge
 784y2024 United Arab Emirates ea-fc-24 (CM 01/02, October 2023 by the CM 01/02 Update Team): geoBoundaries ARE ADM1, Open Data Commons Open Database License 1.0
 792y2024 Turkey ea-fc-24 (EA FC 24): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y2024 Ukraine ea-fc-24 (CM 01/02, October 2023 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
-826y2024 England ea-fc-24 (EA FC 24): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2024 England ea-fc-24 (EA FC 24): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2024 United States ea-fc-24 (EA FC 24): geoBoundaries USA ADM2, Public Domain
 858y2024 Uruguay ea-fc-24 (CM 01/02, October 2023 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 NIRy2024 Northern Ireland ea-fc-24 (CM 01/02, October 2023 by the CM 01/02 Update Team): geoBoundaries GBR ADM2 (GB-NIR), Open Government Licence v3.0
@@ -308,7 +309,7 @@ WALy2024 Wales ea-fc-24 (CM 01/02, October 2023 by the CM 01/02 Update Team): ge
 804y2023 Ukraine ea-fifa-23 (CM 01/02, October 2022 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
 807y2023 N. Macedonia ea-fifa-23 (CM 01/02, October 2022 by the CM 01/02 Update Team): geoBoundaries MKD ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
 818y2023 Egypt ea-fifa-23 (CM 01/02, October 2022 by the CM 01/02 Update Team): geoBoundaries EGY ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
-826y2023 England ea-fifa-23 (FIFA 23): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2023 England ea-fifa-23 (FIFA 23): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2023 United States ea-fifa-23 (FIFA 23): geoBoundaries USA ADM2, Public Domain
 858y2023 Uruguay ea-fifa-23 (CM 01/02, October 2022 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 860y2023 Uzbekistan ea-fifa-23 (CM 01/02, October 2022 by the CM 01/02 Update Team): geoBoundaries UZB ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -392,7 +393,7 @@ WALy2023 Wales ea-fifa-23 (CM 01/02, October 2022 by the CM 01/02 Update Team): 
 804y2022 Ukraine ea-fifa-22 (CM 01/02, October 2021 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
 807y2022 N. Macedonia ea-fifa-22 (CM 01/02, October 2021 by the CM 01/02 Update Team): geoBoundaries MKD ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
 818y2022 Egypt ea-fifa-22 (CM 01/02, October 2021 by the CM 01/02 Update Team): geoBoundaries EGY ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
-826y2022 England ea-fifa-22 (FIFA 22): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2022 England ea-fifa-22 (FIFA 22): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2022 United States ea-fifa-22 (FIFA 22): geoBoundaries USA ADM2, Public Domain
 858y2022 Uruguay ea-fifa-22 (CM 01/02, October 2021 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 860y2022 Uzbekistan ea-fifa-22 (CM 01/02, October 2021 by the CM 01/02 Update Team): geoBoundaries UZB ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -476,7 +477,7 @@ WALy2022 Wales ea-fifa-22 (CM 01/02, October 2021 by the CM 01/02 Update Team): 
 804y2021 Ukraine ea-fifa-21 (CM 01/02, November 2020 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
 807y2021 N. Macedonia ea-fifa-21 (CM 01/02, November 2020 by the CM 01/02 Update Team): geoBoundaries MKD ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
 818y2021 Egypt ea-fifa-21 (CM 01/02, November 2020 by the CM 01/02 Update Team): geoBoundaries EGY ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
-826y2021 England ea-fifa-21 (FIFA 21): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2021 England ea-fifa-21 (FIFA 21): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2021 United States ea-fifa-21 (FIFA 21): geoBoundaries USA ADM2, Public Domain
 858y2021 Uruguay ea-fifa-21 (CM 01/02, November 2020 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 860y2021 Uzbekistan ea-fifa-21 (CM 01/02, November 2020 by the CM 01/02 Update Team): geoBoundaries UZB ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -556,7 +557,7 @@ WALy2021 Wales ea-fifa-21 (CM 01/02, November 2020 by the CM 01/02 Update Team):
 804y2020 Ukraine ea-fifa-20 (CM 01/02, October 2019 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
 807y2020 N. Macedonia ea-fifa-20 (CM 01/02, October 2019 by the CM 01/02 Update Team): geoBoundaries MKD ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
 818y2020 Egypt ea-fifa-20 (CM 01/02, October 2019 by the CM 01/02 Update Team): geoBoundaries EGY ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
-826y2020 England ea-fifa-20 (FIFA 20): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2020 England ea-fifa-20 (FIFA 20): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2020 United States ea-fifa-20 (FIFA 20): geoBoundaries USA ADM2, Public Domain
 858y2020 Uruguay ea-fifa-20 (CM 01/02, October 2019 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 860y2020 Uzbekistan ea-fifa-20 (CM 01/02, October 2019 by the CM 01/02 Update Team): geoBoundaries UZB ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -633,7 +634,7 @@ WALy2020 Wales ea-fifa-20 (CM 01/02, October 2019 by the CM 01/02 Update Team): 
 804y2019 Ukraine ea-fifa-19 (CM 01/02, October 2018 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
 807y2019 N. Macedonia ea-fifa-19 (CM 01/02, October 2018 by the CM 01/02 Update Team): geoBoundaries MKD ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
 818y2019 Egypt ea-fifa-19 (CM 01/02, October 2018 by the CM 01/02 Update Team): geoBoundaries EGY ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
-826y2019 England ea-fifa-19 (FIFA 19): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2019 England ea-fifa-19 (FIFA 19): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2019 United States ea-fifa-19 (FIFA 19): geoBoundaries USA ADM2, Public Domain
 858y2019 Uruguay ea-fifa-19 (CM 01/02, October 2018 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 860y2019 Uzbekistan ea-fifa-19 (CM 01/02, October 2018 by the CM 01/02 Update Team): geoBoundaries UZB ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -706,7 +707,7 @@ WALy2019 Wales ea-fifa-19 (CM 01/02, October 2018 by the CM 01/02 Update Team): 
 804y2018 Ukraine ea-fifa-18 (CM 01/02, October 2017 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
 807y2018 N. Macedonia ea-fifa-18 (CM 01/02, October 2017 by the CM 01/02 Update Team): geoBoundaries MKD ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
 818y2018 Egypt ea-fifa-18 (CM 01/02, October 2017 by the CM 01/02 Update Team): geoBoundaries EGY ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
-826y2018 England ea-fifa-18 (FIFA 18): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2018 England ea-fifa-18 (FIFA 18): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2018 United States ea-fifa-18 (FIFA 18): geoBoundaries USA ADM2, Public Domain
 858y2018 Uruguay ea-fifa-18 (CM 01/02, October 2017 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 860y2018 Uzbekistan ea-fifa-18 (CM 01/02, October 2017 by the CM 01/02 Update Team): geoBoundaries UZB ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -761,7 +762,7 @@ WALy2018 Wales ea-fifa-18 (CM 01/02, October 2017 by the CM 01/02 Update Team): 
 756y2017 Switzerland ea-fifa-17 (CM 01/02, October 2016 by the CM 01/02 Update Team): geoBoundaries CHE ADM3, Federal Office of Topography swisstopo License
 792y2017 Turkey ea-fifa-17 (FIFA 17): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 818y2017 Egypt ea-fifa-17 (CM 01/02, October 2016 by the CM 01/02 Update Team): geoBoundaries EGY ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
-826y2017 England ea-fifa-17 (FIFA 17): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2017 England ea-fifa-17 (FIFA 17): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2017 United States ea-fifa-17 (FIFA 17): geoBoundaries USA ADM2, Public Domain
 858y2017 Uruguay ea-fifa-17 (CM 01/02, October 2016 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 862y2017 Venezuela ea-fifa-17 (CM 01/02, October 2016 by the CM 01/02 Update Team): geoBoundaries VEN ADM1, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -820,7 +821,7 @@ WALy2017 Wales ea-fifa-17 (CM 01/02, October 2016 by the CM 01/02 Update Team): 
 792y2016 Turkey ea-fifa-16 (FIFA 16): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y2016 Ukraine ea-fifa-16 (CM 01/02, October 2015 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
 818y2016 Egypt ea-fifa-16 (CM 01/02, October 2015 by the CM 01/02 Update Team): geoBoundaries EGY ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
-826y2016 England ea-fifa-16 (FIFA 16): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2016 England ea-fifa-16 (FIFA 16): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2016 United States ea-fifa-16 (FIFA 16): geoBoundaries USA ADM2, Public Domain
 858y2016 Uruguay ea-fifa-16 (CM 01/02, October 2015 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 862y2016 Venezuela ea-fifa-16 (CM 01/02, October 2015 by the CM 01/02 Update Team): geoBoundaries VEN ADM1, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -879,7 +880,7 @@ WALy2016 Wales ea-fifa-16 (CM 01/02, October 2015 by the CM 01/02 Update Team): 
 792y2015 Turkey ea-fifa-15 (FIFA 15): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y2015 Ukraine ea-fifa-15 (CM 01/02, October 2014 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
 818y2015 Egypt ea-fifa-15 (CM 01/02, October 2014 by the CM 01/02 Update Team): geoBoundaries EGY ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
-826y2015 England ea-fifa-15 (FIFA 15): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2015 England ea-fifa-15 (FIFA 15): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2015 United States ea-fifa-15 (FIFA 15): geoBoundaries USA ADM2, Public Domain
 858y2015 Uruguay ea-fifa-15 (CM 01/02, October 2014 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 862y2015 Venezuela ea-fifa-15 (CM 01/02, October 2014 by the CM 01/02 Update Team): geoBoundaries VEN ADM1, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -939,7 +940,7 @@ WALy2015 Wales ea-fifa-15 (CM 01/02, October 2014 by the CM 01/02 Update Team): 
 792y2014 Turkey ea-fifa-14 (CM 01/02, Autumn 2013 by the CM 01/02 Update Team): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y2014 Ukraine ea-fifa-14 (CM 01/02, Autumn 2013 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
 818y2014 Egypt ea-fifa-14 (CM 01/02, Autumn 2013 by the CM 01/02 Update Team): geoBoundaries EGY ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
-826y2014 England ea-fifa-14 (FIFA 14): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2014 England ea-fifa-14 (FIFA 14): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2014 United States ea-fifa-14 (FIFA 14): geoBoundaries USA ADM2, Public Domain
 858y2014 Uruguay ea-fifa-14 (CM 01/02, Autumn 2013 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 862y2014 Venezuela ea-fifa-14 (CM 01/02, Autumn 2013 by the CM 01/02 Update Team): geoBoundaries VEN ADM1, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -994,7 +995,7 @@ WALy2014 Wales ea-fifa-14 (CM 01/02, Autumn 2013 by the CM 01/02 Update Team): g
 792y2013 Turkey ea-fifa-13 (CM 01/02, September 2012 by the CM 01/02 Update Team): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y2013 Ukraine ea-fifa-13 (CM 01/02, September 2012 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
 818y2013 Egypt ea-fifa-13 (CM 01/02, September 2012 by the CM 01/02 Update Team): geoBoundaries EGY ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
-826y2013 England ea-fifa-13 (FIFA 13): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2013 England ea-fifa-13 (FIFA 13): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2013 United States ea-fifa-13 (FIFA 13): geoBoundaries USA ADM2, Public Domain
 858y2013 Uruguay ea-fifa-13 (CM 01/02, September 2012 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 862y2013 Venezuela ea-fifa-13 (CM 01/02, September 2012 by the CM 01/02 Update Team): geoBoundaries VEN ADM1, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -1049,7 +1050,7 @@ WALy2013 Wales ea-fifa-13 (CM 01/02, September 2012 by the CM 01/02 Update Team)
 756y2012 Switzerland ea-fifa-12 (FIFA 12): geoBoundaries CHE ADM3, Federal Office of Topography swisstopo License
 792y2012 Turkey ea-fifa-12 (CM 01/02, September 2011 ODB by the CM 01/02 Update Team): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y2012 Ukraine ea-fifa-12 (CM 01/02, September 2011 ODB by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
-826y2012 England ea-fifa-12 (FIFA 12): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2012 England ea-fifa-12 (FIFA 12): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2012 United States ea-fifa-12 (FIFA 12): geoBoundaries USA ADM2, Public Domain
 858y2012 Uruguay ea-fifa-12 (CM 01/02, September 2011 ODB by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 862y2012 Venezuela ea-fifa-12 (CM 01/02, September 2011 ODB by the CM 01/02 Update Team): geoBoundaries VEN ADM1, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -1108,7 +1109,7 @@ WALy2012 Wales ea-fifa-12 (CM 01/02, September 2011 ODB by the CM 01/02 Update T
 764y2011 Thailand ea-fifa-11 (CM 01/02, September 2010 ODB by the CM 01/02 Update Team): geoBoundaries THA ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 792y2011 Turkey ea-fifa-11 (FIFA 11): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y2011 Ukraine ea-fifa-11 (CM 01/02, September 2010 ODB by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
-826y2011 England ea-fifa-11 (FIFA 11): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2011 England ea-fifa-11 (FIFA 11): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2011 United States ea-fifa-11 (FIFA 11): geoBoundaries USA ADM2, Public Domain
 858y2011 Uruguay ea-fifa-11 (CM 01/02, September 2010 ODB by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 860y2011 Uzbekistan ea-fifa-11 (CM 01/02, September 2010 ODB by the CM 01/02 Update Team): geoBoundaries UZB ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -1167,7 +1168,7 @@ WALy2011 Wales ea-fifa-11 (CM 01/02, September 2010 ODB by the CM 01/02 Update T
 764y2010 Thailand ea-fifa-10 (CM 01/02, September 2009 by the CM 01/02 Update Team): geoBoundaries THA ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 792y2010 Turkey ea-fifa-10 (FIFA 10): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y2010 Ukraine ea-fifa-10 (CM 01/02, September 2009 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
-826y2010 England ea-fifa-10 (FIFA 10): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2010 England ea-fifa-10 (FIFA 10): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2010 United States ea-fifa-10 (FIFA 10): geoBoundaries USA ADM2, Public Domain
 858y2010 Uruguay ea-fifa-10 (CM 01/02, September 2009 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 860y2010 Uzbekistan ea-fifa-10 (CM 01/02, September 2009 by the CM 01/02 Update Team): geoBoundaries UZB ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -1228,7 +1229,7 @@ WALy2010 Wales ea-fifa-10 (CM 01/02, September 2009 by the CM 01/02 Update Team)
 764y2009 Thailand ea-fifa-09 (CM 01/02, September 2008 by the CM 01/02 Update Team): geoBoundaries THA ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 792y2009 Turkey ea-fifa-09 (FIFA 09): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y2009 Ukraine ea-fifa-09 (CM 01/02, September 2008 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
-826y2009 England ea-fifa-09 (FIFA 09): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2009 England ea-fifa-09 (FIFA 09): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2009 United States ea-fifa-09 (FIFA 09): geoBoundaries USA ADM2, Public Domain
 858y2009 Uruguay ea-fifa-09 (CM 01/02, September 2008 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 860y2009 Uzbekistan ea-fifa-09 (CM 01/02, September 2008 by the CM 01/02 Update Team): geoBoundaries UZB ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -1293,7 +1294,7 @@ WALy2009 Wales ea-fifa-09 (CM 01/02, September 2008 by the CM 01/02 Update Team)
 792y2008 Turkey ea-fifa-08 (FIFA 08): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y2008 Ukraine ea-fifa-08 (CM 01/02, November 2007 by the CM 01/02 Update Team): geoBoundaries UKR ADM2, Public Domain
 807y2008 N. Macedonia ea-fifa-08 (CM 01/02, November 2007 by the CM 01/02 Update Team): geoBoundaries MKD ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
-826y2008 England ea-fifa-08 (FIFA 08): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2008 England ea-fifa-08 (FIFA 08): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2008 United States ea-fifa-08 (FIFA 08): geoBoundaries USA ADM2, Public Domain
 858y2008 Uruguay ea-fifa-08 (CM 01/02, November 2007 by the CM 01/02 Update Team): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 860y2008 Uzbekistan ea-fifa-08 (CM 01/02, November 2007 by the CM 01/02 Update Team): geoBoundaries UZB ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -1318,7 +1319,7 @@ WALy2008 Wales ea-fifa-08 (CM 01/02, November 2007 by the CM 01/02 Update Team):
 752y2007 Sweden ea-fifa-07 (FIFA 07): geoBoundaries SWE ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
 756y2007 Switzerland ea-fifa-07 (FIFA 07): geoBoundaries CHE ADM3, Federal Office of Topography swisstopo License
 792y2007 Turkey ea-fifa-07 (FIFA 07): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
-826y2007 England ea-fifa-07 (FIFA 07): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2007 England ea-fifa-07 (FIFA 07): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2007 United States ea-fifa-07 (FIFA 07): geoBoundaries USA ADM2, Public Domain
 SCOy2007 Scotland ea-fifa-07 (FIFA 07): geoBoundaries GBR ADM2 (GB-SCT), Open Government Licence v3.0
 008y2004 Albania cm0102-2003-10 (CM 01/02): geoBoundaries ALB ADM3, Open Data Commons Open Database License 1.0
@@ -1364,7 +1365,7 @@ SCOy2007 Scotland ea-fifa-07 (FIFA 07): geoBoundaries GBR ADM2 (GB-SCT), Open Go
 792y2004 Turkey cm0102-2003-10 (CM 01/02): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y2004 Ukraine cm0102-2003-10 (CM 01/02): geoBoundaries UKR ADM2, Public Domain
 807y2004 N. Macedonia cm0102-2003-10 (CM 01/02): geoBoundaries MKD ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
-826y2004 England cm0102-2003-10 (CM 01/02): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2004 England cm0102-2003-10 (CM 01/02): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2004 United States cm0102-2003-10 (CM 01/02): geoBoundaries USA ADM2, Public Domain
 858y2004 Uruguay cm0102-2003-10 (CM 01/02): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 860y2004 Uzbekistan cm0102-2003-10 (CM 01/02): geoBoundaries UZB ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -1415,7 +1416,7 @@ WALy2004 Wales cm0102-2003-10 (CM 01/02): geoBoundaries GBR ADM2 (GB-WLS), Open 
 792y2003 Turkey cm0102-2002-11 (CM 01/02): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y2003 Ukraine cm0102-2002-11 (CM 01/02): geoBoundaries UKR ADM2, Public Domain
 807y2003 N. Macedonia cm0102-2002-11 (CM 01/02): geoBoundaries MKD ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
-826y2003 England cm0102-2002-11 (CM 01/02): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2003 England cm0102-2002-11 (CM 01/02): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2003 United States cm0102-2002-11 (CM 01/02): geoBoundaries USA ADM2, Public Domain
 858y2003 Uruguay cm0102-2002-11 (CM 01/02): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 860y2003 Uzbekistan cm0102-2002-11 (CM 01/02): geoBoundaries UZB ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -1459,7 +1460,7 @@ WALy2003 Wales cm0102-2002-11 (CM 01/02): geoBoundaries GBR ADM2 (GB-WLS), Open 
 752y2002 Sweden cm0102-2001-09 (CM 01/02): geoBoundaries SWE ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
 792y2002 Turkey cm0102-2001-09 (CM 01/02): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y2002 Ukraine cm0102-2001-09 (CM 01/02): geoBoundaries UKR ADM2, Public Domain
-826y2002 England cm0102-2001-09 (CM 01/02): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2002 England cm0102-2001-09 (CM 01/02): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2002 United States cm0102-2001-09 (CM 01/02): geoBoundaries USA ADM2, Public Domain
 858y2002 Uruguay cm0102-2001-09 (CM 01/02): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 NIRy2002 Northern Ireland cm0102-2001-09 (CM 01/02): geoBoundaries GBR ADM2 (GB-NIR), Open Government Licence v3.0
@@ -1491,7 +1492,7 @@ WALy2002 Wales cm0102-2001-09 (CM 01/02): geoBoundaries GBR ADM2 (GB-WLS), Open 
 724y2001 Spain cm-0001 (CM 00/01): geoBoundaries ESP ADM3, Creative Commons Attribution 4.0 International (CC BY 4.0)
 752y2001 Sweden cm-0001 (CM 00/01): geoBoundaries SWE ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
 792y2001 Turkey cm-0001 (CM 00/01): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
-826y2001 England cm-0001 (CM 00/01): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2001 England cm-0001 (CM 00/01): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 NIRy2001 Northern Ireland cm-0001 (CM 00/01): geoBoundaries GBR ADM2 (GB-NIR), Open Government Licence v3.0
 SCOy2001 Scotland cm-0001 (CM 00/01): geoBoundaries GBR ADM2 (GB-SCT), Open Government Licence v3.0
 032y2000 Argentina cm-9900 (CM 99/00): geoBoundaries ARG ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -1508,7 +1509,7 @@ SCOy2001 Scotland cm-0001 (CM 00/01): geoBoundaries GBR ADM2 (GB-SCT), Open Gove
 642y2000 Romania cm-9900 (CM 99/00): geoBoundaries ROU ADM2, Creative Commons Attribution 4.0 International (CC BY 4.0)
 724y2000 Spain cm-9900 (CM 99/00): geoBoundaries ESP ADM3, Creative Commons Attribution 4.0 International (CC BY 4.0)
 752y2000 Sweden cm-9900 (CM 99/00): geoBoundaries SWE ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
-826y2000 England cm-9900 (CM 99/00): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y2000 England cm-9900 (CM 99/00): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y2000 United States cm-9900 (CM 99/00): geoBoundaries USA ADM2, Public Domain
 SCOy2000 Scotland cm-9900 (CM 99/00): geoBoundaries GBR ADM2 (GB-SCT), Open Government Licence v3.0
 032y1999 Argentina cm0102-2020-11-cm3 (CM3): geoBoundaries ARG ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -1522,7 +1523,7 @@ SCOy2000 Scotland cm-9900 (CM 99/00): geoBoundaries GBR ADM2 (GB-SCT), Open Gove
 620y1999 Portugal cm0102-2020-11-cm3 (CM3): geoBoundaries PRT ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
 724y1999 Spain cm0102-2020-11-cm3 (CM3): geoBoundaries ESP ADM3, Creative Commons Attribution 4.0 International (CC BY 4.0)
 752y1999 Sweden cm0102-2020-11-cm3 (CM3): geoBoundaries SWE ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
-826y1999 England cm0102-2020-11-cm3 (CM3): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y1999 England cm0102-2020-11-cm3 (CM3): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y1999 United States cm0102-2020-11-cm3 (CM3): geoBoundaries USA ADM2, Public Domain
 SCOy1999 Scotland cm0102-2020-11-cm3 (CM3): geoBoundaries GBR ADM2 (GB-SCT), Open Government Licence v3.0
 056y1998 Belgium cm-9798 (CM 97/98): geoBoundaries BEL ADM4, Creative Commons Attribution 4.0 International (CC BY 4.0)
@@ -1535,7 +1536,7 @@ SCOy1999 Scotland cm0102-2020-11-cm3 (CM3): geoBoundaries GBR ADM2 (GB-SCT), Ope
 620y1998 Portugal cm-9798 (CM 97/98): geoBoundaries PRT ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
 724y1998 Spain cm-9798 (CM 97/98): geoBoundaries ESP ADM3, Creative Commons Attribution 4.0 International (CC BY 4.0)
 752y1998 Sweden cm-9798 (CM 97/98): geoBoundaries SWE ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
-826y1998 England cm-9798 (CM 97/98): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y1998 England cm-9798 (CM 97/98): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 008y1997 Albania swos-9697 (SWOS 96/97): geoBoundaries ALB ADM3, Open Data Commons Open Database License 1.0
 012y1997 Algeria swos-9697 (SWOS 96/97): geoBoundaries DZA ADM3, Creative Commons Attribution-ShareAlike 2.0
 032y1997 Argentina swos-9697 (SWOS 96/97): geoBoundaries ARG ADM2, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -1589,7 +1590,7 @@ SCOy1999 Scotland cm0102-2020-11-cm3 (CM3): geoBoundaries GBR ADM2 (GB-SCT), Ope
 756y1997 Switzerland swos-9697 (SWOS 96/97): geoBoundaries CHE ADM3, Federal Office of Topography swisstopo License
 792y1997 Turkey swos-9697 (SWOS 96/97): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y1997 Ukraine swos-9697 (SWOS 96/97): geoBoundaries UKR ADM2, Public Domain
-826y1997 England swos-9697 (SWOS 96/97): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y1997 England swos-9697 (SWOS 96/97): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 840y1997 United States swos-9697 (SWOS 96/97): geoBoundaries USA ADM2, Public Domain
 858y1997 Uruguay swos-9697 (SWOS 96/97): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 862y1997 Venezuela swos-9697 (SWOS 96/97): geoBoundaries VEN ADM1, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
@@ -1649,7 +1650,7 @@ WALy1997 Wales swos-9697 (SWOS 96/97): geoBoundaries GBR ADM2 (GB-WLS), Open Gov
 756y1996 Switzerland swos-9596 (SWOS 95/96): geoBoundaries CHE ADM3, Federal Office of Topography swisstopo License
 792y1996 Turkey swos-9596 (SWOS 95/96): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y1996 Ukraine swos-9596 (SWOS 95/96): geoBoundaries UKR ADM2, Public Domain
-826y1996 England swos-9596 (SWOS 95/96): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y1996 England swos-9596 (SWOS 95/96): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 858y1996 Uruguay swos-9596 (SWOS 95/96): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 862y1996 Venezuela swos-9596 (SWOS 95/96): geoBoundaries VEN ADM1, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 NIRy1996 Northern Ireland swos-9596 (SWOS 95/96): geoBoundaries GBR ADM2 (GB-NIR), Open Government Licence v3.0
@@ -1708,7 +1709,7 @@ WALy1996 Wales swos-9596 (SWOS 95/96): geoBoundaries GBR ADM2 (GB-WLS), Open Gov
 756y1995 Switzerland swos-9495 (SWOS 94/95): geoBoundaries CHE ADM3, Federal Office of Topography swisstopo License
 792y1995 Turkey swos-9495 (SWOS 94/95): geoBoundaries TUR ADM2, Open Data Commons Open Database License 1.0
 804y1995 Ukraine swos-9495 (SWOS 94/95): geoBoundaries UKR ADM2, Public Domain
-826y1995 England swos-9495 (SWOS 94/95): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y1995 England swos-9495 (SWOS 94/95): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 858y1995 Uruguay swos-9495 (SWOS 94/95): geoBoundaries URY ADM1, Open Data Commons Open Database License 1.0
 862y1995 Venezuela swos-9495 (SWOS 94/95): geoBoundaries VEN ADM1, Creative Commons Attribution 3.0 Intergovernmental Organisations (CC BY 3.0 IGO)
 NIRy1995 Northern Ireland swos-9495 (SWOS 94/95): geoBoundaries GBR ADM2 (GB-NIR), Open Government Licence v3.0
@@ -1728,5 +1729,5 @@ WALy1995 Wales swos-9495 (SWOS 94/95): geoBoundaries GBR ADM2 (GB-WLS), Open Gov
 724y1994 Spain cm0102-2020-11-cm93 (CM 01/02): geoBoundaries ESP ADM3, Creative Commons Attribution 4.0 International (CC BY 4.0)
 752y1994 Sweden cm0102-2020-11-cm93 (CM 01/02): geoBoundaries SWE ADM2, CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
 756y1994 Switzerland cm0102-2020-11-cm93 (CM 01/02): geoBoundaries CHE ADM3, Federal Office of Topography swisstopo License
-826y1994 England cm0102-2020-11-cm93 (CM 01/02): geoBoundaries GBR ADM2 (GB-ENG), Open Government Licence v3.0
+826y1994 England cm0102-2020-11-cm93 (CM 01/02): ONS GBR LAD 2019 (England (district codes E…)), Open Government Licence v3.0 (Source: Office for National Statistics licensed under the Open Government Licence v.3.0; contains OS data © Crown copyright and database right 2019)
 SCOy1994 Scotland cm0102-2020-11-cm93 (CM 01/02): geoBoundaries GBR ADM2 (GB-SCT), Open Government Licence v3.0

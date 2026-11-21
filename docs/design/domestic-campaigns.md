@@ -155,11 +155,10 @@ disallows every path for every agent (read 2026-11-10); a missing file stops the
 or the build, and `--refresh=all` keeps them. Boundary downloads: one at a time
 (worker threads ask the main thread), 0.5 s apart, four tries. Nominatim is never
 used. From a warm cache the sync of every nation takes about 30 s. A full build
-takes 4.5 to 6.5 minutes: nearly all of it is Canada, whose partition runs three
-times (see Partition), about 275 s with 8 jobs (the default: up to 8, one fewer
-than the CPU's threads) and 389 s when 12 jobs compete for the CPU; no other
-country takes more than about 35 s. `--check` takes as long, so run both in the
-background.
+takes about 2.5 minutes with 12 jobs (the default: up to 8, one fewer than the CPU's
+threads): nearly all of it is Canada, whose partition is redone for clubs boxed in
+(see Partition), about 150 s; Russia and Chile take about 60 s, no other country
+more than about 40 s. `--check` takes as long, so run both in the background.
 
 ## Stage 1: clubs, squads, home towns
 
@@ -309,14 +308,24 @@ format-1 build except for `format` and the one-entry `sections` lists.
    the 100 sections whatever N: the coarsest layer with ≥ 200 units, else the
    finest with ≥ 100, else the finest; a loaded layer's real unit count replaces
    the listed one and the rule runs again. Natural Earth 10m admin-1 is the
-   fallback, then ADM0. Shipped: ADM2 80, ADM3 36, ADM1 8, ADM4 3, Natural Earth
-   1 (New Caledonia).
+   fallback, then ADM0. Shipped: ADM2 79, ADM3 36, ADM1 8, ADM4 3, Natural Earth
+   1 (New Caledonia), and England's districts (below).
+   **England** (826) takes the Office for National Statistics' 317 local authority
+   districts (December 2019, generalised to 20 m and clipped to the coast; Open
+   Government Licence v3.0) since 2026-11-18: geoBoundaries' GBR layers stop at the
+   counties and unitary authorities (its ADM3 repeats ADM2), 151 units for England,
+   so a club in the shires held a whole county (Lincoln City all of Lincolnshire)
+   while a city club held a borough. The ONS's feature service winds rings clockwise;
+   the loader winds them the other way round, as geoBoundaries' are. The file comes
+   from the cache (`data-src/boundaries/ons/`), the same one the Europe maps' branch
+   reads, and the constants and loader are worded as there.
 2. **Fill.** Each polygon of the next coarser layer that the chosen layer mostly
    misses joins as a unit, minus the chosen units, when the missing land is at
    least 5 km² and 0.001% of the country (Moscow and Saint Petersburg in RUS
    ADM2). 26 maps; recorded in `boundaries.filled`.
-3. **Mask.** The game's 826 is England: GBR ADM2 units whose centroid lies in the
-   GB-ENG polygon of GBR ADM1.
+3. **Mask.** The game's 826 is England: its districts are those with E codes.
+   Scotland's, Wales's and Northern Ireland's season maps keep the mask: GBR ADM2
+   units whose centroid lies in that nation's polygon of GBR ADM1.
 4. **Other associations.** China drops polygons mostly within 3 km of Natural
    Earth's Taiwan, Hong Kong and Macau (`boundaries.excluded`).
 5. **Foreign land.** The game's world map (`public/countries-50m.json`) decides
@@ -334,7 +343,11 @@ format-1 build except for `format` and the one-entry `sections` lists.
 **Territories.** Steps 1–10 grow one territory per club. Where every club starts
 on two or more sections (N ≤ 50, "grouped" below), extra rules keep territories
 near their fair share of land and keep clubs crowded into one city from being shut
-in; maps with N from 51 to 99 use the format-1 rules unchanged.
+in; maps with N from 51 to 99 use the format-1 rules unchanged. Since 2026-11-18
+every country map shares out its land as "Balanced land" (below) describes: the
+grouped rules for every map, and step 9's growth replaced. The steps below still
+describe the club maps (NBA, NFL and the others), the Europe maps, and how a club's
+land is cut into its sections (Groups).
 
 1. **Explode** multi-part units into one unit per polygon, so territories stay
    contiguous.
@@ -396,7 +409,7 @@ in; maps with N from 51 to 99 use the format-1 rules unchanged.
    one site losing its cell while another's covers the whole unit, so they are
    nudged apart (about a centimetre, ten times more on each of up to four tries)
    until each lies in its own cell and no other.
-   Pieces are named after the unit with one compass suffix ("Lancashire (east)").
+   Pieces are named after the unit with one compass suffix ("Verona (north-west)").
 9. **Seed and grow.** Strongest first, each club claims its start unit; clubs
    whose start unit went to a stronger club take the nearest free unit (its
    neighbours first). Then the smallest territory takes its adjacent free unit
@@ -454,6 +467,123 @@ in; maps with N from 51 to 99 use the format-1 rules unchanged.
     territory then grows its own sections from its starts with the step-9 rules,
     on its own units only.
 
+### Balanced land
+
+On 2026-11-18 the user asked why some territories "stretch out long and narrow"
+(Italy) and to be "more generous towards tiny clubs and less to big" (England).
+The causes, all in step 9's growth:
+
+- **Fingers.** Smallest first, each turn hands the smallest territory its nearest free
+  unit wherever that lies. Around land no club starts on, every club bordering it
+  takes turns, each heading straight for it, so they enter it in parallel fingers:
+  Perugia's arm to the Lazio coast, Arezzo's and Siena's tails into the land around
+  Viterbo, Triestina along the lagoon west of Trieste. The reach bound only caps a
+  finger's length.
+- **Clubs in a row.** Verona, Vicenza and Padua, or Parma, Reggio and Modena, stand
+  about 25 km apart on one line with no club beside them in the Alps, the Apennines
+  or the Po plain: split by nearness, each takes a strip from mountains to river.
+- **No size rules** on maps with 51 to 100 clubs (no caps, fans or moved starts), so
+  a club in a crowded city held a borough; and England's units were whole counties.
+
+`BALANCE` in `scripts/lib/domestic-build.mjs` (`{ room: 0.25, beta: 0.3 }`) makes
+`partitionCountry` share out the land so:
+
+1. **Fans everywhere, no moved starts.** Every map takes fans and the boxed-in retry,
+   each club needing a quarter of a typical club's land (or the 6 px of before, where
+   that is more): `room`, the same for every club whatever its group's size. A
+   typical club's land is the smaller of its fair share and the median land nearest a
+   club's home, so a country's empty quarter (Siberia, the Amazon, the deserts) does not
+   make every club of its settled part count as boxed in. No club ever starts away from
+   its city: on 2026-11-19 the user asked to "keep cities in their cities". (Moved
+   starts, tried first with that room, sent 916 clubs to a town near their city:
+   Lokomotiv and Dinamo out of Moscow, Fulham, West Ham and Brentford out of London.)
+   Instead a city's crowd fans out from it: clubs link within four tenths of a typical
+   club's width (at most 30 km; else a tenth of a fair share's width, at most 15 km), a
+   fan still holds up to 12 clubs, a fanned club starts as near its own home as its
+   sector goes (from the centre, Nordsjælland started 36 km from Farum, Bucheon 55 km
+   from home), and a club still boxed in after growth is fanned with the clubs of its
+   city. 1,564 clubs are fanned.
+2. **Big units halved once**, before the starts are settled: every unit larger than a
+   section's share of the land, so no club's land is one whole county or desert
+   district. Halving does not depend on the starts, so each redone partition only cuts
+   units for its clubs (this keeps Canada's build at about 7 minutes).
+3. **Nearest start** (`balanceSections`): every unit goes to the club whose start
+   is nearest its centre, measured from a point of the unit the club starts on (its
+   home, or when a stronger club holds the home's unit a point inside its own). Land a
+   fanned club wins beyond its city's zone goes to the club of that fan whose sector
+   points its way from the city's centre, so each sector carries on outward. A club
+   keeps the land that hangs together with its start; pieces cut off
+   from it are flooded, nearest claim first, from the land around them. Landmasses
+   without a start join a club across the sea in step 9's order (`joinIslands`). A club
+   past two fair shares then gives up its farthest land (never its start, never cutting
+   its land in two) to the clubs around it, nearest claim first, those under two shares
+   before any past them, as step 9's caps share a desert out (a club placed inland held
+   83% of Gambia); land no other club reaches (an island it was given) stays its own. This is each club's natural land V: compact, with no
+   fingers. A club starting on a sliver (a fan's cut left Persija Jakarta a piece of Kota
+   Tangerang 2 km by half a km) starts instead on the nearest unit of its own land holding
+   a twentieth of a section's share.
+4. **Land passes** towards targets T = F^0.7 · V^0.3 (F the club's fair share; β =
+   0.3 of the way from equal land to its natural land), scaled to the land of each
+   landmass. In rounds, each pair of neighbouring clubs passes one unit from the club
+   with more land for its target to the other while that brings land nearer the
+   targets (Σ A²/T falls, so it ends): the unit whose square distance from the
+   receiver's start least exceeds its square distance from the giver's (as a power
+   diagram's border moves), and only one lying against the receiver along at least 30%
+   of the shorter of its land border and the receiver's (so land fills hollows and moves
+   on a broad front of the receiver's border, never out from a tip: one unit at a time,
+   a club would grow a snake along any long border; measured on the unit's border alone,
+   a small club could never take a bigger unit beside it), within
+   2.5 radii of a disk of its target land from the receiver's start, at most twice as
+   far from it as from the giver's, not a start, and not cutting the giver's land in
+   two.
+
+Across today's maps (127 measured: each club's whole land, rasterised at about a
+million pixels a map; "thin" is land in parts narrower than half the club's own
+radius, which an opening of that width removes; the spread is the standard deviation
+of the log of each club's land per fair share, its median over the maps):
+
+| | Before | Balanced |
+| --- | --- | --- |
+| Spread of land per fair share (sd of its log) | 1.15 | 1.21 (51 maps more even, 69 less) |
+| Land in thin parts (mean per map) | 23.2% | 17.1% |
+| Clubs over 20% thin | 1,422 | 806 |
+| Clubs under a quarter of their fair share | 1,102 | 1,243 |
+| Clubs over three fair shares | 175 | 171 |
+| Clubs starting away from home (moved) | 201 | 0 |
+| Homes inside their own home section | 3,135 of 4,147 | 2,896 of 4,147 |
+
+The shapes improve on almost every map. The sizes do not, overall: keeping every club in
+its city gives a crowd no land but its city's wedges, while the old rules moved 201
+boxed clubs out (moved starts, 916 of them, took the spread to 1.01 and the clubs under a
+quarter share to 991). Where clubs are spread out the sizes even out: England (now
+districts) has 22 clubs under a quarter share instead of 41 and its largest holds 4.6
+fair shares instead of 7.8; Italy's thin land falls from 17% to 13% with 6 clubs under a
+quarter share (5 before). The clubs over three fair shares hold peninsulas, islands or
+empty land beside other big clubs (Exeter and Plymouth in the south-west, Catania and
+Cagliari on Sicily and Sardinia), which no neighbour can take; capitals with 25 clubs or
+more (Montevideo, Asunción, Cairo) stay crowded. The earlier seasons' maps, built the
+same way, change alike (144 of 1,718 measured): thin land 25.0% → 18.3%, clubs over 20%
+thin 1,251 → 679, over three fair shares 114 → 101, but the spread 0.92 → 1.02 and the
+clubs under a quarter share 639 → 714.
+
+Dead ends (don't retry): weights on the power diagram tuned to the targets (a small
+weight change flips the one unit linking a club's start to the rest of its land, and
+Newton steps throw two clubs a few km apart across each other's starts); growth
+ordered by distance times land per share (no fingers from racing, but caps then wrap
+a small club around a big one, Triestina around Udinese); passing land without the
+30% border rule (Arzignano snaked 50 km along the Adige to the Po delta); looser
+passing (4 radii, three times as far): 178 clubs over three shares instead of 183, but
+more thin land; fans of more than 12 clubs (31 around Asunción made a pinwheel of
+slivers, 26 of Paraguay's clubs mostly thin; from 16 the wedges meeting at a city's
+centre need more clearly different colours than the palette's 16: 19 around Cairo);
+measuring a fanned club from its sector's outer end (that point
+crushed the club just beyond the zone: Bray Wanderers beside Dublin); moving any boxed
+club with one stronger club near it (Peñarol out of Montevideo, Arsenal out of London).
+Uruguay stays the hardest map: its departments are the finest layer that covers it, so
+Montevideo is one unit for about 25 clubs, cut between them.
+
+
+
 ### Output
 
 - **Order.** Sections are numbered by club rank; within a club its home section
@@ -490,7 +620,10 @@ in; maps with N from 51 to 99 use the format-1 rules unchanged.
   neighbours when sections of their groups share an arc **or face each other**
   across water (borders within 3 px at the opening fit, at least 1 km, nothing
   between): best distance to neighbours, then to their neighbours, then the least
-  used.
+  used. Since balanced land (2026-11-20) the clubs with the most neighbours choose
+  first, and a club still too close to a neighbour then takes the colour farthest from
+  all of them: the palette holds about 16 colours that all differ clearly, and Proxy
+  Work, bordering 18 clubs across Egypt's desert, found none free choosing last.
 - **Strength** `str` is `selectLineup(buildClub(...)).rating` on the expanded
   squad, so the setup preview and the campaign agree.
 - **Version** `<id>-<8 hex>`: sha256 of the document without `version`.
@@ -506,9 +639,10 @@ The build is deterministic: same snapshots and caches give byte-identical files,
 whatever `--jobs`. `--check` rebuilds offline and compares every output.
 
 Across the 128 maps: groups split on land 0; a club's home lies in its own home
-section for 3,135 of 4,147 located clubs (75.6%; 679 of 800 on the 100-club
-maps), the others being clubs sharing a town point, fanned or moved clubs, and
-clubs pushed off their unit by a stronger club.
+section for 2,896 of 4,147 located clubs (69.8%; 652 of 800 on the 100-club
+maps; before balanced land 3,135, 75.6%, and 679), the others being clubs sharing a
+town point, fanned clubs whose sector starts beside their home, and clubs pushed off
+their unit by a stronger club. No club starts away from its city.
 
 ## File format 2: `public/domestic/<id>.json`
 
@@ -1675,7 +1809,7 @@ a campaign plays, saves and resumes on a season's map.
 
 ```bash
 node scripts/build-season-countries.mjs --homes --data=<EA sources> --retro-data=<CM and SWOS sources>
-node scripts/build-season-countries.mjs --data=<EA sources> --retro-data=<CM and SWOS sources> --jobs=12   # about 50 minutes
+node scripts/build-season-countries.mjs --data=<EA sources> --retro-data=<CM and SWOS sources> --jobs=12   # about 32 minutes
 node scripts/build-season-countries.mjs --seasons=ea-fifa-11 --only=826y2011 ...                          # one season, one map
 node scripts/build-season-countries.mjs --check ...                                                        # as long
 ```
@@ -1694,8 +1828,8 @@ node scripts/build-season-countries.mjs --check ...                             
   the home and crest of the club it stands for. A few of SWOS's shortened names stay
   as SWOS wrote them where the club is not certain (Paraguay's "G Coronel Oviedo",
   Uruguay's "Central Esp", Mexico's "UN Leon").
-- Size: 111.7 MB of maps, so a full build takes about an hour with 14 worker threads
-  and holds about 18 GB of memory.
+- Size: 1,718 maps, 205.5 MB, so a full build takes about 32 minutes with 12 worker
+  threads (balanced land, 2026-11-20) and holds about 18 GB of memory.
 - Crests: a club with neither a crest of its own nor a twin keeps its monogram (most of
   Scotland's, Wales's and Northern Ireland's, and the lower divisions of the 1990s).
 - EA FIFA 07 – FIFA 14's league names are as the scrape found them later, so a club's
@@ -1761,8 +1895,8 @@ node scripts/build-season-countries.mjs --check ...                             
   times.
 - **Size and time.** 18.8 MB of maps ship in `dist/`, though a session fetches
   only the country chosen (46–250 KB). A decoded country holds several MB, hence
-  the cache bound. A full build or `--check` takes 4.5 to 6.5 minutes, nearly all
-  of it Canada.
+  the cache bound. A full build or `--check` takes about 2.5 minutes with 12 jobs,
+  nearly all of it Canada.
 - **Borders.** The 3 km tolerance against the coarse 1:50m world map leaves thin
   strips of land it gives to neighbours (East Jerusalem's core on Israel's map,
   along Cyprus's Green Line). Where a 1:50m outline overlaps sections (N. Cyprus,
