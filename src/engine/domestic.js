@@ -5,6 +5,7 @@
 
 import { WorldGeometry, arcBorders, topologyArcs } from './geo.js';
 import { createLand, touchingLand } from './claims.js';
+import { mapLands } from './lands.js';
 import { expandSetPlayer } from './footballSets.js';
 import { rememberTwins } from '../data/crests.js';
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
@@ -190,6 +191,23 @@ export function decodeDomestic(data, id = data?.id) {
   const empty = topology.objects.empty?.geometries.length
     ? new WorldGeometry(topology, {}, { object: 'empty', projection: meta.projection, keepPolys: false }) : null;
   return { meta, geo, clubs, sectionNames, focus: meta.focus, startOwners, empty, emptyBorders: empty ? emptyBorders(topology) : null };
+}
+
+const LANDS = new WeakMap(); // decoded map → { paths, lands }
+/**
+ * What a decoded map draws (engine/lands.js): each club's starting group as one land, named by its home section, and a
+ * section no club starts on alone, on the map's fitted paths. The setup card, the campaign map, its borders, Flags mode
+ * and the share image all draw these, so no line runs between a club's own sections. Kept per map and paths.
+ */
+export function domesticLands(domestic) {
+  const paths = domestic?.geo?.paths;
+  if (!paths || !domestic.sectionNames) return [];
+  const hit = LANDS.get(domestic);
+  if (hit?.paths === paths) return hit.lands;
+  const lands = mapLands(Object.keys(domestic.sectionNames), paths,
+    (domestic.clubs || []).map(club => club.startSections || [club.homeSection]));
+  LANDS.set(domestic, { paths, lands });
+  return lands;
 }
 
 /**

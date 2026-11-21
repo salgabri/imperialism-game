@@ -1,6 +1,8 @@
 // Owner: WP-SETUP (see PLAN.md §4). Step 1's map card: the theatre's opening board, each starting territory in its
 // team's kick-off pastel over the land nobody holds or, in Flags mode, under its team's flag (a nation) or crest (a
-// club; its monogram without one), one banner per region as the campaign's Flags mode draws it. A map like the
+// club; its monogram without one), one banner per region as the campaign's Flags mode draws it. A country map's
+// territories are its lands (a club's starting sections as one piece), so each outline is a border between clubs or a
+// coast, never a line between a club's own sections. A map like the
 // campaign's (useMapViewport): scroll or pinch to zoom, drag to pan, double-click to reset, with the −/+/reset group
 // above a Political / Flags switch. Phones pinch and get no zoom buttons, as on the campaign map. The territories carry
 // no roles or labels: the step's title, description and stats say the same in text, so the drawing itself stays out of

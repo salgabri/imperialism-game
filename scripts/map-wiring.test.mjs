@@ -468,12 +468,13 @@ test('handleMapMove keeps the tooltip inside the map by its measured size', () =
   } finally { f.close(); }
 });
 
-test('a country map: setup paints each section as its starting club and names it; capitals mark the home town', () => {
+test('a country map: setup paints each club’s land as its starting club and names it; capitals mark the home town', () => {
   const club = { id: 'd250-1', name: 'Paris FC', code: 'PFC', col: '#123456', homeSection: '250' };
-  const domestic = { clubs: [club], sectionNames: { '250': 'Paris', '276': 'Berlin', '826': 'London' } };
+  const sectionNames = { '250': 'Paris', '276': 'Berlin', '826': 'London' };
   const f = fixture({ phase: 'setup' });
   try {
     const { app } = f;
+    const domestic = { geo: app.geo, clubs: [club], sectionNames };
     app.domesticMap = () => domestic;
     const paris = countryOf(app, '250');
     assert.equal(paris.name, 'Paris');
@@ -487,18 +488,25 @@ test('a country map: setup paints each section as its starting club and names it
     assert.deepEqual(app.tooltip(false), { visible: true, name: 'London', held: 'Awaiting campaign', result: null, link: null });
   } finally { f.close(); }
 
-  // Format 2: the club starts on a group of sections (startOwners); every one takes its colour, home first.
-  const grouped = { ...domestic, startOwners: Object.freeze({ '250': club.id, '276': club.id }) };
+  // Format 2: the club starts on a group of sections (startOwners). They are one land, named by its home and in the
+  // club's colour, drawn as its outline alone: no line runs between its sections, and a hover takes all of it.
   const h = fixture({ phase: 'setup' });
   try {
     const { app } = h;
+    // Berlin moved up against Paris: the two squares share the edge x = 120, wound alike.
+    app.geo = { ...app.geo, paths: { ...app.geo.paths, 276: { ...app.geo.paths['276'], d: 'M120,80h40v40h-40Z',
+      labelRings: [[[120, 80], [160, 80], [160, 120], [120, 120]]] } } };
+    const grouped = { geo: app.geo, clubs: [{ ...club, startSections: ['250', '276'] }], sectionNames,
+      startOwners: Object.freeze({ '250': club.id, '276': club.id }) };
     app.domesticMap = () => grouped;
-    assert.deepEqual(['250', '276'].map(id => countryOf(app, id).fill), [politicalFill(club.id), politicalFill(club.id)]);
+    assert.deepEqual(app.mapCountries().countries.map(row => row.id), ['250', '826'], 'one land for the club, one for London');
+    const land = countryOf(app, '250');
+    assert.equal(land.name, 'Paris');
+    assert.equal(land.fill, politicalFill(club.id));
+    assert.equal(land.d, 'M80,120L80,80L120,80L160,80L160,120L120,120Z', 'one outline round Paris and Berlin');
     assert.notEqual(countryOf(app, '826').fill, politicalFill(club.id), 'land nobody starts on keeps its own fill');
     app.setState({ hoverCid: '250' });
-    assert.equal(app.tooltip(false).held, 'Home of Paris FC');
-    app.setState({ hoverCid: '276' });
-    assert.deepEqual(app.tooltip(false), { visible: true, name: 'Berlin', held: 'Paris FC starts here', result: null, link: null });
+    assert.deepEqual(app.tooltip(false), { visible: true, name: 'Paris', held: 'Home of Paris FC', result: null, link: null });
   } finally { h.close(); }
 
   const g = fixture();

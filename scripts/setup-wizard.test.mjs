@@ -19,6 +19,7 @@ import { DOMESTIC } from '../src/data/domestic.js';
 import { nationPriority } from '../src/data/domesticTiers.js';
 import { getSport } from '../src/sports/index.js';
 import { politicalFill } from '../src/data/empireColours.js';
+import { ringsPath } from '../src/engine/lands.js';
 
 const compiled = await build({
   stdin: { contents: `
@@ -1134,11 +1135,13 @@ function assertCardDrawing(card, preview) {
     preview.sections.map(section => section.owner ?? null), 'each section names the team a click on it previews');
 }
 
-test('country card: sections in their kick-off pastels over the neighbouring land, a map that zooms', async t => {
+test('country card: each club’s land in its kick-off pastel over the neighbouring land, a map that zooms', async t => {
+  // Three sections wound as the shipped maps are; Isle shares the edge (0,10)–(5,10) with North.
+  const section = (ring, fullBounds) => ({ d: ringsPath([ring]), labelRings: [ring], fullBounds });
   const paths = {
-    s1: { d: 'M0,0L10,0L10,10Z', fullBounds: { x: 0, y: 0, w: 10, h: 10 } },
-    s2: { d: 'M10,0L20,0L20,10Z', fullBounds: { x: 10, y: 0, w: 10, h: 10 } },
-    s3: { d: 'M0,10L5,10L5,12Z', fullBounds: { x: 0, y: 10, w: 5, h: 2 } },
+    s1: section([[0, 0], [0, 10], [5, 10], [10, 10], [10, 0]], { x: 0, y: 0, w: 10, h: 10 }),
+    s2: section([[10, 0], [10, 10], [20, 10], [20, 0]], { x: 10, y: 0, w: 10, h: 10 }),
+    s3: section([[0, 10], [0, 12], [5, 12], [5, 10]], { x: 0, y: 10, w: 5, h: 2 }),
   };
   const map = {
     geo: { paths, focusView: () => ({ x: 0, y: 0, w: 20, h: 10 }) }, focus: [0, 0, 1, 1],
@@ -1151,10 +1154,15 @@ test('country card: sections in their kick-off pastels over the neighbouring lan
   assert.deepEqual(preview.sections.map(section => [section.id, section.fill, section.owner]),
     [['s1', politicalFill('d999-1'), 'd999-1'], ['s2', politicalFill('d999-2'), 'd999-2'], ['s3', '#e8e9e4', null]],
     'no startOwners (format 1): home sections only');
-  // Format 2: every section of a club's starting group takes its pastel, not just the home, and previews that club.
-  const grouped = countryMapPreview({ ...map, startOwners: { s1: 'd999-1', s2: 'd999-2', s3: 'd999-1' } }, backdrop);
+  // Format 2: a club's starting group is one land, named by its home, in its pastel and previewing that club; it is
+  // drawn as its outline alone, so no line runs between its sections.
+  const grouped = countryMapPreview({ ...map, startOwners: { s1: 'd999-1', s2: 'd999-2', s3: 'd999-1' },
+    clubs: [{ id: 'd999-1', homeSection: 's1', startSections: ['s1', 's3'] }, { id: 'd999-2', homeSection: 's2', startSections: ['s2'] }] },
+  backdrop);
   assert.deepEqual(grouped.sections.map(section => [section.id, section.fill, section.owner]),
-    [['s1', politicalFill('d999-1'), 'd999-1'], ['s2', politicalFill('d999-2'), 'd999-2'], ['s3', politicalFill('d999-1'), 'd999-1']]);
+    [['s1', politicalFill('d999-1'), 'd999-1'], ['s2', politicalFill('d999-2'), 'd999-2']]);
+  assert.equal(grouped.sections[0].d, 'M10,0L0,0L0,10L0,12L5,12L5,10L10,10Z', 'North and Isle within one outline');
+  assert.equal(grouped.sections[1].d, paths.s2.d, 'a land of one section is drawn as that section');
   assert.deepEqual(preview.backdrop, [{ id: '250', d: 'M-5,-5L0,-5L0,0Z' }]);
   assert.equal(countryMapPreview(map, backdrop), preview, 'memoised per map, paths and backdrop');
   assert.notEqual(countryMapPreview(map, [...backdrop]), preview);
@@ -1173,12 +1181,15 @@ test('country card: sections in their kick-off pastels over the neighbouring lan
   assert.ok(real.sections.every(section => section.fill === politicalFill(home.get(section.id))));
   assert.ok(real.sections.every(section => section.owner === home.get(section.id)), 'a click on a section previews its club');
   assert.ok(real.viewBox.split(' ').map(Number).every(Number.isFinite));
-  // Fiji: 16 clubs on 100 sections, every section painted as the club starting there, and previewing it.
+  // Fiji: 16 clubs on 100 sections, each club's sections drawn as one land, painted as the club starting there, and
+  // previewing it.
   const fiji = decodeDomestic(JSON.parse(readFileSync(new URL('../public/domestic/242.json', import.meta.url), 'utf8')), '242');
   const fijiCard = countryMapPreview(fiji, []);
-  assert.equal(fijiCard.sections.length, 100);
   assert.ok(fiji.clubs.length < 100);
-  assert.ok(fijiCard.sections.every(section => section.fill === politicalFill(fiji.startOwners[section.id])), 'no neutral section');
+  assert.equal(fijiCard.sections.length, fiji.clubs.length, 'one land per club');
+  assert.deepEqual(fijiCard.sections.map(section => section.id).sort(), fiji.clubs.map(club => club.homeSection).sort(),
+    'each land named by its club’s home section');
+  assert.ok(fijiCard.sections.every(section => section.fill === politicalFill(fiji.startOwners[section.id])), 'no neutral land');
   assert.ok(fijiCard.sections.every(section => section.owner === fiji.startOwners[section.id]));
   assert.equal(new Set(fijiCard.sections.map(section => fiji.startOwners[section.id])).size, fiji.clubs.length);
   assert.deepEqual(new Set(fijiCard.sections.map(section => section.owner)), new Set(fiji.clubs.map(club => club.id)),
@@ -1196,7 +1207,7 @@ test('country card: sections in their kick-off pastels over the neighbouring lan
     preview.sections.map(section => section.fill));
   assert.deepEqual(view.qa('.setup-map button').map(button => button.getAttribute('aria-label') || button.textContent),
     ['Zoom in', 'Zoom out', 'Reset view', 'Political', 'Crests'], 'a country is clubs: its banners are crests');
-  assert.equal(card.getAttribute('title'), 'England · 3 sections, one per club');
+  assert.equal(card.getAttribute('title'), 'England · 100 sections, one per club', 'the map’s sections, from its index entry');
   const fijiView = await mount(t, { setup: { layer: 'clubs', clubScope: 'domestic:242' },
     domestic: { state: 'ready', message: null, onRetry() {}, preview: fijiCard } });
   assert.equal(fijiView.q('.setup-step[data-step="1"] .setup-map').getAttribute('title'), 'Fiji · 100 sections, 16 clubs');

@@ -1329,9 +1329,12 @@ where Hellas Verona starts.
 
 In the v4 interface, choosing **Clubs** in setup step 1 adds the **One country ·
 top clubs** dropdown below Europe's two theatres (football only). Picking a country shows a
-preview card: its sections in their starting clubs' kick-off colours over the
-neighbouring land, captioned with the number of sections. The sectioned map
-uses the same flat style as the world map: pastel section fills, white borders
+preview card: each club's land in its kick-off colour over the neighbouring land,
+captioned with the number of sections. The sections decide where the borders
+run, but the map never draws them: a club's starting sections are one land
+(`src/engine/lands.js`), so only the borders between clubs show, and a conquered
+club's land keeps a quiet seam inside its holder's, as a conquered nation does.
+The map uses the same flat style as the world map: pastel fills, white borders
 and the clay and cobalt identity colours. Neighbouring countries form an inert
 land-neutral backdrop, and every home town is marked at any zoom. The title
 card reads the theatre itself, such as "England · top 100 clubs", and the key
@@ -1343,8 +1346,8 @@ land — never claimed". In Flags mode, clubs keep their own colours and carry t
 
 Each country is one file, `public/domestic/<id>.json`, fetched only when chosen.
 The setup screen shows a loading state, and Retry if the fetch fails. The setup
-wizard previews the country in step 1, every section in the colour of the club
-that starts there, and Launch shows that it is preparing the map. The file holds
+wizard previews the country in step 1, every club's land in its colour, and
+Launch shows that it is preparing the map. The file holds
 the sections as TopoJSON with shared borders, the clubs with their starting
 sections and squads, and a projection centred on the country, so distances are
 true at the map's centre. The generated index `src/data/domestic.js` lists the

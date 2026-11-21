@@ -772,7 +772,7 @@ export default function SetupOverlay({
                 <SetupMap kind="country" preview={domestic?.preview || null} loading={model.countryState === 'loading'}
                   caption={!domestic?.preview ? `Loading the map of ${model.country.name}…`
                     : model.country.countries ? `${model.country.name} · ${model.country.clubs} clubs in ${model.country.countries} countries`
-                      : `${model.country.name} · ${domestic.preview.sections.length} sections, `
+                      : `${model.country.name} · ${model.country.sections} sections, `
                         + (model.country.sections === model.country.clubs ? 'one per club' : `${model.country.clubs} clubs`)}
                   mode={mapMode} onMode={chooseMapMode} flags={mapFlags} clubs resetKey={model.scopeId}
                   peekId={peekShown} onTeam={choosePeek}>{peekCard}</SetupMap>
