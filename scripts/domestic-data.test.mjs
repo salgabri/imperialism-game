@@ -229,10 +229,11 @@ for (const entry of DOMESTIC) {
     assert.ok(hits > 0, 'no sample point hit any section');
 
     // A club's home is in its own group or a stronger club's: where clubs share a town,
-    // the strongest holds it (simplified borders may shift by a few hundred metres). When
-    // every club starts on several sections, clubs crowded into one city are fanned out
-    // from it or start just outside it: a home may then lie in a weaker club's group, but
-    // the club's home section stays within a club territory's width of it.
+    // the strongest holds it (simplified borders may shift by a few hundred metres). Clubs
+    // crowded into one city are fanned out from it or start just outside it (every map's
+    // land is balanced, docs/design/domestic-campaigns.md "Balanced land"): a home may then
+    // lie in a weaker club's group, but the club's home section stays within a club
+    // territory's width of it.
     const frame = ([lon, lat]) => [w > 0 && lon < 0 ? lon + 360 : lon, lat];
     const groupPolys = c => doc.clubs[c].sections.flatMap(sid => sectionPolys[sectionIds.indexOf(sid)]);
     const reachKm = Math.sqrt(doc.boundaries.areaKm2 / n);
@@ -242,7 +243,7 @@ for (const entry of DOMESTIC) {
       const k = sectionAt(p);
       if (k < 0 || clubAt[k] <= i || kmToPolys(p, groupPolys(i)) <= 0.6) return;
       const gap = kmToPolys(p, sectionPolys[sectionIds.indexOf(club.section)]);
-      assert.ok(q >= 2 && gap <= reachKm, `${club.name}'s home lies in weaker ${doc.clubs[clubAt[k]].name}'s section ${geoms[k].id} (${gap.toFixed(1)} km from its own)`);
+      assert.ok(gap <= reachKm, `${club.name}'s home lies in weaker ${doc.clubs[clubAt[k]].name}'s section ${geoms[k].id} (${gap.toFixed(1)} km from its own)`);
     });
 
     // A club placed at a GeoNames place (no usable home) gets an ordinary share of the land.

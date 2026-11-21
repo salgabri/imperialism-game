@@ -24,7 +24,7 @@ import { format } from 'node:util';
 import { isMainThread, parentPort, Worker, workerData } from 'node:worker_threads';
 import path from 'node:path';
 import { DOMESTIC_FORMAT } from '../src/engine/domestic.js';
-import { createBoundarySource, createDownloader, GB_CITATION, GN_CITATION } from './lib/domestic-boundaries.mjs';
+import { createBoundarySource, createDownloader, GB_CITATION, GN_CITATION, ONS_LAD_LICENSE, ONS_LAD_SOURCE } from './lib/domestic-boundaries.mjs';
 import { buildCountry, logging } from './lib/domestic-build.mjs';
 import { DATABASE_DATE, VERSION } from './lib/domestic-sync.mjs';
 
@@ -69,6 +69,7 @@ function attributionText(docs) {
     'geoBoundaries (https://www.geoboundaries.org), gbOpen release, files pinned to commit 9469f09:',
     `  ${GB_CITATION}`,
     'Natural Earth (https://www.naturalearthdata.com): public domain, no attribution required.',
+    `England's districts (the game's 826): ${ONS_LAD_SOURCE}, ${ONS_LAD_LICENSE}.`,
     'Club home towns: Wikidata (CC0 1.0), GeoNames cities1000 (https://www.geonames.org, CC BY 4.0),',
     '  and manual overrides in scripts/data/domestic-locations.json. A club with no known home starts',
     '  at a populous GeoNames place hosting no other club (homeSource "placed:<geonameid>", an estimate).',
@@ -93,6 +94,7 @@ function attributionText(docs) {
     lines.push(`  File: ${b.url}`);
     if (b.filled) lines.push(`  Filled from ${b.filled.level} (${b.filled.units.join(', ')}): ${b.filled.source || b.provider}, ${b.filled.license}, ${b.filled.url}`);
     if (b.mask) lines.push(`  Mask ${b.mask}: ${b.maskSource || b.provider} (${b.maskLicense || b.license})${b.maskUrl ? `, ${b.maskUrl}` : ''}`);
+    if (b.part) lines.push(`  Part: ${b.part}`);
     if (b.excluded) lines.push(`  Excluded ${b.excluded.join(', ')} (own football associations): ${b.excludedSource}, ${b.excludedUrl}`);
     if (b.foreign) lines.push(`  Cut (the world map's ${b.foreign.cut.map(c => `${c.shape} ${c.km2.toLocaleString('en')} km²`).join(', ')})`);
   }

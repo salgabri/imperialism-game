@@ -30,7 +30,7 @@ import { NATIONS, buildClub, selectLineup } from '../src/data/teams.js';
 import { expandSetPlayer, setHasClubs } from '../src/engine/footballSets.js';
 import { buildFootballSet } from '../src/data/footballSetBuild.js';
 import { TOP_CLUBS } from '../src/data/scopes.js';
-import { createBoundarySource, createDownloader, GB_CITATION } from './lib/domestic-boundaries.mjs';
+import { createBoundarySource, createDownloader, GB_CITATION, ONS_LAD_LICENSE, ONS_LAD_SOURCE } from './lib/domestic-boundaries.mjs';
 import { buildCountry, logging } from './lib/domestic-build.mjs';
 import { createWikidata, ensureGeonames } from './lib/domestic-locate.mjs';
 import { buildClubSeasons } from './lib/ea-season-builds.mjs';
@@ -380,6 +380,7 @@ function attributionText(docs) {
     "boundary layers as today's map of the country (public/domestic/ATTRIBUTION.txt lists their sources and licences),",
     'grown around that season\'s clubs. Scotland\'s, which today\'s maps lack, are listed below.',
     `geoBoundaries (https://www.geoboundaries.org), gbOpen release, files pinned to commit 9469f09: ${GB_CITATION}`,
+    `England's districts (the game's 826): ${ONS_LAD_SOURCE}, ${ONS_LAD_LICENSE}.`,
     "Clubs and players: the season's own source, as its season file credits it (public/football/<season>.json,",
     "  docs/design/football-years.md); in an EA season, a country the EA edition rates too few clubs of takes the CM 01/02",
     "  Update Team's database of that season (credited to the CM 01/02 Update Team, https://www.champman0102.co.uk;",
@@ -391,7 +392,7 @@ function attributionText(docs) {
   for (const doc of docs) {
     const b = doc.boundaries;
     const players = doc.source.compiler === 'CM 01/02 Update Team' ? `${doc.source.edition}, ${doc.source.version} by the CM 01/02 Update Team` : doc.source.edition;
-    lines.push(`${doc.id} ${doc.name} ${doc.season} (${players}): ${b.provider} ${b.iso3} ${b.level}${b.mask ? ` (${b.mask})` : ''}, ${b.license}`);
+    lines.push(`${doc.id} ${doc.name} ${doc.season} (${players}): ${b.provider} ${b.iso3} ${b.level}${b.mask ? ` (${b.mask})` : ''}${b.part ? ` (${b.part})` : ''}, ${b.license}`);
   }
   return `${lines.join('\n')}\n`;
 }
