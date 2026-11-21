@@ -670,14 +670,81 @@ test('fourteen sport cards sit in four rows of four, compact tiles that stay 44p
   // (measured in Chrome: tiles 60px → 53px, step 1 520px of content in 510px → 510px).
   assert.match(css, /\.setup-sports\[data-rows="3"\]\[data-cols="4"\] \.setup-card__icon \{ width:18px; height:18px; \}/);
   assert.match(css, /\.setup-sports\[data-rows="3"\]\[data-cols="4"\] \.setup-card__button \{ line-height:1; \}/);
-  assert.match(css, /@media \(max-width:699\.98px\) and \(max-height:660px\) \{\s*\.setup-step\[data-step="1"\]:has\(\.setup-notices\):has\(\.setup-sports\[data-rows="3"\]\) \.setup-heading \{ display:none; \}/);
-  // Four rows (fourteen cards): every tile is just its 44px target on a phone and on a window up to 800px tall, and step
-  // 1's heading gives way on any phone (measured in Chrome: 390×664 602px of content in 510px → 510px, 360×640 488px in
-  // 486px → 486px with the rows 2px closer, 1024×768 650px in 605px → 605px).
+  assert.match(css, /@media \(max-width:899\.98px\) and \(max-height:660px\) \{\s*\.setup-step\[data-step="1"\]:has\(\.setup-notices\):has\(\.setup-sports\[data-rows="3"\]\) \.setup-heading \{ display:none; \}/);
+  // Four rows (fourteen cards): every tile is just its 44px target in one column (a phone, a narrow tablet) and on a window
+  // up to 800px tall, and step 1's heading gives way on any phone (measured in Chrome: 390×664 602px of content in 510px →
+  // 510px, 360×640 488px in 486px → 486px with the rows 2px closer, 1024×768 650px in 605px → 605px).
   assert.match(css, /\.setup-sports\[data-rows="4"\] \.setup-card \{ min-height:44px;/);
-  assert.match(css, /@media \(max-width:699\.98px\), \(max-height:799\.98px\) \{\s*\.setup-sports\[data-rows="4"\] \.setup-card \{ padding:3px 4px 2px; gap:1px; \}\s*\.setup-sports\[data-rows="4"\] \.setup-card__icon \{ width:16px; height:16px; \}\s*\.setup-sports\[data-rows="4"\] \.setup-card__button \{ line-height:1; \}/);
+  assert.match(css, /@media \(max-width:899\.98px\), \(max-height:799\.98px\) \{\s*\.setup-sports\[data-rows="4"\] \.setup-card \{ padding:3px 4px 2px; gap:1px; \}\s*\.setup-sports\[data-rows="4"\] \.setup-card__icon \{ width:16px; height:16px; \}\s*\.setup-sports\[data-rows="4"\] \.setup-card__button \{ line-height:1; \}/);
   assert.match(css, /\.setup-step\[data-step="1"\]:has\(\.setup-sports\[data-rows="4"\]\) \.setup-heading \{ display:none; \}/);
   assert.match(css, /\.setup-sports\[data-rows="4"\] \{ row-gap:4px; \}/);
+});
+
+test('step 1 fits a narrow tablet and a short one: the phone\'s height tiers reach every one-column width, and a notice line takes the heading\'s place', async t => {
+  const css = readFileSync(new URL('../src/components/setup.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  // The rules of every `@media <query> { … }` block with this query, together.
+  const media = query => {
+    const head = `@media ${query} {`;
+    let rules = '';
+    for (let at = css.indexOf(head); at !== -1; at = css.indexOf(head, at + 1)) {
+      let end = at + head.length;
+      for (let depth = 1; depth && end < css.length; end += 1) depth += css[end] === '{' ? 1 : css[end] === '}' ? -1 : 0;
+      rules += css.slice(at + head.length, end - 1);
+    }
+    assert.ok(rules, head);
+    return rules;
+  };
+  // Below 900px step 1 is one column, a phone's or a narrow tablet's: the map sits under the controls and every pixel of
+  // them comes out of its height. So the tiers that fit step 1 to a phone's height (short, four rows, smallest) reach every
+  // one-column width; none stops at the phone's 699.98px any more.
+  assert.doesNotMatch(css, /@media \(max-width:699\.98px\)(?: and \(max-height:(?:760|660)px\)|, \(max-height:799\.98px\))/);
+  // Measured with headless Chromium against the dev server (dark, device scale 1, a fresh context per size), step 1 as it
+  // opens, without and with a challenge link's notice line (/?seed=2033). Before → after:
+  // - 800×600 scrolled by 134px either way: the map's 120px floor sat under 457px of controls in a 437px body. Its map and
+  //   lede give way (the short tier), its heading too (four rows in the smallest tier, as on any phone), and its controls
+  //   sit 10px apart: 72px to spare, 18px with the notice line (2px at 14px apart).
+  // - 700×800 with the notice line pushed the map 33px under its floor → the map 158px tall (127px → 148px without).
+  // - 1100×700 with the notice line, a short window under the tablet's step bar, ran 43px over → 30px to spare.
+  const short = media('(max-width:899.98px) and (max-height:760px)');
+  assert.match(short, /\.setup-lede \{ display:none; \}/);
+  assert.match(short, /\.setup-step\[data-step="1"\] \.setup-side \{ display:none; \}/);
+  assert.match(short, /\.setup-step\[data-step="1"\] \.setup-step__body \{ grid-template-rows:minmax\(0, 1fr\); \}/);
+  // With the map gone the counts end flush with the step's foot, where a 24px figure's text box, 2.65px under its line,
+  // passed the stat's 2px padding: 800×600 scrolled by 1px (a phone's 20px figure is 0.2px past, which rounds away). The
+  // padding shifts a pixel down at the same height, top and bottom only: a shorthand would outrank `.setup-stat +
+  // .setup-stat` and set the later stats' text against their rule.
+  assert.match(short, /\.setup-step\[data-step="1"\] \.setup-stat \{ padding-top:1px; padding-bottom:3px; \}/);
+  assert.doesNotMatch(css, /\.setup-stat \{[^}]*\bpadding:(?!2px 0;)/, 'one shorthand only, the base rule\'s');
+  const fourRows = media('(max-width:899.98px), (max-height:799.98px)');
+  assert.match(fourRows, /\.setup-sports\[data-rows="4"\] \.setup-card \{ padding:3px 4px 2px; gap:1px; \}/);
+  assert.match(fourRows, /\.setup-step\[data-step="1"\]:has\(\.setup-notices\):has\(\.setup-sports\[data-rows="4"\]\) \.setup-heading \{ display:none; \}/);
+  assert.match(fourRows, /\.setup-step\[data-step="1"\]:has\(\.setup-season__credit\) \.setup-lede \{ display:none; \}/);
+  const smallest = media('(max-width:899.98px) and (max-height:660px)');
+  assert.match(smallest, /\.setup-step\[data-step="1"\]:has\(\.setup-sports\[data-rows="4"\]\) \.setup-heading \{ display:none; \}/);
+  assert.match(smallest, /\.setup-sports\[data-rows="4"\] \{ row-gap:4px; \}/);
+  assert.match(smallest, /\.setup-step\[data-step="1"\] \.setup-main \{ gap:10px; \}/);
+  // Still fitting, with and without the line: 1920×1080, 1440×900, 1280×800, 1280×720, 1920×800, 1366×800, 1024×768,
+  // 768×1024 and the phones 412×915, 390×844, 390×664, 375×667, 360×780, 360×640 (the phones to the pixel as before). With
+  // the line, 1280×720 and 1024×768 lose the heading (6px → 93px and 3px → 90px to spare), and 768×1024's map grows
+  // 293px → 382px (351px → 372px without, its tiles the compact 44px).
+
+  // Football clubs (/?teams=clubs, a challenge link, and the Clubs radio without one), same method, on main at 8c0b4df0:
+  // 800×600 scrolled by 134px either way, 700×800 by 77px with the line and 19px without, 1100×700 by 45px with it. The
+  // tiers fit all but 800×600 with the line (26px), and in one column 700–899 × 768–780 still scrolled (8–30px): Europe's
+  // two chips and the country row (the country, and how many of its clubs play) took two lines. In one column they now
+  // share one where the row keeps 320px, as on a narrow tablet, and the map gets the 44px back: 800×600 18px to spare
+  // (72px without the line), 700×800's map 120px → 158px (148px), 768×1024's 338px → 382px. A phone's row still wraps
+  // under the chips (412×915 to 360×640 unchanged to the pixel), and nothing in clubs scrolls at any size above.
+  const oneColumn = media('(max-width:899.98px)');
+  assert.match(oneColumn, /\.setup-step\[data-step="1"\] \.setup-group--list:has\(> \.setup-country-row\) \{ display:flex; flex-wrap:wrap; align-items:center; gap:8px 6px; \}/);
+  assert.match(oneColumn, /\.setup-step\[data-step="1"\] \.setup-group--list > \.setup-country-row \{ flex:1 1 320px; margin-top:0; \}/);
+  assert.match(oneColumn, /\.setup-step\[data-step="1"\] \.setup-group--list > :is\(\.setup-domestic__status, \.setup-domestic__error\) \{ flex-basis:100%; margin-top:0; \}/);
+  // The markup those rules read: the chips and the country row are both children of the theatre group.
+  const view = await mount(t, { setup: { layer: 'clubs', clubScope: 'domestic:826' } });
+  const group = view.q('.setup-step[data-step="1"] .setup-group--list');
+  assert.ok(group.querySelector(':scope > .setup-theatres'));
+  assert.ok(group.querySelector(':scope > .setup-country-row > #setup-country'));
+  assert.deepEqual(view.errors, []);
 });
 
 test('a season\'s credit shows whole under the Season choice, as quiet text, and step 1\'s extras make room for it', async t => {
@@ -719,7 +786,7 @@ test('a season\'s credit shows whole under the Season choice, as quiet text, and
   assert.match(own[0], /font:400 11px\/1\.3 var\(--font-sans\); color:var\(--muted\);/);
   assert.match(own[1], /^ font-size:10\.5px; $/);
   for (const body of own) assert.doesNotMatch(body, /display|visibility|overflow:|text-overflow|nowrap|clamp|height|clip/);
-  assert.match(css, /@media \(max-width:699\.98px\), \(max-height:799\.98px\) \{\s*\.setup-step\[data-step="1"\]:has\(\.setup-season__credit\) \.setup-lede \{ display:none; \}/);
+  assert.match(css, /@media \(max-width:899\.98px\), \(max-height:799\.98px\) \{\s*\.setup-step\[data-step="1"\]:has\(\.setup-season__credit\) \.setup-lede \{ display:none; \}/);
   const phoneQuery = '@media (max-width:699.98px) {';
   const phone = css.slice(css.lastIndexOf(phoneQuery), css.indexOf('\n}', css.lastIndexOf(phoneQuery)));
   assert.match(phone, /\.setup-step\[data-step="1"\]:has\(\.setup-season__credit\):has\(\.setup-notices\) \.setup-heading \{ display:none; \}/,
