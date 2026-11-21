@@ -6,6 +6,7 @@
 import { WorldGeometry, arcBorders, topologyArcs } from './geo.js';
 import { createLand, touchingLand } from './claims.js';
 import { mapLands } from './lands.js';
+import { mapFileId, parseSplitId, splitDomestic } from './clubSplit.js';
 import { expandSetPlayer } from './footballSets.js';
 import { rememberTwins } from '../data/crests.js';
 import { expandFmTuple, FM_ROLES } from '../data/fmPlayers.js';
@@ -49,10 +50,15 @@ function trimCache(spare = DOMESTIC_CACHE_LIMIT) {
   }
 }
 
-/** Forget loaded countries (tests, or a forced reload after a failed one). */
+/** Forget loaded countries (tests, or a forced reload after a failed one), and their fetched files. */
 export function clearDomesticCache(id) {
-  if (id == null) cache.clear();
-  else cache.delete(String(id));
+  if (id == null) {
+    cache.clear();
+    files.clear();
+  } else {
+    cache.delete(String(id));
+    files.delete(mapFileId(String(id)));
+  }
 }
 
 /**
@@ -65,6 +71,25 @@ export function clearDomesticCache(id) {
 export function retainDomestic(ids = [], spare = DOMESTIC_CACHE_LIMIT) {
   retained = new Set([...ids].filter(id => id != null).map(String));
   trimCache(spare);
+  trimFiles(spare);
+}
+
+/**
+ * The fetched files go with the decoded maps: a one-shot trim to none spare (a campaign taking over) keeps none, as its
+ * map is decoded already; browsing keeps the retained maps' files and `spare` others, so a country cut to another
+ * number of clubs is worked out without fetching its file again.
+ */
+function trimFiles(spare) {
+  if (spare <= 0) {
+    files.clear();
+    return;
+  }
+  const keep = new Set([...retained].map(mapFileId));
+  for (const key of [...files.keys()].reverse()) {
+    if (keep.has(key)) continue;
+    if (spare > 0) spare--;
+    else files.delete(key);
+  }
 }
 
 /** Decoded country ids in the cache, least recently used first (diagnostics and tests). */
@@ -80,11 +105,45 @@ export function getLoadedDomestic(id) {
   return entry.value;
 }
 
+// The parsed files of the last few maps fetched, by file id: a country map cut to fewer clubs (engine/clubSplit.js) is
+// worked out from its full map's file, so trying several counts fetches and parses that file once.
+const FILE_CACHE_LIMIT = 3;
+const files = new Map();
+
+/** A map file's parsed JSON (shared by concurrent calls; a failed fetch is not kept). `key` names the map asked for. */
+function mapFile(fileId, key, baseUrl, fetchImpl) {
+  const hit = files.get(fileId);
+  if (hit) {
+    files.delete(fileId);
+    files.set(fileId, hit);
+    return hit;
+  }
+  const promise = (async () => {
+    let res;
+    try {
+      res = await fetchImpl(`${baseUrl}domestic/${fileId}.json`);
+    } catch (e) {
+      throw new Error(`Domestic map ${key} failed to load: ${(e && e.message) || e}`);
+    }
+    if (!res || !res.ok) throw new Error(`Domestic map ${key} failed to load (HTTP ${res?.status ?? '?'})`);
+    try {
+      return await res.json();
+    } catch (e) {
+      throw new Error(`Domestic map ${key} is not valid JSON: ${(e && e.message) || e}`);
+    }
+  })();
+  promise.catch(() => { if (files.get(fileId) === promise) files.delete(fileId); });
+  files.set(fileId, promise);
+  while (files.size > FILE_CACHE_LIMIT) files.delete(files.keys().next().value);
+  return promise;
+}
+
 /**
  * Fetch, validate and decode one country. Resolves to `{ meta, geo, clubs,
  * sectionNames, focus, startOwners }` (see decodeDomestic); concurrent and
  * repeated calls share one request per id, and a failed load is not cached. The
  * cache is bounded (see retainDomestic), so an unretained country may load again later.
+ * A country map cut to fewer clubs ('724c20', engine/clubSplit.js) loads its full map's file and is cut here.
  */
 export function loadDomestic(id, { baseUrl = '/', fetch: fetchImpl = globalThis.fetch } = {}) {
   const key = String(id);
@@ -97,19 +156,16 @@ export function loadDomestic(id, { baseUrl = '/', fetch: fetchImpl = globalThis.
   entry.promise = (async () => {
     if (!ID_PATTERN.test(key)) throw new Error(`Unknown domestic country id "${key}"`);
     if (typeof fetchImpl !== 'function') throw new Error('No fetch available to load domestic maps');
-    const url = `${baseUrl}domestic/${key}.json`;
-    let res;
-    try {
-      res = await fetchImpl(url);
-    } catch (e) {
-      throw new Error(`Domestic map ${key} failed to load: ${(e && e.message) || e}`);
-    }
-    if (!res || !res.ok) throw new Error(`Domestic map ${key} failed to load (HTTP ${res?.status ?? '?'})`);
-    let data;
-    try {
-      data = await res.json();
-    } catch (e) {
-      throw new Error(`Domestic map ${key} is not valid JSON: ${(e && e.message) || e}`);
+    const split = parseSplitId(key);
+    const file = await mapFile(split ? split.base : key, key, baseUrl, fetchImpl);
+    let data = file;
+    if (split) {
+      // The full map first, so a broken file says what is wrong with it; only a country's map is cut.
+      validateDomestic(file, split.base);
+      if (file.format !== 2 || file.sport != null || file.theatre != null || file.countries != null) {
+        throw new Error(`Domestic map ${key}: ${split.base} is not a country map, so it cannot be cut to ${split.clubs} clubs`);
+      }
+      data = splitDomestic(file, split.clubs, key);
     }
     // A sport's own map is checked against that sport's clubs, so their players load first. Only a loaded sport's maps
     // are asked for (src/sports/sportData.js): in play this waits for nothing.
@@ -285,6 +341,12 @@ function validateDomestic(data, id) {
     fail('partial must list some of its hosts');
   }
   if (data.sport != null && !SPORTS[data.sport]?.clubs) fail(`unknown sport ${JSON.stringify(data.sport)}`);
+  // A map cut to fewer clubs (engine/clubSplit.js) names the country map it is cut from; its clubs keep their ids there.
+  const split = parseSplitId(id);
+  if (split ? data.base !== split.base || !Array.isArray(data.clubs) || data.clubs.length !== split.clubs : data.base != null) {
+    fail(split ? `must be ${split.base}'s map cut to ${split.clubs} clubs` : 'base is only for a map cut to fewer clubs');
+  }
+  const clubPrefix = split ? split.base : id;
   // A sport's own map (the NBA's) lists the game's clubs of that sport; a country map carries its FM clubs. An earlier
   // era's map of a sport (`seasons`) names its own clubs, whose squads come from those built-in seasons at kickoff.
   const seasonal = data.seasons != null;
@@ -386,7 +448,7 @@ function validateDomestic(data, id) {
       if (club.twin != null && (typeof club.twin !== 'string' || !/^d[0-9A-Z]{3}-\d{1,15}$/.test(club.twin))) fail(`${at} twin must be a country map's club id`);
     } else {
       if (!Number.isInteger(club.fm) || club.fm < 0) fail(`${at} fm must be the FM club id`);
-      if (club.id !== `d${id}-${club.fm}`) fail(`${at} id must be "d${id}-${club.fm}"`);
+      if (club.id !== `d${clubPrefix}-${club.fm}`) fail(`${at} id must be "d${clubPrefix}-${club.fm}"`);
     }
     if (clubIds.has(club.id)) fail(`${at} id is duplicated`);
     clubIds.add(club.id);

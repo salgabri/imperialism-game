@@ -226,6 +226,11 @@ strong.setup-save__text { font-weight:600; }
 .setup-season__credit { margin:-6px 0 0; font:400 11px/1.3 var(--font-sans); color:var(--muted); overflow-wrap:anywhere; }
 .setup-country { margin-top:8px; }
 .setup-country[data-checked] { background:var(--you-soft); border-color:var(--you); }
+/* The country and how many of its clubs play (SetupOverlay ClubCount) share one row. */
+.setup-country-row { display:flex; gap:6px; margin-top:8px; }
+.setup-country-row > .setup-country { flex:1 1 auto; min-width:0; margin-top:0; }
+.setup-count { flex:none; width:auto; min-width:6.4em; }
+.setup-count[data-checked] { background:var(--you-soft); border-color:var(--you); }
 
 /* ---- Theatre: chips that wrap; the map beside them shows the choice and the stats count it ---- */
 .setup-theatres { display:flex; flex-wrap:wrap; gap:6px; }

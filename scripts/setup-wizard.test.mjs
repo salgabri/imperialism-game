@@ -1016,6 +1016,42 @@ test('football clubs offer every shipped country in a dropdown under Europe\'s t
   assert.ok(!nations.qa('#setup-theatre option').some(option => option.value.startsWith('domestic:')));
 });
 
+test('a chosen country offers how many of its clubs play beside it: its top two to all of them', async t => {
+  // England cut to 20 (src/engine/clubSplit.js): the dropdown still names England, the count beside it says 20.
+  const cut = await mount(t, { setup: { layer: 'clubs', clubScope: 'domestic:826c20', clubCount: 20 } });
+  const countries = cut.q('#setup-country');
+  assert.equal(countries.value, 'domestic:826');
+  assert.ok(countries.hasAttribute('data-checked'));
+  assert.equal(cut.q('#setup-theatre').value, 'domestic:826', 'the mirror names the country too');
+  const count = cut.q('#setup-club-count');
+  assert.equal(count.parentElement, countries.parentElement, 'one row with the country');
+  assert.equal(count.getAttribute('aria-label'), 'How many clubs play');
+  assert.equal(count.value, '20');
+  assert.ok(count.hasAttribute('data-checked'));
+  const options = [...count.options].map(option => [option.value, option.textContent]);
+  assert.equal(options.length, ENGLAND.clubs - 1);
+  assert.deepEqual(options.slice(0, 2), [[String(ENGLAND.clubs), `All ${ENGLAND.clubs}`], [String(ENGLAND.clubs - 1), `Top ${ENGLAND.clubs - 1}`]]);
+  assert.deepEqual(options.at(-1), ['2', 'Top 2']);
+  assert.match(cut.q('#setup-theatre-description').textContent, /the top 20 of England's 100 clubs fighting over its 100 sections/);
+  assert.match(cut.q('.setup-stats').textContent, /20/);
+  count.value = '30';
+  await act(async () => count.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
+  assert.deepEqual(cut.calls.picks.at(-1), ['clubCount', 30]);
+  count.value = String(ENGLAND.clubs);
+  await act(async () => count.dispatchEvent(new dom.window.Event('change', { bubbles: true })));
+  assert.deepEqual(cut.calls.picks.at(-1), ['clubCount', null], 'all of them: the map as built');
+  assert.deepEqual(cut.errors, []);
+
+  // The full map: the count reads all of them, unmarked.
+  const full = await mount(t, { setup: COUNTRY });
+  assert.equal(full.q('#setup-club-count').value, String(ENGLAND.clubs));
+  assert.ok(!full.q('#setup-club-count').hasAttribute('data-checked'));
+  // Europe's maps: no count.
+  const europe = await mount(t, { setup: { layer: 'clubs', clubScope: 'domestic:eu124' } });
+  assert.ok(europe.q('#setup-country'));
+  assert.ok(!europe.q('#setup-club-count'));
+});
+
 test('a chosen country: description, counts, summaries, and its map load gating Launch', async t => {
   assert.equal(domesticDescription(ENGLAND), modelDescription(ENGLAND), 'SetupOverlay re-exports the model description');
   assert.equal(modelDescription({ name: 'X', clubs: 3, top: ['A', 'B', 'C'] }),

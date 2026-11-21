@@ -87,8 +87,12 @@ export function readChallenge(search = '', { sets = BUILT_IN_SETS } = {}) {
   if (clubsOnly) setup.layer = 'clubs';
   if (sport.nationsOnly) setup.layer = 'nations';
   const clubLayer = setup.layer === 'clubs';
+  // A country's map cut to fewer clubs ('domestic:724c20') sets their number too.
   take('theatre', value => (clubLayer ? offeredClubTheatre(sport, setup.dataSet, value) : offeredNationTheatre(sport, setup.dataSet, value)),
-    value => { setup[clubLayer ? 'clubScope' : 'scope'] = value; });
+    value => {
+      setup[clubLayer ? 'clubScope' : 'scope'] = value;
+      if (clubLayer) setup.clubCount = domesticEntry(value)?.cut ?? null;
+    });
   if (clubLayer) setup.clubScope = setClubScope(setup);
 
   take('draw', value => DRAW_CARDS.some(card => card.value === value), value => {
