@@ -3,7 +3,15 @@
 // crest misleads (gold trim, a crown or a city badge outweighing the kit colour).
 //
 // Usage:
-//   node scripts/build-club-colours.mjs
+//   node scripts/build-club-colours.mjs           writes src/data/clubColours.js
+//   node scripts/build-club-colours.mjs --check   fails unless it was written from the crests and corrections as they
+//                                                 are (no pixel read; scripts/club-colours.test.mjs checks the same)
+//
+// The file records a digest of what it was read from (scripts/lib/club-colour-sources.mjs): every crest's name and
+// bytes and every correction. A crest added, redrawn or removed, or a correction changed, needs this run again, or
+// the club's land keeps a hash pastel (the 748 crests the country maps' clubs gained on 17 November 2026 went
+// uncoloured until the next day). The digest covers the inputs, not this script: after changing how a colour is
+// read, run it again too.
 //
 // A crest's colour is the dominant hue among its coloured pixels: OKLCH hue in 15° bins,
 // each bin counting half of its two neighbours, gold (often trim) counted at 60%. The
@@ -17,7 +25,7 @@
 //
 // Writes:
 //   src/data/clubColours.js   clubColour(id): a club's colour, or null
-import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import sharp from 'sharp';
@@ -30,14 +38,12 @@ import { CLUBS as NHL_CLUBS } from '../src/data/clubs.hockey.js';
 import { CLUBS as WOMENS_CLUBS } from '../src/data/clubs.womens-football.js';
 import { CLUBS as NRL_CLUBS } from '../src/data/clubs.rugby-league.js';
 import { clubLogoFile } from '../src/data/clubLogos.js';
-import { CREST_ERAS } from '../src/data/clubCrestEras.js';
+import { LOGO_DIR as logoDir, colourSources, recordedDigest, sourcesDigest } from './lib/club-colour-sources.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-const logoDir = path.join(root, 'public/club-logos');
 const moduleFile = path.join(root, 'src/data/clubColours.js');
-const overridesFile = path.join(root, 'scripts/data/club-colours.json');
-const euroleagueFile = path.join(root, 'scripts/data/euroleague-teams.json');
-const PERIOD_CREST = /\.\d{4}\.webp$/;
+const args = process.argv.slice(2);
+if (args.some(arg => arg !== '--check')) throw new Error(`Only --check is supported, not ${args.join(' ')}`);
 
 const SAMPLE = 64; // crests are read at this size: plenty for a colour census
 const OPAQUE = 160; // alpha below this is the crest's transparent surround or its anti-aliased edge
@@ -90,36 +96,41 @@ async function crestColour(file) {
   return hex(bin.rgb.map(v => v / bin.n));
 }
 
+// ---- What the colours are read from (scripts/lib/club-colour-sources.mjs) ----
+const sources = await colourSources();
+const { crests, pastIds, past, corrections } = sources;
+const digest = await sourcesDigest(sources);
+if (args.includes('--check')) {
+  if (recordedDigest(await readFile(moduleFile, 'utf8').catch(() => '')) !== digest) {
+    console.error('The crests or corrections changed since src/data/clubColours.js was written: run npm run build:club-colours');
+    process.exit(1);
+  }
+  console.log(`src/data/clubColours.js matches the ${crests.length} crests and ${corrections.length} corrections it was read from`);
+  process.exit(0);
+}
+
 // ---- Crests ----
 // Today's crests: a period crest ('<club id>.<year>.webp') is no club's colour of today.
-const files = (await readdir(logoDir)).filter(name => name.endsWith('.webp') && !PERIOD_CREST.test(name)).sort();
 const colours = new Map();
-for (const name of files) {
-  const colour = await crestColour(path.join(logoDir, name));
-  if (colour) colours.set(name.slice(0, -'.webp'.length), colour);
+for (const name of crests) {
+  const colour = await crestColour(path.join(logoDir, `${name}.webp`));
+  if (colour) colours.set(name, colour);
 }
 
 // ---- The EuroLeague's clubs of the past ----
 // No crest today, so the crest of their day they wear longest (src/data/clubCrestEras.js), the latest on a tie.
-const euroleague = JSON.parse(await readFile(euroleagueFile, 'utf8'));
-const pastIds = [...new Set([...Object.values(euroleague.history ?? {}), ...Object.values(euroleague.eras ?? {}).flat()].map(club => club.id))].sort();
-for (const id of pastIds) {
-  if (clubLogoFile(id)) continue;
-  const worn = (CREST_ERAS[id] ?? []).filter(([, , file]) => file);
-  if (!worn.length) continue;
-  const [, , file] = worn.reduce((best, era) => (era[1] - era[0] >= best[1] - best[0] ? era : best));
+for (const [id, file] of past) {
   const colour = await crestColour(path.join(logoDir, `${file}.webp`));
   if (colour) colours.set(id, colour);
 }
 
 // ---- Corrections ----
-const { colours: overrides } = JSON.parse(await readFile(overridesFile, 'utf8'));
 const knownIds = new Set([...FOOTBALL_CLUBS, ...BASKETBALL_CLUBS, ...EUROLEAGUE_CLUBS, ...NFL_CLUBS, ...MLB_CLUBS, ...NHL_CLUBS, ...NRL_CLUBS, ...WOMENS_CLUBS].map(club => club.id).concat(pastIds));
-for (const [id, colour] of Object.entries(overrides)) {
+for (const [id, target, colour] of corrections) {
   // A club that has left the built-in leagues keeps its crest for the earlier seasons it played, so its correction too.
   if (!knownIds.has(id) && !DOMESTIC_ID.test(id) && !clubLogoFile(id)) throw new Error(`club-colours.json: no club ${id}`);
   if (!/^#[0-9a-f]{6}$/i.test(colour)) throw new Error(`club-colours.json: ${id} needs a #rrggbb colour, not ${colour}`);
-  colours.set(clubLogoFile(id) ?? id, colour.slice(1).toLowerCase());
+  colours.set(target, colour.slice(1).toLowerCase());
 }
 
 // ---- Module ----
@@ -132,6 +143,7 @@ for (const key of [...colours.keys()].sort(byId)) {
 }
 const nationLines = Object.keys(perNation).sort(byId).map(nation => `  '${nation}': '${perNation[nation].join(' ')}',`);
 await writeFile(moduleFile, `// GENERATED by scripts/build-club-colours.mjs; do not edit. Run \`npm run build:club-colours\` to refresh.
+// sources sha256 ${digest}
 //
 // Each club's own colour: the dominant colour of its crest (public/club-logos/), corrected by
 // scripts/data/club-colours.json. A white or black crest gives a grey. Clubs with neither have none.
@@ -164,4 +176,4 @@ export function clubColour(id) {
 `);
 
 const grey = [...colours.values()].filter(colour => colour.slice(0, 2) === colour.slice(2, 4) && colour.slice(2, 4) === colour.slice(4)).length;
-console.log(`${colours.size} club colours (${files.length} crests, ${Object.keys(overrides).length} corrections, ${grey} grey) → ${path.relative(root, moduleFile)}`);
+console.log(`${colours.size} club colours (${crests.length} crests, ${corrections.length} corrections, ${grey} grey) → ${path.relative(root, moduleFile)}`);
