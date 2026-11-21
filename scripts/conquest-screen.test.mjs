@@ -195,6 +195,10 @@ test('options show position, rating, lineup note and toned gains; selection foll
   const invalid = buildConquest(fixture({ selected: 99 }), { sport });
   assert.equal(invalid.selectedIndex, best.index, 'an unknown selection falls back to the best fit');
   assert.deepEqual(conquestOptions({ candidates: [{ index: 2, name: 'X', pos: 'FW', rating: 80, gain: 0, entersLineup: true }] })[0].note, 'Starts in the XI');
+  // A signing that weakens the team (tennis: a weaker newcomer takes the doubles place of a stronger singles player)
+  // shows its loss, as the lineup panel does, not ±0.0.
+  const weaker = conquestOptions({ candidates: [{ index: 0, name: 'Y', pos: 'S', rating: 58, gain: -1.3, entersLineup: true }] })[0];
+  assert.deepEqual([weaker.gain, weaker.tone], ['−1.3', 'loss']);
   assert.equal(model.claimAside, 'Change to your XI');
 });
 
@@ -438,6 +442,11 @@ test('elimination model restates the defeat winner-first in the article pattern'
   const reloaded = { ...eliminationState(), match: null, history: [{ id: 'match-9', aId: '380', a: { score: '1' }, b: { score: '1' },
     result: { tieText: '2–4 on penalties', territories: 1 } }] };
   assert.equal(buildElimination(reloaded, {}).standfirst, 'Serbia held off Italy 1–1, 4–2 on penalties.');
+  // A tie text reading "in …" (ice hockey's overtime, rugby's golden point) is kept too.
+  for (const [tieText, words] of [['In overtime', 'in overtime'], ['In golden point', 'in golden point'], ['After extra time', 'after extra time']]) {
+    const archived = { ...reloaded, history: [{ ...reloaded.history[0], a: { score: '2' }, b: { score: '3' }, result: { tieText, territories: 1 } }] };
+    assert.equal(buildElimination(archived, {}).standfirst, `Serbia held off Italy 3–2 ${words}.`);
+  }
   assert.equal(buildElimination({ ...eliminationState(), managerElimination: null }, {}), null);
   // No match and no archived entry: result.score is attacker-first ("1–2 (1–1 PENS)"), so it is never printed.
   const orphan = { ...eliminationState(), match: null, history: [] };

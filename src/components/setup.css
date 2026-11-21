@@ -658,6 +658,16 @@ strong.setup-save__text { font-weight:600; }
   .setup-theatre { padding:0 8px; }
 }
 
+/* ---- Cancel in the header on a narrow phone (up to 419px): the row (the wordmark, three save icons, Cancel and the theme
+   toggle) was 411px wide, so the theme toggle slid 7px off a 390 screen and wholly off a 360 one. Tighter gaps and edges,
+   40px-wide icons (still 44px tall) and a 22px wordmark keep the row on screen down to 360: about 337px in 340px. ---- */
+@media (max-width:419.98px) {
+  .setup-head:has(.setup-head__cancel) { gap:4px; padding-left:10px; padding-right:10px; }
+  .setup-head:has(.setup-head__cancel) .setup-head__wordmark { font-size:22px; }
+  .setup-head:has(.setup-head__cancel) .icon-button { width:40px; }
+  .setup-head__cancel { padding:0; }
+}
+
 /* ---- A season's credit (four lines on a phone or in the controls' column, never cut) takes the room of step 1's extras
    where they compete for height: the lede on every phone and on windows up to 800px tall; the whole heading on a phone
    with a notice line (the phone band above) and on a short window with two (a save and a challenge link). The step bar

@@ -590,7 +590,8 @@ videos do with a console game deciding every fixture. The draw, the map, the con
 as usual; only the result is yours. After the draw the match waits in the column (the phone's sheet), in place of Next
 fixture, as **Enter the result**: the two scores, the attacker's first, and a line saying what the score does ("Bolivia
 wins 3–1 and takes Paraguay") or what it lacks. A level football score asks for its penalty shoot-out's score (only the
-shoot-out's score is kept, no kicks). Every other sport plays on until one side wins, so its final score has a winner:
+shoot-out's score is kept, no kicks), one a shoot-out can end on: one kick apart, or a lead the other side could no
+longer catch within five kicks each (3–0, 4–2, 5–3), never 4–0 or 7–4. Every other sport plays on until one side wins, so its final score has a winner:
 after overtime, extra innings or golden point, an ice hockey shoot-out's winner one goal up as the NHL counts it, and a
 tennis tie or a Rocket League series won outright. **Confirm result** (Enter, or Space from outside the form) settles
 the match at once, with no kick-off notice, live clock or chart, and autoplay carries on to the next draw. **Simulate**

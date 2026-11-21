@@ -549,6 +549,10 @@ test('latest results: newest first, winner-first titles, pens/OT, claims, series
     result: { ...HISTORY[1].result, tieText } }));
   const extraRows = buildLatestResults(state({ history: settled }), context(state({ history: settled })), { limit: 10 }).rows;
   assert.deepEqual(extraRows.map(row => row.meta).reverse(), extra.map(([, suffix]) => `ITA 2–1 SRB ${suffix} · claims Dušan Vlahović`));
+  // More overtime periods than one read as the match card counts them.
+  const overtimes = [1, 2, 3].map(n => ({ ...HISTORY[2], id: `ot-${n}`, result: { ...HISTORY[2].result, tieText: `After ${n} overtime period${n > 1 ? 's' : ''}` } }));
+  const otRows = buildLatestResults(state({ history: overtimes }), context(state({ history: overtimes })), { limit: 10 }).rows;
+  assert.deepEqual(otRows.map(row => row.meta).reverse(), ['LAL 101–104 BOS (OT)', 'LAL 101–104 BOS (2OT)', 'LAL 101–104 BOS (3OT)']);
 });
 
 test('ticker: last seven, newest first, "R XXVI  CZECHIA 0  GERMANY 1 · CZECHIA OUT" in source case', () => {

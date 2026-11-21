@@ -185,7 +185,7 @@ export function decodeDomestic(data, id = data?.id) {
   });
   const startOwners = Object.freeze(Object.fromEntries(clubs.flatMap(club => club.startSections.map(s => [s, club.id]))));
   // An earlier season's club with no crest of its own wears its twin's (src/data/crests.js).
-  if (seasonCountry(meta)) rememberTwins(clubs);
+  if (seasonCountry(meta)) rememberTwins(clubs, meta.year);
   // Land no club starts on (topology.objects.empty), never territory: drawn (see domesticSurroundings) and claimed
   // (domesticLand), with its neighbours among the sections and itself.
   const empty = topology.objects.empty?.geometries.length

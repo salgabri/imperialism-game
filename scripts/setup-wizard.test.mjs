@@ -1489,3 +1489,48 @@ test('a pressed segment keeps its white label on hover (Teams toggle, history ki
   assert.doesNotMatch(css, /\.segmented > button:hover:not\(:disabled\) \{/);
   assert.match(css, /\.segmented > button\[aria-pressed=true\], \.segmented > button\[aria-checked=true\] \{ background:var\(--ink\); color:var\(--on-ink\);/);
 });
+
+test('Cancel in the header on a narrow phone: tighter gaps, edges, icons and wordmark keep the theme toggle on screen', () => {
+  // The row (wordmark, three save icons, Cancel, theme toggle) was 411px wide below 420, so the toggle slid off a 390 or
+  // 360 screen whenever Cancel showed (measured in Chrome: toggle at 353..397). Without Cancel the row keeps its look.
+  const css = readFileSync(new URL('../src/components/setup.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+  const narrow = css.slice(css.indexOf('@media (max-width:419.98px)'));
+  assert.match(narrow, /^@media \(max-width:419\.98px\) \{\s*\.setup-head:has\(\.setup-head__cancel\) \{ gap:4px; padding-left:10px; padding-right:10px; \}/);
+  assert.match(narrow, /\.setup-head:has\(\.setup-head__cancel\) \.setup-head__wordmark \{ font-size:22px; \}/);
+  assert.match(narrow, /\.setup-head:has\(\.setup-head__cancel\) \.icon-button \{ width:40px; \}/);
+});
+
+test('while a season loads, its sport card says what it fields: clubs-only sports and seasons are not "Nations"', async () => {
+  const { DEFAULT_SETUP, setClubScope } = await import('../src/app/shared.js');
+  const { BUILT_IN_SETS } = await import('../src/engine/footballSets.js');
+  for (const [sport, layer, dataSet, note] of [['american-football', 'clubs', 'madden-2005', 'Clubs'], ['college-football', 'clubs', 'cfb-2010', 'Schools'],
+    ['basketball', 'clubs', 'nba-2k15', 'Clubs'], ['football', 'nations', 'ea-fifa-05', 'Nations']]) {
+    const base = { ...DEFAULT_SETUP, sport, layer, dataSet };
+    const model = buildSetupModel({ ...base, clubScope: setClubScope(base) }, { season: { sets: BUILT_IN_SETS, state: 'loading', sport: null } });
+    assert.equal(model.season.state, 'loading');
+    assert.equal(model.sports.find(card => card.selected).note, note, `${sport} ${dataSet}`);
+  }
+});
+
+test('theatre descriptions name a league\'s clubs once, in its sport\'s word', async () => {
+  const { CLUB_MAPS } = await import('../src/data/clubMaps.js');
+  const { EUROPE_MAPS } = await import('../src/data/europeMaps.js');
+  const rugby = [...EUROPE_MAPS, ...CLUB_MAPS].find(entry => entry.id === 'rugbyeurope');
+  const college = [...EUROPE_MAPS, ...CLUB_MAPS].find(entry => entry.id === 'cfb');
+  assert.match(modelDescription(rugby), / lead the 36 European clubs, each on land in its own country/);
+  assert.doesNotMatch(modelDescription(rugby), /clubs clubs/);
+  assert.match(modelDescription(college), / lead the 138 FBS schools fighting over the USA, .* A state with several schools is divided/);
+});
+
+test('a key that lands on the team already picked leaves no focus move armed for a later render', async t => {
+  const view = await mount(t, { setup: { role: 'manager', managedTeamId: '250' }, initialStep: 3 });
+  const flag = name => view.qa('.setup-team').find(button => button.dataset.name === name);
+  flag('France').focus();
+  const home = await view.key(flag('France'), 'Home');
+  assert.equal(home.defaultPrevented, true);
+  assert.ok(document.activeElement === flag('France'), 'the picked team keeps focus');
+  const choose = view.button('You choose');
+  choose.focus();
+  await view.click(choose);
+  assert.ok(document.activeElement === choose, 'focus stays on the control just used, not back on the team wall');
+});

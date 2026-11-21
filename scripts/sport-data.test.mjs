@@ -451,6 +451,50 @@ test('Rugby is one card: the NRL\'s map loads rugby league\'s players and sets i
   } finally { await view.close(); }
 });
 
+test('Rugby\'s card: a choice made while the NRL\'s players load is the latest pick, and their arrival does not undo it', async () => {
+  const view = await openPage();
+  try {
+    await setUp(view);
+    const layer = name => [...view.document.querySelectorAll('.setup-segmented button')].find(button => button.textContent === name);
+    const theatre = () => view.document.getElementById('setup-theatre');
+    view.card('rugby-union').click();
+    await until(() => view.control.requested().includes('rugby-union'), 'union is asked for');
+    view.control.release('rugby-union');
+    await until(() => view.app.state.setup.sport === 'rugby-union', 'union is set up');
+    layer('Clubs').click();
+    await until(() => view.app.state.setup.layer === 'clubs', 'Clubs');
+    theatre().value = 'domestic:nrl';
+    theatre().dispatchEvent(new view.window.Event('change', { bubbles: true }));
+    await until(() => view.control.requested().includes('rugby-league'), 'rugby league is asked for');
+    // The player changes their mind before league's players arrive: Nations, union's.
+    layer('Nations').click();
+    await until(() => view.app.state.setup.layer === 'nations', 'Nations applied');
+    assert.equal(view.app.state.sportLoad.id, null, 'the NRL pick is dropped');
+    view.control.release('rugby-league');
+    await pause(100);
+    assert.deepEqual([view.app.state.setup.sport, view.app.state.setup.layer], ['rugby-union', 'nations'], 'still union\'s nations');
+  } finally { await view.close(); }
+});
+
+test('Rugby\'s card: Retry after a failed load makes the whole choice again (Nations, not union\'s clubs)', async () => {
+  const view = await openPage({ url: 'http://localhost/?sport=rugby-league' });
+  try {
+    await until(() => view.control.requested().includes('rugby-league'), 'league is asked for');
+    view.control.release('rugby-league');
+    await until(() => view.app.state.phase === 'setup' && view.app.state.setup.sport === 'rugby-league', 'rugby league is set up');
+    const layer = name => [...view.document.querySelectorAll('.setup-segmented button')].find(button => button.textContent === name);
+    layer('Nations').click();
+    await until(() => view.control.requested().includes('rugby-union'), 'union is asked for');
+    view.control.fail('rugby-union');
+    const alert = await until(() => view.document.querySelector('.setup-sport__error'), 'the error shows');
+    [...alert.querySelectorAll('button')].find(button => button.textContent === 'Retry').click();
+    await until(() => view.control.requested().filter(id => id === 'rugby-union').length === 2, 'Retry asks again');
+    view.control.release('rugby-union');
+    await until(() => view.app.state.setup.sport === 'rugby-union', 'union is set up');
+    assert.equal(view.app.state.setup.layer, 'nations', 'with the Nations the player chose');
+  } finally { await view.close(); }
+});
+
 test('a challenge link to another sport loads its players with the maps, and setup opens on it', async () => {
   const view = await openPage({ url: 'http://localhost/?sport=hockey&theatre=world&role=manager&team=124&seed=7' });
   try {

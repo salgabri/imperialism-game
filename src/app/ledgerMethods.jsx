@@ -19,8 +19,9 @@ function isPlaying(st) {
   return st?.phase === 'playing' || st?.phase === 'victory';
 }
 
-// Theatres and countries that read with "the" after "has conquered": the Elite 32, the USA and Canada, the Premier League.
-const WITH_ARTICLE = /^(Elite 32|USA|United |Netherlands$|Philippines$|Solomon Islands$|Dominican Rep|Central African Rep|Gambia$|Premier League$|Bundesliga$|Eredivisie$)/;
+// Theatres and countries that read with "the" after "has conquered": the Elite 32, the USA and Canada, the Premier League,
+// the Six Nations.
+const WITH_ARTICLE = /^(Elite 32|USA|United |Netherlands$|Philippines$|Solomon Islands$|Dominican Rep|Central African Rep|Gambia$|Premier League$|Bundesliga$|Eredivisie$|Six Nations$)/;
 
 /** What a champion has conquered: "Europe", "the Elite 32", "all the leagues" (clubs' All Leagues). */
 function conqueredName(name) {

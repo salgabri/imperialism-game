@@ -23,8 +23,8 @@ import { FEED_CAP, domesticIdOf } from '../app/shared.js';
 import { V4 } from '../theme.js';
 import { politicalFill } from '../data/empireColours.js';
 import {
-  campaignTitle, displayRound, formatOddsPair, historyRound, plainScopeName, memo, ratingTier, roman, routeCopy, teamChip,
-  territoryWord,
+  articleFor, campaignTitle, displayRound, formatOddsPair, historyRound, plainScopeName, memo, ratingTier, roman, routeCopy,
+  teamChip, territoryWord,
 } from './format.js';
 import { matchupOdds } from './odds.js';
 
@@ -249,8 +249,9 @@ export function biggestUpsetLine(history) {
   }
   if (!best) return null;
   const name = best.result.winnerName || best.winnerName || 'The underdog';
+  const gap = Number.isFinite(bestGap) ? bestGap.toFixed(1) : '';
   return Number.isFinite(bestGap) && bestGap > 0
-    ? `${name} overturned a ${bestGap.toFixed(1)}-point strength gap`
+    ? `${name} overturned ${articleFor(gap)} ${gap}-point strength gap`
     : `${name} won as the underdog`;
 }
 
@@ -268,7 +269,9 @@ function winnerFirstScore(entry, winnerId) {
   const tieText = entry?.result?.tieText || '';
   const kicks = tieText.match(/^(\d+)–(\d+) on penalties$/);
   if (kicks) score += `, ${attackerWon ? `${kicks[1]}–${kicks[2]}` : `${kicks[2]}–${kicks[1]}`} on penalties`;
-  else if (/^after/i.test(tieText)) score += ` ${tieText.replace(/^After/, 'after')}`;
+  // "after extra time", and the sports whose tie text reads "in …": ice hockey's "in overtime" or "in a shoot-out",
+  // rugby union's "in extra time", rugby league's "in golden point".
+  else if (/^(after|in)\s/i.test(tieText)) score += ` ${tieText[0].toLowerCase()}${tieText.slice(1)}`;
   return score;
 }
 

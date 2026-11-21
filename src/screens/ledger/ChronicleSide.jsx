@@ -64,13 +64,17 @@ export const ActivityFeed = React.memo(function ActivityFeed({ entries = [], mea
         : (
           <div className="fi-activity-box" ref={paged.boxRef}>
             <ol className="fi-activity-list" aria-label="Campaign activity">
-              {paged.shown.map(row => (
-                <li key={row.key} className="fi-activity-item" data-kind={row.entry.kind || undefined} title={row.entry.text}>
-                  <span className={`fi-activity-round${row.first ? '' : ' is-repeat'}`}>{row.first ? (row.numeral ? `Round ${row.numeral}` : 'Start') : ''}</span>
-                  <i className="fi-activity-mark" aria-hidden="true" />
-                  <span className="fi-activity-text">{row.entry.text}</span>
-                </li>
-              ))}
+              {paged.shown.map((row, i) => {
+                // A page's first row names its round too, though the run began on the page before.
+                const first = row.first || i === 0;
+                return (
+                  <li key={row.key} className="fi-activity-item" data-kind={row.entry.kind || undefined} title={row.entry.text}>
+                    <span className={`fi-activity-round${first ? '' : ' is-repeat'}`}>{first ? (row.numeral ? `Round ${row.numeral}` : 'Start') : ''}</span>
+                    <i className="fi-activity-mark" aria-hidden="true" />
+                    <span className="fi-activity-text">{row.entry.text}</span>
+                  </li>
+                );
+              })}
             </ol>
           </div>
         )}

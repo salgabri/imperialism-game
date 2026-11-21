@@ -929,13 +929,16 @@ async function chooseDomestic(app, id, { setupChecks = false } = {}) {
   // A Europe map tells the rules of its land; a sport's own map (the NBA's, the NFL's) names its league, each club holding
   // the state of its arena or stadium ("the USA and Canada", but "Australia and New Zealand").
   const land = /^(?:USA|United)\b/.test(entry.name || '') ? `the ${entry.name}` : entry.name;
-  // Women's football's map of every European club counts them as EA rates them; the EuroLeague's names its league.
-  const field = !entry.theatre ? `the ${entry.clubs} ${entry.league} clubs`
+  // Women's football's map of every European club counts them as EA rates them; the EuroLeague's names its league. A
+  // league's clubs are named once, in its sport's word: rugby's league is "European clubs", college football's are schools.
+  const noun = (entry.sport && getSport(entry.sport).clubNoun) || 'clubs';
+  const leagueClubs = /\bclubs$/i.test(entry.league || '') ? `${entry.clubs} ${entry.league}` : `${entry.clubs} ${entry.league} ${noun}`;
+  const field = !entry.theatre ? `the ${leagueClubs}`
     : entry.theatre === 'all' && entry.sport !== 'football' ? `the ${entry.clubs} European clubs EA rates` : `Europe's ${entry.clubs} strongest clubs`;
   result.description = entry.top.every(name => note.includes(name)) && note.endsWith(entry.theatre || entry.countries
     ? `${field}, each on land in its own country: alone it holds all of it, and clubs that share a country split it along its regional borders. A country with no club stays grey.`
     : entry.league
-      ? `the ${entry.clubs} ${entry.league} clubs fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${entry.lines || 'state or province'}. A state with several clubs is divided between them; one with none stays empty.`
+      ? `the ${leagueClubs} fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${entry.lines || 'state or province'}. A state with several ${noun} is divided between them; one with none stays empty.`
       : `${entry.clubs} clubs fighting over ${entry.name}, split into ${sections} sections drawn from its administrative divisions${share}.`);
   result.descriptionText = note;
   // Step 1's country card: every land in its starting club's pastel, one per club (the card has no ids, so compare the

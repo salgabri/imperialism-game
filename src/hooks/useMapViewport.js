@@ -305,6 +305,17 @@ export function useMapViewport(svgRef, resetKey, initialFocus, fitKey = null) {
     return () => observer.disconnect();
   }, [svgRef]);
 
+  // A zoom is the view from now on: the ref takes it at once, so a second wheel event before React re-renders steps on
+  // from it rather than from the view before the first, and a drag under way pans on from it rather than undoing it
+  // with its starting view (drag.current is re-based where the pointer last was).
+  const applyZoom = useCallback(next => {
+    activeFit.current = null;
+    viewRef.current = next;
+    const d = drag.current;
+    if (d) drag.current = { ...d, x: d.lastX ?? d.x, y: d.lastY ?? d.y, view: next };
+    setView(next);
+  }, []);
+
   const zoomAt = useCallback((factor, clientX, clientY) => {
     const el = svgRef.current;
     if (!el) return;
@@ -317,16 +328,14 @@ export function useMapViewport(svgRef, resetKey, initialFocus, fitKey = null) {
     const wx = v.x + (clientX - rect.left - ox) / screenScale;
     const wy = v.y + (clientY - rect.top - oy) / screenScale;
     const next = frame(v.w / factor, 0, 0);
-    activeFit.current = null;
-    setView(frame(next.w, wx - (wx - v.x) * next.w / v.w, wy - (wy - v.y) * next.h / v.h));
-  }, [svgRef, frame]);
+    applyZoom(frame(next.w, wx - (wx - v.x) * next.w / v.w, wy - (wy - v.y) * next.h / v.h));
+  }, [svgRef, frame, applyZoom]);
 
   const zoomBy = useCallback(factor => {
     const v = viewRef.current;
     const next = frame(v.w / factor, 0, 0);
-    activeFit.current = null;
-    setView(frame(next.w, v.x + (v.w - next.w) / 2, v.y + (v.h - next.h) / 2));
-  }, [frame]);
+    applyZoom(frame(next.w, v.x + (v.w - next.w) / 2, v.y + (v.h - next.h) / 2));
+  }, [frame, applyZoom]);
 
   const reveal = useCallback(points => {
     const current = viewRef.current;
@@ -424,6 +433,8 @@ export function useMapViewport(svgRef, resetKey, initialFocus, fitKey = null) {
     }
     const d = drag.current;
     if (!d || !el) return;
+    d.lastX = e.clientX;
+    d.lastY = e.clientY;
     const dx = e.clientX - d.x, dy = e.clientY - d.y;
     d.travel = Math.max(d.travel, Math.abs(dx) + Math.abs(dy));
     if (d.travel < 4) return;
@@ -435,9 +446,16 @@ export function useMapViewport(svgRef, resetKey, initialFocus, fitKey = null) {
     if (scale) setView(frame(d.view.w, d.view.x - dx / scale, d.view.y - dy / scale));
   }, [svgRef, frame]);
   const endDrag = useCallback(e => {
-    if (e?.pointerId != null) touches.current.delete(e.pointerId);
+    const lifted = e?.pointerId != null && touches.current.delete(e.pointerId);
     // Lifting one finger of a pinch ends the gesture without starting a pan from the remaining finger.
     if (touches.current.size < 2) pinch.current = null;
+    else if (lifted && pinch.current) {
+      // A pinch of three or more fingers that loses one goes on with the two that pinch now, from the view they hold:
+      // measured against the pair that was, their distance and midpoint would make the next move jump the camera.
+      const [a, b] = [...touches.current.values()];
+      pinch.current = { distance: Math.hypot(b.x - a.x, b.y - a.y), mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 },
+        view: viewRef.current };
+    }
     drag.current = null;
     setPanning(false);
   }, []);

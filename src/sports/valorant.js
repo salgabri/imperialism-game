@@ -366,8 +366,9 @@ const valorantRules = {
   fallbackStrength: () => EMPTY_STRENGTH,
   requiredPositions: [],
 
-  // Twenty-six clock units a map; the chart ticks at the end of each. A series ends with its deciding map, the last event.
-  clock: { length: LENGTH, msPerUnit: MS_PER_UNIT, ot: BLOCK, tick: BLOCK },
+  // Twenty-six clock units a map; the chart ticks at the end of each. A series ends with its deciding map, the last event:
+  // its clock stops there (`endsWithLastEvent`), so a sweep never reads the rounds after its last map ("M2 OT").
+  clock: { length: LENGTH, msPerUnit: MS_PER_UNIT, ot: BLOCK, tick: BLOCK, endsWithLastEvent: true },
   tieBreak: 'none',
   labels: { score: 'MAPS', start: 'AGENT SELECT…', live: 'LIVE', end: 'FINAL', tie: 'FINAL', tieShort: '' },
 

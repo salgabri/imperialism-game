@@ -369,6 +369,13 @@ export default function SetupOverlay({
     }
     if (next == null) return;
     event.preventDefault();
+    if (wallTeams[next].id === setup.managedTeamId) {
+      // The team already picked: no pick and so no render follows, and a focus move left armed would fire at some later,
+      // unrelated one (Opponent, a role card). Its flag takes focus now, if it is on show.
+      const radio = wall.element?.querySelector('[aria-checked="true"]');
+      if (radio) focusQuietly(radio);
+      return;
+    }
     refocusTeam.current = true;
     choose('managedTeamId', wallTeams[next].id, setup.managedTeamId);
   }

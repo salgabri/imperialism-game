@@ -57,7 +57,9 @@ export default function HistoryBrowser({
   const selectRow = useCallback(id => selectRef.current?.(id), []);
   const newestFirst = useMemo(() => shown.slice().reverse(), [shown]);
   // `measureKey` (the Chronicle's panel) measures the list again in the commit that shows it.
-  const paged = usePagedList(newestFirst, { row: '.fi-history-list > li', focusIndex: newestFirst.findIndex(entry => entry.id === report?.id), measureKey });
+  // Keyed by the match, not its place: each new match moves it down the list, which must not turn the page.
+  const paged = usePagedList(newestFirst, { row: '.fi-history-list > li', focusIndex: newestFirst.findIndex(entry => entry.id === report?.id),
+    focusKey: report?.id ?? null, measureKey });
   return (
     <section className="fi-history" aria-label="Match history">
       <div className="fi-history__index">
@@ -98,7 +100,7 @@ export default function HistoryBrowser({
           )}
       </div>
       {report && (
-        <div className="fi-history__report">
+        <div className="fi-history__report" tabIndex={-1} aria-label="Match result">
           {/* The archived heading reads "Round XIV" like every other round in the UI (MatchCard prints `round` as given). */}
           <MatchCard {...report} round={roman(historyRound(report)) || report.round} archived
             onViewConquest={onViewConquest} onSelectTeam={onSelectTeam} />

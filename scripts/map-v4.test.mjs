@@ -299,7 +299,8 @@ test('fronts tint: your land fronts by your win chance; the fixture opponent use
     assert.deepEqual(mapVM.fixtureWinChance(live, ctx), { opponentId: '688', p: b });
     assert.equal(mapVM.frontsFills(live, { ...ctx, cache: new Map() })['688'], MAP.frontsTint[tone], `live ${b}`);
   }
-  // The tactical gate and a locked draw use the default-approach estimate in the fixture's orientation.
+  // A locked draw, and a tactical gate with no options to recommend from, use the balanced estimate in the fixture's
+  // orientation.
   for (const extra of [{ tacticalChoice: { aId: '688', dId: '380' } },
     { spin: { stage: 'locked', attackerId: '688', targetId: '380' } }]) {
     const st = playingState(extra);
@@ -307,6 +308,13 @@ test('fronts tint: your land fronts by your win chance; the fixture opponent use
     assert.deepEqual(mapVM.fixtureWinChance(st, ctx), { opponentId: '688', p });
     assert.equal(mapVM.frontsFills(st, ctx)['688'], tint(p));
   }
+  // The tactical gate: the recommended approach's odds (the one Continue kicks off with), as the fronts table reads them.
+  const options = [{ id: 'attack', winProbability: .9 }, { id: 'balanced', winProbability: .2 }, { id: 'defend', winProbability: .1 }];
+  const gate = playingState({ tacticalChoice: { aId: '688', dId: '380', options } });
+  const attacking = matchupOdds(gate, ctx, '688', '380', { tactic: 'attack' }).defender;
+  assert.notEqual(attacking, matchupOdds(gate, ctx, '688', '380').defender, 'the approach changes the estimate');
+  assert.deepEqual(mapVM.fixtureWinChance(gate, { ...ctx, cache: new Map() }), { opponentId: '688', p: attacking });
+  assert.equal(mapVM.frontsFills(gate, { ...ctx, cache: new Map() })['688'], tint(attacking));
   assert.equal(mapVM.fixtureWinChance(playingState({ spin: { stage: 'spinning', attackerId: '688', targetId: '380' } }), ctx), null,
     'no fixture while the compass spins (DEC D19)');
   assert.equal(mapVM.fixtureWinChance(playingState({ match: { aId: '688', dId: '040', applied: false, odds: { a: .5, b: .5 } } }), ctx),
@@ -1056,8 +1064,52 @@ test('phone: no zoom buttons (A4); two fingers pinch-zoom around their midpoint 
       await pointer('pointerup', 1, 400);
       await act(async () => view.q('path[data-country="380"]').dispatchEvent(new dom.window.MouseEvent('click', { bubbles: true })));
       assert.deepEqual(calls.click, ['380'], 'a later tap works again');
+      // Three fingers: lifting one of the pinching pair goes on with the two left, from the view they hold, rather than
+      // measuring them against the pair that was (the camera jumped to the whole world on the next 1px move).
+      await pointer('pointerdown', 1, 380);
+      await pointer('pointerdown', 2, 580);
+      await pointer('pointermove', 2, 780);
+      const pinched = viewBox(view);
+      await pointer('pointerdown', 3, 700);
+      await pointer('pointerup', 1, 380);
+      assert.deepEqual(viewBox(view), pinched, 'a finger lifted, the view holds');
+      await pointer('pointermove', 3, 701);
+      const [x, y, w] = viewBox(view);
+      assert.ok(Math.abs(w / pinched[2] - 80 / 79) < 1e-9, `a 1px move of a 80px pinch zooms 80/79, not ${w / pinched[2]}`);
+      assert.ok(Math.abs(x - pinched[0]) < 10 && Math.abs(y - pinched[1]) < 10, 'and stays where it was');
+      await pointer('pointerup', 2, 780);
+      await pointer('pointerup', 3, 701);
     } finally { await view.close(); }
   }));
+});
+
+test('wheel zoom: notches before a render each count, and a zoom mid-drag holds through the next move', async () => {
+  const canvas = { size: { width: 960, height: 540 } };
+  await withCanvas(canvas, async report => {
+    const { props } = mapProps();
+    const view = await mount(props);
+    try {
+      await report();
+      const svg = view.q('svg.political-map');
+      const wheel = (deltaY, clientX = 480) => svg.dispatchEvent(new dom.window.WheelEvent('wheel',
+        { bubbles: true, cancelable: true, deltaY, clientX, clientY: 270 }));
+      const notch = Math.exp(100 * .0016);
+      // Two notches in one batch, as a trackpad sends them between frames: the second steps on from the first.
+      await act(async () => { wheel(-100); wheel(-100); });
+      assert.ok(Math.abs(viewBox(view)[2] - 960 / notch ** 2) < 1e-6, `both notches zoom: w ${viewBox(view)[2]}`);
+      // A zoom while the mouse drags the map: the drag pans on from the zoomed view instead of restoring the old one.
+      const pointer = (type, clientX) => act(async () => svg.dispatchEvent(new dom.window.PointerEvent(type,
+        { bubbles: true, pointerId: 9, pointerType: 'mouse', clientX, clientY: 270, button: type === 'pointermove' ? -1 : 0 })));
+      await pointer('pointerdown', 480);
+      await pointer('pointermove', 500);
+      await act(async () => { wheel(-100, 500); });
+      const zoomed = viewBox(view)[2];
+      assert.ok(Math.abs(zoomed - 960 / notch ** 3) < 1e-6, 'the notch zooms mid-drag');
+      await pointer('pointermove', 501);
+      assert.ok(Math.abs(viewBox(view)[2] - zoomed) < 1e-9, `the next move keeps the zoom: w ${viewBox(view)[2]}, not ${960 / notch ** 2}`);
+      await pointer('pointerup', 501);
+    } finally { await view.close(); }
+  });
 });
 
 // ---- country maps (domestic campaigns: a country's top clubs on its own sectioned map) ----

@@ -463,7 +463,10 @@ function computeSquad(st, ctx, team) {
   const doubling = lineup.slots.filter(slot => slot.player?.doubling).map(slot => shortName(slot.player.name));
   if (doubling.length) notes.push(`${doubling.join(' and ')} ${doubling.length === 1 ? 'plays' : 'play'} the singles and the doubles: the team has ${plural(squad.length, 'rated player')}.`);
   const estimated = lineup.starters.filter(isEstimated);
-  if (estimated.length) notes.push(`${estimated.length} of the ${plan} starting ratings are estimates, each marked: ${estimateReason(estimated[0])}.`);
+  if (estimated.length) {
+    notes.push(`${estimated.length} of the ${plan} starting ratings ${estimated.length === 1 ? 'is an estimate, marked' : 'are estimates, each marked'}: `
+      + `${estimateReason(estimated[0])}.`);
+  }
   // The manager's own team for the "Your squad" shortcut (spectators follow instead).
   const ownId = ctx?.managedId ?? null;
   const back = BACK_LABELS[st.squadReturn] ? { label: BACK_LABELS[st.squadReturn] } : null;
@@ -495,7 +498,7 @@ function computeSquad(st, ctx, team) {
     profileScale: 'Scale 60–95',
     acquisitions: {
       rows: claims,
-      aside: claimedCount ? `${plural(claimedCount, 'player')} · ${claimedStarters} of ${plan} starters were claimed in conquest` : '',
+      aside: claimedCount ? `${plural(claimedCount, 'player')} · ${claimedStarters} of ${plan} starters ${claimedStarters === 1 ? 'was' : 'were'} claimed in conquest` : '',
       empty: 'No players claimed yet. Win a conquest to claim one player from the fallen squad.',
     },
     status: alive ? 'alive' : 'fallen',

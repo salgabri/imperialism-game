@@ -81,8 +81,13 @@ export default function VictoryOverlay({
     function onKeyDown(event) {
       if (event.key === 'Escape') { event.preventDefault(); closeCallback.current?.(); return; }
       if (event.key !== 'Tab') return;
-      const buttons = dialogRef.current?.querySelectorAll('button:not(:disabled), [tabindex="0"], a[href]');
-      if (!buttons?.length) return;
+      // Only what is on show: a control the layout hides (the squad's source links, which the compact pass drops)
+      // cannot take focus, so as the trap's last stop it let Tab leave the dialog and held Shift+Tab on Close. Without a
+      // layout (jsdom) every control counts.
+      const laidOut = (dialogRef.current?.getClientRects?.().length ?? 0) > 0;
+      const buttons = [...(dialogRef.current?.querySelectorAll('button:not(:disabled), [tabindex="0"], a[href]') || [])]
+        .filter(el => !laidOut || el.getClientRects().length > 0);
+      if (!buttons.length) return;
       const first = buttons[0];
       const last = buttons[buttons.length - 1];
       if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }

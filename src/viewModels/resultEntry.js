@@ -2,6 +2,7 @@
 // view-model: the match waiting for the score the player types in, and what that score would do. Pure: (state, ctx) in,
 // plain data out; no window, document, timers or RNG.
 import { matchSport } from '../sports/index.js';
+import { isTennisSport } from '../data/teams.js';
 import { EMPTY_DRAFT, readResult } from '../engine/enteredResult.js';
 import { displayRound, roman } from './format.js';
 
@@ -16,7 +17,8 @@ const side = team => ({
  * tennis tie, a Rocket League series), a winner.
  */
 function levelLine(sport) {
-  if (sport.tieBreak === 'none') return 'Level scores need a winner: one side wins the tie.';
+  // A tennis tie; an esport's series.
+  if (sport.tieBreak === 'none') return `Level scores need a winner: one side wins the ${isTennisSport(sport.id) ? 'tie' : 'series'}.`;
   if (sport.overtime?.shootoutAt != null) return 'Level scores need a winner: type the final score, overtime and shoot-out included.';
   const overtime = (sport.words?.overtime || 'overtime').toLowerCase();
   return `Level scores need a winner: type the score after ${overtime}.`;
@@ -49,8 +51,9 @@ export function buildResultEntry(st, ctx = {}) {
   let line;
   if (result.state === 'incomplete') line = `Play ${A.name} v ${D.name}, then type its final score.`;
   else if (result.state === 'level') {
-    line = result.shootout ? (draft.pa !== '' && draft.pb !== '' ? 'A shoot-out needs a winner.' : 'Level: type the penalty shoot-out’s score.')
-      : levelLine(sport);
+    line = !result.shootout ? levelLine(sport)
+      : result.impossible ? `No shoot-out ends ${draft.pa}–${draft.pb}: it stops once one side cannot catch up, and sudden death ends one apart.`
+        : draft.pa !== '' && draft.pb !== '' ? 'A shoot-out needs a winner.' : 'Level: type the penalty shoot-out’s score.';
   } else {
     const W = result.winner === A.id ? A : D, L = W === A ? D : A;
     // The winner's score first: the match's, or the shoot-out's after a level one.

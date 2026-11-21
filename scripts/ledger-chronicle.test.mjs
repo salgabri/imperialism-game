@@ -281,6 +281,11 @@ test('one upset definition: the Chronicle count, tags and "Biggest upset" all re
   const counted = ledgerVM.buildChronicle({ ...baseState(), history: [...history, flagged] }, ctxFor());
   assert.equal(counted.header.stats.find(s => s.key === 'upsets').value, '2');
   assert.equal(counted.turning.find(t => t.key === 'biggestUpset').text, 'Serbia overturned a 6.0-point strength gap');
+  // "an" before a number said with a vowel first: an 8.4, an 11.9, an 18.2, an 80.0.
+  for (const [gap, article] of [[8.4, 'an'], [11.9, 'an'], [18.2, 'an'], [80, 'an'], [1.5, 'a'], [110.5, 'a'], [7, 'a']]) {
+    const entry = { ...flagged, upsetGap: gap };
+    assert.equal(ledgerVM.biggestUpsetLine([entry]), `Austria overturned ${article} ${gap.toFixed(1)}-point strength gap`);
+  }
 });
 
 // ---------- Ledger screen ----------
@@ -708,7 +713,8 @@ test('victory dialog keeps the smoke contract and closes with Escape', async con
   const view = await mount(VictoryOverlay, {
     id: '380', code: 'ITA', isClub: false, round: '031', name: 'ITALY', color: '#888', subtitle: 'has conquered Europe in 31 battles',
     conquests: '9', steals: '4', territories: '55', effNow: '88.1', effBase: '84.5', effGain: { text: '+3.6' },
-    squad: teams['380'].squad.slice(0, 3), positionColors: football.positionColors, seed: 2026,
+    squad: teams['380'].squad.slice(0, 3).map((player, i) => ({ ...player, sourceInfo: { source: 'ea-fc', edition: '27', url: `https://sofifa.com/player/${i + 1}` } })),
+    positionColors: football.positionColors, seed: 2026,
     recap: { biggestUpset: 'Serbia overturned a 6.0-point strength gap', decisiveMatch: 'Italy 2–1 Spain', transferImpact: '', 'Elapsed time': '12 min', 'Leader changes': 3 },
     onClose: () => closes.push(true), onNew: () => news.push(true),
   }, context);
@@ -733,6 +739,25 @@ test('victory dialog keeps the smoke contract and closes with Escape', async con
   assert.deepEqual(closes, [true, true]);
   assert.deepEqual(news, [true]);
   assert.equal(dialog.querySelectorAll('.fi-player-row').length, 3);
+  // The Tab trap counts only controls on show. Laid out (jsdom has no layout: every element gets client rects here but
+  // the squad's source links, which the compact pass hides), Tab from the last visible control wraps to Close, and
+  // Shift+Tab from Close reaches it, rather than leaving the dialog or holding focus on Close.
+  const hidden = new Set(dialog.querySelectorAll('.fi-player-source a[href]'));
+  const rects = Object.getOwnPropertyDescriptor(dom.window.Element.prototype, 'getClientRects');
+  Object.defineProperty(dom.window.Element.prototype, 'getClientRects', { configurable: true,
+    value() { return hidden.has(this) || this.closest?.('.fi-player-source') ? [] : [{ width: 10, height: 10 }]; } });
+  try {
+    const controls = [...dialog.querySelectorAll('button:not(:disabled), [tabindex="0"], a[href]')].filter(el => !hidden.has(el));
+    const close = dialog.querySelector('[aria-label="Close campaign results"]'), last = controls.at(-1);
+    assert.ok(hidden.size > 0 && !hidden.has(last), 'a source link is the trap\'s last element without layout');
+    last.focus();
+    await key(document, 'Tab');
+    assert.ok(document.activeElement === close, 'Tab from the last control on show wraps to Close');
+    await key(document, 'Tab', { shiftKey: true });
+    assert.ok(document.activeElement === last, 'Shift+Tab from Close reaches the last control on show');
+  } finally {
+    if (rects) Object.defineProperty(dom.window.Element.prototype, 'getClientRects', rects);
+  }
   await view.close();
   assert.equal(document.activeElement.id, 'prior');
   assertConsoleClean();

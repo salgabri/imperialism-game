@@ -10,7 +10,7 @@ import { bundleApp, bundleComponents, syncAppFixture, withDom } from './lib/app-
 import { buildTeam, makeRng } from '../src/data/teams.js';
 import { SPORT_LIST, matchSport, settledText } from '../src/sports/index.js';
 import { football } from '../src/sports/football.js';
-import { EMPTY_DRAFT, entersResults, readResult, scoreText } from '../src/engine/enteredResult.js';
+import { EMPTY_DRAFT, entersResults, possibleShootout, readResult, scoreText } from '../src/engine/enteredResult.js';
 import { campaignSnapshot, createCampaignId, parseCampaign } from '../src/engine/storage.js';
 import { buildResultEntry } from '../src/viewModels/resultEntry.js';
 import { buildFeedRows, buildLiveMatch } from '../src/viewModels/match.js';
@@ -70,7 +70,9 @@ test('a typed score reads as a result under every sport\'s rules, and a level on
       assert.deepEqual(level, { state: 'ready', ga: 1, gd: 1, winner: 'a', shootout: true,
         tie: { by: 'penalties', periods: [], A: [], D: [], ga: 4, gd: 3 } }, id);
       assert.equal(settledText(sport, level.tie), '4–3 on penalties', id);
-      assert.equal(readResult(sport, draft(1, 1, 2, 5), 'a', 'd').winner, 'd', id);
+      assert.equal(readResult(sport, draft(1, 1, 2, 4), 'a', 'd').winner, 'd', id);
+      // No shoot-out ends 5–2: 4–2 after four rounds each has already settled it.
+      assert.equal(readResult(sport, draft(1, 1, 2, 5), 'a', 'd').state, 'level', id);
       assert.equal(readResult(sport, draft(1, 1), 'a', 'd').state, 'level', id);
       assert.equal(readResult(sport, draft(1, 1, 3, 3), 'a', 'd').state, 'level', id);
     } else {
@@ -97,11 +99,16 @@ test('the form says what the score does, or what it lacks, in each sport\'s word
     assert.equal(line(draft(1, 1)), 'Level: type the penalty shoot-out’s score.');
     assert.equal(line(draft(1, 1, 3, 3)), 'A shoot-out needs a winner.');
     assert.equal(line(draft(1, 1, 2, 4)), `${Germany} wins 4–2 on penalties and takes ${France}.`);
+    // A shoot-out stops once one side cannot catch up, and sudden death ends one apart: 7–4 and 0–4 never happen.
+    assert.match(line(draft(1, 1, 7, 4)), /^No shoot-out ends 7–4/);
+    assert.match(line(draft(1, 1, 0, 4)), /^No shoot-out ends 0–4/);
+    assert.equal(line(draft(1, 1, 7, 6)), `${France} wins 7–6 on penalties and takes ${Germany}.`);
     assert.match(line(draft(98, 98), 'basketball'), /score after overtime/);
     assert.match(line(draft(3, 3), 'baseball'), /score after extra innings/);
     assert.match(line(draft(18, 18), 'rugby-league'), /score after golden point/);
     assert.match(line(draft(2, 2), 'hockey'), /overtime and shoot-out included/);
     assert.match(line(draft(2, 2), 'tennis'), /one side wins the tie/);
+    assert.match(line(draft(1, 1), 'valorant'), /one side wins the series/);
     const model = buildResultEntry({ ...st, resultDraft: draft(1, 1) }, ctx);
     assert.equal(model.shootout, true);
     assert.equal(model.unit, 'goals');
@@ -389,6 +396,16 @@ test('the form: two score fields (a shoot-out\'s when level), Enter moves on unt
     await act(async () => { form.dispatchEvent(new window.Event('submit', { bubbles: true, cancelable: true })); });
     assert.equal(document.activeElement, form.querySelector('#result-entry-a'), 'Enter goes to the first empty field');
     assert.deepEqual(calls, []);
+    // A browser submits by Enter only through an enabled default button, and Confirm waits for the whole score: Enter in
+    // a field moves on by itself (the synthetic submit above never reached that case).
+    await render({ draft: { ...EMPTY_DRAFT, a: '2' } });
+    const first = form.querySelector('#result-entry-a');
+    first.focus();
+    const enter = new window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true });
+    await act(async () => { first.dispatchEvent(enter); });
+    assert.equal(enter.defaultPrevented, true);
+    assert.ok(document.activeElement === form.querySelector('#result-entry-b'), 'Enter after the first score moves to the second');
+    assert.deepEqual(calls, []);
     await render({ draft: draft(1, 1), shootout: true, line: 'Level: type the penalty shoot-out’s score.' });
     assert.deepEqual([...form.querySelectorAll('input')].map(input => input.id), ['result-entry-a', 'result-entry-b', 'result-entry-pa', 'result-entry-pb']);
     await render({ draft: draft(2, 1), ready: true });
@@ -398,4 +415,30 @@ test('the form: two score fields (a shoot-out\'s when level), Enter moves on unt
     assert.deepEqual(calls, [['submit'], ['simulate']]);
     act(() => root.unmount());
   });
+});
+
+test('a typed shoot-out is one a shoot-out can end on: every final of five rounds or of sudden death, and nothing else', () => {
+  // Kick by kick, the first side first (either side may kick first, so a final counts either way round).
+  const finals = new Set();
+  const walk = (kick, a, b) => {
+    const takenA = Math.ceil(kick / 2), takenB = Math.floor(kick / 2);
+    if (a > b + (5 - takenB) || b > a + (5 - takenA)) { finals.add(`${a}-${b}`); finals.add(`${b}-${a}`); return; }
+    if (kick === 10) {
+      // Level after five each: sudden death, a round at a time, ends one apart.
+      for (let extra = 0; extra < 4; extra++) for (const [x, y] of [[1, 0], [0, 1]]) {
+        finals.add(`${a + extra + x}-${b + extra + y}`);
+      }
+      return;
+    }
+    if (kick % 2 === 0) { walk(kick + 1, a + 1, b); walk(kick + 1, a, b); } else { walk(kick + 1, a, b + 1); walk(kick + 1, a, b); }
+  };
+  walk(0, 0, 0);
+  for (let p = 0; p <= 9; p++) {
+    for (let q = 0; q <= 9; q++) {
+      if (p === q) continue;
+      assert.equal(possibleShootout(p, q), finals.has(`${p}-${q}`), `${p}–${q}`);
+    }
+  }
+  assert.equal(readResult(football, { a: '1', b: '1', pa: '9', pb: '2' }).state, 'level');
+  assert.equal(readResult(football, { a: '1', b: '1', pa: '12', pb: '11' }).state, 'ready');
 });

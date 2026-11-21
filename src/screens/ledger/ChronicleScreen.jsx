@@ -4,7 +4,7 @@
 // them the screen keeps its own local state (ported Sidebar behaviour). The board 06 kind chips are local state.
 // Compact pass (docs/design/compact-pass.md): lists page, and below 1200px Matches, Result and Story take a panel each
 // behind the segmented control; picking a match there opens its result.
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import LedgerHead from './LedgerHead.jsx';
 import HistoryBrowser from './HistoryBrowser.jsx';
 import { ActivityFeed, TurningPoints } from './ChronicleSide.jsx';
@@ -38,11 +38,22 @@ export default function ChronicleScreen({
   const shown = kind === 'all' ? teamShown : teamShown.filter(entry => inHistoryKind(entry, kind, ids));
   const report = shown.find(entry => entry.id === selection?.id) || shown[shown.length - 1] || null;
 
+  const focusReport = useRef(false);
   function select(id) {
     setLocalSelection(id);
     onHistorySelect?.(id);
+    focusReport.current = true;
     setPanel('result');
   }
+  // Below 1200px the result takes the list's place, hiding the row that had focus: focus goes to the result rather than
+  // to the page (where Space would run the masthead's primary). A row still on show (the wide layout) keeps it.
+  useEffect(() => {
+    if (!focusReport.current) return;
+    focusReport.current = false;
+    const active = typeof document === 'undefined' ? null : document.activeElement;
+    if (active && active !== document.body && active.getClientRects().length > 0) return;
+    document.querySelector('#view-panel-chronicle .fi-history__report')?.focus({ preventScroll: true });
+  });
   function changeFilter(value) {
     setLocalFilter(value);
     onHistoryFilter?.(value);

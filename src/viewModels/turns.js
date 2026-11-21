@@ -9,8 +9,6 @@ import { roundRobinOrder, nextTurn, reachableTargets, routeToTarget, createTarge
 import { roman, historyRound, formatOddsPair, formatWinChance, winTone, territoryWord, memo } from './format.js';
 import { matchupOdds, winChanceFor } from './odds.js';
 
-/** Rows shown in the target panel (M§1.6); the count copy uses the full option list. */
-export const TARGET_ROWS = 6;
 /** Recent attackers in the random-draw strip (M§1.7). */
 export const RECENT_ATTACKERS = 6;
 /** The spectator's "This turn" while the needle spins: the same words as the fixture block. */
@@ -323,17 +321,15 @@ function reachNoun(st, ctx, attackerId, total) {
  * "Choose a target" panel model (PLAN §3.5 TargetPanel).
  * → { count: '6 neighbours in reach', rows: [{ teamId, flagId, isClub, code, color, name, eff: '80.5', spoils: '+10',
  *     win: '66%', tone, selected }], selectedId, ctaLabel: 'Attack Hungary' }
- * At most TARGET_ROWS rows; a selection outside them (picked on the map) replaces the last row so it stays visible.
+ * A row for every empire in reach: the panel pages what the column cannot hold and the arrow keys walk every page
+ * (README "Rules of war"), the selection's page in view. Six rows at most once left the rest reachable on the map alone.
  */
 export function buildTargetPanel(st, ctx) {
   const pt = st?.pendingTarget;
   if (!pt || !st.teams?.[pt.attackerId]) return EMPTY_PANEL;
   const options = targetOptions(st, ctx, pt.attackerId);
   const selectedId = pendingSelection(st, options);
-  let shown = options.slice(0, TARGET_ROWS);
-  const chosen = options.find(option => option.teamId === selectedId);
-  if (chosen && !shown.includes(chosen)) shown = [...shown.slice(0, TARGET_ROWS - 1), chosen];
-  const rows = shown.map(option => {
+  const rows = options.map(option => {
     const team = st.teams[option.teamId];
     return {
       ...mark(team, option.teamId),

@@ -523,10 +523,13 @@ export function domesticDescription(entry) {
   const leaders = top.length > 1 ? `${top.slice(0, -1).join(', ')} and ${top.at(-1)} lead` : top.length ? `${top[0]} leads` : 'The strongest clubs lead';
   // Format-1 index entries have no `sections`: one section per club.
   const clubs = entry.clubs, sections = entry.sections ?? clubs;
+  // A league's clubs in its sport's word (college football's schools), once: rugby's league is named "European clubs".
+  const noun = (entry.sport && getSport(entry.sport).clubNoun) || 'clubs';
+  const leagueClubs = /\bclubs$/i.test(entry.league || '') ? `${clubs} ${entry.league}` : `${clubs} ${entry.league} ${noun}`;
   // A map of Europe: football's strongest clubs, women's football's every European club, or a league's (basketball's
   // EuroLeague, whose Dubai holds the Emirates).
   if (entry.theatre || entry.countries) {
-    const field = !entry.theatre ? `the ${clubs} ${entry.league} clubs`
+    const field = !entry.theatre ? `the ${leagueClubs}`
       : entry.theatre === 'all' && entry.sport !== 'football' ? `the ${clubs} European clubs EA rates` : `Europe's ${clubs} strongest clubs`;
     return `${leaders} ${field}, each on land in its own country: alone it holds all of it, and clubs that `
       + 'share a country split it along its regional borders. A country with no club stays grey.';
@@ -536,8 +539,8 @@ export function domesticDescription(entry) {
     const place = entry.lines || 'state or province';
     // "the USA and Canada", but "Australia and New Zealand".
     const land = /^(?:USA|United)\b/.test(entry.name) ? `the ${entry.name}` : entry.name;
-    return `${leaders} the ${clubs} ${entry.league} clubs fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${place}. `
-      + 'A state with several clubs is divided between them; one with none stays empty.';
+    return `${leaders} the ${leagueClubs} fighting over ${land}, each starting with only its ${entry.venue || 'arena'}'s ${place}. `
+      + `A state with several ${noun} is divided between them; one with none stays empty.`;
   }
   const fewer = Math.floor(sections / clubs), more = Math.ceil(sections / clubs);
   const share = sections === clubs ? '' : `; each club starts with ${fewer === more ? fewer : `${fewer} or ${more}`} of them`;
@@ -753,8 +756,13 @@ function teamIdentity(sport, id, clubLayer) {
 
 const NO_ROWS = Object.freeze([]);
 // What step 1 shows for a chosen data set that has not loaded: no clubs counted, no matches or length estimated.
-const NO_CLUBS = Object.freeze({ clubs: NO_ROWS });
 const PENDING_PREVIEW = Object.freeze({ matches: '–', duration: '–' });
+/**
+ * The sport card's note while its chosen season loads: what the season fields, uncounted ("Nations", or for a season
+ * or sport with clubs only, "Clubs", college football's "Schools"), where `sportNote` counts the loaded season's clubs.
+ */
+const pendingNote = (sport, dataSet) => (sport.clubsOnly || (dataSet != null && !setHasNations(dataSet))
+  ? (sport.clubNoun ? sport.clubNoun[0].toUpperCase() + sport.clubNoun.slice(1) : 'Clubs') : 'Nations');
 
 /** Strongest first, then by name: the order of the Favourites list and the suggested team's tie-break. */
 const byRating = (a, b) => (b.rating ?? 0) - (a.rating ?? 0) || String(a.name).localeCompare(String(b.name));
@@ -893,7 +901,7 @@ export function buildSetupModel(setup = {}, ctx = {}) {
     // The chosen set's card counts its own clubs.
     // One card per sport, but Rugby's two (`cardOf`): its note names both, whichever is set up.
     sports: CARD_LIST.map(item => ({ id: item.id, name: item.name,
-      note: item.id !== sport.id || cardSports(item.id).length > 1 ? SPORT_NOTES[item.id] : pending ? sportNote(NO_CLUBS)
+      note: item.id !== sport.id || cardSports(item.id).length > 1 ? SPORT_NOTES[item.id] : pending ? pendingNote(sport, dataSet)
         : sportNote(sport, { clubsOnly: dataSet != null && !setHasNations(dataSet) }),
       selected: item.id === cardOf(sportPick.id), busy: !!sportLoad && !sportFailed && item.id === cardOf(sportPick.id) })),
     // The card the cards show as picked (rugby league's is Rugby's), and the wait for a sport picked before its players

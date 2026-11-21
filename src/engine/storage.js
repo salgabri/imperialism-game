@@ -329,6 +329,8 @@ function validateCampaign(input, rebuildSources) {
     if (configuration.managedTeamId != null && configuration.managedTeamId !== '' && !known(configuration.managedTeamId)) invalid('The managed team setting is unavailable.');
     // A country campaign names its map ('domestic:826') and the map build it was played on.
     const { clubScope, domesticVersion } = configuration;
+    // Theatres are names: anything else (a hand-edited 5) would reach the readers that take them as text.
+    for (const key of ['scope', 'clubScope']) if (configuration[key] != null && typeof configuration[key] !== 'string') invalid(`Campaign ${key} setting is unsupported.`);
     const domestic = isDomesticScope(clubScope);
     if (typeof clubScope === 'string' && clubScope.startsWith(DOMESTIC_PREFIX)
         && (!domestic || !/^[0-9A-Za-z]{1,12}$/.test(domesticScopeId(clubScope)))) invalid('Campaign country setting is unsupported.');

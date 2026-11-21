@@ -33,12 +33,24 @@ const scoreOf = text => {
  */
 export const levelNeedsShootout = sport => sport?.tieBreak === 'shootout';
 
+// The finals a best-of-five shoot-out can end on inside its five rounds by more than one (it stops as soon as one side
+// cannot catch up: 3–0 is over after three kicks each, so 4–0 never happens), winner first. Sudden death, and every
+// round before it, ends one apart.
+const CLEAR_SHOOTOUT_FINALS = new Set(['2-0', '3-0', '3-1', '4-1', '4-2', '5-3']);
+
+/** Whether a penalty shoot-out can end `p`–`q`. */
+export function possibleShootout(p, q) {
+  const [w, l] = p > q ? [p, q] : [q, p];
+  return w !== l && (w - l === 1 || CLEAR_SHOOTOUT_FINALS.has(`${w}-${l}`));
+}
+
 /**
  * The result a draft reads as, for the match `aId` v `dId` under `sport`'s rules (matchSport) →
  * { state, ga, gd, tie, winner, shootout }:
  * - 'incomplete': a score is missing (its ga or gd is null);
- * - 'level': the score is level and nothing settles it yet: in football the shoot-out's score is missing or level
- *   (`shootout` true), in every other sport a level final score is not a result;
+ * - 'level': the score is level and nothing settles it yet: in football the shoot-out's score is missing, level or one
+ *   no shoot-out ends on (`shootout` true; `impossible` for the last), in every other sport a level final score is not a
+ *   result;
  * - 'ready': ga, gd, tie and winner as a sport's `simulate` returns them, without events. A level football score
  *   carries its shoot-out as football's tie ({ by: 'penalties', ga, gd }, attacker first), with no kicks: only the
  *   shoot-out's score is known, not who scored or missed.
@@ -51,6 +63,7 @@ export function readResult(sport, draft = EMPTY_DRAFT, aId = 'a', dId = 'd') {
   if (!shootout) return { state: 'level', ga, gd, tie: null, winner: null, shootout: false };
   const pa = scoreOf(draft?.pa), pd = scoreOf(draft?.pb);
   if (pa == null || pd == null || pa === pd) return { state: 'level', ga, gd, tie: null, winner: null, shootout: true };
+  if (!possibleShootout(pa, pd)) return { state: 'level', ga, gd, tie: null, winner: null, shootout: true, impossible: true };
   return { state: 'ready', ga, gd, tie: { by: 'penalties', periods: [], A: [], D: [], ga: pa, gd: pd },
     winner: pa > pd ? aId : dId, shootout: true };
 }

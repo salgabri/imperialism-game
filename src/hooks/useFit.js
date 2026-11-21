@@ -41,13 +41,15 @@ function pageOf(index, size, current) {
 
 /**
  * The page holding `focusIndex`, set in the render that changes the focus or the page size (`turn` turns to it), so a new
- * page size is never shown at another page first. A page turn changes neither, so it is never undone. Object.is, as the
+ * page size is never shown at another page first. A page turn changes neither, so it is never undone. `focusKey` names
+ * the focused item (its index when not given): a focus that only moves in the list (a new match recorded above the
+ * selected one, your team's rank changing) is the same focus, so a page the player turned to stays. Object.is, as the
  * effect deps it replaces compared: a NaN focus equals itself, rather than counting as new on every render.
  */
-function useFocusPage(focusIndex, pageSize, turn) {
-  const [anchor, setAnchor] = useState({ focusIndex, pageSize });
-  if (!Object.is(anchor.focusIndex, focusIndex) || !Object.is(anchor.pageSize, pageSize)) {
-    setAnchor({ focusIndex, pageSize });
+function useFocusPage(focusIndex, pageSize, turn, focusKey = focusIndex) {
+  const [anchor, setAnchor] = useState({ focusKey, pageSize });
+  if (!Object.is(anchor.focusKey, focusKey) || !Object.is(anchor.pageSize, pageSize)) {
+    setAnchor({ focusKey, pageSize });
     if (focusIndex >= 0) turn(focusIndex, pageSize);
   }
 }
@@ -60,7 +62,7 @@ function useFocusPage(focusIndex, pageSize, turn) {
  * it changes, measures the box again in that commit: a panel switch that shows a box hidden until then.
  * → { boxRef, page, pages, pageSize, shown, start, setPage }
  */
-export function usePagedList(items, { row = '[data-row]', focusIndex = -1, minRows = 1, measureKey = null } = {}) {
+export function usePagedList(items, { row = '[data-row]', focusIndex = -1, focusKey, minRows = 1, measureKey = null } = {}) {
   const [pageSize, setPageSize] = useState(Infinity);
   const [page, setPage] = useState(0);
   // The rows rendered until the first measure (firstRows); Infinity once nothing will measure the box, or once a
@@ -73,7 +75,7 @@ export function usePagedList(items, { row = '[data-row]', focusIndex = -1, minRo
   // on show (and can keep the focus) from the first render.
   const held = !measured && items.length > limit;
 
-  useFocusPage(focusIndex, pageSize, (index, size) => setPage(current => pageOf(index, size, current)));
+  useFocusPage(focusIndex, pageSize, (index, size) => setPage(current => pageOf(index, size, current)), focusKey ?? focusIndex);
 
   const observer = useRef(null);
   // The row height measured with more than one row on show, and the box width it was measured at (see `measure`).
