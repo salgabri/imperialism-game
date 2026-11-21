@@ -4364,6 +4364,271 @@
     "ru-zebre-parma": {
       "file": "Zebre parma logo23.png",
       "sha256": "c42f826d5ca2d1f4b17c176364bbeba3ec62efc6221ccdf008e5584b5b734840"
+    },
+    "d031-1300097": {
+      "file": "Shamkir FC logo.png",
+      "sha256": "61d64c33456a4f8269197b8f138320412c572af85f640032c0f8ae62869a9284",
+      "thumb": 250
+    },
+    "d040-16032291": {
+      "file": "SV Gloggnitz.png",
+      "sha256": "1ccbd020f1020de1398b9c4e159cb9431b15d9de9edb7028426d6d23c428edba",
+      "thumb": 120,
+      "wiki": "de"
+    },
+    "d040-16280059": {
+      "file": "Logo FC Marchfeld.jpg",
+      "sha256": "df6c816c1dda9ce5bb623a95e290f4c846e219bb91dd0c6d51902485abc3230e",
+      "thumb": 330,
+      "wiki": "de"
+    },
+    "d040-5603912": {
+      "file": "Logo SC Karlsdorf.jpg",
+      "sha256": "28516a09857d26ed56f35cffd89df71ddaa41e80710f2578134f88f5e49cabac",
+      "thumb": 330,
+      "wiki": "de"
+    },
+    "d051-483918": {
+      "file": "FK Araks Ararat.png",
+      "sha256": "461a2f3f9841dd8d577a2f01965cb10595178618b4554e94057ad547d507e518",
+      "thumb": 330,
+      "wiki": "fa"
+    },
+    "d100-22017621": {
+      "file": "Litex Lowetsch.png",
+      "sha256": "1ace68329281eb1489c01b32208cf25324732b68bd55edda6d2e51b3f252b1d5",
+      "thumb": 330,
+      "wiki": "de"
+    },
+    "d112-485662": {
+      "file": "FC Zvezda-BGU.png",
+      "sha256": "45eae045fedd03de03e7921dc903c1f75d519cc6507922f8bfa766e61d7781e3",
+      "thumb": 120
+    },
+    "d120-13177528": {
+      "file": "Эмблема ФК Стад Ренар.png",
+      "sha256": "3f6fd373a87f9aa0f60e912ee96df7f84cbb728c589401c61799519563af8d3a",
+      "thumb": 330,
+      "wiki": "ru"
+    },
+    "d120-5340786": {
+      "file": "Эмблема ФК Динамо Дуала.png",
+      "sha256": "c2c2a33558fb5a64f25e00d4fc9756a33fe2912fe6fa998fbbb71c56a92f2082",
+      "thumb": 330,
+      "wiki": "ru"
+    },
+    "d180-13173118": {
+      "file": "Renaissance FC.png",
+      "sha256": "e454e83d1045c67d86860cc0a71f4198b3a038cfc646b1394b39c452a40c570c",
+      "thumb": 330,
+      "wiki": "pt"
+    },
+    "d191-441": {
+      "file": "Logo HNK Rijeka.svg",
+      "sha256": "7d5c185c1f3f0092250e1c0834d7775cf77daf29de3d0db8bc9aaf3814895a29",
+      "thumb": 330,
+      "wiki": "de"
+    },
+    "d203-472": {
+      "file": "FC Hradec Kralove.svg",
+      "sha256": "5a286b019a251c39c220a0ae68cd52a864a1240ae681c651fe7c253f09312b32",
+      "thumb": 330,
+      "wiki": "de"
+    },
+    "d214-19013098": {
+      "file": "Дельфінес дель Есте.png",
+      "sha256": "aef5484d05d1a04c4a83c7e0f0969689b520bbf60d758f42291149907eb96bc5",
+      "thumb": 120,
+      "wiki": "uk"
+    },
+    "d231-13100001": {
+      "file": "Себета Сити.jpg",
+      "sha256": "31188348c0e7867e7e9f577edd514d5cc85297cb7aa937ae66f769379732a701",
+      "thumb": 330,
+      "wiki": "ru"
+    },
+    "d270-12021627": {
+      "file": "Logo Samger FC.gif",
+      "sha256": "f3d037a6aaca1a9f22c2eb7fff01a12d88adc4dcbf73dc9629018db26fe1de14",
+      "thumb": 120,
+      "wiki": "de"
+    },
+    "d270-13100021": {
+      "file": "Logo Brikama United.jpg",
+      "sha256": "b74cca944fe17b3606e649d0422f8d93757323f742fc5f0dc5b1a7c42babc05f",
+      "thumb": 120,
+      "wiki": "de"
+    },
+    "d320-5395169": {
+      "file": "Sacachispas de chiquimula.png",
+      "sha256": "d17fc27041bdee15619cb109012438c1ea89730f358cfd16a3ea317eaf5aeaf1",
+      "thumb": 120,
+      "wiki": "pl"
+    },
+    "d340-87010722": {
+      "file": "Хутикальпа (лого).png",
+      "sha256": "727dd6d238878d5a5a9eb90e9f4e361d46b8ab80f4d64eede7cb5c717b953452",
+      "thumb": 120,
+      "wiki": "ru"
+    },
+    "d356-2000026684": {
+      "file": "Delhi FC logo.png",
+      "sha256": "e22390bbd689a842a7e1ee1676cfd2e1d852e29f6d611740c3614e1252323c0c",
+      "thumb": 250
+    },
+    "d360-2000273329": {
+      "file": "Java United FC.png",
+      "sha256": "2c75522cdd3db8c747e4d711198ad67745e6a22450d53c203e0fee22f1222bfc",
+      "thumb": 250
+    },
+    "d404-12084360": {
+      "file": "Administration Police FC.jpg",
+      "sha256": "4be142db06048f51d2fbe1209d204a9a0bbe0ecf60d3481185bef363961bd2e0",
+      "thumb": 250
+    },
+    "d410-66010577": {
+      "file": "Yangju Citizen.jpg",
+      "sha256": "f65d7954d0f4f71449ed66ee54eafe5e7cad8ae42efee710a27b4a5227a4a426",
+      "thumb": 250
+    },
+    "d418-23447422": {
+      "file": "BIS Football Club.jpg",
+      "sha256": "863d6911cf79103a6106d489dee48cccca07caa4c55ae285cc9ab80af6e8811a",
+      "thumb": 330
+    },
+    "d418-5624443": {
+      "file": "Vientiane F.C. logo.png",
+      "sha256": "a94fd5cc1199e30eea5132296586dc4fbd9f887b90851b81c89fd0581ae2266b",
+      "thumb": 250
+    },
+    "d422-115001": {
+      "file": "Al-Akhaa Al-Ahli logo.png",
+      "sha256": "a4ac66e2579deaa6e010ec38d1355f7efb10f1bfce97fda0cbf37e4f65776128",
+      "thumb": 250
+    },
+    "d458-135359": {
+      "file": "Kedah Darul Aman FC logo.svg",
+      "sha256": "4f97a811c2448e293649154cb3cfc372faa3d6537d60ce60c794c94488e37bee",
+      "thumb": 330
+    },
+    "d458-23501400": {
+      "file": "Kelantan City F.C.png",
+      "sha256": "3a869b3b05c6b82b162bf7912c38ac2601a98fe22cc0a1a33dc53e69742ca677",
+      "thumb": 250
+    },
+    "d484-2000288156": {
+      "file": "Racing de veracruz logo.png",
+      "sha256": "d52986dc32f0fa43ba5a72e8adf7bbc7d5c0eae1e64ddb20d09f4373ed4c0f8a",
+      "thumb": 250
+    },
+    "d616-96054415": {
+      "file": "Логотип МАСК «Лехія» Дзержонюв.png",
+      "sha256": "a3275f34057d8e5e8dcbaf9c56cf57889b5681e890cf839e463a018875ebc989",
+      "thumb": 120,
+      "wiki": "uk"
+    },
+    "d642-2000132627": {
+      "file": "ASA Târgu Mureș (1962) logo.png",
+      "sha256": "9e75f4c550d715d5dba3c41c9fc3ed3afbc54cbeb9c23cf22c49758d56aac106",
+      "thumb": 250
+    },
+    "d642-57055056": {
+      "file": "CSM Slatina.svg",
+      "sha256": "7888d576e5b14718c2827a3f26ef281c83090decb8a93e267e38a7e6f41bc96d",
+      "thumb": 330,
+      "wiki": "ro"
+    },
+    "d646-13229239": {
+      "file": "Gasogi United FC.svg",
+      "sha256": "dfa3cce088053a3236f0d89306903f7a1404797cefc1e7560621dbf858e7fb45",
+      "thumb": 330,
+      "wiki": "ar"
+    },
+    "d710-2000127078": {
+      "file": "Upington City FC.jpg",
+      "sha256": "aee16b9f9bb8b0af8a64bd506cbe04e10ad066f81fc4fc83b40390174825772a",
+      "thumb": 250
+    },
+    "d760-135470": {
+      "file": "Homs Al Fidaa SC logo.png",
+      "sha256": "4ec7c565122e15996cd2f8578b6f4f5d6f73c27d7e1a95b1e18d6d39f666f022",
+      "thumb": 120
+    },
+    "d760-135475": {
+      "file": "Damascus Al-Ahli Club logo.png",
+      "sha256": "274ac7323199f21afcee1898427d45fd7ec57fbd7e8219aa5dfc41cdb17207a8",
+      "thumb": 250
+    },
+    "d780-82088381": {
+      "file": "Terminix La Horquetta Rangers logo.png",
+      "sha256": "32a7ced57c4a164be3a0be289307b5cb7c6f46560f626d5070c4658a24f7b635",
+      "thumb": 330,
+      "wiki": "ru"
+    },
+    "d792-70054564": {
+      "file": "Isparta32spor.png",
+      "sha256": "14b2fa98990153f89895f0b6c5cd645d2950db1a7b8ff8a9cf8ab99f574a49ff",
+      "thumb": 250,
+      "wiki": "tr"
+    },
+    "d792-70078180": {
+      "file": "Karaman FK Logo.png",
+      "sha256": "8b0e60621fcdf184745e522f2a8b88b3bf326789ea97eec852f9248d1c4d05fa",
+      "thumb": 330,
+      "wiki": "tr"
+    },
+    "d792-70080498": {
+      "file": "Derincespor A.Ş.png",
+      "sha256": "5150ea9b96e91e438deb976dc41f7472c5786944f60a607ed2d8c8cfafb0b5e7",
+      "thumb": 330,
+      "wiki": "tr"
+    },
+    "d804-2000032124": {
+      "file": "FC Livyi Bereh Kyiv logo.png",
+      "sha256": "c1cbf24713df49031ee5f8af20c4134061ee7b431fb5e573e85ac340cbfdb652",
+      "thumb": 120
+    },
+    "d834-13100988": {
+      "file": "Кагера Шугер фк лого.png",
+      "sha256": "2445510e027960dbca4a64907d8aae59ea3604c5f1a01c595fb9f55053235b8a",
+      "thumb": 120,
+      "wiki": "uk"
+    },
+    "d834-13219657": {
+      "file": "КМК фк лого.jpg",
+      "sha256": "c65b94cd57664b3d78e45a8ecf3cc3ed74cd7d118529ad525965a11e1a1e68cb",
+      "thumb": 330,
+      "wiki": "uk"
+    },
+    "d840-20030692": {
+      "file": "Miami United FC.png",
+      "sha256": "a046435ecfd0659a47e13bf51e6fba34f7250c3a91e791c83a00019dfbd2a550",
+      "thumb": 250
+    },
+    "d854-5340770": {
+      "file": "USFA.png",
+      "sha256": "177c587fbfa2f8d9da81f90c1713ce9f6fd0722fa9adbb1c3ea62c6edae95e88",
+      "wiki": "de"
+    },
+    "d858-2000262519": {
+      "file": "Sportivo Bella Italia de Mercedes.png",
+      "sha256": "047dc9698e36c39c0313d1a848f0c9e19dca04981c7169426f638d9b96fd9baf",
+      "thumb": 330,
+      "wiki": "es"
+    },
+    "d894-13227215": {
+      "file": "Maestro United F.C. Logo.jpg",
+      "sha256": "252c42f9f369282c8f3c6b383f7d456ee0af6e154abc35b1d06bc2b62a3ae28a",
+      "thumb": 250
+    },
+    "w-glasgow-city-fc": {
+      "file": "Glasgow City FC (2011).jpg",
+      "sha256": "aa588e53b58a3ae734de691205cd081b8cb70117b5fb44a8806f895e725c2bcb",
+      "background": "#ffffff"
+    },
+    "w-badalona-women": {
+      "file": "FC Levante Badalona.png",
+      "sha256": "51a94e245f2d0621ccf62674397feaa9c47d04e717613ec703d1f8256b37cd34"
     }
   },
   "twins": {
@@ -4426,6 +4691,7 @@
     "w-deportivo-alaves": "d724-1688",
     "w-fc-zurich": "d756-1854",
     "w-le-havre": "d250-856",
-    "w-rc-lens": "d250-871"
+    "w-rc-lens": "d250-871",
+    "w-costa-adeje-tenerife": "d724-1680"
   }
 }

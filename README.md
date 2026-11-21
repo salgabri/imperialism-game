@@ -2003,8 +2003,9 @@ the map of its era.
   2025/26's level (league scoring rose from 74 to 86 points a team). Each season
   plays at its own pace and scoring rate. Every club wears its crest of the day,
   the 69 not in today's EuroLeague (CSKA Moscow, Siena, Benetton Treviso…) too;
-  where no allowed source pictures it, the club shows its code (44 of 568
-  club-seasons). See the
+  where no allowed source pictures it, the club shows its nearest picture (since
+  21 November 2026; only the one-season Saint Petersburg Lions of 2000/01, pictured
+  nowhere, keep their code). See the
   [design notes](docs/design/euroleague.md#earlier-seasons-200001-to-202526).
 
 - **What a season holds:** the franchises of that season, each with the best
@@ -2843,8 +2844,9 @@ draws them (from the originals cached in the ignored `data-src/crest-eras/`) int
 `public/club-logos/<club id>.<first year>.webp`, lists them in
 `public/club-logos/SOURCES-eras.tsv` and writes `src/data/clubCrestEras.js`. Where
 the game knows a club wore another crest but has no picture of it, the club shows its
-monogram in those seasons rather than a crest it did not have yet; seasons no source
-dates keep today's crest. Period crests come
+nearest picture in those seasons (the crest it wore next, else today's), not a monogram,
+since 21 November 2026; the retired caricatures of Native Americans keep the monogram by
+the user's choice. Seasons no source dates keep today's crest. Period crests come
 only from sources whose robots.txt allows it: Wikipedia articles and file pages in
 any language, Wikimedia Commons, and the Wayback Machine's copies of them.
 
@@ -2933,9 +2935,12 @@ women's sides of FC Zürich, Fleury 91 and Montpellier under their own logos. Wh
 only another language's Wikipedia has a club's crest of today, the record names it
 (`wiki`: `it` for Sassuolo's and Athletic's, `fr` for Braga's and Fleury's) and the
 sync reads that Wikipedia's file page and its own upload; `SOURCES.tsv` then links
-that page. A record may also pin a standard thumbnail (`thumb`: 250, 330 or 500 px)
+that page. A record may also pin a standard thumbnail (`thumb`: 120, 250, 330 or 500 px)
 instead of the original, as college football's 138 school crests do, since
-`upload.wikimedia.org` answers a run of originals with HTTP 429.
+`upload.wikimedia.org` answers a run of originals with HTTP 429, and name the colour of a
+box the picture was saved on (`background`), which the drawing clears. A women's side may
+have a `pages` record of its own, and `--pages` gives a club named in `twins` its twin's
+crest, new or committed.
 
 The clubs of today's country maps that had no crest got one wherever Wikipedia has it
 (17 November 2026). Of the 4,184 clubs on the 128 FM 26 maps, 1,208 had none, over a
@@ -2960,8 +2965,21 @@ Ukrainian Wikipedia). `--pages` now also gives an all-leagues or women's club
 its twin's new crest, as the full sync would (Union Berlin's, Brann's and US
 Saint-Malo's women's sides, and Union Berlin's all-leagues club). Since an earlier
 season's club wears its twin's crest (`src/data/crests.js`), 394 more club-seasons on
-the earlier seasons' maps show one too. The worker's image cache now holds 8,000
-files, enough for the 5,400 flags and crests.
+the earlier seasons' maps show one too.
+
+On 21 November 2026 the user asked that no mode show a club without its logo. Every club
+the game can show was counted in every sport, season and map: 3,756 football clubs had no
+crest in some season, a fifth of the football clubs on maps, and a few dozen elsewhere.
+Each was matched to its Wikidata item and its article's infobox crest as above, every match
+read against its article by reviewers and every picture checked by eye, and 2,393 passed
+(docs/design/period-marks.md, "No club without a crest"): 46 more of today's map clubs wear
+one through `pages`, 1,633 crests of today stand for the earlier seasons' clubs in
+`crest-eras.json` (where today's map club of the same item has none to share), and the
+seasons that showed a monogram for want of a picture show the nearest one. Football's
+crest-less share fell to 4.7% of its club appearances (1,295 clubs, mostly lower divisions
+whose articles show no crest or another club's); every other sport shows a crest everywhere
+but the retired caricatures and the Saint Petersburg Lions. `scripts/club-crests.test.mjs`
+checks it all. The worker's image cache now holds 10,000 files, for the 7,200 flags and crests.
 
 A club's land on the political map takes its crest's colour, so a crest added, redrawn
 or removed also needs `npm run build:club-colours`, as does a change to the colour

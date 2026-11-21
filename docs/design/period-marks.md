@@ -423,7 +423,89 @@ Tottenham's cockerel of 2024 and Ankaraspor's crest of 1978 (French and Turkish
 Wikipedia only), and the stars of Gotham, the North Carolina Courage and Orlando, which
 no source dates.
 
+### No club without a crest
+
+On 21 November 2026 the user showed Italy's map of 1999/2000 in Crests mode, a dozen of its
+clubs under monograms (Treviso, Savoia, Rimini, Varese, Castel di Sangro, Viterbese,
+Fermana), and asked: "make sure that in none of the modes there are missing logos". A census
+of every club the game can show (each sport's clubs of today, every map in
+`public/domestic/` and every season that plays on one, each club-season resolved as
+`src/data/crests.js` resolves it) found 3,756 football clubs without a crest in some
+season: 460 of the 4,184 clubs of today's country maps and the rest on the earlier seasons'
+country maps (Championship Manager 01/02's Update Team fills above all) and Europe maps, 11,260
+of the 55,214 football club appearances (a club on a map in a season), a fifth. Outside
+football: 14 EuroLeague clubs of 2000/01-2006/07, three of today's women's sides (Glasgow City,
+Badalona Women, Costa Adeje Tenerife), Idaho's college football of 2004-2008, the Perth Reds of
+1997 and Western Suburbs before 1974, and the 50 monogram eras.
+
+Three rules changed. A monogram era (a crest known to differ, or no emblem at all, with no
+picture of it) now shows the club's nearest picture: the crest worn right after it, else
+today's when today's covers the seasons after it, else the next pictured crest or the one
+before. So do the seasons no era covers where the club has no crest of today (the
+EuroLeague's strict codes of 2000/01-2006/07: CSKA's red-star shield of 2006/07 now stands for
+its seasons before). And a club of the earlier seasons with no crest of its own now wears
+its crest of today in every season that has none, by the undated rule, read from its
+Wikipedia article. The retired caricatures of Native Americans above keep the monogram, as
+the user chose; and a club no source pictures at all keeps it too (`NO_PICTURE` in
+`scripts/club-crests.test.mjs`).
+
+How the crests were found (the tools stay in the ignored `data-src/crest-missing/`): each
+club was matched to its Wikidata item, the one its home on the map came from when its names
+fit, else the best-named football club of its country among every football club item
+(labels and aliases in thirteen languages, the multi-sport clubs that play football too);
+the stalled earlier-seasons crest session's hand mapping came first. The item's article gave
+the infobox crest, English Wikipedia's first, then the club's own languages', then any; the
+file page gave the original, its licence template and its size; the picture is Wikimedia's
+standard thumbnail (330, 250 or 120 px, never wider than the original) or the original when
+smaller. Clubs with no match had their article's title guessed (the name, "F.C.", "FC")
+on English Wikipedia and their country's. A wrong crest is worse than none, so every match
+was checked. Those the stalled session had mapped by hand, and those whose names agreed
+closely with the item the club's home came from, were taken (1,929), except 456 whose article
+or item carried a word the club's names lack (a town, a "-2"): those, every other match (784)
+and the 30 guessed titles were read against their article's lead by reviewers, and 296 turned
+out to be another club (a reserve, youth or women's side, a namesake in another town, a merged
+or refounded successor, a different club of the same city) or could not be told; 15 of them,
+matched to their reserve or women's side, got their first team's crest instead. Every picture
+was then looked at on contact sheets, and 86 more went: photographs (grounds, gates, team
+pictures), city arms, flags, Italian Wikipedia's colour fields and stripes, league and federation
+logos, icons, and crests that plainly name another club (East Stirling's showing Stirling
+Albion's, Dinamo-93 Minsk's Dinamo Minsk's). Of 2,760 pictures, 2,393 passed.
+
+Where the crests went: a club of today's country maps through `pages` in
+`scripts/data/club-logos.json` (46 clubs: 21 from English Wikipedia's file pages, 25 from
+another language's, among them German, Russian, Ukrainian and Turkish); a club of the earlier
+seasons through
+`scripts/data/crest-eras.json`, wearing the file of today's map club of the same Wikidata
+item where it has one, else a crest of today drawn under its own id
+(`<club id>.<first year>.webp`, 1,633 of them, `league: "missing"`, 1,306 from English
+Wikipedia's file pages, 192 from Commons, 135 from 18 other Wikipedias); Glasgow City's
+and Badalona Women's women's sides under their own logos of today (the files their period
+crests came from), Costa Adeje Tenerife under CD Tenerife's (`twins`); 12 EuroLeague clubs,
+Idaho (gone from the FBS since 2018), the Perth Reds of 1997 and Farnborough Town of
+1994-2000 under the picture nearest their seasons, picked by hand from the earlier research
+(PAOK's wordmark of 2006, London Towers' LT of 2006, Ural Great's UG of 2008, Farnborough
+F.C.'s crest, whose article covers Farnborough Town since 2007). The UK clubs' period crests of
+that stalled session (8e88144f, 109 crests read from archived infoboxes) came in first.
+
+What is left. Outside football, only the caricatures and the Saint Petersburg Lions of
+2000/01, whose logo no source shows. In football, 1,295 clubs, 2,622 of the 55,214 club
+appearances (4.7%): 414 clubs of today's country maps (China's, Uzbekistan's, Senegal's lower
+divisions and the like; 41 of the 128 maps are complete, from 36) and 881 of the earlier
+seasons' maps (Italy's of 1999/2000 keeps three of its eleven), mostly lower-division and gone
+clubs whose article has no crest (Brescello), whose article is now another club's (Alzano
+Virescit's is its merged successor's, Germinal Ekeren's Beerschot's) or shows only a symbol
+(Savoia's arms of the Duchy of Savoy), or which have no article at all. They keep the
+monogram; `scripts/club-crests.test.mjs` holds their number as a ceiling. The crests of today
+standing for earlier seasons are undated: a club renamed or moved since shows its later
+identity's crest (the MetroStars the Red Bulls', Delhi Dynamos Odisha's), as the undated rule
+has it everywhere else, until a pass reads their articles' archived infoboxes season by season
+as the UK clubs' were read.
+
 ## Checks
+
+`scripts/club-crests.test.mjs`: every club of every map, season and sport resolves to a
+crest the game ships, but the caricatures and `NO_PICTURE` outside football and at most
+2,622 football club appearances; no monogram era outside the caricatures and `NO_PICTURE`.
 
 `scripts/period-marks.test.mjs`: the tables (every flag period in order and
 vendored, every name of the day's flag vendored, every crest era's file shipped, a

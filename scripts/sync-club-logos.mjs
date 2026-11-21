@@ -48,12 +48,14 @@
 //     there, and is drawn as the period crests are (scripts/lib/crest-image.mjs). So a club's crest of today can change
 //     though the API is never asked again: ASVEL's LDLC ASVEL logo (since 2018/19) came this way. Its file then drops
 //     out of the API's file requests (fifty files each), which changes one of them: a full run needs an answer no
-//     cache holds, and stops. A record may name a standard thumbnail width instead (`thumb`: 250, 330 or 500), whose
-//     bytes are then pinned and drawn: upload.wikimedia.org answers a run of originals with HTTP 429 and asks for its
-//     standard thumbnails instead, so college football's 138 school crests are 330px thumbnails. So are 287 of the 748
-//     crests the country maps' clubs gained on 17 November 2026; 86 of those came from another language's file page.
-//     --pages also gives a club that wears its twin's file (an all-leagues or women's club) its twin's new crest when it
-//     has none, as the full sync would.
+//     cache holds, and stops. A record may name a standard thumbnail width instead (`thumb`: 120, 250, 330 or 500, never
+//     wider than the original), whose bytes are then pinned and drawn: upload.wikimedia.org answers a run of originals
+//     with HTTP 429 and asks for its standard thumbnails instead, so college football's 138 school crests are 330px
+//     thumbnails. So are 287 of the 748 crests the country maps' clubs gained on 17 November 2026; 86 of those came from
+//     another language's file page. A record may name the colour of a box the picture was saved on (`background`,
+//     '#ffffff'), which the drawing clears as the period crests' is. A women's club may have a record of its own.
+//     --pages also gives a club that wears its twin's file (an all-leagues or women's club) its twin's crest, new or
+//     committed, when it has none, as the full sync would.
 //
 // Writes:
 //   public/club-logos/<club id>.webp   one per club with a crest (an all-leagues club with a
@@ -383,11 +385,13 @@ for (const club of footballClubs) {
   }
   clubs.push({ id: club.id, name: club.name, qid: twin?.club.qid ?? null, twin: twin?.club.id ?? null });
 }
-// A women's club named in neither "twins" nor "items" keeps its monogram.
+// A women's club named in none of "twins", "items" and "pages" keeps its monogram.
 for (const club of WOMENS_CLUBS) {
   const named = twinOverrides[club.id];
   if (named && !domesticById.has(named)) throw new Error(`club-logos.json twins ${club.id} with unknown domestic club ${named}`);
-  if (named || itemOverrides[club.id]) clubs.push({ id: club.id, name: club.name, qid: named ? domesticById.get(named).qid : null, twin: named ?? null });
+  if (named || itemOverrides[club.id] || pageOverrides[club.id]) {
+    clubs.push({ id: club.id, name: club.name, qid: named ? domesticById.get(named).qid : null, twin: named ?? null });
+  }
 }
 for (const [league, items, list] of [['NBA', nba, BASKETBALL_CLUBS], ['NFL', nfl, NFL_CLUBS], ['MLB', mlb, MLB_CLUBS], ['NHL', nhl, NHL_CLUBS], ['NRL', nrl, NRL_CLUBS]]) for (const club of list) {
   const qid = items.get(club.name) || null;
@@ -422,7 +426,7 @@ for (const [id, qid] of Object.entries(itemOverrides)) {
 // thumbnail of it) checked against its pin and drawn before anything is written, so a page or a file that has changed
 // stops the run. upload.wikimedia.org answers a run of originals with HTTP 429 and asks for thumbnails in its standard
 // sizes instead (https://w.wiki/GHai): college football's 138 crests are 330px thumbnails.
-const STANDARD_THUMBS = new Set([250, 330, 500]);
+const STANDARD_THUMBS = new Set([120, 250, 330, 500]);
 /** A file's thumbnail `width` pixels wide on upload.wikimedia.org, from its original's address (an SVG's is a PNG). */
 const thumbOf = (original, width) => {
   const match = /^(https:\/\/upload\.wikimedia\.org\/wikipedia\/(?:[a-z]{2,3}|commons))\/([0-9a-f]\/[0-9a-f]{2})\/([^/?#]+)$/.exec(original);
@@ -435,6 +439,8 @@ for (const [id, record] of Object.entries(pageOverrides)) {
   if (!club) throw new Error(`club-logos.json "pages" names unknown club ${id}`);
   if (!record?.file || !/^[0-9a-f]{64}$/.test(record.sha256 ?? '')) throw new Error(`club-logos.json "pages" ${id}: give its file and its original's SHA-256`);
   if (record.thumb !== undefined && !STANDARD_THUMBS.has(record.thumb)) throw new Error(`club-logos.json "pages" ${id}: thumb ${record.thumb} is no standard width (${[...STANDARD_THUMBS].join(', ')})`);
+  // A picture saved on a solid box names the box's colour, which the drawing clears (as the period crests' do).
+  if (record.background !== undefined && !/^#[0-9a-f]{6}$/.test(record.background)) throw new Error(`club-logos.json "pages" ${id}: background is a #rrggbb colour`);
   const name = fileName(record.file);
   const info = await pageInfo(name, record.wiki ?? 'en');
   const source = record.thumb ? thumbOf(info.original, record.thumb) : info.original;
@@ -443,7 +449,8 @@ for (const [id, record] of Object.entries(pageOverrides)) {
     throw new Error(`${id}: ${source} (SHA-256 ${sha256(bytes)}) is not the ${record.thumb ? 'thumbnail' : 'original'} pinned in ${path.relative(root, overridesFile)} "pages". Nothing was written.`);
   }
   club.twin = null; // a file of its own
-  pageCrests.set(id, { webp: await crestWebp(bytes, { svg: !record.thumb && /\.svg$/i.test(info.original) }), crest: { file: id, name, info, from: 'page' } });
+  pageCrests.set(id, { webp: await crestWebp(bytes, { svg: !record.thumb && /\.svg$/i.test(info.original), background: record.background ?? null }),
+    crest: { file: id, name, info, from: 'page' } });
 }
 
 const qids = pagesOnly ? [] : [...new Set(clubs.map(club => club.qid).filter(Boolean))].sort();
@@ -499,10 +506,11 @@ for (const [id, { webp, crest }] of pageCrests) {
   crests.set(id, { ...crest, label: crests.get(id)?.label });
 }
 if (!pagesOnly) for (const club of clubs.filter(entry => entry.twin && crests.has(entry.twin))) crests.set(club.id, { ...crests.get(club.twin), file: club.twin });
-// --pages: an all-leagues or women's club without a crest shares its twin's new one, as the full sync would (Union
-// Berlin's all-leagues club wears its country-map twin's since that twin's crest came from its file page).
-if (pagesOnly) for (const club of clubs.filter(entry => entry.twin && !crests.has(entry.id) && pageCrests.has(entry.twin))) {
-  crests.set(club.id, { ...crests.get(club.twin), file: club.twin, label: undefined });
+// --pages: an all-leagues or women's club without a crest shares its twin's, new or committed, as the full sync would
+// (Union Berlin's all-leagues club wears its country-map twin's since that twin's crest came from its file page; Costa
+// Adeje Tenerife's women wear CD Tenerife's, named in "twins").
+if (pagesOnly) for (const club of clubs.filter(entry => entry.twin && !crests.has(entry.id) && crests.has(entry.twin))) {
+  crests.set(club.id, { ...crests.get(club.twin), label: undefined });
 }
 
 // Files of clubs that no longer have a crest go (--pages leaves every other club's as it is). A period crest

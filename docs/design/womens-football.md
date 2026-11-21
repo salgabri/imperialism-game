@@ -80,7 +80,9 @@ A club with a men's side wears its crest (`twins` in `scripts/data/club-logos.js
 and a club without one has its own from Wikipedia (`items`, 23: the NWSL, OL Lyonnes, London City,
 Madrid CFF and others). Six keep their monogram: Badalona Women (no item found), Costa Adeje
 Tenerife (Wikidata's item is another club's), Glasgow City (no usable image), US Saint-Malo, and
-Union Berlin and Brann, whose men's crests the sync rejects for their shape.
+Union Berlin and Brann, whose men's crests the sync rejects for their shape. (Brann's, Union Berlin's and US Saint-Malo's came
+with the country maps' crests of 17 November 2026; Glasgow City and Badalona Women wear their own logos from
+their file pages, and Costa Adeje Tenerife CD Tenerife's, since 21 November 2026.)
 
 ## In the code
 

@@ -206,15 +206,10 @@ test('rugby league 1998 to 2007: every club wears the crest of its day, the era 
 
 test('the EuroLeague of 2000/01 to 2025/26: every club wears the crest of its day, the clubs since gone too', () => {
   const files = new Set(readdirSync(new URL('public/club-logos/', root)).filter(name => name.endsWith('.webp')).map(name => name.slice(0, -5)));
-  // Club-seasons whose crest no allowed source pictures or dates keep their code (docs/design/period-marks.md,
-  // "Coverage").
-  const codes = {
-    'el-aek-athens': [2001, 2002, 2003, 2004], 'el-buducnost': [2001, 2002, 2003], 'el-cska-moscow': [2002, 2003, 2004, 2005, 2006],
-    'el-dynamo-moscow': [2007], 'el-krka': [2002, 2004], 'el-london-towers': [2001, 2002], 'el-lugano': [2001],
-    'el-olimpija': [2001, 2002, 2003, 2004, 2005], 'el-oostende': [2002], 'el-ovarense': [2001], 'el-paok': [2001],
-    'el-peristeri': [2001, 2002], 'el-pesaro': [2002, 2005], 'el-spirou-charleroi': [2001, 2002], 'el-st-petersburg-lions': [2001],
-    'el-ural-great': [2002], 'el-verona': [2001], 'el-zadar': [2001, 2002],
-  };
+  // Club-seasons whose crest no allowed source pictures or dates show the club's nearest picture since November 2026
+  // (docs/design/period-marks.md, "No club without a crest"); only the Saint Petersburg Lions, pictured nowhere, keep
+  // their code.
+  const codes = { 'el-st-petersburg-lions': [2001] };
   let seasons = 0;
   for (const name of readdirSync(new URL('public/basketball/', root)).filter(name => /^nba-2k\d\d\.json$/.test(name))) {
     const { year, clubs } = JSON.parse(read(`public/basketball/${name}`));
@@ -244,12 +239,15 @@ test('the EuroLeague of 2000/01 to 2025/26: every club wears the crest of its da
     // Valencia's 2017 badge through 2025/26 (its 40th-year crest is 2026/27's); Efes's 50th-year logo in 2025/26.
     ['el-valencia-basket', 2026, 'el-valencia-basket.2018'], ['el-valencia-basket', null, today('el-valencia-basket')],
     ['el-anadolu-efes', 2025, today('el-anadolu-efes')], ['el-anadolu-efes', 2026, 'el-anadolu-efes.2026'],
-    ['el-cska-moscow', 2006, null], ['el-cska-moscow', 2007, 'el-cska-moscow.2007'], ['el-cska-moscow', 2018, 'el-cska-moscow.2018'],
+    // CSKA's red-star shield, first dated in 2006/07, stands for its seasons before (no picture shows an older logo).
+    ['el-cska-moscow', 2002, 'el-cska-moscow.2007'], ['el-cska-moscow', 2006, 'el-cska-moscow.2007'],
+    ['el-cska-moscow', 2007, 'el-cska-moscow.2007'], ['el-cska-moscow', 2018, 'el-cska-moscow.2018'],
     ['el-arka-gdynia', 2008, 'el-arka-gdynia.2005'], ['el-arka-gdynia', 2009, 'el-arka-gdynia.2009'],
     // Galatasaray under the sports club's plain GS emblem (the stars are the football team's, round 3); AEK's 1997 emblem
-    // has no picture, its 2004 redraw has; Olimpija's dragon roundel from 2005/06 (round 3).
-    ['el-galatasaray', 2014, 'f-galatasaray-sk.1994'], ['el-aek-athens', 2004, null], ['el-aek-athens', 2005, 'el-aek-athens.2005'],
-    ['el-olimpija', 2005, null], ['el-olimpija', 2006, 'el-olimpija.2006'],
+    // has no picture, so its 2004 redraw stands for it; Olimpija's dragon roundel from 2005/06 (round 3) for the seasons
+    // before it too.
+    ['el-galatasaray', 2014, 'f-galatasaray-sk.1994'], ['el-aek-athens', 2004, 'el-aek-athens.2005'], ['el-aek-athens', 2005, 'el-aek-athens.2005'],
+    ['el-olimpija', 2005, 'el-olimpija.2006'], ['el-olimpija', 2006, 'el-olimpija.2006'],
     // ASVEL's 60th-year shield in 2009/10; the LDLC ASVEL logo since 2018/19 is its crest of today.
     ['el-asvel', 2010, 'el-asvel.2008'], ['el-asvel', 2020, today('el-asvel')], ['el-asvel', 2026, today('el-asvel')],
   ]) assert.equal(crestFile(id, year), file, `${id} ${year}`);
@@ -260,22 +258,13 @@ test('the EuroLeague of 2000/01 to 2025/26: every club wears the crest of its da
 
 test('rugby league 1960 to 1997: every club wears the crest of its day, the era and gone clubs too', () => {
   const files = new Set(readdirSync(new URL('public/club-logos/', root)).filter(name => name.endsWith('.webp')).map(name => name.slice(0, -5)));
-  // The seasons that show a monogram (docs/design/period-marks.md, "Coverage"). Eastern Suburbs had no logo before 1967
-  // and Balmain no badge before 1964. A logo known to differ that no picture shows: Parramatta's to 1979, Penrith's
-  // before its panther of 1978, the badges of Balmain, Norths, St. George and Wests before 1978, the Sydney Tigers'
-  // roundel of 1996. No source dates the Perth Reds' logo of 1997. Souths' and Wests' 90th-season badges of 1997, variants
-  // of the badges worn before, show those (round 4).
-  const monogram = {
-    'nrl-eastern-suburbs-roosters': [[1960, 1966]],
-    'nrl-parramatta-eels': [[1960, 1979]],
-    'nrl-penrith-panthers': [[1967, 1977]],
-    'nrl-western-suburbs-magpies': [[1960, 1977]],
-    'nrl-balmain-tigers': [[1960, 1977]],
-    'nrl-sydney-tigers': [[1996, 1996]],
-    'nrl-north-sydney-bears': [[1960, 1977]],
-    'nrl-st-george-dragons': [[1960, 1977]],
-    'nrl-perth-reds': [[1997, 1997]],
-  };
+  // No season shows a monogram since November 2026 (docs/design/period-marks.md, "No club without a crest"): where no
+  // picture shows the logo of the day, the nearest picture stands for it. Eastern Suburbs had no logo before 1967 and
+  // Balmain no badge before 1964; Parramatta's logo to 1979, Penrith's before its panther of 1978, the badges of Balmain,
+  // Norths, St. George and Wests before 1978 and the Sydney Tigers' roundel of 1996 differ but survive in no picture; no
+  // source dates the Perth Reds' logo of 1997. Souths' and Wests' 90th-season badges of 1997, variants of the badges worn
+  // before, show those (round 4).
+  const monogram = {};
   const seasons = readdirSync(new URL('public/rugby-league/', root)).filter(name => /^nrl-(?:sl-)?(?:19[6-8]\d|199[0-7])\.json$/.test(name));
   assert.equal(seasons.length, 39, 'nrl-1960 ... nrl-1997 and nrl-sl-1997');
   for (const name of seasons) {
@@ -380,9 +369,10 @@ test('round 4: every club rechecked under the 64 px rule, a variant shows its ne
     ['el-panathinaikos', 2002, 'el-panathinaikos.2008'], ['f-chelsea', 1994, 'f-chelsea.1996'],
     ['mlb-new-york-mets', 1962, today('mlb-new-york-mets')], ['nrl-western-suburbs-magpies', 1997, 'nrl-western-suburbs-magpies.1978'],
     ['nhl-california-golden-seals', 1971, 'nhl-california-golden-seals.1975'],
-    // A different design with no picture keeps the monogram; the retired caricatures stay monograms. The Braves' logos
-    // before today's of 1987 are named by no source: the monogram, not the logo of 1987.
-    ['nrl-perth-reds', 1997, null], ['mlb-cleveland-indians', 2018, null], ['mlb-milwaukee-braves', 1960, null],
+    // The retired caricatures stay monograms. The Braves' logos before today's of 1987 are named by no source: the
+    // monogram, not the logo of 1987. A different design with no picture shows the nearest picture since November 2026:
+    // the Perth Reds' only logo, undated, for 1997.
+    ['nrl-perth-reds', 1997, 'nrl-perth-reds.1997'], ['mlb-cleveland-indians', 2018, null], ['mlb-milwaukee-braves', 1960, null],
     ['mlb-atlanta-braves', 1967, null], ['mlb-atlanta-braves', 1986, null], ['mlb-atlanta-braves', 1987, today('mlb-atlanta-braves')],
     // Undated seasons right before a pictured crest show that picture, not today's crest of later years (PSV's stars
     // of 2020, St. Pauli's brown of 2018, Racing's "RC" of 2004, Valencia's C.F. crest of 2009/10) or a monogram.

@@ -325,7 +325,10 @@ crests from Wikipedia, Commons and the Wayback Machine's copies of them, for the
 2017 badge before 2026/27's). ASVEL's seasons since 2019/20 wear its crest of today, the LDLC
 ASVEL logo. Where no allowed source pictures or dates a club's crest of a season, it shows its
 code, as the NRL's gone clubs do: 44 of the 568 club-seasons, among them CSKA Moscow 2001/02 to
-2005/06, Olimpija 2000/01 to 2005/06 and Siena 2002/03 to 2005/06.
+2005/06, Olimpija 2000/01 to 2005/06 and Siena 2002/03 to 2005/06. Since 21 November 2026 those seasons show the club's
+nearest picture instead (CSKA's red-star shield of 2006/07 for its seasons before, PAOK's wordmark of 2006 for
+2000/01; period-marks.md, "No club without a crest"): only the Saint Petersburg Lions of 2000/01, pictured nowhere,
+keep their code.
 
 **Where they live.** Each season's EuroLeague clubs ride in its NBA season's file
 (`public/basketball/nba-2k01.json` … `nba-2k26.json`), after the NBA's, `euroleague` naming their
@@ -432,8 +435,9 @@ the four in Iceland's small lineups, is its power forward.
   refreshed.
 - Earlier seasons' names are EuroLeague's, title-cased: its API spells most players without their
   accents (Jasikevicius, Tomasevic), and only today's starters have spellings of their own.
-- 44 of the earlier seasons' 568 club-seasons show the club's code: no allowed source pictures or
-  dates its crest of that season.
+- One of the earlier seasons' 568 club-seasons shows the club's code: the Saint Petersburg Lions of 2000/01, whose
+  logo no allowed source pictures. The 43 others no source dated show the club's nearest picture (since
+  21 November 2026).
 - ASVEL's crest of today (the built-in season's) is read from its file page, not from Wikipedia's
   API like the other clubs' (`pages` in `scripts/data/club-logos.json`,
   `npm run sync:club-logos -- --pages`): the sync may no longer ask that API, and its cached

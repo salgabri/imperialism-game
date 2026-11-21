@@ -974,7 +974,8 @@ Super League's David Peachey, Ian Roberts and Stacey Jones.
   logos of the clubs of 1982-1997). Eastern Suburbs had no logo before 1967, and Parramatta's crests to 1979, Penrith's
   mark before 1978 and Wests' before 1978 survive in no usable picture: those seasons show the club's monogram, as do
   Balmain (and the Sydney Tigers), Norths, St. George, Newtown, Wests after 1989 and the Perth Reds, whose logos of the
-  time no source dates. Souths' seasons of 1980-1997, undated, wear today's crest.
+  time no source dates. Souths' seasons of 1980-1997, undated, wear today's crest. Since 21 November 2026 none shows a monogram: each
+  of those seasons shows the club's nearest picture, the logo it wore next (period-marks.md, "No club without a crest").
 - **Clubs only**, as every earlier season: a nations game plays the built-in nations.
 
 ## Rules by era
