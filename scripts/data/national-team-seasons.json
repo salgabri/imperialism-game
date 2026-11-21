@@ -358,6 +358,14 @@
     "rule": "T = best − perHundredElo × (E_best − E) / 100: E is the nation's Elo, E_best the best Elo among the teams that played in the four years before.",
     "calibration": "best is the strongest built-in nation's strength (EA FC 27 + FM 26, 2026/27). 3.2 points per 100 Elo gives the game's football model (rate 1.28·e^(1.5·tanh(0.075Δ / 1.5)), Poisson goals) Elo's expected score within 0.0015 for gaps of 50 to 300 Elo, and the 173 built-in strengths regress on their 2026 Elo from the same results with a slope of 3.20 (r 0.895)."
   },
+  "levels": {
+    "table": "scripts/data/football-confederations.json",
+    "reference": "UEFA",
+    "years": 8,
+    "prior": 100,
+    "rule": "E′ = E + the level of the nation's confederation on the Elo's day, and E_best the best E′ of the teams active in the four years before. A confederation's level is the Elo that, added to each of its sides, best predicts its sides' matches against the other confederations' sides in the eight years either side of the day (the results hold men's matches to 2026-10-06), each match scored with the Elo from before it: p = We(dr + level_home − level_away), fitted by maximum likelihood (a draw half a win) under a normal prior of mean 0 and standard deviation 100 Elo, UEFA's level held at 0. A level moves a whole confederation, so it changes no forecast inside one.",
+    "calibration": "Measured 2026-11-21 (docs/design/football-years.md, \"Confederation levels\"): of the 6,849 matches between two confederations' sides, each scored with the Elo from before it, CONCACAF's, the AFC's and the OFC's sides played below their Elo against UEFA's in every decade (49 to 280 Elo where beyond two standard errors) and CAF's 58 to 114 Elo before 1995; with the levels fitted each year without that year's matches, no decade's offset is beyond two standard errors and the log loss falls in every decade (1955–1995 0.6030 → 0.5914, 1996–2026 0.6010 → 0.5876). The eight years and the prior of 100 Elo were chosen on those held-out matches. On the 4,523 of them eloratings.net also rates, its own forecasts score 0.5901, ours 0.6016 before the levels and 0.5886 after; EA's full national XIs, which see no result, agree better with the levelled Elo in each of the 22 EA seasons (Spearman 0.726–0.879 → 0.793–0.909)."
+  },
   "xi": {
     "GK": 1,
     "DF": 4,

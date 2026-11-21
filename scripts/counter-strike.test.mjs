@@ -22,8 +22,8 @@ import { buildSetupModel, signingsOffered, SPORT_NOTES } from '../src/screens/se
 import { readChallenge } from '../src/screens/setup/challenge.js';
 import { readExport } from './lib/liquipedia.mjs';
 import {
-  formatOf, gameRating, halvesOf, isNationsEvent, kFactor, LINEUP, mapOf, MIN_PLAYERS, nationalTeams, nationOfTeamName, nationsOf,
-  playerOf, readTournaments, scoreFits, seriesInOrder, startersOf, TEAM_SIZE, tournamentOf,
+  formatOf, gameRating, halvesOf, homesOf, isNationsEvent, kFactor, LINEUP, mapOf, MIN_PLAYERS, nationalTeams, nationOfTeamName, nationsOf,
+  playerOf, readTournaments, regionOfNation, scoreFits, seriesInOrder, startersOf, TEAM_SIZE, tournamentOf,
 } from './lib/counter-strike.mjs';
 import { teamKeys } from './lib/liquipedia.mjs';
 
@@ -149,6 +149,20 @@ test('a rating is Elo / 25 − 2; a nation names its best seven and plays its be
   const five = french.slice(0, LINEUP).reduce((sum, player) => sum + player.rating, 0) / LINEUP;
   assert.equal(nations[0].str, Math.round(five * 10) / 10, 'the mean of the five who play');
   assert.equal(french[0].source.url, 'https://liquipedia.net/counterstrike/F1');
+});
+
+test('a player\'s home is his nation\'s region, else the region of his events: a newcomer starts at its level', () => {
+  assert.deepEqual(['643', '804', '398', '860', '496', '156', '036', '554', '710', '682', '504', '076', '840', '792', '376', '250', '826', null]
+    .map(regionOfNation), ['CIS', 'CIS', 'CIS', 'CIS', 'ASIA', 'ASIA', 'OCE', 'OCE', 'AF', 'MENA', 'MENA', 'SA', 'NA', 'EU', 'EU', 'EU', 'EU', null]);
+  // South Africans at a European event are South Africa's scene's; the side whose nation is unknown, the event's region's.
+  const side = prefix => [1, 2, 3, 4, 5].map(i => ({ name: `${prefix}${i}` }));
+  const series = [{ date: '2026-01-10', event: 'Some Cup/Europe', region: 'EU', international: false, host: null, page: 'p', index: 0,
+    names: ['A', 'B'], teams: [side('Za'), side('Xb')], rosters: [], games: [{ winner: 2 }], winner: 2 }];
+  const nationOf = key => (key.startsWith('Za') ? '710' : null);
+  const homes = homesOf(series, { nationOf });
+  assert.deepEqual([homes.get('Za1'), homes.get('Xb1')], ['AF', 'EU']);
+  const before = homesOf(series, { nationOf, until: '2026-01-01' });
+  assert.deepEqual([before.get('Za1'), before.has('Xb1')], ['AF', false], 'a nation is a player\'s whenever he plays');
 });
 
 test('the national teams rebuild byte for byte from the committed snapshot, and nothing is estimated', t => {

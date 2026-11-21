@@ -80,11 +80,11 @@ ties; real: the World Group's singles, every tie's, in the match files):
 
 | Measure | 1972 | Real, 1968–1975 | 1985 | Real, 1980–1994 | 2005 | Real, 1995–2017 |
 | --- | --- | --- | --- | --- | --- | --- |
-| Ties won 2–0 / 2–1 | 72.2 / 27.8% | 64.8 / 35.2% | 61.9 / 38.1% | 57.6 / 42.4% | — | — |
+| Ties won 2–0 / 2–1 | 70.9 / 29.1% | 64.8 / 35.2% | 61.9 / 38.1% | 57.6 / 42.4% | — | — |
 | Ties won 3–0 / 3–1 / 3–2 | — | — | — | — | 40.8 / 33.6 / 25.6% | 38.5 / 34.0 / 27.5% |
-| Rubbers to a third set | 29.9% | 23.6% | 33.1% | 23.8% | 33.6% | 31.6% |
-| Sets that reached 6–6 | 10.1% | 6.0% | 10.4% | 7.2% | 10.6% | 10.3% |
-| Sets past 7–5 ending 8–6 / 9–7 / longer | 47.5 / 23.4 / 29.1% | 54.5 / 21.2 / 24.2% (with 1977–1979) | 43.1 / 26.1 / 30.7% | 38.6 / 24.3 / 37.1% (deciding sets, 1980–2017) | 45.9 / 25.0 / 29.1% | the same |
+| Rubbers to a third set | 29.4% | 23.6% | 33.1% | 23.8% | 33.6% | 31.6% |
+| Sets that reached 6–6 | 9.8% | 6.0% | 10.4% | 7.2% | 10.6% | 10.3% |
+| Sets past 7–5 ending 8–6 / 9–7 / longer | 47.1 / 25.0 / 27.9% | 54.5 / 21.2 / 24.2% (with 1977–1979) | 43.1 / 26.1 / 30.7% | 38.6 / 24.3 / 37.1% (deciding sets, 1980–2017) | 45.9 / 25.0 / 29.1% | the same |
 
 The real samples (`scripts/tennis-formats-real.mjs`): 250, 806 and 265 ties; 1,118, 3,607 and 2,399 sets; 99 sets and
 70 deciding sets past 7–5. The Federation Cup to 1994 was an open event, every entrant in one draw rather than sixteen of
@@ -245,7 +245,8 @@ ticks, and the running App playing a 1985 season in three-rubber ties.
 ## Earlier seasons
 
 Status: built 2026-11-08, when the user asked for them after the sport shipped; 1968–1972 added 2026-11-09 (1968–1972,
-below) and 1963–1967 on 2026-11-14 (1963–1967, below). The Season choice lists 63 earlier seasons, 2025 back to 1963,
+below) and 1963–1967 on 2026-11-14 (1963–1967, below); the regions measured and 1963–1972 levelled on 2026-11-21
+(Regions, below). The Season choice lists 63 earlier seasons, 2025 back to 1963,
 each the WTA's women (before 1968 the amateurs) at the end of a year and the Fed Cup nations of that day, nations only
 (set ids `wta-<year>`, kind `wta`, `public/womens-tennis/wta-<year>.json`). They follow the men's seasons
 ([tennis.md](tennis.md), "Earlier seasons") and the user's choices for them: Tennis Abstract's own published lists where
@@ -369,16 +370,17 @@ their ratings with them; its seasons from 1973 are within a point and a half of 
 
 | Season | Rated | Nations | Best (rating) | Strongest three | Tingay's ten shared | Rank correlation |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1968 | 160 | 16 | Margaret Court (88) | United States, Great Britain, Australia | 8 (7 before) | 0.76 (0.66) |
+| 1968 | 160 | 16 | Margaret Court (88) | United States, Great Britain, Australia | 8 (7 before) | 0.75 (0.66) |
 | 1969 | 152 | 16 | Margaret Court (93) | United States, Great Britain, Australia | 9 (9) | 0.66 (0.58) |
 | 1970 | 158 | 17 | Margaret Court (93) | United States, Australia, Great Britain | 8 (8) | 0.67 (0.73) |
 | 1971 | 132 | 18 | Billie Jean King (95) | United States, Australia, Great Britain | 8 (8) | 0.60 (0.60) |
 | 1972 | 167 | 19 | Billie Jean King (96) | United States, Australia, Great Britain | 9 (9) | 0.84 (0.81) |
 
 **What moved.** The warm-up moves 1968 most and fades by 1971: over each season's top eight, the second run's Elo less the
-first's is −11 to +194 in 1968 (King +194, now second behind Court where she was seventh), −6 to +16 in 1969, −5 to +9
-in 1970 and −8 to 0 in 1971 and 1972, where King now edges Court as 1972's best (both 96). The five seasons share 8.4 of
-Tingay's ten (8.2 before), rank correlation 0.71 (0.68). Court ends 1971 at 2,256 (2,262 before) and peaks at 2,394 in
+first's is −11 to +201 in 1968 (King +201, now second behind Court where she was seventh), −6 to +20 in 1969, −3 to +11
+in 1970, −3 to +1 in 1971 and −6 to +1 in 1972, where King now edges Court as 1972's best (both 96); these are with the
+newcomers' levels of 2026-11-21 ([Regions](#regions)), which moved them by a few points. The five seasons share 8.4 of
+Tingay's ten (8.2 before), rank correlation 0.70 (0.68). Court ends 1971 at 2,258 (2,262 before) and peaks at 2,395 in
 December 1973 (2,403): Tennis Abstract puts her peak at 2,389 in 1971 (The Tennis 128, from a database that reaches back
 to the 1920s), and the open era's many matches, not the warm-up, set her 1971.
 
@@ -447,27 +449,29 @@ Janice Wainwright its Janice Townsend). Not joined: Maria Ayala (Chile, 1960) an
 namesakes in the player file are of other countries. 278 of the 547 are Sackmann's; the rest keep an id of their own
 (`wp:<key>`), with the name of their article or link and the country their flags give most often.
 
-**The method.** The first run's, with the men's two changes for a warm-up. Newcomers of the pages start at 1325, fitted
-to five points so that the run carries on as the shipped one: over the first run's top 50 of each season 1973–1980 the
-second run's Elo of the same women differs by +0.1 on average (the mean absolute difference 1.2 at most a season), and on
-Tennis Abstract's 17 targets of 1973–2000 it is −0.3 Elo on average, root mean square 42.8, where the first run is −0.4
-and 42.7; 1320 puts the seam at −0.4, 1330 at +1.4, 1280 at −9.5 and 1380 at +14.8. A layoff that begins before 1968 is
+**The method.** The first run's, with the men's two changes for a warm-up. Newcomers of the pages start at 1315 plus their
+region's and their nation's level ([Regions](#regions), since 2026-11-21), fitted to five points so that the run carries
+on as the shipped one: over the first run's top 50 of each season 1973–1980 the second run's Elo of the same women
+differs by +0.4 to +0.8 on average (the mean absolute difference 1.4 at most a season), and on Tennis Abstract's 17
+targets of 1973–2000 it is −0.1 Elo on average, root mean square 42.9, where the first run is −0.4 and 42.7; with the
+levels 1310 puts the seam at −1.2 to −0.1, 1320 at +1.6 to +2.0. Before the levels the start was 1325, fitted the same way
+(1320 put the seam at −0.4, 1330 at +1.4, 1280 at −9.5 and 1380 at +14.8). A layoff that begins before 1968 is
 charged only when it ends before 1968 and lasts 13 weeks or more (the pages hold the majors and the cup alone). Against
 Tingay's tens of 1963–1967 the layoff barely matters: rank correlation 0.72 with eight weeks, 0.76 with 13, 0.72 with
 26, 39 or no charge. A gap across 1968 (Court's year away, 1967) is never charged.
 
 | Season | Rated | Nations | Best (rating) | Strongest three | Tingay's ten shared | Rank correlation |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1963 | 65 | 16 | Margaret Court (80) | Australia, United States, Great Britain | 9 | 0.57 |
-| 1964 | 67 | 20 | Margaret Court (82) | Australia, United States, Great Britain | 6 | 0.45 |
-| 1965 | 69 | 13 | Margaret Court (85) | Australia, United States, Great Britain | 8 | 0.88 |
-| 1966 | 78 | 20 | Margaret Court (83) | Australia, United States, Great Britain | 6 | 0.95 |
+| 1963 | 65 | 16 | Margaret Court (81) | Australia, United States, Great Britain | 9 | 0.57 |
+| 1964 | 67 | 20 | Margaret Court (82) | Australia, United States, Great Britain | 6 | 0.41 |
+| 1965 | 69 | 13 | Margaret Court (85) | Australia, United States, Great Britain | 8 | 0.89 |
+| 1966 | 78 | 20 | Margaret Court (83) | Australia, United States, Great Britain | 6 | 0.96 |
 | 1967 | 72 | 17 | Billie Jean King (83) | United States, Great Britain, Australia | 7 | 0.93 |
 
 **Validation.** Tingay's tens of 1963–1967, read from the same saved page of his lists (the manifest's `checks`): 7.2 of
-his ten shared a season, rank correlation 0.76. Every one of his women is rated in her season but Nancy Richey, his
+his ten shared a season, rank correlation 0.75 (0.76 before the region levels). Every one of his women is rated in her season but Nancy Richey, his
 ninth of 1963: the pages give her one match (the U.S. Championships' pages show their last eight only). 1964 agrees least
-(six shared, 0.45): Carole Caldwell Graebner, his fourth, is 16th and Helga Schultze, his fifth, 17th, each on the few
+(six shared, 0.41): Carole Caldwell Graebner, his fourth, is 14th and Helga Schultze, his fifth, 20th, each on the few
 matches the pages give her. Court leads Australia in 1963–1966 and is away in 1967, as she was; King leads 1967.
 
 **Nations of the day.** Every cup nation of every year fields a team, and every woman who played a cup singles rubber
@@ -485,6 +489,78 @@ Slovakia, West Germany plays under its own name.
 
 **The format.** The cup of 1968–1975: three rubbers, the doubles third, advantage sets ([Format by year](#format-by-year)).
 
+### Regions
+
+Measured and fixed 2026-11-21 with the men's ([tennis.md](tennis.md#regions)), when the user asked that the ratings be
+correct and normalized: a nation that wins its own region may still be weak beside the rest of the world. The measure is
+the men's: continents as the IOC's continental associations group the nations, Europe split at the Iron Curtain, the
+Americas into the United States and Canada and the rest; in each era, every match between two listed women of two regions,
+each scored by their Elo before it, fitted at once with a home edge for a major's host and for a cup tie's first-named side
+(the Federation Cup was played at one venue until 1994, so that side's edge comes out near nothing then); −50 means a
+region's women won as though 50 Elo, two rating points, weaker than their Elo. `validation.json` holds every figure.
+
+| Seasons | W. Europe | E. Europe | N. America | L. America | Asia | Oceania | Africa |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 1963–1967, before | **−41 ± 16** | +2 ± 48 | **+63 ± 20** | +30 ± 42 | — | −10 ± 21 | −23 ± 36 |
+| 1963–1967, after | −19 ± 16 | −25 ± 49 | **+43 ± 21** | +40 ± 42 | — | −8 ± 21 | −43 ± 36 |
+| 1968–1972, before | −1 ± 5 | +17 ± 16 | 0 ± 5 | −28 ± 16 | −10 ± 22 | +7 ± 6 | −5 ± 12 |
+| 1968–1972, after | +1 ± 5 | +15 ± 16 | −2 ± 5 | −21 ± 16 | −9 ± 22 | +6 ± 6 | −7 ± 12 |
+| 1973–1979 | −17 ± 5 | **+36 ± 8** | +7 ± 4 | −28 ± 15 | 0 ± 18 | −11 ± 6 | +20 ± 10 |
+| 1980–1989 | +4 ± 3 | +13 ± 5 | −6 ± 3 | +5 ± 7 | −1 ± 10 | −14 ± 6 | 0 ± 8 |
+| 1990–1999 | +6 ± 2 | +6 ± 3 | −5 ± 3 | −14 ± 7 | −5 ± 6 | −8 ± 7 | +3 ± 9 |
+| 2000–2009 | +2 ± 2 | +4 ± 2 | −4 ± 4 | −10 ± 6 | −8 ± 4 | +6 ± 7 | −8 ± 9 |
+| 2010–2015 | −1 ± 3 | +1 ± 2 | +8 ± 5 | −7 ± 10 | −5 ± 5 | −6 ± 8 | −11 ± 18 |
+
+Bold: beyond twice its standard error and over 25 Elo, a rating point. The matches between regions of 1963–1967 are few:
+Western Europe's women played 348, North America's 253, Oceania's 248, Africa's 105, Latin America's 89, Eastern Europe's
+59, Asia's under 20, too few to measure. Before the fix the pages' seasons left Western Europe's women 41 ± 16 Elo
+(1.6 points) high and North America's 63 ± 20 (2.5) low; checked once with the players' ages in the fit too, −60 ± 16
+and +66 ± 19 (1960–1967). 210 of Western Europe's 229 newcomers first appear in Wimbledon's or Paris's whole draws, many
+of them local players out in the first rounds; North America's are mostly those who travelled to them (55 of 70), as the U.S.
+Championships' pages show only their last eight. From 1980 no region stands more than 15 Elo from the others. Against
+Tennis Abstract's own lists of 2016–2025 (3,087 player-seasons, the computed Elo 2.5 under theirs overall), each region's
+difference is within 2 of the overall but Africa's, on 21 player-seasons: Western Europe −0.5 ± 1.2, Eastern Europe −0.4 ±
+1.2, North America +1.4 ± 1.9, Latin America +0.7 ± 2.5, Asia −0.3 ± 2.0, Oceania −0.3 ± 2.8, Africa +13.6 ± 5.6.
+
+**The fix**, the men's: a newcomer of the pages starts at the base start plus her region's level and her nation's (the
+nation of the day her season's row gives her: her cup's, else her draws' flag, else the player file's), the levels those
+that best predict every counted match of 1960–1967, each by the ratings before it, under normal priors of spread 150 Elo
+on a region's level and 100 on a nation's around its region's, averaging zero over the newcomers, rounded to five points
+(`method.early.start.regions`; `npm run sync:womens-tennis-seasons -- --fit-regions`). The base start, fitted as before so
+that the run carries on as the shipped one, goes from 1325 to 1315.
+
+- **Regions:** Western Europe −75, Eastern Europe +45, North America +35, Latin America −35, Asia −125 (five newcomers:
+  mostly its prior), Oceania +5, Africa +50.
+- **Nations** (38), the largest: Italy +105, the United States and Czechoslovakia +95, Brazil and the Netherlands +90, West
+  Germany +80; Canada −80, Denmark, Ecuador and Switzerland −70, Japan and Morocco −55. An American newcomer starts at
+  1445, a British one at 1280, a Danish one at 1170.
+
+Judged on held-out seasons (fitted on the even seasons' matches, judged on the odd seasons of 1963–1967, and the other way
+round), the log loss of every match goes from 0.4971 to 0.4948 and from 0.4948 to 0.4881, of those between regions from
+0.4657 to 0.4607 and from 0.4626 to 0.4528, within one from 0.5818 to 0.5872 and 0.5635 to 0.5636. Levels by region alone
+(a nation's spread 0) do as well or a little better here (the pages' nations have few newcomers each); the two tours'
+held-out seasons together chose the spread.
+
+**What changes.** 1963–1972 only: 1973–2015 come from the first run, byte for byte as they were. The seam with it stays
+within 1.4 points a season, the fit to Tennis Abstract's targets −0.1 Elo, root mean square 42.9 (−0.3 and 42.8 before),
+Tingay's tens 7.2 shared a season to 1967 (rank correlation 0.75, 0.76 before) and 8.4 from 1968 (0.70, 0.71 before). Over
+the 172 nation-seasons a nation's strength moves 0.7 points on average and its place 0.4. Europe's small nations fall:
+Denmark 5.7 points a season (1964 56.5 → 50.5), Switzerland 4.8, Norway 3.7, Ireland 2.0, Austria 1.7, Belgium 1.6; Japan
+2.2 (1964 54 → 48.5) and Canada 0.9. Czechoslovakia gains 0.7 (1963 64.5 → 67, fifth → fourth), Brazil 0.8, the United
+States 0.3. The first three of every season are unchanged.
+
+**What is left.**
+
+- **North America's women of 1963–1967** still won as though 43 ± 21 Elo (1.7 points) stronger than their Elo: King,
+  Richey and Casals rising, and their seasons' few matches.
+- **Eastern Europe's women of 1973–1979**, from the first run, won as though 36 ± 8 Elo (1.4 points) stronger than their
+  Elo: Navratilova (for Czechoslovakia to 1975), Ruzici, Chmyreva, Morozova, Mandlikova and Marsikova, a cohort rising
+  faster than Elo follows (checked once by age: those under 23 +58 ± 10, the older +16 ± 15; with age bands in the
+  fit +31 ± 8). Region levels for the first run's newcomers of 1968–1979 predict its held-out seasons better (log loss
+  0.5230 → 0.5203 and 0.5302 → 0.5253) but leave the cohort as it was (+35 → +31 and +36 → +27 on the halves) while
+  moving every season of 1973–2015, so the first run keeps Tennis Abstract's method unchanged; the user may decide
+  otherwise.
+
 ### Tests
 
 `scripts/womens-tennis-seasons.test.mjs`: the build and (with the inputs cached) the sync rebuild byte for byte, the
@@ -496,7 +572,9 @@ South Africa barred from 1978 and back in 1992; the Soviet Union, the CIS and Se
 Seles's seasons, and the flags' rule only before 1968; Tennis Abstract's own lists and renamed keys; the validation
 thresholds; 1963–1972 with Court and King leading Australia and the United States, Court away in 1967, South Africa
 playing, the 1971 nations from the cups around it, Tingay's tens (Richey's 1963 the one woman unrated), King second in
-1968, Court's peak, the seam and fit of the second run and its counts; the pages read (a draw's rounds numbered back,
+1968, Court's peak, the seam and fit of the second run and its counts; the regions (the pages' newcomers' levels in the
+manifest, Western Europe's and North America's women of 1963–1967 nearer their results with them, from 1973 every region
+within 20 Elo but Eastern Europe's rising women of the 1970s, Tennis Abstract's lists by region); the pages read (a draw's rounds numbered back,
 the finals' repeat counted once, walkovers and retirements, the dates, the links' kinds; a cup's singles and doubles; the
 women: redirects, Wikidata's and the reviewed joins, the checks of a reviewed row, opponents never one woman); every cup
 nation of 1963–1967 fielding a team, the Soviet Union of 1967, Bueno only in 1965, Rhodesia, and (with the pages cached)
@@ -508,11 +586,14 @@ the saves; and a challenge link to a season. `scripts/tennis-formats.test.mjs` h
 ### Limits
 
 - **1963–1979 are rough**, as the men's 1960–1979: the ratings start from nothing in 1960, while Tennis Abstract's reach
-  back to the 1920s, and Court's 1971 is 133 points under Tennis Abstract's.
+  back to the 1920s, and Court's 1971 is 131 points under Tennis Abstract's.
 - **1963–1967 hold the majors and the cup alone**, as Wikipedia records them: no other event of the women's amateur
   circuit, and of the U.S. Championships only the last eight (but 1966's quarter). A woman of a few matches keeps an
-  uncertain rating (Carole Caldwell Graebner, Tingay's fourth of 1964, is 16th), Nancy Richey is unrated in 1963, and a
-  cup nation's women who played the cup alone are rated on their one to four rubbers, near a newcomer's start.
+  uncertain rating (Carole Caldwell Graebner, Tingay's fourth of 1964, is 14th), Nancy Richey is unrated in 1963, and a
+  cup nation's women who played the cup alone are rated on their one to four rubbers, near their nation's newcomers'
+  start ([Regions](#regions)).
+- **Regions**: North America's women of 1963–1967 still stand about 1.7 points under their results against the other
+  regions, and Eastern Europe's of 1973–1979 about 1.4 ([Regions](#regions)).
 - **Who is who** before 1968 is the pages' links and names, joined by Wikipedia's redirects, Wikidata and a review by
   hand: a woman written under two names the review did not find (a maiden name and a married one, neither linked) counts
   as two, and a red link's title is her name where no article gives a better one.

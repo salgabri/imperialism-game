@@ -7,8 +7,10 @@
 // season and the two before it (scripts/lib/cfb-history.mjs); each school's best at each position are ranked across the
 // season and read off College Football 27's ratings at that position (the built-in season, Week 10 Ratings). Each school
 // then moves toward its results (docs/design/computed-ratings.md, step 5): its Simple Rating System over the season's
-// games between FBS schools, the margin the match model gives a point of the strength it plays, and a whole-number move of
-// its players toward its target, which never reorders them.
+// games between FBS schools (one system for the whole FBS; a conference the games leave loose, as 2020's were, held toward
+// its level in the seasons either side: scripts/lib/cfb-history.mjs srsHoldingLooseConferences), the margin the match
+// model gives a point of the strength it plays, and a whole-number move of its players toward its target, which never
+// reorders them.
 //
 // The value's weights were fitted once (--tune) to College Football 27's launch ratings (iteration 1-base, EA SPORTS'
 // ratings site, cached in data-src/college-football/1-base/) of the players of 2025 who returned in 2026, and are frozen
@@ -42,7 +44,7 @@ import { parquetMetadata, readParquet } from './lib/parquet.mjs';
 import {
   boxOf, CLASS_SPAN, DEPTH, FIRST_BOX, FIRST_CLASS, FIRST_SEASON, fitWeights, LAST_SEASON, PARTICIPANTS_FROM, participantsOf, plain, POSITIONS,
   rateSeason, rebuiltRoster, recruitsOf, repairedClasses, regimeOf, ROSTERS_FROM, rosterOf, scheduleOf, seasonPlayers, SIGNALS, SOURCE_NAMES, standardise,
-  teamTotalsOf, valueSeason, shrinkSignals,
+  teamTotalsOf, valueSeason, shrinkSignals, looseConferences, srsHoldingLooseConferences, CONFERENCE_DRIFT,
 } from './lib/cfb-history.mjs';
 import { clubMoveOf, mean, perPointOf, ratingsOf, referenceOf, resultsTargets, spearman, srsOf } from './lib/computed-ratings.mjs';
 import { FORMATION, POSITION_OF, shortOf, squadOf } from './lib/nfl.mjs';
@@ -212,6 +214,19 @@ const boxFor = year => once(`box/${year}`, async () => boxOf(await parquet('play
 const totalsFor = year => once(`totals/${year}`, async () => teamTotalsOf(await boxFor(year)));
 const participantsFor = year => once(`participants/${year}`, async () => participantsOf(await parquet('play_participants', year)));
 const rosterFor = year => once(`roster/${year}`, async () => rosterOf((await pinned(`cfbfastR-data/rosters/cfb_rosters_${year}.csv`)).toString('utf8'), (await context()).schoolOf));
+/**
+ * Season `year`'s games between FBS schools as the SRS reads them, `{ home, away, homeScore, awayScore, neutral, postseason }`
+ * by the game's school ids, and `conferenceOf(school)`, each school's conference that season (the regular season's, as the
+ * schedule names it, under the manifest's name for it).
+ */
+const gamesOf = year => once(`games/${year}`, async () => {
+  const { espnOf, schoolOfEspn, manifest } = await context();
+  const schedule = await scheduleFor(year);
+  const games = schedule.games.map(g => ({ home: schoolOfEspn.get(g.home), away: schoolOfEspn.get(g.away), homeScore: g.homeScore, awayScore: g.awayScore,
+    neutral: g.neutral, postseason: g.postseason }));
+  const conferenceOf = school => manifest.conferences[schedule.conference.get(espnOf[school])] ?? schedule.conference.get(espnOf[school]);
+  return { games, conferenceOf };
+});
 const classesFor = () => once('classes', async () => {
   const raw = new Map();
   for (const year of range(FIRST_CLASS, LAST_SEASON)) raw.set(year, await parquet('cfb_recruits', year));
@@ -417,17 +432,25 @@ async function fieldOf(s, data, weights) {
 }
 
 async function snapshotOf(s, weights) {
-  const { espnOf, schoolOfEspn, manifest } = await context();
+  const { espnOf } = await context();
   const data = await seasonData(s);
   const regime = regimeOf(s);
   const { source: referenceSource } = await referenceClubs();
   const { players, left, rated, population, schools, pools, gaps } = await fieldOf(s, data, weights);
-  const schedule = await scheduleFor(s);
   // The move: S from the season's games between FBS schools, m under the season's rules.
-  const games = schedule.games.map(g => ({ home: schoolOfEspn.get(g.home), away: schoolOfEspn.get(g.away), homeScore: g.homeScore, awayScore: g.awayScore,
-    neutral: g.neutral, postseason: g.postseason }));
-  // Every game counts toward the SRS, a school that does not play the season's too (its opponents' margins are real).
-  const srs = srsOf(games);
+  const { games, conferenceOf } = await gamesOf(s);
+  // Every game counts toward the SRS, a school that does not play the season's too (its opponents' margins are real). A
+  // conference the season's games leave loose, whose schools met other conferences fewer times than it has schools (2020's
+  // SEC, Big Ten, MAC, Pac-12 and Mountain West), is held toward its level in the seasons either side
+  // (srsHoldingLooseConferences); every other season's SRS is the games' alone.
+  const loose = looseConferences(games, conferenceOf);
+  let srs = null, held = [];
+  if (!loose.length) srs = srsOf(games);
+  else {
+    const neighbours = [];
+    for (const year of [s - 1, s + 1]) if (year >= FIRST_SEASON && year <= LAST_SEASON) neighbours.push(await gamesOf(year));
+    ({ srs, loose: held } = srsHoldingLooseConferences(games, conferenceOf, neighbours));
+  }
   // m under the season's own rules (src/sports/collegeFootball.js collegeSeasonRules, without a data set, so that m does
   // not depend on the move it sets), else today's.
   const rules = college.collegeSeasonRules?.(s, null) ?? college.COLLEGE_RULES;
@@ -452,15 +475,15 @@ async function snapshotOf(s, weights) {
   const placed = list => Object.fromEntries(REBUILT_KINDS.map(kind => [kind, list.filter(how => how === kind).length]));
   const rebuilt = data.rebuilt ? { roster: placed(data.rosters.get(s).map(e => e.rebuilt)),
     squads: placed(schools.flatMap(school => moved[school].map(p => byId.get(p.id).rebuilt))) } : null;
-  const conferenceOf = school => manifest.conferences[schedule.conference.get(espnOf[school])] ?? schedule.conference.get(espnOf[school]);
   const snapshot = {
     note: `The ${s} FBS season, computed (scripts/sync-cfb-seasons.mjs; docs/design/college-football.md, "Earlier seasons"): each school's squad as [name, position, years in college, recruiting grade or null, value, rank at the position, rating before the move, rating]; its conference, record and points against FBS schools, its Simple Rating System and its move; and the season's games between FBS schools as [home, away, home points, away points, neutral, postseason].`,
     source: { season: s, league: 'FBS', regime, retrieved: pins.retrieved,
       repos: Object.fromEntries(Object.entries(pins.repos).map(([key, repo]) => [key, `${repo.url}/tree/${repo.commit}`])) },
     conversion: {
-      overall: conversionText(s, regime, perPoint, srs, level, data.rebuilt),
+      overall: conversionText(s, regime, perPoint, srs, level, data.rebuilt, held),
       weights: weights[regime], reference: `${referenceSource.edition}, ${referenceSource.iteration.label}`, depth: DEPTH, population,
-      move: { srs: { reliability: rounded(srs.reliability, 3), homeEdge: rounded(srs.homeEdge, 2), sigma: rounded(srs.sigma, 2) },
+      move: { srs: { reliability: rounded(srs.reliability, 3), homeEdge: rounded(srs.homeEdge, 2), sigma: rounded(srs.sigma, 2),
+        ...(held.length ? { loose: looseText(held) } : {}) },
         perPoint, mean: rounded(level, 3), scale: rounded(scale, 4) },
     },
     left,
@@ -540,13 +563,33 @@ async function validateRebuild(weights) {
 /** How rebuiltRoster places a player, in its order. */
 const REBUILT_KINDS = Object.freeze(['box', 'confirmed', 'signed', 'filled']);
 
-function conversionText(s, regime, perPoint, srs, level, rebuilt) {
+function conversionText(s, regime, perPoint, srs, level, rebuilt, held = []) {
   const signals = regime === 'full' ? 'their share of their school\'s passes, carries and catches, their yards, the tackles, sacks and passes defended their plays name, their interceptions and field goals'
     : 'their share of their school\'s passes, carries and catches, their yards, interceptions and field goals (plays before 2014 name no tacklers)';
   const window = s - FIRST_BOX >= 2 ? `${s} and the two seasons before it 3:2:1` : s === FIRST_BOX ? `${s} alone (ESPN's box scores begin with it)`
     : `${s} and ${s - 1} 3:2 (ESPN's box scores begin with ${FIRST_BOX})`;
   const roster = rebuilt ? "No roster lists the season's players, so each school's are rebuilt: those with a box-score line for it, the recruits it signed in the season's class or the four before whom a later season places there again, and those of the season's class or the one before whom no record places elsewhere; a school still short of a starting place takes its other such recruits at that position; each position is then read as if every school carried College Football 27's depth there, the players the rebuild cannot name ranking below all it can. " : '';
-  return `Computed: ${roster}each player's value is a weighted sum of standardised signals of his position (${signals}, his 247Sports recruiting grade and his years in college), pooled over ${window}; the weights were fitted to College Football 27's launch ratings of the players of 2025 who returned in 2026 and frozen. Each school's best at each position (College Football 27's depth) are ranked across the season's FBS schools and read off College Football 27's ratings at that position (Week 10 Ratings). Each school then moves toward its results: its Simple Rating System over the season's games between FBS schools (reliability ${rounded(srs.reliability, 3)}), times √reliability ÷ ${perPoint} points a game per point of played strength, about the schools' mean ${rounded(level, 2)}; every player of the school by a whole number and its best few one more, never reordered.`;
+  return `Computed: ${roster}each player's value is a weighted sum of standardised signals of his position (${signals}, his 247Sports recruiting grade and his years in college), pooled over ${window}; the weights were fitted to College Football 27's launch ratings of the players of 2025 who returned in 2026 and frozen. Each school's best at each position (College Football 27's depth) are ranked across the season's FBS schools and read off College Football 27's ratings at that position (Week 10 Ratings). Each school then moves toward its results: its Simple Rating System over the season's games between FBS schools (reliability ${rounded(srs.reliability, 3)})${heldText(s, held)}, times √reliability ÷ ${perPoint} points a game per point of played strength, about the schools' mean ${rounded(level, 2)}; every player of the school by a whole number and its best few one more, never reordered.`;
+}
+
+/**
+ * The conversion's words for a season whose games leave conferences loose (srsHoldingLooseConferences), else nothing: which
+ * conferences, how few games placed them, and how their levels were held toward the seasons either side.
+ */
+function heldText(s, held) {
+  if (!held.length) return '';
+  const list = held.map((h, i) => `the ${h.conference} ${h.games}${i === 0 ? ' times' : ''}`);
+  const names = list.length > 1 ? `${list.slice(0, -1).join(', ')} and ${list.at(-1)}` : list[0];
+  return `, in which a conference whose schools met other conferences fewer times than it has schools (${names}) has its level `
+    + `held toward the mean of its levels in ${s - 1} and ${s + 1}, counted as one more observation of it, as precise as that mean's own `
+    + `error and the ${CONFERENCE_DRIFT} points² a conference's level strays from the seasons either side allow`;
+}
+
+/** The snapshot's record of each loose conference's level: alone (its games), its neighbours', and held (with both). */
+function looseText(held) {
+  const level = ({ level: l, se }) => ({ level: rounded(l, 2), se: rounded(se, 2) });
+  return Object.fromEntries(held.map(h => [h.conference, { schools: h.schools, games: h.games, alone: level(h.alone), neighbours: level(h.neighbours),
+    weight: rounded(h.weight, 2), held: level(h.held) }]));
 }
 
 function serialize(snapshot) {

@@ -47,14 +47,33 @@ export function resultRows(rows) {
 }
 
 /**
+ * The rater both readers share: `ratings` (team → Elo) and `play(m)`, which rates one match and returns its gap and
+ * result from before it, `{ dr, w }` (dr the home side's, its home edge included; w 1, ½ or 0).
+ */
+function rater(matches, elo) {
+  const firstYear = new Map();
+  for (const m of matches) for (const team of [m.home, m.away]) if (!firstYear.has(team)) firstYear.set(team, Number(m.date.slice(0, 4)));
+  const startOf = team => (firstYear.get(team) > elo.start.lateAfter ? elo.start.late : elo.start.early);
+  const ratings = new Map();
+  const play = m => {
+    for (const team of [m.home, m.away]) if (!ratings.has(team)) ratings.set(team, startOf(team));
+    const dr = ratings.get(m.home) + (m.neutral ? 0 : elo.home) - ratings.get(m.away);
+    const w = m.homeScore > m.awayScore ? 1 : m.homeScore < m.awayScore ? 0 : 0.5;
+    const change = kFactor(m.tournament, elo.k) * goalFactor(Math.abs(m.homeScore - m.awayScore)) * (w - expectedScore(dr));
+    ratings.set(m.home, ratings.get(m.home) + change);
+    ratings.set(m.away, ratings.get(m.away) - change);
+    return { dr, w };
+  };
+  return { ratings, play };
+}
+
+/**
  * Rate `matches` (resultRows') in order and read the ratings on each of `dates`: the state after every match played
  * before that day. Returns `{ [date]: { ratings: Map(team → Elo), last: Map(team → day of its last match), games } }`.
  */
 export function eloOn(matches, dates, elo) {
-  const firstYear = new Map();
-  for (const m of matches) for (const team of [m.home, m.away]) if (!firstYear.has(team)) firstYear.set(team, Number(m.date.slice(0, 4)));
-  const startOf = team => (firstYear.get(team) > elo.start.lateAfter ? elo.start.late : elo.start.early);
-  const ratings = new Map(), last = new Map(), games = new Map();
+  const { ratings, play } = rater(matches, elo);
+  const last = new Map(), games = new Map();
   const snapshots = {};
   const wanted = [...new Set(dates)].sort();
   let next = 0;
@@ -62,12 +81,7 @@ export function eloOn(matches, dates, elo) {
   for (const m of matches) {
     while (next < wanted.length && m.date >= wanted[next]) take();
     if (next === wanted.length) break;
-    for (const team of [m.home, m.away]) if (!ratings.has(team)) ratings.set(team, startOf(team));
-    const dr = ratings.get(m.home) + (m.neutral ? 0 : elo.home) - ratings.get(m.away);
-    const w = m.homeScore > m.awayScore ? 1 : m.homeScore < m.awayScore ? 0 : 0.5;
-    const change = kFactor(m.tournament, elo.k) * goalFactor(Math.abs(m.homeScore - m.awayScore)) * (w - expectedScore(dr));
-    ratings.set(m.home, ratings.get(m.home) + change);
-    ratings.set(m.away, ratings.get(m.away) - change);
+    play(m);
     for (const team of [m.home, m.away]) {
       last.set(team, m.date);
       games.set(team, (games.get(team) || 0) + 1);
@@ -77,12 +91,24 @@ export function eloOn(matches, dates, elo) {
   return snapshots;
 }
 
+/**
+ * Rate every match in order, as eloOn does, and hand each to `visit(m, dr, w)` with its gap and result from before it:
+ * the Elo's own forecast of that match, one step ahead (scripts/lib/confederation-levels.mjs scores it).
+ */
+export function eloTrace(matches, elo, visit) {
+  const { play } = rater(matches, elo);
+  for (const m of matches) {
+    const { dr, w } = play(m);
+    visit(m, dr, w);
+  }
+}
+
 /** The day `days` after `day` (YYYY-MM-DD, UTC). */
 export function dayAfter(day, days = 1) {
   return new Date(Date.parse(`${day}T00:00:00Z`) + days * 86_400_000).toISOString().slice(0, 10);
 }
 
-/** The same day `years` earlier (29 February falls back to the 28th). */
+/** The same day `years` earlier (29 February falls back to the 28th); a negative `years` is that many years later. */
 export function yearsBefore(day, years) {
   const [y, m, d] = day.split('-').map(Number);
   const back = new Date(Date.UTC(y - years, m - 1, d));

@@ -5,7 +5,7 @@
   "tournament": {"id":"WC-1970","name":"1970 FIFA Men's World Cup","start":"1970-05-31","final":"1970-06-21","host":"Mexico","winner":"Brazil"},
   "minutes": "appearances",
   "ballonDor": [1969,1970],
-  "elo": {"date":"1970-06-22","activeSince":"1966-06-22","active":150,"best":{"team":"Brazil","elo":1995.3}},
+  "elo": {"date":"1970-06-22","activeSince":"1966-06-22","active":150,"best":{"team":"Brazil","elo":1995.3},"levels":{"from":"1962-06-22","to":"1978-06-22","matches":843,"confederations":[["UEFA",0,0,507],["CONMEBOL",-30.3,19.8,305],["CONCACAF",-113.7,25.6,179],["CAF",-66.6,22.9,249],["AFC",-123.4,20,349],["OFC",-97.1,31.1,97]]},"levelledBest":{"team":"Brazil","elo":1965}},
   "unmatchedVotes": [
     {"year":1969,"name":"Johan Cruyff","nationality":"Netherlands","points":30},
     {"year":1969,"name":"George Best","nationality":"Northern Ireland","points":21},
@@ -33,7 +33,7 @@
     {"year":1970,"name":"Carles Rexach","nationality":"Spain","points":1}
   ],
   "nations": [
-    {"team":"Belgium","results":"Belgium","elo":1583.5,"rank":26,"squad":[
+    {"team":"Belgium","results":"Belgium","elo":1583.5,"rank":26,"confederation":"UEFA","squad":[
       {"id":"P-92631","name":"Christian Piot","shirt":1,"position":"GK","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1947-10-04","wikipedia":"https://en.wikipedia.org/wiki/Christian_Piot"},
       {"id":"P-23037","name":"Georges Heylens","shirt":2,"position":"DF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1941-08-08","wikipedia":"https://en.wikipedia.org/wiki/Georges_Heylens"},
       {"id":"P-98745","name":"Jean Thissen","shirt":3,"position":"DF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1946-04-21","wikipedia":"https://en.wikipedia.org/wiki/Jean_Thissen"},
@@ -57,7 +57,7 @@
       {"id":"P-77729","name":"Frans Janssens","shirt":21,"position":"FW","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1945-09-25","wikipedia":"https://en.wikipedia.org/wiki/Frans_Janssens"},
       {"id":"P-62963","name":"Jacques Duquesne","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1940-04-22","wikipedia":"https://en.wikipedia.org/wiki/Jacques_Duquesne_(footballer)"}
     ]},
-    {"team":"Brazil","results":"Brazil","elo":1995.3,"rank":1,"squad":[
+    {"team":"Brazil","results":"Brazil","elo":1995.3,"rank":1,"confederation":"CONMEBOL","squad":[
       {"id":"P-39749","name":"Félix","shirt":1,"position":"GK","minutes":540,"starts":6,"goals":0,"awards":[],"ballonDor":{},"born":"1937-12-24","wikipedia":"https://en.wikipedia.org/wiki/F%C3%A9lix_Mi%C3%A9lli_Venerando"},
       {"id":"P-59934","name":"Brito","shirt":2,"position":"DF","minutes":540,"starts":6,"goals":0,"awards":[],"ballonDor":{},"born":"1939-08-09","wikipedia":"https://en.wikipedia.org/wiki/H%C3%A9rcules_Brito_Ruas"},
       {"id":"P-02965","name":"Piazza","shirt":3,"position":"MF","minutes":540,"starts":6,"goals":0,"awards":[],"ballonDor":{},"born":"1943-02-25","wikipedia":"https://en.wikipedia.org/wiki/Wilson_da_Silva_Piazza"},
@@ -81,7 +81,7 @@
       {"id":"P-72683","name":"Zé Maria","shirt":21,"position":"DF","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1949-05-18","wikipedia":"https://en.wikipedia.org/wiki/Jos%C3%A9_Maria_Rodrigues_Alves"},
       {"id":"P-06015","name":"Leão","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1949-07-11","wikipedia":"https://en.wikipedia.org/wiki/%C3%89merson_Le%C3%A3o"}
     ]},
-    {"team":"Bulgaria","results":"Bulgaria","elo":1552.1,"rank":32,"squad":[
+    {"team":"Bulgaria","results":"Bulgaria","elo":1552.1,"rank":32,"confederation":"UEFA","squad":[
       {"id":"P-66734","name":"Simeon Simeonov","shirt":1,"position":"GK","minutes":180,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1946-04-26","wikipedia":"https://en.wikipedia.org/wiki/Simeon_Simeonov_(footballer,_born_1946)"},
       {"id":"P-53019","name":"Aleksandar Shalamanov","shirt":2,"position":"DF","minutes":212,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1941-09-04","wikipedia":"https://en.wikipedia.org/wiki/Aleksandar_Shalamanov"},
       {"id":"P-19802","name":"Ivan Dimitrov","shirt":3,"position":"DF","minutes":138,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1935-05-14","wikipedia":"https://en.wikipedia.org/wiki/Ivan_Dimitrov_(footballer)"},
@@ -105,7 +105,7 @@
       {"id":"P-99127","name":"Bozhidar Grigorov","shirt":21,"position":"FW","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1945-07-27","wikipedia":"https://en.wikipedia.org/wiki/Bozhidar_Grigorov"},
       {"id":"P-92968","name":"Georgi Kamenski","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1947-02-03","wikipedia":"https://en.wikipedia.org/wiki/Georgi_Kamenski"}
     ]},
-    {"team":"Czechoslovakia","results":"Czechoslovakia","elo":1667.7,"rank":11,"squad":[
+    {"team":"Czechoslovakia","results":"Czechoslovakia","elo":1667.7,"rank":11,"confederation":"UEFA","squad":[
       {"id":"P-15216","name":"Ivo Viktor","shirt":1,"position":"GK","minutes":180,"starts":2,"goals":0,"awards":[],"ballonDor":{"1969":1},"born":"1942-05-21","wikipedia":"https://en.wikipedia.org/wiki/Ivo_Viktor"},
       {"id":"P-49133","name":"Karol Dobiaš","shirt":2,"position":"DF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1947-12-18","wikipedia":"https://en.wikipedia.org/wiki/Karol_Dobia%C5%A1"},
       {"id":"P-95896","name":"Václav Migas","shirt":3,"position":"DF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1944-09-16","wikipedia":"https://en.wikipedia.org/wiki/V%C3%A1clav_Migas"},
@@ -129,7 +129,7 @@
       {"id":"P-90487","name":"Ján Čapkovič","shirt":21,"position":"FW","minutes":18,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1948-01-11","wikipedia":"https://en.wikipedia.org/wiki/J%C3%A1n_%C4%8Capkovi%C4%8D"},
       {"id":"P-17536","name":"Alexander Vencel","shirt":22,"position":"GK","minutes":90,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1944-02-08","wikipedia":"https://en.wikipedia.org/wiki/Alexander_Vencel_(born_1944)"}
     ]},
-    {"team":"El Salvador","results":"El Salvador","elo":1432.4,"rank":57,"squad":[
+    {"team":"El Salvador","results":"El Salvador","elo":1432.4,"rank":57,"confederation":"CONCACAF","squad":[
       {"id":"P-08268","name":"Raúl Magaña","shirt":1,"position":"GK","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1940-02-24","wikipedia":"https://en.wikipedia.org/wiki/Ra%C3%BAl_Maga%C3%B1a"},
       {"id":"P-00086","name":"Roberto Rivas","shirt":2,"position":"DF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1941-07-17","wikipedia":"https://en.wikipedia.org/wiki/Roberto_Rivas_(footballer)"},
       {"id":"P-60582","name":"Salvador Mariona","shirt":3,"position":"DF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1943-12-16","wikipedia":"https://en.wikipedia.org/wiki/Salvador_Mariona"},
@@ -153,7 +153,7 @@
       {"id":"P-28429","name":"Elmer Acevedo","shirt":21,"position":"FW","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1946-02-24","wikipedia":"https://en.wikipedia.org/wiki/Elmer_Acevedo"},
       {"id":"P-56225","name":"Alberto Villalta","shirt":22,"position":"MF","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1947-11-19","wikipedia":"https://en.wikipedia.org/wiki/Alberto_Villalta"}
     ]},
-    {"team":"England","results":"England","elo":1847.3,"rank":3,"squad":[
+    {"team":"England","results":"England","elo":1847.3,"rank":3,"confederation":"UEFA","squad":[
       {"id":"P-74455","name":"Gordon Banks","shirt":1,"position":"GK","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{"1970":8},"born":"1937-12-30","wikipedia":"https://en.wikipedia.org/wiki/Gordon_Banks"},
       {"id":"P-79568","name":"Keith Newton","shirt":2,"position":"DF","minutes":261,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1941-06-23","wikipedia":"https://en.wikipedia.org/wiki/Keith_Newton_(footballer)"},
       {"id":"P-40921","name":"Terry Cooper","shirt":3,"position":"DF","minutes":390,"starts":4,"goals":0,"awards":[],"ballonDor":{"1970":3},"born":"1944-07-12","wikipedia":"https://en.wikipedia.org/wiki/Terry_Cooper_(footballer,_born_1944)"},
@@ -177,7 +177,7 @@
       {"id":"P-52978","name":"Allan Clarke","shirt":21,"position":"FW","minutes":90,"starts":1,"goals":1,"awards":[],"ballonDor":{},"born":"1946-07-31","wikipedia":"https://en.wikipedia.org/wiki/Allan_Clarke_(footballer)"},
       {"id":"P-27328","name":"Jeff Astle","shirt":22,"position":"FW","minutes":92,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1942-05-13","wikipedia":"https://en.wikipedia.org/wiki/Jeff_Astle"}
     ]},
-    {"team":"Israel","results":"Israel","elo":1489.3,"rank":43,"squad":[
+    {"team":"Israel","results":"Israel","elo":1489.3,"rank":43,"confederation":"AFC","squad":[
       {"id":"P-09393","name":"Yitzchak Vissoker","shirt":1,"position":"GK","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1944-09-18","wikipedia":"https://en.wikipedia.org/wiki/Yitzchak_Vissoker"},
       {"id":"P-08449","name":"Shraga Bar","shirt":2,"position":"DF","minutes":224,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1948-03-24","wikipedia":"https://en.wikipedia.org/wiki/Shraga_Bar"},
       {"id":"P-92635","name":"Menachem Bello","shirt":3,"position":"DF","minutes":90,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1947-12-26","wikipedia":"https://en.wikipedia.org/wiki/Menachem_Bello"},
@@ -201,7 +201,7 @@
       {"id":"P-18748","name":"Yechiel Hameiri","shirt":21,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1946-08-20","wikipedia":"https://en.wikipedia.org/wiki/Yechiel_Hameiri"},
       {"id":"P-66373","name":"Yair Nossovsky","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1937-06-29","wikipedia":"https://en.wikipedia.org/wiki/Yair_Nossovsky"}
     ]},
-    {"team":"Italy","results":"Italy","elo":1833.8,"rank":4,"squad":[
+    {"team":"Italy","results":"Italy","elo":1833.8,"rank":4,"confederation":"UEFA","squad":[
       {"id":"P-73673","name":"Enrico Albertosi","shirt":1,"position":"GK","minutes":570,"starts":6,"goals":0,"awards":[],"ballonDor":{},"born":"1939-11-02","wikipedia":"https://en.wikipedia.org/wiki/Enrico_Albertosi"},
       {"id":"P-42540","name":"Tarcisio Burgnich","shirt":2,"position":"DF","minutes":570,"starts":6,"goals":1,"awards":[],"ballonDor":{},"born":"1939-04-25","wikipedia":"https://en.wikipedia.org/wiki/Tarcisio_Burgnich"},
       {"id":"P-68170","name":"Giacinto Facchetti","shirt":3,"position":"DF","minutes":570,"starts":6,"goals":0,"awards":[],"ballonDor":{"1970":3},"born":"1942-07-18","wikipedia":"https://en.wikipedia.org/wiki/Giacinto_Facchetti"},
@@ -225,7 +225,7 @@
       {"id":"P-05329","name":"Giuseppe Furino","shirt":21,"position":"DF","minutes":44,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1946-07-05","wikipedia":"https://en.wikipedia.org/wiki/Giuseppe_Furino"},
       {"id":"P-63857","name":"Pierino Prati","shirt":22,"position":"FW","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{"1969":17},"born":"1946-12-13","wikipedia":"https://en.wikipedia.org/wiki/Pierino_Prati"}
     ]},
-    {"team":"Mexico","results":"Mexico","elo":1585.2,"rank":24,"squad":[
+    {"team":"Mexico","results":"Mexico","elo":1585.2,"rank":24,"confederation":"CONCACAF","squad":[
       {"id":"P-66980","name":"Ignacio Calderón","shirt":1,"position":"GK","minutes":360,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1943-12-13","wikipedia":"https://en.wikipedia.org/wiki/Ignacio_Calder%C3%B3n"},
       {"id":"P-80210","name":"Juan Manuel Alejandrez","shirt":2,"position":"DF","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1944-05-17","wikipedia":"https://en.wikipedia.org/wiki/Juan_Manuel_Alejandrez"},
       {"id":"P-64553","name":"Gustavo Peña","shirt":3,"position":"DF","minutes":360,"starts":4,"goals":1,"awards":[],"ballonDor":{},"born":"1941-11-22","wikipedia":"https://en.wikipedia.org/wiki/Gustavo_Pe%C3%B1a"},
@@ -249,7 +249,7 @@
       {"id":"P-48001","name":"Javier Fragoso","shirt":21,"position":"FW","minutes":360,"starts":4,"goals":1,"awards":[],"ballonDor":{},"born":"1942-04-19","wikipedia":"https://en.wikipedia.org/wiki/Javier_Fragoso"},
       {"id":"P-18898","name":"Francisco Castrejón","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1947-06-11","wikipedia":"https://en.wikipedia.org/wiki/Francisco_Castrej%C3%B3n"}
     ]},
-    {"team":"Morocco","results":"Morocco","elo":1413.3,"rank":66,"squad":[
+    {"team":"Morocco","results":"Morocco","elo":1413.3,"rank":66,"confederation":"CAF","squad":[
       {"id":"P-34408","name":"Allal Ben Kassou","shirt":1,"position":"GK","minutes":180,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1941-11-11","wikipedia":"https://en.wikipedia.org/wiki/Allal_Ben_Kassou"},
       {"id":"P-93664","name":"Abdallah Lamrani","shirt":2,"position":"DF","minutes":180,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1946-01-01","wikipedia":"https://en.wikipedia.org/wiki/Abdallah_Lamrani"},
       {"id":"P-20578","name":"Boujemaa Benkhrif","shirt":3,"position":"DF","minutes":246,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1947-11-30","wikipedia":"https://en.wikipedia.org/wiki/Boujemaa_Benkhrif"},
@@ -270,7 +270,7 @@
       {"id":"P-98667","name":"Abdelkader El Khiati","shirt":18,"position":"DF","minutes":34,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1945-01-01","wikipedia":"https://en.wikipedia.org/wiki/Abdelkader_El_Khiati"},
       {"id":"P-99251","name":"Abdelkader Ouaraghli","shirt":19,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1943-01-01","wikipedia":"https://en.wikipedia.org/wiki/Abdelkader_Ouaraghli"}
     ]},
-    {"team":"Peru","results":"Peru","elo":1579.1,"rank":28,"squad":[
+    {"team":"Peru","results":"Peru","elo":1579.1,"rank":28,"confederation":"CONMEBOL","squad":[
       {"id":"P-15677","name":"Luis Rubiños","shirt":1,"position":"GK","minutes":360,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1940-12-31","wikipedia":"https://en.wikipedia.org/wiki/Luis_Rubi%C3%B1os"},
       {"id":"P-30953","name":"Eloy Campos","shirt":2,"position":"DF","minutes":119,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1942-05-31","wikipedia":"https://en.wikipedia.org/wiki/Eloy_Campos"},
       {"id":"P-38349","name":"Orlando de la Torre","shirt":3,"position":"DF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1943-11-21","wikipedia":"https://en.wikipedia.org/wiki/Orlando_de_la_Torre"},
@@ -294,7 +294,7 @@
       {"id":"P-84160","name":"Jesus Goyzueta","shirt":21,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1947-01-01","wikipedia":"https://en.wikipedia.org/wiki/Jesus_Goyzueta"},
       {"id":"P-51451","name":"Oswaldo Ramírez","shirt":22,"position":"FW","minutes":48,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1947-03-29","wikipedia":"https://en.wikipedia.org/wiki/Oswaldo_Ram%C3%ADrez"}
     ]},
-    {"team":"Romania","results":"Romania","elo":1618.4,"rank":17,"squad":[
+    {"team":"Romania","results":"Romania","elo":1618.4,"rank":17,"confederation":"UEFA","squad":[
       {"id":"P-04931","name":"Necula Răducanu","shirt":1,"position":"GK","minutes":63,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1946-05-10","wikipedia":"https://en.wikipedia.org/wiki/Necula_R%C4%83ducanu"},
       {"id":"P-35798","name":"Lajos Sătmăreanu","shirt":2,"position":"DF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1944-02-21","wikipedia":"https://en.wikipedia.org/wiki/Lajos_S%C4%83tm%C4%83reanu"},
       {"id":"P-53044","name":"Nicolae Lupescu","shirt":3,"position":"DF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1940-12-17","wikipedia":"https://en.wikipedia.org/wiki/Nicolae_Lupescu"},
@@ -318,7 +318,7 @@
       {"id":"P-26945","name":"Stere Adamache","shirt":21,"position":"GK","minutes":207,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1941-08-17","wikipedia":"https://en.wikipedia.org/wiki/Stere_Adamache"},
       {"id":"P-73129","name":"Gheorghe Gornea","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1944-08-02","wikipedia":"https://en.wikipedia.org/wiki/Gheorghe_Gornea"}
     ]},
-    {"team":"Soviet Union","results":"Russia","elo":1788.3,"rank":5,"squad":[
+    {"team":"Soviet Union","results":"Russia","elo":1788.3,"rank":5,"confederation":"UEFA","squad":[
       {"id":"P-99794","name":"Leonid Shmuts","shirt":1,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1948-10-08","wikipedia":"https://en.wikipedia.org/wiki/Leonid_Shmuts"},
       {"id":"P-79597","name":"Anzor Kavazashvili","shirt":2,"position":"GK","minutes":390,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1940-07-19","wikipedia":"https://en.wikipedia.org/wiki/Anzor_Kavazashvili"},
       {"id":"P-76618","name":"Valentin Afonin","shirt":3,"position":"DF","minutes":300,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1939-12-22","wikipedia":"https://en.wikipedia.org/wiki/Valentin_Afonin"},
@@ -342,7 +342,7 @@
       {"id":"P-98262","name":"Vitaly Khmelnitsky","shirt":21,"position":"FW","minutes":324,"starts":3,"goals":1,"awards":[],"ballonDor":{},"born":"1943-06-12","wikipedia":"https://en.wikipedia.org/wiki/Vitaly_Khmelnitsky"},
       {"id":"P-53800","name":"Valeriy Porkujan","shirt":22,"position":"FW","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1944-10-04","wikipedia":"https://en.wikipedia.org/wiki/Valeriy_Porkujan"}
     ]},
-    {"team":"Sweden","results":"Sweden","elo":1667.4,"rank":12,"squad":[
+    {"team":"Sweden","results":"Sweden","elo":1667.4,"rank":12,"confederation":"UEFA","squad":[
       {"id":"P-43209","name":"Ronnie Hellström","shirt":1,"position":"GK","minutes":90,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1949-02-21","wikipedia":"https://en.wikipedia.org/wiki/Ronnie_Hellstr%C3%B6m"},
       {"id":"P-84013","name":"Hans Selander","shirt":2,"position":"DF","minutes":180,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1945-03-15","wikipedia":"https://en.wikipedia.org/wiki/Hans_Selander"},
       {"id":"P-15529","name":"Kurt Axelsson","shirt":3,"position":"DF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1941-11-10","wikipedia":"https://en.wikipedia.org/wiki/Kurt_Axelsson"},
@@ -366,7 +366,7 @@
       {"id":"P-71589","name":"Inge Ejderstedt","shirt":21,"position":"FW","minutes":22,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1946-12-24","wikipedia":"https://en.wikipedia.org/wiki/Inge_Ejderstedt"},
       {"id":"P-31050","name":"Sten Pålsson","shirt":22,"position":"MF","minutes":15,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1945-12-04","wikipedia":"https://en.wikipedia.org/wiki/Sten_P%C3%A5lsson"}
     ]},
-    {"team":"Uruguay","results":"Uruguay","elo":1688.1,"rank":8,"squad":[
+    {"team":"Uruguay","results":"Uruguay","elo":1688.1,"rank":8,"confederation":"CONMEBOL","squad":[
       {"id":"P-53140","name":"Ladislao Mazurkiewicz","shirt":1,"position":"GK","minutes":570,"starts":6,"goals":0,"awards":[],"ballonDor":{},"born":"1945-02-14","wikipedia":"https://en.wikipedia.org/wiki/Ladislao_Mazurkiewicz"},
       {"id":"P-47978","name":"Atilio Ancheta","shirt":2,"position":"DF","minutes":570,"starts":6,"goals":0,"awards":[],"ballonDor":{},"born":"1948-07-19","wikipedia":"https://en.wikipedia.org/wiki/Atilio_Ancheta"},
       {"id":"P-83747","name":"Roberto Matosas","shirt":3,"position":"DF","minutes":570,"starts":6,"goals":0,"awards":[],"ballonDor":{},"born":"1940-05-11","wikipedia":"https://en.wikipedia.org/wiki/Roberto_Matosas"},
@@ -390,7 +390,7 @@
       {"id":"P-08424","name":"Julio Losada","shirt":21,"position":"FW","minutes":180,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1950-06-16","wikipedia":"https://en.wikipedia.org/wiki/Julio_Losada"},
       {"id":"P-81455","name":"Walter Corbo","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1949-05-02","wikipedia":"https://en.wikipedia.org/wiki/Walter_Corbo"}
     ]},
-    {"team":"West Germany","results":"Germany","elo":1870.1,"rank":2,"squad":[
+    {"team":"West Germany","results":"Germany","elo":1870.1,"rank":2,"confederation":"UEFA","squad":[
       {"id":"P-14080","name":"Sepp Maier","shirt":1,"position":"GK","minutes":510,"starts":5,"goals":0,"awards":[],"ballonDor":{},"born":"1944-02-28","wikipedia":"https://en.wikipedia.org/wiki/Sepp_Maier"},
       {"id":"P-28162","name":"Horst-Dieter Höttges","shirt":2,"position":"DF","minutes":259,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1943-09-10","wikipedia":"https://en.wikipedia.org/wiki/Horst-Dieter_H%C3%B6ttges"},
       {"id":"P-93072","name":"Karl-Heinz Schnellinger","shirt":3,"position":"DF","minutes":412,"starts":5,"goals":1,"awards":[],"ballonDor":{},"born":"1939-03-31","wikipedia":"https://en.wikipedia.org/wiki/Karl-Heinz_Schnellinger"},

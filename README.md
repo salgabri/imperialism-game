@@ -131,6 +131,7 @@ npm run sync:reep-bridge # reduce the pinned Reep register in data-src/reep/ to 
 npm run validate:football # score the football squads against World Football Elo and real results (docs/design/football-gate/; fetches eloratings.net's tables once)
 npm run engine-scale:football # measure the built-in football squads' scale, odds and campaign length against the squads they replaced (about a minute); then validate:football -- --engine-scale-only carries it into the report without Elo
 npm run build-basketball # regenerate the basketball fives, rated by the built-in NBA 2K (pinned 2K Archive page)
+npm run sync:fiba-results # FIBA's 2023–2026 men's games from 34 pinned Wikipedia articles in data-src/fiba-results/, the evidence the nations' check reads (--fetch reads missing pages; --check compares byte for byte)
 npm run build-clubs      # regenerate the club layer for both sports
 npm run sync:domestic-clubs # country club snapshots from the cache (EFEM requests need permission)
 npm run sync:club-logos  # club crests: Wikidata via QLever (network, cached), Wikipedia's answers from the pinned cache only
@@ -161,6 +162,7 @@ npm run sync:mlb-the-show # snapshot MLB The Show's Live cards from its public A
 npm run build-mlb        # rebuild the MLB clubs and the baseball nations from that snapshot (--check compares byte for byte)
 npm run import:mlb-war   # rebuild the 1960–2017 baseball snapshots from the pinned WAR and Baseball Databank files in data-src/mlb-war/ (--check compares byte for byte)
 npm run sync:mlb-league-runs # each club's runs and shutouts from MLB's Stats API for the seasons after the Databank's (network; writes scripts/data/mlb-league-runs.json)
+npm run sync:mlb-interleague # the AL's and NL's interleague records of 1997–2017 from the pinned Wikipedia article in data-src/mlb-interleague/ (--fetch reads it once; --check compares byte for byte)
 npm run build:mlb-map    # rebuild MLB's maps of the USA and Canada, today's and the 43 of earlier seasons (1–2 minutes a map; --check compares byte for byte)
 npm run sync:nhl         # snapshot EA's NHL 27 ratings and the NHL's rosters and statistics into scripts/data/nhl-27.json (the NHL's from the cache only; no --refresh)
 npm run build-hockey     # rebuild the NHL clubs and the hockey nations from that snapshot (--check compares byte for byte)
@@ -1133,7 +1135,9 @@ minutes and his production (RugbyPass's stats at the Six Nations' own game-for-f
 stability, ranked within his position onto the default shape of a sport no game rates: the three European leagues'
 players together, Super Rugby's and League One's each within its league, then set on the European scale by an offset
 measured from their nations' Tests (+0.7 and −1.2). Each club then moves by its 2025/26 results and each nation the rated
-players cover (the Six Nations', the Rugby Championship's four, Japan and Fiji) by its Tests. The 36 European clubs field
+players cover (the Six Nations', the Rugby Championship's four, Japan and Fiji) by its Tests; Georgia, Tonga and Samoa,
+which they cover less, move toward their Test level too (Tonga and Samoa by the share of their Tests the rated players
+played, Georgia's generated places at its Test level), so Tonga and Samoa no longer stand above Georgia. The 36 European clubs field
 their matchday 23 and keep up to 30; Super Rugby's and League One's clubs, like the URC's four South African sides, are
 rated but play on no map. Nations field the rated players by their latest Test side, fifteen holding at least half a
 matchday 23. Every rating is marked an estimate. See the [design notes](docs/design/rugby-union.md).
@@ -1153,8 +1157,11 @@ saved with them. See the
 read from five exports of the wiki saved by hand on 2026-11-14 and 15 (no script fetches Liquipedia: its robots.txt
 shuts Anthropic's crawlers out) into `scripts/data/rocket-league-elo.json`: 1,009 events of S- and A-Tier, 90,966 games
 from 2015 to November 2026. There is no game's rating list for an esport: each player's rating is an Elo built game by
-game, a team playing at its three players' mean, on the game's scale Elo / 25 − 2 (dralii's 2,506 is 98), so the match
-model plays Elo's own odds; held out on the last 180 days its predictions were calibrated (log loss 0.581). A player
+game, a team playing at its three players' mean, on the game's scale Elo / 25 − 2 (dralii's 2,333 is 91), so the match
+model plays Elo's own odds. The regions meet only at the international events, so each region's newcomers start at its
+own level, fitted with every player's strength on the games between regions (Europe 1,500, North America 1,487, MENA
+1,405, South America 1,298, Oceania 1,240, Asia-Pacific 1,012, Sub-Saharan Africa 984): a region's best no longer rate
+like the world's. Held out on the last 180 days its predictions were calibrated (log loss 0.576). A player
 plays for the nation he last played for at the FIFAe World Cup or the Esports Nations Cup, else the flag Liquipedia
 files him under; 817 players have played within the year, and 57 nations have the three a series needs, from the United
 States, France and Saudi Arabia down. Nothing is estimated. Each year from 2016 is an
@@ -1164,7 +1171,9 @@ States, France and Saudi Arabia down. Nothing is estimated. Each year from 2016 
 (CC BY-SA 3.0), read from four exports of the wiki saved by hand on 2026-11-15 (no script fetches Liquipedia) into
 `scripts/data/counter-strike-elo.json`: 3,007 events of S-, A- and B-Tier, 110,249 maps from 2012 to November 2026. Each
 player's rating is Rocket League's Elo, built map by map, a team playing at its five players' mean, on the same scale
-(Aleksib's 2,368 is 93); held out on the last 180 days its predictions were calibrated (log loss 0.641). A player plays
+(huNter-'s 2,336 is 91), each region's newcomers starting at its level fitted on the maps between regions (Europe
+1,500, the CIS 1,553, South America 1,458, North America 1,359, Asia 1,326, MENA 1,307, Oceania 1,264, Africa 1,231);
+held out on the last 180 days its predictions were calibrated (log loss 0.641). A player plays
 for the nation he last played for at a national-team event (the Esports Nations Cup, WESG, the IESF's world
 championships), else his Liquipedia page's country; 1,667 players have played within the year, and 40 nations have the
 five a map needs, from Russia, Ukraine, France and Brazil down. Nothing is estimated. See the
@@ -1174,17 +1183,20 @@ five a map needs, from Russia, Ukraine, France and Brazil down. Nothing is estim
 from 2023's season (its first qualifiers in September 2022) to 15 November 2026, fetched a page at a time through
 `scripts/lib/polite-fetch.mjs` (vlr.gg's robots.txt keeps no agent from its events and matches) and cached in
 `data-src/vlr/`, into `scripts/data/valorant-elo.json`: 534 events, 21,142 matches, 44,939 maps. Each player's rating is
-the same Elo, map by map, a team playing at its five players' mean, on the same scale (RieNs's 2,445 is 96); held out on
-the last 180 days its predictions were calibrated (log loss 0.638). A player plays for the nation he last played for at
-the Esports Nations Cup, else the flag vlr.gg files him under; 2,437 players have played within the year, and 63 nations
-have the five a map needs, from Turkey, Canada and South Korea down. Nothing is estimated. Each year from 2023 is an
+the same Elo, map by map, a team playing at its five players' mean, on the same scale (RieNs's 2,485 is 97), each
+newcomer starting at his circuit's level, fitted on the maps between circuits (VCT Americas 1,812 down to Challengers
+Vietnam 1,306): with every newcomer at 1,500, the VCT's sides had beaten the Challengers' by 59 Elo more than expected and
+South Asia's, Oceania's and MENA's sides had stood 140–190 above their results. Held out on the last 180 days its
+predictions were calibrated (log loss 0.638). A player plays for the nation he last played for at the Esports Nations
+Cup, else the flag vlr.gg files him under; 2,437 players have played within the year, and 63 nations have the five a map
+needs, from Canada, Turkey and South Korea down. Nothing is estimated. Each year from 2023 is an
 [earlier season](#valorant-seasons). See the [design notes](docs/design/valorant.md).
 
 **League of Legends** — `src/data/rosters.league-of-legends.js`, from every game gol.gg records of the leagues and the
 international events from July 2025 (where gol.gg stopped answering the fetch) to 14 November 2026, fetched the same way
 and cached in `data-src/golgg/`, into `scripts/data/league-of-legends-elo.json`: 211 tournaments, 4,865 series, 10,940
 games. Each player's rating is the same Elo, game by game, a newcomer starting at his league's level as every link between
-the leagues sets it, on a scale of (Elo − 100) / 25 (Bin's 2,530 is 97); held out on the last 180 days its predictions
+the leagues sets it, on a scale of (Elo − 100) / 25 (Bin's 2,511 is 96); held out on the last 180 days its predictions
 were calibrated (log loss 0.609). A player plays for the country gol.gg files him under, in the role he plays most; 1,315
 players have played within the year, and 40 nations have the five a game needs, from South Korea and China down. Nothing
 is estimated. See the [design notes](docs/design/league-of-legends.md).
@@ -1256,7 +1268,11 @@ Football never invents a missing player or rating: an incomplete future source
 is shown as an incomplete squad. The shipped sources cover every football XI.
 Basketball is curated to the 47 federations that matter, so **28% of shirts are
 real** but every serious basketball nation is. Basketball gaps retain generated
-players at the confederation baseline, shown dimmed and asterisked.
+players at the sport's baseline (45, the same on every continent), shown dimmed and asterisked. The fives' curated
+players were checked against 706 FIBA games of 2023–2026 (World Cup, Olympics and their qualifiers, the 2025
+continental championships): no continent's curated players sit off the line the NBA- and EuroLeague-rated nations
+set, and moving each five to its results forecast held-out games worse, so they stay as curated
+([the check](docs/design/euroleague.md#the-nations-level-against-fibas-results)).
 
 To rebuild after swapping datasets:
 
@@ -1778,8 +1794,8 @@ the game: pick one under **Season** in setup. Each is a file in
   the same club is in in the nearest other edition. Ratings are EA's overalls, unchanged.
   EA rates only part of the world, so 49–82 nations have a full XI of EA's own each season (fewer in the older
   editions). A nation with at least six rated players, half an XI, fields a side; the places EA leaves empty in
-  its natural XI go to players capped for it that season on Wikidata, rated from its World Football Elo and
-  marked as estimates ([computed fills](docs/design/football-years.md#computed-fills)), and it starts
+  its natural XI go to players capped for it that season on Wikidata, rated from its World Football Elo (levelled
+  across confederations, as the computed seasons' is) and marked as estimates ([computed fills](docs/design/football-years.md#computed-fills)), and it starts
   short-handed only where Wikidata names nobody (FIFA 05–09: none). One with fewer fields no team, and its land
   stays neutral. Scotland, Wales and Northern Ireland field their own
   teams; places with no shape on the map (Malta, the Faroe Islands, …) have
@@ -1955,7 +1971,11 @@ nations only, 15 to 24 of them.
 - **Ratings:** a nation's strength comes from its Elo the day after the final,
   `T = 87 − 3.2 × (best Elo − its Elo) / 100`, with the Elo computed from every
   international result to that day (martj42's results, CC0) by eloratings.net's
-  formula. Its eleven are the players of its World Cup squad with the most
+  formula, plus its confederation's level: the matches between confederations within
+  eight years of the day show how far each confederation's Elo sits from Europe's
+  (CONCACAF, the AFC and the OFC 57–128 points below it at the World Cups, CAF 42–67),
+  so a continent's champion no longer rates like the world's best
+  ([confederation levels](docs/design/football-years.md#confederation-levels)). Its eleven are the players of its World Cup squad with the most
   minutes in each role (1 GK, 4 DF, 4 MF, 2 FW; a role short of players who
   played takes the most-used left, out of position), ordered by Ballon d'Or
   votes, World Cup awards, goals a minute and minutes, and rated T plus today's
@@ -2283,7 +2303,12 @@ only when chosen.
   of Baseball-Reference's and FanGraphs' WAR) per playing time over the season and the
   two before it is put rank for rank, within hitters, starters and relievers, on MLB
   The Show 18 to 24's scale; tested on 2018–2024, it misses the Show by about 4.4
-  points a player. Names, birthplaces and each club's main ballpark are the Chadwick
+  points a player. Each club then moves toward its won-lost record; from 1997 the two
+  leagues are read on one scale through their interleague games (Wikipedia's
+  "Interleague play", pinned, checked against the Databank's league totals), so the
+  AL's lead of 2004–2017 (about 1.9 points in those games) is in the ratings, where
+  reading each league alone had centred it away. Before 1997 nothing links the leagues
+  soundly, and they stay level. Names, birthplaces and each club's main ballpark are the Chadwick
   Baseball Bureau's Baseball Databank's (`e9f247e` of November 2023, the latest commit
   its forks hold, read from the fork `infonuum/baseballdatabank`, as the Bureau's own
   repository is gone), with one birthplace corrected from Wikipedia (Elmer Valo's).
@@ -2399,10 +2424,14 @@ file in `public/tennis/` (13–56 KB) that loads only when chosen.
 - **1960 to 1972** are a second run of the same method, warmed up on Sackmann's
   file of the amateur era (the majors and the Davis Cup, 1877–1967), with its
   duplicate player ids merged: 1960 to 1967 are the amateurs alone ("Amateur Elo"),
-  the professionals back from 1968, all marked rough. They share about seven of
-  Lance Tingay's year-end ten each season, Laver is first in 1968–1970 as in Tennis
-  Abstract's own Elo, and the run meets the shipped seasons from 1973 within a few
-  points ([design notes](docs/design/tennis.md#before-1973)).
+  the professionals back from 1968, all marked rough. The amateur file holds only the
+  majors and the Davis Cup, whose zones pair a region's nations with each other, so a
+  newcomer of 1946–1967 starts at his region's and nation's level, fitted on how those
+  sides fared against the rest (Asia's men had stood 119 Elo above their results; Iran
+  1962 now plays at 46, not 56.5; [regions](docs/design/tennis.md#regions)). They share
+  about seven of Lance Tingay's year-end ten each season, Laver is first in 1968–1970 as
+  in Tennis Abstract's own Elo, and the run meets the shipped seasons from 1973 within a
+  few points ([design notes](docs/design/tennis.md#before-1973)).
 - **Ratings** are Elo / 25 + 4 as in the built-in season; a season whose best would
   pass 99 (Borg in 1980) is shifted down as a whole, which keeps every match's
   odds. The raw Elo stays with each player.
@@ -2455,8 +2484,11 @@ chosen. They are built as the men's are, by the same scripts with `--tour=wta`
   [1963–1967](docs/design/womens-tennis.md#19631967)). 1963–1967 are those results
   alone, labelled "Amateur Elo" and rough; each lists the women with three matches in
   the season or a singles rubber in that year's cup, so every cup nation fields the
-  women who played it. From 1973 the second run agrees with the first within a point
-  and a half, and those seasons are unchanged. Margaret Court leads 1963–1966 and is
+  women who played it. A newcomer of those pages starts at her region's and nation's
+  level, fitted on the matches between regions: Western Europe's local entrants to the
+  Wimbledon and Paris draws had held its level 41 Elo too high
+  ([regions](docs/design/womens-tennis.md#regions)). From 1973 the second run agrees with
+  the first within a point and a half, and those seasons are unchanged. Margaret Court leads 1963–1966 and is
   away in 1967; Maria Bueno, Brazil's only rated woman most years, plays only in 1965,
   when Brazil had two. 1963–1972 share seven to eight of Lance Tingay's year-end ten.
 - **Ratings** are Elo / 25 + 4; a season whose best would pass 99 (Navratilova in 1985,
@@ -2719,10 +2751,12 @@ year from 2023 to 2025, nations only. Pick one under **Season** in setup. Each s
 
 - **Ratings** are the same Elo as the built-in season's, run over vlr.gg's results up to 31
   December of that year: who was rated then (20 maps behind him, one within the year), on the
-  same scale (Elo / 25 − 2), each nation's seven best with its five best playing. The cache begins
-  in September 2022, so 2023 is the first season.
-- **Nations:** 48 at the end of 2023 (the United States, Turkey and Canada lead), 60 in 2024 (South
-  Korea first) and 61 in 2025 (Turkey). A player plays for the nation the whole record gives him,
+  same scale (Elo / 25 − 2), each newcomer at his circuit's level fitted on the maps before that
+  December, each nation's seven best with its five best playing. The cache begins in September
+  2022, so 2023 is the first season.
+- **Nations:** 48 at the end of 2023 (the United States, Canada and Turkey lead), 60 in 2024 (the
+  United States first; Indonesia, Japan and the Philippines, third, fifth and eighth before the
+  circuits were levelled, now fifth, seventh and thirteenth) and 61 in 2025 (Turkey). A player plays for the nation the whole record gives him,
   whichever year it is, for the team he played for that December.
 - **Maps by year:** each season plays its series on its December's map pool, the seven maps played
   most in the year's last thousand (2023's has Breeze and Lotus, 2024's Abyss and Pearl, 2025's

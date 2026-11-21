@@ -8,11 +8,16 @@
 // (`kFactor`), so a newcomer finds his level quickly and a veteran's rating holds. Nothing is estimated: a player is
 // rated only from the games Liquipedia records him in, and only a player who has played lately (ACTIVE_DAYS) plays.
 //
+// A newcomer starts at his region's level: the RLCS region whose events he has played most games in, else his nation's
+// (regionOfNation), each region's level fitted at once with every player's own strength (liquipedia-elo.mjs regionLevels),
+// so a region whose teams mostly play each other is not rated as the world's equal (docs/design/rocket-league.md,
+// "Regions").
+//
 // On the game's scale a rating is Elo / 25 − 2, so a rating point is 25 Elo points, as in tennis, and the match model
-// plays Elo's own odds for each game (src/sports/rocketLeague.js); the offset puts the best player of the exports of
-// 2026-11-14 and 15 (dralii, 2,506) at 98 and a newcomer at 1,500 at 58. A nation names its best players by Elo (TEAM_SIZE); it
-// needs three for a team, so a nation with fewer fields none and its land stays neutral.
-import { createLiquipediaElo } from './liquipedia-elo.mjs';
+// plays Elo's own odds for each game (src/sports/rocketLeague.js); the levels are anchored so that Europe's newcomers start
+// at 1,500 (58), as every newcomer once did. A nation names its best players by Elo (TEAM_SIZE); it needs three for a team,
+// so a nation with fewer fields none and its land stays neutral.
+import { createLiquipediaElo, regionByConfederation } from './liquipedia-elo.mjs';
 
 export const SPORT = 'rocket-league';
 export const TEAM_SIZE = 5;
@@ -33,11 +38,22 @@ export const TIERS = Object.freeze([1, 2, 3]);
 
 // K per game: K_SCALE / (games + 5) ^ 0.4, FiveThirtyEight's shape, never below K_FLOOR. A newcomer's first game moves
 // him about 5.2 times a 300-game veteran's. K_SCALE is the one that best foresaw the last 180 days of the exports of
-// 2026-11-14 and 15 (2,462 games, each scored before it was played; regional starts on): log loss 0.5811 at 320, 0.5996
-// at 110, 0.5834 at 240, 0.5817 at 400, 0.5850 at 500; at 320 the games it gave 75% went 78%, those at 94.6% went 92.3%.
+// 2026-11-14 and 15 (2,462 games, each scored before it was played; the regions' levels on, fitted on the games before):
+// log loss 0.5759 at 320, 0.5924 at 110, 0.5815 at 180, 0.5774 at 240, 0.5771 at 400, 0.5809 at 500 (re-run 2026-11-21).
 // Rocket League's form moves fast: rosters change and a team's level with them.
 export const K_SCALE = 320;
 export const K_FLOOR = 8;
+
+/**
+ * A nation's RLCS region, for a player no regional event places (homesOf): its confederation's, Australia with Oceania and
+ * the Arab states (North Africa's among them) and Iran with the Middle East and North Africa, as the RLCS draws them.
+ */
+export const MENA_NATIONS = Object.freeze(['682', '784', '414', '634', '048', '512', '400', '422', '760', '368', '364', '275', '887',
+  '818', '434', '788', '012', '504', '478', '736']);
+export const regionOfNation = regionByConfederation({
+  confederations: { UEFA: 'EU', CONMEBOL: 'SAM', CONCACAF: 'NA', AFC: 'APAC', CAF: 'SSA', OFC: 'OCE' },
+  nations: { OCE: ['036'], MENA: MENA_NATIONS },
+});
 
 
 // ---------- the export, read ----------
@@ -63,10 +79,13 @@ const elo = createLiquipediaElo({
     school: (tournament, title) => isSchool(title, tournament),
   },
   isNationsEvent,
+  // A player's home is the RLCS region whose events he has played most games in, else his nation's.
+  homeBy: 'event',
+  regionOfNation,
 });
 
-export { abbreviationScore, baseTeamName, BORROW_DAYS, binOdds, expected, flagOf, foldPlayers, homeOf, isRegionFlag, looseKey,
-  nationalTeams, nationOfFlag, nationOfPlayer, ODDS_BINS, oddsBin, playerKey, rowOf, scoreOf } from './liquipedia-elo.mjs';
+export { abbreviationScore, ANCHOR, baseTeamName, BORROW_DAYS, binOdds, expected, flagOf, foldPlayers, homeOf, isRegionFlag, LEVEL_TAU,
+  looseKey, nationalTeams, nationOfFlag, nationOfPlayer, ODDS_BINS, OFFSET_TAU, oddsBin, playerKey, rowOf, scoreOf } from './liquipedia-elo.mjs';
 
 /** A player's Elo on the game's scale: Elo / 25 − 2, rounded. */
 export const gameRating = elo.gameRating;
@@ -79,4 +98,5 @@ export const kFactor = elo.kFactor;
 export const readTournaments = elo.readTournaments;
 /** The three who start for a roster: its first three players who are no substitutes and did play. */
 export const startersOf = elo.startersOf;
-export const { seriesInOrder, runElo, homeEdge, regionalStarts, ratedPlayers, playersAsOf, playerOf, tupleOf, nationsOf, leftOut } = elo;
+export const { seriesInOrder, runElo, crossRegion, homeEdge, homesOf, regionLevels, ratedPlayers, playersAsOf, playerOf, tupleOf,
+  nationsOf, leftOut } = elo;

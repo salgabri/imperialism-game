@@ -225,6 +225,39 @@ test('nations field the rated players by their latest Test side: the Six Nations
   assert.equal(ROSTERS['250'][2].length, 30, 'a nation\'s squad: its 23 and depth');
 });
 
+test('the fielded nations the rated players cover less move by their Tests too: Georgia all the way, Tonga and Samoa by their coverage', () => {
+  const partial = AUDIT.report.tests.partial;
+  assert.deepEqual(Object.keys(partial).sort(), ['268', '776', '882'], 'every fielded nation below the cover, and only those');
+  for (const [id, move] of Object.entries(partial)) {
+    assert.ok(move.coverage < AUDIT.report.tests.covered, id);
+    assert.ok(Math.abs(move.after - move.target) < 0.6, `${NATIONS[id][0]}: ${move.after} v ${move.target}`);
+  }
+  // Tonga and Samoa field their own players alone: each moves the share of its Test minutes they played.
+  for (const id of ['776', '882']) {
+    const move = partial[id];
+    assert.equal(move.share, move.coverage, NATIONS[id][0]);
+    assert.ok(move.level < move.target && move.target < move.before, `${NATIONS[id][0]} moves down toward its Tests, part of the way`);
+    assert.ok(Math.abs(move.target - (move.before + move.coverage * (move.level - move.before))) < 0.01, NATIONS[id][0]);
+  }
+  // Georgia's side is completed with generated players, who stand for its Test players the data does not rate: they are
+  // drawn at its Test level (its stored strength counts their places there), and the side plays at that level.
+  const georgia = partial['268'];
+  assert.equal(georgia.share, 1);
+  assert.equal(georgia.fill, georgia.level);
+  // Its stored strength, which its generated players are drawn from: its own places at their ratings, the open ones at the level.
+  assert.ok(Math.abs(ROSTERS['268'][0] - georgia.level) <= 1, `Georgia's stored strength ${ROSTERS['268'][0]}`);
+  const played = seed => rugbyUnionStrength(selectLineup(buildTeam('268', makeRng(seed), sport)));
+  const mean = [1, 2, 3, 4, 5, 6, 7, 8].reduce((total, seed) => total + played(seed), 0) / 8;
+  assert.ok(Math.abs(mean - georgia.level) < 0.6, `Georgia plays ${mean} against its Test level ${georgia.level}`);
+  const generated = selectLineup(buildTeam('268', makeRng(1), sport)).slots.filter(slot => slot.player?.gen);
+  assert.equal(generated.length, 8);
+  assert.ok(generated.every(slot => Math.abs(slot.player.rating - (ROSTERS['268'][0] - 3)) <= 4), 'generated at its level − 3, ± 4');
+  // In their Tests' order: Fiji (Test level 81.4), Georgia (80.8), Tonga (76.1), Samoa (74.4).
+  const strength = id => [1, 2, 3, 4].reduce((total, seed) => total + rugbyUnionStrength(selectLineup(buildTeam(id, makeRng(seed), sport))), 0) / 4;
+  const [fij, geo, tga, sam] = ['242', '268', '776', '882'].map(strength);
+  assert.ok(fij > geo && geo > tga && tga > sam, JSON.stringify({ fij, geo, tga, sam }));
+});
+
 test('Super Rugby Pacific\'s 11 clubs and League One\'s 12 are rated for their players and play on no map', () => {
   const pool = Object.values(SPECS).filter(spec => ['Super Rugby Pacific', 'League One'].includes(spec.league));
   const counts = {};

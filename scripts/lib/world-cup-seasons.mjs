@@ -9,6 +9,7 @@ import { FOOTBALL_FEDERATIONS } from '../../src/data/footballFederations.js';
 import {
   FOOTBALL_SET_FORMAT, NO_TEAM, contentHash, dayNationResolver, identitiesFor, nationResolver, serializeFootballSet, territoryFor,
 } from '../../src/data/footballSetBuild.js';
+import { levelOf, levelled, levelsText } from './confederation-levels.mjs';
 
 /** A computed player's `source`, as his record names it. */
 export const WORLD_CUP_SOURCE = 'world-cup';
@@ -126,12 +127,23 @@ ${crossCheck.name} (${crossCheck.url})
 const round2 = x => Math.round(x * 100) / 100;
 const plus = x => (x > 0 ? `+${x.toFixed(1)}` : x === 0 ? '0.0' : `−${(-x).toFixed(1)}`);
 
+/**
+ * A finalist's Elo with its confederation's level (scripts/lib/confederation-levels.mjs): `{ level, value }`, value E′ = E +
+ * the level, which its strength reads. A finalist without a confederation stops the build.
+ */
+export function levelledEloOf(nation, facts) {
+  const level = levelOf(facts.elo.levels, nation.confederation);
+  if (level == null) throw new Error(`${facts.id}: ${nation.team} has no confederation`);
+  return { level, value: levelled(nation.elo, level) };
+}
+
 /** The rule as a season's source names it. */
 export function conversionText(manifest, facts) {
   const { best, perHundredElo } = manifest.strength;
   const roles = Object.entries(manifest.xi).map(([role, count]) => `${count} ${role}`).join(', ');
-  return `T = ${best} − ${perHundredElo} × (E_best − E) / 100, E the nation's Elo on ${facts.elo.date} (the day after the final) and E_best `
-    + `the best of the teams active in the four years before (${facts.elo.best.team}, ${facts.elo.best.elo}); the XI (${roles}, the most minutes) `
+  return `T = ${best} − ${perHundredElo} × (E′_best − E′) / 100, E′ = E + the level of the nation's confederation: E its Elo on ${facts.elo.date} `
+    + `(the day after the final), the levels ${levelsText(facts.elo.levels)}, one step ahead, and E′_best the best E′ of the teams active in the `
+    + `four years before (${facts.elo.levelledBest.team}, ${facts.elo.levelledBest.elo}); the XI (${roles}, the most minutes) `
     + 'ordered by Ballon d\'Or points, World Cup awards, goals a minute and minutes; its k-th player T + D_k, '
     + `D = ${manifest.profile.map(plus).join(', ')}, rounded so the XI sums to round(11 × T)`;
 }
@@ -167,7 +179,8 @@ export function buildWorldCupSeason(facts, manifest, { federations = FOOTBALL_FE
   const nations = {}, nationAudit = [];
   for (const id of Object.keys(NATIONS).filter(fields)) {
     const { nation } = entries.find(entry => entry.id === id);
-    const strength = strengthOf(nation.elo, facts.elo.best.elo, manifest.strength);
+    const { level, value: levelledElo } = levelledEloOf(nation, facts);
+    const strength = strengthOf(levelledElo, facts.elo.levelledBest.elo, manifest.strength);
     const { eleven, filled } = pickEleven(nation.squad, manifest.xi);
     const order = orderEleven(eleven, manifest.awards);
     const ratings = elevenRatings(strength, manifest.profile);
@@ -184,7 +197,8 @@ export function buildWorldCupSeason(facts, manifest, { federations = FOOTBALL_FE
     const lineup = selectLineup({ sport: 'football', squad: players.map(([name, pos, rating]) => ({ name, pos, rating })) });
     nations[id] = [Math.round(lineup.rating), nation.squad.length, players];
     nationAudit.push({
-      id, name: identities[id]?.name ?? NATIONS[id][0], team: nation.team, elo: nation.elo, rank: nation.rank, T: round2(strength),
+      id, name: identities[id]?.name ?? NATIONS[id][0], team: nation.team, elo: nation.elo, rank: nation.rank,
+      confederation: nation.confederation, level, levelled: levelledElo, T: round2(strength),
       strength: nations[id][0], mean: round2(ratings.reduce((sum, r) => sum + r, 0) / ratings.length),
       outOfPosition: lineup.slots.filter(slot => slot.outOfPosition).map(slot => `${slot.player.name} (${slot.player.pos} as ${slot.position})`),
       filled: filled.map(player => `${player.name} (${player.position}, ${player.minutes}')`),

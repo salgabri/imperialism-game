@@ -168,6 +168,7 @@ test('teams play for the nation of their year: Serbia and Montenegro for Serbia,
 
 test('the manifest shares the computed seasons\' constants and names every EA season at its ratings date', () => {
   assert.deepEqual(MANIFEST.elo, NATIONAL.elo);
+  assert.deepEqual(MANIFEST.levels, NATIONAL.levels, 'the same confederation levels');
   assert.equal(MANIFEST.strength.perHundredElo, NATIONAL.strength.perHundredElo);
   assert.deepEqual([MANIFEST.xi, MANIFEST.profile, MANIFEST.selection.openCapsPerYear, MANIFEST.selection.ages],
     [NATIONAL.xi, NATIONAL.profile, NATIONAL.selection.openCapsPerYear, NATIONAL.selection.ages]);
@@ -273,7 +274,7 @@ test('the loader takes computed players only in an EA season\'s nations, named b
 
 test('a computed player says why his rating is an estimate, and the setup\'s note says how EA\'s seasons fill their XIs', () => {
   const player = { sourceInfo: { source: FILL_SOURCE, league: FILL_LEAGUE } };
-  assert.equal(estimateTitle(player), 'Estimated rating: EA rated too few of this nation\'s players for an XI, so this one comes from his caps for it that season and its World Football Elo');
+  assert.equal(estimateTitle(player), 'Estimated rating: EA rated too few of this nation\'s players for an XI, so this one comes from his caps for it that season and its World Football Elo, levelled across confederations');
   assert.equal(estimateReason(player), 'EA rated too few of this nation\'s players for an XI');
   assert.match(SEASON_NOTES.football, /places EA leaves empty go to players capped for it that season on Wikidata/);
 });

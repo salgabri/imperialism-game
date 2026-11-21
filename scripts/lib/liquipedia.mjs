@@ -202,14 +202,17 @@ export function wikiDate(value) {
   return month ? `${year}-${pad(month)}-${pad(Number(day))}` : null;
 }
 
-/** RLCS's regions as Liquipedia's pages name them, by the key the ratings use. */
+/**
+ * RLCS's regions as Liquipedia's pages name them, by the key the ratings use. The 2021-22 season split Asia-Pacific in two
+ * ("…/2021-22/Fall/Asia-Pacific North/1"): both halves are APAC's.
+ */
 export const REGIONS = Object.freeze({
   EU: ['europe', 'eu'],
   NA: ['north america', 'na'],
   SAM: ['south america', 'sam', 'sa'],
   MENA: ['middle east & north africa', 'middle east and north africa', 'mena', 'middle east'],
   OCE: ['oceania', 'oce'],
-  APAC: ['asia-pacific', 'asia pacific', 'apac', 'asia', 'apac north', 'apac south'],
+  APAC: ['asia-pacific', 'asia pacific', 'apac', 'asia', 'apac north', 'apac south', 'asia-pacific north', 'asia-pacific south'],
   SSA: ['sub-saharan africa', 'ssa', 'africa'],
 });
 const regionTables = new WeakMap();

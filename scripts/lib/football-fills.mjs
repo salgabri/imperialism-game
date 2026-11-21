@@ -11,6 +11,7 @@ import { naturalFootballRoles } from '../../src/data/footballSquad.js';
 import { listedPosition, seasonPools } from './national-team-seasons.mjs';
 import { nameWords, namesAgree, wordsAgree } from './person-names.mjs';
 import { RESULTS_NAMES } from './results-names.mjs';
+import { levelOf, levelled, levelsText } from './confederation-levels.mjs';
 
 /** The calendar years the fills' seasons reach: FIFA 05's 2004/05 window (2004, 2005) to the built-in 2026/27's (2026, 2027). */
 export const FILL_YEARS = Object.freeze([2004, 2027]);
@@ -241,11 +242,12 @@ export function filledPlayer(player, { edition, eloDate, teamElo, country, name 
 }
 
 /** The rule as a season's source names it. */
-export function fillConversion(manifest, { eloDate, best, level }) {
+export function fillConversion(manifest, { eloDate, best, level, levels }) {
   const plus = x => (x > 0 ? `+${x.toFixed(1)}` : x === 0 ? '0.0' : `−${(-x).toFixed(1)}`);
-  return `T = L − ${manifest.strength.perHundredElo} × (E_best − E) / 100, E the nation's Elo on ${eloDate}, E_best the best of the teams `
-    + `active in the four years before (${best.team}, ${best.elo}) and L = ${level.toFixed(2)}, the median over this season's full EA XIs `
-    + `of their mean + ${manifest.strength.perHundredElo} × (E_best − E) / 100; each place EA's players leave empty in a fielded nation's `
+  return `T = L − ${manifest.strength.perHundredElo} × (E′_best − E′) / 100, E′ = E + the level of the nation's confederation: E its Elo on ${eloDate}, `
+    + `the levels ${levelsText(levels)}, one step ahead, E′_best the best E′ of the teams active in the four years before (${best.team}, ${best.elo}) `
+    + `and L = ${level.toFixed(2)}, the median over this season's full EA XIs of their mean + ${manifest.strength.perHundredElo} × (E′_best − E′) / 100; `
+    + 'each place EA\'s players leave empty in a fielded nation\'s '
     + 'natural XI taken by a player of that position whose Wikidata stint for the nation covers the season\'s year or the year before, '
     + 'the most caps a year first; the m added players rated so the XI sums to round(11 × T), ordered by caps, each R + d_j, '
     + `d the profile D = ${manifest.profile.map(plus).join(', ')} read at m evenly spaced places and centred, their mean R and `
@@ -262,8 +264,16 @@ export function fillConversion(manifest, { eloDate, best, level }) {
 export function fillSeason({ nations, players, fill, federations = FOOTBALL_FEDERATIONS }) {
   const { year, season, elo, wikidata, manifest } = fill;
   const { perHundredElo } = manifest.strength;
-  const eloOf = new Map(elo.ratings.map(([team, value, rank]) => [team, { value, rank }]));
-  const nationElo = nation => eloOf.get(RESULTS_NAMES[nation]) ?? null;
+  // A nation's Elo with its confederation's level (scripts/lib/confederation-levels.mjs): E′ = E + the level, which the line reads.
+  const eloOf = new Map(elo.ratings.map(([team, value, rank, confederation]) => {
+    const level = levelOf(elo.levels, confederation);
+    return [team, { value, rank, confederation, level, levelled: level == null ? null : levelled(value, level) }];
+  }));
+  const nationElo = nation => {
+    const found = eloOf.get(RESULTS_NAMES[nation]) ?? null;
+    if (found && found.level == null) throw new Error(`${season}: ${RESULTS_NAMES[nation]} has an Elo but no confederation`);
+    return found;
+  };
   const lineupOf = squad => selectLineup({ sport: 'football', squad });
   const fields = squad => lineupOf(squad).slots.filter(slot => slot.player).length * 2 >= XI;
   const fullXI = squad => squad.length === XI && lineupOf(squad).slots.every(slot => slot.player && !slot.outOfPosition);
@@ -272,8 +282,8 @@ export function fillSeason({ nations, players, fill, federations = FOOTBALL_FEDE
   const fielded = Object.entries(nations).filter(([nation, { squad }]) => !Object.hasOwn(merged, nation) && !inactive.includes(nation)
     && squad.length && fields(squad));
   const points = fielded.filter(([nation, { squad }]) => fullXI(squad) && nationElo(nation))
-    .map(([nation, { squad }]) => ({ strength: squad.reduce((sum, p) => sum + p.rating, 0) / XI, elo: nationElo(nation).value }));
-  const level = lineLevel(points, elo.best.elo, perHundredElo);
+    .map(([nation, { squad }]) => ({ strength: squad.reduce((sum, p) => sum + p.rating, 0) / XI, elo: nationElo(nation).levelled }));
+  const level = lineLevel(points, elo.levelledBest.elo, perHundredElo);
 
   const teamNation = teamNations(wikidata.teams, year, manifest.names, federations);
   // The national-team seasons' ages: a stint whose player would be under 14 or over 45 when the season starts names the wrong
@@ -289,7 +299,7 @@ export function fillSeason({ nations, players, fill, federations = FOOTBALL_FEDE
     const row = { id: nation, name: NATIONS[nation][0], ea: squad.length, before };
     const teamElo = nationElo(nation);
     if (!teamElo) { audit.push({ ...row, why: 'no Elo' }); continue; }
-    const T = fillTarget(teamElo.value, elo.best.elo, level, perHundredElo);
+    const T = fillTarget(teamElo.levelled, elo.levelledBest.elo, level, perHundredElo);
     let sameAsEa = 0; // candidates who are EA players already
     const candidates = (pools.get(nation) || []).filter(candidate => {
       if (candidate.caps === 0) return false;
@@ -304,7 +314,8 @@ export function fillSeason({ nations, players, fill, federations = FOOTBALL_FEDE
       return spreadRatings(added.sum, profileOf(m, manifest.profile), playerRange(T, manifest.profile));
     };
     const filled = fillEleven({ pool, squad, candidates, rate });
-    if (!filled) { audit.push({ ...row, elo: teamElo.value, T: round2(T), why: `no candidate for the ${XI - naturalFootballRoles(pool).squad.length} places`, sameAsEa }); continue; }
+    const levelRow = { confederation: teamElo.confederation, level: teamElo.level, levelled: teamElo.levelled };
+    if (!filled) { audit.push({ ...row, elo: teamElo.value, ...levelRow, T: round2(T), why: `no candidate for the ${XI - naturalFootballRoles(pool).squad.length} places`, sameAsEa }); continue; }
     const used = new Set(filled.ea.map(player => player.name));
     const records = filled.added.map(player => {
       const shared = used.has(player.name) || filled.added.filter(other => other.name === player.name).length > 1;
@@ -320,7 +331,7 @@ export function fillSeason({ nations, players, fill, federations = FOOTBALL_FEDE
     const after = lineupOf(file.map(entry => entry.player));
     squads.set(nation, { players: file.map(entry => entry.row), strength: after.rating, added: records.length });
     audit.push({
-      ...row, elo: teamElo.value, rank: teamElo.rank, T: round2(T), after: after.rating, kept: filled.ea.length,
+      ...row, elo: teamElo.value, rank: teamElo.rank, ...levelRow, T: round2(T), after: after.rating, kept: filled.ea.length,
       ...(held ? { held: held < 0 ? 'up to T + min D' : 'down to T + max D' } : {}),
       added: filled.added.map((player, k) => `${records[k][0]} ${records[k][1]} ${player.rating} ${player.caps ?? '?'} caps ${player.from}–${player.to}${player.ended ? '*' : ''} (${round2(player.figure)})`),
       ...(filled.droppedEa.length ? { droppedEa: filled.droppedEa.map(player => `${player.name} ${player.positions.join('/')} ${player.rating}`) } : {}),
@@ -331,10 +342,10 @@ export function fillSeason({ nations, players, fill, federations = FOOTBALL_FEDE
   }
   const source = {
     method: 'computed', computed: true, rawScale: 'Elo', snapshotDate: elo.date, retrieved: manifest.retrieved,
-    conversion: fillConversion(manifest, { eloDate: elo.date, best: elo.best, level }),
+    conversion: fillConversion(manifest, { eloDate: elo.date, best: elo.levelledBest, level, levels: elo.levels }),
     players: { name: 'Wikidata', endpoint: manifest.sources.wikidata.endpoint, licence: manifest.sources.wikidata.licence,
       files: Object.fromEntries(manifest.sources.wikidata.files.map(file => [file.name, file.sha256])) },
     results: { name: manifest.sources.results.name, commit: manifest.sources.results.commit, licence: manifest.sources.results.licence },
   };
-  return { squads, source, audit: { level: round2(level), fullXIs: points.length, best: elo.best, nations: audit } };
+  return { squads, source, audit: { level: round2(level), fullXIs: points.length, best: elo.best, levels: elo.levels, levelledBest: elo.levelledBest, nations: audit } };
 }

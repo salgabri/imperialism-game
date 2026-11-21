@@ -23,6 +23,10 @@ play at home, New Zealand (three players before), Australia (thirteen), Japan (o
 their own players, from Super Rugby Pacific's and Japan Rugby League One's clubs, rated within their leagues and set on the
 European scale by their nations' Tests. Those clubs play on no map.
 
+Re-placed 2026-11-21 ([The less-covered nations](#the-less-covered-nations)): Georgia, Tonga and Samoa, whose rated
+players played less than three quarters of their Test minutes, move by their Tests too, so the four weakest nations that
+field a team play in their Tests' order: Fiji, Georgia, Tonga, Samoa.
+
 Everything outside the match (territory, the draw, targeting, conquest, signings, saves) is the game's own, unchanged.
 
 **No game rates union players.** Big Ant's Rugby 25 keeps its ratings in the game and no site publishes them (the 2026-11-01
@@ -137,12 +141,13 @@ rebuilds byte for byte), the audit of every step in `docs/design/rugby-union-aud
      "National teams drawn from many leagues"). A Simple Rating System of 2025/26's Tests (104 among the nations France's
      games connect; reliability 0.94, home edge 3.1). The line it is read on is the three leagues' (`anchor`): the nations
      their players cover by themselves, France, Ireland, Italy, Scotland, England, Wales and Argentina, their mean strength
-     at their Tests' mean rating, a point of Test rating √0.94 ÷ m (`report.tests.line`). Only a nation whose 2025/26 Test
-     minutes the rated players played at least 75% of (`COVERED`) moves to its place on it: the seven (95–100%), and now
-     Australia (99%), South Africa (98%), Japan (97%), New Zealand (94%) and Fiji (93%). A nation's Tests are all it played
-     that season with team sheets, the Lions' included (Australia's third Test against them fell on 2 August 2025). The
-     rule stays at 75%: the covered nations reach 93% or more and the next, Tonga, 56% (Samoa 33%, Georgia 35%), whose
-     squads are not the sides their results were won with, so their players keep their own ratings.
+     at their Tests' mean rating, a point of Test rating √0.94 ÷ m (`report.tests.line`). A nation whose 2025/26 Test
+     minutes the rated players played at least 75% of (`COVERED`) moves all the way to its place on it: the seven
+     (95–100%), and now Australia (99%), South Africa (98%), Japan (97%), New Zealand (94%) and Fiji (93%). A nation's Tests
+     are all it played that season with team sheets, the Lions' included (Australia's third Test against them fell on 2
+     August 2025). Since 2026-11-21 the three fielded nations below 75% move too, as far as their side as the game fields it
+     stands for the side that played their Tests (`report.tests.partial`, [below](#the-less-covered-nations)): Georgia
+     (35%) all the way, its generated players at its Test level; Tonga (56%) and Samoa (33%) that share of the way.
    - Why the two apart. Moved by its club's results, a Leinster international would carry a URC season in which he rested
      through most of it: Leinster's results rate its rotated side, not its Test XV. Moved from his own rating, Ireland's
      squad is ordered by its players' evidence and set at its Test level. A player can therefore rate a point or two
@@ -153,9 +158,50 @@ rebuilds byte for byte), the audit of every step in `docs/design/rugby-union-aud
 **The season, as built:** clubs from Stade Toulousain (83.7), Bath (83.0), Northampton (82.3), Saracens (82.2) and Leinster
 (81.7) down to Zebre Parma (75.9), Newcastle (74.7) and US Montauban (71.6, last of the Top 14 with an SRS of −32). Nations:
 South Africa 93, France 92, New Zealand 91, Australia 90, England and Ireland 89, Argentina and Scotland 88, Italy 85, Japan
-and Wales 84, Fiji 80, each a whole 23 of its own players; Tonga 79 and Samoa 77 (thirty and twenty-seven of their own,
-at their own ratings); Georgia 69, whose 24 rated players leave eight places the game fills with generated players.
-Fifteen nations field a team; Spain, the United States and the rest, with seven players or fewer, stay neutral.
+and Wales 84, Fiji 80, each a whole 23 of its own players; Georgia 80, whose 24 rated players leave eight places (its
+backs') the game fills with generated players at its Test level; Tonga 77 and Samoa 75 (thirty and twenty-seven of their
+own). Fifteen nations field a team; Spain, the United States and the rest, with seven players or fewer, stay neutral.
+
+### The less-covered nations
+
+Changed 2026-11-21, on the user's request that ratings be "correct and normalized, just because one team is a national or a
+country a continental champion they might still be quite weak in comparison to other areas". Until then a nation whose
+rated players had played less than 75% of its Test minutes kept their own ratings. Measured as play fields them (the mean of
+24 draws of their generated players), against the level their 2025/26 Tests give them on the same line as everyone's:
+
+| Nation | Coverage | Its 23's share of its Test minutes | Test level | Played before | Played now | Stored strength |
+| --- | --- | --- | --- | --- | --- | --- |
+| Fiji (covered, for comparison) | 93% | 65% | 81.4 | 81.4 | 81.4 | 80 |
+| Georgia | 35% | 31% (15 rated places) | 80.8 | 78.5 | 80.9 | 69 → 80 |
+| Tonga | 56% | 52% | 76.1 | 80.5 | 78.0 | 79 → 77 |
+| Samoa | 33% | 31% (10 of its 23 played no 2025/26 Test) | 74.4 | 78.3 | 77.0 | 77 → 75 |
+
+- **The order was the Tests' reversed.** Georgia, the Rugby Europe Championship's winner of 2024 and 2025 and its finalist
+  of 2026, played 11 Tests: it beat the United States 43–30, Canada 38–17, Samoa 33–12, Spain 42–30 and Romania 53–30, and
+  lost to Japan 23–25 and, in that final, Portugal 17–19. Tonga lost to Spain
+  19–32, Portugal 28–32, Fiji 10–32 and Japan 24–62; Samoa lost all five of its Tests, to the United States 13–29 among
+  them. The game had Tonga (80.5) above Georgia (78.5) and Samoa (78.3) level with it.
+- **Tonga and Samoa stood 4.4 and 3.9 points above their Test levels**, as much as the covered nations of their tier stood
+  above theirs before they moved (Fiji 4.4, Japan 3.9, Wales 2.7, Italy 2.5): the bunching every nation's own ratings carry,
+  as a Test minute counts alike for whichever nation it is played. Their rated players played their Tests (Tonga's 23 played
+  52% of its Test minutes, near Fiji's 65% and Japan's 59%); the rest of their Test sides were players the data does not
+  rate, whose places in the game go to rated players who played less (five of Tonga's 23 and ten of Samoa's played no Test
+  in 2025/26). So each now moves the share of the way its rated players played (its coverage): Tonga 56%, every player 3
+  points down, its eleven best 2; Samoa 33%, every player 2 down, its fourteen best 1.
+- **Georgia stood 2.3 points below its Test level**, its eight generated backs at 66 ± 4 (its stored strength, 69, counted
+  their places at the sport's baseline, 45). They stand in the places of the Test players the data does not rate, who
+  played 65% of its Test minutes and won its results. Now its stored strength counts those places at its Test level (80.8),
+  so its generated players come at 77 ± 4, and the side, its own players where the data rates them and the generated ones
+  for the rest, stands for its whole Test side and moves all the way: its rated players 2 points down (Davit Niniashvili
+  91 → 89), as the covered nations of its tier moved down. Moved by its rated players alone, the 45-baseline fill would have
+  put them 2 points up (Niniashvili 94) to carry backs at 68.
+- Considered and not taken: moving Tonga and Samoa all the way (to 76.1 and 74.4) takes no account of their 23s being
+  stronger than the sides that played their Tests; moving Georgia by its coverage with its fill at its Test level leaves it at
+  82.1, above Fiji, whose Tests rate it higher. Spain (seven rated players), the United States (six) and the rest still field
+  no team, so nothing moves them.
+- Nothing else changed: the clubs, the covered nations, the pool leagues' offsets and the map are as before
+  (`npm run build-rugby-union -- --check`); the roster audit's rating conflicts (a player rated one way for his club and
+  another for his country) went from 255 to 259, all warnings.
 
 ## Super Rugby Pacific and League One
 
@@ -312,7 +358,8 @@ map's section numbers and version follow the clubs' order by strength, so a rati
 `scripts/rugby-union.test.mjs`: the RugbyPass parsers, minutes and the snapshot's sums on synthetic pages; a pool league's
 players kept, a club that meets the Lions still a club, a nation never one; the clubs, nations and audit byte for byte;
 every club's whole 23; the positions' costs; the nations' Test levels in their Tests' order, New Zealand's, Australia's and
-Japan's whole 23s of their own, the anchor and the offsets; Super Rugby's and League One's clubs off the map, each filling
+Japan's whole 23s of their own, the anchor and the offsets; the less-covered nations' moves (Georgia at its Test level with
+its generated players drawn there, Tonga and Samoa by their coverage, the four in their Tests' order); Super Rugby's and League One's clubs off the map, each filling
 its 23 and moved to its results; the Six Nations theatre; the match (a winner always, the feed adding up, sudden death);
 the score effects; the clubs' margins following their results; favourites and home advantage; the feed copy; the live
 chart; the setup and the squad screen; the real figures. `scripts/simulation-realism.test.mjs` holds the model to the
@@ -329,9 +376,10 @@ Tonga and Samoa among them. The smoke plays a Six Nations campaign and one of th
   Anton Lienert-Brown played its 2025/26 Tests on sabbatical at Kobe), but its 30 also hold League One's TJ Perenara and
   Mark Tele'a, last capped in 2024/25, and Brodie Retallick, Richie Mo'unga and Aaron Smith, not since the 2023 World Cup:
   Retallick starts at lock and Mo'unga is on the bench. New Zealand still plays at its Test level.
-- Tonga (56% of its Test minutes covered) and Samoa (33%) keep their players' own ratings, about four points above where
-  their Tests would put them (Tonga 80.5 against 76.1, Samoa 78.3 against 74.4 in the model's strength): the rule moves a
-  nation only where its rated players played its Tests.
+- Tonga (56% of its Test minutes covered) and Samoa (33%) move only that share of the way to their Tests' level, so they
+  still play above it (Tonga 78.0 against 76.1, Samoa 77.0 against 74.4 in the model's strength): how much better their
+  rated 23s are than the sides that played their Tests the data cannot say ([above](#the-less-covered-nations)). Georgia's
+  eight generated backs are drawn at its Test level, not from players' evidence.
 - RugbyPass holds no team sheets for 35 of Super Rugby 2025's games: those players' 2024/25 seasons count only the 48
   it holds, and too few of them reach a quarter season in both of the last two at five positions to measure their own
   reliabilities (above).

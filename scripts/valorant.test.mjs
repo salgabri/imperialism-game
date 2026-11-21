@@ -20,7 +20,8 @@ import { readChallenge } from '../src/screens/setup/challenge.js';
 import { countsEvent, readEventList, readEventMatches, readMatch } from './lib/vlr.mjs';
 import { circuitOf, gameRating, isNationsEvent, nationalTeams, nationOfPlayer, regionOfCircuit, seriesOf } from './lib/valorant.mjs';
 import {
-  circuitLevels, expected, favouriteBins, homeEdge, homesOf, isOffensiveName, kFactor, mostOf, nationsOf, ratedPlayers, runElo, START,
+  circuitLevels, expected, favouriteBins, groupOffset, groupOffsets, homeEdge, homesOf, isOffensiveName, kFactor, mostOf, nationsOf, ratedPlayers,
+  runElo, scoredGames, scoreRows, START,
 } from './lib/esports-elo.mjs';
 
 const sport = getSport('valorant');
@@ -195,6 +196,58 @@ test('each circuit\'s level is fitted at once with its players\'; a newcomer sta
   assert.equal(startOf({ homes }), levels['Challengers France']);
   assert.equal(startOf({}), levels['VCT EMEA'], 'with no homes given, his first event\'s circuit');
 });
+
+test('the levels\' own prior holds a thinly linked circuit near the mean; a player of no circuit takes his country\'s home', () => {
+  // A strong circuit meets a weak one 100 times; a third, whose players are as good as the weak one's, meets them twice.
+  const series = [];
+  const rng = makeRng(9);
+  for (let day = 0; day < 300; day++) {
+    const date = new Date(Date.UTC(2024, 0, 1) + day * 86400000).toISOString().slice(0, 10);
+    const pick = (prefix, flag) => side(`${prefix}${Math.floor(rng() * 4)}-`, flag);
+    for (const [prefix, circuit, flag] of [['s', 'VCT EMEA', 'de'], ['w', 'Challengers France', 'fr'], ['t', 'Challengers Italy', 'it']]) {
+      series.push({ date, circuit, games: [{ sides: [pick(prefix, flag), pick(prefix, flag)], winner: rng() < 0.5 ? 1 : 2 }] });
+    }
+    if (day % 3 === 0) series.push({ date, circuit: null, games: [{ sides: [pick('s', 'de'), pick('w', 'fr')], winner: rng() < 0.75 ? 1 : 2 }] });
+    if (day === 100 || day === 200) series.push({ date, circuit: null, games: [{ sides: [pick('w', 'fr'), pick('t', 'it')], winner: 1 }] });
+  }
+  const free = circuitLevels(series), held = circuitLevels(series, { levelSpread: 50 });
+  assert.ok(Math.abs(held['Challengers Italy'] - START) < Math.abs(free['Challengers Italy'] - START), JSON.stringify({ free, held }));
+  assert.ok(held['VCT EMEA'] - held['Challengers France'] > 50, 'a hundred meetings still set the gap');
+  // A French amateur who only ever plays an invitational (no circuit) calls home the circuit most French players call home.
+  const invitational = [...series, { date: '2024-12-01', circuit: null, games: [{ sides: [side('amateur', 'fr'), side('s0-', 'de')], winner: 2 }] }];
+  assert.equal(homesOf(invitational).has('amateur0'), false);
+  const byCountry = homesOf(invitational, { byCountry: true });
+  assert.equal(byCountry.get('amateur0'), 'Challengers France', 'every French player calls Challengers France home');
+  assert.equal(byCountry.get('s0-0'), 'VCT EMEA', 'a player of a circuit keeps his own');
+  assert.equal(homesOf([{ date: '2024-01-01', circuit: null, games: [{ sides: [side('x', null), side('y', 'zz')], winner: 1 }] }], { byCountry: true }).size, 0,
+    'no flag, or no one of his country with a home: no home');
+});
+
+test('the games between circuits, each scored before it is played, and a group\'s offset in them', () => {
+  // Two circuits meet; the first wins 70% of the meetings where Elo, every newcomer at 1500, starts them level.
+  const series = [];
+  const rng = makeRng(3);
+  for (let day = 0; day < 600; day++) {
+    const date = new Date(Date.UTC(2024, 0, 1) + day * 86400000).toISOString().slice(0, 10);
+    for (const [prefix, circuit] of [['a', 'VCT Pacific'], ['b', 'Challengers Japan']]) {
+      series.push({ id: series.length, date, circuit, games: [{ sides: [side(`${prefix}${day % 3}-`, 'jp'), side(`${prefix}${(day + 1) % 3}-`, 'jp')], winner: rng() < 0.5 ? 1 : 2 }] });
+    }
+    if (day % 2 === 0) series.push({ id: series.length, date, circuit: null, games: [{ sides: [side(`a${day % 3}-`, 'jp'), side(`b${day % 3}-`, 'jp')], winner: rng() < 0.7 ? 1 : 2 }] });
+  }
+  const rows = scoredGames(series, { scale: 240 }, { from: '2024-03-01' });
+  const between = rows.filter(row => row.circuits[0] && row.circuits[1] && row.circuits[0] !== row.circuits[1]);
+  assert.ok(between.length > 200 && between.every(row => row.circuits[0] === 'VCT Pacific' && row.circuits[1] === 'Challengers Japan'));
+  assert.ok(rows.filter(row => row.circuits[0] === row.circuits[1]).length > 2 * between.length, 'the rest within one circuit');
+  const offsets = groupOffsets(rows);
+  assert.equal(offsets['VCT Pacific'].elo, -offsets['Challengers Japan'].elo, 'one offset, two sides');
+  assert.ok(offsets['VCT Pacific'].se > 0 && offsets['VCT Pacific'].n === between.length);
+  // Elo follows the 70%, so the residual left is small, and a known miss is recovered: every game won by the side Elo gives 0.3.
+  assert.ok(Math.abs(offsets['VCT Pacific'].elo) < 3 * offsets['VCT Pacific'].se, JSON.stringify(offsets['VCT Pacific']));
+  const missed = groupOffset(Array.from({ length: 400 }, (_, i) => ({ gap: -147.2, won: i % 2, cluster: i })));
+  assert.ok(Math.abs(missed.elo - 147) <= 1, JSON.stringify(missed));
+  assert.equal(scoreRows([{ e: 0.5, won: 1 }, { e: 0.5, won: 0 }]).logLoss, Math.LN2);
+});
+
 
 test('the rated players: twenty maps behind them, one within the year; a player\'s nation is his national team\'s, else his flag\'s', () => {
   const games = Array.from({ length: 25 }, () => ({ sides: [side('a', 'fr'), side('b', 'de')], winner: 1 }));

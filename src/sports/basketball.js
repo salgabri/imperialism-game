@@ -60,6 +60,11 @@ const BENCH_SHARE = 0.32;
 const HOME_EFFICIENCY = 0.024;
 /** The scorer of a bench run: the dataset names each side's starting five only. */
 export const BENCH = 'Bench';
+/**
+ * The strength of a nation with no rated players, and of a shirt a nation's five leaves unfilled (scripts/build-basketball.mjs):
+ * hockey's, baseball's and the rugby codes' baseline, the same on every continent.
+ */
+export const BASELINE = 45;
 const DECISIVE_SLOPE = 3;
 
 // A possession is shared by the two sides; better offence raises efficiency,
@@ -315,9 +320,10 @@ const basketballRules = {
   positionPlan: ['PG', 'SG', 'SF', 'PF', 'C'],
   positionColors: { PG: C.gold, SG: C.cyan, SF: C.green, PF: C.red, C: '#B07CD8' },
 
-  // Only the forty curated federations field a team (fieldedNations: a real side). Built anyway, a nation outside the
-  // list would be all generated at this strength.
-  fallbackStrength: (rec, confMeta) => Math.max(40, confMeta[rec[2]].baseStr - 8),
+  // Only the curated federations field a team (fieldedNations: a real side). Built anyway, a nation outside the list would
+  // be all generated at the baseline, a minnow's whatever its continent, as in hockey and baseball: not football's
+  // confederation constants (CONF_META), whose order, South America's above Europe's, is football's and not basketball's.
+  fallbackStrength: () => BASELINE,
   requiredPositions: [],
 
   clock: { length: FIBA.minutes, msPerUnit: 95 },

@@ -21,6 +21,8 @@
 // The men's seasons before 1973 come from a second run (docs/design/tennis.md, "Before 1973"): Sackmann's amateur file
 // (the majors and the Davis Cup, 1877-1967) as a warm-up before the open era's files, its newcomers at their own start
 // (`earlyLevelOf`), its layoffs charged only from `layoff.amateurWeeks`, and its duplicate ids merged (`applyAliases`).
+// Since 2026-11-21 its newcomers of 1946-1967 start at their region's and nation's level (`start.regions`;
+// docs/design/tennis.md, "Regions"), as do the women's newcomers of 1960-1967 (docs/design/womens-tennis.md, "Regions").
 
 /**
  * Round order within an event, qualifying first (the WTA's files have a fifth qualifying round; the amateur file a
@@ -197,11 +199,21 @@ export function wtaLevelOf(m) {
  * `yElo`, also each season's yElo (every player restarting at 1500 against his opponents' real Elo); `levelOf`, which
  * matches count and at what start (`atpLevelOf`, the default, or `wtaLevelOf`); `before(m, winner, loser)`, called with
  * each counted match and its two players' ratings and counted matches before it ({ elo, n }), layoffs charged.
- * Returns `{ snapshots: { [season]: { last, date, players } }, peaks, yElo, counts }`, each snapshot player `{ id,
- * name, elo, n, season: counted matches that season, last, absent? }` for everyone who played a counted match that
- * season, `absent` the layoff penalty his listed Elo already shows.
+ *
+ * Newcomers' levels (`start.regions`: `{ levels: [level…], from?: season, region: { [region]: Elo }, nation: { [code]:
+ * Elo } }`, the seasons before 1973, docs/design/tennis.md "Regions"): a newcomer whose first counted match is at one of
+ * `levels`, from season `from` on, starts his region's level plus his nation's above or below `start[level]`, his origin
+ * `originOf(id, m)` → `{ region, nation }` (either null, or one the levels do not name, for none). `likelihood: { regions,
+ * nations, score(m) }` also returns the log-likelihood of the matches `score` picks, each by the ratings before it, with
+ * its gradient and information in those regions' and nations' levels: every rating carries its derivatives in the levels
+ * through each update (`fitLevels` in scripts/lib/tennis-regions.mjs fits the levels with it).
+ * Returns `{ snapshots: { [season]: { last, date, players } }, peaks, yElo, counts, likelihood? }`, each snapshot player
+ * `{ id, name, elo, n, season: counted matches that season, last, absent? }` for everyone who played a counted match that
+ * season, `absent` the layoff penalty his listed Elo already shows; `likelihood` `{ n, ll, grad, info, newcomers }`,
+ * `newcomers` by level's key (a region, or `nation:<code>`) the players who started at it.
  */
-export function rateMatches(matches, method, { seasons = [], yElo = false, asOf = null, levelOf = atpLevelOf, before = null } = {}) {
+export function rateMatches(matches, method, { seasons = [], yElo = false, asOf = null, levelOf = atpLevelOf, before = null, originOf = null,
+  likelihood = null } = {}) {
   const wanted = new Set(seasons);
   const players = new Map();
   const counts = { counted: 0, unplayed: 0, 'no score': 0, placeholder: 0, skipped: 0 };
@@ -213,13 +225,33 @@ export function rateMatches(matches, method, { seasons = [], yElo = false, asOf 
     if (player.boost > 0) factor *= 1 + (layoff.kBoost - 1) * player.boost / layoff.kMatches;
     return factor;
   };
+  // A newcomer's origin, when his start is his region's and nation's: at one of those levels, from their first season on.
+  const regional = start.regions ?? null;
+  if (regional && !originOf) throw new Error('Newcomers\' levels need originOf');
+  const originAt = (id, level, m) => (regional && regional.levels.includes(level) && m.season >= (regional.from ?? -Infinity)
+    ? originOf(id, m) : null);
+  // The likelihood's levels (the regions', then the nations'): each player's derivatives in them (`d`), the sums over
+  // the scored matches.
+  const keys = likelihood ? [...likelihood.regions, ...likelihood.nations.map(code => `nation:${code}`)] : [];
+  const P = keys.length;
+  const L = likelihood && { n: 0, ll: 0, grad: new Array(P).fill(0), info: keys.map(() => new Array(P).fill(0)),
+    newcomers: Object.fromEntries(keys.map(key => [key, 0])) };
   // A new player's rating by the level of the first counted match: tour level (the Davis Cup or Fed Cup included), a
-  // challenger (a WTA 125 or an ITF event), or the qualifying of a tour-level event.
-  const playerOf = (id, name, level) => {
+  // challenger (a WTA 125 or an ITF event), or the qualifying of a tour-level event; and his region's and nation's level.
+  const playerOf = (id, name, level, m) => {
     let player = players.get(id);
     if (!player) {
-      player = { id, name, r: start[level], n: 0, last: 0, boost: 0, comeback: 0, prior: 0, peak: -Infinity, peakDate: 0,
-        season: 0, seasonCount: 0, yYear: 0, yR: 0, yN: 0, yW: 0, yL: 0 };
+      const origin = originAt(id, level, m);
+      const shift = origin ? (regional.region[origin.region] ?? 0) + (regional.nation[origin.nation] ?? 0) : 0;
+      player = { id, name, r: start[level] + shift, n: 0, last: 0, boost: 0, comeback: 0, prior: 0,
+        peak: -Infinity, peakDate: 0, season: 0, seasonCount: 0, yYear: 0, yR: 0, yN: 0, yW: 0, yL: 0 };
+      if (L) {
+        player.d = new Array(P).fill(0);
+        for (const key of origin ? [origin.region, `nation:${origin.nation}`] : []) {
+          const i = keys.indexOf(key);
+          if (i >= 0) { player.d[i] = 1; L.newcomers[key]++; }
+        }
+      }
       players.set(id, player);
     }
     return player;
@@ -289,7 +321,7 @@ export function rateMatches(matches, method, { seasons = [], yElo = false, asOf 
     if (level == null || (method.files === 'tour' && level !== 'tour')) { counts.skipped++; continue; }
     counts.counted++;
     lastDate = Math.max(lastDate, m.date);
-    const w = playerOf(m.winner, m.winnerName, level), l = playerOf(m.loser, m.loserName, level);
+    const w = playerOf(m.winner, m.winnerName, level, m), l = playerOf(m.loser, m.loserName, level, m);
     comeback(w, m.date);
     comeback(l, m.date);
     if (before) before(m, { elo: w.r, n: w.n }, { elo: l.r, n: l.n });
@@ -308,6 +340,22 @@ export function rateMatches(matches, method, { seasons = [], yElo = false, asOf 
     }
     const e = expected(w.r, l.r);
     const kw = kOf(w), kl = kOf(l);
+    if (L) {
+      // The winner's log-odds move by slope × (d_w − d_l) per unit of each level; each update carries the derivatives
+      // (a layoff's penalty is taken as fixed).
+      const slope = Math.LN10 / 400, gap = w.d.map((x, i) => x - l.d[i]);
+      if (likelihood.score(m)) {
+        L.n++;
+        L.ll += Math.log(e);
+        for (let i = 0; i < P; i++) {
+          if (!gap[i]) continue;
+          L.grad[i] += (1 - e) * slope * gap[i];
+          for (let j = 0; j < P; j++) L.info[i][j] += e * (1 - e) * slope * slope * gap[i] * gap[j];
+        }
+      }
+      const de = slope * e * (1 - e);
+      for (let i = 0; i < P; i++) { w.d[i] -= kw * de * gap[i]; l.d[i] += kl * de * gap[i]; }
+    }
     w.r += kw * (1 - e);
     l.r -= kl * (1 - e);
     for (const p of [w, l]) {
@@ -324,7 +372,7 @@ export function rateMatches(matches, method, { seasons = [], yElo = false, asOf 
   const peaks = [...players.values()].map(p => ({ id: p.id, name: p.name, peak: round1(p.peak), date: p.peakDate }))
     .sort((a, b) => b.peak - a.peak || byText(a.id, b.id));
   for (const list of Object.values(yEloSeasons)) list.sort((a, b) => b.yElo - a.yElo || byText(a.id, b.id));
-  return { snapshots, peaks, yElo: yEloSeasons, counts };
+  return { snapshots, peaks, yElo: yEloSeasons, counts, ...(L ? { likelihood: L } : {}) };
 }
 
 /**

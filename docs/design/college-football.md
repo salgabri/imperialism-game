@@ -153,7 +153,7 @@ advantage on, the home side at home: −0.003 on average, fourteen within 0.01):
 | 2017 | 0.230 (0.227) | 15.7 (14.3) | 28.9 (28.0) | 4.5% (3.6%) |
 | 2018 | 0.230 (0.230) | 15.4 (14.7) | 29.4 (28.3) | 4.7% (3.9%) |
 | 2019 | 0.230 (0.232) | 15.0 (14.0) | 28.8 (27.9) | 4.4% (3.0%) |
-| 2020 | 0.248 (0.253) | 15.3 (14.2) | 30.4 (28.8) | 5.5% (4.0%) |
+| 2020 | 0.255 (0.253) | 15.1 (14.2) | 30.2 (28.8) | 4.8% (4.0%) |
 | 2021 | 0.232 (0.233) | 15.1 (14.5) | 28.6 (27.5) | 4.5% (4.0%) |
 | 2022 | 0.220 (0.213) | 15.0 (14.4) | 28.3 (27.2) | 5.1% (5.9%) |
 | 2023 | 0.223 (0.225) | 14.7 (14.5) | 27.6 (26.7) | 4.8% (5.5%) |
@@ -339,8 +339,10 @@ all-conference players — and could field only the schools those name enough pl
   position (Week 10 Ratings, each school's best as many: `referenceOf`, `ratingsOf`). Each school then fields the lineup
   the game picks and its best backups (34), by the built-in season's rules.
 - **The move toward results.** As the NFL's computed seasons: each school's Simple Rating System over the season's games
-  between FBS schools (regular season and postseason, a bowl or playoff game at a neutral site), its reliability r (0.67
-  in 2020, when conferences barely met; 0.88–0.92 otherwise), m the margin the match model gives a point of played
+  between FBS schools (regular season and postseason, a bowl or playoff game at a neutral site), one system for the whole
+  FBS, so the conferences stand on one scale through their games against each other ([One scale for the
+  conferences](#one-scale-for-the-conferences)); its reliability r (0.88–0.92; 0.856 in 2020, whose conferences barely met
+  and are held toward the seasons either side, 0.67 before 2026-11-21), m the margin the match model gives a point of played
   strength under the season's rules without its data set (4.1–4.6 points from 2009 and 3.9–4.5 in 2004–2008, 2006's
   3.9 its clock rules' fewer possessions, over 160,000 games; 3.6–4.1 before the luck recalibration of 2026-11-18, [Luck
   and form](#luck-and-form), whose bigger scale gives more margin a point), and the target T = μ + √r × S ÷ m; every
@@ -428,6 +430,65 @@ UCF the Florida Citrus Bowl to 2006, Akron the Rubber Bowl to 2008, and Tulane t
 Hurricane Katrina sent its six home games to six grounds; ESPN's schedule places Temple's 2004 home games at Franklin
 Field, its season's article at Lincoln Financial Field, where the map has them ([domestic-campaigns.md](domestic-campaigns.md),
 "The FBS map").
+
+### One scale for the conferences
+
+Status: audited 2026-11-21, on the user's request that ratings be "normalized": a conference's champion must not rate like
+the best of a stronger conference because its results were read inside its own. The move's SRS is one system over every
+game between FBS schools of the season, conference, non-conference and postseason, so each conference's level is what
+its games against the others say: 19 to 65 games a conference a season, its level within 1.6 to 3.4 points (the SRS's own
+standard error) against a spread of conference levels of about 9 (the SEC +5 to +16, the MAC −7.5 to −15.1). Measured
+from the snapshots (`scripts/data/cfb-seasons/`), margins in points, ± one standard error:
+
+- **After the move, non-conference games.** The schools' played strength × m against their real margins (less the
+  season's home edge), by conference over 2004–2025: within ±1.1 points of nought (SEC +0.3 ± 0.4, Big Ten +0.6 ± 0.5,
+  Big 12 +1.1 ± 0.6; Conference USA −0.8 ± 0.5, Sun Belt −0.6 ± 0.5, MAC −0.3 ± 0.5, Mountain West −0.5 ± 0.5), and the
+  Group of Five side against the Power Five −0.8 ± 0.3 (n 2,031): the √r shrink, which moves a 15-point gap by 0.8.
+- **Held out: the bowls.** Each season's SRS of its regular season alone, predicting its bowls: the Group of Five side
+  against the Power Five +0.0 ± 1.4 (n 140; +0.6 ± 2.0 to 2013, −0.4 ± 2.0 since); the Power Five's schools −0.0 ± 0.6
+  (n 937), the Group of Five's −0.3 ± 0.8 (n 567). By conference the largest are the SEC's +2.6 ± 1.2 (n 208), the
+  MAC's −3.0 ± 1.7 (n 112), the Pac-12's −2.8 ± 1.5 (n 97) and the Big 12's −2.3 ± 1.4 (n 161), what fifteen conferences'
+  noise gives.
+- **In play.** The non-conference games and bowls replayed by the engine with the season files (twenty times each, the
+  home side at home): the Group of Five side against the Power Five −17.3 points a game against the real −17.9 (n 2,173).
+  It wins 21.1% of them against the real 18.0%: the drive model's extra luck ([Luck and form](#luck-and-form): 15.2 points
+  about the SRS against 14.2), which upsets any mismatch alike, not the conferences' scale.
+
+**2020, the exception.** The SEC, the Big Ten and the MAC played their own conferences only until the bowls; the Pac-12
+met another conference three times, the Mountain West eight. Read from those few games, the MAC's level was +3.1 ± 10.7,
+above the FBS's mean, from two bowls it won (Buffalo 17–10 over Marshall, Ball State 34–13 over San José State): Buffalo
+(6–1) rated the FBS's tenth school, Ball State (7–1) thirteenth, Eastern Michigan (2–4) above the FBS's mean. The SEC
+read +7.5 ± 5.3, the Big Ten +7.2 ± 7.4, the Pac-12 +1.8 ± 9.4 and the Mountain West −5.8 ± 5.6, and the season's r fell
+to 0.67.
+
+So a conference the season's games leave loose, one whose schools met other conferences fewer times than it has schools
+(`looseConferences`; 2020's five alone, every other conference-season meets the others at least 2.3 times a school), has
+its level held toward the mean of its levels in the seasons either side, counted as one more observation of it
+(`srsHoldingLooseConferences`, `srsWithPriors` in `scripts/lib/cfb-history.mjs`): of variance δ² + (SE₋² + SE₊²)/4,
+weighed against the season's margins' variance, as precise as 36 to 48 games. δ² = 2.5 (`CONFERENCE_DRIFT`) is how far a
+conference's level strays from the mean of its two neighbours, measured over the 173 conference-seasons of 2005–2024 that
+have both (2019–2021 left out): 9.75 points² observed, 7.25 of them the levels' own errors. Every school's place inside its
+conference still comes from the games, and so does every other conference's level; without a loose conference the SRS is
+srsOf's to the last bit, so the other 21 seasons rebuild byte for byte.
+
+- **Validated** on every conference-season of 2005–2024 with both neighbours (173), its regular-season games against other
+  conferences cut as 2020 cut them: its level read from what is left (its bowls) missed its level over its full schedule
+  by 6.3 points (root mean square; 9.9 at the 90th percentile), held toward its neighbours by 3.2 (5.0), the neighbours
+  alone by 3.4 (5.6); any δ² from 1 to 10 gives 3.13 to 3.20. In 2020 itself each of the 22 games between a loose
+  conference and another, left out in turn and predicted from the rest: 19.7 points off by the SRS of the rest, 15.9 by
+  the rule (the season's luck is 14.2); Buffalo over Marshall, Buffalo by 37.4 against 5.5 (it won by 7).
+- **2020 now.** The MAC's level −12.0 ± 2.1 (its neighbours' −12.6), the SEC's +10.8, the Big Ten's +9.2, the Pac-12's
+  +5.6 and the Mountain West's −4.2; r 0.856. The MAC's schools play 3.0 points lower (Buffalo 83.4 → 81.1, Ball State
+  83.3 → 80.9, Eastern Michigan 81.3 → 78.2; the conference's mean 80.7 → 77.7 against the FBS's 80.1); Alabama (13–0)
+  87.3 → 88.8 leads, then Oklahoma, Ohio State, Clemson and Georgia. Replayed on its own schedule the season spreads its
+  standings 0.255 against the real 0.253 (0.248 before; the Luck and form table's 2020 row is this one). Only `cfb-2020`
+  changes: its snapshot, season file and version, the audit, and its average matchup's spread in
+  `src/data/collegeLeagueAverages.js` (18.7 → 24.4).
+- **Not pooled elsewhere.** A conference's level in a normal season sits about ±2 points from the truth, and only δ ≈ 1.6
+  from the mean of the seasons either side, so pooling every season's levels with its neighbours' would roughly halve that
+  noise; it would also read each season partly from other seasons' results, which the move does not do where a season's
+  own games place its conferences. Decided 2026-11-21 (the coordinating session, for the user): no pooling beyond the
+  rule for a loose conference.
 
 ## Interface
 
@@ -682,7 +743,10 @@ recruiting classes' repaired team ids, a rebuilt roster's four kinds of player a
 class lists, the 3:2:1 window, shrinkage, the standardised signals, the least-squares weights, the rating by rank and at
 full depth); the frozen weights against the calibration; the rebuilt seasons' placements and the rebuild's validation
 (`rebuild-check.json`); every snapshot's squads, gaps and left-out schools, its SRS, targets and moves recomputed from its
-own games; every national champion among its season's five strongest; the snapshots rebuilt byte for byte from the
+own games (2020's with its loose conferences held toward 2019 and 2021); the SRS with priors equal to srsOf's without
+them, and holding a loosely linked group on invented games; the loose conferences (2020's five, no other season's), δ²
+measured again from the snapshots (173 conference-seasons, 2.5) and the MAC of 2020 back among the weakest; every national
+champion among its season's five strongest; the snapshots rebuilt byte for byte from the
 pinned sources where `data-src/` has them (2006, 2011 and 2025; `npm run sync:cfb-seasons -- --check` does all, and
 `-- --validate --check` the validation); every season, its listing and audit rebuilt; each season on its era's map with
 the conferences of its day, Idaho playing 2004–2008 and none after, Hawaii every season, New Mexico State's 2020 left

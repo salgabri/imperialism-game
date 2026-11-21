@@ -1,0 +1,36 @@
+{
+  "note": "The American League's record against the National League in each regular season's interleague games, 1997 to 2017: [the American League's wins, the National League's] (docs/design/baseball.md, \"One scale for both leagues\"), from English Wikipedia's \"Interleague play\" at the revision `source` pins (its table of each season's total games and each league's wins; facts only). Each season's wins less losses are the Baseball Databank's American League clubs' wins less their losses (their games inside the league cancel out). Written by node scripts/sync-mlb-interleague.mjs; npm run build:mlb-seasons puts the two leagues on one scale with it (scripts/lib/mlb-war.mjs jointShareOf).",
+  "source": {
+    "name": "English Wikipedia, \"Interleague play\"",
+    "url": "https://en.wikipedia.org/wiki/Interleague_play",
+    "revision": 1381217136,
+    "sha256": "c2ece3be5c6f8a7580a12a6b91f020b99509dbc4095e6f6fca813edfa4a52953",
+    "retrieved": "2026-11-21",
+    "licence": "CC BY-SA 4.0 (facts only are taken: each season's interleague games, the American League's wins and the National League's)",
+    "table": "Year | Best record | Total games | American League | National League"
+  },
+  "league": "AL",
+  "seasons": {
+    "1997": [97, 117],
+    "1998": [114, 110],
+    "1999": [116, 135],
+    "2000": [136, 115],
+    "2001": [132, 120],
+    "2002": [123, 129],
+    "2003": [115, 137],
+    "2004": [127, 125],
+    "2005": [136, 116],
+    "2006": [154, 98],
+    "2007": [137, 115],
+    "2008": [149, 103],
+    "2009": [138, 114],
+    "2010": [134, 118],
+    "2011": [131, 121],
+    "2012": [142, 110],
+    "2013": [154, 146],
+    "2014": [163, 137],
+    "2015": [167, 133],
+    "2016": [165, 135],
+    "2017": [160, 140]
+  }
+}

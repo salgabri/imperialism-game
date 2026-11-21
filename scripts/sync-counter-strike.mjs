@@ -6,14 +6,14 @@
 //
 // Usage: node scripts/sync-counter-strike.mjs [--tune]
 //   npm run sync:counter-strike
-//   --tune  also scores K and the regional starts on the last HOLDOUT_DAYS of maps, before each is played
+//   --tune  also scores K, with and without the regions' levels, on the last HOLDOUT_DAYS of maps, before each is played
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { readExport } from './lib/liquipedia.mjs';
-import { ACTIVE_DAYS, EDITION, K_SCALE, MIN_GAMES, ODDS_BINS, TIERS, formatOf, homeEdge, isRegionFlag, leftOut, nationalTeams,
-  nationOfPlayer, nationsOf, oddsBin, playerOf, ratedPlayers, readTournaments, regionalStarts, rowOf, runElo, scoreOf, seriesInOrder }
-  from './lib/counter-strike.mjs';
+import { ACTIVE_DAYS, EDITION, K_SCALE, LEVEL_TAU, MIN_GAMES, ODDS_BINS, OFFSET_TAU, TIERS, formatOf, homeEdge, homesOf, isRegionFlag,
+  leftOut, nationalTeams, nationOfPlayer, nationsOf, oddsBin, playerOf, ratedPlayers, readTournaments, regionLevels, rowOf, runElo,
+  scoreOf, seriesInOrder } from './lib/counter-strike.mjs';
 
 const args = process.argv.slice(2);
 const unknown = args.filter(arg => arg !== '--tune');
@@ -59,21 +59,31 @@ if (!series.length) process.exit(1);
 
 const last = series.at(-1).date;
 const holdout = new Date(Date.parse(last) - HOLDOUT_DAYS * 86400000).toISOString().slice(0, 10);
+// Each player's nation as the whole record gives it (his national teams, flags and page): his home is its region.
+const { players: everyone } = runElo(series);
+const nationOf = key => nationOfPlayer(everyone.get(key) ?? { key, flags: new Map() }, people, national);
 if (args.includes('--tune')) {
-  console.log(`\nScored on the ${HOLDOUT_DAYS} days from ${holdout}, each map before it is played:`);
+  console.log(`\nScored on the ${HOLDOUT_DAYS} days from ${holdout}, each map before it is played (the regions' levels from the maps`
+    + ' before; between regions: maps whose sides are each most of one region\'s players):');
+  // The levels do not hang on K: fitted once, on the maps before the held-out ones.
+  const homesBefore = homesOf(series, { until: holdout, nationOf });
+  const levelsBefore = regionLevels(series, homesBefore, { until: holdout });
+  console.log(`  levels before ${holdout}: ${JSON.stringify(levelsBefore)}`);
   for (const scale of [60, 80, 110, 140, 180, 240, 320, 400]) {
-    for (const regional of [false, true]) {
-      const starts = regional ? regionalStarts(series, { scale }) : {};
-      const { scored } = runElo(series, { scale, starts, holdout });
-      const all = scoreOf(scored.all), world = scoreOf(scored.international);
-      console.log(`  K ${String(scale).padStart(3)}${regional ? ' regional' : '         '}  log loss ${all.logLoss.toFixed(4)}`
-        + `  Brier ${all.brier.toFixed(4)}  (${all.n} maps)  international ${world.logLoss?.toFixed(4) ?? '—'} (${world.n})`);
+    for (const levels of [false, true]) {
+      const { scored } = runElo(series, { scale, starts: levels ? levelsBefore : {}, homes: homesBefore, holdout });
+      const all = scoreOf(scored.all), world = scoreOf(scored.international), cross = scoreOf(scored.cross);
+      console.log(`  K ${String(scale).padStart(3)}${levels ? ' levels' : '       '}  log loss ${all.logLoss.toFixed(4)}`
+        + `  Brier ${all.brier.toFixed(4)}  (${all.n} maps)  between regions ${cross.logLoss?.toFixed(4) ?? '—'} (${cross.n})`
+        + `  international ${world.logLoss?.toFixed(4) ?? '—'} (${world.n})`);
     }
   }
 }
 
-// Every newcomer starts at START (scripts/lib/counter-strike.mjs, K_SCALE): regional starts foresee no better here.
-const starts = {};
+// A newcomer starts at his region's level (docs/design/counter-strike.md, "Regions"): his home his nation's region, else
+// the region whose events he has played most maps in; each region's level fitted at once with every player's own strength.
+const homes = homesOf(series, { nationOf });
+const starts = regionLevels(series, homes);
 
 // How Counter-Strike 2's real maps went (MR12, from PLAY_FROM), for the match model (src/sports/counterStrike.js): only the
 // maps whose ten players had each played MIN_GAMES maps before, as every rated player has (a newcomer's Elo has not yet
@@ -120,7 +130,7 @@ const countMap = (one, game, e, sides) => {
 };
 const tournamentGame = new Map(tournaments.map(tournament => [tournament.title, tournament.game]));
 for (const one of series) one.game = tournamentGame.get(one.event) ?? null;
-const { players, scored, lan } = runElo(series, { starts, holdout, onGame: countMap });
+const { players, scored, lan } = runElo(series, { starts, homes, holdout, onGame: countMap });
 // The series of those maps: best of one, three and five, as they ended (from the favourite's side, by its odds before the
 // first map), for the series' form: each scoreline's count, and for each by the favourite's odds (ODDS_BINS bins, each a
 // row of its scorelines' counts in the order `lines` names them), so form can be fitted at the real series' own odds.
@@ -148,7 +158,7 @@ for (const row of Object.values(play.series)) row.odds = Math.round(row.odds / r
 const nationOfKey = key => nationOfPlayer(players.get(key) ?? { key, flags: new Map() }, people, national);
 const home = homeEdge(seasonedLan, nationOfKey);
 const homeAll = homeEdge(lan, nationOfKey);
-const rated = ratedPlayers(players, last, people, national);
+const rated = ratedPlayers(players, last, people, national, homes);
 const exported = pages.reduce((latest, page) => (String(page.timestamp) > latest ? String(page.timestamp) : latest), '').slice(0, 10);
 const round3 = x => Math.round(x * 1000) / 1000;
 
@@ -163,7 +173,9 @@ const snapshot = {
     name: 'Liquipedia', wiki: 'https://liquipedia.net/counterstrike/', license: 'CC BY-SA 3.0', edition: EDITION,
     exported, files: files.length, pages: pages.length, from: series[0].date, to: last, tournaments: tournaments.length,
     series: series.length, maps, players: players.size, rated: rated.length, activeDays: ACTIVE_DAYS, minGames: MIN_GAMES,
-    kScale: K_SCALE, starts, holdout: { from: holdout, ...scoreOf(scored.all), international: scoreOf(scored.international), calibration },
+    kScale: K_SCALE, levels: { offsetTau: OFFSET_TAU, levelTau: LEVEL_TAU }, starts,
+    holdout: { from: holdout, ...scoreOf(scored.all), international: scoreOf(scored.international), betweenRegions: scoreOf(scored.cross),
+      calibration },
     home, homeAll,
   },
   play: { ...play, rounds: round3(play.rounds / Math.max(1, play.maps)), ot: round3(play.ot / Math.max(1, play.maps)),
@@ -176,8 +188,9 @@ await writeSnapshot(snapshotFile, head, rows);
 const asPlayers = snapshot.players.map((row, i) => playerOf(row, exported, i + 1));
 const nations = nationsOf(asPlayers);
 const { noFlag, offMap, short } = leftOut(asPlayers);
-console.log(`\nWrote ${rated.length} rated players (of ${players.size}) to ${path.relative(root, snapshotFile)}; regional starts ${JSON.stringify(starts)}`);
-console.log(`  held out from ${holdout}: log loss ${scoreOf(scored.all).logLoss?.toFixed(4)} over ${scored.all.n} maps;`
+console.log(`\nWrote ${rated.length} rated players (of ${players.size}) to ${path.relative(root, snapshotFile)}; regions' levels ${JSON.stringify(starts)}`);
+console.log(`  held out from ${holdout}: log loss ${scoreOf(scored.all).logLoss?.toFixed(4)} over ${scored.all.n} maps`
+  + ` (between regions ${scoreOf(scored.cross).logLoss?.toFixed(4)} over ${scored.cross.n});`
   + ` calibration ${calibration.map(([e, w, n]) => `${e}→${w} (${n})`).join(', ')}`);
 console.log(`  home sides at LANs, between seasoned players: ${home ? `${home.games} maps, ${home.elo} ± ${home.se} Elo against Elo's`
   + ` expectation` : 'none'} (every LAN map: ${homeAll ? `${homeAll.games}, ${homeAll.elo} ± ${homeAll.se}` : 'none'})`);

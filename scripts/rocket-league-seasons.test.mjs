@@ -95,14 +95,23 @@ test('every season decodes: three to five players a nation, each his Elo of that
   assert.deepEqual(YEARS.map(year => seasonFile(year).coverage.nations), [50, 27, 33, 30, 29, 24, 18, 13, 11, 9]);
 });
 
-test('each season is its day\'s: Kaydop\'s France and mist\'s United States in 2019, Saudi Arabia ahead in 2021', () => {
+test('each season is its day\'s: Kaydop\'s France and mist\'s United States in 2019, its regions as its own games placed them', () => {
   const doc = seasonFile(2019);
   assert.deepEqual(squadNames(doc, '840').slice(0, 3), ['mist', 'jstn.', 'GarrettG']);
   assert.ok(squadNames(doc, '250').includes('Kaydop') && squadNames(doc, '250').includes('Ferra'));
   assert.equal(doc.nations['840'][2][0][3].team, 'Pittsburgh Knights', 'each player\'s team of that day');
   const top = year => Object.entries(seasonFile(year).nations).sort((a, b) => b[1][0] - a[1][0])[0][0];
-  assert.equal(top(2021), '682', 'Saudi Arabia led at the end of 2021');
+  // The games to the end of 2021 place MENA's level well below Europe's and North America's (it climbs every year after),
+  // so Saudi Arabia trails Great Britain then.
+  assert.equal(top(2021), '826', 'Great Britain led at the end of 2021');
+  assert.ok(snapshot(2021).starts.MENA < snapshot(2025).starts.MENA);
+  assert.ok(seasonFile(2021).nations['682'][0] < seasonFile(2021).nations['826'][0]);
   assert.equal(top(2017), '528', 'the Netherlands (remkoe) at the end of 2017');
+  // Each season's regions are placed by its own games: the levels it was rated with are its snapshot's, Europe's 1,500.
+  for (const year of YEARS) {
+    assert.equal(snapshot(year).starts.EU, 1500, `${year}: Europe's level anchors it`);
+    assert.match(seasonFile(year).source.conversion, new RegExp(`region's level as the games to ${year}-12-31 measure it`));
+  }
   // The built-in season's rule for a name two share: each shown by his page.
   assert.deepEqual(ROSTERS['512'][2].map(([name]) => name).filter(name => name.startsWith('Abdullah')), ['Abdullah', 'Abdullahrll']);
 });

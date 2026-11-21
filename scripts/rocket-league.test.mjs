@@ -21,13 +21,13 @@ import { buildSetupModel, signingsOffered, SPORT_NOTES } from '../src/screens/se
 import { automaticAcquisition } from '../src/engine/campaignExperience.js';
 import { readChallenge } from '../src/screens/setup/challenge.js';
 import {
-  allTemplates, gameOf, normalTitle, parseTemplates, personOf, plainText, readExport, rostersOf, seriesOf, subpagesOf, teamKeys,
+  allTemplates, gameOf, normalTitle, parseTemplates, personOf, plainText, readExport, regionOf, rostersOf, seriesOf, subpagesOf, teamKeys,
   tournamentOf, wikiDate,
 } from './lib/liquipedia.mjs';
 import {
-  abbreviationScore, baseTeamName, expected, foldPlayers, gameRating, homeEdge, isRegionFlag, kFactor, LINEUP, looseKey, MIN_PLAYERS,
-  nationalTeams, nationOfFlag, nationsOf, playerOf, ratedPlayers, readTournaments, regionalStarts, runElo, seriesInOrder, startersOf,
-  START, TEAM_SIZE,
+  abbreviationScore, baseTeamName, expected, foldPlayers, gameRating, homeEdge, homesOf, isRegionFlag, kFactor, LINEUP, looseKey,
+  MIN_PLAYERS, nationalTeams, nationOfFlag, nationsOf, playerOf, ratedPlayers, readTournaments, regionLevels, regionOfNation, runElo,
+  seriesInOrder, startersOf, START, TEAM_SIZE,
 } from './lib/rocket-league.mjs';
 
 const sport = getSport('rocket-league');
@@ -109,6 +109,9 @@ test('an event\'s infobox gives its tier, mode, region, dates and host', () => {
   assert.deepEqual(tournamentOf(major), { name: 'RLCS 2026 - Paris Major', tier: 1, tierType: null, mode: '3v3', start: '2026-05-21',
     end: '2026-05-24', region: null, type: 'Offline', country: 'France', city: 'Paris', series: 'Rocket League Championship Series' });
   assert.equal(tournamentOf(open).region, 'EU', 'the region its title names');
+  for (const half of ['North', 'South']) {
+    assert.equal(regionOf({}, `Rocket League Championship Series/2021-22/Fall/Asia-Pacific ${half}/1`), 'APAC', `Asia-Pacific ${half} is APAC's`);
+  }
   assert.equal(tournamentOf(open).mode, '3v3', 'unnamed, the RLCS\'s own');
   assert.equal(tournamentOf({ title: 'X', text: 'no infobox' }), null);
 });
@@ -208,27 +211,61 @@ test('the Elo is a team\'s: each game moves its three by the same amount, the wi
   assert.ok(kFactor(0) > kFactor(100) && kFactor(100) > kFactor(10000) && kFactor(1e9) === 8);
 });
 
-test('a region whose teams beat Elo\'s odds at the internationals starts its newcomers higher', () => {
-  // Two regions of four teams each, every team the same inside its region; region B's teams win every international game.
+// Two regions of four teams each, every team the same inside its region; NA's teams win every game against EU's. A
+// third region's two teams split their series, and one of them then beats an EU team once (the 26th day). Each series is
+// `{ date, event, region, … }` as seriesInOrder gives it.
+function twoRegions() {
   const roster = name => ({ team: name, players: [1, 2, 3].map(i => ({ name: `${name}${i}`, flag: 'fr' })) });
-  const teams = [...'abcd'].map(t => roster(`A${t}`)).concat([...'abcd'].map(t => roster(`B${t}`)));
+  const teams = [...'abcd'].map(t => roster(`A${t}`)).concat([...'abcd'].map(t => roster(`B${t}`)), [roster('Ca'), roster('Cb')]);
   const series = [];
   let day = 1;
-  const date = () => `2026-01-${String(day++).padStart(2, '0')}`;
+  const add = (x, y, region, winners) => series.push({ date: `2026-01-${String(day++).padStart(2, '0')}`, event: region ? `r${region}` : 'world',
+    region, international: !region, host: null, page: 'p', index: 0, names: [teams[x].team, teams[y].team],
+    teams: [teams[x].players, teams[y].players], rosters: [teams[x], teams[y]], games: winners.map(winner => ({ winner })), winner: winners.at(-1) });
   for (let round = 0; round < 3; round++) {
-    for (const [x, y, region] of [[0, 1, 'EU'], [2, 3, 'EU'], [4, 5, 'NA'], [6, 7, 'NA']]) {
-      series.push({ date: date(), event: `r${round}`, region, international: false, host: null, page: 'p', index: 0,
-        names: [teams[x].team, teams[y].team], teams: [teams[x].players, teams[y].players], rosters: [teams[x], teams[y]],
-        games: [{ winner: 1 }, { winner: 2 }], winner: 1 });
-    }
-    for (const [x, y] of [[0, 4], [1, 5], [2, 6], [3, 7]]) {
-      series.push({ date: date(), event: `world${round}`, region: null, international: true, host: null, page: 'p', index: 0,
-        names: [teams[x].team, teams[y].team], teams: [teams[x].players, teams[y].players], rosters: [teams[x], teams[y]],
-        games: [{ winner: 2 }, { winner: 2 }, { winner: 2 }], winner: 2 });
-    }
+    for (const [x, y, region] of [[0, 1, 'EU'], [2, 3, 'EU'], [4, 5, 'NA'], [6, 7, 'NA']]) add(x, y, region, [1, 2]);
+    for (const [x, y] of [[0, 4], [1, 5], [2, 6], [3, 7]]) add(x, y, null, [2, 2, 2]);
   }
-  const starts = regionalStarts(series, { least: 1 });
-  assert.ok(starts.NA > starts.EU, `NA ${starts.NA} over EU ${starts.EU}`);
+  add(8, 9, 'OCE', [1, 2]);
+  add(8, 0, null, [1]);
+  return series;
+}
+
+test('a region whose sides beat the others\' more than Elo expects is placed higher, Europe\'s level at 1,500', () => {
+  const series = twoRegions();
+  const homes = homesOf(series);
+  assert.deepEqual(['Aa1', 'Bd3', 'Ca2'].map(key => homes.get(key)), ['EU', 'NA', 'OCE'], 'each player\'s home: the region of his events');
+  const levels = regionLevels(series, homes);
+  assert.equal(levels.EU, START, 'Europe\'s level anchors the scale');
+  assert.ok(levels.NA > levels.EU + 100, `NA ${levels.NA} over EU ${levels.EU}`);
+  assert.ok(levels.OCE > levels.EU && levels.OCE < levels.NA, `one win lifts OCE (${levels.OCE}) less than NA's twelve`);
+  assert.ok(levels.world > levels.EU && levels.world < levels.NA, 'the world\'s mean between them');
+  assert.deepEqual(regionLevels(series, homes, { until: '2026-01-01' }), { world: START }, 'no games before the first');
+  // A newcomer starts at his home's level, else at his first event's region's, else at the world's mean.
+  const first = new Map();
+  const look = (list, options) => runElo(list, { ...options, onGame: (one, game, e, sides) => {
+    for (const player of sides.flat()) if (!first.has(player.key)) first.set(player.key, player.elo);
+  } });
+  look(series, { starts: levels, homes });
+  assert.deepEqual(['Aa1', 'Ba1', 'Ca1'].map(key => first.get(key)), [levels.EU, levels.NA, levels.OCE]);
+  first.clear();
+  look(series, { starts: levels, homes: new Map() });
+  assert.deepEqual(['Aa1', 'Ba1', 'Ca1'].map(key => first.get(key)), [levels.EU, levels.NA, levels.OCE], 'his first event\'s region');
+  first.clear();
+  look(series.filter(one => !one.region), { starts: levels, homes: new Map() });
+  assert.equal(first.get('Aa1'), levels.world, 'an international event names no region');
+});
+
+test('a player no regional event places has his nation\'s RLCS region', () => {
+  assert.deepEqual(['682', '504', '036', '554', '710', '392', '076', '840', '250', '826', null].map(regionOfNation),
+    ['MENA', 'MENA', 'OCE', 'OCE', 'SSA', 'APAC', 'SAM', 'NA', 'EU', 'EU', null]);
+  const series = twoRegions();
+  const nationOf = key => (key.startsWith('Ca') ? '682' : null);
+  // The OCE team's players lose their one regional series: they are known only from the international game.
+  const homes = homesOf(series.filter(one => one.region !== 'OCE'), { nationOf });
+  assert.equal(homes.get('Ca1'), 'MENA', 'no region from his events: his nation\'s');
+  assert.equal(homesOf(series, { nationOf }).get('Ca1'), 'OCE', 'his events\' region first');
+  assert.equal(homesOf(series, { nationOf, until: '2026-01-25' }).has('Ca1'), false, 'first seen after `until`: no home yet');
 });
 
 test('the home crowd\'s edge reads only LAN games with one side of the host nation', () => {

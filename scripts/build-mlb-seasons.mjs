@@ -19,7 +19,10 @@
 // franchise eras of scripts/data/mlb-war-seasons.json and its nations by the Baseball Databank's birth country. Each club
 // then moves toward its real won-lost record (docs/design/computed-ratings.md, step 5; scripts/lib/mlb-war.mjs
 // resultsMove), by the win share a point of strength is worth in the engine under the season's rules, measured by
-// playing it (perPointOfSeason, seeded by the season, so the season rebuilds byte for byte).
+// playing it (perPointOfSeason, seeded by the season, so the season rebuilds byte for byte). From 1997 the season's
+// interleague record (scripts/data/mlb-interleague.json, read from English Wikipedia's "Interleague play" at the revision
+// scripts/data/mlb-war-seasons.json pins, each season's net checked against the Databank's league totals) puts both
+// leagues' clubs on one scale (jointShareOf).
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -126,7 +129,7 @@ const pearson = (xs, ys) => {
  * The computed season of `year` from its snapshot (scripts/data/mlb-war-seasons/<year>.json): its data set document and
  * audit row. `manifest` is scripts/data/mlb-war-seasons.json, `reference` scripts/data/mlb-war-reference.json.
  */
-function buildWarSeason(snapshot, year, manifest, franchises, reference) {
+function buildWarSeason(snapshot, year, manifest, franchises, reference, interleagueRecords) {
   if (snapshot.season !== year) throw new Error(`scripts/data/mlb-war-seasons/${year}.json is the ${snapshot.season} season`);
   const colours = new Map(CLUBS.map(club => [club.id, club.col]));
   const teams = teamsOfWar(franchises, manifest, year).map(team => ({ ...team, show: team.war, col: colours.get(team.id) ?? colourFor(team.id) }));
@@ -161,9 +164,14 @@ function buildWarSeason(snapshot, year, manifest, franchises, reference) {
   const builtUnmoved = unmoved.map(club => buildClub({ ...club, league: 'MLB', squad: club.squad.map(tupleOf) }, baseball));
   const premium = seasonPremium(builtUnmoved);
   const perPoint = perPointOfSeason(builtUnmoved, baseballOfSeason(year, premium), hashStr(`${warSeasonIdOf(year)}|per point`));
+  // From 1997 the leagues met in interleague games, which put both on one scale (docs/design/baseball.md, "One scale for
+  // both leagues"): a season whose leagues' clubs did not win exactly as many games as they lost met, and must say how.
+  const interleague = interleagueOf(interleagueRecords, year);
+  const nets = Object.values(snapshot.teams).reduce((sum, team) => ({ ...sum, [team.league]: (sum[team.league] ?? 0) + team.w - team.l }), {});
+  if (!interleague && Object.values(nets).some(net => net !== 0)) throw new Error(`${year}: the leagues met (${JSON.stringify(nets)}) but scripts/data/mlb-interleague.json has no record for it`);
   const move = resultsMove(teams.map(team => ({ id: team.id, league: recordOf(team).league, w: recordOf(team).w, l: recordOf(team).l,
     pool: players.filter(player => player.team === team.war).sort(byRatingThenScore) })), { perPoint, strengthOf, order: byRatingThenScore,
-    lineupOf: pool => new Set(lineupOf(pool).starters.map(player => player.id)) });
+    lineupOf: pool => new Set(lineupOf(pool).starters.map(player => player.id)), interleague });
   const moved = new Map(move.moves.flatMap(club => club.pool.map(player => [player.id, player.rating])));
   if (moved.size !== players.length) throw new Error(`${year}: the clubs' moves rate ${moved.size} of ${players.length} players`);
   for (const player of players) player.rating = moved.get(player.id);
@@ -199,7 +207,7 @@ function buildWarSeason(snapshot, year, manifest, franchises, reference) {
     name: 'JEFFBAGWELL WAR (Neil Paine) and the Baseball Databank (Chadwick Baseball Bureau)',
     computed: true,
     method: manifest.seasonSource.method,
-    conversion: `${manifest.seasonSource.conversion} ${moveText(year, move, perPoint)}`,
+    conversion: `${manifest.seasonSource.conversion} ${moveText(year, move, perPoint, interleague)}`,
     licence: manifest.seasonSource.licence,
     url: manifest.sources.war.url,
     retrieved: manifest.seasonSource.retrieved,
@@ -237,10 +245,16 @@ function buildWarSeason(snapshot, year, manifest, franchises, reference) {
     // The same for the strength the match model plays, which the move sets.
     playedVsRecord: vsRecord(t => movedOf.get(t.id).after),
     playedVsRecordBefore: vsRecord(t => movedOf.get(t.id).before),
+    // ... and against the results strength the move aims at (each club's record, both leagues on one scale from 1997).
+    playedVsResults: Math.round(pearson(teams.map(t => movedOf.get(t.id).after), teams.map(t => move.strengths[t.id])) * 1000) / 1000,
     // The move's constants: the records' reliability, the win share a point is worth (measured at the pitching premium of
     // the clubs before the move) and the season's mean strength before it.
     results: { reliability: Math.round(move.reliability * 1000) / 1000, perPoint: Math.round(perPoint * 10000) / 10000, level: r2(move.level),
       premiumBefore: premium },
+    // The two leagues: each one's mean played strength before and after the move, and from 1997 the American League's
+    // interleague record against the National League and the edge Δ it gives (docs/design/baseball.md, "One scale for both
+    // leagues").
+    leagues: leaguesOf(teams, recordOf, movedOf, interleague, move.edge),
     // Each club's strength as the match model plays it, before and after, its target, and how its players moved.
     moves: clubs.map(c => {
       const m = movedOf.get(c.id);
@@ -257,16 +271,51 @@ function buildWarSeason(snapshot, year, manifest, franchises, reference) {
 }
 
 /**
- * The sentence each computed season's `source.conversion` ends with: how its clubs moved toward their real records, with
- * the season's own constants.
+ * The season's interleague record (scripts/data/mlb-interleague.json, read from the pinned page by node
+ * scripts/sync-mlb-interleague.mjs): `{ league, w, l }`, the American League's wins and losses against the National
+ * League, or null before 1997, when the leagues never met in the regular season.
  */
-function moveText(year, move, perPoint) {
-  return 'Then each club moves toward its real won-lost record (docs/design/computed-ratings.md, step 5). Its target, in the strength '
-    + 'the match model plays (the mean of its lineup\'s batting and its defence, 75% pitching and 25% fielding), is '
-    + `μ + √r × (W% − ½) × (n − 1)/n ÷ m: μ ${move.level.toFixed(2)}, the season's mean strength before the move; r ${move.reliability.toFixed(3)}, `
-    + 'the share of the records\' variance that is not luck; n the clubs of its league, none of which plays itself; '
-    + `m ${perPoint.toFixed(4)}, the win share a point of strength is worth in the engine under ${year}'s rules. Every player of the `
+function interleagueOf(records, year) {
+  const record = records.seasons[year];
+  return record ? { league: records.league, w: record[0], l: record[1] } : null;
+}
+
+/**
+ * A season's two leagues for the audit: each one's clubs, their mean played strength before and after the move, the
+ * American League's lead over the National League in it, and from 1997 the interleague record and its edge Δ.
+ */
+function leaguesOf(teams, recordOf, movedOf, interleague, edge) {
+  const r2 = value => Math.round(value * 100) / 100;
+  const meanOf = (league, key) => {
+    const own = teams.filter(team => recordOf(team).league === league);
+    return own.reduce((sum, team) => sum + movedOf.get(team.id)[key], 0) / own.length;
+  };
+  const out = {};
+  for (const league of ['AL', 'NL']) out[league] = { clubs: teams.filter(team => recordOf(team).league === league).length, before: r2(meanOf(league, 'before')), after: r2(meanOf(league, 'after')) };
+  out.lead = { before: r2(meanOf('AL', 'before') - meanOf('NL', 'before')), after: r2(meanOf('AL', 'after') - meanOf('NL', 'after')) };
+  if (interleague) out.interleague = { record: `${interleague.w}–${interleague.l}`, edge: Math.round(edge * 10000) / 10000 };
+  return out;
+}
+
+/**
+ * The sentence each computed season's `source.conversion` ends with: how its clubs moved toward their real records, with
+ * the season's own constants. From 1997 (`interleague`) both leagues stand on one scale, set by their interleague games.
+ */
+function moveText(year, move, perPoint, interleague) {
+  const head = 'Then each club moves toward its real won-lost record (docs/design/computed-ratings.md, step 5). Its target, in the strength '
+    + 'the match model plays (the mean of its lineup\'s batting and its defence, 75% pitching and 25% fielding), is ';
+  const tail = `m ${perPoint.toFixed(4)}, the win share a point of strength is worth in the engine under ${year}'s rules. Every player of the `
     + 'club moves by one whole number and the best few of its lineup by one more, so nobody passes a teammate.';
+  if (!interleague) {
+    return `${head}μ + √r × (W% − ½) × (n − 1)/n ÷ m: μ ${move.level.toFixed(2)}, the season's mean strength before the move; r ${move.reliability.toFixed(3)}, `
+      + `the share of the records' variance that is not luck; n the clubs of its league, none of which plays itself; ${tail}`;
+  }
+  return `${head}μ + √r × S ÷ m: μ ${move.level.toFixed(2)}, the season's mean strength before the move; r ${move.reliability.toFixed(3)}, `
+    + 'the share of the records\' variance that is not luck; S its strength above the season\'s mean with both leagues on one scale: '
+    + `the American League won ${interleague.w}–${interleague.l} against the National League in the season's interleague games, an edge Δ of `
+    + `${move.edge.toFixed(4)} between the leagues' average clubs, which each league holds above or below the season's mean in proportion to the other `
+    + 'league\'s clubs; within its league a club stands (W% − ½ − f × Δ) ÷ ((1 − f) × n/(n − 1) + f) above its league\'s mean, f the share of its '
+    + `league's games that were interleague and n the clubs of its league; ${tail}`;
 }
 
 /**
@@ -274,7 +323,7 @@ function moveText(year, move, perPoint) {
  * file's MIT licence, the Baseball Databank's CC BY-SA 3.0 statement and Retrosheet's notice, in their own words).
  */
 function attributionText(manifest, docs) {
-  const { war, databank, wikipedia } = manifest.sources;
+  const { war, databank, wikipedia, interleague } = manifest.sources;
   // Each notice indented, in its own words (a line's trailing spaces dropped).
   const indent = text => text.split('\n').map(line => (line ? `  ${line.trimEnd()}` : '')).join('\n');
   const corrected = Object.values(manifest.birthCountries || {});
@@ -288,8 +337,8 @@ Generated by scripts/build-mlb-seasons.mjs from scripts/data/mlb-war-seasons.jso
 The ratings in these files are computed by this project from the players' WAR (docs/design/baseball.md, "Seasons
 before 2018: computed from WAR"): each player's WAR per playing time over three seasons, put rank for rank on
 MLB The Show 18 to 24's scale, then every player of a club moved toward the club's real won-lost record (the
-Databank's), by one whole number and the best few of its lineup by one more. No game rated these seasons, and
-these are not any game's ratings.
+Databank's; from 1997 with both leagues on one scale, by their interleague games), by one whole number and the
+best few of its lineup by one more. No game rated these seasons, and these are not any game's ratings.
 
 WAR: ${war.name} by ${war.author} (${war.repository}),
   file ${war.file} at commit ${war.commit}.
@@ -320,6 +369,12 @@ Ballpark names of the day, the locations of the ballparks of the 1960s and 1970s
   gets wrong (${correctedPlaces}):
   ${wikipedia.name} (CC BY-SA 4.0), only facts taken from each article's infobox; each article's revision is
   pinned in scripts/data/mlb-war-seasons.json.
+
+The American League's record against the National League in the interleague games of 1997 to 2017, which
+  puts both leagues' clubs on one scale from 1997 (scripts/data/mlb-interleague.json):
+  ${interleague.name} (${interleague.url}), revision ${interleague.revision} (CC BY-SA 4.0),
+  only each season's games and each league's wins taken from its table; pinned in
+  scripts/data/mlb-war-seasons.json.
 `;
 }
 
@@ -372,11 +427,17 @@ async function main() {
   // The seasons computed from WAR, newest first.
   const warManifest = JSON.parse(await readFile(path.join(root, 'scripts/data/mlb-war-seasons.json'), 'utf8'));
   const reference = JSON.parse(await readFile(path.join(root, 'scripts/data/mlb-war-reference.json'), 'utf8'));
+  // The interleague records, read from the page scripts/data/mlb-war-seasons.json pins (`sources.interleague`).
+  const interleagueRecords = JSON.parse(await readFile(path.join(root, 'scripts/data/mlb-interleague.json'), 'utf8'));
+  const pin = warManifest.sources.interleague;
+  if (interleagueRecords.source.revision !== pin.revision || interleagueRecords.source.sha256 !== pin.sha256) {
+    throw new Error('scripts/data/mlb-interleague.json is not read from the pinned page: run node scripts/sync-mlb-interleague.mjs');
+  }
   const warResults = [];
   for (let year = warManifest.seasons.to; year >= warManifest.seasons.from; year--) {
     const file = path.join(root, `scripts/data/mlb-war-seasons/${year}.json`);
     if (!existsSync(file)) throw new Error(`No snapshot for ${year}: run npm run import:mlb-war`);
-    warResults.push(buildWarSeason(JSON.parse(await readFile(file, 'utf8')), year, warManifest, franchises, reference));
+    warResults.push(buildWarSeason(JSON.parse(await readFile(file, 'utf8')), year, warManifest, franchises, reference, interleagueRecords));
   }
   for (const { doc, text, audit } of warResults) {
     console.log(`${doc.id} on ${doc.map}: ${doc.clubs.length} clubs (record r ${audit.strengthVsRecord}), ${audit.fielded.length} of ${audit.nations.length} nations field a team, `

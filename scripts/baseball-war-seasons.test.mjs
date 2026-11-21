@@ -23,12 +23,14 @@ import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { readChallenge } from '../src/screens/setup/challenge.js';
 import { kmToPolys, pointInPolys } from './lib/domestic-partition.mjs';
 import { baseball, baseballOfSeason, seasonPremium } from '../src/sports/baseball.js';
-import { nationOfBirthCountry, rateByRank, resultsMove, teamsOfWar, warScoreOf, warSeasonIdOf } from './lib/mlb-war.mjs';
+import { jointShareOf, nationOfBirthCountry, rateByRank, resultsMove, teamsOfWar, warScoreOf, warSeasonIdOf } from './lib/mlb-war.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 const MANIFEST = JSON.parse(read('scripts/data/mlb-war-seasons.json'));
+// The American League's interleague records, read from the page the manifest pins (node scripts/sync-mlb-interleague.mjs).
+const INTERLEAGUE = JSON.parse(read('scripts/data/mlb-interleague.json'));
 const REFERENCE = JSON.parse(read('scripts/data/mlb-war-reference.json'));
 const FRANCHISES = JSON.parse(read('scripts/data/mlb-teams.json')).teams;
 const AUDIT = JSON.parse(read('docs/design/baseball-war-seasons-audit.json'));
@@ -47,6 +49,18 @@ const pearson = (xs, ys) => {
   let sxy = 0, sxx = 0, syy = 0;
   for (let i = 0; i < xs.length; i++) { sxy += (xs[i] - mx) * (ys[i] - my); sxx += (xs[i] - mx) ** 2; syy += (ys[i] - my) ** 2; }
   return sxy / Math.sqrt(sxx * syy);
+};
+/**
+ * Each club's results strength in season `year`, by `teamsOfWar` order: its win share less a half within its league before
+ * 1997, and from 1997 both leagues on one scale through the season's interleague games (jointShareOf).
+ */
+const resultsOf = year => {
+  const { teams } = snapshotOf(year);
+  const clubs = teamsOfWar(FRANCHISES, MANIFEST, year).map(t => ({ id: t.id, league: teams[t.war].league, w: teams[t.war].w, l: teams[t.war].l }));
+  const shares = Object.fromEntries(clubs.map(c => [c.id, c.w / (c.w + c.l) - 0.5]));
+  const record = INTERLEAGUE.seasons[year];
+  const joint = record ? jointShareOf(clubs, shares, { league: INTERLEAGUE.league, w: record[0], l: record[1] }).strengths : shares;
+  return clubs.map(c => joint[c.id]);
 };
 
 // ---------- building ----------
@@ -165,12 +179,13 @@ test('the computed seasons look like their years: Mantle and Mays in 1961, the O
   assert.equal(seasonFile(1975).clubs[0].name, 'Cincinnati Reds');
   assert.equal(seasonFile(1998).clubs[0].name, 'New York Yankees');
   // Club strength follows the real records: r 0.94 on average over the 58 seasons once each club has moved toward its
-  // record (0.82 from the players alone), 0.89 at the least (2014).
+  // record (0.82 from the players alone), 0.89 at the least (2014); from 1997 the records with both leagues on one scale
+  // (jointShareOf), which the raw records of 2006 and 2008, the years the American League won most of its interleague
+  // games, follow at 0.80 and 0.81.
   const rs = YEARS.map(year => {
-    const { teams } = snapshotOf(year);
     const clubs = teamsOfWar(FRANCHISES, MANIFEST, year);
     const doc = seasonFile(year);
-    return pearson(clubs.map(t => doc.clubs.find(c => c.id === t.id).str), clubs.map(t => teams[t.war].w / (teams[t.war].w + teams[t.war].l)));
+    return pearson(clubs.map(t => doc.clubs.find(c => c.id === t.id).str), resultsOf(year));
   });
   assert.ok(rs.reduce((s, r) => s + r, 0) / rs.length >= 0.92 && Math.min(...rs) >= 0.85, `r ${rs}`);
   assert.deepEqual(AUDIT.seasons.map(season => season.id), [...YEARS].reverse().map(warSeasonIdOf));
@@ -202,8 +217,11 @@ test('each club moves toward its record: every player by one whole number, the l
         if (a.before > b.before) assert.ok(a.after >= b.after, `${year} ${club.name}: ${b.name} passes ${a.name}`);
       }
     }
-    // The strength the match model plays follows the record exactly; the conversion says how, with the season's constants.
-    assert.ok(audit.playedVsRecord >= 0.999 && audit.strengthVsRecord > audit.strengthVsRecordBefore, `${year}`);
+    // The strength the match model plays follows the results exactly (before 1997 the record itself; from 1997 the record
+    // with both leagues on one scale); the conversion says how, with the season's constants.
+    assert.ok(audit.playedVsResults >= 0.999, `${year}: played ${audit.playedVsResults}`);
+    if (year < 1997) assert.ok(audit.playedVsRecord >= 0.999 && audit.strengthVsRecord > audit.strengthVsRecordBefore, `${year}`);
+    else assert.match(doc.source.conversion, new RegExp(`the American League won ${INTERLEAGUE.seasons[year].join('–')} against the National League`));
     assert.match(doc.source.conversion, /Then each club moves toward its real won-lost record/);
     assert.ok(doc.source.conversion.includes(`r ${audit.results.reliability.toFixed(3)},`) && doc.source.conversion.includes(`m ${audit.results.perPoint.toFixed(4)},`),
       `${year}: the conversion states the move's constants`);
@@ -244,6 +262,80 @@ test('a club\'s target is μ + √r × (W% − ½) × (n − 1)/n ÷ m, and the 
   const rated = Object.fromEntries(a.pool.map(p => [p.id, p.rating]));
   assert.equal(rated.a3, 90 + a.shift);
   assert.ok([rated.a1, rated.a2].every(r => r === 70 + a.shift || r === 71 + a.shift));
+});
+
+test('leagues that met share one scale: a club\'s strength is its league\'s interleague edge and its record less what that edge gave it', () => {
+  // Two leagues of three and two clubs, 100 games each; the AL won 12–8 of the 20 games between them (Δ = 0.1), so its
+  // clubs won 4 more than they lost in all, the NL's 4 fewer. f: 20 of the AL's 300 games, 20 of the NL's 200.
+  const clubs = [
+    { id: 'a', league: 'AL', w: 60, l: 40 }, { id: 'b', league: 'AL', w: 47, l: 53 }, { id: 'c', league: 'AL', w: 45, l: 55 },
+    { id: 'd', league: 'NL', w: 52, l: 48 }, { id: 'e', league: 'NL', w: 46, l: 54 },
+  ];
+  const shares = Object.fromEntries(clubs.map(c => [c.id, c.w / (c.w + c.l) - 0.5]));
+  const { strengths, edge, shares: f } = jointShareOf(clubs, shares, { league: 'AL', w: 12, l: 8 });
+  assert.ok(Math.abs(edge - 0.1) < 1e-12);
+  assert.ok(Math.abs(f.AL - 20 / 300) < 1e-12 && Math.abs(f.NL - 20 / 200) < 1e-12);
+  const within = (share, n, fl, own) => (share - fl * own) / ((1 - fl) * n / (n - 1) + fl);
+  const expected = {
+    a: within(0.1, 3, 20 / 300, 0.1) + 0.1 * 2 / 5, b: within(-0.03, 3, 20 / 300, 0.1) + 0.1 * 2 / 5, c: within(-0.05, 3, 20 / 300, 0.1) + 0.1 * 2 / 5,
+    d: within(0.02, 2, 0.1, -0.1) - 0.1 * 3 / 5, e: within(-0.04, 2, 0.1, -0.1) - 0.1 * 3 / 5,
+  };
+  for (const id of Object.keys(expected)) assert.ok(Math.abs(strengths[id] - expected[id]) < 1e-12, `${id}: ${strengths[id]} against ${expected[id]}`);
+  // The clubs' strengths average nought, and the AL's average club stands the edge above the NL's.
+  const mean = list => list.reduce((s, x) => s + x, 0) / list.length;
+  assert.ok(Math.abs(mean(Object.values(strengths))) < 0.002);
+  assert.ok(Math.abs(mean(['a', 'b', 'c'].map(id => strengths[id])) - mean(['d', 'e'].map(id => strengths[id])) - 0.1) < 0.002);
+  // A .500 club of the stronger league stands above a .500 club of the weaker.
+  const level = jointShareOf([{ id: 'x', league: 'AL', w: 50, l: 50 }, { id: 'y', league: 'AL', w: 52, l: 48 }, { id: 'z', league: 'NL', w: 50, l: 50 },
+    { id: 'v', league: 'NL', w: 48, l: 52 }], { x: 0, y: 0.02, z: 0, v: -0.02 }, { league: 'AL', w: 12, l: 8 }).strengths;
+  assert.ok(level.x > level.z + 0.05, `${level.x} against ${level.z}`);
+  // An interleague record the clubs' own records do not add up to is refused, and so is a season of one league.
+  assert.throws(() => jointShareOf(clubs, shares, { league: 'AL', w: 11, l: 9 }), /won 4 more than they lost/);
+  assert.throws(() => jointShareOf(clubs.filter(c => c.league === 'AL'), shares, { league: 'AL', w: 12, l: 8 }), /two leagues/);
+  // resultsMove takes it: each target is μ + √r × the joint strength ÷ m.
+  const player = (id, rating) => ({ id, rating });
+  const pools = clubs.map(c => ({ ...c, pool: [player(`${c.id}1`, 70), player(`${c.id}2`, 70)] }));
+  const strengthOf = pool => (pool[0].rating + pool[1].rating) / 2;
+  const move = resultsMove(pools, { perPoint: 0.025, strengthOf, order: (x, y) => y.rating - x.rating || (x.id < y.id ? -1 : 1),
+    lineupOf: pool => new Set(pool.map(p => p.id)), interleague: { league: 'AL', w: 12, l: 8 } });
+  assert.ok(Math.abs(move.edge - 0.1) < 1e-12);
+  move.moves.forEach(m => assert.ok(Math.abs(m.target - (70 + Math.sqrt(move.reliability) * expected[m.id] / 0.025)) < 1e-9, m.id));
+});
+
+const interleagueCached = existsSync(new URL(`../${MANIFEST.sources.interleague.cache}/${MANIFEST.sources.interleague.file}`, import.meta.url));
+test('the interleague records are the pinned page\'s, rebuilt byte for byte from it', { skip: !interleagueCached && 'the page (data-src/mlb-interleague/) is not on this computer' }, () => {
+  assert.match(execFileSync(process.execPath, ['scripts/sync-mlb-interleague.mjs', '--check'], { cwd: root, encoding: 'utf8' }),
+    /Verified scripts.data.mlb-interleague\.json byte for byte/);
+});
+
+test('from 1997 the interleague records put the leagues on one scale: the Databank\'s records agree, and the American League leads by its edge', () => {
+  // The records come from the page the manifest pins (English Wikipedia's "Interleague play", one revision), each season
+  // with interleague games and none before; the American League's clubs' wins less their losses are exactly its
+  // interleague games' (its games inside the league cancel out).
+  const pin = MANIFEST.sources.interleague;
+  assert.deepEqual([INTERLEAGUE.source.url, INTERLEAGUE.source.revision, INTERLEAGUE.source.sha256], [pin.url, pin.revision, pin.sha256]);
+  assert.match(pin.url, /^https:\/\/en\.wikipedia\.org\/wiki\//);
+  assert.deepEqual(Object.keys(INTERLEAGUE.seasons).map(Number), YEARS.filter(year => year >= 1997));
+  for (const year of YEARS) {
+    const nets = { AL: 0, NL: 0 };
+    for (const team of Object.values(snapshotOf(year).teams)) nets[team.league] += team.w - team.l;
+    const record = INTERLEAGUE.seasons[year];
+    assert.equal(nets.AL, record ? record[0] - record[1] : 0, `${year}`);
+    assert.equal(nets.NL + nets.AL, 0, `${year}`);
+  }
+  // After the move the AL's clubs average √r × Δ ÷ m above the NL's in the strength the match model plays (Δ its edge
+  // in the season's interleague games), and the leagues stand level before 1997, when nothing linked them.
+  for (const season of AUDIT.seasons) {
+    const year = Number(season.id.slice(-4)), lead = season.leagues.lead.after;
+    if (year < 1997) { assert.ok(Math.abs(lead) <= 0.05, `${year}: ${lead}`); continue; }
+    const record = INTERLEAGUE.seasons[year];
+    const edge = record[0] / (record[0] + record[1]) - 0.5;
+    assert.equal(season.leagues.interleague.record, record.join('–'));
+    assert.ok(Math.abs(lead - Math.sqrt(season.results.reliability) * edge / season.results.perPoint) <= 0.06, `${year}: lead ${lead}`);
+  }
+  // 2006, the AL 154–98: its 95–67 Tigers play above the NL's 97–65 Mets, its 62–100 Royals above the NL's 66–96 Cubs.
+  const played = name => Number(AUDIT.seasons.find(s => s.id === 'mlb-war-2006').moves.find(m => m.startsWith(`${name} `)).match(/→ ([\d.]+)/)[1]);
+  assert.ok(played('Detroit Tigers') > played('New York Mets') && played('Kansas City Royals') > played('Chicago Cubs'));
 });
 
 test('played as their leagues played, the moved seasons\' standings spread as the real ones did', () => {

@@ -872,3 +872,145 @@ export function rateSeason(players, reference, ratingsOf, { schools = null } = {
   }
   return { rated, population };
 }
+
+// ---------- conferences the season's games leave loose ----------
+
+/**
+ * How far, in points², a conference's true level strays from the mean of its levels in the seasons either side: the
+ * mean square of each conference's SRS level less the mean of its two neighbours', 9.75 over the 173 conference-seasons
+ * of 2005–2024 that have both neighbours (2019–2021 left out), less the 7.25 the levels' own errors give it (their SEs
+ * from each season's SRS: SE² + (SE₋² + SE₊²)/4). Measured 2026-11-21 (docs/design/college-football.md, "Conferences
+ * the games leave loose"); scripts/cfb-seasons.test.mjs measures it again from the snapshots' games.
+ */
+export const CONFERENCE_DRIFT = 2.5;
+
+/**
+ * The conferences a season's games leave loose: those whose schools met another conference's (or an independent) fewer
+ * times than the conference has schools, so that most of them never did and its level against the rest of the FBS rests
+ * on a few games. 2020 alone: the SEC, the Big Ten and the MAC played their conferences only until the bowls. `games`:
+ * `[{ home, away }]` (every game between FBS schools the SRS reads); `conferenceOf(school)`: its conference that season.
+ * Independents are no conference. → `[{ conference, schools, games }]`, sorted by conference.
+ */
+export function looseConferences(games, conferenceOf) {
+  const schools = new Map(), out = new Map();
+  for (const g of games) {
+    const a = conferenceOf(g.home), b = conferenceOf(g.away);
+    for (const [school, own] of [[g.home, a], [g.away, b]]) {
+      if (!own || own === 'Independent') continue;
+      if (!schools.has(own)) schools.set(own, new Set());
+      schools.get(own).add(school);
+    }
+    if (a === b && a !== 'Independent') continue;
+    for (const own of new Set([a, b])) if (own && own !== 'Independent') out.set(own, (out.get(own) ?? 0) + 1);
+  }
+  return [...schools].map(([conference, set]) => ({ conference, schools: [...set].sort(), games: out.get(conference) ?? 0 }))
+    .filter(entry => entry.games < entry.schools.length).sort((a, b) => (a.conference < b.conference ? -1 : 1));
+}
+
+/**
+ * The Simple Rating System of computed-ratings.mjs srsOf (every margin by least squares, one home edge, the ratings summing
+ * to nought), with `priors`, `[{ members, level, weight }]`: each adds weight × (its members' mean rating − level)² to the
+ * squares, one more observation of a group's level, as precise as `weight` games. `sigma2`, the margins' variance about
+ * the fit, sets the error the reliability counts; by default the fit's own residuals'. Without priors the ratings, edge,
+ * sigma and reliability are srsOf's. → `{ ratings, homeEdge, sigma, reliability, levelOf(members) → { level, se } }`, a
+ * group's mean rating and its standard error.
+ */
+export function srsWithPriors(games, priors = [], { sigma2: fixed = null } = {}) {
+  const clubs = [...new Set(games.flatMap(game => [game.home, game.away]))].sort();
+  const n = clubs.length, at = new Map(clubs.map((club, i) => [club, i]));
+  const hasHome = games.some(game => !game.neutral);
+  const size = n + 2;
+  const m = Array.from({ length: size }, () => new Array(size).fill(0));
+  const rhs = new Array(size).fill(0);
+  for (const game of games) {
+    const row = new Array(n + 1).fill(0);
+    row[at.get(game.home)] += 1;
+    row[at.get(game.away)] -= 1;
+    row[n] = game.neutral ? 0 : 1;
+    const margin = game.homeScore - game.awayScore;
+    for (let i = 0; i <= n; i++) {
+      if (!row[i]) continue;
+      for (let j = 0; j <= n; j++) m[i][j] += row[i] * row[j];
+      rhs[i] += row[i] * margin;
+    }
+  }
+  for (const prior of priors) {
+    const index = prior.members.map(club => at.get(club));
+    if (index.some(i => i == null)) throw new Error('A prior names a club with no game');
+    const k = index.length;
+    for (const i of index) {
+      for (const j of index) m[i][j] += prior.weight / (k * k);
+      rhs[i] += prior.weight * prior.level / k;
+    }
+  }
+  if (!hasHome) m[n][n] = 1;
+  for (let i = 0; i < n; i++) { m[i][n + 1] = 1; m[n + 1][i] = 1; }
+  const a = m.map((row, i) => [...row, ...Array.from({ length: size }, (_, j) => (i === j ? 1 : 0))]);
+  for (let col = 0; col < size; col++) {
+    let pivot = col;
+    for (let r = col + 1; r < size; r++) if (Math.abs(a[r][col]) > Math.abs(a[pivot][col])) pivot = r;
+    if (Math.abs(a[pivot][col]) < 1e-12) throw new Error('The games do not rate every club');
+    [a[col], a[pivot]] = [a[pivot], a[col]];
+    const lead = a[col][col];
+    for (let c = 0; c < 2 * size; c++) a[col][c] /= lead;
+    for (let r = 0; r < size; r++) {
+      if (r === col || !a[r][col]) continue;
+      const factor = a[r][col];
+      for (let c = 0; c < 2 * size; c++) a[r][c] -= factor * a[col][c];
+    }
+  }
+  const inverse = a.map(row => row.slice(size));
+  const solution = inverse.map(row => row.reduce((sum, x, j) => sum + x * rhs[j], 0));
+  const rating = clubs.map((club, i) => solution[i]), edge = hasHome ? solution[n] : 0;
+  const residuals = games.map(game => game.homeScore - game.awayScore
+    - (rating[at.get(game.home)] - rating[at.get(game.away)] + (game.neutral ? 0 : edge)));
+  const fitted = n + (hasHome ? 1 : 0) - 1;
+  const sigma2 = fixed ?? residuals.reduce((sum, r) => sum + r * r, 0) / Math.max(1, games.length - fitted);
+  const error = sigma2 * clubs.reduce((sum, club, i) => sum + inverse[i][i], 0) / n;
+  const spread = rating.reduce((sum, r) => sum + r * r, 0) / n;
+  const levelOf = members => {
+    const index = members.map(club => at.get(club)).filter(i => i != null);
+    if (!index.length) throw new Error('A group with no rated club');
+    let cov = 0;
+    for (const i of index) for (const j of index) cov += inverse[i][j];
+    return { level: index.reduce((sum, i) => sum + rating[i], 0) / index.length, se: Math.sqrt(sigma2 * cov / index.length ** 2) };
+  };
+  return {
+    ratings: Object.fromEntries(clubs.map((club, i) => [club, rating[i]])),
+    homeEdge: edge, sigma: Math.sqrt(sigma2), reliability: spread > 0 ? Math.max(0, 1 - error / spread) : 0, levelOf,
+  };
+}
+
+/**
+ * A season's SRS where its games leave conferences loose (looseConferences): each such conference's level held toward
+ * its level in the seasons either side, as one more observation of it (srsWithPriors): their mean, with the variance
+ * CONFERENCE_DRIFT + (SE₋² + SE₊²)/4, as precise as the season's margins' variance ÷ that variance games. Every other
+ * school's rating comes from the games alone, as srsOf's would. `games` the season's, `conferenceOf` its; `neighbours`:
+ * `[{ games, conferenceOf }]` of the season before and the one after. Throws for a loose conference either neighbour
+ * lacks: nothing would place it. → `{ srs, loose: [{ conference, schools, games, alone: { level, se }, neighbours: { level,
+ * se }, weight, held: { level, se } }] }`, `srs` as srsWithPriors gives it, its sigma the games' own without priors.
+ */
+export function srsHoldingLooseConferences(games, conferenceOf, neighbours) {
+  const loose = looseConferences(games, conferenceOf);
+  const alone = srsWithPriors(games);
+  if (!loose.length) return { srs: alone, loose: [] };
+  if (neighbours.length !== 2) throw new Error(`${loose.map(entry => entry.conference).join(', ')}: a loose conference needs a season either side`);
+  const sigma2 = alone.sigma ** 2;
+  const fits = neighbours.map(nb => ({ fit: srsWithPriors(nb.games), conferenceOf: nb.conferenceOf,
+    clubs: [...new Set(nb.games.flatMap(game => [game.home, game.away]))] }));
+  const priors = loose.map(entry => {
+    const levels = fits.map(nb => {
+      const members = nb.clubs.filter(club => nb.conferenceOf(club) === entry.conference);
+      if (!members.length) throw new Error(`The ${entry.conference} met other conferences ${entry.games} times and a season either side has no ${entry.conference} to place it by`);
+      return nb.fit.levelOf(members);
+    });
+    const level = (levels[0].level + levels[1].level) / 2, variance = CONFERENCE_DRIFT + (levels[0].se ** 2 + levels[1].se ** 2) / 4;
+    return { entry, members: entry.schools, level, weight: sigma2 / variance, neighbours: { level, se: Math.sqrt(variance) } };
+  });
+  const srs = srsWithPriors(games, priors, { sigma2 });
+  return {
+    srs,
+    loose: priors.map(p => ({ conference: p.entry.conference, schools: p.entry.schools.length, games: p.entry.games, alone: alone.levelOf(p.members),
+      neighbours: p.neighbours, weight: p.weight, held: srs.levelOf(p.members) })),
+  };
+}

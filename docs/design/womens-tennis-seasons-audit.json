@@ -65,11 +65,75 @@
     "early": {
       "about": "The women's seasons before 1973 (docs/design/womens-tennis.md, \"1963-1967\"): a second run of this method, kept apart from the first so that 1973-2025 rebuild byte for byte. It reads the four majors' women's singles and the Federation Cup of 1960-1967 from English Wikipedia's pages (wikipedia, above) before the open era's files, its newcomers of the pages starting at their own level and its layoffs before the open era charged only from amateurWeeks, and snapshots 1963-1972 (seasons.early). The rest is the method above.",
       "results": "English Wikipedia: the majors' women's singles draws and the Federation Cup",
-      "method": "Tennis Abstract's published Elo method, warmed up on the majors' and the Federation Cup's results of 1960-1967 from English Wikipedia (docs/design/womens-tennis.md, \"1963-1967\")",
+      "method": "Tennis Abstract's published Elo method, warmed up on the majors' and the Federation Cup's results of 1960-1967 from English Wikipedia, their newcomers starting at their region's and nation's level (docs/design/womens-tennis.md, \"1963-1967\" and \"Regions\")",
       "counted": "Every played singles match of the pages: the majors' draws and the cup's singles rubbers (rubbers 1 and 2; the doubles, rubber 3, rate nobody), never a walkover, a retirement or a default (the scores' w/o, ret., def. and a retirement's superscript r). A match that the finals bracket and a section both show is counted once. Rounds are numbered back from each bracket's last (scripts/lib/tennis-wikipedia.mjs); the cup's by its days, its last day the final. A major's matches are dated the first day of its women's singles, a cup rubber its tie's day.",
       "start": {
-        "amateur": 1325,
-        "fit": "Not published: a newcomer whose first counted match is on the pages starts at 1325, fitted to five points so that the run carries on as the shipped one. Over the shipped run's top 50 of each season 1973-1980 its Elo of the same women differs from the shipped run's by +0.1 on average (at most 0.5 in a season); on Tennis Abstract's 17 targets for 1973-2000 (targets above) it comes out -0.3 Elo on average, root mean square 42.8 (the shipped run: -0.4 and 42.7). 1320 puts the seam at -0.4, 1330 at +1.4, 1280 at -9.5 and 1380 at +14.8 (with the layoffs below); Tingay's tens agree as well with any of them."
+        "amateur": 1315,
+        "fit": "Not published: a newcomer whose first counted match is on the pages starts at 1315 plus her region's and her nation's level (regions, below), fitted to five points so that the run carries on as the shipped one. Over the shipped run's top 50 of each season 1973-1980 its Elo of the same women differs from the shipped run's by +0.4 to +0.8 on average (at most 1.4 absolute in a season); on Tennis Abstract's 17 targets for 1973-2000 (targets above) it comes out -0.1 Elo on average, root mean square 42.9 (the shipped run: -0.4 and 42.7). With the levels 1310 puts the seam at -1.2 to -0.1, 1320 at +1.6 to +2.0. The start was 1325 until the levels came in (2026-11-21), when it fitted the same way (1320 put the seam at -0.4, 1330 at +1.4, 1280 at -9.5 and 1380 at +14.8, with the layoffs below); Tingay's tens agree as well with any of them.",
+        "regions": {
+          "levels": [
+            "amateur"
+          ],
+          "from": 1960,
+          "fit": {
+            "seasons": [
+              1960,
+              1967
+            ],
+            "sigma": 150,
+            "tau": 100
+          },
+          "region": {
+            "W.Europe": -75,
+            "E.Europe": 45,
+            "N.America": 35,
+            "L.America": -35,
+            "Asia": -125,
+            "Oceania": 5,
+            "Africa": 50
+          },
+          "nation": {
+            "ARG": 30,
+            "AUS": 25,
+            "AUT": 20,
+            "BEL": -20,
+            "BRA": 90,
+            "BUL": -20,
+            "CAN": -80,
+            "CHI": -30,
+            "COL": -25,
+            "DEN": -70,
+            "ECU": -70,
+            "EGY": 30,
+            "ESP": -50,
+            "FIN": -25,
+            "FRA": -15,
+            "FRG": 80,
+            "GBR": 40,
+            "GRE": -15,
+            "HUN": -10,
+            "IRL": -50,
+            "ITA": 105,
+            "JPN": -55,
+            "KEN": -25,
+            "MAR": -55,
+            "MEX": 35,
+            "NED": 90,
+            "NOR": -30,
+            "NZL": -25,
+            "POL": -40,
+            "RHO": 30,
+            "RSA": 40,
+            "SUI": -70,
+            "SWE": -25,
+            "TCH": 95,
+            "URS": -5,
+            "URU": -20,
+            "USA": 95,
+            "VEN": -25
+          },
+          "note": "Region and nation levels, as the men's (docs/design/womens-tennis.md, \"Regions\"): a newcomer of the pages starts at start.amateur plus her region's level and her nation's, her nation the one of the day her season's row gives her (her cup's, else her draws' flag, else the player file's; its region by the IOC's continental associations, Europe split at the Iron Curtain: scripts/lib/tennis-regions.mjs); a nation the table does not name has no level of its own. With every newcomer at one start the pages left Western Europe's women high and North America's low against the other regions: 210 of Western Europe's 229 newcomers first appear in Wimbledon's or Paris's whole draws, many of them local players out in the first rounds, while North America's are mostly those who travelled to them (55 of 70; the U.S. Championships' pages show only their last eight). The levels are those that best predict every counted match of 1960-1967 (fit.seasons), each by the ratings before it, under normal priors of spread 150 Elo on a region's level and 100 on a nation's around its region's, averaging zero over the newcomers, rounded to five points; npm run sync:womens-tennis-seasons -- --fit-regions fits them again from the cached inputs. Judged on held-out seasons (fitted on the even seasons, judged on the odd ones of 1963-1967, and the other way round), the log loss of every match goes from 0.4971 to 0.4948 and from 0.4948 to 0.4881, of those between regions from 0.4657 to 0.4607 and 0.4626 to 0.4528, within one from 0.5818 to 0.5872 and 0.5635 to 0.5636. Asia's level rests on five newcomers and its prior."
+        }
       },
       "layoff": {
         "from": 19680101,
@@ -678,6 +742,345 @@
         }
       }
     },
+    "regions": {
+      "eras": {
+        "1973-1979": {
+          "regions": {
+            "W.Europe": {
+              "n": 4734,
+              "elo": -17.3,
+              "se": 4.5,
+              "points": -0.69
+            },
+            "E.Europe": {
+              "n": 2043,
+              "elo": 35.5,
+              "se": 8.3,
+              "points": 1.42
+            },
+            "N.America": {
+              "n": 5841,
+              "elo": 7.2,
+              "se": 3.8,
+              "points": 0.29
+            },
+            "L.America": {
+              "n": 702,
+              "elo": -27.7,
+              "se": 14.8,
+              "points": -1.11
+            },
+            "Asia": {
+              "n": 481,
+              "elo": -0.3,
+              "se": 18.3,
+              "points": -0.01
+            },
+            "Oceania": {
+              "n": 3487,
+              "elo": -11.2,
+              "se": 5.8,
+              "points": -0.45
+            },
+            "Africa": {
+              "n": 1328,
+              "elo": 19.7,
+              "se": 10.3,
+              "points": 0.79
+            }
+          },
+          "home": {
+            "major": {
+              "n": 586,
+              "elo": 30,
+              "se": 17.9
+            },
+            "cup": {
+              "n": 226,
+              "elo": 7.4,
+              "se": 30.1
+            }
+          }
+        },
+        "1980-1989": {
+          "regions": {
+            "W.Europe": {
+              "n": 10522,
+              "elo": 4.2,
+              "se": 2.9,
+              "points": 0.17
+            },
+            "E.Europe": {
+              "n": 5677,
+              "elo": 13.1,
+              "se": 4.7,
+              "points": 0.52
+            },
+            "N.America": {
+              "n": 12724,
+              "elo": -5.6,
+              "se": 2.5,
+              "points": -0.22
+            },
+            "L.America": {
+              "n": 3133,
+              "elo": 5,
+              "se": 6.6,
+              "points": 0.2
+            },
+            "Asia": {
+              "n": 1356,
+              "elo": -1.2,
+              "se": 10.3,
+              "points": -0.05
+            },
+            "Oceania": {
+              "n": 4269,
+              "elo": -14.3,
+              "se": 5.5,
+              "points": -0.57
+            },
+            "Africa": {
+              "n": 2063,
+              "elo": -0.3,
+              "se": 8.3,
+              "points": -0.01
+            }
+          },
+          "home": {
+            "major": {
+              "n": 1285,
+              "elo": 40.5,
+              "se": 11.7
+            },
+            "cup": {
+              "n": 421,
+              "elo": 7.9,
+              "se": 21.6
+            }
+          }
+        },
+        "1990-1999": {
+          "regions": {
+            "W.Europe": {
+              "n": 14170,
+              "elo": 5.6,
+              "se": 2.3,
+              "points": 0.22
+            },
+            "E.Europe": {
+              "n": 9129,
+              "elo": 5.7,
+              "se": 3.4,
+              "points": 0.23
+            },
+            "N.America": {
+              "n": 9964,
+              "elo": -5.2,
+              "se": 3.2,
+              "points": -0.21
+            },
+            "L.America": {
+              "n": 3225,
+              "elo": -14.3,
+              "se": 6.5,
+              "points": -0.57
+            },
+            "Asia": {
+              "n": 3937,
+              "elo": -4.5,
+              "se": 5.8,
+              "points": -0.18
+            },
+            "Oceania": {
+              "n": 2614,
+              "elo": -7.7,
+              "se": 7.4,
+              "points": -0.31
+            },
+            "Africa": {
+              "n": 1823,
+              "elo": 2.5,
+              "se": 9,
+              "points": 0.1
+            }
+          },
+          "home": {
+            "major": {
+              "n": 1080,
+              "elo": 20.7,
+              "se": 13
+            },
+            "cup": {
+              "n": 785,
+              "elo": 40.2,
+              "se": 15.2
+            }
+          }
+        },
+        "2000-2009": {
+          "regions": {
+            "W.Europe": {
+              "n": 19730,
+              "elo": 2.3,
+              "se": 1.9,
+              "points": 0.09
+            },
+            "E.Europe": {
+              "n": 19745,
+              "elo": 4.1,
+              "se": 1.9,
+              "points": 0.16
+            },
+            "N.America": {
+              "n": 9574,
+              "elo": -4,
+              "se": 3.5,
+              "points": -0.16
+            },
+            "L.America": {
+              "n": 3829,
+              "elo": -10.4,
+              "se": 5.8,
+              "points": -0.41
+            },
+            "Asia": {
+              "n": 6839,
+              "elo": -7.8,
+              "se": 4.2,
+              "points": -0.31
+            },
+            "Oceania": {
+              "n": 2902,
+              "elo": 6.2,
+              "se": 7,
+              "points": 0.25
+            },
+            "Africa": {
+              "n": 1663,
+              "elo": -7.8,
+              "se": 9.3,
+              "points": -0.31
+            }
+          },
+          "home": {
+            "major": {
+              "n": 990,
+              "elo": 33.4,
+              "se": 13.7
+            },
+            "cup": {
+              "n": 1091,
+              "elo": 25.3,
+              "se": 12.6
+            }
+          }
+        },
+        "2010-2015": {
+          "regions": {
+            "W.Europe": {
+              "n": 12239,
+              "elo": -0.6,
+              "se": 2.5,
+              "points": -0.03
+            },
+            "E.Europe": {
+              "n": 13094,
+              "elo": 0.8,
+              "se": 2.3,
+              "points": 0.03
+            },
+            "N.America": {
+              "n": 5724,
+              "elo": 8.4,
+              "se": 4.5,
+              "points": 0.34
+            },
+            "L.America": {
+              "n": 1397,
+              "elo": -7.1,
+              "se": 10,
+              "points": -0.29
+            },
+            "Asia": {
+              "n": 5095,
+              "elo": -4.6,
+              "se": 4.7,
+              "points": -0.18
+            },
+            "Oceania": {
+              "n": 2043,
+              "elo": -6.2,
+              "se": 8.2,
+              "points": -0.25
+            },
+            "Africa": {
+              "n": 450,
+              "elo": -10.7,
+              "se": 18,
+              "points": -0.43
+            }
+          },
+          "home": {
+            "major": {
+              "n": 570,
+              "elo": 24.3,
+              "se": 17.2
+            },
+            "cup": {
+              "n": 668,
+              "elo": 22.6,
+              "se": 15.7
+            }
+          }
+        }
+      },
+      "published": {
+        "seasons": [
+          2016,
+          2025
+        ],
+        "n": 3087,
+        "meanDiff": -2.5,
+        "regions": {
+          "Africa": {
+            "n": 21,
+            "diff": 13.6,
+            "se": 5.6
+          },
+          "Asia": {
+            "n": 365,
+            "diff": -0.3,
+            "se": 2
+          },
+          "E.Europe": {
+            "n": 1067,
+            "diff": -0.4,
+            "se": 1.2
+          },
+          "L.America": {
+            "n": 115,
+            "diff": 0.7,
+            "se": 2.5
+          },
+          "N.America": {
+            "n": 471,
+            "diff": 1.4,
+            "se": 1.9
+          },
+          "Oceania": {
+            "n": 127,
+            "diff": -0.3,
+            "se": 2.8
+          },
+          "W.Europe": {
+            "n": 921,
+            "diff": -0.5,
+            "se": 1.2
+          }
+        }
+      }
+    },
     "early": {
       "seasons": [
         1963,
@@ -708,12 +1111,12 @@
           2000
         ],
         "n": 17,
-        "meanDiff": -0.3,
-        "rms": 42.8,
+        "meanDiff": -0.1,
+        "rms": 42.9,
         "byDecade": {
-          "1970s": 6.9,
-          "1980s": 30,
-          "1990s": -18.1
+          "1970s": 7.3,
+          "1980s": 30.3,
+          "1990s": -18
         },
         "after": {
           "n": 14,
@@ -723,51 +1126,277 @@
       "seam": {
         "1973": {
           "n": 50,
-          "meanDiff": -0.2,
-          "meanAbsDiff": 1.2,
-          "maxAbsDiff": 7.8
+          "meanDiff": 0.4,
+          "meanAbsDiff": 1.4,
+          "maxAbsDiff": 6.5
         },
         "1974": {
           "n": 50,
-          "meanDiff": -0.2,
-          "meanAbsDiff": 1.2,
-          "maxAbsDiff": 6.3
+          "meanDiff": 0.4,
+          "meanAbsDiff": 1.3,
+          "maxAbsDiff": 5.8
         },
         "1975": {
           "n": 50,
-          "meanDiff": -0.2,
-          "meanAbsDiff": 0.8,
-          "maxAbsDiff": 4.9
+          "meanDiff": 0.4,
+          "meanAbsDiff": 0.9,
+          "maxAbsDiff": 5.7
         },
         "1976": {
           "n": 50,
-          "meanDiff": 0.2,
-          "meanAbsDiff": 0.5,
-          "maxAbsDiff": 4
+          "meanDiff": 0.6,
+          "meanAbsDiff": 0.8,
+          "maxAbsDiff": 4.6
         },
         "1977": {
           "n": 50,
-          "meanDiff": 0.2,
-          "meanAbsDiff": 0.5,
+          "meanDiff": 0.7,
+          "meanAbsDiff": 0.8,
           "maxAbsDiff": 3.1
         },
         "1978": {
           "n": 50,
-          "meanDiff": 0.4,
-          "meanAbsDiff": 0.5,
-          "maxAbsDiff": 4.8
+          "meanDiff": 0.7,
+          "meanAbsDiff": 0.8,
+          "maxAbsDiff": 5.3
         },
         "1979": {
           "n": 50,
-          "meanDiff": 0.4,
-          "meanAbsDiff": 0.4,
-          "maxAbsDiff": 2.5
+          "meanDiff": 0.8,
+          "meanAbsDiff": 0.8,
+          "maxAbsDiff": 2.9
         },
         "1980": {
           "n": 50,
-          "meanDiff": 0.5,
-          "meanAbsDiff": 0.5,
-          "maxAbsDiff": 2.4
+          "meanDiff": 0.8,
+          "meanAbsDiff": 0.8,
+          "maxAbsDiff": 2.8
+        }
+      },
+      "regions": {
+        "1963-1967": {
+          "without": {
+            "regions": {
+              "W.Europe": {
+                "n": 348,
+                "elo": -40.6,
+                "se": 16.3,
+                "points": -1.62
+              },
+              "E.Europe": {
+                "n": 59,
+                "elo": 2.2,
+                "se": 48.1,
+                "points": 0.09
+              },
+              "N.America": {
+                "n": 253,
+                "elo": 63.4,
+                "se": 20.4,
+                "points": 2.54
+              },
+              "L.America": {
+                "n": 89,
+                "elo": 30.4,
+                "se": 41.9,
+                "points": 1.21
+              },
+              "Oceania": {
+                "n": 248,
+                "elo": -9.6,
+                "se": 20.7,
+                "points": -0.38
+              },
+              "Africa": {
+                "n": 105,
+                "elo": -22.6,
+                "se": 35.9,
+                "points": -0.9
+              }
+            },
+            "home": {
+              "major": {
+                "n": 156,
+                "elo": 88.4,
+                "se": 34.2
+              },
+              "cup": {
+                "n": 150,
+                "elo": 7.9,
+                "se": 33.8
+              }
+            }
+          },
+          "with": {
+            "regions": {
+              "W.Europe": {
+                "n": 348,
+                "elo": -19,
+                "se": 16.4,
+                "points": -0.76
+              },
+              "E.Europe": {
+                "n": 59,
+                "elo": -25,
+                "se": 49,
+                "points": -1
+              },
+              "N.America": {
+                "n": 253,
+                "elo": 43.3,
+                "se": 20.5,
+                "points": 1.73
+              },
+              "L.America": {
+                "n": 89,
+                "elo": 39.6,
+                "se": 42,
+                "points": 1.58
+              },
+              "Oceania": {
+                "n": 248,
+                "elo": -7.6,
+                "se": 20.9,
+                "points": -0.3
+              },
+              "Africa": {
+                "n": 105,
+                "elo": -42.8,
+                "se": 36,
+                "points": -1.71
+              }
+            },
+            "home": {
+              "major": {
+                "n": 156,
+                "elo": 83.7,
+                "se": 34.4
+              },
+              "cup": {
+                "n": 150,
+                "elo": 13.4,
+                "se": 34.7
+              }
+            }
+          }
+        },
+        "1968-1972": {
+          "without": {
+            "regions": {
+              "W.Europe": {
+                "n": 3701,
+                "elo": -1.3,
+                "se": 4.9,
+                "points": -0.05
+              },
+              "E.Europe": {
+                "n": 623,
+                "elo": 16.5,
+                "se": 15.6,
+                "points": 0.66
+              },
+              "N.America": {
+                "n": 3339,
+                "elo": 0.1,
+                "se": 5.4,
+                "points": 0
+              },
+              "L.America": {
+                "n": 613,
+                "elo": -28.1,
+                "se": 16.3,
+                "points": -1.12
+              },
+              "Asia": {
+                "n": 350,
+                "elo": -9.7,
+                "se": 22.2,
+                "points": -0.39
+              },
+              "Oceania": {
+                "n": 2808,
+                "elo": 7.2,
+                "se": 6.3,
+                "points": 0.29
+              },
+              "Africa": {
+                "n": 1006,
+                "elo": -5.3,
+                "se": 12.1,
+                "points": -0.21
+              }
+            },
+            "home": {
+              "major": {
+                "n": 393,
+                "elo": -16.1,
+                "se": 21.4
+              },
+              "cup": {
+                "n": 142,
+                "elo": 13.2,
+                "se": 37.7
+              }
+            }
+          },
+          "with": {
+            "regions": {
+              "W.Europe": {
+                "n": 3701,
+                "elo": 0.7,
+                "se": 4.9,
+                "points": 0.03
+              },
+              "E.Europe": {
+                "n": 623,
+                "elo": 15.1,
+                "se": 15.6,
+                "points": 0.6
+              },
+              "N.America": {
+                "n": 3339,
+                "elo": -2.1,
+                "se": 5.4,
+                "points": -0.08
+              },
+              "L.America": {
+                "n": 613,
+                "elo": -21.4,
+                "se": 16.3,
+                "points": -0.86
+              },
+              "Asia": {
+                "n": 350,
+                "elo": -9.2,
+                "se": 22.2,
+                "points": -0.37
+              },
+              "Oceania": {
+                "n": 2808,
+                "elo": 6.4,
+                "se": 6.4,
+                "points": 0.25
+              },
+              "Africa": {
+                "n": 1006,
+                "elo": -6.6,
+                "se": 12.1,
+                "points": -0.26
+              }
+            },
+            "home": {
+              "major": {
+                "n": 393,
+                "elo": -15.9,
+                "se": 21.4
+              },
+              "cup": {
+                "n": 142,
+                "elo": 12,
+                "se": 37.9
+              }
+            }
+          }
         }
       }
     },
@@ -778,12 +1407,12 @@
           "amateur": {
             "seasons": 5,
             "shared": 7.2,
-            "rho": 0.76
+            "rho": 0.75
           },
           "open": {
             "seasons": 5,
             "shared": 8.4,
-            "rho": 0.71
+            "rho": 0.7
           }
         },
         "seasons": {
@@ -799,7 +1428,7 @@
               4,
               8,
               6,
-              9,
+              10,
               null,
               5
             ],
@@ -810,16 +1439,16 @@
           "1964": {
             "shared": 6,
             "listed": 10,
-            "rho": 0.45,
+            "rho": 0.41,
             "ranks": [
               1,
               2,
-              3,
-              16,
-              17,
-              11,
               4,
-              7,
+              14,
+              20,
+              11,
+              3,
+              6,
               13,
               5
             ],
@@ -828,11 +1457,11 @@
           "1965": {
             "shared": 8,
             "listed": 10,
-            "rho": 0.88,
+            "rho": 0.89,
             "ranks": [
               1,
-              4,
               3,
+              4,
               2,
               8,
               5,
@@ -846,7 +1475,7 @@
           "1966": {
             "shared": 6,
             "listed": 10,
-            "rho": 0.95,
+            "rho": 0.96,
             "ranks": [
               3,
               1,
@@ -854,10 +1483,10 @@
               5,
               6,
               7,
-              14,
+              11,
               13,
-              17,
-              19
+              15,
+              20
             ],
             "notListed": []
           },
@@ -873,27 +1502,27 @@
               4,
               6,
               7,
-              15,
+              14,
               16,
-              12
+              13
             ],
             "notListed": []
           },
           "1968": {
             "shared": 8,
             "listed": 10,
-            "rho": 0.76,
+            "rho": 0.75,
             "ranks": [
               2,
               4,
-              5,
               6,
+              5,
               1,
               3,
-              8,
+              7,
               10,
-              26,
-              14
+              28,
+              13
             ],
             "notListed": []
           },
@@ -947,7 +1576,7 @@
               7,
               4,
               11,
-              10
+              9
             ],
             "notListed": []
           },
@@ -978,9 +1607,9 @@
             "name": "Margaret Court",
             "year": 1971,
             "published": 2389,
-            "computed": 2393.9,
+            "computed": 2395.1,
             "date": "1973-12-10",
-            "endOfYear": 2256.3
+            "endOfYear": 2258.3
           }
         ]
       }
@@ -5573,7 +6202,7 @@
     },
     {
       "id": "wta-1972",
-      "version": "wta-1972-3d4efafc",
+      "version": "wta-1972-42edc5d6",
       "label": "Elo from match results, end of 1972 (rough)",
       "kind": "computed",
       "run": "early",
@@ -5583,11 +6212,11 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Billie Jean King USA 2293.7 → 96",
-        "Margaret Court AUS 2290.3 → 96",
-        "Chris Evert USA 2268.9 → 95",
-        "Evonne Goolagong AUS 2148.8 → 90",
-        "Nancy Richey USA 2119.9 → 89"
+        "Billie Jean King USA 2295.1 → 96",
+        "Margaret Court AUS 2291.8 → 96",
+        "Chris Evert USA 2270.2 → 95",
+        "Evonne Goolagong AUS 2149.8 → 90",
+        "Nancy Richey USA 2121.3 → 89"
       ],
       "nations": [
         "United States 93.9 (Billie Jean King 96, Chris Evert 95, Nancy Richey 89, Rosie Casals 86, Julie Heldman 78; +51)",
@@ -5599,10 +6228,10 @@
         "South Africa 73.4 (Patricia Walkden 77, Brenda Kirk 72, Laura Rossouw 69, Esme Emmanuel 69, Alison Mcmillan 65; +3)",
         "Soviet Union (Russia) 72.4 (Olga Morozova 80, Eugenia Birioukova 68, Marina Kroschina 67, Anna Yeremeyeva 65, Marina Chuvirina 62; +1)",
         "Czechoslovakia (Czechia) 70.5 (Vlasta Kodesova 73, Alena Palmeova West 68)",
-        "Sweden 68 (Christina Sandberg 71, Ingrid Bentzer 70, Margareta Strandberg 60, Mimi Wikstedt 56, Madeleine Pegel 54)",
+        "Sweden 67.9 (Christina Sandberg 71, Ingrid Bentzer 70, Margareta Strandberg 59, Mimi Wikstedt 56, Madeleine Pegel 54)",
         "Hungary 65.2 (Judith Szorenyi 66, Erzsebet Szell 65, Marie Pinterova 65, Katalin Borka 63)",
-        "Ireland 62 (Susan Minford 62, Geraldine Barniville 62)",
         "Indonesia 61.5 (Lita Liem 64, Lany Kaligis 59)",
+        "Ireland 61.5 (Susan Minford 62, Geraldine Barniville 61)",
         "Canada 60.3 (Vicky Berner 63, Jane Ohara 58, Andree Martin 56)",
         "New Zealand 60 (Marilyn Pryde 65, Robyn Legge 55)",
         "Italy 59.7 (Maria Teresa Nasuelli 61, Monica Giorgi 59, Rosalba Vido 56)",
@@ -5647,7 +6276,7 @@
     },
     {
       "id": "wta-1971",
-      "version": "wta-1971-4bed5d8f",
+      "version": "wta-1971-1ab06305",
       "label": "Elo from match results, end of 1971 (rough)",
       "kind": "computed",
       "run": "early",
@@ -5657,14 +6286,14 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Billie Jean King USA 2277.5 → 95",
-        "Margaret Court AUS 2256.3 → 94",
-        "Rosie Casals USA 2076.7 → 87",
-        "Virginia Wade GBR 2073.1 → 87",
-        "Kerry Reid AUS 2048 → 86"
+        "Billie Jean King USA 2279.3 → 95",
+        "Margaret Court AUS 2258.3 → 94",
+        "Rosie Casals USA 2078.1 → 87",
+        "Virginia Wade GBR 2074.4 → 87",
+        "Kerry Reid AUS 2049.4 → 86"
       ],
       "nations": [
-        "United States 89.4 (Billie Jean King 95, Rosie Casals 87, Nancy Richey 83, Chris Evert 83, Julie Heldman 82; +31)",
+        "United States 89.5 (Billie Jean King 95, Rosie Casals 87, Chris Evert 84, Nancy Richey 83, Julie Heldman 82; +31)",
         "Australia 88.6 (Margaret Court 94, Kerry Reid 86, Evonne Goolagong 86, Judy Tegart 80, Lesley Turner 77; +15)",
         "Great Britain 83.7 (Virginia Wade 87, Ann Jones 84, Joyce Williams 78, Christine Truman 75, Winnie Shaw 75; +18)",
         "France 78.7 (Francoise Durr 85, Gail Sherriff 79, Odile De Roubin 66, Daniele Bouteleux 65, Nathalie Fuchs 61)",
@@ -5678,9 +6307,9 @@
         "Czechoslovakia (Czechia) 64 (Alena Palmeova West 67, Miroslava Holubova 61)",
         "Indonesia 62 (Lita Liem 67, Lany Kaligis 57)",
         "Hungary 61.5 (Katalin Borka 63, Marie Pinterova 61, Eva Szabo 60, Judith Szorenyi 59)",
-        "New Zealand 59.5 (Marilyn Pryde 65, Cecilie Fleming 54)",
         "Zimbabwe 59.5 (Daphne Pattison 62, Sally Hudson Beck 57)",
-        "Canada 57 (Jane Ohara 60, Andree Martin 54)",
+        "New Zealand 59 (Marilyn Pryde 65, Cecilie Fleming 53)",
+        "Canada 56.5 (Jane Ohara 60, Andree Martin 53)",
         "Chile 55.5 (Ana Maria Arias 60, Michelle Rodriguez 51)"
       ],
       "merged": [
@@ -5720,7 +6349,7 @@
     },
     {
       "id": "wta-1970",
-      "version": "wta-1970-756a810c",
+      "version": "wta-1970-0621e7c6",
       "label": "Elo from match results, end of 1970 (rough)",
       "kind": "computed",
       "run": "early",
@@ -5730,30 +6359,30 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Margaret Court AUS 2225.4 → 93",
-        "Billie Jean King USA 2164.2 → 91",
-        "Nancy Richey USA 2078.9 → 87",
-        "Ann Jones GBR 2052.1 → 86",
-        "Virginia Wade GBR 2027.3 → 85"
+        "Margaret Court AUS 2228 → 93",
+        "Billie Jean King USA 2166.8 → 91",
+        "Nancy Richey USA 2081.8 → 87",
+        "Ann Jones GBR 2054.2 → 86",
+        "Virginia Wade GBR 2029.1 → 85"
       ],
       "nations": [
         "United States 87.6 (Billie Jean King 91, Nancy Richey 87, Rosie Casals 84, Julie Heldman 80, Peaches Bartkowicz 80; +43)",
         "Australia 87 (Margaret Court 93, Evonne Goolagong 84, Kerry Reid 83, Judy Tegart 79, Lesley Hunt 78; +17)",
         "Great Britain 83.8 (Ann Jones 86, Virginia Wade 85, Winnie Shaw 79, Joyce Williams 75, Corinne Molesworth 69; +18)",
-        "France 76.2 (Francoise Durr 81, Gail Sherriff 77, Odile De Roubin 68, Daniele Bouteleux 62, Christiane Spinoza 60; +1)",
-        "South Africa 75.5 (Patricia Walkden 78, Annette Van Zyl 75, Laura Rossouw 72, Esme Emmanuel 71, Brenda Kirk 65; +3)",
-        "West Germany (Germany) 75.4 (Helga Masthoff 79, Helga Schultze 77, Heide Orth 66, Kora Schediwy 64, Almut Sturm 61; +1)",
+        "France 76.1 (Francoise Durr 81, Gail Sherriff 77, Odile De Roubin 68, Daniele Bouteleux 61, Christiane Spinoza 60; +1)",
+        "West Germany (Germany) 75.8 (Helga Masthoff 80, Helga Schultze 77, Heide Orth 66, Kora Schediwy 64, Almut Sturm 61; +1)",
+        "South Africa 75.6 (Patricia Walkden 78, Annette Van Zyl 75, Laura Rossouw 72, Esme Emmanuel 72, Brenda Kirk 65; +3)",
         "Soviet Union (Russia) 72.8 (Olga Morozova 79, Tiiu Kivi 68, Yevgenia Izopaitis 61)",
         "Netherlands 70.6 (Marijke Jansen 73, Betty Stove 72, Trudy Groenman 65, Ada Bakker 61, Judith Salome 61)",
         "Sweden 67.7 (Christina Sandberg 74, Eva Lundquist 62, Ingrid Bentzer 59)",
         "Czechoslovakia (Czechia) 67.3 (Vlasta Kodesova 72, Alena Palmeova West 64, Lenka Kodesova 57)",
         "Japan 66.3 (Kazuko Sawamatsu 74, Kimiyo Hatanaka 59, Junko Sawamatsu 57)",
-        "Italy 65.7 (Lea Pericoli 74, Maria Teresa Nasuelli 62, Monica Giorgi 60, Daniela Marzano 53)",
+        "Italy 65.2 (Lea Pericoli 74, Maria Teresa Nasuelli 61, Monica Giorgi 60, Daniela Marzano 52)",
         "Hungary 62.1 (Katalin Borka 64, Erzsebet Polgar 62, Marie Pinterova 60, Eva Szabo 57, Judith Szorenyi 57)",
         "Indonesia 60.5 (Lita Liem 63, Lany Kaligis 58)",
         "New Zealand 58 (Marilyn Pryde 59, Robyn Legge 57)",
-        "Canada 57.5 (Jane Ohara 61, Andree Martin 54)",
-        "Chile 55.5 (Ana Maria Arias 59, Michelle Rodriguez 52)"
+        "Canada 56.5 (Jane Ohara 60, Andree Martin 53)",
+        "Chile 55 (Ana Maria Arias 59, Michelle Rodriguez 51)"
       ],
       "merged": [
         "Belarus → Soviet Union (Russia)",
@@ -5796,7 +6425,7 @@
     },
     {
       "id": "wta-1969",
-      "version": "wta-1969-a3233e9a",
+      "version": "wta-1969-3a0972ec",
       "label": "Elo from match results, end of 1969 (rough)",
       "kind": "computed",
       "run": "early",
@@ -5806,29 +6435,29 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Margaret Court AUS 2229.7 → 93",
-        "Billie Jean King USA 2095.8 → 88",
-        "Virginia Wade GBR 2087.7 → 88",
-        "Nancy Richey USA 2060.6 → 86",
-        "Ann Jones GBR 2014.5 → 85"
+        "Margaret Court AUS 2233.6 → 93",
+        "Billie Jean King USA 2099.7 → 88",
+        "Virginia Wade GBR 2090.4 → 88",
+        "Nancy Richey USA 2064.9 → 87",
+        "Ann Jones GBR 2017.7 → 85"
       ],
       "nations": [
-        "United States 86.3 (Billie Jean King 88, Nancy Richey 86, Julie Heldman 84, Peaches Bartkowicz 83, Rosie Casals 79; +35)",
+        "United States 86.7 (Billie Jean King 88, Nancy Richey 87, Julie Heldman 84, Peaches Bartkowicz 83, Rosie Casals 79; +35)",
         "Great Britain 84.5 (Virginia Wade 88, Ann Jones 85, Winnie Shaw 78, Christine Truman 75, Joyce Williams 74; +20)",
-        "Australia 84.2 (Margaret Court 93, Kerry Reid 79, Lesley Turner 77, Karen Krantzcke 77, Judy Tegart 76; +12)",
+        "Australia 84.3 (Margaret Court 93, Kerry Reid 79, Lesley Turner 78, Karen Krantzcke 77, Judy Tegart 76; +12)",
         "West Germany (Germany) 75 (Helga Masthoff 80, Helga Schultze 74, Edda Buding 70, Kora Schediwy 64, Almut Sturm 64; +3)",
-        "France 72.8 (Francoise Durr 75, Gail Sherriff 75, Rosie Reyes 64, Odile De Roubin 64, Evelyne Terras 60; +6)",
+        "France 72.7 (Francoise Durr 75, Gail Sherriff 75, Rosie Reyes 64, Odile De Roubin 63, Evelyne Terras 59; +6)",
         "South Africa 72 (Annette Van Zyl 77, Maryna Godwin 69, Esme Emmanuel 69, Anita Van Deventer 67, Joan Wilshere 65; +4)",
-        "Soviet Union (Russia) 68.2 (Olga Morozova 73, Tiiu Kivi 64, Marina Chuvirina 61)",
-        "Italy 66.9 (Lea Pericoli 72, Maria Teresa Riedl 65, Maria Teresa Nasuelli 61, Monica Giorgi 60)",
+        "Soviet Union (Russia) 68.1 (Olga Morozova 73, Tiiu Kivi 64, Marina Chuvirina 60)",
+        "Italy 66.8 (Lea Pericoli 72, Maria Teresa Riedl 65, Maria Teresa Nasuelli 60, Monica Giorgi 60)",
         "Czechoslovakia (Czechia) 66.5 (Vlasta Kodesova 68, Alena Palmeova West 65)",
         "Netherlands 65.8 (Marijke Jansen 68, Betty Stove 67, Ada Bakker 61, Astrid Suurbeek 57, Judith Salome 55)",
         "Sweden 65.7 (Christina Sandberg 71, Eva Lundquist 61, Margareta Strandberg 58)",
         "Hungary 65.5 (Marie Pinterova 69, Erzsebet Polgar 62)",
         "Japan 63 (Kazuko Sawamatsu 70, Kimiyo Hatanaka 57, Junko Sawamatsu 52)",
-        "Canada 62 (Faye Urban 67, Andree Martin 57)",
+        "Canada 61.5 (Faye Urban 67, Andree Martin 56)",
         "Indonesia 60.5 (Lita Liem 64, Lany Kaligis 57)",
-        "Argentina 58.9 (Graciela Moran 60, Raquel Giscafre 59, Mabel Vrancovich 59, Ana Cavadini 54)"
+        "Argentina 58.5 (Graciela Moran 59, Raquel Giscafre 59, Mabel Vrancovich 59, Ana Cavadini 54)"
       ],
       "merged": [
         "Belarus → Soviet Union (Russia)",
@@ -5860,8 +6489,8 @@
           "Suzana Gesteira (BRA)",
           "Judith Dibar (ROU)",
           "Ana Maria Arias (CHI)",
-          "Anne Marie Studer (SUI)",
           "Beverley Vercoe (NZL)",
+          "Anne Marie Studer (SUI)",
           "Ingrid Loeys (BEL)",
           "Irena Skulj (YUG)",
           "Patricia Montano (MEX)",
@@ -5872,7 +6501,7 @@
     },
     {
       "id": "wta-1968",
-      "version": "wta-1968-5e4d140a",
+      "version": "wta-1968-0f78ff85",
       "label": "Elo from match results, end of 1968 (rough)",
       "kind": "computed",
       "run": "early",
@@ -5882,28 +6511,28 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Margaret Court AUS 2091.7 → 88",
-        "Billie Jean King USA 2031.9 → 85",
-        "Ann Jones GBR 1990.2 → 84",
-        "Virginia Wade GBR 1976.3 → 83",
-        "Nancy Richey USA 1921.3 → 81"
+        "Margaret Court AUS 2096.8 → 88",
+        "Billie Jean King USA 2039.8 → 86",
+        "Ann Jones GBR 1997.3 → 84",
+        "Virginia Wade GBR 1979.9 → 83",
+        "Maria Bueno BRA 1930.1 → 81"
       ],
       "nations": [
-        "United States 81.7 (Billie Jean King 85, Nancy Richey 81, Peaches Bartkowicz 77, Julie Heldman 76, Rosie Casals 75; +42)",
+        "United States 82.2 (Billie Jean King 86, Nancy Richey 81, Peaches Bartkowicz 78, Julie Heldman 76, Rosie Casals 76; +42)",
         "Great Britain 81.3 (Ann Jones 84, Virginia Wade 83, Winnie Shaw 76, Christine Truman 69, Shirley Bloomer 68; +21)",
         "Australia 81 (Margaret Court 88, Judy Tegart 78, Karen Krantzcke 75, Kerry Reid 71, Lesley Turner 70; +11)",
         "France 73.6 (Gail Sherriff 78, Francoise Durr 74, Rosie Reyes 66, Odile De Roubin 62, Monique Salfati 58; +6)",
-        "South Africa 72.2 (Annette Van Zyl 76, Maryna Godwin 72, Laura Rossouw 65, Anita Van Deventer 65, Esme Emmanuel 60)",
+        "South Africa 72.7 (Annette Van Zyl 77, Maryna Godwin 72, Laura Rossouw 66, Anita Van Deventer 65, Esme Emmanuel 61)",
         "West Germany (Germany) 71.7 (Helga Masthoff 76, Helga Schultze 70, Edda Buding 68, Almut Sturm 65, Kerstin Seelbach 61; +4)",
         "Brazil 70.5 (Maria Bueno 81, Vera Lucia Giugni 60, Suzana Gesteira 60)",
-        "Soviet Union (Russia) 67.4 (Galina Baksheeva 69, Anna Dmitrieva 66, Olga Morozova 65)",
+        "Soviet Union (Russia) 67 (Galina Baksheeva 69, Anna Dmitrieva 65, Olga Morozova 65)",
         "Czechoslovakia (Czechia) 65.8 (Vlasta Kodesova 67, Alena Palmeova West 66, Jitka Horcickova 59)",
-        "Italy 64.3 (Lea Pericoli 67, Maria Teresa Riedl 64, Roberta Beltrame 62, Francesca Gordigiani 57, Monica Giorgi 56; +2)",
-        "Netherlands 63.6 (Marijke Jansen 69, Astrid Suurbeek 61, Ada Bakker 60, Lidy Venneboer 56, Judith Salome 54)",
+        "Netherlands 64.1 (Marijke Jansen 69, Astrid Suurbeek 62, Ada Bakker 60, Lidy Venneboer 57, Judith Salome 54)",
+        "Italy 63.8 (Lea Pericoli 67, Maria Teresa Riedl 63, Roberta Beltrame 61, Francesca Gordigiani 57, Monica Giorgi 56; +2)",
         "Canada 62.5 (Faye Urban 67, Vicky Berner 58)",
         "Mexico 61.8 (Elena Subirats 63, Lucia Gongora 62, Patricia Montano 55)",
-        "Hungary 61 (Erzsebet Polgar 65, Eva Szabo 57)",
-        "Sweden 59.3 (Christina Sandberg 66, Ingrid Bentzer 57, Eva Lundquist 53, Ulla Sandulf 48)",
+        "Hungary 60.5 (Erzsebet Polgar 65, Eva Szabo 56)",
+        "Sweden 59.1 (Christina Sandberg 66, Ingrid Bentzer 57, Eva Lundquist 52, Ulla Sandulf 47)",
         "Argentina 57 (Raquel Giscafre 57, Mabel Vrancovich 57)"
       ],
       "merged": [
@@ -5933,13 +6562,13 @@
           "Patricia Walkden (RHO)",
           "Birgitta Lindstrom (FIN)",
           "Kazuko Sawamatsu (JPN)",
-          "Maria Eugenia Guzman (ECU)",
           "Judith Dibar (ROU)",
+          "Maria Eugenia Guzman (ECU)",
           "Ingrid Loeys (BEL)",
           "Michelle Rodriguez (CHI)",
           "Virginia Caceres (PER)",
-          "Anne Marie Studer (SUI)",
           "Cecilie Fleming (NZL)",
+          "Anne Marie Studer (SUI)",
           "Carmen Coronado (ESP)",
           "Carol Ann Kalogeropoulos (GRE)"
         ],
@@ -5948,7 +6577,7 @@
     },
     {
       "id": "wta-1967",
-      "version": "wta-1967-aa313726",
+      "version": "wta-1967-44b36177",
       "label": "Amateur Elo, end of 1967 (rough)",
       "kind": "computed",
       "run": "early",
@@ -5958,30 +6587,30 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Billie Jean King USA 1967.3 → 83",
-        "Ann Jones GBR 1831.1 → 77",
-        "Nancy Richey USA 1810.2 → 76",
-        "Lesley Turner AUS 1771.6 → 75",
-        "Francoise Durr FRA 1764.2 → 75"
+        "Billie Jean King USA 1974.4 → 83",
+        "Ann Jones GBR 1841.4 → 78",
+        "Nancy Richey USA 1817.3 → 77",
+        "Lesley Turner AUS 1780.7 → 75",
+        "Francoise Durr FRA 1774.9 → 75"
       ],
       "nations": [
-        "United States 78.1 (Billie Jean King 83, Nancy Richey 76, Rosie Casals 74, Kathleen Harter 71, Stephanie Defina 64; +6)",
-        "Great Britain 72 (Ann Jones 77, Christine Truman 71, Virginia Wade 68, Winnie Shaw 60, Lorna Cornell 59; +1)",
-        "Australia 71.6 (Lesley Turner 75, Jan Lehane 70, Judy Tegart 69, Kerry Reid 67, Gail Sherriff 64; +7)",
-        "West Germany (Germany) 66.7 (Helga Schultze 68, Edda Buding 67, Helga Masthoff 59)",
+        "United States 78.6 (Billie Jean King 83, Nancy Richey 77, Rosie Casals 74, Kathleen Harter 72, Stephanie Defina 66; +6)",
+        "Great Britain 72.3 (Ann Jones 78, Christine Truman 71, Virginia Wade 68, Winnie Shaw 59, Lorna Cornell 58; +1)",
+        "Australia 72 (Lesley Turner 75, Jan Lehane 71, Judy Tegart 69, Kerry Reid 67, Gail Sherriff 64; +7)",
         "Soviet Union (Russia) 66.5 (Galina Baksheeva 69, Anna Dmitrieva 64)",
-        "South Africa 65.1 (Annette Van Zyl 73, Maryna Godwin 60, Esme Emmanuel 60, Glenda Swan 59, Greta Delport 56)",
-        "France 64.7 (Francoise Durr 75, Maylis Burel 59, Evelyne Terras 56, Rosie Reyes 55, Monique Salfati 54)",
-        "Czechoslovakia (Czechia) 61 (Vlasta Kodesova 61, Jitka Horcickova 61)",
-        "Netherlands 60.7 (Trudy Groenman 62, Betty Stove 60, Lidy Venneboer 57)",
-        "Italy 60.5 (Lea Pericoli 66, Monica Giorgi 57, Francesca Gordigiani 57, Maria Teresa Riedl 56, Roberta Beltrame 55)",
-        "Zimbabwe 60 (Patricia Walkden 64, Fiona Morris 56)",
-        "Sweden 55.2 (Christina Sandberg 57, Eva Lundquist 54, Ingrid Bentzer 51)",
-        "Belgium 55 (Christiane Mercelis 57, Ingrid Loeys 53)",
-        "Denmark 55 (Milly Vagn Nielsen 56, Pia Balling 54)",
-        "Switzerland 55 (Silvia Gubler 59, Anne Marie Studer 51)",
-        "Norway 54 (Ellen Grindvold 55, Kirsten Robsahm 53)",
-        "Canada 53.4 (Vicky Berner 54, Susan Butt 53, Faye Urban 52)"
+        "West Germany (Germany) 66.1 (Helga Schultze 67, Edda Buding 67, Helga Masthoff 58)",
+        "South Africa 65.9 (Annette Van Zyl 73, Maryna Godwin 62, Esme Emmanuel 61, Glenda Swan 58, Greta Delport 56)",
+        "France 64 (Francoise Durr 75, Maylis Burel 58, Evelyne Terras 54, Rosie Reyes 54, Monique Salfati 53)",
+        "Czechoslovakia (Czechia) 62 (Jitka Horcickova 62, Vlasta Kodesova 62)",
+        "Zimbabwe 61.5 (Patricia Walkden 64, Fiona Morris 59)",
+        "Netherlands 61.2 (Trudy Groenman 63, Betty Stove 60, Lidy Venneboer 57)",
+        "Italy 60.8 (Lea Pericoli 66, Monica Giorgi 58, Francesca Gordigiani 57, Maria Teresa Riedl 55, Roberta Beltrame 55)",
+        "Sweden 53.7 (Christina Sandberg 55, Eva Lundquist 53, Ingrid Bentzer 50)",
+        "Belgium 53.5 (Christiane Mercelis 56, Ingrid Loeys 51)",
+        "Canada 52.8 (Vicky Berner 54, Susan Butt 52, Faye Urban 50)",
+        "Norway 50.5 (Ellen Grindvold 51, Kirsten Robsahm 50)",
+        "Switzerland 50.5 (Silvia Gubler 54, Anne Marie Studer 47)",
+        "Denmark 49.5 (Milly Vagn Nielsen 50, Pia Balling 49)"
       ],
       "merged": [
         "Belarus → Soviet Union (Russia)",
@@ -6015,7 +6644,7 @@
     },
     {
       "id": "wta-1966",
-      "version": "wta-1966-f836665d",
+      "version": "wta-1966-4a2148b8",
       "label": "Amateur Elo, end of 1966 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6025,33 +6654,33 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Margaret Court AUS 1967.9 → 83",
-        "Maria Bueno BRA 1900.7 → 80",
-        "Billie Jean King USA 1827.1 → 77",
-        "Lesley Turner AUS 1825.1 → 77",
-        "Ann Jones GBR 1799.1 → 76"
+        "Margaret Court AUS 1972.9 → 83",
+        "Maria Bueno BRA 1913.6 → 81",
+        "Billie Jean King USA 1833.3 → 77",
+        "Lesley Turner AUS 1830 → 77",
+        "Ann Jones GBR 1807.6 → 76"
       ],
       "nations": [
-        "Australia 77.6 (Margaret Court 83, Lesley Turner 77, Robyn Ebbern 68, Judy Tegart 68, Karen Krantzcke 65; +9)",
-        "United States 75.1 (Billie Jean King 77, Nancy Richey 76, Carole Graebner 71, Julie Heldman 68, Rosie Casals 65; +6)",
-        "Great Britain 67.8 (Ann Jones 76, Rita Bentley 63, Frances Maclennan 61, Shirley Bloomer 61, Winnie Shaw 60)",
-        "West Germany (Germany) 66.6 (Edda Buding 69, Helga Schultze 66, Helga Masthoff 57)",
-        "South Africa 66.2 (Annette Van Zyl 74, Glenda Swan 62, Heather Nicholls 59, Esme Emmanuel 59, Laura Rossouw 58; +1)",
+        "Australia 77.6 (Margaret Court 83, Lesley Turner 77, Robyn Ebbern 68, Judy Tegart 68, Karen Krantzcke 66; +9)",
+        "United States 75.2 (Billie Jean King 77, Nancy Richey 76, Carole Graebner 71, Julie Heldman 69, Rosie Casals 67; +6)",
+        "Great Britain 67.8 (Ann Jones 76, Rita Bentley 63, Shirley Bloomer 61, Frances Maclennan 61, Winnie Shaw 59)",
+        "West Germany (Germany) 66 (Edda Buding 68, Helga Schultze 66, Helga Masthoff 56)",
+        "South Africa 66 (Annette Van Zyl 74, Glenda Swan 61, Esme Emmanuel 60, Laura Rossouw 60, Heather Nicholls 59; +1)",
         "Netherlands 63.1 (Trudy Groenman 66, Betty Stove 62, Elsie Spruyt 53)",
-        "France 62.5 (Francoise Durr 68, Janine Lieffrig 60, Christiane Spinoza 58, Anne-Marie Rouchon 55, Evelyne Terras 54; +1)",
-        "Argentina 60 (Norma Baylon 68, Graciela Moran 52)",
-        "Czechoslovakia (Czechia) 60 (Vlasta Kodesova 60, Jitka Horcickova 60)",
-        "Zimbabwe 59 (Patricia Walkden 62, Joan Walker 56)",
-        "Italy 58.3 (Lea Pericoli 64, Francesca Gordigiani 55, Roberta Beltrame 54, Maria Teresa Riedl 53)",
+        "France 62.1 (Francoise Durr 68, Janine Lieffrig 60, Christiane Spinoza 57, Anne-Marie Rouchon 52, Evelyne Terras 52; +1)",
+        "Czechoslovakia (Czechia) 61 (Vlasta Kodesova 61, Jitka Horcickova 61)",
+        "Zimbabwe 60 (Patricia Walkden 62, Joan Walker 58)",
+        "Argentina 59.5 (Norma Baylon 68, Graciela Moran 51)",
+        "Italy 58.2 (Lea Pericoli 64, Francesca Gordigiani 55, Roberta Beltrame 54, Maria Teresa Riedl 52)",
         "Hungary 58 (Erzsebet Szell 61, Klara Bardoczy 55)",
         "Bulgaria 57 (Maria Chakarova 59, Lubka Radkova 55)",
-        "Canada 56.5 (Faye Urban 57, Vicky Berner 56)",
-        "Sweden 56.5 (Christina Sandberg 60, Eva Lundquist 53)",
-        "Austria 56 (Sonja Pachta 57, Monika Hassmann 55)",
-        "Belgium 56 (Christiane Mercelis 57, Michele Kahn 55)",
-        "Poland 55 (Danula Rylska 55, Barbara Olszewska 55)",
-        "Switzerland 55 (Sonja Fetz 56, Anne Marie Studer 54)",
-        "Morocco 52.5 (Francoise Repoux 53, Jacqueline Morales 52)"
+        "Austria 55 (Sonja Pachta 57, Monika Hassmann 53)",
+        "Canada 55 (Faye Urban 55, Vicky Berner 55)",
+        "Poland 55 (Barbara Olszewska 55, Danula Rylska 55)",
+        "Belgium 54 (Christiane Mercelis 57, Michele Kahn 51)",
+        "Sweden 54 (Christina Sandberg 57, Eva Lundquist 51)",
+        "Morocco 52 (Francoise Repoux 53, Jacqueline Morales 51)",
+        "Switzerland 49.5 (Sonja Fetz 50, Anne Marie Studer 49)"
       ],
       "merged": [
         "Slovakia → Czechoslovakia (Czechia)"
@@ -6071,7 +6700,7 @@
     },
     {
       "id": "wta-1965",
-      "version": "wta-1965-bf97b77f",
+      "version": "wta-1965-a5433657",
       "label": "Amateur Elo, end of 1965 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6081,26 +6710,26 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Margaret Court AUS 2027 → 85",
-        "Billie Jean King USA 1870.9 → 79",
-        "Lesley Turner AUS 1860.4 → 78",
-        "Maria Bueno BRA 1856.7 → 78",
-        "Annette Van Zyl RSA 1719.8 → 73"
+        "Margaret Court AUS 2031.9 → 85",
+        "Billie Jean King USA 1880.1 → 79",
+        "Maria Bueno BRA 1865.7 → 79",
+        "Lesley Turner AUS 1865.6 → 79",
+        "Annette Van Zyl RSA 1739.5 → 74"
       ],
       "nations": [
-        "Australia 78.8 (Margaret Court 85, Lesley Turner 78, Robyn Ebbern 69, Judy Tegart 67, Jill Emmerson 65; +9)",
-        "United States 73.6 (Billie Jean King 79, Nancy Richey 72, Carole Graebner 67, Justina Bricka 65, Jane Albert 63; +4)",
-        "Great Britain 69.4 (Christine Truman 73, Ann Jones 69, Elizabeth Starkie 66, Virginia Wade 60, Joyce Williams 60; +5)",
-        "Brazil 65 (Maria Bueno 78, Maureen Schwartz 52)",
-        "South Africa 64.2 (Annette Van Zyl 73, Glenda Swan 60, Esme Emmanuel 56, Bernice Carr 54)",
-        "France 62.7 (Francoise Durr 67, Jacqueline Rees Lewis 60, Johanne Venturino 60, Janine Lieffrig 59, Nicole Seghers 58; +2)",
-        "West Germany (Germany) 62.3 (Edda Buding 65, Helga Schultze 64, Almut Sturm 54, Helga Masthoff 53, Heide Orth 52)",
-        "Argentina 62 (Norma Baylon 69, Nora Somoza 55)",
-        "Czechoslovakia (Czechia) 61.5 (Vlasta Kodesova 62, Jitka Horcickova 61)",
-        "New Zealand 60.5 (Ruia Morrison 61, Elizabeth Terry 60)",
-        "Italy 59.4 (Lea Pericoli 64, Francesca Gordigiani 55, Maria Teresa Riedl 54)",
+        "Australia 79.2 (Margaret Court 85, Lesley Turner 79, Robyn Ebbern 69, Judy Tegart 67, Jill Emmerson 65; +9)",
+        "United States 73.8 (Billie Jean King 79, Nancy Richey 72, Carole Graebner 68, Jane Albert 66, Justina Bricka 66; +4)",
+        "Great Britain 69.4 (Christine Truman 73, Ann Jones 69, Elizabeth Starkie 66, Virginia Wade 60, Joyce Williams 59; +5)",
+        "Brazil 66.5 (Maria Bueno 79, Maureen Schwartz 54)",
+        "South Africa 64.9 (Annette Van Zyl 74, Glenda Swan 60, Esme Emmanuel 58, Bernice Carr 55)",
+        "Czechoslovakia (Czechia) 63 (Vlasta Kodesova 63, Jitka Horcickova 63)",
+        "West Germany (Germany) 62.1 (Edda Buding 65, Helga Schultze 64, Almut Sturm 53, Helga Masthoff 52, Heide Orth 52)",
+        "France 61.9 (Francoise Durr 67, Jacqueline Rees Lewis 59, Janine Lieffrig 58, Johanne Venturino 57, Nicole Seghers 56; +2)",
+        "Argentina 61.5 (Norma Baylon 68, Nora Somoza 55)",
+        "New Zealand 59.5 (Ruia Morrison 60, Elizabeth Terry 59)",
+        "Italy 58.9 (Lea Pericoli 64, Francesca Gordigiani 54, Maria Teresa Riedl 53)",
         "Netherlands 58 (Trudy Groenman 59, Betty Stove 57)",
-        "Japan 53 (Kazuko Kuromatsu 53, Yohko Obata 53)"
+        "Japan 47.5 (Kazuko Kuromatsu 48, Yohko Obata 47)"
       ],
       "merged": [
         "Slovakia → Czechoslovakia (Czechia)"
@@ -6113,8 +6742,8 @@
         "barred": [],
         "aloneInTheirNation": [
           "Anna Dmitrieva (URS)",
-          "Christiane Mercelis (BEL)",
           "Patricia Walkden (RHO)",
+          "Christiane Mercelis (BEL)",
           "Ingrid Bentzer (SWE)",
           "Michelle Rodriguez (CHI)"
         ],
@@ -6123,7 +6752,7 @@
     },
     {
       "id": "wta-1964",
-      "version": "wta-1964-70120c98",
+      "version": "wta-1964-83509f53",
       "label": "Amateur Elo, end of 1964 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6133,33 +6762,33 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Margaret Court AUS 1951.6 → 82",
-        "Maria Bueno BRA 1925.4 → 81",
-        "Lesley Turner AUS 1804.8 → 76",
-        "Billie Jean King USA 1801.5 → 76",
-        "Jan Lehane AUS 1709.8 → 72"
+        "Margaret Court AUS 1957.1 → 82",
+        "Maria Bueno BRA 1932.4 → 81",
+        "Billie Jean King USA 1817.1 → 77",
+        "Lesley Turner AUS 1810.9 → 76",
+        "Jan Lehane AUS 1711.8 → 72"
       ],
       "nations": [
         "Australia 77.1 (Margaret Court 82, Lesley Turner 76, Jan Lehane 72, Robyn Ebbern 67, Judy Tegart 66; +5)",
-        "United States 72.7 (Billie Jean King 76, Karen Susman 72, Nancy Richey 69, Carole Graebner 66, Carol Aucamp 63; +3)",
-        "Great Britain 69.8 (Christine Truman 71, Ann Jones 71, Deidre Catt 66, Elizabeth Starkie 64, Rita Bentley 60; +1)",
-        "Czechoslovakia (Czechia) 66.6 (Vera Sukova 72, Vlasta Kodesova 62, Jitka Horcickova 58)",
-        "Argentina 64 (Norma Baylon 70, Ana-Maria Bocio 58)",
-        "South Africa 64 (Annette Van Zyl 68, Glenda Swan 60)",
-        "France 61.1 (Francoise Durr 63, Jacqueline Rees Lewis 60, Janine Lieffrig 56)",
-        "West Germany (Germany) 61 (Helga Schultze 65, Helga Masthoff 59, Heide Orth 58, Almut Sturm 56)",
-        "Netherlands 59.5 (Trudy Groenman 60, Betty Stove 59)",
-        "Italy 58.2 (Lea Pericoli 61, Francesca Gordigiani 56, Maria Teresa Riedl 53)",
-        "Belgium 57.5 (Christiane Mercelis 60, Monique Bedoret 55)",
-        "Canada 56.5 (Vicky Berner 59, Benita Senn 54)",
-        "Denmark 56.5 (Ulla Pontoppidan 57, Pia Balling 56)",
-        "Austria 56 (Monika Hassmann 60, Andrea Winkler 52)",
-        "Mexico 55 (Patricia Reyes 55, Antonia Prado 55)",
-        "Japan 54 (Kazuko Kuromatsu 55, Reiko Miyagi 53)",
-        "Sweden 54 (Katarina Bartholdson 56, Ulla Sandulf 52)",
-        "Norway 53.5 (Kirsten Robsahm 56, Liv Paldan 51)",
-        "Switzerland 53 (Anne Marie Studer 55, Alice Wavre 51)",
-        "Ireland 52.5 (Eleanor McFadden 53, Geraldine Barniville 52)"
+        "United States 73.3 (Billie Jean King 77, Karen Susman 72, Nancy Richey 70, Carole Graebner 67, Carol Aucamp 65; +3)",
+        "Great Britain 69.7 (Christine Truman 71, Ann Jones 71, Deidre Catt 65, Elizabeth Starkie 64, Rita Bentley 60; +1)",
+        "Czechoslovakia (Czechia) 67.8 (Vera Sukova 72, Vlasta Kodesova 64, Jitka Horcickova 62)",
+        "South Africa 64.5 (Annette Van Zyl 69, Glenda Swan 60)",
+        "Argentina 63.5 (Norma Baylon 70, Ana-Maria Bocio 57)",
+        "France 61 (Francoise Durr 63, Jacqueline Rees Lewis 60, Janine Lieffrig 55)",
+        "West Germany (Germany) 60.5 (Helga Schultze 65, Helga Masthoff 58, Heide Orth 58, Almut Sturm 55)",
+        "Netherlands 59.5 (Trudy Groenman 61, Betty Stove 58)",
+        "Italy 57.7 (Lea Pericoli 61, Francesca Gordigiani 55, Maria Teresa Riedl 52)",
+        "Belgium 55.5 (Christiane Mercelis 60, Monique Bedoret 51)",
+        "Mexico 55 (Antonia Prado 55, Patricia Reyes 55)",
+        "Canada 54.5 (Vicky Berner 57, Benita Senn 52)",
+        "Austria 53.5 (Monika Hassmann 57, Andrea Winkler 50)",
+        "Sweden 51.5 (Katarina Bartholdson 54, Ulla Sandulf 49)",
+        "Denmark 50.5 (Ulla Pontoppidan 51, Pia Balling 50)",
+        "Norway 50 (Kirsten Robsahm 52, Liv Paldan 48)",
+        "Ireland 49 (Eleanor McFadden 50, Geraldine Barniville 48)",
+        "Japan 48.5 (Kazuko Kuromatsu 49, Reiko Miyagi 48)",
+        "Switzerland 48.5 (Anne Marie Studer 50, Alice Wavre 47)"
       ],
       "merged": [
         "Slovakia → Czechoslovakia (Czechia)"
@@ -6181,7 +6810,7 @@
     },
     {
       "id": "wta-1963",
-      "version": "wta-1963-ea8558a3",
+      "version": "wta-1963-dc36f3f1",
       "label": "Amateur Elo, end of 1963 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6191,29 +6820,29 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Margaret Court AUS 1910.5 → 80",
-        "Billie Jean King USA 1794.6 → 76",
-        "Maria Bueno BRA 1793 → 76",
-        "Ann Jones GBR 1759.3 → 74",
-        "Vera Sukova TCH 1752 → 74"
+        "Margaret Court AUS 1916.6 → 81",
+        "Billie Jean King USA 1821.6 → 77",
+        "Maria Bueno BRA 1802.5 → 76",
+        "Ann Jones GBR 1763.7 → 75",
+        "Vera Sukova TCH 1752.3 → 74"
       ],
       "nations": [
-        "Australia 75.3 (Margaret Court 80, Jan Lehane 74, Lesley Turner 73, Robyn Ebbern 64, Jill Emmerson 64; +6)",
-        "United States 72 (Billie Jean King 76, Darlene Hard 73, Donna Floyd 64, Dorothy Knode 60, Mary Habicht 59; +3)",
-        "Great Britain 70.3 (Ann Jones 74, Christine Truman 70, Elizabeth Starkie 65, Deidre Catt 62, Rita Bentley 60; +2)",
-        "South Africa 66.3 (Renee Schuurman 70, Margaret Hunt 65, Annette Van Zyl 62, Heather Nicholls 61)",
-        "Czechoslovakia (Czechia) 64.5 (Vera Sukova 74, Markéta Prochová 55)",
-        "West Germany (Germany) 63.5 (Edda Buding 66, Helga Schultze 64, Renata Ostermann 59, Margot Dittmeyer 56)",
+        "Australia 75.8 (Margaret Court 81, Jan Lehane 74, Lesley Turner 74, Robyn Ebbern 64, Jill Emmerson 64; +6)",
+        "United States 72.8 (Billie Jean King 77, Darlene Hard 73, Donna Floyd 66, Dorothy Knode 62, Carol Aucamp 61; +3)",
+        "Great Britain 70.5 (Ann Jones 75, Christine Truman 70, Elizabeth Starkie 64, Deidre Catt 61, Lorna Cornell 60; +2)",
+        "Czechoslovakia (Czechia) 67 (Vera Sukova 74, Markéta Prochová 60)",
+        "South Africa 66.8 (Renee Schuurman 70, Margaret Hunt 66, Annette Van Zyl 63, Heather Nicholls 61)",
+        "West Germany (Germany) 63.3 (Edda Buding 66, Helga Schultze 64, Renata Ostermann 57, Margot Dittmeyer 56)",
         "Hungary 60 (Zsuzsa Kormoczy 64, Zsófia Broszmann 56)",
-        "France 59.4 (Christiane Spinoza 60, Francoise Durr 60, Janine Lieffrig 57, Jacqueline Rees Lewis 57)",
-        "Italy 58.2 (Francesca Gordigiani 59, Lea Pericoli 58, Silvana Lazzarino 58, Lucia Bassi 56)",
-        "Belgium 57.5 (Christiane Mercelis 59, Elza Bellens 56)",
-        "Canada 57.4 (Hana Sládková-Koželuhová 59, Louise Brown 56, Ann Barclay 55)",
-        "Norway 57 (Ruth Hauknes 59, Liv Paldan 55)",
-        "Austria 56 (Sonja Pachta 59, Andrea Winkler 53)",
-        "Netherlands 56 (Eva Duldig 59, Jenny Ridderhof 53)",
-        "Denmark 55.5 (Pia Balling 56, Vera Johansen 55)",
-        "Switzerland 54 (Janine Bourgnon 56, Alice Wavre 52)"
+        "Italy 58.2 (Silvana Lazzarino 59, Lea Pericoli 58, Francesca Gordigiani 58, Lucia Bassi 56)",
+        "France 57.9 (Francoise Durr 59, Christiane Spinoza 58, Janine Lieffrig 56, Jacqueline Rees Lewis 55)",
+        "Canada 55.5 (Hana Sládková-Koželuhová 57, Louise Brown 54, Ann Barclay 54)",
+        "Belgium 55 (Christiane Mercelis 58, Elza Bellens 52)",
+        "Netherlands 55 (Eva Duldig 58, Jenny Ridderhof 52)",
+        "Austria 54.5 (Sonja Pachta 58, Andrea Winkler 51)",
+        "Norway 53 (Ruth Hauknes 55, Liv Paldan 51)",
+        "Denmark 50 (Pia Balling 50, Vera Johansen 50)",
+        "Switzerland 49.5 (Janine Bourgnon 52, Alice Wavre 47)"
       ],
       "merged": [
         "Slovakia → Czechoslovakia (Czechia)"
@@ -6227,8 +6856,8 @@
         "aloneInTheirNation": [
           "Maria Bueno (BRA)",
           "Norma Baylon (ARG)",
-          "Carmen Coronado (ESP)",
-          "Francoise Repoux (MAR)"
+          "Francoise Repoux (MAR)",
+          "Carmen Coronado (ESP)"
         ],
         "noNationOnTheMap": []
       }

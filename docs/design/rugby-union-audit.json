@@ -1244,6 +1244,42 @@
      "before": 89.36,
      "after": 88.76
     }
+   },
+   "partial": {
+    "268": {
+     "srs": 1.38,
+     "coverage": 0.346,
+     "share": 1,
+     "level": 80.79,
+     "fill": 80.79,
+     "target": 80.79,
+     "shift": -2,
+     "plus": 0,
+     "before": 82.8,
+     "after": 80.8
+    },
+    "776": {
+     "srs": -17.47,
+     "coverage": 0.561,
+     "share": 0.561,
+     "level": 76.08,
+     "target": 78.02,
+     "shift": -3,
+     "plus": 11,
+     "before": 80.5,
+     "after": 78.02
+    },
+    "882": {
+     "srs": -24.18,
+     "coverage": 0.333,
+     "share": 0.333,
+     "level": 74.41,
+     "target": 77,
+     "shift": -2,
+     "plus": 14,
+     "before": 78.29,
+     "after": 77
+    }
    }
   },
   "window": [
@@ -2249,23 +2285,9 @@
    "open": []
   },
   {
-   "id": "776",
-   "name": "Tonga",
-   "str": 79,
-   "players": 30,
-   "open": []
-  },
-  {
-   "id": "882",
-   "name": "Samoa",
-   "str": 77,
-   "players": 27,
-   "open": []
-  },
-  {
    "id": "268",
    "name": "Georgia",
-   "str": 69,
+   "str": 80,
    "players": 24,
    "open": [
     "FH",
@@ -2277,6 +2299,20 @@
     "FH",
     "CE"
    ]
+  },
+  {
+   "id": "776",
+   "name": "Tonga",
+   "str": 77,
+   "players": 30,
+   "open": []
+  },
+  {
+   "id": "882",
+   "name": "Samoa",
+   "str": 75,
+   "players": 27,
+   "open": []
   },
   {
    "id": "724",

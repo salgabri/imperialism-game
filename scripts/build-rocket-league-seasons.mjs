@@ -81,10 +81,15 @@ function buildSeason(snapshot) {
   };
   const rough = year < ROUGH_BEFORE;
   const label = `Liquipedia Elo, end of ${year}${rough ? ' (rough)' : ''}`;
+  const levels = Object.entries(snapshot.starts ?? {}).filter(([region]) => region !== 'world').map(([region, elo]) => `${region} ${elo}`);
   const source = {
     edition: EDITION, name: 'Liquipedia', snapshotDate: snapshot.date, retrieved: snapshot.exported, url: WIKI, rawScale: 'Elo',
     computed: true, method: `the Elo of every 3v3 series of Liquipedia's S-, A- and B-Tier events from ${snapshot.from} to the end of`
-      + ` ${year} (docs/design/rocket-league.md, "Earlier seasons")`, licence: LICENCE.name, rated: snapshot.rated,
+      + ` ${year} (docs/design/rocket-league.md, "Earlier seasons")`,
+    conversion: `rating = Elo / 25 − 2, rounded; each newcomer started at his region's level as the games to ${snapshot.date} measure it`
+      + ` (${levels.join(', ')}; fitted at once with every player's own strength, Europe's at 1,500: docs/design/rocket-league.md,`
+      + ' "Regions")',
+    licence: LICENCE.name, rated: snapshot.rated,
     ...(rough ? { rough: true } : {}),
   };
   const doc = {
@@ -99,7 +104,7 @@ function buildSeason(snapshot) {
   const { noFlag, offMap, short } = leftOut(players);
   const audit = {
     id: doc.id, version: doc.version, label, date: snapshot.date, to: snapshot.to, series: snapshot.series, games: snapshot.games,
-    rated: snapshot.rated, top: players.slice(0, 5).map(player => `${player.name} ${player.elo} → ${player.rating}`),
+    rated: snapshot.rated, levels: snapshot.starts ?? null, top: players.slice(0, 5).map(player => `${player.name} ${player.elo} → ${player.rating}`),
     nations: nations.map(nation => `${nation.name} ${nation.str} (${nation.squad.map(player => `${player.name} ${player.rating}`).join(', ')}`
       + `${nation.players > nation.squad.length ? `; +${nation.players - nation.squad.length}` : ''})`),
     leftOut: { noCountry: noFlag.map(player => player.name), offTheMap: offMap.length, fewerThanThree: short.length },

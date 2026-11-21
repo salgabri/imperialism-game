@@ -8,7 +8,7 @@ const REASONS = Object.freeze({
   // Football's computed fills (scripts/lib/football-fills.mjs): an EA season's nation short of an XI, its empty places
   // taken by players capped for it that season.
   'International football': Object.freeze({ reason: 'EA rated too few of this nation\'s players for an XI',
-    basis: 'his caps for it that season and its World Football Elo' }),
+    basis: 'his caps for it that season and its World Football Elo, levelled across confederations' }),
   // Rugby union's (scripts/lib/rugby-union.mjs): every player's, as no game publishes its ratings.
   'Rugby union': Object.freeze({ reason: 'no game publishes rugby union ratings',
     basis: 'his minutes for his club and in Tests and his RugbyPass match stats, ranked within his position, then moved by his club\'s results (his nation\'s Tests, for his country)' }),

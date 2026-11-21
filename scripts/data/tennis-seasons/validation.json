@@ -790,6 +790,345 @@
    }
   }
  },
+ "regions": {
+  "eras": {
+   "1973-1979": {
+    "regions": {
+     "W.Europe": {
+      "n": 7545,
+      "elo": 0.9,
+      "se": 3.7,
+      "points": 0.04
+     },
+     "E.Europe": {
+      "n": 3646,
+      "elo": -4.4,
+      "se": 6.1,
+      "points": -0.18
+     },
+     "N.America": {
+      "n": 9115,
+      "elo": 7.9,
+      "se": 3.2,
+      "points": 0.31
+     },
+     "L.America": {
+      "n": 4080,
+      "elo": 5.3,
+      "se": 5.7,
+      "points": 0.21
+     },
+     "Asia": {
+      "n": 1212,
+      "elo": -3,
+      "se": 11.3,
+      "points": -0.12
+     },
+     "Oceania": {
+      "n": 5873,
+      "elo": -9.8,
+      "se": 4.4,
+      "points": -0.39
+     },
+     "Africa": {
+      "n": 2477,
+      "elo": -9.1,
+      "se": 7.4,
+      "points": -0.36
+     }
+    },
+    "home": {
+     "major": {
+      "n": 733,
+      "elo": 42.6,
+      "se": 15.6
+     },
+     "cup": {
+      "n": 517,
+      "elo": 93.4,
+      "se": 18.3
+     }
+    }
+   },
+   "1980-1989": {
+    "regions": {
+     "W.Europe": {
+      "n": 14890,
+      "elo": 7.6,
+      "se": 2.3,
+      "points": 0.31
+     },
+     "E.Europe": {
+      "n": 5743,
+      "elo": -1.2,
+      "se": 4.8,
+      "points": -0.05
+     },
+     "N.America": {
+      "n": 13034,
+      "elo": -3.7,
+      "se": 2.6,
+      "points": -0.15
+     },
+     "L.America": {
+      "n": 8019,
+      "elo": -1,
+      "se": 3.8,
+      "points": -0.04
+     },
+     "Asia": {
+      "n": 1183,
+      "elo": -9.5,
+      "se": 11.2,
+      "points": -0.38
+     },
+     "Oceania": {
+      "n": 5493,
+      "elo": -9,
+      "se": 4.8,
+      "points": -0.36
+     },
+     "Africa": {
+      "n": 2692,
+      "elo": 3.6,
+      "se": 7.2,
+      "points": 0.14
+     }
+    },
+    "home": {
+     "major": {
+      "n": 1107,
+      "elo": 64.5,
+      "se": 12.5
+     },
+     "cup": {
+      "n": 866,
+      "elo": 92.3,
+      "se": 14.3
+     }
+    }
+   },
+   "1990-1999": {
+    "regions": {
+     "W.Europe": {
+      "n": 24070,
+      "elo": 1.8,
+      "se": 1.6,
+      "points": 0.07
+     },
+     "E.Europe": {
+      "n": 10965,
+      "elo": 5.4,
+      "se": 3.1,
+      "points": 0.22
+     },
+     "N.America": {
+      "n": 10981,
+      "elo": -5.2,
+      "se": 3.1,
+      "points": -0.21
+     },
+     "L.America": {
+      "n": 9993,
+      "elo": -5.3,
+      "se": 3.3,
+      "points": -0.21
+     },
+     "Asia": {
+      "n": 1564,
+      "elo": -12.3,
+      "se": 9.5,
+      "points": -0.49
+     },
+     "Oceania": {
+      "n": 5457,
+      "elo": 3,
+      "se": 4.8,
+      "points": 0.12
+     },
+     "Africa": {
+      "n": 4156,
+      "elo": 2.3,
+      "se": 5.6,
+      "points": 0.09
+     }
+    },
+    "home": {
+     "major": {
+      "n": 942,
+      "elo": 61.9,
+      "se": 13.3
+     },
+     "cup": {
+      "n": 1208,
+      "elo": 81.5,
+      "se": 11.8
+     }
+    }
+   },
+   "2000-2009": {
+    "regions": {
+     "W.Europe": {
+      "n": 30741,
+      "elo": 2.3,
+      "se": 1.4,
+      "points": 0.09
+     },
+     "E.Europe": {
+      "n": 19498,
+      "elo": 1.1,
+      "se": 2.1,
+      "points": 0.04
+     },
+     "N.America": {
+      "n": 9787,
+      "elo": -1.4,
+      "se": 3.5,
+      "points": -0.06
+     },
+     "L.America": {
+      "n": 13833,
+      "elo": 0.8,
+      "se": 2.7,
+      "points": 0.03
+     },
+     "Asia": {
+      "n": 5561,
+      "elo": -10.3,
+      "se": 4.8,
+      "points": -0.41
+     },
+     "Oceania": {
+      "n": 3746,
+      "elo": -3.3,
+      "se": 6.1,
+      "points": -0.13
+     },
+     "Africa": {
+      "n": 2634,
+      "elo": -7,
+      "se": 7.1,
+      "points": -0.28
+     }
+    },
+    "home": {
+     "major": {
+      "n": 1289,
+      "elo": 61.9,
+      "se": 11.1
+     },
+     "cup": {
+      "n": 1285,
+      "elo": 84,
+      "se": 11.5
+     }
+    }
+   },
+   "2010-2015": {
+    "regions": {
+     "W.Europe": {
+      "n": 19181,
+      "elo": -1.6,
+      "se": 1.9,
+      "points": -0.06
+     },
+     "E.Europe": {
+      "n": 14194,
+      "elo": 1.2,
+      "se": 2.5,
+      "points": 0.05
+     },
+     "N.America": {
+      "n": 6058,
+      "elo": 7.6,
+      "se": 4.5,
+      "points": 0.31
+     },
+     "L.America": {
+      "n": 7039,
+      "elo": -7.9,
+      "se": 4,
+      "points": -0.32
+     },
+     "Asia": {
+      "n": 4984,
+      "elo": -2.5,
+      "se": 5,
+      "points": -0.1
+     },
+     "Oceania": {
+      "n": 3202,
+      "elo": 8.5,
+      "se": 6.5,
+      "points": 0.34
+     },
+     "Africa": {
+      "n": 1338,
+      "elo": 5.8,
+      "se": 10.3,
+      "points": 0.23
+     }
+    },
+    "home": {
+     "major": {
+      "n": 772,
+      "elo": 58.7,
+      "se": 14.5
+     },
+     "cup": {
+      "n": 888,
+      "elo": 86.6,
+      "se": 14
+     }
+    }
+   }
+  },
+  "published": {
+   "seasons": [
+    2016,
+    2025
+   ],
+   "n": 3425,
+   "meanDiff": 26.6,
+   "regions": {
+    "Africa": {
+     "n": 43,
+     "diff": -3.3,
+     "se": 4.2
+    },
+    "Asia": {
+     "n": 297,
+     "diff": 1.5,
+     "se": 2.2
+    },
+    "E.Europe": {
+     "n": 612,
+     "diff": -0.6,
+     "se": 1.4
+    },
+    "L.America": {
+     "n": 453,
+     "diff": -0.7,
+     "se": 1.5
+    },
+    "N.America": {
+     "n": 395,
+     "diff": 1,
+     "se": 1.6
+    },
+    "Oceania": {
+     "n": 165,
+     "diff": 5.7,
+     "se": 2.4
+    },
+    "W.Europe": {
+     "n": 1460,
+     "diff": -0.7,
+     "se": 0.9
+    }
+   }
+  }
+ },
  "early": {
   "seasons": [
    1960,
@@ -817,66 +1156,304 @@
     2000
    ],
    "n": 38,
-   "meanDiff": -2,
+   "meanDiff": -2.1,
    "rms": 15.3,
    "byDecade": {
     "1970s": -1.2,
-    "1980s": -1.5,
-    "1990s": -4.7
+    "1980s": -1.8,
+    "1990s": -4.9
    },
    "after": {
     "n": 15,
-    "meanDiff": 29.1
+    "meanDiff": 29
    }
   },
   "seam": {
    "1973": {
     "n": 50,
-    "meanDiff": 0.1,
-    "meanAbsDiff": 2.3,
-    "maxAbsDiff": 18.5
+    "meanDiff": 0.5,
+    "meanAbsDiff": 2.4,
+    "maxAbsDiff": 18.8
    },
    "1974": {
     "n": 50,
-    "meanDiff": -1.2,
-    "meanAbsDiff": 1.5,
-    "maxAbsDiff": 5
+    "meanDiff": -1.1,
+    "meanAbsDiff": 1.4,
+    "maxAbsDiff": 4.9
    },
    "1975": {
     "n": 50,
-    "meanDiff": 0.7,
-    "meanAbsDiff": 2.4,
-    "maxAbsDiff": 48.3
+    "meanDiff": 0.6,
+    "meanAbsDiff": 2.5,
+    "maxAbsDiff": 48.4
    },
    "1976": {
     "n": 50,
-    "meanDiff": 0.9,
-    "meanAbsDiff": 1.8,
+    "meanDiff": 0.8,
+    "meanAbsDiff": 2,
     "maxAbsDiff": 45.3
    },
    "1977": {
     "n": 50,
-    "meanDiff": 2.6,
-    "meanAbsDiff": 3,
-    "maxAbsDiff": 100
+    "meanDiff": 2.3,
+    "meanAbsDiff": 3.1,
+    "maxAbsDiff": 99.9
    },
    "1978": {
     "n": 50,
-    "meanDiff": 2.2,
-    "meanAbsDiff": 2.3,
-    "maxAbsDiff": 68.4
+    "meanDiff": 1.8,
+    "meanAbsDiff": 2.2,
+    "maxAbsDiff": 68.1
    },
    "1979": {
     "n": 50,
-    "meanDiff": 0.5,
-    "meanAbsDiff": 0.5,
-    "maxAbsDiff": 1.6
+    "meanDiff": 0.2,
+    "meanAbsDiff": 0.3,
+    "maxAbsDiff": 1.3
    },
    "1980": {
     "n": 50,
-    "meanDiff": 0.3,
-    "meanAbsDiff": 0.3,
-    "maxAbsDiff": 1.6
+    "meanDiff": 0,
+    "meanAbsDiff": 0.2,
+    "maxAbsDiff": 1.3
+   }
+  },
+  "regions": {
+   "1960-1967": {
+    "without": {
+     "regions": {
+      "W.Europe": {
+       "n": 1109,
+       "elo": -15.5,
+       "se": 9.1,
+       "points": -0.62
+      },
+      "E.Europe": {
+       "n": 409,
+       "elo": 1.5,
+       "se": 18.4,
+       "points": 0.06
+      },
+      "N.America": {
+       "n": 562,
+       "elo": 1.3,
+       "se": 15.4,
+       "points": 0.05
+      },
+      "L.America": {
+       "n": 539,
+       "elo": 11.1,
+       "se": 15.5,
+       "points": 0.44
+      },
+      "Asia": {
+       "n": 167,
+       "elo": -119.1,
+       "se": 30.9,
+       "points": -4.77
+      },
+      "Oceania": {
+       "n": 700,
+       "elo": 40.9,
+       "se": 13.4,
+       "points": 1.64
+      },
+      "Africa": {
+       "n": 318,
+       "elo": 3.4,
+       "se": 21.6,
+       "points": 0.14
+      }
+     },
+     "home": {
+      "major": {
+       "n": 489,
+       "elo": 53.7,
+       "se": 19.5
+      },
+      "cup": {
+       "n": 791,
+       "elo": 61.4,
+       "se": 15.5
+      }
+     }
+    },
+    "with": {
+     "regions": {
+      "W.Europe": {
+       "n": 1109,
+       "elo": -10.3,
+       "se": 9.1,
+       "points": -0.41
+      },
+      "E.Europe": {
+       "n": 409,
+       "elo": -3.4,
+       "se": 18.4,
+       "points": -0.14
+      },
+      "N.America": {
+       "n": 562,
+       "elo": 1.4,
+       "se": 15.4,
+       "points": 0.06
+      },
+      "L.America": {
+       "n": 539,
+       "elo": 19.4,
+       "se": 15.6,
+       "points": 0.78
+      },
+      "Asia": {
+       "n": 167,
+       "elo": -79.4,
+       "se": 31.3,
+       "points": -3.17
+      },
+      "Oceania": {
+       "n": 700,
+       "elo": 25.2,
+       "se": 13.3,
+       "points": 1.01
+      },
+      "Africa": {
+       "n": 318,
+       "elo": -8.8,
+       "se": 21.5,
+       "points": -0.35
+      }
+     },
+     "home": {
+      "major": {
+       "n": 489,
+       "elo": 54.2,
+       "se": 19.6
+      },
+      "cup": {
+       "n": 791,
+       "elo": 60,
+       "se": 15.8
+      }
+     }
+    }
+   },
+   "1968-1972": {
+    "without": {
+     "regions": {
+      "W.Europe": {
+       "n": 3718,
+       "elo": 0.7,
+       "se": 5.2,
+       "points": 0.03
+      },
+      "E.Europe": {
+       "n": 2046,
+       "elo": 22.4,
+       "se": 7.8,
+       "points": 0.89
+      },
+      "N.America": {
+       "n": 3994,
+       "elo": 8.4,
+       "se": 4.9,
+       "points": 0.34
+      },
+      "L.America": {
+       "n": 1229,
+       "elo": -17.9,
+       "se": 10.9,
+       "points": -0.72
+      },
+      "Asia": {
+       "n": 401,
+       "elo": -27.4,
+       "se": 20.1,
+       "points": -1.1
+      },
+      "Oceania": {
+       "n": 3636,
+       "elo": -10.7,
+       "se": 5.3,
+       "points": -0.43
+      },
+      "Africa": {
+       "n": 1416,
+       "elo": -7.1,
+       "se": 9.8,
+       "points": -0.28
+      }
+     },
+     "home": {
+      "major": {
+       "n": 394,
+       "elo": 36.9,
+       "se": 21.1
+      },
+      "cup": {
+       "n": 351,
+       "elo": 64,
+       "se": 22.1
+      }
+     }
+    },
+    "with": {
+     "regions": {
+      "W.Europe": {
+       "n": 3718,
+       "elo": 1.7,
+       "se": 5.2,
+       "points": 0.07
+      },
+      "E.Europe": {
+       "n": 2046,
+       "elo": 20.6,
+       "se": 7.9,
+       "points": 0.82
+      },
+      "N.America": {
+       "n": 3994,
+       "elo": 7.9,
+       "se": 4.9,
+       "points": 0.32
+      },
+      "L.America": {
+       "n": 1229,
+       "elo": -16.4,
+       "se": 10.9,
+       "points": -0.66
+      },
+      "Asia": {
+       "n": 401,
+       "elo": -15.5,
+       "se": 20.1,
+       "points": -0.62
+      },
+      "Oceania": {
+       "n": 3636,
+       "elo": -11.9,
+       "se": 5.3,
+       "points": -0.47
+      },
+      "Africa": {
+       "n": 1416,
+       "elo": -7.5,
+       "se": 9.8,
+       "points": -0.3
+      }
+     },
+     "home": {
+      "major": {
+       "n": 394,
+       "elo": 37.8,
+       "se": 21.2
+      },
+      "cup": {
+       "n": 351,
+       "elo": 65.5,
+       "se": 22.2
+      }
+     }
+    }
    }
   }
  },
@@ -886,8 +1463,8 @@
    "periods": {
     "amateur": {
      "seasons": 8,
-     "shared": 7.1,
-     "rho": 0.7
+     "shared": 7.5,
+     "rho": 0.69
     },
     "open": {
      "seasons": 5,
@@ -897,19 +1474,19 @@
    },
    "seasons": {
     "1960": {
-     "shared": 7,
+     "shared": 8,
      "listed": 10,
-     "rho": 0.87,
+     "rho": 0.83,
      "ranks": [
       1,
       2,
       3,
       7,
       9,
-      11,
+      12,
       4,
       8,
-      12,
+      10,
       26
      ],
      "notListed": []
@@ -917,14 +1494,14 @@
     "1961": {
      "shared": 8,
      "listed": 10,
-     "rho": 0.33,
+     "rho": 0.36,
      "ranks": [
       2,
       3,
       8,
-      6,
-      15,
       5,
+      15,
+      6,
       4,
       1,
       7,
@@ -933,20 +1510,20 @@
      "notListed": []
     },
     "1962": {
-     "shared": 6,
+     "shared": 7,
      "listed": 10,
      "rho": 0.73,
      "ranks": [
       1,
       3,
-      12,
-      2,
       10,
+      2,
+      9,
       5,
       13,
-      17,
+      14,
       6,
-      36
+      35
      ],
      "notListed": []
     },
@@ -961,9 +1538,9 @@
       5,
       14,
       4,
-      9,
-      71,
-      12,
+      8,
+      74,
+      11,
       20
      ],
      "notListed": []
@@ -971,7 +1548,7 @@
     "1964": {
      "shared": 8,
      "listed": 10,
-     "rho": 0.67,
+     "rho": 0.68,
      "ranks": [
       1,
       3,
@@ -980,45 +1557,45 @@
       2,
       4,
       7,
-      13,
       12,
+      13,
       6
      ],
      "notListed": []
     },
     "1965": {
-     "shared": 7,
+     "shared": 8,
      "listed": 10,
-     "rho": 0.68,
+     "rho": 0.67,
      "ranks": [
       1,
-      2,
       3,
+      2,
       4,
       27,
       6,
-      12,
-      21,
+      10,
+      18,
       5,
-      7
+      9
      ],
      "notListed": []
     },
     "1966": {
      "shared": 8,
      "listed": 10,
-     "rho": 0.83,
+     "rho": 0.76,
      "ranks": [
       3,
       2,
       1,
-      8,
-      4,
       7,
+      4,
+      8,
       5,
       22,
-      10,
-      11
+      6,
+      12
      ],
      "notListed": []
     },
@@ -1030,10 +1607,10 @@
       2,
       1,
       3,
-      39,
+      37,
       5,
       4,
-      13,
+      12,
       6,
       7,
       16
@@ -1046,15 +1623,15 @@
      "rho": 0.76,
      "ranks": [
       1,
-      4,
+      5,
       2,
       11,
       3,
       6,
       16,
-      25,
+      24,
       17,
-      9
+      8
      ],
      "notListed": []
     },
@@ -1140,7 +1717,7 @@
      "ours": [
       "Rod Laver 1",
       "Ken Rosewall 2",
-      "Arthur Ashe 4",
+      "Arthur Ashe 5",
       "John Newcombe 6"
      ]
     },
@@ -1168,9 +1745,9 @@
      "name": "Rod Laver",
      "year": 1970,
      "published": 2571,
-     "computed": 2329.2,
+     "computed": 2332.7,
      "date": "1969-09-20",
-     "endOfYear": 2269
+     "endOfYear": 2271.3
     }
    ]
   }

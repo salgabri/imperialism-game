@@ -73,6 +73,19 @@ Netherlands seven to nine of its thirteen places; eleven more one to seven playe
   classic teams are heritage players born in the USA, are almost empty, and Japan has
   only its MLB players (no NPB). The game's football nations are likewise dated XIs by
   database nationality rather than call-ups.
+- **Generated players, audited 2026-11-21, unchanged.** Asked whether made-up ratings lift a weak nation toward the
+  strong ones, the built-in season and The Show 18–25's were built as a campaign builds them
+  (scripts/lib/roster-audit.mjs `loadSeasons`/`seasonTeams`). Generated players hold 12.8% of the fielded nations' lineup
+  places: 41 of 95 season-nations (the Netherlands in 9 seasons, Colombia 8, Panama 7, Japan and Canada 6), one to six of
+  the 13. Each comes at the nation's stored strength − 3 ± 4, a stored strength that counts his place at 45: 53 to 73,
+  always below the nation's own starters, by 11 points at the median (5 to 22). So a nation plays 3.6 points above its
+  stored strength at the median (8.2 at most, the Netherlands in 2019), and 19 pairs within 4.1 points of each other turn,
+  most often the Netherlands or Japan over Colombia or Panama. In the built-in season Japan's three generated players
+  (catcher, shortstop, centre field) take it from 71.7 to 76.2 as played, past Canada (75.2) and Puerto Rico (73.3); Korea
+  plays 65.1 (62.1 at 45), Colombia 63.5 (60.5), Panama 62.5 (56.4) and the Netherlands 61.5 (55.9). No confederation
+  constant reaches the field (the fallback is the flat 45). Whether a missing place is worth 45, the nation's level less 3,
+  or more (Japan's NPB players, whom the game leaves out) would take World Baseball Classic and Premier12 results, which the
+  repo does not hold, so the rule stands.
 
 ## The lineup
 
@@ -312,7 +325,8 @@ not used. The 2020 season was 60 games; here it is a season like any other.
 
 Status: built 2026-11-09; its names, birthplaces, records and ballparks re-sourced from
 the Baseball Databank on 2026-11-10; each club moved toward its real record on
-2026-11-17 (below, "Each club's move toward its record"). Fifty-eight more seasons, 1960
+2026-11-17 (below, "Each club's move toward its record"), and from 1997 with both leagues
+on one scale on 2026-11-21 ("One scale for both leagues"). Fifty-eight more seasons, 1960
 to 2017 (`mlb-war-<year>`, listed "Computed from WAR, end of <year>"), whose ratings no
 game published. Each player's rating is computed from his WAR and put on MLB The Show's
 scale, rank for rank within his role; then every player of a club moves by the same
@@ -354,10 +368,15 @@ ignored `data-src/mlb-war/`:
   robots.txt allows /wiki/ pages to every agent; one request every 1.5 s, 2026-11-09.
   The research pass had read the same parks' coordinates from Wikidata's query service,
   whose robots.txt disallows /sparql; those answers are not used.
+- **English Wikipedia's "Interleague play"** (CC BY-SA 4.0; facts only): the American
+  League's record against the National League in each season's interleague games,
+  1997–2017, revision 1381217136, read once on 2026-11-21 and cached in the ignored
+  `data-src/mlb-interleague/`; `node scripts/sync-mlb-interleague.mjs` writes
+  `scripts/data/mlb-interleague.json` from it (below, "One scale for both leagues").
 - **MLB The Show 18 to 24** (the earlier seasons' snapshots): the scale only, and the
   calibration. No card is copied into these seasons.
 
-`public/baseball/ATTRIBUTION.txt` credits all three, repeats the MIT notice and, in the
+`public/baseball/ATTRIBUTION.txt` credits all three (and the interleague article), repeats the MIT notice and, in the
 Databank README's own words, its CC BY-SA 3.0 statement and Retrosheet's notice (the
 importer checks that the README holds both), credits Baseball-Reference and FanGraphs as
 the WAR's origin and the Lahman database of 2015 the Databank grew from, and puts the
@@ -481,8 +500,9 @@ says it had:
 - **A club never plays itself**, so in a league of n clubs its share measures its gap to
   the others, which is n ÷ (n − 1) times its gap to the league's mean: S × (n − 1)/n is
   its strength above the mean, as a balanced schedule's SRS reads margins. n is its
-  league's clubs that season (8 to 16), the leagues met only in the World Series before
-  1997, and the interleague games since are a tenth of a schedule.
+  league's clubs that season (8 to 16). Before 1997 the leagues met only in the World
+  Series; from 1997 their interleague games put both on one scale (below, "One scale for
+  both leagues", 2026-11-21).
 - **m**, the win share a point of strength is worth, is measured with the engine under
   the season's own rules (`perPointOf`): two copies of one of the season's clubs, drawn
   at random, every player of one raised and of the other lowered by half a gap of ±2 or
@@ -490,35 +510,131 @@ says it had:
   drama, the raised one batting first half the time, seeded by the season so it rebuilds
   byte for byte. m is 0.0234 to 0.0252 (0.0242 on average).
 - **The target** is T = μ + √r × S × (n − 1)/n ÷ m, μ the season's mean strength before
-  the move (`resultsTargets`). The square root of r: the engine adds its own luck back.
+  the move (`resultsTargets`); from 1997, μ + √r × S ÷ m with S the club's strength above
+  the season's mean on both leagues' scale (`jointShareOf`). The square root of r: the
+  engine adds its own luck back.
 - **The move** (`clubMoveOf`): every player of the club by one whole number, and the best
   few of the lineup it plays by one more, whichever brings its strength nearest the
   target; then the rest of the club in rating order. Nobody passes a teammate. The best
   few are the lineup's, not the club's, because a point more for a starter on the bench
   would move him into the bullpen out of his position (the 2002 Diamondbacks). Clubs move
-  by −5 to +4 points a player (−2 to +2 for 1,409 of the 1,522), 1.08 points of strength
-  on average, and land within 0.12 of their targets (0.03 on average). The largest: the
-  2004 Diamondbacks (51–111) 77.9 → 73.1, the 1991 Reds (74–88) 82.8 → 78.4, the 2010
-  Mariners (61–101) 80.0 → 75.7, the 2001 Mariners (116–46) 82.2 → 86.4, the 1977 Angels
-  (74–88) 82.2 → 78.0 and the 1996 Mariners (85–76) 84.4 → 80.3.
+  by −5 to +4 points a player (−2 to +2 for 1,383 of the 1,522), 1.13 points of strength
+  on average, and land within 0.11 of their targets (0.03 on average). The largest: the
+  2004 Diamondbacks (51–111) 77.9 → 72.9, the 2001 Mariners (116–46) 82.2 → 86.9, the
+  2012 Orioles (93–69) 78.1 → 82.7, the 2008 Padres (63–99) 79.4 → 74.9, the 1991 Reds
+  (74–88) 82.8 → 78.4 and the 2012 Athletics (94–68) 78.6 → 82.9 (until 2026-11-21, when
+  both leagues came onto one scale, the 2010 Mariners, 1977 Angels and 1996 Mariners were
+  among them and 1,409 clubs moved within two).
 
-Each season's `source.conversion` states the move and its own μ, r and m, and the audit
-lists every club's strength before and after, its target and its move. After it, the
-strength the match model plays follows the record exactly (Pearson 1.000 every season),
-and the strength the game shows at r 0.944 on average (0.887 in 2014 to 0.983 in 1962;
-Spearman 0.94 in the median season), against 0.817 before. Played as their real leagues
-played (each club against its own league only, as many games as it played, 40 seasons
-each; `scripts/baseball-war-seasons.test.mjs`), the 58 seasons' standings spread as the
-real ones did: win% SD 0.0696 on average against the real 0.0704, 0.0012 from it on
-average (0.0063 before the move) and correlated with it at 0.99 across the seasons (0.71
-before). The realism harness plays every club against every other, which spreads them a
-little less: 1968, 1987 and 2000 at 0.057, 0.058 and 0.058 against the real 0.059, 0.059
-and 0.061 (`npm run simulation:realism`). Player ratings move with their clubs: Pedro Martinez's 2001, an
-injured season for a club that went 82–79, falls from 94 to 91; Mickey Mantle's 1961
-rises from 95 to 98. Each season's pitching premium, recomputed from the moved clubs,
-rises by 0.09 to 0.23, because the extra point goes first to the lineup's best, often
-its ace. The national teams take the moved ratings; one nation stops fielding a team:
-Mexico in 1993, whose own players now hold less than half its lineup.
+Each season's `source.conversion` states the move and its own μ, r and m (from 1997 its
+interleague record and edge too), and the audit lists every club's strength before and
+after, its target and its move, and each league's mean strength before and after. After
+it, the strength the match model plays follows the club's results exactly (Pearson 1.000
+every season: its record, from 1997 on both leagues' scale), and the strength the game
+shows at r 0.947 on average (0.895 in 1984 to 0.983 in 1962; Spearman 0.94 in the median
+season), against 0.817 before. Against the raw record alone, from 1997, the shown strength
+follows it at 0.909 on average (0.796 in 2006, when the American League won 154–98 of its
+interleague games: a .500 club of the one league was not a .500 club of the other). Played
+as their real leagues played (each club against its own league only, as many games as it
+played, 40 seasons each; `scripts/baseball-war-seasons.test.mjs`), the 58 seasons'
+standings spread as the real ones did: win% SD 0.0696 on average against the real 0.0704,
+0.0013 from it on average (0.0063 before the move) and correlated with it at 0.99 across
+the seasons (0.71 before). The realism harness plays every club against every other, which
+spreads them a little less: 1968, 1987 and 2000 at 0.057, 0.058 and 0.060 against the
+real 0.059, 0.059 and 0.061 (`npm run simulation:realism`; 2000 at 0.058 until its leagues
+came onto one scale). Player ratings move with
+their clubs: Pedro Martinez's 2001, an injured season for a club that went 82–79, falls
+from 94 to 91; Mickey Mantle's 1961 rises from 95 to 98. Each season's pitching premium,
+recomputed from the moved clubs, rises by 0.02 to 0.23, because the extra point goes first
+to the lineup's best, often its ace. The national teams take the moved ratings; one nation
+stops fielding a team: Mexico in 1993, whose own players now hold less than half its
+lineup.
+
+**One scale for both leagues** (2026-11-21, on the user's request to make sure ratings are
+"normalized": a league's best must not be rated like the best of a stronger one just
+because its results were read inside its own league; `jointShareOf` in
+`scripts/lib/mlb-war.mjs`). The clubs of both leagues meet on every MLB map, but the move
+read each club's record inside its own league, every league's share centred on ½: after it
+the American League's clubs averaged within 0.04 points of the National League's in
+every season before 1997, and from 1997 only by what their interleague games added to
+their own records (−0.3 to +0.7 points). Those games say how far apart the leagues were:
+
+| | interleague games (AL record) | the AL's edge in them, in points of strength (± SE) | the ratings' AL lead before → after |
+| --- | --- | --- | --- |
+| 1997–2003 | 1,696 (833–863) | −0.4 ± 0.5 | −0.1 → −0.3 |
+| 2004–2017 | 3,768 (2,057–1,711) | +1.9 ± 0.3 | +0.3 → +1.5 |
+| 2006 | 252 (154–98) | +4.6 ± 1.3 | +0.7 → +3.5 |
+| 2008 | 252 (149–103) | +3.8 ± 1.3 | +0.6 → +3.1 |
+
+(A point of strength is worth m, about 0.024 of a game's win share, so the 2004–2017
+edge is the AL's 54.6% of the games between the leagues.) The WAR itself carries a
+league's quality only in part: Baseball-Reference sets each league's replacement level by
+era, which the JEFFBAGWELL file shows as a fixed lead in Baseball-Reference's pitching WAR a
+club (`br_pwar162`: the National League's by 2.6–3.0 in 1960–65, the American League's by
+1.3–1.5 in 1972–79 and 1989–91, 1.9–3.0 in 1992–2012 and 1.4 in 2013–17), averaged there
+with FanGraphs', which shows little. Rank-mapped over the whole season, the players carried
+it as a lead before the move of up to 1.3 points for the National League (in the 1960s) and up
+to 1.4 for the American League (1974–76, 1993–96), which the move then centred away; it
+did not follow the interleague games from season to season (1997–2003: +0.2 to +0.8 where
+the games say −1.9 to +1.7).
+
+So from 1997 each club's strength is read with both leagues on one scale. English
+Wikipedia's "Interleague play" gives the American League's record against the National League
+each season (97–117 in 1997 to 160–140 in 2017; below, "The source of the records"), and the
+sync and the build check it against the Databank: the
+American League's clubs' wins less their losses are exactly those of its interleague games,
+since its games inside the league cancel out (all 21 agree). Its edge Δ = W ÷ (W + L) − ½;
+each league stands Δ × (the other league's share of the clubs) above or below the
+season's mean, and within its league a club stands (W% − ½ − f × Δ) ÷ ((1 − f) × n/(n − 1)
++ f) above its league's mean, f the share of its league's games that were interleague (its
+own record holds them too). Before 1997, with f and Δ nought, that is the rule as it was,
+and those 37 seasons rebuild byte for byte. The target keeps the season's r, the share of
+the records' variance that is not luck (0.67 on average in 1997–2017): the leagues' edge,
+read from 214 to 300 games a season, is about as reliable (0.59 over the 21 seasons, its
+own error against how far it ranged), so one √r serves both.
+
+- **Held out.** Each season's edge, as the move now carries it, predicts the next season's
+  interleague games better than the shipped ratings did: 7.6 nats of log-likelihood over a
+  level pair of leagues across 1998–2017, against 4.2 for the ratings before (whose lead was
+  what each club's own interleague games gave it) and 5.0 for the raw edge unshrunk. The
+  gain is the AL's run of 2005–2017; in 1997–2003 the edge changed sign from season to
+  season and carries nothing over. The players who changed league, whom the games do not
+  count, agree where it matters: their league-relative hitting (wRC+) and pitching (ERA−)
+  before and after the move put the American League 1.8 ± 0.5 points ahead in 2004–12 and
+  1.1 ± 0.6 in 2013–17 (the games: 2.1 ± 0.4 and 1.6 ± 0.5).
+- **In play.** The clubs played against each other at random across the leagues (20,000
+  games a season, neutral venue, Balanced): the AL's clubs win 0.537 of 2004–2017's games
+  against the NL's (0.508 before; real 0.546) and 0.490 of 1997–2003's (0.498; real 0.491);
+  the rest of the gap is √r's.
+- **Clubs.** 2006: the Tigers (95–67) 82.2 → 83.7 and the Mets (97–65) 82.6 → 81.3, the
+  Yankees 82.5 → 83.9, the Cardinals (83–78, the World Series' winners) 80.1 → 78.7, the
+  Royals (62–100) 76.2 → 77.7 now above the Cubs (66–96) 76.9 → 75.6. 2008: the Rays
+  (97–65) 82.7 → 84.1 and the Cubs (97–64) 82.8 → 81.7. 2003, when the National League
+  won 137–115: the Braves (101–61) 83.3 → 84.0 and the Yankees (101–61) 83.3 → 82.7.
+  Players move with their clubs: in 2006 Albert Pujols and Chase Utley 95 → 94 and Carlos
+  Beltran 94 → 92, Travis Hafner, Alex Rodriguez and Carlos Guillen 91 → 93 and Johan
+  Santana 94 → 95. The nations take the new ratings; no season's fielded nations change.
+- **Before 1997 the leagues stay level.** Nothing in the repo's sources links them soundly:
+  one World Series a season and the All-Star games are too few, and the players who changed
+  league, the one large link, missed the 1997–2003 games by 2.3 points (they put the AL 1.9
+  ± 0.7 ahead where the games say −0.4 ± 0.5). Read the same way, they put the National
+  League 2.3 ± 0.9 points ahead in 1960–68 and 2.4 ± 0.7 in 1969–76 and the leagues level in
+  1977–92 (−0.1 ± 0.5); Baseball-Reference's replacement levels lean the same way. Decided
+  2026-11-21 (the coordinating session, for the user): the leagues stay level before 1997,
+  because that one large link, checked on the seasons that can check it, missed them by 2.3
+  points, so it is not a sound link.
+- **The source of the records.** English Wikipedia's "Interleague play"
+  (https://en.wikipedia.org/wiki/Interleague_play), revision 1381217136, read once on
+  2026-11-21 through `scripts/lib/polite-fetch.mjs` (en.wikipedia.org's robots.txt allows /wiki/
+  pages to every agent, ClaudeBot included) into the ignored `data-src/mlb-interleague/`, and
+  pinned by revision and SHA-256 in the manifest (`sources.interleague`). No cache on the
+  computer held the season's games one by one (MLB's Stats API cache holds only players, and
+  Retrosheet's game logs are disallowed). `node scripts/sync-mlb-interleague.mjs` checks the
+  pin and reads the article's table of each season's total games and each league's wins into
+  `scripts/data/mlb-interleague.json` (`--check` rebuilds it byte for byte; facts only, CC BY-SA
+  4.0, credited in `public/baseball/ATTRIBUTION.txt`). It stops unless each season's two wins
+  add up to its games (214 in 1997, 224 in 1998, 251 in 1999 and 2000, 252 to 2012, 300 from
+  2013) and its net is the Databank's: all 21 agree, and the build checks the nets again.
 
 **Spot checks** (`docs/design/baseball-war-seasons-audit.json` has every season; strength
 is the lineup's mean rating, which the game shows):
@@ -530,8 +646,8 @@ is the lineup's mean rating, which the game shows):
 | 1969 | Orioles 85.2 (109–53), Twins 81.9 (97–65), Mets 81.5 (100–62) | Clemente 96, Yastrzemski 95 | 0.92 → 0.97 |
 | 1975 | Reds 84.6 (108–54), Athletics 82.9 (98–64), Red Sox 81.7 | Morgan 98, Schmidt 96, Bench 93 | 0.87 → 0.96 |
 | 1984 | Tigers 83.0 (104–58), Padres 81.8 (92–70), Cubs 81.2 | Ripken 95, Carter 94, Schmidt 92 | 0.68 → 0.90 |
-| 1998 | Yankees 85.5 (114–48), Braves 82.4 (106–56), Astros 82.2 | Bonds 98, Piazza 94, Griffey Jr. 92 | 0.85 → 0.97 |
-| 2017 | Astros 82.4 (101–61), Indians 82.0 (102–60), Dodgers 81.9 (104–58) | Trout 97, Donaldson 94, Altuve 93 | 0.83 → 0.97 |
+| 1998 | Yankees 85.6 (114–48), Braves 82.3 (106–56), Astros 82.2 | Bonds 98, Piazza 94, Griffey Jr. 92 | 0.85 → 0.97 |
+| 2017 | Astros 82.8 (101–61), Indians 82.5 (102–60), Dodgers 81.5 (104–58) | Trout 98, Altuve 94, Donaldson 94 | 0.83 → 0.94 |
 
 The best pitchers read as expected: Gibson 94 in 1968, Seaver 93 in 1975, Gooden 94 in
 1985; Hoyt Wilhelm (1961), Gossage (1985, level with Quisenberry) and Rivera (2001) head
@@ -642,9 +758,14 @@ at least 0.88; records to 2022); ratings that keep each role's order; the listin
 MLB The Show's, each season on its map; every season decoding, computed, its clubs its
 map's, each fielding all nine places and keeping 26 players or every pitcher it used; the
 spot checks above and the record correlation (at least 0.92 on average and 0.85 in every
-season); each club's move (one whole number a player and one more for the lineup's best
-few, nobody passing a teammate, its constants in the conversion) and the target's
-formula on a made-up season of two leagues; the standings played by the real leagues
+season; from 1997 against the records on both leagues' scale); each club's move (one whole
+number a player and one more for the lineup's best few, nobody passing a teammate, its
+constants in the conversion) and the target's formula on a made-up season of two leagues;
+the joint scale on made-up leagues (each club's strength, its league's edge, a .500 club of
+the stronger league above one of the weaker, a record that does not add up refused); the
+interleague records rebuilt byte for byte from the pinned page (when it is on the computer),
+their pin the manifest's, their nets the Databank's, and the American League's lead after
+the move √r × Δ ÷ m from 1997 and nought before; the standings played by the real leagues
 (within 0.003 of the real spreads on average, r above 0.95); the nations of 1960, the Databank's birth
 countries, Elmer Valo's correction and Rod Carew's Panama; the namesakes; the clubs of
 their day; the rename rule (37 maps, ballparks named in place,
@@ -687,6 +808,17 @@ model's (`baseballStrength`), not the lineup's shown mean; m measured each seaso
 its own rules, 40,000 games a gap; the extra point for the best of the lineup first, so the
 move never puts a starting pitcher in the bullpen; one rating a player, so the national
 teams take the moved ratings.
+
+**Decisions** (2026-11-21). The user's: ratings "correct and normalized", a league's best
+not rated like the best of a stronger one for being read inside its own league. Claude's,
+building it: from 1997 one scale for both leagues, set by each season's own interleague
+record (not a window of seasons: the move reads the season's results), shrunk by the
+season's √r like every club's record; the interleague records read from English Wikipedia's
+"Interleague play" at one pinned revision, no cache holding the games themselves, and
+checked against the Databank's league totals; the WAR's own league adjustment neither used
+nor undone (the move centres it away). The coordinating session's, for the user, on
+2026-11-21: before 1997 the leagues stay level, the players who changed league having missed
+the interleague games of 1997–2003, the seasons that can check them, by 2.3 points.
 
 ## Rules by era
 
@@ -743,9 +875,10 @@ pitchers differently each year, and the computed seasons inherit 2018–24's bal
 the 2.3 premium that makes the built-in clubs' average matchup an even edge would give
 2025's hitters 1.4 rating points too much. Each season takes its own,
 `seasonPremium` of its clubs (their defence's mean rating above their batting's):
-0.93 for MLB The Show 25, 1.53 for 19, 2.68 for 22, 1.86 to 2.88 for the computed
+0.93 for MLB The Show 25, 1.53 for 19, 2.68 for 22, 1.89 to 2.86 for the computed
 seasons (1.72 to 2.71 before each club's move toward its record of 2026-11-17, which
-gives its extra point to the lineup's best first, often the ace). `npm run build:mlb-seasons` writes them to `src/data/baseballSeasonPremiums.js`
+gives its extra point to the lineup's best first, often the ace; 1.86 to 2.88 until both
+leagues came onto one scale on 2026-11-21). `npm run build:mlb-seasons` writes them to `src/data/baseballSeasonPremiums.js`
 (and `--check` holds them), and a season's nations play its clubs' premium.
 
 | Season | Runs a game | Runs a nine innings | Shut out | A half-inning scores | Runs a scoring one | Premium | The game: runs, shut out |
@@ -757,9 +890,9 @@ gives its extra point to the lineup's best first, often the ace). `npm run build
 | 1977 | 4.47 | 4.48 | 5.7% | 26.7% | 1.86 | 2.54 | 4.49, 6.3% |
 | 1987 | 4.72 | 4.76 | 5.0% | 27.8% | 1.88 | 2.35 | 4.72, 5.6% |
 | 1994 | 4.92 | 4.96 | 4.5% | 28.7% | 1.90 | 2.42 | 4.91, 4.9% |
-| 2000 | 5.14 | 5.20 | 4.2% | 29.7% | 1.92 | 2.56 | 5.13, 4.5% |
-| 2010 | 4.38 | 4.43 | 6.8% | 26.3% | 1.85 | 2.49 | 4.38, 6.7% |
-| 2014 | 4.07 | 4.08 | 7.3% | 24.8% | 1.81 | 2.40 | 4.06, 7.6% |
+| 2000 | 5.14 | 5.20 | 4.2% | 29.7% | 1.92 | 2.47 | 5.13, 4.5% |
+| 2010 | 4.38 | 4.43 | 6.8% | 26.3% | 1.85 | 2.52 | 4.38, 6.7% |
+| 2014 | 4.07 | 4.08 | 7.3% | 24.8% | 1.81 | 2.39 | 4.06, 7.6% |
 | 2019 | 4.83 | 4.86 | 5.5% | 28.3% | 1.89 | 1.53 | 4.81, 5.5% |
 | 2020 | 4.65 | 4.85 | 5.5% | 27.3% | 1.87 | 2.28 | 4.64, 6.2% |
 | 2021 | 4.53 | 4.65 | 6.2% | 26.7% | 1.86 | 0.89 | 4.50, 6.5% |
@@ -768,7 +901,10 @@ gives its extra point to the lineup's best first, often the ace). `npm run build
 
 The real columns are the module's (shut out: the share of a side's games it scored no
 runs in); "the game" plays every pairing of the season's clubs twelve times under its
-rules (the computed seasons' rows drawn again after their clubs' move, 2026-11-17). Over
+rules (the computed seasons' rows drawn again after their clubs' move, 2026-11-17; the
+premiums of 1997–2017 recomputed when their leagues came onto one scale, 2026-11-21, which
+moves their game by at most 0.05 runs and 0.4 points of shutouts, within the draw's own
+noise). Over
 all 67 seasons the game's runs a game sit within 0.9% of the league's (0.2% over on
 average) and its shutouts 0.4 points above the league's on average (at most 1.4 points,
 1982). 2020 and 2021 scheduled seven-inning doubleheaders
@@ -862,6 +998,13 @@ rules and resumes with them.
   did not have ([Rules by era](#rules-by-era) says what the designated hitter would
   take); each scores at its league's runs a game all the same. The WAR averages
   Baseball-Reference's and FanGraphs', whose terms could not be read.
+- Before 1997 the two leagues stand level, each club placed by its record inside its own
+  league: nothing linked them but the World Series and the All-Star games, and the players
+  who changed league, the one large link, missed the interleague games of 1997–2003 by 2.3
+  points, so it is no sound link. Read that way they would put the National League about
+  2.3 points ahead in 1960–76 ([One scale for both leagues](#seasons-before-2018-computed-from-war)).
+  From 1997 each season's interleague record sets the gap, its own games only, so a season
+  whose games ran against the trend (2003's, the National League ahead by 1.5) carries it.
 - Names and birthplaces of 1960 to 2017 are the Baseball Databank's of November 2023, a
   resource its own README calls legacy, its legacy parts unmaintained: names without
   diacritics, and whatever it has not corrected since. Its seasons end with 2022, so the

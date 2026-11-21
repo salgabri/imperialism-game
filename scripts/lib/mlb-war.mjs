@@ -9,7 +9,8 @@
 // regressed toward a level below replacement, so that playing time counts. Each role's scores are then put on MLB The
 // Show's scale rank for rank: the k-th best score of a season of T clubs takes the overall a player at the same depth
 // per club held in MLB The Show 18 to 24. Each club then moves toward its real record (`resultsMove`,
-// docs/design/computed-ratings.md, step 5), every player of it by the same whole number and its best few by one more.
+// docs/design/computed-ratings.md, step 5), every player of it by the same whole number and its best few by one more;
+// from 1997 the interleague games put both leagues' clubs on one scale (`jointShareOf`).
 import { makeRng } from '../../src/data/teams.js';
 import { clubMoveOf, mean, perPointOf, resultsTargets, winShareOf } from './computed-ratings.mjs';
 
@@ -166,28 +167,75 @@ export function perPointOfSeason(clubs, sport, seed, games = MEASURE_GAMES) {
 }
 
 /**
+ * Each club's strength above the season's mean, in win share, when the season's two leagues met in interleague games
+ * (docs/design/baseball.md, "One scale for both leagues"). `clubs`: `[{ id, league, w, l }]` of exactly two leagues;
+ * `shares`: each club's win share less a half (winShareOf's ratings); `interleague`: `{ league, w, l }`, that league's
+ * record against the other in the season's interleague games. Its edge Δ = w ÷ (w + l) − ½ is what the average club of
+ * that league won above a half against the average club of the other. A club's own record holds its interleague games
+ * too, a share f of its league's games (the interleague games over its league's clubs' games): its share less a half is
+ * d × ((1 − f) × n/(n − 1) + f) + f × Δ, d its strength above its league's mean (against the n − 1 others of its league a
+ * record measures n/(n − 1) of d, against the other league d + Δ, its league's edge or the other's). Above the season's
+ * mean of N clubs a league's mean stands its edge × the other league's clubs ÷ N away, so the clubs still average nought.
+ * With no interleague games (f = 0, Δ = 0) this is a league's share × (n − 1)/n. Throws unless the clubs of `league`
+ * won as many more games than they lost as its interleague record says: its games inside the league cancel out.
+ * → `{ strengths: { club: strength }, edge: Δ, shares: { league: f } }`.
+ */
+export function jointShareOf(clubs, shares, interleague) {
+  const leagues = [...new Set(clubs.map(club => club.league))].sort();
+  if (leagues.length !== 2 || !leagues.includes(interleague.league)) throw new Error(`Interleague games need two leagues, ${interleague.league} one of them: ${leagues.join(', ')}`);
+  const games = interleague.w + interleague.l;
+  if (!(games > 0)) throw new Error('No interleague games');
+  const net = clubs.filter(club => club.league === interleague.league).reduce((sum, club) => sum + club.w - club.l, 0);
+  if (net !== interleague.w - interleague.l) {
+    throw new Error(`The ${interleague.league}'s clubs won ${net} more than they lost, its interleague record ${interleague.w}–${interleague.l} says ${interleague.w - interleague.l}`);
+  }
+  const edge = interleague.w / games - 0.5;
+  const of = Object.fromEntries(leagues.map(league => {
+    const own = clubs.filter(club => club.league === league);
+    return [league, { n: own.length, f: games / own.reduce((sum, club) => sum + club.w + club.l, 0), edge: league === interleague.league ? edge : -edge }];
+  }));
+  const total = clubs.length;
+  const strengths = Object.fromEntries(clubs.map(club => {
+    const { n, f, edge: own } = of[club.league];
+    const other = total - n;
+    const d = (shares[club.id] - f * own) / ((1 - f) * n / (n - 1) + f);
+    return [club.id, d + own * other / total];
+  }));
+  return { strengths, edge, shares: Object.fromEntries(leagues.map(league => [league, of[league].f])) };
+}
+
+/**
  * Each club's move toward its real record (docs/design/computed-ratings.md, step 5). `clubs`: `[{ id, league, w, l,
  * pool }]`, `pool` the club's players best first by `order`. Its results strength is its win share less a half
  * (winShareOf), as strength above its league's mean: a club never plays itself, so among the n clubs of a league that
  * play each other its share measures (n − 1)/n of its gap to them all, as a balanced schedule's Simple Rating System
- * reads its margins. Its target is the season's mean strength before the move plus √reliability × that ÷ `perPoint`
- * (resultsTargets), and every player of the club moves by one whole number, its best few by one more (clubMoveOf), so
- * that `strengthOf(pool)`, the strength the engine plays, comes nearest it. The best few are those of the lineup the
- * club plays (`lineupOf(pool)`, their ids), best first by `order`, then the rest: a point more for a player on the bench
- * would only move him into that lineup out of his position, a starting pitcher into the bullpen. Nobody passes a
- * teammate. → `{ level, reliability, scale, moves: [{ id, target, before, after, shift, plus, pool }] }`.
+ * reads its margins. A season whose leagues met (`interleague`, `{ league, w, l }`: that league's record against the
+ * other, from 1997) puts both on one scale instead (jointShareOf): each club's strength above the season's mean, its
+ * league's edge in those games included. Its target is the season's mean strength before the move plus √reliability ×
+ * that ÷ `perPoint` (resultsTargets), and every player of the club moves by one whole number, its best few by one more
+ * (clubMoveOf), so that `strengthOf(pool)`, the strength the engine plays, comes nearest it. The best few are those of
+ * the lineup the club plays (`lineupOf(pool)`, their ids), best first by `order`, then the rest: a point more for a
+ * player on the bench would only move him into that lineup out of his position, a starting pitcher into the bullpen.
+ * Nobody passes a teammate. → `{ level, reliability, scale, edge, strengths, moves: [{ id, target, before, after, shift, plus,
+ * pool }] }`, `edge` the interleague edge Δ (null without interleague games), `strengths` each club's results strength above
+ * the season's mean, in win share.
  */
-export function resultsMove(clubs, { perPoint, strengthOf, order, lineupOf }) {
+export function resultsMove(clubs, { perPoint, strengthOf, order, lineupOf, interleague = null }) {
   const level = mean(clubs.map(club => strengthOf(club.pool)));
   const { ratings, reliability } = winShareOf(Object.fromEntries(clubs.map(club => [club.id, { w: club.w, l: club.l }])));
-  const size = new Map();
-  for (const club of clubs) size.set(club.league, (size.get(club.league) ?? 0) + 1);
-  const above = Object.fromEntries(clubs.map(club => [club.id, ratings[club.id] * (size.get(club.league) - 1) / size.get(club.league)]));
+  let above, edge = null;
+  if (interleague) {
+    ({ strengths: above, edge } = jointShareOf(clubs, ratings, interleague));
+  } else {
+    const size = new Map();
+    for (const club of clubs) size.set(club.league, (size.get(club.league) ?? 0) + 1);
+    above = Object.fromEntries(clubs.map(club => [club.id, ratings[club.id] * (size.get(club.league) - 1) / size.get(club.league)]));
+  }
   const { scale, targets } = resultsTargets({ ratings: above, reliability }, { mean: level, perPoint });
   const moves = clubs.map(club => {
     const lineup = lineupOf(club.pool);
     const bestFirst = (a, b) => (lineup.has(b.id) ? 1 : 0) - (lineup.has(a.id) ? 1 : 0) || order(a, b);
     return { id: club.id, target: targets[club.id], ...clubMoveOf(club.pool, targets[club.id], strengthOf, { bestFirst }) };
   });
-  return { level, reliability, scale, moves };
+  return { level, reliability, scale, edge, strengths: above, moves };
 }

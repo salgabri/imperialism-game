@@ -260,6 +260,42 @@ the credits CC BY-SA asks for and licenses the season files under it.
   Spearman 0.88 and top-20 Spearman 0.96 on average over 52 releases; at the release after each season's final from 2003,
   top-48 Spearman 0.86 to 0.92. The Pearson over every team both rank is lower than the men's (0.90), as FIFA's ranking
   holds many small nations the results rate from few matches.
+- **Across confederations** (measured 2026-11-21, not changed). Men's football's computed seasons now add a level per
+  confederation to the Elo, fitted on the matches between confederations' sides
+  ([football-years.md](football-years.md#confederation-levels)). The women's Elo was measured the same way, each
+  inter-confederation match scored with the Elo from before it (UEFA at 0, ± the standard error; the last column is the
+  log loss with the men's levels, eight years either side and a prior of 100 Elo, fitted without each year's matches):
+
+  | Years | Matches | CONMEBOL | CONCACAF | CAF | AFC | OFC | Log loss, men's levels |
+  | --- | --- | --- | --- | --- | --- | --- | --- |
+  | 1985–1995 | 119 | +9 ± 126 | −42 ± 51 | −488 ± 162 (9 matches) | −149 ± 59 | −181 ± 72 | 0.5012 → 0.4930 |
+  | 1996–2003 | 253 | +28 ± 59 | −4 ± 38 | −20 ± 85 | −25 ± 42 | −64 ± 58 | 0.4729 → 0.4795 |
+  | 2004–2011 | 377 | +37 ± 48 | −14 ± 33 | −54 ± 71 | −45 ± 34 | −10 ± 51 | 0.5063 → 0.5103 |
+  | 2012–2015 | 315 | +13 ± 69 | −109 ± 38 | −158 ± 76 | −68 ± 37 | −67 ± 83 | 0.5808 → 0.5722 |
+
+  From 1996 to 2011 no offset is beyond two standard errors, and the women's game changed fast: the offsets of
+  1985–1995 had closed by 1996, and those of 2012–2015 grew on as Europe's sides drew away (2016–2026: CONCACAF −120, CAF
+  −144, the AFC −182, the OFC −208, all beyond two standard errors). So the women's window and prior were chosen on
+  women's matches, as the men's were on men's: windows of 2, 3, 4, 6 and 8 years either side, priors of 30, 60 and 100
+  Elo and an empirical-Bayes prior (each window's own spread of levels, by the method of moments), every year of
+  1985–2015 scored with levels fitted without its matches. The rule, fixed before the run and the same for every season:
+  levels apply only if they lower the held-out log loss over 1985–2015 and leave no period (1985–1995, 1996–2003,
+  2004–2011, 2012–2015) worse by more than one standard error (a bootstrap over years, 2,000 draws). None of the 20
+  settings qualifies. Every one leaves 1996–2003 worse by more than its error (by 0.0004 to 0.0168 a match), most leave
+  2004–2011 worse too, and none lowers the 1985–2015 log loss of 0.5198 by two standard errors: the best, six years
+  either side with the empirical-Bayes prior, reaches 0.5169 (−0.0029 ± 0.0036), with 1996–2003 +0.0004 ± 0.0002 and
+  2004–2011 +0.0021 ± 0.0020; six years and a prior of 30, 0.5174 (−0.0024 ± 0.0022, 1996–2003 +0.0018 ± 0.0010); the
+  men's setting 0.5194 (−0.0005 ± 0.0042, 1996–2003 +0.0066 ± 0.0031). So the seasons keep their Elo as it is.
+
+  What the best of those settings would have done, T as built → levelled: 1991/92 Chinese Taipei 77.0 → 74.8, Japan
+  74.0 → 71.7, China 84.7 → 82.4, Nigeria 75.0 → 69.5, New Zealand 77.6 → 74.6; 1994/95 Japan 73.5 → 72.8, China 81.5 →
+  80.9, Nigeria 73.9 → 73.6; 2010/11 Mexico 71.5 → 70.1, Nigeria 75.8 → 73.8, Equatorial Guinea 68.1 → 66.1 (Brazil the
+  strongest, the United States 88 → 86.6); 2012/13 Cameroon 61.4 → 59.1; 2014/15 Nigeria 72.6 → 70.6, Cameroon 66.9 →
+  64.9, Côte d'Ivoire 62.4 → 60.4, Thailand 67.8 → 66.7, and Mexico and Costa Rica unchanged at 68.8 and 68.4: they move
+  with the United States, the strongest, and it is Europe's sides that rise (Germany 82.7 → 85.4). FIFA's ranking is no
+  better tied: used as the forecast of the 701 inter-confederation matches of 2003 to 2015 (its gap scaled to fit), it
+  leaves CAF +183 ± 63 and CONMEBOL +68 ± 33, under-rating the sides outside Europe where our Elo leaves CAF −151 ± 60
+  and CONCACAF −50 ± 24.
 - **The champions.** The strongest nation by Elo the day after each final is the champion but in 2004/05 (Germany, the
   bronze medallist, 11 points ahead of the United States) and 2010/11 (the United States, runners-up, ahead of Brazil,
   Germany and the champions Japan, fourth, as FIFA's ranking had them that July). In 1996/97 the bronze medallists

@@ -67,8 +67,106 @@
       "file": "atp_matches_amateur.csv",
       "fileNote": "25,001 rows of two levels, the majors (G, 20,201) and the Davis Cup rubbers (D, 4,800); each row stops after 40 of the header's 49 cells (the empty statistics and rank cells left off, padded when read), and two rounds appear that the open era's files lack: PR, a preliminary round before the first full one, and CR, the challenge round of Wimbledon to 1921 and of the US Championships to 1911. A row's season is the year of its date. Every row is counted but walkovers, retirements, defaults and placeholder opponents.",
       "start": {
-        "amateur": 1360,
-        "fit": "Not published: a newcomer whose first counted match is in the amateur file starts at 1360, fitted to five points so that the run carries on as the shipped one. On Tennis Abstract's 38 targets for 1973-2000 (targets above) it comes out 2.0 Elo low on average, root mean square 15.3 (the shipped run: 2.0 and 15.1), and over the shipped run's top 50 of each season 1973-1980 its Elo of the same men differs from the shipped run's by 0.3 to 3.0 points on average (absolute), by -1.2 to +2.6 in all. A start of 1350 leaves those seasons 0.1 to 4.8 points under the shipped run, 1370 2.9 to 5.9 over it, 1450 (the open era's tour start) 18 to 30 over it."
+        "amateur": 1345,
+        "fit": "Not published: a newcomer whose first counted match is in the amateur file starts at 1345, from 1946 plus his region's and his nation's level (regions, below), fitted to five points so that the run carries on as the shipped one. On Tennis Abstract's 38 targets for 1973-2000 (targets above) it comes out 2.1 Elo low on average, root mean square 15.3 (the shipped run: 2.0 and 15.1), and over the shipped run's top 50 of each season 1973-1980 its Elo of the same men differs from the shipped run's by 0.2 to 3.1 points on average (absolute), by -1.1 to +2.3 in all. With the levels a start of 1340 leaves those seasons 1.1 to 3.7 points from the shipped run (-3.2 to +0.9), 1350 1.3 to 4.0 over it. The start was 1360 until the levels came in (2026-11-21), when it fitted the same way (1350 left those seasons 0.1 to 4.8 points under the shipped run, 1370 2.9 to 5.9 over it, 1450, the open era's tour start, 18 to 30 over it): the levels raise the strong nations' newcomers, who reach the top 50, as they lower the weak nations', who do not.",
+        "regions": {
+          "levels": [
+            "amateur"
+          ],
+          "from": 1946,
+          "fit": {
+            "seasons": [
+              1946,
+              1967
+            ],
+            "sigma": 150,
+            "tau": 100
+          },
+          "region": {
+            "W.Europe": -75,
+            "E.Europe": 45,
+            "N.America": 5,
+            "L.America": -35,
+            "Asia": -180,
+            "Oceania": 50,
+            "Africa": 40
+          },
+          "nation": {
+            "ARG": 35,
+            "AUS": 50,
+            "AUT": 15,
+            "BEL": 60,
+            "BRA": 105,
+            "BUL": -10,
+            "CAN": -10,
+            "CAR": -105,
+            "CHI": -5,
+            "CHN": 45,
+            "COL": -90,
+            "CRC": 10,
+            "CUB": -20,
+            "DEN": 85,
+            "DOM": -40,
+            "ECU": 75,
+            "EGY": -115,
+            "ESP": 95,
+            "FIN": -65,
+            "FRA": 60,
+            "FRG": 175,
+            "GBR": 5,
+            "GRE": -5,
+            "GUA": 5,
+            "HAI": -30,
+            "HKG": 55,
+            "HUN": -40,
+            "INA": -10,
+            "IND": 230,
+            "IRI": -95,
+            "IRL": -70,
+            "ISR": -160,
+            "ITA": 230,
+            "JAM": -55,
+            "JPN": 175,
+            "KEN": 40,
+            "KOR": -60,
+            "LIB": -75,
+            "LUX": -190,
+            "MAR": -10,
+            "MAS": -175,
+            "MEX": 105,
+            "MON": -80,
+            "MYA": -55,
+            "NED": 45,
+            "NIG": -10,
+            "NOR": -30,
+            "NZL": -30,
+            "PAK": -30,
+            "PAN": 20,
+            "PER": 95,
+            "PHI": 105,
+            "POL": -30,
+            "POR": -155,
+            "RHO": -15,
+            "ROU": -5,
+            "RSA": 70,
+            "SRI": -110,
+            "SUI": -40,
+            "SWE": 225,
+            "TCH": 40,
+            "THA": -65,
+            "TRI": -20,
+            "TUN": 10,
+            "TUR": -225,
+            "URS": 95,
+            "URU": -30,
+            "USA": 15,
+            "VEN": -75,
+            "VIE": -10,
+            "YUG": -25,
+            "ZIM": 55
+          },
+          "note": "Region and nation levels (docs/design/tennis.md, \"Regions\"): a newcomer whose first counted match is in the amateur file from 1946 on starts at start.amateur plus his region's level and his nation's, his nation the one of the day his season's row gives him (its region by the IOC's continental associations, Europe split at the Iron Curtain: scripts/lib/tennis-regions.mjs); a nation the table does not name has no level of its own. The amateur file holds only the majors and the Davis Cup, whose zones pair a region's nations with each other, so with every newcomer at one start a region's players kept the level of its newcomers whatever their strength: in the shipped seasons of 1960-1967 the listed Asian men won against other regions as though 119 Elo (4.8 rating points) weaker than their Elo. The levels are those that best predict every counted match of 1946-1967 (fit.seasons), each by the ratings before it: maximum likelihood by Gauss-Newton on each rating's derivatives in the levels, under normal priors of spread 150 Elo on a region's level and 100 on a nation's around its region's, averaging zero over the newcomers (the start keeps the run's level), rounded to five points; npm run sync:tennis-seasons -- --fit-regions fits them again from the cached inputs. Judged on held-out seasons (fitted on the even seasons, judged on the odd ones of 1960-1967, and the other way round), the log loss of every match goes from 0.5310 to 0.5243 and from 0.5157 to 0.5057, of those between regions from 0.5300 to 0.5285 and 0.5117 to 0.5024, within one from 0.5329 to 0.5164 and 0.5238 to 0.5124; levels by region alone (a nation's spread 0) gain about a quarter as much, and a region's level moves with the half it is fitted on (Asia -107 and -205). Before 1946 every newcomer starts at start.amateur: the levels describe the post-war amateur game, and the regions stood elsewhere before the war (Japan reached the Challenge Round of 1921)."
+        }
       },
       "layoff": {
         "from": 19680101,
@@ -878,6 +976,345 @@
         }
       }
     },
+    "regions": {
+      "eras": {
+        "1973-1979": {
+          "regions": {
+            "W.Europe": {
+              "n": 7545,
+              "elo": 0.9,
+              "se": 3.7,
+              "points": 0.04
+            },
+            "E.Europe": {
+              "n": 3646,
+              "elo": -4.4,
+              "se": 6.1,
+              "points": -0.18
+            },
+            "N.America": {
+              "n": 9115,
+              "elo": 7.9,
+              "se": 3.2,
+              "points": 0.31
+            },
+            "L.America": {
+              "n": 4080,
+              "elo": 5.3,
+              "se": 5.7,
+              "points": 0.21
+            },
+            "Asia": {
+              "n": 1212,
+              "elo": -3,
+              "se": 11.3,
+              "points": -0.12
+            },
+            "Oceania": {
+              "n": 5873,
+              "elo": -9.8,
+              "se": 4.4,
+              "points": -0.39
+            },
+            "Africa": {
+              "n": 2477,
+              "elo": -9.1,
+              "se": 7.4,
+              "points": -0.36
+            }
+          },
+          "home": {
+            "major": {
+              "n": 733,
+              "elo": 42.6,
+              "se": 15.6
+            },
+            "cup": {
+              "n": 517,
+              "elo": 93.4,
+              "se": 18.3
+            }
+          }
+        },
+        "1980-1989": {
+          "regions": {
+            "W.Europe": {
+              "n": 14890,
+              "elo": 7.6,
+              "se": 2.3,
+              "points": 0.31
+            },
+            "E.Europe": {
+              "n": 5743,
+              "elo": -1.2,
+              "se": 4.8,
+              "points": -0.05
+            },
+            "N.America": {
+              "n": 13034,
+              "elo": -3.7,
+              "se": 2.6,
+              "points": -0.15
+            },
+            "L.America": {
+              "n": 8019,
+              "elo": -1,
+              "se": 3.8,
+              "points": -0.04
+            },
+            "Asia": {
+              "n": 1183,
+              "elo": -9.5,
+              "se": 11.2,
+              "points": -0.38
+            },
+            "Oceania": {
+              "n": 5493,
+              "elo": -9,
+              "se": 4.8,
+              "points": -0.36
+            },
+            "Africa": {
+              "n": 2692,
+              "elo": 3.6,
+              "se": 7.2,
+              "points": 0.14
+            }
+          },
+          "home": {
+            "major": {
+              "n": 1107,
+              "elo": 64.5,
+              "se": 12.5
+            },
+            "cup": {
+              "n": 866,
+              "elo": 92.3,
+              "se": 14.3
+            }
+          }
+        },
+        "1990-1999": {
+          "regions": {
+            "W.Europe": {
+              "n": 24070,
+              "elo": 1.8,
+              "se": 1.6,
+              "points": 0.07
+            },
+            "E.Europe": {
+              "n": 10965,
+              "elo": 5.4,
+              "se": 3.1,
+              "points": 0.22
+            },
+            "N.America": {
+              "n": 10981,
+              "elo": -5.2,
+              "se": 3.1,
+              "points": -0.21
+            },
+            "L.America": {
+              "n": 9993,
+              "elo": -5.3,
+              "se": 3.3,
+              "points": -0.21
+            },
+            "Asia": {
+              "n": 1564,
+              "elo": -12.3,
+              "se": 9.5,
+              "points": -0.49
+            },
+            "Oceania": {
+              "n": 5457,
+              "elo": 3,
+              "se": 4.8,
+              "points": 0.12
+            },
+            "Africa": {
+              "n": 4156,
+              "elo": 2.3,
+              "se": 5.6,
+              "points": 0.09
+            }
+          },
+          "home": {
+            "major": {
+              "n": 942,
+              "elo": 61.9,
+              "se": 13.3
+            },
+            "cup": {
+              "n": 1208,
+              "elo": 81.5,
+              "se": 11.8
+            }
+          }
+        },
+        "2000-2009": {
+          "regions": {
+            "W.Europe": {
+              "n": 30741,
+              "elo": 2.3,
+              "se": 1.4,
+              "points": 0.09
+            },
+            "E.Europe": {
+              "n": 19498,
+              "elo": 1.1,
+              "se": 2.1,
+              "points": 0.04
+            },
+            "N.America": {
+              "n": 9787,
+              "elo": -1.4,
+              "se": 3.5,
+              "points": -0.06
+            },
+            "L.America": {
+              "n": 13833,
+              "elo": 0.8,
+              "se": 2.7,
+              "points": 0.03
+            },
+            "Asia": {
+              "n": 5561,
+              "elo": -10.3,
+              "se": 4.8,
+              "points": -0.41
+            },
+            "Oceania": {
+              "n": 3746,
+              "elo": -3.3,
+              "se": 6.1,
+              "points": -0.13
+            },
+            "Africa": {
+              "n": 2634,
+              "elo": -7,
+              "se": 7.1,
+              "points": -0.28
+            }
+          },
+          "home": {
+            "major": {
+              "n": 1289,
+              "elo": 61.9,
+              "se": 11.1
+            },
+            "cup": {
+              "n": 1285,
+              "elo": 84,
+              "se": 11.5
+            }
+          }
+        },
+        "2010-2015": {
+          "regions": {
+            "W.Europe": {
+              "n": 19181,
+              "elo": -1.6,
+              "se": 1.9,
+              "points": -0.06
+            },
+            "E.Europe": {
+              "n": 14194,
+              "elo": 1.2,
+              "se": 2.5,
+              "points": 0.05
+            },
+            "N.America": {
+              "n": 6058,
+              "elo": 7.6,
+              "se": 4.5,
+              "points": 0.31
+            },
+            "L.America": {
+              "n": 7039,
+              "elo": -7.9,
+              "se": 4,
+              "points": -0.32
+            },
+            "Asia": {
+              "n": 4984,
+              "elo": -2.5,
+              "se": 5,
+              "points": -0.1
+            },
+            "Oceania": {
+              "n": 3202,
+              "elo": 8.5,
+              "se": 6.5,
+              "points": 0.34
+            },
+            "Africa": {
+              "n": 1338,
+              "elo": 5.8,
+              "se": 10.3,
+              "points": 0.23
+            }
+          },
+          "home": {
+            "major": {
+              "n": 772,
+              "elo": 58.7,
+              "se": 14.5
+            },
+            "cup": {
+              "n": 888,
+              "elo": 86.6,
+              "se": 14
+            }
+          }
+        }
+      },
+      "published": {
+        "seasons": [
+          2016,
+          2025
+        ],
+        "n": 3425,
+        "meanDiff": 26.6,
+        "regions": {
+          "Africa": {
+            "n": 43,
+            "diff": -3.3,
+            "se": 4.2
+          },
+          "Asia": {
+            "n": 297,
+            "diff": 1.5,
+            "se": 2.2
+          },
+          "E.Europe": {
+            "n": 612,
+            "diff": -0.6,
+            "se": 1.4
+          },
+          "L.America": {
+            "n": 453,
+            "diff": -0.7,
+            "se": 1.5
+          },
+          "N.America": {
+            "n": 395,
+            "diff": 1,
+            "se": 1.6
+          },
+          "Oceania": {
+            "n": 165,
+            "diff": 5.7,
+            "se": 2.4
+          },
+          "W.Europe": {
+            "n": 1460,
+            "diff": -0.7,
+            "se": 0.9
+          }
+        }
+      }
+    },
     "early": {
       "seasons": [
         1960,
@@ -905,66 +1342,304 @@
           2000
         ],
         "n": 38,
-        "meanDiff": -2,
+        "meanDiff": -2.1,
         "rms": 15.3,
         "byDecade": {
           "1970s": -1.2,
-          "1980s": -1.5,
-          "1990s": -4.7
+          "1980s": -1.8,
+          "1990s": -4.9
         },
         "after": {
           "n": 15,
-          "meanDiff": 29.1
+          "meanDiff": 29
         }
       },
       "seam": {
         "1973": {
           "n": 50,
-          "meanDiff": 0.1,
-          "meanAbsDiff": 2.3,
-          "maxAbsDiff": 18.5
+          "meanDiff": 0.5,
+          "meanAbsDiff": 2.4,
+          "maxAbsDiff": 18.8
         },
         "1974": {
           "n": 50,
-          "meanDiff": -1.2,
-          "meanAbsDiff": 1.5,
-          "maxAbsDiff": 5
+          "meanDiff": -1.1,
+          "meanAbsDiff": 1.4,
+          "maxAbsDiff": 4.9
         },
         "1975": {
           "n": 50,
-          "meanDiff": 0.7,
-          "meanAbsDiff": 2.4,
-          "maxAbsDiff": 48.3
+          "meanDiff": 0.6,
+          "meanAbsDiff": 2.5,
+          "maxAbsDiff": 48.4
         },
         "1976": {
           "n": 50,
-          "meanDiff": 0.9,
-          "meanAbsDiff": 1.8,
+          "meanDiff": 0.8,
+          "meanAbsDiff": 2,
           "maxAbsDiff": 45.3
         },
         "1977": {
           "n": 50,
-          "meanDiff": 2.6,
-          "meanAbsDiff": 3,
-          "maxAbsDiff": 100
+          "meanDiff": 2.3,
+          "meanAbsDiff": 3.1,
+          "maxAbsDiff": 99.9
         },
         "1978": {
           "n": 50,
-          "meanDiff": 2.2,
-          "meanAbsDiff": 2.3,
-          "maxAbsDiff": 68.4
+          "meanDiff": 1.8,
+          "meanAbsDiff": 2.2,
+          "maxAbsDiff": 68.1
         },
         "1979": {
           "n": 50,
-          "meanDiff": 0.5,
-          "meanAbsDiff": 0.5,
-          "maxAbsDiff": 1.6
+          "meanDiff": 0.2,
+          "meanAbsDiff": 0.3,
+          "maxAbsDiff": 1.3
         },
         "1980": {
           "n": 50,
-          "meanDiff": 0.3,
-          "meanAbsDiff": 0.3,
-          "maxAbsDiff": 1.6
+          "meanDiff": 0,
+          "meanAbsDiff": 0.2,
+          "maxAbsDiff": 1.3
+        }
+      },
+      "regions": {
+        "1960-1967": {
+          "without": {
+            "regions": {
+              "W.Europe": {
+                "n": 1109,
+                "elo": -15.5,
+                "se": 9.1,
+                "points": -0.62
+              },
+              "E.Europe": {
+                "n": 409,
+                "elo": 1.5,
+                "se": 18.4,
+                "points": 0.06
+              },
+              "N.America": {
+                "n": 562,
+                "elo": 1.3,
+                "se": 15.4,
+                "points": 0.05
+              },
+              "L.America": {
+                "n": 539,
+                "elo": 11.1,
+                "se": 15.5,
+                "points": 0.44
+              },
+              "Asia": {
+                "n": 167,
+                "elo": -119.1,
+                "se": 30.9,
+                "points": -4.77
+              },
+              "Oceania": {
+                "n": 700,
+                "elo": 40.9,
+                "se": 13.4,
+                "points": 1.64
+              },
+              "Africa": {
+                "n": 318,
+                "elo": 3.4,
+                "se": 21.6,
+                "points": 0.14
+              }
+            },
+            "home": {
+              "major": {
+                "n": 489,
+                "elo": 53.7,
+                "se": 19.5
+              },
+              "cup": {
+                "n": 791,
+                "elo": 61.4,
+                "se": 15.5
+              }
+            }
+          },
+          "with": {
+            "regions": {
+              "W.Europe": {
+                "n": 1109,
+                "elo": -10.3,
+                "se": 9.1,
+                "points": -0.41
+              },
+              "E.Europe": {
+                "n": 409,
+                "elo": -3.4,
+                "se": 18.4,
+                "points": -0.14
+              },
+              "N.America": {
+                "n": 562,
+                "elo": 1.4,
+                "se": 15.4,
+                "points": 0.06
+              },
+              "L.America": {
+                "n": 539,
+                "elo": 19.4,
+                "se": 15.6,
+                "points": 0.78
+              },
+              "Asia": {
+                "n": 167,
+                "elo": -79.4,
+                "se": 31.3,
+                "points": -3.17
+              },
+              "Oceania": {
+                "n": 700,
+                "elo": 25.2,
+                "se": 13.3,
+                "points": 1.01
+              },
+              "Africa": {
+                "n": 318,
+                "elo": -8.8,
+                "se": 21.5,
+                "points": -0.35
+              }
+            },
+            "home": {
+              "major": {
+                "n": 489,
+                "elo": 54.2,
+                "se": 19.6
+              },
+              "cup": {
+                "n": 791,
+                "elo": 60,
+                "se": 15.8
+              }
+            }
+          }
+        },
+        "1968-1972": {
+          "without": {
+            "regions": {
+              "W.Europe": {
+                "n": 3718,
+                "elo": 0.7,
+                "se": 5.2,
+                "points": 0.03
+              },
+              "E.Europe": {
+                "n": 2046,
+                "elo": 22.4,
+                "se": 7.8,
+                "points": 0.89
+              },
+              "N.America": {
+                "n": 3994,
+                "elo": 8.4,
+                "se": 4.9,
+                "points": 0.34
+              },
+              "L.America": {
+                "n": 1229,
+                "elo": -17.9,
+                "se": 10.9,
+                "points": -0.72
+              },
+              "Asia": {
+                "n": 401,
+                "elo": -27.4,
+                "se": 20.1,
+                "points": -1.1
+              },
+              "Oceania": {
+                "n": 3636,
+                "elo": -10.7,
+                "se": 5.3,
+                "points": -0.43
+              },
+              "Africa": {
+                "n": 1416,
+                "elo": -7.1,
+                "se": 9.8,
+                "points": -0.28
+              }
+            },
+            "home": {
+              "major": {
+                "n": 394,
+                "elo": 36.9,
+                "se": 21.1
+              },
+              "cup": {
+                "n": 351,
+                "elo": 64,
+                "se": 22.1
+              }
+            }
+          },
+          "with": {
+            "regions": {
+              "W.Europe": {
+                "n": 3718,
+                "elo": 1.7,
+                "se": 5.2,
+                "points": 0.07
+              },
+              "E.Europe": {
+                "n": 2046,
+                "elo": 20.6,
+                "se": 7.9,
+                "points": 0.82
+              },
+              "N.America": {
+                "n": 3994,
+                "elo": 7.9,
+                "se": 4.9,
+                "points": 0.32
+              },
+              "L.America": {
+                "n": 1229,
+                "elo": -16.4,
+                "se": 10.9,
+                "points": -0.66
+              },
+              "Asia": {
+                "n": 401,
+                "elo": -15.5,
+                "se": 20.1,
+                "points": -0.62
+              },
+              "Oceania": {
+                "n": 3636,
+                "elo": -11.9,
+                "se": 5.3,
+                "points": -0.47
+              },
+              "Africa": {
+                "n": 1416,
+                "elo": -7.5,
+                "se": 9.8,
+                "points": -0.3
+              }
+            },
+            "home": {
+              "major": {
+                "n": 394,
+                "elo": 37.8,
+                "se": 21.2
+              },
+              "cup": {
+                "n": 351,
+                "elo": 65.5,
+                "se": 22.2
+              }
+            }
+          }
         }
       }
     },
@@ -974,8 +1649,8 @@
         "periods": {
           "amateur": {
             "seasons": 8,
-            "shared": 7.1,
-            "rho": 0.7
+            "shared": 7.5,
+            "rho": 0.69
           },
           "open": {
             "seasons": 5,
@@ -985,19 +1660,19 @@
         },
         "seasons": {
           "1960": {
-            "shared": 7,
+            "shared": 8,
             "listed": 10,
-            "rho": 0.87,
+            "rho": 0.83,
             "ranks": [
               1,
               2,
               3,
               7,
               9,
-              11,
+              12,
               4,
               8,
-              12,
+              10,
               26
             ],
             "notListed": []
@@ -1005,14 +1680,14 @@
           "1961": {
             "shared": 8,
             "listed": 10,
-            "rho": 0.33,
+            "rho": 0.36,
             "ranks": [
               2,
               3,
               8,
-              6,
-              15,
               5,
+              15,
+              6,
               4,
               1,
               7,
@@ -1021,20 +1696,20 @@
             "notListed": []
           },
           "1962": {
-            "shared": 6,
+            "shared": 7,
             "listed": 10,
             "rho": 0.73,
             "ranks": [
               1,
               3,
-              12,
-              2,
               10,
+              2,
+              9,
               5,
               13,
-              17,
+              14,
               6,
-              36
+              35
             ],
             "notListed": []
           },
@@ -1049,9 +1724,9 @@
               5,
               14,
               4,
-              9,
-              71,
-              12,
+              8,
+              74,
+              11,
               20
             ],
             "notListed": []
@@ -1059,7 +1734,7 @@
           "1964": {
             "shared": 8,
             "listed": 10,
-            "rho": 0.67,
+            "rho": 0.68,
             "ranks": [
               1,
               3,
@@ -1068,45 +1743,45 @@
               2,
               4,
               7,
-              13,
               12,
+              13,
               6
             ],
             "notListed": []
           },
           "1965": {
-            "shared": 7,
+            "shared": 8,
             "listed": 10,
-            "rho": 0.68,
+            "rho": 0.67,
             "ranks": [
               1,
-              2,
               3,
+              2,
               4,
               27,
               6,
-              12,
-              21,
+              10,
+              18,
               5,
-              7
+              9
             ],
             "notListed": []
           },
           "1966": {
             "shared": 8,
             "listed": 10,
-            "rho": 0.83,
+            "rho": 0.76,
             "ranks": [
               3,
               2,
               1,
-              8,
-              4,
               7,
+              4,
+              8,
               5,
               22,
-              10,
-              11
+              6,
+              12
             ],
             "notListed": []
           },
@@ -1118,10 +1793,10 @@
               2,
               1,
               3,
-              39,
+              37,
               5,
               4,
-              13,
+              12,
               6,
               7,
               16
@@ -1134,15 +1809,15 @@
             "rho": 0.76,
             "ranks": [
               1,
-              4,
+              5,
               2,
               11,
               3,
               6,
               16,
-              25,
+              24,
               17,
-              9
+              8
             ],
             "notListed": []
           },
@@ -1228,7 +1903,7 @@
             "ours": [
               "Rod Laver 1",
               "Ken Rosewall 2",
-              "Arthur Ashe 4",
+              "Arthur Ashe 5",
               "John Newcombe 6"
             ]
           },
@@ -1256,9 +1931,9 @@
             "name": "Rod Laver",
             "year": 1970,
             "published": 2571,
-            "computed": 2329.2,
+            "computed": 2332.7,
             "date": "1969-09-20",
-            "endOfYear": 2269
+            "endOfYear": 2271.3
           }
         ]
       }
@@ -6185,7 +6860,7 @@
     },
     {
       "id": "tennis-1972",
-      "version": "tennis-1972-822cbbe7",
+      "version": "tennis-1972-1d81e427",
       "label": "Elo from match results, end of 1972 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6195,24 +6870,24 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Ilie Nastase ROU 2190.1 → 92",
-        "Stan Smith USA 2179.3 → 91",
-        "John Newcombe AUS 2132.1 → 89",
-        "Arthur Ashe USA 2119.7 → 89",
-        "Rod Laver AUS 2109.6 → 88"
+        "Ilie Nastase ROU 2190.8 → 92",
+        "Stan Smith USA 2180 → 91",
+        "John Newcombe AUS 2133.4 → 89",
+        "Arthur Ashe USA 2120.9 → 89",
+        "Rod Laver AUS 2111 → 88"
       ],
       "nations": [
         "United States 89 (Stan Smith 91, Arthur Ashe 89, Jimmy Connors 85, Marty Riessen 85, Roscoe Tanner 84; +33)",
         "Australia 87.7 (John Newcombe 89, Rod Laver 88, Ken Rosewall 87, Tony Roche 82, Roy Emerson 81; +28)",
         "Romania 82.5 (Ilie Nastase 92, Ion Tiriac 73)",
-        "Spain 81.1 (Manuel Orantes 85, Andres Gimeno 82, Juan Gisbert 76, Antonio Munoz 67)",
+        "Spain 81.2 (Manuel Orantes 85, Andres Gimeno 82, Juan Gisbert 77, Antonio Munoz 67)",
         "Soviet Union (Russia) 79.1 (Alex Metreveli 87, Teimuraz Kakulia 72, Vladimir Korotkov 68)",
         "Great Britain 78.2 (Roger Taylor 80, Mark Cox 80, Gerald Battrick 72, John Paish 70, Graham Stilwell 68; +4)",
         "Czechoslovakia (Czechia) 76.9 (Jan Kodes 83, Jiri Hrebec 74, Vladimir Zednik 72, Frantisek Pala 69, Milan Holecek 68; +1)",
         "France 76.7 (Pierre Barthes 77, Patrice Dominguez 77, Francois Jauffret 76, Patrick Proisy 75, Georges Goven 72; +5)",
         "Yugoslavia (Serbia) 76.5 (Nikola Pilic 80, Zeljko Franulovic 77, Boro Jovanovic 73, Nicola Spear 64)",
+        "Italy 75.1 (Adriano Panatta 78, Martin Mulligan 75, Nicola Pietrangeli 71, Antonio Zugarelli 68, Paolo Bertolucci 66; +2)",
         "West Germany (Germany) 74.9 (Karl Meiler 76, Harald Elschenbroich 75, Wilhelm Bungert 74, Jurgen Fassbender 71)",
-        "Italy 74.7 (Adriano Panatta 78, Martin Mulligan 74, Nicola Pietrangeli 71, Antonio Zugarelli 68, Paolo Bertolucci 66; +2)",
         "Brazil 74 (Thomaz Koch 76, Jose Edison Mandarino 72)",
         "Chile 73.3 (Jaime Fillol 76, Jaime Pinto Bravo 71, Patricio Cornejo 69)",
         "New Zealand 72.4 (Brian Fairlie 74, Onny Parun 73, Jeff Simpson 62)",
@@ -6222,8 +6897,8 @@
         "Mexico 70.5 (Joaquin Loyo Mayo 71, Raul Ramirez 70)",
         "Colombia 69 (Ivan Molina 70, Jairo Velasco 68)",
         "Canada 67.5 (Mike Belkin 74, Don Mccormick 61)",
-        "Japan 66.9 (Toshiro Sakai 68, Jun Kamiwazumi 67, Kiyoshi Tanabe 65, Jun Kuki 64)",
-        "India 66.6 (Premjit Lall 69, Sashi Menon 65, Vijay Amritraj 65, Anand Amritraj 65)"
+        "India 66.6 (Premjit Lall 69, Vijay Amritraj 65, Anand Amritraj 65, Sashi Menon 65)",
+        "Japan 66.1 (Toshiro Sakai 67, Jun Kamiwazumi 66, Kiyoshi Tanabe 65, Jun Kuki 64)"
       ],
       "merged": [
         "Belarus → Soviet Union (Russia)",
@@ -6280,7 +6955,7 @@
     },
     {
       "id": "tennis-1971",
-      "version": "tennis-1971-ccf22b44",
+      "version": "tennis-1971-f36c5cc7",
       "label": "Elo from match results, end of 1971 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6290,22 +6965,22 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Rod Laver AUS 2206.3 → 92",
-        "Ken Rosewall AUS 2165.2 → 91",
-        "Ilie Nastase ROU 2153.8 → 90",
-        "John Newcombe AUS 2129.2 → 89",
-        "Stan Smith USA 2112.8 → 89"
+        "Rod Laver AUS 2207.9 → 92",
+        "Ken Rosewall AUS 2166.8 → 91",
+        "Ilie Nastase ROU 2154.8 → 90",
+        "John Newcombe AUS 2130.8 → 89",
+        "Stan Smith USA 2114 → 89"
       ],
       "nations": [
         "Australia 90.4 (Rod Laver 92, Ken Rosewall 91, John Newcombe 89, Roy Emerson 83, Tony Roche 82; +29)",
         "United States 87.9 (Stan Smith 89, Arthur Ashe 88, Marty Riessen 86, Bob Lutz 85, Richard Gonzalez 84; +28)",
         "Spain 83.6 (Manuel Santana 85, Manuel Orantes 84, Andres Gimeno 83, Juan Gisbert 77, Antonio Munoz 64)",
         "Romania 83 (Ilie Nastase 90, Ion Tiriac 76)",
+        "Great Britain 78.5 (Roger Taylor 81, Mark Cox 79, Gerald Battrick 78, Graham Stilwell 67, John Paish 65; +2)",
         "Yugoslavia (Serbia) 78.5 (Nikola Pilic 81, Zeljko Franulovic 81, Boro Jovanovic 72, Nicola Spear 65)",
         "France 78.4 (Georges Goven 80, Pierre Barthes 79, Patrick Proisy 74, Patrice Dominguez 74, Francois Jauffret 73; +4)",
-        "Great Britain 78.1 (Roger Taylor 81, Mark Cox 78, Gerald Battrick 78, Graham Stilwell 67, John Paish 65; +2)",
         "Czechoslovakia (Czechia) 76.6 (Jan Kodes 84, Milan Holecek 73, Frantisek Pala 69, Jiri Hrebec 69, Vladimir Zednik 68; +2)",
-        "Italy 74.6 (Martin Mulligan 76, Adriano Panatta 75, Nicola Pietrangeli 72, Ezio Di Matteo 70, Massimo Di Domenico 65; +2)",
+        "Italy 75 (Martin Mulligan 77, Adriano Panatta 75, Nicola Pietrangeli 72, Ezio Di Matteo 70, Massimo Di Domenico 65; +2)",
         "Brazil 74.5 (Thomaz Koch 78, Jose Edison Mandarino 71)",
         "West Germany (Germany) 74 (Christian Kuhnke 75, Wilhelm Bungert 75, Harald Elschenbroich 73, Hans Jurgen Pohmann 67, Ingo Buding 66)",
         "New Zealand 73 (Onny Parun 73, Brian Fairlie 73)",
@@ -6313,8 +6988,8 @@
         "Chile 72.4 (Jaime Fillol 77, Patricio Cornejo 68, Jaime Pinto Bravo 67)",
         "Denmark 72.4 (Jan Leschly 78, Torben Ulrich 67, Jorgen Ulrich 66)",
         "Mexico 70.5 (Joaquin Loyo Mayo 72, Marcello Lara 69)",
-        "India 69 (Premjit Lall 71, Jaidip Mukerjea 67)",
-        "Japan 66.4 (Jun Kamiwazumi 67, Jun Kuki 66, Toshiro Sakai 65)",
+        "India 68.5 (Premjit Lall 70, Jaidip Mukerjea 67)",
+        "Japan 66 (Jun Kamiwazumi 67, Jun Kuki 65, Toshiro Sakai 65)",
         "Austria 62.5 (Peter Pokorny 63, Hans Kary 62)",
         "Belgium 62.5 (Patrick Hombergen 66, Eric Drossart 59)"
       ],
@@ -6339,8 +7014,8 @@
           "Raymond Moore (RSA)",
           "Robert Maud (RSA)",
           "Frew Mcmillan (RSA)",
-          "Byron Bertram (RSA)",
           "Terry Ryan (RSA)",
+          "Byron Bertram (RSA)",
           "Pat Cramer (RSA)",
           "Derek Schroder (RSA)"
         ],
@@ -6361,7 +7036,7 @@
     },
     {
       "id": "tennis-1970",
-      "version": "tennis-1970-e1cd61d9",
+      "version": "tennis-1970-5be00af6",
       "label": "Elo from match results, end of 1970 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6371,16 +7046,16 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Rod Laver AUS 2269 → 95",
-        "Ken Rosewall AUS 2143.5 → 90",
-        "Arthur Ashe USA 2114.1 → 89",
-        "Cliff Richey USA 2109.1 → 88",
-        "Stan Smith USA 2095.3 → 88"
+        "Rod Laver AUS 2271.3 → 95",
+        "Ken Rosewall AUS 2145.7 → 90",
+        "Arthur Ashe USA 2115.7 → 89",
+        "Cliff Richey USA 2110.7 → 88",
+        "Stan Smith USA 2096.9 → 88"
       ],
       "nations": [
         "Australia 91.5 (Rod Laver 95, Ken Rosewall 90, Tony Roche 88, John Newcombe 87, Roy Emerson 84; +25)",
         "United States 88 (Arthur Ashe 89, Cliff Richey 88, Stan Smith 88, Richard Gonzalez 84, Marty Riessen 84; +23)",
-        "Spain 83.4 (Manuel Santana 86, Andres Gimeno 83, Manuel Orantes 81, Juan Gisbert 77)",
+        "Spain 83.5 (Manuel Santana 86, Andres Gimeno 83, Manuel Orantes 82, Juan Gisbert 77)",
         "Yugoslavia (Serbia) 81.1 (Zeljko Franulovic 83, Nikola Pilic 81, Nicola Spear 72)",
         "Romania 79 (Ilie Nastase 80, Ion Tiriac 78)",
         "Great Britain 78.9 (Roger Taylor 83, Mark Cox 78, Gerald Battrick 73, Graham Stilwell 72, Peter Curtis 71; +3)",
@@ -6393,10 +7068,10 @@
         "Brazil 73.5 (Thomaz Koch 78, Jose Edison Mandarino 69)",
         "Italy 70.6 (Martin Mulligan 75, Adriano Panatta 70, Ezio Di Matteo 63, Massimo Di Domenico 63)",
         "Hungary 69.5 (Istvan Gulyas 73, Peter Szoke 66, Szabolcz Baranyi 66)",
-        "India 69.5 (Premjit Lall 70, Jaidip Mukerjea 69)",
-        "Colombia 65 (Jairo Velasco 67, William Alvarez 63)",
+        "India 69 (Premjit Lall 70, Jaidip Mukerjea 68)",
+        "Colombia 64.5 (Jairo Velasco 67, William Alvarez 62)",
         "Austria 62 (Hans Kary 63, Peter Pokorny 61)",
-        "Belgium 61 (Patrick Hombergen 62, Eric Drossart 60)"
+        "Belgium 60.5 (Patrick Hombergen 62, Eric Drossart 59)"
       ],
       "merged": [
         "Belarus → Soviet Union (Russia)",
@@ -6432,8 +7107,8 @@
           "Robert Maud (RSA)",
           "Frew Mcmillan (RSA)",
           "Raymond Moore (RSA)",
-          "Byron Bertram (RSA)",
           "Terry Ryan (RSA)",
+          "Byron Bertram (RSA)",
           "Keith Diepraam (RSA)",
           "Rauty Krog (RSA)"
         ],
@@ -6444,8 +7119,8 @@
           "Ismail El Shafei (EGY)",
           "Joaquin Loyo Mayo (MEX)",
           "Torben Ulrich (DEN)",
-          "Haroon Rahim (PAK)",
           "Hank Irvine (RHO)",
+          "Haroon Rahim (PAK)",
           "Richard Russell (JAM)",
           "Pancho Guzman (ECU)",
           "Jun Kuki (JPN)"
@@ -6455,7 +7130,7 @@
     },
     {
       "id": "tennis-1969",
-      "version": "tennis-1969-94ecce39",
+      "version": "tennis-1969-d09bb999",
       "label": "Elo from match results, end of 1969 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6465,26 +7140,26 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Rod Laver AUS 2250.3 → 94",
-        "Tom Okker NED 2119.4 → 89",
-        "Richard Gonzalez USA 2084.7 → 87",
-        "Ken Rosewall AUS 2067 → 87",
-        "Tony Roche AUS 2061.2 → 86"
+        "Rod Laver AUS 2253.7 → 94",
+        "Tom Okker NED 2122.3 → 89",
+        "Richard Gonzalez USA 2087.6 → 88",
+        "Ken Rosewall AUS 2070.4 → 87",
+        "Tony Roche AUS 2064.3 → 87"
       ],
       "nations": [
-        "Australia 89.5 (Rod Laver 94, Ken Rosewall 87, Tony Roche 86, John Newcombe 85, Roy Emerson 83; +20)",
-        "United States 85.8 (Richard Gonzalez 87, Arthur Ashe 85, Stan Smith 85, Cliff Richey 85, Earl Butch Buchholz 83; +28)",
+        "Australia 89.6 (Rod Laver 94, Ken Rosewall 87, Tony Roche 87, John Newcombe 85, Roy Emerson 84; +20)",
+        "United States 86.2 (Richard Gonzalez 88, Arthur Ashe 85, Stan Smith 85, Cliff Richey 85, Earl Butch Buchholz 84; +28)",
         "Spain 83.8 (Andres Gimeno 86, Manuel Santana 83, Manuel Orantes 76)",
+        "Great Britain 79 (Mark Cox 81, Roger Taylor 79, Graham Stilwell 78, Robert Wilson 72, David Lloyd 70; +2)",
         "Romania 79 (Ilie Nastase 80, Ion Tiriac 78)",
-        "Great Britain 78.9 (Mark Cox 81, Roger Taylor 79, Graham Stilwell 78, Robert Wilson 71, David Lloyd 69; +2)",
         "South Africa 78 (Bob Hewitt 79, Cliff Drysdale 79, Raymond Moore 74, Robert Maud 74, Julian Krinsky 69; +3)",
         "Yugoslavia (Serbia) 77.6 (Zeljko Franulovic 79, Nikola Pilic 78, Nicola Spear 69)",
         "West Germany (Germany) 76.4 (Wilhelm Bungert 78, Christian Kuhnke 77, Harald Elschenbroich 74, Hans Joachim Ploetz 70, Ingo Buding 68)",
         "France 74.9 (Francois Jauffret 78, Pierre Barthes 74, Georges Goven 71, Jean Loup Rouyer 70, Michele Leclercq 69; +6)",
-        "Italy 73.9 (Martin Mulligan 78, Nicola Pietrangeli 72, Vittorio Crotta 61)",
+        "Italy 74.5 (Martin Mulligan 79, Nicola Pietrangeli 72, Vittorio Crotta 62)",
         "Brazil 73.5 (Thomaz Koch 79, Jose Edison Mandarino 68)",
-        "Chile 73.1 (Luis Ayala 75, Jaime Fillol 73, Patricio Cornejo 70, Patricio Rodriguez Chi 69, Jaime Pinto Bravo 66; +1)",
-        "Czechoslovakia (Czechia) 72.7 (Jan Kodes 78, Milan Holecek 71, Jan Kukal 71, Stepan Koudelka 60)",
+        "Chile 73.5 (Luis Ayala 75, Jaime Fillol 74, Patricio Cornejo 70, Patricio Rodriguez Chi 69, Jaime Pinto Bravo 66; +1)",
+        "Czechoslovakia (Czechia) 72.8 (Jan Kodes 78, Milan Holecek 71, Jan Kukal 71, Stepan Koudelka 61)",
         "Soviet Union (Russia) 72 (Alex Metreveli 73, Thomas Lejus 71)",
         "New Zealand 70.5 (Brian Fairlie 72, Onny Parun 69)",
         "Ecuador 70 (Pancho Segura 72, Pancho Guzman 68)",
@@ -6542,7 +7217,7 @@
     },
     {
       "id": "tennis-1968",
-      "version": "tennis-1968-1e49a981",
+      "version": "tennis-1968-912d2f18",
       "label": "Elo from match results, end of 1968 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6552,36 +7227,36 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Rod Laver AUS 2126.5 → 89",
-        "Ken Rosewall AUS 2071.1 → 87",
-        "Tony Roche AUS 2043.4 → 86",
-        "Arthur Ashe USA 2015.7 → 85",
-        "Roy Emerson AUS 2014.4 → 85"
+        "Rod Laver AUS 2130.6 → 89",
+        "Ken Rosewall AUS 2074.9 → 87",
+        "Tony Roche AUS 2048.2 → 86",
+        "Roy Emerson AUS 2018.2 → 85",
+        "Arthur Ashe USA 2017.7 → 85"
       ],
       "nations": [
-        "Australia 87.5 (Rod Laver 89, Ken Rosewall 87, Tony Roche 86, Roy Emerson 85, John Newcombe 84; +20)",
+        "Australia 87.5 (Rod Laver 89, Ken Rosewall 87, Tony Roche 86, Roy Emerson 85, John Newcombe 85; +20)",
         "United States 82.9 (Arthur Ashe 85, Richard Gonzalez 82, Stan Smith 82, Clark Graebner 79, Cliff Richey 77; +43)",
         "Spain 81.1 (Andres Gimeno 84, Manuel Santana 82, Juan Gisbert 74, Manuel Orantes 73, Juan Manuel Couder 70; +2)",
-        "South Africa 78.1 (Bob Hewitt 80, Cliff Drysdale 78, Robert Maud 76, Raymond Moore 73, Jackie Saul 67; +5)",
-        "Romania 76 (Ilie Nastase 78, Ion Tiriac 77, Sever Dron 62)",
+        "South Africa 78.1 (Bob Hewitt 80, Cliff Drysdale 78, Robert Maud 76, Raymond Moore 73, Jackie Saul 68; +5)",
+        "Romania 76.1 (Ilie Nastase 78, Ion Tiriac 77, Sever Dron 63)",
+        "Brazil 75 (Jose Edison Mandarino 76, Thomaz Koch 74)",
         "Denmark 75 (Jan Leschly 77, Torben Ulrich 74, Jorgen Ulrich 69)",
-        "Italy 74.6 (Martin Mulligan 78, Nicola Pietrangeli 74, Eugenio Castigliano 70, Ezio Di Matteo 68, Gaetano Di Maso 67; +5)",
-        "Brazil 74.5 (Jose Edison Mandarino 75, Thomaz Koch 74)",
-        "Great Britain 74.5 (Mark Cox 77, Roger Taylor 74, Gerald Battrick 72, Graham Stilwell 69, Robert Wilson 69; +9)",
-        "West Germany (Germany) 73.5 (Wilhelm Bungert 80, Harald Elschenbroich 70, Hans Joachim Ploetz 68, Ingo Buding 67, Jurgen Fassbender 64; +2)",
-        "Chile 73 (Luis Ayala 76, Jaime Fillol 72, Patricio Cornejo 69, Jaime Pinto Bravo 69, Patricio Rodriguez Chi 67)",
-        "France 72.7 (Pierre Barthes 75, Francois Jauffret 74, Georges Goven 67, Daniel Contet 64, Jean Pierre Courcol 62)",
-        "Yugoslavia (Serbia) 72.7 (Nikola Pilic 77, Boro Jovanovic 71, Zeljko Franulovic 70, Nicola Spear 65)",
-        "India 72 (Ramanathan Krishnan 75, Jaidip Mukerjea 69, Premjit Lall 69)",
+        "Great Britain 74.6 (Mark Cox 77, Roger Taylor 74, Gerald Battrick 72, Graham Stilwell 70, Robert Wilson 69; +9)",
+        "Italy 74.6 (Martin Mulligan 78, Nicola Pietrangeli 74, Eugenio Castigliano 70, Gaetano Di Maso 68, Ezio Di Matteo 68; +5)",
+        "West Germany (Germany) 73.9 (Wilhelm Bungert 80, Harald Elschenbroich 71, Hans Joachim Ploetz 68, Ingo Buding 67, Jurgen Fassbender 64; +2)",
+        "Chile 73.4 (Luis Ayala 76, Jaime Fillol 73, Patricio Cornejo 69, Jaime Pinto Bravo 69, Patricio Rodriguez Chi 67)",
+        "Yugoslavia (Serbia) 73.2 (Nikola Pilic 77, Boro Jovanovic 72, Zeljko Franulovic 71, Nicola Spear 65)",
+        "France 72.6 (Pierre Barthes 75, Francois Jauffret 74, Georges Goven 67, Daniel Contet 63, Jean Pierre Courcol 62)",
         "Mexico 72 (Rafael Osuna 73, Joaquin Loyo Mayo 72, Marcello Lara 67)",
+        "Sweden 72 (Jan Erik Lundquist 76, Ove Bengtson 68)",
+        "India 71.9 (Ramanathan Krishnan 75, Jaidip Mukerjea 69, Premjit Lall 68)",
         "Soviet Union (Russia) 71.7 (Alex Metreveli 76, Thomas Lejus 70, Vladimir Korotkov 68, Sergei Likhachev 65)",
-        "Sweden 71.5 (Jan Erik Lundquist 76, Ove Bengtson 67)",
         "Czechoslovakia (Czechia) 70.2 (Milan Holecek 71, Jan Kodes 70, Jan Kukal 67)",
         "Canada 67 (Mike Belkin 72, Keith Carpenter 62)",
-        "Ecuador 66.8 (Pancho Segura 72, Miguel Olvera 64, Pancho Guzman 64, Eduardo Zuleta 60)",
+        "Ecuador 66.9 (Pancho Segura 72, Miguel Olvera 64, Pancho Guzman 64, Eduardo Zuleta 61)",
         "New Zealand 65.2 (Onny Parun 67, Brian Fairlie 65, John McDonald 57)",
-        "Jamaica 60 (Richard Russell 65, Lance Lumsden 55)",
-        "Belgium 58.5 (Patrick Hombergen 59, Eric Drossart 58)"
+        "Jamaica 59.5 (Richard Russell 65, Lance Lumsden 54)",
+        "Belgium 57.5 (Patrick Hombergen 58, Eric Drossart 57)"
       ],
       "merged": [
         "Belarus → Soviet Union (Russia)",
@@ -6617,14 +7292,14 @@
           "Alejandro Olmedo (PER)",
           "Istvan Gulyas (HUN)",
           "Ismail El Shafei (EGY)",
-          "Koji Watanabe (JPN)",
           "Nicholas Kalogeropoulos (GRE)",
+          "Koji Watanabe (JPN)",
           "Wieslaw Gasiorek (POL)",
           "Tito Vazquez (ARG)",
-          "Mathias Werren (SUI)",
           "Humphrey Hose (VEN)",
-          "Haroon Rahim (PAK)",
+          "Mathias Werren (SUI)",
           "Tico Carrero (PUR)",
+          "Haroon Rahim (PAK)",
           "Michael Hickey (IRL)"
         ],
         "noNationOnTheMap": []
@@ -6632,7 +7307,7 @@
     },
     {
       "id": "tennis-1967",
-      "version": "tennis-1967-53feb263",
+      "version": "tennis-1967-c3fd67e0",
       "label": "Amateur Elo, end of 1967 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6642,43 +7317,43 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Roy Emerson AUS 2069 → 87",
-        "John Newcombe AUS 1941.8 → 82",
-        "Manuel Santana ESP 1935.5 → 81",
-        "Bob Hewitt RSA 1866.6 → 79",
-        "Tony Roche AUS 1855.8 → 78"
+        "Roy Emerson AUS 2073.7 → 87",
+        "John Newcombe AUS 1948.8 → 82",
+        "Manuel Santana ESP 1924.3 → 81",
+        "Bob Hewitt RSA 1875 → 79",
+        "Tony Roche AUS 1868.7 → 79"
       ],
       "nations": [
-        "Australia 83 (Roy Emerson 87, John Newcombe 82, Tony Roche 78, Ken Fletcher 76, Owen Davidson 74; +13)",
-        "United States 76.6 (Clark Graebner 78, Arthur Ashe 77, Vic Seixas 73, Charlie Pasarell 73, Marty Riessen 72; +16)",
+        "Australia 83.1 (Roy Emerson 87, John Newcombe 82, Tony Roche 79, Ken Fletcher 76, Owen Davidson 74; +13)",
+        "United States 77 (Clark Graebner 78, Arthur Ashe 78, Vic Seixas 73, Charlie Pasarell 73, Marty Riessen 72; +16)",
         "South Africa 75.7 (Bob Hewitt 79, Cliff Drysdale 77, Abe Segal 68, Robert Maud 65, Raymond Moore 62; +3)",
         "Spain 73.1 (Manuel Santana 81, Juan Gisbert 71, Jose Luis Arillla 65, Manuel Orantes 58, Jose Maria Gisbert 57)",
-        "Brazil 71.9 (Jose Edison Mandarino 74, Thomaz Koch 70, Ronnie Barnes 69)",
-        "India 71.2 (Ramanathan Krishnan 74, Jaidip Mukerjea 69, Premjit Lall 66)",
-        "Great Britain 70.8 (Robert Wilson 71, Roger Taylor 71, Mark Cox 70, Michael Sangster 70, Graham Stilwell 62; +4)",
-        "France 70.5 (Pierre Darmon 75, Francois Jauffret 70, Georges Goven 64, Daniel Contet 61, Jean Baptiste Chanfreau 57; +2)",
-        "Denmark 70.3 (Jan Leschly 74, Jorgen Ulrich 67, Torben Ulrich 65)",
-        "West Germany (Germany) 70 (Wilhelm Bungert 75, Ingo Buding 69, Hans Joachim Ploetz 65, Harald Elschenbroich 59)",
+        "Brazil 72.4 (Jose Edison Mandarino 74, Thomaz Koch 71, Ronnie Barnes 70)",
+        "Great Britain 71.1 (Robert Wilson 72, Roger Taylor 71, Mark Cox 70, Michael Sangster 69, Graham Stilwell 63; +4)",
+        "France 71 (Pierre Darmon 75, Francois Jauffret 71, Georges Goven 64, Daniel Contet 62, Jean Baptiste Chanfreau 56; +2)",
+        "India 70.6 (Ramanathan Krishnan 74, Jaidip Mukerjea 68, Premjit Lall 64)",
+        "West Germany (Germany) 70.3 (Wilhelm Bungert 75, Ingo Buding 69, Hans Joachim Ploetz 67, Harald Elschenbroich 60)",
+        "Denmark 69.9 (Jan Leschly 74, Jorgen Ulrich 66, Torben Ulrich 65)",
         "Mexico 69.5 (Rafael Osuna 73, Marcello Lara 66)",
-        "Italy 68.4 (Nicola Pietrangeli 73, Giordano Majoli 65, Gaetano Di Maso 59)",
-        "Yugoslavia (Serbia) 68.1 (Nikola Pilic 74, Nicola Spear 66, Boro Jovanovic 63, Zeljko Franulovic 58)",
-        "Soviet Union (Russia) 66.1 (Alex Metreveli 68, Thomas Lejus 65, Vyacheslav Egorov 65, Sergei Likhachev 64, Vladimir Ivanov 63)",
-        "Hungary 65.7 (Istvan Gulyas 73, Andras Szikszay 59, Peter Szoke 56)",
+        "Italy 69.2 (Nicola Pietrangeli 74, Giordano Majoli 65, Gaetano Di Maso 62)",
+        "Yugoslavia (Serbia) 68.5 (Nikola Pilic 75, Nicola Spear 66, Boro Jovanovic 63, Zeljko Franulovic 58)",
+        "Soviet Union (Russia) 67.5 (Alex Metreveli 68, Vyacheslav Egorov 68, Vladimir Ivanov 66, Thomas Lejus 65, Sergei Likhachev 64)",
+        "Hungary 65.3 (Istvan Gulyas 73, Andras Szikszay 58, Peter Szoke 56)",
         "Netherlands 65 (Tom Okker 70, Jan Hajer 60)",
-        "Philippines 64.5 (Felicisimo Ampon 66, Eddie Cruz 64, Samuel Ang 59)",
         "Romania 64 (Ion Tiriac 67, Ilie Nastase 61)",
-        "Japan 63 (Koji Watanabe 65, Ichizo Konishi 63, Keishiro Yanagi 60, Ryoichi Mori 58)",
-        "Czechoslovakia (Czechia) 62.9 (Jan Kodes 65, Milan Holecek 61, Jan Kukal 60)",
-        "Chile 61.6 (Patricio Rodriguez Chi 64, Patricio Cornejo 60, Jaime Pinto Bravo 56)",
+        "Czechoslovakia (Czechia) 63 (Jan Kodes 65, Jan Kukal 61, Milan Holecek 61)",
+        "Japan 61.9 (Koji Watanabe 64, Ichizo Konishi 62, Keishiro Yanagi 58, Ryoichi Mori 57)",
+        "Philippines 61.6 (Felicisimo Ampon 65, Eddie Cruz 59, Samuel Ang 55)",
         "Ecuador 61 (Miguel Olvera 65, Pancho Guzman 57)",
-        "Bulgaria 59.5 (Kiril Yashmakov 60, Rangel Rangelov 59)",
-        "Greece 59 (Nicholas Kalogeropoulos 66, Periclis Gavrilidis 52)",
-        "Argentina 58.5 (Julian Ganzabal 62, Roberto Aubone 55)",
-        "New Zealand 58.5 (Brian Fairlie 61, Onny Parun 56)",
+        "Chile 60.7 (Patricio Rodriguez Chi 64, Patricio Cornejo 58, Jaime Pinto Bravo 55)",
+        "New Zealand 59.5 (Brian Fairlie 62, Onny Parun 57)",
+        "Bulgaria 58.5 (Kiril Yashmakov 59, Rangel Rangelov 58)",
         "Poland 58.5 (Wieslaw Gasiorek 63, Tadeusz Nowicki 54)",
-        "Belgium 57.2 (Eric Drossart 59, Claude De Gronckel 56, Patrick Hombergen 53)",
-        "Jamaica 55 (Richard Russell 55, Lance Lumsden 55)",
-        "Luxembourg 54.5 (Frank Baden 58, Thierry Brasseur 51)"
+        "Argentina 57.5 (Julian Ganzabal 61, Roberto Aubone 54)",
+        "Greece 57.5 (Nicholas Kalogeropoulos 66, Periclis Gavrilidis 49)",
+        "Belgium 56.6 (Eric Drossart 58, Claude De Gronckel 56, Patrick Hombergen 52)",
+        "Jamaica 54 (Richard Russell 55, Lance Lumsden 53)",
+        "Luxembourg 48 (Frank Baden 52, Thierry Brasseur 44)"
       ],
       "merged": [
         "Belarus → Soviet Union (Russia)",
@@ -6725,7 +7400,7 @@
     },
     {
       "id": "tennis-1966",
-      "version": "tennis-1966-203c4a73",
+      "version": "tennis-1966-c2566ea0",
       "label": "Amateur Elo, end of 1966 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6735,42 +7410,42 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Roy Emerson AUS 2065 → 87",
-        "Fred Stolle AUS 2018.3 → 85",
-        "Manuel Santana ESP 2016.1 → 85",
-        "Dennis Ralston USA 1895 → 80",
-        "Arthur Ashe USA 1877.6 → 79"
+        "Roy Emerson AUS 2068.7 → 87",
+        "Fred Stolle AUS 2025.5 → 85",
+        "Manuel Santana ESP 1995.9 → 84",
+        "Dennis Ralston USA 1899.8 → 80",
+        "Arthur Ashe USA 1883.6 → 79"
       ],
       "nations": [
-        "Australia 84.2 (Roy Emerson 87, Fred Stolle 85, John Newcombe 77, Tony Roche 77, Bob Hewitt 77; +9)",
+        "Australia 84.4 (Roy Emerson 87, Fred Stolle 85, Tony Roche 78, John Newcombe 78, Bob Hewitt 78; +9)",
         "United States 78.4 (Dennis Ralston 80, Arthur Ashe 79, Chuck Mckinley 75, Marty Riessen 73, Clark Graebner 72; +16)",
-        "Spain 74.7 (Manuel Santana 85, Juan Manuel Couder 68, Juan Gisbert 68, Jose Luis Arillla 67, Jose Maria Gisbert 57)",
-        "India 73.2 (Ramanathan Krishnan 78, Jaidip Mukerjea 73, Premjit Lall 65, Shiv Prakash Misra 63, Ravi Venkatesan 61)",
-        "Brazil 72.3 (Jose Edison Mandarino 74, Thomaz Koch 71, Ronnie Barnes 69)",
+        "Spain 74.3 (Manuel Santana 84, Juan Gisbert 68, Juan Manuel Couder 68, Jose Luis Arillla 67, Jose Maria Gisbert 57)",
+        "India 72.4 (Ramanathan Krishnan 77, Jaidip Mukerjea 73, Premjit Lall 63, Shiv Prakash Misra 61, Ravi Venkatesan 59)",
         "West Germany (Germany) 72 (Wilhelm Bungert 73, Ingo Buding 71)",
-        "France 70.8 (Pierre Darmon 74, Francois Jauffret 71, Georges Goven 65, Daniel Contet 63, Patrice Beust 60)",
-        "South Africa 70.2 (Cliff Drysdale 76, Abe Segal 67, Keith Diepraam 66, Terry Ryan 64, Frew Mcmillan 61; +3)",
-        "Great Britain 69.2 (Robert Wilson 71, Michael Sangster 69, Mark Cox 66, Roger Taylor 66, Peter Curtis 62; +2)",
-        "Mexico 68.4 (Rafael Osuna 76, Luis Augusto Garcia 65, Joaquin Loyo Mayo 60, Jaime Subirats 60)",
-        "Denmark 67.8 (Jorgen Ulrich 68, Torben Ulrich 68, Jan Leschly 66)",
-        "Italy 66.2 (Nicola Pietrangeli 75, Giordano Majoli 61, Gaetano Di Maso 59, Sergio Tacchini 59)",
+        "Brazil 71.8 (Jose Edison Mandarino 73, Thomaz Koch 71, Ronnie Barnes 69)",
+        "South Africa 71.2 (Cliff Drysdale 78, Abe Segal 67, Keith Diepraam 66, Terry Ryan 66, Jackie Saul 62; +3)",
+        "France 70.9 (Pierre Darmon 74, Francois Jauffret 71, Georges Goven 65, Daniel Contet 64, Patrice Beust 59)",
+        "Great Britain 69.2 (Robert Wilson 71, Michael Sangster 69, Roger Taylor 66, Mark Cox 66, Graham Stilwell 61; +2)",
+        "Mexico 68.6 (Rafael Osuna 76, Luis Augusto Garcia 65, Joaquin Loyo Mayo 61, Jaime Subirats 61)",
+        "Denmark 67.8 (Torben Ulrich 68, Jorgen Ulrich 68, Jan Leschly 66)",
+        "Italy 67.3 (Nicola Pietrangeli 75, Gaetano Di Maso 63, Giordano Majoli 62, Sergio Tacchini 59)",
         "Yugoslavia (Serbia) 66 (Nikola Pilic 67, Nicola Spear 65)",
-        "Philippines 65.5 (Felicisimo Ampon 68, Raymundo Deyro 63)",
-        "Czechoslovakia (Czechia) 63.4 (Jiri Javorsky 65, Jan Kodes 62, Frantisek Pala 61)",
+        "Philippines 63.5 (Felicisimo Ampon 66, Raymundo Deyro 61)",
         "Romania 63 (Ion Tiriac 66, Ilie Nastase 60)",
-        "Japan 62.1 (Koji Watanabe 63, Ichizo Konishi 62, Osamu Ishiguro 58)",
+        "Czechoslovakia (Czechia) 62.9 (Jiri Javorsky 64, Frantisek Pala 62, Jan Kodes 61)",
         "New Zealand 62 (Lew Gerrard 63, Ian Crookenden 61)",
-        "Netherlands 61.5 (Tom Okker 67, Jan Hajer 56)",
+        "Japan 61.5 (Ichizo Konishi 62, Koji Watanabe 62, Osamu Ishiguro 57)",
         "Ecuador 61.1 (Miguel Olvera 62, Eduardo Zuleta 61, Pancho Guzman 57)",
-        "Switzerland 60.5 (Dimitri Sturdza 62, Thedy Stalder 59)",
-        "Chile 59.5 (Patricio Rodriguez Chi 62, Jaime Pinto Bravo 57)",
+        "Netherlands 61 (Tom Okker 67, Jan Hajer 55)",
         "Poland 59.5 (Wieslaw Gasiorek 61, Piotr Jamroz 58)",
-        "Canada 58.3 (Keith Carpenter 60, Mike Belkin 59, Harry Fauquier 54, Bob Puddicombe 53)",
-        "Egypt 56.7 (Moataz El Sonbol 57, Fathi Mohammed Aly 57, Ismail El Shafei 54)",
-        "Argentina 56.5 (Eduardo Soriano 57, Roberto Aubone 56)",
-        "Belgium 56.5 (Eric Drossart 58, Claude De Gronckel 55, Patrick Hombergen 55)",
-        "Israel 56 (Eleazar Davidman 60, Yehoshua Shalem 52)",
-        "Jamaica 55 (Richard Russell 56, Lance Lumsden 54)"
+        "Chile 58.5 (Patricio Rodriguez Chi 61, Jaime Pinto Bravo 56)",
+        "Canada 57.8 (Keith Carpenter 60, Mike Belkin 58, Harry Fauquier 54, Bob Puddicombe 52)",
+        "Argentina 56 (Eduardo Soriano 57, Roberto Aubone 55)",
+        "Belgium 55.9 (Eric Drossart 57, Claude De Gronckel 55, Patrick Hombergen 54)",
+        "Switzerland 55.5 (Dimitri Sturdza 57, Thedy Stalder 54)",
+        "Jamaica 53.5 (Richard Russell 55, Lance Lumsden 52)",
+        "Egypt 53.4 (Fathi Mohammed Aly 54, Moataz El Sonbol 53, Ismail El Shafei 52)",
+        "Israel 50 (Eleazar Davidman 56, Yehoshua Shalem 44)"
       ],
       "merged": [
         "Croatia → Yugoslavia (Serbia)",
@@ -6791,20 +7466,20 @@
         "aloneInTheirNation": [
           "Istvan Gulyas (HUN)",
           "Alex Metreveli (URS)",
-          "Tico Carrero (PUR)",
           "Ove Bengtson (SWE)",
+          "Tico Carrero (PUR)",
           "Haibibi Bouchaib (MAR)",
-          "Senaka Kumara (SRI)",
           "William Alvarez (COL)",
           "Peter Pokorny (AUT)",
-          "Pekka Saila (FIN)"
+          "Pekka Saila (FIN)",
+          "Senaka Kumara (SRI)"
         ],
         "noNationOnTheMap": []
       }
     },
     {
       "id": "tennis-1965",
-      "version": "tennis-1965-e9bd1e5e",
+      "version": "tennis-1965-369d63f0",
       "label": "Amateur Elo, end of 1965 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6814,37 +7489,37 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Roy Emerson AUS 2092.8 → 88",
-        "Manuel Santana ESP 2022.9 → 85",
-        "Fred Stolle AUS 1996 → 84",
-        "Cliff Drysdale RSA 1906 → 80",
-        "Dennis Ralston USA 1849.1 → 78"
+        "Roy Emerson AUS 2097.9 → 88",
+        "Fred Stolle AUS 2001.3 → 84",
+        "Manuel Santana ESP 1993.2 → 84",
+        "Cliff Drysdale RSA 1898.2 → 80",
+        "Dennis Ralston USA 1850.6 → 78"
       ],
       "nations": [
-        "Australia 84.1 (Roy Emerson 88, Fred Stolle 84, Neale Fraser 77, Tony Roche 76, Bob Hewitt 76; +13)",
+        "Australia 84.3 (Roy Emerson 88, Fred Stolle 84, Neale Fraser 78, Tony Roche 77, Bob Hewitt 76; +13)",
         "United States 77 (Dennis Ralston 78, Arthur Ashe 77, Vic Seixas 75, Chuck Mckinley 75, Ron Holmberg 74; +20)",
-        "Spain 74.1 (Manuel Santana 85, Juan Manuel Couder 67, Juan Gisbert 67, Jose Luis Arillla 66, Alberto Arilla 62)",
-        "India 72.8 (Ramanathan Krishnan 76, Jaidip Mukerjea 74, Premjit Lall 66, Shiv Prakash Misra 62)",
+        "Spain 73.7 (Manuel Santana 84, Juan Gisbert 67, Juan Manuel Couder 67, Jose Luis Arillla 66, Alberto Arilla 63)",
         "West Germany (Germany) 72.3 (Wilhelm Bungert 73, Christian Kuhnke 72, Ingo Buding 70)",
-        "France 70.9 (Pierre Darmon 74, Pierre Barthes 71, Francois Jauffret 65, Jean Noel Grinda 64, Jean Claude Barclay 64; +3)",
-        "Mexico 70.4 (Rafael Osuna 77, Tony Palafox 70, Joaquin Loyo Mayo 62, Vicente Zarazua 54)",
-        "South Africa 70.4 (Cliff Drysdale 80, Keith Diepraam 67, Frew Mcmillan 59, Robin Sanders 57, Robert Maud 57; +2)",
-        "Great Britain 70.3 (Billy Knight 72, Michael Sangster 72, Roger Taylor 69, Keith Wooldridge 58, Graham Stilwell 57)",
+        "India 71.6 (Ramanathan Krishnan 76, Jaidip Mukerjea 72, Premjit Lall 63, Shiv Prakash Misra 61)",
+        "Mexico 71.2 (Rafael Osuna 78, Tony Palafox 70, Joaquin Loyo Mayo 64, Vicente Zarazua 56)",
+        "France 70.9 (Pierre Darmon 74, Pierre Barthes 71, Francois Jauffret 65, Jean Noel Grinda 64, Jean Claude Barclay 63; +3)",
+        "South Africa 70.6 (Cliff Drysdale 80, Keith Diepraam 67, Frew Mcmillan 60, Robert Maud 58, Robin Sanders 58; +2)",
+        "Sweden 70.5 (Jan Erik Lundquist 78, Christer Holm 64, Lars Olander 59)",
+        "Great Britain 70.2 (Billy Knight 72, Michael Sangster 72, Roger Taylor 69, Graham Stilwell 57, Keith Wooldridge 57)",
         "Italy 69.5 (Nicola Pietrangeli 76, Giuseppe Merlo 65, Sergio Tacchini 55)",
         "Brazil 68.8 (Thomaz Koch 70, Ronnie Barnes 69, Jose Edison Mandarino 62)",
-        "Sweden 68.6 (Jan Erik Lundquist 78, Christer Holm 60, Lars Olander 56)",
-        "Soviet Union (Russia) 66.5 (Thomas Lejus 69, Alex Metreveli 64)",
-        "Yugoslavia (Serbia) 66 (Nikola Pilic 68, Boro Jovanovic 64)",
-        "Czechoslovakia (Czechia) 63.5 (Jiri Javorsky 67, Milan Holecek 60)",
-        "Japan 62.7 (Ichizo Konishi 64, Osamu Ishiguro 62, Koji Watanabe 59)",
-        "South Vietnam 60 (Hoang Duc Luu 60, Van Bay Vo 60)",
-        "Austria 59 (Norbert Klatil 61, Georg Pazderka 57)",
+        "Soviet Union (Russia) 67.5 (Thomas Lejus 70, Alex Metreveli 65)",
+        "Yugoslavia (Serbia) 65.5 (Nikola Pilic 67, Boro Jovanovic 64)",
+        "Czechoslovakia (Czechia) 64 (Jiri Javorsky 67, Milan Holecek 61)",
+        "Japan 61.5 (Ichizo Konishi 63, Osamu Ishiguro 61, Koji Watanabe 56)",
         "New Zealand 59 (Lew Gerrard 60, Ian Crookenden 58)",
         "Ecuador 58 (Eduardo Zuleta 60, Pancho Guzman 56)",
-        "Chile 56.7 (Patricio Cornejo 59, Jaime Pinto Bravo 56, Ernesto Aguirre 54, Omar Pabst 53)",
-        "Belgium 56.5 (Eric Drossart 58, Claude De Gronckel 55)",
-        "Luxembourg 56 (Frank Baden 57, Thierry Brasseur 55)",
-        "Netherlands 54.5 (Tom Okker 55, Jan Hajer 54)"
+        "Austria 56 (Norbert Klatil 58, Georg Pazderka 54)",
+        "Belgium 56 (Eric Drossart 58, Claude De Gronckel 54)",
+        "Chile 55.3 (Patricio Cornejo 57, Jaime Pinto Bravo 55, Ernesto Aguirre 53, Omar Pabst 52)",
+        "Netherlands 54 (Tom Okker 54, Jan Hajer 54)",
+        "South Vietnam 52 (Hoang Duc Luu 53, Van Bay Vo 51)",
+        "Luxembourg 48.5 (Frank Baden 51, Thierry Brasseur 46)"
       ],
       "merged": [
         "Belarus → Soviet Union (Russia)",
@@ -6884,8 +7559,8 @@
           "Keith Carpenter (CAN)",
           "Wieslaw Gasiorek (POL)",
           "Roger Dowdeswell (RHO)",
-          "Tim Sturdza (SUI)",
           "William Alvarez (COL)",
+          "Tim Sturdza (SUI)",
           "Richard Russell (JAM)"
         ],
         "noNationOnTheMap": []
@@ -6893,7 +7568,7 @@
     },
     {
       "id": "tennis-1964",
-      "version": "tennis-1964-8f52fb50",
+      "version": "tennis-1964-0a8df6ff",
       "label": "Amateur Elo, end of 1964 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6903,40 +7578,40 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Roy Emerson AUS 2113.8 → 89",
-        "Chuck Mckinley USA 1942.4 → 82",
-        "Fred Stolle AUS 1922.3 → 81",
-        "Manuel Santana ESP 1896.1 → 80",
-        "Jan Erik Lundquist SWE 1865.4 → 79"
+        "Roy Emerson AUS 2120.9 → 89",
+        "Chuck Mckinley USA 1945.1 → 82",
+        "Fred Stolle AUS 1930.2 → 81",
+        "Manuel Santana ESP 1901.1 → 80",
+        "Jan Erik Lundquist SWE 1870 → 79"
       ],
       "nations": [
-        "Australia 82.6 (Roy Emerson 89, Fred Stolle 81, Bob Hewitt 75, Martin Mulligan 71, Ken Fletcher 71; +8)",
+        "Australia 82.8 (Roy Emerson 89, Fred Stolle 81, Bob Hewitt 76, Martin Mulligan 72, Ken Fletcher 72; +8)",
         "United States 77.9 (Chuck Mckinley 82, Vic Seixas 76, Dennis Ralston 74, Ron Holmberg 73, Hugh Stewart 71; +15)",
         "Sweden 76 (Jan Erik Lundquist 79, Ulf Schmidt 73)",
-        "Great Britain 73.1 (Michael Sangster 74, Jaroslav Drobny 73, Billy Knight 72, Roger Taylor 71, Robert Wilson 71; +3)",
+        "West Germany (Germany) 73.3 (Wilhelm Bungert 75, Christian Kuhnke 75, Wolfgang Stuck 67, Ingo Buding 66)",
+        "Great Britain 73.1 (Michael Sangster 74, Jaroslav Drobny 73, Billy Knight 72, Robert Wilson 71, Roger Taylor 71; +3)",
         "Mexico 73 (Rafael Osuna 78, Tony Palafox 68)",
-        "West Germany (Germany) 72.7 (Wilhelm Bungert 75, Christian Kuhnke 74, Wolfgang Stuck 66, Ingo Buding 65)",
-        "Spain 72.5 (Manuel Santana 80, Jose Luis Arillla 65, Juan Manuel Couder 65)",
+        "Spain 72.9 (Manuel Santana 80, Jose Luis Arillla 66, Juan Manuel Couder 65)",
         "France 70.4 (Pierre Darmon 75, Pierre Barthes 69, Jean Claude Barclay 64, Jean Noel Grinda 64, Francois Jauffret 62; +1)",
-        "Italy 69.4 (Nicola Pietrangeli 77, Giuseppe Merlo 69, Giordano Majoli 56, Sergio Tacchini 54)",
-        "Denmark 69 (Torben Ulrich 70, Jorgen Ulrich 69, Jan Leschly 64)",
-        "Brazil 67.8 (Ronnie Barnes 69, Thomaz Koch 68, Jose Edison Mandarino 61)",
-        "India 67.4 (Jaidip Mukerjea 71, Shiv Prakash Misra 64, Premjit Lall 63)",
-        "South Africa 67.3 (Abe Segal 69, Cliff Drysdale 68, Clive Brebnor 63, Keith Diepraam 62, David Phillips 61; +3)",
-        "Philippines 67.2 (Felicisimo Ampon 68, Raymundo Deyro 67, Johnny Jose 64)",
-        "Yugoslavia (Serbia) 67 (Nikola Pilic 71, Boro Jovanovic 63)",
-        "Soviet Union (Russia) 64 (Thomas Lejus 66, Alex Metreveli 62)",
+        "Italy 69.8 (Nicola Pietrangeli 77, Giuseppe Merlo 69, Giordano Majoli 60, Sergio Tacchini 54)",
+        "Denmark 69.1 (Torben Ulrich 70, Jorgen Ulrich 69, Jan Leschly 65)",
+        "Brazil 68.1 (Ronnie Barnes 69, Thomaz Koch 69, Jose Edison Mandarino 60)",
+        "South Africa 67.5 (Abe Segal 69, Cliff Drysdale 68, Clive Brebnor 64, David Phillips 63, Keith Diepraam 62; +3)",
+        "India 66.1 (Jaidip Mukerjea 69, Shiv Prakash Misra 64, Premjit Lall 60)",
+        "Yugoslavia (Serbia) 66 (Nikola Pilic 70, Boro Jovanovic 62)",
+        "Philippines 65.6 (Felicisimo Ampon 67, Raymundo Deyro 65, Johnny Jose 61)",
+        "Soviet Union (Russia) 65 (Thomas Lejus 67, Alex Metreveli 63)",
         "Zimbabwe 63 (Adrian Bey 67, Frank Saloman 59)",
-        "Hungary 62 (Istvan Gulyas 68, Andras Szikszay 56)",
-        "New Zealand 59.5 (Lew Gerrard 60, Ian Crookenden 59)",
-        "Chile 58.5 (Patricio Rodriguez Chi 63, Ernesto Aguirre 54)",
-        "Argentina 58 (Eduardo Soriano 59, Roberto Aubone 57)",
-        "Czechoslovakia (Czechia) 58 (Milan Holecek 60, Stepan Koudelka 56)",
-        "Canada 57.7 (Mike Belkin 58, Keith Carpenter 58, Francois Godbout 55)",
-        "South Vietnam 57.5 (Van Bay Vo 58, Hoang Duc Luu 57)",
-        "Ireland 57 (Derek Arthurs 61, Peter Jackson 53)",
-        "Netherlands 57 (Jan Hajer 58, Tom Okker 56)",
-        "Belgium 54.5 (Eric Drossart 59, Claude De Gronckel 50)"
+        "Hungary 61.5 (Istvan Gulyas 68, Andras Szikszay 55)",
+        "New Zealand 60 (Lew Gerrard 60, Ian Crookenden 60)",
+        "Czechoslovakia (Czechia) 59.5 (Milan Holecek 61, Stepan Koudelka 58)",
+        "Canada 57.7 (Keith Carpenter 58, Mike Belkin 58, Francois Godbout 55)",
+        "Argentina 57.5 (Eduardo Soriano 59, Roberto Aubone 56)",
+        "Chile 57 (Patricio Rodriguez Chi 62, Ernesto Aguirre 52)",
+        "Netherlands 56 (Jan Hajer 57, Tom Okker 55)",
+        "Belgium 54 (Eric Drossart 59, Claude De Gronckel 49)",
+        "Ireland 52.5 (Derek Arthurs 56, Peter Jackson 49)",
+        "South Vietnam 50 (Van Bay Vo 50, Hoang Duc Luu 50)"
       ],
       "merged": [
         "Belarus → Soviet Union (Russia)",
@@ -6971,12 +7646,12 @@
         "aloneInTheirNation": [
           "Iyo Pimentel (VEN)",
           "Nicholas Kalogeropoulos (GRE)",
-          "Eduardo Zuleta (ECU)",
           "Mustapha Belkhodja (TUN)",
+          "Eduardo Zuleta (ECU)",
           "Reino Nyyssonen (FIN)",
           "Osamu Ishiguro (JPN)",
-          "Tim Sturdza (SUI)",
           "Andrzej Licis (POL)",
+          "Tim Sturdza (SUI)",
           "Eleazar Davidman (ISR)",
           "Richard Russell (JAM)"
         ],
@@ -6985,7 +7660,7 @@
     },
     {
       "id": "tennis-1963",
-      "version": "tennis-1963-234b91f9",
+      "version": "tennis-1963-5268b5da",
       "label": "Amateur Elo, end of 1963 (rough)",
       "kind": "computed",
       "run": "early",
@@ -6995,41 +7670,41 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Roy Emerson AUS 2013.2 → 85",
-        "Chuck Mckinley USA 1917.5 → 81",
-        "Rafael Osuna MEX 1911.6 → 80",
-        "Frank Froehling USA 1861.7 → 78",
-        "Manuel Santana ESP 1856.5 → 78"
+        "Roy Emerson AUS 2020.1 → 85",
+        "Chuck Mckinley USA 1918.4 → 81",
+        "Rafael Osuna MEX 1915.2 → 81",
+        "Frank Froehling USA 1869.4 → 79",
+        "Manuel Santana ESP 1863 → 79"
       ],
       "nations": [
-        "United States 78.8 (Chuck Mckinley 81, Frank Froehling 78, Hamilton Richardson 76, Dennis Ralston 76, Vic Seixas 76; +21)",
-        "Australia 78 (Roy Emerson 85, Fred Stolle 74, Bob Hewitt 73, Martin Mulligan 71, Ken Fletcher 70; +9)",
-        "Mexico 74.5 (Rafael Osuna 80, Tony Palafox 69)",
+        "United States 79.2 (Chuck Mckinley 81, Frank Froehling 79, Dennis Ralston 76, Vic Seixas 76, Hamilton Richardson 75; +21)",
+        "Australia 78.2 (Roy Emerson 85, Fred Stolle 74, Bob Hewitt 74, Martin Mulligan 72, Ken Fletcher 70; +9)",
+        "Mexico 75 (Rafael Osuna 81, Tony Palafox 69)",
         "Sweden 74.5 (Jan Erik Lundquist 76, Ulf Schmidt 73)",
-        "Great Britain 73.6 (Michael Sangster 76, Billy Knight 73, Robert Wilson 72, Roger Taylor 68, Alan Mills 65; +5)",
-        "India 71.8 (Ramanathan Krishnan 77, Jaidip Mukerjea 68, Premjit Lall 61)",
-        "Italy 71.4 (Nicola Pietrangeli 76, Giuseppe Merlo 69, Antonio Maggi 58)",
-        "Spain 70.4 (Manuel Santana 78, Juan Manuel Couder 69, Jose Luis Arillla 62, Alberto Arilla 54)",
-        "West Germany (Germany) 69.6 (Christian Kuhnke 73, Wilhelm Bungert 70, Wolfgang Stuck 64, Adolf Kreinberg 60, Dieter Ecklebe 55)",
-        "Brazil 67.9 (Ronnie Barnes 70, Thomaz Koch 67, Jose Edison Mandarino 61)",
+        "Great Britain 73.6 (Michael Sangster 76, Robert Wilson 73, Billy Knight 72, Roger Taylor 68, Alan Mills 64; +5)",
+        "Italy 72 (Nicola Pietrangeli 77, Giuseppe Merlo 69, Antonio Maggi 59)",
+        "India 70.9 (Ramanathan Krishnan 77, Jaidip Mukerjea 66, Premjit Lall 60)",
+        "Spain 70.8 (Manuel Santana 79, Juan Manuel Couder 69, Jose Luis Arillla 62, Alberto Arilla 54)",
+        "West Germany (Germany) 70.7 (Christian Kuhnke 74, Wilhelm Bungert 71, Wolfgang Stuck 65, Adolf Kreinberg 62, Dieter Ecklebe 56)",
+        "Brazil 68.2 (Ronnie Barnes 70, Thomaz Koch 68, Jose Edison Mandarino 60)",
         "France 67.9 (Pierre Darmon 75, Jacques Renavand 64, Jean Claude Barclay 63, Pierre Barthes 60, Francois Jauffret 60; +4)",
-        "South Africa 66 (Gordon Forbes 68, Abe Segal 66, Cliff Drysdale 64, David Phillips 60, Frew Mcmillan 59; +1)",
+        "South Africa 66.4 (Gordon Forbes 68, Abe Segal 66, Cliff Drysdale 65, David Phillips 63, Frew Mcmillan 60; +1)",
         "Zimbabwe 66 (Adrian Bey 69, Frank Saloman 63)",
         "Denmark 65.6 (Jorgen Ulrich 68, Jan Leschly 66, Carl Edvard Hedelund 52)",
-        "Japan 65.5 (Atsushi Miyagi 68, Osamu Ishiguro 63)",
+        "Soviet Union (Russia) 64.6 (Thomas Lejus 67, Alex Metreveli 63, Mikhail Mozer 63, Sergei Likhachev 63)",
         "Belgium 64.5 (Jackie Brichant 69, Eric Drossart 60)",
-        "Philippines 64.5 (Felicisimo Ampon 67, Johnny Jose 62)",
-        "Soviet Union (Russia) 63.9 (Thomas Lejus 67, Mikhail Mozer 62, Sergei Likhachev 62, Alex Metreveli 61)",
+        "Japan 63.5 (Atsushi Miyagi 66, Osamu Ishiguro 61)",
         "Yugoslavia (Serbia) 63 (Nikola Pilic 64, Boro Jovanovic 62)",
-        "Romania 61 (Ion Tiriac 63, Alexandru Bardan 59)",
-        "Ecuador 59.5 (Eduardo Zuleta 63, Pancho Guzman 56)",
+        "Philippines 62.5 (Felicisimo Ampon 66, Johnny Jose 59)",
+        "Romania 60.5 (Ion Tiriac 62, Alexandru Bardan 59)",
+        "Ecuador 59 (Eduardo Zuleta 62, Pancho Guzman 56)",
         "New Zealand 58.5 (Ian Crookenden 59, Ronald Mckenzie 58)",
-        "Greece 58 (Nicholas Kalogeropoulos 58, Nick Kalyvas 58)",
-        "Chile 57.5 (Patricio Rodriguez Chi 61, Ernesto Aguirre 54)",
+        "Chile 56.5 (Patricio Rodriguez Chi 60, Ernesto Aguirre 53)",
         "Canada 56 (Francois Godbout 57, Keith Carpenter 55)",
-        "Austria 53.5 (Detler Herdy 54, Franz Hainka 53)",
-        "Portugal 53 (Alfredo Vaz Pinto 55, David Cohen 51)",
-        "Israel 50.5 (Eleazar Davidman 53, Gabriel Dubitzky 48)"
+        "Greece 55 (Nick Kalyvas 55, Nicholas Kalogeropoulos 55)",
+        "Austria 51 (Detler Herdy 51, Franz Hainka 51)",
+        "Portugal 46.5 (Alfredo Vaz Pinto 48, David Cohen 45)",
+        "Israel 46 (Eleazar Davidman 49, Gabriel Dubitzky 43)"
       ],
       "merged": [
         "Belarus → Soviet Union (Russia)",
@@ -7064,14 +7739,14 @@
           "Iyo Pimentel (VEN)",
           "Istvan Gulyas (HUN)",
           "Jiri Javorsky (TCH)",
-          "Reino Nyyssonen (FIN)",
           "Mustapha Belkhodja (TUN)",
-          "Sheikh Qutubuddin (PAK)",
-          "Sultan Aman Azman (MAS)",
+          "Reino Nyyssonen (FIN)",
           "Gunnar Sjowall (NOR)",
           "Tim Sturdza (SUI)",
           "Fathi Mohammed Aly (EGY)",
           "Willem Maris (NED)",
+          "Sheikh Qutubuddin (PAK)",
+          "Sultan Aman Azman (MAS)",
           "Nazmi Bari (TUR)"
         ],
         "noNationOnTheMap": []
@@ -7079,7 +7754,7 @@
     },
     {
       "id": "tennis-1962",
-      "version": "tennis-1962-abeea604",
+      "version": "tennis-1962-d6008095",
       "label": "Amateur Elo, end of 1962 (rough)",
       "kind": "computed",
       "run": "early",
@@ -7089,41 +7764,41 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Rod Laver AUS 2131 → 89",
-        "Neale Fraser AUS 2017.9 → 85",
-        "Roy Emerson AUS 1978.4 → 83",
-        "Jan Erik Lundquist SWE 1861.1 → 78",
-        "Rafael Osuna MEX 1859.3 → 78"
+        "Rod Laver AUS 2139.1 → 90",
+        "Neale Fraser AUS 2024.9 → 85",
+        "Roy Emerson AUS 1984.4 → 83",
+        "Jan Erik Lundquist SWE 1868.8 → 79",
+        "Rafael Osuna MEX 1861.8 → 78"
       ],
       "nations": [
-        "Australia 85.2 (Rod Laver 89, Neale Fraser 85, Roy Emerson 83, Martin Mulligan 73, Bob Hewitt 73; +17)",
-        "United States 76.8 (Hamilton Richardson 78, Vic Seixas 77, Chuck Mckinley 76, Ron Holmberg 72, Frank Froehling 72; +15)",
-        "Italy 75.2 (Fausto Gardini 77, Nicola Pietrangeli 76, Giuseppe Merlo 71, Orlando Sirola 69, Sergio Jacobini 64; +1)",
-        "Sweden 75 (Jan Erik Lundquist 78, Ulf Schmidt 72)",
+        "Australia 85.7 (Rod Laver 90, Neale Fraser 85, Roy Emerson 83, Martin Mulligan 74, Bob Hewitt 74; +17)",
+        "United States 76 (Vic Seixas 77, Chuck Mckinley 76, Hamilton Richardson 76, Ron Holmberg 72, Frank Froehling 72; +15)",
+        "Italy 75.6 (Fausto Gardini 78, Nicola Pietrangeli 76, Giuseppe Merlo 71, Orlando Sirola 69, Sergio Jacobini 66; +1)",
+        "Sweden 75.5 (Jan Erik Lundquist 79, Ulf Schmidt 72)",
         "Mexico 72.9 (Rafael Osuna 78, Tony Palafox 71, Mario Llamas 67, Pancho Contreras 66)",
-        "Great Britain 72.1 (Robert Wilson 73, Billy Knight 73, Michael Sangster 71, Alan Mills 66, Roger Taylor 64; +2)",
+        "Great Britain 72.1 (Robert Wilson 73, Billy Knight 73, Michael Sangster 71, Alan Mills 66, Roger Taylor 63; +2)",
         "Spain 69.8 (Manuel Santana 76, Juan Manuel Couder 65, Jose Luis Arillla 58)",
-        "India 69.7 (Ramanathan Krishnan 78, Jaidip Mukerjea 66, Premjit Lall 62, Akhtar Ali 59)",
         "France 69.2 (Pierre Darmon 73, Gerard Pilet 68, Jean Noel Grinda 66, Jacques Renavand 62)",
-        "South Africa 68.2 (Gordon Forbes 70, Abe Segal 69, Cliff Drysdale 65, A Rodney Mandelstam 61, Keith Diepraam 59; +1)",
-        "West Germany (Germany) 67 (Christian Kuhnke 68, Wilhelm Bungert 68, Ingo Buding 64, Bodo Nitsche 62, Dieter Ecklebe 56)",
+        "India 69 (Ramanathan Krishnan 78, Jaidip Mukerjea 65, Premjit Lall 61, Akhtar Ali 57)",
+        "South Africa 68.4 (Gordon Forbes 70, Abe Segal 69, Cliff Drysdale 66, A Rodney Mandelstam 62, Keith Diepraam 61; +1)",
+        "West Germany (Germany) 67.4 (Christian Kuhnke 68, Wilhelm Bungert 68, Bodo Nitsche 65, Ingo Buding 65, Dieter Ecklebe 57)",
+        "Soviet Union (Russia) 65.1 (Alex Metreveli 66, Thomas Lejus 65, Sergei Likhachev 61)",
         "Denmark 64.4 (Jorgen Ulrich 67, Jan Leschly 64, Carl Edvard Hedelund 53)",
-        "Belgium 64 (Jackie Brichant 71, Eric Drossart 57)",
-        "Brazil 63.6 (Carlos Fernandes 67, Thomaz Koch 61, Jose Edison Mandarino 57)",
+        "Belgium 63.5 (Jackie Brichant 71, Eric Drossart 56)",
+        "Brazil 63.5 (Carlos Fernandes 66, Thomaz Koch 62, Jose Edison Mandarino 57)",
         "Ecuador 63 (Miguel Olvera 64, Eduardo Zuleta 62)",
-        "Philippines 63 (Raymundo Deyro 67, Johnny Jose 59)",
-        "Poland 62.8 (Wladyslaw Skonecki 67, Andrzej Licis 59, Wieslaw Gasiorek 57)",
-        "Soviet Union (Russia) 62.6 (Thomas Lejus 63, Alex Metreveli 63, Sergei Likhachev 59)",
-        "Austria 62.5 (Franz Saiko 66, Laci Legenstein 59)",
-        "Yugoslavia (Serbia) 62.5 (Nikola Pilic 65, Boro Jovanovic 60)",
-        "Czechoslovakia (Czechia) 61.7 (Jiri Javorsky 62, Pavel Korda 62, Petr Strobl 59)",
-        "Hungary 61.5 (Istvan Gulyas 64, Zoltan Katona 59)",
-        "Japan 61.5 (Michio Fujii 62, Osamu Ishiguro 61)",
-        "Canada 58 (Donald Fontana 60, Francois Godbout 56)",
-        "Chile 58 (Patricio Apey 59, Patricio Rodriguez Chi 57)",
-        "Iran 56.5 (Taghi Akbari 60, Reza Akbari 53)",
+        "Yugoslavia (Serbia) 62.5 (Nikola Pilic 64, Boro Jovanovic 61)",
+        "Czechoslovakia (Czechia) 62.3 (Jiri Javorsky 63, Pavel Korda 62, Petr Strobl 60)",
+        "Poland 61.8 (Wladyslaw Skonecki 66, Andrzej Licis 58, Wieslaw Gasiorek 56)",
+        "Austria 61.5 (Franz Saiko 65, Laci Legenstein 58)",
+        "Philippines 60.5 (Raymundo Deyro 65, Johnny Jose 56)",
+        "Hungary 60 (Istvan Gulyas 64, Zoltan Katona 56)",
+        "Japan 59 (Michio Fujii 59, Osamu Ishiguro 59)",
+        "Canada 57.5 (Donald Fontana 59, Francois Godbout 56)",
+        "Chile 56.5 (Patricio Apey 57, Patricio Rodriguez Chi 56)",
         "New Zealand 56.5 (Ian Crookenden 59, John McDonald 54)",
-        "Romania 53 (Ion Tiriac 55, Constantin Nastase 51)"
+        "Romania 52.5 (Ion Tiriac 55, Constantin Nastase 50)",
+        "Iran 46 (Taghi Akbari 49, Reza Akbari 43)"
       ],
       "merged": [
         "Belarus → Soviet Union (Russia)",
@@ -7159,9 +7834,9 @@
           "Reino Nyyssonen (FIN)",
           "Mustapha Belkhodja (TUN)",
           "Thorvald Moe (NOR)",
-          "Eleazar Davidman (ISR)",
           "Evert Schneider (NED)",
           "Peter Jackson (IRL)",
+          "Eleazar Davidman (ISR)",
           "Karim Fawaz (LIB)"
         ],
         "noNationOnTheMap": []
@@ -7169,7 +7844,7 @@
     },
     {
       "id": "tennis-1961",
-      "version": "tennis-1961-cc90d757",
+      "version": "tennis-1961-33704eac",
       "label": "Amateur Elo, end of 1961 (rough)",
       "kind": "computed",
       "run": "early",
@@ -7179,38 +7854,38 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Neale Fraser AUS 2010.1 → 84",
-        "Rod Laver AUS 1982 → 83",
-        "Roy Emerson AUS 1906.5 → 80",
-        "Luis Ayala CHI 1888.8 → 80",
-        "Ramanathan Krishnan IND 1868.7 → 79"
+        "Neale Fraser AUS 2015.7 → 85",
+        "Rod Laver AUS 1987.5 → 84",
+        "Roy Emerson AUS 1910.6 → 80",
+        "Luis Ayala CHI 1889.9 → 80",
+        "Nicola Pietrangeli ITA 1861.2 → 78"
       ],
       "nations": [
-        "Australia 81.9 (Neale Fraser 84, Rod Laver 83, Roy Emerson 80, Bob Hewitt 71, Bob Mark 68; +14)",
-        "United States 74.9 (Vic Seixas 76, Tut Bartzen 75, Chuck Mckinley 73, Ron Holmberg 72, Chris Crawford 72; +16)",
-        "Italy 74 (Nicola Pietrangeli 78, Fausto Gardini 76, Orlando Sirola 68, Sergio Tacchini 56)",
-        "Sweden 73.5 (Jan Erik Lundquist 77, Ulf Schmidt 70)",
-        "Great Britain 72.4 (Michael Sangster 74, Robert Wilson 73, Billy Knight 72, Alan Mills 64, Roger Taylor 62; +3)",
-        "France 68.9 (Gerard Pilet 71, Pierre Darmon 71, Jean Claude Barclay 61, Francois Jauffret 60, Daniel Contet 59; +1)",
-        "India 68.1 (Ramanathan Krishnan 79, Akhtar Ali 62, Premjit Lall 60, Jaidip Mukerjea 57)",
-        "Chile 68 (Luis Ayala 80, Patricio Rodriguez Chi 56)",
-        "Mexico 67.3 (Rafael Osuna 71, Tony Palafox 67, Mario Llamas 65, Gabino Palafox 56)",
-        "South Africa 66 (Abe Segal 70, Albert Gaertner 63, Julian Mayers 58)",
+        "Australia 82.8 (Neale Fraser 85, Rod Laver 84, Roy Emerson 80, Bob Hewitt 72, Barry Phillips Moore 68; +14)",
+        "United States 75 (Vic Seixas 76, Tut Bartzen 75, Chuck Mckinley 73, Ron Holmberg 73, Chris Crawford 72; +16)",
+        "Italy 74.2 (Nicola Pietrangeli 78, Fausto Gardini 76, Orlando Sirola 68, Sergio Tacchini 58)",
+        "Sweden 74 (Jan Erik Lundquist 78, Ulf Schmidt 70)",
+        "Great Britain 72.3 (Michael Sangster 74, Robert Wilson 73, Billy Knight 72, Alan Mills 63, John Barrett 61; +3)",
+        "France 68.7 (Gerard Pilet 71, Pierre Darmon 71, Jean Claude Barclay 60, Francois Jauffret 59, Jacques Renavand 58; +1)",
+        "Mexico 67.6 (Rafael Osuna 71, Tony Palafox 67, Mario Llamas 66, Gabino Palafox 58)",
+        "Chile 67.5 (Luis Ayala 80, Patricio Rodriguez Chi 55)",
+        "India 67 (Ramanathan Krishnan 78, Akhtar Ali 61, Premjit Lall 59, Jaidip Mukerjea 55)",
+        "South Africa 66.4 (Abe Segal 70, Albert Gaertner 64, Julian Mayers 58)",
         "Brazil 65.5 (Carlos Fernandes 69, Ronnie Barnes 63, Jose Edison Mandarino 58)",
-        "Spain 65.3 (Manuel Santana 77, Alberto Arilla 54, Emilio Martinez Del Rey 52)",
-        "Japan 64 (Atsushi Miyagi 64, Osamu Ishiguro 64)",
+        "Spain 65.2 (Manuel Santana 77, Alberto Arilla 54, Emilio Martinez Del Rey 51)",
+        "West Germany (Germany) 63.5 (Christian Kuhnke 65, Wilhelm Bungert 64, Ingo Buding 64, Dieter Ecklebe 55)",
         "Ecuador 63 (Eduardo Zuleta 64, Miguel Olvera 62)",
-        "New Zealand 63 (Lew Gerrard 64, Mark Otway 62)",
-        "West Germany (Germany) 62.4 (Wilhelm Bungert 64, Christian Kuhnke 63, Ingo Buding 62, Dieter Ecklebe 54)",
-        "Austria 61.8 (Franz Saiko 65, Laci Legenstein 60, Franz Hainka 53)",
-        "Poland 61.8 (Wladyslaw Skonecki 67, Wieslaw Gasiorek 57, Jozef Orlikowski 55)",
-        "Canada 61.5 (Robert Bedard 65, Francois Godbout 58)",
-        "Yugoslavia (Serbia) 61.2 (Nikola Pilic 63, Boro Jovanovic 60, Voldo Presecki 57)",
-        "Hungary 59.5 (Istvan Gulyas 62, Zoltan Katona 57)",
-        "Finland 56 (Reino Nyyssonen 58, Sakari Salo 54)",
-        "Thailand 53.5 (Sutiraphan Karalak 54, Seri Charuchinda 53)",
-        "Netherlands 53 (Willem Maris 56, Piet Van Eijsden 50)",
-        "Norway 51.5 (Thorvald Moe 53, Finn Dag Jagge 50)"
+        "Yugoslavia (Serbia) 62.1 (Nikola Pilic 64, Boro Jovanovic 61, Voldo Presecki 57)",
+        "New Zealand 62 (Lew Gerrard 63, Mark Otway 61)",
+        "Japan 61.5 (Atsushi Miyagi 62, Osamu Ishiguro 61)",
+        "Poland 61.3 (Wladyslaw Skonecki 67, Wieslaw Gasiorek 56, Jozef Orlikowski 54)",
+        "Austria 61.1 (Franz Saiko 64, Laci Legenstein 60, Franz Hainka 51)",
+        "Canada 61 (Robert Bedard 64, Francois Godbout 58)",
+        "Hungary 59 (Istvan Gulyas 62, Zoltan Katona 56)",
+        "Finland 53 (Reino Nyyssonen 54, Sakari Salo 52)",
+        "Netherlands 52.5 (Willem Maris 55, Piet Van Eijsden 50)",
+        "Norway 48.5 (Thorvald Moe 50, Finn Dag Jagge 47)",
+        "Thailand 46 (Sutiraphan Karalak 47, Seri Charuchinda 45)"
       ],
       "merged": [
         "Croatia → Yugoslavia (Serbia)",
@@ -7234,8 +7909,8 @@
           "Adrian Bey (RHO)",
           "Jiri Javorsky (TCH)",
           "Eduardo Soriano (ARG)",
-          "William Alvarez (COL)",
-          "Mustapha Belkhodja (TUN)"
+          "Mustapha Belkhodja (TUN)",
+          "William Alvarez (COL)"
         ],
         "noNationOnTheMap": [
           "Roland Borghini (MON)"
@@ -7244,7 +7919,7 @@
     },
     {
       "id": "tennis-1960",
-      "version": "tennis-1960-bb100191",
+      "version": "tennis-1960-0fc22dc1",
       "label": "Amateur Elo, end of 1960 (rough)",
       "kind": "computed",
       "run": "early",
@@ -7254,36 +7929,36 @@
       "shift": 0,
       "over99": [],
       "top": [
-        "Neale Fraser AUS 2031.7 → 85",
-        "Rod Laver AUS 1932 → 81",
-        "Nicola Pietrangeli ITA 1921.2 → 81",
-        "Luis Ayala CHI 1887.7 → 80",
-        "Hamilton Richardson USA 1864.9 → 79"
+        "Neale Fraser AUS 2037.6 → 86",
+        "Rod Laver AUS 1937.1 → 81",
+        "Nicola Pietrangeli ITA 1922 → 81",
+        "Luis Ayala CHI 1888 → 80",
+        "Vic Seixas USA 1834.2 → 77"
       ],
       "nations": [
-        "Australia 81 (Neale Fraser 85, Rod Laver 81, Roy Emerson 75, Don Candy 71, Bob Mark 69; +10)",
-        "United States 77.5 (Hamilton Richardson 79, Vic Seixas 77, Barry Mackay 76, Earl Butch Buchholz 75, Tut Bartzen 74; +18)",
-        "Italy 74.4 (Nicola Pietrangeli 81, Giuseppe Merlo 73, Orlando Sirola 72, Sergio Tacchini 56)",
+        "Australia 81.4 (Neale Fraser 86, Rod Laver 81, Roy Emerson 75, Don Candy 71, Bob Mark 69; +10)",
+        "United States 76.3 (Vic Seixas 77, Hamilton Richardson 76, Barry Mackay 76, Earl Butch Buchholz 75, Tut Bartzen 73; +18)",
+        "Italy 74.6 (Nicola Pietrangeli 81, Giuseppe Merlo 73, Orlando Sirola 72, Sergio Tacchini 58)",
         "Great Britain 73.6 (Jaroslav Drobny 75, Robert Wilson 74, Billy Knight 71, Roger Becker 69, Michael Davies 68; +1)",
         "Sweden 72 (Jan Erik Lundquist 75, Ulf Schmidt 69)",
-        "France 71.2 (Robert Haillet 73, Pierre Darmon 71, Gerard Pilet 68, Jean Noel Grinda 68, Jean Claude Molinari 66)",
+        "France 71.2 (Robert Haillet 73, Pierre Darmon 71, Jean Noel Grinda 68, Gerard Pilet 68, Jean Claude Molinari 66)",
         "Spain 70 (Andres Gimeno 72, Manuel Santana 68)",
-        "India 68.8 (Ramanathan Krishnan 76, Naresh Kumar 62, Jaidip Mukerjea 60)",
-        "Chile 68 (Luis Ayala 80, Patricio Rodriguez Chi 56)",
         "Denmark 68 (Jorgen Ulrich 69, Kurt Nielsen 67)",
-        "Mexico 66.6 (Rafael Osuna 67, Mario Llamas 67, Pancho Contreras 66, Joaquin Reyes 64, Tony Palafox 60)",
+        "India 67.4 (Ramanathan Krishnan 75, Naresh Kumar 60, Jaidip Mukerjea 59)",
+        "Chile 67 (Luis Ayala 80, Patricio Rodriguez Chi 54)",
+        "Mexico 67 (Rafael Osuna 68, Mario Llamas 67, Pancho Contreras 66, Joaquin Reyes 64, Tony Palafox 60)",
+        "South Africa 65.1 (Ian Vermaak 67, Albert Gaertner 66, A Rodney Mandelstam 61, Gaetan Koenig 58)",
         "Hungary 64.5 (Andras Adam Stolpa 65, Istvan Gulyas 64)",
         "Brazil 64.4 (Carlos Fernandes 67, Ronnie Barnes 63, Jose Edison Mandarino 57)",
-        "New Zealand 64 (Lew Gerrard 66, Mark Otway 62)",
-        "South Africa 63.9 (Ian Vermaak 67, Albert Gaertner 64, A Rodney Mandelstam 59, Gaetan Koenig 56)",
-        "Philippines 63.5 (Raymundo Deyro 68, Johnny Jose 59)",
-        "Poland 62.8 (Wladyslaw Skonecki 67, Andrzej Licis 60, Wieslaw Gasiorek 53)",
-        "West Germany (Germany) 62.6 (Wolfgang Stuck 66, Ingo Buding 61, Christian Kuhnke 61, Wilhelm Bungert 57, Dieter Ecklebe 56)",
-        "Austria 61.5 (Laci Legenstein 62, Franz Saiko 61)",
-        "Canada 60.5 (Robert Bedard 63, Francois Godbout 58)",
-        "Argentina 60 (Eduardo Soriano 62, Roberto Aubone 58)",
-        "Venezuela 59.5 (Iyo Pimentel 65, Marcus Gambus 54)",
-        "Netherlands 55 (Willem Maris 59, Piet Van Eijsden 51)"
+        "West Germany (Germany) 64.4 (Wolfgang Stuck 67, Ingo Buding 64, Christian Kuhnke 62, Dieter Ecklebe 58, Wilhelm Bungert 57)",
+        "New Zealand 63.5 (Lew Gerrard 66, Mark Otway 61)",
+        "Poland 62.9 (Wladyslaw Skonecki 67, Andrzej Licis 60, Wieslaw Gasiorek 54)",
+        "Austria 60.5 (Laci Legenstein 61, Franz Saiko 60)",
+        "Philippines 60.5 (Raymundo Deyro 66, Johnny Jose 55)",
+        "Canada 60 (Robert Bedard 62, Francois Godbout 58)",
+        "Argentina 59 (Eduardo Soriano 61, Roberto Aubone 57)",
+        "Venezuela 58 (Iyo Pimentel 65, Marcus Gambus 51)",
+        "Netherlands 54 (Willem Maris 57, Piet Van Eijsden 51)"
       ],
       "merged": [],
       "nationFrom": {
@@ -7295,14 +7970,14 @@
         "barred": [],
         "aloneInTheirNation": [
           "Jackie Brichant (BEL)",
-          "Osamu Ishiguro (JPN)",
           "Jiri Javorsky (TCH)",
           "Eduardo Zuleta (ECU)",
-          "Boro Jovanovic (YUG)",
           "Thomas Lejus (URS)",
+          "Osamu Ishiguro (JPN)",
+          "Boro Jovanovic (YUG)",
           "Thorvald Moe (NOR)",
-          "Reino Nyyssonen (FIN)",
-          "Guy Jackson (IRL)"
+          "Guy Jackson (IRL)",
+          "Reino Nyyssonen (FIN)"
         ],
         "noNationOnTheMap": [
           "Roland Borghini (MON)",

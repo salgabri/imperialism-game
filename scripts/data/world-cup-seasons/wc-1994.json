@@ -5,7 +5,7 @@
   "tournament": {"id":"WC-1994","name":"1994 FIFA Men's World Cup","start":"1994-06-17","final":"1994-07-17","host":"United States","winner":"Brazil"},
   "minutes": "appearances",
   "ballonDor": [1993,1994],
-  "elo": {"date":"1994-07-18","activeSince":"1990-07-18","active":210,"best":{"team":"Brazil","elo":1933.5}},
+  "elo": {"date":"1994-07-18","activeSince":"1990-07-18","active":210,"best":{"team":"Brazil","elo":1933.5},"levels":{"from":"1986-07-18","to":"2002-07-18","matches":1767,"confederations":[["UEFA",0,0,961],["CONMEBOL",-1.8,15.5,634],["CONCACAF",-65,15.7,589],["CAF",-41.5,16.2,488],["AFC",-61.1,14.1,706],["OFC",-97.2,25,156]]},"levelledBest":{"team":"Brazil","elo":1931.7}},
   "unmatchedVotes": [
     {"year":1993,"name":"Eric Cantona","nationality":"France","points":34},
     {"year":1993,"name":"Alen Bokšić","nationality":"Croatia","points":29},
@@ -29,7 +29,7 @@
     {"year":1994,"name":"Zvonimir Boban","nationality":"Croatia","points":1}
   ],
   "nations": [
-    {"team":"Argentina","results":"Argentina","elo":1732,"rank":15,"squad":[
+    {"team":"Argentina","results":"Argentina","elo":1732,"rank":15,"confederation":"CONMEBOL","squad":[
       {"id":"P-34056","name":"Sergio Goycochea","shirt":1,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1963-10-17","wikipedia":"https://en.wikipedia.org/wiki/Sergio_Goycochea"},
       {"id":"P-53817","name":"Sergio Vázquez","shirt":2,"position":"DF","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1965-11-23","wikipedia":"https://en.wikipedia.org/wiki/Sergio_V%C3%A1zquez"},
       {"id":"P-28816","name":"José Chamot","shirt":3,"position":"DF","minutes":360,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1969-05-17","wikipedia":"https://en.wikipedia.org/wiki/Jos%C3%A9_Chamot"},
@@ -53,7 +53,7 @@
       {"id":"P-93732","name":"Alejandro Mancuso","shirt":21,"position":"MF","minutes":28,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1968-09-04","wikipedia":"https://en.wikipedia.org/wiki/Alejandro_Mancuso"},
       {"id":"P-87458","name":"Norberto Scoponi","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1961-01-13","wikipedia":"https://en.wikipedia.org/wiki/Norberto_Scoponi"}
     ]},
-    {"team":"Belgium","results":"Belgium","elo":1689.8,"rank":23,"squad":[
+    {"team":"Belgium","results":"Belgium","elo":1689.8,"rank":23,"confederation":"UEFA","squad":[
       {"id":"P-00531","name":"Michel Preud'homme","shirt":1,"position":"GK","minutes":360,"starts":4,"goals":0,"awards":["Golden Glove"],"ballonDor":{"1994":7},"born":"1959-01-24","wikipedia":"https://en.wikipedia.org/wiki/Michel_Preud%27homme"},
       {"id":"P-72736","name":"Dirk Medved","shirt":2,"position":"DF","minutes":102,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1968-06-15","wikipedia":"https://en.wikipedia.org/wiki/Dirk_Medved"},
       {"id":"P-10129","name":"Vital Borkelmans","shirt":3,"position":"DF","minutes":66,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1963-06-01","wikipedia":"https://en.wikipedia.org/wiki/Vital_Borkelmans"},
@@ -77,7 +77,7 @@
       {"id":"P-90526","name":"Stéphane van der Heyden","shirt":21,"position":"MF","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1969-07-03","wikipedia":"https://en.wikipedia.org/wiki/St%C3%A9phane_van_der_Heyden"},
       {"id":"P-48499","name":"Pascal Renier","shirt":22,"position":"DF","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1971-08-03","wikipedia":"https://en.wikipedia.org/wiki/Pascal_Renier"}
     ]},
-    {"team":"Bolivia","results":"Bolivia","elo":1537.9,"rank":47,"squad":[
+    {"team":"Bolivia","results":"Bolivia","elo":1537.9,"rank":47,"confederation":"CONMEBOL","squad":[
       {"id":"P-83061","name":"Carlos Trucco","shirt":1,"position":"GK","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1957-08-08","wikipedia":"https://en.wikipedia.org/wiki/Carlos_Trucco"},
       {"id":"P-06645","name":"Juan Manuel Peña","shirt":2,"position":"DF","minutes":90,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1973-01-17","wikipedia":"https://en.wikipedia.org/wiki/Juan_Manuel_Pe%C3%B1a"},
       {"id":"P-47593","name":"Marco Sandy","shirt":3,"position":"DF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1971-08-29","wikipedia":"https://en.wikipedia.org/wiki/Marco_Sandy"},
@@ -101,7 +101,7 @@
       {"id":"P-09978","name":"Erwin Sánchez","shirt":21,"position":"MF","minutes":270,"starts":3,"goals":1,"awards":[],"ballonDor":{},"born":"1969-10-19","wikipedia":"https://en.wikipedia.org/wiki/Erwin_S%C3%A1nchez"},
       {"id":"P-84079","name":"Julio César Baldivieso","shirt":22,"position":"MF","minutes":156,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1971-12-02","wikipedia":"https://en.wikipedia.org/wiki/Julio_C%C3%A9sar_Baldivieso"}
     ]},
-    {"team":"Brazil","results":"Brazil","elo":1933.5,"rank":1,"squad":[
+    {"team":"Brazil","results":"Brazil","elo":1933.5,"rank":1,"confederation":"CONMEBOL","squad":[
       {"id":"P-31850","name":"Cláudio Taffarel","shirt":1,"position":"GK","minutes":660,"starts":7,"goals":0,"awards":[],"ballonDor":{},"born":"1966-05-08","wikipedia":"https://en.wikipedia.org/wiki/Cl%C3%A1udio_Taffarel"},
       {"id":"P-26340","name":"Jorginho","shirt":2,"position":"DF","minutes":561,"starts":7,"goals":0,"awards":[],"ballonDor":{},"born":"1964-08-17","wikipedia":"https://en.wikipedia.org/wiki/Jorginho_(footballer,_born_1964)"},
       {"id":"P-61247","name":"Ricardo Rocha","shirt":3,"position":"DF","minutes":75,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1962-09-11","wikipedia":"https://en.wikipedia.org/wiki/Ricardo_Rocha_(footballer,_born_1962)"},
@@ -125,7 +125,7 @@
       {"id":"P-81097","name":"Viola","shirt":21,"position":"FW","minutes":14,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1969-01-01","wikipedia":"https://en.wikipedia.org/wiki/Viola_(footballer)"},
       {"id":"P-12835","name":"Gilmar Rinaldi","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1959-01-13","wikipedia":"https://en.wikipedia.org/wiki/Gilmar_Rinaldi"}
     ]},
-    {"team":"Bulgaria","results":"Bulgaria","elo":1693,"rank":22,"squad":[
+    {"team":"Bulgaria","results":"Bulgaria","elo":1693,"rank":22,"confederation":"UEFA","squad":[
       {"id":"P-94024","name":"Borislav Mihaylov","shirt":1,"position":"GK","minutes":616,"starts":7,"goals":0,"awards":[],"ballonDor":{},"born":"1963-02-12","wikipedia":"https://en.wikipedia.org/wiki/Borislav_Mikhailov"},
       {"id":"P-88510","name":"Emil Kremenliev","shirt":2,"position":"DF","minutes":330,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1969-08-13","wikipedia":"https://en.wikipedia.org/wiki/Emil_Kremenliev"},
       {"id":"P-47670","name":"Trifon Ivanov","shirt":3,"position":"DF","minutes":492,"starts":6,"goals":0,"awards":[],"ballonDor":{},"born":"1965-07-27","wikipedia":"https://en.wikipedia.org/wiki/Trifon_Ivanov"},
@@ -149,7 +149,7 @@
       {"id":"P-51016","name":"Velko Yotov","shirt":21,"position":"FW","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1970-08-26","wikipedia":"https://en.wikipedia.org/wiki/Velko_Yotov"},
       {"id":"P-33264","name":"Ivaylo Andonov","shirt":22,"position":"FW","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1967-08-14","wikipedia":"https://en.wikipedia.org/wiki/Ivaylo_Andonov"}
     ]},
-    {"team":"Cameroon","results":"Cameroon","elo":1543.4,"rank":46,"squad":[
+    {"team":"Cameroon","results":"Cameroon","elo":1543.4,"rank":46,"confederation":"CAF","squad":[
       {"id":"P-17774","name":"Joseph-Antoine Bell","shirt":1,"position":"GK","minutes":180,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1954-10-08","wikipedia":"https://en.wikipedia.org/wiki/Joseph-Antoine_Bell"},
       {"id":"P-84420","name":"André Kana-Biyik","shirt":2,"position":"DF","minutes":90,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1965-09-01","wikipedia":"https://en.wikipedia.org/wiki/Andr%C3%A9_Kana-Biyik"},
       {"id":"P-98173","name":"Rigobert Song","shirt":3,"position":"DF","minutes":153,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1976-07-01","wikipedia":"https://en.wikipedia.org/wiki/Rigobert_Song"},
@@ -173,7 +173,7 @@
       {"id":"P-95667","name":"Thomas N'Kono","shirt":21,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1956-07-20","wikipedia":"https://en.wikipedia.org/wiki/Thomas_N%27Kono"},
       {"id":"P-93402","name":"Jacques Songo'o","shirt":22,"position":"GK","minutes":90,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1964-03-17","wikipedia":"https://en.wikipedia.org/wiki/Jacques_Songo%27o"}
     ]},
-    {"team":"Colombia","results":"Colombia","elo":1770.9,"rank":11,"squad":[
+    {"team":"Colombia","results":"Colombia","elo":1770.9,"rank":11,"confederation":"CONMEBOL","squad":[
       {"id":"P-24621","name":"Óscar Córdoba","shirt":1,"position":"GK","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1970-02-03","wikipedia":"https://en.wikipedia.org/wiki/%C3%93scar_C%C3%B3rdoba"},
       {"id":"P-70177","name":"Andrés Escobar","shirt":2,"position":"DF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1967-03-13","wikipedia":"https://en.wikipedia.org/wiki/Andr%C3%A9s_Escobar"},
       {"id":"P-33086","name":"Alexis Mendoza","shirt":3,"position":"DF","minutes":90,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1961-11-08","wikipedia":"https://en.wikipedia.org/wiki/Alexis_Mendoza"},
@@ -197,7 +197,7 @@
       {"id":"P-10444","name":"Faustino Asprilla","shirt":21,"position":"FW","minutes":225,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1969-11-10","wikipedia":"https://en.wikipedia.org/wiki/Faustino_Asprilla"},
       {"id":"P-42369","name":"José María Pazo","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1964-04-04","wikipedia":"https://en.wikipedia.org/wiki/Jos%C3%A9_Mar%C3%ADa_Pazo"}
     ]},
-    {"team":"Germany","results":"Germany","elo":1854.1,"rank":3,"squad":[
+    {"team":"Germany","results":"Germany","elo":1854.1,"rank":3,"confederation":"UEFA","squad":[
       {"id":"P-59164","name":"Bodo Illgner","shirt":1,"position":"GK","minutes":450,"starts":5,"goals":0,"awards":[],"ballonDor":{},"born":"1967-04-07","wikipedia":"https://en.wikipedia.org/wiki/Bodo_Illgner"},
       {"id":"P-47227","name":"Thomas Strunz","shirt":2,"position":"MF","minutes":128,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1968-04-25","wikipedia":"https://en.wikipedia.org/wiki/Thomas_Strunz"},
       {"id":"P-67713","name":"Andreas Brehme","shirt":3,"position":"DF","minutes":322,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1960-11-09","wikipedia":"https://en.wikipedia.org/wiki/Andreas_Brehme"},
@@ -221,7 +221,7 @@
       {"id":"P-78222","name":"Mario Basler","shirt":21,"position":"MF","minutes":30,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1968-12-18","wikipedia":"https://en.wikipedia.org/wiki/Mario_Basler"},
       {"id":"P-33751","name":"Oliver Kahn","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1969-06-15","wikipedia":"https://en.wikipedia.org/wiki/Oliver_Kahn"}
     ]},
-    {"team":"Greece","results":"Greece","elo":1472.2,"rank":65,"squad":[
+    {"team":"Greece","results":"Greece","elo":1472.2,"rank":65,"confederation":"UEFA","squad":[
       {"id":"P-07892","name":"Antonis Minou","shirt":1,"position":"GK","minutes":90,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1958-05-04","wikipedia":"https://en.wikipedia.org/wiki/Antonis_Minou"},
       {"id":"P-54632","name":"Stratos Apostolakis","shirt":2,"position":"DF","minutes":180,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1964-05-11","wikipedia":"https://en.wikipedia.org/wiki/Stratos_Apostolakis"},
       {"id":"P-86801","name":"Thanasis Kolitsidakis","shirt":3,"position":"DF","minutes":90,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1966-11-20","wikipedia":"https://en.wikipedia.org/wiki/Thanasis_Kolitsidakis"},
@@ -245,7 +245,7 @@
       {"id":"P-80966","name":"Alexis Alexandris","shirt":21,"position":"FW","minutes":90,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1968-10-21","wikipedia":"https://en.wikipedia.org/wiki/Alexis_Alexandris"},
       {"id":"P-20597","name":"Alexis Alexiou","shirt":22,"position":"DF","minutes":90,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1963-09-08","wikipedia":"https://en.wikipedia.org/wiki/Alexandros_Alexiou"}
     ]},
-    {"team":"Italy","results":"Italy","elo":1899.3,"rank":2,"squad":[
+    {"team":"Italy","results":"Italy","elo":1899.3,"rank":2,"confederation":"UEFA","squad":[
       {"id":"P-88002","name":"Gianluca Pagliuca","shirt":1,"position":"GK","minutes":411,"starts":5,"goals":0,"awards":[],"ballonDor":{},"born":"1966-12-18","wikipedia":"https://en.wikipedia.org/wiki/Gianluca_Pagliuca"},
       {"id":"P-83615","name":"Luigi Apolloni","shirt":2,"position":"DF","minutes":216,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1967-05-02","wikipedia":"https://en.wikipedia.org/wiki/Luigi_Apolloni"},
       {"id":"P-24741","name":"Antonio Benarrivo","shirt":3,"position":"DF","minutes":600,"starts":6,"goals":0,"awards":[],"ballonDor":{},"born":"1968-08-21","wikipedia":"https://en.wikipedia.org/wiki/Antonio_Benarrivo"},
@@ -269,7 +269,7 @@
       {"id":"P-78280","name":"Gianfranco Zola","shirt":21,"position":"FW","minutes":10,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1966-07-05","wikipedia":"https://en.wikipedia.org/wiki/Gianfranco_Zola"},
       {"id":"P-14001","name":"Luca Bucci","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1969-03-13","wikipedia":"https://en.wikipedia.org/wiki/Luca_Bucci"}
     ]},
-    {"team":"Mexico","results":"Mexico","elo":1752,"rank":13,"squad":[
+    {"team":"Mexico","results":"Mexico","elo":1752,"rank":13,"confederation":"CONCACAF","squad":[
       {"id":"P-50787","name":"Jorge Campos","shirt":1,"position":"GK","minutes":390,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1966-10-15","wikipedia":"https://en.wikipedia.org/wiki/Jorge_Campos"},
       {"id":"P-78308","name":"Claudio Suárez","shirt":2,"position":"DF","minutes":390,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1968-12-17","wikipedia":"https://en.wikipedia.org/wiki/Claudio_Su%C3%A1rez"},
       {"id":"P-09363","name":"Juan de Dios Ramírez Perales","shirt":3,"position":"DF","minutes":390,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1969-03-08","wikipedia":"https://en.wikipedia.org/wiki/Juan_de_Dios_Ram%C3%ADrez_Perales"},
@@ -293,7 +293,7 @@
       {"id":"P-74788","name":"Raúl Gutiérrez","shirt":21,"position":"DF","minutes":81,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1966-10-16","wikipedia":"https://en.wikipedia.org/wiki/Ra%C3%BAl_Guti%C3%A9rrez"},
       {"id":"P-10416","name":"Adrián Chávez","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1962-06-27","wikipedia":"https://en.wikipedia.org/wiki/Adri%C3%A1n_Ch%C3%A1vez"}
     ]},
-    {"team":"Morocco","results":"Morocco","elo":1519.8,"rank":54,"squad":[
+    {"team":"Morocco","results":"Morocco","elo":1519.8,"rank":54,"confederation":"CAF","squad":[
       {"id":"P-74924","name":"Khalil Azmi","shirt":1,"position":"GK","minutes":179,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1964-08-23","wikipedia":"https://en.wikipedia.org/wiki/Khalil_Azmi"},
       {"id":"P-61342","name":"Nacer Abdellah","shirt":2,"position":"DF","minutes":147,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1966-03-03","wikipedia":"https://en.wikipedia.org/wiki/Nacer_Abdellah"},
       {"id":"P-19991","name":"Abdelkrim El Hadrioui","shirt":3,"position":"DF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1972-03-06","wikipedia":"https://en.wikipedia.org/wiki/Abdelkrim_El_Hadrioui"},
@@ -317,7 +317,7 @@
       {"id":"P-16451","name":"Mohamed Samadi","shirt":21,"position":"MF","minutes":98,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1970-03-21","wikipedia":"https://en.wikipedia.org/wiki/Mohamed_Samadi"},
       {"id":"P-62567","name":"Zakaria Alaoui","shirt":22,"position":"GK","minutes":91,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1966-06-17","wikipedia":"https://en.wikipedia.org/wiki/Zakaria_Alaoui"}
     ]},
-    {"team":"Netherlands","results":"Netherlands","elo":1835.7,"rank":5,"squad":[
+    {"team":"Netherlands","results":"Netherlands","elo":1835.7,"rank":5,"confederation":"UEFA","squad":[
       {"id":"P-15829","name":"Ed de Goey","shirt":1,"position":"GK","minutes":450,"starts":5,"goals":0,"awards":[],"ballonDor":{},"born":"1966-12-20","wikipedia":"https://en.wikipedia.org/wiki/Ed_de_Goey"},
       {"id":"P-32212","name":"Frank de Boer","shirt":2,"position":"DF","minutes":360,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1970-05-15","wikipedia":"https://en.wikipedia.org/wiki/Frank_de_Boer"},
       {"id":"P-92391","name":"Frank Rijkaard","shirt":3,"position":"MF","minutes":335,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1962-09-30","wikipedia":"https://en.wikipedia.org/wiki/Frank_Rijkaard"},
@@ -341,7 +341,7 @@
       {"id":"P-25693","name":"John de Wolf","shirt":21,"position":"DF","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1962-12-10","wikipedia":"https://en.wikipedia.org/wiki/John_de_Wolf"},
       {"id":"P-22351","name":"Theo Snelders","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1963-12-07","wikipedia":"https://en.wikipedia.org/wiki/Theo_Snelders"}
     ]},
-    {"team":"Nigeria","results":"Nigeria","elo":1694.1,"rank":21,"squad":[
+    {"team":"Nigeria","results":"Nigeria","elo":1694.1,"rank":21,"confederation":"CAF","squad":[
       {"id":"P-75277","name":"Peter Rufai","shirt":1,"position":"GK","minutes":390,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1963-08-24","wikipedia":"https://en.wikipedia.org/wiki/Peter_Rufai"},
       {"id":"P-39450","name":"Augustine Eguavoen","shirt":2,"position":"DF","minutes":300,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1965-08-19","wikipedia":"https://en.wikipedia.org/wiki/Augustine_Eguavoen"},
       {"id":"P-72134","name":"Benedict Iroha","shirt":3,"position":"DF","minutes":90,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1969-11-29","wikipedia":"https://en.wikipedia.org/wiki/Benedict_Iroha"},
@@ -365,7 +365,7 @@
       {"id":"P-56969","name":"Mutiu Adepoju","shirt":21,"position":"MF","minutes":145,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1970-12-22","wikipedia":"https://en.wikipedia.org/wiki/Mutiu_Adepoju"},
       {"id":"P-77276","name":"Wilfred Agbonavbare","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1966-10-05","wikipedia":"https://en.wikipedia.org/wiki/Wilfred_Agbonavbare"}
     ]},
-    {"team":"Norway","results":"Norway","elo":1735.5,"rank":14,"squad":[
+    {"team":"Norway","results":"Norway","elo":1735.5,"rank":14,"confederation":"UEFA","squad":[
       {"id":"P-03090","name":"Erik Thorstvedt","shirt":1,"position":"GK","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1962-10-28","wikipedia":"https://en.wikipedia.org/wiki/Erik_Thorstvedt"},
       {"id":"P-83152","name":"Gunnar Halle","shirt":2,"position":"DF","minutes":78,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1965-08-11","wikipedia":"https://en.wikipedia.org/wiki/Gunnar_Halle"},
       {"id":"P-02163","name":"Erland Johnsen","shirt":3,"position":"DF","minutes":90,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1967-04-05","wikipedia":"https://en.wikipedia.org/wiki/Erland_Johnsen"},
@@ -389,7 +389,7 @@
       {"id":"P-96984","name":"Sigurd Rushfeldt","shirt":21,"position":"FW","minutes":45,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1972-12-11","wikipedia":"https://en.wikipedia.org/wiki/Sigurd_Rushfeldt"},
       {"id":"P-50065","name":"Lars Bohinen","shirt":22,"position":"MF","minutes":202,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1969-09-08","wikipedia":"https://en.wikipedia.org/wiki/Lars_Bohinen"}
     ]},
-    {"team":"Republic of Ireland","results":"Republic of Ireland","elo":1696.8,"rank":20,"squad":[
+    {"team":"Republic of Ireland","results":"Republic of Ireland","elo":1696.8,"rank":20,"confederation":"UEFA","squad":[
       {"id":"P-67839","name":"Pat Bonner","shirt":1,"position":"GK","minutes":360,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1960-05-24","wikipedia":"https://en.wikipedia.org/wiki/Pat_Bonner"},
       {"id":"P-25274","name":"Denis Irwin","shirt":2,"position":"DF","minutes":180,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1965-10-31","wikipedia":"https://en.wikipedia.org/wiki/Denis_Irwin"},
       {"id":"P-99685","name":"Terry Phelan","shirt":3,"position":"DF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1967-03-16","wikipedia":"https://en.wikipedia.org/wiki/Terry_Phelan"},
@@ -413,7 +413,7 @@
       {"id":"P-15705","name":"Jason McAteer","shirt":21,"position":"MF","minutes":163,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1971-06-18","wikipedia":"https://en.wikipedia.org/wiki/Jason_McAteer"},
       {"id":"P-33377","name":"Alan Kelly","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1968-08-11","wikipedia":"https://en.wikipedia.org/wiki/Alan_Kelly_Jr."}
     ]},
-    {"team":"Romania","results":"Romania","elo":1784.7,"rank":10,"squad":[
+    {"team":"Romania","results":"Romania","elo":1784.7,"rank":10,"confederation":"UEFA","squad":[
       {"id":"P-29644","name":"Florin Prunea","shirt":1,"position":"GK","minutes":300,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1968-08-08","wikipedia":"https://en.wikipedia.org/wiki/Florin_Prunea"},
       {"id":"P-12625","name":"Dan Petrescu","shirt":2,"position":"DF","minutes":480,"starts":5,"goals":1,"awards":[],"ballonDor":{},"born":"1967-12-22","wikipedia":"https://en.wikipedia.org/wiki/Dan_Petrescu"},
       {"id":"P-87995","name":"Daniel Prodan","shirt":3,"position":"DF","minutes":480,"starts":5,"goals":0,"awards":[],"ballonDor":{},"born":"1972-03-23","wikipedia":"https://en.wikipedia.org/wiki/Daniel_Prodan"},
@@ -437,7 +437,7 @@
       {"id":"P-00266","name":"Marian Ivan","shirt":21,"position":"FW","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1969-01-06","wikipedia":"https://en.wikipedia.org/wiki/Marian_Ivan"},
       {"id":"P-47501","name":"Ștefan Preda","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1970-06-18","wikipedia":"https://en.wikipedia.org/wiki/%C8%98tefan_Preda"}
     ]},
-    {"team":"Russia","results":"Russia","elo":1710.4,"rank":17,"squad":[
+    {"team":"Russia","results":"Russia","elo":1710.4,"rank":17,"confederation":"UEFA","squad":[
       {"id":"P-82210","name":"Stanislav Cherchesov","shirt":1,"position":"GK","minutes":90,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1963-09-02","wikipedia":"https://en.wikipedia.org/wiki/Stanislav_Cherchesov"},
       {"id":"P-82492","name":"Dmitri Kuznetsov","shirt":2,"position":"DF","minutes":180,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1965-08-28","wikipedia":"https://en.wikipedia.org/wiki/Dmitri_Kuznetsov_(footballer,_born_1965)"},
       {"id":"P-06372","name":"Sergei Gorlukovich","shirt":3,"position":"DF","minutes":91,"starts":2,"goals":0,"awards":[],"ballonDor":{},"born":"1961-11-18","wikipedia":"https://en.wikipedia.org/wiki/Sergei_Gorlukovich"},
@@ -461,7 +461,7 @@
       {"id":"P-69635","name":"Dmitri Khlestov","shirt":21,"position":"MF","minutes":270,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1971-01-21","wikipedia":"https://en.wikipedia.org/wiki/Dmitri_Khlestov"},
       {"id":"P-46493","name":"Sergei Yuran","shirt":22,"position":"FW","minutes":55,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1969-06-11","wikipedia":"https://en.wikipedia.org/wiki/Sergei_Yuran"}
     ]},
-    {"team":"Saudi Arabia","results":"Saudi Arabia","elo":1619.9,"rank":31,"squad":[
+    {"team":"Saudi Arabia","results":"Saudi Arabia","elo":1619.9,"rank":31,"confederation":"AFC","squad":[
       {"id":"P-12996","name":"Mohamed Al-Deayea","shirt":1,"position":"GK","minutes":360,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1972-08-02","wikipedia":"https://en.wikipedia.org/wiki/Mohamed_Al-Deayea"},
       {"id":"P-60332","name":"Abdullah Al-Dosari","shirt":2,"position":"DF","minutes":118,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1969-11-01","wikipedia":"https://en.wikipedia.org/wiki/Abdullah_Al-Dosari"},
       {"id":"P-44462","name":"Mohammed Al-Khilaiwi","shirt":3,"position":"DF","minutes":360,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1971-08-21","wikipedia":"https://en.wikipedia.org/wiki/Mohammed_Al-Khilaiwi"},
@@ -485,7 +485,7 @@
       {"id":"P-43829","name":"Hussein Al-Sadiq","shirt":21,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1973-10-15","wikipedia":"https://en.wikipedia.org/wiki/Hussein_Al-Sadiq"},
       {"id":"P-36914","name":"Ibrahim Al-Helwah","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1972-08-18","wikipedia":"https://en.wikipedia.org/wiki/Ibrahim_Al-Helwah"}
     ]},
-    {"team":"South Korea","results":"South Korea","elo":1604.5,"rank":36,"squad":[
+    {"team":"South Korea","results":"South Korea","elo":1604.5,"rank":36,"confederation":"AFC","squad":[
       {"id":"P-20285","name":"In-young Choi","shirt":1,"position":"GK","minutes":225,"starts":3,"goals":0,"awards":[],"ballonDor":{},"born":"1962-03-05","wikipedia":"https://en.wikipedia.org/wiki/Choi_In-young"},
       {"id":"P-93017","name":"Jong-son Chung","shirt":2,"position":"MF","minutes":50,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1966-03-20","wikipedia":"https://en.wikipedia.org/wiki/Chung_Jong-son"},
       {"id":"P-68563","name":"Jong-hwa Lee","shirt":3,"position":"DF","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1963-07-20","wikipedia":"https://en.wikipedia.org/wiki/Lee_Jong-hwa"},
@@ -509,7 +509,7 @@
       {"id":"P-34573","name":"Chul-woo Park","shirt":21,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1965-09-29","wikipedia":"https://en.wikipedia.org/wiki/Park_Chul-woo"},
       {"id":"P-95122","name":"Woon-jae Lee","shirt":22,"position":"GK","minutes":45,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1973-04-26","wikipedia":"https://en.wikipedia.org/wiki/Lee_Woon-jae"}
     ]},
-    {"team":"Spain","results":"Spain","elo":1796.2,"rank":7,"squad":[
+    {"team":"Spain","results":"Spain","elo":1796.2,"rank":7,"confederation":"UEFA","squad":[
       {"id":"P-63214","name":"Andoni Zubizarreta","shirt":1,"position":"GK","minutes":360,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1961-10-23","wikipedia":"https://en.wikipedia.org/wiki/Andoni_Zubizarreta"},
       {"id":"P-59647","name":"Albert Ferrer","shirt":2,"position":"DF","minutes":450,"starts":5,"goals":0,"awards":[],"ballonDor":{},"born":"1970-06-06","wikipedia":"https://en.wikipedia.org/wiki/Albert_Ferrer"},
       {"id":"P-20256","name":"Jorge Otero","shirt":3,"position":"DF","minutes":104,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1969-03-08","wikipedia":"https://en.wikipedia.org/wiki/Jorge_Otero"},
@@ -533,7 +533,7 @@
       {"id":"P-38878","name":"Luis Enrique","shirt":21,"position":"MF","minutes":360,"starts":4,"goals":1,"awards":[],"ballonDor":{},"born":"1970-05-08","wikipedia":"https://en.wikipedia.org/wiki/Luis_Enrique"},
       {"id":"P-60604","name":"Julen Lopetegui","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1966-08-28","wikipedia":"https://en.wikipedia.org/wiki/Julen_Lopetegui"}
     ]},
-    {"team":"Sweden","results":"Sweden","elo":1850.3,"rank":4,"squad":[
+    {"team":"Sweden","results":"Sweden","elo":1850.3,"rank":4,"confederation":"UEFA","squad":[
       {"id":"P-94051","name":"Thomas Ravelli","shirt":1,"position":"GK","minutes":660,"starts":7,"goals":0,"awards":[],"ballonDor":{"1994":21},"born":"1959-08-13","wikipedia":"https://en.wikipedia.org/wiki/Thomas_Ravelli"},
       {"id":"P-23360","name":"Roland Nilsson","shirt":2,"position":"DF","minutes":660,"starts":7,"goals":0,"awards":[],"ballonDor":{},"born":"1963-11-27","wikipedia":"https://en.wikipedia.org/wiki/Roland_Nilsson"},
       {"id":"P-63774","name":"Patrik Andersson","shirt":3,"position":"DF","minutes":660,"starts":7,"goals":0,"awards":[],"ballonDor":{},"born":"1971-08-18","wikipedia":"https://en.wikipedia.org/wiki/Patrik_Andersson"},
@@ -557,7 +557,7 @@
       {"id":"P-65081","name":"Jesper Blomqvist","shirt":21,"position":"MF","minutes":86,"starts":1,"goals":0,"awards":[],"ballonDor":{},"born":"1974-02-05","wikipedia":"https://en.wikipedia.org/wiki/Jesper_Blomqvist"},
       {"id":"P-07902","name":"Magnus Hedman","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1973-03-19","wikipedia":"https://en.wikipedia.org/wiki/Magnus_Hedman"}
     ]},
-    {"team":"Switzerland","results":"Switzerland","elo":1686,"rank":24,"squad":[
+    {"team":"Switzerland","results":"Switzerland","elo":1686,"rank":24,"confederation":"UEFA","squad":[
       {"id":"P-09954","name":"Marco Pascolo","shirt":1,"position":"GK","minutes":360,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1966-05-09","wikipedia":"https://en.wikipedia.org/wiki/Marco_Pascolo"},
       {"id":"P-06183","name":"Marc Hottiger","shirt":2,"position":"DF","minutes":360,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1967-11-07","wikipedia":"https://en.wikipedia.org/wiki/Marc_Hottiger"},
       {"id":"P-14226","name":"Yvan Quentin","shirt":3,"position":"DF","minutes":328,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1970-05-02","wikipedia":"https://en.wikipedia.org/wiki/Yvan_Quentin"},
@@ -581,7 +581,7 @@
       {"id":"P-16251","name":"Thomas Wyss","shirt":21,"position":"MF","minutes":13,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1966-08-29","wikipedia":"https://en.wikipedia.org/wiki/Thomas_Wyss"},
       {"id":"P-31551","name":"Martin Brunner","shirt":22,"position":"GK","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1963-04-23","wikipedia":"https://en.wikipedia.org/wiki/Martin_Brunner"}
     ]},
-    {"team":"United States","results":"United States","elo":1526.9,"rank":51,"squad":[
+    {"team":"United States","results":"United States","elo":1526.9,"rank":51,"confederation":"CONCACAF","squad":[
       {"id":"P-43736","name":"Tony Meola","shirt":1,"position":"GK","minutes":360,"starts":4,"goals":0,"awards":[],"ballonDor":{},"born":"1969-02-21","wikipedia":"https://en.wikipedia.org/wiki/Tony_Meola"},
       {"id":"P-76583","name":"Mike Lapper","shirt":2,"position":"DF","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1970-09-28","wikipedia":"https://en.wikipedia.org/wiki/Mike_Lapper"},
       {"id":"P-06020","name":"Mike Burns","shirt":3,"position":"DF","minutes":0,"starts":0,"goals":0,"awards":[],"ballonDor":{},"born":"1970-09-14","wikipedia":"https://en.wikipedia.org/wiki/Mike_Burns_(soccer)"},

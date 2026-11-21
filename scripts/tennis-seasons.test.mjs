@@ -18,6 +18,8 @@ import { parseCampaign } from '../src/engine/storage.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { readChallenge } from '../src/screens/setup/challenge.js';
 import { gameRating } from './lib/tennis.mjs';
+import { earlyLevelOf, rateMatches } from './lib/tennis-elo.mjs';
+import { REGIONS, fitLevels, hostOf, regionOfCode, regionOffsets } from './lib/tennis-regions.mjs';
 import { codeOfDay, nationOfDay, teamsOf } from './lib/tennis-seasons.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 
@@ -318,6 +320,129 @@ test('before 1973 the second run carries on as the first and agrees with the pub
   for (const statement of checks.statements.yearEnd) assert.equal(statement.ours[0], 'Rod Laver 1', `${statement.season}`);
   // Nothing from the published lists is in a season file.
   assert.ok(!read('public/tennis/tennis-1962.json').includes('Tingay'));
+});
+
+// ---------- regions ----------
+
+test('regions: every nation of the day belongs to one, by the IOC\'s continental associations, Europe split at the Iron Curtain', () => {
+  assert.deepEqual(['GBR', 'ISR', 'TUR', 'TCH', 'URS', 'GEO', 'USA', 'MEX', 'IND', 'KAZ', 'AUS', 'RSA', 'EGY'].map(regionOfCode),
+    ['W.Europe', 'W.Europe', 'W.Europe', 'E.Europe', 'E.Europe', 'E.Europe', 'N.America', 'L.America', 'Asia', 'Asia', 'Oceania', 'Africa', 'Africa']);
+  assert.deepEqual([null, 'UNK', 'ITF'].map(regionOfCode), [null, null, null]);
+  assert.throws(() => regionOfCode('XYZ'), /No region for the code XYZ/);
+  // Every nation of every season, the published ones too, has one (an unknown code throws).
+  for (const year of YEARS) for (const row of snapshot(year).players) regionOfCode(row[2]);
+});
+
+// A synthetic tour: two regions of players whose results follow their true strengths, each match { season, winner, loser, … }.
+function syntheticTour({ seasons = 16, perSeason = 500, between = 0.1, weaker = 120, seed = 7 } = {}) {
+  const rng = makeRng(seed);
+  const normal = () => Math.sqrt(-2 * Math.log(1 - rng())) * Math.cos(2 * Math.PI * rng());
+  const players = Array.from({ length: 300 }, (_, i) => ({ id: `p${i}`, region: i % 2 ? 'Asia' : 'W.Europe', code: i % 2 ? 'IND' : 'FRA',
+    strength: normal() * 100 - (i % 2 ? weaker : 0), from: 1940 + Math.floor(rng() * seasons) }));
+  const matches = [];
+  for (let season = 1940; season < 1940 + seasons; season++) {
+    const active = players.filter(p => p.from <= season);
+    for (let i = 0; i < perSeason; i++) {
+      const a = active[Math.floor(rng() * active.length)];
+      const pool = active.filter(p => p !== a && (rng() < between ? p.region !== a.region : p.region === a.region));
+      if (!pool.length) continue;
+      const b = pool[Math.floor(rng() * pool.length)];
+      const aWins = rng() < 1 / (1 + 10 ** ((b.strength - a.strength) / 400));
+      const [w, l] = aWins ? [a, b] : [b, a];
+      matches.push({ season, date: season * 10000 + 101 + Math.floor(i / 50), event: `${season}-${Math.floor(i / 50)}`, eventName: 'Synthetic Open', level: 'G',
+        round: 10, num: i, file: 2, row: i, winner: w.id, loser: l.id, winnerName: w.id, loserName: l.id, why: null });
+    }
+  }
+  const byId = new Map(players.map(p => [p.id, p]));
+  return { matches, byId, originOf: id => ({ region: byId.get(id).region, nation: byId.get(id).code }) };
+}
+const SYNTHETIC_METHOD = { k: { numerator: 250, offset: 6, exponent: 0.4 }, start: { tour: 1450, amateur: 1345 }, layoff: null, files: 'all' };
+
+test('a newcomer of the amateur sources starts at his region\'s level plus his nation\'s, from its first season, at its levels only', () => {
+  const at = (season, winner, loser, file = 2) => ({ season, date: season * 10000 + 601, event: `${season}`, eventName: 'X', level: 'G', round: 10, num: 1,
+    file, row: 0, winner, loser, winnerName: winner, loserName: loser, why: null });
+  const regions = { levels: ['amateur'], from: 1950, region: { Asia: -100 }, nation: { IND: 50, FRA: 30 } };
+  const origin = { a: { region: 'Asia', nation: 'IND' }, b: { region: 'W.Europe', nation: 'FRA' }, c: { region: 'Asia', nation: 'JPN' },
+    d: { region: 'Asia', nation: 'IND' }, e: { region: 'Asia', nation: 'IND' } };
+  const first = new Map();
+  rateMatches([at(1949, 'd', 'b'), at(1950, 'a', 'c'), at(1968, 'e', 'b', 0)], { ...SYNTHETIC_METHOD, start: { ...SYNTHETIC_METHOD.start, regions } },
+    { levelOf: earlyLevelOf, originOf: id => origin[id], before: (m, w, l) => {
+      if (!first.has(m.winner)) first.set(m.winner, w.elo);
+      if (!first.has(m.loser)) first.set(m.loser, l.elo);
+    } });
+  // d and b before 1950: the common start; a: Asia's and India's levels; c: Asia's, Japan has none; e: an open-era newcomer.
+  assert.deepEqual(Object.fromEntries(first), { d: 1345, b: 1345, a: 1345 - 100 + 50, c: 1345 - 100, e: 1450 });
+  assert.throws(() => rateMatches([at(1950, 'a', 'c')], { ...SYNTHETIC_METHOD, start: { ...SYNTHETIC_METHOD.start, regions } }, { levelOf: earlyLevelOf }), /originOf/);
+});
+
+test('the likelihood carries each rating\'s derivative in the levels: its gradient is the log-likelihood\'s slope', () => {
+  const { matches, originOf } = syntheticTour({ seasons: 6, perSeason: 300 });
+  const llAt = (asia, ind) => rateMatches(matches, { ...SYNTHETIC_METHOD, start: { ...SYNTHETIC_METHOD.start,
+    regions: { levels: ['amateur'], region: { Asia: asia }, nation: { IND: ind } } } },
+  { levelOf: earlyLevelOf, originOf, likelihood: { regions: ['Asia', 'W.Europe'], nations: ['IND'], score: m => m.season >= 1942 } }).likelihood;
+  const at = llAt(-40, 10);
+  const h = 0.5;
+  const slopeAsia = (llAt(-40 + h, 10).ll - llAt(-40 - h, 10).ll) / (2 * h), slopeInd = (llAt(-40, 10 + h).ll - llAt(-40, 10 - h).ll) / (2 * h);
+  assert.ok(Math.abs(at.grad[0] - slopeAsia) < 1e-6 && Math.abs(at.grad[2] - slopeInd) < 1e-6, JSON.stringify([at.grad, slopeAsia, slopeInd]));
+  assert.ok(at.info[0][0] > 0 && at.newcomers.Asia > 100 && at.newcomers.Asia === at.newcomers['nation:IND'], JSON.stringify(at.newcomers));
+});
+
+test('the fit finds a weaker region\'s level, and the measure finds its players overrated without it and not with it', () => {
+  // Asia's players are 120 Elo weaker on average, a tenth of their matches against the others, and start where everyone
+  // does: Elo leaves them high against the others.
+  const { matches, originOf, byId } = syntheticTour();
+  const code = id => byId.get(id).code;
+  const rowsOf = method => {
+    const rows = [];
+    rateMatches(matches, method, { levelOf: earlyLevelOf, originOf, before: (m, w, l) => {
+      if (m.season >= 1948) rows.push({ level: 'A', eventName: 'X', we: w.elo, le: l.elo, wc: code(m.winner), lc: code(m.loser) });
+    } });
+    return rows;
+  };
+  const without = regionOffsets(rowsOf(SYNTHETIC_METHOD)).regions;
+  assert.ok(without.Asia.elo < -3 * without.Asia.se && without.Asia.elo < -20, JSON.stringify(without));
+  const start = { ...SYNTHETIC_METHOD.start, regions: { levels: ['amateur'], region: {}, nation: {} } };
+  const fitted = fitLevels(matches, { ...SYNTHETIC_METHOD, start }, { levelOf: earlyLevelOf, originOf, score: () => true, nations: [] });
+  const gap = fitted.region.Asia - fitted.region['W.Europe'];
+  assert.ok(gap < -60 && gap > -200, `Asia ${Math.round(gap)} Elo under Western Europe`);
+  // The levels average zero over the newcomers (150 a region here).
+  assert.ok(Math.abs(fitted.region.Asia + fitted.region['W.Europe']) < 1, JSON.stringify(fitted.region));
+  const withLevels = regionOffsets(rowsOf({ ...SYNTHETIC_METHOD, start: { ...start, regions: { ...start.regions, region: fitted.region } } })).regions;
+  assert.ok(Math.abs(withLevels.Asia.elo) < Math.abs(without.Asia.elo) / 2, `${without.Asia.elo} → ${withLevels.Asia.elo}`);
+  // The measure's home edge: a cup tie's first-named side, a major's host.
+  assert.deepEqual([hostOf({ level: 'D', eventName: 'Davis Cup EUR R1: AUT vs FIN' }), hostOf({ level: 'G', eventName: 'Wimbledon' }), hostOf({ level: 'A', eventName: 'Rome' })],
+    [{ kind: 'cup', code: 'AUT' }, { kind: 'major', code: 'GBR' }, null]);
+});
+
+test('before 1973 the newcomers of 1946-1967 start at their region\'s and nation\'s level: Asia\'s men no longer far above their results', () => {
+  const R = EARLY.start.regions;
+  assert.deepEqual([R.levels, R.from, R.fit], [['amateur'], 1946, { seasons: [1946, 1967], sigma: 150, tau: 100 }]);
+  assert.deepEqual(Object.keys(R.region).sort(), [...REGIONS].sort());
+  assert.ok([...Object.values(R.region), ...Object.values(R.nation)].every(level => Number.isInteger(level) && level % 5 === 0), 'rounded to five points');
+  // The men of Asia's Davis Cup zone (India excepted) and the small nations of Europe start lowest; Sweden's, Italy's, India's highest.
+  assert.ok(R.region.Asia < -100 && R.nation.TUR < -150 && R.nation.LUX < -150 && R.nation.SWE > 150 && R.nation.ITA > 150 && R.nation.IND > 150);
+  // The listed men of 1960-1967 against the other regions' (each match by the Elo before it): Asia's won as though 120 Elo
+  // weaker than their Elo; with the levels a third of that is gone, and every other region is within 30 Elo.
+  const { without, with: after } = VALIDATION.early.regions['1960-1967'];
+  assert.ok(without.regions.Asia.elo < -100 && without.regions.Asia.elo < -3 * without.regions.Asia.se, JSON.stringify(without.regions.Asia));
+  assert.ok(after.regions.Asia.elo > without.regions.Asia.elo + 30, `${without.regions.Asia.elo} → ${after.regions.Asia.elo}`);
+  for (const [region, offset] of Object.entries(after.regions)) if (region !== 'Asia') assert.ok(Math.abs(offset.elo) < 30, `${region}: ${JSON.stringify(offset)}`);
+  assert.ok(Object.values(VALIDATION.early.regions['1968-1972'].with.regions).every(offset => Math.abs(offset.elo) < 25), 'the open era\'s first seasons');
+  // The minnows fall: Luxembourg's two men of 1965 under Belgium's.
+  assert.ok(seasonFile(1965).nations['442'][0] < seasonFile(1965).nations['056'][0]);
+});
+
+test('the computed seasons of 1973-2015 put every region within 15 Elo of the others, and Tennis Abstract\'s lists agree by region', () => {
+  const { eras, published } = VALIDATION.regions;
+  assert.deepEqual(Object.keys(eras), ['1973-1979', '1980-1989', '1990-1999', '2000-2009', '2010-2015']);
+  for (const [era, fit] of Object.entries(eras)) {
+    for (const [region, offset] of Object.entries(fit.regions)) assert.ok(Math.abs(offset.elo) < 15, `${era} ${region}: ${JSON.stringify(offset)}`);
+    // The Davis Cup's hosts win more than Elo expects, by about 80 Elo.
+    assert.ok(fit.home.cup.elo > 50, `${era}: ${JSON.stringify(fit.home)}`);
+  }
+  // 2016-2025: the computed Elo less Tennis Abstract's of the same men, region by region, about the overall difference.
+  assert.equal(published.n > 3000, true);
+  for (const [region, { n, diff }] of Object.entries(published.regions)) if (n >= 100) assert.ok(Math.abs(diff) < 8, `${region}: ${diff}`);
 });
 
 test('the loader refuses a tennis season that is not the builder\'s', () => {

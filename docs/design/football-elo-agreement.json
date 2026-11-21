@@ -4,12 +4,12 @@
   "summary": {
     "seasons": 35,
     "scored": 35,
-    "medianSpearman": 0.8686,
+    "medianSpearman": 0.8688,
     "lowest": [
-      "ea-fifa-11 0.8046",
-      "ea-fc-25 0.814",
+      "ea-fifa-11 0.8036",
+      "ea-fc-25 0.8121",
       "cm0102-2020-11-cm93 0.8167",
-      "ea-fifa-10 0.8335",
+      "ea-fifa-10 0.8338",
       "ea-fifa-12 0.8342"
     ]
   },
@@ -467,18 +467,18 @@
       "ratingsDate": "2004-07-01",
       "fielded": 78,
       "scored": 78,
-      "spearman": 0.8789,
-      "pearson": 0.8949,
+      "spearman": 0.8788,
+      "pearson": 0.8954,
       "fullXIs": {
         "n": 78,
-        "spearman": 0.8789
+        "spearman": 0.8788
       },
       "spearmanCi95": [
-        0.7899,
-        0.9315
+        0.7907,
+        0.9313
       ],
-      "withinConfederation": 0.8393,
-      "top50ByElo": 0.7889,
+      "withinConfederation": 0.8444,
+      "top50ByElo": 0.7866,
       "aboveElo": [
         "Scotland 15 by strength, 47 by Elo",
         "Ghana 41 by strength, 69 by Elo",
@@ -486,7 +486,7 @@
       ],
       "belowElo": [
         "Ecuador 59 by strength, 29 by Elo",
-        "Peru 63 by strength, 37 by Elo",
+        "Peru 63.5 by strength, 37 by Elo",
         "Costa Rica 59 by strength, 33 by Elo"
       ],
       "noElo": [],
@@ -504,26 +504,26 @@
       "ratingsDate": "2005-07-01",
       "fielded": 76,
       "scored": 76,
-      "spearman": 0.9037,
-      "pearson": 0.8989,
+      "spearman": 0.9004,
+      "pearson": 0.8969,
       "fullXIs": {
         "n": 76,
-        "spearman": 0.9037
+        "spearman": 0.9004
       },
       "spearmanCi95": [
-        0.8472,
-        0.9379
+        0.8395,
+        0.9373
       ],
-      "withinConfederation": 0.8537,
-      "top50ByElo": 0.8512,
+      "withinConfederation": 0.8561,
+      "top50ByElo": 0.8472,
       "aboveElo": [
-        "Mali 38 by strength, 65 by Elo",
-        "Wales 38 by strength, 54 by Elo",
+        "Mali 37.5 by strength, 65 by Elo",
+        "Wales 37.5 by strength, 54 by Elo",
         "Ghana 42.5 by strength, 58 by Elo"
       ],
       "belowElo": [
-        "Costa Rica 62.5 by strength, 41 by Elo",
-        "Iran 38 by strength, 17 by Elo",
+        "Iran 42.5 by strength, 17 by Elo",
+        "Costa Rica 63 by strength, 41 by Elo",
         "Tunisia 56 by strength, 36 by Elo"
       ],
       "noElo": [],
@@ -541,27 +541,27 @@
       "ratingsDate": "2006-07-01",
       "fielded": 80,
       "scored": 80,
-      "spearman": 0.8931,
-      "pearson": 0.9147,
+      "spearman": 0.8891,
+      "pearson": 0.9118,
       "fullXIs": {
         "n": 80,
-        "spearman": 0.8931
+        "spearman": 0.8891
       },
       "spearmanCi95": [
-        0.8171,
-        0.9372
+        0.8129,
+        0.9349
       ],
-      "withinConfederation": 0.8082,
-      "top50ByElo": 0.7597,
+      "withinConfederation": 0.8181,
+      "top50ByElo": 0.7581,
       "aboveElo": [
         "Serbia 11 by strength, 38 by Elo",
-        "Wales 29 by strength, 55 by Elo",
-        "Mali 37.5 by strength, 61 by Elo"
+        "Wales 28 by strength, 55 by Elo",
+        "Mali 36 by strength, 61 by Elo"
       ],
       "belowElo": [
         "Romania 53 by strength, 14 by Elo",
-        "Ukraine 43 by strength, 22 by Elo",
-        "Ecuador 48.5 by strength, 28 by Elo"
+        "Costa Rica 71 by strength, 49 by Elo",
+        "Ecuador 49 by strength, 28 by Elo"
       ],
       "noElo": [],
       "elo": {
@@ -583,27 +583,27 @@
       "ratingsDate": "2007-07-01",
       "fielded": 84,
       "scored": 84,
-      "spearman": 0.887,
-      "pearson": 0.9033,
+      "spearman": 0.8877,
+      "pearson": 0.904,
       "fullXIs": {
         "n": 84,
-        "spearman": 0.887
+        "spearman": 0.8877
       },
       "spearmanCi95": [
-        0.8185,
-        0.9287
+        0.8206,
+        0.9283
       ],
-      "withinConfederation": 0.8963,
-      "top50ByElo": 0.8041,
+      "withinConfederation": 0.8965,
+      "top50ByElo": 0.8067,
       "aboveElo": [
         "Mali 34.5 by strength, 63 by Elo",
         "Wales 34.5 by strength, 59 by Elo",
         "Scotland 12 by strength, 35.5 by Elo"
       ],
       "belowElo": [
-        "Romania 45.5 by strength, 12 by Elo",
+        "Romania 45 by strength, 12 by Elo",
         "Montenegro 74 by strength, 48 by Elo",
-        "Venezuela 68 by strength, 44 by Elo"
+        "Croatia 34.5 by strength, 11 by Elo"
       ],
       "noElo": [],
       "elo": {
@@ -620,26 +620,26 @@
       "ratingsDate": "2008-07-01",
       "fielded": 86,
       "scored": 86,
-      "spearman": 0.8997,
-      "pearson": 0.9113,
+      "spearman": 0.9001,
+      "pearson": 0.9122,
       "fullXIs": {
         "n": 86,
-        "spearman": 0.8997
+        "spearman": 0.9001
       },
       "spearmanCi95": [
-        0.8475,
-        0.9342
+        0.8444,
+        0.9346
       ],
-      "withinConfederation": 0.8668,
-      "top50ByElo": 0.783,
+      "withinConfederation": 0.8682,
+      "top50ByElo": 0.7824,
       "aboveElo": [
         "Côte d'Ivoire 16 by strength, 38 by Elo",
         "South Africa 51 by strength, 72.5 by Elo",
         "Senegal 33 by strength, 54 by Elo"
       ],
       "belowElo": [
-        "Montenegro 67.5 by strength, 44 by Elo",
-        "Romania 33 by strength, 10 by Elo",
+        "Japan 47.5 by strength, 24 by Elo",
+        "Montenegro 67 by strength, 44 by Elo",
         "Bulgaria 41 by strength, 19 by Elo"
       ],
       "noElo": [],
@@ -657,18 +657,18 @@
       "ratingsDate": "2009-07-01",
       "fielded": 85,
       "scored": 85,
-      "spearman": 0.8335,
-      "pearson": 0.8625,
+      "spearman": 0.8338,
+      "pearson": 0.8621,
       "fullXIs": {
         "n": 84,
-        "spearman": 0.8275
+        "spearman": 0.8278
       },
       "spearmanCi95": [
-        0.7337,
-        0.8964
+        0.7344,
+        0.897
       ],
-      "withinConfederation": 0.8287,
-      "top50ByElo": 0.7423,
+      "withinConfederation": 0.8277,
+      "top50ByElo": 0.7426,
       "aboveElo": [
         "Senegal 24 by strength, 64 by Elo",
         "Belgium 24 by strength, 57 by Elo",
@@ -694,17 +694,17 @@
       "ratingsDate": "2010-07-01",
       "fielded": 84,
       "scored": 84,
-      "spearman": 0.8046,
-      "pearson": 0.8288,
+      "spearman": 0.8036,
+      "pearson": 0.8272,
       "fullXIs": {
         "n": 84,
-        "spearman": 0.8046
+        "spearman": 0.8036
       },
       "spearmanCi95": [
-        0.6889,
-        0.879
+        0.6905,
+        0.8787
       ],
-      "withinConfederation": 0.7904,
+      "withinConfederation": 0.8013,
       "top50ByElo": 0.7203,
       "aboveElo": [
         "Belgium 15 by strength, 58 by Elo",
@@ -768,27 +768,27 @@
       "ratingsDate": "2012-07-01",
       "fielded": 94,
       "scored": 94,
-      "spearman": 0.8662,
-      "pearson": 0.8832,
+      "spearman": 0.8631,
+      "pearson": 0.8804,
       "fullXIs": {
         "n": 94,
-        "spearman": 0.8662
+        "spearman": 0.8631
       },
       "spearmanCi95": [
-        0.7966,
-        0.9142
+        0.7942,
+        0.9106
       ],
-      "withinConfederation": 0.8543,
-      "top50ByElo": 0.7582,
+      "withinConfederation": 0.8626,
+      "top50ByElo": 0.7574,
       "aboveElo": [
         "Senegal 31 by strength, 65 by Elo",
         "Cameroon 17.5 by strength, 51 by Elo",
         "Belgium 9 by strength, 41.5 by Elo"
       ],
       "belowElo": [
-        "South Korea 52 by strength, 17 by Elo",
-        "Egypt 78 by strength, 45 by Elo",
-        "Australia 52 by strength, 19.5 by Elo"
+        "South Korea 51.5 by strength, 17 by Elo",
+        "Egypt 78.5 by strength, 45 by Elo",
+        "Australia 51.5 by strength, 19.5 by Elo"
       ],
       "noElo": [],
       "elo": {
@@ -805,27 +805,27 @@
       "ratingsDate": "2013-07-01",
       "fielded": 94,
       "scored": 94,
-      "spearman": 0.8536,
-      "pearson": 0.8854,
+      "spearman": 0.8522,
+      "pearson": 0.8845,
       "fullXIs": {
         "n": 94,
-        "spearman": 0.8536
+        "spearman": 0.8522
       },
       "spearmanCi95": [
-        0.7667,
-        0.9119
+        0.7645,
+        0.911
       ],
-      "withinConfederation": 0.8475,
-      "top50ByElo": 0.7792,
+      "withinConfederation": 0.8544,
+      "top50ByElo": 0.7815,
       "aboveElo": [
         "Cameroon 22 by strength, 64 by Elo",
         "Morocco 34 by strength, 70 by Elo",
-        "Northern Ireland 49.5 by strength, 85 by Elo"
+        "Northern Ireland 49 by strength, 85 by Elo"
       ],
       "belowElo": [
-        "Ecuador 49.5 by strength, 13.5 by Elo",
-        "Australia 54 by strength, 25 by Elo",
-        "New Zealand 85 by strength, 57 by Elo"
+        "Ecuador 49 by strength, 13.5 by Elo",
+        "Australia 53.5 by strength, 25 by Elo",
+        "New Zealand 84 by strength, 57 by Elo"
       ],
       "noElo": [],
       "elo": {
@@ -842,27 +842,27 @@
       "ratingsDate": "2014-07-01",
       "fielded": 97,
       "scored": 97,
-      "spearman": 0.8526,
-      "pearson": 0.8658,
+      "spearman": 0.8522,
+      "pearson": 0.8663,
       "fullXIs": {
         "n": 96,
-        "spearman": 0.848
+        "spearman": 0.8475
       },
       "spearmanCi95": [
-        0.7661,
-        0.9092
+        0.7659,
+        0.9091
       ],
-      "withinConfederation": 0.8682,
-      "top50ByElo": 0.7708,
+      "withinConfederation": 0.8626,
+      "top50ByElo": 0.7732,
       "aboveElo": [
         "Morocco 29.5 by strength, 72 by Elo",
         "Cameroon 24.5 by strength, 64 by Elo",
-        "Northern Ireland 56 by strength, 89 by Elo"
+        "Northern Ireland 55 by strength, 89 by Elo"
       ],
       "belowElo": [
         "Panama 85.5 by strength, 36 by Elo",
         "Jordan 93.5 by strength, 57.5 by Elo",
-        "Ecuador 50 by strength, 17.5 by Elo"
+        "Ecuador 49.5 by strength, 17.5 by Elo"
       ],
       "noElo": [],
       "elo": {
@@ -879,18 +879,18 @@
       "ratingsDate": "2015-07-01",
       "fielded": 101,
       "scored": 101,
-      "spearman": 0.8843,
-      "pearson": 0.8887,
+      "spearman": 0.8842,
+      "pearson": 0.8882,
       "fullXIs": {
         "n": 97,
-        "spearman": 0.8743
+        "spearman": 0.8742
       },
       "spearmanCi95": [
-        0.8214,
-        0.9215
+        0.8213,
+        0.9213
       ],
-      "withinConfederation": 0.878,
-      "top50ByElo": 0.6172,
+      "withinConfederation": 0.8807,
+      "top50ByElo": 0.6181,
       "aboveElo": [
         "Cameroon 18.5 by strength, 53 by Elo",
         "Morocco 31 by strength, 64 by Elo",
@@ -917,14 +917,14 @@
       "fielded": 102,
       "scored": 102,
       "spearman": 0.8984,
-      "pearson": 0.8723,
+      "pearson": 0.8722,
       "fullXIs": {
         "n": 93,
-        "spearman": 0.8786
+        "spearman": 0.8788
       },
       "spearmanCi95": [
-        0.8445,
-        0.9298
+        0.8447,
+        0.9297
       ],
       "withinConfederation": 0.8868,
       "top50ByElo": 0.7299,
@@ -935,7 +935,7 @@
       ],
       "belowElo": [
         "Peru 54 by strength, 17 by Elo",
-        "Panama 78 by strength, 46 by Elo",
+        "Panama 77.5 by strength, 46 by Elo",
         "Trinidad & Tobago 92.5 by strength, 64 by Elo"
       ],
       "noElo": [],
@@ -953,27 +953,27 @@
       "ratingsDate": "2017-07-01",
       "fielded": 104,
       "scored": 104,
-      "spearman": 0.8683,
-      "pearson": 0.8331,
+      "spearman": 0.8688,
+      "pearson": 0.8333,
       "fullXIs": {
         "n": 97,
-        "spearman": 0.8543
+        "spearman": 0.8548
       },
       "spearmanCi95": [
-        0.7985,
-        0.9137
+        0.799,
+        0.914
       ],
-      "withinConfederation": 0.8507,
+      "withinConfederation": 0.8504,
       "top50ByElo": 0.6708,
       "aboveElo": [
         "Morocco 25 by strength, 60 by Elo",
         "Algeria 25 by strength, 56 by Elo",
-        "Angola 75 by strength, 103 by Elo"
+        "Angola 75.5 by strength, 103 by Elo"
       ],
       "belowElo": [
-        "Iran 70 by strength, 22 by Elo",
+        "Iran 70.5 by strength, 22 by Elo",
         "Iceland 60.5 by strength, 20 by Elo",
-        "Bolivia 81 by strength, 41.5 by Elo"
+        "Bolivia 80.5 by strength, 41.5 by Elo"
       ],
       "noElo": [],
       "elo": {
@@ -990,17 +990,17 @@
       "ratingsDate": "2018-07-01",
       "fielded": 101,
       "scored": 101,
-      "spearman": 0.8789,
-      "pearson": 0.8517,
+      "spearman": 0.8784,
+      "pearson": 0.8515,
       "fullXIs": {
         "n": 92,
         "spearman": 0.8688
       },
       "spearmanCi95": [
-        0.8144,
-        0.9238
+        0.8135,
+        0.9236
       ],
-      "withinConfederation": 0.8471,
+      "withinConfederation": 0.8468,
       "top50ByElo": 0.759,
       "aboveElo": [
         "Algeria 29.5 by strength, 75 by Elo",
@@ -1009,7 +1009,7 @@
       ],
       "belowElo": [
         "Iran 71 by strength, 20 by Elo",
-        "Syria 94.5 by strength, 55 by Elo",
+        "Syria 95 by strength, 55 by Elo",
         "Peru 48.5 by strength, 15 by Elo"
       ],
       "noElo": [],
@@ -1064,17 +1064,17 @@
       "ratingsDate": "2020-07-01",
       "fielded": 106,
       "scored": 106,
-      "spearman": 0.8987,
-      "pearson": 0.8863,
+      "spearman": 0.8977,
+      "pearson": 0.8869,
       "fullXIs": {
         "n": 93,
-        "spearman": 0.8741
+        "spearman": 0.8733
       },
       "spearmanCi95": [
-        0.8443,
-        0.9288
+        0.8433,
+        0.9281
       ],
-      "withinConfederation": 0.868,
+      "withinConfederation": 0.869,
       "top50ByElo": 0.7807,
       "aboveElo": [
         "Cameroon 27 by strength, 61 by Elo",
@@ -1082,8 +1082,8 @@
         "Angola 66.5 by strength, 94 by Elo"
       ],
       "belowElo": [
+        "Haiti 100 by strength, 65 by Elo",
         "Peru 51.5 by strength, 17 by Elo",
-        "Haiti 99 by strength, 65 by Elo",
         "Venezuela 47.5 by strength, 20 by Elo"
       ],
       "noElo": [],
@@ -1101,18 +1101,18 @@
       "ratingsDate": "2021-07-01",
       "fielded": 107,
       "scored": 107,
-      "spearman": 0.8857,
-      "pearson": 0.8718,
+      "spearman": 0.8866,
+      "pearson": 0.8713,
       "fullXIs": {
         "n": 94,
-        "spearman": 0.8706
+        "spearman": 0.872
       },
       "spearmanCi95": [
-        0.8277,
-        0.9216
+        0.8286,
+        0.9224
       ],
-      "withinConfederation": 0.8559,
-      "top50ByElo": 0.6681,
+      "withinConfederation": 0.8579,
+      "top50ByElo": 0.6669,
       "aboveElo": [
         "DR Congo 47 by strength, 81 by Elo",
         "Ghana 34.5 by strength, 59 by Elo",
@@ -1138,17 +1138,17 @@
       "ratingsDate": "2022-07-01",
       "fielded": 109,
       "scored": 109,
-      "spearman": 0.8747,
-      "pearson": 0.842,
+      "spearman": 0.8743,
+      "pearson": 0.8409,
       "fullXIs": {
         "n": 100,
-        "spearman": 0.8655
+        "spearman": 0.865
       },
       "spearmanCi95": [
-        0.8191,
-        0.9103
+        0.8186,
+        0.9098
       ],
-      "withinConfederation": 0.8716,
+      "withinConfederation": 0.8731,
       "top50ByElo": 0.7605,
       "aboveElo": [
         "Ghana 32.5 by strength, 73 by Elo",
@@ -1175,17 +1175,17 @@
       "ratingsDate": "2023-07-01",
       "fielded": 106,
       "scored": 106,
-      "spearman": 0.8686,
-      "pearson": 0.8617,
+      "spearman": 0.8676,
+      "pearson": 0.8613,
       "fullXIs": {
         "n": 96,
-        "spearman": 0.8382
+        "spearman": 0.8371
       },
       "spearmanCi95": [
-        0.7998,
-        0.9127
+        0.7985,
+        0.9121
       ],
-      "withinConfederation": 0.874,
+      "withinConfederation": 0.8742,
       "top50ByElo": 0.8037,
       "aboveElo": [
         "Kosovo 46 by strength, 82 by Elo",
@@ -1193,9 +1193,9 @@
         "Nigeria 27.5 by strength, 57 by Elo"
       ],
       "belowElo": [
-        "Iran 66.5 by strength, 26.5 by Elo",
-        "Iraq 93 by strength, 56 by Elo",
-        "Panama 82.5 by strength, 46 by Elo"
+        "Iran 67 by strength, 26.5 by Elo",
+        "Panama 82.5 by strength, 46 by Elo",
+        "Iraq 92.5 by strength, 56 by Elo"
       ],
       "noElo": [],
       "elo": {
@@ -1212,27 +1212,27 @@
       "ratingsDate": "2024-07-01",
       "fielded": 105,
       "scored": 105,
-      "spearman": 0.814,
-      "pearson": 0.7928,
+      "spearman": 0.8121,
+      "pearson": 0.7907,
       "fullXIs": {
         "n": 94,
-        "spearman": 0.8149
+        "spearman": 0.8123
       },
       "spearmanCi95": [
-        0.7256,
-        0.8759
+        0.7221,
+        0.8761
       ],
-      "withinConfederation": 0.7797,
-      "top50ByElo": 0.6986,
+      "withinConfederation": 0.784,
+      "top50ByElo": 0.6971,
       "aboveElo": [
         "Bosnia & Herz. 38.5 by strength, 83 by Elo",
         "Ghana 28.5 by strength, 71 by Elo",
-        "Suriname 63.5 by strength, 102 by Elo"
+        "Suriname 63 by strength, 102 by Elo"
       ],
       "belowElo": [
         "Iraq 99.5 by strength, 49 by Elo",
         "Egypt 99.5 by strength, 51 by Elo",
-        "Panama 76 by strength, 31.5 by Elo"
+        "Iran 68 by strength, 21 by Elo"
       ],
       "noElo": [],
       "elo": {

@@ -2,9 +2,9 @@ Valorant seasons 2023-2025 (val-<year>.json): attribution
 =================================================
 
 The ratings in these files are computed by this project from the match results vlr.gg records (https://www.vlr.gg): an Elo of
-every player, built map by map from every map of its VCT, Challengers and off-season events from September 2022, as it
-stood on the last day of each year; each player's country is the one the whole record gives him (his Esports Nations
-Cup team, else the flag vlr.gg files him under). vlr.gg publishes no ratings: these are not its numbers. See
-docs/design/valorant.md, "Earlier seasons".
+every player, built map by map from every map of its VCT, Challengers and off-season events from September 2022, each
+newcomer starting at his home circuit's level, as it stood on the last day of each year; each player's country is the
+one the whole record gives him (his Esports Nations Cup team, else the flag vlr.gg files him under). vlr.gg publishes no
+ratings: these are not its numbers. See docs/design/valorant.md, "Earlier seasons".
 
 Credit: vlr.gg (https://www.vlr.gg); each player's source links his page there.

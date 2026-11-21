@@ -17,6 +17,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { dayAfter, eloOn, resultRows } from './lib/football-elo.mjs';
 import { ballonDorVotes, csvRows, eloCrossCheck, factsText, pageRevision, worldCupFacts, worldCupLineups } from './lib/world-cup-facts.mjs';
+import { confederationResolver, interConfederationMatches, tournamentWithLevels } from './lib/confederation-levels.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 
@@ -74,6 +75,11 @@ async function main() {
   const days = manifest.seasons.map(season => dayAfter(finalOf(season)));
   const yearEnds = manifest.seasons.map(season => `${season.year + 1}-01-01`);
   const elo = eloOn(matches, [...days, ...yearEnds], manifest.elo);
+  // The confederation levels: every inter-confederation match scored with the Elo from before it.
+  const table = JSON.parse(await readFile(path.join(root, manifest.levels.table), 'utf8'));
+  const confederationOf = confederationResolver(table);
+  const inter = interConfederationMatches(matches, manifest.elo, confederationOf);
+  const levels = { years: manifest.levels.years, prior: manifest.levels.prior, reference: manifest.levels.reference };
 
   const outputs = new Map(), spellings = [], pinnedUsed = new Set();
   const summary = [];
@@ -82,12 +88,14 @@ async function main() {
       if (!lineupBoxes[title]) throw new Error(`${season.id}: the manifest pins no page ${title}`);
       return lineupBoxes[title];
     }) : null;
-    const { facts, audit } = worldCupFacts({ wc, lineups: boxes, votes, season, elo: manifest.elo, snapshot: elo[days[i]], names: manifest.names });
+    const { facts: plain, audit } = worldCupFacts({ wc, lineups: boxes, votes, season, elo: manifest.elo, snapshot: elo[days[i]], names: manifest.names });
+    const facts = tournamentWithLevels(plain, { snapshot: elo[days[i]], inter, levels, confederations: table.confederations, confederationOf });
     spellings.push(...audit.spellings);
     for (const name of audit.pinned) pinnedUsed.add(name);
     outputs.set(path.join(root, 'scripts/data/world-cup-seasons', `${season.id}.json`), factsText(facts));
     summary.push(`${season.id}: ${facts.nations.length} squads, ${facts.nations.reduce((n, nation) => n + nation.squad.length, 0)} players; Elo of ${facts.elo.date}, `
-      + `best ${facts.elo.best.team} ${facts.elo.best.elo}; ${facts.unmatchedVotes.length} Ballon d'Or votes for players in no squad`);
+      + `best ${facts.elo.best.team} ${facts.elo.best.elo}, levelled ${facts.elo.levelledBest.team} ${facts.elo.levelledBest.elo}; `
+      + `levels ${facts.elo.levels.confederations.map(([c, level]) => `${c} ${level}`).join(', ')}; ${facts.unmatchedVotes.length} Ballon d'Or votes for players in no squad`);
   }
 
   // Every name the line-up pages spell otherwise is one the manifest has reviewed, and every reviewed one still occurs.

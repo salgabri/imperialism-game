@@ -8,7 +8,7 @@ export const BUILT_IN_COLLEGE_FOOTBALL_SEASONS = Object.freeze([
   Object.freeze({ id: 'cfb-2023', version: 'cfb-2023-b62cba7f', year: 2023, season: '2023', label: 'FBS (computed)', map: 'cfb2023' }),
   Object.freeze({ id: 'cfb-2022', version: 'cfb-2022-0cbcd1d9', year: 2022, season: '2022', label: 'FBS (computed)', map: 'cfb2022' }),
   Object.freeze({ id: 'cfb-2021', version: 'cfb-2021-53433832', year: 2021, season: '2021', label: 'FBS (computed)', map: 'cfb2021' }),
-  Object.freeze({ id: 'cfb-2020', version: 'cfb-2020-2d527784', year: 2020, season: '2020', label: 'FBS (computed)', map: 'cfb2020' }),
+  Object.freeze({ id: 'cfb-2020', version: 'cfb-2020-94017180', year: 2020, season: '2020', label: 'FBS (computed)', map: 'cfb2020' }),
   Object.freeze({ id: 'cfb-2019', version: 'cfb-2019-4e2ac9f9', year: 2019, season: '2019', label: 'FBS (computed)', map: 'cfb2018' }),
   Object.freeze({ id: 'cfb-2018', version: 'cfb-2018-9d1afc66', year: 2018, season: '2018', label: 'FBS (computed)', map: 'cfb2018' }),
   Object.freeze({ id: 'cfb-2017', version: 'cfb-2017-12d9c5c3', year: 2017, season: '2017', label: 'FBS (computed)', map: 'cfb2017' }),

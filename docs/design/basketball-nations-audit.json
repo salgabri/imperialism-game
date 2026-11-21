@@ -1,0 +1,2554 @@
+{
+ "about": "Basketball's national fives against FIBA's men's results of 2023–2026 (scripts/build-basketball.mjs, scripts/lib/fiba-nations.mjs; docs/design/euroleague.md, \"The nations' level against FIBA's results\"). T is a nation's results in lineup points from the field's mean (√r × SRS ÷ the engine's margin a point); five is its five's strength as the engine plays it; stands is where the anchors' relation puts T; gap = stands − five; move is what the method would move its curated players by. Validation scores held-out games through the engine, each pair [the fives as they are, as the rule moves them].",
+ "facts": {
+  "file": "scripts/data/fiba-results.json",
+  "games": 706,
+  "byCompetition": {
+   "wc2023": 92,
+   "wcq2027": 378,
+   "oqt2024": 36,
+   "og2024": 26,
+   "asiacup2025": 36,
+   "afrobasket2025": 36,
+   "americup2025": 26,
+   "eurobasket2025": 76
+  },
+  "retrieved": "2026-11-21"
+ },
+ "weights": {
+  "byYear": {
+   "2023": 1,
+   "2024": 2,
+   "2025": 3,
+   "2026": 3
+  },
+  "competitions": "the tournaments; the qualifiers only for a fielded nation no tournament rates"
+ },
+ "srs": {
+  "games": 328,
+  "sides": 71,
+  "homeEdge": 5.41,
+  "sigma": 12.54,
+  "reliability": 0.883
+ },
+ "qualifierWindows": {
+  "rated": {
+   "nations": 18,
+   "games": 122,
+   "mean": -2.81
+  },
+  "curated": {
+   "nations": 21,
+   "games": 153,
+   "mean": 2.51
+  },
+  "nations": {
+   "Cameroon": {
+    "games": 9,
+    "mean": -5.49,
+    "share": 0.8
+   },
+   "Canada": {
+    "games": 6,
+    "mean": -0.23,
+    "share": 0
+   },
+   "China": {
+    "games": 8,
+    "mean": -6.73,
+    "share": 1
+   },
+   "Croatia": {
+    "games": 7,
+    "mean": 19.2,
+    "share": 0.41
+   },
+   "Cyprus": {
+    "games": 6,
+    "mean": 5.37,
+    "share": 1
+   },
+   "Czechia": {
+    "games": 6,
+    "mean": 7.5,
+    "share": 0.58
+   },
+   "Dominican Rep.": {
+    "games": 7,
+    "mean": 8.8,
+    "share": 0.41
+   },
+   "Estonia": {
+    "games": 7,
+    "mean": 0.51,
+    "share": 1
+   },
+   "Finland": {
+    "games": 6,
+    "mean": -1.98,
+    "share": 0.42
+   },
+   "France": {
+    "games": 6,
+    "mean": 7.39,
+    "share": 0
+   },
+   "Georgia": {
+    "games": 4,
+    "mean": 8.5,
+    "share": 0.41
+   },
+   "Germany": {
+    "games": 7,
+    "mean": -20.63,
+    "share": 0
+   },
+   "Greece": {
+    "games": 5,
+    "mean": -10.47,
+    "share": 0.61
+   },
+   "Iceland": {
+    "games": 8,
+    "mean": 4.18,
+    "share": 1
+   },
+   "Iran": {
+    "games": 8,
+    "mean": -5.13,
+    "share": 1
+   },
+   "Israel": {
+    "games": 8,
+    "mean": -5.1,
+    "share": 0
+   },
+   "Italy": {
+    "games": 8,
+    "mean": -1.84,
+    "share": 0.21
+   },
+   "Côte d'Ivoire": {
+    "games": 9,
+    "mean": 12.46,
+    "share": 1
+   },
+   "Japan": {
+    "games": 8,
+    "mean": 15.95,
+    "share": 0.8
+   },
+   "Latvia": {
+    "games": 4,
+    "mean": -13.91,
+    "share": 0.42
+   },
+   "Lithuania": {
+    "games": 8,
+    "mean": -12.68,
+    "share": 0.2
+   },
+   "Mexico": {
+    "games": 8,
+    "mean": 14.46,
+    "share": 0.8
+   },
+   "Montenegro": {
+    "games": 5,
+    "mean": -3.92,
+    "share": 1
+   },
+   "New Zealand": {
+    "games": 8,
+    "mean": 5.54,
+    "share": 1
+   },
+   "Nigeria": {
+    "games": 9,
+    "mean": -4.2,
+    "share": 0.42
+   },
+   "Philippines": {
+    "games": 8,
+    "mean": -5.12,
+    "share": 1
+   },
+   "Poland": {
+    "games": 4,
+    "mean": 18.55,
+    "share": 0.61
+   },
+   "Portugal": {
+    "games": 6,
+    "mean": 9.02,
+    "share": 0.8
+   },
+   "Puerto Rico": {
+    "games": 6,
+    "mean": 5.5,
+    "share": 0.79
+   },
+   "Senegal": {
+    "games": 9,
+    "mean": -6.61,
+    "share": 0.79
+   },
+   "Serbia": {
+    "games": 6,
+    "mean": -6.31,
+    "share": 0
+   },
+   "Slovenia": {
+    "games": 7,
+    "mean": -7.02,
+    "share": 0.58
+   },
+   "Spain": {
+    "games": 4,
+    "mean": -4.05,
+    "share": 0.62
+   },
+   "South Sudan": {
+    "games": 9,
+    "mean": -4.88,
+    "share": 0.41
+   },
+   "Sweden": {
+    "games": 8,
+    "mean": -6.21,
+    "share": 0.8
+   },
+   "Turkey": {
+    "games": 6,
+    "mean": 0.98,
+    "share": 0.21
+   },
+   "Egypt": {
+    "games": 9,
+    "mean": -2.24,
+    "share": 1
+   },
+   "England": {
+    "games": 6,
+    "mean": 7.93,
+    "share": 1
+   },
+   "United States": {
+    "games": 7,
+    "mean": -14.72,
+    "share": 0
+   },
+   "Venezuela": {
+    "games": 4,
+    "mean": 12.16,
+    "share": 1
+   },
+   "Australia": {
+    "games": 8,
+    "mean": -4.5,
+    "share": 0
+   },
+   "Argentina": {
+    "games": 6,
+    "mean": 0.89,
+    "share": 0.38
+   },
+   "Bosnia & Herz.": {
+    "games": 6,
+    "mean": 11.18,
+    "share": 0.59
+   },
+   "Angola": {
+    "games": 9,
+    "mean": 5.27,
+    "share": 0.8
+   },
+   "Belgium": {
+    "games": 4,
+    "mean": 4.45,
+    "share": 1
+   }
+  }
+ },
+ "perPoint": 1.459,
+ "perResultsPoint": 0.6443,
+ "engineHomeEdge": 1.81,
+ "line": {
+  "anchors": [
+   "Canada",
+   "France",
+   "Germany",
+   "Israel",
+   "Italy",
+   "Lithuania",
+   "Serbia",
+   "Turkey",
+   "United States",
+   "Australia"
+  ],
+  "level": 78.7,
+  "centre": 13.41,
+  "slope": 0.616,
+  "residualSd": 5.77,
+  "atCuratedFives": {
+   "at": -0.05,
+   "value": 70.41,
+   "p5": 62.41,
+   "p50": 70.45,
+   "p95": 79.94
+  }
+ },
+ "regions": {
+  "Europe": {
+   "curatedFives": 10,
+   "meanGap": 0.8
+  },
+  "Americas": {
+   "curatedFives": 3,
+   "meanGap": -1.04
+  },
+  "Africa": {
+   "curatedFives": 5,
+   "meanGap": 1.19
+  },
+  "Asia": {
+   "curatedFives": 5,
+   "meanGap": -0.61
+  }
+ },
+ "nations": {
+  "120": {
+   "name": "Cameroon",
+   "fiba": "Cameroon",
+   "region": "Africa",
+   "curated": 4,
+   "srs": 1.95,
+   "from": "tournaments",
+   "T": 1.25,
+   "five": 69.79,
+   "share": 0.8,
+   "stands": 71.21,
+   "gap": 1.42,
+   "move": 2
+  },
+  "124": {
+   "name": "Canada",
+   "fiba": "Canada",
+   "region": "Americas",
+   "curated": 0,
+   "srs": 23.2,
+   "from": "tournaments",
+   "T": 14.95,
+   "five": 82.37,
+   "share": 0,
+   "stands": 79.64,
+   "gap": -2.73,
+   "move": 0
+  },
+  "156": {
+   "name": "China",
+   "fiba": "China",
+   "region": "Asia",
+   "curated": 5,
+   "srs": 5.12,
+   "from": "tournaments",
+   "T": 3.3,
+   "five": 70.85,
+   "share": 1,
+   "stands": 72.47,
+   "gap": 1.62,
+   "move": 2
+  },
+  "191": {
+   "name": "Croatia",
+   "fiba": "Croatia",
+   "region": "Europe",
+   "curated": 2,
+   "srs": 11.84,
+   "from": "tournaments",
+   "T": 7.63,
+   "five": 76.23,
+   "share": 0.41,
+   "stands": 75.13,
+   "gap": -1.1,
+   "move": -1
+  },
+  "196": {
+   "name": "Cyprus",
+   "fiba": "Cyprus",
+   "region": "Europe",
+   "curated": 5,
+   "srs": -28.65,
+   "from": "tournaments",
+   "T": -18.46,
+   "five": 64.67,
+   "share": 1,
+   "stands": 59.07,
+   "gap": -5.6,
+   "move": -6
+  },
+  "203": {
+   "name": "Czechia",
+   "fiba": "Czechia",
+   "region": "Europe",
+   "curated": 3,
+   "srs": -3.33,
+   "from": "tournaments",
+   "T": -2.15,
+   "five": 72.09,
+   "share": 0.58,
+   "stands": 69.11,
+   "gap": -2.97,
+   "move": -3
+  },
+  "214": {
+   "name": "Dominican Rep.",
+   "fiba": "Dominican Republic",
+   "region": "Americas",
+   "curated": 2,
+   "srs": 8.15,
+   "from": "tournaments",
+   "T": 5.25,
+   "five": 74.92,
+   "share": 0.41,
+   "stands": 73.67,
+   "gap": -1.25,
+   "move": -1
+  },
+  "233": {
+   "name": "Estonia",
+   "fiba": "Estonia",
+   "region": "Europe",
+   "curated": 5,
+   "srs": 5.17,
+   "from": "tournaments",
+   "T": 3.33,
+   "five": 69.59,
+   "share": 1,
+   "stands": 72.49,
+   "gap": 2.9,
+   "move": 3
+  },
+  "246": {
+   "name": "Finland",
+   "fiba": "Finland",
+   "region": "Europe",
+   "curated": 2,
+   "srs": 11.14,
+   "from": "tournaments",
+   "T": 7.18,
+   "five": 73.4,
+   "share": 0.42,
+   "stands": 74.86,
+   "gap": 1.46,
+   "move": 1
+  },
+  "250": {
+   "name": "France",
+   "fiba": "France",
+   "region": "Europe",
+   "curated": 0,
+   "srs": 14.4,
+   "from": "tournaments",
+   "T": 9.28,
+   "five": 81.61,
+   "share": 0,
+   "stands": 76.15,
+   "gap": -5.46,
+   "move": 0
+  },
+  "268": {
+   "name": "Georgia",
+   "fiba": "Georgia",
+   "region": "Europe",
+   "curated": 2,
+   "srs": 2.56,
+   "from": "tournaments",
+   "T": 1.65,
+   "five": 70.39,
+   "share": 0.41,
+   "stands": 71.45,
+   "gap": 1.07,
+   "move": 1
+  },
+  "276": {
+   "name": "Germany",
+   "fiba": "Germany",
+   "region": "Europe",
+   "curated": 0,
+   "srs": 30.37,
+   "from": "tournaments",
+   "T": 19.57,
+   "five": 76.77,
+   "share": 0,
+   "stands": 82.49,
+   "gap": 5.72,
+   "move": 0
+  },
+  "300": {
+   "name": "Greece",
+   "fiba": "Greece",
+   "region": "Europe",
+   "curated": 3,
+   "srs": 16.23,
+   "from": "tournaments",
+   "T": 10.46,
+   "five": 78.2,
+   "share": 0.61,
+   "stands": 76.88,
+   "gap": -1.32,
+   "move": -1
+  },
+  "352": {
+   "name": "Iceland",
+   "fiba": "Iceland",
+   "region": "Europe",
+   "curated": 5,
+   "srs": -5.68,
+   "from": "tournaments",
+   "T": -3.66,
+   "five": 68.27,
+   "share": 1,
+   "stands": 68.18,
+   "gap": -0.09,
+   "move": 0
+  },
+  "364": {
+   "name": "Iran",
+   "fiba": "Iran",
+   "region": "Asia",
+   "curated": 5,
+   "srs": -5.87,
+   "from": "tournaments",
+   "T": -3.78,
+   "five": 70.01,
+   "share": 1,
+   "stands": 68.11,
+   "gap": -1.9,
+   "move": -2
+  },
+  "376": {
+   "name": "Israel",
+   "fiba": "Israel",
+   "region": "Europe",
+   "curated": 0,
+   "srs": 9.88,
+   "from": "tournaments",
+   "T": 6.36,
+   "five": 72.81,
+   "share": 0,
+   "stands": 74.36,
+   "gap": 1.55,
+   "move": 0
+  },
+  "380": {
+   "name": "Italy",
+   "fiba": "Italy",
+   "region": "Europe",
+   "curated": 1,
+   "srs": 11.58,
+   "from": "tournaments",
+   "T": 7.46,
+   "five": 70.69,
+   "share": 0.21,
+   "stands": 75.03,
+   "gap": 4.34,
+   "move": 4
+  },
+  "384": {
+   "name": "Côte d'Ivoire",
+   "fiba": "Ivory Coast",
+   "region": "Africa",
+   "curated": 5,
+   "srs": -2.68,
+   "from": "tournaments",
+   "T": -1.73,
+   "five": 70.44,
+   "share": 1,
+   "stands": 69.37,
+   "gap": -1.07,
+   "move": -1
+  },
+  "392": {
+   "name": "Japan",
+   "fiba": "Japan",
+   "region": "Asia",
+   "curated": 4,
+   "srs": -3.16,
+   "from": "tournaments",
+   "T": -2.04,
+   "five": 72.56,
+   "share": 0.8,
+   "stands": 69.18,
+   "gap": -3.38,
+   "move": -4
+  },
+  "428": {
+   "name": "Latvia",
+   "fiba": "Latvia",
+   "region": "Europe",
+   "curated": 2,
+   "srs": 11.89,
+   "from": "tournaments",
+   "T": 7.66,
+   "five": 72.99,
+   "share": 0.42,
+   "stands": 75.15,
+   "gap": 2.17,
+   "move": 2
+  },
+  "440": {
+   "name": "Lithuania",
+   "fiba": "Lithuania",
+   "region": "Europe",
+   "curated": 1,
+   "srs": 16.64,
+   "from": "tournaments",
+   "T": 10.72,
+   "five": 78.12,
+   "share": 0.2,
+   "stands": 77.04,
+   "gap": -1.08,
+   "move": -1
+  },
+  "484": {
+   "name": "Mexico",
+   "fiba": "Mexico",
+   "region": "Americas",
+   "curated": 4,
+   "srs": -3.23,
+   "from": "tournaments",
+   "T": -2.08,
+   "five": 70.02,
+   "share": 0.8,
+   "stands": 69.16,
+   "gap": -0.86,
+   "move": -1
+  },
+  "499": {
+   "name": "Montenegro",
+   "fiba": "Montenegro",
+   "region": "Europe",
+   "curated": 5,
+   "srs": 2.31,
+   "from": "tournaments",
+   "T": 1.49,
+   "five": 71.04,
+   "share": 1,
+   "stands": 71.35,
+   "gap": 0.31,
+   "move": 0
+  },
+  "528": {
+   "name": "Netherlands",
+   "fiba": "Netherlands",
+   "region": "Europe",
+   "curated": 5,
+   "srs": -0.27,
+   "from": "qualifiers",
+   "T": -0.17,
+   "five": 70.21,
+   "share": 1,
+   "stands": 70.33,
+   "gap": 0.12,
+   "move": 0,
+   "aligned": {
+    "qualifiers": -1.66,
+    "offset": 1.39,
+    "on": [
+     "Cyprus",
+     "Estonia",
+     "Iceland",
+     "Montenegro",
+     "Portugal",
+     "Sweden",
+     "England",
+     "Belgium"
+    ]
+   }
+  },
+  "554": {
+   "name": "New Zealand",
+   "fiba": "New Zealand",
+   "region": "Asia",
+   "curated": 5,
+   "srs": 2.08,
+   "from": "tournaments",
+   "T": 1.34,
+   "five": 69.81,
+   "share": 1,
+   "stands": 71.26,
+   "gap": 1.45,
+   "move": 1
+  },
+  "566": {
+   "name": "Nigeria",
+   "fiba": "Nigeria",
+   "region": "Africa",
+   "curated": 2,
+   "srs": 2.18,
+   "from": "tournaments",
+   "T": 1.4,
+   "five": 75.46,
+   "share": 0.42,
+   "stands": 71.3,
+   "gap": -4.16,
+   "move": -4
+  },
+  "608": {
+   "name": "Philippines",
+   "fiba": "Philippines",
+   "region": "Asia",
+   "curated": 5,
+   "srs": -1.83,
+   "from": "tournaments",
+   "T": -1.18,
+   "five": 70.57,
+   "share": 1,
+   "stands": 69.71,
+   "gap": -0.85,
+   "move": -1
+  },
+  "616": {
+   "name": "Poland",
+   "fiba": "Poland",
+   "region": "Europe",
+   "curated": 3,
+   "srs": 6.1,
+   "from": "tournaments",
+   "T": 3.93,
+   "five": 72.47,
+   "share": 0.61,
+   "stands": 72.86,
+   "gap": 0.38,
+   "move": 0
+  },
+  "620": {
+   "name": "Portugal",
+   "fiba": "Portugal",
+   "region": "Europe",
+   "curated": 4,
+   "srs": 3.77,
+   "from": "tournaments",
+   "T": 2.43,
+   "five": 70.43,
+   "share": 0.8,
+   "stands": 71.93,
+   "gap": 1.51,
+   "move": 2
+  },
+  "630": {
+   "name": "Puerto Rico",
+   "fiba": "Puerto Rico",
+   "region": "Americas",
+   "curated": 4,
+   "srs": 9.09,
+   "from": "tournaments",
+   "T": 5.85,
+   "five": 71.68,
+   "share": 0.79,
+   "stands": 74.04,
+   "gap": 2.36,
+   "move": 3
+  },
+  "686": {
+   "name": "Senegal",
+   "fiba": "Senegal",
+   "region": "Africa",
+   "curated": 4,
+   "srs": 10.5,
+   "from": "tournaments",
+   "T": 6.77,
+   "five": 70.81,
+   "share": 0.79,
+   "stands": 74.6,
+   "gap": 3.8,
+   "move": 5
+  },
+  "688": {
+   "name": "Serbia",
+   "fiba": "Serbia",
+   "region": "Europe",
+   "curated": 0,
+   "srs": 25.09,
+   "from": "tournaments",
+   "T": 16.17,
+   "five": 79.53,
+   "share": 0,
+   "stands": 80.39,
+   "gap": 0.87,
+   "move": 0
+  },
+  "705": {
+   "name": "Slovenia",
+   "fiba": "Slovenia",
+   "region": "Europe",
+   "curated": 3,
+   "srs": 11.48,
+   "from": "tournaments",
+   "T": 7.4,
+   "five": 75.12,
+   "share": 0.58,
+   "stands": 74.99,
+   "gap": -0.13,
+   "move": 0
+  },
+  "724": {
+   "name": "Spain",
+   "fiba": "Spain",
+   "region": "Europe",
+   "curated": 3,
+   "srs": 15.08,
+   "from": "tournaments",
+   "T": 9.72,
+   "five": 76.96,
+   "share": 0.62,
+   "stands": 76.42,
+   "gap": -0.54,
+   "move": -1
+  },
+  "728": {
+   "name": "South Sudan",
+   "fiba": "South Sudan",
+   "region": "Africa",
+   "curated": 2,
+   "srs": 10.42,
+   "from": "tournaments",
+   "T": 6.71,
+   "five": 72.5,
+   "share": 0.41,
+   "stands": 74.57,
+   "gap": 2.07,
+   "move": 2
+  },
+  "752": {
+   "name": "Sweden",
+   "fiba": "Sweden",
+   "region": "Europe",
+   "curated": 4,
+   "srs": 10.36,
+   "from": "tournaments",
+   "T": 6.67,
+   "five": 71.63,
+   "share": 0.8,
+   "stands": 74.55,
+   "gap": 2.91,
+   "move": 4
+  },
+  "792": {
+   "name": "Turkey",
+   "fiba": "Turkey",
+   "region": "Europe",
+   "curated": 1,
+   "srs": 28.01,
+   "from": "tournaments",
+   "T": 18.04,
+   "five": 74.5,
+   "share": 0.21,
+   "stands": 81.55,
+   "gap": 7.05,
+   "move": 7
+  },
+  "804": {
+   "name": "Ukraine",
+   "fiba": "Ukraine",
+   "region": "Europe",
+   "curated": 4,
+   "srs": 17.28,
+   "from": "qualifiers",
+   "T": 11.13,
+   "five": 70.62,
+   "share": 0.8,
+   "stands": 77.29,
+   "gap": 6.67,
+   "move": 8,
+   "aligned": {
+    "qualifiers": 15.88,
+    "offset": 1.39,
+    "on": [
+     "Cyprus",
+     "Estonia",
+     "Iceland",
+     "Montenegro",
+     "Portugal",
+     "Sweden",
+     "England",
+     "Belgium"
+    ]
+   }
+  },
+  "818": {
+   "name": "Egypt",
+   "fiba": "Egypt",
+   "region": "Africa",
+   "curated": 5,
+   "srs": 0.95,
+   "from": "tournaments",
+   "T": 0.61,
+   "five": 70.19,
+   "share": 1,
+   "stands": 70.81,
+   "gap": 0.63,
+   "move": 1
+  },
+  "826": {
+   "name": "England",
+   "fiba": "Great Britain",
+   "region": "Europe",
+   "curated": 5,
+   "srs": -10.75,
+   "from": "tournaments",
+   "T": -6.93,
+   "five": 68.23,
+   "share": 1,
+   "stands": 66.17,
+   "gap": -2.06,
+   "move": -2
+  },
+  "840": {
+   "name": "United States",
+   "fiba": "United States",
+   "region": "Americas",
+   "curated": 0,
+   "srs": 28.48,
+   "from": "tournaments",
+   "T": 18.35,
+   "five": 92.82,
+   "share": 0,
+   "stands": 81.74,
+   "gap": -11.08,
+   "move": 0
+  },
+  "862": {
+   "name": "Venezuela",
+   "fiba": "Venezuela",
+   "region": "Americas",
+   "curated": 5,
+   "srs": -12.27,
+   "from": "tournaments",
+   "T": -7.91,
+   "five": 70.2,
+   "share": 1,
+   "stands": 65.57,
+   "gap": -4.63,
+   "move": -5
+  },
+  "036": {
+   "name": "Australia",
+   "fiba": "Australia",
+   "region": "Asia",
+   "curated": 0,
+   "srs": 20.55,
+   "from": "tournaments",
+   "T": 13.24,
+   "five": 77.76,
+   "share": 0,
+   "stands": 78.59,
+   "gap": 0.83,
+   "move": 0
+  },
+  "032": {
+   "name": "Argentina",
+   "fiba": "Argentina",
+   "region": "Americas",
+   "curated": 2,
+   "srs": 13.27,
+   "from": "tournaments",
+   "T": 8.55,
+   "five": 73.94,
+   "share": 0.38,
+   "stands": 75.7,
+   "gap": 1.77,
+   "move": 2
+  },
+  "024": {
+   "name": "Angola",
+   "fiba": "Angola",
+   "region": "Africa",
+   "curated": 4,
+   "srs": 3.8,
+   "from": "tournaments",
+   "T": 2.45,
+   "five": 70.77,
+   "share": 0.8,
+   "stands": 71.95,
+   "gap": 1.18,
+   "move": 1
+  },
+  "070": {
+   "name": "Bosnia & Herz.",
+   "fiba": "Bosnia and Herzegovina",
+   "region": "Europe",
+   "curated": 3,
+   "srs": 3.39,
+   "from": "tournaments",
+   "T": 2.18,
+   "five": 72.68,
+   "share": 0.59,
+   "stands": 71.78,
+   "gap": -0.9,
+   "move": -1
+  },
+  "056": {
+   "name": "Belgium",
+   "fiba": "Belgium",
+   "region": "Europe",
+   "curated": 5,
+   "srs": 0.32,
+   "from": "tournaments",
+   "T": 0.2,
+   "five": 69.2,
+   "share": 1,
+   "stands": 70.56,
+   "gap": 1.36,
+   "move": 1
+  }
+ },
+ "marginOffsets": {
+  "Europe": -8.3,
+  "Americas": -5.95,
+  "Africa": -5.05,
+  "Asia": -6.29
+ },
+ "validation": {
+  "samples": 2000,
+  "rules": {
+   "nation": {
+    "splits": {
+     "wc2023→2024": {
+      "about": "fit on the 2023 World Cup (its hosts never played away: the home edge is the full fit's), test on the 2024 Olympic qualifiers and Olympics",
+      "all": {
+       "games": 46,
+       "logLoss": [
+        0.4625,
+        0.4834
+       ],
+       "brier": [
+        0.1502,
+        0.1592
+       ]
+      },
+      "cross": {
+       "games": 32,
+       "logLoss": [
+        0.4411,
+        0.4792
+       ],
+       "brier": [
+        0.1421,
+        0.1588
+       ]
+      },
+      "same": {
+       "games": 14,
+       "logLoss": [
+        0.5114,
+        0.4931
+       ],
+       "brier": [
+        0.1686,
+        0.1602
+       ]
+      },
+      "residual": {
+       "Africa": {
+        "teamGames": 10,
+        "before": -0.42,
+        "after": -1.33
+       },
+       "Americas curated": {
+        "teamGames": 3,
+        "before": 3.26,
+        "after": 0.79
+       },
+       "Americas others": {
+        "teamGames": 1,
+        "before": -9.77,
+        "after": -2.36
+       },
+       "Americas": {
+        "teamGames": 17,
+        "before": -2.96,
+        "after": -4.23
+       },
+       "Asia": {
+        "teamGames": 10,
+        "before": 0.36,
+        "after": -0.77
+       },
+       "Europe others": {
+        "teamGames": 24,
+        "before": 0,
+        "after": 0
+       },
+       "Europe": {
+        "teamGames": 27,
+        "before": 1.88,
+        "after": 3.44
+       }
+      }
+     },
+     "to-og2024": {
+      "about": "fit on the 2023 World Cup and the 2024 Olympic qualifiers, test on the Olympics",
+      "all": {
+       "games": 22,
+       "logLoss": [
+        0.4064,
+        0.4722
+       ],
+       "brier": [
+        0.1308,
+        0.1584
+       ]
+      },
+      "cross": {
+       "games": 16,
+       "logLoss": [
+        0.312,
+        0.4017
+       ],
+       "brier": [
+        0.089,
+        0.1274
+       ]
+      },
+      "same": {
+       "games": 6,
+       "logLoss": [
+        0.6581,
+        0.6602
+       ],
+       "brier": [
+        0.2425,
+        0.2412
+       ]
+      },
+      "residual": {
+       "Africa": {
+        "teamGames": 3,
+        "before": 7.12,
+        "after": 7.29
+       },
+       "Americas curated": {
+        "teamGames": 1,
+        "before": 9.77,
+        "after": 0.65
+       },
+       "Americas others": {
+        "teamGames": 1,
+        "before": -9.77,
+        "after": -0.65
+       },
+       "Americas": {
+        "teamGames": 10,
+        "before": -7.19,
+        "after": -8.2
+       },
+       "Asia": {
+        "teamGames": 6,
+        "before": -0.45,
+        "after": -1.21
+       },
+       "Europe others": {
+        "teamGames": 10,
+        "before": 0,
+        "after": 0
+       },
+       "Europe": {
+        "teamGames": 13,
+        "before": 4.1,
+        "after": 5.19
+       }
+      }
+     },
+     "to-2025": {
+      "about": "fit before the 2025 continental championships, test on them",
+      "all": {
+       "games": 98,
+       "logLoss": [
+        0.5593,
+        0.6281
+       ],
+       "brier": [
+        0.1863,
+        0.216
+       ]
+      },
+      "same": {
+       "games": 98,
+       "logLoss": [
+        0.5593,
+        0.6281
+       ],
+       "brier": [
+        0.1863,
+        0.216
+       ]
+      },
+      "residual": {
+       "Africa curated": {
+        "teamGames": 12,
+        "before": 3.26,
+        "after": 3.79
+       },
+       "Africa others": {
+        "teamGames": 4,
+        "before": -9.77,
+        "after": -11.38
+       },
+       "Americas curated": {
+        "teamGames": 5,
+        "before": -2.33,
+        "after": -0.39
+       },
+       "Americas others": {
+        "teamGames": 9,
+        "before": 1.29,
+        "after": 0.22
+       },
+       "Asia curated": {
+        "teamGames": 11,
+        "before": -3.41,
+        "after": -1.22
+       },
+       "Asia others": {
+        "teamGames": 3,
+        "before": 12.49,
+        "after": 4.48
+       },
+       "Europe curated": {
+        "teamGames": 42,
+        "before": -8.15,
+        "after": -8.87
+       },
+       "Europe others": {
+        "teamGames": 110,
+        "before": 3.11,
+        "after": 3.39
+       }
+      }
+     }
+    },
+    "leaveOneOut": {
+     "wc2023": {
+      "games": 72,
+      "logLoss": [
+       0.6536,
+       0.6677
+      ],
+      "brier": [
+       0.2138,
+       0.2215
+      ]
+     },
+     "oqt2024": {
+      "games": 24,
+      "logLoss": [
+       0.5139,
+       0.5396
+      ],
+      "brier": [
+       0.1679,
+       0.1768
+      ]
+     },
+     "og2024": {
+      "games": 22,
+      "logLoss": [
+       0.4064,
+       0.4321
+      ],
+      "brier": [
+       0.1308,
+       0.1425
+      ]
+     },
+     "eurobasket2025": {
+      "games": 76,
+      "logLoss": [
+       0.548,
+       0.7437
+      ],
+      "brier": [
+       0.18,
+       0.2703
+      ]
+     },
+     "americup2025": {
+      "games": 7,
+      "logLoss": [
+       0.5547,
+       0.5412
+      ],
+      "brier": [
+       0.1854,
+       0.1794
+      ]
+     },
+     "afrobasket2025": {
+      "games": 8,
+      "logLoss": [
+       0.7185,
+       0.8555
+      ],
+      "brier": [
+       0.262,
+       0.3282
+      ]
+     },
+     "asiacup2025": {
+      "games": 7,
+      "logLoss": [
+       0.5042,
+       0.7642
+      ],
+      "brier": [
+       0.169,
+       0.2889
+      ]
+     },
+     "all": {
+      "games": 216,
+      "logLoss": [
+       0.5701,
+       0.6622
+      ],
+      "brier": [
+       0.1878,
+       0.2304
+      ]
+     }
+    }
+   },
+   "half": {
+    "splits": {
+     "wc2023→2024": {
+      "about": "fit on the 2023 World Cup (its hosts never played away: the home edge is the full fit's), test on the 2024 Olympic qualifiers and Olympics",
+      "all": {
+       "games": 46,
+       "logLoss": [
+        0.4625,
+        0.4663
+       ],
+       "brier": [
+        0.1502,
+        0.1509
+       ]
+      },
+      "cross": {
+       "games": 32,
+       "logLoss": [
+        0.4411,
+        0.4555
+       ],
+       "brier": [
+        0.1421,
+        0.1477
+       ]
+      },
+      "same": {
+       "games": 14,
+       "logLoss": [
+        0.5114,
+        0.4908
+       ],
+       "brier": [
+        0.1686,
+        0.1582
+       ]
+      },
+      "residual": {
+       "Africa": {
+        "teamGames": 10,
+        "before": -0.42,
+        "after": -1.09
+       },
+       "Americas curated": {
+        "teamGames": 3,
+        "before": 3.26,
+        "after": 2.21
+       },
+       "Americas others": {
+        "teamGames": 1,
+        "before": -9.77,
+        "after": -6.63
+       },
+       "Americas": {
+        "teamGames": 17,
+        "before": -2.96,
+        "after": -3.31
+       },
+       "Asia": {
+        "teamGames": 10,
+        "before": 0.36,
+        "after": 0.09
+       },
+       "Europe others": {
+        "teamGames": 24,
+        "before": 0,
+        "after": 0
+       },
+       "Europe": {
+        "teamGames": 27,
+        "before": 1.88,
+        "after": 2.46
+       }
+      }
+     },
+     "to-og2024": {
+      "about": "fit on the 2023 World Cup and the 2024 Olympic qualifiers, test on the Olympics",
+      "all": {
+       "games": 22,
+       "logLoss": [
+        0.4064,
+        0.4305
+       ],
+       "brier": [
+        0.1308,
+        0.1408
+       ]
+      },
+      "cross": {
+       "games": 16,
+       "logLoss": [
+        0.312,
+        0.3461
+       ],
+       "brier": [
+        0.089,
+        0.1033
+       ]
+      },
+      "same": {
+       "games": 6,
+       "logLoss": [
+        0.6581,
+        0.6556
+       ],
+       "brier": [
+        0.2425,
+        0.2408
+       ]
+      },
+      "residual": {
+       "Africa": {
+        "teamGames": 3,
+        "before": 7.12,
+        "after": 7.06
+       },
+       "Americas curated": {
+        "teamGames": 1,
+        "before": 9.77,
+        "after": 5
+       },
+       "Americas others": {
+        "teamGames": 1,
+        "before": -9.77,
+        "after": -5
+       },
+       "Americas": {
+        "teamGames": 10,
+        "before": -7.19,
+        "after": -7.72
+       },
+       "Asia": {
+        "teamGames": 6,
+        "before": -0.45,
+        "after": -0.79
+       },
+       "Europe others": {
+        "teamGames": 10,
+        "before": 0,
+        "after": 0
+       },
+       "Europe": {
+        "teamGames": 13,
+        "before": 4.1,
+        "after": 4.68
+       }
+      }
+     },
+     "to-2025": {
+      "about": "fit before the 2025 continental championships, test on them",
+      "all": {
+       "games": 98,
+       "logLoss": [
+        0.5593,
+        0.5875
+       ],
+       "brier": [
+        0.1863,
+        0.1994
+       ]
+      },
+      "same": {
+       "games": 98,
+       "logLoss": [
+        0.5593,
+        0.5875
+       ],
+       "brier": [
+        0.1863,
+        0.1994
+       ]
+      },
+      "residual": {
+       "Africa curated": {
+        "teamGames": 12,
+        "before": 3.26,
+        "after": 3.52
+       },
+       "Africa others": {
+        "teamGames": 4,
+        "before": -9.77,
+        "after": -10.57
+       },
+       "Americas curated": {
+        "teamGames": 5,
+        "before": -2.33,
+        "after": -1.55
+       },
+       "Americas others": {
+        "teamGames": 9,
+        "before": 1.29,
+        "after": 0.86
+       },
+       "Asia curated": {
+        "teamGames": 11,
+        "before": -3.41,
+        "after": -2.38
+       },
+       "Asia others": {
+        "teamGames": 3,
+        "before": 12.49,
+        "after": 8.72
+       },
+       "Europe curated": {
+        "teamGames": 42,
+        "before": -8.15,
+        "after": -8.51
+       },
+       "Europe others": {
+        "teamGames": 110,
+        "before": 3.11,
+        "after": 3.25
+       }
+      }
+     }
+    },
+    "leaveOneOut": {
+     "wc2023": {
+      "games": 72,
+      "logLoss": [
+       0.6536,
+       0.6633
+      ],
+      "brier": [
+       0.2138,
+       0.2176
+      ]
+     },
+     "oqt2024": {
+      "games": 24,
+      "logLoss": [
+       0.5139,
+       0.5152
+      ],
+      "brier": [
+       0.1679,
+       0.1676
+      ]
+     },
+     "og2024": {
+      "games": 22,
+      "logLoss": [
+       0.4064,
+       0.4184
+      ],
+      "brier": [
+       0.1308,
+       0.1364
+      ]
+     },
+     "eurobasket2025": {
+      "games": 76,
+      "logLoss": [
+       0.548,
+       0.6137
+      ],
+      "brier": [
+       0.18,
+       0.2079
+      ]
+     },
+     "americup2025": {
+      "games": 7,
+      "logLoss": [
+       0.5547,
+       0.5335
+      ],
+      "brier": [
+       0.1854,
+       0.1778
+      ]
+     },
+     "afrobasket2025": {
+      "games": 8,
+      "logLoss": [
+       0.7185,
+       0.7737
+      ],
+      "brier": [
+       0.262,
+       0.2882
+      ]
+     },
+     "asiacup2025": {
+      "games": 7,
+      "logLoss": [
+       0.5042,
+       0.6292
+      ],
+      "brier": [
+       0.169,
+       0.2319
+      ]
+     },
+     "all": {
+      "games": 216,
+      "logLoss": [
+       0.5701,
+       0.6032
+      ],
+      "brier": [
+       0.1878,
+       0.2021
+      ]
+     }
+    }
+   },
+   "quarter-relative": {
+    "splits": {
+     "wc2023→2024": {
+      "about": "fit on the 2023 World Cup (its hosts never played away: the home edge is the full fit's), test on the 2024 Olympic qualifiers and Olympics",
+      "all": {
+       "games": 46,
+       "logLoss": [
+        0.4625,
+        0.461
+       ],
+       "brier": [
+        0.1502,
+        0.1487
+       ]
+      },
+      "cross": {
+       "games": 32,
+       "logLoss": [
+        0.4411,
+        0.4424
+       ],
+       "brier": [
+        0.1421,
+        0.1421
+       ]
+      },
+      "same": {
+       "games": 14,
+       "logLoss": [
+        0.5114,
+        0.5034
+       ],
+       "brier": [
+        0.1686,
+        0.1637
+       ]
+      },
+      "residual": {
+       "Africa": {
+        "teamGames": 10,
+        "before": -0.42,
+        "after": -0.23
+       },
+       "Americas curated": {
+        "teamGames": 3,
+        "before": 3.26,
+        "after": 2.76
+       },
+       "Americas others": {
+        "teamGames": 1,
+        "before": -9.77,
+        "after": -8.27
+       },
+       "Americas": {
+        "teamGames": 17,
+        "before": -2.96,
+        "after": -3.29
+       },
+       "Asia": {
+        "teamGames": 10,
+        "before": 0.36,
+        "after": 0.38
+       },
+       "Europe others": {
+        "teamGames": 24,
+        "before": 0,
+        "after": 0
+       },
+       "Europe": {
+        "teamGames": 27,
+        "before": 1.88,
+        "after": 2.02
+       }
+      }
+     },
+     "to-og2024": {
+      "about": "fit on the 2023 World Cup and the 2024 Olympic qualifiers, test on the Olympics",
+      "all": {
+       "games": 22,
+       "logLoss": [
+        0.4064,
+        0.4084
+       ],
+       "brier": [
+        0.1308,
+        0.1316
+       ]
+      },
+      "cross": {
+       "games": 16,
+       "logLoss": [
+        0.312,
+        0.3226
+       ],
+       "brier": [
+        0.089,
+        0.094
+       ]
+      },
+      "same": {
+       "games": 6,
+       "logLoss": [
+        0.6581,
+        0.6371
+       ],
+       "brier": [
+        0.2425,
+        0.2319
+       ]
+      },
+      "residual": {
+       "Africa": {
+        "teamGames": 3,
+        "before": 7.12,
+        "after": 7.64
+       },
+       "Americas curated": {
+        "teamGames": 1,
+        "before": 9.77,
+        "after": 8.27
+       },
+       "Americas others": {
+        "teamGames": 1,
+        "before": -9.77,
+        "after": -8.27
+       },
+       "Americas": {
+        "teamGames": 10,
+        "before": -7.19,
+        "after": -7.63
+       },
+       "Asia": {
+        "teamGames": 6,
+        "before": -0.45,
+        "after": -0.63
+       },
+       "Europe others": {
+        "teamGames": 10,
+        "before": 0,
+        "after": 0
+       },
+       "Europe": {
+        "teamGames": 13,
+        "before": 4.1,
+        "after": 4.39
+       }
+      }
+     },
+     "to-2025": {
+      "about": "fit before the 2025 continental championships, test on them",
+      "all": {
+       "games": 98,
+       "logLoss": [
+        0.5593,
+        0.5749
+       ],
+       "brier": [
+        0.1863,
+        0.1935
+       ]
+      },
+      "same": {
+       "games": 98,
+       "logLoss": [
+        0.5593,
+        0.5749
+       ],
+       "brier": [
+        0.1863,
+        0.1935
+       ]
+      },
+      "residual": {
+       "Africa curated": {
+        "teamGames": 12,
+        "before": 3.26,
+        "after": 3.34
+       },
+       "Africa others": {
+        "teamGames": 4,
+        "before": -9.77,
+        "after": -10.03
+       },
+       "Americas curated": {
+        "teamGames": 5,
+        "before": -2.33,
+        "after": -2.48
+       },
+       "Americas others": {
+        "teamGames": 9,
+        "before": 1.29,
+        "after": 1.38
+       },
+       "Asia curated": {
+        "teamGames": 11,
+        "before": -3.41,
+        "after": -3.17
+       },
+       "Asia others": {
+        "teamGames": 3,
+        "before": 12.49,
+        "after": 11.61
+       },
+       "Europe curated": {
+        "teamGames": 42,
+        "before": -8.15,
+        "after": -8.27
+       },
+       "Europe others": {
+        "teamGames": 110,
+        "before": 3.11,
+        "after": 3.16
+       }
+      }
+     }
+    },
+    "leaveOneOut": {
+     "wc2023": {
+      "games": 72,
+      "logLoss": [
+       0.6536,
+       0.6462
+      ],
+      "brier": [
+       0.2138,
+       0.2107
+      ]
+     },
+     "oqt2024": {
+      "games": 24,
+      "logLoss": [
+       0.5139,
+       0.5216
+      ],
+      "brier": [
+       0.1679,
+       0.1708
+      ]
+     },
+     "og2024": {
+      "games": 22,
+      "logLoss": [
+       0.4064,
+       0.4025
+      ],
+      "brier": [
+       0.1308,
+       0.1297
+      ]
+     },
+     "eurobasket2025": {
+      "games": 76,
+      "logLoss": [
+       0.548,
+       0.5511
+      ],
+      "brier": [
+       0.18,
+       0.1805
+      ]
+     },
+     "americup2025": {
+      "games": 7,
+      "logLoss": [
+       0.5547,
+       0.5522
+      ],
+      "brier": [
+       0.1854,
+       0.1853
+      ]
+     },
+     "afrobasket2025": {
+      "games": 8,
+      "logLoss": [
+       0.7185,
+       0.7376
+      ],
+      "brier": [
+       0.262,
+       0.2707
+      ]
+     },
+     "asiacup2025": {
+      "games": 7,
+      "logLoss": [
+       0.5042,
+       0.5611
+      ],
+      "brier": [
+       0.169,
+       0.1982
+      ]
+     },
+     "all": {
+      "games": 216,
+      "logLoss": [
+       0.5701,
+       0.5717
+      ],
+      "brier": [
+       0.1878,
+       0.1884
+      ]
+     }
+    }
+   },
+   "region": {
+    "splits": {
+     "wc2023→2024": {
+      "about": "fit on the 2023 World Cup (its hosts never played away: the home edge is the full fit's), test on the 2024 Olympic qualifiers and Olympics",
+      "all": {
+       "games": 46,
+       "logLoss": [
+        0.4625,
+        0.4693
+       ],
+       "brier": [
+        0.1502,
+        0.154
+       ]
+      },
+      "cross": {
+       "games": 32,
+       "logLoss": [
+        0.4411,
+        0.4423
+       ],
+       "brier": [
+        0.1421,
+        0.1432
+       ]
+      },
+      "same": {
+       "games": 14,
+       "logLoss": [
+        0.5114,
+        0.5311
+       ],
+       "brier": [
+        0.1686,
+        0.1789
+       ]
+      },
+      "residual": {
+       "Africa": {
+        "teamGames": 10,
+        "before": -0.42,
+        "after": 0.27
+       },
+       "Americas curated": {
+        "teamGames": 3,
+        "before": 3.26,
+        "after": 1.67
+       },
+       "Americas others": {
+        "teamGames": 1,
+        "before": -9.77,
+        "after": -5
+       },
+       "Americas": {
+        "teamGames": 17,
+        "before": -2.96,
+        "after": -3.27
+       },
+       "Asia": {
+        "teamGames": 10,
+        "before": 0.36,
+        "after": 0.61
+       },
+       "Europe others": {
+        "teamGames": 24,
+        "before": 0,
+        "after": 0
+       },
+       "Europe": {
+        "teamGames": 27,
+        "before": 1.88,
+        "after": 1.73
+       }
+      }
+     },
+     "to-og2024": {
+      "about": "fit on the 2023 World Cup and the 2024 Olympic qualifiers, test on the Olympics",
+      "all": {
+       "games": 22,
+       "logLoss": [
+        0.4064,
+        0.4899
+       ],
+       "brier": [
+        0.1308,
+        0.1672
+       ]
+      },
+      "cross": {
+       "games": 16,
+       "logLoss": [
+        0.312,
+        0.3935
+       ],
+       "brier": [
+        0.089,
+        0.1248
+       ]
+      },
+      "same": {
+       "games": 6,
+       "logLoss": [
+        0.6581,
+        0.7471
+       ],
+       "brier": [
+        0.2425,
+        0.2803
+       ]
+      },
+      "residual": {
+       "Africa": {
+        "teamGames": 3,
+        "before": 7.12,
+        "after": 6.48
+       },
+       "Americas curated": {
+        "teamGames": 1,
+        "before": 9.77,
+        "after": 5
+       },
+       "Americas others": {
+        "teamGames": 1,
+        "before": -9.77,
+        "after": -5
+       },
+       "Americas": {
+        "teamGames": 10,
+        "before": -7.19,
+        "after": -6.42
+       },
+       "Asia": {
+        "teamGames": 6,
+        "before": -0.45,
+        "after": 0.74
+       },
+       "Europe others": {
+        "teamGames": 10,
+        "before": 0,
+        "after": 0
+       },
+       "Europe": {
+        "teamGames": 13,
+        "before": 4.1,
+        "after": 3.1
+       }
+      }
+     },
+     "to-2025": {
+      "about": "fit before the 2025 continental championships, test on them",
+      "all": {
+       "games": 98,
+       "logLoss": [
+        0.5593,
+        0.5679
+       ],
+       "brier": [
+        0.1863,
+        0.1928
+       ]
+      },
+      "same": {
+       "games": 98,
+       "logLoss": [
+        0.5593,
+        0.5679
+       ],
+       "brier": [
+        0.1863,
+        0.1928
+       ]
+      },
+      "residual": {
+       "Africa curated": {
+        "teamGames": 12,
+        "before": 3.26,
+        "after": 3.48
+       },
+       "Africa others": {
+        "teamGames": 4,
+        "before": -9.77,
+        "after": -10.43
+       },
+       "Americas curated": {
+        "teamGames": 5,
+        "before": -2.33,
+        "after": 0.65
+       },
+       "Americas others": {
+        "teamGames": 9,
+        "before": 1.29,
+        "after": -0.36
+       },
+       "Asia curated": {
+        "teamGames": 11,
+        "before": -3.41,
+        "after": -1.81
+       },
+       "Asia others": {
+        "teamGames": 3,
+        "before": 12.49,
+        "after": 6.62
+       },
+       "Europe curated": {
+        "teamGames": 42,
+        "before": -8.15,
+        "after": -7.61
+       },
+       "Europe others": {
+        "teamGames": 110,
+        "before": 3.11,
+        "after": 2.91
+       }
+      }
+     }
+    },
+    "leaveOneOut": {
+     "wc2023": {
+      "games": 72,
+      "logLoss": [
+       0.6536,
+       0.6725
+      ],
+      "brier": [
+       0.2138,
+       0.2225
+      ]
+     },
+     "oqt2024": {
+      "games": 24,
+      "logLoss": [
+       0.5139,
+       0.5544
+      ],
+      "brier": [
+       0.1679,
+       0.1829
+      ]
+     },
+     "og2024": {
+      "games": 22,
+      "logLoss": [
+       0.4064,
+       0.4555
+      ],
+      "brier": [
+       0.1308,
+       0.1516
+      ]
+     },
+     "eurobasket2025": {
+      "games": 76,
+      "logLoss": [
+       0.548,
+       0.752
+      ],
+      "brier": [
+       0.18,
+       0.2723
+      ]
+     },
+     "americup2025": {
+      "games": 7,
+      "logLoss": [
+       0.5547,
+       0.5537
+      ],
+      "brier": [
+       0.1854,
+       0.1833
+      ]
+     },
+     "afrobasket2025": {
+      "games": 8,
+      "logLoss": [
+       0.7185,
+       0.7027
+      ],
+      "brier": [
+       0.262,
+       0.2543
+      ]
+     },
+     "asiacup2025": {
+      "games": 7,
+      "logLoss": [
+       0.5042,
+       0.5026
+      ],
+      "brier": [
+       0.169,
+       0.1715
+      ]
+     },
+     "all": {
+      "games": 216,
+      "logLoss": [
+       0.5701,
+       0.657
+      ],
+      "brier": [
+       0.1878,
+       0.2267
+      ]
+     }
+    }
+   },
+   "margins": {
+    "splits": {
+     "wc2023→2024": {
+      "about": "fit on the 2023 World Cup (its hosts never played away: the home edge is the full fit's), test on the 2024 Olympic qualifiers and Olympics",
+      "all": {
+       "games": 46,
+       "logLoss": [
+        0.4625,
+        0.5375
+       ],
+       "brier": [
+        0.1502,
+        0.166
+       ]
+      },
+      "cross": {
+       "games": 32,
+       "logLoss": [
+        0.4411,
+        0.5467
+       ],
+       "brier": [
+        0.1421,
+        0.1639
+       ]
+      },
+      "same": {
+       "games": 14,
+       "logLoss": [
+        0.5114,
+        0.5166
+       ],
+       "brier": [
+        0.1686,
+        0.1707
+       ]
+      },
+      "residual": {
+       "Africa": {
+        "teamGames": 10,
+        "before": -0.42,
+        "after": 1.94
+       },
+       "Americas curated": {
+        "teamGames": 3,
+        "before": 3.26,
+        "after": 6.89
+       },
+       "Americas others": {
+        "teamGames": 1,
+        "before": -9.77,
+        "after": -20.66
+       },
+       "Americas": {
+        "teamGames": 17,
+        "before": -2.96,
+        "after": 0.19
+       },
+       "Asia": {
+        "teamGames": 10,
+        "before": 0.36,
+        "after": 6.05
+       },
+       "Europe others": {
+        "teamGames": 24,
+        "before": 0,
+        "after": 0
+       },
+       "Europe": {
+        "teamGames": 27,
+        "before": 1.88,
+        "after": -3.08
+       }
+      }
+     },
+     "to-og2024": {
+      "about": "fit on the 2023 World Cup and the 2024 Olympic qualifiers, test on the Olympics",
+      "all": {
+       "games": 22,
+       "logLoss": [
+        0.4064,
+        0.3866
+       ],
+       "brier": [
+        0.1308,
+        0.1247
+       ]
+      },
+      "cross": {
+       "games": 16,
+       "logLoss": [
+        0.312,
+        0.285
+       ],
+       "brier": [
+        0.089,
+        0.0805
+       ]
+      },
+      "same": {
+       "games": 6,
+       "logLoss": [
+        0.6581,
+        0.6578
+       ],
+       "brier": [
+        0.2425,
+        0.2425
+       ]
+      },
+      "residual": {
+       "Africa": {
+        "teamGames": 3,
+        "before": 7.12,
+        "after": 8.19
+       },
+       "Americas curated": {
+        "teamGames": 1,
+        "before": 9.77,
+        "after": 13.03
+       },
+       "Americas others": {
+        "teamGames": 1,
+        "before": -9.77,
+        "after": -13.03
+       },
+       "Americas": {
+        "teamGames": 10,
+        "before": -7.19,
+        "after": -6.95
+       },
+       "Asia": {
+        "teamGames": 6,
+        "before": -0.45,
+        "after": 1.04
+       },
+       "Europe others": {
+        "teamGames": 10,
+        "before": 0,
+        "after": 0
+       },
+       "Europe": {
+        "teamGames": 13,
+        "before": 4.1,
+        "after": 2.98
+       }
+      }
+     },
+     "to-2025": {
+      "about": "fit before the 2025 continental championships, test on them",
+      "all": {
+       "games": 98,
+       "logLoss": [
+        0.5593,
+        0.5546
+       ],
+       "brier": [
+        0.1863,
+        0.1857
+       ]
+      },
+      "same": {
+       "games": 98,
+       "logLoss": [
+        0.5593,
+        0.5546
+       ],
+       "brier": [
+        0.1863,
+        0.1857
+       ]
+      },
+      "residual": {
+       "Africa curated": {
+        "teamGames": 12,
+        "before": 3.26,
+        "after": 3.73
+       },
+       "Africa others": {
+        "teamGames": 4,
+        "before": -9.77,
+        "after": -11.2
+       },
+       "Americas curated": {
+        "teamGames": 5,
+        "before": -2.33,
+        "after": 1.4
+       },
+       "Americas others": {
+        "teamGames": 9,
+        "before": 1.29,
+        "after": -0.78
+       },
+       "Asia curated": {
+        "teamGames": 11,
+        "before": -3.41,
+        "after": -1.81
+       },
+       "Asia others": {
+        "teamGames": 3,
+        "before": 12.49,
+        "after": 6.62
+       },
+       "Europe curated": {
+        "teamGames": 42,
+        "before": -8.15,
+        "after": -8.21
+       },
+       "Europe others": {
+        "teamGames": 110,
+        "before": 3.11,
+        "after": 3.13
+       }
+      }
+     }
+    },
+    "leaveOneOut": {
+     "wc2023": {
+      "games": 72,
+      "logLoss": [
+       0.6536,
+       0.6757
+      ],
+      "brier": [
+       0.2138,
+       0.2163
+      ]
+     },
+     "oqt2024": {
+      "games": 24,
+      "logLoss": [
+       0.5139,
+       0.6448
+      ],
+      "brier": [
+       0.1679,
+       0.2163
+      ]
+     },
+     "og2024": {
+      "games": 22,
+      "logLoss": [
+       0.4064,
+       0.3461
+      ],
+      "brier": [
+       0.1308,
+       0.1112
+      ]
+     },
+     "eurobasket2025": {
+      "games": 76,
+      "logLoss": [
+       0.548,
+       0.5323
+      ],
+      "brier": [
+       0.18,
+       0.1742
+      ]
+     },
+     "americup2025": {
+      "games": 7,
+      "logLoss": [
+       0.5547,
+       0.5637
+      ],
+      "brier": [
+       0.1854,
+       0.1789
+      ]
+     },
+     "afrobasket2025": {
+      "games": 8,
+      "logLoss": [
+       0.7185,
+       0.8701
+      ],
+      "brier": [
+       0.262,
+       0.3257
+      ]
+     },
+     "asiacup2025": {
+      "games": 7,
+      "logLoss": [
+       0.5042,
+       0.4809
+      ],
+      "brier": [
+       0.169,
+       0.1753
+      ]
+     },
+     "all": {
+      "games": 216,
+      "logLoss": [
+       0.5701,
+       0.5855
+      ],
+      "brier": [
+       0.1878,
+       0.1923
+      ]
+     }
+    }
+   }
+  }
+ },
+ "decision": "not applied: every rule that moves the curated players scores the held-out games worse than the ratings as they are (validation)"
+}

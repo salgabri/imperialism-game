@@ -21,6 +21,7 @@ import { eloOn, resultRows } from './lib/football-elo.mjs';
 import { csvRows } from './lib/world-cup-facts.mjs';
 import { entityId, seasonElo, sparqlRows, wikidataTables } from './lib/national-team-facts.mjs';
 import { FILL_YEARS, withoutMalformedDays, womenOf } from './lib/football-fills.mjs';
+import { confederationResolver, interConfederationMatches, seasonEloWithLevels } from './lib/confederation-levels.mjs';
 import { politeFetch } from './lib/polite-fetch.mjs';
 import { WIKIDATA_SPARQL, sparqlRequest } from './lib/wikidata-sparql.mjs';
 
@@ -113,7 +114,14 @@ async function main() {
 
   const matches = resultRows(csvRows(await pinned(dataDir, results.folder, results.files[0], `${results.download}${results.files[0].name}`)));
   const snapshots = eloOn(matches, manifest.seasons.map(season => season.date), manifest.elo);
-  const elo = Object.fromEntries(manifest.seasons.map(season => [season.id, seasonElo(snapshots[season.date], season.date, manifest.elo.activeYears)]));
+  // Each season's Elo with its confederation levels: every inter-confederation match scored with the Elo from before it.
+  const table = JSON.parse(await readFile(path.join(root, manifest.levels.table), 'utf8'));
+  const confederationOf = confederationResolver(table);
+  const inter = interConfederationMatches(matches, manifest.elo, confederationOf);
+  const levels = { years: manifest.levels.years, prior: manifest.levels.prior, reference: manifest.levels.reference };
+  const elo = Object.fromEntries(manifest.seasons.map(season => [season.id, seasonEloWithLevels(
+    seasonElo(snapshots[season.date], season.date, manifest.elo.activeYears),
+    { snapshot: snapshots[season.date], inter, levels, confederations: table.confederations, confederationOf })]));
 
   const outputs = new Map([
     [path.join(OUT, 'wikidata.json'), factsText({
@@ -125,13 +133,19 @@ async function main() {
     })],
     [path.join(OUT, 'elo.json'), factsText({
       about: 'Each season\'s World Football Elo on its ratings date, computed from martj42\'s results (CC0) by the formula eloratings.net '
-        + 'publishes: every team that played in the four years before, [results name, Elo, rank]. Written by scripts/sync-football-fills.mjs.',
+        + 'publishes: every team that played in the four years before, [results name, Elo, rank, confederation]; its confederation levels '
+        + '(scripts/lib/confederation-levels.mjs: [confederation, level, standard error, matches]) and the best levelled Elo. Written by '
+        + 'scripts/sync-football-fills.mjs.',
       seasons: elo,
     })],
   ]);
   console.log(`Wikidata: ${tables.teams.length} teams, ${tables.players.length} players, ${tables.stints.length} stints `
     + `(${tables.audit.ended} ended by the rule, ${tables.audit.noEnd} left out with neither end nor caps, ${tables.audit.noCaps} without caps)`);
-  for (const season of manifest.seasons) console.log(`${season.id}: Elo of ${elo[season.id].date}, ${elo[season.id].ratings.length} active, best ${elo[season.id].best.team} ${elo[season.id].best.elo}`);
+  for (const season of manifest.seasons) {
+    const { date, ratings, best, levelledBest, levels: found } = elo[season.id];
+    console.log(`${season.id}: Elo of ${date}, ${ratings.length} active, best ${best.team} ${best.elo}, levelled ${levelledBest.team} ${levelledBest.elo}; `
+      + `levels ${found.confederations.map(([c, level]) => `${c} ${level}`).join(', ')}`);
+  }
   if (args.check) {
     const differs = [];
     for (const [file, text] of outputs) {

@@ -96,6 +96,19 @@ none, fields no team (`fieldedNations`), so seven play and the rest of the land 
 United Kingdom's empire. This is the NHL's players only: no KHL, SHL or Liiga, so Czechia,
 Slovakia and Switzerland are thinner than their real teams.
 
+**Generated players, audited 2026-11-21, unchanged.** Asked whether made-up ratings lift a weak nation toward the strong
+ones, every season was built as a campaign builds it (`loadSeasons`/`seasonTeams`, scripts/lib/roster-audit.mjs). Generated
+players hold 7.0% of the fielded nations' lineup places: 83 of 310 season-nations, one to nine of the 19 places (Slovakia
+in 20 seasons, Finland 17, Czechia 14, Switzerland 13, Sweden 12, Russia 5, Denmark and Germany one each). Each comes at the
+nation's stored strength − 3 ± 4, a stored strength that counts his place at the baseline: 58 to 82, always below the
+nation's own starters, by 14 points at the median (5 to 20). So a nation plays 4.1 points above its stored strength at the
+median (7.6 at most, Denmark 2016/17), and in five pairs of nations within 2.1 points of each other the order turns
+(Sweden over Czechia in 1990/91 and 1991/92, Slovakia over Finland in 2007/08, Finland over Czechia in 1984/85, Sweden over
+the United States in 1980/81). The built-in season keeps its order: Czechia 79.0 and Switzerland 76.7 as played (75.5 and
+70.7 at the baseline), behind Finland's 85.8. No confederation constant reaches the ice (the fallback is the flat
+baseline). Whether a missing place is worth 45, the nation's level less 3, or more would take IIHF results, which the repo
+does not hold, so the rule stands.
+
 ## The lineup
 
 Nineteen starters: four centres, four left wings, four right wings, six defenders and the
@@ -448,6 +461,15 @@ hand-weighted mean of points a game, minutes a game and save percentage over the
   the squad's best few one point more, whichever brings the squad's lineup nearest it (`clubMoveOf`): nobody passes
   anybody in his club. r runs 0.50 (2015/16) to 0.95 (1974/75), m 0.27 goals a point (2003/04) to 0.42 (1981/82), the
   moves −4 to +3.
+- *2012/13 and 2020/21, groups that never met* (audited 2026-11-21, on the user's request that ratings be "normalized";
+  unchanged). Each conference (2012/13) or division (2020/21) is read against its own mean, so the groups stand level.
+  The seasons either side, whose games the snapshots keep, measure the same clubs in one league, by the SRS of every
+  game (goals a game): 2012/13's Western Conference 0.06 ± 0.14 above the Eastern in 2011/12 and 0.24 ± 0.10 in
+  2013/14, 0.2 to 0.8 of a point of played strength at that season's m (0.288); 2020/21's divisions at most 0.26 apart in
+  2019/20 (its East's clubs first, +0.17 ± 0.09) and 0.25 in 2018/19 (its Central's first, +0.15), their order not the
+  same from one season to the next, under 0.9 of a point at m 0.305. Under a point and inconsistent, the groups stay level
+  (decided 2026-11-21 by the coordinating session, for the user); college football's rule for a loose conference
+  ([college-football.md](college-football.md#one-scale-for-the-conferences)) would hold them toward the seasons either side.
 - *Nations.* The databank's birth country, a birth it files in the USSR, Czechoslovakia or Yugoslavia counting for the
   country its city is in today, and a birth city it files under a country the city is not in (Bratislava and eleven more
   Slovak cities under the Czech Republic, Ceske Budejovice and Havlickuv Brod under Slovakia, Sverdlovsk under Ukraine,
