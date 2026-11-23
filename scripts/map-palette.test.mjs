@@ -8,8 +8,10 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { APART, CLOSE, FLAGS_CLOSE, clubRanks, empireNeighbours, empirePalette, ownColour, separate } from '../src/engine/mapPalette.js';
 import { WorldGeometry } from '../src/engine/geo.js';
+import { decodeDomestic } from '../src/engine/domestic.js';
 import { rememberTwins } from '../src/data/crests.js';
 import { DEPENDENCIES, NATIONS, makeRng } from '../src/data/teams.js';
+import { clubColour } from '../src/data/clubColours.js';
 import { politicalFill } from '../src/data/empireColours.js';
 import { DARK_TOKENS, V4, darkFill, empireFill, empireFillPair, themedPaint } from '../src/theme.js';
 import { toOklch } from '../src/engine/colour.js';
@@ -37,15 +39,18 @@ function lookAlikes(own, adj, palette) {
   return out;
 }
 
-/** A shipped country map as the palette reads it: its starting board, borders, land and clubs (twins remembered). */
+/**
+ * A shipped country map as the palette reads it: its starting board, borders, land and clubs, each with the twin its
+ * map gives it (null for none).
+ */
 function countryMap(file) {
   const data = JSON.parse(readFileSync(new URL(`../public/domestic/${file}`, import.meta.url), 'utf8'));
   // As engine/domestic.js decodes it, without fitting paths the palette does not read.
   const geo = new WorldGeometry(data.topology, {}, { object: 'sections', projection: data.projection, borderLengths: false });
-  if (data.season || data.year) rememberTwins(data.clubs);
-  const home = Object.freeze(Object.fromEntries(data.clubs.flatMap(club => (club.sections || [club.section]).map(section => [section, club.id]))));
-  const teams = Object.fromEntries(data.clubs.map(club => [club.id, { ...club, kind: 'club' }]));
-  return { id: data.id, home, adj: geo.adj, areaOf: id => geo.surfaceOf(id).area, ranks: clubRanks(data.clubs), teams };
+  const clubs = data.clubs.map(club => ({ ...club, twin: club.twin ?? null }));
+  const home = Object.freeze(Object.fromEntries(clubs.flatMap(club => (club.sections || [club.section]).map(section => [section, club.id]))));
+  const teams = Object.fromEntries(clubs.map(club => [club.id, { ...club, kind: 'club' }]));
+  return { id: data.id, home, adj: geo.adj, areaOf: id => geo.surfaceOf(id).area, ranks: clubRanks(clubs), teams };
 }
 const paletteOf = (map, own = map.home, managedId = null) =>
   empirePalette({ own, adj: map.adj, home: map.home, areaOf: map.areaOf, ranks: map.ranks, teams: map.teams, managedId });
@@ -126,6 +131,28 @@ test('a club takes its crest colour, an earlier season’s club its twin’s, an
   assert.equal(ownColour('x-none', { col: 'oklch(0.74 0.15 0)' }).colour, 'oklch(0.74 0.15 0)');
   assert.equal(ownColour('x-none').colour, null, 'none: its hash pastel');
   assert.deepEqual(ownColour('643').fits.every(colour => toOklch(colour)), true, 'a nation’s flag colours to fall back on');
+});
+
+test('a season club takes its own map’s twin’s colour, never that of a namesake from another country decoded since', () => {
+  // A season's `f-<name>` id can name clubs of two countries in other seasons (src/data/crests.js). Peru's León of
+  // 1995/96 is León de Huánuco, Mexico's of 2015/16 Club León: a player who opens Mexico's map and comes back gets
+  // Peru's from the map loader's cache, not decoded again. Venezuela's Valencia of 1995/96 has no twin on today's map of
+  // Venezuela; Spain's of 2014/15 is Valencia CF.
+  const decode = id => decodeDomestic(JSON.parse(readFileSync(new URL(`../public/domestic/${id}.json`, import.meta.url), 'utf8')), id);
+  const clubOf = (map, id) => map.clubs.find(club => club.id === id);
+  // A map's colours at kick-off, as the setup card and the map paint its decoded clubs: each time on a board of its own,
+  // as the kick-off is kept per starting board.
+  const kickoff = map => empirePalette({ own: { ...map.startOwners }, adj: map.geo.adj, areaOf: id => map.geo.surfaceOf(id).area,
+    ranks: clubRanks(map.clubs), teams: Object.fromEntries(map.clubs.map(club => [club.id, club])) }).political;
+  const peru = decode('604y1996'), venezuela = decode('862y1996');
+  const before = [kickoff(peru), kickoff(venezuela)];
+  const mexico = decode('484y2016'), spain = decode('724y2015');
+  assert.deepEqual([clubOf(peru, 'f-leon').twin, clubOf(mexico, 'f-leon').twin], ['d604-5290586', 'd484-1259']);
+  assert.deepEqual([clubOf(venezuela, 'f-valencia').twin, clubOf(spain, 'f-valencia').twin], [null, 'd724-1775']);
+  const leon = clubOf(peru, 'f-leon'), valencia = clubOf(venezuela, 'f-valencia');
+  assert.equal(ownColour('f-leon', leon).colour, clubColour('d604-5290586'), 'León de Huánuco’s crest colour, not Club León’s');
+  assert.equal(ownColour('f-valencia', valencia).colour, valencia.col, 'its map colour, not Valencia CF’s crest colour');
+  assert.deepEqual([kickoff(peru), kickoff(venezuela)], before, 'Peru’s and Venezuela’s colours, whatever maps were decoded since');
 });
 
 // ---- Every board ----

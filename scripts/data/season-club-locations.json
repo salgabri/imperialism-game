@@ -135,13 +135,20 @@
   "Vidus Riga": { "lon": 24.1059, "lat": 56.946, "note": "Riga (GeoNames 456172): not Riga FC (2015), whose name it shares" }
 },
 "484": {
+  "Club Atlético Chiapas": { "lon": -89.6232, "lat": 20.967, "note": "Mérida (GeoNames 3523349), where CM 01/02's data of 2002/03 and 2003/04 has this Primera A side play (Estadio Carlos Iturralde): not Jaguares de Chiapas of Tuxtla Gutiérrez, whose name shares only Chiapas" },
+  "Club Universitario de Nuevo León": { "as": "d484-104360", "note": "Tigres UANL of Monterrey (CM 01/02's short name Tigres, ground the Estadio Universitario): not Club León, whose name the matching found inside Nuevo León" },
+  "Club de Fútbol México": { "lon": -99.5164, "lat": 27.4763, "note": "Nuevo Laredo (GeoNames 3522551), where CM 01/02's data of 2002/03 and 2003/04 has this side play (short name Toros Neza, at Neza 86 in 2001/02): not Lobos ULMX, whose name shares only México" },
+  "Club de Fútbol Oaxaca": { "lon": -96.7254, "lat": 17.0603, "note": "Oaxaca (GeoNames 3522507): a Primera A side of the early 2000s, not the Alebrijes (2012)" },
   "Club de Fútbol Universidad": { "as": "d484-1260", "note": "Pumas de la UNAM (Mexico City), not Guadalajara's Leones Negros, whose Wikidata item the name matched" },
+  "Club de Fútbol de la UAT": { "as": "d484-136013", "note": "Correcaminos of the Universidad Autónoma de Tamaulipas, Ciudad Victoria (CM 01/02's short name Correcaminos): no word of its name is one the matching can use" },
   "Inter de Tijuana": { "lon": -117.0037, "lat": 32.5027, "note": "Tijuana (GeoNames 3981609): not the Xolos (2007)" },
   "Linces de Celaya": { "lon": -100.814, "lat": 20.5218, "note": "Celaya (GeoNames 4014875): SWOS also has Celaya, today's Celaya FC" },
   "Marte Morelos": { "lon": -99.2308, "lat": 18.9261, "note": "Cuernavaca (GeoNames 3529947), Club Marte's city in Morelos, not Ecatepec de Morelos" },
+  "Promotora Deportiva Tijuana": { "lon": -117.0037, "lat": 32.5027, "note": "Tijuana (GeoNames 3981609): Nacional Tijuana of the early 2000s Primera A, not the Xolos (2007)" },
+  "Pumas Tabasco": { "lon": -92.9393, "lat": 17.9863, "note": "Villahermosa (GeoNames 3514670): UNAM's Liga de Expansión side, not Pumas UNAM of Mexico City" },
   "Toros Hidalgo": { "unplaced": true, "note": "SWOS names the state of Hidalgo only; not the village of Pueblo Hidalgo" },
   "UA Guadalajara": { "lon": -103.3874, "lat": 20.7211, "note": "Zapopan (GeoNames 3979770), UAG Tecos', not Chivas" },
-  "UN Leon": { "lon": -101.6825, "lat": 21.1218, "note": "León (GeoNames 3998655): SWOS also has Club León" }
+  "UN Leon": { "as": "d484-104360", "note": "Tigres UANL (Universidad Autónoma de Nuevo León): SWOS 95/96's squad keeps six of SWOS 94/95's Club Tigres (Avilán, Lanari, Martínez, Solís, Lozano, Almaguer); not a club of León" }
 },
 "554": {
   "Central United": { "lon": 174.7364, "lat": -36.8978, "note": "Auckland, Central United's home as SWOS 94/95's Central has it (Wikidata Q166141)" },

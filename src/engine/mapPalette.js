@@ -125,13 +125,16 @@ function politicalChoices(colour, step, id, fits = []) {
 
 /**
  * The colour an empire's political fill starts from, its lightness step and its other fitting colours: a nation's
- * (nationColours.js); a club's crest colour, else that of the crest it wears (an earlier season's club,
- * src/data/crests.js), else its map colour (`team.col`), else none (its hash pastel).
+ * (nationColours.js); a club's crest colour, else that of its twin's crest, the one it wears (an earlier season's club,
+ * src/data/crests.js), else its map colour (`team.col`), else none (its hash pastel). The twin is the one its own map
+ * gives it (`team.twin`, null for none: engine/domestic.js decodeDomestic): a season's `f-<name>` id names namesakes in
+ * other countries in other seasons, and the twin remembered last for that id may be one of theirs. Only a team that
+ * carries no `twin` looks it up by id (crests.js twinOf).
  */
 export function ownColour(id, team = null) {
   const nation = NATION_COLOURS[id];
   if (nation) return { colour: nation[0], step: nation[1], fits: nation[2] || [] };
-  const twin = twinOf(id);
+  const twin = team?.twin !== undefined ? team.twin : twinOf(id);
   const colour = empireColour(id) || (twin && clubColour(twin)) || team?.col || null;
   return { colour: colour && toOklch(colour) ? colour : null, step: idStep(id), fits: [] };
 }

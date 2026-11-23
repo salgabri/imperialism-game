@@ -3,11 +3,15 @@
 // (DEC D15), the dashed target preview and hover (C-18), tooltip copy, conquest framing reset, render purity (§0.9).
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { setTimeout as delay } from 'node:timers/promises';
 import { MAP, V4, empireFill } from '../src/theme.js';
 import { flagRegionIndexSteps } from '../src/engine/flagRegions.js';
+import { ownColour } from '../src/engine/mapPalette.js';
+import { buildClub } from '../src/data/teams.js';
+import { clubColour } from '../src/data/clubColours.js';
 import { politicalFill } from '../src/data/empireColours.js';
-import { bundleApp, syncAppFixture, findElement } from './lib/app-harness.mjs';
+import { bundleApp, bundleComponents, syncAppFixture, findElement } from './lib/app-harness.mjs';
 
 const App = await bundleApp();
 const IDS = ['250', '276', '826'];
@@ -522,4 +526,30 @@ test('a country map: setup paints each club’s land as its starting club and na
     const town = app.mapHomes(true).find(home => home.id === '276');
     assert.deepEqual([town.x, town.y], [201.5, 99.25], 'a section marks the home town, not its routing anchor');
   } finally { g.close(); }
+});
+
+test('a country campaign paints a season’s club in its own map’s twin’s colour, as setup does, never a namesake’s', async () => {
+  // One bundle, so the map methods read the twins its decodeDomestic remembers (src/data/crests.js).
+  const { mapPalette, decodeDomestic } = await bundleComponents({ mapPalette: ['src/app/mapMethods.jsx', 'mapPalette'],
+    decodeDomestic: ['src/engine/domestic.js', 'decodeDomestic'] }, { jsx: 'automatic' });
+  const decode = id => decodeDomestic(JSON.parse(readFileSync(new URL(`../public/domestic/${id}.json`, import.meta.url), 'utf8')), id);
+  // You manage `id` on `map`, built as App.opening builds a campaign's teams (without twins): the map paints it clay, and
+  // its own colour where clay does not show.
+  const ownFill = (map, id) => {
+    const app = { geo: map.geo, domesticMap: () => map, managedId: st => st.managedTeamId };
+    const teams = Object.fromEntries(map.clubs.map(club => [club.id, buildClub(club, { id: 'football' })]));
+    return mapPalette.call(app, { phase: 'playing', own: { ...map.startOwners }, teams, settings: {}, managedTeamId: id }).political.get(id);
+  };
+  // Peru 1995/96, whose León is León de Huánuco, then Mexico 2015/16, whose León is Club León: back on Peru, the map
+  // loader serves its map from the cache, not decoded again.
+  const peru = decode('604y1996');
+  decode('484y2016');
+  assert.equal(ownFill(peru, 'f-leon'), empireFill('f-leon', clubColour('d604-5290586'), ownColour('f-leon').step),
+    'León de Huánuco’s colour, not Club León’s');
+  // Venezuela 1995/96, whose Valencia has no twin, and Spain 2014/15, whose Valencia is Valencia CF.
+  const venezuela = decode('862y1996');
+  decode('724y2015');
+  const valencia = venezuela.clubs.find(club => club.id === 'f-valencia');
+  assert.equal(ownFill(venezuela, 'f-valencia'), empireFill('f-valencia', valencia.col, ownColour('f-valencia').step),
+    'its map colour, not Valencia CF’s');
 });

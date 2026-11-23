@@ -26,11 +26,14 @@ const CARICATURES = {
 const NO_PICTURE = {
   'el-st-petersburg-lions': 'a one-season club of 2000/01: no article, file or archived page in any language shows a logo',
 };
-// Football's club appearances (a club on a map in a season) with no crest, 23 November 2026 after the fifth pass: 1,371
-// of about 60,400, 706 clubs by country and id (269 of today's country maps, 437 of the earlier seasons'), whose articles
+// Football's club appearances (a club on a map in a season) with no crest, 23 November 2026 after the fifth pass: 1,378
+// of about 60,400, 710 clubs by country and id (269 of today's country maps, 441 of the earlier seasons'), whose articles
 // show no crest, show another club's, or do not exist (1,412 after the fourth pass, 1,501 after the third, the USA's San
-// Francisco of 1996/97 included since the namesakes' fix). A crest found for one lowers it.
-const FOOTBALL_WITHOUT_CREST = 1371;
+// Francisco of 1996/97 included since the namesakes' fix). The same day five Mexican clubs of 2002/03 to 2003/04 and
+// 2022/23 lost the twin a place in their names had given them (another club's crest: Promotora Deportiva Tijuana, CF
+// Oaxaca, CF México, Atlético Chiapas, Pumas Tabasco; +9) and SWOS's "UN Leon" took Tigres' (-2). A crest found for one
+// lowers it.
+const FOOTBALL_WITHOUT_CREST = 1378;
 const isFootball = id => /^(f-|d[0-9A-Z]+-)/.test(id);
 
 const excused = (id, year) => (CARICATURES[id] && year != null && CARICATURES[id][0] <= year && year <= CARICATURES[id][1]) || id in NO_PICTURE;
