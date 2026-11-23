@@ -94,7 +94,7 @@
           "sha256": "b705168377f9e9ae0014b7976093fc358b1d83da639bd5130f88644730154216"
         }
       ],
-      "version": "cm0102-2003-10-6a0df0f4",
+      "version": "cm0102-2003-10-79375835",
       "coverage": {
         "players": 2545,
         "nations": 162,
@@ -105,7 +105,7 @@
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2003-10",
-        "version": "cm0102-2003-10-6a0df0f4",
+        "version": "cm0102-2003-10-79375835",
         "database": {
           "known": true,
           "label": "October 2003 by Alex Sawczuk, fan-made",
@@ -7007,7 +7007,7 @@
           "md5": "a79d766a3869490bc2ec4e60b1e01b58"
         }
       ],
-      "version": "cm-0001-07a05986",
+      "version": "cm-0001-5e05ca36",
       "coverage": {
         "players": 2178,
         "nations": 134,
@@ -7018,7 +7018,7 @@
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm-0001",
-        "version": "cm-0001-07a05986",
+        "version": "cm-0001-5e05ca36",
         "database": {
           "known": true,
           "label": "3.81",
@@ -18598,7 +18598,7 @@
         "sha256": "91632a6f626789ac3471892bd965956e4b9ae41b0168c2008c91028ad4251a26",
         "download": "https://raw.githubusercontent.com/nckstwrt/CM0102-Starter-Kit/e658af1696751535f678e19342c6e345efdbe8ec/data/cm93_data.zip"
       },
-      "version": "cm0102-2020-11-cm93-7545db33",
+      "version": "cm0102-2020-11-cm93-97feb92d",
       "coverage": {
         "players": 2125,
         "nations": 121,
@@ -18609,7 +18609,7 @@
       "audit": {
         "generatedBy": "scripts/build-football-set.mjs",
         "id": "cm0102-2020-11-cm93",
-        "version": "cm0102-2020-11-cm93-7545db33",
+        "version": "cm0102-2020-11-cm93-97feb92d",
         "database": {
           "known": true,
           "label": "93/94 by Cam F, fan-made",
@@ -19716,8 +19716,8 @@
             "Rotor Volgograd (Russia)",
             "Dnipro Dnipropetrovsk (Ukraine)",
             "Tekstilshchik Kamyshin (Russia)",
-            "Dinamo Tbilisi (Georgia)",
             "Ferencváros (Hungary)",
+            "Dinamo Tbilisi (Georgia)",
             "Trabzonspor (Turkey)",
             "Alania Vladikavkaz (Russia)",
             "FK Ural (Russia)",

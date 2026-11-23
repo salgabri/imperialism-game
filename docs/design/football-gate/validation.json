@@ -409,10 +409,10 @@
             0.9913,
             1
           ],
-          "topFiveChampionShare": 0.55,
+          "topFiveChampionShare": 0.5682,
           "topFiveChampionShare95": [
-            0.5033,
-            0.5959
+            0.5215,
+            0.6137
           ]
         },
         "failed": [],
@@ -439,7 +439,7 @@
       "sources": "EA FC 26",
       "ratingsDate": "2025-09-19",
       "informationDate": "2025-09-19",
-      "contentHash": "ea-fc-26-282f8904",
+      "contentHash": "ea-fc-26-753197a9",
       "gate": "provisional",
       "verdict": "fail",
       "verdicts": {
@@ -554,7 +554,7 @@
         "badRatings": [],
         "badStrength": [],
         "badNationStatus": [],
-        "contentHash": "ea-fc-26-282f8904",
+        "contentHash": "ea-fc-26-753197a9",
         "failures": []
       },
       "crossSectional": {

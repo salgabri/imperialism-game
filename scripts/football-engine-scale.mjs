@@ -105,9 +105,11 @@ export function scaleChecks(measured, reference, tol = ENGINE_SCALE.tolerances) 
 // ---- measurements ----
 export async function loadEngine(root = ROOT) {
   const imp = file => import(pathToFileURL(path.join(root, file)).href);
-  const [teams, footballModule, sets, config, odds] = await Promise.all([
-    imp('src/data/teams.js'), imp('src/sports/football.js'), imp('src/engine/footballSets.js'), imp('src/config.js'), imp('src/engine/odds.js')]);
-  return { ...teams, ...footballModule, fieldedNations: sets.fieldedNations, CONFIG: config.CONFIG, UNCERTAINTY_PRESETS: odds.UNCERTAINTY_PRESETS };
+  const [teams, footballModule, sets, config, odds, scopes] = await Promise.all([
+    imp('src/data/teams.js'), imp('src/sports/football.js'), imp('src/engine/footballSets.js'), imp('src/config.js'), imp('src/engine/odds.js'),
+    imp('src/data/scopes.js')]);
+  return { ...teams, ...footballModule, fieldedNations: sets.fieldedNations, CONFIG: config.CONFIG, UNCERTAINTY_PRESETS: odds.UNCERTAINTY_PRESETS,
+    strongestClubs: scopes.strongestClubs, TOP_CLUBS: scopes.TOP_CLUBS };
 }
 
 /** Scale statistics and the match probe for the built-in nations (those fielding a side) and clubs. */
@@ -123,7 +125,10 @@ export function measureSquads(engine, { rosters, clubs }) {
     strengths.push(lineup.slots.reduce((s, slot) => s + slot.effectiveRating, 0) / lineup.slots.length);
     eff.set(id, teamEff(teams.get(id)));
   }
-  const clubStarters = clubs.flatMap(club => selectLineup(buildClub(club, sport)).slots.map(slot => slot.effectiveRating));
+  // The clubs the theatres take: today's field (since 23 November 2026 the list keeps, after it, the clubs of today's maps
+  // of before; scripts/lib/today-field.mjs), every club of a list that has no field.
+  const field = engine.strongestClubs && engine.TOP_CLUBS ? engine.strongestClubs(clubs, engine.TOP_CLUBS) : clubs;
+  const clubStarters = field.flatMap(club => selectLineup(buildClub(club, sport)).slots.map(slot => slot.effectiveRating));
   // Probe: every pair inside a confederation scope, attacker = lower id; one seeded RNG per pair.
   const drama = UNCERTAINTY_PRESETS.balanced.drama, threshold = Number(CONFIG.upsetThreshold);
   const pairs = [];

@@ -54,6 +54,19 @@ test('a league slip, a game before the first date and a scoreless row are left o
   assert.deepEqual(games.map(game => [game.date, game.league]), [['2001-01-01', 'x'], ['2001-01-04', null]]);
 });
 
+test('a league game the source left without a continent counts by its countries\' other rows; one of nowhere in Europe does not', () => {
+  const blank = game => ({ ...game, home_continent: '', away_continent: '' });
+  const games = strengthGames([
+    row('2024-05-01', 'A (x)', 'B (x)', 1, 0, { homeCountry: 'x' }),
+    blank(row('2025-09-01', 'A (x)', 'B (x)', 2, 0, { homeCountry: 'x' })),
+    { ...row('2024-05-02', 'C (q)', 'D (q)', 1, 0, { homeCountry: 'q' }), home_continent: 'Asia', away_continent: 'Asia' },
+    blank(row('2025-09-02', 'C (q)', 'D (q)', 1, 0, { homeCountry: 'q' })),
+    blank(row('2025-09-03', 'E (w)', 'F (w)', 1, 0, { homeCountry: 'w' })),
+  ]);
+  // Turkey's and Czechia's every game of 2025/26 came so at the pinned commit, and their clubs fell out of its list.
+  assert.deepEqual(games.map(game => [game.date, game.league]), [['2024-05-01', 'x'], ['2025-09-01', 'x']]);
+});
+
 test('a league\'s standings: its winners above its mean, a promoted club starting at the relegated clubs\' rating', () => {
   const first = ['A (x)', 'B (x)', 'C (x)', 'D (x)'];
   const second = ['A (x)', 'B (x)', 'C (x)', 'E (x)'];

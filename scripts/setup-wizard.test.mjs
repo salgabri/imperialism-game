@@ -20,6 +20,9 @@ import { nationPriority } from '../src/data/domesticTiers.js';
 import { getSport } from '../src/sports/index.js';
 import { politicalFill } from '../src/data/empireColours.js';
 import { ringsPath } from '../src/engine/lands.js';
+import { europeMapOf } from '../src/data/domesticScope.js';
+// Today's Europe maps, by the index: the built-in season's field by results (eu124b2027).
+const TODAY_TOP = europeMapOf('all').id, TODAY_ELITE = europeMapOf('elite').id;
 
 const compiled = await build({
   stdin: { contents: `
@@ -1030,7 +1033,7 @@ test('football clubs offer every shipped country in a dropdown under Europe\'s t
   assert.deepEqual(rows[0], { id: `domestic:${sorted[0].id}`, name: sorted[0].name, label: sorted[0].name, count: sorted[0].clubs, note: '' });
   const clubs = buildSetupModel({ ...BASE, layer: 'clubs' });
   assert.deepEqual(clubs.scopes.map(scope => [scope.id, scope.label, scope.count]),
-    [['domestic:eu124', 'Top 124', 124], ['domestic:eu32', 'Elite 32', 32]], 'no single league: the strongest clubs in Europe, then its elite');
+    [[`domestic:${TODAY_TOP}`, 'Top 124', 124], [`domestic:${TODAY_ELITE}`, 'Elite 32', 32]], 'no single league: the strongest clubs in Europe, then its elite');
   assert.equal(clubs.domesticScopes, rows);
   for (const setup of [{ ...BASE }, { ...BASE, sport: 'basketball', layer: 'clubs' }, { ...BASE, sport: 'basketball' }]) {
     assert.deepEqual(buildSetupModel(setup).domesticScopes, [], `${setup.sport} ${setup.layer}: no single-country theatres`);
@@ -1117,7 +1120,7 @@ test('a chosen country offers how many of its clubs play beside it: its top two 
   assert.equal(full.q('#setup-club-count').value, String(ENGLAND.clubs));
   assert.ok(!full.q('#setup-club-count').hasAttribute('data-checked'));
   // Europe's maps: no count.
-  const europe = await mount(t, { setup: { layer: 'clubs', clubScope: 'domestic:eu124' } });
+  const europe = await mount(t, { setup: { layer: 'clubs', clubScope: `domestic:${TODAY_TOP}` } });
   assert.ok(europe.q('#setup-country'));
   assert.ok(!europe.q('#setup-club-count'));
 });

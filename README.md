@@ -1330,10 +1330,13 @@ MLB and NHL club its own of
 [Australia and New Zealand](#the-nrl-map), and each NWSL club its own of [the USA](#the-nwsl-map).
 
 Club lineups come from the same sources as the national squads:
-`clubs.football.js` from the EA FC 27 snapshot: the 124 strongest of its 309
-European first-division clubs by the mean of their best XI, from Paris Saint-Germain
-to Lecce (17 leagues: 20 clubs each from England and Spain, one each from Norway,
-Croatia and Bulgaria), and `clubs.basketball.js` from NBA 2K27 as
+`clubs.football.js` from the EA FC 27 snapshot and today's FM 26 country maps: Europe's
+124 strongest clubs by results (see [the Europe maps](#the-europe-maps)), each with its best
+XI, EA's for 116 of them, FM 26's for the eight in leagues EA rates only in part (from
+Liverpool to Legia Warszawa, 26 countries: 15 clubs each from England and Spain, one each
+from Serbia, Azerbaijan, Hungary and Croatia; until 23 November 2026 the 124 strongest of
+EA's 309 European first-division clubs by the mean of their best XI, which the list still
+keeps, unranked, for today's maps of before), and `clubs.basketball.js` from NBA 2K27 as
 2K Archive compiles it. 2K Archive lists each player's positions as 2K gives
 them, primary first; a second position that is not the first's neighbour is
 dropped, and 123 of the 150 NBA starters cover two positions. Each franchise's
@@ -1601,8 +1604,8 @@ strongest clubs of the season, on a map of Europe where a club's land lies in it
 own country.
 
 - **A country's only club holds all of it**, on the outline the world map gives it:
-  Bodø/Glimt holds Norway, Dinamo Zagreb Croatia, and in the Elite 32 Paris
-  Saint-Germain holds France.
+  Dinamo Zagreb holds Croatia, Red Star Serbia, Ferencváros Hungary, and in the Elite 32
+  Paris Saint-Germain holds France and Galatasaray Turkey.
 - **Clubs that share a country split it along its administrative borders, level by
   level, down to the communes.** A region with one club goes whole to it, and one with
   two or more is split one level down, between them only, and so on: Bavaria's clubs
@@ -1615,12 +1618,12 @@ own country.
   small for its clubs and shares its largest neighbour's land too (Berlin and
   Brandenburg, Madrid and Castile). Only a commune two clubs share is ever cut (Milan's
   San Siro). Where clubs are crowded into one city, its communes are dealt out around it
-  so each has a way out, and a club boxed in by the others may start next door:
-  Beşiktaş plays out of Anatolia. A stray piece of a club's land under 400 km² that
+  so each has a way out, and a club boxed in by the others may start next door
+  (Beşiktaş played out of Anatolia on today's Top 124 of before). A stray piece of a club's land under 400 km² that
   lies inside another's goes to that club.
 - **A country with no club stays grey**: it is not on the map, only drawn beneath it
   as any country map's neighbours are. It is never territory, and attacks go around
-  it, by sea if need be. The Elite 32 has no Dutch club, so the Netherlands stays grey.
+  it, by sea if need be. The Elite 32 has no Swiss or Austrian club, so Switzerland and Austria stay grey.
 
 Welsh clubs of the Premier League (Swansea, Cardiff, in earlier seasons) hold Wales,
 not England. AS Monaco, a Ligue 1 club, holds the land around Monaco in France.
@@ -1651,17 +1654,33 @@ Steaua) are listed in `scripts/data/club-strength-names.json`. 2005/06, 2004/05,
 and the computed seasons have nations only, so no maps. A campaign saved on an earlier
 season's map of before (when its 124 came from the seven leagues, or from all of Europe by
 the players' ratings) still resumes there; a new one plays the season's map by results.
+
+Today's season (2026/27) plays its Top 124 and Elite 32 **by results** too (since 23
+November 2026): Europe's strongest clubs by the newest season the results hold (2025/26,
+to 30 September 2025), each with its EA FC 27 XI, or, where EA rates the club's league only
+in part (Serbia, Russia, Israel, Cyprus), the XI of the FM 26 squad its country map plays
+(Red Star, Zenit, Maccabi Tel Aviv). FM 26's club XIs sit on EA FC 27's scale (over the 196
+clubs both rate, EA = −1.02 + 1.022 × FM, r 0.96), so their ratings stay as the country maps
+play them. A club relegated since those results (West Ham, Wolves, Wolfsburg, St. Pauli,
+Mallorca, Girona) is in no first division of EA's and is passed over. The field spans 26
+countries, the five big leagues 70 of its 124 (17 countries and 90 before). The same day
+the results' newest rows were read whole: the source leaves the continent blank on 935
+European league games of June to September 2025, every Turkish and Czech game of 2025/26
+among them, and 2025/26's 124 had lacked Galatasaray, Fenerbahçe, Slavia, Sparta and Plzeň.
 Football's "One country · top clubs" campaigns play the chosen season's own top clubs (below). A world campaign saved before these maps
 stays on the world, and resumes as it was; a CM 01/02 set built on your own computer
 has no map of Europe, so it deals its clubs onto the world.
 
-Each map is `public/domestic/eu<clubs>[<r, e or s><season year>].json`, fetched when chosen,
-with the index `src/data/europeMaps.js`: `eu124` and `eu32` today's, `eu124r2018` an earlier
-season's by results (64 maps in play). The maps the earlier seasons had before stay as they
-were, never rebuilt and never offered, for the campaigns saved on them: the seven-league
-maps (`eu124s2018`; the EA and Championship Manager seasons' until 14 November 2026, SWOS's
-until 17 November 2026) and those of all of Europe by the players' ratings (`eu124e2018`,
-until 21 November 2026). They follow the clubs, so rebuild them after
+Each map is `public/domestic/eu<clubs>[<b, r, e or s><season year>].json`, fetched when chosen,
+with the index `src/data/europeMaps.js`: `eu124b2027` and `eu32b2027` today's, `eu124r2018` an
+earlier season's by results (64 maps in play). The maps of before stay as they were, never
+rebuilt and never offered, for the campaigns saved on them: today's of before (`eu124`,
+`eu32`, the strongest XIs, until 23 November 2026; their clubs stay in
+`src/data/clubs.football.js`, unranked after the field, so the maps still decode), 2025/26's
+first by results (`eu124r2026`, replaced by `eu124r2026b`), the seven-league maps
+(`eu124s2018`; the EA and Championship Manager seasons' until 14 November 2026, SWOS's until
+17 November 2026) and those of all of Europe by the players' ratings (`eu124e2018`, until 21
+November 2026). They follow the clubs, so rebuild them after
 `npm run build-clubs`, `npm run build:ea-seasons`, `npm run build:retro-seasons`,
 `npm run build-womens-football` or `npm run build:womens-seasons`:
 

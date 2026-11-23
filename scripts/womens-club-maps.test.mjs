@@ -25,6 +25,9 @@ import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { challengeQuery, readChallenge } from '../src/screens/setup/challenge.js';
 import { kmToPolys, pointInPolys, polysOf } from './lib/domestic-partition.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
+import { europeMapOf } from '../src/data/domesticScope.js';
+// Today's Europe maps, by the index: the built-in season's field by results (eu124b2027).
+const TODAY_TOP = europeMapOf('all').id, TODAY_ELITE = europeMapOf('elite').id;
 
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 const docOf = id => JSON.parse(read(`public/domestic/${id}.json`));
@@ -171,15 +174,15 @@ test('a women\'s setup names the map of its theatre and season', () => {
   const cases = [
     ['all', null, 'weu'], ['elite', null, 'weu32'], ['NWSL', null, 'nwsl'],
     // The league theatres of before play every European club; a map of another season or sport finds its counterpart.
-    ["Women's Super League", null, 'weu'], ['Liga F', null, 'weu'], ['domestic:weu32s2025', null, 'weu32'], ['domestic:eu32', null, 'weu32'],
+    ["Women's Super League", null, 'weu'], ['Liga F', null, 'weu'], ['domestic:weu32s2025', null, 'weu32'], [`domestic:${TODAY_ELITE}`, null, 'weu32'],
     ['domestic:nba', null, 'weu'], ['domestic:826', null, 'weu'],
     ['domestic:weu32', 'eaw-fc-25', 'weu32s2025'], ['domestic:nwsl', 'eaw-fc-24', 'nwsls2024'], ['all', 'eaw-fc-26', 'weus2026'],
     // FIFA 23 has every European club only.
     ['domestic:nwsl', 'eaw-fifa-23', 'weus2023'], ['elite', 'eaw-fifa-23', 'weus2023'],
   ];
   for (const [clubScope, dataSet, map] of cases) assert.equal(setClubScope(clubs({ clubScope, dataSet })), `domestic:${map}`, `${clubScope} ${dataSet}`);
-  assert.equal(setClubScope({ sport: 'football', layer: 'clubs', clubScope: 'domestic:weu32' }), 'domestic:eu32', 'and back to football\'s elite');
-  assert.equal(setClubScope({ sport: 'football', layer: 'clubs', clubScope: 'domestic:nwsl' }), 'domestic:eu124');
+  assert.equal(setClubScope({ sport: 'football', layer: 'clubs', clubScope: 'domestic:weu32' }), `domestic:${TODAY_ELITE}`, 'and back to football\'s elite');
+  assert.equal(setClubScope({ sport: 'football', layer: 'clubs', clubScope: 'domestic:nwsl' }), `domestic:${TODAY_TOP}`);
   assert.equal(setClubScope({ sport: 'basketball', layer: 'clubs', clubScope: 'domestic:nwsl' }), 'domestic:nba');
   assert.equal(domesticIdOf(clubs({ clubScope: 'domestic:nwsl' })), 'nwsl');
   assert.equal(domesticIdOf({ sport: 'football', layer: 'clubs', clubScope: 'domestic:nwsl' }), null, 'a map is its own sport\'s');
@@ -207,7 +210,7 @@ test('a challenge link names the women\'s theatres; one to a European league of 
   assert.equal(link('theatre=domestic:weu32&season=eaw-fc-24').clubScope, 'domestic:weu32s2024');
   const old = readChallenge('?sport=womens-football&teams=clubs&theatre=Liga+F');
   assert.deepEqual([old.setup.clubScope, old.ignored], ['domestic:weu', ['theatre']]);
-  assert.equal(readChallenge('?sport=football&teams=clubs&theatre=domestic:nwsl').setup.clubScope, 'domestic:eu124', 'a map stays with its sport');
+  assert.equal(readChallenge('?sport=football&teams=clubs&theatre=domestic:nwsl').setup.clubScope, `domestic:${TODAY_TOP}`, 'a map stays with its sport');
   const query = challengeQuery({ sport: 'womens-football', layer: 'clubs', clubScope: 'domestic:nwsl', seed: '7' });
   assert.match(query, /theatre=domestic:nwsl/);
   assert.equal(readChallenge(`?${query}`).setup.clubScope, 'domestic:nwsl');

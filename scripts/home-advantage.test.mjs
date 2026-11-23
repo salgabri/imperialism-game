@@ -9,7 +9,8 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { JSDOM } from 'jsdom';
 import { bundleApp, bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 import { buildClub, buildTeam, makeRng, teamEff } from '../src/data/teams.js';
-import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
+import { CLUBS as ALL_FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
+import { TOP_CLUBS, strongestClubs } from '../src/data/scopes.js';
 import { CLUBS as NBA_CLUBS } from '../src/data/clubs.basketball.js';
 import { CLUBS as NFL_CLUBS } from '../src/data/clubs.american-football.js';
 import { CLUBS as MLB_CLUBS } from '../src/data/clubs.baseball.js';
@@ -36,6 +37,8 @@ import { challengeQuery, readChallenge } from '../src/screens/setup/challenge.js
 import { DEFAULT_SETUP } from '../src/app/shared.js';
 import { runProductionCampaign } from './production-balance.mjs';
 import { REAL } from './simulation-realism.mjs';
+// Today's football field, the clubs the theatres take: the list keeps, after it, the clubs of today's maps of before.
+const FOOTBALL_CLUBS = strongestClubs(ALL_FOOTBALL_CLUBS, TOP_CLUBS);
 
 await bundleApp();
 const { SetupOverlay } = await bundleComponents({ SetupOverlay: 'src/components/SetupOverlay.jsx' });

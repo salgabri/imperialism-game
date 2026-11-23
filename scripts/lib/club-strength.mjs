@@ -68,11 +68,22 @@ export const seasonOfDate = date => Number(date.slice(0, 4)) + (Number(date.slic
  * competition, home_country, away_country, home_continent, away_continent, level }`.
  */
 export function strengthGames(rows, rules = STRENGTH_RULES) {
+  // The source leaves the continent blank on some of its newest rows (935 European league games of June to September
+  // 2025 at the pinned commit, every Turkish and Czech game of 2025/26 among them): a country's continent is the one its
+  // latest row that names one gives.
+  const named = new Map();
+  for (const row of rows) {
+    for (const [country, continent] of [[row.home_country, row.home_continent], [row.away_country, row.away_continent]]) {
+      if (continent && !(named.get(country)?.date > row.date)) named.set(country, { date: row.date, continent });
+    }
+  }
+  const continentOf = (continent, country) => continent || named.get(country)?.continent || '';
   const games = [];
   rows.forEach((row, index) => {
     if (row.date < rules.firstDate || row.gh == null || row.ga == null) return;
     const isUefa = row.level === 'international' && uefa.has(row.competition);
-    const isLeague = row.level === 'national' && row.home_continent === 'Europe' && row.away_continent === 'Europe'
+    const isLeague = row.level === 'national' && continentOf(row.home_continent, row.home_country) === 'Europe'
+      && continentOf(row.away_continent, row.away_country) === 'Europe'
       && (leagueOfCountry(row.competition, row.home_country) || leagueOfCountry(row.competition, row.away_country));
     if (!isUefa && !isLeague) return;
     games.push({ index, date: row.date, home: row.home, away: row.away, hg: row.gh, ag: row.ga, shootout: row.full_time === 'P',

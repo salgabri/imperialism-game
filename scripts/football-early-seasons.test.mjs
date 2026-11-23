@@ -33,6 +33,9 @@ import { SWOS_SQUAD, buildSwosSeason, properCase } from './lib/swos.mjs';
 import { sampleDatabase, writeCm0102Files } from './lib/cm0102-fixture.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
 import { BIG_LEAGUES, EUROPEAN_LEAGUES } from '../src/data/footballLeagues.js';
+import { europeMapOf } from '../src/data/domesticScope.js';
+// Today's Europe maps, by the index: the built-in season's field by results (eu124b2027).
+const TODAY_TOP = europeMapOf('all').id, TODAY_ELITE = europeMapOf('elite').id;
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const read = file => readFileSync(path.join(root, file), 'utf8');
@@ -526,7 +529,7 @@ test('the running App plays 1996/97\'s clubs on its own maps, and launches and r
     assert.ok(app.state.footballSets.some(set => set.id === 'swos-9697' && set.season === '1996/97'), 'listed before any request');
     // Its clubs play on its own Europe maps, as every season with clubs does.
     app.pickSetup('layer', 'clubs');
-    app.pickSetup('clubScope', 'domestic:eu32');
+    app.pickSetup('clubScope', `domestic:${TODAY_ELITE}`);
     app.pickSetup('dataSet', 'swos-9697');
     assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32r1997'], 'the theatre follows the season');
     app.pickSetup('layer', 'nations');
@@ -558,7 +561,7 @@ test('the running App launches a 2001/02 clubs campaign on its own map of Europe
   await withApp(async fixture => {
     const { app, time } = fixture;
     app.pickSetup('layer', 'clubs');
-    app.pickSetup('clubScope', 'domestic:eu32');
+    app.pickSetup('clubScope', `domestic:${TODAY_ELITE}`);
     app.pickSetup('dataSet', 'cm0102-2001-09');
     assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32r2002'], 'the theatre follows the season');
     time.advance(200);
@@ -592,7 +595,7 @@ test('the running App offers 2000/01 and 1999/00 with clubs and nations, and pla
     app.pickSetup('dataSet', 'cm-0001');
     assert.deepEqual([app.state.setup.layer, app.state.setup.dataSet], ['nations', 'cm-0001']);
     app.pickSetup('layer', 'clubs');
-    app.pickSetup('clubScope', 'domestic:eu32');
+    app.pickSetup('clubScope', `domestic:${TODAY_ELITE}`);
     app.pickSetup('dataSet', 'cm-9900');
     assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32r2000'], 'the theatre follows the season');
     time.advance(200);

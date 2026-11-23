@@ -356,12 +356,12 @@
     },
     "clubStarters": {
       "n": 1364,
-      "mean": 77.5139,
-      "sd": 4.1073,
-      "min": 69,
+      "mean": 76.6921,
+      "sd": 4.8523,
+      "min": 66,
       "max": 91,
       "quantiles": {
-        "q10": 73,
+        "q10": 70,
         "q50": 77,
         "q90": 83
       }
@@ -503,7 +503,7 @@
         },
         {
           "campaign": "clubs/elite/blitz/balanced/single/best-fit/spectator",
-          "firstSeedFingerprint": "9d46ae1a0ae5",
+          "firstSeedFingerprint": "59c5524b0085",
           "runs": 40,
           "completed": 40,
           "completion": 1,
@@ -512,17 +512,17 @@
             1
           ],
           "meanMatches": 31,
-          "topFiveChampionShare": 0.45,
+          "topFiveChampionShare": 0.55,
           "topFiveChampionShare95": [
-            0.3071,
-            0.6017
+            0.3983,
+            0.6929
           ],
-          "effectiveChampionCount": 13.81,
+          "effectiveChampionCount": 13.98,
           "distinctChampions": 18
         },
         {
           "campaign": "clubs/all/duel/wild/single/highest-rated/spectator",
-          "firstSeedFingerprint": "3bd81e4146fc",
+          "firstSeedFingerprint": "59aafedc57d6",
           "runs": 40,
           "completed": 40,
           "completion": 1,
@@ -531,13 +531,13 @@
             1
           ],
           "meanMatches": 123,
-          "topFiveChampionShare": 0.05,
+          "topFiveChampionShare": 0.15,
           "topFiveChampionShare95": [
-            0.0138,
-            0.165
+            0.0706,
+            0.2907
           ],
-          "effectiveChampionCount": 28.53,
-          "distinctChampions": 31
+          "effectiveChampionCount": 27.55,
+          "distinctChampions": 30
         },
         {
           "campaign": "nations/CONMEBOL/duel/predictable/single/highest-rated/balanced",
@@ -605,10 +605,10 @@
           0.9913,
           1
         ],
-        "topFiveChampionShare": 0.55,
+        "topFiveChampionShare": 0.5682,
         "topFiveChampionShare95": [
-          0.5033,
-          0.5959
+          0.5215,
+          0.6137
         ]
       }
     },
@@ -653,13 +653,13 @@
         "campaign": "clubs/elite/blitz/balanced/single/best-fit/spectator",
         "completionInside": true,
         "topFiveInside": true,
-        "effectiveChampionCountRatio": 1.1075
+        "effectiveChampionCountRatio": 1.1211
       },
       {
         "campaign": "clubs/all/duel/wild/single/highest-rated/spectator",
         "completionInside": true,
-        "topFiveInside": false,
-        "effectiveChampionCountRatio": 1.1394
+        "topFiveInside": true,
+        "effectiveChampionCountRatio": 1.1002
       },
       {
         "campaign": "nations/CONMEBOL/duel/predictable/single/highest-rated/balanced",
@@ -844,7 +844,7 @@
       },
       {
         "check": "pooled topFiveChampionShare",
-        "value": 0.55,
+        "value": 0.5682,
         "reference": 0.5409,
         "tolerance": "reference Wilson 95%",
         "interval": [

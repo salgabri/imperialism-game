@@ -17,6 +17,9 @@ import { BUILT_IN_SETS, setHasClubs, setHasLayer, setSportOf } from '../src/engi
 import { buildSetupModel, seasonTagOf } from '../src/screens/setup/setupModel.js';
 import { seasonForLayer } from '../src/app/shared.js';
 import { bundleComponents, findElement, syncAppFixture, withDom } from './lib/app-harness.mjs';
+import { europeMapOf } from '../src/data/domesticScope.js';
+// Today's Europe maps, by the index: the built-in season's field by results (eu124b2027).
+const TODAY_TOP = europeMapOf('all').id, TODAY_ELITE = europeMapOf('elite').id;
 
 // One bundle, so the test clears the very data set caches the App reads.
 const B = await bundleComponents({
@@ -653,14 +656,14 @@ test('Clubs list no season with nations only, a season keeps the teams, and Club
     // Clubs list the built-in season and the seasons with clubs. A season with nations only, picked anyway (the
     // dropdown offers no way to), changes nothing: no season changes the teams.
     app.pickSetup('layer', 'clubs');
-    app.pickSetup('clubScope', 'domestic:eu32');
+    app.pickSetup('clubScope', `domestic:${TODAY_ELITE}`);
     app.pickSetup('role', 'manager');
     app.pickSetup('managedTeamId', 'f-arsenal');
     assert.deepEqual(offered(), [null, ...footballSetIds(app).filter(id => setHasClubs(id))]);
     assert.ok(['ea-fifa-07', 'cm0102-2003-10', 'cm0102-2020-11-cm93'].every(id => offered().includes(id)));
     assert.ok(!['ea-fifa-06', 'ea-fifa-05', 'wc-1994', 'nt-1976', 'cm0102-2017-04-cm89'].some(id => offered().includes(id)));
     app.pickSetup('dataSet', EARLY_ID);
-    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope, setup().managedTeamId], ['clubs', null, 'domestic:eu32', 'f-arsenal']);
+    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope, setup().managedTeamId], ['clubs', null, `domestic:${TODAY_ELITE}`, 'f-arsenal']);
 
     // Nations list every season, and the season stays with them. It has no maps of Europe, so the theatre is kept as the
     // plain elite for when clubs come back.
