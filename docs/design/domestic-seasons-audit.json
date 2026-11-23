@@ -38,7 +38,7 @@
   },
   {
    "id": "031y2026",
-   "version": "031y2026-4bcbfaad",
+   "version": "031y2026-7c036f22",
    "name": "Azerbaijan",
    "level": "ADM2",
    "clubs": 13,
@@ -53,7 +53,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 75416
+   "bytes": 75471
   },
   {
    "id": "032y2026",
@@ -199,7 +199,7 @@
   },
   {
    "id": "076y2026",
-   "version": "076y2026-d9bdde1e",
+   "version": "076y2026-ec22e7bf",
    "name": "Brazil",
    "level": "ADM2",
    "clubs": 100,
@@ -212,7 +212,7 @@
     "p90": 0,
     "max": 0.5
    },
-   "bytes": 240063
+   "bytes": 240092
   },
   {
    "id": "100y2026",
@@ -591,7 +591,7 @@
   },
   {
    "id": "300y2026",
-   "version": "300y2026-8abb15c6",
+   "version": "300y2026-8dcbfacb",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 39,
@@ -613,7 +613,7 @@
     "p90": 0,
     "max": 0.9
    },
-   "bytes": 145286
+   "bytes": 145307
   },
   {
    "id": "320y2026",
@@ -828,7 +828,7 @@
   },
   {
    "id": "398y2026",
-   "version": "398y2026-49beb2fa",
+   "version": "398y2026-06bd4a51",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 14,
@@ -841,7 +841,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 113076
+   "bytes": 113152
   },
   {
    "id": "410y2026",
@@ -1002,7 +1002,7 @@
   },
   {
    "id": "504y2026",
-   "version": "504y2026-158e68d3",
+   "version": "504y2026-6d3a9478",
    "name": "Morocco",
    "level": "ADM2",
    "clubs": 15,
@@ -1017,7 +1017,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 109240
+   "bytes": 109259
   },
   {
    "id": "528y2026",
@@ -1213,7 +1213,7 @@
   },
   {
    "id": "643y2026",
-   "version": "643y2026-c8bc1c26",
+   "version": "643y2026-c3bc52f3",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 60,
@@ -1226,7 +1226,7 @@
     "p90": 0,
     "max": 2.1
    },
-   "bytes": 169070
+   "bytes": 169128
   },
   {
    "id": "682y2026",
@@ -1247,7 +1247,7 @@
   },
   {
    "id": "688y2026",
-   "version": "688y2026-06e1c735",
+   "version": "688y2026-8c564a7b",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 33,
@@ -1260,7 +1260,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 136941
+   "bytes": 136655
   },
   {
    "id": "703y2026",
@@ -1470,7 +1470,7 @@
   },
   {
    "id": "804y2026",
-   "version": "804y2026-03c43638",
+   "version": "804y2026-1c0ca8d8",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 19,
@@ -1483,7 +1483,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 86649
+   "bytes": 86300
   },
   {
    "id": "807y2026",
@@ -1506,7 +1506,7 @@
   },
   {
    "id": "818y2026",
-   "version": "818y2026-2243376f",
+   "version": "818y2026-fbdb3f85",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 19,
@@ -1516,13 +1516,13 @@
     "Harras El Hodoud",
     "El Mokawloon SC"
    ],
-   "homeInSection": 14,
+   "homeInSection": 13,
    "displacementKm": {
     "median": 0,
     "p90": 0.1,
-    "max": 0.2
+    "max": 0.3
    },
-   "bytes": 116814
+   "bytes": 116770
   },
   {
    "id": "826y2026",
@@ -1580,7 +1580,7 @@
   },
   {
    "id": "860y2026",
-   "version": "860y2026-c707abf1",
+   "version": "860y2026-7791abfc",
    "name": "Uzbekistan",
    "level": "ADM2",
    "clubs": 16,
@@ -1593,7 +1593,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 104134
+   "bytes": 104154
   },
   {
    "id": "862y2026",
@@ -1769,7 +1769,7 @@
   },
   {
    "id": "076y2025",
-   "version": "076y2025-768fe6d8",
+   "version": "076y2025-a482954b",
    "name": "Brazil",
    "level": "ADM2",
    "clubs": 100,
@@ -1782,7 +1782,7 @@
     "p90": 0,
     "max": 0.5
    },
-   "bytes": 240819
+   "bytes": 240844
   },
   {
    "id": "100y2025",
@@ -1854,7 +1854,7 @@
   },
   {
    "id": "156y2025",
-   "version": "156y2025-612c1886",
+   "version": "156y2025-a2a6df07",
    "name": "China",
    "level": "ADM2",
    "clubs": 16,
@@ -1867,7 +1867,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 121442
+   "bytes": 121466
   },
   {
    "id": "170y2025",
@@ -2034,7 +2034,7 @@
   },
   {
    "id": "300y2025",
-   "version": "300y2025-4735d6e1",
+   "version": "300y2025-ecc6b669",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 38,
@@ -2055,7 +2055,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 144493
+   "bytes": 144514
   },
   {
    "id": "348y2025",
@@ -2178,7 +2178,7 @@
   },
   {
    "id": "398y2025",
-   "version": "398y2025-f8bfd8b5",
+   "version": "398y2025-f0f95f99",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 11,
@@ -2191,7 +2191,7 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 109755
+   "bytes": 109811
   },
   {
    "id": "410y2025",
@@ -2403,7 +2403,7 @@
   },
   {
    "id": "643y2025",
-   "version": "643y2025-462e4057",
+   "version": "643y2025-3c03d617",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 60,
@@ -2416,7 +2416,7 @@
     "p90": 0,
     "max": 2.1
    },
-   "bytes": 169298
+   "bytes": 169362
   },
   {
    "id": "682y2025",
@@ -2507,7 +2507,7 @@
   },
   {
    "id": "724y2025",
-   "version": "724y2025-3f9afda8",
+   "version": "724y2025-4ac9fbf5",
    "name": "Spain",
    "level": "ADM3",
    "clubs": 42,
@@ -2520,7 +2520,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 157169
+   "bytes": 157049
   },
   {
    "id": "752y2025",
@@ -2609,7 +2609,7 @@
   },
   {
    "id": "804y2025",
-   "version": "804y2025-646792dd",
+   "version": "804y2025-31a2a516",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 19,
@@ -2622,7 +2622,7 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 86808
+   "bytes": 87161
   },
   {
    "id": "826y2025",
@@ -2714,7 +2714,7 @@
   },
   {
    "id": "WALy2025",
-   "version": "WALy2025-f469c576",
+   "version": "WALy2025-a26056e7",
    "name": "Wales",
    "level": "ADM2",
    "clubs": 16,
@@ -2729,7 +2729,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 55054
+   "bytes": 55013
   },
   {
    "id": "032y2024",
@@ -3010,7 +3010,7 @@
   },
   {
    "id": "246y2024",
-   "version": "246y2024-a85ff3d7",
+   "version": "246y2024-05a2e07d",
    "name": "Finland",
    "level": "ADM3",
    "clubs": 24,
@@ -3023,7 +3023,7 @@
     "p90": 0,
     "max": 0.7
    },
-   "bytes": 127165
+   "bytes": 127121
   },
   {
    "id": "250y2024",
@@ -3061,7 +3061,7 @@
   },
   {
    "id": "300y2024",
-   "version": "300y2024-3274d431",
+   "version": "300y2024-9dcfdff9",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 38,
@@ -3082,7 +3082,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 144697
+   "bytes": 144718
   },
   {
    "id": "348y2024",
@@ -3188,7 +3188,7 @@
   },
   {
    "id": "398y2024",
-   "version": "398y2024-713d46a4",
+   "version": "398y2024-128a4c7b",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 11,
@@ -3201,7 +3201,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 109580
+   "bytes": 109605
   },
   {
    "id": "410y2024",
@@ -3375,7 +3375,7 @@
   },
   {
    "id": "643y2024",
-   "version": "643y2024-7cf24697",
+   "version": "643y2024-33a43a1f",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 60,
@@ -3388,7 +3388,7 @@
     "p90": 0,
     "max": 2.1
    },
-   "bytes": 169112
+   "bytes": 169181
   },
   {
    "id": "682y2024",
@@ -3564,7 +3564,7 @@
   },
   {
    "id": "804y2024",
-   "version": "804y2024-dc493834",
+   "version": "804y2024-b7fe6a5f",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 19,
@@ -3577,7 +3577,7 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 87954
+   "bytes": 86807
   },
   {
    "id": "826y2024",
@@ -3615,7 +3615,7 @@
   },
   {
    "id": "858y2024",
-   "version": "858y2024-29c79b82",
+   "version": "858y2024-d5f69130",
    "name": "Uruguay",
    "level": "ADM1",
    "clubs": 21,
@@ -3628,7 +3628,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 103771
+   "bytes": 102618
   },
   {
    "id": "NIRy2024",
@@ -3999,7 +3999,7 @@
   },
   {
    "id": "158y2023",
-   "version": "158y2023-6a851b31",
+   "version": "158y2023-a77bafd5",
    "name": "Chinese Taipei",
    "level": "ADM2",
    "clubs": 14,
@@ -4016,7 +4016,7 @@
     "p90": 0.1,
     "max": 0.1
    },
-   "bytes": 109593
+   "bytes": 109621
   },
   {
    "id": "170y2023",
@@ -4199,7 +4199,7 @@
   },
   {
    "id": "246y2023",
-   "version": "246y2023-41aa16ce",
+   "version": "246y2023-55ed5c6b",
    "name": "Finland",
    "level": "ADM3",
    "clubs": 24,
@@ -4210,13 +4210,13 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.1
+    "max": 0
    },
-   "bytes": 126590
+   "bytes": 126618
   },
   {
    "id": "250y2023",
-   "version": "250y2023-6610c5e0",
+   "version": "250y2023-47611280",
    "name": "France",
    "level": "ADM3",
    "clubs": 40,
@@ -4229,7 +4229,7 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 155092
+   "bytes": 155084
   },
   {
    "id": "268y2023",
@@ -4287,7 +4287,7 @@
   },
   {
    "id": "300y2023",
-   "version": "300y2023-a5451ba4",
+   "version": "300y2023-fad3fda8",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -4308,7 +4308,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 146605
+   "bytes": 146685
   },
   {
    "id": "320y2023",
@@ -4526,7 +4526,7 @@
   },
   {
    "id": "398y2023",
-   "version": "398y2023-d285e7ab",
+   "version": "398y2023-a93a40b9",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 24,
@@ -4541,7 +4541,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 124071
+   "bytes": 124304
   },
   {
    "id": "410y2023",
@@ -4683,7 +4683,7 @@
   },
   {
    "id": "504y2023",
-   "version": "504y2023-39db0e5c",
+   "version": "504y2023-778ddae4",
    "name": "Morocco",
    "level": "ADM2",
    "clubs": 17,
@@ -4698,7 +4698,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 111730
+   "bytes": 111751
   },
   {
    "id": "508y2023",
@@ -4891,7 +4891,7 @@
   },
   {
    "id": "643y2023",
-   "version": "643y2023-d4cc125a",
+   "version": "643y2023-c0095fd0",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 60,
@@ -4904,7 +4904,7 @@
     "p90": 0,
     "max": 2.1
    },
-   "bytes": 167871
+   "bytes": 167935
   },
   {
    "id": "682y2023",
@@ -4925,7 +4925,7 @@
   },
   {
    "id": "688y2023",
-   "version": "688y2023-2f9e81ee",
+   "version": "688y2023-a4b89b12",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 32,
@@ -4938,11 +4938,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 135136
+   "bytes": 135200
   },
   {
    "id": "703y2023",
-   "version": "703y2023-8fa018ba",
+   "version": "703y2023-1b8a8001",
    "name": "Slovakia",
    "level": "ADM3",
    "clubs": 24,
@@ -4955,7 +4955,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 127148
+   "bytes": 126970
   },
   {
    "id": "704y2023",
@@ -4976,7 +4976,7 @@
   },
   {
    "id": "705y2023",
-   "version": "705y2023-334d18cd",
+   "version": "705y2023-388197a3",
    "name": "Slovenia",
    "level": "ADM2",
    "clubs": 24,
@@ -4989,7 +4989,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 124365
+   "bytes": 124549
   },
   {
    "id": "710y2023",
@@ -5149,7 +5149,7 @@
   },
   {
    "id": "804y2023",
-   "version": "804y2023-0291bd3d",
+   "version": "804y2023-19d4d02c",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 30,
@@ -5164,7 +5164,7 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 99738
+   "bytes": 98952
   },
   {
    "id": "807y2023",
@@ -5185,7 +5185,7 @@
   },
   {
    "id": "818y2023",
-   "version": "818y2023-c4adb61a",
+   "version": "818y2023-3eaa2762",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 18,
@@ -5194,13 +5194,13 @@
    "placed": [
     "El Mokawloon SC"
    ],
-   "homeInSection": 11,
+   "homeInSection": 13,
    "displacementKm": {
     "median": 0,
-    "p90": 0.4,
-    "max": 0.5
+    "p90": 0,
+    "max": 0.4
    },
-   "bytes": 114451
+   "bytes": 114431
   },
   {
    "id": "826y2023",
@@ -5238,24 +5238,24 @@
   },
   {
    "id": "858y2023",
-   "version": "858y2023-2392cd74",
+   "version": "858y2023-204ecd93",
    "name": "Uruguay",
    "level": "ADM1",
    "clubs": 28,
    "located": 28,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 21,
+   "homeInSection": 22,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 109964
+   "bytes": 109053
   },
   {
    "id": "860y2023",
-   "version": "860y2023-b95be1e0",
+   "version": "860y2023-96ee1c66",
    "name": "Uzbekistan",
    "level": "ADM2",
    "clubs": 14,
@@ -5268,7 +5268,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 96989
+   "bytes": 97009
   },
   {
    "id": "862y2023",
@@ -5567,7 +5567,7 @@
   },
   {
    "id": "112y2022",
-   "version": "112y2022-a7e5b296",
+   "version": "112y2022-5af03aa8",
    "name": "Belarus",
    "level": "ADM2",
    "clubs": 15,
@@ -5580,7 +5580,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 115738
+   "bytes": 115731
   },
   {
    "id": "124y2022",
@@ -5707,7 +5707,7 @@
   },
   {
    "id": "203y2022",
-   "version": "203y2022-7fa5e998",
+   "version": "203y2022-a3cb2ed6",
    "name": "Czechia",
    "level": "ADM3",
    "clubs": 40,
@@ -5720,7 +5720,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 147292
+   "bytes": 147248
   },
   {
    "id": "208y2022",
@@ -5741,7 +5741,7 @@
   },
   {
    "id": "218y2022",
-   "version": "218y2022-800a8280",
+   "version": "218y2022-32bcd97a",
    "name": "Ecuador",
    "level": "ADM2",
    "clubs": 21,
@@ -5754,9 +5754,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.3
+    "max": 0.1
    },
-   "bytes": 120431
+   "bytes": 120658
   },
   {
    "id": "222y2022",
@@ -5797,24 +5797,24 @@
   },
   {
    "id": "246y2022",
-   "version": "246y2022-ad9ccea5",
+   "version": "246y2022-7b7822a0",
    "name": "Finland",
    "level": "ADM3",
    "clubs": 24,
    "located": 24,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 18,
+   "homeInSection": 19,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 126345
+   "bytes": 126457
   },
   {
    "id": "250y2022",
-   "version": "250y2022-86e88458",
+   "version": "250y2022-09232f97",
    "name": "France",
    "level": "ADM3",
    "clubs": 40,
@@ -5827,7 +5827,7 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 155459
+   "bytes": 155451
   },
   {
    "id": "268y2022",
@@ -5884,7 +5884,7 @@
   },
   {
    "id": "300y2022",
-   "version": "300y2022-9066c60b",
+   "version": "300y2022-8650e606",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -5907,7 +5907,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 146473
+   "bytes": 146485
   },
   {
    "id": "348y2022",
@@ -6085,7 +6085,7 @@
   },
   {
    "id": "398y2022",
-   "version": "398y2022-845a6bd0",
+   "version": "398y2022-3e9b9d22",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 14,
@@ -6098,7 +6098,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 113033
+   "bytes": 113073
   },
   {
    "id": "410y2022",
@@ -6206,7 +6206,7 @@
   },
   {
    "id": "504y2022",
-   "version": "504y2022-dd0f1502",
+   "version": "504y2022-57542f94",
    "name": "Morocco",
    "level": "ADM2",
    "clubs": 15,
@@ -6221,7 +6221,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 109125
+   "bytes": 109145
   },
   {
    "id": "528y2022",
@@ -6395,7 +6395,7 @@
   },
   {
    "id": "643y2022",
-   "version": "643y2022-1b253565",
+   "version": "643y2022-62794693",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 60,
@@ -6410,7 +6410,7 @@
     "p90": 0,
     "max": 2.1
    },
-   "bytes": 167805
+   "bytes": 167846
   },
   {
    "id": "682y2022",
@@ -6431,7 +6431,7 @@
   },
   {
    "id": "688y2022",
-   "version": "688y2022-2793b2df",
+   "version": "688y2022-21270e19",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 17,
@@ -6444,11 +6444,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 118653
+   "bytes": 118646
   },
   {
    "id": "703y2022",
-   "version": "703y2022-86f86623",
+   "version": "703y2022-e5d37658",
    "name": "Slovakia",
    "level": "ADM3",
    "clubs": 24,
@@ -6461,7 +6461,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 126678
+   "bytes": 126681
   },
   {
    "id": "704y2022",
@@ -6621,7 +6621,7 @@
   },
   {
    "id": "804y2022",
-   "version": "804y2022-40057d41",
+   "version": "804y2022-ded5e15e",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 33,
@@ -6630,13 +6630,13 @@
    "placed": [
     "VPK-Agro"
    ],
-   "homeInSection": 27,
+   "homeInSection": 28,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 2.3
    },
-   "bytes": 103526
+   "bytes": 102475
   },
   {
    "id": "807y2022",
@@ -6657,7 +6657,7 @@
   },
   {
    "id": "818y2022",
-   "version": "818y2022-79f4221b",
+   "version": "818y2022-355c3726",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 16,
@@ -6670,9 +6670,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.1
+    "max": 0
    },
-   "bytes": 112370
+   "bytes": 112518
   },
   {
    "id": "826y2022",
@@ -6710,24 +6710,24 @@
   },
   {
    "id": "858y2022",
-   "version": "858y2022-05623413",
+   "version": "858y2022-25cd584d",
    "name": "Uruguay",
    "level": "ADM1",
    "clubs": 28,
    "located": 28,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 24,
+   "homeInSection": 25,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 112309
+   "bytes": 110656
   },
   {
    "id": "860y2022",
-   "version": "860y2022-ec947ef2",
+   "version": "860y2022-e79357fc",
    "name": "Uzbekistan",
    "level": "ADM2",
    "clubs": 14,
@@ -6740,7 +6740,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 101078
+   "bytes": 101098
   },
   {
    "id": "862y2022",
@@ -6835,7 +6835,7 @@
   },
   {
    "id": "008y2021",
-   "version": "008y2021-d39c3d90",
+   "version": "008y2021-6c552316",
    "name": "Albania",
    "level": "ADM3",
    "clubs": 10,
@@ -6848,7 +6848,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 91786
+   "bytes": 92412
   },
   {
    "id": "012y2021",
@@ -7009,7 +7009,7 @@
   },
   {
    "id": "100y2021",
-   "version": "100y2021-817bc882",
+   "version": "100y2021-8ccd07b8",
    "name": "Bulgaria",
    "level": "ADM2",
    "clubs": 21,
@@ -7024,11 +7024,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 101713
+   "bytes": 101738
   },
   {
    "id": "112y2021",
-   "version": "112y2021-4c14066f",
+   "version": "112y2021-b271b601",
    "name": "Belarus",
    "level": "ADM2",
    "clubs": 24,
@@ -7043,7 +7043,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 125216
+   "bytes": 125209
   },
   {
    "id": "124y2021",
@@ -7189,20 +7189,20 @@
   },
   {
    "id": "203y2021",
-   "version": "203y2021-084ebc66",
+   "version": "203y2021-2399460c",
    "name": "Czechia",
    "level": "ADM3",
    "clubs": 40,
    "located": 40,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 39,
+   "homeInSection": 40,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.1
+    "max": 0
    },
-   "bytes": 147131
+   "bytes": 147114
   },
   {
    "id": "208y2021",
@@ -7223,7 +7223,7 @@
   },
   {
    "id": "218y2021",
-   "version": "218y2021-d5e34cc7",
+   "version": "218y2021-38a69e4a",
    "name": "Ecuador",
    "level": "ADM2",
    "clubs": 16,
@@ -7233,10 +7233,10 @@
    "homeInSection": 11,
    "displacementKm": {
     "median": 0,
-    "p90": 0,
-    "max": 0
+    "p90": 0.1,
+    "max": 0.1
    },
-   "bytes": 114862
+   "bytes": 114802
   },
   {
    "id": "233y2021",
@@ -7257,24 +7257,24 @@
   },
   {
    "id": "246y2021",
-   "version": "246y2021-9b8f21a4",
+   "version": "246y2021-91da4c65",
    "name": "Finland",
    "level": "ADM3",
    "clubs": 24,
    "located": 24,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 21,
+   "homeInSection": 20,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 126369
+   "bytes": 126572
   },
   {
    "id": "250y2021",
-   "version": "250y2021-c51b44eb",
+   "version": "250y2021-b7675044",
    "name": "France",
    "level": "ADM3",
    "clubs": 40,
@@ -7287,7 +7287,7 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 155652
+   "bytes": 155644
   },
   {
    "id": "268y2021",
@@ -7342,7 +7342,7 @@
   },
   {
    "id": "300y2021",
-   "version": "300y2021-34022d44",
+   "version": "300y2021-3495f4f7",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -7367,7 +7367,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 145972
+   "bytes": 146009
   },
   {
    "id": "348y2021",
@@ -7535,7 +7535,7 @@
   },
   {
    "id": "398y2021",
-   "version": "398y2021-08a34a03",
+   "version": "398y2021-901db98c",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 23,
@@ -7551,7 +7551,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 123317
+   "bytes": 123365
   },
   {
    "id": "410y2021",
@@ -7678,7 +7678,7 @@
   },
   {
    "id": "504y2021",
-   "version": "504y2021-b88dc090",
+   "version": "504y2021-14491d43",
    "name": "Morocco",
    "level": "ADM2",
    "clubs": 20,
@@ -7693,7 +7693,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 114859
+   "bytes": 114880
   },
   {
    "id": "528y2021",
@@ -7852,7 +7852,7 @@
   },
   {
    "id": "643y2021",
-   "version": "643y2021-1fea7975",
+   "version": "643y2021-ad23742d",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 60,
@@ -7865,7 +7865,7 @@
     "p90": 0,
     "max": 2.1
    },
-   "bytes": 168105
+   "bytes": 168179
   },
   {
    "id": "682y2021",
@@ -7886,7 +7886,7 @@
   },
   {
    "id": "688y2021",
-   "version": "688y2021-0da1ed52",
+   "version": "688y2021-1425fd2f",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 37,
@@ -7899,11 +7899,11 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 140307
+   "bytes": 140321
   },
   {
    "id": "703y2021",
-   "version": "703y2021-9acba23e",
+   "version": "703y2021-1772a733",
    "name": "Slovakia",
    "level": "ADM3",
    "clubs": 23,
@@ -7916,7 +7916,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 125679
+   "bytes": 125592
   },
   {
    "id": "704y2021",
@@ -7937,7 +7937,7 @@
   },
   {
    "id": "705y2021",
-   "version": "705y2021-6c428859",
+   "version": "705y2021-12e5d7d5",
    "name": "Slovenia",
    "level": "ADM2",
    "clubs": 24,
@@ -7950,11 +7950,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 124103
+   "bytes": 124085
   },
   {
    "id": "710y2021",
-   "version": "710y2021-b450c696",
+   "version": "710y2021-e674c35c",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 19,
@@ -7970,7 +7970,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 122682
+   "bytes": 122675
   },
   {
    "id": "724y2021",
@@ -8112,7 +8112,7 @@
   },
   {
    "id": "804y2021",
-   "version": "804y2021-f7755b39",
+   "version": "804y2021-44c5e819",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 32,
@@ -8123,13 +8123,13 @@
     "OPFK Cherkashchyna",
     "MFK Metalurg Zaporizhya"
    ],
-   "homeInSection": 27,
+   "homeInSection": 28,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 100761
+   "bytes": 101728
   },
   {
    "id": "807y2021",
@@ -8150,7 +8150,7 @@
   },
   {
    "id": "818y2021",
-   "version": "818y2021-b1e1b6ed",
+   "version": "818y2021-bc7ba86b",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 21,
@@ -8167,7 +8167,7 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 117286
+   "bytes": 117310
   },
   {
    "id": "826y2021",
@@ -8205,24 +8205,24 @@
   },
   {
    "id": "858y2021",
-   "version": "858y2021-5fe340f5",
+   "version": "858y2021-8c1a0c69",
    "name": "Uruguay",
    "level": "ADM1",
    "clubs": 28,
    "located": 28,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 24,
+   "homeInSection": 25,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 111912
+   "bytes": 111007
   },
   {
    "id": "860y2021",
-   "version": "860y2021-49e311f9",
+   "version": "860y2021-d8af3e31",
    "name": "Uzbekistan",
    "level": "ADM2",
    "clubs": 15,
@@ -8235,11 +8235,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 102548
+   "bytes": 102582
   },
   {
    "id": "862y2021",
-   "version": "862y2021-cb3961a7",
+   "version": "862y2021-32618de7",
    "name": "Venezuela",
    "level": "ADM1",
    "clubs": 23,
@@ -8252,7 +8252,7 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 120142
+   "bytes": 119929
   },
   {
    "id": "KOSy2021",
@@ -8327,7 +8327,7 @@
   },
   {
    "id": "008y2020",
-   "version": "008y2020-60110c62",
+   "version": "008y2020-bb6ada1b",
    "name": "Albania",
    "level": "ADM3",
    "clubs": 10,
@@ -8340,11 +8340,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 93072
+   "bytes": 92850
   },
   {
    "id": "012y2020",
-   "version": "012y2020-33ad0dfb",
+   "version": "012y2020-ec445ce2",
    "name": "Algeria",
    "level": "ADM3",
    "clubs": 17,
@@ -8357,7 +8357,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 111995
+   "bytes": 111875
   },
   {
    "id": "032y2020",
@@ -8518,7 +8518,7 @@
   },
   {
    "id": "112y2020",
-   "version": "112y2020-1dee8dda",
+   "version": "112y2020-ed1acc05",
    "name": "Belarus",
    "level": "ADM2",
    "clubs": 16,
@@ -8531,7 +8531,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 117009
+   "bytes": 116985
   },
   {
    "id": "124y2020",
@@ -8620,7 +8620,7 @@
   },
   {
    "id": "191y2020",
-   "version": "191y2020-7396b8dc",
+   "version": "191y2020-08a55ad7",
    "name": "Croatia",
    "level": "ADM2",
    "clubs": 40,
@@ -8635,7 +8635,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 144807
+   "bytes": 144799
   },
   {
    "id": "196y2020",
@@ -8658,20 +8658,20 @@
   },
   {
    "id": "203y2020",
-   "version": "203y2020-8b6c4223",
+   "version": "203y2020-c17368dd",
    "name": "Czechia",
    "level": "ADM3",
    "clubs": 40,
    "located": 40,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 38,
+   "homeInSection": 39,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 147511
+   "bytes": 147424
   },
   {
    "id": "208y2020",
@@ -8692,7 +8692,7 @@
   },
   {
    "id": "218y2020",
-   "version": "218y2020-f00ccaf1",
+   "version": "218y2020-66c68fa7",
    "name": "Ecuador",
    "level": "ADM2",
    "clubs": 16,
@@ -8704,10 +8704,10 @@
    "homeInSection": 10,
    "displacementKm": {
     "median": 0,
-    "p90": 0.3,
-    "max": 0.3
+    "p90": 0.1,
+    "max": 0.1
    },
-   "bytes": 115351
+   "bytes": 115317
   },
   {
    "id": "233y2020",
@@ -8728,24 +8728,24 @@
   },
   {
    "id": "246y2020",
-   "version": "246y2020-1d194b4a",
+   "version": "246y2020-dedd1ed9",
    "name": "Finland",
    "level": "ADM3",
    "clubs": 24,
    "located": 24,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 21,
+   "homeInSection": 20,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 126426
+   "bytes": 126422
   },
   {
    "id": "250y2020",
-   "version": "250y2020-4b153fed",
+   "version": "250y2020-46449986",
    "name": "France",
    "level": "ADM3",
    "clubs": 40,
@@ -8758,7 +8758,7 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 155485
+   "bytes": 155477
   },
   {
    "id": "268y2020",
@@ -8816,7 +8816,7 @@
   },
   {
    "id": "300y2020",
-   "version": "300y2020-1201c85f",
+   "version": "300y2020-5ad883d1",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -8841,7 +8841,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 146031
+   "bytes": 145984
   },
   {
    "id": "348y2020",
@@ -8971,7 +8971,7 @@
   },
   {
    "id": "380y2020",
-   "version": "380y2020-58876598",
+   "version": "380y2020-b5930484",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 40,
@@ -8984,7 +8984,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 154150
+   "bytes": 154175
   },
   {
    "id": "392y2020",
@@ -9005,7 +9005,7 @@
   },
   {
    "id": "398y2020",
-   "version": "398y2020-8b44c748",
+   "version": "398y2020-2c64563c",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 12,
@@ -9018,7 +9018,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 111242
+   "bytes": 111287
   },
   {
    "id": "410y2020",
@@ -9128,7 +9128,7 @@
   },
   {
    "id": "504y2020",
-   "version": "504y2020-18e50e61",
+   "version": "504y2020-54d4a43d",
    "name": "Morocco",
    "level": "ADM2",
    "clubs": 22,
@@ -9143,7 +9143,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 117396
+   "bytes": 117417
   },
   {
    "id": "528y2020",
@@ -9285,7 +9285,7 @@
   },
   {
    "id": "643y2020",
-   "version": "643y2020-03be0145",
+   "version": "643y2020-a7ddfe0a",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 60,
@@ -9298,7 +9298,7 @@
     "p90": 0,
     "max": 2.1
    },
-   "bytes": 167803
+   "bytes": 167898
   },
   {
    "id": "682y2020",
@@ -9319,7 +9319,7 @@
   },
   {
    "id": "688y2020",
-   "version": "688y2020-3a74f90d",
+   "version": "688y2020-ffc77c6e",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 32,
@@ -9332,11 +9332,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 134408
+   "bytes": 134437
   },
   {
    "id": "703y2020",
-   "version": "703y2020-f1d9e224",
+   "version": "703y2020-c78a38ee",
    "name": "Slovakia",
    "level": "ADM3",
    "clubs": 24,
@@ -9351,7 +9351,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 126499
+   "bytes": 126481
   },
   {
    "id": "704y2020",
@@ -9372,7 +9372,7 @@
   },
   {
    "id": "705y2020",
-   "version": "705y2020-8b2316f8",
+   "version": "705y2020-84b29503",
    "name": "Slovenia",
    "level": "ADM2",
    "clubs": 24,
@@ -9387,11 +9387,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 123989
+   "bytes": 123983
   },
   {
    "id": "710y2020",
-   "version": "710y2020-4238c0c2",
+   "version": "710y2020-f0c654cc",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 17,
@@ -9404,7 +9404,7 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 119712
+   "bytes": 119682
   },
   {
    "id": "724y2020",
@@ -9529,7 +9529,7 @@
   },
   {
    "id": "804y2020",
-   "version": "804y2020-0cca1717",
+   "version": "804y2020-3d6cb3b1",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 28,
@@ -9545,7 +9545,7 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 97094
+   "bytes": 96849
   },
   {
    "id": "807y2020",
@@ -9566,7 +9566,7 @@
   },
   {
    "id": "818y2020",
-   "version": "818y2020-d7b4e918",
+   "version": "818y2020-f40194aa",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 22,
@@ -9579,10 +9579,10 @@
    "homeInSection": 15,
    "displacementKm": {
     "median": 0,
-    "p90": 0,
-    "max": 0.3
+    "p90": 0.2,
+    "max": 0.4
    },
-   "bytes": 118218
+   "bytes": 118506
   },
   {
    "id": "826y2020",
@@ -9620,24 +9620,24 @@
   },
   {
    "id": "858y2020",
-   "version": "858y2020-953c8b39",
+   "version": "858y2020-fbe56d4e",
    "name": "Uruguay",
    "level": "ADM1",
    "clubs": 28,
    "located": 28,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 24,
+   "homeInSection": 25,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 107552
+   "bytes": 106634
   },
   {
    "id": "860y2020",
-   "version": "860y2020-0d88a285",
+   "version": "860y2020-a3572caf",
    "name": "Uzbekistan",
    "level": "ADM2",
    "clubs": 14,
@@ -9650,11 +9650,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 101350
+   "bytes": 101384
   },
   {
    "id": "862y2020",
-   "version": "862y2020-96f97431",
+   "version": "862y2020-1783ac62",
    "name": "Venezuela",
    "level": "ADM1",
    "clubs": 20,
@@ -9665,9 +9665,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0.2,
-    "max": 0.3
+    "max": 0.4
    },
-   "bytes": 117727
+   "bytes": 117453
   },
   {
    "id": "KOSy2020",
@@ -9759,7 +9759,7 @@
   },
   {
    "id": "012y2019",
-   "version": "012y2019-925030a9",
+   "version": "012y2019-13e5a13c",
    "name": "Algeria",
    "level": "ADM3",
    "clubs": 22,
@@ -9772,7 +9772,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 117103
+   "bytes": 117098
   },
   {
    "id": "032y2019",
@@ -9827,7 +9827,7 @@
   },
   {
    "id": "051y2019",
-   "version": "051y2019-2e210075",
+   "version": "051y2019-afae2304",
    "name": "Armenia",
    "level": "ADM2",
    "clubs": 13,
@@ -9840,7 +9840,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 68880
+   "bytes": 68905
   },
   {
    "id": "056y2019",
@@ -9918,7 +9918,7 @@
   },
   {
    "id": "112y2019",
-   "version": "112y2019-eb582fe5",
+   "version": "112y2019-4dd937f4",
    "name": "Belarus",
    "level": "ADM2",
    "clubs": 19,
@@ -9931,7 +9931,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 120245
+   "bytes": 120294
   },
   {
    "id": "152y2019",
@@ -10003,7 +10003,7 @@
   },
   {
    "id": "191y2019",
-   "version": "191y2019-e47e24e7",
+   "version": "191y2019-45b878f0",
    "name": "Croatia",
    "level": "ADM2",
    "clubs": 40,
@@ -10016,7 +10016,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 144538
+   "bytes": 144530
   },
   {
    "id": "196y2019",
@@ -10037,20 +10037,20 @@
   },
   {
    "id": "203y2019",
-   "version": "203y2019-ba917192",
+   "version": "203y2019-e576c22a",
    "name": "Czechia",
    "level": "ADM3",
    "clubs": 33,
    "located": 33,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 31,
+   "homeInSection": 32,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 139398
+   "bytes": 139576
   },
   {
    "id": "208y2019",
@@ -10108,7 +10108,7 @@
   },
   {
    "id": "246y2019",
-   "version": "246y2019-7423babe",
+   "version": "246y2019-d5e83851",
    "name": "Finland",
    "level": "ADM3",
    "clubs": 24,
@@ -10121,11 +10121,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 126383
+   "bytes": 126317
   },
   {
    "id": "250y2019",
-   "version": "250y2019-16109324",
+   "version": "250y2019-c87e848e",
    "name": "France",
    "level": "ADM3",
    "clubs": 40,
@@ -10138,7 +10138,7 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 156076
+   "bytes": 156068
   },
   {
    "id": "268y2019",
@@ -10197,7 +10197,7 @@
   },
   {
    "id": "300y2019",
-   "version": "300y2019-7f860fc5",
+   "version": "300y2019-00abc6c1",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -10217,7 +10217,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 146201
+   "bytes": 146194
   },
   {
    "id": "348y2019",
@@ -10297,7 +10297,7 @@
   },
   {
    "id": "364y2019",
-   "version": "364y2019-66d16269",
+   "version": "364y2019-281dcfce",
    "name": "Iran",
    "level": "ADM2",
    "clubs": 33,
@@ -10314,7 +10314,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 135449
+   "bytes": 135442
   },
   {
    "id": "372y2019",
@@ -10386,7 +10386,7 @@
   },
   {
    "id": "398y2019",
-   "version": "398y2019-96e65aa7",
+   "version": "398y2019-e510d527",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 14,
@@ -10399,7 +10399,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 113346
+   "bytes": 113416
   },
   {
    "id": "410y2019",
@@ -10511,7 +10511,7 @@
   },
   {
    "id": "504y2019",
-   "version": "504y2019-520232c7",
+   "version": "504y2019-f51e84da",
    "name": "Morocco",
    "level": "ADM2",
    "clubs": 18,
@@ -10526,7 +10526,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 112831
+   "bytes": 112852
   },
   {
    "id": "528y2019",
@@ -10652,7 +10652,7 @@
   },
   {
    "id": "642y2019",
-   "version": "642y2019-02fcaa2d",
+   "version": "642y2019-69c1d0f6",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 36,
@@ -10661,17 +10661,17 @@
    "placed": [
     "Sepsi Sf. Gheorghe"
    ],
-   "homeInSection": 33,
+   "homeInSection": 34,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 141849
+   "bytes": 141739
   },
   {
    "id": "643y2019",
-   "version": "643y2019-817f5e40",
+   "version": "643y2019-d88a8891",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 60,
@@ -10684,7 +10684,7 @@
     "p90": 0,
     "max": 2.1
    },
-   "bytes": 167785
+   "bytes": 167825
   },
   {
    "id": "682y2019",
@@ -10705,7 +10705,7 @@
   },
   {
    "id": "688y2019",
-   "version": "688y2019-5d24d73f",
+   "version": "688y2019-8e87e3a7",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 35,
@@ -10718,7 +10718,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 137944
+   "bytes": 137965
   },
   {
    "id": "703y2019",
@@ -10739,7 +10739,7 @@
   },
   {
    "id": "705y2019",
-   "version": "705y2019-1ec71d3f",
+   "version": "705y2019-c543c9a2",
    "name": "Slovenia",
    "level": "ADM2",
    "clubs": 24,
@@ -10754,11 +10754,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 124143
+   "bytes": 124156
   },
   {
    "id": "710y2019",
-   "version": "710y2019-bf6c5def",
+   "version": "710y2019-463de987",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 20,
@@ -10771,7 +10771,7 @@
     "p90": 0,
     "max": 1.1
    },
-   "bytes": 122876
+   "bytes": 122937
   },
   {
    "id": "724y2019",
@@ -10896,7 +10896,7 @@
   },
   {
    "id": "804y2019",
-   "version": "804y2019-65bde8fc",
+   "version": "804y2019-b681aa8c",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 31,
@@ -10913,7 +10913,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 100804
+   "bytes": 100686
   },
   {
    "id": "807y2019",
@@ -10934,7 +10934,7 @@
   },
   {
    "id": "818y2019",
-   "version": "818y2019-a2d111ca",
+   "version": "818y2019-48adb051",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 23,
@@ -10944,13 +10944,13 @@
     "El Dakhlia SC",
     "Harras El Hodoud"
    ],
-   "homeInSection": 16,
+   "homeInSection": 15,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.1
+    "max": 0.2
    },
-   "bytes": 119498
+   "bytes": 119563
   },
   {
    "id": "826y2019",
@@ -10988,7 +10988,7 @@
   },
   {
    "id": "858y2019",
-   "version": "858y2019-b8b010f6",
+   "version": "858y2019-06763a5f",
    "name": "Uruguay",
    "level": "ADM1",
    "clubs": 32,
@@ -10997,17 +10997,17 @@
    "placed": [
     "Canadian Soccer Club"
    ],
-   "homeInSection": 27,
+   "homeInSection": 28,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 112858
+   "bytes": 111213
   },
   {
    "id": "860y2019",
-   "version": "860y2019-d1309432",
+   "version": "860y2019-d6c07811",
    "name": "Uzbekistan",
    "level": "ADM2",
    "clubs": 16,
@@ -11020,7 +11020,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 101703
+   "bytes": 101704
   },
   {
    "id": "862y2019",
@@ -11094,7 +11094,7 @@
   },
   {
    "id": "008y2018",
-   "version": "008y2018-042ad6ee",
+   "version": "008y2018-cd288dfa",
    "name": "Albania",
    "level": "ADM3",
    "clubs": 11,
@@ -11107,7 +11107,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 94108
+   "bytes": 94100
   },
   {
    "id": "012y2018",
@@ -11285,7 +11285,7 @@
   },
   {
    "id": "156y2018",
-   "version": "156y2018-42ec05e2",
+   "version": "156y2018-c5bb0817",
    "name": "China",
    "level": "ADM2",
    "clubs": 56,
@@ -11301,13 +11301,13 @@
     "Hainan Boying",
     "Hebei Elite"
    ],
-   "homeInSection": 38,
+   "homeInSection": 40,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 161742
+   "bytes": 161666
   },
   {
    "id": "170y2018",
@@ -11345,7 +11345,7 @@
   },
   {
    "id": "191y2018",
-   "version": "191y2018-718d3e42",
+   "version": "191y2018-92b37b3d",
    "name": "Croatia",
    "level": "ADM2",
    "clubs": 40,
@@ -11358,7 +11358,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 144434
+   "bytes": 144426
   },
   {
    "id": "196y2018",
@@ -11432,24 +11432,24 @@
   },
   {
    "id": "233y2018",
-   "version": "233y2018-41d9fff1",
+   "version": "233y2018-41c8a6a7",
    "name": "Estonia",
    "level": "ADM2",
    "clubs": 16,
    "located": 16,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 13,
+   "homeInSection": 12,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 117262
+   "bytes": 117172
   },
   {
    "id": "246y2018",
-   "version": "246y2018-630a590e",
+   "version": "246y2018-66c771f5",
    "name": "Finland",
    "level": "ADM3",
    "clubs": 24,
@@ -11462,11 +11462,11 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 126330
+   "bytes": 126324
   },
   {
    "id": "250y2018",
-   "version": "250y2018-2a1c7a04",
+   "version": "250y2018-3abc2ef7",
    "name": "France",
    "level": "ADM3",
    "clubs": 40,
@@ -11479,11 +11479,11 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 156062
+   "bytes": 156054
   },
   {
    "id": "268y2018",
-   "version": "268y2018-e169991d",
+   "version": "268y2018-7fc2fff6",
    "name": "Georgia",
    "level": "ADM2",
    "clubs": 14,
@@ -11494,9 +11494,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0
+    "max": 0.1
    },
-   "bytes": 114560
+   "bytes": 114982
   },
   {
    "id": "276y2018",
@@ -11517,7 +11517,7 @@
   },
   {
    "id": "288y2018",
-   "version": "288y2018-99c0f425",
+   "version": "288y2018-966ce9a8",
    "name": "Ghana",
    "level": "ADM2",
    "clubs": 13,
@@ -11532,11 +11532,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 115296
+   "bytes": 115288
   },
   {
    "id": "300y2018",
-   "version": "300y2018-f59adb04",
+   "version": "300y2018-1e1dcb9d",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -11561,11 +11561,11 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 146814
+   "bytes": 146724
   },
   {
    "id": "348y2018",
-   "version": "348y2018-b0885ea9",
+   "version": "348y2018-ae770e3a",
    "name": "Hungary",
    "level": "ADM3",
    "clubs": 33,
@@ -11582,7 +11582,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 135639
+   "bytes": 135734
   },
   {
    "id": "352y2018",
@@ -11639,7 +11639,7 @@
   },
   {
    "id": "364y2018",
-   "version": "364y2018-afa3540a",
+   "version": "364y2018-754f0ab1",
    "name": "Iran",
    "level": "ADM2",
    "clubs": 32,
@@ -11650,13 +11650,13 @@
     "Oxin Alborz",
     "Khooneh Be Khooneh"
    ],
-   "homeInSection": 23,
+   "homeInSection": 24,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 133764
+   "bytes": 133853
   },
   {
    "id": "372y2018",
@@ -11677,7 +11677,7 @@
   },
   {
    "id": "376y2018",
-   "version": "376y2018-dc53d103",
+   "version": "376y2018-2ac86294",
    "name": "Israel",
    "level": "ADM2",
    "clubs": 32,
@@ -11690,7 +11690,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 81488
+   "bytes": 81821
   },
   {
    "id": "380y2018",
@@ -11728,7 +11728,7 @@
   },
   {
    "id": "398y2018",
-   "version": "398y2018-ad210c41",
+   "version": "398y2018-5688a585",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 13,
@@ -11741,7 +11741,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 111628
+   "bytes": 111688
   },
   {
    "id": "410y2018",
@@ -11762,7 +11762,7 @@
   },
   {
    "id": "442y2018",
-   "version": "442y2018-6252d925",
+   "version": "442y2018-80806ab6",
    "name": "Luxembourg",
    "level": "ADM2",
    "clubs": 16,
@@ -11775,7 +11775,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 67735
+   "bytes": 67149
   },
   {
    "id": "484y2018",
@@ -11815,7 +11815,7 @@
   },
   {
    "id": "504y2018",
-   "version": "504y2018-5375af36",
+   "version": "504y2018-58227d6d",
    "name": "Morocco",
    "level": "ADM2",
    "clubs": 14,
@@ -11830,7 +11830,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 109025
+   "bytes": 109039
   },
   {
    "id": "528y2018",
@@ -11957,7 +11957,7 @@
   },
   {
    "id": "642y2018",
-   "version": "642y2018-e354e4b9",
+   "version": "642y2018-091df92c",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 30,
@@ -11970,7 +11970,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 134135
+   "bytes": 134156
   },
   {
    "id": "643y2018",
@@ -12008,7 +12008,7 @@
   },
   {
    "id": "688y2018",
-   "version": "688y2018-23e66aa9",
+   "version": "688y2018-7d8b4da5",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 29,
@@ -12018,13 +12018,13 @@
     "FK Backa Balanka",
     "Triglav Kranj"
    ],
-   "homeInSection": 25,
+   "homeInSection": 26,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 131433
+   "bytes": 131373
   },
   {
    "id": "703y2018",
@@ -12045,7 +12045,7 @@
   },
   {
    "id": "705y2018",
-   "version": "705y2018-80b53f17",
+   "version": "705y2018-b794d874",
    "name": "Slovenia",
    "level": "ADM2",
    "clubs": 23,
@@ -12060,11 +12060,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 123591
+   "bytes": 123582
   },
   {
    "id": "710y2018",
-   "version": "710y2018-80385f20",
+   "version": "710y2018-5a7e59cb",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 18,
@@ -12077,7 +12077,7 @@
     "p90": 0,
     "max": 1.1
    },
-   "bytes": 120329
+   "bytes": 120464
   },
   {
    "id": "724y2018",
@@ -12200,7 +12200,7 @@
   },
   {
    "id": "804y2018",
-   "version": "804y2018-29afe402",
+   "version": "804y2018-7a19c5b7",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 30,
@@ -12211,9 +12211,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.1
+    "max": 0
    },
-   "bytes": 102931
+   "bytes": 99031
   },
   {
    "id": "807y2018",
@@ -12310,7 +12310,7 @@
   },
   {
    "id": "860y2018",
-   "version": "860y2018-fab62477",
+   "version": "860y2018-cda2f968",
    "name": "Uzbekistan",
    "level": "ADM2",
    "clubs": 16,
@@ -12325,7 +12325,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 101943
+   "bytes": 101945
   },
   {
    "id": "862y2018",
@@ -12399,7 +12399,7 @@
   },
   {
    "id": "012y2017",
-   "version": "012y2017-f4ab80d7",
+   "version": "012y2017-996958c4",
    "name": "Algeria",
    "level": "ADM3",
    "clubs": 15,
@@ -12408,13 +12408,13 @@
    "placed": [
     "NA d'Hussein-Dey"
    ],
-   "homeInSection": 12,
+   "homeInSection": 13,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 110407
+   "bytes": 110456
   },
   {
    "id": "032y2017",
@@ -12571,20 +12571,20 @@
   },
   {
    "id": "156y2017",
-   "version": "156y2017-acafc743",
+   "version": "156y2017-60405ef4",
    "name": "China",
    "level": "ADM2",
    "clubs": 18,
    "located": 18,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 14,
+   "homeInSection": 15,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 121726
+   "bytes": 121607
   },
   {
    "id": "170y2017",
@@ -12605,20 +12605,20 @@
   },
   {
    "id": "191y2017",
-   "version": "191y2017-2b98cd53",
+   "version": "191y2017-6a4766e8",
    "name": "Croatia",
    "level": "ADM2",
    "clubs": 40,
    "located": 40,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 34,
+   "homeInSection": 33,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 144803
+   "bytes": 144835
   },
   {
    "id": "196y2017",
@@ -12673,7 +12673,7 @@
   },
   {
    "id": "246y2017",
-   "version": "246y2017-08f6c7a4",
+   "version": "246y2017-e78412ad",
    "name": "Finland",
    "level": "ADM3",
    "clubs": 24,
@@ -12690,7 +12690,7 @@
   },
   {
    "id": "250y2017",
-   "version": "250y2017-284b9e6c",
+   "version": "250y2017-28989ab6",
    "name": "France",
    "level": "ADM3",
    "clubs": 40,
@@ -12741,7 +12741,7 @@
   },
   {
    "id": "300y2017",
-   "version": "300y2017-6c39eb77",
+   "version": "300y2017-be02e65a",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -12763,7 +12763,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 146318
+   "bytes": 146365
   },
   {
    "id": "348y2017",
@@ -12784,20 +12784,20 @@
   },
   {
    "id": "352y2017",
-   "version": "352y2017-f0b95265",
+   "version": "352y2017-ea011a3e",
    "name": "Iceland",
    "level": "ADM2",
    "clubs": 12,
    "located": 12,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 10,
+   "homeInSection": 11,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 113429
+   "bytes": 113980
   },
   {
    "id": "356y2017",
@@ -12852,7 +12852,7 @@
   },
   {
    "id": "376y2017",
-   "version": "376y2017-268a0795",
+   "version": "376y2017-eecf2395",
    "name": "Israel",
    "level": "ADM2",
    "clubs": 25,
@@ -12865,7 +12865,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 70665
+   "bytes": 70722
   },
   {
    "id": "380y2017",
@@ -12903,7 +12903,7 @@
   },
   {
    "id": "398y2017",
-   "version": "398y2017-32b3ca41",
+   "version": "398y2017-bc41b9cd",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 12,
@@ -12916,7 +12916,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 110806
+   "bytes": 110838
   },
   {
    "id": "410y2017",
@@ -13039,7 +13039,7 @@
   },
   {
    "id": "642y2017",
-   "version": "642y2017-56484ffb",
+   "version": "642y2017-3c0f7d34",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 17,
@@ -13052,11 +13052,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 121203
+   "bytes": 121198
   },
   {
    "id": "643y2017",
-   "version": "643y2017-195122cc",
+   "version": "643y2017-48b5042e",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 16,
@@ -13069,7 +13069,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 123914
+   "bytes": 123931
   },
   {
    "id": "682y2017",
@@ -13107,7 +13107,7 @@
   },
   {
    "id": "710y2017",
-   "version": "710y2017-60614857",
+   "version": "710y2017-d904443c",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 18,
@@ -13122,7 +13122,7 @@
     "p90": 0,
     "max": 1.1
    },
-   "bytes": 120875
+   "bytes": 120832
   },
   {
    "id": "724y2017",
@@ -13508,7 +13508,7 @@
   },
   {
    "id": "156y2016",
-   "version": "156y2016-82711976",
+   "version": "156y2016-a4e0fcca",
    "name": "China",
    "level": "ADM2",
    "clubs": 18,
@@ -13517,13 +13517,13 @@
    "placed": [
     "Jiangsu Sainty"
    ],
-   "homeInSection": 15,
+   "homeInSection": 16,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 122077
+   "bytes": 122101
   },
   {
    "id": "170y2016",
@@ -13544,20 +13544,20 @@
   },
   {
    "id": "191y2016",
-   "version": "191y2016-5a89549b",
+   "version": "191y2016-3245a9a1",
    "name": "Croatia",
    "level": "ADM2",
    "clubs": 40,
    "located": 40,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 34,
+   "homeInSection": 33,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 144766
+   "bytes": 144819
   },
   {
    "id": "196y2016",
@@ -13646,7 +13646,7 @@
   },
   {
    "id": "250y2016",
-   "version": "250y2016-22efa812",
+   "version": "250y2016-ebcdbb51",
    "name": "France",
    "level": "ADM3",
    "clubs": 40,
@@ -13659,7 +13659,7 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 156177
+   "bytes": 156169
   },
   {
    "id": "276y2016",
@@ -13680,7 +13680,7 @@
   },
   {
    "id": "300y2016",
-   "version": "300y2016-7b9028e3",
+   "version": "300y2016-947b53bc",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -13700,7 +13700,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 145740
+   "bytes": 145742
   },
   {
    "id": "348y2016",
@@ -13723,7 +13723,7 @@
   },
   {
    "id": "352y2016",
-   "version": "352y2016-918d7a7e",
+   "version": "352y2016-41cd1fb1",
    "name": "Iceland",
    "level": "ADM2",
    "clubs": 11,
@@ -13736,7 +13736,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 112719
+   "bytes": 112881
   },
   {
    "id": "356y2016",
@@ -13808,7 +13808,7 @@
   },
   {
    "id": "376y2016",
-   "version": "376y2016-116c2de6",
+   "version": "376y2016-40ca8686",
    "name": "Israel",
    "level": "ADM2",
    "clubs": 26,
@@ -13821,7 +13821,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 71819
+   "bytes": 71873
   },
   {
    "id": "380y2016",
@@ -13859,7 +13859,7 @@
   },
   {
    "id": "398y2016",
-   "version": "398y2016-82a0b5c9",
+   "version": "398y2016-bd4411b3",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 12,
@@ -13872,7 +13872,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 110968
+   "bytes": 111020
   },
   {
    "id": "410y2016",
@@ -14035,7 +14035,7 @@
   },
   {
    "id": "642y2016",
-   "version": "642y2016-0615f69f",
+   "version": "642y2016-55627275",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 18,
@@ -14048,11 +14048,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 122164
+   "bytes": 122207
   },
   {
    "id": "643y2016",
-   "version": "643y2016-4a5da079",
+   "version": "643y2016-d141cdbb",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 16,
@@ -14065,7 +14065,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 123863
+   "bytes": 123880
   },
   {
    "id": "682y2016",
@@ -14120,7 +14120,7 @@
   },
   {
    "id": "710y2016",
-   "version": "710y2016-a8b2735d",
+   "version": "710y2016-cc0dff30",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 17,
@@ -14135,7 +14135,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 120076
+   "bytes": 120164
   },
   {
    "id": "724y2016",
@@ -14207,7 +14207,7 @@
   },
   {
    "id": "804y2016",
-   "version": "804y2016-a85b5631",
+   "version": "804y2016-0e01c88a",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 11,
@@ -14220,7 +14220,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 76865
+   "bytes": 76892
   },
   {
    "id": "818y2016",
@@ -14368,7 +14368,7 @@
   },
   {
    "id": "012y2015",
-   "version": "012y2015-f98f9353",
+   "version": "012y2015-0ab55040",
    "name": "Algeria",
    "level": "ADM3",
    "clubs": 15,
@@ -14381,7 +14381,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 110515
+   "bytes": 110663
   },
   {
    "id": "032y2015",
@@ -14470,7 +14470,7 @@
   },
   {
    "id": "076y2015",
-   "version": "076y2015-42e8aa0a",
+   "version": "076y2015-2696d92a",
    "name": "Brazil",
    "level": "ADM2",
    "clubs": 98,
@@ -14483,7 +14483,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 240917
+   "bytes": 240851
   },
   {
    "id": "100y2015",
@@ -14538,7 +14538,7 @@
   },
   {
    "id": "156y2015",
-   "version": "156y2015-0ed03ab1",
+   "version": "156y2015-38d3501b",
    "name": "China",
    "level": "ADM2",
    "clubs": 17,
@@ -14553,7 +14553,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 121241
+   "bytes": 121257
   },
   {
    "id": "170y2015",
@@ -14574,7 +14574,7 @@
   },
   {
    "id": "191y2015",
-   "version": "191y2015-9c72eb06",
+   "version": "191y2015-2f0e4eca",
    "name": "Croatia",
    "level": "ADM2",
    "clubs": 40,
@@ -14587,7 +14587,7 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 144849
+   "bytes": 144879
   },
   {
    "id": "196y2015",
@@ -14642,7 +14642,7 @@
   },
   {
    "id": "218y2015",
-   "version": "218y2015-a7499587",
+   "version": "218y2015-ccfd98a1",
    "name": "Ecuador",
    "level": "ADM2",
    "clubs": 13,
@@ -14655,9 +14655,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0
+    "max": 0.1
    },
-   "bytes": 113546
+   "bytes": 113070
   },
   {
    "id": "233y2015",
@@ -14697,7 +14697,7 @@
   },
   {
    "id": "250y2015",
-   "version": "250y2015-a341a252",
+   "version": "250y2015-f417e6ad",
    "name": "France",
    "level": "ADM3",
    "clubs": 40,
@@ -14710,7 +14710,7 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 155420
+   "bytes": 155412
   },
   {
    "id": "276y2015",
@@ -14731,7 +14731,7 @@
   },
   {
    "id": "300y2015",
-   "version": "300y2015-7c6a69af",
+   "version": "300y2015-bec94def",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -14751,7 +14751,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 146473
+   "bytes": 146478
   },
   {
    "id": "348y2015",
@@ -14776,7 +14776,7 @@
   },
   {
    "id": "352y2015",
-   "version": "352y2015-65f619c6",
+   "version": "352y2015-82a57136",
    "name": "Iceland",
    "level": "ADM2",
    "clubs": 13,
@@ -14789,7 +14789,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 115277
+   "bytes": 115370
   },
   {
    "id": "356y2015",
@@ -14861,7 +14861,7 @@
   },
   {
    "id": "376y2015",
-   "version": "376y2015-326320f5",
+   "version": "376y2015-171712b6",
    "name": "Israel",
    "level": "ADM2",
    "clubs": 31,
@@ -14876,7 +14876,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 77039
+   "bytes": 77426
   },
   {
    "id": "380y2015",
@@ -14914,7 +14914,7 @@
   },
   {
    "id": "398y2015",
-   "version": "398y2015-834b1e04",
+   "version": "398y2015-cf009dfc",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 13,
@@ -14927,7 +14927,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 111870
+   "bytes": 111922
   },
   {
    "id": "410y2015",
@@ -14948,7 +14948,7 @@
   },
   {
    "id": "428y2015",
-   "version": "428y2015-7f80dc82",
+   "version": "428y2015-fdbb99ef",
    "name": "Latvia",
    "level": "ADM2",
    "clubs": 11,
@@ -14959,9 +14959,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.1
+    "max": 0
    },
-   "bytes": 110669
+   "bytes": 110693
   },
   {
    "id": "484y2015",
@@ -15086,7 +15086,7 @@
   },
   {
    "id": "642y2015",
-   "version": "642y2015-6655a9f1",
+   "version": "642y2015-52bf3d81",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 25,
@@ -15099,7 +15099,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 129898
+   "bytes": 129989
   },
   {
    "id": "643y2015",
@@ -15154,7 +15154,7 @@
   },
   {
    "id": "710y2015",
-   "version": "710y2015-6668b043",
+   "version": "710y2015-fcb06d82",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 21,
@@ -15169,7 +15169,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 124617
+   "bytes": 124610
   },
   {
    "id": "724y2015",
@@ -15241,7 +15241,7 @@
   },
   {
    "id": "804y2015",
-   "version": "804y2015-24978f8b",
+   "version": "804y2015-dd4d168e",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 15,
@@ -15257,7 +15257,7 @@
     "p90": 3.1,
     "max": 14.9
    },
-   "bytes": 82024
+   "bytes": 82520
   },
   {
    "id": "818y2015",
@@ -15405,7 +15405,7 @@
   },
   {
    "id": "012y2014",
-   "version": "012y2014-6cdcd8f4",
+   "version": "012y2014-0ccc3b7c",
    "name": "Algeria",
    "level": "ADM3",
    "clubs": 16,
@@ -15421,7 +15421,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 113456
+   "bytes": 113625
   },
   {
    "id": "031y2014",
@@ -15595,7 +15595,7 @@
   },
   {
    "id": "156y2014",
-   "version": "156y2014-03fe5849",
+   "version": "156y2014-8a850bf0",
    "name": "China",
    "level": "ADM2",
    "clubs": 17,
@@ -15610,7 +15610,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 120921
+   "bytes": 120945
   },
   {
    "id": "170y2014",
@@ -15631,24 +15631,24 @@
   },
   {
    "id": "191y2014",
-   "version": "191y2014-095a5fae",
+   "version": "191y2014-ab560333",
    "name": "Croatia",
    "level": "ADM2",
    "clubs": 40,
    "located": 40,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 33,
+   "homeInSection": 32,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.3
+    "max": 0.5
    },
-   "bytes": 145170
+   "bytes": 145118
   },
   {
    "id": "196y2014",
-   "version": "196y2014-1df0279b",
+   "version": "196y2014-ef7ebc84",
    "name": "Cyprus",
    "level": "ADM2",
    "clubs": 15,
@@ -15660,10 +15660,10 @@
    "homeInSection": 9,
    "displacementKm": {
     "median": 0,
-    "p90": 0.1,
+    "p90": 0.2,
     "max": 0.3
    },
-   "bytes": 95295
+   "bytes": 94468
   },
   {
    "id": "203y2014",
@@ -15805,7 +15805,7 @@
   },
   {
    "id": "300y2014",
-   "version": "300y2014-dd70bc85",
+   "version": "300y2014-88ed2a24",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -15826,7 +15826,7 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 147203
+   "bytes": 147216
   },
   {
    "id": "348y2014",
@@ -15902,7 +15902,7 @@
   },
   {
    "id": "376y2014",
-   "version": "376y2014-8f4edd98",
+   "version": "376y2014-52123a39",
    "name": "Israel",
    "level": "ADM2",
    "clubs": 31,
@@ -15915,11 +15915,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 78524
+   "bytes": 78918
   },
   {
    "id": "380y2014",
-   "version": "380y2014-b0e2b72e",
+   "version": "380y2014-60eb1a98",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 42,
@@ -15932,7 +15932,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 155310
+   "bytes": 155331
   },
   {
    "id": "392y2014",
@@ -15953,7 +15953,7 @@
   },
   {
    "id": "398y2014",
-   "version": "398y2014-5822c9a0",
+   "version": "398y2014-443fa262",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 11,
@@ -15966,7 +15966,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 110340
+   "bytes": 110372
   },
   {
    "id": "410y2014",
@@ -15987,7 +15987,7 @@
   },
   {
    "id": "428y2014",
-   "version": "428y2014-6b7cb377",
+   "version": "428y2014-5f01d052",
    "name": "Latvia",
    "level": "ADM2",
    "clubs": 13,
@@ -16002,7 +16002,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 113806
+   "bytes": 113830
   },
   {
    "id": "442y2014",
@@ -16091,7 +16091,7 @@
   },
   {
    "id": "604y2014",
-   "version": "604y2014-15ab141e",
+   "version": "604y2014-803b5123",
    "name": "Peru",
    "level": "ADM2",
    "clubs": 15,
@@ -16104,7 +16104,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 116603
+   "bytes": 116707
   },
   {
    "id": "616y2014",
@@ -16142,7 +16142,7 @@
   },
   {
    "id": "642y2014",
-   "version": "642y2014-97c9a52c",
+   "version": "642y2014-32aa54ae",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 26,
@@ -16155,11 +16155,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 131307
+   "bytes": 131339
   },
   {
    "id": "643y2014",
-   "version": "643y2014-f3d00ab2",
+   "version": "643y2014-108bc6af",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 16,
@@ -16172,7 +16172,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 123472
+   "bytes": 123489
   },
   {
    "id": "682y2014",
@@ -16193,7 +16193,7 @@
   },
   {
    "id": "688y2014",
-   "version": "688y2014-db0c1dc0",
+   "version": "688y2014-eeb6e752",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 38,
@@ -16208,11 +16208,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 143293
+   "bytes": 143497
   },
   {
    "id": "710y2014",
-   "version": "710y2014-f23ed151",
+   "version": "710y2014-5992ff41",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 20,
@@ -16228,7 +16228,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 123364
+   "bytes": 123357
   },
   {
    "id": "724y2014",
@@ -16283,7 +16283,7 @@
   },
   {
    "id": "792y2014",
-   "version": "792y2014-91c0505b",
+   "version": "792y2014-e1770580",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 58,
@@ -16299,11 +16299,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 165096
+   "bytes": 165075
   },
   {
    "id": "804y2014",
-   "version": "804y2014-5b3d0285",
+   "version": "804y2014-ce86a441",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 18,
@@ -16319,7 +16319,7 @@
     "p90": 3.1,
     "max": 14.7
    },
-   "bytes": 85173
+   "bytes": 85511
   },
   {
    "id": "818y2014",
@@ -16463,7 +16463,7 @@
   },
   {
    "id": "032y2013",
-   "version": "032y2013-e19dcf35",
+   "version": "032y2013-276eec90",
    "name": "Argentina",
    "level": "ADM2",
    "clubs": 69,
@@ -16478,7 +16478,7 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 180019
+   "bytes": 180032
   },
   {
    "id": "036y2013",
@@ -16603,20 +16603,20 @@
   },
   {
    "id": "152y2013",
-   "version": "152y2013-a054c78a",
+   "version": "152y2013-397561cd",
    "name": "Chile",
    "level": "ADM3",
    "clubs": 26,
    "located": 26,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 25,
+   "homeInSection": 23,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 136524
+   "bytes": 136482
   },
   {
    "id": "156y2013",
@@ -16661,7 +16661,7 @@
   },
   {
    "id": "191y2013",
-   "version": "191y2013-ddbc18c7",
+   "version": "191y2013-c46d5557",
    "name": "Croatia",
    "level": "ADM2",
    "clubs": 40,
@@ -16674,11 +16674,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 144812
+   "bytes": 144802
   },
   {
    "id": "196y2013",
-   "version": "196y2013-947fad9d",
+   "version": "196y2013-1e45542b",
    "name": "Cyprus",
    "level": "ADM2",
    "clubs": 16,
@@ -16691,7 +16691,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 89413
+   "bytes": 88301
   },
   {
    "id": "203y2013",
@@ -16833,7 +16833,7 @@
   },
   {
    "id": "300y2013",
-   "version": "300y2013-688d875c",
+   "version": "300y2013-cdfa7fb7",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 37,
@@ -16855,7 +16855,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 144286
+   "bytes": 144344
   },
   {
    "id": "348y2013",
@@ -16912,7 +16912,7 @@
   },
   {
    "id": "376y2013",
-   "version": "376y2013-8a53ce00",
+   "version": "376y2013-4534ce0a",
    "name": "Israel",
    "level": "ADM2",
    "clubs": 30,
@@ -16927,11 +16927,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 75005
+   "bytes": 74799
   },
   {
    "id": "380y2013",
-   "version": "380y2013-59ab3229",
+   "version": "380y2013-809ee8a4",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 42,
@@ -16944,7 +16944,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 156458
+   "bytes": 156464
   },
   {
    "id": "392y2013",
@@ -16965,7 +16965,7 @@
   },
   {
    "id": "398y2013",
-   "version": "398y2013-4b678e6d",
+   "version": "398y2013-f13cff92",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 13,
@@ -16978,7 +16978,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 112287
+   "bytes": 112332
   },
   {
    "id": "410y2013",
@@ -17067,7 +17067,7 @@
   },
   {
    "id": "604y2013",
-   "version": "604y2013-3eede419",
+   "version": "604y2013-c4aab9fa",
    "name": "Peru",
    "level": "ADM2",
    "clubs": 19,
@@ -17082,7 +17082,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 122138
+   "bytes": 122046
   },
   {
    "id": "616y2013",
@@ -17120,7 +17120,7 @@
   },
   {
    "id": "642y2013",
-   "version": "642y2013-4962f103",
+   "version": "642y2013-c32a36ee",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 20,
@@ -17133,11 +17133,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 124689
+   "bytes": 124452
   },
   {
    "id": "643y2013",
-   "version": "643y2013-acead840",
+   "version": "643y2013-bdd26c1b",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 16,
@@ -17150,7 +17150,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 123460
+   "bytes": 123493
   },
   {
    "id": "682y2013",
@@ -17171,7 +17171,7 @@
   },
   {
    "id": "688y2013",
-   "version": "688y2013-a65d83de",
+   "version": "688y2013-4937d8c4",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 34,
@@ -17180,17 +17180,17 @@
    "placed": [
     "Polet Ljubic"
    ],
-   "homeInSection": 30,
+   "homeInSection": 29,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 138005
+   "bytes": 138082
   },
   {
    "id": "710y2013",
-   "version": "710y2013-88ed61bb",
+   "version": "710y2013-bfd3b94d",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 22,
@@ -17206,7 +17206,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 125905
+   "bytes": 126040
   },
   {
    "id": "724y2013",
@@ -17261,7 +17261,7 @@
   },
   {
    "id": "792y2013",
-   "version": "792y2013-cc6fb82a",
+   "version": "792y2013-3b1fc08b",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 49,
@@ -17277,11 +17277,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 155107
+   "bytes": 155149
   },
   {
    "id": "804y2013",
-   "version": "804y2013-aa0e1841",
+   "version": "804y2013-82bb8fb1",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 18,
@@ -17294,14 +17294,14 @@
    "homeInSection": 13,
    "displacementKm": {
     "median": 0,
-    "p90": 2.3,
+    "p90": 3.1,
     "max": 14.7
    },
-   "bytes": 85245
+   "bytes": 85180
   },
   {
    "id": "818y2013",
-   "version": "818y2013-66b0b5bf",
+   "version": "818y2013-9ad521a3",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 13,
@@ -17317,7 +17317,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 108745
+   "bytes": 108770
   },
   {
    "id": "826y2013",
@@ -17442,7 +17442,7 @@
   },
   {
    "id": "008y2012",
-   "version": "008y2012-cd27a28e",
+   "version": "008y2012-2297cf3a",
    "name": "Albania",
    "level": "ADM3",
    "clubs": 17,
@@ -17455,11 +17455,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 101291
+   "bytes": 101224
   },
   {
    "id": "032y2012",
-   "version": "032y2012-e4ce1bb0",
+   "version": "032y2012-45780c85",
    "name": "Argentina",
    "level": "ADM2",
    "clubs": 65,
@@ -17474,7 +17474,7 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 175014
+   "bytes": 175036
   },
   {
    "id": "036y2012",
@@ -17618,24 +17618,24 @@
   },
   {
    "id": "152y2012",
-   "version": "152y2012-55434f31",
+   "version": "152y2012-1322385d",
    "name": "Chile",
    "level": "ADM3",
    "clubs": 29,
    "located": 29,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 28,
+   "homeInSection": 26,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 140893
+   "bytes": 140847
   },
   {
    "id": "156y2012",
-   "version": "156y2012-9ad4879f",
+   "version": "156y2012-f1e92ace",
    "name": "China",
    "level": "ADM2",
    "clubs": 27,
@@ -17655,7 +17655,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 132476
+   "bytes": 132495
   },
   {
    "id": "170y2012",
@@ -17699,7 +17699,7 @@
   },
   {
    "id": "196y2012",
-   "version": "196y2012-72817b4b",
+   "version": "196y2012-bce2f340",
    "name": "Cyprus",
    "level": "ADM2",
    "clubs": 16,
@@ -17711,10 +17711,10 @@
    "homeInSection": 10,
    "displacementKm": {
     "median": 0,
-    "p90": 0,
+    "p90": 0.1,
     "max": 0.1
    },
-   "bytes": 92332
+   "bytes": 93857
   },
   {
    "id": "203y2012",
@@ -17888,7 +17888,7 @@
   },
   {
    "id": "360y2012",
-   "version": "360y2012-7edeb1d0",
+   "version": "360y2012-39058a12",
    "name": "Indonesia",
    "level": "ADM2",
    "clubs": 15,
@@ -17901,7 +17901,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 139094
+   "bytes": 139114
   },
   {
    "id": "372y2012",
@@ -17922,7 +17922,7 @@
   },
   {
    "id": "376y2012",
-   "version": "376y2012-b1b38b21",
+   "version": "376y2012-f4b8a389",
    "name": "Israel",
    "level": "ADM2",
    "clubs": 20,
@@ -17935,11 +17935,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 64240
+   "bytes": 64227
   },
   {
    "id": "380y2012",
-   "version": "380y2012-451a449c",
+   "version": "380y2012-22194dce",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 42,
@@ -17952,7 +17952,7 @@
     "p90": 0,
     "max": 0.6
    },
-   "bytes": 157467
+   "bytes": 157561
   },
   {
    "id": "392y2012",
@@ -17993,7 +17993,7 @@
   },
   {
    "id": "428y2012",
-   "version": "428y2012-a5cde140",
+   "version": "428y2012-2bd6da8d",
    "name": "Latvia",
    "level": "ADM2",
    "clubs": 10,
@@ -18006,7 +18006,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 109884
+   "bytes": 109959
   },
   {
    "id": "484y2012",
@@ -18078,7 +18078,7 @@
   },
   {
    "id": "604y2012",
-   "version": "604y2012-b0c2b00a",
+   "version": "604y2012-f605dab0",
    "name": "Peru",
    "level": "ADM2",
    "clubs": 24,
@@ -18096,7 +18096,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 127649
+   "bytes": 127647
   },
   {
    "id": "616y2012",
@@ -18134,7 +18134,7 @@
   },
   {
    "id": "642y2012",
-   "version": "642y2012-14c4b6f5",
+   "version": "642y2012-e55e6ee7",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 23,
@@ -18147,11 +18147,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 128457
+   "bytes": 128479
   },
   {
    "id": "643y2012",
-   "version": "643y2012-58dee6cf",
+   "version": "643y2012-e7c59e5e",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 16,
@@ -18164,11 +18164,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 123750
+   "bytes": 123767
   },
   {
    "id": "688y2012",
-   "version": "688y2012-f888a7e6",
+   "version": "688y2012-3f325552",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 40,
@@ -18185,11 +18185,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 143747
+   "bytes": 143557
   },
   {
    "id": "705y2012",
-   "version": "705y2012-9015e921",
+   "version": "705y2012-b26349e7",
    "name": "Slovenia",
    "level": "ADM2",
    "clubs": 12,
@@ -18202,7 +18202,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 112229
+   "bytes": 112232
   },
   {
    "id": "710y2012",
@@ -18280,7 +18280,7 @@
   },
   {
    "id": "792y2012",
-   "version": "792y2012-3f82c102",
+   "version": "792y2012-f8580dda",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 67,
@@ -18299,11 +18299,11 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 174798
+   "bytes": 174791
   },
   {
    "id": "804y2012",
-   "version": "804y2012-fe4e0f86",
+   "version": "804y2012-42db5ecc",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 15,
@@ -18316,9 +18316,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.3
+    "max": 0
    },
-   "bytes": 83787
+   "bytes": 82557
   },
   {
    "id": "826y2012",
@@ -18443,7 +18443,7 @@
   },
   {
    "id": "008y2011",
-   "version": "008y2011-df5a699a",
+   "version": "008y2011-2bfaf4a1",
    "name": "Albania",
    "level": "ADM3",
    "clubs": 16,
@@ -18454,13 +18454,13 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0
+    "max": 0.8
    },
-   "bytes": 100542
+   "bytes": 101465
   },
   {
    "id": "032y2011",
-   "version": "032y2011-aa1213bc",
+   "version": "032y2011-1934596e",
    "name": "Argentina",
    "level": "ADM2",
    "clubs": 72,
@@ -18475,7 +18475,7 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 183259
+   "bytes": 183281
   },
   {
    "id": "036y2011",
@@ -18591,7 +18591,7 @@
   },
   {
    "id": "100y2011",
-   "version": "100y2011-96ad942a",
+   "version": "100y2011-059733b7",
    "name": "Bulgaria",
    "level": "ADM2",
    "clubs": 25,
@@ -18604,7 +18604,7 @@
     "p90": 0,
     "max": 1.5
    },
-   "bytes": 106590
+   "bytes": 106613
   },
   {
    "id": "112y2011",
@@ -18625,24 +18625,24 @@
   },
   {
    "id": "152y2011",
-   "version": "152y2011-05364af9",
+   "version": "152y2011-fc250be3",
    "name": "Chile",
    "level": "ADM3",
    "clubs": 31,
    "located": 31,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 29,
+   "homeInSection": 28,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 143402
+   "bytes": 143492
   },
   {
    "id": "156y2011",
-   "version": "156y2011-1577b67c",
+   "version": "156y2011-633344c7",
    "name": "China",
    "level": "ADM2",
    "clubs": 43,
@@ -18668,7 +18668,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 150240
+   "bytes": 150228
   },
   {
    "id": "170y2011",
@@ -18732,7 +18732,7 @@
   },
   {
    "id": "196y2011",
-   "version": "196y2011-9263a42c",
+   "version": "196y2011-c492f975",
    "name": "Cyprus",
    "level": "ADM2",
    "clubs": 19,
@@ -18748,7 +18748,7 @@
     "p90": 0,
     "max": 6.4
    },
-   "bytes": 89024
+   "bytes": 89045
   },
   {
    "id": "203y2011",
@@ -18824,7 +18824,7 @@
   },
   {
    "id": "233y2011",
-   "version": "233y2011-7608d31a",
+   "version": "233y2011-52d62d64",
    "name": "Estonia",
    "level": "ADM2",
    "clubs": 10,
@@ -18837,7 +18837,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 110942
+   "bytes": 110875
   },
   {
    "id": "246y2011",
@@ -18974,7 +18974,7 @@
   },
   {
    "id": "360y2011",
-   "version": "360y2011-473e9e43",
+   "version": "360y2011-a30043e4",
    "name": "Indonesia",
    "level": "ADM2",
    "clubs": 21,
@@ -18987,7 +18987,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 144674
+   "bytes": 144700
   },
   {
    "id": "372y2011",
@@ -19008,7 +19008,7 @@
   },
   {
    "id": "376y2011",
-   "version": "376y2011-f0555626",
+   "version": "376y2011-ff57ec0e",
    "name": "Israel",
    "level": "ADM2",
    "clubs": 34,
@@ -19025,7 +19025,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 81441
+   "bytes": 82383
   },
   {
    "id": "380y2011",
@@ -19212,7 +19212,7 @@
   },
   {
    "id": "642y2011",
-   "version": "642y2011-c8ad7ed2",
+   "version": "642y2011-f6d9f1c0",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 26,
@@ -19225,11 +19225,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 131770
+   "bytes": 131766
   },
   {
    "id": "643y2011",
-   "version": "643y2011-71ba6b9d",
+   "version": "643y2011-3b23cf62",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 16,
@@ -19242,11 +19242,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 124195
+   "bytes": 124229
   },
   {
    "id": "688y2011",
-   "version": "688y2011-5ac80631",
+   "version": "688y2011-14bbd993",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 40,
@@ -19262,17 +19262,17 @@
     "Big Bull Bacinci",
     "Ibar Rozaje"
    ],
-   "homeInSection": 31,
+   "homeInSection": 32,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 145942
+   "bytes": 145978
   },
   {
    "id": "705y2011",
-   "version": "705y2011-a26c819b",
+   "version": "705y2011-6eff11a2",
    "name": "Slovenia",
    "level": "ADM2",
    "clubs": 11,
@@ -19285,7 +19285,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 111161
+   "bytes": 111154
   },
   {
    "id": "710y2011",
@@ -19320,7 +19320,7 @@
   },
   {
    "id": "724y2011",
-   "version": "724y2011-9c9eaff1",
+   "version": "724y2011-70402a74",
    "name": "Spain",
    "level": "ADM3",
    "clubs": 40,
@@ -19333,7 +19333,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 153339
+   "bytes": 153332
   },
   {
    "id": "752y2011",
@@ -19409,20 +19409,20 @@
   },
   {
    "id": "804y2011",
-   "version": "804y2011-de6d602f",
+   "version": "804y2011-dbe825ae",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 15,
    "located": 15,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 13,
+   "homeInSection": 14,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 81430
+   "bytes": 81754
   },
   {
    "id": "826y2011",
@@ -19477,7 +19477,7 @@
   },
   {
    "id": "860y2011",
-   "version": "860y2011-85651a9e",
+   "version": "860y2011-d84e2072",
    "name": "Uzbekistan",
    "level": "ADM2",
    "clubs": 12,
@@ -19492,7 +19492,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 96993
+   "bytes": 96980
   },
   {
    "id": "862y2011",
@@ -19547,7 +19547,7 @@
   },
   {
    "id": "WALy2011",
-   "version": "WALy2011-7bcae112",
+   "version": "WALy2011-150ef356",
    "name": "Wales",
    "level": "ADM2",
    "clubs": 16,
@@ -19562,11 +19562,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 54437
+   "bytes": 54467
   },
   {
    "id": "008y2010",
-   "version": "008y2010-d7a080f7",
+   "version": "008y2010-61447d50",
    "name": "Albania",
    "level": "ADM3",
    "clubs": 16,
@@ -19579,11 +19579,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 100408
+   "bytes": 100617
   },
   {
    "id": "032y2010",
-   "version": "032y2010-33b046f4",
+   "version": "032y2010-04d1abce",
    "name": "Argentina",
    "level": "ADM2",
    "clubs": 70,
@@ -19598,7 +19598,7 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 180814
+   "bytes": 180836
   },
   {
    "id": "036y2010",
@@ -19716,7 +19716,7 @@
   },
   {
    "id": "100y2010",
-   "version": "100y2010-986d9276",
+   "version": "100y2010-555f7984",
    "name": "Bulgaria",
    "level": "ADM2",
    "clubs": 25,
@@ -19729,7 +19729,7 @@
     "p90": 0,
     "max": 1.5
    },
-   "bytes": 106715
+   "bytes": 106738
   },
   {
    "id": "112y2010",
@@ -19750,24 +19750,24 @@
   },
   {
    "id": "152y2010",
-   "version": "152y2010-79c35828",
+   "version": "152y2010-ada26560",
    "name": "Chile",
    "level": "ADM3",
    "clubs": 31,
    "located": 31,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 29,
+   "homeInSection": 28,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 143363
+   "bytes": 143404
   },
   {
    "id": "156y2010",
-   "version": "156y2010-3d4cb66e",
+   "version": "156y2010-b626139e",
    "name": "China",
    "level": "ADM2",
    "clubs": 49,
@@ -19798,7 +19798,7 @@
     "p90": 0,
     "max": 0.8
    },
-   "bytes": 157284
+   "bytes": 157304
   },
   {
    "id": "170y2010",
@@ -19862,7 +19862,7 @@
   },
   {
    "id": "196y2010",
-   "version": "196y2010-26729b13",
+   "version": "196y2010-d2e6f454",
    "name": "Cyprus",
    "level": "ADM2",
    "clubs": 19,
@@ -19878,7 +19878,7 @@
     "p90": 0,
     "max": 6.4
    },
-   "bytes": 89050
+   "bytes": 89071
   },
   {
    "id": "203y2010",
@@ -20087,7 +20087,7 @@
   },
   {
    "id": "360y2010",
-   "version": "360y2010-101561fe",
+   "version": "360y2010-5ff7eddb",
    "name": "Indonesia",
    "level": "ADM2",
    "clubs": 23,
@@ -20100,7 +20100,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 147012
+   "bytes": 147077
   },
   {
    "id": "372y2010",
@@ -20123,7 +20123,7 @@
   },
   {
    "id": "376y2010",
-   "version": "376y2010-470c8b8c",
+   "version": "376y2010-455bfd83",
    "name": "Israel",
    "level": "ADM2",
    "clubs": 35,
@@ -20140,7 +20140,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 81731
+   "bytes": 83107
   },
   {
    "id": "380y2010",
@@ -20327,7 +20327,7 @@
   },
   {
    "id": "642y2010",
-   "version": "642y2010-d7d348ff",
+   "version": "642y2010-bcce754f",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 28,
@@ -20340,11 +20340,11 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 134003
+   "bytes": 133888
   },
   {
    "id": "643y2010",
-   "version": "643y2010-32f42ca8",
+   "version": "643y2010-0f0cca20",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 16,
@@ -20357,11 +20357,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 122459
+   "bytes": 122476
   },
   {
    "id": "688y2010",
-   "version": "688y2010-15c41f8c",
+   "version": "688y2010-99a184d2",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 40,
@@ -20378,17 +20378,17 @@
     "Ibar Rozaje",
     "Ozren Sokobanja"
    ],
-   "homeInSection": 30,
+   "homeInSection": 31,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 146693
+   "bytes": 146454
   },
   {
    "id": "705y2010",
-   "version": "705y2010-e7fe5867",
+   "version": "705y2010-fa21a397",
    "name": "Slovenia",
    "level": "ADM2",
    "clubs": 11,
@@ -20401,11 +20401,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 111351
+   "bytes": 111344
   },
   {
    "id": "710y2010",
-   "version": "710y2010-7e458a80",
+   "version": "710y2010-3553b0bf",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 34,
@@ -20434,11 +20434,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 139671
+   "bytes": 139584
   },
   {
    "id": "724y2010",
-   "version": "724y2010-a57385eb",
+   "version": "724y2010-dc5e2439",
    "name": "Spain",
    "level": "ADM3",
    "clubs": 41,
@@ -20451,7 +20451,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 147283
+   "bytes": 147288
   },
   {
    "id": "752y2010",
@@ -20529,7 +20529,7 @@
   },
   {
    "id": "804y2010",
-   "version": "804y2010-0f9bdb3e",
+   "version": "804y2010-ad5c98cd",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 15,
@@ -20538,13 +20538,13 @@
    "placed": [
     "Tavria Simferopol"
    ],
-   "homeInSection": 12,
+   "homeInSection": 13,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.2
+    "max": 0
    },
-   "bytes": 85197
+   "bytes": 82509
   },
   {
    "id": "826y2010",
@@ -20599,7 +20599,7 @@
   },
   {
    "id": "860y2010",
-   "version": "860y2010-3f5f0c48",
+   "version": "860y2010-5d8d99bd",
    "name": "Uzbekistan",
    "level": "ADM2",
    "clubs": 12,
@@ -20614,7 +20614,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 97299
+   "bytes": 97282
   },
   {
    "id": "862y2010",
@@ -20669,7 +20669,7 @@
   },
   {
    "id": "WALy2010",
-   "version": "WALy2010-460095f7",
+   "version": "WALy2010-3fc59f65",
    "name": "Wales",
    "level": "ADM2",
    "clubs": 16,
@@ -20678,17 +20678,17 @@
    "placed": [
     "The New Saints"
    ],
-   "homeInSection": 15,
+   "homeInSection": 14,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 54315
+   "bytes": 54318
   },
   {
    "id": "008y2009",
-   "version": "008y2009-5ad5eda4",
+   "version": "008y2009-094017c8",
    "name": "Albania",
    "level": "ADM3",
    "clubs": 15,
@@ -20701,11 +20701,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 98701
+   "bytes": 99097
   },
   {
    "id": "032y2009",
-   "version": "032y2009-490343ce",
+   "version": "032y2009-fc167f67",
    "name": "Argentina",
    "level": "ADM2",
    "clubs": 68,
@@ -20720,11 +20720,11 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 178121
+   "bytes": 178143
   },
   {
    "id": "036y2009",
-   "version": "036y2009-9aeab0af",
+   "version": "036y2009-cd5d1c7b",
    "name": "Australia",
    "level": "ADM2",
    "clubs": 38,
@@ -20743,7 +20743,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 140615
+   "bytes": 140643
   },
   {
    "id": "040y2009",
@@ -20842,7 +20842,7 @@
   },
   {
    "id": "100y2009",
-   "version": "100y2009-ac807c58",
+   "version": "100y2009-5d382f4f",
    "name": "Bulgaria",
    "level": "ADM2",
    "clubs": 23,
@@ -20855,7 +20855,7 @@
     "p90": 0,
     "max": 1.5
    },
-   "bytes": 102819
+   "bytes": 102842
   },
   {
    "id": "112y2009",
@@ -20876,24 +20876,24 @@
   },
   {
    "id": "152y2009",
-   "version": "152y2009-4d60a281",
+   "version": "152y2009-a5b3921b",
    "name": "Chile",
    "level": "ADM3",
    "clubs": 29,
    "located": 29,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 28,
+   "homeInSection": 27,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 141112
+   "bytes": 141125
   },
   {
    "id": "156y2009",
-   "version": "156y2009-fcc8d34f",
+   "version": "156y2009-a924f42c",
    "name": "China",
    "level": "ADM2",
    "clubs": 49,
@@ -20924,7 +20924,7 @@
     "p90": 0,
     "max": 0.8
    },
-   "bytes": 157444
+   "bytes": 157469
   },
   {
    "id": "170y2009",
@@ -20989,7 +20989,7 @@
   },
   {
    "id": "196y2009",
-   "version": "196y2009-a64760d5",
+   "version": "196y2009-2bc0bc63",
    "name": "Cyprus",
    "level": "ADM2",
    "clubs": 19,
@@ -21005,7 +21005,7 @@
     "p90": 0,
     "max": 6.4
    },
-   "bytes": 101345
+   "bytes": 101366
   },
   {
    "id": "203y2009",
@@ -21152,7 +21152,7 @@
   },
   {
    "id": "300y2009",
-   "version": "300y2009-2055c340",
+   "version": "300y2009-0b79847b",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -21177,7 +21177,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 147308
+   "bytes": 147316
   },
   {
    "id": "320y2009",
@@ -21236,7 +21236,7 @@
   },
   {
    "id": "360y2009",
-   "version": "360y2009-30ce505b",
+   "version": "360y2009-816630b3",
    "name": "Indonesia",
    "level": "ADM2",
    "clubs": 23,
@@ -21249,7 +21249,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 147027
+   "bytes": 147092
   },
   {
    "id": "372y2009",
@@ -21270,7 +21270,7 @@
   },
   {
    "id": "376y2009",
-   "version": "376y2009-9fee684d",
+   "version": "376y2009-89a4c8bf",
    "name": "Israel",
    "level": "ADM2",
    "clubs": 37,
@@ -21288,7 +21288,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 85734
+   "bytes": 85731
   },
   {
    "id": "380y2009",
@@ -21474,7 +21474,7 @@
   },
   {
    "id": "642y2009",
-   "version": "642y2009-65023925",
+   "version": "642y2009-fd01349a",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 26,
@@ -21487,11 +21487,11 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 132060
+   "bytes": 131901
   },
   {
    "id": "643y2009",
-   "version": "643y2009-35a10e09",
+   "version": "643y2009-098905e7",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 60,
@@ -21504,11 +21504,11 @@
     "p90": 0,
     "max": 0.8
    },
-   "bytes": 170754
+   "bytes": 170817
   },
   {
    "id": "688y2009",
-   "version": "688y2009-aef6cb30",
+   "version": "688y2009-5b433dfd",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 40,
@@ -21524,13 +21524,13 @@
     "Big Bull Bacinci",
     "Ibar Rozaje"
    ],
-   "homeInSection": 31,
+   "homeInSection": 32,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 146652
+   "bytes": 146240
   },
   {
    "id": "703y2009",
@@ -21553,7 +21553,7 @@
   },
   {
    "id": "705y2009",
-   "version": "705y2009-a7f71dad",
+   "version": "705y2009-808e6228",
    "name": "Slovenia",
    "level": "ADM2",
    "clubs": 11,
@@ -21566,11 +21566,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 110991
+   "bytes": 110984
   },
   {
    "id": "710y2009",
-   "version": "710y2009-40a4f9a2",
+   "version": "710y2009-bf79a68f",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 34,
@@ -21599,11 +21599,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 139599
+   "bytes": 139512
   },
   {
    "id": "724y2009",
-   "version": "724y2009-6a163f50",
+   "version": "724y2009-6e508dde",
    "name": "Spain",
    "level": "ADM3",
    "clubs": 41,
@@ -21616,7 +21616,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 147014
+   "bytes": 146994
   },
   {
    "id": "752y2009",
@@ -21694,7 +21694,7 @@
   },
   {
    "id": "804y2009",
-   "version": "804y2009-529c819a",
+   "version": "804y2009-ff9216aa",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 27,
@@ -21705,13 +21705,13 @@
     "FC Vinnitsa",
     "Polissya Zhitomyr"
    ],
-   "homeInSection": 21,
+   "homeInSection": 22,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 2.3
+    "max": 3.1
    },
-   "bytes": 96769
+   "bytes": 97626
   },
   {
    "id": "826y2009",
@@ -21766,7 +21766,7 @@
   },
   {
    "id": "860y2009",
-   "version": "860y2009-c130c1ec",
+   "version": "860y2009-45a2cb94",
    "name": "Uzbekistan",
    "level": "ADM2",
    "clubs": 11,
@@ -21781,7 +21781,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 97474
+   "bytes": 97829
   },
   {
    "id": "NIRy2009",
@@ -21839,7 +21839,7 @@
   },
   {
    "id": "008y2008",
-   "version": "008y2008-ad7986d8",
+   "version": "008y2008-badbc41e",
    "name": "Albania",
    "level": "ADM3",
    "clubs": 14,
@@ -21849,14 +21849,14 @@
    "homeInSection": 12,
    "displacementKm": {
     "median": 0,
-    "p90": 0,
-    "max": 0
+    "p90": 0.1,
+    "max": 0.4
    },
-   "bytes": 95856
+   "bytes": 100573
   },
   {
    "id": "012y2008",
-   "version": "012y2008-ef1b2f08",
+   "version": "012y2008-3fecda40",
    "name": "Algeria",
    "level": "ADM3",
    "clubs": 18,
@@ -21873,11 +21873,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 115801
+   "bytes": 115705
   },
   {
    "id": "032y2008",
-   "version": "032y2008-b5f3359d",
+   "version": "032y2008-ab709744",
    "name": "Argentina",
    "level": "ADM2",
    "clubs": 71,
@@ -21892,11 +21892,11 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 182225
+   "bytes": 182247
   },
   {
    "id": "036y2008",
-   "version": "036y2008-8ddc7487",
+   "version": "036y2008-6a3ba46e",
    "name": "Australia",
    "level": "ADM2",
    "clubs": 40,
@@ -21910,13 +21910,13 @@
     "Cockburn City",
     "Northern Demons"
    ],
-   "homeInSection": 31,
+   "homeInSection": 33,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.5
+    "max": 0.2
    },
-   "bytes": 143076
+   "bytes": 143071
   },
   {
    "id": "040y2008",
@@ -22015,7 +22015,7 @@
   },
   {
    "id": "100y2008",
-   "version": "100y2008-b6c0e183",
+   "version": "100y2008-7c677c48",
    "name": "Bulgaria",
    "level": "ADM2",
    "clubs": 28,
@@ -22028,7 +22028,7 @@
     "p90": 0,
     "max": 1.5
    },
-   "bytes": 108622
+   "bytes": 108645
   },
   {
    "id": "112y2008",
@@ -22049,24 +22049,24 @@
   },
   {
    "id": "152y2008",
-   "version": "152y2008-4a044c86",
+   "version": "152y2008-4d8fe804",
    "name": "Chile",
    "level": "ADM3",
    "clubs": 30,
    "located": 30,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 29,
+   "homeInSection": 28,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.2
+    "max": 0
    },
-   "bytes": 142601
+   "bytes": 142609
   },
   {
    "id": "156y2008",
-   "version": "156y2008-6374cd37",
+   "version": "156y2008-9f99dd8d",
    "name": "China",
    "level": "ADM2",
    "clubs": 50,
@@ -22098,7 +22098,7 @@
     "p90": 0,
     "max": 1.9
    },
-   "bytes": 158492
+   "bytes": 158493
   },
   {
    "id": "170y2008",
@@ -22164,7 +22164,7 @@
   },
   {
    "id": "196y2008",
-   "version": "196y2008-8f914354",
+   "version": "196y2008-cafef992",
    "name": "Cyprus",
    "level": "ADM2",
    "clubs": 18,
@@ -22179,7 +22179,7 @@
     "p90": 0.1,
     "max": 6.4
    },
-   "bytes": 97456
+   "bytes": 97477
   },
   {
    "id": "203y2008",
@@ -22256,7 +22256,7 @@
   },
   {
    "id": "233y2008",
-   "version": "233y2008-666bdea3",
+   "version": "233y2008-8b77f1e9",
    "name": "Estonia",
    "level": "ADM2",
    "clubs": 16,
@@ -22272,7 +22272,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 117797
+   "bytes": 117790
   },
   {
    "id": "246y2008",
@@ -22332,7 +22332,7 @@
   },
   {
    "id": "300y2008",
-   "version": "300y2008-e7ae4d50",
+   "version": "300y2008-c4388c60",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -22355,7 +22355,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 146125
+   "bytes": 146149
   },
   {
    "id": "320y2008",
@@ -22432,7 +22432,7 @@
   },
   {
    "id": "360y2008",
-   "version": "360y2008-90c0d28e",
+   "version": "360y2008-1348e3d4",
    "name": "Indonesia",
    "level": "ADM2",
    "clubs": 24,
@@ -22445,7 +22445,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 147714
+   "bytes": 147674
   },
   {
    "id": "372y2008",
@@ -22466,7 +22466,7 @@
   },
   {
    "id": "376y2008",
-   "version": "376y2008-a2446b1c",
+   "version": "376y2008-b8b3c635",
    "name": "Israel",
    "level": "ADM2",
    "clubs": 39,
@@ -22483,7 +22483,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 87366
+   "bytes": 87226
   },
   {
    "id": "380y2008",
@@ -22707,7 +22707,7 @@
   },
   {
    "id": "642y2008",
-   "version": "642y2008-8c611044",
+   "version": "642y2008-1b5d955c",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 26,
@@ -22720,11 +22720,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 131356
+   "bytes": 131349
   },
   {
    "id": "643y2008",
-   "version": "643y2008-b44e973a",
+   "version": "643y2008-335a5fc7",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 60,
@@ -22735,17 +22735,17 @@
     "Spartak-MGK",
     "Spartak Schelkovo"
    ],
-   "homeInSection": 54,
+   "homeInSection": 55,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.8
    },
-   "bytes": 170673
+   "bytes": 170800
   },
   {
    "id": "688y2008",
-   "version": "688y2008-87cd7248",
+   "version": "688y2008-4b979cf7",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 40,
@@ -22764,7 +22764,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 145303
+   "bytes": 145318
   },
   {
    "id": "703y2008",
@@ -22804,7 +22804,7 @@
   },
   {
    "id": "710y2008",
-   "version": "710y2008-cc6eb857",
+   "version": "710y2008-fa7c0369",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 36,
@@ -22834,11 +22834,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 141855
+   "bytes": 141897
   },
   {
    "id": "724y2008",
-   "version": "724y2008-3ce7b4eb",
+   "version": "724y2008-59f299b0",
    "name": "Spain",
    "level": "ADM3",
    "clubs": 41,
@@ -22851,7 +22851,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 147647
+   "bytes": 147691
   },
   {
    "id": "752y2008",
@@ -22929,7 +22929,7 @@
   },
   {
    "id": "804y2008",
-   "version": "804y2008-a0e626b9",
+   "version": "804y2008-a1450550",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 28,
@@ -22940,17 +22940,17 @@
     "FC Vinnitsa",
     "Polissya Zhitomyr"
    ],
-   "homeInSection": 22,
+   "homeInSection": 23,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 2.3
+    "max": 3.1
    },
-   "bytes": 97445
+   "bytes": 98131
   },
   {
    "id": "807y2008",
-   "version": "807y2008-603523ad",
+   "version": "807y2008-d09ed6bb",
    "name": "N. Macedonia",
    "level": "ADM2",
    "clubs": 12,
@@ -22963,7 +22963,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 76076
+   "bytes": 76097
   },
   {
    "id": "826y2008",
@@ -23018,7 +23018,7 @@
   },
   {
    "id": "860y2008",
-   "version": "860y2008-81895108",
+   "version": "860y2008-4d8362ce",
    "name": "Uzbekistan",
    "level": "ADM2",
    "clubs": 11,
@@ -23033,7 +23033,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 97478
+   "bytes": 97833
   },
   {
    "id": "862y2008",
@@ -23329,7 +23329,7 @@
   },
   {
    "id": "724y2007",
-   "version": "724y2007-01880fbc",
+   "version": "724y2007-b2e78268",
    "name": "Spain",
    "level": "ADM3",
    "clubs": 41,
@@ -23342,7 +23342,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 146613
+   "bytes": 146745
   },
   {
    "id": "752y2007",
@@ -23448,7 +23448,7 @@
   },
   {
    "id": "008y2004",
-   "version": "008y2004-608d87eb",
+   "version": "008y2004-8b2219ba",
    "name": "Albania",
    "level": "ADM3",
    "clubs": 14,
@@ -23458,14 +23458,14 @@
    "homeInSection": 12,
    "displacementKm": {
     "median": 0,
-    "p90": 0,
-    "max": 0
+    "p90": 0.1,
+    "max": 0.4
    },
-   "bytes": 96086
+   "bytes": 100788
   },
   {
    "id": "012y2004",
-   "version": "012y2004-fc7234f9",
+   "version": "012y2004-2e8252e0",
    "name": "Algeria",
    "level": "ADM3",
    "clubs": 17,
@@ -23482,11 +23482,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 116462
+   "bytes": 116313
   },
   {
    "id": "032y2004",
-   "version": "032y2004-dfff6b5a",
+   "version": "032y2004-2cdcec57",
    "name": "Argentina",
    "level": "ADM2",
    "clubs": 53,
@@ -23499,7 +23499,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 161786
+   "bytes": 161808
   },
   {
    "id": "036y2004",
@@ -23542,7 +23542,7 @@
   },
   {
    "id": "056y2004",
-   "version": "056y2004-7dfd7cf7",
+   "version": "056y2004-7e0386f2",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 60,
@@ -23560,7 +23560,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 149584
+   "bytes": 147333
   },
   {
    "id": "068y2004",
@@ -23583,24 +23583,24 @@
   },
   {
    "id": "076y2004",
-   "version": "076y2004-f395a8d8",
+   "version": "076y2004-dc7fc49b",
    "name": "Brazil",
    "level": "ADM2",
    "clubs": 100,
    "located": 100,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 87,
+   "homeInSection": 88,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 247464
+   "bytes": 247453
   },
   {
    "id": "100y2004",
-   "version": "100y2004-7fba4f63",
+   "version": "100y2004-d67a3fb2",
    "name": "Bulgaria",
    "level": "ADM2",
    "clubs": 21,
@@ -23613,7 +23613,7 @@
     "p90": 0,
     "max": 1.5
    },
-   "bytes": 104434
+   "bytes": 104457
   },
   {
    "id": "112y2004",
@@ -23651,7 +23651,7 @@
   },
   {
    "id": "156y2004",
-   "version": "156y2004-4a3f6a64",
+   "version": "156y2004-ea31af26",
    "name": "China",
    "level": "ADM2",
    "clubs": 32,
@@ -23672,7 +23672,7 @@
     "p90": 0,
     "max": 1
    },
-   "bytes": 140346
+   "bytes": 140355
   },
   {
    "id": "170y2004",
@@ -23717,7 +23717,7 @@
   },
   {
    "id": "203y2004",
-   "version": "203y2004-0d137990",
+   "version": "203y2004-7dfa432e",
    "name": "Czechia",
    "level": "ADM3",
    "clubs": 22,
@@ -23730,7 +23730,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 128775
+   "bytes": 128764
   },
   {
    "id": "208y2004",
@@ -23793,7 +23793,7 @@
   },
   {
    "id": "250y2004",
-   "version": "250y2004-43f4cbec",
+   "version": "250y2004-0dc793cc",
    "name": "France",
    "level": "ADM3",
    "clubs": 66,
@@ -23806,11 +23806,11 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 176884
+   "bytes": 176867
   },
   {
    "id": "276y2004",
-   "version": "276y2004-f153ae82",
+   "version": "276y2004-8599f806",
    "name": "Germany",
    "level": "ADM3",
    "clubs": 100,
@@ -23823,11 +23823,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 218420
+   "bytes": 218411
   },
   {
    "id": "300y2004",
-   "version": "300y2004-9ce8d0cb",
+   "version": "300y2004-d27cb39d",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -23850,11 +23850,11 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 146664
+   "bytes": 146685
   },
   {
    "id": "348y2004",
-   "version": "348y2004-151c85df",
+   "version": "348y2004-2dab0051",
    "name": "Hungary",
    "level": "ADM3",
    "clubs": 15,
@@ -23872,11 +23872,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 118183
+   "bytes": 118071
   },
   {
    "id": "360y2004",
-   "version": "360y2004-6837f355",
+   "version": "360y2004-f0263f0f",
    "name": "Indonesia",
    "level": "ADM2",
    "clubs": 20,
@@ -23889,7 +23889,7 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 145057
+   "bytes": 145088
   },
   {
    "id": "372y2004",
@@ -23912,7 +23912,7 @@
   },
   {
    "id": "380y2004",
-   "version": "380y2004-5391aa09",
+   "version": "380y2004-da1bad72",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 100,
@@ -23925,9 +23925,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.1
+    "max": 0
    },
-   "bytes": 203965
+   "bytes": 203995
   },
   {
    "id": "392y2004",
@@ -23952,7 +23952,7 @@
   },
   {
    "id": "410y2004",
-   "version": "410y2004-2b63228a",
+   "version": "410y2004-ab2d78a2",
    "name": "South Korea",
    "level": "ADM2",
    "clubs": 12,
@@ -23968,7 +23968,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 118987
+   "bytes": 118908
   },
   {
    "id": "484y2004",
@@ -24066,7 +24066,7 @@
   },
   {
    "id": "616y2004",
-   "version": "616y2004-351217a3",
+   "version": "616y2004-1f213039",
    "name": "Poland",
    "level": "ADM2",
    "clubs": 46,
@@ -24079,7 +24079,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 154741
+   "bytes": 154756
   },
   {
    "id": "620y2004",
@@ -24122,7 +24122,7 @@
   },
   {
    "id": "643y2004",
-   "version": "643y2004-0a647e8f",
+   "version": "643y2004-7d843db8",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 32,
@@ -24131,17 +24131,17 @@
    "placed": [
     "Torpedo Metallurg"
    ],
-   "homeInSection": 28,
+   "homeInSection": 29,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.8
    },
-   "bytes": 139439
+   "bytes": 139522
   },
   {
    "id": "688y2004",
-   "version": "688y2004-be62e985",
+   "version": "688y2004-072d4dc6",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 40,
@@ -24160,11 +24160,11 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 145660
+   "bytes": 145652
   },
   {
    "id": "710y2004",
-   "version": "710y2004-337173a8",
+   "version": "710y2004-6b39b7c7",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 25,
@@ -24183,7 +24183,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 129265
+   "bytes": 129271
   },
   {
    "id": "724y2004",
@@ -24207,7 +24207,7 @@
   },
   {
    "id": "752y2004",
-   "version": "752y2004-bce43b46",
+   "version": "752y2004-66fdde59",
    "name": "Sweden",
    "level": "ADM2",
    "clubs": 40,
@@ -24222,11 +24222,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 142344
+   "bytes": 142336
   },
   {
    "id": "792y2004",
-   "version": "792y2004-20044d5a",
+   "version": "792y2004-6e9a5d0f",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 100,
@@ -24255,11 +24255,11 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 211437
+   "bytes": 211448
   },
   {
    "id": "804y2004",
-   "version": "804y2004-5882edfb",
+   "version": "804y2004-e686d3da",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 18,
@@ -24269,13 +24269,13 @@
     "Tavria Simferopol",
     "FC Vinnitsa"
    ],
-   "homeInSection": 15,
+   "homeInSection": 16,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 88591
+   "bytes": 89235
   },
   {
    "id": "807y2004",
@@ -24313,7 +24313,7 @@
   },
   {
    "id": "840y2004",
-   "version": "840y2004-100b9ba4",
+   "version": "840y2004-c7f436cc",
    "name": "United States",
    "level": "ADM2",
    "clubs": 18,
@@ -24328,7 +24328,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 119611
+   "bytes": 119677
   },
   {
    "id": "858y2004",
@@ -24349,7 +24349,7 @@
   },
   {
    "id": "860y2004",
-   "version": "860y2004-0d4ee089",
+   "version": "860y2004-a334d6cc",
    "name": "Uzbekistan",
    "level": "ADM2",
    "clubs": 11,
@@ -24364,7 +24364,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 98929
+   "bytes": 99284
   },
   {
    "id": "862y2004",
@@ -24402,7 +24402,7 @@
   },
   {
    "id": "SCOy2004",
-   "version": "SCOy2004-244dcdfa",
+   "version": "SCOy2004-d064215a",
    "name": "Scotland",
    "level": "ADM2",
    "clubs": 40,
@@ -24417,7 +24417,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 127008
+   "bytes": 127001
   },
   {
    "id": "WALy2004",
@@ -24442,7 +24442,7 @@
   },
   {
    "id": "008y2003",
-   "version": "008y2003-cc01a4c9",
+   "version": "008y2003-7fe9cc21",
    "name": "Albania",
    "level": "ADM3",
    "clubs": 14,
@@ -24452,14 +24452,14 @@
    "homeInSection": 12,
    "displacementKm": {
     "median": 0,
-    "p90": 0,
-    "max": 0
+    "p90": 0.1,
+    "max": 0.4
    },
-   "bytes": 94551
+   "bytes": 99253
   },
   {
    "id": "012y2003",
-   "version": "012y2003-77cbb1af",
+   "version": "012y2003-b41aa9df",
    "name": "Algeria",
    "level": "ADM3",
    "clubs": 17,
@@ -24476,11 +24476,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 114932
+   "bytes": 114783
   },
   {
    "id": "032y2003",
-   "version": "032y2003-b990b1ee",
+   "version": "032y2003-eda80a53",
    "name": "Argentina",
    "level": "ADM2",
    "clubs": 53,
@@ -24493,7 +24493,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 160296
+   "bytes": 160318
   },
   {
    "id": "036y2003",
@@ -24536,7 +24536,7 @@
   },
   {
    "id": "056y2003",
-   "version": "056y2003-b38a3133",
+   "version": "056y2003-d912833a",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 60,
@@ -24552,7 +24552,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 145516
+   "bytes": 143783
   },
   {
    "id": "068y2003",
@@ -24575,7 +24575,7 @@
   },
   {
    "id": "076y2003",
-   "version": "076y2003-1de5a09f",
+   "version": "076y2003-b30e7d07",
    "name": "Brazil",
    "level": "ADM2",
    "clubs": 100,
@@ -24588,11 +24588,11 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 245794
+   "bytes": 245818
   },
   {
    "id": "100y2003",
-   "version": "100y2003-ece3c25e",
+   "version": "100y2003-0c1ebf01",
    "name": "Bulgaria",
    "level": "ADM2",
    "clubs": 21,
@@ -24605,7 +24605,7 @@
     "p90": 0,
     "max": 1.5
    },
-   "bytes": 102892
+   "bytes": 102915
   },
   {
    "id": "112y2003",
@@ -24643,7 +24643,7 @@
   },
   {
    "id": "156y2003",
-   "version": "156y2003-7033841c",
+   "version": "156y2003-98e2a380",
    "name": "China",
    "level": "ADM2",
    "clubs": 32,
@@ -24664,7 +24664,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 138733
+   "bytes": 138756
   },
   {
    "id": "170y2003",
@@ -24709,7 +24709,7 @@
   },
   {
    "id": "203y2003",
-   "version": "203y2003-79500f6f",
+   "version": "203y2003-e8bc7409",
    "name": "Czechia",
    "level": "ADM3",
    "clubs": 23,
@@ -24722,7 +24722,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 128653
+   "bytes": 128647
   },
   {
    "id": "208y2003",
@@ -24785,7 +24785,7 @@
   },
   {
    "id": "250y2003",
-   "version": "250y2003-23aaae82",
+   "version": "250y2003-8f444660",
    "name": "France",
    "level": "ADM3",
    "clubs": 66,
@@ -24798,11 +24798,11 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 175362
+   "bytes": 175345
   },
   {
    "id": "276y2003",
-   "version": "276y2003-36cd691d",
+   "version": "276y2003-618bb1ae",
    "name": "Germany",
    "level": "ADM3",
    "clubs": 100,
@@ -24815,11 +24815,11 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 217137
+   "bytes": 217128
   },
   {
    "id": "300y2003",
-   "version": "300y2003-40f63d27",
+   "version": "300y2003-bda72715",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -24842,11 +24842,11 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 145114
+   "bytes": 145135
   },
   {
    "id": "348y2003",
-   "version": "348y2003-7cf8ae7e",
+   "version": "348y2003-bb362c2b",
    "name": "Hungary",
    "level": "ADM3",
    "clubs": 16,
@@ -24865,11 +24865,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 117837
+   "bytes": 117796
   },
   {
    "id": "360y2003",
-   "version": "360y2003-2f16cb81",
+   "version": "360y2003-069128d1",
    "name": "Indonesia",
    "level": "ADM2",
    "clubs": 20,
@@ -24882,7 +24882,7 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 143524
+   "bytes": 143555
   },
   {
    "id": "372y2003",
@@ -24905,7 +24905,7 @@
   },
   {
    "id": "380y2003",
-   "version": "380y2003-9c4cee5a",
+   "version": "380y2003-02ebf7d3",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 100,
@@ -24918,7 +24918,7 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.1
+    "max": 0
    },
    "bytes": 202499
   },
@@ -24945,7 +24945,7 @@
   },
   {
    "id": "410y2003",
-   "version": "410y2003-8fbc6f88",
+   "version": "410y2003-d0c27f7f",
    "name": "South Korea",
    "level": "ADM2",
    "clubs": 12,
@@ -24961,7 +24961,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 117503
+   "bytes": 117496
   },
   {
    "id": "484y2003",
@@ -25115,24 +25115,24 @@
   },
   {
    "id": "643y2003",
-   "version": "643y2003-354872a9",
+   "version": "643y2003-d28a4bde",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 32,
    "located": 32,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 29,
+   "homeInSection": 30,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.8
    },
-   "bytes": 138354
+   "bytes": 138457
   },
   {
    "id": "688y2003",
-   "version": "688y2003-64acf097",
+   "version": "688y2003-053a2cd5",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 40,
@@ -25151,11 +25151,11 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 144323
+   "bytes": 144315
   },
   {
    "id": "710y2003",
-   "version": "710y2003-b1de0403",
+   "version": "710y2003-f68b962b",
    "name": "South Africa",
    "level": "ADM3",
    "clubs": 24,
@@ -25173,7 +25173,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 126753
+   "bytes": 126746
   },
   {
    "id": "724y2003",
@@ -25197,7 +25197,7 @@
   },
   {
    "id": "752y2003",
-   "version": "752y2003-1fb7f83f",
+   "version": "752y2003-3fb0a7eb",
    "name": "Sweden",
    "level": "ADM2",
    "clubs": 40,
@@ -25212,11 +25212,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 140882
+   "bytes": 140874
   },
   {
    "id": "792y2003",
-   "version": "792y2003-5e5a4a77",
+   "version": "792y2003-2e812d35",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 100,
@@ -25245,11 +25245,11 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 209714
+   "bytes": 209726
   },
   {
    "id": "804y2003",
-   "version": "804y2003-0de460a8",
+   "version": "804y2003-599d1b76",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 19,
@@ -25259,13 +25259,13 @@
     "Tavria Simferopol",
     "FC Vinnitsa"
    ],
-   "homeInSection": 15,
+   "homeInSection": 16,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 86714
+   "bytes": 88022
   },
   {
    "id": "807y2003",
@@ -25303,7 +25303,7 @@
   },
   {
    "id": "840y2003",
-   "version": "840y2003-4644d9e0",
+   "version": "840y2003-fc931d5e",
    "name": "United States",
    "level": "ADM2",
    "clubs": 19,
@@ -25318,7 +25318,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 119140
+   "bytes": 119153
   },
   {
    "id": "858y2003",
@@ -25339,7 +25339,7 @@
   },
   {
    "id": "860y2003",
-   "version": "860y2003-48433761",
+   "version": "860y2003-a60ed81a",
    "name": "Uzbekistan",
    "level": "ADM2",
    "clubs": 11,
@@ -25354,7 +25354,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 97396
+   "bytes": 97751
   },
   {
    "id": "862y2003",
@@ -25392,7 +25392,7 @@
   },
   {
    "id": "SCOy2003",
-   "version": "SCOy2003-2b8b3328",
+   "version": "SCOy2003-b9763d3b",
    "name": "Scotland",
    "level": "ADM2",
    "clubs": 40,
@@ -25401,13 +25401,13 @@
    "placed": [
     "Berwick Rangers"
    ],
-   "homeInSection": 35,
+   "homeInSection": 36,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 125444
+   "bytes": 125478
   },
   {
    "id": "WALy2003",
@@ -25431,7 +25431,7 @@
   },
   {
    "id": "012y2002",
-   "version": "012y2002-4d55b93e",
+   "version": "012y2002-6eb7a2bd",
    "name": "Algeria",
    "level": "ADM3",
    "clubs": 13,
@@ -25447,11 +25447,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 110201
+   "bytes": 109816
   },
   {
    "id": "032y2002",
-   "version": "032y2002-385d22d4",
+   "version": "032y2002-633ac1c8",
    "name": "Argentina",
    "level": "ADM2",
    "clubs": 52,
@@ -25464,7 +25464,7 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 159763
+   "bytes": 159785
   },
   {
    "id": "036y2002",
@@ -25507,7 +25507,7 @@
   },
   {
    "id": "056y2002",
-   "version": "056y2002-214cbb96",
+   "version": "056y2002-9c4acf0e",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 60,
@@ -25524,7 +25524,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 144835
+   "bytes": 145134
   },
   {
    "id": "068y2002",
@@ -25547,7 +25547,7 @@
   },
   {
    "id": "076y2002",
-   "version": "076y2002-a88a25ab",
+   "version": "076y2002-9e66b87e",
    "name": "Brazil",
    "level": "ADM2",
    "clubs": 100,
@@ -25560,7 +25560,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 245798
+   "bytes": 245804
   },
   {
    "id": "152y2002",
@@ -25581,7 +25581,7 @@
   },
   {
    "id": "156y2002",
-   "version": "156y2002-6722ef63",
+   "version": "156y2002-5f7a77fd",
    "name": "China",
    "level": "ADM2",
    "clubs": 29,
@@ -25600,7 +25600,7 @@
     "p90": 0,
     "max": 0.6
    },
-   "bytes": 132438
+   "bytes": 132442
   },
   {
    "id": "170y2002",
@@ -25702,7 +25702,7 @@
   },
   {
    "id": "250y2002",
-   "version": "250y2002-a03e0310",
+   "version": "250y2002-7174ceb8",
    "name": "France",
    "level": "ADM3",
    "clubs": 56,
@@ -25715,11 +25715,11 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 164099
+   "bytes": 164115
   },
   {
    "id": "276y2002",
-   "version": "276y2002-fc987cae",
+   "version": "276y2002-8a0432d2",
    "name": "Germany",
    "level": "ADM3",
    "clubs": 98,
@@ -25732,11 +25732,11 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 213855
+   "bytes": 213846
   },
   {
    "id": "300y2002",
-   "version": "300y2002-5799b1f6",
+   "version": "300y2002-31db0f7f",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -25760,11 +25760,11 @@
     "p90": 0,
     "max": 0.5
    },
-   "bytes": 145143
+   "bytes": 145164
   },
   {
    "id": "348y2002",
-   "version": "348y2002-233a3156",
+   "version": "348y2002-3785bc48",
    "name": "Hungary",
    "level": "ADM3",
    "clubs": 15,
@@ -25782,7 +25782,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 116127
+   "bytes": 116149
   },
   {
    "id": "372y2002",
@@ -25805,7 +25805,7 @@
   },
   {
    "id": "380y2002",
-   "version": "380y2002-5311e939",
+   "version": "380y2002-8acd760f",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 100,
@@ -25820,7 +25820,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 200929
+   "bytes": 200961
   },
   {
    "id": "392y2002",
@@ -25841,7 +25841,7 @@
   },
   {
    "id": "410y2002",
-   "version": "410y2002-9e215b80",
+   "version": "410y2002-37c25b0b",
    "name": "South Korea",
    "level": "ADM2",
    "clubs": 11,
@@ -25856,7 +25856,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 116199
+   "bytes": 116191
   },
   {
    "id": "484y2002",
@@ -25994,7 +25994,7 @@
   },
   {
    "id": "643y2002",
-   "version": "643y2002-26829f9c",
+   "version": "643y2002-ae5ce3db",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 30,
@@ -26007,11 +26007,11 @@
     "p90": 0,
     "max": 0.8
    },
-   "bytes": 135949
+   "bytes": 135962
   },
   {
    "id": "688y2002",
-   "version": "688y2002-d0cb00d1",
+   "version": "688y2002-e947eef2",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 40,
@@ -26031,7 +26031,7 @@
     "p90": 0,
     "max": 0.5
    },
-   "bytes": 144332
+   "bytes": 144324
   },
   {
    "id": "710y2002",
@@ -26054,7 +26054,7 @@
   },
   {
    "id": "724y2002",
-   "version": "724y2002-05d6fed7",
+   "version": "724y2002-380993e5",
    "name": "Spain",
    "level": "ADM3",
    "clubs": 70,
@@ -26070,11 +26070,11 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 180615
+   "bytes": 180611
   },
   {
    "id": "752y2002",
-   "version": "752y2002-dca2abb2",
+   "version": "752y2002-1fdea1c0",
    "name": "Sweden",
    "level": "ADM2",
    "clubs": 40,
@@ -26089,11 +26089,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 141164
+   "bytes": 141015
   },
   {
    "id": "792y2002",
-   "version": "792y2002-d8f604cc",
+   "version": "792y2002-79451fbc",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 100,
@@ -26124,24 +26124,24 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 210297
+   "bytes": 210312
   },
   {
    "id": "804y2002",
-   "version": "804y2002-50d42894",
+   "version": "804y2002-d62e33c3",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 11,
    "located": 11,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 10,
+   "homeInSection": 11,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 77646
+   "bytes": 78467
   },
   {
    "id": "826y2002",
@@ -26162,7 +26162,7 @@
   },
   {
    "id": "840y2002",
-   "version": "840y2002-8c59ba94",
+   "version": "840y2002-31abaa29",
    "name": "United States",
    "level": "ADM2",
    "clubs": 12,
@@ -26177,7 +26177,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 110978
+   "bytes": 110968
   },
   {
    "id": "858y2002",
@@ -26290,7 +26290,7 @@
   },
   {
    "id": "056y2001",
-   "version": "056y2001-151567b5",
+   "version": "056y2001-7b69b460",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 60,
@@ -26306,11 +26306,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 145057
+   "bytes": 145692
   },
   {
    "id": "076y2001",
-   "version": "076y2001-798265cd",
+   "version": "076y2001-971457af",
    "name": "Brazil",
    "level": "ADM2",
    "clubs": 100,
@@ -26325,7 +26325,7 @@
     "p90": 0,
     "max": 0.9
    },
-   "bytes": 242015
+   "bytes": 241981
   },
   {
    "id": "156y2001",
@@ -26384,7 +26384,7 @@
   },
   {
    "id": "246y2001",
-   "version": "246y2001-6700b6a6",
+   "version": "246y2001-0f935f24",
    "name": "Finland",
    "level": "ADM3",
    "clubs": 24,
@@ -26401,7 +26401,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 128071
+   "bytes": 128064
   },
   {
    "id": "250y2001",
@@ -26422,7 +26422,7 @@
   },
   {
    "id": "276y2001",
-   "version": "276y2001-70a47c5f",
+   "version": "276y2001-db98cab0",
    "name": "Germany",
    "level": "ADM3",
    "clubs": 96,
@@ -26435,11 +26435,11 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 213937
+   "bytes": 213928
   },
   {
    "id": "300y2001",
-   "version": "300y2001-9172899a",
+   "version": "300y2001-a95ada89",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 38,
@@ -26462,11 +26462,11 @@
     "p90": 0,
     "max": 0.5
    },
-   "bytes": 143957
+   "bytes": 143821
   },
   {
    "id": "348y2001",
-   "version": "348y2001-d43ab89b",
+   "version": "348y2001-ff8c34a7",
    "name": "Hungary",
    "level": "ADM3",
    "clubs": 14,
@@ -26486,7 +26486,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 115756
+   "bytes": 115749
   },
   {
    "id": "372y2001",
@@ -26510,7 +26510,7 @@
   },
   {
    "id": "380y2001",
-   "version": "380y2001-8d41b6a3",
+   "version": "380y2001-6ef1ffee",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 74,
@@ -26525,7 +26525,7 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 175525
+   "bytes": 175488
   },
   {
    "id": "392y2001",
@@ -26641,7 +26641,7 @@
   },
   {
    "id": "643y2001",
-   "version": "643y2001-9533e8bc",
+   "version": "643y2001-d8a7fd8b",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 31,
@@ -26654,7 +26654,7 @@
     "p90": 0,
     "max": 2.1
    },
-   "bytes": 137284
+   "bytes": 137349
   },
   {
    "id": "688y2001",
@@ -26698,7 +26698,7 @@
   },
   {
    "id": "724y2001",
-   "version": "724y2001-c72184eb",
+   "version": "724y2001-ef6f732d",
    "name": "Spain",
    "level": "ADM3",
    "clubs": 67,
@@ -26714,7 +26714,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 177295
+   "bytes": 177255
   },
   {
    "id": "752y2001",
@@ -26829,7 +26829,7 @@
   },
   {
    "id": "056y2000",
-   "version": "056y2000-87701b72",
+   "version": "056y2000-9fe2ecee",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 43,
@@ -26839,13 +26839,13 @@
     "KSV Roeselaere",
     "RRC Tournaisien"
    ],
-   "homeInSection": 39,
+   "homeInSection": 38,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 127381
+   "bytes": 126827
   },
   {
    "id": "076y2000",
@@ -26883,7 +26883,7 @@
   },
   {
    "id": "250y2000",
-   "version": "250y2000-262d27f0",
+   "version": "250y2000-40747179",
    "name": "France",
    "level": "ADM3",
    "clubs": 58,
@@ -26896,11 +26896,11 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 167083
+   "bytes": 167074
   },
   {
    "id": "276y2000",
-   "version": "276y2000-76bc1d81",
+   "version": "276y2000-5194e9f0",
    "name": "Germany",
    "level": "ADM3",
    "clubs": 97,
@@ -26913,11 +26913,11 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 215039
+   "bytes": 215022
   },
   {
    "id": "380y2000",
-   "version": "380y2000-9381d337",
+   "version": "380y2000-45aad61e",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 68,
@@ -26932,7 +26932,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 169109
+   "bytes": 169080
   },
   {
    "id": "392y2000",
@@ -27013,7 +27013,7 @@
   },
   {
    "id": "642y2000",
-   "version": "642y2000-942a013b",
+   "version": "642y2000-2058e9dd",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 10,
@@ -27026,11 +27026,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 113434
+   "bytes": 113513
   },
   {
    "id": "724y2000",
-   "version": "724y2000-5f9f0779",
+   "version": "724y2000-cf4849ff",
    "name": "Spain",
    "level": "ADM3",
    "clubs": 65,
@@ -27046,11 +27046,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 174330
+   "bytes": 174322
   },
   {
    "id": "752y2000",
-   "version": "752y2000-4e21510e",
+   "version": "752y2000-dd4ae6ef",
    "name": "Sweden",
    "level": "ADM2",
    "clubs": 40,
@@ -27065,7 +27065,7 @@
     "p90": 0,
     "max": 1.3
    },
-   "bytes": 142015
+   "bytes": 142007
   },
   {
    "id": "826y2000",
@@ -27086,7 +27086,7 @@
   },
   {
    "id": "840y2000",
-   "version": "840y2000-7b1c03a3",
+   "version": "840y2000-6bb16ba0",
    "name": "United States",
    "level": "ADM2",
    "clubs": 10,
@@ -27099,7 +27099,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 109680
+   "bytes": 109660
   },
   {
    "id": "SCOy2000",
@@ -27139,7 +27139,7 @@
   },
   {
    "id": "056y1999",
-   "version": "056y1999-3c199b79",
+   "version": "056y1999-65842597",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 20,
@@ -27152,7 +27152,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 100382
+   "bytes": 100003
   },
   {
    "id": "076y1999",
@@ -27173,7 +27173,7 @@
   },
   {
    "id": "250y1999",
-   "version": "250y1999-e0adf0c6",
+   "version": "250y1999-ccd42ebb",
    "name": "France",
    "level": "ADM3",
    "clubs": 50,
@@ -27186,11 +27186,11 @@
     "p90": 0,
     "max": 0.7
    },
-   "bytes": 157154
+   "bytes": 157145
   },
   {
    "id": "276y1999",
-   "version": "276y1999-637dfdc7",
+   "version": "276y1999-0f09dcce",
    "name": "Germany",
    "level": "ADM3",
    "clubs": 53,
@@ -27203,11 +27203,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 163004
+   "bytes": 162996
   },
   {
    "id": "380y1999",
-   "version": "380y1999-3906659e",
+   "version": "380y1999-1ade10c5",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 59,
@@ -27222,7 +27222,7 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 159397
+   "bytes": 159363
   },
   {
    "id": "392y1999",
@@ -27279,7 +27279,7 @@
   },
   {
    "id": "724y1999",
-   "version": "724y1999-b52732ae",
+   "version": "724y1999-73251f77",
    "name": "Spain",
    "level": "ADM3",
    "clubs": 50,
@@ -27295,11 +27295,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 156078
+   "bytes": 156114
   },
   {
    "id": "752y1999",
-   "version": "752y1999-e496621a",
+   "version": "752y1999-2d000bf5",
    "name": "Sweden",
    "level": "ADM2",
    "clubs": 28,
@@ -27312,7 +27312,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 127592
+   "bytes": 127655
   },
   {
    "id": "826y1999",
@@ -27333,7 +27333,7 @@
   },
   {
    "id": "840y1999",
-   "version": "840y1999-ffabe76b",
+   "version": "840y1999-13ff55d2",
    "name": "United States",
    "level": "ADM2",
    "clubs": 10,
@@ -27346,7 +27346,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 108868
+   "bytes": 108825
   },
   {
    "id": "SCOy1999",
@@ -27370,7 +27370,7 @@
   },
   {
    "id": "056y1998",
-   "version": "056y1998-b7ffb475",
+   "version": "056y1998-b8ad1373",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 31,
@@ -27383,7 +27383,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 107160
+   "bytes": 107161
   },
   {
    "id": "208y1998",
@@ -27404,7 +27404,7 @@
   },
   {
    "id": "250y1998",
-   "version": "250y1998-a8298048",
+   "version": "250y1998-f2e638b2",
    "name": "France",
    "level": "ADM3",
    "clubs": 44,
@@ -27417,11 +27417,11 @@
     "p90": 0,
     "max": 0.7
    },
-   "bytes": 146078
+   "bytes": 146073
   },
   {
    "id": "276y1998",
-   "version": "276y1998-274d152d",
+   "version": "276y1998-f3b74d0e",
    "name": "Germany",
    "level": "ADM3",
    "clubs": 35,
@@ -27434,7 +27434,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 136446
+   "bytes": 136497
   },
   {
    "id": "380y1998",
@@ -27508,7 +27508,7 @@
   },
   {
    "id": "724y1998",
-   "version": "724y1998-d03b5b68",
+   "version": "724y1998-52f92fb6",
    "name": "Spain",
    "level": "ADM3",
    "clubs": 39,
@@ -27521,7 +27521,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 138381
+   "bytes": 138342
   },
   {
    "id": "752y1998",
@@ -27612,7 +27612,7 @@
   },
   {
    "id": "036y1997",
-   "version": "036y1997-730b0dc1",
+   "version": "036y1997-2b538554",
    "name": "Australia",
    "level": "ADM2",
    "clubs": 40,
@@ -27628,7 +27628,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 132548
+   "bytes": 132541
   },
   {
    "id": "040y1997",
@@ -27649,7 +27649,7 @@
   },
   {
    "id": "056y1997",
-   "version": "056y1997-a380334e",
+   "version": "056y1997-a63f1cd9",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 18,
@@ -27662,7 +27662,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 95563
+   "bytes": 95169
   },
   {
    "id": "068y1997",
@@ -27720,24 +27720,24 @@
   },
   {
    "id": "112y1997",
-   "version": "112y1997-5eebaf1f",
+   "version": "112y1997-73b4d04d",
    "name": "Belarus",
    "level": "ADM2",
    "clubs": 18,
    "located": 18,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 15,
+   "homeInSection": 16,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 116686
+   "bytes": 116688
   },
   {
    "id": "152y1997",
-   "version": "152y1997-5db86bc5",
+   "version": "152y1997-6a17b7d3",
    "name": "Chile",
    "level": "ADM3",
    "clubs": 16,
@@ -27750,7 +27750,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 117567
+   "bytes": 117549
   },
   {
    "id": "158y1997",
@@ -27833,7 +27833,7 @@
   },
   {
    "id": "203y1997",
-   "version": "203y1997-16f02ad9",
+   "version": "203y1997-f7df8a47",
    "name": "Czechia",
    "level": "ADM3",
    "clubs": 16,
@@ -27846,7 +27846,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 116013
+   "bytes": 115974
   },
   {
    "id": "208y1997",
@@ -27867,7 +27867,7 @@
   },
   {
    "id": "218y1997",
-   "version": "218y1997-57c513f4",
+   "version": "218y1997-feab84d5",
    "name": "Ecuador",
    "level": "ADM2",
    "clubs": 14,
@@ -27880,7 +27880,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 110610
+   "bytes": 110621
   },
   {
    "id": "222y1997",
@@ -27913,7 +27913,7 @@
   },
   {
    "id": "233y1997",
-   "version": "233y1997-42c6b391",
+   "version": "233y1997-e9daae8f",
    "name": "Estonia",
    "level": "ADM2",
    "clubs": 14,
@@ -27926,7 +27926,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 113313
+   "bytes": 113306
   },
   {
    "id": "246y1997",
@@ -27947,7 +27947,7 @@
   },
   {
    "id": "250y1997",
-   "version": "250y1997-f4660a5b",
+   "version": "250y1997-d1b559c2",
    "name": "France",
    "level": "ADM3",
    "clubs": 42,
@@ -27960,11 +27960,11 @@
     "p90": 0,
     "max": 0.7
    },
-   "bytes": 138139
+   "bytes": 138131
   },
   {
    "id": "276y1997",
-   "version": "276y1997-25bf38d6",
+   "version": "276y1997-6a0693e3",
    "name": "Germany",
    "level": "ADM3",
    "clubs": 46,
@@ -27977,11 +27977,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 142786
+   "bytes": 142660
   },
   {
    "id": "300y1997",
-   "version": "300y1997-2a769a37",
+   "version": "300y1997-dbf4ac5a",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 25,
@@ -27997,11 +27997,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 124571
+   "bytes": 124586
   },
   {
    "id": "348y1997",
-   "version": "348y1997-cb40e4ff",
+   "version": "348y1997-b5a21a19",
    "name": "Hungary",
    "level": "ADM3",
    "clubs": 21,
@@ -28014,7 +28014,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 118876
+   "bytes": 118841
   },
   {
    "id": "352y1997",
@@ -28052,7 +28052,7 @@
   },
   {
    "id": "376y1997",
-   "version": "376y1997-9d6c0f56",
+   "version": "376y1997-8ef3e98a",
    "name": "Israel",
    "level": "ADM2",
    "clubs": 17,
@@ -28065,7 +28065,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 57226
+   "bytes": 57024
   },
   {
    "id": "380y1997",
@@ -28318,7 +28318,7 @@
   },
   {
    "id": "643y1997",
-   "version": "643y1997-85aaa41d",
+   "version": "643y1997-9836d611",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 23,
@@ -28331,7 +28331,7 @@
     "p90": 0,
     "max": 0.7
    },
-   "bytes": 122042
+   "bytes": 122059
   },
   {
    "id": "688y1997",
@@ -28484,7 +28484,7 @@
   },
   {
    "id": "792y1997",
-   "version": "792y1997-88cd9000",
+   "version": "792y1997-7aa55a92",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 24,
@@ -28497,11 +28497,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 121339
+   "bytes": 121362
   },
   {
    "id": "804y1997",
-   "version": "804y1997-9f358739",
+   "version": "804y1997-760bad78",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 18,
@@ -28516,7 +28516,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 81570
+   "bytes": 81531
   },
   {
    "id": "826y1997",
@@ -28537,7 +28537,7 @@
   },
   {
    "id": "840y1997",
-   "version": "840y1997-399dfdad",
+   "version": "840y1997-f692bde0",
    "name": "United States",
    "level": "ADM2",
    "clubs": 15,
@@ -28550,7 +28550,7 @@
     "p90": 0,
     "max": 0.6
    },
-   "bytes": 110989
+   "bytes": 110905
   },
   {
    "id": "858y1997",
@@ -28649,7 +28649,7 @@
   },
   {
    "id": "008y1996",
-   "version": "008y1996-867b8e10",
+   "version": "008y1996-3752a933",
    "name": "Albania",
    "level": "ADM3",
    "clubs": 20,
@@ -28662,7 +28662,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 100939
+   "bytes": 98740
   },
   {
    "id": "012y1996",
@@ -28700,7 +28700,7 @@
   },
   {
    "id": "036y1996",
-   "version": "036y1996-fc939382",
+   "version": "036y1996-4f5845ae",
    "name": "Australia",
    "level": "ADM2",
    "clubs": 40,
@@ -28716,7 +28716,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 131878
+   "bytes": 131871
   },
   {
    "id": "040y1996",
@@ -28737,7 +28737,7 @@
   },
   {
    "id": "056y1996",
-   "version": "056y1996-f610f029",
+   "version": "056y1996-39812f3d",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 23,
@@ -28750,7 +28750,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 98234
+   "bytes": 98493
   },
   {
    "id": "068y1996",
@@ -28808,24 +28808,24 @@
   },
   {
    "id": "112y1996",
-   "version": "112y1996-cfbbd8a2",
+   "version": "112y1996-56239a1a",
    "name": "Belarus",
    "level": "ADM2",
    "clubs": 18,
    "located": 18,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 15,
+   "homeInSection": 16,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 115977
+   "bytes": 115979
   },
   {
    "id": "152y1996",
-   "version": "152y1996-2d09c412",
+   "version": "152y1996-94fd873b",
    "name": "Chile",
    "level": "ADM3",
    "clubs": 18,
@@ -28838,7 +28838,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 118518
+   "bytes": 118559
   },
   {
    "id": "158y1996",
@@ -28921,7 +28921,7 @@
   },
   {
    "id": "203y1996",
-   "version": "203y1996-94d7f900",
+   "version": "203y1996-7561168c",
    "name": "Czechia",
    "level": "ADM3",
    "clubs": 20,
@@ -28934,7 +28934,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 118599
+   "bytes": 118580
   },
   {
    "id": "208y1996",
@@ -28955,7 +28955,7 @@
   },
   {
    "id": "218y1996",
-   "version": "218y1996-2c905c66",
+   "version": "218y1996-a95315f2",
    "name": "Ecuador",
    "level": "ADM2",
    "clubs": 12,
@@ -28968,7 +28968,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 108312
+   "bytes": 108331
   },
   {
    "id": "222y1996",
@@ -29001,7 +29001,7 @@
   },
   {
    "id": "233y1996",
-   "version": "233y1996-b9ca88c2",
+   "version": "233y1996-90011ecb",
    "name": "Estonia",
    "level": "ADM2",
    "clubs": 14,
@@ -29014,7 +29014,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 112603
+   "bytes": 112596
   },
   {
    "id": "246y1996",
@@ -29035,7 +29035,7 @@
   },
   {
    "id": "250y1996",
-   "version": "250y1996-92e7925d",
+   "version": "250y1996-a648624a",
    "name": "France",
    "level": "ADM3",
    "clubs": 51,
@@ -29048,11 +29048,11 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 145257
+   "bytes": 145249
   },
   {
    "id": "276y1996",
-   "version": "276y1996-59d8a6b6",
+   "version": "276y1996-d8f1a8a8",
    "name": "Germany",
    "level": "ADM3",
    "clubs": 44,
@@ -29065,11 +29065,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 140254
+   "bytes": 140271
   },
   {
    "id": "300y1996",
-   "version": "300y1996-64781b7b",
+   "version": "300y1996-e11dead3",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 23,
@@ -29085,7 +29085,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 122088
+   "bytes": 122103
   },
   {
    "id": "348y1996",
@@ -29140,7 +29140,7 @@
   },
   {
    "id": "376y1996",
-   "version": "376y1996-7b312d61",
+   "version": "376y1996-5a70d972",
    "name": "Israel",
    "level": "ADM2",
    "clubs": 15,
@@ -29153,7 +29153,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 57474
+   "bytes": 57468
   },
   {
    "id": "380y1996",
@@ -29407,7 +29407,7 @@
   },
   {
    "id": "643y1996",
-   "version": "643y1996-b7afa6d5",
+   "version": "643y1996-ee6268ec",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 23,
@@ -29420,7 +29420,7 @@
     "p90": 0,
     "max": 0.7
    },
-   "bytes": 121327
+   "bytes": 121344
   },
   {
    "id": "688y1996",
@@ -29585,7 +29585,7 @@
   },
   {
    "id": "792y1996",
-   "version": "792y1996-038091b6",
+   "version": "792y1996-a2ca9048",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 19,
@@ -29598,11 +29598,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 116170
+   "bytes": 116148
   },
   {
    "id": "804y1996",
-   "version": "804y1996-8b9f48f4",
+   "version": "804y1996-54aa12a1",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 18,
@@ -29617,7 +29617,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 80859
+   "bytes": 80820
   },
   {
    "id": "826y1996",
@@ -29728,7 +29728,7 @@
   },
   {
    "id": "008y1995",
-   "version": "008y1995-43556933",
+   "version": "008y1995-5cc13aa3",
    "name": "Albania",
    "level": "ADM3",
    "clubs": 17,
@@ -29741,7 +29741,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 97379
+   "bytes": 97409
   },
   {
    "id": "012y1995",
@@ -29779,7 +29779,7 @@
   },
   {
    "id": "036y1995",
-   "version": "036y1995-db1a6d8d",
+   "version": "036y1995-dd95186b",
    "name": "Australia",
    "level": "ADM2",
    "clubs": 40,
@@ -29796,7 +29796,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 131588
+   "bytes": 131581
   },
   {
    "id": "040y1995",
@@ -29888,20 +29888,20 @@
   },
   {
    "id": "112y1995",
-   "version": "112y1995-c1955964",
+   "version": "112y1995-827e8a6f",
    "name": "Belarus",
    "level": "ADM2",
    "clubs": 18,
    "located": 18,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 15,
+   "homeInSection": 16,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 116110
+   "bytes": 116112
   },
   {
    "id": "152y1995",
@@ -30082,7 +30082,7 @@
   },
   {
    "id": "233y1995",
-   "version": "233y1995-ac27e5fd",
+   "version": "233y1995-55eb478c",
    "name": "Estonia",
    "level": "ADM2",
    "clubs": 14,
@@ -30095,7 +30095,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 112751
+   "bytes": 112744
   },
   {
    "id": "246y1995",
@@ -30116,7 +30116,7 @@
   },
   {
    "id": "250y1995",
-   "version": "250y1995-69295275",
+   "version": "250y1995-f93eec18",
    "name": "France",
    "level": "ADM3",
    "clubs": 47,
@@ -30129,11 +30129,11 @@
     "p90": 0,
     "max": 0.7
    },
-   "bytes": 141800
+   "bytes": 141792
   },
   {
    "id": "276y1995",
-   "version": "276y1995-d30729cb",
+   "version": "276y1995-19e03ef1",
    "name": "Germany",
    "level": "ADM3",
    "clubs": 41,
@@ -30146,11 +30146,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 138041
+   "bytes": 138033
   },
   {
    "id": "300y1995",
-   "version": "300y1995-6d727ea2",
+   "version": "300y1995-7ce88db7",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 21,
@@ -30166,7 +30166,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 120402
+   "bytes": 120417
   },
   {
    "id": "348y1995",
@@ -30221,7 +30221,7 @@
   },
   {
    "id": "376y1995",
-   "version": "376y1995-2bbe05cf",
+   "version": "376y1995-9ff473da",
    "name": "Israel",
    "level": "ADM2",
    "clubs": 15,
@@ -30234,7 +30234,7 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 57582
+   "bytes": 57576
   },
   {
    "id": "380y1995",
@@ -30420,7 +30420,7 @@
   },
   {
    "id": "604y1995",
-   "version": "604y1995-d667eece",
+   "version": "604y1995-cc5542b8",
    "name": "Peru",
    "level": "ADM2",
    "clubs": 18,
@@ -30433,7 +30433,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 114384
+   "bytes": 114412
   },
   {
    "id": "616y1995",
@@ -30488,7 +30488,7 @@
   },
   {
    "id": "643y1995",
-   "version": "643y1995-36118193",
+   "version": "643y1995-67d1b1db",
    "name": "Russia",
    "level": "ADM2",
    "clubs": 23,
@@ -30501,7 +30501,7 @@
     "p90": 0,
     "max": 0.7
    },
-   "bytes": 121509
+   "bytes": 121526
   },
   {
    "id": "688y1995",
@@ -30666,7 +30666,7 @@
   },
   {
    "id": "792y1995",
-   "version": "792y1995-ecfa87fd",
+   "version": "792y1995-bd543823",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 19,
@@ -30679,11 +30679,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 116239
+   "bytes": 116231
   },
   {
    "id": "804y1995",
-   "version": "804y1995-609de29b",
+   "version": "804y1995-75bc68a6",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 18,
@@ -30696,9 +30696,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.2
+    "max": 0
    },
-   "bytes": 81305
+   "bytes": 80478
   },
   {
    "id": "826y1995",
@@ -30826,7 +30826,7 @@
   },
   {
    "id": "056y1994",
-   "version": "056y1994-105b918f",
+   "version": "056y1994-2425be3a",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 24,
@@ -30839,7 +30839,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 104442
+   "bytes": 104373
   },
   {
    "id": "076y1994",
@@ -30877,7 +30877,7 @@
   },
   {
    "id": "250y1994",
-   "version": "250y1994-802ebdca",
+   "version": "250y1994-44ba77c6",
    "name": "France",
    "level": "ADM3",
    "clubs": 54,
@@ -30890,7 +30890,7 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 162520
+   "bytes": 162511
   },
   {
    "id": "276y1994",
@@ -30911,7 +30911,7 @@
   },
   {
    "id": "380y1994",
-   "version": "380y1994-1a18520d",
+   "version": "380y1994-bf6d289f",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 60,
@@ -30926,7 +30926,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 161316
+   "bytes": 161333
   },
   {
    "id": "392y1994",
@@ -31022,7 +31022,7 @@
   },
   {
    "id": "752y1994",
-   "version": "752y1994-a35b4190",
+   "version": "752y1994-3e4282b1",
    "name": "Sweden",
    "level": "ADM2",
    "clubs": 40,
@@ -31035,7 +31035,7 @@
     "p90": 0,
     "max": 1.3
    },
-   "bytes": 141553
+   "bytes": 141545
   },
   {
    "id": "756y1994",

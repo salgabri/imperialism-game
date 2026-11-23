@@ -2119,6 +2119,28 @@ the others the town their season's data has them play in, with no twin. SWOS's "
 Club Tigres in its squad), and CM's "Club de Fútbol de la UAT", whose name has no word the
 matching can use, takes Correcaminos de la UAT's home instead of an estimate.
 
+**Spellings of one located club.** A club another season spells otherwise (SWOS's "SK Slavia
+Prag" beside FIFA's "SK Slavia Prague", "Dinamo Kiev", "Guangzhou Evergrande Taobao",
+"Qingdao W. Coast", Kazakh and Ukrainian transliterations) matched no club of today and took
+its Wikidata item from no one, since another spelling had it, so it stood at its town's GeoNames
+point while that spelling stood at its ground; two such clubs of one town met on that point as
+if they shared a ground (Slavia and Dukla Prag in 2019/20, Dynamo and Arsenal Kiev). Since 24
+November 2026, 242 such names, each checked by hand (never in one season with the other
+spelling; Wikidata's labels and aliases where the spelling alone did not settle it), are
+overrides: 117 name today's map's club they are (`as`: its home and twin), 124 take the ground
+their other spelling stands at (Wikidata's P115 or P625 point, with a note naming that
+spelling), and one, the Update Team's "Desna Chernigiv", Desna Chernihiv's stadium instead of
+the village of Desna, 118 km away. 436 season maps were rebuilt. A town's name alone makes no
+two clubs one: Torpedo Mogilev takes the ground of its own later name, Torpedo-Kadino, not
+Dnepr Mogilev's. Left as they were: spellings whose other spelling stands only at a town or
+headquarters point; spellings whose other spelling is placed by another club's item (Steaua
+Bucharest's by the army club's youth side, Arsenal Kiev's and Metalurg Donetsk's by their
+reserve sides'); and spellings the move would set on another club's point: Sportul
+Studențesc's ground, Regie, is where today's Rapid stands, İstanbul Büyükşehir
+Belediyespor's, the Atatürk Olympic Stadium, where Fatih Karagümrük's seasons of
+2001/02–2003/04 and 2011/12 stand with its ground of today, and Wikidata gives Primorac
+Stobreč Hajduk's Poljud.
+
 **Homes** (`scripts/lib/season-club-homes.mjs`, written once to
 `scripts/data/season-club-homes.json` by `--homes`, offline from the caches): a hand
 override (`scripts/data/season-club-locations.json`: a point, a Wikidata item, or
