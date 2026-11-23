@@ -3092,8 +3092,9 @@ first passes had missed (30 on Lithuanian Wikipedia, whose "Vaizdas:" file links
 not know), the Wayback Machine's copies of the clubs' articles gave the crests whose files
 were lost since (53), and a second look, with more of the article, at the matches left
 undecided settled 27. That left 2.5% (765 clubs). A fourth pass on 23 November took the
-Wayback search through every club still without a crest, and 46 more passed: 2.3% are left
-(720 clubs by country and id, mostly lower divisions whose articles show no crest or another
+Wayback search through every club still without a crest, and 46 more passed; a fifth found 14
+clubs the same as another id that wears a crest, or at the home of a club item never read. 2.3%
+are left (706 clubs by country and id, mostly lower divisions whose articles show no crest or another
 club's). `scripts/club-crests.test.mjs` checks it all. The worker's
 image cache now holds 10,000 files, for the 7,700 flags and crests.
 

@@ -18175,6 +18175,20 @@
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
+  "f-fk-rezekne-bjss.2014": {
+   "club": "FK Rezekne/BJSS",
+   "years": "2014–2014",
+   "kind": "wikipedia",
+   "title": "File:Rēzeknes_FA_logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:R%C4%93zeknes_FA_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/a/ae/R%C4%93zeknes_FA_logo.png/250px-R%C4%93zeknes_FA_logo.png",
+   "licence": "Fair use (non-free, as the file page states)",
+   "sha256": "5e79342a70356503a61845e02deda5820e317af3db7558309a31b83336d69172",
+   "cache": "data-src/crest-eras/files/missing/f-fk-rezekne-bjss/2014-R_zeknes_FA_logo.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Rēzeknes FA/BJSS\" (November 2026, fifth pass: the article of the Wikidata item the game places the club's home at); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-fk-rigas-futbola-skola.2014": {
    "club": "FK Rigas Futbola skola",
    "years": "2014–2014",
@@ -32701,6 +32715,20 @@
    "sha256": "5ceaa4b7b6f37651d733b64d2f0ed2bc8e8db35ed98419facd19db1bab213689",
    "cache": "data-src/crest-eras/files/missing/f-sangiovannese/2003-A.S.D._Sangiovannese_1927.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"ASD Sangiovannese 1927\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-sangju-sangmu.2015": {
+   "club": "Sangju Sangmu",
+   "years": "2015–2023",
+   "kind": "wikipedia",
+   "title": "File:상주_상무_축구단_로고.png",
+   "page": "https://ko.wikipedia.org/wiki/%ED%8C%8C%EC%9D%BC:%EC%83%81%EC%A3%BC_%EC%83%81%EB%AC%B4_%EC%B6%95%EA%B5%AC%EB%8B%A8_%EB%A1%9C%EA%B3%A0.png",
+   "download": "https://upload.wikimedia.org/wikipedia/ko/a/ab/%EC%83%81%EC%A3%BC_%EC%83%81%EB%AC%B4_%EC%B6%95%EA%B5%AC%EB%8B%A8_%EB%A1%9C%EA%B3%A0.png",
+   "licence": "공정 이용 (non-free, as the file page states)",
+   "sha256": "e96093d1bf5e17570016e12615a433241206006f61a90d120b484a27231ce71d",
+   "cache": "data-src/crest-eras/files/missing/f-sangju-sangmu/2015-_.png",
+   "evidence": "crest of today: the infobox of ko.wikipedia's article \"상주 상무 FC\" (November 2026, fifth pass: the article of the Wikidata item the game places the club's home at); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -50623,6 +50651,13 @@
     "f-canberra-deakin.1995"
    ]
   ],
+  "f-canelas-gaia-clube-futebol": [
+   [
+    2002,
+    2004,
+    "f-clube-futebol-canelas-de-gaia.2001"
+   ]
+  ],
   "f-cangzhou-fc": [
    [
     2025,
@@ -51152,6 +51187,13 @@
     1995,
     1996,
     "f-central.1995"
+   ]
+  ],
+  "f-central-cordoba": [
+   [
+    2025,
+    2025,
+    "d032-14018428"
    ]
   ],
   "f-central-esp": [
@@ -58036,6 +58078,13 @@
     "d688-1955"
    ]
   ],
+  "f-fk-rezekne-bjss": [
+   [
+    2014,
+    2014,
+    "f-fk-rezekne-bjss.2014"
+   ]
+  ],
   "f-fk-rigas-futbola-skola": [
    [
     2014,
@@ -59976,6 +60025,13 @@
     "f-harbin-yiteng.2009"
    ]
   ],
+  "f-harelbeke": [
+   [
+    1996,
+    1997,
+    "f-krc-harelbeke.1998"
+   ]
+  ],
   "f-harland-wolff-welders": [
    [
     2023,
@@ -60407,6 +60463,13 @@
     2018,
     2026,
     "d246-816"
+   ]
+  ],
+  "f-hjk-klubi-04-helsinki": [
+   [
+    2022,
+    2022,
+    "f-klubi-04-helsinki.2019"
    ]
   ],
   "f-hltex-lykoi": [
@@ -65428,13 +65491,6 @@
     "f-nac-breda.1997"
    ]
   ],
-  "f-nacional@620": [
-   [
-    2015,
-    2021,
-    "d620-2433"
-   ]
-  ],
   "f-nacional-futebol-clube": [
    [
     2001,
@@ -65452,6 +65508,13 @@
     2015,
     2015,
     "f-nacional-futebol-clube-am.2002"
+   ]
+  ],
+  "f-nacional@620": [
+   [
+    2015,
+    2021,
+    "d620-2433"
    ]
   ],
   "f-nafpaktiakos-asteras": [
@@ -68273,6 +68336,13 @@
     "f-persikab-bandung.2003"
    ]
   ],
+  "f-persisam-putra-samarinda": [
+   [
+    2013,
+    2014,
+    "f-putra-samarinda.2012"
+   ]
+  ],
   "f-persiwa-wamena": [
    [
     2012,
@@ -68435,6 +68505,13 @@
     2018,
     2018,
     "f-metallurg-bekabad.2003"
+   ]
+  ],
+  "f-pfk-prykarpattya-ivano-frankivsk": [
+   [
+    2021,
+    2023,
+    "d804-5316335"
    ]
   ],
   "f-pfk-sumy": [
@@ -69210,6 +69287,13 @@
     "f-r-francs-borains.2001"
    ]
   ],
+  "f-r-kapellen-fc": [
+   [
+    2000,
+    2000,
+    "f-fc-kapellen.1998"
+   ]
+  ],
   "f-r-racing-club": [
    [
     2025,
@@ -69331,6 +69415,13 @@
     2018,
     2018,
     "d442-1231"
+   ]
+  ],
+  "f-racing@032": [
+   [
+    1995,
+    1996,
+    "d032-93"
    ]
   ],
   "f-rad-belgrade": [
@@ -70456,6 +70547,13 @@
     "f-rubin-kazan.2017"
    ]
   ],
+  "f-rudar-pljevlja@499": [
+   [
+    2018,
+    2023,
+    "f-rudar-pljevlja.2002"
+   ]
+  ],
   "f-rudar-pljevlja@688": [
    [
     2002,
@@ -70465,13 +70563,6 @@
    [
     2008,
     2008,
-    "f-rudar-pljevlja.2002"
-   ]
-  ],
-  "f-rudar-pljevlja@499": [
-   [
-    2018,
-    2023,
     "f-rudar-pljevlja.2002"
    ]
   ],
@@ -70763,17 +70854,17 @@
     "f-san-cristobal.1997"
    ]
   ],
-  "f-san-francisco@484": [
-   [
-    1995,
-    1996,
-    "f-san-francisco.1995"
-   ]
-  ],
   "f-san-francisco-2": [
    [
     1997,
     1997,
+    "f-san-francisco.1995"
+   ]
+  ],
+  "f-san-francisco@484": [
+   [
+    1995,
+    1996,
     "f-san-francisco.1995"
    ]
   ],
@@ -70815,6 +70906,30 @@
     2003,
     2004,
     "f-sangiovannese.2003"
+   ]
+  ],
+  "f-sangju-sangmu": [
+   [
+    2015,
+    2015,
+    "f-sangju-sangmu.2015"
+   ],
+   [
+    2017,
+    2021,
+    "f-sangju-sangmu.2015"
+   ],
+   [
+    2023,
+    2023,
+    "f-sangju-sangmu.2015"
+   ]
+  ],
+  "f-sangju-sangmu-fc": [
+   [
+    2007,
+    2013,
+    "f-sangju-sangmu.2015"
    ]
   ],
   "f-sanliurfa-belediyespor": [
@@ -73448,6 +73563,13 @@
     "f-sv-mattersburg.2002"
    ]
   ],
+  "f-sv-nationaal": [
+   [
+    1996,
+    1997,
+    "f-sv-nationaal-leger.1995"
+   ]
+  ],
   "f-sv-nationaal-leger": [
    [
     1995,
@@ -75338,20 +75460,6 @@
     "f-as-valence.1998"
    ]
   ],
-  "f-valencia@862": [
-   [
-    1996,
-    1997,
-    "d862-5300226"
-   ]
-  ],
-  "f-valencia@724": [
-   [
-    2015,
-    2024,
-    "d724-1775"
-   ]
-  ],
   "f-valencia-c-f": [
    [
     1994,
@@ -75364,6 +75472,20 @@
     1995,
     2009,
     "f-valencia-cf.2005"
+   ]
+  ],
+  "f-valencia@724": [
+   [
+    2015,
+    2024,
+    "d724-1775"
+   ]
+  ],
+  "f-valencia@862": [
+   [
+    1996,
+    1997,
+    "d862-5300226"
    ]
   ],
   "f-valenciennes-fc": [
@@ -75522,6 +75644,18 @@
    [
     2013,
     2013,
+    "f-vedrich-97-rechitsa.2003"
+   ]
+  ],
+  "f-vedrich-rechitsa": [
+   [
+    1995,
+    1997,
+    "f-vedrich-97-rechitsa.2003"
+   ],
+   [
+    2009,
+    2012,
     "f-vedrich-97-rechitsa.2003"
    ]
   ],

@@ -539,23 +539,42 @@ picture, the 30 clubs whose archived infobox had opened with an icon or a photog
 JPEG is now taken for a photograph). 173 more archived pictures were read by reviewers and
 checked on contact sheets, and most went: the same names abroad (York United of Jamaica, not
 Canada's), merged and refounded successors, feeder sides, the clubs that moved under a new
-identity (Sangju Sangmu, Persijatim, Perseru Serui, Meadowbank, those that became Beijing Renhe:
-monograms all, as the rule above has it), civil-defence symbols, federations', towns' and
+identity (Persijatim, Perseru Serui, Meadowbank, those that became Beijing Renhe: monograms
+all, as the rule above has it; Sangju Sangmu found its own crest in the fifth pass), civil-defence symbols, federations', towns' and
 companies' emblems, kit makers' logos, photographs. 46 passed, 10 for today's map clubs and 36
 for the earlier seasons' (26 files still on Wikipedia, 20 archived pictures); one more, São José
 of Macapá's crest, went because the game places its São José in São José dos Campos.
 
+The user asked for fewer still the same day, and a fifth pass looked inside the game's own data.
+A club under a monogram may be a club that wears a crest under another id: another game's
+database spells it otherwise (Vedrich Rechitsa and Vedrich-97 Rechitsa, SV Nationaal and SV
+Nationaal Leger), or an earlier season's id names it. Candidates were the clubs of the same
+country with a close name, never on one map in one season with the club (two ids on one map are
+two clubs) and, where both have a home, near it; a reviewer read 43 pairs and passed 9 (Racing
+of 1994/95-1995/96 is Racing Club's, placed at its ground in Avellaneda, the 1995 map having a
+Racing de Córdoba of its own), and two in part (Central Córdoba's 2025 season is Santiago del
+Estero's club, its 1990s ones may be Rosario's and keep the monogram; PFK Prykarpattya of 2021-23
+is today's club). They wear the crest the other id wears; no new picture. And the maps record
+where each club's home came from: for 21 clubs, a football club's Wikidata item other than the
+one matched before. Its articles, current or archived, gave 15 crests and 4 passed: Murang'a
+SEAL's, Rēzekne FA's, and both Sangju Sangmu ids' own logo (상주 상무 축구단 로고, on the
+Korean article of the Gimcheon Sangmu item), so Sangju Sangmu now wears its own crest rather
+than none, never Gimcheon's. League season articles' tables were read too, for crests beside
+club names: modern Wikipedias keep logos out of those tables (Costa Rica's show province flags,
+Turkey's a map), and the Commons categories of the clubs' items held no logo not seen before.
+
 What is left. Outside football, only the caricatures and the Saint Petersburg Lions of
-2000/01, whose logo no source shows. In football, 720 clubs (by country and id), 1,412 of the
-60,387 club appearances (2.3%; 1,501 after the third pass, 1,755 before it): 271 clubs of
-today's country maps (China's, Uzbekistan's, Laos's and South Africa's lower divisions and the
-like; 57 of the 128 maps are complete, from 36) and 449 of the earlier seasons' maps (Italy's of
-1999/2000 keeps two of its eleven), mostly lower-division and gone clubs whose article has no
-crest (Brescello), whose article is now another club's (Alzano Virescit's is its merged
-successor's, Germinal Ekeren's Beerschot's), or which have no article or free logo at all. They
-keep the monogram; `scripts/club-crests.test.mjs` holds their number as a ceiling. Every one of
-them has now been through the Wayback search, its current articles read again and its matches
-reviewed: another pass needs another source. The crests of today
+2000/01, whose logo no source shows. In football, 706 clubs (by country and id), 1,371 of the
+60,387 club appearances (2.3%; 1,412 after the fourth pass, 1,501 after the third, 1,755 before
+it): 269 clubs of today's country maps (China's, Uzbekistan's, Laos's and South Africa's lower
+divisions and the like; 58 of the 128 maps are complete, from 36) and 437 of the earlier
+seasons' maps (Italy's of 1999/2000 keeps two of its eleven), mostly lower-division and gone
+clubs whose article has no crest (Brescello), whose article is now another club's (Alzano
+Virescit's is its merged successor's, Germinal Ekeren's Beerschot's), or which have no article
+or free logo at all. They keep the monogram; `scripts/club-crests.test.mjs` holds their number
+as a ceiling. Every one of them has now been through the Wayback search, its current articles
+read again, its matches reviewed and its other ids compared: another pass needs another
+source. The crests of today
 standing for earlier seasons are undated: a club renamed or moved since shows its later
 identity's crest (the MetroStars the Red Bulls', Delhi Dynamos Odisha's), as the undated rule
 has it everywhere else, until a pass reads their articles' archived infoboxes season by season
@@ -603,7 +622,7 @@ Montenegro, to 2010/11; they are the same clubs as Montenegro's of today and wea
 
 `scripts/club-crests.test.mjs`, on the census (`scripts/lib/crest-census.mjs`): every club
 of every map, season and sport resolves to a crest the game ships, but the caricatures and
-`NO_PICTURE` outside football and at most 1,412 football club appearances; no monogram era
+`NO_PICTURE` outside football and at most 1,371 football club appearances; no monogram era
 outside the caricatures and `NO_PICTURE`; no club-season wears the crest of another country's
 club of today (`d<country>-…`) or a crest that clubs of two countries wear, but Serbia's
 Montenegrin clubs; an id names one country's club in a season year, and a namesake's eras
