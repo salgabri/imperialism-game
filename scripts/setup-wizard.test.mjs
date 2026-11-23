@@ -683,9 +683,9 @@ test('fourteen sport cards sit in four rows of four, compact tiles that stay 44p
   assert.match(css, /\.setup-sports\[data-rows="4"\] \{ row-gap:4px; \}/);
 });
 
-test('step 1 fits a narrow tablet and a short one: the phone\'s height tiers reach every one-column width, and a notice line takes the heading\'s place', async t => {
+/** setup.css without its comments, and the rules of every `@media <query> { … }` block with that query, together. */
+function setupCss() {
   const css = readFileSync(new URL('../src/components/setup.css', import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
-  // The rules of every `@media <query> { … }` block with this query, together.
   const media = query => {
     const head = `@media ${query} {`;
     let rules = '';
@@ -697,6 +697,11 @@ test('step 1 fits a narrow tablet and a short one: the phone\'s height tiers rea
     assert.ok(rules, head);
     return rules;
   };
+  return { css, media };
+}
+
+test('step 1 fits a narrow tablet and a short one: the phone\'s height tiers reach every one-column width, and a notice line takes the heading\'s place', async t => {
+  const { css, media } = setupCss();
   // Below 900px step 1 is one column, a phone's or a narrow tablet's: the map sits under the controls and every pixel of
   // them comes out of its height. So the tiers that fit step 1 to a phone's height (short, four rows, smallest) reach every
   // one-column width; none stops at the phone's 699.98px any more.
@@ -705,7 +710,8 @@ test('step 1 fits a narrow tablet and a short one: the phone\'s height tiers rea
   // opens, without and with a challenge link's notice line (/?seed=2033). Before → after:
   // - 800×600 scrolled by 134px either way: the map's 120px floor sat under 457px of controls in a 437px body. Its map and
   //   lede give way (the short tier), its heading too (four rows in the smallest tier, as on any phone), and its controls
-  //   sit 10px apart: 72px to spare, 18px with the notice line (2px at 14px apart).
+  //   sit 10px apart: 72px to spare, 18px with the notice line (2px at 14px apart). Since 2026-11-23 its sports lie in two
+  //   rows of seven instead (the next test), and it keeps its heading and 14px.
   // - 700×800 with the notice line pushed the map 33px under its floor → the map 158px tall (127px → 148px without).
   // - 1100×700 with the notice line, a short window under the tablet's step bar, ran 43px over → 30px to spare.
   const short = media('(max-width:899.98px) and (max-height:760px)');
@@ -720,12 +726,22 @@ test('step 1 fits a narrow tablet and a short one: the phone\'s height tiers rea
   assert.doesNotMatch(css, /\.setup-stat \{[^}]*\bpadding:(?!2px 0;)/, 'one shorthand only, the base rule\'s');
   const fourRows = media('(max-width:899.98px), (max-height:799.98px)');
   assert.match(fourRows, /\.setup-sports\[data-rows="4"\] \.setup-card \{ padding:3px 4px 2px; gap:1px; \}/);
-  assert.match(fourRows, /\.setup-step\[data-step="1"\]:has\(\.setup-notices\):has\(\.setup-sports\[data-rows="4"\]\) \.setup-heading \{ display:none; \}/);
   assert.match(fourRows, /\.setup-step\[data-step="1"\]:has\(\.setup-season__credit\) \.setup-lede \{ display:none; \}/);
+  // The notice line takes the heading's place up to 840px tall since 2026-11-23 (the next test), not 800.
+  assert.doesNotMatch(fourRows, /\.setup-heading/);
+  assert.match(media('(max-width:899.98px), (max-height:839.98px)'),
+    /\.setup-step\[data-step="1"\]:has\(\.setup-notices\):has\(\.setup-sports\[data-rows="4"\]\) \.setup-heading \{ display:none; \}/);
   const smallest = media('(max-width:899.98px) and (max-height:660px)');
-  assert.match(smallest, /\.setup-step\[data-step="1"\]:has\(\.setup-sports\[data-rows="4"\]\) \.setup-heading \{ display:none; \}/);
   assert.match(smallest, /\.setup-sports\[data-rows="4"\] \{ row-gap:4px; \}/);
-  assert.match(smallest, /\.setup-step\[data-step="1"\] \.setup-main \{ gap:10px; \}/);
+  // Since 2026-11-23 a narrow tablet lays its sports in two rows of seven (the next test), so at 800×600 it keeps its heading
+  // and its controls' 14px: the smallest tier no longer hides one or tightens the other. A phone still drops the heading
+  // with four rows (the phone band) and keeps its 10px.
+  assert.doesNotMatch(smallest, /\.setup-step\[data-step="1"\]:has\(\.setup-sports\[data-rows="4"\]\) \.setup-heading/);
+  assert.doesNotMatch(smallest, /\.setup-main \{ gap:10px; \}/);
+  const phoneQuery = '@media (max-width:699.98px) {';
+  const phone = css.slice(css.lastIndexOf(phoneQuery), css.indexOf('\n}', css.lastIndexOf(phoneQuery)));
+  assert.match(phone, /\.setup-step\[data-step="1"\]:has\(\.setup-sports\[data-rows="4"\]\) \.setup-heading \{ display:none; \}/);
+  assert.match(phone, /\.setup-main \{ gap:10px; \}/);
   // Still fitting, with and without the line: 1920×1080, 1440×900, 1280×800, 1280×720, 1920×800, 1366×800, 1024×768,
   // 768×1024 and the phones 412×915, 390×844, 390×664, 375×667, 360×780, 360×640 (the phones to the pixel as before). With
   // the line, 1280×720 and 1024×768 lose the heading (6px → 93px and 3px → 90px to spare), and 768×1024's map grows
@@ -747,6 +763,77 @@ test('step 1 fits a narrow tablet and a short one: the phone\'s height tiers rea
   const group = view.q('.setup-step[data-step="1"] .setup-group--list');
   assert.ok(group.querySelector(':scope > .setup-theatres'));
   assert.ok(group.querySelector(':scope > .setup-country-row > #setup-country'));
+  assert.deepEqual(view.errors, []);
+});
+
+test('a short window lays step 1\'s sports in two rows of seven, and steps 2 and 3 make room on a narrow tablet', async t => {
+  const { media } = setupCss();
+  // Measured 2026-11-23 with headless Chromium against the dev server (dark, device scale 1, a fresh context per size),
+  // football nations and clubs, without and with a challenge link's notice line (/?seed=2033), steps 1, 2 (More rules shut
+  // and open) and 3 (a manager, the default role without a link), over widths 700–1920 and heights 600–1024. Beside the
+  // body's scroll it counted content run out of its column (into the padding, over the other column, or a wall squeezed
+  // under 44px). Before → after:
+  //
+  // Step 1 in two columns. The controls (heading, four rows of sports, Teams and Season, the theatre chips, the counts) need
+  // 536px, 507px with the notice line in the heading's place, and a tablet's body under its 43px step bar is the window
+  // less 163px: 900–1199 × 600 scrolled by 85px (56px with the line), × 640 by 45px (16px), × 660 by 25px (and the line ran
+  // 10px into the padding); desktops 1200–1599 × 600 by 42px (13px) and × 640 by 2px; 1600 and wider, whose rows are 40px,
+  // × 600 by 59px (25px) and × 640 by 19px. Clubs ran 2px more. Below 720px tall (760 under a finger) the controls column
+  // widens to 640px and the sports lie in two rows of seven (seven tiles of 78.3px in its 596px, as wide as four in the
+  // 380px column's 336px), and the map gives up the width: 1100×600 28px to spare (38px with the line), 1280×600 71px (81px),
+  // 1600×600 55px (69px). Under a finger 1100×700 scrolled by 9px (the 44px chips and rows) → fits.
+  const short = media('(min-width:900px) and (max-height:719.98px), (min-width:900px) and (max-height:760px) and (pointer:coarse)');
+  assert.match(short, /\.setup-step\[data-step="1"\] \.setup-step__body \{ grid-template-columns:minmax\(0, 640px\) minmax\(0, 1fr\); \}/);
+  assert.match(short, /\.setup-sports\[data-rows="4"\] \{ grid-template-columns:repeat\(7, minmax\(0, 1fr\)\); \}/);
+  // A tablet 800px tall with the line, its tiles the full 62px, scrolled by 13px (15px clubs; 1600 and wider ran 12px into
+  // the padding): the line takes the heading's place up to 840px tall now, not 800 → 57px to spare.
+  assert.match(media('(max-width:899.98px), (max-height:839.98px)'),
+    /^\s*\.setup-step\[data-step="1"\]:has\(\.setup-notices\):has\(\.setup-sports\[data-rows="4"\]\) \.setup-heading \{ display:none; \}\s*$/);
+  // Step 1 in one column on a narrow tablet (660–860px wide) up to 800px tall: two rows of seven too. With the line and ice
+  // hockey's 2024/25 credit 800×600 scrolled by 14px → fits; at 768 tall the map sat on its 120px floor, 4px into the foot
+  // padding → 216px. 700×800 and 768×1024 keep four rows (their maps 158px and 382px with the line, as before).
+  assert.match(media('(min-width:700px) and (max-width:899.98px) and (max-height:799.98px)'),
+    /^\s*\.setup-sports\[data-rows="4"\] \{ grid-template-columns:repeat\(7, minmax\(0, 1fr\)\); \}\s*$/);
+  // Step 2 with More rules open in one column (700–899 wide) scrolled by 25px at 600px tall and 9px at 768 (3px into the
+  // padding at 640): its fields sit three to a row → fits. A phone 761–790px tall scrolled by 8px at 780 (360×780 among the
+  // listed sizes, 390 and 412 wide alike): the cards show their names alone and the heading gives way up to 800px tall in
+  // one column now, not 760.
+  assert.match(media('(min-width:700px) and (max-width:899.98px)'), /\.setup-settings-fields \{ grid-template-columns:repeat\(3, minmax\(0, 1fr\)\); \}/);
+  assert.match(media('(max-width:899.98px) and (max-height:799.98px)'),
+    /\.setup-step\[data-step="2"\]:has\(\.setup-advanced\[open\]\) :is\(\.setup-heading, \.rule-card__body, \.rule-dots, \.rule-card__tag\) \{ display:none; \}/);
+  assert.doesNotMatch(media('(max-width:899.98px) and (max-height:760px)'), /setup-advanced/);
+  // Step 3 for a manager: in one column the selected team's card (435px, and the challenge link's 44px) took the room of the
+  // wall of flags, which was 0px tall from 600 to 830 (the role cards over the card; 68px of scroll at 600, 28px at 640, 8px
+  // at 660) and 11px at 860, 700×800 included. Its players give way below 960px tall (and in two columns up to 660, where
+  // 900–1199 × 600 scrolled by 25px), its fronts below 800: the wall 98px at 800×600 (142px without the heading, below),
+  // 154px at 700×800 (124px for clubs, in three pages), 266px at 800×768; 768×1024 keeps the whole card (the wall 205px).
+  assert.match(media('(max-width:899.98px) and (max-height:959.98px), (max-height:660px)'), /^\s*\.setup-pick__players \{ display:none; \}\s*$/);
+  const noFronts = media('(max-width:899.98px) and (max-height:799.98px)');
+  assert.match(noFronts, /\.setup-pick__fronts \{ display:none; \}/);
+  assert.match(noFronts, /\.setup-pick__stats \{ border-bottom:0; \}/);
+  // Under a finger the wall's cells are 44px squares, and at 800×600 it had 40px: on a narrow tablet up to 660px tall the
+  // step's heading gives way too → 83px (142px under a mouse). A phone keeps it (360×640's wall 138px).
+  assert.match(media('(min-width:700px) and (max-width:899.98px) and (max-height:660px)'),
+    /^\s*\.setup-step\[data-step="3"\] \.setup-heading \{ display:none; \}\s*$/);
+  // Extras only: never a control, the wall or the card's head and figures, and never the tiles.
+  for (const rules of [short, noFronts, media('(max-width:899.98px) and (max-height:959.98px), (max-height:660px)')]) {
+    assert.doesNotMatch(rules, /(?:setup-teams|setup-roles|setup-opponents|setup-pick__head|setup-card|setup-theatre|setup-season)[^{]*\{[^}]*display:none/);
+  }
+
+  // The markup those rules read: fourteen tiles in four rows of four by default, More rules' fields (five or six, so two
+  // rows of three), and the card's players, figures and fronts as its own children.
+  const teams = [{ ...TEAMS[0], neighbours: ['380', '724'], players: [{ pos: 'FW', name: 'A. Forward', rating: 90 }] }, ...TEAMS.slice(1)];
+  const view = await mount(t, { managerTeams: teams, setup: { role: 'manager', managedTeamId: '250' } });
+  const sports = view.q('.setup-step[data-step="1"] .setup-sports');
+  assert.equal(sports.dataset.rows, '4');
+  assert.equal(sports.querySelectorAll(':scope > .setup-card').length, 14);
+  const fields = view.qa('.setup-step[data-step="2"] .setup-settings-fields > .control-field');
+  assert.ok(fields.length >= 5 && fields.length <= 6, `${fields.length} fields`);
+  await view.click(view.qa('.setup-rail__step')[2]);
+  const card = view.q('.setup-step[data-step="3"] .setup-pick');
+  for (const part of ['.setup-pick__head', '.setup-pick__stats', '.setup-pick__players', '.setup-pick__fronts']) {
+    assert.ok(card.querySelector(`:scope > ${part}`), part);
+  }
   assert.deepEqual(view.errors, []);
 });
 

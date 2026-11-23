@@ -75,16 +75,21 @@ scrolling panels, at desktop, tablet and phone sizes.
   one row, theatre chips (Europe's Top 124 and Elite 32 for football clubs), the One country · top clubs dropdown,
   and the counts at the foot. The theatre's map fills the side. Below 900px wide (one column, a phone or a narrow tablet)
   the map sits under the controls instead, so since 2026-11-21 setup.css's phone height tiers reach every one-column
-  width: up to 760px tall the map and lede give way, four rows of sports take the compact 44px tiles, and up to 660px tall
-  the heading gives way too and the controls sit 10px apart. A notice line takes the heading's place in one column and on
-  windows up to 800px tall. Football clubs' country row (the country, and how many of its clubs play) shares the line of
+  width: up to 760px tall the map and lede give way, and four rows of sports take the compact 44px tiles; on a phone up to
+  660px tall the heading gives way too. Since 2026-11-23 a narrow tablet up to 800px tall lays its sports in two rows of
+  seven instead, and keeps its heading. A short window in two columns (below 720px tall, or 760 under a finger) does the
+  same: the controls column widens to 640px for the two rows of seven, and the map gives up the width. A notice line takes
+  the heading's place in one column and on windows up to 840px tall. Football clubs' country row (the country, and how many of its clubs play) shares the line of
   Europe's two chips in one column where it keeps 320px; on a phone it still wraps under them. Under the Season choice, a season whose listing carries a
   credit shows it whole as quiet text, never cut (since 2026-11-10: ice hockey's Hockey Databank statement and MoneyPuck's
   credit, [hockey.md](hockey.md#credits)); the lede gives way to it in one column and on windows up to 800px tall, and the
   heading too with a notice line on a phone or two notice lines on a short window. Step 2: four short draw cards, with
-  Show matches and More rules beside them. Step 3: compact role cards with the opponent choice in the same row, a flag wall strongest first
-  (arrows, Home, End and type-ahead walk it across its pages), and the suggested team as a compact card. The rail's
-  ad shows only at 1600px and wider and at least 740px tall.
+  Show matches and More rules beside them. With More rules open in one column up to 800px tall the cards show their names
+  alone and the heading gives way, and on a narrow tablet More rules hold three fields to a row. Step 3: compact role
+  cards with the opponent choice in the same row, a flag wall strongest first (arrows, Home, End and type-ahead walk it
+  across its pages), and the suggested team as a compact card. The card gives up its best players below 960px tall in one
+  column and up to 660 in two, and its fronts below 800 in one column, so the wall keeps its room; on a narrow tablet up
+  to 660px tall the step's heading gives way too. The rail's ad shows only at 1600px and wider and at least 740px tall.
 - **Map column.** Next fixture puts the approach in its kicker and the odds detail on its title, and the
   "simulate the result" link is now just "Simulate". The result card drops "Full time" and the strengths. Latest
   results repeats the ticker, so it shows only where there's room: on desktops 860px tall or more, on tablets in
@@ -177,6 +182,38 @@ the line, 19px without), 1100×700 (45px with it) and 800×600 (134px either way
 them in one column, where the country row under the chips cost the map 44px. Now none of those sizes scrolls in clubs
 either, and 30 grid cases do, none in one column; 700×800's map is 158px tall with the line, and the phones are unchanged.
 
+**Short windows, steps 1–3** (2026-11-23). Same method, football nations and clubs, without and with a challenge link's
+line, at steps 1, 2 (More rules shut and open) and 3 (a manager, the default role without a link), over widths 700–1920
+and heights 600–1024. Besides the step's scroll the check counted content run out of its column: into the step's padding,
+over the other column, or a wall of flags under 44px. The scroll alone missed the worst case: at 700×800, a listed size,
+step 3's wall was 0px tall and the role cards lay over the selected team's card, and nothing scrolled. Before, 115 of 390
+grid cases failed in nations (72 scrolled) and 125 in clubs (74):
+- Step 1 in two columns. The controls need 536px, 507px with the line in the heading's place, and a tablet's body is the
+  window less 163px under its step bar (a desktop's less 120px). Tablets 900–1199px wide scrolled by 85px at 600 tall
+  (56px with the line), 45px at 640 (16px) and 25px at 660, and by 13px at 800 tall with the line (the tiles the full
+  62px). Desktops scrolled by 42px at 600 (13px) and 2px at 640; 1600 and wider, whose rows are 40px, by 59px at 600 (25px)
+  and 19px at 640. Clubs ran 2px more, and under a finger 1100×700 scrolled by 9px. Below 720px tall (760 under a finger)
+  the controls column is 640px wide and the sports lie in two rows of seven, the map taking what width is left: 1100×600
+  has 28px to spare (38px with the line), 1280×600 71px (81px), 1600×600 55px (69px), 1100×700 under a finger 104px
+  (114px), 1100×600 under a finger 4px (14px). At 800px tall the line takes the heading's place: 57px to spare.
+- Step 1 in one column: ice hockey's 2024/25 credit with the line scrolled 800×600 by 14px, now 58px to spare. Narrow
+  tablets 768px tall had the map on its 120px floor, 4px into the padding; it is 216px tall now.
+- Step 2 with More rules open: narrow tablets scrolled by 25px at 600 tall and 9px at 768, phones 761–790px tall by 8px
+  at 780 (360×780 is a listed size). Now nothing scrolls; under a finger a narrow tablet 600px tall runs 1px into the padding.
+- Step 3: in one column the wall had 0px from 600 to 830 tall (68px of scroll at 600, 28px at 640, 8px at 660) and 11px
+  at 860. It is 142px at 800×600 (112px for clubs, in three pages; under a finger 83px, its 44px cells paged), 154px at
+  700×800 (124px), 266px at 800×768; 768×1024 keeps the whole card and its 205px wall. In two columns 900–1199 × 600
+  scrolled by 25px; it fits now.
+
+Now none of 1,020 grid cases fails in nations or clubs (heights 680, 710, 719 and 780 added), none of 440 under a finger
+scrolls (12 of them are that 1px of More rules), and the 17 listed sizes fit at every step with and without the line, in
+both (12 of their 68 cases failed before). The phones' step 1 is unchanged to the pixel. At the listed sizes 1100×700 now lays its sports in two rows of
+seven, 800×600 has its heading back, and 1280×800, 1366×800 and 1920×800 with the line lose the heading (1920×800 had run
+12px into the padding). The other twelve sports fit at 800×600, 800×768, 700×800, 1100×600, 1100×700, 1280×600, 1366×768,
+1024×768, 1280×720, 1600×600, 390×664 and 360×640, each layer they have, with and without the line. A save's Resume line
+behaves as the link's: alone it failed 9 of 20 short sizes before, and now only 360×780 runs 4px into the padding, as
+before (a phone, its map on its floor).
+
 ## Limits
 
 - Hover titles don't exist on touch screens. Everything moved to a `title` is also in `sr-only` text or
@@ -192,11 +229,14 @@ either, and 30 grid cases do, none in one column; 700×800's map is 158px tall w
   the preview's XIs (one switch away).
 - Two notice lines at once (a save on this browser and a challenge link) were never fitted on phones: setup's step 1
   scrolls there for football clubs by 26px at 390×664 and 41px at 360×640. A hockey season's credit adds to it (2px at
-  390×664, 47px at 360×640, 37px at 360×780); short desktops and tablets with two lines fit, the heading giving way.
-- Setup's step 1 still scrolls on some short windows in two columns (measured 2026-11-21): tablets
-  900–1199px wide up to 660px tall (by up to 85px) and 800px tall with a notice line (13px, where the compact tiles stop),
-  desktops up to 640px tall (42px at 600), football clubs alike. At 800×600 with a notice line the hockey credit scrolls
-  by 14px. Under a coarse pointer 1100×700 scrolls by 9px, as before.
+  390×664, 47px at 360×640, 37px at 360×780); short desktops and tablets with two lines fit, the heading giving way,
+  but a tablet 600px tall runs 12px into the step's padding with them (it scrolled by 106px before 2026-11-23), and
+  700×800's map sits on its floor, 12px into the padding.
+- Setup was fitted down to 600px tall (measured 2026-11-23). Shorter windows still run out: in two columns step 1 scrolls
+  by 8–18px at 540px tall and up to 58px at 500, and in one column step 2 runs over from 580px.
+- Below 720px tall step 1's map gives its width to the controls: it is 240px wide at 900, and under 500px up to 1140 wide
+  on a tablet and 1375 on a desktop. A team's preview on so narrow a map lies across it and can cover the zoom buttons
+  until it is closed.
 
 ## Verifying
 

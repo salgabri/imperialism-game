@@ -636,8 +636,8 @@ strong.setup-save__text { font-weight:600; }
 
 /* ---- A short window in one column (a phone with its browser bars showing, 390×664 and shorter; a narrow tablet, 800×600):
    the extras give way before the controls scroll. Step 1 drops the rule line and the map, which in one column sits under the
-   controls and had no room left for its 120px floor (800×600 scrolled by 134px); with More rules open, step 2's cards show
-   their names alone. ---- */
+   controls and had no room left for its 120px floor (800×600 scrolled by 134px). Step 2's give-way reaches 800px tall
+   (below). ---- */
 @media (max-width:899.98px) and (max-height:760px) {
   .setup-lede { display:none; }
   .setup-step[data-step="1"] .setup-side { display:none; }
@@ -646,32 +646,77 @@ strong.setup-save__text { font-weight:600; }
      line (2.2px at a phone's 20px): past the stat's 2px padding, 800×600 scrolled by 1px. The stat's padding shifts a pixel
      down, at the same height, to hold it (top and bottom only: the stats after the first keep their left padding). */
   .setup-step[data-step="1"] .setup-stat { padding-top:1px; padding-bottom:3px; }
-  .setup-step[data-step="2"]:has(.setup-advanced[open]) :is(.setup-heading, .rule-card__body, .rule-dots, .rule-card__tag) { display:none; }
 }
 
 /* ---- Four rows of sports (thirteen or more) cost a fourth row's height on top of three: in one column (a phone, a narrow
    tablet), where every pixel of the controls comes out of the map's, and on a window up to 800px tall, each tile is just its
    44px target (a smaller icon, the name's two lines snug). Measured at 1024×768: 650px of content in 605px with the desktop's
-   tiles, 584px with these. A notice line (Resume, a challenge link) takes the place of step 1's heading there, as a season's
-   credit does; the step bar names the step. Measured with a challenge link's line: 700×800 pushed the map 33px under its
-   floor, 1100×700 (a short window under the tablet's step bar) ran 43px over. ---- */
+   tiles, 584px with these. ---- */
 @media (max-width:899.98px), (max-height:799.98px) {
   .setup-sports[data-rows="4"] .setup-card { padding:3px 4px 2px; gap:1px; }
   .setup-sports[data-rows="4"] .setup-card__icon { width:16px; height:16px; }
   .setup-sports[data-rows="4"] .setup-card__button { line-height:1; }
+}
+/* A notice line (Resume, a challenge link) takes the place of step 1's heading in one column and on a window up to 840px tall,
+   as a season's credit does; the step bar names the step. Measured with a challenge link's line: 700×800 pushed the map 33px
+   under its floor, 1100×700 (a short window under the tablet's step bar) ran 43px over, and a tablet 800px tall, its tiles
+   the full 62px, ran 30px over (900–1199 wide; 32px for football clubs). */
+@media (max-width:899.98px), (max-height:839.98px) {
   .setup-step[data-step="1"]:has(.setup-notices):has(.setup-sports[data-rows="4"]) .setup-heading { display:none; }
 }
 
 /* ---- The smallest windows in one column (360×640, 800×600): three rows of sports and a notice line (Resume, a challenge
    link) leave no room for step 1's heading, so it gives way as step 2's does for More rules; the step bar names the step.
-   Four rows leave none with or without one, as on any phone (the phone band). ---- */
+   Four rows leave none with or without one on any phone (the phone band); a narrow tablet lays them in two rows (below). ---- */
 @media (max-width:899.98px) and (max-height:660px) {
   .setup-step[data-step="1"]:has(.setup-notices):has(.setup-sports[data-rows="3"]) .setup-heading { display:none; }
-  .setup-step[data-step="1"]:has(.setup-sports[data-rows="4"]) .setup-heading { display:none; }
   /* Four rows of sports were 2px too tall for 360×640 with a notice line (488px in 486px): their rows close up by 2px. */
   .setup-sports[data-rows="4"] { row-gap:4px; }
-  /* A narrow tablet's controls keep a phone's 10px apart: 800×600 with a notice line had 2px to spare at 14px. */
-  .setup-step[data-step="1"] .setup-main { gap:10px; }
+}
+
+/* ---- A short window in two columns (below 720px tall; up to 760 under a finger, whose 44px targets need the room): the map
+   gives up width before the controls scroll. Step 1's controls column widens to 640px, and thirteen or more sports lie in
+   two rows of seven instead of four rows of four (seven tiles of 78px, as wide as four in the 380px column, so "Basketball"
+   keeps its line). Measured at 1100×600 (a 437px body under the tablet's step bar): 507px of controls with a notice line and
+   536px with the heading → 399px and 409px; under a finger 560px at 1100×700 (537px) → 433px. A tablet 700px tall had 1px
+   to spare (football clubs ran 1px into the step's padding). ---- */
+@media (min-width:900px) and (max-height:719.98px), (min-width:900px) and (max-height:760px) and (pointer:coarse) {
+  .setup-step[data-step="1"] .setup-step__body { grid-template-columns:minmax(0, 640px) minmax(0, 1fr); }
+  .setup-sports[data-rows="4"] { grid-template-columns:repeat(7, minmax(0, 1fr)); }
+}
+/* A narrow tablet in one column is 660–860px wide: up to 800px tall its sports lie in two rows of seven too. At 800×600 with a
+   notice line and a season's credit (ice hockey's 2024/25) step 1 ran 14px over; up to 770px tall the map sat on its 120px
+   floor and ran into the step's foot padding (4px at 768). */
+@media (min-width:700px) and (max-width:899.98px) and (max-height:799.98px) {
+  .setup-sports[data-rows="4"] { grid-template-columns:repeat(7, minmax(0, 1fr)); }
+}
+
+/* ---- Steps 2 and 3 on a narrow tablet and a short window ---- */
+/* In one column a narrow tablet's More rules hold three fields to a row, not two: with them open, step 2 ran 25px over at
+   800×600 and 9px at 800×768 (700–899 wide). */
+@media (min-width:700px) and (max-width:899.98px) {
+  .setup-settings-fields { grid-template-columns:repeat(3, minmax(0, 1fr)); }
+}
+/* With More rules open, step 2's cards show their names alone and its heading gives way in one column up to 800px tall (up to
+   760 until 2026-11-23: a phone 761–790px tall scrolled by 8px at 780, 360×780 among them). */
+@media (max-width:899.98px) and (max-height:799.98px) {
+  .setup-step[data-step="2"]:has(.setup-advanced[open]) :is(.setup-heading, .rule-card__body, .rule-dots, .rule-card__tag) { display:none; }
+}
+/* Step 3's selected team gives up its players, then its fronts (as the map's peek card does), so the wall of flags keeps its
+   room. In one column the card (435px, and the challenge link's 44px) sits under the wall, which took what was left: none
+   at all from 600px tall to 830 (the wall 0px, the role cards over the card) and 11px at 860. In two columns at 600px tall
+   the card ran 25px over. */
+@media (max-width:899.98px) and (max-height:959.98px), (max-height:660px) {
+  .setup-pick__players { display:none; }
+}
+@media (max-width:899.98px) and (max-height:799.98px) {
+  .setup-pick__fronts { display:none; }
+  .setup-pick__stats { border-bottom:0; }
+}
+/* On a narrow tablet up to 660px tall step 3's heading gives way too (the step bar names the step): under a finger the wall
+   had 40px at 800×600, less than its 44px cells (98px under a mouse) → 83px (142px). */
+@media (min-width:700px) and (max-width:899.98px) and (max-height:660px) {
+  .setup-step[data-step="3"] .setup-heading { display:none; }
 }
 
 /* ---- Below the 390 phone target (e.g. 360 Android): tighten the step bar. ---- */
