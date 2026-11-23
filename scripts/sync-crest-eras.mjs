@@ -4,15 +4,19 @@
 //
 // Reads scripts/data/crest-eras.json: `crests`, each period crest by its file key ('<club id>.<first year>') with its
 // source (a Wikipedia or Commons file, or an archived copy of one on the Wayback Machine), licence and the SHA-256 of
-// the original, cached under the gitignored data-src/crest-eras/files/; and `clubs`, each club id's eras
-// [first year, last year, file key | today's file of another id | null], in the season years the game uses.
+// the original, cached under the gitignored data-src/crest-eras/files/; and `clubs`, each club's eras
+// [first year, last year, file key | today's file of another id | null], in the season years the game uses. A club is
+// its id, or its id and country ('<club id>@<country>', the country as its season maps name it) where the seasons give
+// that id to clubs of two countries (a namesake: f-valencia is Venezuela's Valencia FC in 1995/96 and Valencia CF in
+// 2015/16). Such an id keys all its eras by country; scripts/club-crests.test.mjs holds each to its own country's seasons.
 // No network: the originals come from the cache, where the research put them (data-src/crest-eras/BRIEF.md).
 //
 // Writes:
 //   public/club-logos/<key>.webp         each period crest, trimmed and fitting 128x128 as scripts/sync-club-logos.mjs
 //                                         draws today's crests (scripts/lib/crest-image.mjs)
 //   public/club-logos/SOURCES-eras.tsv   each period crest's club, years, source file, licence and page
-//   src/data/clubCrestEras.js            CREST_ERAS for src/data/crests.js
+//   src/data/clubCrestEras.js            CREST_ERAS for src/data/crests.js, by club id: a namesake's eras of every country
+//                                         in one list, each with its country as a fourth element
 // --check rebuilds all three in memory and fails on any difference (and on a cached original whose hash moved).
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
@@ -28,6 +32,7 @@ assert(process.argv.slice(2).every(argument => argument === '--check'), 'Only --
 const outDir = path.join(root, 'public/club-logos');
 const manifest = JSON.parse(await readFile(path.join(root, 'scripts/data/crest-eras.json'), 'utf8'));
 const KEY = /^[a-z0-9-]+\.\d{4}$/;
+const CLUB = /^([a-z0-9-]+)(?:@([0-9A-Z]{3}))?$/; // a club id, or a namesake's id and country
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const byId = (a, b) => a.localeCompare(b, 'en', { numeric: true });
 
@@ -47,20 +52,35 @@ for (const [key, crest] of Object.entries(crests)) {
 }
 const todays = new Set((await readdir(outDir)).filter(name => name.endsWith('.webp') && !/\.\d{4}\.webp$/.test(name)).map(name => name.slice(0, -5)));
 const used = new Set();
-for (const [id, eras] of Object.entries(clubs)) {
-  assert(Array.isArray(eras) && eras.length, `${id}: no eras`);
+const erasById = new Map(); // club id → its eras, a namesake's of every country with that country as a fourth element
+for (const [key, eras] of Object.entries(clubs)) {
+  const [, id, country] = CLUB.exec(key) ?? [];
+  assert(id, `${key}: a club is '<club id>' or '<club id>@<country>'`);
+  assert(Array.isArray(eras) && eras.length, `${key}: no eras`);
   let last = -Infinity;
   for (const era of eras) {
-    assert(Array.isArray(era) && era.length === 3, `${id}: an era is [first, last, file]`);
+    assert(Array.isArray(era) && era.length === 3, `${key}: an era is [first, last, file]`);
     const [from, through, file] = era;
-    assert(Number.isInteger(from) && Number.isInteger(through) && from <= through && from > last, `${id}: eras ${JSON.stringify(eras)} are not in order`);
+    assert(Number.isInteger(from) && Number.isInteger(through) && from <= through && from > last, `${key}: eras ${JSON.stringify(eras)} are not in order`);
     last = through;
+    if (!erasById.has(id)) erasById.set(id, []);
+    erasById.get(id).push(country ? [from, through, file, country] : [from, through, file]);
     if (file === null) continue;
-    assert(Object.hasOwn(crests, file) || todays.has(file), `${id}: ${file} is neither a period crest nor a crest of today`);
+    assert(Object.hasOwn(crests, file) || todays.has(file), `${key}: ${file} is neither a period crest nor a crest of today`);
     if (Object.hasOwn(crests, file)) used.add(file);
   }
 }
 for (const key of Object.keys(crests)) assert(used.has(key), `${key}: no club wears it`);
+// A namesake keys every era by country (none left to whichever club the id names), and its countries' eras never meet:
+// a season year gives an id to one country's club only.
+for (const [id, eras] of erasById) {
+  const keyed = eras.filter(era => era.length === 4).length;
+  assert(keyed === 0 || keyed === eras.length, `${id}: key every era by country ('${id}@<country>') or none`);
+  eras.sort((a, b) => a[0] - b[0]);
+  for (let i = 1; i < eras.length; i++) {
+    assert(eras[i][0] > eras[i - 1][1], `${id}: the eras of ${eras[i - 1][3]} and ${eras[i][3]} meet (${JSON.stringify(eras)})`);
+  }
+}
 
 // ---- build ----
 const outputs = new Map();
@@ -88,10 +108,11 @@ const tsv = [
 ];
 outputs.set(path.join(outDir, 'SOURCES-eras.tsv'), Buffer.from(tsv.join('\n') + '\n'));
 
-const lines = Object.keys(clubs).sort(byId).map(id => `  ${JSON.stringify(id)}: ${JSON.stringify(clubs[id])},`);
+const lines = [...erasById.keys()].sort(byId).map(id => `  ${JSON.stringify(id)}: ${JSON.stringify(erasById.get(id))},`);
 const module = `// GENERATED by scripts/sync-crest-eras.mjs from scripts/data/crest-eras.json; do not edit. Run \`npm run sync:crest-eras\`.
 //
 // Club id → the seasons whose crest is not today's: [first year, last year, crest file or null] (src/data/crests.js).
+// An id the seasons give to clubs of two countries (a namesake) has each country's eras, with that country fourth.
 export const CREST_ERAS = Object.freeze({${lines.length ? `\n${lines.join('\n')}\n` : ''}});
 `;
 outputs.set(path.join(root, 'src/data/clubCrestEras.js'), Buffer.from(module));
