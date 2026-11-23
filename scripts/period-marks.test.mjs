@@ -17,6 +17,7 @@ import { CREST_ERAS } from '../src/data/clubCrestEras.js';
 import { clubLogoFile } from '../src/data/clubLogos.js';
 import { decodeFootballSet, fieldedNations, seasonSport } from '../src/engine/footballSets.js';
 import { getSport } from '../src/sports/index.js';
+import { nonFreeLicence } from './lib/wiki-file-page.mjs';
 
 const root = new URL('../', import.meta.url);
 const read = path => readFileSync(new URL(path, root), 'utf8');
@@ -159,6 +160,12 @@ test('every crest era is in order and names a crest file the game ships, or none
   const sources = read('public/club-logos/SOURCES-eras.tsv').split('\n').filter(line => line && !line.startsWith('#')).slice(1);
   const periodFiles = [...files].filter(name => /\.\d{4}$/.test(name));
   assert.deepEqual(sources.map(line => line.split('\t')[0]).sort(), periodFiles.map(name => `${name}.webp`).sort(), 'a source row for each period crest');
+  // A licence that names a non-free template (Lithuanian Wikipedia's "Sąžiningo naudojimo", "Fair use (as its file page
+  // stated, archived 2016...)") says the crest is non-free, as the others do.
+  for (const line of sources) {
+    const [image, , , , licence] = line.split('\t');
+    if (nonFreeLicence(licence.replace(/ \(.*$/, ''))) assert.match(licence, /\(non-free, /, `${image}: ${licence}`);
+  }
 });
 
 test('a club wears today\'s crest in a season of today and outside its eras, its period crest or monogram within them', () => {
