@@ -3104,7 +3104,13 @@ crests above kept hash pastels until the colours were read again the next day.
 
 Crests are the clubs' trademarks, and most are non-free files that Wikipedia
 hosts under its non-free content policy. `public/club-logos/SOURCES.tsv` records
-each club's file, its licence as Wikipedia records it, and its file page.
+each club's file, its licence as Wikipedia records it, and its file page. A file is
+non-free when its licence template marks it so, or when its licence's name does
+(`scripts/lib/wiki-file-page.mjs`): several Wikipedias' fair-use templates carry no
+marker (Lithuanian, Hebrew, Ukrainian, Greek, Portuguese...), nor do the logo
+templates of Italian ("Marchio") and French ("marque déposée") Wikipedia, so 118 rows
+said "no" for non-free files until 23 November 2026. A period crest from such a file
+says "(non-free, as the file page states)" in `SOURCES-eras.tsv`, as the others do.
 `src/data/clubLogos.js` lists which clubs have a crest, so the game never
 requests a missing file.
 

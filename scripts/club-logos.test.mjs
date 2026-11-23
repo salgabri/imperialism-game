@@ -21,6 +21,7 @@ import { CLUBS as CFB_CLUBS } from '../src/data/clubs.college-football.js';
 import { CLUBS as RUGBY_UNION_CLUBS } from '../src/data/clubs.rugby-union.js';
 import { DOMESTIC } from '../src/data/domestic.js';
 import { withDom } from './lib/app-harness.mjs';
+import { nonFreeLicence } from './lib/wiki-file-page.mjs';
 
 const root = new URL('../', import.meta.url);
 const compiled = await build({
@@ -74,6 +75,10 @@ test('every club the list gives a crest has its file, a source row, and nothing 
     // ملف:, percent-encoded as the page gives it).
     const page = /^https:\/\/(?:[a-z]{2,3}\.wikipedia|commons\.wikimedia)\.org\/wiki\/([^:/]+):/.exec(row[6]);
     assert.ok(page && FILE_NAMESPACES.has(decodeURIComponent(page[1]).replace(/_/g, ' ')), `${id}: links its file page (${row[6]})`);
+    assert.match(row[5], /^(?:yes|no)$/, `${id}: non-free is yes or no`);
+    // A licence whose name says the file is not free (Lithuanian Wikipedia's "Sąžiningo naudojimo", Italian Wikipedia's
+    // "Marchio"...) makes it non-free, though its template carries no licensetpl_nonfree marker.
+    if (nonFreeLicence(row[4])) assert.equal(row[5], 'yes', `${id}: ${row[4]} is a non-free licence`);
   }
 });
 
