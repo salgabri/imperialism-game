@@ -529,8 +529,8 @@ club moved to another city under a new identity still keeps the monogram (FC Caf
 AFC Eskilstuna).
 
 What is left. Outside football, only the caricatures and the Saint Petersburg Lions of
-2000/01, whose logo no source shows. In football, 765 clubs, 1,500 of the 55,214 club
-appearances (2.7%; 887 and 1,755 before the third pass): 281 clubs of today's country maps
+2000/01, whose logo no source shows. In football, 765 clubs, 1,500 of the 60,050 club
+appearances (2.5%; 887 clubs and 1,755 appearances before the third pass): 281 clubs of today's country maps
 (China's, Uzbekistan's, Laos's and South Africa's lower divisions and the like; 53 of the 128
 maps are complete, from 36) and 484 of the earlier seasons' maps (Italy's of 1999/2000 keeps
 two of its eleven), mostly lower-division and gone clubs whose article has no crest

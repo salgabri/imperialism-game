@@ -3072,7 +3072,7 @@ but the retired caricatures and the Saint Petersburg Lions. A third pass that ev
 first passes had missed (30 on Lithuanian Wikipedia, whose "Vaizdas:" file links they did
 not know), the Wayback Machine's copies of the clubs' articles gave the crests whose files
 were lost since (53), and a second look, with more of the article, at the matches left
-undecided settled 27. That left 2.7% (765 clubs, mostly lower divisions whose articles show
+undecided settled 27. That left 2.5% (765 clubs, mostly lower divisions whose articles show
 no crest or another club's). `scripts/club-crests.test.mjs` checks it all. The worker's
 image cache now holds 10,000 files, for the 7,700 flags and crests.
 
