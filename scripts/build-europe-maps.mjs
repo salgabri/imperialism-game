@@ -59,8 +59,9 @@ import { checkLevels, COUNTRIES, naturalEarthGroups, nestLevels, ONS_DISTRICTS, 
 import { createBoundarySource, GB_CITATION, NE_URL, ONS_LAD_LICENSE, ONS_LAD_SOURCE, ONS_LAD_URL } from './lib/domestic-boundaries.mjs';
 import { colourSections, contentHash, serialize } from './lib/domestic-output.mjs';
 import {
-  arcPoints, bboxOf, centroidOf, dissolve, EARTH_KM, facingKm, facingSections, interiorPoint, kmBetween, kmToPolys, nodeRings, OVERSEAS_KM,
-  partitionCountry, pointInPolys, polyAreaKm2, polysAreaKm2, polysOf, quantize, sectionTopology, simplifyTopology, splitOnLand,
+  arcPoints, bboxOf, centroidOf, dissolve, EARTH_KM, facingKm, facingSections, GROUND_SLACK_KM, groundProblem, interiorPoint, kmBetween, kmToPolys,
+  nodeRings, OVERSEAS_KM, partitionCountry, pointInPolys, polyAreaKm2, polysAreaKm2, polysOf, quantize, SAME_GROUND_KM, sectionTopology,
+  SHARED_SLACK_KM, simplifyTopology, splitOnLand, withinKmOf,
 } from './lib/domestic-partition.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -106,11 +107,14 @@ const SPECK_EDGE_KM = 0.005;
 // Land farther than this outside a country's world outline is below its 1:50m detail (Porto Santo): no club can hold it there.
 const OUTLINE_KM = 5;
 // The land a club needs, per the partition's fair rules: this share of the country's land per club, and about 35 km
-// across (6 px at the Europe map's opening fit). A club that cannot find it around its ground starts next door: Galatasaray
-// across the Bosphorus, as Thrace is a thirtieth of Turkey. Asking for less leaves such clubs slivers; for more, far from home.
+// across (6 px at the Europe map's opening fit). Since 2026-11-21 every club starts at its ground, so one that cannot find
+// it there is fanned with its city and keeps what its crowd leaves it (until then it started next door: Galatasaray
+// across the Bosphorus, as Thrace is a thirtieth of Turkey).
 const MIN_SHARE = 0.1;
 const MIN_CLUB_KM2 = 1200;
 const POINT_TARGET = 16000;
+// Vertices this near a ground stay as the map is simplified, so no border near one moves across it.
+const GROUND_KEEP_KM = 1;
 const MAX_BYTES = 250000;
 // Country splits remembered for the next maps (the least recently used goes first).
 const SPLITS_KEPT = 40;
@@ -305,9 +309,9 @@ async function loadCountry(source, shapeId, outline, log) {
  * whichever neighbour takes it, unless it is larger than a club's share; a region with two or more clubs is split one
  * level down between them, and only they may take its land. The same holds at every level below, down to the communes
  * (COUNTRIES): a province with one club goes whole to it, a commune with two is the one place a club's land is cut
- * between them (the partition's crowd cut). A region with one club is its start, and should that club start next door
- * (boxed in by its city), the region goes to one of its parent's clubs like a region with none. A city-state is too small
- * for its clubs and is first joined to its largest neighbouring region, whose land its clubs then share.
+ * between them (the partition's crowd cut). A region with one club is that club's start (every club starts on its
+ * ground). A city-state is too small for its clubs and is first joined to its largest neighbouring region, whose land its
+ * clubs then share.
  */
 function regionalUnits(country, homes) {
   const { units, adjacency, tree, pathOf } = country;
@@ -408,12 +412,12 @@ function splitCountry(country, shape, clubs, log) {
   }));
   const total = rawUnits.reduce((sum, unit) => sum + polysAreaKm2(unit.polys), 0);
   // Fans of whole units: a city's clubs each get a way out along the communes around it, and only a commune two of them
-  // share is cut. A club boxed in by its city starts next door, on its region's land.
-  const { units, topo, owner, shift, dropped, fans, movedStarts } = partitionCountry(rawUnits, homes, {
+  // share is cut. Every club starts on its own ground, however crowded its city.
+  const { units, topo, owner, shift, dropped, fans } = partitionCountry(rawUnits, homes, {
     sections: clubs.length, maxGapKm: MAX_GAP_KM, allowed: (club, unit) => !unit.zone || unit.zone.has(club),
     fair: { minKm2: Math.max(MIN_CLUB_KM2, MIN_SHARE * total / clubs.length) }, fan: 'units',
   });
-  if (fans.length || movedStarts.length) log(`    ${shape.name}: fanned ${fans.map(fan => fan.members.map(c => clubs[c].name).join(' + ')).join('; ') || 'none'}; moved ${movedStarts.map(c => clubs[c].name).join(', ') || 'none'}`);
+  if (fans.length) log(`    ${shape.name}: fanned ${fans.map(fan => fan.members.map(c => clubs[c].name).join(' + ')).join('; ')}`);
   if (shift) throw new Error(`${shape.name} crosses the antimeridian`);
   if (dropped.length) log(`    ${shape.name}: dropped overseas ${dropped.join(', ')}`);
   const strays = units.filter((unit, u) => unit.zone && !unit.zone.has(owner[u]));
@@ -426,7 +430,7 @@ function splitCountry(country, shape, clubs, log) {
     if (Math.abs(got - want) > Math.max(5, 0.002 * want)) throw new Error(`${shape.name}: ${club.name}'s units hold ${Math.round(want)} km², merged ${Math.round(got)} km²`);
   });
   const all = polysOf(feature(topo, mergeArcs(topo, topo.objects.units.geometries)).geometry);
-  const land = fitToOutline(territories, all, shape.polys, shape.name, country.outside, country.outside ? homes : null);
+  const land = fitToOutline(territories, all, shape.polys, shape.name, country.outside, homes);
   absorbSpecks(land, homes);
   return { land, unitCounts: clubs.map((_, c) => owner.filter(o => o === c).length) };
 }
@@ -511,7 +515,7 @@ function speckMoves(land, homes) {
     const sizes = list.map(group => group.reduce((sum, k) => sum + areas[k], 0));
     const largest = sizes.indexOf(Math.max(...sizes));
     // The group nearest the club's ground stays, holding it or not: a ground can stand just outside its parish where the
-    // outline moved the shore (Belenenses' Restelo), and a club boxed in by its city starts next door.
+    // outline moved the shore (Belenenses' Restelo).
     let home = -1, homeKm = Infinity;
     if (homes[c]) {
       list.forEach((group, g) => {
@@ -660,7 +664,15 @@ async function buildMap({ source, spec, countries, splits, log }) {
   nodeRings(pieces);
   const fitted = topology({ pieces: { type: 'FeatureCollection', features: pieces.map((piece, k) => ({ type: 'Feature', id: k, properties: {}, geometry: multi(piece.polys) })) } });
   const pieceGeoms = fitted.objects.pieces.geometries;
-  const sectionGeoms = clubs.map((_, c) => feature(fitted, mergeArcs(fitted, pieceGeoms.filter((_, k) => pieces[k].club === c))).geometry);
+  // A merge that loses land (pieces meeting at a point, rings wound against each other: Coventry City's ten pieces on the
+  // Top 124 of 1998/99, about Gloucestershire and Northamptonshire since it starts at its ground, merged to −889 km²) takes
+  // the union of the club's pieces instead, as dissolve does.
+  const sectionGeoms = clubs.map((_, c) => {
+    const merged = feature(fitted, mergeArcs(fitted, pieceGeoms.filter((_, k) => pieces[k].club === c))).geometry;
+    const want = polysAreaKm2(land[c]);
+    if (Math.abs(polysAreaKm2(polysOf(merged)) - want) <= Math.max(5, 0.002 * want)) return merged;
+    return { type: 'MultiPolygon', coordinates: polygonClipping.union(...pieces.filter(piece => piece.club === c).map(piece => piece.polys)) };
+  });
 
   const ids = clubs.map((_, i) => `${mapId}-${String(i + 1).padStart(3, '0')}`);
   const names = landNames(clubs);
@@ -681,24 +693,42 @@ async function buildMap({ source, spec, countries, splits, log }) {
   };
   const rows = clubs.map((club, i) => ({ id: club.id, ...(seasons ? { name: club.name } : {}), col: '', section: ids[i], home: club.home, shape: club.shape }));
 
-  let target = POINT_TARGET, doc, text, qtopo;
-  for (;;) {
-    qtopo = quantize(simplifyTopology(filtered.topo, target, p => outlineVertices.has(`${p[0]},${p[1]}`)), 1e5);
-    delete qtopo.bbox;
-    const geoms = qtopo.objects.sections.geometries;
-    const sectionPolys = geoms.map(g => polysOf(feature(qtopo, g).geometry));
-    // Neighbouring clubs differ in colour, across a border or across water.
-    const across = facingSections(sectionPolys, facingKm(focus));
-    const clubAdj = clubs.map(() => new Set());
-    neighbors(geoms).forEach((list, p) => { for (const j of [...list, ...across[p]]) if (j !== p) clubAdj[p].add(j); });
-    const colours = colourSections(clubAdj.map(s => [...s].sort((a, b) => a - b)));
-    rows.forEach((row, i) => { row.col = colours[i]; });
-    doc = { ...meta, topology: qtopo, clubs: rows };
-    doc.version = `${mapId}-${contentHash(doc)}`;
-    text = serialize(doc);
-    if (Buffer.byteLength(text) <= MAX_BYTES || target < 6000) break;
-    target = Math.floor(target * 0.85);
+  // And the vertices about each ground, so no border near one moves across it as the map is simplified; where one still
+  // does, those about that ground as far again, and wider each round, and the map is simplified again.
+  const nearGround = withinKmOf(clubs.map(club => club.home).filter(Boolean), GROUND_KEEP_KM);
+  const guarded = new Map();
+  let target = POINT_TARGET, doc, text, qtopo, astray;
+  for (let round = 0; ; round++) {
+    const rings = [...guarded].map(([i, km]) => [clubs[i].home, km]);
+    const guard = p => rings.some(([g, km]) => Math.abs(p[1] - g[1]) * 111.2 <= km && kmBetween(p, g) <= km);
+    for (;;) {
+      qtopo = quantize(simplifyTopology(filtered.topo, target, p => outlineVertices.has(`${p[0]},${p[1]}`) || nearGround(p) || guard(p)), 1e5);
+      delete qtopo.bbox;
+      const geoms = qtopo.objects.sections.geometries;
+      const sectionPolys = geoms.map(g => polysOf(feature(qtopo, g).geometry));
+      // Neighbouring clubs differ in colour, across a border or across water.
+      const across = facingSections(sectionPolys, facingKm(focus));
+      const clubAdj = clubs.map(() => new Set());
+      neighbors(geoms).forEach((list, p) => { for (const j of [...list, ...across[p]]) if (j !== p) clubAdj[p].add(j); });
+      const colours = colourSections(clubAdj.map(s => [...s].sort((a, b) => a - b)));
+      rows.forEach((row, i) => { row.col = colours[i]; });
+      doc = { ...meta, topology: qtopo, clubs: rows };
+      doc.version = `${mapId}-${contentHash(doc)}`;
+      text = serialize(doc);
+      if (Buffer.byteLength(text) <= MAX_BYTES || target < 6000) break;
+      target = Math.floor(target * 0.85);
+    }
+    // Every club's land holds its ground.
+    const lands = qtopo.objects.sections.geometries.map(g => { const polys = polysOf(feature(qtopo, g).geometry); return { polys, box: bboxOf(polys) }; });
+    astray = clubs.map((club, i) => {
+      const sharing = clubs.some((other, j) => j !== i && kmBetween(other.home, club.home) <= SAME_GROUND_KM);
+      const problem = groundProblem(club.home, i, lands, sharing ? SHARED_SLACK_KM : GROUND_SLACK_KM);
+      return problem && { i, text: `${club.name} ${fixed(problem.km, 2)} km out, by ${clubs[problem.holder].name}'s land` };
+    }).filter(Boolean);
+    if (!astray.length || round === 5) break;
+    for (const { i } of astray) guarded.set(i, (guarded.get(i) ?? GROUND_KEEP_KM) * 2.5);
   }
+  if (astray.length) throw new Error(`${mapId}: grounds outside their club's land: ${astray.map(a => a.text).join('; ')}`);
 
   // Verify with the game's own loader.
   const decoded = decodeDomestic(JSON.parse(text), mapId);
@@ -710,9 +740,6 @@ async function buildMap({ source, spec, countries, splits, log }) {
   if (Math.abs(areaDiff) > 0.02) throw new Error(`${mapId}: section area ${Math.round(totalArea)} km² differs from the outlines' ${Math.round(sourceAreaKm2)} km² by ${(areaDiff * 100).toFixed(2)}%`);
   const landSplit = splitOnLand(geoms, ids.map((_, i) => i)).map(c => clubs[c].name);
   if (landSplit.length) log(`  split on land: ${landSplit.join(', ')}`);
-  const km = clubs.map((club, i) => kmToPolys(club.home, sectionPolys[i]));
-  const far = clubs.filter((_, i) => km[i] > 5).map(club => `${club.name} ${fixed(km[clubs.indexOf(club)])} km`);
-  if (far.length) log(`  grounds outside their land: ${far.join(', ')}`);
   log(`  ${n} clubs in ${hosts.length} countries, ${arcPoints(qtopo)} arc points, ${(Buffer.byteLength(text) / 1024).toFixed(1)} KB, ${Object.keys(decoded.sectionNames).length} sections decode`);
   for (const [shapeId, members] of byCountry) {
     const list = members.map(i => `${names[i]} ${Math.round(areas[i] / 1000)}k`).join(', ');

@@ -292,14 +292,35 @@ function solve(own, adj, rank, teams, managedId, start = null) {
   const isClub = new Set(clubs);
   const flagNear = id => [...near(id)].filter(other => isClub.has(other));
   const flags = separate(clubs, flagNear, id => startingWith(start?.flags.get(id), flagChoices(teams[id].col)), flagGap, FLAGS_CLOSE);
-  return { political, flags };
+  return { political, flags, neighbours };
 }
 
-// The fills chosen (id → fill). The dark theme then paints each political fill with the twin it was measured with.
-const fills = choices => new Map([...choices].map(([id, choice]) => {
-  if (choice.twin) paintTwin(choice.fill, choice.twin);
-  return [id, choice.fill];
-}));
+// The fills chosen (id → fill). The dark theme then paints each political fill with the twin it was measured with. One
+// light fill paints one twin, so where empires wear one light fill from different colours (`neighbours` given: the
+// political map), the twin of the last to choose it unless that leaves one of them nearer than CLOSE to a neighbour in
+// the dark theme, then the first of the others' twins that does not (Cartaginés's light fill, worn by San Carlos too, on
+// Costa Rica's maps of 2009/10 and 2010/11: San Carlos's twin had painted it 0.063 from bordering Goicoechea).
+const fills = (choices, neighbours = null) => {
+  const twinOf = new Map();
+  for (const [, choice] of choices) if (choice.twin) twinOf.set(choice.fill, choice.twin);
+  if (neighbours) {
+    const holders = new Map();
+    for (const [id, choice] of choices) if (choice.twin) (holders.get(choice.fill) ?? holders.set(choice.fill, []).get(choice.fill)).push(id);
+    for (const [fill, ids] of holders) {
+      const twins = [...new Set(ids.map(id => choices.get(id).twin).reverse())];
+      if (twins.length < 2) continue;
+      const clear = twin => ids.every(id => [...(neighbours.get(id) || [])].every(other => {
+        const near = choices.get(other);
+        // A pair already alike in the light theme no twin mends; else the dark theme must keep them apart too.
+        return !near || distance(lab(fill, L_WEIGHT), lab(near.fill, L_WEIGHT)) < CLOSE
+          || distance(lab(twin, L_WEIGHT), lab(twinOf.get(near.fill) ?? near.twin ?? near.fill, L_WEIGHT)) >= CLOSE;
+      }));
+      twinOf.set(fill, twins.find(clear) ?? twins[0]);
+    }
+  }
+  for (const [fill, twin] of twinOf) paintTwin(fill, twin);
+  return new Map([...choices].map(([id, choice]) => [id, choice.fill]));
+};
 // Kick-off solutions, per starting board and managed empire.
 const kickoffs = new WeakMap();
 function kickoff(home, adj, areaOf, ranks, teams, managedId) {
@@ -316,7 +337,7 @@ function kickoff(home, adj, areaOf, ranks, teams, managedId) {
   const rank = new Map([...area.keys()].sort((a, b) => at(a) - at(b) || area.get(b) - area.get(a) || (a < b ? -1 : a > b ? 1 : 0))
     .map((id, i) => [id, i]));
   const choices = solve(home, adj, rank, teams, managedId);
-  const start = { adj, ranks, rank, ...choices, palette: { political: fills(choices.political), flags: fills(choices.flags) } };
+  const start = { adj, ranks, rank, ...choices, palette: { political: fills(choices.political, choices.neighbours), flags: fills(choices.flags) } };
   byManaged.set(managedId, start);
   return start;
 }
@@ -353,6 +374,6 @@ export function empirePalette({ own, adj, home = own, areaOf = () => 1, ranks = 
   const start = kickoff(home || own, adj, areaOf, ranks, teams, managedId ?? null);
   if (own === (home || own)) return start.palette;
   const choices = solve(own, adj, start.rank, teams, managedId ?? null, start);
-  return { political: fills(choices.political), flags: fills(choices.flags) };
+  return { political: fills(choices.political, choices.neighbours), flags: fills(choices.flags) };
 }
 

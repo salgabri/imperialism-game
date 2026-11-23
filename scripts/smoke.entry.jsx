@@ -234,11 +234,11 @@ const monogramOf = team => (team?.kind === 'club' && !crestOf(team) ? team.code 
 const flies = team => !!(FLAG_CODES[team?.flagId] || crestOf(team) || monogramOf(team));
 
 /** A club crest banner: the club colour across the region and at most one undistorted crest inside it. */
-function crestAssetsMatch(banner, team) {
+function crestAssetsMatch(banner, team, colour = team?.col) {
   const crest = crestOf(team);
   const shape = bannerShape(banner);
   if (!shape || !crest || banner.dataset.flagSource !== crest || banner.dataset.flagLayout !== 'crest'
-    || shape.fallback.getAttribute('fill') !== team.col || shape.images.length > 1) return false;
+    || shape.fallback.getAttribute('fill') !== colour || shape.images.length > 1) return false;
   if (!shape.images.length) return true;
   const [px, py, pw, ph] = shape.region;
   const [x, y, w, h] = numericBox(shape.images[0]);
@@ -251,14 +251,14 @@ function crestAssetsMatch(banner, team) {
  * A club monogram banner (a club with no crest): the club colour across the region and, where there is room, one 4:3
  * chip inside it carrying the club's code, painted by the stylesheet (no artwork, no stroke or fill of its own).
  */
-function monogramAssetsMatch(banner, team) {
+function monogramAssetsMatch(banner, team, colour = team?.col) {
   const code = monogramOf(team);
   if (!code || !banner || banner.localName !== 'g' || banner.hasAttribute('viewBox') || banner.hasAttribute('transform')
     || banner.getAttribute('pointer-events') !== 'none' || banner.dataset.flagLayout !== 'monogram'
     || banner.hasAttribute('data-flag-source')
     || banner.querySelector('image, [stroke], [transform], [style*="transform"], [tabindex], a, use, foreignObject')) return false;
   const [fallback, chip, ...rest] = banner.children;
-  if (fallback?.localName !== 'rect' || fallback.getAttribute('fill') !== team.col || rest.length) return false;
+  if (fallback?.localName !== 'rect' || fallback.getAttribute('fill') !== colour || rest.length) return false;
   if (!chip) return true;
   const rect = chip.querySelector('rect'), text = chip.querySelector('text');
   if (chip.localName !== 'g' || chip.getAttribute('class') !== 'fi-map-monogram' || chip.dataset.flagMonogram !== code
@@ -271,8 +271,15 @@ function monogramAssetsMatch(banner, team) {
 }
 
 /** The right banner for a region's owner: its crest for a club with one, its monogram for one without, else its flag. */
-const ownerAssetsMatch = (banner, team) => (crestOf(team) ? crestAssetsMatch(banner, team)
-  : monogramOf(team) ? monogramAssetsMatch(banner, team) : flagAssetsMatch(banner, FLAG_CODES[team?.flagId]));
+/**
+ * The colour a club flies on the campaign map's Flags banners: the one the map's palette gives it (src/engine/mapPalette.js),
+ * its own unless a bordering club looks alike, as the map's banners take it (mapMethods.jsx campaignMarks); setup flies
+ * its own.
+ */
+const flagColour = (app, team) => ((app.state.phase === 'playing' || app.state.phase === 'victory') && team?.col
+  && app.mapPalette(app.state)?.flags.get(team.id)) || team?.col;
+const ownerAssetsMatch = (banner, team, colour = team?.col) => (crestOf(team) ? crestAssetsMatch(banner, team, colour)
+  : monogramOf(team) ? monogramAssetsMatch(banner, team, colour) : flagAssetsMatch(banner, FLAG_CODES[team?.flagId]));
 
 /**
  * Who the map paints a country for: its holder, else the team that claimed it (a world map's nation with no team,
@@ -287,7 +294,7 @@ function bannerPartsMatch(app, path, owner) {
     && JSON.stringify(filledRings(path.getAttribute('d'))) === JSON.stringify(filledRings(parts.map(shapeD).join('')))
     && parts.every(part => {
       const banner = flagBanner(part);
-      return banner?.id === `fi-flag-${part.dataset.flagComponent}` && ownerAssetsMatch(banner, owner);
+      return banner?.id === `fi-flag-${part.dataset.flagComponent}` && ownerAssetsMatch(banner, owner, flagColour(app, owner));
     });
 }
 
@@ -371,7 +378,7 @@ function empireFlagsSnapshot(app) {
     if (!banner) { localBounds = false; coversEveryPolygon = false; correctOwner = false; continue; }
     correctOwner &&= componentParts.every(part => {
       const ownerId = holderOf(app, part.dataset.flagCountry);
-      return banner.dataset.owner === ownerId && ownerAssetsMatch(banner, app.state.teams[ownerId]);
+      return banner.dataset.owner === ownerId && ownerAssetsMatch(banner, app.state.teams[ownerId], flagColour(app, app.state.teams[ownerId]));
     });
     const bounds = bannerBounds(banner);
     const points = componentParts.flatMap(pathPoints);
@@ -398,7 +405,7 @@ function empireFlagsSnapshot(app) {
     unpaintedOwnersHaveNoFillArea: unpaintedOwners.every(id => countryPaths()
       .filter(path => app.state.own[path.dataset.country] === id).every(path => filledRings(path.getAttribute('d')).length === 0)),
     onePatternPerComponent: patterns.length === groups.size && new Set(patterns.map(pattern => pattern.id)).size === groups.size,
-    oneBannerPerPattern: patterns.every(pattern => ownerAssetsMatch(pattern, app.state.teams[pattern.dataset.owner])),
+    oneBannerPerPattern: patterns.every(pattern => ownerAssetsMatch(pattern, app.state.teams[pattern.dataset.owner], flagColour(app, app.state.teams[pattern.dataset.owner]))),
     sharedReferences, localBounds, coversEveryPolygon, correctOwner, exactCountryCoverage,
     signature: JSON.stringify(patterns.map(banner => ({ id: banner.id, bounds: bannerBounds(banner), source: banner.dataset.flagSource,
       layers: [...banner.querySelectorAll('image')].map(image => ({ url: image.getAttribute('href'), bounds: boxOf(image), fit: image.getAttribute('preserveAspectRatio') }))
@@ -506,7 +513,7 @@ function regionalFlagsSnapshot(app) {
     const owner = app.state.teams[holderOf(app, path.dataset.country)];
     const parts = countryFlagParts(path.dataset.country);
     if (filledRings(path.getAttribute('d')).length === 0) return parts.length === 0;
-    return parts.length > 0 && parts.every(part => ownerAssetsMatch(flagBanner(part), owner));
+    return parts.length > 0 && parts.every(part => ownerAssetsMatch(flagBanner(part), owner, flagColour(app, owner)));
   };
   const neutralMatches = path => !path.getAttribute('fill').startsWith('url(')
     && countryFlagParts(path.dataset.country).length === 0;
@@ -2310,7 +2317,7 @@ export async function run(scenario) {
     await until('flag map selected', () => app.state.mapMode === 'flags');
     const heldPaths = countryPaths().filter(path => path.dataset.owner);
     const patterns = [...new Set(countryFlagParts().map(flagBanner).filter(Boolean))];
-    const championFlag = patterns.filter(pattern => ownerAssetsMatch(pattern, champion));
+    const championFlag = patterns.filter(pattern => ownerAssetsMatch(pattern, champion, flagColour(app, champion)));
     const flagFills = heldPaths.filter(path => countryFlagParts(path.dataset.country).length > 0).length;
     const paintableTerritories = heldPaths.filter(path => filledRings(path.getAttribute('d')).length > 0).length;
     const uniqueHeldPatterns = new Set(patterns.map(pattern => pattern.id)).size;

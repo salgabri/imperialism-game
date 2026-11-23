@@ -10,8 +10,8 @@ import { decodeDomestic, DOMESTIC_FORMAT, DOMESTIC_SECTIONS } from '../../src/en
 import { colourSections, contentHash, serialize } from './domestic-output.mjs';
 import { createNamer, sameName } from './domestic-boundaries.mjs';
 import {
-  arcPoints, baseId, bboxOf, components, dissolve, facingKm, facingSections, kmBetween, kmToPolys, partitionCountry, pointInPolys, polysAreaKm2,
-  quantileOf, quantize, sectionTopology, simplifyTopology, splitOnLand,
+  arcPoints, baseId, bboxOf, components, dissolve, facingKm, facingSections, GROUND_SLACK_KM, groundProblem, holeUnits, kmBetween, kmToPolys, nearPoints, partitionCountry,
+  pointInPolys, polysAreaKm2, quantileOf, quantize, SAME_GROUND_KM, sectionTopology, SHARED_SLACK_KM, simplifyTopology, splitOnLand,
 } from './domestic-partition.mjs';
 import { DATABASE_DATE } from './domestic-sync.mjs';
 
@@ -28,6 +28,23 @@ const POINT_TARGET = 14000; // arc points per country; lowered when the file wou
 // club crowded into a city with less is fanned out or starts at a town nearby), and land then passes from clubs big
 // for their share to their neighbours, towards targets 30% of the way from equal land to each club's nearest-start land.
 const BALANCE = { room: 0.25, beta: 0.3 };
+// A ground a simplified border crosses keeps the vertices this near it (km), 2.5 times as far each round after, for up
+// to GUARD_ROUNDS rounds (build).
+const GUARD_KM = 2.5;
+const GUARD_ROUNDS = 5;
+/** Whether a point lies within its km of any of `rings` ([point, km]): the vertices kept about grounds. */
+const guardOf = rings => (rings.length ? p => rings.some(([g, km]) => Math.abs(p[1] - g[1]) * 111.2 <= km && kmBetween(p, g) <= km) : () => false);
+// The most clubs that keep one home point between them (Banjul's seven).
+const MAX_SHARED_HOME = 7;
+/** Whether a decoded section's routing anchor lies inside the land it paints (even-odd, as the game's tests check it). */
+function insidePainted(p) {
+  let hit = false;
+  for (const ring of p.labelRings) for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i], [xj, yj] = ring[j];
+    if (yi > p.cy !== yj > p.cy && p.cx < ((xj - xi) * (p.cy - yi)) / (yj - yi) + xi) hit = !hit;
+  }
+  return hit;
+}
 // Fewer cities1000 places than this many per extra section count as sparse.
 const SPARSE_PLACES = 3;
 // GeoNames populated places that are places today (not sections of one, abandoned, historical or destroyed).
@@ -210,9 +227,13 @@ export async function buildCountry(id, snapshot, source, season = null) {
   // GeoNames places: names for broken unit names, and homes for clubs without one.
   const { country: a2, admin1 } = snapshot.nation.geonames || {};
   const cities = a2 ? await source.places(a2) : [];
+  // A city the layer leaves out, a hole its units ring round (Bishkek), joins as a unit named after it.
+  const holes = holeUnits(picked.units, cities).map(({ town, ...unit }) => ({ ...unit, name: town.name }));
+  if (holes.length) log(`  filled holes holding a town: ${holes.map(u => u.name).join(', ')}`);
+  const sourceList = [...picked.units, ...holes];
   const regionAt = await source.regions(picked.iso3, a2);
-  let namer = createNamer(picked.units, { iso3: picked.iso3, a2, places: cities, regionAt });
-  if (namer.garbled && a2) namer = createNamer(picked.units, { iso3: picked.iso3, a2, places: await source.places(a2, { full: true }), regionAt });
+  let namer = createNamer(sourceList, { iso3: picked.iso3, a2, places: cities, regionAt });
+  if (namer.garbled && a2) namer = createNamer(sourceList, { iso3: picked.iso3, a2, places: await source.places(a2, { full: true }), regionAt });
 
   // Places for the sections no club starts on: cities1000, or where it is sparse the
   // country file's populated places too (villages, mostly without a population).
@@ -233,11 +254,16 @@ export async function buildCountry(id, snapshot, source, season = null) {
     if (full) extraPlaces = [...extraPlaces, ...inScope(full).filter(p => VILLAGE_CODES.test(p.code) && !known.has(p.id))];
   }
   extraPlaces = extraPlaces.filter(p => readable(namer.place(p)));
+  // A home point the sources give more than MAX_SHARED_HOME clubs is no club's ground (fifteen Xiamen clubs of 2008/09
+  // on the city's one point): the weakest beyond that many are placed as clubs without a home.
   const rawHomes = clubs.map(c => (c.location ? [c.location.lon, c.location.lat] : null));
+  rawHomes.forEach((h, i) => {
+    if (h && rawHomes.slice(0, i).filter(o => o && kmBetween(o, h) <= SAME_GROUND_KM).length >= MAX_SHARED_HOME) rawHomes[i] = null;
+  });
   const {
-    shift, units, adjacency, topo: unitTopo, homes, homeOf, located, placed, extras, moved, fans, movedStarts, dropped, splits, sourceUnits, sourceAreaKm2,
-    maxGapKm, owner: seedOf, seedUnit, seedPoint,
-  } = partitionCountry(picked.units, rawHomes, { places: inScope(cities), extraPlaces, sections: S, log, balance: BALANCE });
+    shift, units, adjacency, topo: unitTopo, homes, homeOf, located, placed, extras, moved, fans, dropped, splits, sourceUnits, sourceAreaKm2,
+    maxGapKm, owner: seedOf, seedUnit, seedPoint, junctions,
+  } = partitionCountry(sourceList, rawHomes, { places: inScope(cities), extraPlaces, sections: S, log, balance: BALANCE });
   const isLocated = i => Boolean(homeOf[i] && !placed[i]);
 
   // Club groups: seed k < n is club k's home section, an extra seed's section joins the
@@ -297,10 +323,10 @@ export async function buildCountry(id, snapshot, source, season = null) {
     const best = named.reduce((a, p) => (!a || kmBetween(q, [p.lon, p.lat]) < kmBetween(q, [a.lon, a.lat]) ? p : a), null);
     return best && namer.place(best);
   };
-  const seedNames = sectionNames({ units, seedUnit, homeOf, placed, extras, towns, nearestTown, sourceUnits: picked.units, namer, regionAt });
+  const seedNames = sectionNames({ units, seedUnit, homeOf, placed, extras, towns, nearestTown, sourceUnits: sourceList, namer, regionAt });
   const names = order.map(k => seedNames[k]);
   const unitCounts = order.map((_, p) => owner.filter(o => o === p).length);
-  const sectionGeoms = dissolve(unitTopo, owner, S);
+  const sectionGeoms = dissolve(unitTopo, owner, S, units);
   const groupOf = clubs.map((_, c) => order.map((k, p) => p).filter(p => clubAt[p] === c));
 
   // Islets below ~4 px² at the opening fit are noise; a club's home islet (or the place
@@ -321,7 +347,7 @@ export async function buildCountry(id, snapshot, source, season = null) {
     version: '',
     projection,
     focus: null,
-    boundaries: { ...picked.boundaries, units: sourceUnits, areaKm2: Math.round(sourceAreaKm2) },
+    boundaries: { ...picked.boundaries, ...(holes.length ? { holes: holes.map(u => u.name) } : {}), units: sourceUnits, areaKm2: Math.round(sourceAreaKm2) },
     source: season ? season.source : {
       provider: 'EFEM.club', game: 'Football Manager 26', edition: 'FM 26', version: snapshot.source.version,
       snapshotDate: DATABASE_DATE, rawScale: 100, conversion: FM_CONVERSION, origin: FM_ORIGIN,
@@ -345,25 +371,42 @@ export async function buildCountry(id, snapshot, source, season = null) {
   // An earlier season's map has a smaller budget (`season.points`): a country has a map for every season its clubs are
   // rated in, so each one's outline costs that many times over.
   let target = season?.points ?? POINT_TARGET;
-  let doc, text, qtopo;
-  for (;;) {
-    qtopo = quantize(simplifyTopology(filtered.topo, target), 1e5);
-    delete qtopo.bbox;
-    const geoms = qtopo.objects.sections.geometries;
-    meta.focus = focusBox(qtopo, units, comp, count, homeOf.slice(0, n));
-    // Neighbouring clubs' groups differ in colour, also where sections face each other
-    // across a strait or a river mouth.
-    const across = facingSections(geoms.map(g => geomPolys(qtopo, g)), facingKm(meta.focus));
-    const clubAdj = clubs.map(() => new Set());
-    neighbors(geoms).forEach((list, p) => { for (const j of [...list, ...across[p]]) if (clubAt[j] !== clubAt[p]) clubAdj[clubAt[p]].add(clubAt[j]); });
-    const colours = colourSections(clubAdj.map(s => [...s].sort((a, b) => a - b)), { crowdedFirst: true });
-    rows.forEach((row, i) => { row.col = colours[i]; });
-    doc = { ...meta, topology: qtopo, clubs: rows };
-    doc.version = `${id}-${contentHash(doc)}`;
-    text = serialize(doc);
-    if (Buffer.byteLength(text) <= MAX_BYTES || target < 4000) break;
-    target = Math.floor(target * 0.85);
+  let doc, text, qtopo, astray;
+  // Grounds stay put, so clubs sharing one still meet there. Where simplifying moves a border across a ground (FC Sochi's
+  // across Druzhba Maikop's, 7 km, on Russia's map of 2025/26), the vertices about that ground stay too, GUARD_KM and
+  // then wider, and the map is simplified again.
+  const junctionAt = nearPoints(junctions), guarded = new Map();
+  for (let round = 0; ; round++) {
+    const guard = guardOf([...guarded].map(([i, km]) => [homes[i], km]));
+    for (;;) {
+      qtopo = quantize(simplifyTopology(filtered.topo, target, p => junctionAt(p) || guard(p)), 1e5);
+      delete qtopo.bbox;
+      const geoms = qtopo.objects.sections.geometries;
+      meta.focus = focusBox(qtopo, units, comp, count, homeOf.slice(0, n));
+      // Neighbouring clubs' groups differ in colour, also where sections face each other
+      // across a strait or a river mouth.
+      const across = facingSections(geoms.map(g => geomPolys(qtopo, g)), facingKm(meta.focus));
+      const clubAdj = clubs.map(() => new Set());
+      neighbors(geoms).forEach((list, p) => { for (const j of [...list, ...across[p]]) if (clubAt[j] !== clubAt[p]) clubAdj[clubAt[p]].add(clubAt[j]); });
+      const colours = colourSections(clubAdj.map(s => [...s].sort((a, b) => a - b)), { crowdedFirst: true });
+      rows.forEach((row, i) => { row.col = colours[i]; });
+      doc = { ...meta, topology: qtopo, clubs: rows };
+      doc.version = `${id}-${contentHash(doc)}`;
+      text = serialize(doc);
+      if (Buffer.byteLength(text) <= MAX_BYTES || target < 4000) break;
+      target = Math.floor(target * 0.85);
+    }
+    // Every club's land holds its ground (or, for a club placed without one, the place it starts at).
+    const lands = groupOf.map(list => { const polys = list.flatMap(p => geomPolys(qtopo, qtopo.objects.sections.geometries[p])); return { polys, box: bboxOf(polys) }; });
+    astray = clubs.map((c, i) => {
+      const sharing = homes.some((h, j) => j !== i && h && homes[i] && kmBetween(h, homes[i]) <= SAME_GROUND_KM);
+      const problem = (placed[i] || located[i].unit != null) && groundProblem(homes[i], i, lands, sharing ? SHARED_SLACK_KM : GROUND_SLACK_KM);
+      return problem && { i, text: `${c.name} ${fixed(problem.km, 2)} km out, by ${clubs[problem.holder].name}'s land` };
+    }).filter(Boolean);
+    if (!astray.length || round === GUARD_ROUNDS) break;
+    for (const { i } of astray) guarded.set(i, (guarded.get(i) ?? GUARD_KM / 2.5) * 2.5);
   }
+  if (astray.length) throw new Error(`${id}: grounds outside their club's land: ${astray.map(a => a.text).join('; ')}`);
 
   // Verify with the game's own loader and gather the audit numbers.
   const decoded = decodeDomestic(JSON.parse(text), id);
@@ -374,6 +417,10 @@ export async function buildCountry(id, snapshot, source, season = null) {
     const p = decoded.geo.paths[g.id];
     if (!p || !Number.isFinite(p.cx) || !Number.isFinite(p.cy) || !(p.area > 0)) throw new Error(`${id}: section ${g.id} does not decode to a finite, non-empty shape`);
   }
+  // The game routes a section's attacks from a point inside the land it paints, rounded to a tenth at the opening fit
+  // (src/engine/geo.js; scripts/domestic-routing.test.mjs holds today's maps to it): a crumb the rounding loses has none.
+  const unanchored = qtopo.objects.sections.geometries.map(g => g.id).filter(sid => !insidePainted(decoded.geo.paths[sid]));
+  if (unanchored.length) log(`  sections with no point inside their painted land: ${unanchored.join(', ')}`);
   const areaDiff = (totalArea - sourceAreaKm2) / sourceAreaKm2;
   if (Math.abs(areaDiff) > 0.02) throw new Error(`${id}: section area ${Math.round(totalArea)} km² differs from the source ${Math.round(sourceAreaKm2)} km² by ${(areaDiff * 100).toFixed(2)}%`);
   const inSection = [], displacement = [], displaced = [];
@@ -390,7 +437,7 @@ export async function buildCountry(id, snapshot, source, season = null) {
   const audit = {
     id, name: snapshot.nation.name, provider: picked.provider, iso3: picked.iso3, level: picked.level,
     units: sourceUnits, parts: units.length, droppedUnits: dropped, maxGapKm: fixed(maxGapKm),
-    splits: splits.map(({ source, ...split }) => ({ ...split, unit: namer.name(picked.units.find(u => String(u.id) === source) ?? { id: source, name: split.unit, polys: [] }) })),
+    splits: splits.map(({ source, ...split }) => ({ ...split, unit: namer.name(sourceList.find(u => String(u.id) === source) ?? { id: source, name: split.unit, polys: [] }) })),
     clubs: n, located: clubs.filter((_, i) => isLocated(i)).length, snapped: located.filter(l => l.status === 'snapped').length,
     unlocated: clubs.filter((_, i) => !homeOf[i]).map(c => c.name), discardedHomes: discarded,
     placed: clubs.map((c, i) => placed[i] && { club: c.name, place: placed[i].name, geonames: placed[i].id, areaPct: fixed(100 * groupAreas[i] / totalArea) }).filter(Boolean),
@@ -400,15 +447,14 @@ export async function buildCountry(id, snapshot, source, season = null) {
       groups: {
         sizes: [...new Set(groupOf.map(list => list.length))].sort((a, b) => a - b),
         // Clubs whose size moved from the rank rule (a club hemmed in by others in its city
-        // passes its larger size on), clubs fanned out around a city, clubs starting just
-        // outside their boxed-in city, and groups split on one landmass (none expected).
-        sizeMoved: moved.map(c => clubs[c].name), fanned: fans.map(f => f.members.map(c => clubs[c].name)),
-        movedStarts: movedStarts.map(c => clubs[c].name), splitOnLand: landSplit,
+        // passes its larger size on), clubs fanned out around a city, and groups split on one
+        // landmass (none expected).
+        sizeMoved: moved.map(c => clubs[c].name), fanned: fans.map(f => f.members.map(c => clubs[c].name)), splitOnLand: landSplit,
         areaKm2: { min: fixed(Math.min(...groupAreas)), median: fixed(quantileOf(groupAreas, 0.5)), max: fixed(Math.max(...groupAreas)) },
       },
     } : {}),
-    // With one section per club there are no groups, but clubs crowded into a city still fan out or start nearby.
-    ...(n < S ? {} : { fanned: fans.map(f => f.members.map(c => clubs[c].name)), movedStarts: movedStarts.map(c => clubs[c].name) }),
+    // With one section per club there are no groups, but clubs crowded into a city still fan out.
+    ...(n < S ? {} : { fanned: fans.map(f => f.members.map(c => clubs[c].name)) }),
     homeInSection: inSection.length,
     displacementKm: { median: fixed(quantileOf(displacement, 0.5) ?? 0), p90: fixed(quantileOf(displacement, 0.9) ?? 0), max: fixed(Math.max(0, ...displacement)) },
     displaced: displaced.slice(0, 12),
@@ -425,7 +471,7 @@ export async function buildCountry(id, snapshot, source, season = null) {
     + `${audit.arcPoints} arc points; ${(audit.bytes / 1024).toFixed(1)} KB; ${Date.now() - t0} ms`);
   if (audit.groups) {
     const g = audit.groups;
-    log(`  groups of ${g.sizes.join('/')} sections; sizes moved ${g.sizeMoved.length}, fanned ${g.fanned.flat().length}, starts moved ${g.movedStarts.length}, split on land ${g.splitOnLand.length}${g.splitOnLand.length ? ` (${g.splitOnLand.join(', ')})` : ''}`);
+    log(`  groups of ${g.sizes.join('/')} sections; sizes moved ${g.sizeMoved.length}, fanned ${g.fanned.flat().length}, split on land ${g.splitOnLand.length}${g.splitOnLand.length ? ` (${g.splitOnLand.join(', ')})` : ''}`);
   }
   const strongest = rows.map((r, i) => [r.str, i]).sort((a, b) => b[0] - a[0] || a[1] - b[1]).slice(0, 3).map(([, i]) => rows[i].name);
   return {

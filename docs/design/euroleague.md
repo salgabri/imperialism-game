@@ -205,12 +205,13 @@ borders, and a country with no club stays grey. Its index entry (`src/data/europ
 - alone: Bayern Munich (Germany), Žalgiris (Lithuania), Dubai Basketball (the United Arab
   Emirates, far to the south-east: the opening camera frames it with the rest);
 - Spain's four and Italy's and France's two each split their countries by region;
-- Istanbul's three: Anadolu Efes keeps Thrace, Fenerbahçe and Beşiktaş grow over Anatolia,
-  Beşiktaş starting across the Bosphorus (141 km from its arena; 99 km before the levels went
-  down to the communes on 2026-11-15);
+- Istanbul's three, each holding its own arena (since 2026-11-21, domestic-campaigns.md
+  "Grounds"): Anadolu Efes keeps Thrace, Fenerbahçe grows over Anatolia, and Beşiktaş, boxed in
+  between them, holds about 840 km² of the city (until then it started across the Bosphorus,
+  141 km from its arena, with 350,000 km² of Anatolia);
 - Athens and Piraeus: Panathinaikos holds more of Greece than Olympiacos;
-- Belgrade's two and Tel Aviv's two: each city is one unit of its country's finest layer, so it
-  joins a neighbouring region and one club starts next door. Serbia's levels are its districts and
+- Belgrade's two and Tel Aviv's two: each city is one unit of its country's finest layer, cut
+  between its two clubs, each at its own arena. Serbia's levels are its districts and
   municipalities, Israel's its districts and sub-districts (`COUNTRIES` in
   `scripts/lib/admin-levels.mjs`): neither source goes below the city.
 
@@ -384,17 +385,16 @@ Perm and St Petersburg), Croatia (Cibona and Zadar), Slovenia (Olimpija and Krka
   CSKA's Moscow, 4 km from its own land, as football's other Moscow clubs do. (This branch first cut Russia its own way, west of 60°E; on merging
   main, whose football maps shipped European Russia first, its maps moved onto main's, so both
   sports draw the same Russia.)
-- **Crowded cities.** As Beşiktaş does today, a club crowded into Istanbul or Athens can start next
-  door, mostly the weakest of the city's clubs: Beşiktaş in 2012/13 (141 km from its arena),
-  Galatasaray across the Bosphorus in 2011/12, 2013/14, 2014/15 and 2016/17 (136 km; in 2011/12
-  and 2013/14 ahead of the weaker Anadolu Efes), Darüşşafaka in 2015/16, 2016/17 and 2018/19 (101
-  to 144 km), Ülkerspor in 2001/02 to 2005/06 (102 km); AEK Athens, Peristeri, Panionios and
-  Maroussi a suburb or two away (11 to 54 km), and Panathinaikos or Olympiacos in some seasons from
-  2001/02 to 2009/10 (16 to 54 km). Each map's build log lists them. Which club gives way follows
-  the season's strengths and arenas, so the re-rating of 2026-11-18 moved some (Olympiacos, 4–10
-  in 2004/05, starts outside Athens's core), and since the levels went down to the communes
-  (2026-11-15) Istanbul's clubs start farther out: about 100 km before (136 in 2016/17), and
-  Ülkerspor 11 km.
+- **Crowded cities.** Since 2026-11-21 every club holds its own arena (domestic-campaigns.md,
+  "Grounds"), so a club crowded into Istanbul or Athens keeps what its city leaves it: Olympiacos
+  about 4 km² of Piraeus in 2009/10 (it held 25,000 km² while Panathinaikos and Maroussi started
+  20 and 40 km from their arenas), Darüşşafaka 363 km² in 2016/17, Anadolu Efes 589 km² in
+  2013/14, Panathinaikos 591 km² in 2005/06, AEK Athens 657 km² in 2001/02 and Beşiktaş 837 km² in
+  2012/13. Until then such a club, mostly the weakest of the city's, started next door: Beşiktaş in
+  2012/13 141 km from its arena, Galatasaray across the Bosphorus (136 km), Darüşşafaka 101 to
+  144 km out, Ülkerspor 102 km; AEK Athens, Peristeri, Panionios and Maroussi a suburb or two away
+  (11 to 54 km), and Panathinaikos or Olympiacos in some seasons from 2001/02 to 2009/10 (16 to
+  54 km).
 
 **Setup.** An earlier season's club theatres are its NBA era's map and its EuroLeague's; the
 EuroLeague carries over between seasons (2009/10's map, then 2019/20's), and a season before

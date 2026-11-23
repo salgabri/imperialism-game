@@ -14,7 +14,7 @@ import { HISTORIC_NATIONS, NATIONS } from '../src/data/teams.js';
 import { decodeDomestic, DOMESTIC_SECTIONS } from '../src/engine/domestic.js';
 import { expandFmTuple, FM_ROLES } from '../src/data/fmPlayers.js';
 import { FOREIGN_DEPTH_KM, hostShapes, loadWorldMap } from './lib/domestic-boundaries.mjs';
-import { bboxOf, facingKm, facingSections, kmToPolys, pointInPolys, polysAreaKm2, splitOnLand } from './lib/domestic-partition.mjs';
+import { bboxOf, facingKm, facingSections, GROUND_SLACK_KM, groundProblem, kmBetween, pointInPolys, polysAreaKm2, SAME_GROUND_KM, SHARED_SLACK_KM, splitOnLand } from './lib/domestic-partition.mjs';
 import { DATABASE_DATE, MIN_CLUBS } from './lib/domestic-sync.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -228,22 +228,17 @@ for (const entry of DOMESTIC) {
     }
     assert.ok(hits > 0, 'no sample point hit any section');
 
-    // A club's home is in its own group or a stronger club's: where clubs share a town,
-    // the strongest holds it (simplified borders may shift by a few hundred metres). Clubs
-    // crowded into one city are fanned out from it or start just outside it (every map's
-    // land is balanced, docs/design/domestic-campaigns.md "Balanced land"): a home may then
-    // lie in a weaker club's group, but the club's home section stays within a club
-    // territory's width of it.
+    // Every club's land holds its home (docs/design/domestic-campaigns.md, "Grounds"): its ground or town, within
+    // GROUND_SLACK_KM as simplified borders move, or SHARED_SLACK_KM of a home it shares with other clubs; a home off the
+    // land has no other club's land nearer it. Crowded clubs are fanned out from their city, never started outside it.
     const frame = ([lon, lat]) => [w > 0 && lon < 0 ? lon + 360 : lon, lat];
-    const groupPolys = c => doc.clubs[c].sections.flatMap(sid => sectionPolys[sectionIds.indexOf(sid)]);
-    const reachKm = Math.sqrt(doc.boundaries.areaKm2 / n);
+    const lands = doc.clubs.map(club => { const polys = club.sections.flatMap(sid => sectionPolys[sectionIds.indexOf(sid)]); return { polys, box: bboxOf(polys) }; });
     doc.clubs.forEach((club, i) => {
-      if (!club.home || /^placed:/.test(club.homeSource)) return;
+      if (!club.home) return;
       const p = frame(club.home);
-      const k = sectionAt(p);
-      if (k < 0 || clubAt[k] <= i || kmToPolys(p, groupPolys(i)) <= 0.6) return;
-      const gap = kmToPolys(p, sectionPolys[sectionIds.indexOf(club.section)]);
-      assert.ok(gap <= reachKm, `${club.name}'s home lies in weaker ${doc.clubs[clubAt[k]].name}'s section ${geoms[k].id} (${gap.toFixed(1)} km from its own)`);
+      const shared = doc.clubs.some((other, j) => j !== i && other.home && kmBetween(frame(other.home), p) <= SAME_GROUND_KM);
+      const problem = groundProblem(p, i, lands, shared ? SHARED_SLACK_KM : GROUND_SLACK_KM);
+      assert.equal(problem, null, problem && `${club.name}'s home lies ${problem.km.toFixed(2)} km outside its land, by ${doc.clubs[problem.holder].name}'s`);
     });
 
     // A club placed at a GeoNames place (no usable home) gets an ordinary share of the land.

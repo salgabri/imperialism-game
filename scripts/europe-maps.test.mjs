@@ -278,9 +278,13 @@ test('clubs share a country along its regional borders: a region with one club g
   // The elite's Bavaria and Saxony have one club each, and each whole region is that club's.
   for (const town of ['wurzburg', 'regensburg', 'passau', 'munich']) assert.equal(holder(ELITE, TOWNS[town]), CLUB_ID('FC Bayern München'), town);
   for (const town of ['dresden', 'leipzig', 'chemnitz']) assert.equal(holder(ELITE, TOWNS[town]), CLUB_ID('RB Leipzig'), town);
-  // A country with several clubs is really divided: even the most crowded club holds land you can see on the map.
+  // A country with several clubs is really divided: even the most crowded club holds land you can see on the map. Since
+  // every club holds its own ground (2026-11-21, domestic-campaigns.md "Grounds"), Fulham, its ground on the Thames
+  // between Chelsea's and Brentford's boroughs, keeps its corner of Hammersmith and Fulham: land over the river is no link.
+  const riverside = new Set(['f-fulham-fc']);
   for (const doc of [TOP, ELITE]) doc.clubs.forEach((club, i) => {
-    assert.ok(polysAreaKm2(polysOfSection(doc, i)) > 800, `${doc.id}: ${club.id} holds ${Math.round(polysAreaKm2(polysOfSection(doc, i)))} km²`);
+    const km2 = polysAreaKm2(polysOfSection(doc, i));
+    assert.ok(km2 > (riverside.has(club.id) ? 0.5 : 800), `${doc.id}: ${club.id} holds ${Math.round(km2)} km²`);
   });
 });
 

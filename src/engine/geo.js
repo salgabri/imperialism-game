@@ -106,6 +106,8 @@ export class WorldGeometry {
     // campaigns, club seeding and pinned tests depend on its exact output.
     this.legacy = lon0 === DEFAULT_PROJECTION.lon0 && lat0 === DEFAULT_PROJECTION.lat0;
     this.xScale = lat0 === DEFAULT_PROJECTION.lat0 ? PROJECTION_X_SCALE : Math.cos(lat0 * Math.PI / 180);
+    // A club map's sections, painted finer should one be smaller than the rounding (buildPaths).
+    this.sections = options.object === 'sections';
 
     const { countries, adjacency, borders, edges } = decodeTopo(topo, options.object || 'countries', options.borderLengths !== false);
     this.countries = countries;
@@ -344,8 +346,15 @@ export class WorldGeometry {
     return { d, labels };
   }
 
-  buildPaths(s, tx, ty) {
+  /**
+   * Each country's (or section's) painted path at fit `s`, `tx`, `ty`, its coordinates rounded to a tenth, or with `fine`
+   * to a hundredth: a club map with a section smaller than a tenth's rounding, which would paint nothing and leave no
+   * point inside it to route from (a crumb of OC Renaissance du Congo's, one of three clubs on Kinshasa's one point), is
+   * painted that way, all of it, so no neighbour's rounding covers it either.
+   */
+  buildPaths(s, tx, ty, fine = false) {
     const paths = {};
+    let coarse = false;
     for (const c of this.countries) {
       let d = '';
       const labelRings = [];
@@ -390,8 +399,15 @@ export class WorldGeometry {
             let boxX0 = Infinity, boxY0 = Infinity, boxX1 = -Infinity, boxY1 = -Infinity;
             for (let i = 0; i < n; i++) {
               const q = part[i], x = q[0] * s + tx, y = q[1] * s + ty;
-              roundTenth(x, ROUNDED, 0);
-              roundTenth(y, ROUNDED, 2);
+              if (fine) {
+                ROUNDED[0] = x.toFixed(2);
+                ROUNDED[1] = Number(ROUNDED[0]);
+                ROUNDED[2] = y.toFixed(2);
+                ROUNDED[3] = Number(ROUNDED[2]);
+              } else {
+                roundTenth(x, ROUNDED, 0);
+                roundTenth(y, ROUNDED, 2);
+              }
               text.push(ROUNDED[0] + ',' + ROUNDED[2]);
               ring.push([ROUNDED[1], ROUNDED[3]]);
               // Include every rendered island/segment in an empire's flag canvas.
@@ -434,6 +450,13 @@ export class WorldGeometry {
         ? { x: minX - 0.1, y: minY - 0.1, w: maxX - minX + 0.2, h: maxY - minY + 0.2 }
         : { ...bbox };
 
+      // Rounding to a tenth can leave a hairline section's surface point outside the land it paints (Manukau United's
+      // home section on New Zealand's map): then the point of that painted land farthest from its edges.
+      if (this.sections && !this.legacy && labelRings.length && !insideRings([cx, cy], labelRings)) {
+        const inner = farthestInside(labelRings);
+        if (inner) [cx, cy] = inner;
+        else if (!fine) coarse = true;
+      }
       // Prefer the capital as the country's anchor point; the centroid is only
       // a fallback for shapes with no capital of their own.
       const labelX = cx;
@@ -455,7 +478,7 @@ export class WorldGeometry {
       // The home town marker, where it is on the painted section; else the anchor.
       if (!this.legacy) Object.assign(paths[c.id], { homeX: home ? home[0] : cx, homeY: home ? home[1] : cy });
     }
-    return paths;
+    return coarse ? this.buildPaths(s, tx, ty, true) : paths;
   }
 
   /**
@@ -879,14 +902,19 @@ function surfaceMetrics(polys) {
     if (!best || area > best.area) best = { area, rings: poly.flat(), index };
   });
   if (!best) return { area: 0, point: null, index: -1 };
+  return { area: Math.max(0, best.area), point: farthestInside(best.rings), index: best.index };
+}
+
+/** Of the midpoints of the inside spans of 24 horizontal scanlines across `rings` (even-odd), the farthest from any edge; null if none. */
+function farthestInside(rings) {
   let minY = Infinity, maxY = -Infinity;
-  for (const ring of best.rings) for (let i = 0; i < ring.length; i++) { const y = ring[i][1]; minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
+  for (const ring of rings) for (let i = 0; i < ring.length; i++) { const y = ring[i][1]; minY = Math.min(minY, y); maxY = Math.max(maxY, y); }
   let point = null, clearance = -1;
   const lines = 24;
   for (let k = 0; k < lines && maxY > minY; k++) {
     const y = minY + (maxY - minY) * (k + 0.5) / lines;
     const xs = [];
-    for (const ring of best.rings) {
+    for (const ring of rings) {
       for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
         const xi = ring[i][0], yi = ring[i][1], xj = ring[j][0], yj = ring[j][1];
         if (yi > y !== yj > y) xs.push(xi + (y - yi) * (xj - xi) / (yj - yi));
@@ -897,11 +925,11 @@ function surfaceMetrics(polys) {
       if (!(xs[i + 1] > xs[i])) continue;
       const candidate = [(xs[i] + xs[i + 1]) / 2, y];
       let d2 = Infinity;
-      for (const ring of best.rings) for (let a = 0, b = ring.length - 1; a < ring.length; b = a++) d2 = Math.min(d2, segmentDistance2(candidate, ring[b], ring[a]));
+      for (const ring of rings) for (let a = 0, b = ring.length - 1; a < ring.length; b = a++) d2 = Math.min(d2, segmentDistance2(candidate, ring[b], ring[a]));
       if (d2 > clearance) { clearance = d2; point = candidate; }
     }
   }
-  return { area: Math.max(0, best.area), point, index: best.index };
+  return point;
 }
 
 // A country chart's routing anchor keeps at least this share of its polygon's

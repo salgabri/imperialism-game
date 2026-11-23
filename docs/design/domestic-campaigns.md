@@ -374,22 +374,17 @@ land is cut into its sections (Groups).
    within the zone, in the order of the homes' bearings, starting at the widest
    gap (the sea, for a port). Only its club may take a sector's pieces; beyond the
    zone clubs grow freely, so their land follows the country's shape. A club
-   starts in the largest connected part of its sector: at home when that part
-   holds it, else next to the centre. 901 clubs in 203 fans (Brunei's twelve,
-   Dhaka's ten, Tbilisi's eight, Limassol's four, Graz's two). A cluster whose
-   zone would take in more than 12 clubs is not fanned, since its sectors would be
-   slivers: Asunción (29 linked clubs) and Cairo (17) are not; their boxed-in
-   clubs start outside instead (step 7).
-7. **Moved starts** (grouped; `moveBoxedStarts`). A club needs about 6 px of land
-   across at the opening fit per section (`minSectionKm2 = (6·extent/900)²` km²,
-   so its room is that times its group size). Strongest first, a club keeps its
-   home as its start when the land nearest it that it can grow into (same
-   landmass, not through another club's start unit or fan sector) gives it that
-   room and leaves every stronger club its room. Otherwise it starts at the place
-   or admin-unit centre nearest its home with four times that room (else, of the
-   first 200 tried, the one with the most), outside every fan zone, at least the
-   square root of its room from other starts and within `√(area/N)` of home: the
-   stronger clubs keep the city. 201 clubs start this way.
+   starts at its ground, its sector laid out to hold it ("Grounds"). 901 clubs in 203
+   fans (Brunei's twelve, Dhaka's ten, Tbilisi's eight, Limassol's four, Graz's two),
+   counted before balanced land. A cluster whose zone would take in more than 12 clubs
+   is not fanned, since its sectors would be slivers: Asunción (29 linked clubs) and
+   Cairo (17) are not; their clubs share the city as they grow.
+7. **Starts at home** (since 2026-11-21, "Grounds" below). Every club starts on its
+   own ground. A club needs about 6 px of land across at the opening fit per section
+   (`minSectionKm2 = (6·extent/900)²` km², so its room is that times its group size);
+   until 2026-11-21 one whose ground did not give it that room started at a place or
+   admin-unit centre near home instead (moved starts, `moveBoxedStarts`: 201 clubs).
+   Now a club short of room is fanned with its city (steps 6 and 10).
 8. **Split** (`splitUnits`), until there are at least 100 units:
    - While there are fewer units than sections (slivers below 1% of a median unit
      ignored): cut the unit holding the most starts into one piece per club, else
@@ -398,6 +393,8 @@ land is cut into its sections (Groups).
    - While seeding would leave a club more than max(3 km, half the median unit
      side) from its start because stronger clubs share its unit, cut that unit
      into one piece per club, worst gap first.
+   - When grouped, while a unit holds the grounds of two or more clubs (clubs sharing
+     one ground aside), cut it so each holds its own (`ownHomes`).
 
    A crowd cut is a Voronoi diagram of sites at the starts; clubs sharing one town
    point (closer than a tenth of a cell) share the land around it through k-means
@@ -425,19 +422,17 @@ land is cut into its sections (Groups).
    sides)); when grouped, clubs under their cap and at most twice as far as the
    nearest come first. Among those, the nearest land within reach wins, else the
    least stretched, so an archipelago does not chain to one club island by island.
-10. **Boxed-in retry** (grouped). The estimates in steps 6–7 cannot see a club
+10. **Boxed-in retry** (grouped). The estimates in step 6 cannot see a club
     shut in by its neighbours' land as they grow (Port Vila's clubs). After
     growth, a club whose territory is under half its room
     (`BOXED = 0.5 × minSectionKm2 × group size`) is boxed in. One not yet fanned
     is fanned with its city when another club's home lies within the link
-    distance (fans may then be pairs), and otherwise, or if that did not help,
-    starts outside; a fan with boxed members gives up as many of its weakest
-    members, which start outside. The partition is then redone from the same
-    units, until no club escalates; the attempt whose boxed clubs fall least short
-    (sum of squared shortfalls, the earliest of equals) is kept, with only its log
-    lines, so no map ends worse than its first attempt. 23 maps retried (Canada,
-    Egypt, Paraguay and Vanuatu among them); maps without a boxed club are
-    unaffected.
+    distance (fans may then be pairs); a club with none near, or already fanned,
+    keeps its land (until 2026-11-21 it started outside instead). The partition is
+    then redone from the same units, until no club escalates; the attempt whose boxed
+    clubs fall least short (sum of squared shortfalls, the earliest of equals) is
+    kept, with only its log lines, so no map ends worse than its first attempt. Maps
+    without a boxed club are unaffected.
 
 **Groups** (`subdivideTerritories`, N < 100).
 
@@ -499,10 +494,10 @@ The causes, all in step 9's growth:
    Lokomotiv and Dinamo out of Moscow, Fulham, West Ham and Brentford out of London.)
    Instead a city's crowd fans out from it: clubs link within four tenths of a typical
    club's width (at most 30 km; else a tenth of a fair share's width, at most 15 km), a
-   fan still holds up to 12 clubs, a fanned club starts as near its own home as its
-   sector goes (from the centre, Nordsjælland started 36 km from Farum, Bucheon 55 km
-   from home), and a club still boxed in after growth is fanned with the clubs of its
-   city. 1,564 clubs are fanned.
+   fan still holds up to 12 clubs, a fanned club starts at its ground, its sector laid
+   out to hold it ("Grounds"; until 2026-11-21 it started as near home as its sector
+   went: Nordsjælland 36 km from Farum, Bucheon 55 km from home), and a club still boxed
+   in after growth is fanned with the clubs of its city.
 2. **Big units halved once**, before the starts are settled: every unit larger than a
    section's share of the land, so no club's land is one whole county or desert
    district. Halving does not depend on the starts, so each redone partition only cuts
@@ -519,9 +514,9 @@ The causes, all in step 9's growth:
    its land in two) to the clubs around it, nearest claim first, those under two shares
    before any past them, as step 9's caps share a desert out (a club placed inland held
    83% of Gambia); land no other club reaches (an island it was given) stays its own. This is each club's natural land V: compact, with no
-   fingers. A club starting on a sliver (a fan's cut left Persija Jakarta a piece of Kota
-   Tangerang 2 km by half a km) starts instead on the nearest unit of its own land holding
-   a twentieth of a section's share.
+   fingers. Until 2026-11-21 a club starting on a sliver (a fan's cut left Persija Jakarta a
+   piece of Kota Tangerang 2 km by half a km) started instead on the nearest unit of its own
+   land holding a twentieth of a section's share; now it starts at its ground ("Grounds").
 4. **Land passes** towards targets T = F^0.7 · V^0.3 (F the club's fair share; β =
    0.3 of the way from equal land to its natural land), scaled to the land of each
    landmass. In rounds, each pair of neighbouring clubs passes one unit from the club
@@ -582,7 +577,125 @@ club with one stronger club near it (Peñarol out of Montevideo, Arsenal out of 
 Uruguay stays the hardest map: its departments are the finest layer that covers it, so
 Montevideo is one unit for about 25 clubs, cut between them.
 
+### Grounds
 
+On 2026-11-21 the user, shown the Top 124's Nice pushed 30 km up the Var while Monaco held
+Nice: "a territory needs to own the part of the map where their city and stadium is in". So
+every map now holds each club's home in its own land:
+
+- **The rule** (`groundProblem` in `scripts/lib/domestic-partition.mjs`). A club's land holds the
+  point the map gives as its home (its ground, or its town where no ground is known), or lies
+  within `GROUND_SLACK_KM` (0.5 km) of it, as simplified borders move. Clubs sharing a home
+  (`SAME_GROUND_KM`, 0.25 km: a stadium two clubs play at, or one town point the sources give
+  several clubs) each hold land within `SHARED_SLACK_KM` (2 km) of it. A home on no land (a ground
+  on a coast drawn coarser than it stands, or just across a border) has no other club's land
+  nearer it by more than that. The country, season and Europe builders throw (`grounds outside
+  their club's land`) on a map that breaks it, and `scripts/home-ground.test.mjs` checks every map
+  shipped: the country maps, the Europe maps in play (the frozen maps of before stay as they were,
+  for the campaigns saved on them), and the sports' club maps to a quarter of a pixel at the
+  opening fit (their county lines are simplified: UBS Arena stands 0.1 km inside Nassau County).
+- **Every club starts on its own ground** (steps 7, 8 and 10). Moved starts are gone, and so is
+  the start moved off a sliver. A unit holding two or more grounds is cut so each holds its own.
+  A ground just off the land counts from the nearest land a little inland (`INLAND_KM`, 0.3 km),
+  so clubs sharing a coastal ground meet there.
+- **Fans that hold their grounds** (`fanSectors`, `fanLayout`). A fan's members are the clubs
+  whose crowd it is, its zone is capped, and its centre (`fanApex`) is the point that sees the
+  most of the land between its grounds (`landSeen`: land past water is no club's way out of it,
+  Auckland's harbour). Its sectors are laid out so each holds its club's ground with clearance
+  (`GROUND_CLEAR_KM`, 0.3 km), not by equal land alone (SC Bastia's sector had missed Bastia).
+  Clubs whose ground is the centre take the gap between two grounds with the most land. The
+  first edge runs through the widest gap in the land (the sea, for a port), unless one between
+  two grounds in turn leaves the club with least land for its share clearly more
+  (`FIRST_EDGE_GAIN`, 1.25 times as much and 0.05 of a share more): the other edges are held
+  clear of the grounds either side, so a first edge beside a ground could leave its club nothing.
+  Gokulam Kerala, its ground 0.3 km seaward of Kozhikode's centre, had held only the strip
+  between the sea and Calicut FC's ground (1.7 km² in two sections); IFK Göteborg and GAIS, at
+  Ullevi, a sector of 1° on Sweden's maps of 1994/95 and 2009/10, the edge 2° past the ground
+  0.8 km west (Västra Frölunda's, then Örgryte's) with Häcken's sector taking all the land round
+  from there to its own ground; Slavia and Dukla, both placed at Prague's centre on Czechia's map
+  of 2019/20, likewise (Slavia's land ended 20 km out).
+- **Shared grounds** (`groundTeams`, `splitTeam`). Clubs sharing a home partition as one team,
+  with all their shares, and split its land at the end. Each way of splitting is cut and joined
+  up as the split's will be (`joinShared`: a club keeps the land that hangs together with its
+  stretch at the ground, through borders longer than four steps of the map's quantization; land
+  cut off goes to the club it shares most border with, its team's first; an island no start
+  reaches goes whole to the club holding most of it), and the way where every club holds land
+  nearest the ground, then whose least club holds most of its share, goes (`judgeSplit`; a way
+  leaving a club only a crumb at its ground, or under a tenth of its share, `FAIR_FLOOR`, ranks
+  below any within 2 km that does not):
+  - **grown**: on a grid over the team's land (cells of at most 0.5 km for land up to 600 km
+    across), each cell's shortest way to the ground, straight wherever it can be (lazy Theta*),
+    gives the order a line out of the ground sweeps the land, bending round corners (`wayOut`);
+    that order is cut at the clubs' shares, and the clubs grow out from the ground over the grid
+    towards their runs, the one furthest short of its share first (`growRuns`); units are cut
+    along the cells' borders, staircases drawn as straight lines (`regionRings`). A strip of the
+    team's land leading away from the ground (south-west of Kara) is split along its length.
+  - **wedges** about the ground: at the sweep's cuts, of the clubs' shares of the land by
+    bearing, of their shares of the land at the ground (a fan's narrow sector: Paris FC's and
+    Red Star's at Charléty in 2003/04 and 2004/05), and turned to the fairest split judged on a
+    coarser grid (`bestTurn`, half-planes too).
+  - for three clubs or more, **by halves** too: two sides split the land as two, then each
+    side's land is split again about the same ground.
+- **Sections whole** (`keepSectionsWhole`). A section is its start's land and islands off it: a
+  stretch of a section neither joined to its start nor on the sea goes to the section of its club
+  it borders most, and a section starting inland gives islands larger than its land to the
+  nearest section of its club that reaches the sea (Tauro's, in Panama City, had been given the
+  islands off Darién).
+- **Holes and junctions.** A unit missing from its admin layer (Bishkek, left out of
+  Kyrgyzstan's districts) is filled from the land round it where the place there is dense enough
+  (`holeUnits`: at least 1,000 people a km², 5–5,000 km², so lakes stay water). Simplification
+  keeps the vertices where clubs' land meets at a ground or a fan's centre (`junctions`), so a
+  ground there (Adelaide's) does not drift across it, and on the Europe maps every vertex within
+  1 km of a ground (`GROUND_KEEP_KM`). Where a simplified border still crosses a ground, the map is
+  simplified again keeping the vertices about that ground, 2.5 km (Europe: 2.5 km past the 1 km)
+  and 2.5 times as far each round: FC Sochi's border had moved 7 km across Druzhba Maikop's ground
+  on Russia's map of 2025/26, Beşiktaş's half a kilometre across Galatasaray's in 2022/23.
+- **Slivers.** A cut about a ground can leave a club a strip metres wide along a border, which the
+  map's quantization draws as a line (a section with "no drawable land"). A piece of a cut narrower
+  than `SLIVER_WIDTH_KM` (50 m, or half the joining threshold where that is more; width is twice the
+  area over the outline) joins the piece it lies against most (`absorbSlivers`), and a club left
+  nothing else keeps its largest; a section on nothing but slivers, or a crumb under a quarter of a
+  pixel at the opening fit (`CRUMB_PX2`), takes the largest wide units beside it from other sections
+  of its club holding more than one (`widenThinSections`); a crumb its club cannot widen takes
+  another club's so, never a start, a unit that would part that club's land or take it out of reach
+  of its ground. A club sharing a ground starts on a piece of its land the map can draw where its
+  land has one (Olympic El Qanah's home section had been its 0.016 km² at Ismailia, its land over
+  the canal). The game anchors a hairline section, whose surface point rounding to a tenth leaves
+  outside the land it paints, at the point of that painted land farthest from its edges
+  (`farthestInside` in `src/engine/geo.js`: Manukau United's and Quest United's home sections,
+  among six clubs each on Auckland's and Vientiane's town points), and paints a club map holding a
+  section too small for that rounding to a hundredth, all of it, so the section shows and no
+  neighbour's rounding covers it (OC Renaissance du Congo's six sections in its 8 km² of Kinshasa,
+  among three clubs on the city's one point, every unit beside them another section's start).
+  Pieces cut this way can meet at a point as their rings are merged (Suriname's SV Leo Victor,
+  between Livorno and Beekhuizen): `dissolve` parts a merged ring where it touches itself
+  (`untangle`) and, should a unit still go missing, takes the union of the section's units instead;
+  the Europe builder takes the union of a club's pieces where their merge loses land (Coventry
+  City's ten on the Top 124 of 1998/99 merged to −889 km²).
+- **Crowded points.** A home point the sources give more than `MAX_SHARED_HOME` (7) clubs is no
+  club's ground: fifteen Xiamen clubs of 2008/09 stand on the city's one point, and those past the
+  seven strongest are placed as clubs without a home.
+
+Across the 127 maps measured against main (`scripts/compare-maps.mjs`): grounds over 0.5 km
+outside their club's land 847 → 27 (20 stand on no land of the map, their club's land the nearest
+to them: Lisbon's and Porto's riverside grounds on a coast drawn coarser, Morfou's in the north of
+Cyprus and Tiga's island off the map; seven share a ground and lie within 2 km of it, at most
+Arab Contractors' 1.9 km out of the Cairo point four clubs share), clubs under a quarter of
+their fair share 1,242 → 1,243, but the median spread of land per fair share 1.19 → 1.29 (50
+maps more even, 77 less) and maps with a club under 10 km² 15 → 19: a crowd of clubs in one
+city now keeps its land there. The earlier seasons' 1,718 maps, built the same way, change alike:
+grounds over 0.5 km outside their club's land 6,014 → 193 (151 on no land, the rest sharing a
+ground and within 2 km of it), clubs under a quarter of their fair share 9,447 → 9,420, the median
+spread 0.97 → 1.00 (756 maps more even, 945 less), and maps with a club under 10 km² 89 → 144.
+
+Limits. Shared grounds whose team's land reaches most of its land through a neck split unevenly:
+Kara's (Kozah FC and ASC Kara), whose land north and west of the town lies past a neck a grid
+cell wide, about 10,500 km² to 3,100. Several clubs on one town point can still leave one
+little: OC Renaissance du Congo 8 km² of Kinshasa, whose team's land reaches the rest of the
+country through a corridor one club holds; Tala'ea El Gaish 32 km² of the Cairo point it shares
+with three others. Banjul's seven clubs share St Mary's Island, 0.8 to 1.9 km² each. Links
+across narrow water (`joinWater`, `WATER_KM`) are off: Fulham's land does not reach over the
+Thames to Putney, as the groups' "split on land" check needs.
 
 ### Output
 
@@ -628,8 +741,8 @@ Montevideo is one unit for about 25 clubs, cut between them.
   squad, so the setup preview and the campaign agree.
 - **Version** `<id>-<8 hex>`: sha256 of the document without `version`.
 - **Audit.** Besides the format-1 fields, `sections: 100`, `extras` (sections at
-  places and at units), `groups` (sizes, `sizeMoved`, `fanned`, `movedStarts`,
-  `splitOnLand`, group areas; N < 100 only), each placed club's land share
+  places and at units), `groups` (sizes, `sizeMoved`, `fanned`, `splitOnLand`, group
+  areas; N < 100 only), each placed club's land share
   (`placed[].areaPct`) and section-area p10/p90.
 - **Checks before writing:** the game's `decodeDomestic` loads the file, every
   section decodes to a finite, non-empty shape, and section areas sum to the
@@ -638,11 +751,11 @@ Montevideo is one unit for about 25 clubs, cut between them.
 The build is deterministic: same snapshots and caches give byte-identical files,
 whatever `--jobs`. `--check` rebuilds offline and compares every output.
 
-Across the 128 maps: groups split on land 0; a club's home lies in its own home
-section for 2,896 of 4,147 located clubs (69.8%; 652 of 800 on the 100-club
-maps; before balanced land 3,135, 75.6%, and 679), the others being clubs sharing a
-town point, fanned clubs whose sector starts beside their home, and clubs pushed off
-their unit by a stronger club. No club starts away from its city.
+Across the 128 maps: groups split on land 0; every club's land holds its ground
+("Grounds"), and a club's home lies in its own home section for 3,610 of 4,147 located
+clubs (87.1%; 759 of 800 on the 100-club maps; 2,896, 69.8%, and 652 before 2026-11-21),
+the others being clubs sharing a ground (680 share one with another club, and only one
+section can hold the point) and grounds on a section border.
 
 ## File format 2: `public/domestic/<id>.json`
 
@@ -1704,8 +1817,9 @@ seasons with clubs (the built-in one and 31 earlier) and each of the two fields:
   400 km² or more (24 before), such as Lokomotiv's Severodvinsk inside Spartak's north
   (1,230 km², six seasons from 2001/02 to 2021/22) and Real Madrid's Cádiz beside Valencia's
   Andalusia (about 7,400 km², four seasons from 1993/94 to 2000/01).
-    - A region holding one club stays whole, for that club. Should the club start next door
-      (boxed in by its city, below), the region goes to its parent's clubs like an empty one.
+    - A region holding one club stays whole, for that club, which starts there on its
+      ground (until 2026-11-21 a club boxed in by its city could start next door, and its
+      region then went to its parent's clubs like an empty one).
     - A region holding two or more is split one level down, and only its clubs may
       take its land (the partition's `allowed`). So on down: a province with one club goes
       whole to it, and only a commune holding two or more clubs is cut (the crowd cut).
@@ -1726,11 +1840,12 @@ seasons with clubs (the built-in one and 31 earlier) and each of the two fields:
       clubs share the joined land.
 - **Partition**: `partitionCountry` per country, one section per club, with
   `fair: { minKm2 }`: format 1's sections, but the land rules of format 2 where they keep
-  a club from being shut in (growth caps at 1.5× a fair share, fans, moved starts, the
-  boxed-in retry), and no unit halved for its size, so regions stay whole. A club needs a
-  tenth of its country's share per club and at least 1,200 km²: about 35 km across, 6 px
-  at the opening fit. One that cannot find it around its ground starts next door, on land
-  its region lets it take and never on another club's home unit. Land the
+  a club from being shut in (growth caps at 1.5× a fair share, fans, the boxed-in retry),
+  and no unit halved for its size, so regions stay whole. A club needs a tenth of its
+  country's share per club and at least 1,200 km²: about 35 km across, 6 px at the opening
+  fit. Every club starts on its own ground (since 2026-11-21, "Grounds" above); one that
+  cannot find that land around it is fanned with its city and keeps what its crowd leaves
+  it (until then it started next door, on land its region let it take). Land the
   world outline leaves out (Porto Santo) is dropped first, or a club moved there would end
   up with nothing. The fans keep to the units (`fan: 'units'`, since 2026-11-15): each
   commune or borough of a crowded city's zone goes whole to the club whose ground it holds,
@@ -1753,36 +1868,34 @@ seasons with clubs (the built-in one and 31 earlier) and each of the two fields:
   across borders and water. Sections are in rank order, `eu124-001` the strongest. The
   file adds `theatre` (`all` or `elite`), `seasons` for an earlier season's map, and a
   club row's `shape`, and `partial` for a country it holds only part of (Russia). The 64 maps
-  in play hold 150–201 KB each, 10.9 MB in all, and the 62 maps of before (below) 10.3 MB, with
+  in play hold 150–206 KB each, 11.2 MB in all, and the 128 maps of before (below) 21.5 MB, with
   `public/domestic/ATTRIBUTION-europe.txt` and the index `src/data/europeMaps.js`
   (`{ id, sport, league, name, theatre, seasons?, clubs, sections, countries, version, top?, replacedBy? }`).
 
-**Result** (built-in season). Elite 32: Paris Saint-Germain holds France; the Netherlands
-and Belgium stay grey; Bayern Munich Bavaria and RB Leipzig the east. Top 124: 17 countries
-in colour, the rest of Europe grey, Bodø/Glimt Norway, Dinamo Zagreb Croatia, Ludogorets
-Bulgaria. The smallest land is about 1,000 km² (Arsenal's, in London's crowd of clubs;
-1,900 km², Rayo Vallecano's, before the levels went down to the communes). Lisbon's two clubs
-split their city along its parishes (Benfica's ground had stood 2 km outside its land),
-Paris's along its arrondissements, Prague's along its cadastral areas; Milan's comune is
-the one place cut, between Inter and AC Milan alone. A club's ground lies in its own land,
-except for clubs boxed in by their neighbours, whose land starts next door: at most about
-100 km away, for Beşiktaş in the Top 124, which starts across the Bosphorus in Anatolia as
-Galatasaray holds Thrace, a thirtieth of the country; Panathinaikos 43 km from its ground,
-Nice 30 (Monaco holds it), Crystal Palace and Everton about 26; in the Elite 32 only Everton,
-25 km. Earlier seasons crowd more. Their fields from all of Europe (6 to 20 countries a map)
-put up to five clubs in Istanbul, so one may start up to about 200 km out (İstanbul
-Başakşehir in 2021/22, about 150 km in four other seasons), Copenhagen three, one starting up
-to about 120 km away, and the Rhine and Ruhr many, Fortuna Düsseldorf starting about 120 km
-out in 2012/13 and 2019/20; Moscow's clubs start within 11 km of their grounds. England's
-crowded seasons can leave a club little more than its borough: Everton about 115 to 126 km²
-beside Liverpool while Burnley holds all of Lancashire's county council and more (2014/15,
-2016/17, 2018/19, 2020/21, 2023/24, 2025/26), Newcastle about 200 km² in six seasons from
-1996/97 to 2008/09. Across the 98 maps, 37 club lands are under 800 km² (40 before the
-communes) and 285 grounds lie over 5 km outside their club's land (344 before; Russia's 35
-down to 4, England's 129 to 94), but 81 lie over 50 km out (74 before), two thirds of them
-Turkish clubs'. Russia's clubs share European Russia's 4.0 million km²: in 2015/16's Elite 32
-Zenit holds about 1.9 million and CSKA Moscow 2.1, in its Top 124 eight clubs 0.3 to 1.0
-million each.
+**Result** (the maps of the built-in season of before, `eu124` and `eu32`, kept for their saves).
+Elite 32: Paris Saint-Germain holds France; the Netherlands and Belgium stay grey; Bayern
+Munich Bavaria and RB Leipzig the east. Top 124: 17 countries in colour, the rest of Europe
+grey, Bodø/Glimt Norway, Dinamo Zagreb Croatia, Ludogorets Bulgaria. The smallest land is about
+1,000 km² (Arsenal's, in London's crowd of clubs). Lisbon's two clubs split their city along its
+parishes, Paris's along its arrondissements, Prague's along its cadastral areas; Milan's comune
+is the one place cut, between Inter and AC Milan alone. These maps, like every map of before,
+are never rebuilt: a club boxed in by its neighbours starts next door there, Beşiktaş about
+100 km away across the Bosphorus, Panathinaikos 43 km from its ground, Nice 30 (Monaco holds it),
+Crystal Palace and Everton about 26.
+
+**Result** (the 64 maps in play: today's by results, `eu124b2027` and `eu32b2027`, and every
+earlier season's, rebuilt 2026-11-23). Every club's ground lies in its own land ("Grounds"):
+150 grounds lie over 0.5 km outside it, all on no land of the map, where its coast is drawn
+coarser than they stand (Monaco's, Fenerbahçe's at Kadıköy, Bodø/Glimt's, 1.7 to 2.6 km
+offshore; Venezia's on its lagoon, 6 km, the only two over 5 km); before, 201 lay over 5 km out
+and 76 over 50 km, two thirds of them Turkish clubs'. The cost is a crowded city's land: 84 club
+lands are under 800 km² (15 before), Fulham's about 1 km² in today's Top 124 and four earlier
+ones, its ground on the Thames between Chelsea's and Brentford's boroughs (land over the river
+is no link), Beşiktaş's 15 km² of Istanbul in seven seasons, Arsenal's 34 km² in the Elite 32s of
+2021/22 and 2022/23, Galatasaray's 113 km², Sunderland's about 180 to 205 km², Liverpool's 200
+to 230 km² and Everton's about 460 km². In today's Top 124 every other club holds over
+1,300 km². Russia's clubs share European Russia's 4.0 million km²: in 2015/16's Elite 32 Zenit
+holds all of it, in its Top 124 eight clubs 0.2 to 1.0 million each.
 
 **Maps of before** (`replacedBy`). A saved campaign resumes only on a map with exactly its
 clubs (`fitDomesticCampaign` in `src/engine/storage.js` moves one club by club onto a rebuild,
@@ -1892,8 +2005,8 @@ none, to the season's Top 124 as before; going back to the built-in season goes
 back to today's map. The "One country · top clubs" list shows the chosen season's
 countries only.
 
-**What ships.** 1,718 maps over the 31 seasons with clubs, 41,078 club-seasons, 205.4 MB
-(47–249 KB a map, median 119 KB), each fetched only when chosen; the index
+**What ships.** 1,718 maps over the 31 seasons with clubs, 41,078 club-seasons, 195.8 MB
+(45–242 KB a map, median 115 KB), each fetched only when chosen; the index
 `src/data/domesticSeasons.js` is about 20 KB. `docs/design/domestic-seasons-audit.json`
 gives every map's layer, clubs, homes and size.
 
@@ -1942,8 +2055,9 @@ seasons field every league it has, Europe's and the Americas', Algeria's, South
 Africa's, Japan's, Taiwan's, Australia's and New Zealand's (until 2026-11-16 only the
 seven big leagues', the other league files uncached); India's, Ghana's and Canada's
 clubs, fewer than ten, have no map, nor 1994/95's and 1995/96's United States. A
-club's home lies in its own home section for 32,448 of 39,717 located club-seasons
-(81.7%); 1,361 club-seasons are placed (estimates), most of them the Update Team's smaller clubs no source places.
+club's home lies in its own home section for 36,195 of 39,691 located club-seasons
+(91.2%; 28,798 of 39,719, 72.5%, before 2026-11-21); 1,387 club-seasons are placed (estimates),
+most of them the Update Team's smaller clubs no source places.
 
 **Clubs** (`scripts/lib/season-country-clubs.mjs`, read through the season
 builders, so the players are the season file's own tuples):
@@ -2103,9 +2217,10 @@ node scripts/build-season-countries.mjs --check ...                             
   groups hold about 2.7% of all land (2.28% approximate overrides, 0.41% placed
   clubs), but 74% of Laos (7 of its 16 clubs are placed), a quarter of Togo and of
   Eswatini, 21% of China, 19% of Uzbekistan, 17% of Egypt and 12% of Ecuador. Up to
-  five clubs share one town point (in eight countries, Bangladesh, Brunei and
-  Ethiopia among them); only one can hold the point. Some overrides rest on
-  medium-confidence judgement (noted in the file).
+  seven clubs share one town point (Banjul's; Bangladesh, Brunei and Ethiopia among
+  the others); each holds land within 2 km of it ("Grounds"), which leaves a crowd on
+  a small island little land. Some overrides rest on medium-confidence judgement
+  (noted in the file).
 - **Crests.** 460 of the 4,184 clubs have no crest (README "Club crests"), holding
   1,985 of the sections (15.5%). 748 clubs gained a crest from Wikipedia's file pages
   on 17 November 2026 (1,208 had none before, 35% of the sections). 36 maps are complete;
@@ -2117,12 +2232,10 @@ node scripts/build-season-countries.mjs --check ...                             
 - **Group sizes are not always by strength.** "The stronger clubs take the
   larger groups" holds only where they have room: a club hemmed in by its city
   hands its larger size to the strongest club with room (150 clubs involved).
-- **Home sections away from home.** A club's home lies in its own home section
-  for 3,135 of 4,147 located clubs (75.6%). For fanned clubs (901) and moved
-  starts (201) the home section is the one nearest their start, not the one
-  holding their town, and the town may lie in a weaker club's group; `home`
-  keeps the real town. Moved starts stay within `√(area/N)` of home, so an
-  archipelago capital (Port Vila) keeps its clubs on or near the home island.
+- **Home sections away from home.** A club's land holds its home, but the home lies
+  in its own home section for 3,610 of 4,147 located clubs (87.1%): clubs sharing a
+  ground (only one section can hold the point) and grounds on a section's border
+  make the rest.
 - **Uneven sections.** Group sizes are fixed and groups contiguous, so empty
   land bordered by few clubs keeps huge sections: Canada's arctic (one section of
   2.26 million km²), China's west (1.53 million), Algeria's Sahara (392,000 km²),

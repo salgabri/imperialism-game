@@ -705,6 +705,10 @@ nations by their land, largest first; your clay comes first and your neighbours
 keep clear of it. "Clearly apart" is an OKLab distance of 0.065 with lightness
 counted at 0.4 (two pastels of one hue read as one colour however light), in
 whichever theme has them nearer; Flags mode keeps clubs' colours 0.1 apart.
+Two empires' pastels can round to one light colour with different dark-theme
+twins, and the map paints one twin a light colour: the one that keeps every
+empire wearing it clear of its neighbours (Cartaginés's and San Carlos's on Costa
+Rica's maps of 2009/10 and 2010/11).
 
 The colours of kick-off hold all campaign long: as empires grow, an empire
 changes colour only when a conquest brings a look-alike to its border (about
@@ -1481,9 +1485,11 @@ populous ones), and each grows inside the territory only, so a group is always
 contiguous on land. Where every club gets two or more sections (50 clubs or
 fewer), territories also stop growing at about 1.5 times their fair share of
 land, clubs crowded into one city start in wedges fanned out around it (Dhaka's
-ten clubs), and a club still boxed in starts just outside its city, never
-farther from home than one club's share of the country is wide; when a club
-still ends up with too little land, the partition is redone. Each section is
+ten clubs), and every club starts on its own ground: since 21 November 2026 a
+club's land always holds its city and stadium, and a club crowded into a city
+keeps what its neighbours leave it there (it used to start just outside); when a
+club still ends up with too little land, the partition is redone with its city
+fanned. Each section is
 dissolved, simplified and quantized. Names come from the source units, or for an
 extra section from the town it was built around, repaired from GeoNames where
 broken, and are unique on each map; a club pushed off its home unit names its
@@ -1618,8 +1624,10 @@ own country.
   small for its clubs and shares its largest neighbour's land too (Berlin and
   Brandenburg, Madrid and Castile). Only a commune two clubs share is ever cut (Milan's
   San Siro). Where clubs are crowded into one city, its communes are dealt out around it
-  so each has a way out, and a club boxed in by the others may start next door
-  (Beşiktaş played out of Anatolia on today's Top 124 of before). A stray piece of a club's land under 400 km² that
+  so each has a way out, and every club holds its own ground however crowded its city
+  (since 21 November 2026; on the maps of before, kept for their saves, a club boxed in
+  by the others could start next door: Beşiktaş played out of Anatolia on the Top 124 of
+  before). A stray piece of a club's land under 400 km² that
   lies inside another's goes to that club.
 - **A country with no club stays grey**: it is not on the map, only drawn beneath it
   as any country map's neighbours are. It is never territory, and attacks go around
