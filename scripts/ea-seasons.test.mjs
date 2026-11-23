@@ -794,7 +794,9 @@ const FLOORS = {
 };
 const committed = id => JSON.parse(readFileSync(new URL(`../public/football/${id}.json`, import.meta.url), 'utf8'));
 // EA's own tuples: a computed player a nation lists beside them (scripts/lib/football-fills.mjs) is `[name, position, rating, source]`.
-const tuplesOf = doc => [...Object.values(doc.nations).flatMap(([, , squad]) => squad), ...doc.clubs.flatMap(club => club.squad)].filter(tuple => tuple.length !== 4);
+// EA's own records: not a nation's computed players, nor a club another source fills (`fill`, the Update Team's tuples).
+const tuplesOf = doc => [...Object.values(doc.nations).flatMap(([, , squad]) => squad), ...doc.clubs.filter(club => !club.fill).flatMap(club => club.squad)]
+  .filter(tuple => tuple.length !== 4);
 
 test('a club EA files under Rest of World plays in the first division its id is in, in the nearest other edition', () => {
   const row = (version, club, league) => ({ fifa_version: `${version}.0`, fifa_update: '2.0', club_team_id: `${club}.0`, league_id: `${league}.0` });
@@ -803,9 +805,10 @@ test('a club EA files under Rest of World plays in the first division its id is 
   assert.deepEqual(restOfWorldLeague(rows, 280, 20, 2), { league: EA_LEAGUES[63], from: 'FIFA 21' }, 'the later of two as near');
   assert.deepEqual(restOfWorldLeague(rows, 1, 20, 2), { league: EA_LEAGUES[67], from: 'FIFA 18' }, 'the nearer');
   assert.deepEqual(restOfWorldLeague(rows, 9, 20, 2), { league: null, from: null }, "a club of no European first division plays in none");
-  // FIFA 20 filed Greece's, Russia's and Ukraine's clubs, and Dinamo Zagreb, under Rest of World.
+  // FIFA 20 filed Greece's, Russia's and Ukraine's clubs, and Dinamo Zagreb, under Rest of World: those among its strongest by
+  // results play in their leagues.
   const fifa20 = committed('ea-fifa-20');
-  for (const [name, league] of [['Olympiakos Piraeus', 'Greek Super League'], ['Spartak Moskva', 'Russian Premier League'],
+  for (const [name, league] of [['Olympiakos Piraeus', 'Greek Super League'], ['Lokomotiv Moskva', 'Russian Premier League'],
     ['Shakhtar Donetsk', 'Ukrainian Premier League'], ['Dinamo Zagreb', 'Croatian HNL']]) {
     assert.equal(fifa20.clubs.find(club => club.name === name)?.league, league, name);
   }

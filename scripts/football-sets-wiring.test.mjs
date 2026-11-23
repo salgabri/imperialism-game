@@ -687,7 +687,7 @@ test('Clubs list no season with nations only, a season keeps the teams, and Club
 
     // Clubs: the nearest season with clubs, FIFA 07 (a year on; 2003/04's is two back), on its map of the elite.
     app.pickSetup('layer', 'clubs');
-    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['clubs', 'ea-fifa-07', 'domestic:eu32e2007']);
+    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['clubs', 'ea-fifa-07', 'domestic:eu32r2007']);
     assert.deepEqual([modelOf().layer, modelOf().season.id], ['clubs', 'ea-fifa-07']);
     // Nations straight back give FIFA 06 back, and Clubs again FIFA 07.
     app.pickSetup('layer', 'nations');
@@ -702,7 +702,7 @@ test('Clubs list no season with nations only, a season keeps the teams, and Club
     app.pickSetup('dataSet', 'ea-fifa-07');
     assert.equal(setup().layer, 'nations', 'the player chooses clubs again if they want them');
     app.pickSetup('layer', 'clubs');
-    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['clubs', 'ea-fifa-07', 'domestic:eu32e2007']);
+    assert.deepEqual([setup().layer, setup().dataSet, setup().clubScope], ['clubs', 'ea-fifa-07', 'domestic:eu32r2007']);
   });
 });
 

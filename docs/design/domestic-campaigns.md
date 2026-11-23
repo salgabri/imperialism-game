@@ -1474,9 +1474,63 @@ from Denmark, Ukraine and Scotland, and one each from Norway, Croatia and Bulgar
 The strongest `ELITE_CLUBS` (32) are the elite. The league names and the map shape each
 league's clubs hold land in are `src/data/footballLeagues.js` (`EUROPEAN_LEAGUES`).
 
-**An earlier season's field** (since 14 November 2026) is drawn the same way from its own
-source: every European first division the source rates, its clubs with eleven rated players,
-and the strongest `TOP_CLUBS` kept in the season's file (`strongestBuilt` in
+**An earlier season's field by results** (since 21 November 2026). A game rates a league's
+clubs well against each other, but not one league against another: FIFA 10 rated every Premier
+League and La Liga side above Salzburg, Basel and every Ukrainian club, so the five big leagues
+took 88–95 of every EA season's 124, and 12–20 countries played at all. So an earlier season's
+field is now its clubs ranked by results, on one scale across every country:
+
+- **Strength** (`scripts/lib/club-strength.mjs`, `scripts/data/club-strength.json`,
+  `npm run build:club-strength`): from every result of Europe's top divisions and the UEFA cups
+  since 1955 (David Schoch's [football-data](https://github.com/schochastics/football-data),
+  `data/results/games.parquet` at a pinned commit, Open Data Commons Attribution License 1.0, read
+  by `scripts/lib/parquet.mjs`, which reads Snappy pages since). A club's *standing* is its Elo in
+  its own league's games only, less the league's mean (K 20, home 80 points, World Football Elo's
+  margin weights, a shoot-out a draw; a promoted club takes the relegated clubs' mean rating). Each
+  league's *level* in each UEFA season is fitted to all 26,872 UEFA cup games at once, with the
+  game's Elo chance from level + standing + European form + home advantage (fitted, 101 points);
+  levels move between seasons by a random walk of 30 points, so a league with few European games
+  borrows from the years either side, and are held loosely to 1,500 (300 points). *European form*
+  is a club's own over- or under-performance in Europe that season, held to 0 (50 points). A club's
+  strength is level + its mean standing over August to May + its form, for clubs that played a
+  top-division game from 15 August to 31 May (2019/20 ran into August 2020, so the clubs it
+  relegated are not 2020/21's). One Elo rating per club, tried first, let an isolated league drift
+  from the rest: it put Lincoln Red Imps 19th in 2009/10 and eight Lithuanian clubs in 1993/94's 124.
+  The file keeps each season's 300 strongest of the countries with a shape on the map, by the
+  results' club name; not Andorra's, the Faroes', Gibraltar's, Liechtenstein's, Malta's or San
+  Marino's, nor Kazakhstan's, a UEFA member in Asia whose land would stretch the map to China.
+- **Squads** (`scripts/lib/europe-field.mjs`): down the ranking, each club takes its squad from
+  the season's own source where it rates it, matched by name within the club's country (or the
+  country of the league it plays in: Swansea's England) when one candidate alone has every word
+  of the shorter name (same spelling first, then fewest other words), or by
+  `scripts/data/club-strength-names.json` where the names differ (PSG and Paris Saint-Germain,
+  FCSB and Steaua, Croatia Zagreb, Dinamo's 1990s name). A candidate named exactly as another
+  ranked club is that club's only (FC Moskva is no Lokomotiv's). A club no source gives eleven
+  players is passed over, and the audit names it. An EA season's clubs EA lacks (Shakhtar
+  before FIFA 14, Dynamo Kyiv and Dinamo Zagreb before FIFA 19, Red Star, Ludogorets, Zenit from
+  FIFA 19, every Russian club from FIFA 23) come
+  from the CM 01/02 Update Team's database of the same season (`scripts/lib/update-team-fill.mjs`,
+  2007/08 on), only of its countries' top divisions (so no Zenit Penza), marked `fill`, their
+  Update Team ratings put on EA's scale by a line fitted over the XI means of the clubs both rate
+  (`clubFill.scale`: FIFA 10's 36.2 + 0.58 × the Update Team's, r 0.85; r 0.85–0.97 over the
+  seasons), which the game applies as it reads the season (`src/engine/footballSets.js`). A
+  Championship Manager season's clubs come from the first divisions `LEAGUES` reads, as stored,
+  and every other European country's top division by nation.
+- **Order**: the season file lists its 124 strongest first, each with its `rank`; the Elite 32 are
+  the first 32 (`strongestClubs` in `src/data/scopes.js` takes `rank` where a season has it).
+- **Ids**: a club keeps the id its season's country map already gives it, and no other takes one
+  of those (`scripts/lib/season-map-ids.mjs`), so the 1,718 season country maps keep every club
+  and id (`node scripts/build-season-countries.mjs --ids` checks it without geometry).
+
+Every season now fields 20–27 countries (12–20 before), the five big leagues 73–84 of an EA
+season's 124 (88–95 before), 230 of them filled from the Update Team's databases. 2006/07 (FIFA 07)
+is the exception at 17 countries: no Update Team database fills it. Where a CM database
+rates a country's clubs with fewer than eleven players (Ukraine's, Turkey's and Switzerland's in
+1997–2001), the next clubs take their places.
+
+**Before results**, from 14 November 2026, an earlier season's field was drawn the same way as
+today's from its own source: every European first division the source rates, its clubs with
+eleven rated players, and the strongest `TOP_CLUBS` kept in the season's file (`strongestBuilt` in
 `src/data/footballSetBuild.js`, by strength then name, as the file lists them). The EA
 editions (`scripts/lib/ea-seasons.mjs` `EA_LEAGUES`, by competition id, Russia's 67 among
 them; FIFA 07–14 by SoFIFA's league names, FC 25 by its website's) rate 130–177 clubs beyond
@@ -1497,14 +1551,17 @@ leaves dozens of clubs on one rounded strength at the cut, so SWOS's cut goes by
 mean. Until then they kept the seven big leagues' top divisions whole (134 clubs), the other
 league files being uncached.
 Until 14 November 2026 (SWOS's: 17 November) an earlier season's file held the seven big
-leagues only, and its two fields were the strongest of those; those maps stay for the
-campaigns saved on them (below). FIFA 06,
+leagues only, and its two fields were the strongest of those. Those maps (`eu124s2018`) and the
+ones by rating of 14–21 November (`eu124e2018`) stay for the campaigns saved on them (below),
+replaced by the maps by results (`eu124r2018`, `replacedBy`). FIFA 06,
 FIFA 05 and Simon Treanor's fan-made 1989/90 (2005/06, 2004/05, 1989/90) and the computed
 seasons (1960/61 to 1993/94) have nations only, so they have no maps.
 
-**Build** (`npm run build:europe-maps`, `scripts/build-europe-maps.mjs`, about 30 minutes, most
-of it the earlier seasons' maps with Russian clubs, whose 1,557 districts the partition grows over;
-`--only=eu124,eu32`, `--check`, `--dry-run`, `--boundaries=<dir>` for another boundary cache).
+**Build** (`npm run build:europe-maps`, `scripts/build-europe-maps.mjs`, two to three hours in one run since the
+fields by results, most of it the earlier seasons' maps with Russian clubs, whose 1,557 districts the partition grows
+over; `--only=eu124,eu32`, `--check`, `--dry-run`, `--boundaries=<dir>` for another boundary cache). Runs of disjoint
+`--only` sets go side by side (seven took about an hour for the 62 earlier seasons' maps), then `--index` builds no
+map and writes the index and attribution from the maps on disk.
 The maps follow the clubs, so they are rebuilt after `npm run build-clubs`,
 `npm run build:ea-seasons` or `npm run build:retro-seasons`; the build stops on a club with
 no row in the table below, and the test on a field that has changed. For each of the 32
@@ -1696,9 +1753,11 @@ attribution), each entry naming the map that replaced it. The setup never offers
 (`servesSeason` in `src/data/domesticScope.js`), a setup or link that names one moves on to
 its replacement (`setClubScope`), and a campaign saved on one still passes the save checks
 (`isSeasonTheatreMap`) and resumes there. SWOS's seasons joined them on 17 November 2026
-(`eu124e1995` to `eu32e1997`; their six `s` maps are among the 62).
+(`eu124e1995` to `eu32e1997`; their six `s` maps are among the 62). On 21 November 2026 the
+fields by results took ids of their own the same way, `eu124r<year>` and `eu32r<year>`, and the
+`e` maps joined the `s` maps, each naming its `r` map as the one that replaced it.
 
-**Runtime.** Scopes are `domestic:eu124`, `domestic:eu32` and `domestic:eu124e2018`.
+**Runtime.** Scopes are `domestic:eu124`, `domestic:eu32` and `domestic:eu124r2018`.
 `setClubScope` keeps a setup on the map of its theatre and season: `all`, `elite`, an old
 link's league and another sport's map all land there, and one country's map stays
 until a season leaves it. The setup lists the season's two rows ("Europe") above the

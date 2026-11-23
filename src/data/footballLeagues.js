@@ -38,7 +38,41 @@ export const EUROPEAN_LEAGUES = Object.freeze({
   'Irish League': 'NIR',
   'Welsh Premier League': 'WAL',
   'Luxembourg National Division': '442',
+  // Since 21 November 2026 an earlier season's field is Europe's strongest clubs by results (scripts/lib/europe-field.mjs),
+  // from every country with a shape on the map, so every other first division is named too.
+  'Serbian SuperLiga': '688',
+  'Montenegrin First League': '499',
+  'Slovak First League': '703',
+  'Slovenian PrvaLiga': '705',
+  'Premier League of Bosnia and Herzegovina': '070',
+  'Macedonian First League': '807',
+  'Kategoria Superiore': '008',
+  'Belarusian Premier League': '112',
+  'Moldovan Super Liga': '498',
+  'Israeli Premier League': '376',
+  'Kazakhstan Premier League': '398',
+  'Erovnuli Liga': '268',
+  'Armenian Premier League': '051',
+  'A Lyga': '440',
+  'Latvian Higher League': '428',
+  'Meistriliiga': '233',
+  'Besta deild': '352',
+  'Kosovo Superleague': 'KOS',
 });
 
 /** The seven big leagues: every season with clubs fields clubs from each of them. */
 export const BIG_LEAGUES = Object.freeze(['Premier League', 'La Liga', 'Serie A', 'Bundesliga', 'Ligue 1', 'Eredivisie', 'Liga Portugal']);
+
+// Each shape's first division, the first EUROPEAN_LEAGUES names for it (FR Yugoslavia's before Serbia's own).
+const FIRST_DIVISION = new Map();
+for (const [league, country] of Object.entries(EUROPEAN_LEAGUES)) if (!FIRST_DIVISION.has(country)) FIRST_DIVISION.set(country, league);
+
+/**
+ * The first division of the country of shape `country` in the season ending in `year`, as the game names it, or null:
+ * FR Yugoslavia's league (and Serbia and Montenegro's, which keeps its name) for Serbia's and Montenegro's clubs up to
+ * 2005/06, then each country's own.
+ */
+export function firstDivisionOf(country, year) {
+  if (country === '688' || country === '499') return year <= 2006 ? 'Yugoslav First League' : country === '688' ? 'Serbian SuperLiga' : 'Montenegrin First League';
+  return FIRST_DIVISION.get(country) ?? null;
+}

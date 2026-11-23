@@ -5,6 +5,8 @@
 //                                                docs/design/football-retro-seasons-audit.json
 //   npm run build:retro-seasons -- --check       builds and compares every output byte for byte, writes nothing
 //   npm run build:retro-seasons -- --data=<dir>  the downloaded sources elsewhere (default data-src/)
+//   npm run build:retro-seasons -- --candidates=<file>  also write every season's candidate clubs to <file>
+//                                                (for scripts/data/club-strength-names.json)
 //
 // 2002/03 and 2001/02 are SI's own Championship Manager 01/02 databases (3.9.68 and 3.9.60) and 1998/99 SI's
 // Championship Manager 3 data in the CM 01/02 format, all three read by the CM 01/02 builder
@@ -21,6 +23,10 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { buildRetroSeason } from './lib/retro-season-builds.mjs';
+import { seasonField } from './lib/europe-field.mjs';
+import { seasonMapIds } from './lib/season-map-ids.mjs';
+import { seasonYear } from '../src/data/footballSetBuild.js';
+import { setHasClubs } from '../src/engine/footballSets.js';
 import { committedSeasons, eaSeasonIds, footballSeasonsModule, nationalTeamSeasonIds, worldCupSeasonIds } from './lib/football-seasons-listing.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -31,6 +37,7 @@ function parseArgs(argv) {
     const [, key, value] = /^--([a-z]+)(?:=(.*))?$/s.exec(arg) || [];
     if (key === 'check' && value === undefined) args.check = true;
     else if (key === 'data' && value) args.data = value;
+    else if (key === 'candidates' && value) args.candidates = value;
     else throw new Error(`Unknown option ${arg}`);
   }
   return args;
@@ -41,12 +48,20 @@ async function main() {
   const manifest = JSON.parse(await readFile(path.join(root, 'scripts/data/retro-seasons.json'), 'utf8'));
   const ea = JSON.parse(await readFile(path.join(root, 'scripts/data/ea-seasons.json'), 'utf8'));
   const dataDir = path.resolve(args.data ?? path.join(root, 'data-src'));
+  // Each season with clubs keeps Europe's strongest by results (scripts/data/club-strength.json, scripts/lib/europe-field.mjs).
+  const strengths = JSON.parse(await readFile(path.join(root, 'scripts/data/club-strength.json'), 'utf8'));
+  const { names } = JSON.parse(await readFile(path.join(root, 'scripts/data/club-strength-names.json'), 'utf8'));
+  const candidates = args.candidates ? {} : null;
   const results = [];
   for (const season of manifest.seasons) {
+    const year = seasonYear(season.season);
+    const made = setHasClubs(season.id) ? seasonField({ strengths, names, year, ids: await seasonMapIds(root, year), reserved: new Set((await seasonMapIds(root, year)).values()) }) : null;
+    // --candidates: every name the season's source gives, for scripts/data/club-strength-names.json.
+    const field = !made || !candidates ? made : built => { candidates[season.id] = { year, own: built.map(club => [club.country, club.name]), fill: [] }; return made(built); };
     // A season's reader, where its kind is read from more than one kind of source (CM: a zip, or a CD's tables) or
     // from one of its own (SWOS: the game's team files).
     // A season read later than the others names its own day.
-    const result = await buildRetroSeason(season, dataDir, season.retrieved ?? manifest.retrieved);
+    const result = await buildRetroSeason(season, dataDir, season.retrieved ?? manifest.retrieved, field ? { field } : {});
     const { doc } = result;
     if (doc.id !== season.id || doc.season !== season.season || doc.local !== false) {
       throw new Error(`${season.id} built as ${doc.id} ${doc.season}${doc.local === false ? '' : ', local'}: the manifest and the source disagree`);
@@ -56,6 +71,11 @@ async function main() {
     console.log(`${doc.id} ${doc.season} ${doc.label}: ${coverage.completeXIs}/${Object.keys(doc.nations).length} full XIs, `
       + `${coverage.nations} nations with players, ${coverage.clubs} clubs, ${coverage.players} players, ${Math.round(Buffer.byteLength(result.text) / 1024)} KB`);
     for (const warning of result.warnings) console.log(`  warning: ${warning}`);
+  }
+  if (candidates) {
+    await writeFile(path.resolve(args.candidates), `${JSON.stringify(candidates)}
+`);
+    console.log(`Wrote every season's candidate clubs to ${args.candidates}`);
   }
   const worldCup = JSON.parse(await readFile(path.join(root, 'scripts/data/world-cup-seasons.json'), 'utf8'));
   const nationalTeams = JSON.parse(await readFile(path.join(root, 'scripts/data/national-team-seasons.json'), 'utf8'));

@@ -60,7 +60,9 @@ for (const [file, [, country]] of Object.entries(SWOS_LEAGUES)) {
  * Belarus, Estonia, Iceland, Israel, Latvia, Lithuania, Slovakia and Slovenia are none of those first divisions, so
  * their clubs play on their countries' maps only.
  */
-const LEAGUE_OF_COUNTRY = new Map(Object.entries(EUROPEAN_LEAGUES).map(([league, country]) => [country, league]));
+// Each country's first league EUROPEAN_LEAGUES names: SWOS's seasons are FR Yugoslavia's, not Serbia's alone.
+const LEAGUE_OF_COUNTRY = new Map();
+for (const [league, country] of Object.entries(EUROPEAN_LEAGUES)) if (!LEAGUE_OF_COUNTRY.has(country)) LEAGUE_OF_COUNTRY.set(country, league);
 export const SWOS_EUROPE_LEAGUES = Object.freeze(Object.fromEntries(Object.entries(SWOS_LEAGUE_FILES)
   .filter(([, country]) => LEAGUE_OF_COUNTRY.has(country)).map(([file, country]) => [file, Object.freeze([LEAGUE_OF_COUNTRY.get(country), country])])));
 for (const [file, league] of Object.entries(SWOS_LEAGUES)) {
@@ -203,7 +205,7 @@ const mean = xs => (xs.length ? xs.reduce((s, x) => s + x, 0) / xs.length : 0);
  * Returns `{ doc, text, audit, warnings }`; throws on anything it does not understand rather than guess.
  */
 export function buildSwosSeason(rows, { source, year, federations = FOOTBALL_FEDERATIONS, prices, id: seasonId = SWOS_ID, clubRows = [], topClubs = null,
-  everyClubRows = null }) {
+  everyClubRows = null, field = null }) {
   const warnings = [];
   const warn = message => warnings.push(message);
   const resolve = nationResolver(SWOS_NATIONS);
@@ -286,7 +288,7 @@ export function buildSwosSeason(rows, { source, year, federations = FOOTBALL_FED
   const idle = [...nationOf.keys()].filter(id => Object.hasOwn(territory.merged, id) || territory.inactive.includes(id));
   if (idle.length) throw new Error(`SWOS rates national teams with no federation of their own in ${year}: ${idle.join(', ')}`);
 
-  const { clubs, leagues: leagueAudit, collisions } = swosClubs(clubRows, playerFor, warn, topClubs);
+  const { clubs, leagues: leagueAudit, collisions, field: fieldAudit } = swosClubs(clubRows, playerFor, warn, topClubs, field);
   // Every division's clubs of every league file, for the season's own country maps (scripts/build-season-countries.mjs).
   const allClubs = everyClubRows ? swosLeagueClubs(everyClubRows, playerFor, seasonId, warn) : null;
   const written = new Set([...Object.values(nations).flatMap(([, , squad]) => squad), ...clubs.flatMap(club => club.squad)].map(tuple => tuple[0]));
@@ -302,7 +304,7 @@ export function buildSwosSeason(rows, { source, year, federations = FOOTBALL_FED
     ...(Object.keys(identities).length ? { identities } : {}),
     // Each league's top division, and the players SWOS files at two of its top-division clubs (namesakes, or one
     // player's record left at his old club): each club keeps its own sixteen.
-    ...(clubRows.length ? { clubRows: clubRows.length, leagues: leagueAudit, collisions } : {}),
+    ...(clubRows.length ? { clubRows: clubRows.length, leagues: leagueAudit, collisions } : {}), ...(fieldAudit ? { field: fieldAudit } : {}),
     // Every name whose case the rule sets other than plain capitalisation, for review.
     names, shortNations: nationAudit.filter(n => !n.naturalLineup).map(n => `${n.id} ${n.name} (${n.players})`), warnings,
   };
@@ -502,7 +504,7 @@ function swosLeagueClubs(rows, playerFor, seasonId, warn) {
  * clubs: each its own sixteen, its best eleven by SWOS's positions (pickFootballSquad), its strength their mean rating,
  * presented as every other set's clubs are (presentClubs). `playerOf` makes each player, its nationality his code.
  */
-function swosClubs(rows, playerOf, warn, topClubs = null) {
+function swosClubs(rows, playerOf, warn, topClubs = null, field = null) {
   if (!rows.length) return { clubs: [], leagues: [], collisions: [] };
   const byTeam = new Map();
   for (const row of rows) {
@@ -540,8 +542,13 @@ function swosClubs(rows, playerOf, warn, topClubs = null) {
   const names = built.map(club => `${club.country}:${club.name}`);
   if (new Set(names).size !== names.length) throw new Error('Two SWOS clubs of one country take one name');
   const collisions = [...heldBy].filter(([, clubs]) => clubs.length > 1).map(([who, clubs]) => `${who.split('|')[0]} (${clubs.join(', ')})`);
-  // A season reading every league keeps Europe's strongest `topClubs`, as every other season's club layer does. SWOS's
-  // coarse skills leave dozens of clubs on one rounded strength at the cut, so the cut goes by the unrounded one.
+  // A season reading every league keeps Europe's strongest `topClubs`, as every other season's club layer does: by results
+  // where a `field` is given (scripts/lib/europe-field.mjs), else by their XIs. SWOS's coarse skills leave dozens of
+  // clubs on one rounded strength at the cut, so a cut by XIs goes by the unrounded one.
+  if (field) {
+    const picked = field(built);
+    return { clubs: presentClubs(picked.clubs, warn, { ranked: true, idOf: picked.idOf, reserved: picked.reserved }), leagues, collisions, field: picked.audit };
+  }
   const kept = topClubs == null ? built : strongestBuilt(built.map(club => ({ ...club, str: club.exact })), topClubs)
     .map(club => ({ ...club, str: Math.round(club.exact) }));
   return { clubs: presentClubs(kept, warn), leagues, collisions };

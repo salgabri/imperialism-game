@@ -5,7 +5,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import zlib from 'node:zlib';
-import { parquetMetadata, readParquet } from './lib/parquet.mjs';
+import { parquetMetadata, readParquet, snappyUncompress } from './lib/parquet.mjs';
 
 // ---------- a minimal writer ----------
 
@@ -50,8 +50,35 @@ function plainBytes(type, values) {
   if (type === 'DOUBLE') return values.flatMap(v => { const b = Buffer.alloc(8); b.writeDoubleLE(v); return [...b]; });
   return values.flatMap(v => { const s = Buffer.from(v); const n = Buffer.alloc(4); n.writeUInt32LE(s.length); return [...n, ...s]; });
 }
-const CODEC = { UNCOMPRESSED: 0, GZIP: 2, ZSTD: 6 };
-const compress = (codec, bytes) => [...(codec === 'GZIP' ? zlib.gzipSync(Buffer.from(bytes)) : codec === 'ZSTD' ? zlib.zstdCompressSync(Buffer.from(bytes)) : Buffer.from(bytes))];
+const CODEC = { UNCOMPRESSED: 0, SNAPPY: 1, GZIP: 2, ZSTD: 6 };
+/** Snappy's raw format, greedily: literals of up to 60 bytes and two-byte-offset copies of 4 to 64 bytes. */
+function snappyCompress(bytes) {
+  const input = Buffer.from(bytes);
+  const out = [...varint(input.length)];
+  const seen = new Map();
+  let start = 0, i = 0;
+  const literal = end => {
+    for (let s = start; s < end; s += 60) {
+      const n = Math.min(60, end - s);
+      out.push((n - 1) << 2, ...input.subarray(s, s + n));
+    }
+  };
+  while (i + 4 <= input.length) {
+    const key = input.readUInt32LE(i), before = seen.get(key);
+    seen.set(key, i);
+    if (before == null || i - before > 65535) { i++; continue; }
+    let n = 4;
+    while (i + n < input.length && n < 64 && input[before + n] === input[i + n]) n++;
+    literal(i);
+    out.push(((n - 1) << 2) | 2, (i - before) & 0xff, (i - before) >> 8);
+    i += n;
+    start = i;
+  }
+  literal(input.length);
+  return out;
+}
+const compress = (codec, bytes) => [...(codec === 'GZIP' ? zlib.gzipSync(Buffer.from(bytes)) : codec === 'ZSTD' ? zlib.zstdCompressSync(Buffer.from(bytes))
+  : codec === 'SNAPPY' ? snappyCompress(bytes) : Buffer.from(bytes))];
 
 /**
  * A Parquet file of `rows` (each `{ column: value }`) by `columns` (`[{ name, type, optional, utf8, dictionary, v2,
@@ -141,13 +168,42 @@ test('two row groups follow each other; a column subset decodes only those colum
   assert.throws(() => readParquet(file, { columns: ['tackles'] }), /no column tackles/);
 });
 
+test('Snappy pages read back as the football results file writes them: dictionaries, optional columns, both page versions', () => {
+  // As schochastics/football-data's results: text names and dates (INT32 days) with nulls, every page Snappy-compressed.
+  const rows = Array.from({ length: 40 }, (_, i) => ({
+    home: i % 9 === 4 ? null : ['Bolton Wanderers', 'Everton', 'Preston North End', 'Derby County'][i % 4],
+    date: -29700 + Math.floor(i / 3),
+    goals: i % 11 === 7 ? null : (i * 7) % 5,
+    note: `game ${i} of the season, game ${i} of the season`,
+  }));
+  const columns = [
+    { name: 'home', type: 'BYTE_ARRAY', optional: true, utf8: true, dictionary: true, codec: 'SNAPPY' },
+    { name: 'date', type: 'INT64', optional: false, codec: 'SNAPPY', v2: true },
+    { name: 'goals', type: 'INT64', optional: true, codec: 'SNAPPY', dictionary: true, v2: true },
+    { name: 'note', type: 'BYTE_ARRAY', optional: false, utf8: true, codec: 'SNAPPY' },
+  ];
+  assert.deepEqual(readParquet(writeParquet(rows, columns)), rows);
+});
+
+test('Snappy streams decode with every literal and copy form, and a copy outside its output is refused', () => {
+  const ascii = text => [...Buffer.from(text)];
+  // "abcd" then a one-byte-offset copy of 8 (overlapping), a two-byte-offset copy of 3 and a four-byte-offset copy of 2.
+  const stream = [17, 12, ...ascii('abcd'), (4 << 2) | 1, 4, ((3 - 1) << 2) | 2, 12, 0, ((2 - 1) << 2) | 3, 2, 0, 0, 0];
+  assert.equal(Buffer.from(snappyUncompress(new Uint8Array(stream))).toString(), 'abcdabcdabcd' + 'abc' + 'bc');
+  // A literal of 100 bytes: its length (less one) in the byte after the tag (tag 60).
+  const long = 'x'.repeat(99) + 'y';
+  assert.equal(Buffer.from(snappyUncompress(new Uint8Array([100, 60 << 2, 99, ...ascii(long)]))).toString(), long);
+  assert.throws(() => snappyUncompress(new Uint8Array([6, 0, ...ascii('a'), (4 << 2) | 1, 9])), /outside its output/);
+  assert.throws(() => snappyUncompress(new Uint8Array([9, 12, ...ascii('abcd')])), /4 bytes out of a stated 9/);
+});
+
 test('what the reader does not read it refuses, never guesses', () => {
   assert.throws(() => readParquet(new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])), /not a Parquet file/);
-  const snappy = writeParquet(ROWS.slice(0, 4), [{ name: 'grade', type: 'DOUBLE', optional: false, codec: 'UNCOMPRESSED' }]);
-  // The same file, its column chunk claiming snappy pages (codec 1): the metadata's codec byte is the varint after field 4.
-  const text = Buffer.from(snappy);
+  const brotli = writeParquet(ROWS.slice(0, 4), [{ name: 'grade', type: 'DOUBLE', optional: false, codec: 'UNCOMPRESSED' }]);
+  // The same file, its column chunk claiming brotli pages (codec 4): the metadata's codec byte is the varint after field 4.
+  const text = Buffer.from(brotli);
   const at = text.lastIndexOf(Buffer.from([0x15, 0x00])); // field 4 (delta 1 from 3), i32 0 (UNCOMPRESSED)
   assert.ok(at > 0);
-  text[at + 1] = 0x02; // zigzag(1)
-  assert.throws(() => readParquet(new Uint8Array(text)), /SNAPPY are not read/);
+  text[at + 1] = 0x08; // zigzag(4)
+  assert.throws(() => readParquet(new Uint8Array(text)), /BROTLI are not read/);
 });

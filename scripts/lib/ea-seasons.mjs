@@ -167,11 +167,12 @@ export function buildSnapshotEaSeason(players, { id, fifaVersion, edition, updat
  * `clubKey` groups a club's players and `league` is an EA_LEAGUES entry `[game league, map shape]` or null (not one of
  * Europe's first divisions). The season is `{ id, year, edition, update, source, federations }`, plus `auditExtra` (fields
  * the audit adds after the snapshot date), `everyLeague` (stop, not warn, on one of the seven big leagues left with no
- * club), `noClubs` (a season with nations only, so a league with no club is no news) and `fill` (the computed fills'
- * facts for the season: `{ elo, wikidata, manifest }`, scripts/lib/football-fills.mjs fillSeason). The season keeps
- * Europe's strongest TOP_CLUBS clubs. Returns `{ doc, text, audit, warnings }`.
+ * club), `noClubs` (a season with nations only, so a league with no club is no news), `fill` (the computed fills'
+ * facts for the season: `{ elo, wikidata, manifest }`, scripts/lib/football-fills.mjs fillSeason) and `field` (the
+ * season's field by results, scripts/lib/europe-field.mjs resultsField). The season keeps Europe's strongest TOP_CLUBS
+ * clubs: by results where `field` is given, else by the ratings of their XIs. Returns `{ doc, text, audit, warnings }`.
  */
-export function assembleEaSeason(records, { id, year, edition, update, source, federations = FOOTBALL_FEDERATIONS, auditExtra = {}, everyLeague = false, noClubs = false, fill = null }) {
+export function assembleEaSeason(records, { id, year, edition, update, source, federations = FOOTBALL_FEDERATIONS, auditExtra = {}, everyLeague = false, noClubs = false, fill = null, field = null }) {
   const warnings = [];
   const warn = message => warnings.push(message);
   const { players, noTeam } = eaPlayersOf(records, { edition, source });
@@ -209,7 +210,7 @@ export function assembleEaSeason(records, { id, year, edition, update, source, f
     fillAudit = filled.audit;
   }
   return assembleEaClubs(players, { id, year, edition, update, source, fill: fillSource, federations,
-    auditExtra: fillAudit ? { ...auditExtra, fill: fillAudit } : auditExtra, everyLeague, noClubs, warnings, warn, noTeam, nations, nationAudit, records });
+    auditExtra: fillAudit ? { ...auditExtra, fill: fillAudit } : auditExtra, everyLeague, noClubs, warnings, warn, noTeam, nations, nationAudit, records, field });
 }
 
 /** A nation's listed player as selectLineup reads him: an EA tuple, or a computed record `[name, 'DF/MF', rating, source]`. */
@@ -262,7 +263,7 @@ export function eaPlayersOf(records, { edition, source }) {
 }
 
 /** assembleEaSeason's clubs, territory and document, from its players and nations. */
-function assembleEaClubs(players, { id, year, edition, update, source, fill = null, federations, auditExtra, everyLeague, noClubs, warnings, warn, noTeam, nations, nationAudit, records }) {
+function assembleEaClubs(players, { id, year, edition, update, source, fill = null, federations, auditExtra, everyLeague, noClubs, warnings, warn, noTeam, nations, nationAudit, records, field = null }) {
   const byClub = new Map();
   for (const player of players) {
     const { league } = player;
@@ -290,29 +291,34 @@ function assembleEaClubs(players, { id, year, edition, update, source, fill = nu
     if (everyLeague) throw new Error(`${edition}: no ${league} club has eleven players`);
     warn(`No ${league} clubs in ${edition}`);
   }
-  const clubs = presentClubs(strongestBuilt(built, TOP_CLUBS), warn);
-  for (const club of clubs) leagueAudit.get(club.league).kept++;
+  // The season's clubs: by results (`field`), a club EA lacks filled from another source where the field has one, else
+  // the strongest XIs.
+  const picked = field ? field(built) : { clubs: strongestBuilt(built, TOP_CLUBS), clubFill: null, audit: null };
+  const clubs = presentClubs(picked.clubs, warn, { ranked: !!field, idOf: picked.idOf, reserved: picked.reserved });
+  for (const club of clubs) auditOf(club.league).kept++;
 
   const territory = territoryFor(federations, year);
-  // A computed player (`[name, position, rating, source]`) is no EA record: `computed` counts them, where a season has any.
+  // A computed player (`[name, position, rating, source]`) is no EA record: `computed` counts them, where a season has any;
+  // a filled club's players are the other source's (`filled`).
   const isEa = tuple => tuple.length !== 4;
   const listed = Object.values(nations).flatMap(([, , squad]) => squad);
-  const written = new Set([...listed.filter(isEa), ...clubs.flatMap(club => club.squad)].map(tuple => tuple[0]));
+  const written = new Set([...listed.filter(isEa), ...clubs.filter(club => !club.fill).flatMap(club => club.squad)].map(tuple => tuple[0]));
   const computed = listed.filter(tuple => !isEa(tuple)).length;
+  const filled = clubs.filter(club => club.fill).reduce((sum, club) => sum + club.squad.length, 0);
   const coverage = {
     players: written.size, nations: nationAudit.filter(n => n.players).length,
     completeXIs: nationAudit.filter(n => n.naturalLineup).length, clubs: clubs.length, leagues: new Set(clubs.map(club => club.league)).size,
-    ...(computed ? { computed } : {}),
+    ...(computed ? { computed } : {}), ...(filled ? { filled } : {}),
   };
   const doc = { format: FOOTBALL_SET_FORMAT, kind: 'ea', id, version: '', year, season: seasonOf(year), label: edition, local: false,
     // The computed fills' rule and inputs, where the season lists any (scripts/lib/football-fills.mjs): beside EA's source, which
-    // the season's country maps credit as it is.
-    source, ...(fill ? { fill } : {}), nations, clubs, territory, coverage };
+    // the season's country maps credit as it is. A club EA lacks comes from `clubFill`'s source, on EA's scale by its line.
+    source, ...(fill ? { fill } : {}), ...(picked.clubFill ? { clubFill: picked.clubFill } : {}), nations, clubs, territory, coverage };
   doc.version = `${id}-${contentHash(doc)}`;
   // The nations short of a natural XI, as "id name (players)": the rest is in the season file itself.
   const shortNations = nationAudit.filter(n => !n.naturalLineup).map(n => `${n.id} ${n.name} (${n.players})`);
   const audit = { id, version: doc.version, edition, update, roster: source.roster, snapshotDate: source.snapshotDate, ...auditExtra,
     rows: records.length, noTeam, coverage, leagues: Object.fromEntries([...leagueAudit].sort(([a], [b]) => leagueOrder(a) - leagueOrder(b) || (a < b ? -1 : 1))),
-    territory, shortNations, warnings };
+    ...(picked.audit ? { field: picked.audit } : {}), territory, shortNations, warnings };
   return { doc, text: serializeFootballSet(doc), audit, warnings };
 }

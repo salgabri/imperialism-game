@@ -187,6 +187,8 @@ const COMPUTED_NATION_KINDS = new Set(['wc', 'nt', 'wwc', 'wol']);
 const FILL_LEAGUE = 'International football';
 const FILL_ROLES = new Set(['GK', 'DF', 'MF', 'FW']);
 const isFilledPlayer = tuple => Array.isArray(tuple) && tuple.length === 4;
+/** A filled club's player's rating on its season's scale (`clubFill.scale`): a + b × its source's, rounded, held to 1-99. */
+export const fillRating = (rating, { a, b }) => Math.min(99, Math.max(1, Math.round(a + b * rating)));
 
 // What build-rosters writes for a nation with no players.
 const EMPTY_STRENGTH = 40;
@@ -460,13 +462,19 @@ export function decodeFootballSet(data, id = data?.id) {
   // An EA season's nation can list computed players beside EA's (scripts/lib/football-fills.mjs): plain records, as the
   // computed national-team seasons' are.
   const nationPlayer = tuple => (isFilledPlayer(tuple) ? [tuple[0], tuple[1], tuple[2], { ...tuple[3] }] : expand(tuple));
+  // A club another source fills (`fill`): that source's player, on the season's scale by `clubFill`'s line, its own
+  // rating kept in its record (`unscaledRating`).
+  const clubPlayer = club => (!club.fill ? expand : tuple => {
+    const [name, pos, rating, sourceInfo] = expandSetPlayer(tuple, meta.clubFill.source, 'cm0102');
+    return [name, pos, fillRating(rating, meta.clubFill.scale), { ...sourceInfo, unscaledRating: rating, scale: meta.clubFill.scale.conversion }];
+  });
   return {
     meta,
     rosters: Object.fromEntries(Object.keys(NATIONS).map(nation => {
       const [str, pool, players] = nations[nation] || [EMPTY_STRENGTH, 0, []];
       return [nation, [str, pool, players.map(nationPlayer)]];
     })),
-    clubs: clubs.map(club => ({ ...club, squad: club.squad.map(expand) })),
+    clubs: clubs.map(club => ({ ...club, squad: club.squad.map(clubPlayer(club)) })),
     territory: { merged: { ...territory.merged, ...(englandHolds ? Object.fromEntries(HOME_NATIONS.map(id => [id, '826'])) : {}) },
       inactive: [...territory.inactive, ...(beforePacificIslands(nations) ? PACIFIC_ISLANDS : []),
         ...unlistedHistoric(nations).filter(id => !territory.inactive.includes(id))] },
@@ -691,10 +699,26 @@ function validateFootballSet(data, id) {
     }
   };
 
+  // A men's EA season's club EA lacks comes from another source of the same season, the CM 01/02 Update Team's database
+  // (`fill: true`, its tuples that source's), and plays on EA's scale by the line `clubFill.scale` gives
+  // (scripts/lib/europe-field.mjs): each rating a + b × the database's, rounded and held to 1-99.
+  const clubFill = data.clubFill;
+  if (clubFill !== undefined) {
+    const scale = clubFill?.scale;
+    if (setKindOf(id) !== 'ea' || !isObject(clubFill) || !isObject(clubFill.source) || !isObject(scale) || !Number.isFinite(scale.a)
+      || !(Number.isFinite(scale.b) && scale.b > 0) || !text(scale.conversion)) {
+      fail('clubFill must name its source and the line that puts its ratings on the season\'s scale');
+    }
+    const problem = KINDS.cm0102.source(clubFill.source, id);
+    if (problem) fail(`clubFill ${problem}`);
+    if (typeof clubFill.source.url !== 'string' || !/^https?:\/\/\S+$/i.test(clubFill.source.url)) fail('clubFill source url must be an http(s) link');
+  }
+
   // The builder writes only tuples that rebuild exactly, so anything else (an unknown or repeated position key, a
-  // full name equal to the name, a malformed date) is a file it did not write.
-  const players = (at, tuples, { nation: inNation = false } = {}) => {
+  // full name equal to the name, a malformed date) is a file it did not write. A filled club's tuples are its source's.
+  const players = (at, tuples, { nation: inNation = false, filled = false } = {}) => {
     if (!Array.isArray(tuples)) fail(`${at} must be a list of players`);
+    const [own, ownSource, ownKind] = filled ? [KINDS.cm0102, clubFill.source, 'cm0102'] : [kind, src, setKindOf(id)];
     const ids = new Set();
     tuples.forEach((tuple, j) => {
       const where = `${at}[${j}]`;
@@ -704,20 +728,20 @@ function validateFootballSet(data, id) {
         ids.add(tuple[3].id);
         return;
       }
-      if (!Array.isArray(tuple) || tuple.length !== kind.size) fail(`${where} is not ${TUPLE_NAMES[setKindOf(id)] ?? 'a CM'} player tuple`);
+      if (!Array.isArray(tuple) || tuple.length !== own.size) fail(`${where} is not ${TUPLE_NAMES[ownKind] ?? 'a CM'} player tuple`);
       const [playerId, , , , positions, , , dateOfBirth] = tuple;
       if (ids.has(playerId)) fail(`${where} repeats player ${playerId}`);
       ids.add(playerId);
       const keys = String(positions).split(',');
       // Own keys only: 'constructor' must not pass as a position.
-      if (!keys.every(key => Object.hasOwn(kind.roles, key)) || new Set(keys).size !== keys.length) {
+      if (!keys.every(key => Object.hasOwn(own.roles, key)) || new Set(keys).size !== keys.length) {
         fail(`${where} has unknown or repeated positions ${JSON.stringify(positions)}`);
       }
       if (dateOfBirth !== '' && !/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth)) fail(`${where} date of birth ${JSON.stringify(dateOfBirth)} is not YYYY-MM-DD`);
       let rebuilt;
       try {
-        const [name, , , sourceInfo] = expandSetPlayer(tuple, src, setKindOf(id));
-        rebuilt = kind.tupleOf(name, sourceInfo);
+        const [name, , , sourceInfo] = expandSetPlayer(tuple, ownSource, ownKind);
+        rebuilt = own.tupleOf(name, sourceInfo);
       } catch (e) {
         fail(`${where}: ${e.message}`);
       }
@@ -768,7 +792,10 @@ function validateFootballSet(data, id) {
     if (!nation(club.country)) fail(`${at} country ${JSON.stringify(club.country)} is not a nation id`);
     if (!text(club.col)) fail(`${at} has no colour`);
     if (!rating(club.str)) fail(`${at} str must be a rating 1-99`);
-    players(`${at} squad`, club.squad);
+    // A season whose field is Europe's strongest by results (scripts/lib/europe-field.mjs) ranks every club, in its order.
+    if ((club.rank !== undefined || data.clubs[0]?.rank !== undefined) && club.rank !== i + 1) fail(`${at} rank must be its place in the field, ${i + 1}`);
+    if (club.fill !== undefined && (club.fill !== true || clubFill === undefined)) fail(`${at} fill must be true, in a season with a clubFill`);
+    players(`${at} squad`, club.squad, { filled: club.fill === true });
   });
 
   const territory = data.territory;

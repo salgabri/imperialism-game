@@ -1,9 +1,11 @@
 // A small reader for flat Parquet files, enough for the college football seasons' sources (sportsdataverse's
-// cfbfastR-cfb-data tables, which Polars writes): the file's Thrift metadata (compact protocol), its row groups, and
-// each column chunk's dictionary and data pages (versions 1 and 2) with PLAIN and dictionary (RLE_DICTIONARY,
-// PLAIN_DICTIONARY) values and RLE / bit-packed definition levels; pages uncompressed, gzip or zstd (node:zlib). Types:
-// BOOLEAN, INT32, INT64, FLOAT, DOUBLE and BYTE_ARRAY (UTF8 text). Nested or repeated columns, other encodings and
-// codecs are refused, never guessed. No I/O here: `readParquet` takes the file's bytes.
+// cfbfastR-cfb-data tables, which Polars writes) and the football results the club strengths are computed from
+// (schochastics/football-data, which nanoparquet writes): the file's Thrift metadata (compact protocol), its row groups,
+// and each column chunk's dictionary and data pages (versions 1 and 2) with PLAIN and dictionary (RLE_DICTIONARY,
+// PLAIN_DICTIONARY) values and RLE / bit-packed definition levels; pages uncompressed, gzip or zstd (node:zlib) or
+// Snappy (snappyUncompress, below). Types: BOOLEAN, INT32 (a DATE as its days since 1970-01-01), INT64, FLOAT, DOUBLE
+// and BYTE_ARRAY (UTF8 text). Nested or repeated columns, other encodings and codecs are refused, never guessed. No I/O
+// here: `readParquet` takes the file's bytes.
 import zlib from 'node:zlib';
 
 const MAGIC = 'PAR1';
@@ -127,9 +129,53 @@ export function parquetMetadata(bytes) {
   return { version: meta[1], rows: meta[3], createdBy: text(meta[6]) ?? null, columns, rowGroups };
 }
 
+/**
+ * Snappy's raw format (github.com/google/snappy, format_description.txt), as Parquet compresses pages with it: the
+ * uncompressed length as a varint, then literals (their length in the tag, or in one to four bytes after it) and copies
+ * of earlier output (an offset of one, two or four bytes), which may overlap what they write.
+ */
+export function snappyUncompress(data) {
+  const r = new Reader(data);
+  const length = r.varint();
+  const out = new Uint8Array(length);
+  let o = 0;
+  while (r.offset < data.length) {
+    const tag = r.byte();
+    const kind = tag & 3;
+    if (kind === 0) {
+      let n = tag >> 2;
+      if (n >= 60) {
+        const bytes = r.take(n - 59);
+        n = 0;
+        for (let b = bytes.length - 1; b >= 0; b--) n = n * 256 + bytes[b];
+      }
+      n += 1;
+      if (o + n > length) throw new Error('Snappy: a literal runs past the stated length');
+      out.set(r.take(n), o);
+      o += n;
+      continue;
+    }
+    let n, offset;
+    if (kind === 1) {
+      n = 4 + ((tag >> 2) & 7);
+      offset = ((tag >> 5) << 8) | r.byte();
+    } else {
+      n = 1 + (tag >> 2);
+      const bytes = r.take(kind === 2 ? 2 : 4);
+      offset = 0;
+      for (let b = bytes.length - 1; b >= 0; b--) offset = offset * 256 + bytes[b];
+    }
+    if (!offset || offset > o || o + n > length) throw new Error('Snappy: a copy reaches outside its output');
+    for (let k = 0; k < n; k++, o++) out[o] = out[o - offset];
+  }
+  if (o !== length) throw new Error(`Snappy: ${o} bytes out of a stated ${length}`);
+  return out;
+}
+
 function decompress(codec, data, size) {
   if (codec === 'UNCOMPRESSED') return data;
-  const out = codec === 'ZSTD' ? zlib.zstdDecompressSync(data) : codec === 'GZIP' ? zlib.gunzipSync(data) : null;
+  const out = codec === 'ZSTD' ? zlib.zstdDecompressSync(data) : codec === 'GZIP' ? zlib.gunzipSync(data)
+    : codec === 'SNAPPY' ? snappyUncompress(data) : null;
   if (!out) throw new Error(`Parquet: pages compressed with ${codec} are not read`);
   if (out.length !== size) throw new Error(`Parquet: a page decompressed to ${out.length} bytes, its header says ${size}`);
   return new Uint8Array(out.buffer, out.byteOffset, out.byteLength);

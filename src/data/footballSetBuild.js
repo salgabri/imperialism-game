@@ -11,7 +11,7 @@ import { cmMonthDay, decodeCmDate, fileSignature, readCm0102 } from './cm0102.js
 import { CM0102_RELEASES } from './cm0102Releases.js';
 import { CM0102_NATIONS } from './cm0102Nations.js';
 import { FOOTBALL_FEDERATIONS } from './footballFederations.js';
-import { BIG_LEAGUES, EUROPEAN_LEAGUES } from './footballLeagues.js';
+import { BIG_LEAGUES, EUROPEAN_LEAGUES, firstDivisionOf } from './footballLeagues.js';
 import { pickFootballSquad } from './footballSquad.js';
 import { sha256 } from './sha256.js';
 
@@ -142,20 +142,24 @@ export const strongestBuilt = (built, count = null) => (count == null ? built.sl
 /**
  * A set's club rows, strongest first, from `built` ([{ name, league, country, str, squad }], each squad player
  * carrying its `tuple`): `f-<slug>` ids (a clash gets a suffix, and a warning), three-capital codes and colours, as
- * build-clubs makes them. Shared by the CM 01/02 and EA season builders.
+ * build-clubs makes them. Shared by the CM 01/02 and EA season builders. A field `ranked` by results
+ * (scripts/lib/europe-field.mjs) keeps its order and writes each club's `rank`, and a club another source fills, `fill`;
+ * `idOf` gives a club the id it already has (on its season's country map), in place of its name's, and no other club
+ * takes one of `reserved` (every id those maps give), so a club's id never moves from season build to season build.
  */
-export function presentClubs(built, warn) {
+export function presentClubs(built, warn, { ranked = false, idOf = null, reserved = null } = {}) {
   const codes = new Set(), ids = new Set();
-  return built.slice().sort(strongestFirst).map(club => {
-    const base = `f-${slug(club.name)}`;
+  return (ranked ? built.slice() : built.slice().sort(strongestFirst)).map(club => {
+    const own = idOf?.(club) ?? null;
+    const base = own ?? `f-${slug(club.name)}`;
     let id = base;
-    for (let n = 2; ids.has(id); n++) id = `${base}-${n}`;
-    if (id !== base) warn(`Two clubs make the id ${base}; the weaker is ${id}`);
+    for (let n = 2; ids.has(id) || (id !== own && reserved?.has(id)); n++) id = `${base}-${n}`;
+    if (id !== base) warn(reserved?.has(base) && !ids.has(base) ? `${base} is another club's on its season's country maps, so ${club.name} is ${id}` : `Two clubs make the id ${base}; the weaker is ${id}`);
     ids.add(id);
     const code = makeCode(ascii(club.name), codes);
     if (!/^[A-Z0-9]{3}$/.test(code)) throw new Error(`No three-capital code for the club ${club.name} (got ${code})`);
-    return { id, name: club.name, code, league: club.league, country: club.country, col: colourFor(id),
-      str: club.str, squad: club.squad.map(p => p.tuple) };
+    return { id, name: club.name, code, league: club.league, country: club.country, col: colourFor(id), str: club.str,
+      ...(ranked ? { rank: club.rank } : {}), ...(club.fill ? { fill: true } : {}), squad: club.squad.map(p => p.tuple) };
   });
 }
 
@@ -439,14 +443,16 @@ function withoutTrailingBytes(files, trailing) {
  * name) play for nation `playsFor` instead, or with none for no nation, though still for their clubs: a 1989/90 database
  * that files East Germans as 'Germany' names its East German clubs, whose Germans play for East Germany (278). `clubs: false` builds the nations alone (a season whose clubs are not its year's).
  * Clubs come from every European first division the database holds (LEAGUES); `topClubs` keeps only that many of the
- * strongest (a built-in season keeps TOP_CLUBS, src/data/scopes.js), and with none every one stays. Returns
+ * strongest (a built-in season keeps TOP_CLUBS, src/data/scopes.js), and with none every one stays. A `field`
+ * (scripts/lib/europe-field.mjs resultsField) keeps Europe's strongest by results instead, from those and every other
+ * club of a European nation with a first division the game names (src/data/footballLeagues.js firstDivisionOf). Returns
  * `{ doc, text, audit, summary, warnings }`; throws on an unknown layout, an unmapped nation (unless allowed) or an
  * unnamed database.
  */
 export function buildFootballSet(files, {
   databases = CM0102_RELEASES, nationMap = CM0102_NATIONS, federations = FOOTBALL_FEDERATIONS, identity = {}, allowUnmapped = false,
   famous = FAMOUS_BIRTHDAYS, verifyFiles = true, local = true, sourceExtra = {}, kind, noNationAt = null, clubs: withClubs = true, topClubs = null,
-  everyClub = false,
+  everyClub = false, field = null,
 } = {}) {
   const warnings = [];
   const warn = message => warnings.push(message);
@@ -615,13 +621,42 @@ export function buildFootballSet(files, {
     for (const club of members) {
       const squad = pickFootballSquad(clubPools.get(club.row) || []);
       if (squad.length < CLUB_SIZE) { short.push({ name: club.name, players: squad.length }); continue; }
-      built.push({ name: club.name, league, country, str: Math.round(mean(squad.map(p => p.rating))), squad });
+      built.push({ name: club.name, league, country, str: Math.round(mean(squad.map(p => p.rating))), squad, row: club.row });
     }
     leagueAudit.push({ league, country, competition: comp.name, members: members.length, clubs: members.length - short.length, kept: 0, short });
   }
-  // A season keeps Europe's strongest clubs (`topClubs`); one with nations only keeps its leagues in the audit, as the
-  // reason it has no clubs.
-  const clubs = withClubs ? presentClubs(strongestBuilt(built, topClubs), warn) : [];
+  // A season keeps Europe's strongest clubs: by results where a `field` is given (scripts/lib/europe-field.mjs), from
+  // those first divisions and every other club of a European country with a first division the game names, as its
+  // nation's; else the `topClubs` strongest XIs. One with nations only keeps its leagues in the audit, as the reason it
+  // has no clubs.
+  let picked = null;
+  if (withClubs && field) {
+    // A country whose first division LEAGUES reads keeps it as the database stores it (Sawczuk's 2003/04 La Liga, with
+    // Real Oviedo for Málaga); every other country's clubs come by their nation.
+    const inLeagues = new Set(built.map(entry => entry.row)), read = new Set(built.map(entry => entry.country));
+    const others = [];
+    for (const club of parsed.clubs) {
+      if (club.nation == null || !clubPools.has(club.row) || inLeagues.has(club.row)) continue;
+      const country = nationRows[club.nation].id, league = firstDivisionOf(country, database.year);
+      if (!league || read.has(country)) continue;
+      const squad = pickFootballSquad(clubPools.get(club.row));
+      if (squad.length < CLUB_SIZE) continue;
+      others.push({ name: club.name, league, country, str: Math.round(mean(squad.map(p => p.rating))), squad, division: club.division ?? null });
+    }
+    // Only a country's top division: the one most of its eight strongest XIs play in (the strongest's, if two tie), so a
+    // namesake lower down is never taken for a club the database lacks. A nation whose league the database does not play
+    // files its clubs in no division (null), and where its strongest are so filed, those are its top division.
+    const top = new Map();
+    for (const country of new Set(others.map(club => club.country))) {
+      const strongest = others.filter(club => club.country === country).sort((a, b) => b.str - a.str).slice(0, 8);
+      const counts = new Map();
+      for (const club of strongest) counts.set(club.division, (counts.get(club.division) || 0) + 1);
+      const most = Math.max(...counts.values());
+      top.set(country, strongest.find(club => counts.get(club.division) === most).division);
+    }
+    picked = field([...built, ...others.filter(club => top.get(club.country) === club.division)]);
+  }
+  const clubs = !withClubs ? [] : picked ? presentClubs(picked.clubs, warn, { ranked: true, idOf: picked.idOf, reserved: picked.reserved }) : presentClubs(strongestBuilt(built, topClubs), warn);
   // Every live club of every nation, for the season's own country maps (scripts/build-season-countries.mjs, `everyClub`):
   // its division, its nation as the game names it, and its squad as a season file picks one (a club with no player
   // has none).
@@ -630,7 +665,12 @@ export function buildFootballSet(files, {
     country: nationRows[club.nation].id, league: club.division == null ? null : parsed.competitions[club.division]?.name || null,
     squad: pickFootballSquad(clubPools.get(club.row)),
   })) : null;
-  for (const club of clubs) leagueAudit.find(entry => entry.league === club.league).kept++;
+  for (const club of clubs) {
+    let entry = leagueAudit.find(row => row.league === club.league);
+    // A league the database holds under no name LEAGUES knows: its clubs reached by their nation.
+    if (!entry) leagueAudit.push(entry = { league: club.league, country: club.country, competition: null, byNation: true, members: 0, clubs: 0, kept: 0, short: [] });
+    entry.kept++;
+  }
 
   // The names, codes and flags of the federations of the day that field players (none from 1996/97 on).
   const identities = identitiesFor(federations, database.year, { fields: id => nations[id]?.[2].length > 0 });
@@ -659,7 +699,7 @@ export function buildFootballSet(files, {
     players: { read: parsed.players.length, eligible: players.length, written: coverage.players, dropped },
     unmapped, noTeam, ...(noNationAt ? { noNationAt: { nationality: noNationAt.nationality, label: noNationAt.label, clubs: noNationClubs.size,
       ...(noNationAt.playsFor ? { playsFor: noNationAt.playsFor } : {}) } } : {}),
-    ...(withClubs ? {} : { nationsOnly: true }), leagues: leagueAudit, territory,
+    ...(withClubs ? {} : { nationsOnly: true }), leagues: leagueAudit, ...(picked ? { field: picked.audit } : {}), territory,
     // A season of federations of the day records them and whose players they field (by shape, how many).
     ...(Object.keys(identities).length || Object.keys(pooled).length ? { federations: { identities, pooled } } : {}),
     nations: nationAudit, warnings,
