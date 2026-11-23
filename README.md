@@ -3112,7 +3112,10 @@ non-free when its licence template marks it so, or when its licence's name does
 marker (Lithuanian, Hebrew, Ukrainian, Greek, Portuguese...), nor do the logo
 templates of Italian ("Marchio") and French ("marque déposée") Wikipedia, so 118 rows
 said "no" for non-free files until 23 November 2026. A period crest from such a file
-says "(non-free, as the file page states)" in `SOURCES-eras.tsv`, as the others do.
+says "(non-free, as the file page states)" in `SOURCES-eras.tsv`, as the others do, and
+every period crest names the licence its file page states (68 of the first rounds' said
+only "see the file page": 41 Italian and French logos kept as non-free, Rayo Vallecano's
+archived fair-use crest, and 26 free files of German Wikipedia and Commons).
 `src/data/clubLogos.js` lists which clubs have a crest, so the game never
 requests a missing file.
 
