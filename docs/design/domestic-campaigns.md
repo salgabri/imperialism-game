@@ -1994,7 +1994,16 @@ names is exactly that ("HJK", "Ferencváros"; a short name inside a longer one n
 wrong club too often: "KaPa", "Apollon", "Independiente Mza."). Botafogo and Pumas, whose
 full names had matched Brasília's and Guadalajara's clubs on Wikidata, are overrides since
 17 November 2026, which moved them on CM's Brazil and Mexico maps of 1993/94 and 2000/01 to
-2003/04.
+2003/04. A place in a club's name can name another club of that place: CM 01/02's "Club
+Universitario de Nuevo León" (Tigres UANL) had matched Club León, and four of its Primera A
+sides of 2002/03 and 2003/04 a later club of their town or state (Promotora Deportiva Tijuana
+the Xolos, Club de Fútbol Oaxaca the Alebrijes, Club Atlético Chiapas Jaguares de Chiapas,
+Club de Fútbol México Lobos ULMX), as the Update Team's Pumas Tabasco of 2022/23 had matched
+Pumas UNAM. Since 23 November 2026 each is an override: Tigres takes its own club of today,
+the others the town their season's data has them play in, with no twin. SWOS's "UN Leon" of
+1995/96 and 1996/97, a hand override at León until then, is Tigres too (six of SWOS 94/95's
+Club Tigres in its squad), and CM's "Club de Fútbol de la UAT", whose name has no word the
+matching can use, takes Correcaminos de la UAT's home instead of an estimate.
 
 **Homes** (`scripts/lib/season-club-homes.mjs`, written once to
 `scripts/data/season-club-homes.json` by `--homes`, offline from the caches): a hand
@@ -2065,7 +2074,7 @@ node scripts/build-season-countries.mjs --check ...                             
   clubs keep the names SWOS scrambled ("Koshema Ontlors"); their overrides give each
   the home and crest of the club it stands for. A few of SWOS's shortened names stay
   as SWOS wrote them where the club is not certain (Paraguay's "G Coronel Oviedo",
-  Uruguay's "Central Esp", Mexico's "UN Leon").
+  Uruguay's "Central Esp").
 - Size: 1,718 maps, 205.5 MB, so a full build takes about 32 minutes with 12 worker
   threads (balanced land, 2026-11-20) and holds about 18 GB of memory.
 - Crests: a club with neither a crest of its own nor a twin keeps its monogram (most of

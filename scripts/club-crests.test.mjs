@@ -29,8 +29,10 @@ const NO_PICTURE = {
 // Football's club appearances (a club on a map in a season) with no crest, 23 November 2026 after the fourth pass: 1,412
 // of about 60,400, 720 clubs by country and id (271 of today's country maps, 449 of the earlier seasons'), whose articles
 // show no crest, show another club's, or do not exist (1,501 after the third pass, the USA's San Francisco of 1996/97
-// included since the namesakes' fix). A crest found for one lowers it.
-const FOOTBALL_WITHOUT_CREST = 1412;
+// included since the namesakes' fix). The same day five Mexican clubs of 2002/03 to 2003/04 and 2022/23 lost the twin a
+// place in their names had given them (another club's crest: Promotora Deportiva Tijuana, CF Oaxaca, CF México, Atlético
+// Chiapas, Pumas Tabasco; +9) and SWOS's "UN Leon" took Tigres' (-2): 1,419. A crest found for one lowers it.
+const FOOTBALL_WITHOUT_CREST = 1419;
 const isFootball = id => /^(f-|d[0-9A-Z]+-)/.test(id);
 
 const excused = (id, year) => (CARICATURES[id] && year != null && CARICATURES[id][0] <= year && year <= CARICATURES[id][1]) || id in NO_PICTURE;

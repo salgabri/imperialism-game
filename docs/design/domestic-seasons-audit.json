@@ -4649,20 +4649,20 @@
   },
   {
    "id": "484y2023",
-   "version": "484y2023-e1bd8d49",
+   "version": "484y2023-402e6910",
    "name": "Mexico",
    "level": "ADM2",
    "clubs": 36,
    "located": 36,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 27,
+   "homeInSection": 25,
    "displacementKm": {
     "median": 0,
-    "p90": 18.1,
-    "max": 97.1
+    "p90": 32,
+    "max": 51.6
    },
-   "bytes": 139065
+   "bytes": 139188
   },
   {
    "id": "499y2023",
@@ -23946,22 +23946,20 @@
   },
   {
    "id": "484y2004",
-   "version": "484y2004-cecf0df3",
+   "version": "484y2004-56f068ed",
    "name": "Mexico",
    "level": "ADM2",
    "clubs": 32,
-   "located": 31,
+   "located": 32,
    "unlocated": [],
-   "placed": [
-    "Club de Fútbol de la UAT"
-   ],
-   "homeInSection": 20,
+   "placed": [],
+   "homeInSection": 19,
    "displacementKm": {
     "median": 0,
-    "p90": 18.9,
-    "max": 78.5
+    "p90": 48.1,
+    "max": 95.3
    },
-   "bytes": 140928
+   "bytes": 141195
   },
   {
    "id": "528y2004",
@@ -24941,22 +24939,20 @@
   },
   {
    "id": "484y2003",
-   "version": "484y2003-48a55871",
+   "version": "484y2003-5f1fa374",
    "name": "Mexico",
    "level": "ADM2",
    "clubs": 32,
-   "located": 31,
+   "located": 32,
    "unlocated": [],
-   "placed": [
-    "Club de Fútbol de la UAT"
-   ],
+   "placed": [],
    "homeInSection": 20,
    "displacementKm": {
     "median": 0,
-    "p90": 18.9,
-    "max": 78.5
+    "p90": 48.1,
+    "max": 95.3
    },
-   "bytes": 139551
+   "bytes": 139506
   },
   {
    "id": "528y2003",
@@ -25838,20 +25834,20 @@
   },
   {
    "id": "484y2002",
-   "version": "484y2002-3399c1f4",
+   "version": "484y2002-de577c29",
    "name": "Mexico",
    "level": "ADM2",
    "clubs": 21,
    "located": 21,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 13,
+   "homeInSection": 15,
    "displacementKm": {
     "median": 0,
     "p90": 32.1,
     "max": 262.9
    },
-   "bytes": 125732
+   "bytes": 125902
   },
   {
    "id": "528y2002",
@@ -28136,7 +28132,7 @@
   },
   {
    "id": "484y1997",
-   "version": "484y1997-99732ba0",
+   "version": "484y1997-dcca597c",
    "name": "Mexico",
    "level": "ADM2",
    "clubs": 40,
@@ -28146,13 +28142,13 @@
     "S.U.O.O.",
     "Ayense"
    ],
-   "homeInSection": 26,
+   "homeInSection": 27,
    "displacementKm": {
     "median": 0,
     "p90": 8.9,
     "max": 157.9
    },
-   "bytes": 134994
+   "bytes": 135032
   },
   {
    "id": "528y1997",
@@ -29224,7 +29220,7 @@
   },
   {
    "id": "484y1996",
-   "version": "484y1996-e669f940",
+   "version": "484y1996-c3ceb6d1",
    "name": "Mexico",
    "level": "ADM2",
    "clubs": 40,
@@ -29240,7 +29236,7 @@
     "p90": 8.9,
     "max": 157.9
    },
-   "bytes": 134182
+   "bytes": 134331
   },
   {
    "id": "528y1996",
