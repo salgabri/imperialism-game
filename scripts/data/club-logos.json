@@ -5444,6 +5444,69 @@
       "page": "https://en.wikipedia.org/wiki/File:Forest_Zambia.png",
       "licence": "Fair use (as its file page stated, archived 2017; the file is deleted since)",
       "nonFree": true
+    },
+    "d096-23190064": {
+      "file": "Bahtera Kemudi Sekawan Football Club logo.png",
+      "sha256": "2d67db3f2143a92148517377479900182b8502744f3bec8a611b79a09befadf2",
+      "thumb": 250
+    },
+    "d188-80031928": {
+      "file": "Santa Ana F.C..png",
+      "sha256": "c1862273faa47b8ac3464732f1e6fff6655d57a344668ab1907e471c44560ddc",
+      "wayback": "https://web.archive.org/web/20250120181533im_/https://upload.wikimedia.org/wikipedia/commons/2/2f/Santa_Ana_F.C..png",
+      "page": "https://commons.wikimedia.org/wiki/File:Santa_Ana_F.C..png",
+      "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20250120)",
+      "nonFree": true
+    },
+    "d360-2000372197": {
+      "file": "Logo Adhyaksa FC Bekasi.jpg",
+      "sha256": "b1a339b7e69a2861cc76153039a360d0804ecc2734529cd2131efa0183d9d997",
+      "thumb": 120,
+      "wiki": "id"
+    },
+    "d360-5622866": {
+      "file": "Persipal logo 2017.png",
+      "sha256": "125b3fb24d60632ccc31d3a58fff3e6e37a3ebe9eab36b6b1a821fa01e2c60b6",
+      "thumb": 330,
+      "wiki": "id"
+    },
+    "d504-12065964": {
+      "file": "USMO.png",
+      "sha256": "7ed31d671f3cafce98ef6441bc139357d0f3985ef961f3f621e770cbf2802636",
+      "thumb": 120,
+      "wiki": "ar"
+    },
+    "d591-308263": {
+      "file": "DAU-300x300.png",
+      "sha256": "e8b4be38ea784479d3ef50fb435d675bc7671ea49a72991b374dacf8e0f9ecee",
+      "wayback": "https://web.archive.org/web/20230718155143im_/https://upload.wikimedia.org/wikipedia/commons/8/89/DAU-300x300.png",
+      "page": "https://commons.wikimedia.org/wiki/File:DAU-300x300.png",
+      "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20230718)",
+      "nonFree": true
+    },
+    "d646-2000092409": {
+      "file": "Gorilla FC.png",
+      "sha256": "cfb327ebb5f9bc232bf56fc988ff9d97a3edb1047b2dc6fd2e2e56b708cfe97d",
+      "thumb": 330,
+      "wiki": "lt"
+    },
+    "d704-5622891": {
+      "file": "Dongthapfclogo.jpg",
+      "sha256": "020f15551ff67b501874bee1d02e0fda046ac4fe5ac61949173052bfc4d2cdeb",
+      "thumb": 120,
+      "wiki": "de"
+    },
+    "d792-457415": {
+      "file": "Kepez Belediyespor logosu.jpg",
+      "sha256": "0599b134bf0c402662dc1bb12821ff20f8d93a05b2027e45e7dfce92a306d682",
+      "thumb": 330,
+      "wiki": "tr"
+    },
+    "d834-13228843": {
+      "file": "Polisi Tanzania FC logo.png",
+      "sha256": "e4fb27cfc63fd6ce5dba2d41fe14be864dd16d358b407a67df3369674dd50764",
+      "thumb": 330,
+      "wiki": "lt"
     }
   },
   "twins": {

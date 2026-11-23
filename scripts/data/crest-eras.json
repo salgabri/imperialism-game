@@ -4176,6 +4176,20 @@
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
+  "f-adonis-idalious.2012": {
+   "club": "Adonis Idalious",
+   "years": "2012–2012",
+   "kind": "wikipedia",
+   "title": "File:AdonisIdaliouLogo.png",
+   "page": "https://el.wikipedia.org/wiki/%CE%91%CF%81%CF%87%CE%B5%CE%AF%CE%BF:AdonisIdaliouLogo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/el/thumb/b/bd/AdonisIdaliouLogo.png/330px-AdonisIdaliouLogo.png",
+   "licence": "Εύλογη χρήση",
+   "sha256": "da12bbb4b6b4f55632d6d7ba32ee5a7a42f2ead6f11cb2302c9ea60ce1eb26fb",
+   "cache": "data-src/crest-eras/files/missing/f-adonis-idalious/2012-AdonisIdaliouLogo.png",
+   "evidence": "crest of today: the infobox of el.wikipedia's article \"Άδωνις Ιδαλίου\" (November 2026, fourth pass: as archived on 20210830; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-adr-jicaral.2020": {
    "club": "ADR Jicaral",
    "years": "2020–2022",
@@ -4888,6 +4902,21 @@
    "sha256": "d5897e76e927703bbab89eab7217dbdb10433cb67d6dafe119c4259ee68301c5",
    "cache": "data-src/crest-eras/files/missing/f-al-hamriyah/2025-Al_Hamriyah_Club_new_logo.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"Al Hamriyah Club\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-al-kharitiyat-sports-club.2019": {
+   "club": "Al Kharitiyat Sports Club",
+   "years": "2019–2019",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20201123162945im_/https://upload.wikimedia.org/wikipedia/ar/f/fa/AlKharaitiyatLogo.png",
+   "capture": "https://web.archive.org/web/20201123162945/https://ar.wikipedia.org/wiki/%D9%86%D8%A7%D8%AF%D9%8A_%D8%A7%D9%84%D8%AE%D8%B1%D9%8A%D8%B7%D9%8A%D8%A7%D8%AA",
+   "title": "File:AlKharaitiyatLogo.png",
+   "page": "https://ar.wikipedia.org/wiki/File:AlKharaitiyatLogo.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20201123)",
+   "sha256": "a18beaa57bcbf21f71f9d28f0d884a027301af3a0c5334b054b1d88c43cc0e0e",
+   "cache": "data-src/crest-eras/files/missing/f-al-kharitiyat-sports-club/2019-AlKharaitiyatLogo.png",
+   "evidence": "crest of today: the infobox of ar.wikipedia's article \"نادي الخريطيات\" (November 2026, fourth pass: as archived on 20201123; the file is gone from Wikipedia since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -5658,6 +5687,21 @@
    "sha256": "7f349b33d0cbe59039c62eeb20dfcbe3269e511ffd33b68e00b49cdb29e8f6dd",
    "cache": "data-src/crest-eras/files/missing/f-ao-platania-chanion/2015-Platanias_FC_logo.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"Platanias F.C.\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-aok-kassiopi.2017": {
+   "club": "AOK Kassiopi",
+   "years": "2017–2017",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20151104222927im_/https://upload.wikimedia.org/wikipedia/el/1/15/Kassiopi_FC_%28logo%29.png",
+   "capture": "https://web.archive.org/web/20151104222927/https://el.wikipedia.org/wiki/%CE%91.%CE%9F._%CE%9A%CE%B1%CF%83%CF%83%CE%B9%CF%8C%CF%80%CE%B7%CF%82",
+   "title": "File:Kassiopi_FC_(logo).png",
+   "page": "https://el.wikipedia.org/wiki/File:Kassiopi_FC_(logo).png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20151104)",
+   "sha256": "6504f82195a778284d4bb951ed14ccdebc1cf960088db1c7dd844b08e9f36b1d",
+   "cache": "data-src/crest-eras/files/missing/f-aok-kassiopi/2017-Kassiopi_FC_logo_.png",
+   "evidence": "crest of today: the infobox of el.wikipedia's article \"Α.Ο. Κασσιόπης\" (November 2026, fourth pass: as archived on 20151104; the file is gone from Wikipedia since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -8580,6 +8624,21 @@
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
+  "f-builders-hardware-bandits.2008": {
+   "club": "Builders Hardware Bandits",
+   "years": "2008–2011",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20220403220558im_/https://upload.wikimedia.org/wikipedia/en/4/4d/Belmopan_Bandits.png",
+   "capture": "https://web.archive.org/web/20220403220558/https://en.wikipedia.org/wiki/Belmopan_Bandits",
+   "title": "File:Belmopan_Bandits.png",
+   "page": "https://en.wikipedia.org/wiki/File:Belmopan_Bandits.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20220403)",
+   "sha256": "f4d87f6fb93b8bbae8c32ba2a187d3adc1a894599fc501ca69cae09ef05cab92",
+   "cache": "data-src/crest-eras/files/missing/f-builders-hardware-bandits/2008-Belmopan_Bandits.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Belmopan Bandits\" (November 2026, fourth pass: as archived on 20220403; the file is gone from Wikipedia since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-bukovina.1995": {
    "club": "Bukovina",
    "years": "1995–1997",
@@ -10108,6 +10167,20 @@
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
+  "f-cherkashchyna-akademia.2019": {
+   "club": "Cherkashchyna Akademia",
+   "years": "2019–2019",
+   "kind": "commons",
+   "title": "File:FC_Cherkashchyna_logo.png",
+   "page": "https://commons.wikimedia.org/wiki/File:FC_Cherkashchyna_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/FC_Cherkashchyna_logo.png/330px-FC_Cherkashchyna_logo.png",
+   "licence": "Public domain",
+   "sha256": "238149dc33cb9e72939c05bf83b4f41582053426ace665cd3684363f3e107be6",
+   "cache": "data-src/crest-eras/files/missing/f-cherkashchyna-akademia/2019-FC_Cherkashchyna_logo.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"FC Cherkashchyna\" (November 2026, fourth pass: as archived on 20250817; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-cherkashchyna.2020": {
    "club": "Cherkashchyna",
    "years": "2020–2020",
@@ -10329,6 +10402,21 @@
    "sha256": "54acdea8ff4cbc19eb320b56ba9c33d1e3e449764fc80abbb541d36994f817b2",
    "cache": "data-src/crest-eras/files/missing/f-christchurch-technical/1995-Cashmere_Technical_logo.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"Christchurch Technical\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-ciclista-lima.1996": {
+   "club": "Ciclista Lima",
+   "years": "1996–1997",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20220501022614im_/https://upload.wikimedia.org/wikipedia/en/f/f7/Ciclista.png",
+   "capture": "https://web.archive.org/web/20220501022614/https://en.wikipedia.org/wiki/Ciclista_Lima_Association",
+   "title": "File:Ciclista.png",
+   "page": "https://en.wikipedia.org/wiki/File:Ciclista.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20220501)",
+   "sha256": "c52176f82a7c47e365aae2382941000dc66db41b6f4a29933325326d0d29d2e2",
+   "cache": "data-src/crest-eras/files/missing/f-ciclista-lima/1996-Ciclista.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Ciclista Lima Association\" (November 2026, fourth pass: as archived on 20220501; the file is gone from Wikipedia since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -11426,6 +11514,21 @@
    "sha256": "54ff9fe6854c22bd401456b5029ddf77aadb958ef2b3776711279517f620cf9e",
    "cache": "data-src/crest-eras/files/missing/f-corluspor/2001-_orluspor.png",
    "evidence": "crest of today: the infobox of tr.wikipedia's article \"Çorluspor\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-corporacion-club-deportivo-tulua.2002": {
+   "club": "Corporación Club Deportivo Tuluá",
+   "years": "2002–2010",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20220616074513im_/https://upload.wikimedia.org/wikipedia/en/a/a8/Cortulua.png",
+   "capture": "https://web.archive.org/web/20220616074513/https://en.wikipedia.org/wiki/Cortulu%C3%A1",
+   "title": "File:Cortulua.png",
+   "page": "https://en.wikipedia.org/wiki/File:Cortulua.png",
+   "licence": "Fair use (as its file page stated, archived 2016; the file is deleted since)",
+   "sha256": "ac080dd1dbdf89263a271269225ab4b7919aed8d468b9db8f7a399095ce8d6a7",
+   "cache": "data-src/crest-eras/files/missing/f-corporacion-club-deportivo-tulua/2002-Cortulua.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Cortuluá\" (November 2026, fourth pass: as archived on 20220616; the file is gone from Wikipedia since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -12929,6 +13032,20 @@
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
+  "f-dubrovnik.1995": {
+   "club": "Dubrovnik",
+   "years": "1995–1996",
+   "kind": "wikipedia",
+   "title": "File:HNK_Dubrovnik.gif",
+   "page": "https://en.wikipedia.org/wiki/File:HNK_Dubrovnik.gif",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/c/ce/HNK_Dubrovnik.gif/120px-HNK_Dubrovnik.gif",
+   "licence": "Fair use (non-free, as the file page states)",
+   "sha256": "6f16e42b789a9a2bbbc187bd6df8b22c6d18203ce52f71b5e2f9456a89655b96",
+   "cache": "data-src/crest-eras/files/missing/f-dubrovnik/1995-HNK_Dubrovnik.gif",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"HNK Dubrovnik 1919\" (November 2026, fourth pass: as archived on 20210818; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-dumbarton.1994": {
    "club": "Dumbarton",
    "years": "1994–2004",
@@ -12942,6 +13059,20 @@
    "evidence": "no dated source for seasons 1994, 2002-2004: today's crest (the infobox of https://en.wikipedia.org/wiki/Dumbarton_F.C., read 2026-11-16)",
    "verified": "checked by eye: sheet 01 cell 105",
    "league": "seasons"
+  },
+  "f-dunaferr-se.2001": {
+   "club": "Dunaferr SE",
+   "years": "2001–2003",
+   "kind": "wikipedia",
+   "title": "File:Dunaújváros_FC.png",
+   "page": "https://en.wikipedia.org/wiki/File:Duna%C3%BAjv%C3%A1ros_FC.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/7/7d/Duna%C3%BAjv%C3%A1ros_FC.png/250px-Duna%C3%BAjv%C3%A1ros_FC.png",
+   "licence": "Fair use (non-free, as the file page states)",
+   "sha256": "fd0c0e0d9e3c2f0e0e8571a73c5e9b84401221a07b926460c6e1f66b7605f1e9",
+   "cache": "data-src/crest-eras/files/missing/f-dunaferr-se/2001-Duna_jv_ros_FC.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Dunaújváros FC\" (November 2026, fourth pass: as archived on 20210309; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
   },
   "f-dunakanyar-vac-fc.2018": {
    "club": "Dunakanyar-Vác FC",
@@ -13251,6 +13382,20 @@
    "verified": "checked by eye: sheet 01 cell 108",
    "league": "seasons",
    "background": "#ffffff"
+  },
+  "f-eastern-company-sc.2023": {
+   "club": "Eastern Company SC",
+   "years": "2023–2023",
+   "kind": "wikipedia",
+   "title": "File:Eastern_Company_SC.png",
+   "page": "https://lt.wikipedia.org/wiki/Vaizdas:Eastern_Company_SC.png",
+   "download": "https://upload.wikimedia.org/wikipedia/lt/thumb/e/e9/Eastern_Company_SC.png/330px-Eastern_Company_SC.png",
+   "licence": "Sąžiningo naudojimo",
+   "sha256": "83d5fff67145d27d7724c969ae3ce4a8acb2308385f96e24bae7e07a6287da36",
+   "cache": "data-src/crest-eras/files/missing/f-eastern-company-sc/2023-Eastern_Company_SC.png",
+   "evidence": "crest of today: the infobox of lt.wikipedia's article \"Eastern Company SC\" (November 2026, fourth pass: as archived on 20240908; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
   },
   "f-eastern-pride.2001": {
    "club": "Eastern Pride",
@@ -13599,6 +13744,20 @@
    "sha256": "11e8867bce35c34f1400acb371da76effa2502450f3d47afd527850ce497ca3e",
    "cache": "data-src/crest-eras/files/missing/f-el-raja-marsa-matruh/2018-El_Raja_SC_logo.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"El Raja SC\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-el-sekka-el-hadid.2013": {
+   "club": "El Sekka El Hadid",
+   "years": "2013–2013",
+   "kind": "wikipedia",
+   "title": "File:السكة_الحديد.jpg",
+   "page": "https://ar.wikipedia.org/wiki/%D9%85%D9%84%D9%81:%D8%A7%D9%84%D8%B3%D9%83%D8%A9_%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AF.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/ar/thumb/e/ec/%D8%A7%D9%84%D8%B3%D9%83%D8%A9_%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AF.jpg/120px-%D8%A7%D9%84%D8%B3%D9%83%D8%A9_%D8%A7%D9%84%D8%AD%D8%AF%D9%8A%D8%AF.jpg",
+   "licence": "استعمال عادل (non-free, as the file page states)",
+   "sha256": "1d492b448e117db5dfba6b21f01070a1d2a1bd0c27fded9163550f89b6117ab5",
+   "cache": "data-src/crest-eras/files/missing/f-el-sekka-el-hadid/2013-_.jpg",
+   "evidence": "crest of today: the infobox of ar.wikipedia's article \"نادي السكة الحديد\" (November 2026, fourth pass: as archived on 20191117; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -14495,6 +14654,21 @@
    "sha256": "b4916dc5b9bf6f32a4e8e91f3e205c1ca4f5a7a273a6f23a1bf3b78cef5cae28",
    "cache": "data-src/crest-eras/files/missing/f-farum-boldklub/2002-FC_Nordsj_lland_logo.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"FC Nordsjælland\" (November 2026, second pass); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-fas-pyrsos-grevenon.2009": {
+   "club": "FAS Pyrsos Grevenon",
+   "years": "2009–2009",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20220503111203im_/https://upload.wikimedia.org/wikipedia/en/a/a7/Pyrsos.png",
+   "capture": "https://web.archive.org/web/20220503111203/https://en.wikipedia.org/wiki/Pyrsos_Grevena_F.C.",
+   "title": "File:Pyrsos.png",
+   "page": "https://en.wikipedia.org/wiki/File:Pyrsos.png",
+   "licence": "Fair use (as its file page stated, archived 2024; the file is deleted since)",
+   "sha256": "d47e875ea51aba87fcfb6edb7ba3e237cfb6710be9df830e9ac54d46789c2d20",
+   "cache": "data-src/crest-eras/files/missing/f-fas-pyrsos-grevenon/2009-Pyrsos.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Pyrsos Grevena F.C.\" (November 2026, fourth pass: as archived on 20220503; the file is gone from Wikipedia since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -16991,6 +17165,20 @@
    "verified": "contact sheet: shield in light and dark blue quarters with four white crosses (the Zwolle arms), white FC ZWOLLE on a red band at the top; the 2006 en.wikipedia thumbnail is the same design (F.C. ZWOLLE, greyer blues); today's PEC Zwolle crest reads PEC ZWOLLE",
    "league": "football-a"
   },
+  "f-fcm-targu-mures.2013": {
+   "club": "FCM Targu Mures",
+   "years": "2013–2014",
+   "kind": "wikipedia",
+   "title": "File:ASA_2013_Targu_Mures_logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:ASA_2013_Targu_Mures_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/0/04/ASA_2013_Targu_Mures_logo.png/250px-ASA_2013_Targu_Mures_logo.png",
+   "licence": "Fair use (non-free, as the file page states)",
+   "sha256": "670c36914b02109960766461f6c5d5ecdbfdc166110ff9fcdd981336838d4925",
+   "cache": "data-src/crest-eras/files/missing/f-fcm-targu-mures/2013-ASA_2013_Targu_Mures_logo.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"ASA 2013 Târgu Mureș\" (November 2026, fourth pass: as archived on 20211005; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-fcr-valledupar.2023": {
    "club": "FCR Valledupar",
    "years": "2023–2023",
@@ -17874,6 +18062,21 @@
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
+  "f-fk-omladinac-novo-selo.2013": {
+   "club": "FK Omladinac Novo Selo",
+   "years": "2013–2014",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20220512022951im_/https://upload.wikimedia.org/wikipedia/sr/e/e3/%D0%93%D1%80%D0%B1_%D0%A4%D0%9A_%D0%9E%D0%BC%D0%BB%D0%B0%D0%B4%D0%B8%D0%BD%D0%B0%D1%86_%D0%9D%D0%BE%D0%B2%D0%BE_%D0%A1%D0%B5%D0%BB%D0%BE.jpg",
+   "capture": "https://web.archive.org/web/20220512022951/https://sr.wikipedia.org/wiki/%D0%A4%D0%9A_%D0%9E%D0%BC%D0%BB%D0%B0%D0%B4%D0%B8%D0%BD%D0%B0%D1%86_%D0%9D%D0%BE%D0%B2%D0%BE_%D0%A1%D0%B5%D0%BB%D0%BE",
+   "title": "File:Грб_ФК_Омладинац_Ново_Село.jpg",
+   "page": "https://sr.wikipedia.org/wiki/File:Грб_ФК_Омладинац_Ново_Село.jpg",
+   "licence": "not recorded: its file page names no licence (a local upload without a licence template); the club's article showed it as its crest (archived capture 20220512)",
+   "sha256": "ff1486d9ace52f5c7872b9ff58be1d1d5d898f8be70e8698fff108cbdd06d652",
+   "cache": "data-src/crest-eras/files/missing/f-fk-omladinac-novo-selo/2013-_.jpg",
+   "evidence": "crest of today: the infobox of sr.wikipedia's article \"ФК Омладинац Ново Село\" (November 2026, fourth pass: as archived on 20220512; the file is still on Wikipedia, its page naming no licence); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-fk-oslo-st.2003": {
    "club": "FK Oslo Øst",
    "years": "2003–2004",
@@ -17969,6 +18172,20 @@
    "sha256": "dc92d73b8ee4ff8c9d98cef8a7de871c55fbbda1898d0d4c8b9944a94c81deac",
    "cache": "data-src/crest-eras/files/missing/f-fk-rad/2019-FK_Rad_crest.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"FK Rad\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-fk-rigas-futbola-skola.2014": {
+   "club": "FK Rigas Futbola skola",
+   "years": "2014–2014",
+   "kind": "wikipedia",
+   "title": "File:FK_RFS_logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:FK_RFS_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/1/10/FK_RFS_logo.svg/330px-FK_RFS_logo.svg.png",
+   "licence": "Fair use (non-free, as the file page states)",
+   "sha256": "b81da5e9f7f317d3fb4205a5344703dc2cd5dd3a01036f6ae5c481491183c455",
+   "cache": "data-src/crest-eras/files/missing/f-fk-rigas-futbola-skola/2014-FK_RFS_logo.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"FK RFS\" (November 2026, fourth pass: as archived on 20241125; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -20089,6 +20306,21 @@
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
+  "f-hapoel-um-el-fahem.2009": {
+   "club": "Hapoel Um-El-Fahem",
+   "years": "2009–2011",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20240105120643im_/https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Hapoel_Umm-el_Fahm_F.C._logo.png/220px-Hapoel_Umm-el_Fahm_F.C._logo.png",
+   "capture": "https://web.archive.org/web/20240105120643/https://en.wikipedia.org/wiki/Hapoel_Umm_al-Fahm_F.C.",
+   "title": "File:Hapoel_Umm-el_Fahm_F.C._logo.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Hapoel_Umm-el_Fahm_F.C._logo.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20240105)",
+   "sha256": "f4e48538fb8b22720b9ad4e460acd76711b39c9bd2c4982100b43f604c5ff9b7",
+   "cache": "data-src/crest-eras/files/missing/f-hapoel-um-el-fahem/2009-Hapoel_Umm-el_Fahm_F.C._logo.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Hapoel Umm al-Fahm F.C.\" (November 2026, fourth pass: as archived on 20240105; the file is gone from Wikipedia since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-hapoel-umm-al-fahm.2020": {
    "club": "Hapoel Umm al-Fahm",
    "years": "2020–2026",
@@ -20650,6 +20882,21 @@
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
+  "f-hj-rring-idr-tsforening.2002": {
+   "club": "Hjørring Idrætsforening",
+   "years": "2002–2004",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20130801001610im_/https://upload.wikimedia.org/wikipedia/en/9/9a/FC_Hj%C3%B8rring.png",
+   "capture": "https://web.archive.org/web/20130801001610/https://en.wikipedia.org/wiki/FC_Hj%C3%B8rring",
+   "title": "File:FC_Hjørring.png",
+   "page": "https://en.wikipedia.org/wiki/File:FC_Hjørring.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20130801)",
+   "sha256": "8c2a0583378c00639c246ba1f69c0c179ba8e86098d0264593186bc83061462f",
+   "cache": "data-src/crest-eras/files/missing/f-hj-rring-idr-tsforening/2002-FC_Hj_rring.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"FC Hjørring\" (November 2026, fourth pass: as archived on 20130801; the file is gone from Wikipedia since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-hltex-lykoi.2002": {
    "club": "HLTEX Lykoi",
    "years": "2002–2002",
@@ -20997,6 +21244,21 @@
    "sha256": "60517981e128560b846437dba0c154aecdbd5ec129a079ad7ba0e5a3bef55ac5",
    "cache": "data-src/crest-eras/files/missing/f-ia-sud-america/2015-Escudo_actual_IASA.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"Sud América\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-ibar-rozaje.2009": {
+   "club": "Ibar Rozaje",
+   "years": "2009–2011",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20220712014146im_/https://upload.wikimedia.org/wikipedia/sr/1/12/FK_Ibar_Ro%C5%BEaje.gif",
+   "capture": "https://web.archive.org/web/20220712014146/https://sr.wikipedia.org/wiki/%D0%A4%D0%9A_%D0%98%D0%B1%D0%B0%D1%80_%D0%A0%D0%BE%D0%B6%D0%B0%D1%98%D0%B5",
+   "title": "File:FK_Ibar_Rožaje.gif",
+   "page": "https://sr.wikipedia.org/wiki/File:FK_Ibar_Rožaje.gif",
+   "licence": "not recorded: its file page names no licence (a local upload without a licence template); the club's article showed it as its crest (archived capture 20220712)",
+   "sha256": "b1f1e4a6928222d773e58ae80599f2651ff86dfd823a2f0c5f7106d983ccb254",
+   "cache": "data-src/crest-eras/files/missing/f-ibar-rozaje/2009-FK_Ibar_Ro_aje.gif",
+   "evidence": "crest of today: the infobox of sr.wikipedia's article \"ФК Ибар Рожаје\" (November 2026, fourth pass: as archived on 20220712; the file is still on Wikipedia, its page naming no licence); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -22318,6 +22580,20 @@
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
+  "f-kagawa-shiun-fc.2008": {
+   "club": "Kagawa Shiun FC",
+   "years": "2008–2011",
+   "kind": "wikipedia",
+   "title": "File:Kamatamare_Sanuki_logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Kamatamare_Sanuki_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/8/86/Kamatamare_Sanuki_logo.svg/330px-Kamatamare_Sanuki_logo.svg.png",
+   "licence": "Fair use (non-free, as the file page states)",
+   "sha256": "834ec94b9a9f8c1d07107805bb8d4e49c9e80e5950759cb5656488314b7a9728",
+   "cache": "data-src/crest-eras/files/missing/f-kagawa-shiun-fc/2008-Kamatamare_Sanuki_logo.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Kamatamare Sanuki\" (November 2026, fourth pass: as archived on 20220501; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-kajaanin-palloilijat.2003": {
    "club": "Kajaanin Palloilijat",
    "years": "2003–2004",
@@ -23045,6 +23321,20 @@
    "sha256": "4065f6491da093e1960a2dc87ddb55d071c9fc17a847e3290aff2136729b72f5",
    "cache": "data-src/crest-eras/files/missing/f-knockbreda-fc/2020-Knockbreda_F.C.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"Knockbreda F.C.\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-kohtla-jarve-jk-jarve.2019": {
+   "club": "Kohtla-Järve JK Järve",
+   "years": "2019–2021",
+   "kind": "wikipedia",
+   "title": "File:Ida-Virumaa_FC_Alliance_logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:Ida-Virumaa_FC_Alliance_logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5e/Ida-Virumaa_FC_Alliance_logo.png/250px-Ida-Virumaa_FC_Alliance_logo.png",
+   "licence": "Fair use (non-free, as the file page states)",
+   "sha256": "291d7824095b2716c204327480ebf97743a00d2d5e5ee90b892b9f77b2305765",
+   "cache": "data-src/crest-eras/files/missing/f-kohtla-jarve-jk-jarve/2019-Ida-Virumaa_FC_Alliance_logo.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Ida-Virumaa FC Alliance\" (November 2026, fourth pass: as archived on 20230228; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -25590,6 +25880,21 @@
    "verified": "contact sheet: white shield with a red border, MIDDLESBROUGH across the top, red lion rampant, scroll FOOTBALL CLUB with 1876 below; the same as the 2012 Wayback picture",
    "league": "football-a"
   },
+  "f-milicionar-belgrade.2001": {
+   "club": "Milicionar Belgrade",
+   "years": "2001–2001",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20220611033726im_/https://upload.wikimedia.org/wikipedia/sr/e/e4/Policajacgrbnovi.jpg",
+   "capture": "https://web.archive.org/web/20220611033726/https://sr.wikipedia.org/wiki/%D0%A4%D0%9A_%D0%9C%D0%B8%D0%BB%D0%B8%D1%86%D0%B8%D0%BE%D0%BD%D0%B0%D1%80",
+   "title": "File:Policajacgrbnovi.jpg",
+   "page": "https://sr.wikipedia.org/wiki/File:Policajacgrbnovi.jpg",
+   "licence": "not recorded: its file page names no licence (a local upload without a licence template); the club's article showed it as its crest (archived capture 20220611)",
+   "sha256": "01129560d54af25769c25d752dc02df5cbab59d0529024775540d73314806be7",
+   "cache": "data-src/crest-eras/files/missing/f-milicionar-belgrade/2001-Policajacgrbnovi.jpg",
+   "evidence": "crest of today: the infobox of sr.wikipedia's article \"ФК Милиционар\" (November 2026, fourth pass: as archived on 20220611; the file is still on Wikipedia, its page naming no licence); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-minerven.1995": {
    "club": "Minerven",
    "years": "1995–1997",
@@ -27318,6 +27623,20 @@
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
+  "f-nk-varteks.2002": {
+   "club": "NK Varteks",
+   "years": "2002–2004",
+   "kind": "wikipedia",
+   "title": "File:NK_Varteks_Logo.png",
+   "page": "https://en.wikipedia.org/wiki/File:NK_Varteks_Logo.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/1/13/NK_Varteks_Logo.png/250px-NK_Varteks_Logo.png",
+   "licence": "Fair use (non-free, as the file page states)",
+   "sha256": "1ca12ad3291311544318085f5e700299dce7697a537ce89473679ad250cb4912",
+   "cache": "data-src/crest-eras/files/missing/f-nk-varteks/2002-NK_Varteks_Logo.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"NK Varaždin (1931–2015)\" (November 2026, fourth pass: as archived on 20220809; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-nk-verzej.2018": {
    "club": "NK Verzej",
    "years": "2018–2018",
@@ -27890,6 +28209,21 @@
    "sha256": "52f57db6f4ca63d7a4f63331951f2401530617517744fa4c1ea9d458d76eac6b",
    "cache": "data-src/crest-eras/files/missing/f-ofk-mladenovac/2003-OFK_Mladenovac_crest.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"OFK Mladenovac\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-ofk-nis.2002": {
+   "club": "OFK Nis",
+   "years": "2002–2008",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20220309175325im_/https://upload.wikimedia.org/wikipedia/sr/f/fb/Grb-ofk-nis.gif",
+   "capture": "https://web.archive.org/web/20220309175325/https://sr.wikipedia.org/wiki/%D0%9E%D0%A4%D0%9A_%D0%9D%D0%B8%D1%88",
+   "title": "File:Grb-ofk-nis.gif",
+   "page": "https://sr.wikipedia.org/wiki/File:Grb-ofk-nis.gif",
+   "licence": "not recorded: its file page names no licence (a local upload without a licence template); the club's article showed it as its crest (archived capture 20220309)",
+   "sha256": "133dcff8e9d3c44022079359aa4452eda075d1fb790f25397023e070cd324dcb",
+   "cache": "data-src/crest-eras/files/missing/f-ofk-nis/2002-Grb-ofk-nis.gif",
+   "evidence": "crest of today: the infobox of sr.wikipedia's article \"ОФК Ниш\" (November 2026, fourth pass: as archived on 20220309; the file is still on Wikipedia, its page naming no licence); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -29335,6 +29669,20 @@
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
+  "f-persatuan-sepak-bola-pelita-jaya.2012": {
+   "club": "Persatuan Sepak Bola Pelita Jaya",
+   "years": "2012–2014",
+   "kind": "wikipedia",
+   "title": "File:Pelita_jaya.svg",
+   "page": "https://de.wikipedia.org/wiki/Datei:Pelita_jaya.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/de/thumb/d/d3/Pelita_jaya.svg/330px-Pelita_jaya.svg.png",
+   "licence": "Logo",
+   "sha256": "7bf199e90d2c68e08f5aa15b250549e1f1d60509ad6e17d58ca7fedd74afa108",
+   "cache": "data-src/crest-eras/files/missing/f-persatuan-sepak-bola-pelita-jaya/2012-Pelita_jaya.png",
+   "evidence": "crest of today: the infobox of de.wikipedia's article \"Pelita Jaya FC\" (November 2026, fourth pass: as archived on 20170202; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-persatuan-sepakbola-indonesia-bantul.2015": {
    "club": "Persatuan Sepakbola Indonesia Bantul",
    "years": "2015–2019",
@@ -30343,6 +30691,21 @@
    "sha256": "240ac0ebbe3c39d1b83c690d94e65731a4403e0888ebb6c7b8cbc4f2d23d5bde",
    "cache": "data-src/crest-eras/files/missing/f-puteolana/2001-FCPuteolana1902.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"ASD Puteolana 1902\" (November 2026, third pass: as archived on 20261030; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-putra-samarinda.2012": {
+   "club": "Putra Samarinda",
+   "years": "2012–2016",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20131227205133im_/https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Logo_persisam_putra_samarinda.png/180px-Logo_persisam_putra_samarinda.png",
+   "capture": "https://web.archive.org/web/20131227205133/https://en.wikipedia.org/wiki/Putra_Samarinda_F.C.",
+   "title": "File:Logo_persisam_putra_samarinda.png",
+   "page": "https://commons.wikimedia.org/wiki/File:Logo_persisam_putra_samarinda.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20131227)",
+   "sha256": "155553bf31aa88ceb8a52ba8b422c30fba07e7c3ad1c7b7a65200cfaa220fe38",
+   "cache": "data-src/crest-eras/files/missing/f-putra-samarinda/2012-Logo_persisam_putra_samarinda.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Putra Samarinda F.C.\" (November 2026, fourth pass: as archived on 20131227; the file is gone from Wikipedia since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -32113,6 +32476,21 @@
    "sha256": "7cc192db2f032d39ae9ea665b9a7703ff525970d8b2bea59da4ac559812b351e",
    "cache": "data-src/crest-eras/files/missing/f-salangen-if/2003-Salangen_IF.gif",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"Salangen IF\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-salcedo-fc.2026": {
+   "club": "Salcedo FC",
+   "years": "2026–2026",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20251016165729im_/https://upload.wikimedia.org/wikipedia/commons/a/a7/Salcedo_FC_2025.jpg",
+   "capture": "https://web.archive.org/web/20251016165729/https://en.wikipedia.org/wiki/Salcedo_FC",
+   "title": "File:Salcedo_FC_2025.jpg",
+   "page": "https://commons.wikimedia.org/wiki/File:Salcedo_FC_2025.jpg",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20251016)",
+   "sha256": "f5355a3c798c73024399d82224b044f9e5a1dda10b93c258c809e3bf067d2363",
+   "cache": "data-src/crest-eras/files/missing/f-salcedo-fc/2026-Salcedo_FC_2025.jpg",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Salcedo FC\" (November 2026, fourth pass: as archived on 20251016; the file is gone from Wikipedia since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -34136,6 +34514,20 @@
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
+  "f-sorrento-sc.2002": {
+   "club": "Sorrento SC",
+   "years": "2002–2009",
+   "kind": "wikipedia",
+   "title": "File:Sorrento_FC_logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Sorrento_FC_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b0/Sorrento_FC_logo.svg/330px-Sorrento_FC_logo.svg.png",
+   "licence": "Fair use (non-free, as the file page states)",
+   "sha256": "ebed4caffce4fce389c3aee9da3c832d0ce601bcee01e4feacc9474c703239e6",
+   "cache": "data-src/crest-eras/files/missing/f-sorrento-sc/2002-Sorrento_FC_logo.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Sorrento FC\" (November 2026, fourth pass: as archived on 20251113; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-southampton.1994": {
    "club": "Southampton",
    "years": "1994–2004",
@@ -34514,6 +34906,21 @@
    "evidence": "en.wikipedia S.C. Salgueiros, section \"Crest\": this file, captioned \"1920–Present as Sport Comércio e Salgueiros\"; pt.wikipedia: the refounded club took back \"o nome, bandeira, história e emblema do Sport Comércio e Salgueiros\" in 2016/17; de.wikipedia's Sport e Comercio Salgueiros.svg (10 Sep 2008) is the same crest",
    "verified": "white shield with a red border, gold eagle with spread wings over a yellow ball, red S C / S",
    "league": "football-a"
+  },
+  "f-sport-loreto.2020": {
+   "club": "Sport Loreto",
+   "years": "2020–2020",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20150717175738im_/https://upload.wikimedia.org/wikipedia/en/thumb/4/45/Sport_Loreto.jpg/150px-Sport_Loreto.jpg",
+   "capture": "https://web.archive.org/web/20150717175738/https://en.wikipedia.org/wiki/Sport_Loreto",
+   "title": "File:Sport_Loreto.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Sport_Loreto.jpg",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20150717)",
+   "sha256": "fd9fdae473e0a19ecc5ef22dd42503656fb904c931348e1dcd1d317da1e851dc",
+   "cache": "data-src/crest-eras/files/missing/f-sport-loreto/2020-Sport_Loreto.jpg",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Sport Loreto\" (November 2026, fourth pass: as archived on 20150717; the file is gone from Wikipedia since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
   },
   "f-sport-rosario.2018": {
    "club": "Sport Rosario",
@@ -37290,6 +37697,20 @@
    "verified": "black ring with gold laurel branches, white UDINESE CALCIO and gold 1896, the white shield with the black chevron (today: the same layout on a grey ring)",
    "league": "football-b"
   },
+  "f-ue-llagostera.2015": {
+   "club": "UE Llagostera",
+   "years": "2015–2016",
+   "kind": "wikipedia",
+   "title": "File:Escutuellagostera.png",
+   "page": "https://ca.wikipedia.org/wiki/Fitxer:Escutuellagostera.png",
+   "download": "https://upload.wikimedia.org/wikipedia/ca/thumb/f/fc/Escutuellagostera.png/330px-Escutuellagostera.png",
+   "licence": "Fair use (non-free, as the file page states)",
+   "sha256": "2d4bf7d9a30f0d4efc22d6fe833ea83d5609f7c618f6f2db4290bf78efa95119",
+   "cache": "data-src/crest-eras/files/missing/f-ue-llagostera/2015-Escutuellagostera.png",
+   "evidence": "crest of today: the infobox of ca.wikipedia's article \"Unió Esportiva Llagostera\" (November 2026, fourth pass: as archived on 20210916; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-uitm-fc.2021": {
    "club": "UiTM FC",
    "years": "2021–2023",
@@ -37623,6 +38044,20 @@
    "sha256": "9503503ac4d27972a812602eacf37bef87f266e332cb3d231e2ac1d1c6d87dba",
    "cache": "data-src/crest-eras/files/missing/f-universidad-de-los-andes/1995-Universidad_de_Los_Andes_F_tbol_Club.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"Unión Local Andina F.C.\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-universidad-particular-antenor-orrego.2002": {
+   "club": "Universidad Particular Antenor Orrego",
+   "years": "2002–2004",
+   "kind": "wikipedia",
+   "title": "File:Gupao.jpg",
+   "page": "https://en.wikipedia.org/wiki/File:Gupao.jpg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/8/85/Gupao.jpg/120px-Gupao.jpg",
+   "licence": "Fair use (non-free, as the file page states)",
+   "sha256": "f67e65f3f9c6139826cea97cab3d6ec97883c566b95488e401ef88326233e3e5",
+   "cache": "data-src/crest-eras/files/missing/f-universidad-particular-antenor-orrego/2002-Gupao.jpg",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Sport Coopsol Trujillo\" (November 2026, fourth pass: as archived on 20240106; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -38551,6 +38986,20 @@
    "sha256": "951025458ebb93e25854ba03d865930c7abe55cef80c6108863d12d7ae373c6c",
    "cache": "data-src/crest-eras/files/missing/f-voska-sport/2026-KF_Voska_Sport.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"FK Voska Sport\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-vpk-agro.2022": {
+   "club": "VPK-Agro",
+   "years": "2022–2022",
+   "kind": "wikipedia",
+   "title": "File:FC_VPK-Ahro_Shevchenkivka.png",
+   "page": "https://en.wikipedia.org/wiki/File:FC_VPK-Ahro_Shevchenkivka.png",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/5/52/FC_VPK-Ahro_Shevchenkivka.png/250px-FC_VPK-Ahro_Shevchenkivka.png",
+   "licence": "Fair use (non-free, as the file page states)",
+   "sha256": "0dca25160f7dbe4ad599931e958d78bf8b77624f20f31ac7e1610a41ca327c08",
+   "cache": "data-src/crest-eras/files/missing/f-vpk-agro/2022-FC_VPK-Ahro_Shevchenkivka.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"FC VPK-Ahro Shevchenkivka\" (November 2026, fourth pass: as archived on 20230728; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -39591,6 +40040,21 @@
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
+  "f-zska-erewan.2020": {
+   "club": "ZSKA Erewan",
+   "years": "2020–2020",
+   "kind": "wayback",
+   "wayback": "https://web.archive.org/web/20220504184547im_/https://upload.wikimedia.org/wikipedia/commons/d/df/BKMA_Yerevan.png",
+   "capture": "https://web.archive.org/web/20220504184547/https://en.wikipedia.org/wiki/BKMA_Yerevan",
+   "title": "File:BKMA_Yerevan.png",
+   "page": "https://commons.wikimedia.org/wiki/File:BKMA_Yerevan.png",
+   "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20220504)",
+   "sha256": "4d38d6ace60fbe48da9e0789ce55874d0cd5a1c0339c0ae394c714bac7e3cf06",
+   "cache": "data-src/crest-eras/files/missing/f-zska-erewan/2020-BKMA_Yerevan.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"BKMA Yerevan\" (November 2026, fourth pass: as archived on 20220504; the file is gone from Wikipedia since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
   "f-zulia.2016": {
    "club": "Zulia",
    "years": "2016–2018",
@@ -39602,6 +40066,20 @@
    "sha256": "7d797c3751361b69418c0489af85319b3939ada4827453d203a27c97b8f6625b",
    "cache": "data-src/crest-eras/files/missing/f-zulia/2016-Zulia_FC.png",
    "evidence": "crest of today: the infobox of de.wikipedia's article \"Zulia FC\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-zulu-royals-2.2008": {
+   "club": "Zulu Royals",
+   "years": "2008–2008",
+   "kind": "wikipedia",
+   "title": "File:AmaZulu_logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:AmaZulu_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/2/26/AmaZulu_logo.svg/330px-AmaZulu_logo.svg.png",
+   "licence": "Fair use (non-free, as the file page states)",
+   "sha256": "fdbcd16627a5dce08d84a9d838f9c4f57998635e78d27d9071b948a7159200c6",
+   "cache": "data-src/crest-eras/files/missing/f-zulu-royals-2/2008-AmaZulu_logo.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"AmaZulu F.C.\" (November 2026, fourth pass: as archived on 20170712; the file is still on Wikipedia, out of the article since); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -46167,6 +46645,13 @@
     "f-adiyamanspor.2012"
    ]
   ],
+  "f-adonis-idalious": [
+   [
+    2012,
+    2012,
+    "f-adonis-idalious.2012"
+   ]
+  ],
   "f-adr-jicaral": [
    [
     2020,
@@ -46749,6 +47234,13 @@
     2019,
     2024,
     "d784-135450"
+   ]
+  ],
+  "f-al-kharitiyat-sports-club": [
+   [
+    2019,
+    2019,
+    "f-al-kharitiyat-sports-club.2019"
    ]
   ],
   "f-al-kharitiyath": [
@@ -47425,6 +47917,13 @@
     2018,
     2018,
     "f-ae-sparti.2019"
+   ]
+  ],
+  "f-aok-kassiopi": [
+   [
+    2017,
+    2017,
+    "f-aok-kassiopi.2017"
    ]
   ],
   "f-aok-kerkyra": [
@@ -49685,6 +50184,13 @@
     "f-buducnost-vujic-valjevo.2009"
    ]
   ],
+  "f-builders-hardware-bandits": [
+   [
+    2008,
+    2011,
+    "f-builders-hardware-bandits.2008"
+   ]
+  ],
   "f-bukovina": [
    [
     1995,
@@ -50377,6 +50883,18 @@
     "f-cd-alfonso-ugarte-de-puno.2023"
    ]
   ],
+  "f-cd-arabe-unido": [
+   [
+    2022,
+    2023,
+    "d591-308263"
+   ],
+   [
+    2026,
+    2026,
+    "d591-308263"
+   ]
+  ],
   "f-cd-atletico-huila": [
    [
     2021,
@@ -50926,6 +51444,13 @@
     "f-cherkashchyna.2020"
    ]
   ],
+  "f-cherkashchyna-akademia": [
+   [
+    2019,
+    2019,
+    "f-cherkashchyna-akademia.2019"
+   ]
+  ],
   "f-cherkaskyi-dnipro": [
    [
     2018,
@@ -51110,6 +51635,13 @@
     2002,
     2004,
     "d410-106812"
+   ]
+  ],
+  "f-ciclista-lima": [
+   [
+    1996,
+    1997,
+    "f-ciclista-lima.1996"
    ]
   ],
   "f-ciclon-tarija": [
@@ -52170,6 +52702,18 @@
     2003,
     2004,
     "f-corluspor.2001"
+   ]
+  ],
+  "f-corporacion-club-deportivo-tulua": [
+   [
+    2002,
+    2004,
+    "f-corporacion-club-deportivo-tulua.2002"
+   ],
+   [
+    2008,
+    2010,
+    "f-corporacion-club-deportivo-tulua.2002"
    ]
   ],
   "f-corporacion-deportiva-real-cartagena": [
@@ -53475,11 +54019,25 @@
     "f-dsk-shivajians.2018"
    ]
   ],
+  "f-dubrovnik": [
+   [
+    1995,
+    1996,
+    "f-dubrovnik.1995"
+   ]
+  ],
   "f-dumbarton": [
    [
     1994,
     2004,
     "f-dumbarton.1994"
+   ]
+  ],
+  "f-dunaferr-se": [
+   [
+    2001,
+    2003,
+    "f-dunaferr-se.2001"
    ]
   ],
   "f-dunakanyar-vac-fc": [
@@ -53699,6 +54257,13 @@
     "f-east-stirlingshire.1994"
    ]
   ],
+  "f-eastern-company-sc": [
+   [
+    2023,
+    2023,
+    "f-eastern-company-sc.2023"
+   ]
+  ],
   "f-eastern-pride": [
    [
     2001,
@@ -53911,6 +54476,13 @@
     2018,
     2020,
     "f-el-raja-marsa-matruh.2018"
+   ]
+  ],
+  "f-el-sekka-el-hadid": [
+   [
+    2013,
+    2013,
+    "f-el-sekka-el-hadid.2013"
    ]
   ],
   "f-el-tanque": [
@@ -54597,6 +55169,13 @@
     2002,
     2004,
     "f-farum-boldklub.2002"
+   ]
+  ],
+  "f-fas-pyrsos-grevenon": [
+   [
+    2009,
+    2009,
+    "f-fas-pyrsos-grevenon.2009"
    ]
   ],
   "f-fatih-karagumruk": [
@@ -56509,6 +57088,13 @@
     "f-fc-zwolle.2003"
    ]
   ],
+  "f-fcm-targu-mures": [
+   [
+    2013,
+    2014,
+    "f-fcm-targu-mures.2013"
+   ]
+  ],
   "f-fcr-valledupar": [
    [
     2023,
@@ -57339,6 +57925,13 @@
     "f-fk-olympia-radotin.2019"
    ]
   ],
+  "f-fk-omladinac-novo-selo": [
+   [
+    2013,
+    2014,
+    "f-fk-omladinac-novo-selo.2013"
+   ]
+  ],
   "f-fk-oslo-st": [
    [
     2003,
@@ -57427,6 +58020,13 @@
     2015,
     2017,
     "d688-1955"
+   ]
+  ],
+  "f-fk-rigas-futbola-skola": [
+   [
+    2014,
+    2014,
+    "f-fk-rigas-futbola-skola.2014"
    ]
   ],
   "f-fk-rn-horten": [
@@ -59324,6 +59924,13 @@
     "d376-1090"
    ]
   ],
+  "f-hapoel-um-el-fahem": [
+   [
+    2009,
+    2011,
+    "f-hapoel-um-el-fahem.2009"
+   ]
+  ],
   "f-hapoel-umm-al-fahm": [
    [
     2020,
@@ -59764,6 +60371,13 @@
     "f-hit-gorica.1995"
    ]
   ],
+  "f-hj-rring-idr-tsforening": [
+   [
+    2002,
+    2004,
+    "f-hj-rring-idr-tsforening.2002"
+   ]
+  ],
   "f-hjk-helsinki": [
    [
     2001,
@@ -60073,6 +60687,13 @@
     2001,
     2001,
     "f-gas-ialysos-1948.2020"
+   ]
+  ],
+  "f-ibar-rozaje": [
+   [
+    2009,
+    2011,
+    "f-ibar-rozaje.2009"
    ]
   ],
   "f-icasa-futebol-clube": [
@@ -61064,6 +61685,13 @@
     "f-kaarinan-pojat.2008"
    ]
   ],
+  "f-kagawa-shiun-fc": [
+   [
+    2008,
+    2011,
+    "f-kagawa-shiun-fc.2008"
+   ]
+  ],
   "f-kahramanmarasspor": [
    [
     2002,
@@ -61684,6 +62312,13 @@
     2020,
     2020,
     "f-knockbreda-fc.2020"
+   ]
+  ],
+  "f-kohtla-jarve-jk-jarve": [
+   [
+    2019,
+    2021,
+    "f-kohtla-jarve-jk-jarve.2019"
    ]
   ],
   "f-kokand-1912": [
@@ -64133,6 +64768,13 @@
     "d380-1099"
    ]
   ],
+  "f-milicionar-belgrade": [
+   [
+    2001,
+    2001,
+    "f-milicionar-belgrade.2001"
+   ]
+  ],
   "f-minerven": [
    [
     1995,
@@ -65766,6 +66408,13 @@
     "f-nk-uskok.2002"
    ]
   ],
+  "f-nk-varteks": [
+   [
+    2002,
+    2004,
+    "f-nk-varteks.2002"
+   ]
+  ],
   "f-nk-verzej": [
    [
     2018,
@@ -66280,6 +66929,18 @@
     2013,
     2014,
     "f-ofk-mladenovac.2003"
+   ]
+  ],
+  "f-ofk-nis": [
+   [
+    2002,
+    2004,
+    "f-ofk-nis.2002"
+   ],
+   [
+    2008,
+    2008,
+    "f-ofk-nis.2002"
    ]
   ],
   "f-ofk-pomorie": [
@@ -67553,6 +68214,13 @@
     "f-persatuan-sepak-bola-indonesia-balikpapan.2018"
    ]
   ],
+  "f-persatuan-sepak-bola-pelita-jaya": [
+   [
+    2012,
+    2014,
+    "f-persatuan-sepak-bola-pelita-jaya.2012"
+   ]
+  ],
   "f-persatuan-sepakbola-indonesia-bantul": [
    [
     2015,
@@ -68335,6 +69003,18 @@
     2001,
     2002,
     "f-puteolana.2001"
+   ]
+  ],
+  "f-putra-samarinda": [
+   [
+    2012,
+    2012,
+    "f-putra-samarinda.2012"
+   ],
+   [
+    2015,
+    2016,
+    "f-putra-samarinda.2012"
    ]
   ],
   "f-pvf-cand-fc": [
@@ -69980,6 +70660,13 @@
     "f-salangen-if.2003"
    ]
   ],
+  "f-salcedo-fc": [
+   [
+    2026,
+    2026,
+    "f-salcedo-fc.2026"
+   ]
+  ],
   "f-salernitana": [
    [
     1999,
@@ -70126,6 +70813,13 @@
     2003,
     2004,
     "f-sanliurfa-belediyespor.2003"
+   ]
+  ],
+  "f-santa-ana-fc": [
+   [
+    2026,
+    2026,
+    "d188-80031928"
    ]
   ],
   "f-santa-clara": [
@@ -71563,6 +72257,18 @@
     "f-sorkhpooshan-samasha-pakdasht.2019"
    ]
   ],
+  "f-sorrento-sc": [
+   [
+    2002,
+    2004,
+    "f-sorrento-sc.2002"
+   ],
+   [
+    2008,
+    2009,
+    "f-sorrento-sc.2002"
+   ]
+  ],
   "f-southampton": [
    [
     1994,
@@ -71876,6 +72582,13 @@
     2000,
     2004,
     "f-sl-benfica.2000"
+   ]
+  ],
+  "f-sport-loreto": [
+   [
+    2020,
+    2020,
+    "f-sport-loreto.2020"
    ]
   ],
   "f-sport-rosario": [
@@ -74158,6 +74871,13 @@
     "d380-1178"
    ]
   ],
+  "f-ue-llagostera": [
+   [
+    2015,
+    2016,
+    "f-ue-llagostera.2015"
+   ]
+  ],
   "f-uitm-fc": [
    [
     2021,
@@ -74409,6 +75129,13 @@
     2010,
     2014,
     "f-universidad-de-los-andes.1995"
+   ]
+  ],
+  "f-universidad-particular-antenor-orrego": [
+   [
+    2002,
+    2004,
+    "f-universidad-particular-antenor-orrego.2002"
    ]
   ],
   "f-universitea-cluj": [
@@ -75268,6 +75995,20 @@
     2026,
     2026,
     "f-voska-sport.2026"
+   ]
+  ],
+  "f-vpk-agro": [
+   [
+    2022,
+    2022,
+    "f-vpk-agro.2022"
+   ]
+  ],
+  "f-vpk-agro-magdalynivka": [
+   [
+    2021,
+    2021,
+    "f-vpk-agro.2022"
    ]
   ],
   "f-vrbas": [
@@ -76232,6 +76973,13 @@
     "f-zska-dushanbe.2021"
    ]
   ],
+  "f-zska-erewan": [
+   [
+    2020,
+    2020,
+    "f-zska-erewan.2020"
+   ]
+  ],
   "f-zte-fc": [
    [
     2002,
@@ -76251,6 +76999,13 @@
     2019,
     2023,
     "f-zulia.2016"
+   ]
+  ],
+  "f-zulu-royals-2": [
+   [
+    2008,
+    2008,
+    "f-zulu-royals-2.2008"
    ]
   ],
   "f-zunan-sc": [
