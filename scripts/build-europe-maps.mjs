@@ -53,6 +53,8 @@ import { BIG_LEAGUES } from '../src/data/footballLeagues.js';
 import { euroleagueSeasons, gameYearOf } from './lib/euroleague-seasons.mjs';
 import { ELITE_CLUBS, TOP_CLUBS, isEuropeanClub, strongestClubs } from '../src/data/scopes.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
+import { BUILT_IN_SEASON } from '../src/engine/footballSets.js';
+import { todayMapTag } from './lib/today-field.mjs';
 import { checkLevels, COUNTRIES, naturalEarthGroups, nestLevels, ONS_DISTRICTS, WITHIN } from './lib/admin-levels.mjs';
 import { createBoundarySource, GB_CITATION, NE_URL, ONS_LAD_LICENSE, ONS_LAD_SOURCE, ONS_LAD_URL } from './lib/domestic-boundaries.mjs';
 import { colourSections, contentHash, serialize } from './lib/domestic-output.mjs';
@@ -784,6 +786,11 @@ function attributionText(entries, docs) {
  * EuroLeague's: the built-in season's, then one for each run of earlier seasons with the same clubs (el<year>, named after
  * the run's first season), serving the NBA seasons of those years. Last rugby union's European clubs (rugbyUnionField).
  */
+// A season whose field by results changed its clubs after its maps shipped takes maps of a new id, its letter here, so the
+// campaigns saved on the maps of before still resume there: 2025/26 (eu124r2026b), when the results' blank continents
+// (scripts/lib/club-strength.mjs strengthGames) were read on 23 November 2026, gained its Turkish and Czech clubs.
+const FIELD_REVISIONS = { 'ea-fc-26': 'b' };
+
 async function mapSpecs() {
   const { clubs: places } = JSON.parse(await readFile(clubsFile, 'utf8'));
   const field = (list, count) => strongestClubs(list, count).map(club => {
@@ -791,7 +798,9 @@ async function mapSpecs() {
     if (!place) throw new Error(`No place for ${club.id} (${club.name}) in ${path.relative(root, clubsFile)}`);
     return { id: club.id, name: club.name, city: place.city, home: place.home, shape: place.shape ?? club.country };
   });
-  const seasons = [{ tag: '', set: null, clubs: CLUBS }];
+  // Today's field by results (clubs.football.js `rank`, since 23 November 2026) plays on maps of ids of its own
+  // (eu124b2027): the maps of before, today's strongest XIs (eu124), stay for the campaigns saved on them.
+  const seasons = [{ tag: CLUBS.some(club => club.rank != null) ? todayMapTag(BUILT_IN_SEASON.year) : '', set: null, clubs: CLUBS }];
   for (const season of BUILT_IN_SEASONS) {
     const set = JSON.parse(await readFile(setFile(season.id), 'utf8'));
     if (!set.clubs.length) continue;
@@ -801,7 +810,7 @@ async function mapSpecs() {
     // Europe's strongest by results (`rank`, scripts/lib/europe-field.mjs), on maps of ids again its own (eu124r2018).
     const ranked = set.clubs.some(club => club.rank != null);
     const allEurope = set.clubs.some(club => !BIG_LEAGUES.includes(club.league));
-    seasons.push({ tag: `${ranked ? 'r' : allEurope ? 'e' : 's'}${season.year}`, set: season.id, clubs: set.clubs });
+    seasons.push({ tag: `${ranked ? 'r' : allEurope ? 'e' : 's'}${season.year}${ranked ? FIELD_REVISIONS[season.id] ?? '' : ''}`, set: season.id, clubs: set.clubs });
   }
   const women = [{ tag: '', set: null, clubs: WOMENS_CLUBS.filter(isEuropeanClub) }];
   for (const season of BUILT_IN_WOMENS_SEASONS) {
@@ -882,10 +891,11 @@ async function main() {
     built.set(spec.id, { entry, doc });
     outputs.set(file, text);
   }
-  // A season's map the specs no longer make (its seven-league map of before, eu124s2018) stays, never rebuilt, for the
-  // campaigns saved on it: its entry names the map of the same season and theatre that replaced it (`replacedBy`).
-  const sameField = (spec, entry) => spec.sport === entry.sport && spec.theatre === entry.theatre && !!entry.seasons
-    && JSON.stringify(spec.seasons) === JSON.stringify(entry.seasons);
+  // A season's map the specs no longer make (its seven-league map of before, eu124s2018; today's of before, eu124) stays,
+  // never rebuilt, for the campaigns saved on it: its entry names the map of the same season and theatre that replaced
+  // it (`replacedBy`).
+  const sameField = (spec, entry) => spec.sport === entry.sport && !!entry.theatre && spec.theatre === entry.theatre
+    && JSON.stringify(spec.seasons ?? null) === JSON.stringify(entry.seasons ?? null);
   const retired = previous.filter(entry => !specs.some(spec => spec.id === entry.id)).map(entry => {
     const next = specs.find(spec => sameField(spec, entry));
     if (!next) throw new Error(`${entry.id} is in the index, but no map of the specs makes it or replaces it`);
@@ -899,10 +909,15 @@ async function main() {
     const named = (spec.ranked ?? true) && !(spec.seasons && spec.sport !== 'womens-football');
     return { id: doc.id, sport: doc.sport, league: doc.league, name: 'Europe', ...(doc.theatre ? { theatre: doc.theatre } : {}),
       ...(doc.seasons ? { seasons: doc.seasons } : {}), clubs: doc.clubs.length, sections: doc.clubs.length, countries: doc.hosts.length,
-      version: doc.version, ...(named ? { top: doc.clubs.slice(0, 3).map(club => club.name) } : {}) };
+      version: doc.version, ...(named ? { top: spec.clubs.slice(0, 3).map(club => club.name) } : {}) };
   };
   const kept = [];
-  for (const spec of specs) kept.push(built.get(spec.id)?.entry ?? previous.find(entry => entry.id === spec.id) ?? await onDisk(spec));
+  // --index takes every map's entry from its file: runs side by side each wrote the index with the others' entries as
+  // they found them, before those runs redrew their maps.
+  const fromDisk = args.has('--index');
+  for (const spec of specs) {
+    kept.push(built.get(spec.id)?.entry ?? (fromDisk ? await onDisk(spec) : null) ?? previous.find(entry => entry.id === spec.id) ?? await onDisk(spec));
+  }
   const entries = [...kept.filter(Boolean), ...retired];
   outputs.set(indexFile, indexModule(entries));
   const docs = [];

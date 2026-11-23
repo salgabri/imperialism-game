@@ -52,10 +52,13 @@ export const TOP_CLUBS = 124;
 export const ELITE_CLUBS = 32;
 
 /**
- * Which of two clubs is the stronger, for a field: an earlier season ranks its clubs by their results across Europe
- * (`rank`, 1 the strongest: scripts/lib/europe-field.mjs), every other list by the rating of their XIs (`str`).
+ * Which of two clubs is the stronger, for a field: an earlier season and today's club list rank their fields by results
+ * across Europe (`rank`, 1 the strongest: scripts/lib/europe-field.mjs, today-field.mjs), every other list by the rating
+ * of their XIs (`str`). A ranked club comes before an unranked one: today's list keeps, unranked after its field, the
+ * clubs only its Europe maps of before hold.
  */
-export const strongerClub = (a, b) => (a.rank != null && b.rank != null ? a.rank - b.rank : b.str - a.str);
+export const strongerClub = (a, b) => (a.rank != null && b.rank != null ? a.rank - b.rank
+  : a.rank != null || b.rank != null ? (a.rank != null ? -1 : 1) : b.str - a.str);
 
 /** A club list's `count` strongest. Equal strengths keep the list's order, so a list always gives the same clubs. */
 export const strongestClubs = (clubs, count) => clubs.slice().sort(strongerClub).slice(0, count);

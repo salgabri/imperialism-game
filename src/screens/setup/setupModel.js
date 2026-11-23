@@ -671,7 +671,7 @@ export function sportNote(sport, { clubsOnly = false } = {}) {
  * Rugby's card is two sports' (`cardSports`), so its note names both, uncounted, as basketball's names its two leagues.
  */
 export const SPORT_NOTES = Object.freeze({
-  football: 'Nations · 124 clubs from 17 leagues',
+  football: 'Nations · 124 clubs from 26 leagues',
   'womens-football': 'Nations · 84 clubs from 6 leagues',
   basketball: 'Nations · NBA and EuroLeague clubs',
   'american-football': '32 NFL clubs',

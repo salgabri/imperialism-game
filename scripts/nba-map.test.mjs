@@ -22,6 +22,9 @@ import { buildFronts } from '../src/viewModels/campaign.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { kmToPolys, pointInPolys, polysAreaKm2, polysOf } from './lib/domestic-partition.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
+import { europeMapOf } from '../src/data/domesticScope.js';
+// Today's Europe maps, by the index: the built-in season's field by results (eu124b2027).
+const TODAY_TOP = europeMapOf('all').id, TODAY_ELITE = europeMapOf('elite').id;
 
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 const TEXT = read('public/domestic/nba.json');
@@ -302,7 +305,7 @@ test('basketball clubs set up and launch on the NBA map; football clubs keep the
     // Back to football: the NBA's map is no football theatre.
     app.openSetup();
     app.pickSetup('sport', 'football');
-    assert.equal(app.state.setup.clubScope, 'domestic:eu124');
+    assert.equal(app.state.setup.clubScope, `domestic:${TODAY_TOP}`);
   });
 });
 

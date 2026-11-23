@@ -439,7 +439,7 @@
   "seasons": [
     {
       "id": "ea-fc-26",
-      "version": "ea-fc-26-282f8904",
+      "version": "ea-fc-26-753197a9",
       "edition": "EA FC 26",
       "update": 4,
       "roster": "260004",
@@ -982,13 +982,13 @@
         "Andorra": 1
       },
       "coverage": {
-        "players": 2143,
+        "players": 2118,
         "nations": 144,
         "completeXIs": 81,
         "clubs": 124,
-        "leagues": 24,
+        "leagues": 26,
         "computed": 8,
-        "filled": 88
+        "filled": 99
       },
       "leagues": {
         "Premier League": {
@@ -998,7 +998,7 @@
         },
         "La Liga": {
           "clubs": 20,
-          "kept": 17,
+          "kept": 16,
           "short": []
         },
         "Serie A": {
@@ -1008,12 +1008,12 @@
         },
         "Bundesliga": {
           "clubs": 18,
-          "kept": 16,
+          "kept": 15,
           "short": []
         },
         "Ligue 1": {
           "clubs": 18,
-          "kept": 12,
+          "kept": 11,
           "short": []
         },
         "Eredivisie": {
@@ -1043,7 +1043,7 @@
         },
         "Belgian Pro League": {
           "clubs": 16,
-          "kept": 5,
+          "kept": 4,
           "short": []
         },
         "Croatian HNL": {
@@ -1053,12 +1053,12 @@
         },
         "Cypriot First Division": {
           "clubs": 1,
-          "kept": 2,
+          "kept": 3,
           "short": []
         },
         "Czech First League": {
           "clubs": 3,
-          "kept": 0,
+          "kept": 3,
           "short": []
         },
         "Danish Superliga": {
@@ -1078,7 +1078,7 @@
         },
         "Greek Super League": {
           "clubs": 4,
-          "kept": 4,
+          "kept": 3,
           "short": []
         },
         "Hungarian NB I": {
@@ -1123,12 +1123,12 @@
         },
         "Süper Lig": {
           "clubs": 18,
-          "kept": 0,
+          "kept": 2,
           "short": []
         },
         "Ukrainian Premier League": {
           "clubs": 2,
-          "kept": 2,
+          "kept": 1,
           "short": []
         },
         "Veikkausliiga": {
@@ -1146,32 +1146,30 @@
           "Club Brugge (Belgium) = Club Brugge KV (named)",
           "Olympique Lyon (France) = Olympique Lyonnais",
           "Real Betis (Spain) = Real Betis Balompié",
-          "Olympiakos Piraeus (Greece) = Olympiacos FC (named)",
           "Strasbourg (France) = RC Strasbourg Alsace",
-          "Sporting Braga (Portugal) = Sporting Clube de Braga",
+          "Olympiakos Piraeus (Greece) = Olympiacos FC (named)",
           "Crvena zvezda (Serbia) = Red Star Belgrade",
+          "Sporting Braga (Portugal) = Sporting Clube de Braga",
           "Celta de Vigo (Spain) = RC Celta",
           "AZ (Netherlands) = AZ Alkmaar",
-          "Salzburg (Austria) = FC Red Bull Salzburg",
           "Zenit (Russia) = Zenit St. Petersburg (named)",
+          "Rennes (France) = Stade Rennais FC (named)",
           "Brest (France) = Stade Brestois 29",
           "Borussia M'gladbach (Germany) = Borussia Mönchengladbach (named)",
-          "Rennes (France) = Stade Rennais FC (named)",
+          "Salzburg (Austria) = FC Red Bull Salzburg",
           "Mjällby (Sweden) = Mjällby AIF",
           "Ferencváros (Hungary) = Ferencvárosi Torna Club",
-          "Rangers (Scotland) = Rangers FC (named)",
           "Dinamo Zagreb (Croatia) = Dinamo Zagreb (named)",
-          "Antwerp (Belgium) = Royal Antwerp FC",
-          "Auxerre (France) = AJ Auxerre",
+          "Rangers (Scotland) = Rangers FC (named)",
           "Vitória Guimarães (Portugal) = Vitória SC"
         ],
         "fill": {
-          "clubs": 8,
+          "clubs": 9,
           "scale": {
-            "a": 32.238,
-            "b": 0.6415,
-            "clubs": 226,
-            "r": 0.962
+            "a": 32.56,
+            "b": 0.6374,
+            "clubs": 229,
+            "r": 0.958
           }
         }
       },
@@ -1274,13 +1272,12 @@
         "090 Solomon Islands (0)"
       ],
       "warnings": [
-        "f-qarabag-fk is another club's on its season's country maps, so Qarabağ FK is f-qarabag-fk-2",
-        "f-shakhtar-donetsk is another club's on its season's country maps, so Shakhtar Donetsk is f-shakhtar-donetsk-2"
+        "f-qarabag-fk is another club's on its season's country maps, so Qarabağ FK is f-qarabag-fk-2"
       ]
     },
     {
       "id": "ea-fc-25",
-      "version": "ea-fc-25-e9b1ae4d",
+      "version": "ea-fc-25-b4c0e381",
       "edition": "EA FC 25",
       "update": 2,
       "roster": "250002",
@@ -2171,8 +2168,8 @@
         "fill": {
           "clubs": 5,
           "scale": {
-            "a": 30.122,
-            "b": 0.6769,
+            "a": 30.096,
+            "b": 0.6772,
             "clubs": 225,
             "r": 0.968
           }
@@ -2284,7 +2281,7 @@
     },
     {
       "id": "ea-fc-24",
-      "version": "ea-fc-24-a115789f",
+      "version": "ea-fc-24-dee8cbac",
       "edition": "EA FC 24",
       "update": 2,
       "roster": "240002",
@@ -3077,9 +3074,9 @@
         "fill": {
           "clubs": 7,
           "scale": {
-            "a": 33.632,
-            "b": 0.6264,
-            "clubs": 221,
+            "a": 33.774,
+            "b": 0.6243,
+            "clubs": 222,
             "r": 0.965
           }
         }
@@ -3191,7 +3188,7 @@
     },
     {
       "id": "ea-fifa-23",
-      "version": "ea-fifa-23-f486d4e1",
+      "version": "ea-fifa-23-623afc8a",
       "edition": "FIFA 23",
       "update": 2,
       "roster": "230002",
@@ -4011,7 +4008,7 @@
     },
     {
       "id": "ea-fifa-22",
-      "version": "ea-fifa-22-c4438ff3",
+      "version": "ea-fifa-22-ac151c0d",
       "edition": "FIFA 22",
       "update": 2,
       "roster": "220002",
@@ -4892,7 +4889,7 @@
     },
     {
       "id": "ea-fifa-21",
-      "version": "ea-fifa-21-6b6dab6a",
+      "version": "ea-fifa-21-7817cc49",
       "edition": "FIFA 21",
       "update": 2,
       "roster": "210002",
@@ -5812,7 +5809,7 @@
     },
     {
       "id": "ea-fifa-20",
-      "version": "ea-fifa-20-2a393717",
+      "version": "ea-fifa-20-6361817a",
       "edition": "FIFA 20",
       "update": 2,
       "roster": "200002",
@@ -6689,7 +6686,7 @@
     },
     {
       "id": "ea-fifa-19",
-      "version": "ea-fifa-19-d598080c",
+      "version": "ea-fifa-19-fbff9e68",
       "edition": "FIFA 19",
       "update": 2,
       "roster": "190002",
@@ -7472,7 +7469,7 @@
     },
     {
       "id": "ea-fifa-18",
-      "version": "ea-fifa-18-3f2cccc9",
+      "version": "ea-fifa-18-1c3089d0",
       "edition": "FIFA 18",
       "update": 2,
       "roster": "180002",
@@ -8369,7 +8366,7 @@
     },
     {
       "id": "ea-fifa-17",
-      "version": "ea-fifa-17-1cc2e990",
+      "version": "ea-fifa-17-df101017",
       "edition": "FIFA 17",
       "update": 2,
       "roster": "170002",
@@ -10143,7 +10140,7 @@
     },
     {
       "id": "ea-fifa-15",
-      "version": "ea-fifa-15-07cde2c7",
+      "version": "ea-fifa-15-58ac3f1a",
       "edition": "FIFA 15",
       "update": 2,
       "roster": "150002",
@@ -13920,7 +13917,7 @@
     },
     {
       "id": "ea-fifa-11",
-      "version": "ea-fifa-11-dcc122d8",
+      "version": "ea-fifa-11-5d51d344",
       "edition": "FIFA 11",
       "update": 2,
       "roster": "110002",
@@ -18337,7 +18334,7 @@
     },
     {
       "id": "ea-fifa-07",
-      "version": "ea-fifa-07-4be9e6db",
+      "version": "ea-fifa-07-294a1688",
       "edition": "FIFA 07",
       "update": 2,
       "roster": "070002",

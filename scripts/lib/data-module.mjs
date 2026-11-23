@@ -30,9 +30,13 @@ ${lines.join('\n')}
 `;
 }
 
-/** clubs.football.js: `clubs` are { id, name, code, league, country, col, str, squad: player tuples }, in that key order. */
+/**
+ * clubs.football.js: `clubs` are { id, name, code, league, country, col, str, rank?, squad: player tuples }, in that key
+ * order; `rank` (1 the strongest) only for the clubs of today's field by results (scripts/lib/today-field.mjs).
+ */
 export function clubsModule(clubs, header) {
-  const data = asJson(clubs.map(({ id, name, code, league, country, col, str, squad }) => ({ id, name, code, league, country, col, str, squad })));
+  const data = asJson(clubs.map(({ id, name, code, league, country, col, str, rank, squad }) => ({ id, name, code, league, country, col, str,
+    ...(rank != null ? { rank } : {}), squad })));
   const table = createTupleTable(data.flatMap(club => club.squad));
   const lines = data.map(club => `  club(${jsonLiteral({ ...club, squad: club.squad.map(table.pack) })}),`);
   return `${header}

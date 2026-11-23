@@ -15,6 +15,9 @@ import { getSport } from '../src/sports/index.js';
 import { CAMPAIGN_BACKUP_KEY, CAMPAIGN_INDEX_KEY, campaignSnapshot, campaignStorageKey, createCampaignId,
   deleteCampaign, detectSaveConflict, forkCampaign, loadCampaign, loadSave, writeSave } from '../src/engine/storage.js';
 import { bundleApp } from './lib/app-harness.mjs';
+import { europeMapOf } from '../src/data/domesticScope.js';
+// Today's Europe maps, by the index: the built-in season's field by results (eu124b2027).
+const TODAY_TOP = europeMapOf('all').id, TODAY_ELITE = europeMapOf('elite').id;
 
 const QUOTA = 5_000_000; // jsdom's default and Chromium's per-origin localStorage limit, in UTF-16 code units
 const slotBackupKey = id => `${campaignStorageKey(id)}:backup`;
@@ -364,7 +367,7 @@ const RUNS = {
   'football world': { sport: 'football', layer: 'nations', scope: 'world' },
   'basketball world': { sport: 'basketball', layer: 'nations', scope: 'world' },
   'England domestic': { sport: 'football', layer: 'clubs', clubScope: 'domestic:826' },
-  'Top 124 of Europe': { sport: 'football', layer: 'clubs', clubScope: 'domestic:eu124' },
+  'Top 124 of Europe': { sport: 'football', layer: 'clubs', clubScope: `domestic:${TODAY_TOP}` },
   // A computed World Cup season's players are plain records, their sources inline (docs/design/football-years.md).
   'World Cup 1989/90': { sport: 'football', layer: 'nations', scope: 'world', dataSet: 'wc-1990' },
   // So are a computed national-team season's: 1992/93 is the largest, 81 nations (scripts/lib/national-team-seasons.mjs).

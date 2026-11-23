@@ -51,6 +51,9 @@ test('generated modules are JSON lines that load back to the same data', async (
   const clubModule = await load(clubsModule(clubs, '// test\n'));
   assert.deepEqual(Object.keys(clubModule.CLUBS[0]), ['id', 'name', 'code', 'league', 'country', 'col', 'str', 'squad'], 'the clubs’ field order');
   assert.deepEqual(clubModule.CLUBS[0].squad, clubs[0].squad);
+  // A club of today's field by results keeps its place in it (scripts/lib/today-field.mjs).
+  const ranked = await load(clubsModule([{ ...clubs[0], rank: 1 }], '// test\n'));
+  assert.deepEqual(Object.keys(ranked.CLUBS[0]), ['id', 'name', 'code', 'league', 'country', 'col', 'str', 'rank', 'squad']);
 });
 
 test('the shipped football data is fully sourced and loads as plain records', () => {

@@ -31106,8 +31106,8 @@
    "league": "missing"
   },
   "f-rangers-3.1996": {
-   "club": "Rangers",
-   "years": "1996–1996",
+   "club": "Rangers (Christchurch)",
+   "years": "1995–1997",
    "kind": "wikipedia",
    "title": "File:Rangers_AFC_badge.jpg",
    "page": "https://en.wikipedia.org/wiki/File:Rangers_AFC_badge.jpg",
@@ -31115,7 +31115,7 @@
    "licence": "Fair use (non-free, as the file page states)",
    "sha256": "3f43231751d19f22514bc1a8464e310260845e9b114b77b87ebcfa2cc95a2fbf",
    "cache": "data-src/crest-eras/files/missing/f-rangers-3/1996-Rangers_AFC_badge.jpg",
-   "evidence": "crest of today: the infobox of en.wikipedia's article \"Rangers A.F.C.\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Rangers A.F.C.\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule); SWOS 94/95 and 96/97 call the same club of New Zealand's Southern League f-rangers-2, which wears it in 1995 and 1997 (until 21 November 2026 it wore Rangers de Talca's, d152-130788, lent by its namesake in Chile's 1995/96)",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing"
   },
@@ -38355,6 +38355,20 @@
    "cache": "data-src/crest-eras/files/missing/f-vasby-ik-fk/1994-V_sby_IK_FK_logo.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"Väsby IK FK\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
+   "league": "missing"
+  },
+  "f-vasco-da-gama.2011": {
+   "club": "Vasco da Gama (Cape Town)",
+   "years": "2011–2015",
+   "kind": "wikipedia",
+   "title": "File:Vasco_da_Gama_logo.svg",
+   "page": "https://en.wikipedia.org/wiki/File:Vasco_da_Gama_logo.svg",
+   "download": "https://upload.wikimedia.org/wikipedia/en/thumb/1/14/Vasco_da_Gama_logo.svg/330px-Vasco_da_Gama_logo.svg.png",
+   "licence": "Fair use (non-free, as the file page states)",
+   "sha256": "99d28b7a7365e55b2117964bb064f930c8b9eeb1b1a1c62656a42093b04f25da",
+   "cache": "data-src/crest-eras/files/missing/f-vasco-da-gama/2011-Vasco_da_Gama_logo.png",
+   "evidence": "crest of today: the infobox of en.wikipedia's article \"Vasco da Gama F.C.\" (the Parow, Cape Town club, Wikidata Q2094623), whose file page calls it \"the logo for Vasco da Gama (South Africa)\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule). Until 21 November 2026 South Africa's Vasco da Gama wore Brazil's CR Vasco da Gama crest (d076-339), lent by its namesake",
+   "verified": "contact sheet (namesake crests, November 2026): its own caravel shield, beside Brazil's",
    "league": "missing"
   },
   "f-vasco-sports-club.2008": {
@@ -50165,7 +50179,7 @@
     "f-buducnost-banatski-dvor.2003"
    ]
   ],
-  "f-buducnost-podgorica": [
+  "f-buducnost-podgorica@688": [
    [
     2001,
     2004,
@@ -61326,7 +61340,7 @@
     "f-jalkapalloseura-rakuunat.2001"
    ]
   ],
-  "f-jedinstvo-bijelo-polje": [
+  "f-jedinstvo-bijelo-polje@688": [
    [
     2009,
     2011,
@@ -63105,13 +63119,6 @@
     "d250-871"
    ]
   ],
-  "f-leon": [
-   [
-    1995,
-    1997,
-    "d484-1259"
-   ]
-  ],
   "f-leonidio": [
    [
     2002,
@@ -64362,7 +64369,7 @@
     "f-marilia-atletico-clube.2015"
    ]
   ],
-  "f-maritimo": [
+  "f-maritimo@620": [
    [
     2015,
     2022,
@@ -65421,7 +65428,7 @@
     "f-nac-breda.1997"
    ]
   ],
-  "f-nacional": [
+  "f-nacional@620": [
    [
     2015,
     2021,
@@ -68838,7 +68845,7 @@
     "f-prestatyn-town.2010"
    ]
   ],
-  "f-preston": [
+  "f-preston@036": [
    [
     1995,
     1997,
@@ -69453,16 +69460,16 @@
     "f-rangers-fc"
    ]
   ],
-  "f-rangers-2": [
+  "f-rangers-2@554": [
    [
     1995,
     1995,
-    "d152-130788"
+    "f-rangers-3.1996"
    ],
    [
     1997,
     1997,
-    "d152-130788"
+    "f-rangers-3.1996"
    ]
   ],
   "f-rangers-3": [
@@ -70449,7 +70456,7 @@
     "f-rubin-kazan.2017"
    ]
   ],
-  "f-rudar-pljevlja": [
+  "f-rudar-pljevlja@688": [
    [
     2002,
     2004,
@@ -70459,7 +70466,9 @@
     2008,
     2008,
     "f-rudar-pljevlja.2002"
-   ],
+   ]
+  ],
+  "f-rudar-pljevlja@499": [
    [
     2018,
     2023,
@@ -70754,10 +70763,10 @@
     "f-san-cristobal.1997"
    ]
   ],
-  "f-san-francisco": [
+  "f-san-francisco@484": [
    [
     1995,
-    1997,
+    1996,
     "f-san-francisco.1995"
    ]
   ],
@@ -73344,7 +73353,7 @@
     "f-sutherland-sharks.2008"
    ]
   ],
-  "f-sutjeska-niksic": [
+  "f-sutjeska-niksic@688": [
    [
     1995,
     1996,
@@ -75329,12 +75338,14 @@
     "f-as-valence.1998"
    ]
   ],
-  "f-valencia": [
+  "f-valencia@862": [
    [
     1996,
     1997,
-    "d724-1775"
-   ],
+    "d862-5300226"
+   ]
+  ],
+  "f-valencia@724": [
    [
     2015,
     2024,
@@ -75450,16 +75461,16 @@
     "f-vasby-ik-fk.1994"
    ]
   ],
-  "f-vasco-da-gama": [
+  "f-vasco-da-gama@710": [
    [
     2011,
     2011,
-    "d076-339"
+    "f-vasco-da-gama.2011"
    ],
    [
     2013,
     2015,
-    "d076-339"
+    "f-vasco-da-gama.2011"
    ]
   ],
   "f-vasco-sports-club": [

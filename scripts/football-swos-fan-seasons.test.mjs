@@ -30,6 +30,9 @@ import { abroadCountry } from './lib/season-country-clubs.mjs';
 import { SWOS_NATIONALITIES, readTeamFile, swosFileId, swosRows } from './lib/swos-files.mjs';
 import { EAST_GERMAN_BY_HAND, eastGermanClubs, germanPlaces } from './lib/east-german-clubs.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
+import { europeMapOf } from '../src/data/domesticScope.js';
+// Today's Europe maps, by the index: the built-in season's field by results (eu124b2027).
+const TODAY_TOP = europeMapOf('all').id, TODAY_ELITE = europeMapOf('elite').id;
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const read = file => readFileSync(path.join(root, file), 'utf8');
@@ -486,7 +489,7 @@ test('the running App launches a 1995/96 clubs campaign on its own map of Europe
   await withApp(async fixture => {
     const { app, time } = fixture;
     app.pickSetup('layer', 'clubs');
-    app.pickSetup('clubScope', 'domestic:eu32');
+    app.pickSetup('clubScope', `domestic:${TODAY_ELITE}`);
     app.pickSetup('dataSet', 'swos-9596');
     assert.deepEqual([app.state.setup.layer, app.state.setup.clubScope], ['clubs', 'domestic:eu32r1996'], 'the theatre follows the season');
     time.advance(200);

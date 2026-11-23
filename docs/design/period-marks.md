@@ -122,7 +122,9 @@ was another: `[first year, last year, file]` in the season years the game uses. 
 file is a period crest (`public/club-logos/<club id>.<first year>.webp`), another
 id's crest of today (a club spelled two ways by two data sources), or **null**:
 the club wore a crest the game has no picture of, so it shows its monogram rather
-than a crest it did not have yet.
+than a crest it did not have yet. A club is its country and its id: where the seasons
+give one id to clubs of two countries, each era names its country (below, "A club is
+its country and id").
 
 Only a crest known to have been another is null. Since round 3 a crest is another
 when someone comparing the two at about 64 px would see it: another design, emblem,
@@ -191,7 +193,8 @@ exists, the club shows its monogram in those seasons.
 The research (data-src/crest-eras/: the briefs, the club lists, each league's
 findings and the cached originals) is ignored by git. `npm run sync:crest-eras`
 reads `scripts/data/crest-eras.json` (each period crest's club, years, source file,
-licence and SHA-256; each club's eras) and the originals cached under
+licence and SHA-256; each club's eras, by its id or, for a namesake, `<id>@<country>`)
+and the originals cached under
 `data-src/crest-eras/files/`, and writes the WebPs (trimmed, fitting 128 x 128, as
 `npm run sync:club-logos` draws today's), `public/club-logos/SOURCES-eras.tsv` and
 `src/data/clubCrestEras.js`. `--check` rebuilds them byte for byte where the cache
@@ -528,28 +531,84 @@ of a namesake (the Albanian KF Prishtina's on the Serbian league's FK Priština 
 club moved to another city under a new identity still keeps the monogram (FC Café Opera, not
 AFC Eskilstuna).
 
+On 23 November the user asked to go on ("Yes, keep going"), and a fourth pass took the Wayback
+search through every club still under a monogram: the clubs whose match had been another club
+or undecided, the titles guessed for clubs never matched (only an English article whose infobox
+is a football club's, with a ground, stadium, league or manager, counted), and, past their first
+picture, the 30 clubs whose archived infobox had opened with an icon or a photograph (a landscape
+JPEG is now taken for a photograph). 173 more archived pictures were read by reviewers and
+checked on contact sheets, and most went: the same names abroad (York United of Jamaica, not
+Canada's), merged and refounded successors, feeder sides, the clubs that moved under a new
+identity (Sangju Sangmu, Persijatim, Perseru Serui, Meadowbank, those that became Beijing Renhe:
+monograms all, as the rule above has it), civil-defence symbols, federations', towns' and
+companies' emblems, kit makers' logos, photographs. 46 passed, 10 for today's map clubs and 36
+for the earlier seasons' (26 files still on Wikipedia, 20 archived pictures); one more, São José
+of Macapá's crest, went because the game places its São José in São José dos Campos.
+
 What is left. Outside football, only the caricatures and the Saint Petersburg Lions of
-2000/01, whose logo no source shows. In football, 765 clubs, 1,500 of the 60,050 club
-appearances (2.5%; 887 clubs and 1,755 appearances before the third pass): 281 clubs of today's country maps
-(China's, Uzbekistan's, Laos's and South Africa's lower divisions and the like; 53 of the 128
-maps are complete, from 36) and 484 of the earlier seasons' maps (Italy's of 1999/2000 keeps
-two of its eleven), mostly lower-division and gone clubs whose article has no crest
-(Brescello), whose article is now another club's (Alzano Virescit's is its merged successor's,
-Germinal Ekeren's Beerschot's), or which have no article or free logo at all. They keep the
-monogram; `scripts/club-crests.test.mjs` holds their number as a ceiling. The third pass's
-Wayback search read the 250 clubs whose article shows no crest today and 48 of the 74 whose
-reviewers' articles showed none; the rest, the clubs whose match was another club or never
-found, were not searched. The crests of today
+2000/01, whose logo no source shows. In football, 720 clubs (by country and id), 1,412 of the
+60,387 club appearances (2.3%; 1,501 after the third pass, 1,755 before it): 271 clubs of
+today's country maps (China's, Uzbekistan's, Laos's and South Africa's lower divisions and the
+like; 57 of the 128 maps are complete, from 36) and 449 of the earlier seasons' maps (Italy's of
+1999/2000 keeps two of its eleven), mostly lower-division and gone clubs whose article has no
+crest (Brescello), whose article is now another club's (Alzano Virescit's is its merged
+successor's, Germinal Ekeren's Beerschot's), or which have no article or free logo at all. They
+keep the monogram; `scripts/club-crests.test.mjs` holds their number as a ceiling. Every one of
+them has now been through the Wayback search, its current articles read again and its matches
+reviewed: another pass needs another source. The crests of today
 standing for earlier seasons are undated: a club renamed or moved since shows its later
 identity's crest (the MetroStars the Red Bulls', Delhi Dynamos Odisha's), as the undated rule
 has it everywhere else, until a pass reads their articles' archived infoboxes season by season
 as the UK clubs' were read.
 
+### A club is its country and id
+
+The same day a bug hunt found five clubs of the earlier seasons wearing a namesake's crest in
+every mode. A season's `f-<name>` id names one club in that season, but other seasons give the
+same id to a club of another country: `f-valencia` is Venezuela's Valencia FC in 1995/96 and
+1996/97 and Spain's Valencia CF in 2014/15 to 2023/24; `f-rangers-2` is New Zealand's Rangers in SWOS
+94/95 and 96/97 and Chile's Rangers de Talca in 95/96. The census above grouped club-seasons by
+id across countries, matched each id to one club, and gave its crest to the other country's
+club too. Each now wears its own crest, or its monogram where no allowed source pictures one:
+
+| Club-seasons | Wore | Now |
+|---|---|---|
+| Peru's León, 1994/95 to 1996/97 | Club León's (Mexico) | León de Huánuco's crest of today, its twin on Peru's map of today (`d604-5290586`) |
+| New Zealand's Rangers, 1994/95 and 1996/97 | Rangers de Talca's (Chile) | Rangers A.F.C.'s of Christchurch (`f-rangers-3.1996`), which its 1995/96 id, `f-rangers-3`, already wore |
+| The USA's San Francisco, 1996/97 | Atlético San Francisco's (Mexico) | its monogram: SWOS 96/97's non-league San Francisco, placed as the San Francisco Bay Blackhawks (1989 to 1993; `season-club-homes.json`), whose articles in six languages and the English one's captures of 2008 to 2016 show no logo |
+| Venezuela's Valencia, 1995/96 and 1996/97 | Valencia CF's (Spain) | Carabobo FC's crest of today (`d862-5300226`): Valencia Fútbol Club (1964) changed its name and image to Carabobo Fútbol Club in February 1997 (Spanish Wikipedia's "Carabobo Fútbol Club" and "Primera División de Venezuela 1996-97"), and no source pictures its crest before |
+| South Africa's Vasco da Gama, 2010/11 and 2012/13 to 2014/15 | CR Vasco da Gama's (Brazil) | its own logo (`f-vasco-da-gama.2011`, English Wikipedia's "Vasco da Gama F.C.", the Cape Town club), the Brazilian club's design redrawn |
+
+San Francisco adds one club appearance to those under a monogram: 1,501 of football's after
+the third pass.
+
+A club is now its country and its id. `scripts/lib/crest-census.mjs` lists every club-season
+the game can show as (country, id, year) with the crest it wears, resolved as
+`src/data/crests.js` resolves it; `node scripts/crest-census.mjs` lists the clubs without one
+by country and id, where a crest pass starts. An id the seasons give to clubs of two countries
+keys every era by country in `crest-eras.json` (`f-valencia@862`, `f-valencia@724`), and
+`sync-crest-eras` refuses an id with keyed and unkeyed eras, or two countries' eras that meet.
+The generated `CREST_ERAS` stays keyed by id, a namesake's eras carrying their country fourth,
+because a season year gives an id to one country's club only; for the same reason the twins
+are remembered by season year (`rememberTwins(clubs, year)`: kept by id alone, a namesake's
+twin was whichever map decoded last). Eleven ids are keyed: four of the five (Peru's and
+Mexico's León need no eras: each wears its twin's crest), Portugal's and Uruguay's Nacional,
+Portugal's and Venezuela's Marítimo, Australia's Preston Lions and England's Preston North
+End, and four Montenegrin clubs. Serbia's season maps hold Montenegro's clubs, FR Yugoslavia's
+and Serbia and Montenegro's to 2005/06 and the CM 01/02 Update Team's, whose game has no
+Montenegro, to 2010/11; they are the same clubs as Montenegro's of today and wear those crests
+(`d499-…`), the one exception to the checks below.
+
 ## Checks
 
-`scripts/club-crests.test.mjs`: every club of every map, season and sport resolves to a
-crest the game ships, but the caricatures and `NO_PICTURE` outside football and at most
-1,500 football club appearances; no monogram era outside the caricatures and `NO_PICTURE`.
+`scripts/club-crests.test.mjs`, on the census (`scripts/lib/crest-census.mjs`): every club
+of every map, season and sport resolves to a crest the game ships, but the caricatures and
+`NO_PICTURE` outside football and at most 1,412 football club appearances; no monogram era
+outside the caricatures and `NO_PICTURE`; no club-season wears the crest of another country's
+club of today (`d<country>-…`) or a crest that clubs of two countries wear, but Serbia's
+Montenegrin clubs; an id names one country's club in a season year, and a namesake's eras
+each name a country and cover none of another country's seasons; the five clubs above by name;
+twins remembered by season (Uruguay's and Portugal's Nacional).
 
 `scripts/period-marks.test.mjs`: the tables (every flag period in order and
 vendored, every name of the day's flag vendored, every crest era's file shipped, a

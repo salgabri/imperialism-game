@@ -9,6 +9,7 @@ import { build } from 'esbuild';
 import { JSDOM } from 'jsdom';
 import { DOMESTIC } from '../src/data/domestic.js';
 import { nationPriority } from '../src/data/domesticTiers.js';
+import { europeMapOf } from '../src/data/domesticScope.js';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const publicDir = path.join(root, 'public');
@@ -41,8 +42,9 @@ const NRL = { sport: 'rugby-league', layer: 'clubs', clubScope: 'domestic:nrl' }
 // Spain's map cut to its 20 strongest clubs (src/engine/clubSplit.js): chosen as Spain, then Top 20 beside it.
 const SPAIN_20 = { layer: 'clubs', clubScope: 'domestic:724c20', clubCount: 20 };
 // Football clubs: Europe's strongest, each on land in its own country.
-const TOP = { layer: 'clubs', clubScope: 'domestic:eu124' };
-const ELITE = { layer: 'clubs', clubScope: 'domestic:eu32' };
+// Today's maps, by the index: the built-in season's field by results (eu124b2027).
+const TOP = { layer: 'clubs', clubScope: `domestic:${europeMapOf('all').id}` };
+const ELITE = { layer: 'clubs', clubScope: `domestic:${europeMapOf('elite').id}` };
 
 const SCENARIOS = [
   { name: 'South America · duel · ticker', scope: 'CONMEBOL', pacing: 'duel', resolution: 'ticker' },
@@ -354,7 +356,7 @@ function checkTheatres(scenario, theatre) {
   const expected = DOMESTIC.slice().sort((a, b) => nationPriority(a.id) - nationPriority(b.id))
     .map(entry => ({ value: `domestic:${entry.id}`, text: `${entry.name} · ${entry.clubs} clubs` }));
   check('Europe offers its strongest clubs and its elite, and no single league', JSON.stringify(europe?.options) === JSON.stringify([
-    { value: 'domestic:eu124', text: 'Top 124 · 124 clubs' }, { value: 'domestic:eu32', text: 'Elite 32 · 32 clubs' }]),
+    { value: TOP.clubScope, text: 'Top 124 · 124 clubs' }, { value: ELITE.clubScope, text: 'Elite 32 · 32 clubs' }]),
     JSON.stringify(theatre.groups.map(group => group.label)));
   check('every shipped country is offered by name with its club count, in priority order', JSON.stringify(domestic?.options) === JSON.stringify(expected),
     JSON.stringify(domestic?.options));

@@ -16,6 +16,9 @@ import { createTargetedDraw } from '../src/engine/duelDraw.js';
 import { campaignSnapshot, createCampaignId, parseCampaign } from '../src/engine/storage.js';
 import { tooltipModel } from '../src/viewModels/map.js';
 import { bundleComponents, forceResult, syncAppFixture } from './lib/app-harness.mjs';
+import { europeMapOf } from '../src/data/domesticScope.js';
+// Today's Europe maps, by the index: the built-in season's field by results (eu124b2027).
+const TODAY_TOP = europeMapOf('all').id, TODAY_ELITE = europeMapOf('elite').id;
 
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 const ATLAS_TEXT = read('public/countries-50m.json');
@@ -144,7 +147,7 @@ test('the NBA map: every empty state and province can be claimed, and its border
 });
 
 test('Elite 32: Europe\'s countries without a club can be claimed; an island or peninsula off one club stays empty', () => {
-  const eu = decodeDomestic(JSON.parse(read('public/domestic/eu32.json')), 'eu32');
+  const eu = decodeDomestic(JSON.parse(read(`public/domestic/${TODAY_ELITE}.json`)), TODAY_ELITE);
   const euLand = domesticLand(eu, domesticSurroundings(ATLAS, eu));
   for (const id of ['756', '040', '208', '372', '643']) assert.ok(euLand.claimable.has(id), id);
   for (const host of eu.meta.hosts) assert.ok(!euLand.claimable.has(host), `${host} has clubs`);
@@ -159,16 +162,17 @@ test('Elite 32: Europe\'s countries without a club can be claimed; an island or 
 });
 
 test('Top 124: the surroundings keep every land border of the atlas, which joins land the probes cannot', () => {
-  const eu = decodeDomestic(JSON.parse(read('public/domestic/eu124.json')), 'eu124');
+  const eu = decodeDomestic(JSON.parse(read(`public/domestic/${TODAY_TOP}.json`)), TODAY_TOP);
   const around = domesticSurroundings(ATLAS, eu);
   // Built without border lengths, which nothing here reads, the atlas in the map's projection keeps its adjacency.
   const full = new WorldGeometry(ATLAS, {}, { projection: eu.meta.projection });
   const adjacency = adj => JSON.stringify(Object.entries(adj).map(([id, set]) => [id, [...set]]));
   assert.equal(adjacency(around.atlasNeighbours), adjacency(full.adj));
-  // Germany holds clubs, so its own shape is no obstacle the probes could meet: Austria–Germany is the atlas's alone.
+  // Germany holds clubs, so its own shape is no obstacle the probes could meet: Luxembourg–Germany, Luxembourg holding no
+  // club of today's Top 124, is the atlas's alone.
   const euLand = domesticLand(eu, around);
-  assert.ok(euLand.claimable.has('040') && euLand.adj.get('040').includes('276'), 'Austria borders Germany');
-  assert.ok(!domesticLand(eu, { ...around, atlasNeighbours: {} }).adj.get('040').includes('276'), 'a link only the atlas gives');
+  assert.ok(euLand.claimable.has('442') && euLand.adj.get('442').includes('276'), 'Luxembourg borders Germany');
+  assert.ok(!domesticLand(eu, { ...around, atlasNeighbours: {} }).adj.get('442').includes('276'), 'a link only the atlas gives');
 });
 
 test('the world map: a nation landlocked by one team is claimed at once, an island hanging off one is not', () => {

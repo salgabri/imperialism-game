@@ -4,7 +4,8 @@
 // today's: [first year, last year, file], in the season years the game uses (a split season by the year it ends). An
 // era's file is a crest in public/club-logos/ (`<club id>.<first year>`, or another id's own); null where the club wore
 // a crest the game has no picture of: it shows its monogram rather than a crest it did not have yet. Every other year,
-// and a season of today (no year), shows today's crest.
+// and a season of today (no year), shows today's crest. An id the seasons give to clubs of two countries (a namesake)
+// has each country's eras, that country fourth; the id alone finds them, since a season year gives it to one club.
 import { clubLogoFile } from './clubLogos.js';
 import { CREST_ERAS } from './clubCrestEras.js';
 

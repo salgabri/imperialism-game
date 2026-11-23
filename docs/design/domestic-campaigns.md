@@ -1528,6 +1528,47 @@ is the exception at 17 countries: no Update Team database fills it. Where a CM d
 rates a country's clubs with fewer than eleven players (Ukraine's, Turkey's and Switzerland's in
 1997–2001), the next clubs take their places.
 
+**Blank continents** (23 November 2026). The results leave the continent blank on some of their
+newest rows: 935 European league games of June to September 2025 at the pinned commit, every
+Turkish and Czech game of 2025/26 among them, so the clubs of those two countries had no
+top-division game in 2025/26's window and fell out of its list (Galatasaray, 38th in 2024/25,
+with them). `strengthGames` now takes a blank continent from the latest row that names the
+country's. 2025/26's field gained Galatasaray, Fenerbahçe, Slavia, Sparta, Plzeň and Omonia
+(its Elite 32 Galatasaray and Leipzig, for Frankfurt and Feyenoord), so its maps took new ids
+(`eu124r2026b`, `FIELD_REVISIONS` in `scripts/build-europe-maps.mjs`) and its first maps by
+results stay for their saves. The joint fit moved every other season's strengths by a point at
+most: the same clubs, some near-equals reordered, their maps redrawn under their ids (a saved
+campaign moves club by club onto a redrawn map).
+
+**Today's field by results** (since 23 November 2026, `scripts/lib/today-field.mjs`,
+`npm run build-clubs`). The built-in season (2026/27) ranks its clubs the same way, by the
+newest season the results hold (2025/26, to 30 September 2025, more than a year before EA FC
+27's ratings: no source newer than the pinned one allows its use here, ClubElo's API host's
+robots.txt unreadable):
+
+- **Squads**: a ranked club plays its EA FC 27 XI (`firstDivisionClubs`, every first-division
+  club of EA's 27 European competitions), or, in a country whose first division EA rates only
+  in part (fewer than `WHOLE_LEAGUE`, 8, clubs: Serbia, Russia, Israel, Cyprus and Bulgaria
+  beyond Ludogorets, Greece and Czechia beyond EA's few), the XI picked from the FM 26 squad
+  today's country map gives it, each player exactly as that map's campaigns play him
+  (`expandFmTuple`), its id the map's (`d688-1955`), so it wears that club's crest and colours.
+  FM 26's ratings stay as they are: over the 196 clubs both rate, FM 26's XI means sit on EA FC
+  27's scale (EA = −1.02 + 1.022 × FM, r 0.96; at FM 70, EA 70.5), as the built-in nations
+  already take them.
+- **Relegated since**: a ranked club of a country EA rates whole that EA lists in no first
+  division has left it since the results (West Ham, Wolves, Wolfsburg, St. Pauli, Mallorca,
+  Girona): it is passed over, never filled from FM 26's squads of March 2026. A club promoted
+  since has no 2025/26 ranking and waits for newer results.
+- **The list**: `src/data/clubs.football.js` holds the 124 strongest first, each with its `rank`,
+  then, unranked, every club of today's maps of before that the field no longer holds (25), so
+  those maps still decode for the campaigns saved on them; `strongerClub` puts a ranked club
+  before an unranked one, so every theatre takes the field. A club keeps its code.
+
+Today's field spans 26 countries, the five big leagues 70 of its 124 (17 countries and 90 before),
+eight clubs FM 26's: Red Star, Pafos, Maccabi Tel Aviv, Zenit, Krasnodar, Aris Limassol, CSKA
+Moscow and Hapoel Be'er Sheva. Its maps are `eu124b2027` and `eu32b2027`; today's maps of before,
+`eu124` and `eu32`, stay (`replacedBy`).
+
 **Before results**, from 14 November 2026, an earlier season's field was drawn the same way as
 today's from its own source: every European first division the source rates, its clubs with
 eleven rated players, and the strongest `TOP_CLUBS` kept in the season's file (`strongestBuilt` in

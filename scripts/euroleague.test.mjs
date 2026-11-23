@@ -41,6 +41,9 @@ import { challengeQuery, readChallenge } from '../src/screens/setup/challenge.js
 import { ESTIMATE, builtInPlayers, displayName, euroleagueClubs, positionsOf } from './lib/euroleague.mjs';
 import { pointInPolys, polysOf } from './lib/domestic-partition.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
+import { europeMapOf } from '../src/data/domesticScope.js';
+// Today's Europe maps, by the index: the built-in season's field by results (eu124b2027).
+const TODAY_TOP = europeMapOf('all').id, TODAY_ELITE = europeMapOf('elite').id;
 
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
@@ -476,7 +479,7 @@ test('basketball clubs choose the EuroLeague: its map loads, its 20 clubs launch
     // Another sport leaves the EuroLeague's map.
     app.pickSetup('clubScope', EUROLEAGUE_SCOPE);
     app.pickSetup('sport', 'football');
-    assert.equal(app.state.setup.clubScope, 'domestic:eu124');
+    assert.equal(app.state.setup.clubScope, `domestic:${TODAY_TOP}`);
   });
 });
 
@@ -658,7 +661,7 @@ test('an earlier season\'s EuroLeague plays FIBA\'s forty minutes at that season
   assert.equal(matchSport(settings({ clubScope: 'domestic:nba2009', dataSeason: '2010/11' })), nbaBasketballIn('2010/11'));
   assert.equal(matchSport(settings({ clubScope: EUROLEAGUE_SCOPE })), euroleagueBasketball, 'the built-in season plays its own');
   assert.equal(euroleagueBasketballIn('1998/99'), euroleagueBasketball, 'a season without league figures plays the built-in\'s');
-  assert.ok(isEuroleagueScope('domestic:el2001') && isEuroleagueScope(EUROLEAGUE_SCOPE) && !isEuroleagueScope('domestic:nba2009') && !isEuroleagueScope('domestic:eu124'));
+  assert.ok(isEuroleagueScope('domestic:el2001') && isEuroleagueScope(EUROLEAGUE_SCOPE) && !isEuroleagueScope('domestic:nba2009') && !isEuroleagueScope(`domestic:${TODAY_TOP}`));
   const [a, d] = seasonOfYear(2010).clubs.slice(0, 2).map(club => buildClub(club, sport));
   const { pace, rules } = sport.prepareMatch(a, d);
   const league = EUROLEAGUE_LEAGUE_AVERAGES['2010/11'];

@@ -18,6 +18,10 @@ import { ageOn, clubsAgree, eaNameForms, fmAgeDate, fmGameRating, linkingCheck, 
 import { foldTokens, namesAgree } from './lib/reep-bridge.mjs';
 import { decodeFootballSet, fieldedNations } from '../src/engine/footballSets.js';
 import { TOP_CLUBS, strongestClubs } from '../src/data/scopes.js';
+import { expandFmTuple } from '../src/data/fmPlayers.js';
+import { firstDivisionOf } from '../src/data/footballLeagues.js';
+import { FOOTBALL_LEAGUES, LEAGUELESS_CLUBS, firstDivisionClubs } from './lib/first-divisions.mjs';
+import { WHOLE_LEAGUE } from './lib/today-field.mjs';
 
 const evidence = {
   id: 'ea:123', fullName: 'Verified Player', positions: ['MF', 'FW'],
@@ -172,6 +176,14 @@ test('every shipped rating and identity resolves to its exact committed database
         assert.equal(player.rating, record.rating);
         assert.deepEqual(evidence, record.sourceInfo);
         if (team.kind === 'club') assert.equal(evidence.club, team.name);
+      } else if (team.kind === 'club') {
+        // A club whose league EA does not rate whole plays its country map's FM 26 squad (scripts/lib/today-field.mjs):
+        // each player exactly as that map's campaigns play him.
+        const map = JSON.parse(await readFile(new URL(`../public/domestic/${team.home}.json`, import.meta.url), 'utf8'));
+        const tuple = map.clubs.find(club => club.id === team.id)?.squad.find(entry => `fm:${entry[0]}` === player.id);
+        assert.ok(tuple, `${team.name}: ${player.id} is in its country map's squad`);
+        const [name, , rating, sourceInfo] = expandFmTuple(tuple, map.source, team.name);
+        assert.deepEqual([player.name, player.rating, evidence], [name, rating, sourceInfo]);
       } else {
         const record = fmById.get(player.id);
         assert.ok(record, player.id);
@@ -256,15 +268,26 @@ test('the 29-February filter drops half-generated clubs and clubless players onl
 test('competition IDs keep foreign namesakes out of the European club leagues', async () => {
   const ea = await loadEaPlayers(new URL('./data/ea-fc27.csv', import.meta.url));
   const records = new Map(ea.players.map(player => [player.sourceInfo.id, player]));
-  const expected = { 'Premier League': 13, 'La Liga': 53, 'Serie A': 31, Bundesliga: 19, 'Ligue 1': 16, Eredivisie: 10, 'Liga Portugal': 308,
-    'Süper Lig': 68, 'Belgian Pro League': 4, 'Greek Super League': 63, 'Czech First League': 319, 'Scottish Premiership': 50, 'Danish Superliga': 1,
-    Eliteserien: 41, 'Ukrainian Premier League': 332, 'Croatian HNL': 317, 'Bulgarian First League': 0 };
-  assert.equal(football.clubs.length, TOP_CLUBS, 'the strongest clubs in Europe, and no others');
-  assert.deepEqual(football.clubs, strongestClubs(football.clubs, TOP_CLUBS), 'strongest first, as the theatres take them');
-  for (const club of football.clubs) {
+  // Each EA club's league by its competition id; Ludogorets is the one first-division club EA lists under no competition.
+  const expected = Object.fromEntries([...Object.entries(FOOTBALL_LEAGUES).map(([id, { league }]) => [league, Number(id)]),
+    ...Object.values(LEAGUELESS_CLUBS).map(({ league }) => [league, 0])]);
+  // Europe's strongest clubs by results, strongest first as the theatres take them; after them, unranked, the clubs only
+  // today's maps of before hold (europe-maps.test.mjs).
+  const field = football.clubs.filter(club => club.rank != null);
+  assert.equal(field.length, TOP_CLUBS);
+  assert.deepEqual(football.clubs.slice(0, TOP_CLUBS), field);
+  assert.deepEqual(strongestClubs(football.clubs, TOP_CLUBS), field, 'the theatres take the field');
+  for (const club of football.clubs.filter(entry => entry.squad[0][3].source === 'ea-fc')) {
     assert.ok(Object.hasOwn(expected, club.league), `${club.name} plays in ${club.league}`);
-    // Ludogorets is the one first-division club EA lists under no competition.
     for (const player of club.squad) assert.equal(records.get(player[3].id).leagueId, expected[club.league], club.name);
+  }
+  const eaCountries = new Map();
+  for (const club of firstDivisionClubs(ea.players)) eaCountries.set(club.country, (eaCountries.get(club.country) || 0) + 1);
+  // A club of FM 26's plays in its country's first division, one whose league EA rates only in part, every player FM's.
+  for (const club of field.filter(entry => entry.squad[0][3].source !== 'ea-fc')) {
+    assert.equal(club.league, firstDivisionOf(club.country, 2027), club.name);
+    assert.ok(club.squad.every(player => player[3].source === 'football-manager'), club.name);
+    assert.ok(!(eaCountries.get(club.country) >= WHOLE_LEAGUE), `${club.name}: EA rates ${club.country}'s league in part at most`);
   }
   const brazil = buildTeam('076', makeRng(1), football);
   assert.equal(brazil.squad.filter(player => /vin[ií]cius|vini jr/i.test(player.name)).length, 1, 'legal and familiar names must not duplicate Vinícius Júnior');

@@ -25,6 +25,9 @@ import { buildSquad } from '../src/viewModels/squad.js';
 import { buildLiveMatch, scorersLine } from '../src/viewModels/match.js';
 import { kmToPolys, pointInPolys } from './lib/domestic-partition.mjs';
 import { bundleComponents, syncAppFixture } from './lib/app-harness.mjs';
+import { europeMapOf } from '../src/data/domesticScope.js';
+// Today's Europe maps, by the index: the built-in season's field by results (eu124b2027).
+const TODAY_TOP = europeMapOf('all').id, TODAY_ELITE = europeMapOf('elite').id;
 
 const read = file => readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
 const sport = getSport('college-football');
@@ -440,7 +443,7 @@ test('college football sets up with its schools only, launches on the FBS map, s
 
     app.openSetup();
     app.pickSetup('sport', 'football');
-    assert.equal(app.state.setup.clubScope, 'domestic:eu124', 'the FBS map is no football theatre');
+    assert.equal(app.state.setup.clubScope, `domestic:${TODAY_TOP}`, 'the FBS map is no football theatre');
   } finally {
     f.close();
     if (prior) Object.defineProperty(globalThis, 'fetch', prior); else delete globalThis.fetch;

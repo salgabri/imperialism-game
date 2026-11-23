@@ -13,6 +13,9 @@ import { DOMESTIC } from '../src/data/domestic.js';
 import { DEFAULT_SETUP, setClubScope } from '../src/app/shared.js';
 import { buildSetupModel } from '../src/screens/setup/setupModel.js';
 import { challengeQuery, readChallenge } from '../src/screens/setup/challenge.js';
+import { europeMapOf } from '../src/data/domesticScope.js';
+// Today's Europe maps, by the index: the built-in season's field by results (eu124b2027).
+const TODAY_TOP = europeMapOf('all').id, TODAY_ELITE = europeMapOf('elite').id;
 
 const ROOT = new URL('../public/domestic/', import.meta.url);
 const files = new Map();
@@ -273,7 +276,7 @@ test('setup offers the number of clubs beside the country, and describes the cut
   const full = buildSetupModel({ ...DEFAULT_SETUP, sport: 'football', layer: 'clubs', clubScope: 'domestic:724' }, {});
   assert.deepEqual(full.clubCount, { value: 100, min: SPLIT_MIN_CLUBS, max: 100, cut: false });
   // Europe's maps have no such choice.
-  const europe = buildSetupModel({ ...DEFAULT_SETUP, sport: 'football', layer: 'clubs', clubScope: 'domestic:eu124' }, {});
+  const europe = buildSetupModel({ ...DEFAULT_SETUP, sport: 'football', layer: 'clubs', clubScope: `domestic:${TODAY_TOP}` }, {});
   assert.equal(europe.clubCount, null);
   assert.equal(europe.countryScopeId, null);
 });
