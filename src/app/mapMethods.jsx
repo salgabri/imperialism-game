@@ -105,6 +105,28 @@ const startOwnersOf = domestic => {
   return board;
 };
 const setupClubs = new WeakMap(); // decoded country map → its clubs by id
+const clubsOf = domestic => {
+  let clubs = setupClubs.get(domestic);
+  if (!clubs) setupClubs.set(domestic, clubs = Object.fromEntries((domestic.clubs || NONE).map(club => [club.id, club])));
+  return clubs;
+};
+const twinTeams = new WeakMap(); // a campaign's teams → { clubs, teams }
+/**
+ * A country campaign's teams as the palette reads them: each club with the twin its map gives it (engine/domestic.js
+ * decodeDomestic; data/teams.js buildClub leaves it out), as setup reads the map's clubs, so the campaign paints a
+ * season's club as its setup card did and never in a namesake's colour (engine/mapPalette.js ownColour). Kept per
+ * teams and map.
+ */
+function withTwins(teams, clubs) {
+  const hit = twinTeams.get(teams);
+  if (hit?.clubs === clubs) return hit.teams;
+  const out = {};
+  for (const [id, team] of Object.entries(teams)) {
+    out[id] = team && team.twin === undefined && clubs[id] ? { ...team, twin: clubs[id].twin } : team;
+  }
+  twinTeams.set(teams, { clubs, teams: out });
+  return out;
+}
 /**
  * The board the map's empires start on, which orders their choice of colour all campaign long: a country map's
  * starting clubs (every section of each club's starting group), else each world shape's nation (a dependency its
@@ -144,17 +166,16 @@ export function setupBoardPalette(own) {
 }
 
 /**
- * Board `own`'s palette on the map's geometry; `teams` null for setup's (a country map's decoded clubs). A country
- * map's clubs choose strongest first, by the map's own ratings (clubRanks); a world map's nations by their land.
+ * Board `own`'s palette on the map's geometry; `teams` null for setup's (a country map's decoded clubs). On a country
+ * map a campaign's teams take their clubs' twins from it (withTwins). A country map's clubs choose strongest first, by
+ * the map's own ratings (clubRanks); a world map's nations by their land.
  */
 function boardPalette(app, own, teams, managedId) {
   const geo = app.geo, home = homeBoard(app);
   const domestic = app.domesticMap();
   const onMap = domestic?.geo === geo ? domestic : null;
-  if (!teams) {
-    teams = onMap ? setupClubs.get(onMap) : NO_CLAIMS;
-    if (!teams) setupClubs.set(onMap, teams = Object.fromEntries(onMap.clubs.map(club => [club.id, club])));
-  }
+  if (onMap) teams = teams ? withTwins(teams, clubsOf(onMap)) : clubsOf(onMap);
+  else teams ||= NO_CLAIMS;
   const ranks = onMap ? clubRanks(onMap.clubs) : null;
   const cache = app.paletteCache ||= new WeakMap();
   const hit = cache.get(own);
