@@ -42404,7 +42404,7 @@
    "iso3": "ROU",
    "level": "ADM2",
    "units": 3236,
-   "parts": 3352,
+   "parts": 3333,
    "droppedUnits": [],
    "maxGapKm": 3.9,
    "splits": [
@@ -42416,7 +42416,7 @@
     },
     {
      "unit": "Sector 3",
-     "pieces": 25,
+     "pieces": 28,
      "clubs": 2,
      "reason": "2 clubs' shared ground"
     }
@@ -42438,58 +42438,57 @@
      3
     ],
     "sizeMoved": [
+     "Fotbal Club Rapid 1923",
+     "Dinamo 1948 SA",
      "FC Voluntari",
+     "Clubul Sportiv al Armatei Steaua",
+     "CS Concordia Chiajna",
      "ACSF Oradea"
     ],
     "fanned": [
      [
-      "Fotbal Club Rapid 1923",
+      "CS Tunari",
       "Dinamo 1948 SA",
+      "Fotbal Club Rapid 1923",
+      "CS Concordia Chiajna",
+      "Clubul Sportiv al Armatei Steaua",
       "FC Metaloglobus Bucureşti",
       "CS Dinamo Bucureşti",
       "Fotbal Club FCSB",
       "CS Afumaţi",
-      "FC Voluntari",
-      "CS Tunari",
-      "Clubul Sportiv al Armatei Steaua",
-      "CS Concordia Chiajna"
+      "FC Voluntari"
      ]
     ],
     "splitOnLand": [],
     "areaKm2": {
-     "min": 673,
-     "median": 6524.3,
-     "max": 10560.3
+     "min": 792.9,
+     "median": 6585.7,
+     "max": 10530.1
     }
    },
-   "homeInSection": 38,
+   "homeInSection": 39,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0
+    "max": 0.2
    },
    "displaced": [
     {
-     "club": "Dinamo 1948 SA",
-     "section": "Sector 2 (south-west)",
-     "km": 0
-    },
-    {
      "club": "FC Metaloglobus Bucureşti",
-     "section": "Sector 3 (west)",
-     "km": 0
+     "section": "Sector 3 (south-west)",
+     "km": 0.2
     }
    ],
    "sectionAreaKm2": {
-    "min": 28.2,
-    "p10": 649.1,
-    "median": 2654.1,
-    "p90": 3526,
-    "max": 5149.7
+    "min": 40.7,
+    "p10": 687.4,
+    "median": 2572.9,
+    "p90": 3500.6,
+    "max": 5230.7
    },
    "areaKm2": {
     "source": 237372,
-    "sections": 237371,
+    "sections": 237372,
     "diffPct": 0
    },
    "islandsDropped": 0,
@@ -42502,7 +42501,7 @@
    },
    "arcPoints": 14000,
    "pointBudget": 14000,
-   "bytes": 196258,
+   "bytes": 196310,
    "foreignCut": [
     {
      "shape": "Bulgaria",
@@ -42524,7 +42523,7 @@
    "iso3": "RUS",
    "level": "ADM2",
    "units": 2330,
-   "parts": 4234,
+   "parts": 4198,
    "droppedUnits": [],
    "maxGapKm": 21.7,
    "splits": [
@@ -42650,15 +42649,9 @@
     },
     {
      "unit": "Moscow",
-     "pieces": 33,
+     "pieces": 34,
      "clubs": 3,
      "reason": "3 clubs' shared ground"
-    },
-    {
-     "unit": "Moscow",
-     "pieces": 33,
-     "clubs": 2,
-     "reason": "2 clubs' shared ground"
     },
     {
      "unit": "Makhachkala",
@@ -42691,8 +42684,8 @@
     ],
     "sizeMoved": [
      "CSKA Moscow",
-     "Dinamo Moscow",
      "Baltika Kaliningrad",
+     "Torpedo Moscow",
      "Chernomorets Novorossiysk",
      "Veles Moscow",
      "Volga Uljanovsk",
@@ -42703,53 +42696,43 @@
     ],
     "fanned": [
      [
+      "Dinamo Moscow",
       "Torpedo Moscow",
       "CSKA Moscow",
       "Veles Moscow",
       "Chertanovo Moscow",
       "Lokomotiv Moscow",
-      "Dinamo Moscow",
       "Rodina Moscow",
       "Spartak Moscow"
      ]
     ],
     "splitOnLand": [],
     "areaKm2": {
-     "min": 2879.7,
-     "median": 56557.9,
-     "max": 4930829.5
+     "min": 2565,
+     "median": 56536,
+     "max": 4930824.4
     }
    },
-   "homeInSection": 54,
+   "homeInSection": 56,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 1
+    "max": 0.5
    },
    "displaced": [
-    {
-     "club": "Rodina Moscow",
-     "section": "Moscow (north-west, north-east)",
-     "km": 1
-    },
     {
      "club": "PFC Kuban Krasnodar",
      "section": "Krasnodar (north-east)",
      "km": 0.5
     },
     {
+     "club": "Chertanovo Moscow",
+     "section": "Moscow (south-west, south-east)",
+     "km": 0
+    },
+    {
      "club": "CSKA Moscow",
      "section": "Moscow (south)",
-     "km": 0.3
-    },
-    {
-     "club": "Veles Moscow",
-     "section": "Moscow (south-east)",
-     "km": 0.1
-    },
-    {
-     "club": "Chertanovo Moscow",
-     "section": "Moscow (south-west, south)",
      "km": 0
     },
     {
@@ -42759,28 +42742,28 @@
     }
    ],
    "sectionAreaKm2": {
-    "min": 2614.2,
-    "p10": 12873,
-    "median": 35858.2,
-    "p90": 292591.7,
-    "max": 3940514.1
+    "min": 1487.6,
+    "p10": 9343.3,
+    "median": 35913.4,
+    "p90": 292579.1,
+    "max": 3940534.5
    },
    "areaKm2": {
     "source": 16815296,
-    "sections": 16799758,
+    "sections": 16799813,
     "diffPct": -0.09
    },
    "islandsDropped": 1428,
-   "holesDropped": 72,
+   "holesDropped": 70,
    "minIsletKm2": 222.398,
    "antimeridianShift": true,
    "projection": {
     "lon0": 97.7,
     "lat0": 59.5
    },
-   "arcPoints": 14000,
+   "arcPoints": 13999,
    "pointBudget": 14000,
-   "bytes": 212973,
+   "bytes": 212949,
    "foreignCut": [
     {
      "shape": "Kazakhstan",
@@ -52903,7 +52886,7 @@
    "iso3": "TUR",
    "level": "ADM2",
    "units": 975,
-   "parts": 1242,
+   "parts": 1247,
    "droppedUnits": [],
    "maxGapKm": 12.7,
    "splits": [
@@ -52938,14 +52921,8 @@
      "reason": "2 grounds"
     },
     {
-     "unit": "Başakşehir",
-     "pieces": 9,
-     "clubs": 2,
-     "reason": "2 clubs' shared ground"
-    },
-    {
      "unit": "Fatih",
-     "pieces": 11,
+     "pieces": 10,
      "clubs": 2,
      "reason": "2 clubs' shared ground"
     },
@@ -52977,19 +52954,19 @@
    "sections": 100,
    "fanned": [
     [
-     "Fenerbahçe A.Ş.",
-     "Ümraniyespor",
-     "Sarıyer",
-     "Galatasaray A.Ş.",
-     "Beşiktaş A.Ş.",
-     "Kasımpaşa A.Ş.",
+     "Arnavutköy Belediye Gençlik ve Spor",
+     "Fatih Karagümrük",
+     "Başakşehir Futbol Kulübü",
+     "İstanbulspor A.Ş.",
+     "Esenler Erokspor",
      "Eyüpspor",
      "Beyoğlu Yeni Çarşı Spor Faaliyetleri A.Ş.",
-     "Arnavutköy Belediye Gençlik ve Spor",
-     "Esenler Erokspor",
-     "Başakşehir Futbol Kulübü",
-     "Fatih Karagümrük",
-     "İstanbulspor A.Ş."
+     "Kasımpaşa A.Ş.",
+     "Beşiktaş A.Ş.",
+     "Fenerbahçe A.Ş.",
+     "Galatasaray A.Ş.",
+     "Ümraniyespor",
+     "Sarıyer"
     ],
     [
      "Altınordu",
@@ -53010,7 +52987,7 @@
      "Gençlerbirliği"
     ]
    ],
-   "homeInSection": 95,
+   "homeInSection": 96,
    "displacementKm": {
     "median": 0,
     "p90": 0,
@@ -53023,32 +53000,27 @@
      "km": 0.1
     },
     {
-     "club": "Adana Demirspor A.Ş.",
-     "section": "Seyhan (north-west)",
-     "km": 0
+     "club": "Eyüpspor",
+     "section": "Fatih (north-west)",
+     "km": 0.1
     },
     {
-     "club": "Başakşehir Futbol Kulübü",
-     "section": "Başakşehir (north-west)",
+     "club": "Adana Demirspor A.Ş.",
+     "section": "Seyhan (north-west)",
      "km": 0
     },
     {
      "club": "Çankaya Spor Kulübü",
      "section": "Çankaya (south-west, south-west)",
      "km": 0
-    },
-    {
-     "club": "Eyüpspor",
-     "section": "Fatih (north-west)",
-     "km": 0
     }
    ],
    "sectionAreaKm2": {
-    "min": 25,
-    "p10": 215.7,
-    "median": 7219.6,
-    "p90": 15560.9,
-    "max": 24064.4
+    "min": 22.3,
+    "p10": 253.6,
+    "median": 7220.6,
+    "p90": 15561.4,
+    "max": 24063.9
    },
    "areaKm2": {
     "source": 779395,
@@ -53063,9 +53035,9 @@
     "lon0": 35.2,
     "lat0": 39
    },
-   "arcPoints": 11903,
+   "arcPoints": 11901,
    "pointBudget": 11900,
-   "bytes": 233311,
+   "bytes": 233202,
    "foreignCut": [
     {
      "shape": "Iran",

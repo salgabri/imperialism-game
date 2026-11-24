@@ -266,7 +266,7 @@ Layered and deterministic; each location records its `source`:
    province named in the club name or competition limits the search to it, and a
    club with no town there stays unlocated (with a warning).
 
-Coverage: 3,237 Wikidata, 446 override, 464 GeoNames, **37 with no home** (the
+Coverage: 3,233 Wikidata, 450 override, 464 GeoNames, **37 with no home** (the
 build places them, Stage 2 step 5). The sync warns about points far from any
 town and provinces with no matching town; four warnings remain (Cobresal,
 Wolmido, Nedjm Chabab Magra, 31–44 km from a town; Espoir du Burkina,
@@ -752,9 +752,9 @@ The build is deterministic: same snapshots and caches give byte-identical files,
 whatever `--jobs`. `--check` rebuilds offline and compares every output.
 
 Across the 128 maps: groups split on land 0; every club's land holds its ground
-("Grounds"), and a club's home lies in its own home section for 3,610 of 4,147 located
-clubs (87.1%; 759 of 800 on the 100-club maps; 2,896, 69.8%, and 652 before 2026-11-21),
-the others being clubs sharing a ground (680 share one with another club, and only one
+("Grounds"), and a club's home lies in its own home section for 3,614 of 4,147 located
+clubs (87.1%; 760 of 800 on the 100-club maps; 2,896, 69.8%, and 652 before 2026-11-21),
+the others being clubs sharing a ground (676 share one with another club, and only one
 section can hold the point) and grounds on a section border.
 
 ## File format 2: `public/domestic/<id>.json`
@@ -2152,8 +2152,8 @@ none), checked against the stadium and city their season's own database gives th
 with them:
 
 - `as` with `lon`/`lat`: today's club, for its crest, at the ground it had then. Rapid stands at
-  Giulești, not at Regie, where today's map has it (its ground from 2018 to 2022) and where Sportul
-  Studențesc's spellings stand; Steaua, before 2008/09, at Ghencea.
+  Giulești, not at Regie, where today's map had it too (its ground from 2018 to 2022) and where
+  Sportul Studențesc's spellings stand; Steaua, before 2008/09, at Ghencea.
 - `eras`: a club that moved stands at each season's ground (`homeInSeason`): Dnipro's Meteor Stadium
   to 2007/08, then Dnipro-Arena; Steaua's Ghencea to 2014/15, then the National Arena; Fatih
   Karagümrük's Vefa Stadium to 2011/12, then the Atatürk Olympic Stadium; İstanbul Büyükşehir
@@ -2172,8 +2172,14 @@ Cherkasy, in Dnipro).
 A club that lost a wrong twin wears the crest another spelling of it already wears
 (`crest-eras.json`), else its monogram (Železničar Belgrade, FK Daugava Riga, JFK Olimps, Dinamo
 Riga). Platanias and Chania's club still share one point, the Perivolia stadium they played at.
-Today's maps keep their own homes: Rapid at Regie, Başakşehir at the Olympic Stadium, Rodina at
-Dinamo's and CSA Steaua at the youth side's ground.
+
+Four clubs of today stood wrongly by the same causes, Wikidata's first venue of two or its match of a
+name: Rapid at Regie, Başakşehir at the Atatürk Olympic Stadium, on Karagümrük's point, Rodina Moscow
+at Dinamo's VTB Arena, and CSA Steaua at the ground of FCSB's youth side. Since 24 November 2026 they
+are overrides at the grounds they play at (`scripts/data/domestic-locations.json`: Giulești, the
+Fatih Terim Stadium, Arena Khimki, the Steaua stadium in Ghencea), and today's Romania, Turkey and
+Russia are rebuilt. The season names of İstanbul Büyükşehir Belediyespor, Başakşehir's name until
+2014, are overrides at the Olympic Stadium, so that its new home does not move them.
 
 **Homes** (`scripts/lib/season-club-homes.mjs`, written once to
 `scripts/data/season-club-homes.json` by `--homes`, offline from the caches): a hand
@@ -2290,7 +2296,7 @@ node scripts/build-season-countries.mjs --check ...                             
   larger groups" holds only where they have room: a club hemmed in by its city
   hands its larger size to the strongest club with room (150 clubs involved).
 - **Home sections away from home.** A club's land holds its home, but the home lies
-  in its own home section for 3,610 of 4,147 located clubs (87.1%): clubs sharing a
+  in its own home section for 3,614 of 4,147 located clubs (87.1%): clubs sharing a
   ground (only one section can hold the point) and grounds on a section's border
   make the rest.
 - **Uneven sections.** Group sizes are fixed and groups contiguous, so empty

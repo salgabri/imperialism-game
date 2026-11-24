@@ -578,14 +578,14 @@ Qatar (634), 634-d3d1c792: geoBoundaries QAT ADM2, 79 units
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/QAT/ADM2/geoBoundaries-QAT-ADM2_simplified.geojson
   Cut (the world map's Saudi Arabia 241 km²)
 
-Romania (642), 642-05d49a47: geoBoundaries ROU ADM2, 3236 units
+Romania (642), 642-a77b0fad: geoBoundaries ROU ADM2, 3236 units
   Source: Agentia Nationala de Cadastru si Publicitate Imobiliara (2016)
   Licence: Creative Commons Attribution 4.0 International (CC BY 4.0) - License on source page. Additional information in linked PDF.
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ROU/ADM2/geoBoundaries-ROU-ADM2_simplified.geojson
   Filled from ADM1 (TULCEA): World Bank, Creative Commons Attribution 4.0 International (CC BY 4.0), https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/ROU/ADM1/geoBoundaries-ROU-ADM1_simplified.geojson
   Cut (the world map's Bulgaria 414 km², Serbia 41 km²)
 
-Russia (643), 643-a1a84339: geoBoundaries RUS ADM2, 2330 units
+Russia (643), 643-c483e534: geoBoundaries RUS ADM2, 2330 units
   Source: OpenStreetMap, Wambacher (2017)
   Licence: Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/RUS/ADM2/geoBoundaries-RUS-ADM2_simplified.geojson
@@ -698,7 +698,7 @@ Tunisia (788), 788-4c5fb556: geoBoundaries TUN ADM2, 264 units
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TUN/ADM2/geoBoundaries-TUN-ADM2_simplified.geojson
   Cut (the world map's Libya 237 km²)
 
-Turkey (792), 792-c4175107: geoBoundaries TUR ADM2, 975 units
+Turkey (792), 792-972c3a23: geoBoundaries TUR ADM2, 975 units
   Source: OpenStreetMap, OSM Boundaries (2021)
   Licence: Open Data Commons Open Database License 1.0
   File: https://github.com/wmgeolab/geoBoundaries/raw/9469f09/releaseData/gbOpen/TUR/ADM2/geoBoundaries-TUR-ADM2_simplified.geojson

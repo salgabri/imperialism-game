@@ -122,6 +122,7 @@ test('clubs once placed as another club, in a namesake town or at a ground of an
     ['642y2003', 'Rapid Bucharest', [26.0568, 44.4559], 'd642-57171586'], ['642y2003', 'Sportul Studentesc Bucharest', [26.0529, 44.4482]],
     ['792y2012', 'Fatih Karagümrük', [28.939, 41.0278], 'd792-458631'], ['792y2021', 'Fatih Karagümrük', [28.7657, 41.0745], 'd792-458631'],
     ['792y2004', 'Istanbul Büyüksehir Belediye Spor', [28.9053, 41.0382], 'd792-130343'], ['792y2012', 'Istanbul Büyüksehir Belediye Spor', [28.7657, 41.0745], 'd792-130343'],
+    ['792y2013', 'Istanbul Büyüksehir Belediyespor', [28.7657, 41.0745], 'd792-130343'], ['792y2011', 'İstanbul Başakşehir FK', [28.7657, 41.0745], 'd792-130343'],
     // Found with them: clubs on one of their points, and the others at a reserve side's or another club's item.
     ['300y2019', 'Niki Volos', [22.9275, 39.3792], 'd300-129704'], ['300y2016', 'PGS Kissamikos', [23.8475, 35.5222], 'd300-36043527'],
     ['792y2021', 'İstanbul Başakşehir', [28.8087, 41.1228], 'd792-130343'], ['792y2026', 'Medipol Başakşehir FK', [28.8087, 41.1228], 'd792-130343'],
@@ -140,6 +141,11 @@ test('clubs once placed as another club, in a namesake town or at a ground of an
   }
   // Nikšić is off Serbia's map, as Montenegro's other clubs of these seasons are: an estimate, not the village of Sutjeska.
   assert.match(club('688y2003', 'Sutjeska Niksic').homeSource, /^placed:/);
+  // Today's Rapid, CSA Steaua, Başakşehir and Rodina Moscow, at the grounds they play at since they left those Wikidata names.
+  for (const [id, name, home] of [['642', 'Fotbal Club Rapid 1923', [26.0568, 44.4559]], ['642', 'Clubul Sportiv al Armatei Steaua', [26.0403, 44.4132]],
+    ['792', 'Başakşehir Futbol Kulübü', [28.8087, 41.1228]], ['643', 'Rodina Moscow', [37.4542, 55.8853]]]) {
+    assert.deepEqual(club(id, name)?.home, home, `today's ${name}`);
+  }
 });
 
 test('the index lists every shipped season map once, by season and country', () => {

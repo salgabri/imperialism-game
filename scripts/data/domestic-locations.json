@@ -887,5 +887,9 @@
 "13205614": { "name": "Raadsan SC", "lon": 45.3438, "lat": 2.0371, "note": "Mogadishu (GeoNames 53654); a Mogadishu club of the Somali First Division, Banadir Stadium (RSSSF)" },
 "484441": { "name": "Nebitçi Balkanabat", "lon": 54.3671, "lat": 39.5108, "note": "Balkanabat (GeoNames 161616); Wikidata's name match was FC Balkan, another club of the town" },
 "5626499": { "name": "Paro FC", "lon": 89.4133, "lat": 27.4305, "note": "Paro (GeoNames 1252490); Paro FC plays at Woochu Sports Arena, Paro (Wikipedia); the Wikidata venue is Changlimithang, Thimphu" },
-"5626494": { "name": "Druk Stars FC", "lon": 89.6419, "lat": 27.4661, "note": "Thimphu (GeoNames 1252416); Druk Stars FC of Thimphu (Wikipedia)" }
+"5626494": { "name": "Druk Stars FC", "lon": 89.6419, "lat": 27.4661, "note": "Thimphu (GeoNames 1252416); Druk Stars FC of Thimphu (Wikipedia)" },
+"57171586": { "name": "Fotbal Club Rapid 1923", "lon": 26.0568, "lat": 44.4559, "note": "Stadionul Rapid-Giulești (Wikidata Q97889239), its ground since March 2022 (Wikipedia); Wikidata's first venue is Stadionul Regie, its ground while that was built" },
+"57141891": { "name": "Clubul Sportiv al Armatei Steaua", "lon": 26.0403, "lat": 44.4132, "note": "Stadionul Steaua, Ghencea (Wikidata Q65090741), its ground since 2021 (Wikipedia); Wikidata's name match was FCSB's youth side, at Mogoșoaia" },
+"130343": { "name": "Başakşehir Futbol Kulübü", "lon": 28.8087, "lat": 41.1228, "note": "Başakşehir Fatih Terim Stadium (Wikidata Q17182993), its ground since July 2014 (Wikipedia); Wikidata's first venue is the Atatürk Olympic Stadium, its ground before" },
+"58126754": { "name": "Rodina Moscow", "lon": 37.4542, "lat": 55.8853, "note": "Arena Khimki (Wikidata Q641333), its ground since 2025 (Wikipedia); Wikidata's first venue is Dinamo's VTB Arena, where it played some matches of 2022/23" }
 }
