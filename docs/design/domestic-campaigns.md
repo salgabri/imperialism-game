@@ -2160,10 +2160,20 @@ with them:
   Belediyespor's Çetin Emeç Stadium in Bayrampaşa to 2003/04, as CM 01/02's own data has it, then
   the Olympic Stadium.
 
+Twenty more names, on 47 maps, were found with them and are overrides by the same rule: clubs
+twinned to the same wrong club (Niki Volos to NPS Volos; FK Daugava Riga, JFK Olimps and Dinamo Riga
+to Riga FC); clubs standing on one of these clubs' grounds (İstanbul Başakşehir, at the Fatih Terim
+Stadium since 2014/15; Kissamikos, at Maleme before 2017; FC Daugava of Daugavpils and Jūrmala-VV,
+which stood at Riga's Daugava Stadium; Rodina Moscow, which stood at Dinamo's); and those a scan of
+the homes found at a reserve side's or a namesake's item, or a namesake town (SWOS's Shakhtyor and
+Nuremberg, Dynamo Moscow, SK Dnipro-1, Stal Alchevsk, Zirka Kirovohrad, Toledo; Cherkaskyi Dnipro, of
+Cherkasy, in Dnipro).
+
 A club that lost a wrong twin wears the crest another spelling of it already wears
-(`crest-eras.json`), else its monogram (Železničar Belgrade). Platanias and Chania's club still share
-one point, the Perivolia stadium they played at. Today's maps keep their own homes (Rapid at
-Regie, CSA Steaua at the youth side's ground).
+(`crest-eras.json`), else its monogram (Železničar Belgrade, FK Daugava Riga, JFK Olimps, Dinamo
+Riga). Platanias and Chania's club still share one point, the Perivolia stadium they played at.
+Today's maps keep their own homes: Rapid at Regie, Başakşehir at the Olympic Stadium, Rodina at
+Dinamo's and CSA Steaua at the youth side's ground.
 
 **Homes** (`scripts/lib/season-club-homes.mjs`, written once to
 `scripts/data/season-club-homes.json` by `--homes`, offline from the caches): a hand

@@ -122,6 +122,16 @@ test('clubs once placed as another club, in a namesake town or at a ground of an
     ['642y2003', 'Rapid Bucharest', [26.0568, 44.4559], 'd642-57171586'], ['642y2003', 'Sportul Studentesc Bucharest', [26.0529, 44.4482]],
     ['792y2012', 'Fatih Karagümrük', [28.939, 41.0278], 'd792-458631'], ['792y2021', 'Fatih Karagümrük', [28.7657, 41.0745], 'd792-458631'],
     ['792y2004', 'Istanbul Büyüksehir Belediye Spor', [28.9053, 41.0382], 'd792-130343'], ['792y2012', 'Istanbul Büyüksehir Belediye Spor', [28.7657, 41.0745], 'd792-130343'],
+    // Found with them: clubs on one of their points, and the others at a reserve side's or another club's item.
+    ['300y2019', 'Niki Volos', [22.9275, 39.3792], 'd300-129704'], ['300y2016', 'PGS Kissamikos', [23.8475, 35.5222], 'd300-36043527'],
+    ['792y2021', 'İstanbul Başakşehir', [28.8087, 41.1228], 'd792-130343'], ['792y2026', 'Medipol Başakşehir FK', [28.8087, 41.1228], 'd792-130343'],
+    ['428y2012', 'FK Daugava Riga', [24.35, 56.8614]], ['428y2014', 'FK Daugava Riga', [24.1589, 56.9552]], ['428y2012', 'JFK Olimps Riga', [24.1589, 56.9552]],
+    ['428y2012', 'FC Daugava Daugavpils', [26.5505, 55.8746]], ['428y2012', 'FK Jurmala-VV', [23.6102, 56.9496]],
+    ['428y2021', 'Dinamo Riga', [24.7475, 57.8356]], ['428y2020', 'Dinamo Riga/Staicele', [24.7475, 57.8356]],
+    ['804y1996', 'Shakhtyor', [37.8097, 48.0208], 'd804-1895'], ['804y2023', 'SK Dnipro-1', [35.0325, 48.4603]], ['804y2018', 'Cherkaskyi Dnipro', [32.0547, 49.4361]],
+    ['804y2008', 'Stal Alchevsk', [38.7978, 48.4742]], ['804y2014', 'Zirka Kirovohrad', [32.2667, 48.5158]],
+    ['276y1996', 'Nuremberg', [11.1256, 49.4262], 'd276-899'], ['643y2022', 'Dynamo Moscow', [37.5597, 55.7914], 'd643-1520'],
+    ['643y2022', 'Rodina Moscow', [37.7131, 55.8097], 'd643-58126754'], ['643y2026', 'Rodina Moscow', [37.4542, 55.8853], 'd643-58126754'],
   ]) {
     const found = club(id, name);
     assert.ok(found, `${id} ${name}`);
