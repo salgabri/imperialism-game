@@ -594,6 +594,173 @@ function unitMapper(before, after) {
   };
 }
 
+/** Sector edges (turned angles, `k` + 1 of them from 0 to 2π) sharing out `turned` ([turned angle, weight], sorted) equally. */
+function equalEdges(turned, total, k) {
+  const edges = [0];
+  let acc = 0, j = 0;
+  for (let i = 1; i < k; i++) {
+    if (!total) { edges.push(2 * Math.PI * i / k); continue; }
+    while (j < turned.length && acc + turned[j][1] <= total * i / k) acc += turned[j++][1];
+    edges.push(j < turned.length ? turned[j][0] : 2 * Math.PI * i / k);
+  }
+  edges.push(2 * Math.PI);
+  return edges;
+}
+
+/**
+ * Where a fan's sectors start: the bearing just past the widest gap in its zone's land (the sea, for a port), or with no
+ * such gap, half a sector before its first club's ground.
+ */
+function gapStart(zone, C, zoneKm, members, at, bearing) {
+  const land = landSamples(zone, 2000).filter(sample => kmBetween(sample.p, C) <= zoneKm).map(sample => [bearing(sample.p), sample.w]).sort((a, b) => a[0] - b[0]);
+  let start = 0, gap = 0;
+  land.forEach(([b], i) => {
+    const next = i + 1 < land.length ? land[i + 1][0] : land[0][0] + 2 * Math.PI;
+    if (next - b > gap) { gap = next - b; start = next % (2 * Math.PI); }
+  });
+  if (gap < Math.PI / 9) {
+    const first = members.map(at).filter(b => b != null).sort((a, b) => a - b)[0];
+    start = first == null ? 0 : (first - Math.PI / members.length + 2 * Math.PI) % (2 * Math.PI);
+  }
+  return { land, start };
+}
+
+
+// How much more land for its target than the least a fan's club may hold and still grow in a round (growFan).
+const ROUND_SLACK = 1.5;
+// Added to a unit outside a club's own sector as it grows (growFan): it takes such land only with none of its own left.
+const FOREIGN = 1e9;
+
+/**
+ * A fan's clubs share out `region` (unit indices) from their starts `seeds`, in rounds of a unit each for the clubs with
+ * about the least land for their `target` (within ROUND_SLACK), least first: each takes the free unit next to its land
+ * in its own sector (`prefer[unit]`: the index
+ * of the club whose sector holds it) nearest its start, or with none, the nearest unit of any. So each club's land
+ * hangs together and keeps to its sector while it can, and land a sector's club cannot reach goes to one that can. `next(unit)`: its neighbours; `fits(index, unit)`:
+ * land the club may take. Returns per unit the index of the club that took it, -1 for none.
+ */
+function growFan(units, next, region, prefer, seeds, target, fits, first = new Map(), straits = null) {
+  const k = seeds.length;
+  const who = new Int32Array(units.length).fill(-1);
+  const inRegion = new Uint8Array(units.length);
+  for (const u of region) inRegion[u] = 1;
+  const land = new Float64Array(k);
+  const heaps = seeds.map(() => claimHeap());
+  // Each club's ways out: the free units next to its land, and across a strait (`straits`: { links, comp }) the units
+  // of a landmass where it holds none yet; the unit it lands on is its `entries`.
+  const front = seeds.map(() => new Set());
+  const ashore = seeds.map(u => new Set(straits ? [straits.comp[u]] : []));
+  const entries = seeds.map(() => []);
+  const push = (i, v) => {
+    if (!inRegion[v] || who[v] >= 0 || !fits(i, v)) return;
+    front[i].add(v);
+    heaps[i].push((prefer[v] === i ? 0 : FOREIGN) + kmBetween(units[seeds[i]].centroid, units[v].centroid), i, v);
+  };
+  const offer = (i, u) => {
+    for (const v of next(u)) push(i, v);
+    if (straits) for (const v of straits.links.get(u) ?? []) if (!ashore[i].has(straits.comp[v])) push(i, v);
+  };
+  // Still a way for the club: next to its land, or across a strait onto a landmass it holds none of.
+  const reaches = (i, v) => next(v).some(w => who[w] === i)
+    || (!!straits && !ashore[i].has(straits.comp[v]) && (straits.links.get(v) ?? []).some(w => who[w] === i));
+  seeds.forEach((u, i) => { if (who[u] < 0) { who[u] = i; land[i] += units[u].area; } });
+  seeds.forEach((u, i) => offer(i, u));
+  // A club takes no other club's last way out while it has another unit to take (growSections' `spare`).
+  const last = (i, v) => front.some((ways, j) => j !== i && ways.size === 1 && ways.has(v));
+  const live = i => {
+    const heap = heaps[i];
+    while (heap.size && (who[heap.peek()[2]] >= 0 || !reaches(i, heap.peek()[2]))) heap.pop();
+    return heap.size > 0;
+  };
+  // Clubs going `first` (to land km²) grow before any other until they hold it.
+  const ahead = c => first.has(c) && land[c] < first.get(c);
+  // The club's nearest unit that is no other club's last way out, or with `force` its nearest of any; false when it has
+  // none to take.
+  const take = (pick, force = false) => {
+    const held = [];
+    while (heaps[pick].size) {
+      const top = heaps[pick].pop();
+      if (who[top[2]] >= 0 || !reaches(pick, top[2])) continue;
+      held.push(top);
+      if (!last(pick, top[2])) break;
+    }
+    const chosen = held.find(top => !last(pick, top[2])) ?? (force ? held[0] : null);
+    for (const top of held) if (top !== chosen) heaps[pick].push(...top);
+    if (!chosen) return false;
+    const u = chosen[2];
+    for (const ways of front) ways.delete(u);
+    who[u] = pick;
+    land[pick] += units[u].area;
+    if (straits && !ashore[pick].has(straits.comp[u])) { ashore[pick].add(straits.comp[u]); entries[pick].push(u); }
+    offer(pick, u);
+    return true;
+  };
+  // In rounds: each club within ROUND_SLACK of the least land for its target takes one unit, least first, so no club
+  // takes many units in a row while a neighbour waits and walls it in. A club left only with another's last way out
+  // waits, and another grows, the least first; only when none can is a last way out taken (Beşiktaş took Eyüpsultan,
+  // Galatasaray's way out of Sarıyer, while Galatasaray, the larger, waited its turn).
+  for (;;) {
+    const growing = [...Array(k).keys()].filter(live);
+    if (!growing.length) break;
+    const firsts = growing.filter(ahead);
+    const ratio = i => land[i] / target[i];
+    const least = Math.min(...growing.map(ratio));
+    const byRatio = list => list.sort((a, b) => ratio(a) - ratio(b) || a - b);
+    const round = byRatio(firsts.length ? firsts : growing.filter(i => ratio(i) <= ROUND_SLACK * least));
+    let took = false;
+    for (const i of round) if (live(i) && take(i)) took = true;
+    if (took) continue;
+    took = byRatio(growing).some(i => live(i) && take(i));
+    // A way out that two clubs both need goes to the one whose sector holds it (Eyüpsultan, beyond Galatasaray's Sarıyer).
+    if (!took) took = byRatio(growing).some(i => live(i) && prefer[heaps[i].peek()[2]] === i && take(i, true));
+    if (!took) took = byRatio(growing).some(i => live(i) && take(i, true));
+    if (!took) break;
+  }
+  return Object.assign(who, { entries });
+}
+
+// A club of a fan whose land comes out under BOXED_SHARE of its target is shut in: the fan grows again with it going
+// first until it holds FIRST_SHARE of its target (growFanFair).
+const BOXED_SHARE = 0.25;
+const FIRST_SHARE = 0.5;
+
+/**
+ * growFan, redone while a club comes out shut in (under BOXED_SHARE of its target) with the shut-in clubs going first,
+ * the most shut in added each time, until they hold FIRST_SHARE of their targets: a club whose start is small is walled
+ * in while its neighbours grow over the large units around it (Fulham in London; Montreal's island clubs behind
+ * Blainville's land). The most even outcome is kept, so a club sent first that only walls in the others counts for
+ * nothing. Returns { who, held, uneven }.
+ */
+function growFanFair(units, next, region, prefer, seeds, target, fits, straits = null) {
+  const k = seeds.length;
+  const grow = first => {
+    const who = growFan(units, next, region, prefer, seeds, target, fits, first, straits);
+    const held = new Float64Array(k);
+    for (const u of region) if (who[u] >= 0) held[who[u]] += units[u].area;
+    return { who, held, uneven: Array.from(held).reduce((sum, a, i) => sum + Math.log(Math.max(a, 1) / target[i]) ** 2, 0) };
+  };
+  let first = new Map();
+  let best = null, last = grow(first);
+  for (let round = 0; round <= k; round++) {
+    const { who, held, uneven } = last;
+    if (!best || uneven < best.uneven - 1e-9) best = { who, held, uneven };
+    const shut = [...Array(k).keys()].filter(i => !first.has(i) && held[i] < BOXED_SHARE * target[i])
+      .sort((a, b) => held[a] / target[a] - held[b] / target[b]);
+    if (!shut.length) break;
+    // It goes first to half its target, or to an even share of the land it and the others but the largest hold (two
+    // clubs of Istanbul's European side share Thrace, whatever Fenerbahçe holds across the Bosphorus); the more even.
+    const i = shut[0], others = Array.from(held).filter((_, j) => j !== i);
+    const even = (held[i] + others.reduce((a, b) => a + b, 0) - Math.max(...others)) / (k - 1);
+    const tries = [FIRST_SHARE * target[i], even].map(goal => {
+      const next = new Map(first).set(i, goal);
+      return { first: next, ...grow(next) };
+    });
+    ({ first, ...last } = tries[0].uneven <= tries[1].uneven ? tries[0] : tries[1]);
+  }
+  if (last.uneven < best.uneven - 1e-9) best = { who: last.who, held: last.held, uneven: last.uneven };
+  return best;
+}
+
 // More clubs than this around one city would get slivers rather than wedges, and the wedges, all meeting at the centre,
 // would need more clearly different colours than the palette holds (16: 19 around Cairo). Balanced maps keep it
 // (BALANCE_FAN_MAX; 31 around Asunción made a pinwheel of slivers).
@@ -855,7 +1022,14 @@ function fanLayout(C, members, homeOf, land, far, weightOf) {
   });
   const order = slots.flatMap(slot => slot.members);
   const clubAt = p => order.find(c => pointInPolys(p, sectors.get(c))) ?? order[0];
-  return { order, sectors, clubAt };
+  // The club whose sector a point lies in, however far from C (clubs sharing a ground, the first).
+  const sectorOf = p => {
+    const t = (bearing(p) - start + 4 * Math.PI) % (2 * Math.PI);
+    let s = 0;
+    while (s + 1 < slots.length && t >= edges[s + 1]) s++;
+    return slots[s].members[0];
+  };
+  return { order, sectors, clubAt, sectorOf };
 }
 
 // A ground off the land counts from this far inland of the nearest point of it, where its unit is that deep (ontoLand).
@@ -928,7 +1102,7 @@ function nearestInside(polys, p) {
 
 /**
  * Fans for clubs crowded into one city, when every club starts on two or more sections.
- * Clubs whose homes link within `linkKm` form a cluster; its crowd is the clubs within
+ * Clubs whose homes link within `linkKm` form a cluster (with `pairKm`, two that close count as a crowd too); its crowd is the clubs within
  * `linkKm` of the one with the most others within half that (a chain of towns linked out
  * from a city is no part of its crowd: Chantilly, Chambly and Beauvais beyond Paris), and a
  * crowd of three or more, or two sharing a town point, is fanned: left alone, the inner
@@ -954,7 +1128,7 @@ function nearestInside(polys, p) {
  * homeOf[i].unit (and, for a ground where pieces meet, .point to a point of the club's own
  * piece beside it).
  */
-export function fanSectors(units, homeOf, { linkKm, grain, force = new Set(), wholeUnits = false, fanMax = FAN_MAX, weight = () => 1 }) {
+export function fanSectors(units, homeOf, { linkKm, grain, force = new Set(), wholeUnits = false, fanMax = FAN_MAX, weight = () => 1, pairKm = 0 }) {
   const n = homeOf.length;
   const clubs = [...Array(n).keys()].filter(c => homeOf[c]);
   const root = [...Array(n).keys()];
@@ -969,7 +1143,10 @@ export function fanSectors(units, homeOf, { linkKm, grain, force = new Set(), wh
     const core = linked.reduce((best, c) => (around(c) > around(best) ? c : best));
     const crowd = linked.filter(c => force.has(c) || kmBetween(homeOf[c].point, homeOf[core].point) <= linkKm);
     const shared = crowd.some(a => crowd.some(b => a < b && kmBetween(homeOf[a].point, homeOf[b].point) < 0.5));
-    if (crowd.length < 3 && !(crowd.length === 2 && shared) && !(crowd.length === 2 && crowd.some(c => force.has(c)))) continue;
+    // Two clubs of one city (within `pairKm`) too: split along the line between their grounds, a port's two clubs got
+    // the sea and the hinterland (Benfica 6,000 km² of Portugal with the Azores and Madeira, Sporting 37,000).
+    const pair = crowd.length === 2 && kmBetween(homeOf[crowd[0]].point, homeOf[crowd[1]].point) <= pairKm;
+    if (crowd.length < 3 && !(crowd.length === 2 && (shared || pair)) && !(crowd.length === 2 && crowd.some(c => force.has(c)))) continue;
     const centre = centreOf(crowd);
     const spread = Math.max(...crowd.map(c => kmBetween(homeOf[c].point, centre)));
     // Room for a corridor per club, within a few links of the city, up to halfway to the nearest ground beyond the crowd.
@@ -998,6 +1175,7 @@ export function fanSectors(units, homeOf, { linkKm, grain, force = new Set(), wh
     for (const u of zone) for (const poly of u.polys) for (const p of poly[0]) reach = Math.max(reach, Math.hypot((p[0] - C[0]) * kx, (p[1] - C[1]) * ky));
     const layout = fanLayout(C, fan.members, homeOf, land, 1.2 * reach + 1, weight);
     const members = fan.members = layout.order;
+    fan.sectorOf = layout.sectorOf;
     const next = [];
     const cut = [];
     for (const u of list) {
@@ -2001,9 +2179,19 @@ const PASS_REACH = 2;
 const PASS_RADIUS = 2.5;
 // A unit passes only when this share of its land border already lies against the receiving club.
 const PASS_TOUCH = 0.3;
+// On the Europe maps, a unit passes only when half its own land border lies against the receiving club: it fills a
+// hollow in that club's land, never carries it on along a border (a unit at a time, Atlético's land ran on from Madrid
+// down Rayo's side, Villarreal's round Levante's).
+const PASS_TOUCH_WHOLE = 0.5;
+// The units each pair of neighbouring clubs may try in a round, nearest first.
+const PASS_TRIES = 8;
 // No club keeps more than this many fair shares of land while a neighbour under it can take the rest (step 9's caps take
 // 1.5; past 2 the land given up is mostly a ring around the club, which its neighbours would wrap).
 const LAND_CAP = 2;
+// Every club on the Europe maps keeps at least this land around its own start (km²; balanceSections, below).
+const GROUND_MARGIN = 300;
+// A club whose land comes out under this share of its goal after the passes takes its neighbours' land around its start.
+const RESCUE_SHARE = 0.5;
 // Added to a claim on land the club is not allowed on: such claims wait until no allowed claim is left.
 const LATE = 1e15;
 
@@ -2026,6 +2214,7 @@ function claimHeap() {
       cost[size] = k; club[size] = c; unit[size] = u;
       for (let i = size++; i > 0;) { const p = (i - 1) >> 1; if (!less(i, p)) break; swap(i, p); i = p; }
     },
+    peek() { return [cost[0], club[0], unit[0]]; },
     pop() {
       const top = [cost[0], club[0], unit[0]];
       size--;
@@ -2136,6 +2325,143 @@ function borderKm(topo) {
   return out;
 }
 
+// How much water joins a region's two shores while the Europe maps' levels are made to nest (build-europe-maps): the
+// Bosphorus is 0.7 to 3.3 km wide.
+export const CITY_LINK_KM = 3.5;
+
+/**
+ * The straits within each fan's city: units of its zone on two landmasses (`comp`) facing each other across at most
+ * CITY_LINK_KM of water with no land between (every unit around the zone looked at). Returns { links: Map(unit ->
+ * [unit]), group: comp -> the least comp it is joined to by straits }.
+ */
+function cityStraits(units, fans, comp) {
+  const links = new Map();
+  const root = new Map();
+  const find = m => (root.get(m) ?? m) === m ? m : find(root.get(m));
+  for (const fan of fans) {
+    const Z = fan.zoneCentre ?? fan.centre;
+    const near = units.filter(u => kmToPolys(Z, u.polys) <= fan.zoneKm + 2 * CITY_LINK_KM).map(u => u.index);
+    const inZone = new Set(near.filter(i => kmToPolys(Z, units[i].polys) <= fan.zoneKm));
+    facingSections(near.map(i => units[i].polys), CITY_LINK_KM).forEach((list, a) => list.forEach(b => {
+      const i = near[a], j = near[b];
+      if (i === j || comp[i] === comp[j] || !inZone.has(i) || !inZone.has(j)) return;
+      if (!links.has(i)) links.set(i, []);
+      if (!links.get(i).includes(j)) links.get(i).push(j);
+      const [x, y] = [find(comp[i]), find(comp[j])].sort((p, q) => p - q);
+      if (x !== y) root.set(y, x);
+    }));
+  }
+  const group = new Map();
+  for (const m of new Set(comp)) group.set(m, find(m));
+  return { links, group: Object.fromEntries(group) };
+}
+
+// Turns of a fan's sectors tried around its city (shareFan), and how uneven its clubs' land may come out (Σ log² of land to
+// target; 0.5 is one club at half its target) before two neighbours are tried in each other's places.
+const FAN_TURNS = 36;
+const SWAP_UNEVEN = 0.5;
+// Each turn's outcome is scored by how uneven its clubs' land comes out plus FOREIGN_COST times the share of the fan's
+// land they took outside their own sectors: a club that fills a small sector and goes on into its neighbour's grows
+// round it (Atlético's sector held 19,632 km² and Real Madrid's 42,199; Atlético went on along the north of Real
+// Madrid's, Getafe up its west, and Real Madrid kept the middle, wrapped by both). Sizes alone are evened out by
+// that very growth, so every turn looked about as good.
+const FOREIGN_COST = 1;
+
+/**
+ * A city's fanned clubs (`fan`: { members, centre }, `homes` their grounds) share out the land nearest any of them (the
+ * units `owner` gives them): in sectors around the city of equal land, each the club's own (its ground's unit too),
+ * which the clubs grow over from their starts (growFanFair). The sectors keep the clubs' order around the city by their
+ * grounds, every edge between the two grounds it parts; of FAN_TURNS turns of them, and while the land comes out
+ * uneven (over SWAP_UNEVEN) of the orders with two neighbours swapped too (a club's way out of the city can lie beyond
+ * its neighbour's ground: Arsenal's, from Islington, by Camden and Barnet past Spurs'), the outcome kept is the most
+ * even with the least land taken outside the clubs' own sectors (FOREIGN_COST), ties going to the grounds nearest their
+ * own sectors. Shared out by the zone's land alone, the sectors facing the sea
+ * kept only their city (AEK and Panathinaikos 900 km² each, Olympiacos 64,000); taken straight, a sector's land beyond
+ * a river or a bay was cut off from it (Lisbon's south bank). `fits(club, unit)`: land the club may take.
+ */
+function shareFan(units, adjacency, owner, fan, homes, seedUnit, share, fits, comp, straits = null) {
+  const { members } = fan;
+  // Sectors round the middle of the clubs' grounds (fanSectors' zoneCentre): its meeting point, where the grounds' sectors
+  // meet, can stand at the city's edge (north-west London: all seven clubs lie to its south and east).
+  const C = fan.zoneCentre ?? fan.centre;
+  const k = members.length;
+  const index = new Map(members.map((c, i) => [c, i]));
+  const region = [];
+  owner.forEach((c, u) => { if (index.has(c)) region.push(u); });
+  if (k < 2 || !region.length) return;
+  const kx = Math.cos(C[1] * RAD);
+  const bearing = p => (Math.atan2(p[1] - C[1], (p[0] - C[0]) * kx) + 2 * Math.PI) % (2 * Math.PI);
+  const at = c => (homes[c] && kmBetween(homes[c].point, C) >= 0.05 ? bearing(homes[c].point) : null);
+  const total = region.reduce((sum, u) => sum + units[u].area, 0);
+  // Each club's target: its share of the fan's land on its own landmass (Istanbul's European clubs share Thrace,
+  // whatever Fenerbahçe holds across the Bosphorus).
+  const weight = members.map(c => (share ? share[c] : 1));
+  // (Landmasses a strait joins count as one.)
+  const shore = u => straits?.group[comp[u]] ?? comp[u];
+  const landOn = new Map(), weightOn = new Map();
+  for (const u of region) landOn.set(shore(u), (landOn.get(shore(u)) || 0) + units[u].area);
+  members.forEach((c, i) => { const m = shore(seedUnit[c]); weightOn.set(m, (weightOn.get(m) || 0) + weight[i]); });
+  const target = members.map((c, i) => Math.max(1, (landOn.get(shore(seedUnit[c])) || 0) * weight[i] / weightOn.get(shore(seedUnit[c]))));
+  const unitBearing = new Float64Array(units.length);
+  for (const u of region) unitBearing[u] = bearing(units[u].centroid);
+  const land = region.map(u => [unitBearing[u], units[u].area]);
+  const homeUnit = new Map(members.map(c => [homes[c]?.unit, c]).filter(([u]) => u != null));
+  const circ = x => ((x % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+  const prefer = new Int32Array(units.length).fill(-1);
+  const seeds = members.map(c => seedUnit[c]);
+  // A trial of the clubs' growth over their land with `prefer` as it stands: how even it comes out, and the land taken
+  // outside the clubs' own sectors.
+  const trial = miss => {
+    const grown = growFanFair(units, u => adjacency[u], region, prefer, seeds, target, (i, v) => fits(members[i], v), straits && { links: straits.links, comp });
+    let foreign = 0;
+    for (const u of region) if (grown.who[u] >= 0 && grown.who[u] !== prefer[u]) foreign += units[u].area;
+    return { ...grown, miss, score: grown.uneven + FOREIGN_COST * foreign / total };
+  };
+  const tryOne = (start, swap) => {
+    const turn = b => (b - start + 4 * Math.PI) % (2 * Math.PI);
+    const order = [...members].sort((a, b) => (at(a) == null ? Infinity : turn(at(a))) - (at(b) == null ? Infinity : turn(at(b))) || a - b);
+    if (swap >= 0) [order[swap], order[swap + 1]] = [order[swap + 1], order[swap]];
+    const edges = equalEdges(land.map(([b, w]) => [turn(b), w]).sort((a, b) => a[0] - b[0]), total, k);
+    if (swap < 0) for (let i = 1; i < k; i++) {
+      const a = at(order[i - 1]), b = at(order[i]);
+      if (a == null || b == null) continue;
+      const lo = turn(a), hi = turn(b), room = Math.min(RAD, (hi - lo) / 2);
+      edges[i] = Math.min(Math.max(edges[i], lo + room, edges[i - 1]), hi - room);
+    }
+    let miss = 0;
+    order.forEach((c, i) => {
+      const b = at(c);
+      if (b == null) return;
+      const t = turn(b);
+      if (t < edges[i] || t >= edges[i + 1]) miss += Math.min(circ(edges[i] - t), circ(t - edges[i + 1]));
+    });
+    for (const u of region) {
+      if (homeUnit.has(u)) { prefer[u] = index.get(homeUnit.get(u)); continue; }
+      const t = turn(unitBearing[u]);
+      let i = 0;
+      while (i + 1 < k && t >= edges[i + 1]) i++;
+      prefer[u] = index.get(order[i]);
+    }
+    return trial(miss);
+  };
+  const first = gapStart(region.filter(u => kmToPolys(fan.zoneCentre ?? C, units[u].polys) <= fan.zoneKm).map(u => units[u]), C, fan.zoneKm, members, at, p => bearing(p)).start;
+  // First the sectors the fan was laid out with (fanSectors: each holding its ground, of about equal land round the fan's
+  // meeting point), carried on past the zone; then turns of sectors of equal land round the clubs' middle.
+  let best = null;
+  if (fan.sectorOf) {
+    for (const u of region) prefer[u] = homeUnit.has(u) ? index.get(homeUnit.get(u)) : index.get(fan.sectorOf(units[u].centroid));
+    best = trial(0);
+  }
+  for (let swap = -1; swap + 1 < k && (swap < 0 || best.uneven > SWAP_UNEVEN); swap++) {
+    for (let t = 0; t < FAN_TURNS; t++) {
+      const next = tryOne((first + t * 2 * Math.PI / FAN_TURNS) % (2 * Math.PI), swap);
+      if (!best || next.score < best.score - 1e-6 || (Math.abs(next.score - best.score) <= 1e-6 && next.miss < best.miss - 1e-9)) best = next;
+    }
+  }
+  for (const u of region) if (best.who[u] >= 0) owner[u] = members[best.who[u]];
+  return members.map((c, i) => [c, best.who.entries?.[i] ?? []]);
+}
+
 /**
  * Balanced territories, an alternative to growSections (partitionCountry's `balance`).
  *
@@ -2146,7 +2472,11 @@ function borderKm(topo) {
  * them. That is each club's natural land V: compact, with no fingers. (Smallest-first growth instead hands the
  * smallest territory its nearest free unit whatever its distance, so the clubs around empty land race into it in
  * parallel fingers, and a club boxed in by bigger ones squeezes through gaps; its reach bound keeps empty land near
- * the nearest clubs, so sizes follow how crowded the clubs are.)
+ * the nearest clubs, so sizes follow how crowded the clubs are.) A city's fanned clubs (`fans`, from fanSectors) split
+ * the land nearest them: on the country maps by `fanned`, each fanned club's direction from its city, the land beyond
+ * the city's zone going to the club whose sector points its way; with `wholeUnits` (the Europe maps) by shareFan, the
+ * clubs crossing the city's straits (cityStraits) onto land where they hold none, the unit each lands on then counting
+ * as a start of its land there (`entries`).
  *
  * Each club's target blends its natural land with its fair share F (the country's land per section times its group
  * size, `share`): T = F^(1-β) · V^β, so β = 0 asks equal land and β = 1 the natural split; targets are scaled to the
@@ -2159,12 +2489,17 @@ function borderKm(topo) {
  *   - within PASS_RADIUS radii of a disk of its target land from the receiver's start,
  *   - at most PASS_REACH times as far from the receiver's start as from the giver's (both padded by the grain),
  *   - that is not a start, does not cut the giver's land in two, and lies on land the receiver is `allowed` on.
- * Rounds pass one unit per pair of neighbours, the most unequal pairs first, until a round passes none. Landmasses
+ * Rounds pass one unit per pair of neighbours, the most unequal pairs first, until a round passes none. With
+ * `wholeUnits`, a unit passes only along PASS_TOUCH_WHOLE of its own border, a city's fanned clubs pass none to each
+ * other, a pair tries its PASS_TRIES nearest units in turn (with one, a unit that would cut the giver's land in
+ * two stopped the pair for good: Benfica's Lisbon behind Santa Clara), no club passes land on its start's landmass
+ * below its want (half its goal, or of its `room`), and a club still under its want then takes its neighbours' land
+ * nearest its start (the rescue). Landmasses
  * without a start join a club across the sea in growSections' order (joinIslands): among the clubs with land within
  * the hop window, those about as near as the nearest and allowed there first, the one whose start is nearest. Returns
  * { owner, seedUnit, seedPoint, natural, target, moves, spread: [before, after] } (spread: of log land/target).
  */
-export function balanceSections(units, adjacency, homes, { beta = 0.5, padKm = grainKm(units), minKm2 = 0, share = null, allowed = null, topo = null, fanned = null, weight = null } = {}) {
+export function balanceSections(units, adjacency, homes, { beta = 0.5, padKm = grainKm(units), minKm2 = 0, share = null, allowed = null, topo = null, fans = null, fanned = null, room = null, weight = null, wholeUnits = false } = {}) {
   const shared = borderKm(topo ?? unitTopology(units).topo);
   const landBorder = shared.map(m => [...m.values()].reduce((a, b) => a + b, 0));
   const n = homes.length;
@@ -2176,7 +2511,10 @@ export function balanceSections(units, adjacency, homes, { beta = 0.5, padKm = g
   const reach2 = Array.from({ length: n }, (_, c) => Float64Array.from(units, u => kmBetween(anchor[c], u.centroid) ** 2));
   const startsOn = new Map();
   seedUnit.forEach((u, c) => { if (!startsOn.has(comp[u])) startsOn.set(comp[u], []); startsOn.get(comp[u]).push(c); });
-  const claimOf = (c, u) => reach2[c][u] / (weight?.[c] ?? 1) + (fits(c, u) ? 0 : LATE);
+  // A team of clubs claims as far as `weight` (its clubs) clubs do on the country maps; on the Europe maps by distance alone,
+  // since the weights' boundary round a weaker club's start is a circle about it, so its stronger neighbour's land would wrap
+  // it (Inter and Milan's round Atalanta's); their targets count their clubs' shares, and the passes even the land out.
+  const claimOf = (c, u) => reach2[c][u] / (wholeUnits ? 1 : weight?.[c] ?? 1) + (fits(c, u) ? 0 : LATE);
 
   // Natural land: nearest start, pieces cut off from their start flooded from the land around them.
   const owner = new Array(U).fill(-1);
@@ -2185,8 +2523,8 @@ export function balanceSections(units, adjacency, homes, { beta = 0.5, padKm = g
     if (!list) continue;
     let best = -1, bestK = Infinity;
     for (const c of list) { const k = claimOf(c, u); if (k < bestK) { bestK = k; best = c; } }
-    // Land nearest a fanned club beyond its city's zone goes to the club of the fan whose sector points its way, so
-    // each sector carries on outward.
+    // On the country maps, land nearest a fanned club beyond its city's zone goes to the club of the fan whose sector
+    // points its way, so each sector carries on outward (`fanned`: each fanned club's direction from its city).
     const fz = fanned?.[best];
     if (fz && units[u].fans?.[fz.fan] == null) {
       const [cx, cy] = fz.centre;
@@ -2201,11 +2539,21 @@ export function balanceSections(units, adjacency, homes, { beta = 0.5, padKm = g
     owner[u] = best;
   }
   seedUnit.forEach((u, c) => { owner[u] = c; });
+  // Each city's fanned clubs share out the land nearest any of them, each keeping to its sector while it can, and
+  // crossing the city's straits (Istanbul's Bosphorus) onto land where it holds none: the unit it lands on keeps the
+  // land it reaches from there its own (`entries`).
+  const entries = new Map();
+  if (fans?.length && wholeUnits) {
+    const straits = cityStraits(units, fans, comp);
+    for (const fan of fans) for (const [c, list] of shareFan(units, adjacency, owner, fan, homes, seedUnit, share, fits, comp, straits.links.size ? straits : null) ?? []) {
+      if (list.length) entries.set(c, list);
+    }
+  }
+  const startsOf = c => [seedUnit[c], ...(entries.get(c) ?? []).filter(u => owner[u] === c)];
   const kept = new Uint8Array(U);
-  seedUnit.forEach(u => {
-    const c = owner[u];
-    const stack = [u];
-    kept[u] = 1;
+  seedUnit.forEach((_, c) => {
+    const stack = startsOf(c).filter(u => !kept[u]);
+    for (const u of stack) kept[u] = 1;
     while (stack.length) for (const v of adjacency[stack.pop()]) if (!kept[v] && owner[v] === c) { kept[v] = 1; stack.push(v); }
   });
   for (let u = 0; u < U; u++) if (owner[u] >= 0 && !kept[u]) owner[u] = -1;
@@ -2315,13 +2663,34 @@ export function balanceSections(units, adjacency, homes, { beta = 0.5, padKm = g
   };
   // Σ A²/T falls when area a passes from A to B.
   const gains = (A, B, a) => (a * a - 2 * land[A] * a) / goal[A] + (a * a + 2 * land[B] * a) / goal[B] < -1e-9;
+  // A club's want: half its goal, or of the room it needs (`room`), since a club's goal follows its natural land and a
+  // shut-in club's is small too. No club passes land on its start's landmass below its want (counting its islands,
+  // Ilioupoli gave up its Athens for Kea).
+  const wantOf = c => RESCUE_SHARE * Math.max(goal[c], room?.[c] ?? 0);
+  const ashore = new Array(n).fill(0);
+  owner.forEach((o, u) => { if (o >= 0 && comp[u] === comp[seedUnit[o]]) ashore[o] += units[u].area; });
+  const keeps = (A, u, area = units[u].area) => comp[u] !== comp[seedUnit[A]] || ashore[A] - area >= wantOf(A);
+  const move = (u, A, B) => {
+    owner[u] = B;
+    land[A] -= units[u].area;
+    land[B] += units[u].area;
+    if (comp[u] === comp[seedUnit[A]]) ashore[A] -= units[u].area;
+    if (comp[u] === comp[seedUnit[B]]) ashore[B] += units[u].area;
+  };
+  // The Europe maps' pairs try PASS_TRIES units each round (the country maps one, as built before them).
+  const tries = wholeUnits ? PASS_TRIES : 1;
+  // On the Europe maps the clubs of one city pass no land to each other: shareFan has shared it out, and between starts
+  // a few kilometres apart the border a pass moves (as a power diagram's) runs through the city, so the land passed is
+  // the land beside it (Rayo's by Madrid went to Atlético, whose land then ran south down Rayo's side).
+  const fanOf = new Int32Array(n).fill(-1);
+  if (wholeUnits) (fans ?? []).forEach((fan, f) => { for (const c of fan.members) fanOf[c] = f; });
   let moves = 0;
   for (let round = 0; round < BALANCE_ROUNDS; round++) {
     // Each club's border with the others this round: a unit passes to a club it lies against along PASS_TOUCH of the
     // shorter of its own land border and that club's, so a small club takes a neighbouring unit along a broad front of
-    // its own border, and no club grows out from a tip.
+    // its own border, and no club grows out from a tip (on the Europe maps, PASS_TOUCH_WHOLE of the unit's own).
     const clubBorder = new Array(n).fill(0);
-    for (let u = 0; u < U; u++) for (const [v, km] of shared[u]) if (owner[v] !== owner[u] && owner[u] >= 0) clubBorder[owner[u]] += km;
+    if (!wholeUnits) for (let u = 0; u < U; u++) for (const [v, km] of shared[u]) if (owner[v] !== owner[u] && owner[u] >= 0) clubBorder[owner[u]] += km;
     // The best unit for each pair of neighbouring clubs, giver first.
     const best = new Map();
     for (let u = 0; u < U; u++) {
@@ -2330,31 +2699,110 @@ export function balanceSections(units, adjacency, homes, { beta = 0.5, padKm = g
       for (const v of adjacency[u]) {
         const B = owner[v];
         if (B < 0 || B === A || landmass[B] !== landmass[A] || !fits(B, u)) continue;
+        if (fanOf[A] >= 0 && fanOf[A] === fanOf[B]) continue;
         if (land[A] / goal[A] <= land[B] / goal[B]) continue;
         const dB = Math.sqrt(reach2[B][u]);
         if (dB > radius[B]) continue;
         let touch = 0;
         for (const [w, km] of shared[u]) if (owner[w] === B) touch += km;
-        const front = Math.min(landBorder[u], clubBorder[B]);
-        if (front > 0 && touch < PASS_TOUCH * front) continue;
+        const front = wholeUnits ? PASS_TOUCH_WHOLE * landBorder[u] : PASS_TOUCH * Math.min(landBorder[u], clubBorder[B]);
+        if (front > 0 && touch < front) continue;
         if ((dB + pad2) / (Math.sqrt(reach2[A][u]) + pad2) > PASS_REACH) continue;
         const gap = reach2[B][u] - reach2[A][u];
         const key = A * n + B;
-        const seen = best.get(key);
-        if (!seen || gap < seen.gap || (gap === seen.gap && u < seen.u)) best.set(key, { A, B, u, gap });
+        if (!best.has(key)) best.set(key, { A, B, list: [] });
+        const list = best.get(key).list;
+        if (list.some(item => item.u === u)) continue;
+        const at = list.findIndex(item => gap < item.gap || (gap === item.gap && u < item.u));
+        if (at < 0) { if (list.length < tries) list.push({ u, gap }); } else { list.splice(at, 0, { u, gap }); if (list.length > tries) list.pop(); }
       }
     }
     const order = [...best.values()].sort((p, q) => (land[q.A] / goal[q.A] - land[q.B] / goal[q.B]) - (land[p.A] / goal[p.A] - land[p.B] / goal[p.B]) || p.A - q.A || p.B - q.B);
     let passed = 0;
-    for (const { A, B, u } of order) {
-      if (owner[u] !== A || !adjacency[u].some(v => owner[v] === B) || !gains(A, B, units[u].area) || !holdsWithout(A, u)) continue;
-      owner[u] = B;
-      land[A] -= units[u].area;
-      land[B] += units[u].area;
+    for (const { A, B, list } of order) {
+      // The pair's nearest unit first; one it cannot pass (the giver's land would come apart, or the sizes would grow
+      // apart) gives way to the next, so a pair is never stuck on it (Benfica's Lisbon behind Santa Clara).
+      const pick = list.find(({ u }) => owner[u] === A && adjacency[u].some(v => owner[v] === B) && gains(A, B, units[u].area) && (!wholeUnits || keeps(A, u)) && holdsWithout(A, u));
+      if (!pick) continue;
+      move(pick.u, A, B);
       passed++;
     }
     moves += passed;
     if (!passed) break;
+  }
+  // A club still shut in, under RESCUE_SHARE of its goal, takes the land of its neighbours nearest its start, one unit
+  // at a time, from any neighbour holding more for its goal (a city's clubs on the land around their grounds: Galatasaray
+  // behind Beşiktaş's Thrace, Panathinaikos between AEK and Olympiacos). Nearest its start first, its land grows as a
+  // disk, never out along a border. A start is never taken; a unit whose loss would cut the giver's land in two goes with
+  // the part cut off from the giver's start, when that part is no more than the club still lacks (Beşiktaş's land ran
+  // round Galatasaray's Sarıyer through Eyüpsultan).
+  // The giver's land that hangs from u alone: reached from u's neighbours in A, not from A's start without u (A's land
+  // across the sea is no part of it).
+  const cutOff = (A, u) => {
+    stamp++;
+    const stack = startsOf(A).filter(v => v !== u);
+    for (const v of stack) mark[v] = stamp;
+    while (stack.length) for (const v of adjacency[stack.pop()]) if (v !== u && owner[v] === A && mark[v] !== stamp) { mark[v] = stamp; stack.push(v); }
+    const part = [];
+    const queue = adjacency[u].filter(v => owner[v] === A && mark[v] !== stamp);
+    for (const v of queue) mark[v] = stamp;
+    while (queue.length) {
+      const v = queue.pop();
+      part.push(v);
+      for (const w of adjacency[v]) if (w !== u && owner[w] === A && mark[w] !== stamp) { mark[w] = stamp; queue.push(w); }
+    }
+    return part;
+  };
+  let rescued = 0;
+  for (let c = 0; c < n; c++) {
+    const want = wholeUnits ? wantOf(c) : 0;
+    if (land[c] >= want) continue;
+    const heap = claimHeap();
+    const offer = u => { for (const v of adjacency[u]) if (owner[v] >= 0 && owner[v] !== c && !isSeed[v] && fits(c, v) && landmass[owner[v]] === landmass[c]) heap.push(reach2[c][v], c, v); };
+    owner.forEach((o, u) => { if (o === c) offer(u); });
+    while (heap.size && land[c] < want) {
+      const [, , u] = heap.pop();
+      const A = owner[u];
+      if (A === c || A < 0 || land[A] / goal[A] <= land[c] / goal[c]) continue;
+      const part = holdsWithout(A, u) ? [] : cutOff(A, u);
+      const taken = [u, ...part];
+      const area = taken.reduce((sum, v) => sum + units[v].area, 0);
+      // The giver keeps at least as much of its own landmass for its goal as the club has after (the clubs of a crowded
+      // city never take more than evens from each other).
+      if ((ashore[A] - area) / goal[A] < (land[c] + area) / goal[c] || (part.length && (area > want - land[c] || part.some(v => isSeed[v] || !fits(c, v))))) continue;
+      if (!part.length && land[c] + area > 2 * want) continue;
+      for (const v of taken) { move(v, A, c); rescued++; }
+      for (const v of taken) offer(v);
+    }
+  }
+  moves += rescued;
+  // On the Europe maps every club holds land around its own start: at least GROUND_MARGIN km² of its own shore, in one piece
+  // with it, its neighbours giving it theirs, nearest its start first (who keep as much around theirs; no start changes
+  // hands). The rescue counts a club's land on both shores of a strait, so Beşiktaş could keep only its district around its
+  // ground on the Bosphorus and the rest of its land in Anatolia, and the outline's coast swallowed the strip.
+  if (wholeUnits) {
+    const pieceOf = c => {
+      const seen = new Set([seedUnit[c]]), stack = [seedUnit[c]];
+      while (stack.length) for (const v of adjacency[stack.pop()]) if (owner[v] === c && comp[v] === comp[seedUnit[c]] && !seen.has(v)) { seen.add(v); stack.push(v); }
+      return { seen, km2: [...seen].reduce((sum, v) => sum + units[v].area, 0) };
+    };
+    for (let c = 0; c < n; c++) {
+      for (let piece = pieceOf(c); piece.km2 < GROUND_MARGIN; ) {
+        let pick = null;
+        for (const u of piece.seen) for (const v of adjacency[u]) {
+          const A = owner[v];
+          if (A < 0 || A === c || isSeed[v] || comp[v] !== comp[seedUnit[c]] || !fits(c, v) || !holdsWithout(A, v)) continue;
+          const theirs = pieceOf(A);
+          if (theirs.seen.has(v) && theirs.km2 - units[v].area < Math.min(GROUND_MARGIN, 0.5 * theirs.km2)) continue;
+          const km = reach2[c][v];
+          if (!pick || km < pick.km) pick = { v, A, km };
+        }
+        if (!pick) break;
+        move(pick.v, pick.A, c);
+        moves++;
+        piece = pieceOf(c);
+      }
+    }
   }
   return { owner, seedUnit, seedPoint, natural, target, moves, spread: [before, spreadOf(land)] };
 }
@@ -2434,7 +2882,11 @@ export const gapLimitKm = units => Math.max(3, grainKm(units) / 2);
  * The country maps pass `balance: { room, beta }`: the land rules of format 2 for every map, each club needing `room`
  * of its fair share per section (or more, to be seen), units larger than a section's share halved once up front, and
  * territories shared out by balanceSections (nearest start, then land passed towards targets `beta` of the way from
- * equal land to that) instead of growSections.
+ * equal land to that) instead of growSections. No club starts away from its city: one crowded into it is fanned, and
+ * starts as near its home as its sector goes. The Europe maps pass `balance` with `fair` and `fan: 'units'`: the
+ * same, with `fair`'s room and no unit halved, so their borders stay administrative; their clubs start at home, two
+ * clubs of one city are fanned too, and balanceSections shares each fan's land out (shareFan), crosses a city's straits
+ * and rescues a club left shut in.
  */
 export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places = [], extraPlaces = places, sections = rawHomes.length, joinKm = 0, allowed = null, spare = false, fair = null, fan: fanMode = 'cut', balance = null, log = () => {} } = {}) {
   const n = rawHomes.length;
@@ -2527,9 +2979,10 @@ export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places =
   // The attempt whose boxed-in clubs fall least short (squared shortfalls, the earliest of equals) is kept, and only its
   // lines are logged.
   // Balanced maps cut every unit larger than a section's share of the land once, before the starts are settled
-  // (halving does not depend on them), so each partition redone below cuts units only for its clubs.
+  // (halving does not depend on them), so each partition redone below cuts units only for its clubs. With `fair` (the
+  // Europe maps) units stay whole: the caller keeps them to administrative borders.
   let halved = [];
-  if (balance) {
+  if (balance && !fair) {
     const before = units;
     ({ units, splits: halved } = splitUnits(units, homeOf.map(() => null), sections, { minKm2, maxUnitKm2: sourceAreaKm2 / sections, log }));
     const map = unitMapper(before, units);
@@ -2549,7 +3002,8 @@ export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places =
       // Every club keeps its own ground (the user, 2026-11-19: "keep cities in their cities"; 2026-11-21: "a territory
       // needs to own the part of the map where their city and stadium is in"): a club crowded into a city is fanned out
       // from it, never started at a town nearby.
-      ({ units, fans } = fanSectors(units, teamHome, { linkKm, grain: padKm, force: forceFan, wholeUnits: fanMode === 'units', fanMax: balance ? BALANCE_FAN_MAX : FAN_MAX, weight: t => teams[t].members.length }));
+      ({ units, fans } = fanSectors(units, teamHome, { linkKm, grain: padKm, force: forceFan, wholeUnits: fanMode === 'units', fanMax: balance ? BALANCE_FAN_MAX : FAN_MAX, weight: t => teams[t].members.length,
+        ...(balance && fanMode === 'units' ? { pairKm: linkKm / 3 } : {}) }));
       if (fans.length) note(`  fanned ${fans.map(f => f.members.reduce((sum, t) => sum + teams[t].members.length, 0)).join(' + ')} clubs around ${fans.length} cities`);
     }
     const fanOf = Array.from({ length: T }, (_, t) => fans.map((f, i) => (f.members.includes(t) ? i : -1)).filter(i => i >= 0));
@@ -2557,10 +3011,13 @@ export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places =
     ({ topo, adjacency: unitAdjacency } = topologyOf(units));
     const grownUnits = units;
     if (balance) {
-      const fanAllowed = (t, u) => !grownUnits[u].fans || grownUnits[u].fans.every(m => m == null || m === t);
-      // Each fanned team's direction from its city's centre: the middle of its sector.
-      const fanned = new Array(T).fill(null);
-      fans.forEach((fan, f) => {
+      // A city's zone is its fan's: on the country maps each piece is its sector's club's alone; on the Europe maps any
+      // of the fan's clubs may take it (shareFan shares the fan's land out), no other club.
+      const whole = fanMode === 'units';
+      const fanAllowed = (t, u) => !grownUnits[u].fans || grownUnits[u].fans.every((m, f) => m == null || m === t || (whole && fans[f].members.includes(t)));
+      // Each fanned team's direction from its city's centre, the middle of its sector (the country maps).
+      const fanned = whole ? null : new Array(T).fill(null);
+      if (fanned) fans.forEach((fan, f) => {
         const [cx, cy] = fan.centre;
         const kx = Math.cos(cy * RAD), sum = new Map(fan.members.map(t => [t, [0, 0]]));
         for (const u of units) {
@@ -2572,7 +3029,7 @@ export function partitionCountry(rawUnits, rawHomes, { maxGapKm, reach, places =
         for (const [t, [sx, sy]] of sum) if (sx || sy) fanned[t] = { fan: f, centre: fan.centre, dir: Math.atan2(sy, sx) };
       });
       const grown = balanceSections(units, unitAdjacency, teamHome, {
-        beta: balance.beta, padKm, minKm2, topo, fanned, weight: teams.map(team => team.members.length),
+        beta: balance.beta, padKm, minKm2, topo, fans, fanned, weight: teams.map(team => team.members.length), room: roomShare.map(r => r * minSectionKm2), wholeUnits: whole,
         ...(grouped ? { share, allowed: (t, u) => fanAllowed(t, u) && (!teamAllowed || teamAllowed(t, grownUnits[u])) }
           : teamAllowed ? { allowed: (t, u) => teamAllowed(t, grownUnits[u]) } : {}),
       });

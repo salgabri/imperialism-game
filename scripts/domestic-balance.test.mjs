@@ -85,3 +85,19 @@ test('with beta 1 the targets are the natural land, so nothing passes', () => {
   assert.equal(out.moves, 0);
   assert.deepEqual(landOf(units, out.owner, 2), out.natural);
 });
+
+test("a city's fanned clubs share the land nearest them out evenly, each in one piece from its ground (whole units)", () => {
+  // A port's three grounds a km apart on the coast (the grid's west edge), one club far off: nearest its ground, the
+  // club on the shore keeps a strip of it (88 / 387 / 270 km²); shared out by sectors (shareFan), each holds about a third
+  // of the land nearest them, in one piece around its own ground.
+  const w = 30, h = 30;
+  const units = grid(w, h);
+  const { adjacency, topo } = unitTopology(units);
+  const homes = [home(units, w, 0, 14), home(units, w, 1, 14), home(units, w, 0, 15), home(units, w, 28, 28)];
+  const fans = [{ members: [0, 1, 2], centre: [0.83 * STEP, 14.83 * STEP], zoneKm: 3 }];
+  const out = balanceSections(units, adjacency, homes, { beta: 0.3, topo, fans, wholeUnits: true });
+  homes.forEach((h, c) => assert.equal(out.owner[h.unit], c, `club ${c} holds its ground`));
+  assert.ok(connected(out.owner, adjacency, out.seedUnit), 'a territory came apart');
+  const city = landOf(units, out.owner, homes.length).slice(0, 3);
+  assert.ok(Math.max(...city) / Math.min(...city) < 1.6, `the city's clubs hold ${city.map(Math.round).join(' / ')} km²`);
+});

@@ -577,6 +577,107 @@ club with one stronger club near it (Peñarol out of Montevideo, Arsenal out of 
 Uruguay stays the hardest map: its departments are the finest layer that covers it, so
 Montevideo is one unit for about 25 clubs, cut between them.
 
+#### Balanced land on the Europe maps
+
+On 2026-11-21 the user showed Madrid on 2025/26's Top 124: "these borders are not
+acceptable". The Europe maps ("The Europe maps" below) still grew their land smallest
+first, and Madrid's four clubs, with Castile reserved for them, raced out over it in arms
+that wound round one another: Real Madrid's land curled from Madrid round Castile to
+Portugal, Atlético's round it, Getafe's and Rayo's in between. They now share land out as
+the country maps do (`BALANCE` in `scripts/build-europe-maps.mjs`, `{ beta: 0.3 }`, with
+`fair` and whole-unit fans), with what their administrative units need:
+
+1. **Units whole.** No unit is halved, so every border stays administrative, and a club
+   needs the fair rules' room (a tenth of its country's share per club, at least
+   1,200 km²). Every club starts on its own ground ("Grounds" below): the old rules moved
+   Galatasaray across the Bosphorus and Beşiktaş and Başakşehir 100–200 km into Anatolia.
+   Land goes to the club whose start is nearest by distance alone, a team of clubs sharing a
+   ground claiming as far as one club (the country maps' weights draw a circle round the
+   weaker of two neighbours, and gave Inter and Milan the land wrapping Atalanta's); its target
+   counts its clubs' shares.
+2. **Joined regions open.** An empty region joined to a city-state (`TINY_REGION`) is
+   split as finely as before but open to every club. Reserved for Valencia's four clubs,
+   Castilla-La Mancha gave Valencia CF Toledo, 70 km from Madrid, and boxed Atlético and
+   Rayo into Madrid's own region. A region too small for its clubs joins its largest empty
+   neighbour when that alone gives them room enough, else its largest neighbour, as before:
+   joined to Bayern's Bavaria, the Elite 32's Saxony had Leipzig take Franconia once the land
+   was balanced, with Brandenburg empty beside it. (Empty land first in every case cost
+   Liverpool its share of Lancashire: 372 km².)
+3. **One region on two shores.** While the levels nest, a region's units that face each
+   other across at most 3.5 km of water between two landmasses (`CITY_LINK_KM`) count as
+   joined: Istanbul's Asian districts had joined Kocaeli, whose one club, Fenerbahçe, then
+   started on all of it, Kadıköy and Üsküdar with it.
+4. **A city's clubs share its land** (`shareFan`). A fan (now also two clubs within a
+   third of the link distance, 10 km: Lisbon's, Seville's, Glasgow's, Prague's) shares out
+   all the land nearest any of its clubs, each club's target its share of that land on its
+   own landmass. Its sectors are tried two ways: as the fan was laid out (`fanLayout`: each
+   ground in its own sector, of about equal land round the fan's meeting point, carried on past
+   the zone), and as sectors of equal land round the middle of the clubs' grounds, at 36 turns
+   and, while the land comes out uneven, with two neighbours swapped (Arsenal's way out of
+   Islington runs north-west past Spurs'), each edge between the two grounds it parts. The
+   outcome kept is the most even plus the share of the land taken outside
+   the clubs' own sectors (`FOREIGN_COST` 1): judged by sizes alone, every turn looked
+   alike, as a club that fills a small sector and goes on into its neighbour's evens the
+   sizes out, and the turn kept gave Atlético a sector of 19,632 km² and Real Madrid one of
+   42,199, Atlético's land running on along the north of Real Madrid's and Getafe's up its
+   west, round the land Real Madrid kept. The clubs grow over the land in rounds
+   (`growFan`): each club within 1.5 times the least land for its target takes one unit,
+   of its own sector, nearest its ground, first; no club takes another's last way out while
+   any club can grow otherwise, and a way two clubs both need goes to the club whose sector
+   holds it (Eyüpsultan, Galatasaray's way out of Sarıyer); a club left under a quarter of
+   its target grows again first (`growFanFair`). A city on two landmasses is crossed by its
+   straits, once per club and landmass (`cityStraits`: Beşiktaş onto Üsküdar), and the unit
+   a club lands on keeps its land there its own. Taken straight by sector, land beyond a
+   river or a bay was cut off from its sector (Lisbon's south bank, reached over land only
+   by Vila Franca de Xira); by the zone's land alone, the sectors facing the sea kept only
+   their city (AEK and Panathinaikos 900 km² each, Olympiacos 64,000).
+5. **Passes** move a unit only when half its own border lies against the receiver
+   (`PASS_TOUCH_WHOLE`: it fills a hollow, never carries a club on along a border; at the
+   country maps' 30% of the shorter border, Villarreal's land ran round Levante's), never
+   between the clubs of one city (two grounds a few km apart, the border a pass moves runs
+   through the city: Rayo's land beside Madrid went to Atlético, whose land then ran south
+   down Rayo's side), try each pair's eight nearest units in turn (with one, a unit whose
+   loss would cut the giver's land in two stopped the pair for good: Benfica behind Santa
+   Clara), and no club passes land on its start's landmass below half its goal (counting
+   islands, Ilioupoli would give up Athens for Kea). The cost is evenness where units are
+   coarse: on the Elite 32, Leverkusen holds 0.54 of Germany's fair share (0.74 at 30%).
+6. **Rescue.** A club still under half its goal, or of its room, then takes its
+   neighbours' land nearest its start, from a neighbour holding more for its goal and only
+   up to evens, a unit the giver's land hangs on going with what hangs on it when that is
+   no more than the club lacks (Monza between Inter and Milan, Liverpool and Everton).
+7. **Ground margin.** Every club keeps at least 300 km² around its own start, in one piece on
+   its own shore (`GROUND_MARGIN`), its neighbours giving it their land nearest its start first
+   while they keep as much around theirs. The rescue counts land on both shores of a strait, so
+   Beşiktaş kept only its district on the Bosphorus, the rest of its land in Anatolia, and the
+   map's coarser outline swallowed the district (its ground 5 km out; Leganés's 1–2 km).
+
+The country maps keep their own rules: built with steps 4–6, a crowded city's wedges came
+out long (clubs over 20% thin 806 → 1,174, Brazil's 17 → 64) for more even sizes, so they
+stay as built, byte for byte (`--check`).
+
+Results across the 99 Europe maps in play, against the maps before (grown smallest first, with
+the grounds rules; 2026-11-25): sizes, 1.08 spread of log land to the fair share → 0.77;
+clubs under a quarter of their fair share 493 → 340 (of 5,976), under 800 km² 108 → 24;
+hooked lands (under half their hull, over 500 km²) 181 → 118, wrapped (their middle inside a
+neighbour's hull) 690 → 494; land in strips 23.2% → 21.5% of it. Clubs more than 0.5 km from
+their drawn land stay at 182, and more than 5 km at 2 (Venezia, on its lagoon, in 1998/99 and
+1999/2000). Known weak spots: London's seven clubs, where Chelsea holds 213–264 km² on
+the 2023/24–2025/26 maps and Tottenham 289 on 2018/19's, and Istanbul's two in 1998/99, where
+one club takes nearly all of Turkey and the other 121 km² (the grounds maps have it the other
+way: Galatasaray 757,000 km² and Beşiktaş 23,000).
+
+Dead ends (don't retry): a looser touch for units large beside their receiver (5% of its
+goal: Germany's Elite 32 evened out, but Werder Bremen's land wound round its neighbour's
+on the Top 124); sectors of equal land over all the city's land by bearing (a
+ground in another club's sector, and the sector beyond the Tagus cut off: Sporting kept
+14 km²); a race from the grounds with each start delayed to equal the land (two grounds a
+few km apart reach every way out of the city together, so a 0.1 km delay flipped Lisbon's
+hinterland between Benfica and Sporting); sectors by the bearing where a unit's way leaves
+the city (the Peloponnese leaves Attica by Elefsina alone, so one sector took it all); links
+across any water of a city (rivers within one landmass, splitting a club's land on it);
+moving a shut-in club's start (out of its city: Beşiktaş to Kırklareli, 170 km).
+
+
 ### Grounds
 
 On 2026-11-21 the user, shown the Top 124's Nice pushed 30 km up the Var while Monaco held
@@ -1810,7 +1911,9 @@ seasons with clubs (the built-in one and 31 earlier) and each of the two fields:
   a unit whose region lies in another parent moves to the nearest region of its own. Each
   region is then made one piece where land joins it: a part cut off from the rest of its
   region that borders another region of the same parent joins the one it borders most (a
-  part across the water stays). Together these leave no specks of one club in another's
+  part across the water stays, and since 2026-11-21 so does one facing the rest across a
+  strait of at most 3.5 km between two landmasses: Istanbul's Asian districts, which had
+  joined Kocaeli). Together these leave no specks of one club in another's
   land: across the 98 maps, no piece of 1 to 400 km² as drawn lies against one other club for
   half its edge, against 1,602 before the levels went down to the communes (the test checks
   1 to 300 km², as simplification can shrink a piece by a sixth). Larger pieces can: 23 of
@@ -1837,17 +1940,20 @@ seasons with clubs (the built-in one and 31 earlier) and each of the two fields:
     - A top region whose clubs would hold under a quarter of the country's share per
       club (`TINY_REGION`) joins its largest neighbouring region: Berlin and Brandenburg,
       Bremen and Lower Saxony, Madrid and Castile, Greater Manchester and Lancashire. Their
-      clubs share the joined land.
+      clubs share the joined land; since 2026-11-21 a joined region with no club of its own
+      is split as finely but open to every club ("Balanced land on the Europe maps").
 - **Partition**: `partitionCountry` per country, one section per club, with
   `fair: { minKm2 }`: format 1's sections, but the land rules of format 2 where they keep
-  a club from being shut in (growth caps at 1.5× a fair share, fans, the boxed-in retry),
-  and no unit halved for its size, so regions stay whole. A club needs a tenth of its
-  country's share per club and at least 1,200 km²: about 35 km across, 6 px at the opening
-  fit. Every club starts on its own ground (since 2026-11-21, "Grounds" above); one that
-  cannot find that land around it is fanned with its city and keeps what its crowd leaves
-  it (until then it started next door, on land its region let it take). Land the
-  world outline leaves out (Porto Santo) is dropped first, or a club moved there would end
-  up with nothing. The fans keep to the units (`fan: 'units'`, since 2026-11-15): each
+  a club from being shut in, and no unit halved for its size, so regions stay whole. A club
+  needs a tenth of its country's share per club and at least 1,200 km²: about 35 km across,
+  6 px at the opening fit. Since 2026-11-21 the land is balanced, as on the country maps
+  ("Balanced land on the Europe maps"): nearest start, a crowded city's clubs sharing its
+  land by sectors, passes and a rescue. Until then it grew smallest first with caps at 1.5× a
+  fair share, and a club that could not find its room around its ground started next door, on
+  land its region let it take. Every club starts on its own ground (since 2026-11-21,
+  "Grounds" above); one that cannot find its land around it is fanned with its city and keeps
+  what its crowd leaves it. Land the world outline leaves out (Porto Santo) is dropped first,
+  or a club moved there would end up with nothing. The fans keep to the units (`fan: 'units'`, since 2026-11-15): each
   commune or borough of a crowded city's zone goes whole to the club whose ground it holds,
   else to the sector its centre lies in, only as far as it joins that club's ground, and
   only a commune two of the fan's clubs share is cut, between those two (San Siro's Inter

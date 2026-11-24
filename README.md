@@ -1618,17 +1618,20 @@ own country.
   share Bavaria along its districts, Lisbon's split the city along its parishes, Paris's
   along its arrondissements, Prague's along its cadastral areas. Every European
   country has its levels (`scripts/lib/admin-levels.mjs`), England its counties,
-  councils and districts. A region with no club goes to whichever neighbour reaches it,
-  whole unless it is large for a club's share or borders a crowded region, whose clubs
-  then share it a level down (Moscow Oblast around Moscow's clubs). A city-state is too
-  small for its clubs and shares its largest neighbour's land too (Berlin and
-  Brandenburg, Madrid and Castile). Only a commune two clubs share is ever cut (Milan's
-  San Siro). Where clubs are crowded into one city, its communes are dealt out around it
-  so each has a way out, and every club holds its own ground however crowded its city
-  (since 21 November 2026; on the maps of before, kept for their saves, a club boxed in
-  by the others could start next door: Beşiktaş played out of Anatolia on the Top 124 of
-  before). A stray piece of a club's land under 400 km² that
-  lies inside another's goes to that club.
+  councils and districts. A region with no club goes to the nearest clubs, whole unless
+  it is large for a club's share or borders a crowded region, which then share it a
+  level down (Moscow Oblast around Moscow's clubs). A city-state is too small for its
+  clubs and shares its largest neighbour's land too (Berlin and Brandenburg,
+  Madrid and Castile). Only a commune two clubs share is ever cut (Milan's San Siro).
+  Land goes to the nearest club and then evens out along broad fronts, as on the
+  country maps, so no club's land curls round another's. Clubs crowded into one city
+  share the land around it in sectors, each club growing out from its own ground along
+  its own side of the city: Madrid's four each hold a side of central Spain, and Istanbul's
+  clubs cross the Bosphorus where their land runs short. Every club holds its own
+  ground however crowded its city (since 21 November 2026; on the maps of before, kept
+  for their saves, a club boxed in by the others could start next door: Beşiktaş played
+  out of Anatolia on the Top 124 of before). A stray piece of a club's land under
+  400 km² that lies inside another's goes to that club.
 - **A country with no club stays grey**: it is not on the map, only drawn beneath it
   as any country map's neighbours are. It is never territory, and attacks go around
   it, by sea if need be. The Elite 32 has no Swiss or Austrian club, so Switzerland and Austria stay grey.

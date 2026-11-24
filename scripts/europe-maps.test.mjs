@@ -220,8 +220,9 @@ test('a club holds land only in its own country, and every country with a club i
       assert.ok(own, `${club.id}: ${club.shape} is a world shape`);
       const polys = polysOfSection(doc, i);
       if (!partial.has(club.shape)) total += polysAreaKm2(polys);
+      // (Nor a point of it: the world outline misses much of the Arctic coast European Russia is drawn to.)
       for (const poly of polys) {
-        if (polyAreaKm2(poly) < 50) continue;
+        if (partial.has(club.shape) || polyAreaKm2(poly) < 50) continue;
         const point = interiorPoint([poly]);
         assert.ok(pointInPolys(point, own) || kmToPolys(point, own) < 5, `${entry.id}: ${club.id} land at ${point} is outside ${club.shape}`);
       }
@@ -312,6 +313,56 @@ test('clubs share a country level by level, down to its communes, parishes and d
   assert.ok(!layers.includes('FRA ADM4'), 'France\'s cantons, which cross its arrondissements, are not used');
 });
 
+// Per club of a map, the share of its land border (the sea left out) each other club holds: the arcs the two sections share.
+function borderShares(doc) {
+  const { scale, translate } = doc.topology.transform;
+  const kmOf = doc.topology.arcs.map(arc => {
+    let x = 0, y = 0, km = 0, prev = null;
+    for (const [dx, dy] of arc) {
+      x += dx;
+      y += dy;
+      const p = [x * scale[0] + translate[0], y * scale[1] + translate[1]];
+      if (prev) km += kmBetween(prev, p);
+      prev = p;
+    }
+    return km;
+  });
+  const arcs = doc.topology.objects.sections.geometries.map(g => new Set((g.type === 'Polygon' ? g.arcs : g.arcs.flat()).flat().map(i => (i < 0 ? ~i : i))));
+  return arcs.map((own, i) => {
+    const share = new Map();
+    let total = 0;
+    for (const arc of own) {
+      const others = arcs.flatMap((set, j) => (j !== i && set.has(arc) ? [j] : []));
+      if (!others.length) continue;
+      total += kmOf[arc];
+      for (const j of others) share.set(j, (share.get(j) || 0) + kmOf[arc]);
+    }
+    return new Map([...share].map(([j, km]) => [j, km / total]));
+  });
+}
+
+test("a crowded city's clubs share the land around it, none wrapped round another", () => {
+  // On 2026-11-21 the user showed Madrid's clubs on 2025/26's Top 124 ("these borders are not acceptable"): grown
+  // smallest first, Real Madrid's land curled from Madrid round Castile, Atlético's round it, Getafe's between. Shared out
+  // by sectors, each takes a side of the city: no club's land lies against another's along most of its border, and each
+  // holds a share of central Spain.
+  for (const doc of [docOf('eu124r2026b'), TOP]) {
+    const madrid = doc.clubs.map((club, i) => ({ club, i })).filter(({ club }) => club.shape === '724' && kmBetween(club.home, [-3.7, 40.42]) < 25);
+    assert.ok(madrid.length >= 3, `${doc.id}: Madrid's clubs`);
+    const shares = borderShares(doc);
+    for (const { club, i } of madrid) {
+      assert.ok(polysAreaKm2(polysOfSection(doc, i)) > 15000, `${doc.id}: ${club.id} holds ${Math.round(polysAreaKm2(polysOfSection(doc, i)))} km²`);
+      for (const other of madrid) {
+        if (other.i !== i) assert.ok((shares[i].get(other.i) ?? 0) < 0.6, `${doc.id}: ${club.id} lies against ${other.club.id} along ${Math.round(100 * (shares[i].get(other.i) ?? 0))}% of its border`);
+      }
+    }
+  }
+  // Two clubs of one city share it too, the sea on one side (Lisbon), and Istanbul's, across the Bosphorus.
+  const on = name => TOP.clubs.findIndex(club => club.id === CLUB_ID(name));
+  for (const name of ['SL Benfica', 'Sporting CP']) assert.ok(polysAreaKm2(polysOfSection(TOP, on(name))) > 15000, name);
+  for (const name of ['Galatasaray SK', 'Fenerbahçe SK']) assert.ok(polysAreaKm2(polysOfSection(TOP, on(name))) > 5000, name);
+});
+
 test('no club holds specks in another\'s land: a small piece lying against one club of its country is that club\'s', () => {
   // A unit in pieces goes whole to one club, its detached pieces with it (Spain's municipalities; Portugal's parishes were
   // split into theirs), and the build gives such a piece under 400 km² to the club its edge lies against for at least half
@@ -326,8 +377,11 @@ test('no club holds specks in another\'s land: a small piece lying against one c
     const land = doc.clubs.map((_, i) => polysOfSection(doc, i).map(poly => ({ poly, box: bboxOf([poly]), km2: polyAreaKm2(poly) })));
     doc.clubs.forEach((club, c) => {
       const largest = Math.max(...land[c].map(piece => piece.km2));
+      // The piece at its ground: holding it, or nearest it where the ground stands just off the drawn shore (Beşiktaş's,
+      // on the Bosphorus), as the build keeps it.
+      const atGround = land[c].reduce((best, piece) => (!best || kmToPolys(club.home, [piece.poly]) < kmToPolys(club.home, [best.poly]) ? piece : best), null);
       for (const piece of land[c]) {
-        if (piece.km2 < 1 || piece.km2 >= 300 || piece.km2 === largest || pointInPolys(club.home, [piece.poly])) continue;
+        if (piece.km2 < 1 || piece.km2 >= 300 || piece.km2 === largest || piece === atGround) continue;
         doc.clubs.forEach((other, d) => {
           if (d === c || other.shape !== club.shape) return;
           const near = land[d].filter(item => meets(item.box, piece.box)).map(item => item.poly);

@@ -59,7 +59,7 @@ import { checkLevels, COUNTRIES, naturalEarthGroups, nestLevels, ONS_DISTRICTS, 
 import { createBoundarySource, GB_CITATION, NE_URL, ONS_LAD_LICENSE, ONS_LAD_SOURCE, ONS_LAD_URL } from './lib/domestic-boundaries.mjs';
 import { colourSections, contentHash, serialize } from './lib/domestic-output.mjs';
 import {
-  arcPoints, bboxOf, centroidOf, dissolve, EARTH_KM, facingKm, facingSections, GROUND_SLACK_KM, groundProblem, interiorPoint, kmBetween, kmToPolys,
+  arcPoints, bboxOf, centroidOf, CITY_LINK_KM, components, dissolve, EARTH_KM, facingKm, facingSections, GROUND_SLACK_KM, groundProblem, interiorPoint, kmBetween, kmToPolys,
   nodeRings, OVERSEAS_KM, partitionCountry, pointInPolys, polyAreaKm2, polysAreaKm2, polysOf, quantize, SAME_GROUND_KM, sectionTopology,
   SHARED_SLACK_KM, simplifyTopology, splitOnLand, withinKmOf,
 } from './lib/domestic-partition.mjs';
@@ -77,7 +77,11 @@ const rugbyUnionRatings = path.join(root, 'src/data/clubs.rugby-union.js');
 
 // Each country's levels, from its regions down to its communes, and Russia's European part: scripts/lib/admin-levels.mjs.
 // A region whose clubs would each have under this share of the country's land per club is too small to hold them (a
-// city-state: Berlin, Bremen, Madrid), so it is shared with its largest neighbouring region. A top region with no club is
+// city-state: Berlin, Bremen, Madrid), so it is shared with its largest neighbouring region; or with its largest empty
+// one, when that alone gives its clubs room enough, so a region with one club stays whole to it (the Elite 32's Saxony,
+// joined with Bayern's Bavaria, had Leipzig take Franconia once the land was balanced, with Brandenburg empty beside
+// it). Joined empty land is open to every club, so a crowded city's clubs keep a neighbour's region shared with them
+// while no empty one would do (Merseyside's Cheshire and Lancashire). A top region with no club is
 // split where it is larger than FREE_TOP of the country's share per club, and anything below that where it is larger
 // than FREE_LOWER of a share of the region it lies in, or the lucky neighbour would take far more than the others. Both
 // since 2026-11-15, when the levels went down to the communes: an eighth (from a quarter), so Cheshire's councils are
@@ -107,11 +111,18 @@ const SPECK_EDGE_KM = 0.005;
 // Land farther than this outside a country's world outline is below its 1:50m detail (Porto Santo): no club can hold it there.
 const OUTLINE_KM = 5;
 // The land a club needs, per the partition's fair rules: this share of the country's land per club, and about 35 km
-// across (6 px at the Europe map's opening fit). Since 2026-11-21 every club starts at its ground, so one that cannot find
-// it there is fanned with its city and keeps what its crowd leaves it (until then it started next door: Galatasaray
-// across the Bosphorus, as Thrace is a thirtieth of Turkey).
+// across (6 px at the Europe map's opening fit). Every club starts at its ground (since 2026-11-21), so one that comes out
+// with less is fanned with its city's clubs, and one still shut in takes land around its start from its neighbours
+// (balanceSections' rescue); until then it started next door: Galatasaray across the Bosphorus, as Thrace is a thirtieth
+// of Turkey.
 const MIN_SHARE = 0.1;
 const MIN_CLUB_KM2 = 1200;
+// Land is shared out as on the country maps (balanceSections, docs/design/domestic-campaigns.md, "Balanced land" and
+// "Balanced land on the Europe maps"): each unit to the nearest club allowed there, a crowded city's land shared out by
+// its clubs' sectors, then passed along broad fronts towards targets 30% of the way from equal land to that.
+// Smallest-first growth raced a crowded city's clubs out over the empty regions around it in arms that curled round one
+// another (Madrid's four over Castile and Extremadura, 2026-11-21: "these borders are not acceptable").
+const BALANCE = { beta: 0.3 };
 const POINT_TARGET = 16000;
 // Vertices this near a ground stay as the map is simplified, so no border near one moves across it.
 const GROUND_KEEP_KM = 1;
@@ -283,7 +294,30 @@ async function loadCountry(source, shapeId, outline, log) {
   const adjacency = neighbors(geoms);
   const points = units.map(u => interiorPoint(u.polys)), areas = units.map(u => polysAreaKm2(u.polys));
   const assign = levels.map(list => points.map(point => memberIndex(list, point)));
-  const moved = nestLevels(levels, assign, points, areas, adjacency);
+  // A region's units facing each other across a strait (at most CITY_LINK_KM of water between two landmasses) count as
+  // joined while the levels are made to nest, so a city on two shores stays one region: Istanbul's Asian districts
+  // otherwise went to Kocaeli, whose one club then started on all of it, Kadıköy and Üsküdar with it.
+  const joined = adjacency.map(list => [...list]);
+  const { comp: landmass } = components(adjacency);
+  assign.forEach(regions => {
+    const byRegion = new Map();
+    regions.forEach((r, u) => { if (!byRegion.has(r)) byRegion.set(r, []); byRegion.get(r).push(u); });
+    for (const members of byRegion.values()) {
+      if (members.length < 2) continue;
+      const inside = new Set(members), seen = new Set([members[0]]), stack = [members[0]];
+      while (stack.length) for (const v of adjacency[stack.pop()]) if (inside.has(v) && !seen.has(v)) { seen.add(v); stack.push(v); }
+      if (seen.size === members.length) continue;
+      // Every unit around the region is looked at, so a gap counts only where no unit's land lies in it.
+      const [w, south, e, n] = bboxOf(members.flatMap(u => units[u].polys));
+      const pad = 2 * CITY_LINK_KM / 111, padX = pad / Math.max(0.05, Math.cos(Math.max(Math.abs(south), Math.abs(n)) * Math.PI / 180));
+      const near = units.map((u, i) => i).filter(i => units[i].bbox[0] <= e + padX && units[i].bbox[2] >= w - padX && units[i].bbox[1] <= n + pad && units[i].bbox[3] >= south - pad);
+      facingSections(near.map(u => units[u].polys), CITY_LINK_KM).forEach((list, a) => list.forEach(b => {
+        const i = near[a], j = near[b];
+        if (i !== j && landmass[i] !== landmass[j] && inside.has(i) && inside.has(j) && !joined[i].includes(j)) joined[i].push(j);
+      }));
+    }
+  });
+  const moved = nestLevels(levels, assign, points, areas, joined);
   const tree = { key: spec.iso3, name: spec.iso3, members: [], children: new Map(), area: 0 };
   const pathOf = units.map(() => []);
   units.forEach((unit, i) => {
@@ -311,7 +345,9 @@ async function loadCountry(source, shapeId, outline, log) {
  * (COUNTRIES): a province with one club goes whole to it, a commune with two is the one place a club's land is cut
  * between them (the partition's crowd cut). A region with one club is that club's start (every club starts on its
  * ground). A city-state is too small for its clubs and is first joined to its largest neighbouring region, whose land its
- * clubs then share.
+ * clubs then share; when that region has no club of its own, it is split as finely as theirs but stays open to every
+ * club, as any empty region. Reserved for them, its far side went to them across it (Castilla-La Mancha, joined to
+ * Valencia's city-state, gave Valencia CF Toledo, 70 km from Madrid, and boxed Atlético and Rayo into Madrid's region).
  */
 function regionalUnits(country, homes) {
   const { units, adjacency, tree, pathOf } = country;
@@ -343,7 +379,7 @@ function regionalUnits(country, homes) {
     const inner = forced ? zone : clubs.length ? { clubs, share: node.area / clubs.length } : zone;
     const tooLarge = !clubs.length && node.area > (depth ? FREE_LOWER : FREE_TOP) * (zone ? zone.share : fair);
     const split = clubs.length >= 2 || forced || tooLarge || (!clubs.length && node.children.size && nextToCrowd(node, depth));
-    if (!node.children.size || !split) return emit(node, clubs.length >= 2 ? clubs : zone?.clubs);
+    if (!node.children.size || !split) return emit(node, clubs.length >= 2 ? clubs : zone?.open ? null : zone?.clubs);
     for (const child of node.children.values()) expand(child, inner, false, depth + 1);
     return null;
   };
@@ -385,7 +421,9 @@ function regionalUnits(country, homes) {
     again = false;
     for (let g = 0; g < members.length; g++) {
       if (!members[g].length || !clubsOf(g) || areaOf(g) / clubsOf(g) >= TINY_REGION * fair) continue;
-      const next = touching(g).sort((a, b) => areaOf(b) - areaOf(a) || a - b)[0];
+      const around = touching(g).sort((a, b) => areaOf(b) - areaOf(a) || a - b);
+      const empty = around.find(h => !clubsOf(h));
+      const next = empty != null && (areaOf(g) + areaOf(empty)) / clubsOf(g) >= TINY_REGION * fair ? empty : around[0];
       if (next == null) continue;
       for (const i of members[next]) groupOf[i] = g;
       members[g].push(...members[next]);
@@ -397,7 +435,10 @@ function regionalUnits(country, homes) {
     if (!group.length) continue;
     const clubs = group.flatMap(i => here(tops[i]));
     const zone = group.length > 1 && clubs.length ? { clubs, share: group.reduce((sum, i) => sum + tops[i].area, 0) / clubs.length } : null;
-    for (const i of group) expand(tops[i], zone, !!zone && here(tops[i]).length > 0 && clubs.length > here(tops[i]).length, 0);
+    for (const i of group) {
+      const own = here(tops[i]).length;
+      expand(tops[i], zone && !own ? { ...zone, open: true } : zone, !!zone && own > 0 && clubs.length > own, 0);
+    }
   }
   return out;
 }
@@ -411,11 +452,11 @@ function splitCountry(country, shape, clubs, log) {
     polys: polysOf(feature(country.topo, mergeArcs(country.topo, unit.members.map(i => country.geoms[i]))).geometry),
   }));
   const total = rawUnits.reduce((sum, unit) => sum + polysAreaKm2(unit.polys), 0);
-  // Fans of whole units: a city's clubs each get a way out along the communes around it, and only a commune two of them
-  // share is cut. Every club starts on its own ground, however crowded its city.
+  // Fans of whole units: a city's clubs share out the land nearest any of them along its communes, crossing its straits,
+  // and only a commune two of them share is cut. Every club starts on its own ground, however crowded its city.
   const { units, topo, owner, shift, dropped, fans } = partitionCountry(rawUnits, homes, {
     sections: clubs.length, maxGapKm: MAX_GAP_KM, allowed: (club, unit) => !unit.zone || unit.zone.has(club),
-    fair: { minKm2: Math.max(MIN_CLUB_KM2, MIN_SHARE * total / clubs.length) }, fan: 'units',
+    fair: { minKm2: Math.max(MIN_CLUB_KM2, MIN_SHARE * total / clubs.length) }, fan: 'units', balance: BALANCE,
   });
   if (fans.length) log(`    ${shape.name}: fanned ${fans.map(fan => fan.members.map(c => clubs[c].name).join(' + ')).join('; ')}`);
   if (shift) throw new Error(`${shape.name} crosses the antimeridian`);
