@@ -2098,9 +2098,16 @@ builders, so the players are the season file's own tuples):
   is the season file's pick (pickFootballSquad's natural 4-4-2 XI), so a club on a
   Europe map and a country map fields the same eleven. Clubs rank by `str`, their
   lineup's rating as the game computes it.
-- **Ids.** A club the season file has keeps its id there (same country and name);
-  every other one takes `f-<slug of its name>`, numbered after a clash, the strongest
-  of the season first.
+- **Ids.** A club the season file has keeps its id there (same country and name), every
+  other one the id its map already gives it, so a rebuild moves none (`giveClubIds` in
+  `scripts/lib/season-map-ids.mjs`); a club new to its map takes `f-<slug of its name>`,
+  numbered after a clash, the strongest of the season first. A database may rate two clubs
+  of one name in a country, whose map then holds both, as three do: CSKA Kiev in 2002/03
+  (one in the Premier Division, one below it), Liaoning Huludao and Zulu Royals in 2007/08.
+  Of these the k-th strongest keeps the k-th id its map gives the name, whichever has the
+  plain one, as saves name them. Until 24 November 2026 the ids were read back as one per
+  name, the last club's, so every rebuild swapped the two, and no `--check` of those maps
+  passed (nor did `--ids` see it, which now does).
 
 **Full names and short names.** A club the season's source names in full ("Clube de Regatas
 Vasco da Gama") is matched to today's map by its full name, then by its source's short name where one of today's
@@ -2188,7 +2195,8 @@ campaign does; a save on such a map with another season, or none, is refused
 agree; each map's header, version, sections and groups as today's; its clubs strongest
 first, with the season file's squads where the season file has the club, homes as the
 homes file has them, and decoded by the game's loader; a setup follows the season and
-a campaign plays, saves and resumes on a season's map.
+a campaign plays, saves and resumes on a season's map. `scripts/season-map-ids.test.mjs`: a
+rebuild would give every club of the shipped maps the id it has, two clubs of one name too.
 
 ```bash
 node scripts/build-season-countries.mjs --homes --data=<EA sources> --retro-data=<CM and SWOS sources>
