@@ -41,7 +41,7 @@ import { readExport } from './lib/ea-season-files.mjs';
 import { slug } from './lib/club-identity.mjs';
 import { homeInSeason, LOCATE_REGIONS, locateSeasonClubs } from './lib/season-club-homes.mjs';
 import { countryFields, eaSeasonClubs, retroSeasonClubs } from './lib/season-country-clubs.mjs';
-import { seasonMapIds } from './lib/season-map-ids.mjs';
+import { clubIdLines, giveClubIds, seasonMapIdLists } from './lib/season-map-ids.mjs';
 import { buildRetroSeason } from './lib/retro-season-builds.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -120,44 +120,15 @@ const strengthOf = season => club => selectLineup(buildClub({ ...club,
   squad: club.squad.map(player => expandSetPlayer(player.tuple, season.source, season.kind)) }, { id: 'football' })).rating;
 
 /**
- * The season's country fields with their clubs' ids: a club the season file has (the Europe maps' clubs) keeps its id
- * there, every other one takes `f-<slug of its name>`, with a number after it when another club of the season has that
- * id already (as the season builders do). A fill (updateTeamFills) keeps only the countries its EA season's own fields
+ * The season's country fields with their clubs' ids (giveClubIds, scripts/lib/season-map-ids.mjs): the season file's, else
+ * those its maps already give, else new ones. A fill (updateTeamFills) keeps only the countries its EA season's own fields
  * (`primary`, this function's answer for it) lack, and numbers its ids after theirs. → { fields, short, ids }
  */
 async function seasonFields(season, primary = null) {
   const { fields, short } = countryFields(season.clubs, strengthOf(season));
   if (primary) for (const country of primary.fields.keys()) fields.delete(country);
   const file = JSON.parse(await readFile(path.join(seasonDir, `${season.id}.json`), 'utf8'));
-  // A fill's players are another source's, so none of its clubs takes a season file club's id, but those the season
-  // file takes from the fill itself (`fill`: Europe's strongest that EA lacks, scripts/lib/europe-field.mjs) keep theirs.
-  // The season's own clubs take no id of the fill's.
-  const own = file.clubs.filter(club => !!club.fill === !!primary);
-  const known = new Map(own.map(club => [`${club.country}:${club.name}`, club.id]));
-  const taken = new Set([...file.clubs.filter(club => !club.fill).map(club => club.id), ...(primary ? own.map(club => club.id) : []), ...(primary?.ids ?? [])]);
-  for (const list of fields.values()) {
-    for (const club of list) {
-      club.id = known.get(`${club.country}:${club.name}`) ?? null;
-    }
-  }
-  // Every other club keeps the id its map already gives it (scripts/lib/season-map-ids.mjs), so a change to the season
-  // file's field moves no club's id; a club new to the map takes one in turn, strongest first across the season (ties
-  // by country and name), so the strongest keeps the plain id.
-  const committed = await seasonMapIds(root, season.year);
-  const rest = [];
-  for (const club of [...fields.values()].flat().filter(entry => !entry.id)) {
-    const id = committed.get(`${club.country}:${club.name}`);
-    if (id && !taken.has(id)) { taken.add(id); club.id = id; } else rest.push(club);
-  }
-  rest.sort((a, b) => b.str - a.str || byText(a.country, b.country) || byText(a.name, b.name));
-  for (const club of rest) {
-    const base = `f-${slug(club.name)}`.slice(0, 60);
-    let id = base;
-    for (let n = 2; taken.has(id); n++) id = `${base}-${n}`;
-    taken.add(id);
-    club.id = id;
-  }
-  const ids = [...taken, ...[...fields.values()].flat().map(club => club.id)];
+  const ids = giveClubIds(fields, { file: file.clubs, committed: await seasonMapIdLists(root, season.year), primary: primary?.ids ?? null });
   return { fields, short: primary ? short.filter(entry => !primary.fields.has(entry.country)) : short, ids };
 }
 
@@ -192,8 +163,7 @@ async function checkIds(seasons) {
       const file = path.join(outDir, `${seasonMapId(country, season.year)}.json`);
       if (!existsSync(file)) { differs.push(`${seasonMapId(country, season.year)}: no map yet`); continue; }
       maps++;
-      const committed = JSON.parse(await readFile(file, 'utf8')).clubs.map(club => `${club.id} ${club.name}`).sort();
-      const now = clubs.map(club => `${club.id} ${club.name}`).sort();
+      const committed = clubIdLines(JSON.parse(await readFile(file, 'utf8')).clubs), now = clubIdLines(clubs);
       const gone = committed.filter(entry => !now.includes(entry)), added = now.filter(entry => !committed.includes(entry));
       if (gone.length || added.length) differs.push(`${seasonMapId(country, season.year)}: ${gone.map(e => `-${e}`).concat(added.map(e => `+${e}`)).join(', ')}`);
     }
