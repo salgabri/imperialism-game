@@ -33,8 +33,10 @@ const NO_PICTURE = {
 // 2022/23 lost the twin a place in their names had given them (another club's crest: Promotora Deportiva Tijuana, CF
 // Oaxaca, CF México, Atlético Chiapas, Pumas Tabasco; +9) and SWOS's "UN Leon" took Tigres' (-2). On 24 November 2026
 // 242 season names spelt otherwise than their club's other seasons took that spelling's home, and with it two clubs
-// their twin's crest (KS Erzeni Shijak Tiranë, Veria NPS: -11), 1,367. A crest found for one lowers it.
-const FOOTBALL_WITHOUT_CREST = 1367;
+// their twin's crest (KS Erzeni Shijak Tiranë, Veria NPS: -11), 1,367; clubs twinned to another club through a word of
+// their name lost its crest, all for their own but Železničar Belgrade of 2001/02, which had worn Železničar Pančevo's
+// (+1), 1,368. A crest found for one lowers it.
+const FOOTBALL_WITHOUT_CREST = 1368;
 const isFootball = id => /^(f-|d[0-9A-Z]+-)/.test(id);
 
 const excused = (id, year) => (CARICATURES[id] && year != null && CARICATURES[id][0] <= year && year <= CARICATURES[id][1]) || id in NO_PICTURE;

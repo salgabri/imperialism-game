@@ -1,5 +1,5 @@
 {
-"about": "Hand overrides for the homes of the earlier seasons' country map clubs (scripts/lib/season-club-homes.mjs), by country and the name the season's source gives the club: `as` names today's map's club it is (its home and crest), else `lon`/`lat` with a `note` saying where the point is and why, or `qid` a Wikidata item, or `unplaced: true` where the automatic matching finds the wrong club and the right town is not known (the map then starts it at a populous place, an estimate). Each fixes a name the automatic matching cannot settle: a name two clubs could carry, or one it gives a namesake.",
+"about": "Hand overrides for the homes of the earlier seasons' country map clubs (scripts/lib/season-club-homes.mjs), by country and the name the season's source gives the club: `as` names today's map's club it is (its home and crest, or with `lon`/`lat` its crest at the ground it had then), else `lon`/`lat` with a `note` saying where the point is and why, or `qid` a Wikidata item, or `unplaced: true` where the automatic matching finds the wrong club and the right town is not known (the map then starts it at a populous place, an estimate). `eras` gives a club that moved its ground in other seasons, each `from` and `through` a season year with a point and a note of its own. Each fixes a name the automatic matching cannot settle: a name two clubs could carry, or one it gives a namesake.",
 "clubs": {
 "008": {
   "Bylis Ballshi": { "as": "d008-1300042", "note": "Bylis of Ballsh" },
@@ -53,6 +53,7 @@
   "FC Banants Yerevan": { "as": "d051-59145772", "note": "Banants, Urartu since 2019" }
 },
 "056": {
+  "FC Denderleeuw": { "lon": 4.0708, "lat": 50.8839, "note": "Florent Beeckmanstadion (Wikidata Q2744854): FC Denderleeuw (Q2539148), where \"FC Denderleeuw E.H.\" stands" },
   "FC Kapellen": { "as": "d056-204", "note": "Royal Cappellen FC" },
   "FC Turnhout": { "lon": 4.9428, "lat": 51.3114, "note": "KFC Turnhout (Wikidata Q1568867, which has this name): its ground, where \"KFC Turnhout\" stands" },
   "Harelbeke": { "lon": 3.3111, "lat": 50.845, "note": "KRC Harelbeke (Wikidata Q2694024): its ground, where \"KRC Harelbeke\" stands" },
@@ -63,7 +64,8 @@
   "R Excelsior Mouscron": { "lon": 3.2111, "lat": 50.734, "note": "Royal Excelsior Mouscron (Wikidata Q865735): its ground, where \"Excelsior Mouscron\" stands" },
   "R Kapellen FC": { "as": "d056-204", "note": "Royal Cappellen FC" },
   "R. Excelsior Mouscron": { "lon": 3.2111, "lat": 50.734, "note": "Royal Excelsior Mouscron (Wikidata Q865735): its ground, where \"Excelsior Mouscron\" stands" },
-  "RRC Gent - Zeehaven": { "as": "d056-255", "note": "KRC Gent-Zeehaven" }
+  "RRC Gent - Zeehaven": { "as": "d056-255", "note": "KRC Gent-Zeehaven" },
+  "Verbroedering Denderhoutem": { "lon": 4.0182, "lat": 50.8723, "note": "Denderhoutem (GeoNames 2799649), the village whose sports park it plays at in CM 01/02's data: Dender EH's ground in Denderleeuw, its Wikidata item's (Q1065328), came with the merger of 2005" }
 },
 "068": {
   "San Jose Oruro": { "as": "d068-2000210685", "note": "Club San José of Oruro, not Real Oruro" },
@@ -107,6 +109,9 @@
   "Qingdao Yizhong": { "as": "d156-412", "note": "Qingdao Hainiu, then Qingdao Yizhong" },
   "Qingdao Zhongneng": { "as": "d156-412", "note": "Qingdao Hainiu, then Qingdao Jonoon (Zhongneng)" },
   "Shanghai East Asia": { "as": "d156-23292170", "note": "Shanghai Port, then Shanghai East Asia" },
+  "Shenzhen": { "lon": 114.2122, "lat": 22.6971, "note": "Shenzhen Universiade Sports Centre (Wikidata Q3278276): Shenzhen FC (Q1139956), not Shenzhen Fengpeng's item (Q7494370), which has the same ground" },
+  "Shenzhen Pingan": { "lon": 114.087, "lat": 22.5622, "note": "Shenzhen Stadium (Wikidata Q3277842): Shenzhen FC (Q1139956) under its Ping An name, its ground in CM 01/02's own data" },
+  "Shenzhen Shangqingyin": { "lon": 114.087, "lat": 22.5622, "note": "Shenzhen Stadium (Wikidata Q3277842): Shenzhen FC (Q1139956, which has this name), its ground until 2011" },
   "Shijiazhuang Ever Bright": { "lon": 114.5291, "lat": 38.0413, "note": "Shijiazhuang Ever Bright (Wikidata Q7561031), in Shijiazhuang until 2021: its ground, where \"Cangzhou FC\" stands" }
 },
 "158": {
@@ -156,6 +161,7 @@
   "TPV Tampere": { "lon": 23.7853, "lat": 61.5003, "note": "Tampereen Pallo-Veikot (Wikidata Q1633948): its ground, where \"TPV\" stands" }
 },
 "250": {
+  "Chamois Niortais Football Club": { "lon": -0.4896, "lat": 46.3171, "note": "Stade René Gaillard (Wikidata Q2325923): Chamois Niortais (Q626917, which has this name), where \"Chamois Niortais\" stands, not Union Saint-Florent (Q119519691), at Niort's centre" },
   "FC Mulhouse Sud - Alsace": { "lon": 7.3218, "lat": 47.7364, "note": "FC Mulhouse (Wikidata Q640726, which has this name): its ground, where \"FC Mulhouse\" stands" },
   "Niort": { "lon": -0.4896, "lat": 46.3171, "note": "Chamois Niortais (Wikidata Q626917): its ground, where \"Chamois Niortais\" stands" },
   "Olympique Charleville-Mézières": { "lon": 4.7294, "lat": 49.7727, "note": "OFC Charleville (Wikidata Q2006188): its ground, where \"Charleville\" stands" },
@@ -187,14 +193,22 @@
 "300": {
   "AE Larissa 1964": { "as": "d300-978", "note": "AE Larisa" },
   "AO Egaleo": { "as": "d300-129657", "note": "AO Aigaleo" },
+  "AO Platania Chanion": { "lon": 24.0006, "lat": 35.4873, "note": "Perivolia Municipal Stadium (Wikidata Q15896036), the ground of Platanias (Q24474) from 2012" },
+  "AO Platanias": { "lon": 24.0006, "lat": 35.4873, "note": "Perivolia Municipal Stadium (Wikidata Q15896036), the ground of Platanias (Q24474) from 2012" },
+  "AO Platanias Chanion": { "lon": 24.0006, "lat": 35.4873, "note": "Perivolia Municipal Stadium (Wikidata Q15896036), the ground of Platanias (Q24474) from 2012" },
   "AS Lamia": { "lon": 22.431, "lat": 38.91, "note": "PAS Lamia 1964 (Wikidata Q6481836): its ground, where \"PAS Lamia 1964\" stands" },
   "Kalithea": { "as": "d300-129661", "note": "GS Kallithea, Athens Kallithea since 2024" },
   "Larissa": { "as": "d300-978", "note": "AE Larisa" },
+  "Olympiacos Volos": { "lon": 22.9677, "lat": 39.3555, "note": "Volos Municipal Stadium (Wikidata Q3562133): Olympiakos Volos (Q1417164)" },
+  "Olympiakos ASK Volou": { "lon": 22.9677, "lat": 39.3555, "note": "Volos Municipal Stadium (Wikidata Q3562133): Olympiakos Volos (Q1417164)" },
+  "Olympiakos Volos": { "lon": 22.9677, "lat": 39.3555, "note": "Volos Municipal Stadium (Wikidata Q3562133): Olympiakos Volos (Q1417164), not NPS Volos (2017)" },
+  "Olympiakos Volou": { "lon": 22.9677, "lat": 39.3555, "note": "Volos Municipal Stadium (Wikidata Q3562133): Olympiakos Volos (Q1417164, which has this name)" },
   "P.A.E Veria": { "lon": 22.2024, "lat": 40.5341, "note": "Veria FC (Wikidata Q67147853), not Vergina: its ground, where \"Veria\" stands" },
   "PAE Veria": { "lon": 22.2024, "lat": 40.5341, "note": "Veria FC (Wikidata Q67147853), not Vergina: its ground, where \"Veria\" stands" },
   "Panachaiki Patras": { "lon": 21.7458, "lat": 38.2617, "note": "Panachaiki (Wikidata Q1277456): its ground, where \"Panachaiki\" stands" },
   "PAS Giannena": { "as": "d300-129667", "note": "PAS Giannina" },
   "Pas Giannena": { "as": "d300-129667", "note": "PAS Giannina" },
+  "Platanias Chania": { "lon": 24.0006, "lat": 35.4873, "note": "Perivolia Municipal Stadium (Wikidata Q15896036): Platanias (Q24474), which shared it with Chania's club in 2018/19, not that club (today's PGS Kissamikos Chanion)" },
   "Veria NPS": { "as": "d300-1300559", "note": "NPS Veroia, not Vergina" }
 },
 "348": {
@@ -219,7 +233,8 @@
 },
 "360": {
   "Barito Putra Banjarmasin": { "as": "d360-135531", "note": "PS Barito Putera" },
-  "Gelora Delta Putra Sidoarjo": { "as": "d360-135528", "note": "Deltras, earlier Gelora Putra Delta" }
+  "Gelora Delta Putra Sidoarjo": { "as": "d360-135528", "note": "Deltras, earlier Gelora Putra Delta" },
+  "Persatuan Sepak Bola Pelita Jaya": { "lon": 107.3062, "lat": -6.3026, "note": "Singaperbangsa Stadium, Karawang (Wikidata Q4258740), Pelita Jaya's ground from 2009 to 2012 and in the Update Team's data: not the village of Bola in Sulawesi" }
 },
 "364": {
   "Padideh Shandiz Mashhad": { "lon": 59.5703, "lat": 36.3261, "note": "Padideh, Shahr Khodro since 2019 (Wikidata Q3660911): its ground, where \"Padideh Khorasan FC\" stands" },
@@ -234,6 +249,7 @@
 "380": {
   "Castellammare di Stabia": { "as": "d380-1138", "note": "Juve Stabia" },
   "Cittadella Padova": { "as": "d380-2195", "note": "AS Cittadella, not Padua" },
+  "San Marino": { "lon": 12.477, "lat": 43.9712, "note": "San Marino Stadium, Serravalle (Wikidata Q728131): San Marino Calcio (Q742685), not Marino in Lazio" },
   "Taranto 1906": { "lon": 17.27, "lat": 40.4528, "note": "Taranto (Wikidata Q29400): its ground, where \"Taranto\" stands" },
   "Treviso 1993": { "lon": 12.2558, "lat": 45.67, "note": "Treviso FBC 1993 (Wikidata Q611222): its ground, where \"Treviso\" stands" }
 },
@@ -283,6 +299,7 @@
   "Shakhter Karaganda": { "lon": 73.0751, "lat": 49.8186, "note": "Shakhter Karagandy (Wikidata Q740666): its ground, where \"Shakhter Karagandy\" stands" },
   "Tobol Kostanay": { "as": "d398-484610", "note": "Tobol" },
   "Yelimay Semey": { "as": "d398-59009709", "note": "Yelimay" },
+  "Zhenis Astana": { "as": "d398-59016973", "note": "FC Zhenis, not FK Astana" },
   "Zhetysu Taldykorgan": { "lon": 78.3651, "lat": 45.0197, "note": "FC Zhetysu (Wikidata Q546557): its ground, where \"Zhetysu\" stands" }
 },
 "410": {
@@ -294,6 +311,9 @@
   "FS Metta-Latvijas Universitate Riga": { "as": "d428-8403700", "note": "FS Metta/LU" },
   "Olympia Riga": { "lon": 24.1059, "lat": 56.946, "note": "Riga (GeoNames 456172): not Riga FC (2015), whose name it shares" },
   "Pardaugava Riga": { "lon": 24.1059, "lat": 56.946, "note": "Riga (GeoNames 456172): not Riga FC (2015), whose name it shares" },
+  "Skonto": { "lon": 24.1164, "lat": 56.9614, "note": "Skonto Stadium (Wikidata Q1474452): Skonto FC (Q223823), not Skonto FC-2's item (Q2617678), at Riga's centre" },
+  "Skonto FC": { "lon": 24.1164, "lat": 56.9614, "note": "Skonto Stadium (Wikidata Q1474452): Skonto FC (Q223823), not Skonto FC-2's item (Q2617678), at Riga's centre" },
+  "Skonto FC Riga": { "lon": 24.1164, "lat": 56.9614, "note": "Skonto Stadium (Wikidata Q1474452): Skonto FC (Q223823), not Riga FC (2015), which plays there today" },
   "Skonto Riga": { "lon": 24.1059, "lat": 56.946, "note": "Riga (GeoNames 456172): not Riga FC (2015), whose name it shares" },
   "Vidus Riga": { "lon": 24.1059, "lat": 56.946, "note": "Riga (GeoNames 456172): not Riga FC (2015), whose name it shares" }
 },
@@ -302,6 +322,7 @@
 },
 "484": {
   "Club Atlético Chiapas": { "lon": -89.6232, "lat": 20.967, "note": "Mérida (GeoNames 3523349), where CM 01/02's data of 2002/03 and 2003/04 has this Primera A side play (Estadio Carlos Iturralde): not Jaguares de Chiapas of Tuxtla Gutiérrez, whose name shares only Chiapas" },
+  "Club Leones de Zacatepec": { "lon": -99.192, "lat": 18.6551, "note": "Estadio Agustín \"Coruco\" Díaz, Zacatepec, Morelos (Wikidata Q3058794), its ground in CM 01/02's own data: not the Zacatepec in Puebla" },
   "Club Universitario de Nuevo León": { "as": "d484-104360", "note": "Tigres UANL of Monterrey (CM 01/02's short name Tigres, ground the Estadio Universitario): not Club León, whose name the matching found inside Nuevo León" },
   "Club de Fútbol México": { "lon": -99.5164, "lat": 27.4763, "note": "Nuevo Laredo (GeoNames 3522551), where CM 01/02's data of 2002/03 and 2003/04 has this side play (short name Toros Neza, at Neza 86 in 2001/02): not Lobos ULMX, whose name shares only México" },
   "Club de Fútbol Oaxaca": { "lon": -96.7254, "lat": 17.0603, "note": "Oaxaca (GeoNames 3522507): a Primera A side of the early 2000s, not the Alebrijes (2012)" },
@@ -314,7 +335,8 @@
   "Pumas Tabasco": { "lon": -92.9393, "lat": 17.9863, "note": "Villahermosa (GeoNames 3514670): UNAM's Liga de Expansión side, not Pumas UNAM of Mexico City" },
   "Toros Hidalgo": { "unplaced": true, "note": "SWOS names the state of Hidalgo only; not the village of Pueblo Hidalgo" },
   "UA Guadalajara": { "lon": -103.3874, "lat": 20.7211, "note": "Zapopan (GeoNames 3979770), UAG Tecos', not Chivas" },
-  "UN Leon": { "as": "d484-104360", "note": "Tigres UANL (Universidad Autónoma de Nuevo León): SWOS 95/96's squad keeps six of SWOS 94/95's Club Tigres (Avilán, Lanari, Martínez, Solís, Lozano, Almaguer); not a club of León" }
+  "UN Leon": { "as": "d484-104360", "note": "Tigres UANL (Universidad Autónoma de Nuevo León): SWOS 95/96's squad keeps six of SWOS 94/95's Club Tigres (Avilán, Lanari, Martínez, Solís, Lozano, Almaguer); not a club of León" },
+  "Zacatepec": { "lon": -99.192, "lat": 18.6551, "note": "Estadio Agustín \"Coruco\" Díaz, Zacatepec, Morelos (Wikidata Q3058794): CD Zacatepec (Q1023236), whose item names the Estadio Azteca" }
 },
 "504": {
   "Difaa El Jadida": { "as": "d504-106052", "note": "Difaâ Hassani El Jadidi" },
@@ -347,6 +369,7 @@
   "Wilsa Plock": { "as": "d616-1458", "note": "Wisła Płock, misspelt" }
 },
 "642": {
+  "AFC Rapid Bucharest": { "as": "d642-57171586", "lon": 26.0568, "lat": 44.4559, "note": "Stadionul Rapid-Giulești (Wikidata Q97889239), on the site of Rapid's ground since 1939, not Stadionul Regie" },
   "ASC Daco-Getica Bukarest": { "lon": 26.1453, "lat": 44.4657, "note": "Juventus București, Daco-Getica from 2016 (Wikidata Q2977075): its ground, where \"Juventus Bucuresti\" stands" },
   "Asociația Clubul Sportiv Petrolul 52": { "as": "d642-57151160", "note": "Ploiești, as today's ACS Petrolul 52" },
   "CS Dacia Mioveni": { "lon": 24.9406, "lat": 44.9602, "note": "CS Mioveni (Wikidata Q301279): its ground, where \"Clubul Sportiv Mioveni\" stands" },
@@ -355,13 +378,21 @@
   "CSMS Iasi": { "as": "d642-57086204", "note": "CSM Politehnica Iași" },
   "Dacia Unirea": { "lon": 27.9743, "lat": 45.2715, "note": "Brăila (GeoNames 683902), Dacia Unirea Brăila's" },
   "Electroputere": { "lon": 23.8, "lat": 44.3167, "note": "Craiova (GeoNames 680332)" },
+  "F.C. Steaua Bucharest": { "as": "d642-1513", "lon": 26.0404, "lat": 44.4128, "note": "Stadionul Steaua, Ghencea (Wikidata Q909374): Steaua, today's FCSB, whose ground it was until March 2015" },
   "FC Metaloglobus Bukarest": { "as": "d642-57061123", "note": "Metaloglobus București" },
+  "FC Rapid Bucuresti": { "as": "d642-57171586", "lon": 26.0568, "lat": 44.4559, "note": "Stadionul Rapid-Giulești (Wikidata Q97889239), on the site of Rapid's ground since 1939, not Stadionul Regie" },
   "FCS Bucuresti": { "as": "d642-1513", "note": "FCSB" },
   "National": { "lon": 26.1063, "lat": 44.4323, "note": "Bucharest (GeoNames 683506), FC Național's: not Sebiș" },
   "Pandurii Targu Jiu": { "lon": 23.2701, "lat": 45.0436, "note": "Pandurii Târgu Jiu (Wikidata Q585958): its ground, where \"CS Pandurii Târgu-Jiu\" stands" },
   "Pandurii Târgu-Jiu": { "lon": 23.2701, "lat": 45.0436, "note": "Pandurii Târgu Jiu (Wikidata Q585958): its ground, where \"CS Pandurii Târgu-Jiu\" stands" },
+  "Rapid Bucharest": { "as": "d642-57171586", "lon": 26.0568, "lat": 44.4559, "note": "Stadionul Rapid-Giulești (Wikidata Q97889239), on the site of Rapid's ground since 1939: not Stadionul Regie, today's map's point, where it played from 2018 to 2022" },
+  "Rapid Bucuresti": { "as": "d642-57171586", "lon": 26.0568, "lat": 44.4559, "note": "Stadionul Rapid-Giulești (Wikidata Q97889239), on the site of Rapid's ground since 1939, not Stadionul Regie" },
   "SC Pandurii Târgu-Jiu": { "lon": 23.2701, "lat": 45.0436, "note": "Pandurii Târgu Jiu (Wikidata Q585958): its ground, where \"CS Pandurii Târgu-Jiu\" stands" },
+  "Sportul Studentesc Bucharest": { "lon": 26.0529, "lat": 44.4482, "note": "Stadionul Regie (Wikidata Q1888199): Sportul Studențesc (Q842134), where \"Sportul Studențesc\" stands" },
+  "Steaua Bucharest": { "as": "d642-1513", "lon": 26.0404, "lat": 44.4128, "note": "Stadionul Steaua, Ghencea (Wikidata Q909374): Steaua, today's FCSB, whose ground it was until March 2015" },
+  "Steaua Bucuresti": { "as": "d642-1513", "note": "FCSB, the Steaua of these seasons' first division, at the National Arena from 2015/16: not today's CSA Steaua, whose own point is a youth side's ground (Wikidata Q16957509)", "eras": [{ "from": 2009, "through": 2015, "lon": 26.0404, "lat": 44.4128, "note": "Stadionul Steaua, Ghencea (Wikidata Q909374), its ground until March 2015" }] },
   "Trans-Sil Targu Mures": { "lon": 24.5458, "lat": 46.5497, "note": "FCM Târgu Mureș (Wikidata Q240563, which has this name): its ground, where \"FCM Targu Mures\" stands" },
+  "UFC Rapid Bucuresti": { "as": "d642-57171586", "lon": 26.0568, "lat": 44.4559, "note": "Stadionul Rapid-Giulești (Wikidata Q97889239), on the site of Rapid's ground since 1939, not Stadionul Regie" },
   "Universitea Cluj": { "as": "d642-1515", "note": "Universitatea Cluj, misspelt" },
   "Viitorul": { "as": "d642-2000104441", "note": "FC Viitorul Constanța, whose ground at Ovidiu today's Farul Constanța plays at since the clubs merged in 2021; not Viitorul Domnești" }
 },
@@ -398,7 +429,9 @@
   "Pristina": { "lon": 21.1669, "lat": 42.6727, "note": "Pristina (GeoNames 786714)" },
   "Proleter": { "lon": 20.3819, "lat": 45.3836, "note": "Zrenjanin (GeoNames 783814), the league's Proleter, not Novi Sad's" },
   "RAD Belgrade": { "lon": 20.4722, "lat": 44.7652, "note": "FK Rad (Wikidata Q757098): its ground, where \"Rad Belgrade\" stands" },
-  "Radnički Novi Beograd": { "lon": 20.4242, "lat": 44.8056, "note": "New Belgrade (GeoNames 787607): not Radnički Niš" }
+  "Radnički Novi Beograd": { "lon": 20.4242, "lat": 44.8056, "note": "New Belgrade (GeoNames 787607): not Radnički Niš" },
+  "Sutjeska Niksic": { "lon": 18.9537, "lat": 42.7849, "note": "Nikšić City Stadium (Wikidata Q3120014), in Montenegro, outside the map: not the village of Sutjeska in Vojvodina" },
+  "Zeleznicar Belgrade": { "lon": 20.4476, "lat": 44.8005, "note": "Bara Venecija, Belgrade (Wikidata Q487476), where FK Železničar Beograd's ground stood and CM 01/02's data has it: not Železničar Pančevo" }
 },
 "703": {
   "FK Dubnica nad Vahom": { "lon": 18.1633, "lat": 48.9636, "note": "MFK Dubnica (Wikidata Q1356582, which has this name): its ground, where \"FK ZTS Dubnica\" stands" },
@@ -440,21 +473,34 @@
   "Akhisar Belediye ve Gençlik": { "lon": 27.8118, "lat": 38.9209, "note": "Akhisarspor (Wikidata Q417685): its ground, where \"Akhisar Belediye Gençlik ve Spor\" stands" },
   "Anadolu Üsküdar 1908 Spor": { "lon": 29.0459, "lat": 41.039, "note": "Üsküdar Anadolu (Wikidata Q2315484): its ground, where \"Üsküdar Anadolu\" stands" },
   "Antalya Kepezspor": { "as": "d792-457415", "note": "Kepezspor" },
+  "Fatih Karagümrük": { "as": "d792-458631", "note": "Fatih Karagümrük, at the Atatürk Olympic Stadium since 2020", "eras": [{ "from": 2002, "through": 2012, "lon": 28.939, "lat": 41.0278, "note": "Vefa Stadium, Karagümrük (Wikidata Q11173914), its ground until 2020" }] },
+  "Istanbul Büyüksehir Belediye Spor": { "as": "d792-130343", "lon": 28.7657, "lat": 41.0745, "note": "Atatürk Olympic Stadium (Wikidata Q221122), İstanbul Büyükşehir Belediyespor's ground until it became Başakşehir in 2014", "eras": [{ "from": 2002, "through": 2004, "lon": 28.9053, "lat": 41.0382, "note": "Çetin Emeç Stadium, Bayrampaşa (Wikidata Q6052650), its ground in CM 01/02's own data" }] },
   "Istanbul Büyüksehir Belediyespor": { "as": "d792-130343", "note": "İstanbul Başakşehir, İstanbul Büyükşehir Belediyespor until 2014" },
   "Zeytinburnu": { "lon": 28.912, "lat": 40.994, "note": "Zeytinburnuspor (Wikidata Q197093): its ground, where \"Zeytinburnuspor\" stands" }
 },
 "804": {
   "Agrobiznes Volochysk": { "as": "d804-71100093", "note": "Ahrobiznes Volochysk" },
+  "Arsenal Kiev": { "lon": 30.5352, "lat": 50.4504, "note": "Lobanovskyi Dynamo Stadium (Wikidata Q669347): FC Arsenal Kyiv (Q44295), whose ground it is in the Update Team's data of 2008/09 to 2017/18" },
+  "Arsenal Kyiv": { "lon": 30.5352, "lat": 50.4504, "note": "Lobanovskyi Dynamo Stadium (Wikidata Q669347), FC Arsenal Kyiv's ground in 2018/19 and in the Update Team's data: not its reserve side's item (Q9160335), at Kyiv's centre" },
   "Avangard Kramatorsk": { "lon": 37.5493, "lat": 48.7189, "note": "Avanhard Kramatorsk (Wikidata Q2078847): its ground, where \"Avanhard Kramatorsk\" stands" },
+  "Balkany Zoria": { "lon": 29.694, "lat": 46.0011, "note": "Borys Tropanets Stadium, Zoria (Wikidata Q55752077): FC Balkany Zorya of Odesa Oblast (Q20870818), where \"Balkany Zorya\" stands, not Zorya Luhansk" },
   "Bukovina": { "lon": 25.9324, "lat": 48.2904, "note": "Chernivtsi (GeoNames 710719)" },
   "Chernomorets": { "as": "d804-1884", "note": "Chornomorets Odesa, not Sevastopol's" },
   "Chernomorets Odessa": { "as": "d804-1884", "note": "Chornomorets Odesa" },
   "Desna Chernigiv": { "lon": 31.3272, "lat": 51.5017, "note": "Chernihiv Stadium (Wikidata Q1980760's ground): FC Desna Chernihiv, not Desna village (GeoNames 13546519)" },
+  "Desna Chernihiv": { "lon": 31.3272, "lat": 51.5017, "note": "Chernihiv Stadium (Wikidata Q4439108): FC Desna Chernihiv (Q1980760), where \"Desna Chernigiv\" stands, not today's FC Chernihiv (Chernihiv-SVSM)" },
   "Dinamo Kiev": { "as": "d804-1885", "note": "Dynamo Kyiv" },
+  "Dnepropetrovsk": { "lon": 35.0056, "lat": 48.4356, "note": "Meteor Stadium (Wikidata Q2993138): FC Dnipro (Q175687) under SWOS's name, its ground until September 2008" },
+  "Dnipro Dnipropetrovsk": { "lon": 35.0325, "lat": 48.4603, "note": "Dnipro-Arena (Wikidata Q1233005): FC Dnipro (Q175687), its ground since September 2008, not Dnipro-75's item (Q2034764)", "eras": [{ "from": 2002, "through": 2008, "lon": 35.0056, "lat": 48.4356, "note": "Meteor Stadium (Wikidata Q2993138), FC Dnipro's ground until September 2008" }] },
   "Dynamo Kiev": { "as": "d804-1885", "note": "Dynamo Kyiv" },
   "Epicentr Kamyanets-Podilskyi": { "as": "d804-71017165", "note": "Epitsentr Kamianets-Podilskyi" },
+  "FC Borisfen Borispil": { "lon": 30.9522, "lat": 50.3541, "note": "Kolos Stadium, Boryspil (Wikidata Q967887): FC Borysfen Boryspil (Q2270254), where \"FC Borysfen Boryspil\" stands" },
+  "FC Borysfen Boryspil": { "lon": 30.9522, "lat": 50.3541, "note": "Kolos Stadium, Boryspil (Wikidata Q967887): FC Borysfen Boryspil (Q2270254), not its reserves' item (Q9177989), at Boryspil's centre" },
+  "FC Metalurg Donetsk": { "lon": 37.7981, "lat": 47.9732, "note": "Metalurh Stadium (Wikidata Q2659939): FC Metalurh Donetsk (Q388972), where \"Metalurh Donetsk\" stands" },
+  "FC Sevastopol": { "lon": 33.542, "lat": 44.6026, "note": "Sevastopol Sports Complex (Wikidata Q4411902): FC Sevastopol (Q177373), not its reserves' item (Q2034786), at Sevastopol's centre" },
   "FK Kramatorsk": { "lon": 37.5493, "lat": 48.7189, "note": "Avanhard Kramatorsk, FK Kramatorsk 2018-2021 (Wikidata Q2078847): its ground, where \"Avanhard Kramatorsk\" stands" },
   "FK Metal Kharkiv": { "as": "d804-130868", "note": "Metal Kharkiv, Metalist Kharkiv since 2021" },
+  "FK Sevastopol": { "lon": 33.542, "lat": 44.6026, "note": "Sevastopol Sports Complex (Wikidata Q4411902): FC Sevastopol (Q177373), not its reserves' item (Q2034786), at Sevastopol's centre" },
   "Girnyk-Sport Gorishni Plavni": { "lon": 33.6481, "lat": 49.0042, "note": "Hirnyk-Sport (Wikidata Q2034162): its ground, where \"Hirnyk-Sport Horishni Plavni\" stands" },
   "Hoverla-Zakarpattya Uzhgorod": { "lon": 22.2764, "lat": 48.6236, "note": "Hoverla Uzhhorod (Wikidata Q735624): its ground, where \"Hoverla Uzhhorod\" stands" },
   "Ingulets Petrove": { "as": "d804-71076802", "note": "Inhulets Petrove, not Inhulets" },
@@ -464,6 +510,9 @@
   "Livyi Bereg Kyiv": { "as": "d804-2000032124", "note": "Livyi Bereh Kyiv" },
   "Metallist Kharkiv": { "as": "d804-130868", "note": "Metalist Kharkiv, as \"Metalist Kharkiv\" is placed" },
   "Metallist Kharkov": { "as": "d804-130868", "note": "Metalist Kharkiv, as \"Metalist Kharkiv\" is placed" },
+  "Metallurg Donetsk": { "lon": 37.7981, "lat": 47.9732, "note": "Metalurh Stadium (Wikidata Q2659939): FC Metalurh Donetsk (Q388972), where \"Metalurh Donetsk\" stands" },
+  "Metalurg Donetsk": { "lon": 37.7981, "lat": 47.9732, "note": "Metalurh Stadium (Wikidata Q2659939): FC Metalurh Donetsk (Q388972), where \"Metalurh Donetsk\" stands" },
+  "Metalurh Donetsk": { "lon": 37.7981, "lat": 47.9732, "note": "Metalurh Stadium (Wikidata Q2659939): FC Metalurh Donetsk (Q388972), not its reserves' item (Q2338405), at Donetsk's centre" },
   "MFK Mykolaiv": { "lon": 31.9604, "lat": 46.9714, "note": "MFC Mykolaiv (Wikidata Q2994166): its ground, where \"MFC Mykolaiv\" stands" },
   "Naftovyk Okhtyrka": { "lon": 34.8897, "lat": 50.2986, "note": "Naftovyk-Ukrnafta (Wikidata Q2609277): its ground, where \"Naftovyk-Ukrnafta Okhtyrka\" stands" },
   "Neftyanik-Ukrnafta Okhtyrka": { "lon": 34.8897, "lat": 50.2986, "note": "Naftovyk-Ukrnafta (Wikidata Q2609277): its ground, where \"Naftovyk-Ukrnafta Okhtyrka\" stands" },
@@ -476,6 +525,8 @@
   "PFK Lviv": { "lon": 24.0482, "lat": 49.8192, "note": "FC Lviv (Wikidata Q1388961): its ground, where \"FC Lviv\" stands" },
   "PFK Prykarpattya Ivano-Frankivsk": { "as": "d804-5316335", "note": "Prykarpattia Ivano-Frankivsk" },
   "Poligraftechnika Alexandria": { "lon": 33.1036, "lat": 48.6747, "note": "Polihraftekhnika, FC Oleksandriya (Wikidata Q128390): its ground, where \"FC Oleksandriya\" stands" },
+  "SFC Desna Chernihiv": { "lon": 31.3272, "lat": 51.5017, "note": "Chernihiv Stadium (Wikidata Q4439108): FC Desna Chernihiv (Q1980760), where \"Desna Chernigiv\" stands, not today's FC Chernihiv (Chernihiv-SVSM)" },
+  "SKChF Sevastopol": { "lon": 33.542, "lat": 44.6026, "note": "Sevastopol Sports Complex (Wikidata Q4411902): FC Sevastopol's successor of 2014, which the Update Team's data has there" },
   "Torpedo Zaporoje": { "lon": 35.1171, "lat": 47.8517, "note": "Zaporizhzhia (GeoNames 687700)" },
   "Zarya Lugansk": { "lon": 39.3211, "lat": 48.5594, "note": "Zorya Luhansk (Wikidata Q754307): its ground, where \"Zorya Luhansk\" stands" },
   "Zorya Lugansk": { "lon": 39.3211, "lat": 48.5594, "note": "Zorya Luhansk (Wikidata Q754307): its ground, where \"Zorya Luhansk\" stands" }
@@ -486,6 +537,7 @@
 "818": {
   "El Ahly Cairo": { "as": "d818-106756", "note": "Al Ahly" },
   "Ittihad Alexandria SC": { "as": "d818-529014", "note": "Al-Ittihad Alexandria" },
+  "Masr El Makasa": { "lon": 30.84, "lat": 29.318, "note": "Fayoum Stadium (Wikidata Q5439093): Misr Lel Makkasa of Faiyum (Q3049707), which the Update Team's data has there, not Cairo" },
   "Masry Port Said": { "as": "d818-5370006", "note": "Al-Masry" }
 },
 "840": {

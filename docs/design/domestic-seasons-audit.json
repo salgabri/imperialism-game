@@ -828,20 +828,20 @@
   },
   {
    "id": "398y2026",
-   "version": "398y2026-06bd4a51",
+   "version": "398y2026-c20b8bcb",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 14,
    "located": 14,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 13,
+   "homeInSection": 14,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 113152
+   "bytes": 113536
   },
   {
    "id": "410y2026",
@@ -1196,7 +1196,7 @@
   },
   {
    "id": "642y2026",
-   "version": "642y2026-7f5527da",
+   "version": "642y2026-92111eb8",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 16,
@@ -1209,7 +1209,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 126525
+   "bytes": 126333
   },
   {
    "id": "643y2026",
@@ -2178,20 +2178,20 @@
   },
   {
    "id": "398y2025",
-   "version": "398y2025-f0f95f99",
+   "version": "398y2025-ae0a3251",
    "name": "Kazakhstan",
    "level": "ADM2",
    "clubs": 11,
    "located": 11,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 10,
+   "homeInSection": 11,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.1
+    "max": 0
    },
-   "bytes": 109811
+   "bytes": 109977
   },
   {
    "id": "410y2025",
@@ -2386,7 +2386,7 @@
   },
   {
    "id": "642y2025",
-   "version": "642y2025-b48b7550",
+   "version": "642y2025-947a07e8",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 16,
@@ -2399,7 +2399,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 124916
+   "bytes": 124921
   },
   {
    "id": "643y2025",
@@ -2886,7 +2886,7 @@
   },
   {
    "id": "156y2024",
-   "version": "156y2024-ecc341e4",
+   "version": "156y2024-06f12578",
    "name": "China",
    "level": "ADM2",
    "clubs": 16,
@@ -2899,7 +2899,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 123233
+   "bytes": 123224
   },
   {
    "id": "170y2024",
@@ -3358,7 +3358,7 @@
   },
   {
    "id": "642y2024",
-   "version": "642y2024-3b850972",
+   "version": "642y2024-eb7cb249",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 16,
@@ -3371,7 +3371,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 125052
+   "bytes": 125229
   },
   {
    "id": "643y2024",
@@ -3982,7 +3982,7 @@
   },
   {
    "id": "156y2023",
-   "version": "156y2023-dd88b57e",
+   "version": "156y2023-1df8e6d5",
    "name": "China",
    "level": "ADM2",
    "clubs": 18,
@@ -3995,7 +3995,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 125770
+   "bytes": 125761
   },
   {
    "id": "158y2023",
@@ -4874,20 +4874,20 @@
   },
   {
    "id": "642y2023",
-   "version": "642y2023-e7fa0e55",
+   "version": "642y2023-4bad9b53",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 16,
    "located": 16,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 14,
+   "homeInSection": 15,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 124693
+   "bytes": 124585
   },
   {
    "id": "643y2023",
@@ -5185,7 +5185,7 @@
   },
   {
    "id": "818y2023",
-   "version": "818y2023-3eaa2762",
+   "version": "818y2023-69334658",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 18,
@@ -5194,13 +5194,13 @@
    "placed": [
     "El Mokawloon SC"
    ],
-   "homeInSection": 13,
+   "homeInSection": 14,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 114431
+   "bytes": 114314
   },
   {
    "id": "826y2023",
@@ -5620,7 +5620,7 @@
   },
   {
    "id": "156y2022",
-   "version": "156y2022-a3bdbb9d",
+   "version": "156y2022-460a892b",
    "name": "China",
    "level": "ADM2",
    "clubs": 16,
@@ -5633,7 +5633,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 123484
+   "bytes": 123475
   },
   {
    "id": "170y2022",
@@ -5884,11 +5884,11 @@
   },
   {
    "id": "300y2022",
-   "version": "300y2022-8650e606",
+   "version": "300y2022-3e90b0f9",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
-   "located": 31,
+   "located": 32,
    "unlocated": [],
    "placed": [
     "Ionikos Nikeas",
@@ -5897,7 +5897,6 @@
     "AE Karaiskakis Artas",
     "OF Ierapetras",
     "Diagoras Rodou",
-    "Olympiakos Volou",
     "Almopos Arideas",
     "Panachaiki GE"
    ],
@@ -5907,7 +5906,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 146485
+   "bytes": 146416
   },
   {
    "id": "348y2022",
@@ -6378,7 +6377,7 @@
   },
   {
    "id": "642y2022",
-   "version": "642y2022-c9a7e223",
+   "version": "642y2022-48473397",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 16,
@@ -6391,7 +6390,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 124803
+   "bytes": 124826
   },
   {
    "id": "643y2022",
@@ -6657,7 +6656,7 @@
   },
   {
    "id": "818y2022",
-   "version": "818y2022-355c3726",
+   "version": "818y2022-e8bd6a58",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 16,
@@ -6666,13 +6665,13 @@
    "placed": [
     "El Mokawloon SC"
    ],
-   "homeInSection": 11,
+   "homeInSection": 12,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0
+    "max": 0.3
    },
-   "bytes": 112518
+   "bytes": 112316
   },
   {
    "id": "826y2022",
@@ -7081,7 +7080,7 @@
   },
   {
    "id": "156y2021",
-   "version": "156y2021-f884a5c0",
+   "version": "156y2021-4e95aed1",
    "name": "China",
    "level": "ADM2",
    "clubs": 16,
@@ -7094,7 +7093,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 123509
+   "bytes": 123500
   },
   {
    "id": "158y2021",
@@ -7342,11 +7341,11 @@
   },
   {
    "id": "300y2021",
-   "version": "300y2021-3495f4f7",
+   "version": "300y2021-a51b8c18",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
-   "located": 29,
+   "located": 30,
    "unlocated": [],
    "placed": [
     "Ionikos Nikeas",
@@ -7356,7 +7355,6 @@
     "Diagoras Rodou",
     "GS Ergotelis",
     "OF Ierapetras",
-    "Olympiakos Volou",
     "PO Triglias",
     "AE Karaiskakis Artas",
     "Almopos Arideas"
@@ -7367,7 +7365,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 146009
+   "bytes": 145993
   },
   {
    "id": "348y2021",
@@ -8150,7 +8148,7 @@
   },
   {
    "id": "818y2021",
-   "version": "818y2021-bc7ba86b",
+   "version": "818y2021-35f3aacb",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 21,
@@ -8161,13 +8159,13 @@
     "Harras El Hodoud",
     "El Dakhlia SC"
    ],
-   "homeInSection": 13,
+   "homeInSection": 14,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.3
+    "max": 0
    },
-   "bytes": 117310
+   "bytes": 117788
   },
   {
    "id": "826y2021",
@@ -8569,7 +8567,7 @@
   },
   {
    "id": "156y2020",
-   "version": "156y2020-434cbf0c",
+   "version": "156y2020-102ffd30",
    "name": "China",
    "level": "ADM2",
    "clubs": 16,
@@ -8582,7 +8580,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 123176
+   "bytes": 123167
   },
   {
    "id": "170y2020",
@@ -8816,18 +8814,16 @@
   },
   {
    "id": "300y2020",
-   "version": "300y2020-5ad883d1",
+   "version": "300y2020-c8d769b9",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
-   "located": 29,
+   "located": 31,
    "unlocated": [],
    "placed": [
     "APO Levadiakos",
     "Panachaiki GE",
     "GS Ergotelis",
-    "AO Platanias",
-    "Olympiakos Volou",
     "AE Karaiskakis Artas",
     "Ionikos Nikeas",
     "OF Ierapetras",
@@ -8841,7 +8837,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 145984
+   "bytes": 145934
   },
   {
    "id": "348y2020",
@@ -9529,7 +9525,7 @@
   },
   {
    "id": "804y2020",
-   "version": "804y2020-3d6cb3b1",
+   "version": "804y2020-c4de8ef8",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 28,
@@ -9545,7 +9541,7 @@
     "p90": 0,
     "max": 0.3
    },
-   "bytes": 96849
+   "bytes": 97096
   },
   {
    "id": "807y2020",
@@ -9566,7 +9562,7 @@
   },
   {
    "id": "818y2020",
-   "version": "818y2020-f40194aa",
+   "version": "818y2020-8544e848",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 22,
@@ -9576,13 +9572,13 @@
     "Harras El Hodoud",
     "El Dakhlia SC"
    ],
-   "homeInSection": 15,
+   "homeInSection": 16,
    "displacementKm": {
     "median": 0,
-    "p90": 0.2,
-    "max": 0.4
+    "p90": 0,
+    "max": 0
    },
-   "bytes": 118506
+   "bytes": 118560
   },
   {
    "id": "826y2020",
@@ -10197,7 +10193,7 @@
   },
   {
    "id": "300y2019",
-   "version": "300y2019-00abc6c1",
+   "version": "300y2019-b7f30fa1",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -10211,13 +10207,13 @@
     "AP Eginiakos",
     "Panegialios GS"
    ],
-   "homeInSection": 28,
+   "homeInSection": 29,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 146194
+   "bytes": 146172
   },
   {
    "id": "348y2019",
@@ -10896,7 +10892,7 @@
   },
   {
    "id": "804y2019",
-   "version": "804y2019-b681aa8c",
+   "version": "804y2019-635f9a4e",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 31,
@@ -10913,7 +10909,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 100686
+   "bytes": 101349
   },
   {
    "id": "807y2019",
@@ -10934,7 +10930,7 @@
   },
   {
    "id": "818y2019",
-   "version": "818y2019-48adb051",
+   "version": "818y2019-b561a3c8",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 23,
@@ -10944,13 +10940,13 @@
     "El Dakhlia SC",
     "Harras El Hodoud"
    ],
-   "homeInSection": 15,
+   "homeInSection": 16,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.2
+    "max": 0.1
    },
-   "bytes": 119563
+   "bytes": 119593
   },
   {
    "id": "826y2019",
@@ -11285,7 +11281,7 @@
   },
   {
    "id": "156y2018",
-   "version": "156y2018-c5bb0817",
+   "version": "156y2018-7cf044ba",
    "name": "China",
    "level": "ADM2",
    "clubs": 56,
@@ -11307,7 +11303,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 161666
+   "bytes": 161657
   },
   {
    "id": "170y2018",
@@ -11536,7 +11532,7 @@
   },
   {
    "id": "300y2018",
-   "version": "300y2018-1e1dcb9d",
+   "version": "300y2018-f429f3af",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -11555,13 +11551,13 @@
     "AS Asteras Amaliadas",
     "AO Ilysiakos"
    ],
-   "homeInSection": 24,
+   "homeInSection": 23,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 146724
+   "bytes": 146747
   },
   {
    "id": "348y2018",
@@ -12200,7 +12196,7 @@
   },
   {
    "id": "804y2018",
-   "version": "804y2018-7a19c5b7",
+   "version": "804y2018-9f93702a",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 30,
@@ -12213,7 +12209,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 99031
+   "bytes": 98993
   },
   {
    "id": "807y2018",
@@ -12234,7 +12230,7 @@
   },
   {
    "id": "818y2018",
-   "version": "818y2018-fa1a1ad4",
+   "version": "818y2018-1f85a7ee",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 21,
@@ -12246,13 +12242,13 @@
     "Al Ittihad Al Sakndary",
     "Alassiouty Sport"
    ],
-   "homeInSection": 13,
+   "homeInSection": 14,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.1
+    "max": 0
    },
-   "bytes": 117423
+   "bytes": 117506
   },
   {
    "id": "826y2018",
@@ -12741,7 +12737,7 @@
   },
   {
    "id": "300y2017",
-   "version": "300y2017-be02e65a",
+   "version": "300y2017-62995a35",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -12757,13 +12753,13 @@
     "GAS Eginiakos",
     "AO Acharnaikos"
    ],
-   "homeInSection": 30,
+   "homeInSection": 29,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 146365
+   "bytes": 146414
   },
   {
    "id": "348y2017",
@@ -13039,7 +13035,7 @@
   },
   {
    "id": "642y2017",
-   "version": "642y2017-3c0f7d34",
+   "version": "642y2017-238354a4",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 17,
@@ -13052,7 +13048,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 121198
+   "bytes": 121231
   },
   {
    "id": "643y2017",
@@ -13194,7 +13190,7 @@
   },
   {
    "id": "818y2017",
-   "version": "818y2017-df0cbe18",
+   "version": "818y2017-72804f10",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 17,
@@ -13208,9 +13204,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0
+    "max": 0.6
    },
-   "bytes": 113200
+   "bytes": 113465
   },
   {
    "id": "826y2017",
@@ -13680,7 +13676,7 @@
   },
   {
    "id": "300y2016",
-   "version": "300y2016-947b53bc",
+   "version": "300y2016-2333baf2",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -13694,13 +13690,13 @@
     "GS Ergotelis",
     "Pierikos SFK"
    ],
-   "homeInSection": 31,
+   "homeInSection": 30,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 145742
+   "bytes": 145770
   },
   {
    "id": "348y2016",
@@ -13893,7 +13889,7 @@
   },
   {
    "id": "428y2016",
-   "version": "428y2016-c4399be8",
+   "version": "428y2016-390fe433",
    "name": "Latvia",
    "level": "ADM2",
    "clubs": 13,
@@ -13904,13 +13900,13 @@
     "Rezeknes FA",
     "Rigas Futbola skola"
    ],
-   "homeInSection": 8,
+   "homeInSection": 9,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 113488
+   "bytes": 113322
   },
   {
    "id": "440y2016",
@@ -14035,7 +14031,7 @@
   },
   {
    "id": "642y2016",
-   "version": "642y2016-55627275",
+   "version": "642y2016-5ef4379f",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 18,
@@ -14048,7 +14044,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 122207
+   "bytes": 122175
   },
   {
    "id": "643y2016",
@@ -14207,7 +14203,7 @@
   },
   {
    "id": "804y2016",
-   "version": "804y2016-0e01c88a",
+   "version": "804y2016-4f0e3c43",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 11,
@@ -14220,11 +14216,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 76892
+   "bytes": 76883
   },
   {
    "id": "818y2016",
-   "version": "818y2016-9746447b",
+   "version": "818y2016-8c6e86fa",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 17,
@@ -14238,9 +14234,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0
+    "max": 0.6
    },
-   "bytes": 113200
+   "bytes": 113499
   },
   {
    "id": "826y2016",
@@ -14731,7 +14727,7 @@
   },
   {
    "id": "300y2015",
-   "version": "300y2015-bec94def",
+   "version": "300y2015-25756421",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
@@ -14745,13 +14741,13 @@
     "Panachaiki GE",
     "Ermionida Enosis"
    ],
-   "homeInSection": 31,
+   "homeInSection": 30,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 146478
+   "bytes": 146487
   },
   {
    "id": "348y2015",
@@ -14948,20 +14944,20 @@
   },
   {
    "id": "428y2015",
-   "version": "428y2015-fdbb99ef",
+   "version": "428y2015-b73ef9a3",
    "name": "Latvia",
    "level": "ADM2",
    "clubs": 11,
    "located": 11,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 9,
+   "homeInSection": 8,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0
+    "max": 0.1
    },
-   "bytes": 110693
+   "bytes": 110661
   },
   {
    "id": "484y2015",
@@ -15086,7 +15082,7 @@
   },
   {
    "id": "642y2015",
-   "version": "642y2015-52bf3d81",
+   "version": "642y2015-a6563465",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 25,
@@ -15099,7 +15095,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 129989
+   "bytes": 129736
   },
   {
    "id": "643y2015",
@@ -15241,7 +15237,7 @@
   },
   {
    "id": "804y2015",
-   "version": "804y2015-dd4d168e",
+   "version": "804y2015-5777d195",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 15,
@@ -15255,13 +15251,13 @@
    "displacementKm": {
     "median": 0,
     "p90": 3.1,
-    "max": 14.9
+    "max": 15.3
    },
-   "bytes": 82520
+   "bytes": 82283
   },
   {
    "id": "818y2015",
-   "version": "818y2015-15e91c6f",
+   "version": "818y2015-40b805e7",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 19,
@@ -15275,9 +15271,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 1.9
+    "max": 0.6
    },
-   "bytes": 115368
+   "bytes": 115693
   },
   {
    "id": "826y2015",
@@ -15754,7 +15750,7 @@
   },
   {
    "id": "250y2014",
-   "version": "250y2014-d8a2b8f4",
+   "version": "250y2014-707b0a2f",
    "name": "France",
    "level": "ADM3",
    "clubs": 40,
@@ -15767,7 +15763,7 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 157746
+   "bytes": 157745
   },
   {
    "id": "268y2014",
@@ -15805,28 +15801,27 @@
   },
   {
    "id": "300y2014",
-   "version": "300y2014-88ed2a24",
+   "version": "300y2014-8ab6af71",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
-   "located": 33,
+   "located": 34,
    "unlocated": [],
    "placed": [
     "Diethnis Enosis Ergotelis",
-    "AO Platanias",
     "Apollon Smirnis",
     "AO Kerkyras",
     "AS Fokikos Amfissas",
     "Anagennisi Epanomis",
     "Proodeftiki"
    ],
-   "homeInSection": 28,
+   "homeInSection": 30,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 147216
+   "bytes": 147260
   },
   {
    "id": "348y2014",
@@ -15866,7 +15861,7 @@
   },
   {
    "id": "360y2014",
-   "version": "360y2014-77270128",
+   "version": "360y2014-e3a553c5",
    "name": "Indonesia",
    "level": "ADM2",
    "clubs": 15,
@@ -15881,7 +15876,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 138985
+   "bytes": 138926
   },
   {
    "id": "372y2014",
@@ -15987,7 +15982,7 @@
   },
   {
    "id": "428y2014",
-   "version": "428y2014-5f01d052",
+   "version": "428y2014-c8271298",
    "name": "Latvia",
    "level": "ADM2",
    "clubs": 13,
@@ -16002,7 +15997,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 113830
+   "bytes": 113798
   },
   {
    "id": "442y2014",
@@ -16142,7 +16137,7 @@
   },
   {
    "id": "642y2014",
-   "version": "642y2014-32aa54ae",
+   "version": "642y2014-16a7be4d",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 26,
@@ -16155,7 +16150,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 131339
+   "bytes": 131387
   },
   {
    "id": "643y2014",
@@ -16303,7 +16298,7 @@
   },
   {
    "id": "804y2014",
-   "version": "804y2014-ce86a441",
+   "version": "804y2014-b314628b",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 18,
@@ -16317,13 +16312,13 @@
    "displacementKm": {
     "median": 0,
     "p90": 3.1,
-    "max": 14.7
+    "max": 15.3
    },
-   "bytes": 85511
+   "bytes": 85296
   },
   {
    "id": "818y2014",
-   "version": "818y2014-c02906b4",
+   "version": "818y2014-e4cc1675",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 20,
@@ -16332,13 +16327,13 @@
    "placed": [
     "Al Ittihad Al Sakndary"
    ],
-   "homeInSection": 13,
+   "homeInSection": 15,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.6
+    "max": 0.3
    },
-   "bytes": 116557
+   "bytes": 116996
   },
   {
    "id": "826y2014",
@@ -16782,7 +16777,7 @@
   },
   {
    "id": "250y2013",
-   "version": "250y2013-2f34b72b",
+   "version": "250y2013-1a4e8d47",
    "name": "France",
    "level": "ADM3",
    "clubs": 40,
@@ -16795,7 +16790,7 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 157927
+   "bytes": 157913
   },
   {
    "id": "268y2013",
@@ -16833,29 +16828,27 @@
   },
   {
    "id": "300y2013",
-   "version": "300y2013-cdfa7fb7",
+   "version": "300y2013-035aac98",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 37,
-   "located": 29,
+   "located": 31,
    "unlocated": [],
    "placed": [
-    "AO Platanias",
     "AO Kerkyras",
     "GS Apollon Smyrnis",
-    "Olympiakos Volou",
     "AS Fokikos Amfissas",
     "Diethnis Enosis Ergotelis",
     "Ionikos Nikeas",
     "I.S. Paniliakos"
    ],
-   "homeInSection": 25,
+   "homeInSection": 27,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 144344
+   "bytes": 144282
   },
   {
    "id": "348y2013",
@@ -16876,7 +16869,7 @@
   },
   {
    "id": "360y2013",
-   "version": "360y2013-fe8fa0f4",
+   "version": "360y2013-e4a028f6",
    "name": "Indonesia",
    "level": "ADM2",
    "clubs": 15,
@@ -16891,7 +16884,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 139071
+   "bytes": 138929
   },
   {
    "id": "372y2013",
@@ -17120,7 +17113,7 @@
   },
   {
    "id": "642y2013",
-   "version": "642y2013-c32a36ee",
+   "version": "642y2013-6c72f190",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 20,
@@ -17133,7 +17126,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 124452
+   "bytes": 124727
   },
   {
    "id": "643y2013",
@@ -17281,7 +17274,7 @@
   },
   {
    "id": "804y2013",
-   "version": "804y2013-82bb8fb1",
+   "version": "804y2013-68ae0516",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 18,
@@ -17295,13 +17288,13 @@
    "displacementKm": {
     "median": 0,
     "p90": 3.1,
-    "max": 14.7
+    "max": 15.3
    },
-   "bytes": 85180
+   "bytes": 85880
   },
   {
    "id": "818y2013",
-   "version": "818y2013-9ad521a3",
+   "version": "818y2013-75de4ab7",
    "name": "Egypt",
    "level": "ADM2",
    "clubs": 13,
@@ -17311,13 +17304,13 @@
     "Al Ittihad Al Sakndary",
     "El Sekka El Hadid"
    ],
-   "homeInSection": 9,
+   "homeInSection": 10,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 108770
+   "bytes": 109139
   },
   {
    "id": "826y2013",
@@ -17635,7 +17628,7 @@
   },
   {
    "id": "156y2012",
-   "version": "156y2012-f1e92ace",
+   "version": "156y2012-b7eaf12b",
    "name": "China",
    "level": "ADM2",
    "clubs": 27,
@@ -17655,7 +17648,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 132495
+   "bytes": 132486
   },
   {
    "id": "170y2012",
@@ -17841,16 +17834,15 @@
   },
   {
    "id": "300y2012",
-   "version": "300y2012-d1538d2e",
+   "version": "300y2012-d5ac6141",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
-   "located": 30,
+   "located": 31,
    "unlocated": [],
    "placed": [
     "AO Kerkyras",
     "Diethnis Enosis Ergotelis",
-    "Olympiakos Volou",
     "Anagennisi Epanomis",
     "PAE Thrasyvoulos",
     "Diagoras Rodou",
@@ -17859,13 +17851,13 @@
     "Pierikos",
     "Vyzas Megaron"
    ],
-   "homeInSection": 28,
+   "homeInSection": 29,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 147103
+   "bytes": 147137
   },
   {
    "id": "348y2012",
@@ -17888,7 +17880,7 @@
   },
   {
    "id": "360y2012",
-   "version": "360y2012-39058a12",
+   "version": "360y2012-cfca1122",
    "name": "Indonesia",
    "level": "ADM2",
    "clubs": 15,
@@ -17901,7 +17893,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 139114
+   "bytes": 139291
   },
   {
    "id": "372y2012",
@@ -17993,7 +17985,7 @@
   },
   {
    "id": "428y2012",
-   "version": "428y2012-2bd6da8d",
+   "version": "428y2012-e2947350",
    "name": "Latvia",
    "level": "ADM2",
    "clubs": 10,
@@ -18006,7 +17998,7 @@
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 109959
+   "bytes": 109927
   },
   {
    "id": "484y2012",
@@ -18134,7 +18126,7 @@
   },
   {
    "id": "642y2012",
-   "version": "642y2012-e55e6ee7",
+   "version": "642y2012-ae12a34f",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 23,
@@ -18147,7 +18139,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 128479
+   "bytes": 128452
   },
   {
    "id": "643y2012",
@@ -18280,7 +18272,7 @@
   },
   {
    "id": "792y2012",
-   "version": "792y2012-f8580dda",
+   "version": "792y2012-6f03fe6a",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 67,
@@ -18299,11 +18291,11 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 174791
+   "bytes": 174745
   },
   {
    "id": "804y2012",
-   "version": "804y2012-42db5ecc",
+   "version": "804y2012-e2c7aae1",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 15,
@@ -18318,7 +18310,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 82557
+   "bytes": 82218
   },
   {
    "id": "826y2012",
@@ -18642,7 +18634,7 @@
   },
   {
    "id": "156y2011",
-   "version": "156y2011-633344c7",
+   "version": "156y2011-2279c36a",
    "name": "China",
    "level": "ADM2",
    "clubs": 43,
@@ -18668,7 +18660,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 150228
+   "bytes": 150219
   },
   {
    "id": "170y2011",
@@ -18892,16 +18884,15 @@
   },
   {
    "id": "300y2011",
-   "version": "300y2011-011a7404",
+   "version": "300y2011-005b68bd",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
-   "located": 31,
+   "located": 32,
    "unlocated": [],
    "placed": [
     "Diethnis Enosis Ergotelis",
     "Panaitolikos",
-    "Olympiakos Volou",
     "PAE Thrasyvoulos",
     "AO Kerkyras",
     "Pierikos",
@@ -18909,7 +18900,7 @@
     "Diagoras Rodou",
     "Enosi Panaspropyrgiakou Doxas"
    ],
-   "homeInSection": 28,
+   "homeInSection": 29,
    "displacementKm": {
     "median": 0,
     "p90": 0,
@@ -19212,7 +19203,7 @@
   },
   {
    "id": "642y2011",
-   "version": "642y2011-f6d9f1c0",
+   "version": "642y2011-782d9c35",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 26,
@@ -19225,7 +19216,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 131766
+   "bytes": 131554
   },
   {
    "id": "643y2011",
@@ -19409,7 +19400,7 @@
   },
   {
    "id": "804y2011",
-   "version": "804y2011-dbe825ae",
+   "version": "804y2011-3e0417d4",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 15,
@@ -19422,7 +19413,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 81754
+   "bytes": 82210
   },
   {
    "id": "826y2011",
@@ -19767,7 +19758,7 @@
   },
   {
    "id": "156y2010",
-   "version": "156y2010-b626139e",
+   "version": "156y2010-3b08f382",
    "name": "China",
    "level": "ADM2",
    "clubs": 49,
@@ -19798,7 +19789,7 @@
     "p90": 0,
     "max": 0.8
    },
-   "bytes": 157304
+   "bytes": 157295
   },
   {
    "id": "170y2010",
@@ -20005,11 +19996,11 @@
   },
   {
    "id": "300y2010",
-   "version": "300y2010-3ac7bd47",
+   "version": "300y2010-cc7455cc",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
-   "located": 31,
+   "located": 32,
    "unlocated": [],
    "placed": [
     "Diethnis Enosis Ergotelis",
@@ -20017,18 +20008,17 @@
     "Diagoras Rodou",
     "Panaitolikos",
     "Pierikos",
-    "Olympiakos Volou",
     "PAE Thrasyvoulos",
     "Ionikos Nikeas",
     "Enosi Panaspropyrgiakou Doxas"
    ],
-   "homeInSection": 29,
+   "homeInSection": 30,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 147866
+   "bytes": 147809
   },
   {
    "id": "320y2010",
@@ -20327,20 +20317,20 @@
   },
   {
    "id": "642y2010",
-   "version": "642y2010-bcce754f",
+   "version": "642y2010-73afdaaa",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 28,
    "located": 28,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 27,
+   "homeInSection": 26,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 133888
+   "bytes": 133859
   },
   {
    "id": "643y2010",
@@ -20529,7 +20519,7 @@
   },
   {
    "id": "804y2010",
-   "version": "804y2010-ad5c98cd",
+   "version": "804y2010-3b92adb0",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 15,
@@ -20544,7 +20534,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 82509
+   "bytes": 82619
   },
   {
    "id": "826y2010",
@@ -20893,7 +20883,7 @@
   },
   {
    "id": "156y2009",
-   "version": "156y2009-a924f42c",
+   "version": "156y2009-5d33221b",
    "name": "China",
    "level": "ADM2",
    "clubs": 49,
@@ -20924,7 +20914,7 @@
     "p90": 0,
     "max": 0.8
    },
-   "bytes": 157469
+   "bytes": 157460
   },
   {
    "id": "170y2009",
@@ -21152,11 +21142,11 @@
   },
   {
    "id": "300y2009",
-   "version": "300y2009-0b79847b",
+   "version": "300y2009-28dc148f",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
-   "located": 29,
+   "located": 30,
    "unlocated": [],
    "placed": [
     "Panseraikos",
@@ -21164,20 +21154,19 @@
     "Thrasivoulos",
     "Ionikos Nikeas",
     "AO Ilysiakos",
-    "Olympiakos Volou",
     "Pierikos",
     "AO Kerkyras",
     "Diagoras Rodou",
     "Panaitolikos",
     "FAS Pyrsos Grevenon"
    ],
-   "homeInSection": 25,
+   "homeInSection": 26,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 147316
+   "bytes": 147321
   },
   {
    "id": "320y2009",
@@ -21474,20 +21463,20 @@
   },
   {
    "id": "642y2009",
-   "version": "642y2009-fd01349a",
+   "version": "642y2009-76891274",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 26,
    "located": 26,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 25,
+   "homeInSection": 24,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 131901
+   "bytes": 131841
   },
   {
    "id": "643y2009",
@@ -21694,7 +21683,7 @@
   },
   {
    "id": "804y2009",
-   "version": "804y2009-ff9216aa",
+   "version": "804y2009-4426108e",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 27,
@@ -21711,7 +21700,7 @@
     "p90": 0,
     "max": 3.1
    },
-   "bytes": 97626
+   "bytes": 97349
   },
   {
    "id": "826y2009",
@@ -22066,7 +22055,7 @@
   },
   {
    "id": "156y2008",
-   "version": "156y2008-9f99dd8d",
+   "version": "156y2008-143e66dc",
    "name": "China",
    "level": "ADM2",
    "clubs": 50,
@@ -22098,7 +22087,7 @@
     "p90": 0,
     "max": 1.9
    },
-   "bytes": 158493
+   "bytes": 158484
   },
   {
    "id": "170y2008",
@@ -22298,7 +22287,7 @@
   },
   {
    "id": "250y2008",
-   "version": "250y2008-494104e4",
+   "version": "250y2008-73feb2b4",
    "name": "France",
    "level": "ADM3",
    "clubs": 40,
@@ -22311,7 +22300,7 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 156110
+   "bytes": 156037
   },
   {
    "id": "276y2008",
@@ -22332,11 +22321,11 @@
   },
   {
    "id": "300y2008",
-   "version": "300y2008-c4388c60",
+   "version": "300y2008-b9e12bef",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
-   "located": 31,
+   "located": 32,
    "unlocated": [],
    "placed": [
     "Ionikos Nikeas",
@@ -22345,17 +22334,16 @@
     "Thrasivoulos",
     "Panaitolikos",
     "Pierikos",
-    "Olympiakos ASK Volou",
     "Vizas Megaron",
     "Aiolikos"
    ],
-   "homeInSection": 26,
+   "homeInSection": 27,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 146149
+   "bytes": 146145
   },
   {
    "id": "320y2008",
@@ -22707,7 +22695,7 @@
   },
   {
    "id": "642y2008",
-   "version": "642y2008-1b5d955c",
+   "version": "642y2008-4584cde3",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 26,
@@ -22720,7 +22708,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 131349
+   "bytes": 131379
   },
   {
    "id": "643y2008",
@@ -22745,26 +22733,27 @@
   },
   {
    "id": "688y2008",
-   "version": "688y2008-4b979cf7",
+   "version": "688y2008-e3fadbc1",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 40,
-   "located": 35,
+   "located": 34,
    "unlocated": [],
    "placed": [
     "Zeta Golubovci",
     "Rudar Pljevlja",
+    "Sutjeska Niksic",
     "Mogren Budva",
     "Buducnost Podgorica",
     "Mornar Bar"
    ],
-   "homeInSection": 30,
+   "homeInSection": 29,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.2
+    "max": 0.1
    },
-   "bytes": 145318
+   "bytes": 145034
   },
   {
    "id": "703y2008",
@@ -22929,7 +22918,7 @@
   },
   {
    "id": "804y2008",
-   "version": "804y2008-a1450550",
+   "version": "804y2008-36c7f76a",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 28,
@@ -22946,7 +22935,7 @@
     "p90": 0,
     "max": 3.1
    },
-   "bytes": 98131
+   "bytes": 98885
   },
   {
    "id": "807y2008",
@@ -23176,7 +23165,7 @@
   },
   {
    "id": "250y2007",
-   "version": "250y2007-9f7659c7",
+   "version": "250y2007-1b0f7ea6",
    "name": "France",
    "level": "ADM3",
    "clubs": 40,
@@ -23189,7 +23178,7 @@
     "p90": 0,
     "max": 0.4
    },
-   "bytes": 156175
+   "bytes": 156150
   },
   {
    "id": "276y2007",
@@ -23542,7 +23531,7 @@
   },
   {
    "id": "056y2004",
-   "version": "056y2004-7e0386f2",
+   "version": "056y2004-a7adcaef",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 60,
@@ -23554,13 +23543,13 @@
     "FC Nieuwkerken",
     "K Bocholter VV"
    ],
-   "homeInSection": 52,
+   "homeInSection": 53,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 147333
+   "bytes": 147772
   },
   {
    "id": "068y2004",
@@ -23651,7 +23640,7 @@
   },
   {
    "id": "156y2004",
-   "version": "156y2004-ea31af26",
+   "version": "156y2004-7b073b60",
    "name": "China",
    "level": "ADM2",
    "clubs": 32,
@@ -23672,7 +23661,7 @@
     "p90": 0,
     "max": 1
    },
-   "bytes": 140355
+   "bytes": 140346
   },
   {
    "id": "170y2004",
@@ -23827,11 +23816,11 @@
   },
   {
    "id": "300y2004",
-   "version": "300y2004-d27cb39d",
+   "version": "300y2004-fa7d3246",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
-   "located": 31,
+   "located": 32,
    "unlocated": [],
    "placed": [
     "Akratitos",
@@ -23839,18 +23828,17 @@
     "I.S. Paniliakos",
     "Panseraikos",
     "Proodeftiki",
-    "Olympiakos Volou",
     "Anagenisi Karditsas",
     "Pierikos",
     "Apollon Kryas Vrisis"
    ],
-   "homeInSection": 27,
+   "homeInSection": 28,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 146685
+   "bytes": 146666
   },
   {
    "id": "348y2004",
@@ -23912,7 +23900,7 @@
   },
   {
    "id": "380y2004",
-   "version": "380y2004-da1bad72",
+   "version": "380y2004-1e56adeb",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 100,
@@ -23921,13 +23909,13 @@
    "placed": [
     "Lucchese-Libertas"
    ],
-   "homeInSection": 92,
+   "homeInSection": 91,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0
+    "max": 0.9
    },
-   "bytes": 203995
+   "bytes": 204010
   },
   {
    "id": "392y2004",
@@ -23972,7 +23960,7 @@
   },
   {
    "id": "484y2004",
-   "version": "484y2004-5e6ccedb",
+   "version": "484y2004-c79c2ff2",
    "name": "Mexico",
    "level": "ADM2",
    "clubs": 32,
@@ -23983,9 +23971,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0
+    "max": 0.2
    },
-   "bytes": 140908
+   "bytes": 141050
   },
   {
    "id": "528y2004",
@@ -24105,20 +24093,20 @@
   },
   {
    "id": "642y2004",
-   "version": "642y2004-6ff9f338",
+   "version": "642y2004-b2ccbd1b",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 17,
    "located": 17,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 15,
+   "homeInSection": 16,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.1
+    "max": 0
    },
-   "bytes": 122541
+   "bytes": 122303
   },
   {
    "id": "643y2004",
@@ -24141,26 +24129,27 @@
   },
   {
    "id": "688y2004",
-   "version": "688y2004-072d4dc6",
+   "version": "688y2004-58e80a6c",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 40,
-   "located": 35,
+   "located": 34,
    "unlocated": [],
    "placed": [
     "Zeta Golubovci",
     "Rudar Pljevlja",
+    "Sutjeska Niksic",
     "Mogren Budva",
     "Buducnost Podgorica",
     "Mornar Bar"
    ],
-   "homeInSection": 29,
+   "homeInSection": 28,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 145652
+   "bytes": 145432
   },
   {
    "id": "710y2004",
@@ -24226,7 +24215,7 @@
   },
   {
    "id": "792y2004",
-   "version": "792y2004-6e9a5d0f",
+   "version": "792y2004-954afd6f",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 100,
@@ -24255,11 +24244,11 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 211448
+   "bytes": 211457
   },
   {
    "id": "804y2004",
-   "version": "804y2004-e686d3da",
+   "version": "804y2004-de9acc1d",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 18,
@@ -24275,7 +24264,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 89235
+   "bytes": 88331
   },
   {
    "id": "807y2004",
@@ -24536,7 +24525,7 @@
   },
   {
    "id": "056y2003",
-   "version": "056y2003-d912833a",
+   "version": "056y2003-a87b19f3",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 60,
@@ -24546,13 +24535,13 @@
     "FC Nieuwkerken",
     "K Bocholter VV"
    ],
-   "homeInSection": 54,
+   "homeInSection": 55,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 143783
+   "bytes": 143579
   },
   {
    "id": "068y2003",
@@ -24643,7 +24632,7 @@
   },
   {
    "id": "156y2003",
-   "version": "156y2003-98e2a380",
+   "version": "156y2003-858be896",
    "name": "China",
    "level": "ADM2",
    "clubs": 32,
@@ -24664,7 +24653,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 138756
+   "bytes": 138747
   },
   {
    "id": "170y2003",
@@ -24819,11 +24808,11 @@
   },
   {
    "id": "300y2003",
-   "version": "300y2003-bda72715",
+   "version": "300y2003-c1c7eead",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
-   "located": 31,
+   "located": 32,
    "unlocated": [],
    "placed": [
     "Akratitos",
@@ -24831,18 +24820,17 @@
     "I.S. Paniliakos",
     "Panseraikos",
     "Proodeftiki",
-    "Olympiakos Volou",
     "Anagenisi Karditsas",
     "Pierikos",
     "Apollon Kryas Vrisis"
    ],
-   "homeInSection": 27,
+   "homeInSection": 28,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 145135
+   "bytes": 145119
   },
   {
    "id": "348y2003",
@@ -24905,7 +24893,7 @@
   },
   {
    "id": "380y2003",
-   "version": "380y2003-02ebf7d3",
+   "version": "380y2003-949bf75b",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 100,
@@ -24914,13 +24902,13 @@
    "placed": [
     "Lucchese-Libertas"
    ],
-   "homeInSection": 92,
+   "homeInSection": 91,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0
+    "max": 0.9
    },
-   "bytes": 202499
+   "bytes": 202502
   },
   {
    "id": "392y2003",
@@ -24965,7 +24953,7 @@
   },
   {
    "id": "484y2003",
-   "version": "484y2003-b6f75ffd",
+   "version": "484y2003-c7df4ddd",
    "name": "Mexico",
    "level": "ADM2",
    "clubs": 32,
@@ -24976,9 +24964,9 @@
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0
+    "max": 0.2
    },
-   "bytes": 139311
+   "bytes": 139492
   },
   {
    "id": "528y2003",
@@ -25098,20 +25086,20 @@
   },
   {
    "id": "642y2003",
-   "version": "642y2003-38998ac3",
+   "version": "642y2003-bf7ee568",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 17,
    "located": 17,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 14,
+   "homeInSection": 17,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 120799
+   "bytes": 120526
   },
   {
    "id": "643y2003",
@@ -25132,26 +25120,27 @@
   },
   {
    "id": "688y2003",
-   "version": "688y2003-053a2cd5",
+   "version": "688y2003-21dee124",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 40,
-   "located": 35,
+   "located": 34,
    "unlocated": [],
    "placed": [
     "Zeta Golubovci",
     "Rudar Pljevlja",
+    "Sutjeska Niksic",
     "Mogren Budva",
     "Buducnost Podgorica",
     "Mornar Bar"
    ],
-   "homeInSection": 29,
+   "homeInSection": 28,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.2
    },
-   "bytes": 144315
+   "bytes": 144336
   },
   {
    "id": "710y2003",
@@ -25216,7 +25205,7 @@
   },
   {
    "id": "792y2003",
-   "version": "792y2003-2e812d35",
+   "version": "792y2003-9d2b71d2",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 100,
@@ -25245,11 +25234,11 @@
     "p90": 0,
     "max": 0.1
    },
-   "bytes": 209726
+   "bytes": 209735
   },
   {
    "id": "804y2003",
-   "version": "804y2003-599d1b76",
+   "version": "804y2003-7abdd088",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 19,
@@ -25265,7 +25254,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 88022
+   "bytes": 87775
   },
   {
    "id": "807y2003",
@@ -25507,7 +25496,7 @@
   },
   {
    "id": "056y2002",
-   "version": "056y2002-9c4acf0e",
+   "version": "056y2002-4fba65eb",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 60,
@@ -25518,13 +25507,13 @@
     "R Francs Borains",
     "K Bocholter VV"
    ],
-   "homeInSection": 54,
+   "homeInSection": 55,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 145134
+   "bytes": 145193
   },
   {
    "id": "068y2002",
@@ -25581,7 +25570,7 @@
   },
   {
    "id": "156y2002",
-   "version": "156y2002-5f7a77fd",
+   "version": "156y2002-f1d8edfc",
    "name": "China",
    "level": "ADM2",
    "clubs": 29,
@@ -25600,7 +25589,7 @@
     "p90": 0,
     "max": 0.6
    },
-   "bytes": 132442
+   "bytes": 132408
   },
   {
    "id": "170y2002",
@@ -25736,11 +25725,11 @@
   },
   {
    "id": "300y2002",
-   "version": "300y2002-31db0f7f",
+   "version": "300y2002-b57067db",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 40,
-   "located": 30,
+   "located": 31,
    "unlocated": [],
    "placed": [
     "Ionikos Nikeas",
@@ -25748,19 +25737,18 @@
     "Proodeftiki",
     "HLTEX Lykoi",
     "Anagenisi Karditsas",
-    "Olympiakos Volou",
     "Aharnaikos",
     "I.S. Paniliakos",
     "Pierikos",
     "Panaitolikos"
    ],
-   "homeInSection": 27,
+   "homeInSection": 28,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.5
    },
-   "bytes": 145164
+   "bytes": 145325
   },
   {
    "id": "348y2002",
@@ -25805,7 +25793,7 @@
   },
   {
    "id": "380y2002",
-   "version": "380y2002-8acd760f",
+   "version": "380y2002-363633c7",
    "name": "Italy",
    "level": "ADM4",
    "clubs": 100,
@@ -25814,13 +25802,13 @@
    "placed": [
     "Lucchese-Libertas"
    ],
-   "homeInSection": 92,
+   "homeInSection": 91,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0
+    "max": 0.9
    },
-   "bytes": 200961
+   "bytes": 200969
   },
   {
    "id": "392y2002",
@@ -26011,13 +25999,14 @@
   },
   {
    "id": "688y2002",
-   "version": "688y2002-e947eef2",
+   "version": "688y2002-147944a0",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 40,
-   "located": 34,
+   "located": 33,
    "unlocated": [],
    "placed": [
+    "Sutjeska Niksic",
     "Zeta Golubovci",
     "Buducnost Podgorica",
     "Rudar Pljevlja",
@@ -26025,13 +26014,13 @@
     "Bokelj Kotor",
     "Mornar Bar"
    ],
-   "homeInSection": 28,
+   "homeInSection": 27,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.5
+    "max": 0.2
    },
-   "bytes": 144324
+   "bytes": 143972
   },
   {
    "id": "710y2002",
@@ -26093,7 +26082,7 @@
   },
   {
    "id": "792y2002",
-   "version": "792y2002-79451fbc",
+   "version": "792y2002-1672be3a",
    "name": "Turkey",
    "level": "ADM2",
    "clubs": 100,
@@ -26124,11 +26113,11 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 210312
+   "bytes": 210396
   },
   {
    "id": "804y2002",
-   "version": "804y2002-d62e33c3",
+   "version": "804y2002-f052b1ab",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 11,
@@ -26141,7 +26130,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 78467
+   "bytes": 78136
   },
   {
    "id": "826y2002",
@@ -26290,7 +26279,7 @@
   },
   {
    "id": "056y2001",
-   "version": "056y2001-7b69b460",
+   "version": "056y2001-c817321b",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 60,
@@ -26306,7 +26295,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 145692
+   "bytes": 146224
   },
   {
    "id": "076y2001",
@@ -26329,7 +26318,7 @@
   },
   {
    "id": "156y2001",
-   "version": "156y2001-19a56cd3",
+   "version": "156y2001-64983f7c",
    "name": "China",
    "level": "ADM2",
    "clubs": 17,
@@ -26346,7 +26335,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 119951
+   "bytes": 119903
   },
   {
    "id": "203y2001",
@@ -26439,30 +26428,29 @@
   },
   {
    "id": "300y2001",
-   "version": "300y2001-a95ada89",
+   "version": "300y2001-ba6958db",
    "name": "Greece",
    "level": "ADM3",
    "clubs": 38,
-   "located": 29,
+   "located": 30,
    "unlocated": [],
    "placed": [
     "Ionikos Nikeas",
     "Panahaiki",
     "I.S. Paniliakos",
     "Proodeftiki",
-    "Olympiakos Volou",
     "Akratitos",
     "Panaitolikos",
     "Anagenisi Karditsas",
     "Pierikos"
    ],
-   "homeInSection": 26,
+   "homeInSection": 27,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0.5
    },
-   "bytes": 143821
+   "bytes": 143781
   },
   {
    "id": "348y2001",
@@ -26624,14 +26612,14 @@
   },
   {
    "id": "642y2001",
-   "version": "642y2001-73918e00",
+   "version": "642y2001-5330dc58",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 10,
    "located": 10,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 9,
+   "homeInSection": 10,
    "displacementKm": {
     "median": 0,
     "p90": 0,
@@ -26658,24 +26646,25 @@
   },
   {
    "id": "688y2001",
-   "version": "688y2001-9d7d8ae8",
+   "version": "688y2001-13a32b02",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 24,
-   "located": 21,
+   "located": 20,
    "unlocated": [],
    "placed": [
+    "Sutjeska Niksic",
     "Buducnost Podgorica",
     "FK Zeta Golubovci",
     "Mogren Budva"
    ],
-   "homeInSection": 19,
+   "homeInSection": 18,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 127043
+   "bytes": 127084
   },
   {
    "id": "710y2001",
@@ -26829,7 +26818,7 @@
   },
   {
    "id": "056y2000",
-   "version": "056y2000-9fe2ecee",
+   "version": "056y2000-88c6a281",
    "name": "Belgium",
    "level": "ADM4",
    "clubs": 43,
@@ -26839,13 +26828,13 @@
     "KSV Roeselaere",
     "RRC Tournaisien"
    ],
-   "homeInSection": 38,
+   "homeInSection": 39,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 126827
+   "bytes": 127137
   },
   {
    "id": "076y2000",
@@ -27013,20 +27002,20 @@
   },
   {
    "id": "642y2000",
-   "version": "642y2000-2058e9dd",
+   "version": "642y2000-aa967eca",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 10,
    "located": 10,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 9,
+   "homeInSection": 10,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 113513
+   "bytes": 113569
   },
   {
    "id": "724y2000",
@@ -28158,7 +28147,7 @@
   },
   {
    "id": "484y1997",
-   "version": "484y1997-f1b86ee8",
+   "version": "484y1997-d57f1369",
    "name": "Mexico",
    "level": "ADM2",
    "clubs": 40,
@@ -28168,13 +28157,13 @@
     "S.U.O.O.",
     "Ayense"
    ],
-   "homeInSection": 32,
+   "homeInSection": 33,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.4
+    "max": 0
    },
-   "bytes": 134406
+   "bytes": 134252
   },
   {
    "id": "528y1997",
@@ -28301,20 +28290,20 @@
   },
   {
    "id": "642y1997",
-   "version": "642y1997-5b510edf",
+   "version": "642y1997-87348dc8",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 22,
    "located": 22,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 19,
+   "homeInSection": 22,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 122162
+   "bytes": 122266
   },
   {
    "id": "643y1997",
@@ -28501,7 +28490,7 @@
   },
   {
    "id": "804y1997",
-   "version": "804y1997-760bad78",
+   "version": "804y1997-1e70b632",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 18,
@@ -28516,7 +28505,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 81531
+   "bytes": 82042
   },
   {
    "id": "826y1997",
@@ -29246,7 +29235,7 @@
   },
   {
    "id": "484y1996",
-   "version": "484y1996-f681b860",
+   "version": "484y1996-39cdcc2f",
    "name": "Mexico",
    "level": "ADM2",
    "clubs": 40,
@@ -29256,13 +29245,13 @@
     "S.U.O.O.",
     "Ayense"
    ],
-   "homeInSection": 32,
+   "homeInSection": 33,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.4
+    "max": 0
    },
-   "bytes": 133705
+   "bytes": 133528
   },
   {
    "id": "528y1996",
@@ -29390,20 +29379,20 @@
   },
   {
    "id": "642y1996",
-   "version": "642y1996-1ac4cc10",
+   "version": "642y1996-66de47f7",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 20,
    "located": 20,
    "unlocated": [],
    "placed": [],
-   "homeInSection": 17,
+   "homeInSection": 20,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 0
    },
-   "bytes": 119883
+   "bytes": 119697
   },
   {
    "id": "643y1996",
@@ -29424,24 +29413,25 @@
   },
   {
    "id": "688y1996",
-   "version": "688y1996-f38ecd2b",
+   "version": "688y1996-06850551",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 19,
-   "located": 16,
+   "located": 15,
    "unlocated": [],
    "placed": [
     "Buducnost",
+    "Sutjeska Niksic",
     "Mogren Budva",
     "Borac Banja Luka"
    ],
-   "homeInSection": 14,
+   "homeInSection": 13,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 20.2
    },
-   "bytes": 115218
+   "bytes": 115789
   },
   {
    "id": "703y1996",
@@ -29602,7 +29592,7 @@
   },
   {
    "id": "804y1996",
-   "version": "804y1996-54aa12a1",
+   "version": "804y1996-d8a30d74",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 18,
@@ -29617,7 +29607,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 80820
+   "bytes": 81331
   },
   {
    "id": "826y1996",
@@ -30327,7 +30317,7 @@
   },
   {
    "id": "484y1995",
-   "version": "484y1995-af10d9f5",
+   "version": "484y1995-c8b42f5a",
    "name": "Mexico",
    "level": "ADM2",
    "clubs": 40,
@@ -30338,13 +30328,13 @@
     "S.U.O.O.",
     "Ayense"
    ],
-   "homeInSection": 31,
+   "homeInSection": 32,
    "displacementKm": {
     "median": 0,
     "p90": 0,
-    "max": 0.4
+    "max": 0.1
    },
-   "bytes": 134012
+   "bytes": 133723
   },
   {
    "id": "528y1995",
@@ -30471,7 +30461,7 @@
   },
   {
    "id": "642y1995",
-   "version": "642y1995-c2557cbd",
+   "version": "642y1995-3e77b9d6",
    "name": "Romania",
    "level": "ADM2",
    "clubs": 20,
@@ -30484,7 +30474,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 119876
+   "bytes": 119806
   },
   {
    "id": "643y1995",
@@ -30505,24 +30495,25 @@
   },
   {
    "id": "688y1995",
-   "version": "688y1995-807ae5af",
+   "version": "688y1995-5acbd415",
    "name": "Serbia",
    "level": "ADM2",
    "clubs": 19,
-   "located": 16,
+   "located": 15,
    "unlocated": [],
    "placed": [
     "Buducnost",
+    "Sutjeska Niksic",
     "Mogren Budva",
     "Borac Banja Luka"
    ],
-   "homeInSection": 14,
+   "homeInSection": 13,
    "displacementKm": {
     "median": 0,
     "p90": 0,
     "max": 20.2
    },
-   "bytes": 115335
+   "bytes": 115870
   },
   {
    "id": "703y1995",
@@ -30683,7 +30674,7 @@
   },
   {
    "id": "804y1995",
-   "version": "804y1995-75bc68a6",
+   "version": "804y1995-731c7f0d",
    "name": "Ukraine",
    "level": "ADM2",
    "clubs": 18,
@@ -30698,7 +30689,7 @@
     "p90": 0,
     "max": 0
    },
-   "bytes": 80478
+   "bytes": 80739
   },
   {
    "id": "826y1995",

@@ -1,8 +1,9 @@
 // Where the clubs of the earlier seasons' country maps stand (docs/design/domestic-campaigns.md, "Earlier seasons"),
 // in this order:
 //   1. a hand override (scripts/data/season-club-locations.json, keyed "<country>:<club name>"): a point, a Wikidata
-//      item, a built-in country map's club (`as`: "d826-602") whose home it shares, or `unplaced` where the steps
-//      below would place it wrongly and its town is not known;
+//      item, a built-in country map's club (`as`: "d826-602") whose home it shares, unless the override gives the ground
+//      it had then as a point of its own, or `unplaced` where the steps below would place it wrongly and its town is not
+//      known. A club that moved has its earlier seasons' ground in `eras`, the season years and the point of each;
 //   2. the same club on today's map of its country (scripts/data/domestic/<country>.json): its name, short name or FM
 //      name folds to the season's name, or its distinctive words are the same; its home has been checked there, with
 //      the overrides of scripts/data/domestic-locations.json behind it;
@@ -90,13 +91,45 @@ export function snapshotMatcher(snapshotClubs = [], { exact = false } = {}) {
   };
 }
 
+/** The point a hand override gives (`lon`, `lat` and a `note` saying where it is and why), as a home, or null for none. */
+const overridePoint = ({ lon, lat, note }) => (Number.isFinite(lon) && Number.isFinite(lat) ? { lon, lat, source: 'override', label: note || '' } : null);
+
+/**
+ * The seasons a hand override gives another ground (`eras`: `[{ from, through, lon, lat, note }]`, season years, the first
+ * and last included), as a home's `{ eras: [{ from, through, lon, lat, source, label }] }`, or {} for none. Throws unless
+ * each has its years and point and they follow one another in time.
+ */
+function overrideEras({ eras = [] }, label) {
+  let last = -Infinity;
+  const out = eras.map(era => {
+    const point = overridePoint(era);
+    if (!point || !Number.isInteger(era.from) || !Number.isInteger(era.through) || era.from > era.through || era.from <= last) {
+      throw new Error(`${label}: each era of an override has its point and its years, from and through, after the era before it (${JSON.stringify(eras)})`);
+    }
+    last = era.through;
+    return { from: era.from, through: era.through, ...point };
+  });
+  return out.length ? { eras: out } : {};
+}
+
+/**
+ * A club's home in season year `year`, from its entry of scripts/data/season-club-homes.json: the ground of that season
+ * where its `eras` name one, else its home; null for none.
+ */
+export function homeInSeason(home, year) {
+  if (!home) return null;
+  const { eras = [], ...rest } = home;
+  const era = eras.find(({ from, through }) => from <= year && year <= through);
+  return era ? { ...rest, lon: era.lon, lat: era.lat, source: era.source, label: era.label } : rest;
+}
+
 /**
  * Homes for one country's season clubs. `clubs` are `[{ name, short? }]`, one per name, strongest first; `snapshot` the
  * country's built-in snapshot or null; `europe` the Europe maps' clubs by id with `idOf(name)` the season's id for a
  * name; `overrides` the hand overrides of this country by name; `locate` scripts/lib/domestic-locate.mjs's tools
- * (`{ wikidata, geoFiles }`) and `nation` `{ id, name }`. Returns Map(name → { lon, lat, source, label?, twin? }):
+ * (`{ wikidata, geoFiles }`) and `nation` `{ id, name }`. Returns Map(name → { lon, lat, source, label?, twin?, eras? }):
  * `source` "override", "map:<built-in club id>", "europe:<season id>", "wikidata:Q…" or "geonames:<id>"; `twin` the
- * built-in country map's club it is.
+ * built-in country map's club it is; `eras` the seasons an override gives another ground (homeInSeason).
  */
 export async function locateSeasonClubs({ nation, clubs, snapshot, europe = {}, idOf = () => null, overrides = {}, locate }) {
   const out = new Map();
@@ -106,16 +139,19 @@ export async function locateSeasonClubs({ nation, clubs, snapshot, europe = {}, 
   for (const club of clubs) {
     const override = overrides[club.name];
     if (override?.unplaced) continue;
+    const point = override ? overridePoint(override) : null;
     if (override?.as) {
       const twin = byFm.get(override.as);
       if (!twin?.location) throw new Error(`${nation.name}: the override of ${club.name} names ${override.as}, no located club of today's map`);
-      out.set(club.name, { lon: twin.location.lon, lat: twin.location.lat, source: `map:${override.as}`, label: twin.name, twin: override.as });
+      out.set(club.name, { ...(point ?? { lon: twin.location.lon, lat: twin.location.lat, source: `map:${override.as}`, label: twin.name }),
+        twin: override.as, ...overrideEras(override, `${nation.name}: ${club.name}`) });
       continue;
     }
-    if (override && Number.isFinite(override.lon) && Number.isFinite(override.lat)) {
-      out.set(club.name, { lon: override.lon, lat: override.lat, source: 'override', label: override.note || '' });
+    if (point) {
+      out.set(club.name, { ...point, ...overrideEras(override, `${nation.name}: ${club.name}`) });
       continue;
     }
+    if (override?.eras) throw new Error(`${nation.name}: the override of ${club.name} has eras but no home of its own (as, or lon and lat)`);
     if (override?.qid) { rest.push(club); continue; }
     // Its full name first, then a short name its source gives it ("HJK", "Ferencváros"), where one of today's names is it.
     const twin = twinOf(club.name) ?? (club.short ? exactTwinOf(club.short) : null);

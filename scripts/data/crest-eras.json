@@ -49089,6 +49089,13 @@
     "f-balkan-bukovica-mirijevo.2009"
    ]
   ],
+  "f-balkany-zoria": [
+   [
+    2020,
+    2020,
+    "f-balkany-zorya.2018"
+   ]
+  ],
   "f-balkany-zorya": [
    [
     2018,
@@ -53644,6 +53651,18 @@
    [
     2021,
     2022,
+    "f-desna-chernigiv.2021"
+   ]
+  ],
+  "f-desna-chernihiv": [
+   [
+    2015,
+    2015,
+    "f-desna-chernigiv.2021"
+   ],
+   [
+    2018,
+    2020,
     "f-desna-chernigiv.2021"
    ]
   ],
@@ -67217,6 +67236,18 @@
     "f-olympiakos-piraeus.2014"
    ]
   ],
+  "f-olympiakos-volos": [
+   [
+    2014,
+    2014,
+    "f-olympiakos-volou.2001"
+   ],
+   [
+    2019,
+    2019,
+    "f-olympiakos-volou.2001"
+   ]
+  ],
   "f-olympiakos-volou": [
    [
     2001,
@@ -68628,6 +68659,13 @@
     2019,
     2020,
     "f-pkns-fc.2019"
+   ]
+  ],
+  "f-platanias-chania": [
+   [
+    2019,
+    2019,
+    "f-ao-platania-chanion.2015"
    ]
   ],
   "f-platinum-stars": [
@@ -71418,6 +71456,13 @@
     "d724-1759"
    ]
   ],
+  "f-sfc-desna-chernihiv": [
+   [
+    2014,
+    2014,
+    "f-desna-chernigiv.2021"
+   ]
+  ],
   "f-sg-quelle-furth": [
    [
     2002,
@@ -72183,6 +72228,18 @@
     2016,
     2016,
     "f-skonto-fc.2016"
+   ]
+  ],
+  "f-skonto-fc-riga": [
+   [
+    2012,
+    2012,
+    "f-skonto-riga.1995"
+   ],
+   [
+    2014,
+    2014,
+    "f-skonto-riga.1995"
    ]
   ],
   "f-skonto-riga": [

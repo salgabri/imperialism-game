@@ -2133,18 +2133,43 @@ spelling), and one, the Update Team's "Desna Chernigiv", Desna Chernihiv's stadi
 the village of Desna, 118 km away. 436 season maps were rebuilt. A town's name alone makes no
 two clubs one: Torpedo Mogilev takes the ground of its own later name, Torpedo-Kadino, not
 Dnepr Mogilev's. Left as they were: spellings whose other spelling stands only at a town or
-headquarters point; spellings whose other spelling is placed by another club's item (Steaua
-Bucharest's by the army club's youth side, Arsenal Kiev's and Metalurg Donetsk's by their
-reserve sides'); and spellings the move would set on another club's point: Sportul
-Studențesc's ground, Regie, is where today's Rapid stands, İstanbul Büyükşehir
-Belediyespor's, the Atatürk Olympic Stadium, where Fatih Karagümrük's seasons of
-2001/02–2003/04 and 2011/12 stand with its ground of today, and Wikidata gives Primorac
-Stobreč Hajduk's Poljud.
+headquarters point, and Primorac Stobreč, to which Wikidata gives Hajduk's Poljud. Spellings
+whose other spelling was itself placed as another club, or whose ground was another club's
+point, followed with those clubs:
+
+**Another club's item, twin or town.** The same review found clubs of the earlier seasons placed
+as another club: by its Wikidata item (a reserve side's: FC Arsenal-2 for Arsenal Kyiv, Skonto
+FC-2, Dnipro-75; a merged successor's: Dender EH's for Verbroedering Denderhoutem), as its twin
+through a word of their names (Desna Chernihiv as FC Chernihiv, Olympiakos Volos as NPS Volos,
+Platanias as Chania's club, Železničar Belgrade as Pančevo's, the Steaua of 2008/09 to 2016/17 as
+today's CSA Steaua, at a youth side's ground), in a namesake town (San Marino at Marino in Lazio,
+Nikšić's Sutjeska at a village in Vojvodina, Misr Lel Makkasa in Cairo instead of Faiyum, Zacatepec
+in Puebla or at the Estadio Azteca) or at its own ground of another time. Since 24 November 2026
+they and their clubs' other spellings, 52 names on 122 maps, are overrides, each at the ground
+Wikidata gives the right club (Denderhoutem's village and Belgrade's Bara Venecija, where it gives
+none), checked against the stadium and city their season's own database gives them where that is CM
+01/02's or the Update Team's, else against Wikipedia's articles. Two kinds of override are new
+with them:
+
+- `as` with `lon`/`lat`: today's club, for its crest, at the ground it had then. Rapid stands at
+  Giulești, not at Regie, where today's map has it (its ground from 2018 to 2022) and where Sportul
+  Studențesc's spellings stand; Steaua, before 2008/09, at Ghencea.
+- `eras`: a club that moved stands at each season's ground (`homeInSeason`): Dnipro's Meteor Stadium
+  to 2007/08, then Dnipro-Arena; Steaua's Ghencea to 2014/15, then the National Arena; Fatih
+  Karagümrük's Vefa Stadium to 2011/12, then the Atatürk Olympic Stadium; İstanbul Büyükşehir
+  Belediyespor's Çetin Emeç Stadium in Bayrampaşa to 2003/04, as CM 01/02's own data has it, then
+  the Olympic Stadium.
+
+A club that lost a wrong twin wears the crest another spelling of it already wears
+(`crest-eras.json`), else its monogram (Železničar Belgrade). Platanias and Chania's club still share
+one point, the Perivolia stadium they played at. Today's maps keep their own homes (Rapid at
+Regie, CSA Steaua at the youth side's ground).
 
 **Homes** (`scripts/lib/season-club-homes.mjs`, written once to
 `scripts/data/season-club-homes.json` by `--homes`, offline from the caches): a hand
 override (`scripts/data/season-club-locations.json`: a point, a Wikidata item, or
-today's map's club it is); the same club on today's map of its country (its name,
+today's map's club it is, at its home or at a point of the override's own, with `eras` for the
+seasons a club that moved stood elsewhere); the same club on today's map of its country (its name,
 short name or FM name, or every word of one inside the other, which ranks above
 sharing distinctive words, with EA's abbreviations expanded: "Sheffield Wed",
 "Melb. Victory"), whose home is that map's checked one; the Europe maps' club under

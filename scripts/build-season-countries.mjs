@@ -39,7 +39,7 @@ import { createWikidata, ensureGeonames } from './lib/domestic-locate.mjs';
 import { buildClubSeasons } from './lib/ea-season-builds.mjs';
 import { readExport } from './lib/ea-season-files.mjs';
 import { slug } from './lib/club-identity.mjs';
-import { LOCATE_REGIONS, locateSeasonClubs } from './lib/season-club-homes.mjs';
+import { homeInSeason, LOCATE_REGIONS, locateSeasonClubs } from './lib/season-club-homes.mjs';
 import { countryFields, eaSeasonClubs, retroSeasonClubs } from './lib/season-country-clubs.mjs';
 import { seasonMapIds } from './lib/season-map-ids.mjs';
 import { buildRetroSeason } from './lib/retro-season-builds.mjs';
@@ -261,7 +261,8 @@ const HOMES_ABOUT = 'Where each club of the earlier seasons\' country maps stand
   + 'written by node scripts/build-season-countries.mjs --homes (scripts/lib/season-club-homes.mjs): home [lon, lat] from a hand override '
   + '(source "override", scripts/data/season-club-locations.json), the same club on today\'s map of its country (source "map:<its id there>", '
   + 'also its twin), the Europe maps\' clubs (source "europe:<id>"), Wikidata (source "wikidata:Q…", CC0) or GeoNames (source "geonames:<id>", '
-  + 'CC BY 4.0). null: none of them places it, and the map starts it at a populous place no other club stands in, an estimate.';
+  + 'CC BY 4.0). eras: the season years (from and through, both included) in which a club that moved stood elsewhere, by hand override, and '
+  + 'that ground. null: none of them places it, and the map starts it at a populous place no other club stands in, an estimate.';
 
 // ---- Building ----
 
@@ -295,7 +296,7 @@ async function mapJobs(seasons, homes, { only, onlySeasons }) {
         snapshot: {
           nation: { id: country, name: NATIONS[country][0], geonames: await geonamesOf(country) },
           clubs: clubs.map(club => {
-            const home = homes[country][club.name];
+            const home = homeInSeason(homes[country][club.name], season.year);
             return { id: club.id, name: club.name, league: club.league || `${NATIONS[country][0]} football`,
               location: home ? { lon: home.lon, lat: home.lat, source: home.source } : null, ...(home?.twin ? { twin: home.twin } : {}),
               squad: club.squad.map(player => player.tuple) };

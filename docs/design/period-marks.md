@@ -566,7 +566,8 @@ Turkey's a map), and the Commons categories of the clubs' items held no logo not
 What is left. Outside football, only the caricatures and the Saint Petersburg Lions of
 2000/01, whose logo no source shows. In football, 710 clubs (by country and id), 1,378 of the
 60,387 club appearances (2.3%; 1,412 after the fourth pass, 1,501 after the third, 1,755 before
-it; Mexico's twin fix the same day added 7): 269 clubs of today's country maps (China's, Uzbekistan's, Laos's and South Africa's lower
+it; Mexico's twin fix the same day added 7; on 24 November season spellings' and wrong twins'
+fixes left 1,368): 269 clubs of today's country maps (China's, Uzbekistan's, Laos's and South Africa's lower
 divisions and the like; 58 of the 128 maps are complete, from 36) and 441 of the earlier
 seasons' maps (Italy's of 1999/2000 keeps two of its eleven), mostly lower-division and gone
 clubs whose article has no crest (Brescello), whose article is now another club's (Alzano
@@ -622,7 +623,7 @@ Montenegro, to 2010/11; they are the same clubs as Montenegro's of today and wea
 
 `scripts/club-crests.test.mjs`, on the census (`scripts/lib/crest-census.mjs`): every club
 of every map, season and sport resolves to a crest the game ships, but the caricatures and
-`NO_PICTURE` outside football and at most 1,378 football club appearances; no monogram era
+`NO_PICTURE` outside football and at most 1,368 football club appearances; no monogram era
 outside the caricatures and `NO_PICTURE`; no club-season wears the crest of another country's
 club of today (`d<country>-…`) or a crest that clubs of two countries wear, but Serbia's
 Montenegrin clubs; an id names one country's club in a season year, and a namesake's eras
