@@ -1619,8 +1619,9 @@ own country.
   along its arrondissements, Prague's along its cadastral areas. Every European
   country has its levels (`scripts/lib/admin-levels.mjs`), England its counties,
   councils and districts. A region with no club goes to the nearest clubs, whole unless
-  it is large for a club's share or borders a crowded region, which then share it a
-  level down (Moscow Oblast around Moscow's clubs). A city-state is too small for its
+  it is large for a club's share, borders a crowded region or lies beside a crowded city,
+  whose clubs then share it a level down (Moscow Oblast around Moscow's clubs, the counties
+  round London in districts). A city-state is too small for its
   clubs and shares its largest neighbour's land too (Berlin and Brandenburg,
   Madrid and Castile). Only a commune two clubs share is ever cut (Milan's San Siro).
   Land goes to the nearest club and then evens out along broad fronts, as on the

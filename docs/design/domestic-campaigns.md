@@ -602,7 +602,12 @@ the country maps do (`BALANCE` in `scripts/build-europe-maps.mjs`, `{ beta: 0.3 
    neighbour when that alone gives them room enough, else its largest neighbour, as before:
    joined to Bayern's Bavaria, the Elite 32's Saxony had Leipzig take Franconia once the land
    was balanced, with Brandenburg empty beside it. (Empty land first in every case cost
-   Liverpool its share of Lancashire: 372 km².)
+   Liverpool its share of Lancashire: 372 km².) An empty region over 500 km² within 25 km of
+   a crowd (three or more clubs within 15 km of one another: `CROWD_*`) is split down one level
+   where the country has finer units: London's neighbouring counties (Hertfordshire,
+   1,640 km²) were whole, so a club on a few boroughs in the middle, whose boroughs all border
+   other clubs' land, had no way out but through a neighbour's land (Chelsea 264 km², now
+   3,170, and no London club under 800).
 3. **One region on two shores.** While the levels nest, a region's units that face each
    other across at most 3.5 km of water between two landmasses (`CITY_LINK_KM`) count as
    joined: Istanbul's Asian districts had joined Kocaeli, whose one club, Fenerbahçe, then
@@ -627,7 +632,10 @@ the country maps do (`BALANCE` in `scripts/build-europe-maps.mjs`, `{ beta: 0.3 
    holds it (Eyüpsultan, Galatasaray's way out of Sarıyer); a club left under a quarter of
    its target grows again first (`growFanFair`). A city on two landmasses is crossed by its
    straits, once per club and landmass (`cityStraits`: Beşiktaş onto Üsküdar), and the unit
-   a club lands on keeps its land there its own. Taken straight by sector, land beyond a
+   a club lands on keeps its land there its own. Last, a unit surrounded by another city club's
+   land (65% of its border with the city's clubs) goes to it while the shares stay about as
+   even (`smoothFan`), so no arm reaches between two neighbours' sectors (Spurs' and Arsenal's
+   over London). Taken straight by sector, land beyond a
    river or a bay was cut off from its sector (Lisbon's south bank, reached over land only
    by Vila Franca de Xira); by the zone's land alone, the sectors facing the sea kept only
    their city (AEK and Panathinaikos 900 km² each, Olympiacos 64,000).
@@ -656,17 +664,22 @@ out long (clubs over 20% thin 806 → 1,174, Brazil's 17 → 64) for more even s
 stay as built, byte for byte (`--check`).
 
 Results across the 99 Europe maps in play, against the maps before (grown smallest first, with
-the grounds rules; 2026-11-25): sizes, 1.08 spread of log land to the fair share → 0.77;
-clubs under a quarter of their fair share 493 → 340 (of 5,976), under 800 km² 108 → 24;
-hooked lands (under half their hull, over 500 km²) 181 → 118, wrapped (their middle inside a
-neighbour's hull) 690 → 494; land in strips 23.2% → 21.5% of it. Clubs more than 0.5 km from
+the grounds rules; 2026-11-25): sizes, 1.08 spread of log land to the fair share → 0.76;
+clubs under a quarter of their fair share 493 → 335 (of 5,976), under 800 km² 108 → 19;
+hooked lands (under half their hull, over 500 km²) 181 → 111, wrapped (their middle inside a
+neighbour's hull) 690 → 463; land in strips 23.2% → 21.2% of it. Clubs more than 0.5 km from
 their drawn land stay at 182, and more than 5 km at 2 (Venezia, on its lagoon, in 1998/99 and
-1999/2000). Known weak spots: London's seven clubs, where Chelsea holds 213–264 km² on
-the 2023/24–2025/26 maps and Tottenham 289 on 2018/19's, and Istanbul's two in 1998/99, where
-one club takes nearly all of Turkey and the other 121 km² (the grounds maps have it the other
-way: Galatasaray 757,000 km² and Beşiktaş 23,000).
+1999/2000). Known weak spots, each in one or a few seasons: Liverpool 690–726 km² (2016/17 and
+2018/19–2021/22) and Everton 679–688 (2003/04, 2009/10–2011/12) on the land they share with
+Manchester's clubs, Sunderland 328–341, Arsenal 258 and 266 (2018/19, 2006/07), Bayern Munich
+75 (1999/2000 and 2000/01, with 1860 on the Olympiastadion: a shared ground), and Istanbul's
+Galatasaray 121 (1998/99 and 2020/21). In 1998/99 the grounds maps had it the other way:
+Galatasaray 757,000 km² and Beşiktaş 23,000.
 
-Dead ends (don't retry): a looser touch for units large beside their receiver (5% of its
+Dead ends (don't retry): evening out a starved city club by swapping land between pairs of its
+clubs along random spanning trees, or letting it grow first, or swapping border units, or
+annealing (London's clubs could not move land past the units around Chelsea: it was the units'
+size, above); a looser touch for units large beside their receiver (5% of its
 goal: Germany's Elite 32 evened out, but Werder Bremen's land wound round its neighbour's
 on the Top 124); sectors of equal land over all the city's land by bearing (a
 ground in another club's sector, and the sector beyond the Tagus cut off: Sporting kept

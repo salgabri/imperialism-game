@@ -91,6 +91,11 @@ const rugbyUnionRatings = path.join(root, 'src/data/clubs.rugby-union.js');
 const TINY_REGION = 0.25;
 const FREE_TOP = 0.125;
 const FREE_LOWER = 0.5;
+// An empty region larger than CROWD_SPLIT_KM2 is split down one level (regionalUnits) where a crowd of clubs (three or more
+// within CROWD_KM of one another) is within CROWD_NEAR_KM of it.
+const CROWD_KM = 15;
+const CROWD_NEAR_KM = 25;
+const CROWD_SPLIT_KM2 = 500;
 // A club may start this far from its ground before the unit it shares with a stronger club is cut between them.
 const MAX_GAP_KM = 3;
 // Land near a country's main landmass is framed by the opening camera; the Canaries, the Azores and Svalbard wait for a zoom out.
@@ -373,12 +378,17 @@ function regionalUnits(country, homes) {
   // crowd shares it: whole, it would go to the first club to reach it and shut the others in, to start far away (Moscow
   // Oblast around Moscow's clubs, Kocaeli and Tekirdağ around Istanbul's).
   const nextToCrowd = (node, depth) => node.members.some(u => adjacency[u].some(v => pathOf[v][depth] !== node && here(pathOf[v][depth]).length >= 2));
+  // A city's crowd (three or more clubs within CROWD_KM) reaches an empty region that its clubs' land grows into, whole or
+  // not, one level down where the region is large: whole counties beside London (Hertfordshire, 1,640 km²) left a club on a
+  // few boroughs in the middle no way out but through its neighbours' land.
+  const crowdHomes = homes.filter((h, i) => homes.filter((g, j) => j !== i && kmBetween(h, g) <= CROWD_KM).length >= 2);
+  const nearCrowd = node => node.area > CROWD_SPLIT_KM2 && node.members.some(u => crowdHomes.some(h => kmToPolys(h, units[u].polys) <= CROWD_NEAR_KM));
   // `forced`: a top region joined to another that holds clubs of its own, so its land is shared with the other's clubs too.
   const expand = (node, zone, forced, depth = 0) => {
     const clubs = here(node);
     const inner = forced ? zone : clubs.length ? { clubs, share: node.area / clubs.length } : zone;
     const tooLarge = !clubs.length && node.area > (depth ? FREE_LOWER : FREE_TOP) * (zone ? zone.share : fair);
-    const split = clubs.length >= 2 || forced || tooLarge || (!clubs.length && node.children.size && nextToCrowd(node, depth));
+    const split = clubs.length >= 2 || forced || tooLarge || (!clubs.length && node.children.size && (nextToCrowd(node, depth) || nearCrowd(node)));
     if (!node.children.size || !split) return emit(node, clubs.length >= 2 ? clubs : zone?.open ? null : zone?.clubs);
     for (const child of node.children.values()) expand(child, inner, false, depth + 1);
     return null;

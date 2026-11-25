@@ -2379,7 +2379,57 @@ const FOREIGN_COST = 1;
  * kept only their city (AEK and Panathinaikos 900 km² each, Olympiacos 64,000); taken straight, a sector's land beyond
  * a river or a bay was cut off from it (Lisbon's south bank). `fits(club, unit)`: land the club may take.
  */
-function shareFan(units, adjacency, owner, fan, homes, seedUnit, share, fits, comp, straits = null) {
+// A unit of a city's land is handed over when at least this share of its border with the city's clubs is with another
+// of them (smoothFan), and how much less even the clubs' shares (the sum of log² of land to target) it may make.
+const SMOOTH_TOUCH = 0.65, SMOOTH_SLACK = 0.05;
+const SMOOTH_SWEEPS = 8;
+
+/**
+ * Smooths a city's clubs' borders (`best`: { who, held }, see growFanFair), as each grows over the land nearest its own
+ * ground in its own sector and the sectors' edges are the units', so a neighbour's arm can reach between two others'. A
+ * unit mostly surrounded by another club's (by SMOOTH_TOUCH of its land border with the city's clubs, `borders` of each
+ * unit with each neighbour, km) goes to it, the most surrounded first, as long as the clubs' shares stay about as even
+ * (SMOOTH_SLACK) and its own club's land holds together; starts and landings (`kept`) stay. Changes `best`.
+ */
+function smoothFan(best, units, region, adjacency, borders, seeds, kept, target, fits) {
+  const { who, held } = best;
+  const isSeed = new Set(seeds);
+  const inRegion = new Set(region);
+  const uneven = (i, km2) => Math.log(Math.max(km2, 1) / target[i]) ** 2;
+  const holds = (i, without) => {
+    const seen = new Set([seeds[i]]), stack = [seeds[i]];
+    while (stack.length) for (const v of adjacency[stack.pop()]) if (v !== without && who[v] === i && !seen.has(v)) { seen.add(v); stack.push(v); }
+    return region.every(u => who[u] !== i || u === without || seen.has(u));
+  };
+  for (let sweep = 0; sweep < SMOOTH_SWEEPS; sweep++) {
+    const list = [];
+    for (const u of region) {
+      const a = who[u];
+      if (a < 0 || isSeed.has(u) || kept.has(u)) continue;
+      const share = new Map();
+      let total = 0;
+      for (const [v, km] of borders[u]) if (inRegion.has(v) && who[v] >= 0) { total += km; if (who[v] !== a) share.set(who[v], (share.get(who[v]) ?? 0) + km); }
+      for (const [b, km] of share) if (total && km / total >= SMOOTH_TOUCH) list.push({ u, a, b, touch: km / total });
+    }
+    list.sort((p, q) => q.touch - p.touch || p.u - q.u);
+    let moved = 0;
+    for (const { u, a, b } of list) {
+      if (who[u] !== a || !fits(b, u)) continue;
+      const area = units[u].area;
+      const change = uneven(a, held[a] - area) + uneven(b, held[b] + area) - uneven(a, held[a]) - uneven(b, held[b]);
+      if (change > SMOOTH_SLACK) continue;
+      if (!adjacency[u].some(v => who[v] === b)) continue;
+      if (!holds(a, u)) continue;
+      who[u] = b;
+      held[a] -= area;
+      held[b] += area;
+      moved++;
+    }
+    if (!moved) break;
+  }
+}
+
+function shareFan(units, adjacency, owner, fan, homes, seedUnit, share, fits, comp, straits = null, borders = null) {
   const { members } = fan;
   // Sectors round the middle of the clubs' grounds (fanSectors' zoneCentre): its meeting point, where the grounds' sectors
   // meet, can stand at the city's edge (north-west London: all seven clubs lie to its south and east).
@@ -2458,6 +2508,7 @@ function shareFan(units, adjacency, owner, fan, homes, seedUnit, share, fits, co
       if (!best || next.score < best.score - 1e-6 || (Math.abs(next.score - best.score) <= 1e-6 && next.miss < best.miss - 1e-9)) best = next;
     }
   }
+  if (borders) smoothFan(best, units, region, adjacency, borders, seeds, new Set((best.who.entries ?? []).flat()), target, (i, v) => fits(members[i], v));
   for (const u of region) if (best.who[u] >= 0) owner[u] = members[best.who[u]];
   return members.map((c, i) => [c, best.who.entries?.[i] ?? []]);
 }
@@ -2545,7 +2596,7 @@ export function balanceSections(units, adjacency, homes, { beta = 0.5, padKm = g
   const entries = new Map();
   if (fans?.length && wholeUnits) {
     const straits = cityStraits(units, fans, comp);
-    for (const fan of fans) for (const [c, list] of shareFan(units, adjacency, owner, fan, homes, seedUnit, share, fits, comp, straits.links.size ? straits : null) ?? []) {
+    for (const fan of fans) for (const [c, list] of shareFan(units, adjacency, owner, fan, homes, seedUnit, share, fits, comp, straits.links.size ? straits : null, shared) ?? []) {
       if (list.length) entries.set(c, list);
     }
   }
