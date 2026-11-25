@@ -45,12 +45,12 @@
   "name-unusual": {
    "severity": "warning",
    "about": "a name with punctuation other than hyphens, apostrophes and full stops: a birth-year tag telling namesakes apart, or a source's quotes or brackets (an esport's gamer tags are not checked)",
-   "count": 101
+   "count": 102
   },
   "namesakes-in-team": {
    "severity": "warning",
    "about": "two players of one name in one squad (real namesakes; the match shows both alike)",
-   "count": 80
+   "count": 84
   },
   "spelling-variant": {
    "severity": "warning",
@@ -65,17 +65,17 @@
   "lineup-gap": {
    "severity": "warning",
    "about": "a team the game fields whose lineup has an empty place or a player out of position in goal: its source rates too few of its players",
-   "count": 444
+   "count": 446
   },
   "strength-mismatch": {
    "severity": "warning",
    "about": "a team whose stored strength differs by more than one point from the lineup the game fields from its squad",
-   "count": 78
+   "count": 91
   },
   "birth-date-disagreement": {
    "severity": "warning",
    "about": "a player (by an id that names one person in every season: EA's, Wikidata's) born here more than a month from the date most seasons give: one of the source's editions has it wrong",
-   "count": 209
+   "count": 208
   },
   "rating-jump": {
    "severity": "warning",
@@ -140,9 +140,10 @@
     ]
    },
    "ea-fifa-17": {
-    "count": 1,
+    "count": 2,
     "examples": [
-     "nation:Armenia — age-unusual: 41 when the season starts (born 1974-08-05), a starter"
+     "nation:Armenia — age-unusual: 41 when the season starts (born 1974-08-05), a starter",
+     "club:Dynamo Kiev — age-unusual: 41 when the season starts (born 1975-01-02), a starter"
     ]
    },
    "ea-fifa-16": {
@@ -171,24 +172,12 @@
      "nation:Madagascar — age-unusual: 15 when the season starts (born 1996-09-09), a starter"
     ]
    },
-   "ea-fifa-12": {
-    "count": 1,
-    "examples": [
-     "club:Cesena — age-unusual: 41 when the season starts (born 1969-09-14), a starter"
-    ]
-   },
    "wwc-2011": {
     "count": 3,
     "examples": [
      "nation:North Korea — age-unusual: 15 when the season starts (born 1995-01-04), a starter",
      "nation:Mexico — age-unusual: 15 when the season starts (born 1994-10-19), a starter",
      "nation:Australia — age-unusual: 15 when the season starts (born 1994-11-11), a starter"
-    ]
-   },
-   "ea-fifa-11": {
-    "count": 1,
-    "examples": [
-     "club:Feyenoord — age-unusual: 41 when the season starts (born 1969-01-15), a starter"
     ]
    },
    "ea-fifa-08": {
@@ -240,9 +229,10 @@
     ]
    },
    "cm0102-2020-11-cm93": {
-    "count": 1,
+    "count": 2,
     "examples": [
-     "nation:Cameroon — age-unusual: 41 when the season starts (born 1952-05-20), a starter"
+     "nation:Cameroon — age-unusual: 41 when the season starts (born 1952-05-20), a starter",
+     "club:R Antwerp FC — age-unusual: 43 when the season starts (born 1950-05-06), a starter"
     ]
    },
    "nt-1993": {
@@ -391,7 +381,7 @@
     ]
    },
    "ea-fifa-18": {
-    "count": 5,
+    "count": 6,
     "examples": [
      "nation:Cyprus — namesakes-in-team: FW 51 and another A. Georgiou",
      "nation:Guinea — namesakes-in-team: MF 71 and another I. Sylla",
@@ -405,7 +395,7 @@
     ]
    },
    "ea-fifa-17": {
-    "count": 5,
+    "count": 6,
     "examples": [
      "nation:Guinea — namesakes-in-team: MF 70 and another I. Sylla",
      "nation:Mauritania — namesakes-in-team: DF 65 and another A. Ba",
@@ -486,6 +476,18 @@
     "count": 1,
     "examples": [
      "nation:Slovenia — namesakes-in-team: MF 67 and another Robert Koren"
+    ]
+   },
+   "cm0102-2003-10": {
+    "count": 1,
+    "examples": [
+     "club:Litex Lovech — namesakes-in-team: MF 61 and another Murad Hidiouede"
+    ]
+   },
+   "cm0102-2002-11": {
+    "count": 1,
+    "examples": [
+     "club:Litex Lovech — namesakes-in-team: MF 61 and another Murad Hidiouede"
     ]
    },
    "cm0102-2001-09": {
@@ -746,9 +748,10 @@
     ]
    },
    "ea-fifa-09": {
-    "count": 1,
+    "count": 2,
     "examples": [
-     "nation:Sierra Leone — lineup-gap: P. Kpaka in goal"
+     "nation:Sierra Leone — lineup-gap: P. Kpaka in goal",
+     "club:MSK Zilina — lineup-gap: Ádauto in goal"
     ]
    },
    "ea-fifa-07": {
@@ -804,7 +807,7 @@
     ]
    },
    "cm-9900": {
-    "count": 16,
+    "count": 17,
     "examples": [
      "nation:Congo — lineup-gap: empty MF",
      "nation:Costa Rica — lineup-gap: empty DF, DF, MF, MF; Paulo Wanchope in goal",
@@ -877,12 +880,24 @@
      "club:Dinamo Sassari — strength-mismatch: stored 71, fields 68.8 (Marquez Haynes at PG)"
     ]
    },
+   "ea-fifa-16": {
+    "count": 1,
+    "examples": [
+     "club:FK AS Trencin — strength-mismatch: stored 65, fields 61.6 (Lukas Duriska at DF, Tomas Malec at DF, Mitchell Schet at DF)"
+    ]
+   },
    "nba-2k14": {
     "count": 5,
     "examples": [
      "club:Houston Rockets — strength-mismatch: stored 82, fields 79.2 (Jeremy Lin at PF)",
      "club:Los Angeles Lakers — strength-mismatch: stored 80, fields 77.6 (Nick Young at SF)",
      "club:Atlanta Hawks — strength-mismatch: stored 79, fields 76.4 (Elton Brand at SF)"
+    ]
+   },
+   "ea-fifa-14": {
+    "count": 1,
+    "examples": [
+     "club:FC Slovan Liberec — strength-mismatch: stored 65, fields 63.3 (Michal Janec at MF, Renato Kelic at MF)"
     ]
    },
    "nba-2k13": {
@@ -929,6 +944,12 @@
      "club:Toronto Raptors — strength-mismatch: stored 83, fields 80.6 (Jermaine O'Neal at C)"
     ]
    },
+   "ea-fifa-09": {
+    "count": 1,
+    "examples": [
+     "club:MSK Zilina — strength-mismatch: stored 66, fields 64.5 (Ádauto at GK)"
+    ]
+   },
    "nba-2k08": {
     "count": 3,
     "examples": [
@@ -938,9 +959,10 @@
     ]
    },
    "ea-fifa-08": {
-    "count": 1,
+    "count": 2,
     "examples": [
-     "club:Unión Deportiva Almería — strength-mismatch: stored 73, fields 71.8 (Natalio at FW)"
+     "club:Unión Deportiva Almería — strength-mismatch: stored 73, fields 71.8 (Natalio at FW)",
+     "club:Sheriff Tiraspol — strength-mismatch: stored 51, fields 49 (Alexey Kuchyuk at MF, Vasilii Arlet at MF)"
     ]
    },
    "nba-2k07": {
@@ -972,6 +994,12 @@
      "club:Miami Heat — strength-mismatch: stored 77, fields 74.8 (Brian Grant at C)"
     ]
    },
+   "cm0102-2003-10": {
+    "count": 1,
+    "examples": [
+     "club:FC Slovan Liberec — strength-mismatch: stored 63, fields 61.6 (Lubomir Blaha at DF)"
+    ]
+   },
    "nba-2k03": {
     "count": 7,
     "examples": [
@@ -996,6 +1024,12 @@
      "club:Spirou Charleroi — strength-mismatch: stored 80, fields 77.6 (John Jerome at C)"
     ]
    },
+   "cm-0001": {
+    "count": 1,
+    "examples": [
+     "club:Levski Sofia — strength-mismatch: stored 60, fields 58.8 (Georgi Sheytanov at MF)"
+    ]
+   },
    "nba-2k00": {
     "count": 6,
     "examples": [
@@ -1007,21 +1041,32 @@
    "cm0102-2020-11-cm3": {
     "count": 3,
     "examples": [
-     "club:Dinamo Moscow — strength-mismatch: stored 70, fields 68.6 (Tomas Danilyavichus at DF)",
      "club:Olympiakos Piraeus — strength-mismatch: stored 68, fields 66.9 (Ilia Ivic at GK)",
-     "club:AEK Athens — strength-mismatch: stored 64, fields 62.7 (Vassilis Lakis at FW)"
+     "club:AEK Athens — strength-mismatch: stored 64, fields 62.7 (Vassilis Lakis at FW)",
+     "club:Dinamo Moscow — strength-mismatch: stored 70, fields 68.6 (Tomas Danilyavichus at DF)"
+    ]
+   },
+   "cm-9798": {
+    "count": 4,
+    "examples": [
+     "club:Panathinaikos — strength-mismatch: stored 65, fields 62.9 (Alexandre Nikopolidis at DF, Dimitris Saravakos at MF)",
+     "club:Empoli — strength-mismatch: stored 58, fields 56.5 (Massimiliano Cappellini at MF)",
+     "club:FC Sion — strength-mismatch: stored 68, fields 66.9 (Patrick Sylvestre at DF)"
     ]
    },
    "swos-9495": {
-    "count": 1,
+    "count": 2,
     "examples": [
-     "club:FC Barcelona — strength-mismatch: stored 87, fields 85.5 (Sergi Barjuan at DF)"
+     "club:FC Barcelona — strength-mismatch: stored 87, fields 85.5 (Sergi Barjuan at DF)",
+     "club:OGC Nice — strength-mismatch: stored 62, fields 60.7 (Yves Mangione at MF)"
     ]
    },
    "cm0102-2020-11-cm93": {
-    "count": 1,
+    "count": 3,
     "examples": [
-     "club:AC Sparta Prague — strength-mismatch: stored 60, fields 58.5 (Tomas Repka at GK)"
+     "club:Dinamo Bucharest — strength-mismatch: stored 58, fields 55.6 (Perlat Musta at MF, Gheorghe Mihali at FW)",
+     "club:AC Sparta Prague — strength-mismatch: stored 60, fields 58.5 (Tomas Repka at GK)",
+     "club:HNK Rijeka — strength-mismatch: stored 49, fields 47.6 (Barnabas Sztipanovicz at DF)"
     ]
    },
    "nba-eras-1992": {
@@ -1102,6 +1147,12 @@
     "count": 1,
     "examples": [
      "club:Ottawa Senators — name-unusual: \"Alexandre Picard (1985-07-05)\""
+    ]
+   },
+   "ea-fifa-08": {
+    "count": 1,
+    "examples": [
+     "club:MSK Zilina — name-unusual: \"Cyril Spendla,\""
     ]
    },
    "nhl-2006": {
@@ -1340,20 +1391,20 @@
    }
   },
   "birth-date-disagreement": {
-   "ea-fifa-20": {
+   "ea-fifa-19": {
     "count": 7,
     "examples": [
      "club:Dinamo Zagreb — birth-date-disagreement: D. Livaković born 1995-09-02 here, 1995-01-09 in 7 other seasons",
-     "club:Getafe — birth-date-disagreement: L. Cabrera born 1991-09-06 here, 1991-06-17 in 4 other seasons",
-     "club:AZ Alkmaar — birth-date-disagreement: T. Ouwejan born 1996-06-24 here, 1996-09-30 in 3 other seasons"
+     "club:AZ Alkmaar — birth-date-disagreement: T. Ouwejan born 1996-06-24 here, 1996-09-30 in 2 other seasons",
+     "nation:Haiti — birth-date-disagreement: F. Pierrot born 1997-01-07 here, 1995-03-29 in 4 other seasons"
     ]
    },
-   "ea-fc-26": {
-    "count": 3,
+   "ea-fifa-20": {
+    "count": 8,
     "examples": [
-     "club:1. FC Heidenheim 1846 — birth-date-disagreement: B. Zivzivadze born 1994-05-10 here, 1994-03-10 in 1 other season",
-     "nation:Morocco — birth-date-disagreement: I. Saibari born 2001-07-18 here, 2001-01-28 in 1 other season",
-     "nation:Yemen — birth-date-disagreement: K. Al Asbahi born 2003-11-01 here, 2003-07-11 in 1 other season"
+     "club:Dinamo Zagreb — birth-date-disagreement: D. Livaković born 1995-09-02 here, 1995-01-09 in 7 other seasons",
+     "club:Getafe — birth-date-disagreement: L. Cabrera born 1991-09-06 here, 1991-06-17 in 4 other seasons",
+     "club:AZ Alkmaar — birth-date-disagreement: T. Ouwejan born 1996-06-24 here, 1996-09-30 in 2 other seasons"
     ]
    },
    "ea-fc-24": {
@@ -1371,11 +1422,11 @@
     ]
    },
    "ea-fifa-14": {
-    "count": 11,
+    "count": 8,
     "examples": [
      "nation:Iran — birth-date-disagreement: A. Jahanbakhsh born 1993-10-08 here, 1993-08-11 in 6 other seasons",
-     "club:U.S. Sassuolo Calcio — birth-date-disagreement: F. Acerbi born 1988-08-10 here, 1988-02-10 in 9 other seasons",
-     "nation:Luxembourg — birth-date-disagreement: M. Chanot born 1989-11-21 here, 1990-01-21 in 11 other seasons"
+     "nation:Luxembourg — birth-date-disagreement: M. Chanot born 1989-11-21 here, 1990-01-21 in 11 other seasons",
+     "nation:New Zealand — birth-date-disagreement: M. Rojas born 1991-08-01 here, 1991-11-05 in 9 other seasons"
     ]
    },
    "ea-fifa-16": {
@@ -1387,39 +1438,32 @@
     ]
    },
    "ea-fifa-17": {
-    "count": 9,
+    "count": 10,
     "examples": [
      "nation:Iran — birth-date-disagreement: A. Jahanbakhsh born 1993-10-08 here, 1993-08-11 in 6 other seasons",
      "nation:Afghanistan — birth-date-disagreement: M. Kouhyar born 1998-02-01 here, 1997-09-29 in 3 other seasons",
-     "club:Sassuolo — birth-date-disagreement: F. Acerbi born 1988-08-10 here, 1988-02-10 in 9 other seasons"
+     "club:Las Palmas — birth-date-disagreement: Bigas born 1990-09-15 here, 1990-05-15 in 1 other season"
     ]
    },
    "ea-fifa-18": {
-    "count": 5,
+    "count": 6,
     "examples": [
      "nation:Iran — birth-date-disagreement: A. Jahanbakhsh born 1993-10-08 here, 1993-08-11 in 6 other seasons",
      "club:SD Eibar — birth-date-disagreement: Paulo Oliveira born 1991-01-08 here, 1992-01-08 in 7 other seasons",
      "nation:Palestine — birth-date-disagreement: H. Aiesh born 1995-01-01 here, 1995-04-14 in 2 other seasons"
     ]
    },
+   "ea-fc-26": {
+    "count": 2,
+    "examples": [
+     "nation:Morocco — birth-date-disagreement: I. Saibari born 2001-07-18 here, 2001-01-28 in 1 other season",
+     "nation:Yemen — birth-date-disagreement: K. Al Asbahi born 2003-11-01 here, 2003-07-11 in 1 other season"
+    ]
+   },
    "ea-fifa-23": {
     "count": 1,
     "examples": [
      "club:Real Betis — birth-date-disagreement: G. Rodríguez born 1995-04-11 here, 1994-04-12 in 3 other seasons"
-    ]
-   },
-   "ea-fifa-19": {
-    "count": 7,
-    "examples": [
-     "club:AZ Alkmaar — birth-date-disagreement: T. Ouwejan born 1996-06-24 here, 1996-09-30 in 3 other seasons",
-     "nation:Haiti — birth-date-disagreement: F. Pierrot born 1997-01-07 here, 1995-03-29 in 4 other seasons",
-     "club:SD Eibar — birth-date-disagreement: Paulo Oliveira born 1991-01-08 here, 1992-01-08 in 7 other seasons"
-    ]
-   },
-   "builtin:football": {
-    "count": 1,
-    "examples": [
-     "club:Elche CF — birth-date-disagreement: Bigas born 1990-05-15 here, 1990-09-15 in 4 other seasons"
     ]
    },
    "eaw-fifa-23": {
@@ -1451,31 +1495,23 @@
     ]
    },
    "ea-fifa-13": {
-    "count": 12,
+    "count": 13,
     "examples": [
      "club:Chievo Verona — birth-date-disagreement: F. Acerbi born 1988-08-10 here, 1988-02-10 in 9 other seasons",
-     "club:RCD Espanyol de Barcelona — birth-date-disagreement: C. Stuani born 1986-12-12 here, 1986-10-12 in 5 other seasons",
-     "nation:Costa Rica — birth-date-disagreement: C. Gamboa Luna born 1989-02-24 here, 1989-10-24 in 10 other seasons"
-    ]
-   },
-   "ea-fifa-15": {
-    "count": 8,
-    "examples": [
-     "club:Sassuolo — birth-date-disagreement: F. Acerbi born 1988-08-10 here, 1988-02-10 in 9 other seasons",
-     "nation:New Zealand — birth-date-disagreement: M. Rojas born 1991-08-01 here, 1991-11-05 in 9 other seasons",
-     "club:Getafe — birth-date-disagreement: Guaita born 1987-02-18 here, 1987-01-10 in 8 other seasons"
+     "nation:Costa Rica — birth-date-disagreement: C. Gamboa Luna born 1989-02-24 here, 1989-10-24 in 10 other seasons",
+     "nation:New Zealand — birth-date-disagreement: M. Rojas born 1991-08-01 here, 1991-11-05 in 9 other seasons"
     ]
    },
    "ea-fifa-11": {
-    "count": 12,
+    "count": 11,
     "examples": [
-     "club:Levante Unión Deportiva — birth-date-disagreement: C. Stuani born 1986-12-12 here, 1986-10-12 in 5 other seasons",
      "club:Sunderland — birth-date-disagreement: S. Mignolet born 1988-08-06 here, 1988-03-06 in 12 other seasons",
-     "nation:Ireland — birth-date-disagreement: S. Coleman born 1988-08-03 here, 1988-10-11 in 12 other seasons"
+     "nation:Ireland — birth-date-disagreement: S. Coleman born 1988-08-03 here, 1988-10-11 in 12 other seasons",
+     "club:Levante Unión Deportiva — birth-date-disagreement: C. Stuani born 1986-12-12 here, 1986-10-12 in 4 other seasons"
     ]
    },
    "ea-fifa-22": {
-    "count": 5,
+    "count": 4,
     "examples": [
      "club:Mallorca — birth-date-disagreement: Raíllo born 1991-08-10 here, 1991-10-08 in 3 other seasons",
      "nation:South Sudan — birth-date-disagreement: A. Majok born 2001-01-01 here, 2003-01-01 in 1 other season",
@@ -1491,15 +1527,23 @@
     ]
    },
    "ea-fifa-12": {
-    "count": 12,
+    "count": 13,
     "examples": [
      "nation:Ireland — birth-date-disagreement: S. Coleman born 1988-08-03 here, 1988-10-11 in 12 other seasons",
      "club:Olympiacos CFP — birth-date-disagreement: Marcano born 1986-05-11 here, 1987-06-23 in 9 other seasons",
      "nation:Gabon — birth-date-disagreement: A. Biyogho Poko born 1993-03-07 here, 1993-01-01 in 10 other seasons"
     ]
    },
+   "ea-fifa-15": {
+    "count": 8,
+    "examples": [
+     "nation:New Zealand — birth-date-disagreement: M. Rojas born 1991-08-01 here, 1991-11-05 in 9 other seasons",
+     "club:Getafe — birth-date-disagreement: Guaita born 1987-02-18 here, 1987-01-10 in 8 other seasons",
+     "nation:Saudi Arabia — birth-date-disagreement: Y. Al Shahrani born 1992-10-10 here, 1992-05-25 in 8 other seasons"
+    ]
+   },
    "ea-fifa-07": {
-    "count": 19,
+    "count": 17,
     "examples": [
      "nation:Canada — birth-date-disagreement: A. Hutchinson born 1982-03-01 here, 1983-02-08 in 13 other seasons",
      "club:Palermo — birth-date-disagreement: A. Barzagli born 1981-08-05 here, 1981-05-08 in 12 other seasons",
@@ -1511,14 +1555,14 @@
     "examples": [
      "nation:Canada — birth-date-disagreement: A. Hutchinson born 1982-03-01 here, 1983-02-08 in 13 other seasons",
      "nation:Slovenia — birth-date-disagreement: S. Handanovic born 1984-01-20 here, 1984-07-14 in 14 other seasons",
-     "club:Udinese Calcio — birth-date-disagreement: F. Quagliarella born 1983-10-31 here, 1983-01-31 in 14 other seasons"
+     "club:Udinese Calcio — birth-date-disagreement: F. Quagliarella born 1983-10-31 here, 1983-01-31 in 13 other seasons"
     ]
    },
    "ea-fifa-09": {
-    "count": 12,
+    "count": 13,
     "examples": [
      "nation:Canada — birth-date-disagreement: A. Hutchinson born 1982-03-01 here, 1983-02-08 in 13 other seasons",
-     "nation:Uruguay — birth-date-disagreement: M. Cáceres born 1988-03-17 here, 1987-04-07 in 12 other seasons",
+     "nation:Uruguay — birth-date-disagreement: M. Cáceres born 1988-03-17 here, 1987-04-07 in 10 other seasons",
      "nation:Paraguay — birth-date-disagreement: C. Riveros born 1982-03-15 here, 1982-10-16 in 7 other seasons"
     ]
    },
@@ -1531,7 +1575,7 @@
     ]
    },
    "ea-fifa-10": {
-    "count": 15,
+    "count": 17,
     "examples": [
      "nation:Ghana — birth-date-disagreement: K. Asamoah born 1988-09-09 here, 1988-12-09 in 10 other seasons",
      "nation:Angola — birth-date-disagreement: Djalma born 1985-04-25 here, 1987-05-30 in 7 other seasons",
@@ -1604,17 +1648,16 @@
    "label": "built-in",
    "nations": 173,
    "fielded": 173,
-   "clubs": 124,
+   "clubs": 149,
    "ratings": {
-    "players": 3267,
+    "players": 3542,
     "min": 35,
     "median": 74,
     "max": 91
    },
    "findings": {
     "age-unusual": 2,
-    "namesakes-in-team": 2,
-    "birth-date-disagreement": 1
+    "namesakes-in-team": 2
    }
   },
   {
@@ -1824,7 +1867,7 @@
    "fielded": 40,
    "clubs": 0,
    "ratings": {
-    "players": 277,
+    "players": 274,
     "min": 43,
     "median": 70,
     "max": 91
@@ -1942,7 +1985,7 @@
     "lineup-gap": 30,
     "namesakes-in-team": 2,
     "age-unusual": 3,
-    "birth-date-disagreement": 3
+    "birth-date-disagreement": 2
    }
   },
   {
@@ -2123,6 +2166,23 @@
     "lineup-gap": 23,
     "birth-date-disagreement": 1
    }
+  },
+  {
+   "id": "cs-2025",
+   "sport": "counter-strike",
+   "year": 2025,
+   "season": "2025",
+   "label": "Liquipedia Elo, end of 2025",
+   "nations": 37,
+   "fielded": 37,
+   "clubs": 0,
+   "ratings": {
+    "players": 247,
+    "min": 42,
+    "median": 71,
+    "max": 90
+   },
+   "findings": {}
   },
   {
    "id": "cfb-2025",
@@ -2340,6 +2400,23 @@
    }
   },
   {
+   "id": "cs-2024",
+   "sport": "counter-strike",
+   "year": 2024,
+   "season": "2024",
+   "label": "Liquipedia Elo, end of 2024",
+   "nations": 37,
+   "fielded": 37,
+   "clubs": 0,
+   "ratings": {
+    "players": 257,
+    "min": 43,
+    "median": 70,
+    "max": 91
+   },
+   "findings": {}
+  },
+  {
    "id": "cfb-2024",
    "sport": "college-football",
    "year": 2024,
@@ -2555,6 +2632,23 @@
    }
   },
   {
+   "id": "cs-2023",
+   "sport": "counter-strike",
+   "year": 2023,
+   "season": "2023",
+   "label": "Liquipedia Elo, end of 2023",
+   "nations": 40,
+   "fielded": 40,
+   "clubs": 0,
+   "ratings": {
+    "players": 274,
+    "min": 48,
+    "median": 69,
+    "max": 87
+   },
+   "findings": {}
+  },
+  {
    "id": "cfb-2023",
    "sport": "college-football",
    "year": 2023,
@@ -2744,8 +2838,25 @@
    "findings": {
     "lineup-gap": 22,
     "namesakes-in-team": 3,
-    "birth-date-disagreement": 5
+    "birth-date-disagreement": 4
    }
+  },
+  {
+   "id": "cs-2022",
+   "sport": "counter-strike",
+   "year": 2022,
+   "season": "2022",
+   "label": "Liquipedia Elo, end of 2022",
+   "nations": 39,
+   "fielded": 39,
+   "clubs": 0,
+   "ratings": {
+    "players": 270,
+    "min": 46,
+    "median": 69,
+    "max": 87
+   },
+   "findings": {}
   },
   {
    "id": "cfb-2022",
@@ -2944,6 +3055,23 @@
    }
   },
   {
+   "id": "cs-2021",
+   "sport": "counter-strike",
+   "year": 2021,
+   "season": "2021",
+   "label": "Liquipedia Elo, end of 2021",
+   "nations": 41,
+   "fielded": 41,
+   "clubs": 0,
+   "ratings": {
+    "players": 279,
+    "min": 45,
+    "median": 69,
+    "max": 86
+   },
+   "findings": {}
+  },
+  {
    "id": "cfb-2021",
    "sport": "college-football",
    "year": 2021,
@@ -3134,8 +3262,25 @@
     "namesakes-in-team": 5,
     "lineup-gap": 20,
     "age-unusual": 1,
-    "birth-date-disagreement": 7
+    "birth-date-disagreement": 8
    }
+  },
+  {
+   "id": "cs-2020",
+   "sport": "counter-strike",
+   "year": 2020,
+   "season": "2020",
+   "label": "Liquipedia Elo, end of 2020",
+   "nations": 43,
+   "fielded": 43,
+   "clubs": 0,
+   "ratings": {
+    "players": 288,
+    "min": 40,
+    "median": 68,
+    "max": 86
+   },
+   "findings": {}
   },
   {
    "id": "cfb-2020",
@@ -3330,6 +3475,23 @@
    }
   },
   {
+   "id": "cs-2019",
+   "sport": "counter-strike",
+   "year": 2019,
+   "season": "2019",
+   "label": "Liquipedia Elo, end of 2019",
+   "nations": 42,
+   "fielded": 42,
+   "clubs": 0,
+   "ratings": {
+    "players": 282,
+    "min": 40,
+    "median": 67,
+    "max": 86
+   },
+   "findings": {}
+  },
+  {
    "id": "cfb-2019",
    "sport": "college-football",
    "year": 2019,
@@ -3517,10 +3679,27 @@
     "max": 94
    },
    "findings": {
-    "namesakes-in-team": 5,
+    "namesakes-in-team": 6,
     "lineup-gap": 15,
-    "birth-date-disagreement": 5
+    "birth-date-disagreement": 6
    }
+  },
+  {
+   "id": "cs-2018",
+   "sport": "counter-strike",
+   "year": 2018,
+   "season": "2018",
+   "label": "Liquipedia Elo, end of 2018",
+   "nations": 44,
+   "fielded": 44,
+   "clubs": 0,
+   "ratings": {
+    "players": 296,
+    "min": 43,
+    "median": 66,
+    "max": 89
+   },
+   "findings": {}
   },
   {
    "id": "cfb-2018",
@@ -3708,15 +3887,32 @@
    "ratings": {
     "players": 2558,
     "min": 52,
-    "median": 77,
+    "median": 76,
     "max": 94
    },
    "findings": {
     "lineup-gap": 13,
-    "namesakes-in-team": 5,
-    "age-unusual": 1,
-    "birth-date-disagreement": 9
+    "namesakes-in-team": 6,
+    "age-unusual": 2,
+    "birth-date-disagreement": 10
    }
+  },
+  {
+   "id": "cs-2017",
+   "sport": "counter-strike",
+   "year": 2017,
+   "season": "2017",
+   "label": "Liquipedia Elo, end of 2017",
+   "nations": 41,
+   "fielded": 41,
+   "clubs": 0,
+   "ratings": {
+    "players": 272,
+    "min": 45,
+    "median": 65,
+    "max": 89
+   },
+   "findings": {}
   },
   {
    "id": "cfb-2017",
@@ -3902,15 +4098,33 @@
    "ratings": {
     "players": 2557,
     "min": 52,
-    "median": 76,
+    "median": 75,
     "max": 94
    },
    "findings": {
     "lineup-gap": 12,
     "namesakes-in-team": 3,
     "age-unusual": 1,
+    "strength-mismatch": 1,
     "birth-date-disagreement": 11
    }
+  },
+  {
+   "id": "cs-2016",
+   "sport": "counter-strike",
+   "year": 2016,
+   "season": "2016",
+   "label": "Liquipedia Elo, end of 2016",
+   "nations": 35,
+   "fielded": 35,
+   "clubs": 0,
+   "ratings": {
+    "players": 231,
+    "min": 49,
+    "median": 66,
+    "max": 86
+   },
+   "findings": {}
   },
   {
    "id": "cfb-2016",
@@ -4090,6 +4304,23 @@
    }
   },
   {
+   "id": "cs-2015",
+   "sport": "counter-strike",
+   "year": 2015,
+   "season": "2015",
+   "label": "Liquipedia Elo, end of 2015",
+   "nations": 27,
+   "fielded": 27,
+   "clubs": 0,
+   "ratings": {
+    "players": 181,
+    "min": 49,
+    "median": 67,
+    "max": 87
+   },
+   "findings": {}
+  },
+  {
    "id": "cfb-2015",
    "sport": "college-football",
    "year": 2015,
@@ -4247,8 +4478,26 @@
    "findings": {
     "lineup-gap": 6,
     "namesakes-in-team": 1,
-    "birth-date-disagreement": 11
+    "strength-mismatch": 1,
+    "birth-date-disagreement": 8
    }
+  },
+  {
+   "id": "cs-2014",
+   "sport": "counter-strike",
+   "year": 2014,
+   "season": "2014",
+   "label": "Liquipedia Elo, end of 2014",
+   "nations": 15,
+   "fielded": 15,
+   "clubs": 0,
+   "ratings": {
+    "players": 100,
+    "min": 50,
+    "median": 68,
+    "max": 85
+   },
+   "findings": {}
   },
   {
    "id": "cfb-2014",
@@ -4424,8 +4673,25 @@
     "namesakes-in-team": 1,
     "lineup-gap": 2,
     "age-unusual": 1,
-    "birth-date-disagreement": 12
+    "birth-date-disagreement": 13
    }
+  },
+  {
+   "id": "cs-2013",
+   "sport": "counter-strike",
+   "year": 2013,
+   "season": "2013",
+   "label": "Liquipedia Elo, end of 2013 (rough)",
+   "nations": 15,
+   "fielded": 15,
+   "clubs": 0,
+   "ratings": {
+    "players": 101,
+    "min": 54,
+    "median": 70,
+    "max": 91
+   },
+   "findings": {}
   },
   {
    "id": "cfb-2013",
@@ -4583,10 +4849,26 @@
    "findings": {
     "lineup-gap": 1,
     "namesakes-in-team": 1,
-    "age-unusual": 1,
-    "birth-date-disagreement": 12,
+    "birth-date-disagreement": 13,
     "rating-jump": 2
    }
+  },
+  {
+   "id": "cs-2012",
+   "sport": "counter-strike",
+   "year": 2012,
+   "season": "2012",
+   "label": "Liquipedia Elo, end of 2012 (1.6 and Source)",
+   "nations": 18,
+   "fielded": 18,
+   "clubs": 0,
+   "ratings": {
+    "players": 122,
+    "min": 47,
+    "median": 70,
+    "max": 91
+   },
+   "findings": {}
   },
   {
    "id": "cfb-2012",
@@ -4767,9 +5049,25 @@
    "findings": {
     "namesakes-in-team": 2,
     "lineup-gap": 2,
-    "age-unusual": 1,
-    "birth-date-disagreement": 12
+    "birth-date-disagreement": 11
    }
+  },
+  {
+   "id": "cs-2011",
+   "sport": "counter-strike",
+   "year": 2011,
+   "season": "2011",
+   "label": "Liquipedia Elo, end of 2011 (1.6 and Source)",
+   "nations": 22,
+   "fielded": 22,
+   "clubs": 0,
+   "ratings": {
+    "players": 143,
+    "min": 51,
+    "median": 70,
+    "max": 85
+   },
+   "findings": {}
   },
   {
    "id": "cfb-2011",
@@ -4932,9 +5230,26 @@
     "namesakes-in-team": 2,
     "lineup-gap": 3,
     "strength-mismatch": 1,
-    "birth-date-disagreement": 15,
+    "birth-date-disagreement": 17,
     "rating-jump": 1
    }
+  },
+  {
+   "id": "cs-2010",
+   "sport": "counter-strike",
+   "year": 2010,
+   "season": "2010",
+   "label": "Liquipedia Elo, end of 2010 (1.6 and Source)",
+   "nations": 27,
+   "fielded": 27,
+   "clubs": 0,
+   "ratings": {
+    "players": 175,
+    "min": 49,
+    "median": 67,
+    "max": 86
+   },
+   "findings": {}
   },
   {
    "id": "cfb-2010",
@@ -5103,15 +5418,33 @@
    "ratings": {
     "players": 2384,
     "min": 39,
-    "median": 75,
+    "median": 74,
     "max": 91
    },
    "findings": {
     "namesakes-in-team": 1,
-    "lineup-gap": 1,
-    "birth-date-disagreement": 12,
+    "lineup-gap": 2,
+    "strength-mismatch": 1,
+    "birth-date-disagreement": 13,
     "rating-jump": 3
    }
+  },
+  {
+   "id": "cs-2009",
+   "sport": "counter-strike",
+   "year": 2009,
+   "season": "2009",
+   "label": "Liquipedia Elo, end of 2009 (1.6 and Source)",
+   "nations": 22,
+   "fielded": 22,
+   "clubs": 0,
+   "ratings": {
+    "players": 154,
+    "min": 51,
+    "median": 68,
+    "max": 83
+   },
+   "findings": {}
   },
   {
    "id": "cfb-2009",
@@ -5286,10 +5619,28 @@
    "findings": {
     "namesakes-in-team": 3,
     "age-unusual": 1,
-    "strength-mismatch": 1,
+    "strength-mismatch": 2,
+    "name-unusual": 1,
     "rating-jump": 3,
     "birth-date-disagreement": 28
    }
+  },
+  {
+   "id": "cs-2008",
+   "sport": "counter-strike",
+   "year": 2008,
+   "season": "2008",
+   "label": "Liquipedia Elo, end of 2008 (1.6 and Source)",
+   "nations": 16,
+   "fielded": 16,
+   "clubs": 0,
+   "ratings": {
+    "players": 109,
+    "min": 49,
+    "median": 68,
+    "max": 83
+   },
+   "findings": {}
   },
   {
    "id": "cfb-2008",
@@ -5449,9 +5800,26 @@
    "findings": {
     "namesakes-in-team": 3,
     "lineup-gap": 1,
-    "birth-date-disagreement": 19,
+    "birth-date-disagreement": 17,
     "rating-jump": 7
    }
+  },
+  {
+   "id": "cs-2007",
+   "sport": "counter-strike",
+   "year": 2007,
+   "season": "2007",
+   "label": "Liquipedia Elo, end of 2007 (1.6 and Source)",
+   "nations": 18,
+   "fielded": 18,
+   "clubs": 0,
+   "ratings": {
+    "players": 119,
+    "min": 48,
+    "median": 66,
+    "max": 81
+   },
+   "findings": {}
   },
   {
    "id": "cfb-2007",
@@ -5616,6 +5984,23 @@
    }
   },
   {
+   "id": "cs-2006",
+   "sport": "counter-strike",
+   "year": 2006,
+   "season": "2006",
+   "label": "Liquipedia Elo, end of 2006 (1.6 and Source)",
+   "nations": 18,
+   "fielded": 18,
+   "clubs": 0,
+   "ratings": {
+    "players": 120,
+    "min": 46,
+    "median": 66,
+    "max": 81
+   },
+   "findings": {}
+  },
+  {
    "id": "cfb-2006",
    "sport": "college-football",
    "year": 2006,
@@ -5776,6 +6161,23 @@
    }
   },
   {
+   "id": "cs-2005",
+   "sport": "counter-strike",
+   "year": 2005,
+   "season": "2005",
+   "label": "Liquipedia Elo, end of 2005 (1.6)",
+   "nations": 15,
+   "fielded": 15,
+   "clubs": 0,
+   "ratings": {
+    "players": 103,
+    "min": 49,
+    "median": 64,
+    "max": 78
+   },
+   "findings": {}
+  },
+  {
    "id": "cfb-2005",
    "sport": "college-football",
    "year": 2005,
@@ -5931,6 +6333,23 @@
    "findings": {}
   },
   {
+   "id": "cs-2004",
+   "sport": "counter-strike",
+   "year": 2004,
+   "season": "2004",
+   "label": "Liquipedia Elo, end of 2004 (1.6, rough)",
+   "nations": 15,
+   "fielded": 15,
+   "clubs": 0,
+   "ratings": {
+    "players": 95,
+    "min": 47,
+    "median": 63,
+    "max": 79
+   },
+   "findings": {}
+  },
+  {
    "id": "cm0102-2003-10",
    "sport": "football",
    "year": 2004,
@@ -5942,12 +6361,14 @@
    "ratings": {
     "players": 2872,
     "min": 1,
-    "median": 68,
+    "median": 67,
     "max": 98
    },
    "findings": {
     "lineup-gap": 19,
-    "age-unusual": 1
+    "age-unusual": 1,
+    "strength-mismatch": 1,
+    "namesakes-in-team": 1
    }
   },
   {
@@ -6089,6 +6510,23 @@
    "findings": {}
   },
   {
+   "id": "cs-2003",
+   "sport": "counter-strike",
+   "year": 2003,
+   "season": "2003",
+   "label": "Liquipedia Elo, end of 2003 (1.6, rough)",
+   "nations": 15,
+   "fielded": 15,
+   "clubs": 0,
+   "ratings": {
+    "players": 92,
+    "min": 51,
+    "median": 61,
+    "max": 81
+   },
+   "findings": {}
+  },
+  {
    "id": "cm0102-2002-11",
    "sport": "football",
    "year": 2003,
@@ -6105,7 +6543,8 @@
    },
    "findings": {
     "lineup-gap": 19,
-    "age-unusual": 1
+    "age-unusual": 1,
+    "namesakes-in-team": 1
    }
   },
   {
@@ -6230,6 +6669,23 @@
    "findings": {}
   },
   {
+   "id": "cs-2002",
+   "sport": "counter-strike",
+   "year": 2002,
+   "season": "2002",
+   "label": "Liquipedia Elo, end of 2002 (1.6, rough)",
+   "nations": 8,
+   "fielded": 8,
+   "clubs": 0,
+   "ratings": {
+    "players": 56,
+    "min": 51,
+    "median": 63,
+    "max": 75
+   },
+   "findings": {}
+  },
+  {
    "id": "cm0102-2001-09",
    "sport": "football",
    "year": 2002,
@@ -6241,7 +6697,7 @@
    "ratings": {
     "players": 2686,
     "min": 2,
-    "median": 68,
+    "median": 67,
     "max": 94
    },
    "findings": {
@@ -6374,6 +6830,23 @@
    "findings": {}
   },
   {
+   "id": "cs-2001",
+   "sport": "counter-strike",
+   "year": 2001,
+   "season": "2001",
+   "label": "Liquipedia Elo, end of 2001 (1.6, rough)",
+   "nations": 9,
+   "fielded": 9,
+   "clubs": 0,
+   "ratings": {
+    "players": 61,
+    "min": 53,
+    "median": 62,
+    "max": 75
+   },
+   "findings": {}
+  },
+  {
    "id": "cm-0001",
    "sport": "football",
    "year": 2001,
@@ -6385,12 +6858,13 @@
    "ratings": {
     "players": 2521,
     "min": 4,
-    "median": 69,
+    "median": 68,
     "max": 96
    },
    "findings": {
     "namesakes-in-team": 3,
-    "lineup-gap": 15
+    "lineup-gap": 15,
+    "strength-mismatch": 1
    }
   },
   {
@@ -6530,7 +7004,7 @@
     "max": 96
    },
    "findings": {
-    "lineup-gap": 16,
+    "lineup-gap": 17,
     "age-unusual": 1
    }
   },
@@ -6667,7 +7141,7 @@
    "ratings": {
     "players": 2292,
     "min": 2,
-    "median": 69,
+    "median": 68,
     "max": 96
    },
    "findings": {
@@ -6814,7 +7288,8 @@
    },
    "findings": {
     "lineup-gap": 15,
-    "namesakes-in-team": 1
+    "namesakes-in-team": 1,
+    "strength-mismatch": 4
    }
   },
   {
@@ -6880,7 +7355,7 @@
    "ratings": {
     "players": 2827,
     "min": 41,
-    "median": 66,
+    "median": 65,
     "max": 98
    },
    "findings": {
@@ -7035,7 +7510,7 @@
    "ratings": {
     "players": 2816,
     "min": 41,
-    "median": 66,
+    "median": 64,
     "max": 98
    },
    "findings": {
@@ -7210,13 +7685,13 @@
    "ratings": {
     "players": 2805,
     "min": 41,
-    "median": 65,
+    "median": 64,
     "max": 98
    },
    "findings": {
     "name-unusual": 2,
     "namesakes-in-team": 2,
-    "strength-mismatch": 1
+    "strength-mismatch": 2
    }
   },
   {
@@ -7441,14 +7916,14 @@
    "ratings": {
     "players": 2406,
     "min": 2,
-    "median": 64,
+    "median": 63,
     "max": 99
    },
    "findings": {
-    "age-unusual": 1,
+    "age-unusual": 2,
     "lineup-gap": 15,
     "namesakes-in-team": 1,
-    "strength-mismatch": 1
+    "strength-mismatch": 3
    }
   },
   {

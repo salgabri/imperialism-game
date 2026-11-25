@@ -462,10 +462,12 @@ export const SEASON_NOTES = Object.freeze({
     + 'player plays for the nation he last played for at the FIFAe World Cup or the Esports Nations Cup, else the flag '
     + 'Liquipedia files him under, and only if he has played within the year. Each nation fields its best three; one with '
     + 'fewer fields no team.',
-  'counter-strike': 'Elo ratings computed from every 5v5 series of CS:GO and CS2 that Liquipedia records (CC BY-SA 3.0), to '
-    + 'November 2026, map by map. A player plays for the nation he last played for at a national-team event (the Esports '
-    + 'Nations Cup, WESG, the IESF\'s world championships), else the country of his Liquipedia page, and only if he has '
-    + 'played within the year. Each nation fields its best five; one with fewer fields no team.',
+  'counter-strike': 'Elo ratings computed map by map from every 5v5 series Liquipedia records (CC BY-SA 3.0): to November '
+    + '2026, and at the end of each year from 2001 (2001–2004 and 2013 rough): Counter-Strike 1.6\'s and, from 2006, Source\'s to 2012, then '
+    + 'CS:GO\'s and CS2\'s. Each year plays its own rounds: a map is first to 16 from 2005 to 2023, first to 13 before and since. A '
+    + 'player plays for the nation he last played for at a national-team event (the Esports Nations Cup, WESG, the IESF\'s '
+    + 'world championships), else the country Liquipedia files him under, and only if he has played five maps within the '
+    + 'year. Each nation fields its best five; one with fewer fields no team.',
   valorant: 'Elo ratings computed from every map vlr.gg records of VCT, Challengers and the off-season: to November 2026, '
     + 'and at the end of each year from 2023, each year on its own map pool. A player plays for the nation he last played for '
     + 'at the Esports Nations Cup, else the flag vlr.gg files him under, and only if he has played within the year. Each '

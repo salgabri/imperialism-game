@@ -187,6 +187,7 @@ npm run build-rocket-league # rebuild the Rocket League nations from that snapsh
 npm run build:rocket-league-seasons # rebuild Rocket League's earlier seasons, 2016-2025, from the sync's year-end snapshots (--check)
 npm run sync:counter-strike # Counter-Strike's player Elo from Liquipedia exports saved by hand in data-src/liquipedia-counterstrike/ (no network) into scripts/data/counter-strike-elo.json
 npm run build-counter-strike # rebuild the Counter-Strike nations from that snapshot (--check compares byte for byte)
+npm run build:counter-strike-seasons # rebuild Counter-Strike's earlier seasons, 2001-2025, from the sync's year-end snapshots (--check)
 npm run sync:valorant    # Valorant's player Elo from vlr.gg's results cached in data-src/vlr/ into scripts/data/valorant-elo.json (--fetch fetches the pages the cache lacks)
 npm run build-valorant   # rebuild the Valorant nations from that snapshot (--check compares byte for byte)
 npm run build:valorant-seasons # rebuild Valorant's earlier seasons, 2023-2025, from the sync's year-end snapshots (--check)
@@ -433,7 +434,9 @@ manager of the theatre's favourite, with decisions from the first match.
    NRL.com's match statistics, but 2008: Rugby League 2, the overall ours; before 1998 from the Rugby League
    Project's team lists), the premiership's clubs on the map of their day, Rocket League its 2026 then its
    [earlier seasons](#rocket-league-seasons) 2025 back to 2016 (the Elo of Liquipedia's results at each year's end),
-   Counter-Strike its 2026 (the Elo of Liquipedia's results to November), Valorant its 2026 then its
+   Counter-Strike its 2026 (the Elo of Liquipedia's results to November) then its
+   [earlier seasons](#counter-strike-seasons) 2025 back to 2001 (1.6's and Source's to 2012, each year in its own rounds),
+   Valorant its 2026 then its
    [earlier seasons](#valorant-seasons) 2025 back to 2023 (the Elo of vlr.gg's results at each year's end) and League of
    Legends its 2026 (the Elo of gol.gg's results to November).
    The Season list names a season by its years, adding "· computed", "· converted"
@@ -1182,15 +1185,17 @@ States, France and Saudi Arabia down. Nothing is estimated. Each year from 2016 
 
 **Counter-Strike** — `src/data/rosters.counter-strike.js`, from every 5v5 series of CS:GO and CS2 Liquipedia records
 (CC BY-SA 3.0), read from four exports of the wiki saved by hand on 2026-11-15 (no script fetches Liquipedia) into
-`scripts/data/counter-strike-elo.json`: 3,007 events of S-, A- and B-Tier, 110,249 maps from 2012 to November 2026. Each
+`scripts/data/counter-strike-elo.json`: 2,969 events of S-, A- and B-Tier, 109,313 maps from 2012 to November 2026
+(women's events, a circuit that plays itself, left out). Each
 player's rating is Rocket League's Elo, built map by map, a team playing at its five players' mean, on the same scale
 (huNter-'s 2,336 is 91), each region's newcomers starting at its level fitted on the maps between regions (Europe
-1,500, the CIS 1,553, South America 1,458, North America 1,359, Asia 1,326, MENA 1,307, Oceania 1,264, Africa 1,231);
-held out on the last 180 days its predictions were calibrated (log loss 0.641). A player plays
+1,500, the CIS 1,550, South America 1,445, North America 1,331, Asia 1,325, MENA 1,304, Oceania 1,260, Africa 1,216);
+held out on the last 180 days its predictions were calibrated (log loss 0.640). A player the wiki renamed is one player
+(Device and Dev1ce, the pages of 277 older titles the exports hold no redirect of, joined by the line-ups they share). A player plays
 for the nation he last played for at a national-team event (the Esports Nations Cup, WESG, the IESF's world
-championships), else his Liquipedia page's country; 1,667 players have played within the year, and 40 nations have the
-five a map needs, from Russia, Ukraine, France and Brazil down. Nothing is estimated. See the
-[design notes](docs/design/counter-strike.md).
+championships), else his Liquipedia page's country; 1,522 players have played five maps within the year, and 40 nations have the
+five a map needs, from Russia, Ukraine, France and Brazil down. Nothing is estimated. Each year from 2001 is an
+[earlier season](#counter-strike-seasons). See the [design notes](docs/design/counter-strike.md).
 
 **Valorant** — `src/data/rosters.valorant.js`, from every map vlr.gg records of VCT, Challengers and the off-season,
 from 2023's season (its first qualifiers in September 2022) to 15 November 2026, fetched a page at a time through
@@ -2805,6 +2810,45 @@ year from 2016 to 2025, nations only. Pick one under **Season** in setup. Each s
 The [design notes](docs/design/rocket-league.md#earlier-seasons) give each season's nations and
 scoring.
 
+## Counter-Strike seasons
+
+Counter-Strike can be played on twenty-five earlier seasons as well as the built-in 2026: the end of
+every year from 2001 to 2025, nations only. Pick one under **Season** in setup. Each season is a file
+in `public/counter-strike/` (19–89 KB) that loads only when chosen.
+
+- **Ratings** are the same Elo as the built-in season's, run over Liquipedia's results up to 31
+  December of that year: who was rated then (20 maps behind him, five of them within the year), on
+  the same scale (Elo / 25 − 2), each newcomer at his region's level fitted on the maps to that
+  December, each nation's seven best with its five best playing. From 2013 they are Global
+  Offensive's and Counter-Strike 2's; 2013's newcomers start from what they were worth in 1.6 or
+  Source, which foresaw Global Offensive's first maps far better, and 2013 is marked rough.
+- **1.6 and Source:** to 2012 a season is Counter-Strike 1.6's (Condition Zero's World Cyber Games
+  of 2004 with it) and, from 2006, Source's: an Elo of each, from December 2000. Their record is
+  thinner, so a player needs ten maps there (five within the year), and a series whose maps the wiki
+  does not record counts as one map, its winner's. A player of both is rated in the one he played
+  more of that year. Their scenes never met, but Global Offensive's first years put them on one
+  scale: its sides of Source players did as Elo expected against those of 1.6 players (+16 ± 17 Elo
+  over 531 maps). 2001 to 2004 are marked rough.
+- **Nations** follow the record: 9 at the end of 2001 (Sweden's SK and NiP lead), 15 in 2003, 27 in
+  2010 (Na'Vi's Ukraine second), 15 in 2013, about 40 since 2017; Sweden leads every year to 2014,
+  Denmark Astralis's two, Russia every year since 2021. A player plays for the nation his record
+  gives him, whichever year it is, for the team he played for that December.
+- **Rounds by year:** each season plays the format most of its year's maps were played in, first to
+  16 rounds (MR15) from 2005 to 2023 and first to 13 before and since, and the momentum fitted to
+  them: a round won pulled harder on the next in CS:GO's mid-2010s (0.95 in 2015) than since the
+  economy of 2019 (0.57 from 2022, as today). Who wins a map is Elo's whatever the rounds.
+- **Licence:** Liquipedia's content is CC BY-SA 3.0, as for the built-in season:
+  `public/counter-strike/ATTRIBUTION.txt` credits it and the files are shared under the same licence.
+  To rebuild:
+
+  ```bash
+  npm run sync:counter-strike           # the year-end snapshots in scripts/data/counter-strike-seasons/, from the exports in data-src/liquipedia-counterstrike/
+  npm run build:counter-strike-seasons  # the season files, their listing, the rounds table and the audit (--check compares byte for byte)
+  ```
+
+The [design notes](docs/design/counter-strike.md#earlier-seasons) give each season's nations and
+rounds.
+
 ## Valorant seasons
 
 Valorant can be played on three earlier seasons as well as the built-in 2026: the end of every
@@ -3441,6 +3485,7 @@ public/
   womens-tennis/       the built-in earlier women's tennis seasons (wta-*.json), fetched when chosen
   rugby-league/        the built-in earlier rugby league seasons (nrl-2008.json to nrl-2024.json), fetched when chosen
   rocket-league/       the built-in earlier Rocket League seasons (rl-2016.json to rl-2025.json), fetched when chosen
+  counter-strike/      the built-in earlier Counter-Strike seasons (cs-2001.json to cs-2025.json), fetched when chosen
   valorant/            the built-in earlier Valorant seasons (val-2023.json to val-2025.json), fetched when chosen
   fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
   textures/            former cartographic paper texture (unused since v4)

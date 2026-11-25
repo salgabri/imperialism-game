@@ -1,19 +1,20 @@
 // Counter-Strike's player Elo from Liquipedia's results: reads the wiki's own export (Special:Export's XML, saved by hand
 // into data-src/liquipedia-counterstrike/) and writes scripts/data/counter-strike-elo.json, which npm run
-// build-counter-strike turns into the national teams. Nothing is fetched: Liquipedia's robots.txt shuts Anthropic's
-// crawlers out of the whole site and every bot out of its API (scripts/lib/liquipedia.mjs), so the export is made in a
-// browser (docs/design/counter-strike.md, "The Liquipedia export").
+// build-counter-strike turns into the national teams, and scripts/data/counter-strike-seasons/<year>.json, each earlier
+// year's players as rated on its last day, which npm run build:counter-strike-seasons turns into the earlier seasons.
+// Nothing is fetched: Liquipedia's robots.txt shuts Anthropic's crawlers out of the whole site and every bot out of its API
+// (scripts/lib/liquipedia.mjs), so the export is made in a browser (docs/design/counter-strike.md, "The Liquipedia export").
 //
 // Usage: node scripts/sync-counter-strike.mjs [--tune]
 //   npm run sync:counter-strike
 //   --tune  also scores K, with and without the regions' levels, on the last HOLDOUT_DAYS of maps, before each is played
-import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { readExport } from './lib/liquipedia.mjs';
-import { ACTIVE_DAYS, EDITION, K_SCALE, LEVEL_TAU, MIN_GAMES, ODDS_BINS, OFFSET_TAU, TIERS, formatOf, homeEdge, homesOf, isRegionFlag,
-  leftOut, nationalTeams, nationOfPlayer, nationsOf, oddsBin, playerOf, ratedPlayers, readTournaments, regionLevels, rowOf, runElo,
-  scoreOf, seriesInOrder } from './lib/counter-strike.mjs';
+import { ACTIVE_DAYS, EDITION, FIRST_GO_SEASON, HALF_ROUNDS, K_SCALE, LEVEL_TAU, MIN_GAMES, MIN_GAMES_OLDER, MIN_NATIONS, MIN_RECENT, ODDS_BINS, OFFSET_TAU, OLDER, TIERS, carriedOver, eventFormatOf, foldRenames, formatOf, homeEdge, homesOf, isRegionFlag,
+  leftOut, nationalTeams, nationOfPlayer, nationsOf, oddsBin, older, olderGameOf, playerOf, playersAsOf, ratedPlayers, readTournaments, recentFrom,
+  regionLevels, rowOf, runElo, scoreOf, seriesInOrder } from './lib/counter-strike.mjs';
 
 const args = process.argv.slice(2);
 const unknown = args.filter(arg => arg !== '--tune');
@@ -21,6 +22,7 @@ if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const folder = path.join(root, 'data-src', 'liquipedia-counterstrike');
 const snapshotFile = path.join(root, 'scripts', 'data', 'counter-strike-elo.json');
+const seasonsDir = path.join(root, 'scripts', 'data', 'counter-strike-seasons');
 const HOLDOUT_DAYS = 180;
 // The real maps the match model is held against: Counter-Strike 2's (MR12), from its first events to the export's last.
 const PLAY_FROM = '2023-09-27';
@@ -39,10 +41,15 @@ for (const name of files) {
   pages.push(...found);
 }
 
+const mapsOf = list => list.reduce((sum, one) => sum + one.games.length, 0);
+const resultsOf = list => list.reduce((sum, one) => sum + one.games.filter(game => game.result).length, 0);
 const { tournaments, missing, stageStarts, skipped, people, folded } = readTournaments(pages);
+// 1.6's and Source's events, for the earlier seasons; a renamed player is one over every game's.
+const past = older.readTournaments(pages);
+const renamed = foldRenames([...tournaments, ...past.tournaments], people);
 const { series, unplayable, borrowed, aliased } = seriesInOrder(tournaments);
 const national = nationalTeams(tournaments);
-const maps = series.reduce((sum, one) => sum + one.games.length, 0);
+const maps = mapsOf(series);
 console.log(`${tournaments.length} 5v5 tournaments of tiers ${TIERS.join(', ')} in CS:GO and CS2: ${series.length} series, ${maps} maps`
   + ` (${series[0]?.date ?? '—'} to ${series.at(-1)?.date ?? '—'})`);
 console.log(`  skipped: ${Object.entries(skipped).map(([reason, titles]) => `${titles.length} ${reason}`).join(', ')}`);
@@ -54,7 +61,8 @@ console.log(`  ${borrowed.length} teams played with their roster at another even
 const nationEvents = tournaments.filter(tournament => tournament.nations);
 console.log(`  ${national.size} players have played for a national team, at ${nationEvents.length} events: `
   + `${nationEvents.slice(-8).map(tournament => tournament.title).join('; ')}`);
-console.log(`  ${folded.size} spellings of a player folded into the one his rosters use most (case and punctuation, redirects)`);
+console.log(`  ${folded.size} spellings of a player folded into the one his rosters use most (case and punctuation, redirects),`
+  + ` ${renamed.size} older titles of a renamed player into his latest: ${[...renamed].map(([from, to]) => `${from} → ${to}`).join(', ')}`);
 if (!series.length) process.exit(1);
 
 const last = series.at(-1).date;
@@ -128,9 +136,42 @@ const countMap = (one, game, e, sides) => {
   // The series' favourite: its odds before its first map.
   if (!seriesOdds.has(one)) seriesOdds.set(one, e);
 };
-const tournamentGame = new Map(tournaments.map(tournament => [tournament.title, tournament.game]));
-for (const one of series) one.game = tournamentGame.get(one.event) ?? null;
-const { players, scored, lan } = runElo(series, { starts, homes, holdout, onGame: countMap });
+
+// Each year's maps for its season's rounds (build:counter-strike-seasons): how many in each format (`all`: an event whose
+// scores mostly fit one lends it to those that fit both), and how those of each went between seasoned players, by the
+// favourite's odds before the map as `play` has Counter-Strike 2's: how many, how many overtimes, the rounds in all, how
+// many the favourite won, and in each odds bin the maps, the overtimes and the loser's rounds in regulation.
+const yearPlay = new Map();
+const newYear = () => Object.fromEntries(Object.entries(HALF_ROUNDS).map(([format, half]) => [format,
+  { all: 0, maps: 0, ot: 0, rounds: 0, won: 0, bins: Array.from({ length: ODDS_BINS }, () => [0, 0, ...new Array(half).fill(0)]) }]));
+const countYear = (one, game, e, sides, seasonedAt) => {
+  if (game.result || !game.rounds) return;
+  const format = formatOf(game, one.game, one.format);
+  if (!format) return;
+  const year = Number(one.date.slice(0, 4));
+  if (!yearPlay.has(year)) yearPlay.set(year, newYear());
+  const row = yearPlay.get(year)[format];
+  row.all++;
+  if (!sides.flat().every(player => player.games >= seasonedAt)) return;
+  const winner = game.rounds[game.winner - 1], loser = game.rounds[2 - game.winner], bin = row.bins[oddsBin(e)];
+  // A map whose named winner has the fewer rounds: one or the other is mistyped.
+  if (winner <= loser) return;
+  row.maps++;
+  row.rounds += winner + loser;
+  if ((game.winner === 1) === (e >= 0.5)) row.won++;
+  bin[0]++;
+  if (winner > HALF_ROUNDS[format] + 1) { row.ot++; bin[1]++; } else bin[2 + loser]++;
+};
+/** Each series' game and its event's own format (eventFormatOf), for formatOf. */
+const giveFormats = (list, events) => {
+  const game = new Map(events.map(event => [event.title, event.game])), own = new Map(events.map(event => [event.title, eventFormatOf(event)]));
+  for (const one of list) Object.assign(one, { game: game.get(one.event) ?? null, format: own.get(one.event) ?? null });
+};
+giveFormats(series, tournaments);
+const { players, scored, lan } = runElo(series, { starts, homes, holdout, recentFrom: recentFrom(last), onGame: (one, game, e, sides) => {
+  countMap(one, game, e, sides);
+  countYear(one, game, e, sides, MIN_GAMES);
+} });
 // The series of those maps: best of one, three and five, as they ended (from the favourite's side, by its odds before the
 // first map), for the series' form: each scoreline's count, and for each by the favourite's odds (ODDS_BINS bins, each a
 // row of its scorelines' counts in the order `lines` names them), so form can be fitted at the real series' own odds.
@@ -172,8 +213,8 @@ const snapshot = {
   source: {
     name: 'Liquipedia', wiki: 'https://liquipedia.net/counterstrike/', license: 'CC BY-SA 3.0', edition: EDITION,
     exported, files: files.length, pages: pages.length, from: series[0].date, to: last, tournaments: tournaments.length,
-    series: series.length, maps, players: players.size, rated: rated.length, activeDays: ACTIVE_DAYS, minGames: MIN_GAMES,
-    kScale: K_SCALE, levels: { offsetTau: OFFSET_TAU, levelTau: LEVEL_TAU }, starts,
+    series: series.length, maps, players: players.size, rated: rated.length, renamed: renamed.size, activeDays: ACTIVE_DAYS, minGames: MIN_GAMES,
+    minRecent: MIN_RECENT, kScale: K_SCALE, levels: { offsetTau: OFFSET_TAU, levelTau: LEVEL_TAU }, starts,
     holdout: { from: holdout, ...scoreOf(scored.all), international: scoreOf(scored.international), betweenRegions: scoreOf(scored.cross),
       calibration },
     home, homeAll,
@@ -207,21 +248,110 @@ for (const player of offMap) unknownFlags.set(player.flag, (unknownFlags.get(pla
 if (unknownFlags.size) console.log(`  flags no nation answers to: ${[...unknownFlags].map(([flag, n]) => `${flag} ×${n}`).join(', ')}`);
 console.log(`  ${people.size} player pages read for their country`);
 
-// What another export should add, one title a line to paste into Special:Export: the stage pages the exports' events link
-// to but lack, the newest first (none of an event yet to begin: it has no results), then the pages of the players rated
-// today whom it still has no nation for, the best first, each under every spelling of him. A title an export already
-// holds has nothing more to give.
+// The earlier seasons (docs/design/counter-strike.md, "Earlier seasons"): every calendar year whose end rates players, to
+// the one before the export's last, each as rated on its last day, each newcomer at his region's level as the maps to that
+// day measure it (homesOf and regionLevels over them: nothing a later year showed). Before FIRST_GO_SEASON they are 1.6's
+// and Source's (OLDER), an Elo of each game's own maps, a player's the game's he played more of that year; from then on
+// Global Offensive's and Counter-Strike 2's, the first with what its newcomers bring from the older games.
+await mkdir(seasonsDir, { recursive: true });
+const pastNational = nationalTeams(past.tournaments);
+const pastOrder = older.seriesInOrder(past.tournaments);
+const pastSeries = pastOrder.series.filter(one => one.date);
+giveFormats(pastSeries, past.tournaments);
+const pastGame = new Map(past.tournaments.map(tournament => [tournament.title, olderGameOf(tournament)]));
+const pastEveryone = older.runElo(pastSeries).players;
+const pastNationOf = key => nationOfPlayer(pastEveryone.get(key) ?? { key, flags: new Map() }, people, pastNational);
+console.log(`\n${past.tournaments.length} 5v5 tournaments of 1.6 and Source: ${pastSeries.length} series, ${mapsOf(pastSeries)} maps`
+  + ` (${resultsOf(pastSeries)} of them a series' result alone), ${pastSeries[0].date} to ${pastSeries.at(-1).date};`
+  + ` ${pastOrder.unplayable.length} series left out, a team with no roster of five near it`);
+// Each game's whole record: its years' real maps, and what its players bring to Global Offensive.
+const chains = Object.keys(OLDER).map(game => {
+  const own = pastSeries.filter(one => pastGame.get(one.event) === game);
+  const homesOwn = older.homesOf(own, { nationOf: pastNationOf });
+  const startsOwn = older.regionLevels(own, homesOwn);
+  const run = older.runElo(own, { starts: startsOwn, homes: homesOwn, onGame: (one, map, e, sides) => countYear(one, map, e, sides, MIN_GAMES_OLDER) });
+  console.log(`  ${game}: ${own.length} series, ${mapsOf(own)} maps, ${run.players.size} players; regions' levels ${JSON.stringify(startsOwn)}`);
+  return { game, series: own, players: run.players, homes: homesOwn, starts: startsOwn, nationOf: pastNationOf };
+});
+const seeds = carriedOver(series, chains, nationOf);
+console.log(`  ${seeds.size} players bring a rating from them to Global Offensive (the ${FIRST_GO_SEASON} season)`);
+
+/** 1.6's and Source's season: each game's players as rated then, a player of both the game's he played more of that year. */
+function olderSeason(date) {
+  const best = new Map(), levels = {}, counted = [];
+  for (const { game, series: own } of chains) {
+    const upTo = own.filter(one => one.date <= date);
+    if (!upTo.length) continue;
+    const homesThen = older.homesOf(upTo, { nationOf: pastNationOf });
+    const startsThen = older.regionLevels(upTo, homesThen);
+    const ratedThen = older.playersAsOf(own, date, { starts: startsThen, homes: homesThen, people, national: pastNational, whole: pastEveryone });
+    if (!ratedThen.length) continue;
+    levels[game] = startsThen;
+    counted.push(...upTo);
+    for (const player of ratedThen) if (!best.has(player.key) || player.recent > best.get(player.key).recent) best.set(player.key, { ...player, game });
+  }
+  const ratedThen = [...best.values()].sort((a, b) => b.elo - a.elo || a.name.localeCompare(b.name));
+  return { rated: ratedThen, rows: ratedThen.map(player => [...rowOf(player), player.game]), counted, levels, minGames: MIN_GAMES_OLDER, carried: 0 };
+}
+/** Global Offensive's and Counter-Strike 2's season. */
+function newerSeason(date, year) {
+  const upTo = series.filter(one => one.date <= date);
+  const homesThen = homesOf(upTo, { nationOf });
+  const startsThen = regionLevels(upTo, homesThen);
+  const brought = year === FIRST_GO_SEASON ? seeds : null;
+  const ratedThen = playersAsOf(series, date, { starts: startsThen, homes: homesThen, seeds: brought, people, national, whole: players });
+  return { rated: ratedThen, rows: ratedThen.map(rowOf), counted: upTo, levels: { [year < 2023 ? 'Global Offensive' : 'Global Offensive and Counter-Strike 2']: startsThen },
+    minGames: MIN_GAMES, carried: brought ? ratedThen.filter(player => brought.has(player.key)).length : 0 };
+}
+const seasonRated = [];
+console.log(`\nEarlier seasons, each as rated on 31 December, to ${path.relative(root, seasonsDir)}:`);
+for (let year = Number(pastSeries[0].date.slice(0, 4)); year < Number(last.slice(0, 4)); year++) {
+  const date = `${year}-12-31`;
+  const { rated: ratedThen, rows: rowsThen, counted, levels, minGames, carried } = year < FIRST_GO_SEASON ? olderSeason(date) : newerSeason(date, year);
+  const fielded = nationsOf(ratedThen.map((player, i) => playerOf(rowOf(player), date, i + 1)));
+  if (fielded.length < MIN_NATIONS) {
+    console.log(`  ${year}: ${ratedThen.length} rated, ${fielded.length} nations with five: no season`);
+    continue;
+  }
+  seasonRated.push(...ratedThen);
+  const thatYear = yearPlay.get(year) ?? newYear();
+  // The season's rounds: the format most of the year's maps were played in.
+  const format = thatYear.mr15.all > thatYear.mr12.all ? 'mr15' : 'mr12';
+  const { maps: played, ot, rounds, won, bins } = thatYear[format];
+  const dates = counted.map(one => one.date).sort();
+  const season = { season: year, date, exported, games: Object.keys(levels), from: dates[0], to: dates.at(-1), series: counted.length, maps: mapsOf(counted),
+    results: resultsOf(counted), rated: ratedThen.length, carried, activeDays: ACTIVE_DAYS, minGames, minRecent: MIN_RECENT, starts: levels,
+    format, formats: Object.fromEntries(Object.entries(thatYear).map(([key, row]) => [key, row.all])),
+    play: { minGames, maps: played, ot: round3(ot / Math.max(1, played)), rounds: round3(rounds / Math.max(1, played)),
+      favourite: round3(won / Math.max(1, played)), bins } };
+  await writeSnapshot(path.join(seasonsDir, `${year}.json`), season, rowsThen);
+  const without = leftOut(ratedThen).noFlag;
+  console.log(`  ${year}: ${ratedThen.length} rated${carried ? ` (${carried} with a rating carried over)` : ''}, ${fielded.length} nations`
+    + ` (${fielded.slice(0, 5).map(n => `${n.name} ${n.str}`).join(', ')}…); ${format.toUpperCase()} of ${JSON.stringify(season.formats)};`
+    + ` ${played} maps between seasoned players, ${season.play.rounds} rounds, ${(season.play.ot * 100).toFixed(1)}% to overtime;`
+    + ` ${without.length} with no country${without.length ? ` (${without.slice(0, 5).map(player => `${player.name} ${Math.round(player.elo)}`).join(', ')})` : ''}`);
+}
+
+// What another export should add, one title a line to paste into Special:Export: the pages of the players rated today or
+// at an earlier season's end whom it still has no nation for, the best first, each under every spelling of him; then the
+// stage pages the exports' events link to but lack, the newest first (none of an event yet to begin: it has no results),
+// 1.6's and Source's last. A title an export already holds has nothing more to give.
 const spellings = new Map();
-for (const [from, to] of folded) spellings.set(to, [...(spellings.get(to) ?? []), from]);
+for (const [from, to] of [...folded, ...past.folded, ...renamed]) spellings.set(to, [...(spellings.get(to) ?? []), from]);
 const held = new Set(pages.map(page => page.title));
-const stages = missing.filter(title => String(stageStarts.get(title) ?? '') <= last)
-  .sort((a, b) => String(stageStarts.get(b) ?? '').localeCompare(String(stageStarts.get(a) ?? '')) || a.localeCompare(b));
-const nationless = rated.filter(player => player.nation == null && !(player.flag && !isRegionFlag(player.flag)))
-  .flatMap(player => [player.key, ...(spellings.get(player.key) ?? [])]);
-const titles = [...new Set([...stages, ...nationless])].filter(title => !held.has(title));
+const newest = (titles, startsAt) => titles.filter(title => String(startsAt.get(title) ?? '') <= last)
+  .sort((a, b) => String(startsAt.get(b) ?? '').localeCompare(String(startsAt.get(a) ?? '')) || a.localeCompare(b));
+const stages = [...newest(missing, stageStarts), ...newest(past.missing, past.stageStarts)];
+const bestElo = new Map();
+for (const player of [...rated, ...seasonRated]) {
+  if (player.nation != null || (player.flag && !isRegionFlag(player.flag))) continue;
+  bestElo.set(player.key, Math.max(bestElo.get(player.key) ?? -Infinity, player.elo));
+}
+const nationless = [...bestElo].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).flatMap(([key]) => [key, ...(spellings.get(key) ?? [])]);
+const titles = [...new Set([...nationless, ...stages])].filter(title => !held.has(title));
 const list = path.join(folder, 'next-export.txt');
 if (titles.length) {
   await writeFile(list, `${titles.join('\n')}\n`);
-  console.log(`\nAnother export would add ${stages.length} stage pages and the pages of ${nationless.length} rated players with no nation`
+  console.log(`\nAnother export would add the pages of ${bestElo.size} rated players with no nation and ${stages.length} stage pages`
     + ` (${titles.length} titles in all): they are in ${path.relative(root, list)}, one a line.`);
 }

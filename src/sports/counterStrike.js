@@ -1,12 +1,15 @@
 import { C } from '../theme.js';
 import { defineSportData } from './sportData.js';
+import { rulesMemo, rulesYear } from './eras.js';
 import { GREAT_BRITAIN, HISTORIC_NATIONS, HOME_NATIONS, NATIONS, selectLineup } from '../data/teams.js';
+import { COUNTER_STRIKE_RULES } from '../data/counterStrikeRules.js';
 import { clamp, createScorerSampler, gauss } from '../engine/random.js';
 
 // Counter-Strike 2 as its tier-one events play their playoffs (docs/design/counter-strike.md): two teams of five, a series
 // of maps, best of three. A map is first to 13 rounds (MR12: twelve rounds a half, the sides switching at half-time);
 // level at 12–12, it goes to overtime: six rounds, three a half, first to four, and at 3–3 another. Nations only for now:
-// each fields its five best players by Liquipedia's results.
+// each fields its five best players by Liquipedia's results. An earlier season plays its own year's rounds
+// (COUNTER_STRIKE_RULES, `counterStrikeIn`): first to 16 (MR15, level at 15–15) from 2005 to 2023, and its momentum.
 export const MAPS = 3;
 export const TO_WIN = 2;
 export const HALF = 12;
@@ -16,11 +19,13 @@ export const OT_TO_WIN = OT_HALF + 1;
 
 // On the clock a map has 26 units: one for each of regulation's 24 rounds (a map won 13–4 is over at its 17th), then two
 // for its overtime, its first half in the first and the rest in the second. The shortest series (two maps) fills 52
-// units, and a third extends it as an overtime period does in other sports.
+// units, and a third extends it as an overtime period does in other sports. A season of MR15 has 32 units a map.
 export const REGULATION_UNITS = 2 * HALF;
 export const BLOCK = REGULATION_UNITS + 2;
 export const LENGTH = TO_WIN * BLOCK;
 const MS_PER_UNIT = 85;
+/** The clock of maps of `half` rounds a half → { regulation: its rounds' units, block: a map's, length: the shortest series' }. */
+export const clockOf = (half = HALF) => ({ regulation: 2 * half, block: 2 * half + 2, length: TO_WIN * (2 * half + 2) });
 
 // Ratings are Elo built from every map Liquipedia records (scripts/lib/counter-strike.mjs), on the game's scale: a
 // rating point is 25 Elo points. A team plays at its five players' mean, as the Elo was built, and wins each map with
@@ -36,7 +41,10 @@ export const mapOdds = gap => 1 / (1 + 10 ** (-gap * ELO_PER_POINT / 400));
 // each played 20 maps before, each played at its own pre-map Elo odds (docs/design/counter-strike.md, "Calibration"):
 // 21.59 rounds a map where they played 21.77, 11.5% to overtime where 12.4% went, and the loser's 0 to 11 rounds within
 // a point of the real maps' at every score. Without it the same maps run long and close: 22.85 rounds, 15.1% overtime.
+// An earlier season's is fitted the same way on its own year's maps: 0.95 in CS:GO's mid-2010s, when a lost round cost more.
 export const MOMENTUM = 0.57;
+/** Today's rounds: how many a half and their momentum. An earlier season's are COUNTER_STRIKE_RULES'. */
+export const RULES_TODAY = Object.freeze({ half: HALF, momentum: MOMENTUM });
 
 // Match-day form: one draw for the series in rating points, on every map's gap. It grows with the square of the drama,
 // as in the other sports, so Wild swings series hard and Predictable plays Elo's odds map by map. Real series are far
@@ -67,21 +75,23 @@ export const roundOdds = (c, last = null, momentum = MOMENTUM) => sigmoid(c + (l
   : last === 'D' || last === WON_D ? -momentum : 0));
 
 /** Whether a round is a half's first, the pistol round (`played`: the rounds before it in regulation, or in its overtime). */
-const regulationStart = played => played === 0 || played === HALF;
+const regulationStart = (played, half) => played === 0 || played === half;
 const overtimeStart = played => played === 0 || played === OT_HALF;
 
-// The state of a map: in regulation `a`–`b` (0 to 12 each, not both 12) and the last round's winner; in overtime `x`–`y`
-// within the overtime under way (0 to 3 each, not both 3) and the same. Index (a·13 + b)·3 + last, (x·4 + y)·3 + last.
-const regIndex = (a, b, last) => (a * MAP_POINT + b) * 3 + last;
+// The state of a map of `half` rounds a half (12): in regulation `a`–`b` (0 to 12 each, not both 12) and the last round's
+// winner; in overtime `x`–`y` within the overtime under way (0 to 3 each, not both 3) and the same. Index (a·13 + b)·3 +
+// last, (x·4 + y)·3 + last.
+const regIndex = (a, b, last, half) => (a * (half + 1) + b) * 3 + last;
 const otIndex = (x, y, last) => (x * OT_TO_WIN + y) * 3 + last;
 
 /**
- * A map's chances by state at round strength `c` → { reg, ot, level }: `reg[regIndex(a, b, last)]` the attacker's chance to
- * win the map from `a`–`b` in regulation, `ot[otIndex(x, y, last)]` from `x`–`y` within an overtime, `level` from a level
- * overtime's start (12–12, or 3–3 in one). An overtime is six rounds, first to four; at 3–3 another starts, level again,
- * so `level` is the chance to win an overtime outright over the chance it is won outright by either.
+ * A map's chances by state at round strength `c`, `half` rounds a half → { c, momentum, half, reg, ot, level, start }:
+ * `reg[regIndex(a, b, last)]` the attacker's chance to win the map from `a`–`b` in regulation, `ot[otIndex(x, y, last)]`
+ * from `x`–`y` within an overtime, `level` from a level overtime's start (12–12, or 3–3 in one). An overtime is six rounds,
+ * first to four; at 3–3 another starts, level again, so `level` is the chance to win an overtime outright over the chance
+ * it is won outright by either.
  */
-export function mapTable(c, momentum = MOMENTUM) {
+export function mapTable(c, momentum = MOMENTUM, half = HALF) {
   // One overtime: the chance to win it outright (`win`) and the chance it ends 3–3 (`draw`), by state.
   const win = new Float64Array(OT_TO_WIN * OT_TO_WIN * 3), draw = new Float64Array(OT_TO_WIN * OT_TO_WIN * 3);
   const otAt = (table, x, y, last) => {
@@ -104,18 +114,19 @@ export function mapTable(c, momentum = MOMENTUM) {
   const level = outright / Math.max(1e-15, 1 - tied);
   const ot = new Float64Array(win.length);
   for (let i = 0; i < ot.length; i++) ot[i] = win[i] + draw[i] * level;
-  const reg = new Float64Array(MAP_POINT * MAP_POINT * 3);
-  const regAt = (a, b, last) => (a === MAP_POINT ? 1 : b === MAP_POINT ? 0 : a === HALF && b === HALF ? level : reg[regIndex(a, b, last)]);
-  for (let a = HALF; a >= 0; a--) {
-    for (let b = HALF; b >= 0; b--) {
-      if (a === HALF && b === HALF) continue;
+  const point = half + 1;
+  const reg = new Float64Array(point * point * 3);
+  const regAt = (a, b, last) => (a === point ? 1 : b === point ? 0 : a === half && b === half ? level : reg[regIndex(a, b, last, half)]);
+  for (let a = half; a >= 0; a--) {
+    for (let b = half; b >= 0; b--) {
+      if (a === half && b === half) continue;
       for (let last = 0; last < 3; last++) {
-        const p = roundOdds(c, regulationStart(a + b) ? NONE : last, momentum);
-        reg[regIndex(a, b, last)] = p * regAt(a + 1, b, WON_A) + (1 - p) * regAt(a, b + 1, WON_D);
+        const p = roundOdds(c, regulationStart(a + b, half) ? NONE : last, momentum);
+        reg[regIndex(a, b, last, half)] = p * regAt(a + 1, b, WON_A) + (1 - p) * regAt(a, b + 1, WON_D);
       }
     }
   }
-  return { c, momentum, reg, ot, level, start: reg[regIndex(0, 0, NONE)] };
+  return { c, momentum, half, reg, ot, level, start: reg[regIndex(0, 0, NONE, half)] };
 }
 
 /** A map before its first round. */
@@ -124,19 +135,19 @@ export const MAP_START = Object.freeze({ a: 0, d: 0, overtime: false, x: 0, y: 0
 /**
  * A map's state after one more round, won by `side` ('A' or 'D'): the score, whether it is in overtime and the score within
  * the overtime under way, the last round's winner in its half (null at a half's start, before its pistol round), and the
- * winner once the map is over ('A' or 'D', else null). A finished map stays as it is.
+ * winner once the map is over ('A' or 'D', else null). A finished map stays as it is. `half`: its rounds a half.
  */
-export function stepMap(state, side) {
+export function stepMap(state, side, half = HALF) {
   if (state.over) return state;
   let { a, d, x, y, overtime } = state;
   let last = side, over = null;
   if (side === 'A') a++; else d++;
   if (!overtime) {
-    if (a === MAP_POINT || d === MAP_POINT) over = side;
+    if (a > half || d > half) over = side;
     // 12–12: overtime, from level.
-    else if (a === HALF && d === HALF) { overtime = true; last = null; }
+    else if (a === half && d === half) { overtime = true; last = null; }
     // Half-time: the sides switch, and the next round is a pistol round.
-    else if (a + d === HALF) last = null;
+    else if (a + d === half) last = null;
   } else {
     if (side === 'A') x++; else y++;
     if (x === OT_TO_WIN || y === OT_TO_WIN) over = side;
@@ -148,7 +159,7 @@ export function stepMap(state, side) {
 }
 
 /** Where a map stands after its rounds so far (`rounds`, each 'A' or 'D' in order): stepMap's state. */
-export const mapState = rounds => rounds.reduce(stepMap, MAP_START);
+export const mapState = (rounds, half = HALF) => rounds.reduce((state, side) => stepMap(state, side, half), MAP_START);
 
 /**
  * The chance of a map's rounds so far (`rounds`, in order) at a map's table (mapTable's): each round's odds from the state
@@ -160,7 +171,7 @@ export function roundsChance(table, rounds) {
     if (state.over) break;
     const p = roundOdds(table.c, state.last, table.momentum);
     chance *= side === 'A' ? p : 1 - p;
-    state = stepMap(state, side);
+    state = stepMap(state, side, table.half);
   }
   return chance;
 }
@@ -169,20 +180,21 @@ export function roundsChance(table, rounds) {
 export function mapChance(table, state) {
   if (state.over) return state.over === 'A' ? 1 : 0;
   const last = lastOf(state.last);
-  return state.overtime ? table.ot[otIndex(state.x, state.y, last)] : table.reg[regIndex(state.a, state.d, last)];
+  return state.overtime ? table.ot[otIndex(state.x, state.y, last)] : table.reg[regIndex(state.a, state.d, last, table.half)];
 }
 
-// A map's chance by round strength, on a grid of strengths (built when first read, one for each momentum: today's, and
-// any the calibration tries): the strength that gives Elo's odds is bracketed from it, so the rounds follow the ratings
-// and the map's winner is Elo's exactly.
+// A map's chance by round strength, on a grid of strengths (built when first read, one for each momentum and half: today's,
+// a season's, and any the calibration tries): the strength that gives Elo's odds is bracketed from it, so the rounds
+// follow the ratings and the map's winner is Elo's exactly.
 const C_STEP = 1 / 32, C_RANGE = 6;
 const strengthGrids = new Map();
-function grid(momentum) {
-  let table = strengthGrids.get(momentum);
+function grid(momentum, half) {
+  const key = `${momentum}|${half}`;
+  let table = strengthGrids.get(key);
   if (!table) {
     table = [];
-    for (let i = 0; i <= 2 * C_RANGE / C_STEP; i++) table.push(mapTable(-C_RANGE + i * C_STEP, momentum).start);
-    strengthGrids.set(momentum, table);
+    for (let i = 0; i <= 2 * C_RANGE / C_STEP; i++) table.push(mapTable(-C_RANGE + i * C_STEP, momentum, half).start);
+    strengthGrids.set(key, table);
   }
   return table;
 }
@@ -191,8 +203,8 @@ function grid(momentum) {
  * The round strength (logit) at which the attacker wins a map with `odds` → c: the grid's bracket, then the map's own
  * chance halved between its ends until it is Elo's odds to within a billionth.
  */
-export function strengthFor(odds, momentum = MOMENTUM) {
-  const table = grid(momentum);
+export function strengthFor(odds, momentum = MOMENTUM, half = HALF) {
+  const table = grid(momentum, half);
   const target = clamp(odds, table[0], table.at(-1));
   let lo = 0, hi = table.length - 1;
   while (hi - lo > 1) {
@@ -202,7 +214,7 @@ export function strengthFor(odds, momentum = MOMENTUM) {
   let low = -C_RANGE + lo * C_STEP, high = -C_RANGE + hi * C_STEP;
   for (let i = 0; i < 40 && high - low > 1e-12; i++) {
     const mid = (low + high) / 2;
-    const chance = mapTable(mid, momentum).start;
+    const chance = mapTable(mid, momentum, half).start;
     if (Math.abs(chance - target) < 1e-9) return mid;
     if (chance < target) low = mid; else high = mid;
   }
@@ -219,11 +231,11 @@ export function playMapWon(rng, table, aWins) {
   for (let state = MAP_START; !state.over;) {
     const now = mapChance(table, state);
     const p = roundOdds(table.c, state.last, table.momentum);
-    const after = mapChance(table, stepMap(state, 'A'));
+    const after = mapChance(table, stepMap(state, 'A', table.half));
     const toA = aWins ? p * after / Math.max(1e-15, now) : p * (1 - after) / Math.max(1e-15, 1 - now);
     const side = rng() < clamp(toA, 0, 1) ? 'A' : 'D';
     rounds.push(side);
-    state = stepMap(state, side);
+    state = stepMap(state, side, table.half);
   }
   return rounds;
 }
@@ -231,25 +243,27 @@ export function playMapWon(rng, table, aWins) {
 /**
  * What a map at `odds` should bring → { rounds, overtime, loser: [chance the loser takes 0…11 in regulation] }: its rounds
  * in all, its chance to go to overtime and the loser's rounds when it does not, played forward over the states. How the
- * round model is held against the real maps (scripts/simulation-realism.mjs, docs/design/counter-strike.md).
+ * round model is held against the real maps (scripts/simulation-realism.mjs, scripts/build-counter-strike-seasons.mjs,
+ * docs/design/counter-strike.md).
  */
-export function mapMeans(odds, momentum = MOMENTUM) {
-  const table = mapTable(strengthFor(odds, momentum), momentum);
-  const loser = new Array(HALF).fill(0);
+export function mapMeans(odds, momentum = MOMENTUM, half = HALF) {
+  const table = mapTable(strengthFor(odds, momentum, half), momentum, half);
+  const point = half + 1;
+  const loser = new Array(half).fill(0);
   let rounds = 0, overtime = 0;
   // Regulation, forward over (a, b, last).
-  let states = new Map([[regIndex(0, 0, NONE), 1]]);
-  for (let played = 0; played < REGULATION_UNITS; played++) {
+  let states = new Map([[regIndex(0, 0, NONE, half), 1]]);
+  for (let played = 0; played < 2 * half; played++) {
     const next = new Map();
     for (const [index, chance] of states) {
-      const last = index % 3, ab = (index - last) / 3, a = Math.floor(ab / MAP_POINT), b = ab % MAP_POINT;
-      const p = roundOdds(table.c, regulationStart(a + b) ? NONE : last, momentum);
+      const last = index % 3, ab = (index - last) / 3, a = Math.floor(ab / point), b = ab % point;
+      const p = roundOdds(table.c, regulationStart(a + b, half) ? NONE : last, momentum);
       rounds += chance;
       for (const [na, nb, won, q] of [[a + 1, b, WON_A, p], [a, b + 1, WON_D, 1 - p]]) {
-        const mass = chance * q;
-        if (na === MAP_POINT || nb === MAP_POINT) loser[Math.min(na, nb)] += mass;
-        else if (na === HALF && nb === HALF) overtime += mass;
-        else next.set(regIndex(na, nb, won), (next.get(regIndex(na, nb, won)) ?? 0) + mass);
+        const mass = chance * q, to = regIndex(na, nb, won, half);
+        if (na === point || nb === point) loser[Math.min(na, nb)] += mass;
+        else if (na === half && nb === half) overtime += mass;
+        else next.set(to, (next.get(to) ?? 0) + mass);
       }
     }
     states = next;
@@ -282,14 +296,16 @@ export function mapMeans(odds, momentum = MOMENTUM) {
 
 /**
  * Prepare a series once for cheap resampling: the attacker's edge in rating points on every map (`gap`), tactics, upsets
- * and the venue included. `venue.home`: the defender is at home.
+ * and the venue included. `venue.home`: the defender is at home. `rules`: an earlier season's rounds (`counterStrikeWith`),
+ * which the series keeps (`maps`); today's without.
  */
-export function prepareMatch(attacker, defender, effA, effD, { home = false } = {}) {
+export function prepareMatch(attacker, defender, effA, effD, { home = false } = {}, rules = RULES_TODAY) {
   const lineupA = selectLineup(attacker), lineupD = selectLineup(defender);
   const adjustmentA = (Number.isFinite(effA) ? effA : lineupA.rating) - lineupA.rating;
   const adjustmentD = (Number.isFinite(effD) ? effD : lineupD.rating) - lineupD.rating;
   const gap = lineupA.rating + adjustmentA - (lineupD.rating + adjustmentD) - (home ? HOME_EDGE : 0);
-  return { attackerId: attacker.id, defenderId: defender.id, lineupA, lineupD, gap, maps: { maps: MAPS, toWin: TO_WIN } };
+  return { attackerId: attacker.id, defenderId: defender.id, lineupA, lineupD, gap,
+    maps: { maps: MAPS, toWin: TO_WIN, half: rules.half, momentum: rules.momentum } };
 }
 
 /**
@@ -312,7 +328,7 @@ export function sampleResult(rng, prepared, drama = 6) {
 const scoreline = (own, other) => `${own}–${other}`;
 
 /** The clock unit of a map's round `n` (1 from its first): its own in regulation, overtime's first half then the rest. */
-export const roundUnit = n => (n <= REGULATION_UNITS ? n : n <= REGULATION_UNITS + OT_HALF ? REGULATION_UNITS + 1 : REGULATION_UNITS + 2);
+export const roundUnit = (n, half = HALF) => (n <= 2 * half ? n : n <= 2 * half + OT_HALF ? 2 * half + 1 : 2 * half + 2);
 
 /**
  * Who is a round's MVP: any of the five, the better player more often, each in proportion to his rating above the floor,
@@ -329,12 +345,13 @@ const MVP_FLOOR = 40;
  */
 export function simulateSeries(rng, prepared, drama = 6) {
   const result = sampleResult(rng, prepared, drama);
-  const table = mapTable(strengthFor(mapOdds(prepared.gap + result.form)));
+  const { half, momentum } = prepared.maps, { regulation, block } = clockOf(half);
+  const table = mapTable(strengthFor(mapOdds(prepared.gap + result.form), momentum, half), momentum, half);
   const mvp = { A: createScorerSampler(prepared.lineupA, MVP_WEIGHTS, MVP_FLOOR),
     D: createScorerSampler(prepared.lineupD, MVP_WEIGHTS, MVP_FLOOR) };
   const ev = [];
   result.games.forEach((winner, k) => {
-    const start = k * BLOCK;
+    const start = k * block;
     const rounds = playMapWon(rng, table, winner === 'A');
     const won = { A: 0, D: 0 }, mvps = new Map();
     rounds.forEach((side, i) => {
@@ -342,19 +359,39 @@ export function simulateSeries(rng, prepared, drama = 6) {
       const other = side === 'A' ? 'D' : 'A';
       const name = mvp[side](rng);
       if (side === winner) mvps.set(name, (mvps.get(name) ?? 0) + 1);
-      ev.push({ m: start + roundUnit(i + 1), side, name, pts: 0, map: k + 1, round: i + 1, score: scoreline(won[side], won[other]),
-        ...(i + 1 > REGULATION_UNITS ? { ot: true } : {}) });
+      ev.push({ m: start + roundUnit(i + 1, half), side, name, pts: 0, map: k + 1, round: i + 1, score: scoreline(won[side], won[other]),
+        ...(i + 1 > regulation ? { ot: true } : {}) });
     });
     const loser = winner === 'A' ? 'D' : 'A';
     const best = [...mvps.entries()].sort((x, y) => y[1] - x[1])[0]?.[0] ?? null;
-    ev.push({ m: start + roundUnit(rounds.length), side: winner, name: best, pts: 1, map: k + 1, round: rounds.length,
-      score: scoreline(won[winner], won[loser]), ...(rounds.length > REGULATION_UNITS ? { ot: true } : {}) });
+    ev.push({ m: start + roundUnit(rounds.length, half), side: winner, name: best, pts: 1, map: k + 1, round: rounds.length,
+      score: scoreline(won[winner], won[loser]), ...(rounds.length > regulation ? { ot: true } : {}) });
   });
   return { ga: result.ga, gd: result.gd, ev, winner: result.winner };
 }
 
 /** The map an event or clock unit falls in: M1 for units 1–26, M2 for 27–52… (the start counts as the first). */
-export const mapAt = m => clamp(Math.ceil((Number(m) || 0) / BLOCK), 1, MAPS);
+export const mapAt = (m, block = BLOCK) => clamp(Math.ceil((Number(m) || 0) / block), 1, MAPS);
+
+/** What the rounds of a season change in a match's words and clock: `half` rounds a half, today's twelve or MR15's fifteen. */
+function roundsOf(half) {
+  const { block, length } = clockOf(half);
+  return {
+    blurb: `Five-a-side tactical shooter, best of three maps. First to ${half + 1} rounds takes a map; ${half}–${half} goes to overtime.`,
+    // Twenty-six clock units a map (thirty-two in MR15); the chart ticks at the end of each. A series ends with its deciding
+    // map, the last event.
+    clock: { length, msPerUnit: MS_PER_UNIT, ot: block, tick: block },
+    // The clock shows the map in play: "M2".
+    formatClock: m => `M${mapAt(m, block)}`,
+    // The chart's axis: the end of each map.
+    formatTick: t => (t > 0 ? `M${Math.round(t / block)}` : ''),
+    // The feed's live row: "map 2, best of 3".
+    clockLeft: now => `map ${mapAt(now, block)}, best of ${MAPS}`,
+    formatEvent: (e, code) => ({ when: `M${e.map || mapAt(e.m, block)}`, text: e.pts > 0
+      ? `MAP ${e.map} — ${code} ${e.score}${e.ot ? ' OT' : ''}`
+      : `R${e.round}${e.ot ? ' OT' : ''} — ${e.name} (${code}) ${e.score}` }),
+  };
+}
 
 /** Counter-Strike's nations-only rulebook: no clubs, Great Britain as one. Its players come from sportData.js. */
 const territoryOf = rosters => ({
@@ -368,7 +405,8 @@ const counterStrikeRules = {
   id: 'counter-strike',
   simulationVersion: 1,
   name: 'Counter-Strike',
-  blurb: 'Five-a-side tactical shooter, best of three maps. First to 13 rounds takes a map; 12–12 goes to overtime.',
+  // Its words and clock (roundsOf): today's rounds, twelve a half.
+  ...roundsOf(HALF),
   // Read from the sport's players (sportData.js), once they have loaded.
   rosters: undefined,
   clubs: [],
@@ -391,8 +429,6 @@ const counterStrikeRules = {
   fallbackStrength: () => EMPTY_STRENGTH,
   requiredPositions: [],
 
-  // Twenty-six clock units a map; the chart ticks at the end of each. A series ends with its deciding map, the last event.
-  clock: { length: LENGTH, msPerUnit: MS_PER_UNIT, ot: BLOCK, tick: BLOCK },
   tieBreak: 'none',
   labels: {
     score: 'MAPS',
@@ -406,28 +442,57 @@ const counterStrikeRules = {
   words: { kickoff: 'Start', end: 'Final', lineup: 'Team', lineupShort: 'Team', lineupNoun: 'team', lineupTitle: 'Team',
     overtime: null, half: null },
 
-  // The clock shows the map in play: "M2".
-  formatClock: m => `M${mapAt(m)}`,
-  // The chart's axis: the end of each map.
-  formatTick: t => (t > 0 ? `M${Math.round(t / BLOCK)}` : ''),
-  // The feed's live row: "map 2, best of 3".
-  clockLeft: now => `map ${mapAt(now)}, best of ${MAPS}`,
-  formatEvent: (e, code) => ({ when: `M${e.map || mapAt(e.m)}`, text: e.pts > 0
-    ? `MAP ${e.map} — ${code} ${e.score}${e.ot ? ' OT' : ''}`
-    : `R${e.round}${e.ot ? ' OT' : ''} — ${e.name} (${code}) ${e.score}` }),
+  /** The rules a campaign plays (matchSport): an earlier season's rounds (`counterStrikeIn`), today's for the built-in one. */
+  rulesFor: settings => counterStrikeIn(settings),
   formatToast: e => (e.pts > 0 ? `MAP ${e.map} — ${e.score}${e.ot ? ' OT' : ''}` : `ROUND ${e.round} — ${e.score}`),
 
-  prepareMatch,
+  prepareMatch: (attacker, defender, effA, effD, venue) => prepareMatch(attacker, defender, effA, effD, venue),
   sampleResult,
-  simulate: (rng, attacker, defender, drama, effA, effD, venue) => {
-    const prepared = prepareMatch(attacker, defender, effA, effD, venue);
+  simulate: simulateUnder(RULES_TODAY),
+};
+
+/** A whole series under `rules` (an earlier season's rounds, or today's), its events each side's team's. */
+function simulateUnder(rules) {
+  return (rng, attacker, defender, drama, effA, effD, venue) => {
+    const prepared = prepareMatch(attacker, defender, effA, effD, venue, rules);
     const { ga, gd, ev, winner } = simulateSeries(rng, prepared, drama);
     return { ga, gd, regA: ga, regD: gd, tie: null, winner,
       ev: ev.map(({ side, ...e }) => ({ ...e, tid: side === 'A' ? attacker.id : defender.id })) };
-  },
-};
+  };
+}
 
 export const counterStrike = defineSportData({ ...counterStrikeRules }, { clubs: false, territoryOf });
+
+/**
+ * Counter-Strike in an earlier season's rounds (`rules`: { year, half, momentum }): the same series, its maps of that
+ * year's halves, each round moved by that year's momentum. Who wins a map is Elo's in any rounds, so a season's odds are
+ * today's and its simulation version too.
+ */
+export function counterStrikeWith(rules) {
+  return defineSportData({
+    ...counterStrikeRules,
+    ...roundsOf(rules.half),
+    rules,
+    prepareMatch: (attacker, defender, effA, effD, venue) => prepareMatch(attacker, defender, effA, effD, venue, rules),
+    simulate: simulateUnder(rules),
+  }, { clubs: false, territoryOf });
+}
+
+const seasonCounterStrike = rulesMemo(year => {
+  const { half, momentum } = COUNTER_STRIKE_RULES[year];
+  return counterStrikeWith(Object.freeze({ year, half, momentum }));
+});
+
+/**
+ * Counter-Strike as a setup's or campaign's season played it (`settings`: `dataSet`, `dataYear`; matchSport): each earlier
+ * season in its own year's rounds (COUNTER_STRIKE_RULES: the format most of its maps were played in, and the momentum
+ * fitted to them). The built-in season, which has no data set, and a year the table lacks play today's (`counterStrike`
+ * itself).
+ */
+export function counterStrikeIn(settings) {
+  const year = rulesYear(settings);
+  return year != null && Object.hasOwn(COUNTER_STRIKE_RULES, year) ? seasonCounterStrike(year) : counterStrike;
+}
 
 /**
  * Squad-screen strength profile: the five who play and the best of them → { team, best } on the player-rating scale.

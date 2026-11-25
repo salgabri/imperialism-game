@@ -25,6 +25,7 @@ import { BUILT_IN_WOMENS_TENNIS_SEASONS } from '../data/womensTennisSeasons.js';
 import { BUILT_IN_HOCKEY_SEASONS } from '../data/hockeySeasons.js';
 import { BUILT_IN_RUGBY_LEAGUE_SEASONS } from '../data/rugbyLeagueSeasons.js';
 import { BUILT_IN_ROCKET_LEAGUE_SEASONS } from '../data/rocketLeagueSeasons.js';
+import { BUILT_IN_COUNTER_STRIKE_SEASONS } from '../data/counterStrikeSeasons.js';
 import { BUILT_IN_VALORANT_SEASONS } from '../data/valorantSeasons.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
 import { EUROPE_MAPS } from '../data/europeMaps.js';
@@ -40,6 +41,7 @@ import { womensTennis } from '../sports/womensTennis.js';
 import { hockey } from '../sports/hockey.js';
 import { rugbyLeague } from '../sports/rugbyLeague.js';
 import { rocketLeague } from '../sports/rocketLeague.js';
+import { counterStrike } from '../sports/counterStrike.js';
 import { valorant } from '../sports/valorant.js';
 import { baseball } from '../sports/baseball.js';
 import { football } from '../sports/football.js';
@@ -118,6 +120,9 @@ const SET_KINDS = Object.freeze({
   wta: { prefix: 'wta-', id: /^wta-\d{4}$/, sport: 'womens-tennis', nationsOnly: /^wta-/, calendar: true },
   // `rl-<year>`: Rocket League's players at the end of a year, by the Elo of Liquipedia's results, nations only.
   rl: { prefix: 'rl-', id: /^rl-\d{4}$/, sport: 'rocket-league', nationsOnly: /^rl-/, calendar: true },
+  // `cs-<year>`: Counter-Strike's players at the end of a year, by the Elo of Liquipedia's results (1.6's and Source's to
+  // 2012, then Global Offensive's and Counter-Strike 2's), nations only.
+  cs: { prefix: 'cs-', id: /^cs-\d{4}$/, sport: 'counter-strike', nationsOnly: /^cs-/, calendar: true },
   // `val-<year>`: Valorant's players at the end of a year, by the Elo of vlr.gg's results, nations only.
   val: { prefix: 'val-', id: /^val-\d{4}$/, sport: 'valorant', nationsOnly: /^val-/, calendar: true },
   // `nhl-<season end year>`: an NHL season's ratings from an EA NHL edition (NHL 94 rates 1993/94 → `nhl-1994`), its
@@ -289,7 +294,8 @@ export const isSeasonTheatreMap = (mapId, id) => [...EUROPE_MAPS, ...CLUB_MAPS]
 /** The built-in earlier seasons of every sport, newest first, as the index lists them. */
 export const BUILT_IN_SETS = listing([...BUILT_IN_SEASONS, ...BUILT_IN_WOMENS_SEASONS, ...BUILT_IN_BASKETBALL_SEASONS,
   ...BUILT_IN_AMERICAN_FOOTBALL_SEASONS, ...BUILT_IN_COLLEGE_FOOTBALL_SEASONS, ...BUILT_IN_BASEBALL_SEASONS, ...BUILT_IN_HOCKEY_SEASONS, ...BUILT_IN_TENNIS_SEASONS,
-  ...BUILT_IN_WOMENS_TENNIS_SEASONS, ...BUILT_IN_RUGBY_LEAGUE_SEASONS, ...BUILT_IN_ROCKET_LEAGUE_SEASONS, ...BUILT_IN_VALORANT_SEASONS]);
+  ...BUILT_IN_WOMENS_TENNIS_SEASONS, ...BUILT_IN_RUGBY_LEAGUE_SEASONS, ...BUILT_IN_ROCKET_LEAGUE_SEASONS, ...BUILT_IN_COUNTER_STRIKE_SEASONS,
+  ...BUILT_IN_VALORANT_SEASONS]);
 
 /** The era map a basketball or baseball season's clubs play on (null for any other set). */
 export const seasonMapOf = id => BUILT_IN_SETS.find(set => set.id === id)?.map ?? null;
@@ -413,8 +419,9 @@ export function decodeFootballSet(data, id = data?.id) {
     const playerOf = club => (club.league === EUROLEAGUE && setKindOf(data.id) === 'nba2k' ? player => [...player, euroleagueEstimate()] : player => [...player]);
     return { meta, rosters: null, clubs: clubs.map(club => ({ ...club, squad: club.squad.map(playerOf(club)) })), territory: NO_TERRITORY };
   }
-  // Tennis's seasons, Rocket League's and Valorant's: nations only, each player `[name, position, rating, source]`.
-  if (['elo', 'wta', 'rl', 'val'].includes(setKindOf(data.id))) {
+  // Tennis's seasons, Rocket League's, Counter-Strike's and Valorant's: nations only, each player `[name, position, rating,
+  // source]`.
+  if (['elo', 'wta', 'rl', 'cs', 'val'].includes(setKindOf(data.id))) {
     const { nations, clubs, territory, ...meta } = data;
     return {
       meta,
@@ -557,7 +564,8 @@ KINDS.elo = { size: 4,
 KINDS.wta = KINDS.elo;
 // Rocket League's the same, each player `[name, 'PLR', rating, source]` as its built-in rosters hold them.
 KINDS.rl = KINDS.elo;
-// Valorant's too.
+// Counter-Strike's and Valorant's too.
+KINDS.cs = KINDS.elo;
 KINDS.val = KINDS.elo;
 // A computed World Cup season: nations only, each its XI as `[name, position, rating, source]`, the built-in rosters'
 // shape. Its source says the ratings are computed (method 'computed'), from Elo of which day, by what rule
@@ -637,7 +645,7 @@ function validateFootballSet(data, id) {
   const rating = v => typeof v === 'number' && Number.isFinite(v) && v >= 1 && v <= 99;
   const nation = v => typeof v === 'string' && Object.hasOwn(NATIONS, v);
 
-  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "wc-<yyyy>", "nt-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "wwc-<yyyy>", "wol-<yyyy>", "nba-2k<nn>", "nba-stats-<yyyy>", "mlb-the-show-<nn>", "mlb-war-<yyyy>", "madden-<yyyy>", "pfa-<yyyy>", "cfb-<yyyy>", "nhl-<yyyy>", "nrl-<yyyy>", "nrl-sl-<yyyy>", "tennis-<yyyy>", "wta-<yyyy>" or "rl-<yyyy>"');
+  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "wc-<yyyy>", "nt-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "wwc-<yyyy>", "wol-<yyyy>", "nba-2k<nn>", "nba-stats-<yyyy>", "mlb-the-show-<nn>", "mlb-war-<yyyy>", "madden-<yyyy>", "pfa-<yyyy>", "cfb-<yyyy>", "nhl-<yyyy>", "nrl-<yyyy>", "nrl-sl-<yyyy>", "tennis-<yyyy>", "wta-<yyyy>", "rl-<yyyy>", "cs-<yyyy>" or "val-<yyyy>"');
   if (!isObject(data)) fail('file is not a JSON object');
   if (data.format !== FOOTBALL_SET_FORMAT) fail(`unsupported format ${JSON.stringify(data.format)} (expected ${FOOTBALL_SET_FORMAT})`);
   if (data.id !== id) fail(`file id ${JSON.stringify(data.id)} does not match the requested data set`);
@@ -665,6 +673,7 @@ function validateFootballSet(data, id) {
   if (setKindOf(id) === 'show') return validateBaseballSeason(data, id, fail);
   if (setKindOf(id) === 'elo' || setKindOf(id) === 'wta') return validateTennisSeason(data, id, fail);
   if (setKindOf(id) === 'rl') return validateTennisSeason(data, id, fail, ROCKET_LEAGUE_SEASON);
+  if (setKindOf(id) === 'cs') return validateTennisSeason(data, id, fail, COUNTER_STRIKE_SEASON);
   if (setKindOf(id) === 'val') return validateTennisSeason(data, id, fail, VALORANT_SEASON);
   if (setKindOf(id) === 'wc') return validateWorldCupSeason(data, id, fail);
   if (setKindOf(id) === 'nt') return validateNationalTeamSeason(data, id, fail);
@@ -939,7 +948,9 @@ const TENNIS_SEASON = Object.freeze({ noun: 'a tennis season', least: 2, most: 5
   asOne: 'as the Davis Cup does' });
 const ROCKET_LEAGUE_SEASON = Object.freeze({ noun: 'a Rocket League season', least: 3, most: 5, count: 'three to five',
   position: 'PLR', asOne: 'as Great Britain plays as one' });
-// Valorant's: five to seven a nation, of whom five play.
+// Counter-Strike's and Valorant's: five to seven a nation, of whom five play.
+const COUNTER_STRIKE_SEASON = Object.freeze({ noun: 'a Counter-Strike season', least: 5, most: 7, count: 'five to seven',
+  position: 'PLR', asOne: 'as Great Britain plays as one' });
 const VALORANT_SEASON = Object.freeze({ noun: 'a Valorant season', least: 5, most: 7, count: 'five to seven',
   position: 'PLR', asOne: 'as Great Britain plays as one' });
 
@@ -947,8 +958,8 @@ const VALORANT_SEASON = Object.freeze({ noun: 'a Valorant season', least: 5, mos
  * A tennis season, the men's or the women's: the nations that field a cup team (two to five rated players each, strongest first, as
  * `[name, 'SGL', rating, source]`), no clubs, and its territory: the home nations held by the United Kingdom, every
  * nation it does not list inactive. Ratings are the season's Elo on the game's scale. A Rocket League season the same
- * (`rules` ROCKET_LEAGUE_SEASON): three to five `[name, 'PLR', rating, source]` a nation; a Valorant season's five to
- * seven (VALORANT_SEASON).
+ * (`rules` ROCKET_LEAGUE_SEASON): three to five `[name, 'PLR', rating, source]` a nation; a Counter-Strike or a Valorant
+ * season's five to seven (COUNTER_STRIKE_SEASON, VALORANT_SEASON).
  */
 function validateTennisSeason(data, id, fail, rules = TENNIS_SEASON) {
   const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
@@ -1432,6 +1443,7 @@ export function seasonSport(set) {
       : setKindOf(meta.id) === 'elo' ? { ...tennis, rosters, territory, ...identity }
       : setKindOf(meta.id) === 'wta' ? { ...womensTennis, rosters, territory, ...identity }
       : setKindOf(meta.id) === 'rl' ? { ...rocketLeague, rosters, territory, ...identity }
+      : setKindOf(meta.id) === 'cs' ? { ...counterStrike, rosters, territory, ...identity }
       : setKindOf(meta.id) === 'val' ? { ...valorant, rosters, territory, ...identity }
       : setKindOf(meta.id) === 'nhl' ? { ...hockey, rosters, clubs, territory, clubMap: meta.map, ...identity }
       : setKindOf(meta.id) === 'nrl' ? { ...rugbyLeague, clubs, clubMap: meta.map, ...identity }

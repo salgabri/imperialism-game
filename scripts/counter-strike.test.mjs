@@ -22,8 +22,9 @@ import { buildSetupModel, signingsOffered, SPORT_NOTES } from '../src/screens/se
 import { readChallenge } from '../src/screens/setup/challenge.js';
 import { readExport } from './lib/liquipedia.mjs';
 import {
-  formatOf, gameRating, halvesOf, homesOf, isNationsEvent, kFactor, LINEUP, mapOf, MIN_PLAYERS, nationalTeams, nationOfTeamName, nationsOf,
-  playerOf, readTournaments, regionOfNation, scoreFits, seriesInOrder, startersOf, TEAM_SIZE, tournamentOf,
+  alikeNames, CARRY_DAYS, carriedOver, eventFormatOf, foldRenames, formatOf, gameRating, halvesOf, homesOf, isNationsEvent, kFactor, LINEUP,
+  mapOf, MIN_PLAYERS, MIN_RECENT, nationalTeams, nationOfTeamName, nationsOf, older, playerOf, ratedPlayers, readTournaments, recentFrom,
+  regionOfNation, renameOf, runElo, scoreFits, seriesInOrder, startersOf, TEAM_SIZE, tournamentOf,
 } from './lib/counter-strike.mjs';
 import { teamKeys } from './lib/liquipedia.mjs';
 
@@ -136,7 +137,98 @@ test('national teams play the Nations Cup, named "Denmark" or "Team Denmark", an
   assert.deepEqual([national.get('ZywOo').nation, national.get('Dev1ce').nation, national.has('Donk')], ['250', '208', false]);
 });
 
+test('women\'s events are left out; 1.6\'s and Source\'s are read apart, a series of theirs with no map counting as one', () => {
+  const WOMEN = ['ESL/Impact/League/Season 5', `{{Infobox league|name=ESL Impact S5|game=cs2|liquipediatier=3|restrictions=female|sdate=2024-03-01}}
+${card('FURIA fe', [['kaah', 'br'], ['izaa', 'br'], ['bizinha', 'br'], ['lulitenz', 'br'], ['gabs', 'br']])}`];
+  const CPL = ['CPL/Winter/2003', `{{Infobox league|name=CPL Winter 2003|game=cs16|liquipediatier=1|sdate=2003-12-16}}
+${card('SK Gaming', [['HeatoN', 'se'], ['Potti', 'se'], ['ahl', 'se'], ['fisker', 'se'], ['archie', 'se']])}
+${card('3D', [['Rambo', 'us'], ['Moto', 'us'], ['Bullseye', 'us'], ['KSharp', 'us'], ['method', 'us']])}
+{{Match|opponent1={{TeamOpponent|sk gaming|score=13}}|opponent2={{TeamOpponent|3d|score=9}}|date=2003-12-18}}
+{{Match|opponent1={{TeamOpponent|sk gaming|score=2}}|opponent2={{TeamOpponent|3d|score=1}}|bestof=3|date=2003-12-19
+|map1={{Map|map=de_nuke|score1=13|score2=7}}|map2={{Map|map=de_train|score1=9|score2=13}}|map3={{Map|map=de_inferno|score1=13|score2=11}}}}`];
+  const pages = readExport(xml([MAJOR, MAJOR_TEXT], WOMEN, CPL));
+  const today = readTournaments(pages);
+  assert.deepEqual(today.tournaments.map(t => t.title), [MAJOR]);
+  assert.deepEqual([today.skipped.women, today.skipped.game], [[WOMEN[0]], [CPL[0]]]);
+  assert.equal(tournamentOf(pages[1]).women, true);
+  const past = older.readTournaments(pages);
+  assert.deepEqual(past.tournaments.map(t => t.title), [CPL[0]]);
+  const { series } = older.seriesInOrder(past.tournaments);
+  assert.deepEqual(series.map(one => one.games.map(game => [game.winner, !!game.result])), [[[1, true]], [[1, false], [2, false], [1, false]]],
+    'the first series\' score alone: one map, the winner\'s; the second\'s three maps as played');
+  assert.deepEqual(series.map(one => one.bestOf), [1, 3]);
+  // An event's own format settles a score both fit: CPL's maps are first to 13, so its 16–14 is MR12's overtime.
+  assert.equal(eventFormatOf(past.tournaments[0]), 'mr12');
+  assert.deepEqual([formatOf({ rounds: [16, 14], halves: [] }, 'cs16', 'mr12'), formatOf({ rounds: [16, 14], halves: [] }, 'cs16', 'mr15'),
+    formatOf({ rounds: [16, 14], halves: [] }, 'cs16')], ['mr12', 'mr15', null]);
+});
+
 // ---------- the ratings ----------
+
+test('a player the wiki renamed is one, by alike names, one nation and shared line-ups; two people stay two', () => {
+  assert.deepEqual([['Dev1ce', 'Device'], ['JT', 'JT (South African player)'], ['Magisk', 'Magiskb0Y'], ['PetiSkel', 'PetitSkel'],
+    ['Cabbi', 'Jabbi'], ['NEO', 'neo'], ['Zeus', 'Nico']].map(([a, b]) => alikeNames(a, b)), ['leet', 'same', 'part', 'slip', 'slip', 'same', null]);
+  let day = 0;
+  const event = (title, rosters) => ({ title, start: new Date(Date.UTC(2015, 0, 1) + (day += 20) * 86400000).toISOString().slice(0, 10),
+    rosters: rosters.map(([team, names, flag = 'dk']) => ({ team, keys: teamKeys(team), players: names.map(name => ({ name, link: null, flag })) })) });
+  const DIG = ['Xyp9x', 'dupreeh', 'cajunb', 'karrigan'];
+  const tournaments = [
+    event('A', [['Dignitas', ['Device', ...DIG]], ['NiP', ['f0rest', 'Xizt', 'friberg', 'Get_RiGhT', 'Fifflaren'], 'se']]),
+    event('B', [['Dignitas', ['Dev1ce', ...DIG]]]),
+    event('C', [['Dignitas', ['Device', ...DIG]]]),
+    event('D', [['Dignitas', ['Dev1ce', ...DIG]], ['Flames', ['Jabbi', 'roeJ', 'HooXi', 'nicoodoz', 'Zyphon']]]),
+    // Cabbi takes Jabbi's place at Flames: alike names, shared line-ups, but each in another team within a month.
+    event('E', [['Flames', ['Cabbi', 'roeJ', 'HooXi', 'nicoodoz', 'Zyphon']], ['Heroic', ['Jabbi', 'stavn', 'cadiaN', 'TeSeS', 'refrezh']]]),
+    // Two Nicos of one roster are two people.
+    event('F', [['Mix', ['Nico', 'NiCo', 'a1', 'a2', 'a3']]]),
+  ];
+  const players = new Map();
+  for (const t of tournaments) for (const r of t.rosters) for (const p of r.players) {
+    if (!players.has(p.name)) players.set(p.name, { key: p.name, nation: 'dk', about: 'dk', rosters: [] });
+    players.get(p.name).rosters.push({ day: Date.parse(t.start) / 86400000, event: t.title, keys: r.keys,
+      mates: new Set(r.players.map(m => m.name).filter(m => m !== p.name)) });
+  }
+  assert.equal(renameOf(players.get('Dev1ce'), players.get('Device')), true);
+  assert.equal(renameOf(players.get('Cabbi'), players.get('Jabbi')), false, 'Jabbi plays on elsewhere: two people');
+  assert.equal(renameOf(players.get('Nico'), players.get('NiCo')), false, 'one roster lists both');
+  const folded = foldRenames(tournaments, new Map([['Device', 'denmark']]));
+  assert.deepEqual([...folded], [['Device', 'Dev1ce']], 'the title of his latest roster');
+  assert.ok(tournaments[0].rosters[0].players[0].link === 'Dev1ce');
+  // A page that moved with no shared line-up: one title's last roster, the other's first within a year, one nation.
+  const moved = [event('G', [['Complexity', ['JT (South African player)', 'b1', 'b2', 'b3', 'b4'], 'za']]),
+    event('H', [['Liquid', ['JT', 'c1', 'c2', 'c3', 'c4'], 'za']])];
+  assert.deepEqual([...foldRenames(moved)], [['JT (South African player)', 'JT']]);
+});
+
+test('a player needs five maps in the year to be rated, and a Global Offensive newcomer brings what he was worth in 1.6', () => {
+  const side = (prefix, n = 5) => Array.from({ length: n }, (_, i) => ({ name: `${prefix}${i + 1}` }));
+  const series = [];
+  const rosters = (...teams) => teams.map(prefix => ({ team: prefix, players: side(prefix) }));
+  for (let i = 0; i < 30; i++) series.push({ date: `2025-0${1 + (i % 6)}-10`, event: 'E', region: 'EU', page: 'p', index: i, host: null,
+    teams: [side('A'), side('B')], rosters: rosters('A', 'B'), games: [{ winner: 1 }] });
+  series.sort((x, y) => x.date.localeCompare(y.date));
+  // B's five played their thirty maps; A1–A5 too, but in 2026 only A's play another four.
+  for (let i = 0; i < 4; i++) series.push({ date: '2026-03-01', event: 'E', region: 'EU', page: 'q', index: i, host: null,
+    teams: [side('A'), side('C')], rosters: rosters('A', 'C'), games: [{ winner: 2 }] });
+  const asOf = '2026-11-15';
+  const { players } = runElo(series, { recentFrom: recentFrom(asOf) });
+  assert.deepEqual([players.get('A1').recent, players.get('B1').recent], [4, 0]);
+  assert.equal(MIN_RECENT, 5);
+  assert.deepEqual(ratedPlayers(players, asOf).map(p => p.key), [], 'four maps in the year are too few; B\'s last was a year before');
+  const after = runElo([...series, { ...series.at(-1), index: 9, games: [{ winner: 1 }] }], { recentFrom: recentFrom(asOf) }).players;
+  assert.ok(ratedPlayers(after, asOf).some(p => p.key === 'A1'), 'the fifth map of the year rates him');
+  // carriedOver: the newcomer's 1.6 Elo above his region's level there, if he played it within three years and its nation is his.
+  const go = [{ date: '2013-02-01', teams: [side('A'), side('B')], rosters: rosters('A', 'B'), games: [{ winner: 1 }] }];
+  const chain = { players: new Map([['A1', { games: 120, last: '2012-11-01', elo: 1800 }], ['A2', { games: 8, last: '2012-11-01', elo: 1900 }],
+    ['A3', { games: 300, last: '2009-01-01', elo: 1900 }], ['B1', { games: 50, last: '2012-12-01', elo: 1450 }]]),
+  homes: new Map([['A1', 'EU'], ['B1', 'NA']]), starts: { EU: 1500, NA: 1480, world: 1490 }, nationOf: key => (key === 'B1' ? '840' : '752') };
+  const seeds = carriedOver(go, [chain], key => (key === 'B1' ? '124' : '752'));
+  assert.deepEqual([...seeds], [['A1', { above: 300, games: 120 }]], 'A2 played too few maps, A3 too long ago, B1 for another nation');
+  assert.ok(CARRY_DAYS >= 1000);
+  const run = runElo(go, { starts: { EU: 1500 }, homes: new Map(side('A').map(p => [p.name, 'EU'])), seeds }).players;
+  assert.ok(Math.abs(run.get('A1').elo - run.get('A2').elo - 300) < 1, 'he starts 300 above his team-mate');
+  assert.equal(run.get('A1').brought, 120);
+});
 
 test('a rating is Elo / 25 − 2; a nation names its best seven and plays its best five', () => {
   assert.deepEqual([gameRating(1500), gameRating(1900), gameRating(2400)], [58, 74, 94]);
@@ -213,7 +305,7 @@ test('a map runs to 13, with half-time after twelve rounds and overtimes of six 
   assert.equal(play(`${level}ADADADDDDD`).over, 'D', '15–19');
   assert.deepEqual(stepMap(play('A'.repeat(13)), 'D'), play('A'.repeat(13)), 'a finished map stays as it is');
   assert.deepEqual(mapState([]), MAP_START);
-  assert.deepEqual([1, 12, 24, 25, 27, 28, 40].map(roundUnit), [1, 12, 24, 25, 25, 26, 26]);
+  assert.deepEqual([1, 12, 24, 25, 27, 28, 40].map(n => roundUnit(n)), [1, 12, 24, 25, 25, 26, 26]);
 });
 
 test('rounds drawn for a known winner are the round chain\'s own: drawn at Elo\'s odds, they score as the chain does', () => {

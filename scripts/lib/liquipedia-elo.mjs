@@ -141,6 +141,192 @@ export function foldPlayers(tournaments, redirects = new Map(), nationOfName = n
   return folded;
 }
 
+// ---------- renamed players ----------
+
+// A player whose page the wiki renamed ("Magiskb0Y" to "Magisk"), or whom rosters link under two titles ("Dev1ce" and
+// "Device", "JT (South African player)" and "JT"), is two players to an export without the old title's redirect. Two keys
+// are one player by what the rosters show of them (renameOf): alike names, one nation, the same team-mates about the same
+// time, and nothing that puts him in two teams at once.
+const DISAMBIGUATED = / \(([^)]*)\)$/;
+const LEET = { 0: 'o', 1: 'i', 3: 'e', 4: 'a', 5: 's', 7: 't', 8: 'b', 9: 'g', $: 's', '@': 'a', '!': 'i', l: 'i' };
+const bareName = key => String(key).replace(DISAMBIGUATED, '').toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').replace(/ø/g, 'o');
+const looseName = key => bareName(key).replace(/[^a-z0-9]+/g, '');
+/** A name as its letters, the digits players write for them turned back: "Dev1ce" → "device", "P4TriCK" → "patrick". */
+const leetName = key => bareName(key).replace(/[01345789$@!l]/g, c => LEET[c]).replace(/[^a-z]+/g, '');
+/** Whether two names are one typing slip apart: a letter added, dropped, changed or swapped with its neighbour. */
+function oneSlip(a, b) {
+  if (Math.abs(a.length - b.length) > 1) return false;
+  let i = 0;
+  while (i < a.length && i < b.length && a[i] === b[i]) i++;
+  const restA = a.slice(i), restB = b.slice(i);
+  return restA.slice(1) === restB || restA === restB.slice(1) || restA.slice(1) === restB.slice(1)
+    || (restA.length > 1 && restA[0] === restB[1] && restA[1] === restB[0] && restA.slice(2) === restB.slice(2));
+}
+
+/**
+ * How alike two players' keys are: 'same' (but for a disambiguation, case and punctuation), 'leet' (the digits written
+ * for letters), 'part' (one begins or ends the other: "Magisk", "Magiskb0Y"), 'slip' (a typing slip apart), or null.
+ */
+export function alikeNames(a, b) {
+  const la = looseName(a), lb = looseName(b), short = Math.min(la.length, lb.length);
+  if (short < 2) return null;
+  if (la === lb) return 'same';
+  if (leetName(a).length >= 3 && leetName(a) === leetName(b)) return 'leet';
+  if (short >= 3 && (la.startsWith(lb) || lb.startsWith(la))) return 'part';
+  if (short >= 4 && (la.endsWith(lb) || lb.endsWith(la))) return 'part';
+  return short >= 5 && oneSlip(la, lb) ? 'slip' : null;
+}
+
+/** A line-up two rosters share: three team-mates or more, the rosters within 200 days of each other. */
+export const RENAME_MATES = 3;
+export const RENAME_DAYS = 200;
+// Two teams at once: rosters of two teams, a team-mate at most between them, within a month.
+const CLASH_DAYS = 30;
+// A page that moved without a shared line-up: the new title's first roster within a year of the old one's last.
+const HANDOVER_DAYS = 365;
+// A name the wiki tells apart by a person's name ("Seb (Sebastian Dietrich)"), not by his country ("(Polish player)").
+const isPersonal = key => { const tag = DISAMBIGUATED.exec(key)?.[1] ?? ''; return /^\S+ \S+/.test(tag) && !/player/i.test(tag); };
+const oneTeam = (x, y) => x.keys.some(key => y.keys.includes(key));
+function sharedMates(x, y) {
+  let n = 0;
+  for (const mate of x.mates) if (y.mates.has(mate)) n++;
+  return n;
+}
+/**
+ * What every roster that lists two keys says of them → { links: the line-ups they share (RENAME_MATES team-mates within
+ * RENAME_DAYS), eachFirst: whether each comes first in some, clashes: how often they stand in two teams within a month,
+ * apart: whether a roster lists both, or one event lists them in two teams (but for an all-star match among a hundred
+ * shared line-ups) }.
+ */
+function together(a, b) {
+  let links = 0, clashes = 0, twoTeams = 0, before = false, after = false;
+  for (const x of a.rosters) {
+    for (const y of b.rosters) {
+      const gap = Math.abs(x.day - y.day), oneEvent = x.event === y.event;
+      if (gap > RENAME_DAYS && !oneEvent) continue;
+      const mates = sharedMates(x, y);
+      if (mates >= RENAME_MATES) {
+        links++;
+        if (x.day < y.day) before = true;
+        if (x.day > y.day) after = true;
+      } else if (!oneTeam(x, y)) {
+        if (oneEvent) twoTeams++;
+        if (gap <= CLASH_DAYS && mates <= 1) clashes++;
+      }
+    }
+  }
+  return { links, clashes, eachFirst: before && after, apart: a.rosters.some(one => one.mates.has(b.key)) || twoTeams > 0.01 * links };
+}
+
+/**
+ * Whether two keys are one player, by every roster that lists them (`a`, `b`: { key, nation, about, rosters: [{ day, event,
+ * keys, mates: Set }], in date order }; `about` his nation, else half his team-mates'): alike names, no clash of
+ * nations, nothing that tells them apart (together), and
+ *   - the same name, or the same in leet: a shared line-up, and at most one clash to twenty of them; or, with no line-up,
+ *     one title's first roster within a year after the other's last, about one nation (five letters or more, in leet). A name
+ *     the wiki tells apart by a person's name has namesakes: ten shared line-ups, each title first in some of them;
+ *   - one name part of the other: two shared line-ups, and at most one clash to fifty;
+ *   - a typing slip apart: three, no clash, and either one spelling in two rosters at most or each first in some.
+ */
+export function renameOf(a, b) {
+  const alike = alikeNames(a.key, b.key);
+  if (!alike || (a.nation && b.nation && a.nation !== b.nation)) return false;
+  const { links, clashes, eachFirst, apart } = together(a, b);
+  if (apart) return false;
+  if (alike === 'same' || alike === 'leet') {
+    if (isPersonal(a.key) || isPersonal(b.key)) return links >= 10 && eachFirst && clashes <= 0.05 * links;
+    if (links) return clashes <= 0.05 * links;
+    const [first, second] = a.rosters[0].day <= b.rosters[0].day ? [a, b] : [b, a];
+    const gap = second.rosters[0].day - first.rosters.at(-1).day;
+    return gap > 0 && gap <= HANDOVER_DAYS && !!a.about && a.about === b.about
+      && (alike === 'same' || Math.min(looseName(a.key).length, looseName(b.key).length) >= 5);
+  }
+  if (alike === 'part') return links >= 2 && clashes <= 0.02 * links;
+  return links >= 3 && !clashes && (eachFirst || Math.min(a.rosters.length, b.rosters.length) <= 2);
+}
+
+/**
+ * Renamed players folded into one key each (renameOf), the title his latest roster uses: every roster player under an older
+ * title gets the kept one as his `link`, in all of `tournaments` (readTournaments', of one record or several). `people`: the countries of the players' pages, a kept key without one taking its
+ * older title's. A player's nation is his national team's, else his cards' flags' or his page's; `about`, for one without,
+ * that of half his team-mates or more.
+ * → Map(folded key → kept key)
+ */
+export function foldRenames(tournaments, people = new Map(), nationOfName = nationOfTeam) {
+  const national = nationalTeams(tournaments, nationOfName);
+  const players = new Map();
+  for (const tournament of tournaments) {
+    if (!tournament.start) continue;
+    const day = Date.parse(tournament.start) / DAY;
+    for (const roster of tournament.rosters) {
+      const keys = roster.players.map(playerKey);
+      roster.players.forEach((player, i) => {
+        const key = keys[i];
+        if (!players.has(key)) players.set(key, { key, flags: new Map(), rosters: [] });
+        const row = players.get(key);
+        if (player.flag) row.flags.set(player.flag, (row.flags.get(player.flag) ?? 0) + 1);
+        row.rosters.push({ day, event: tournament.title, keys: roster.keys, mates: new Set(keys.filter(mate => mate !== key)) });
+      });
+    }
+  }
+  const byMate = new Map(), bySpelling = new Map();
+  const listed = (map, at, row) => { if (!map.has(at)) map.set(at, []); map.get(at).push(row); };
+  for (const row of players.values()) row.nation = nationOfPlayer(row, people, national);
+  const known = new Map([...players.values()].map(row => [row.key, row.nation]));
+  for (const row of players.values()) {
+    row.rosters.sort((x, y) => x.day - y.day);
+    const mates = row.rosters.flatMap(one => [...one.mates]);
+    const theirs = new Map();
+    for (const mate of mates) if (known.get(mate)) theirs.set(known.get(mate), (theirs.get(known.get(mate)) ?? 0) + 1);
+    const told = [...theirs.values()].reduce((sum, n) => sum + n, 0);
+    row.about = row.nation ?? [...theirs].find(([, n]) => n >= 0.5 * told)?.[0] ?? null;
+    for (const mate of new Set(mates)) listed(byMate, mate, row);
+    for (const name of new Set([`=${looseName(row.key)}`, `~${leetName(row.key)}`])) if (name.length > 2) listed(bySpelling, name, row);
+  }
+  // Two keys worth a look: alike names that have shared a team-mate, or that spell one name.
+  const pairs = new Map();
+  for (const list of [...byMate.values(), ...bySpelling.values()]) {
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        const [a, b] = list[i].key < list[j].key ? [list[i], list[j]] : [list[j], list[i]];
+        const id = `${a.key}\n${b.key}`;
+        if (!pairs.has(id)) pairs.set(id, alikeNames(a.key, b.key) ? [a, b] : null);
+      }
+    }
+  }
+  // The surest names first; a group never takes in a player its rosters tell apart from one of its own.
+  const SURE = ['same', 'leet', 'part', 'slip'];
+  const found = [...pairs.values()].filter(pair => pair && renameOf(...pair))
+    .map(([a, b]) => ({ a, b, rank: SURE.indexOf(alikeNames(a.key, b.key)) }))
+    .sort((p, q) => p.rank - q.rank || p.a.key.localeCompare(q.a.key) || p.b.key.localeCompare(q.b.key));
+  const groupOf = new Map();
+  for (const { a, b } of found) {
+    const ga = groupOf.get(a.key) ?? [a], gb = groupOf.get(b.key) ?? [b];
+    if (ga === gb || ga.some(x => gb.some(y => together(x, y).apart))) continue;
+    const group = [...ga, ...gb];
+    for (const member of group) groupOf.set(member.key, group);
+  }
+  const folded = new Map();
+  for (const group of new Set(groupOf.values())) {
+    const kept = group.slice().sort((x, y) => y.rosters.at(-1).day - x.rosters.at(-1).day || y.rosters.length - x.rosters.length
+      || x.key.localeCompare(y.key))[0].key;
+    for (const { key } of group) {
+      if (key === kept) continue;
+      folded.set(key, kept);
+      if (people.has(key) && !people.has(kept)) people.set(kept, people.get(key));
+    }
+  }
+  for (const tournament of tournaments) {
+    for (const roster of tournament.rosters) {
+      for (const player of roster.players) {
+        const to = folded.get(playerKey(player));
+        if (to) player.link = to;
+      }
+    }
+  }
+  return folded;
+}
+
 // ---------- teams ----------
 
 // A series names its teams by the wiki's team templates ("nip", "kc", "flcn", "Genesis (South American Team)"), its event's
@@ -348,13 +534,15 @@ function distinctNames(squad) {
  *   starters: a team card's places that start (rostersOf); gameOf: how the wiki writes a game (seriesOf);
  *   templateWords: a series' team template may name its roster by a word of its name (wordScore);
  *   homeBy: what a player's home region is (homesOf), 'event' (the region whose events he has played most games in, else
- *     his nation's) or 'nation' (his nation's, else that); regionOfNation(id): a nation's region (regionByConfederation).
+ *     his nation's) or 'nation' (his nation's, else that); regionOfNation(id): a nation's region (regionByConfederation);
+ *   resultGames(tournament): whether a series of it that records a winner but no game counts as one game, its winner's;
+ *     minRecent: the games of the last `activeDays` a player needs to be rated (0: having played in them is enough).
  */
 export function createLiquipediaElo(config) {
   const { wiki, sourceId = 'liquipedia', edition = 'Liquipedia Elo', lineup, teamSize, minPlayers, minGames, activeDays,
     start = 1500, eloPerPoint, eloOffset, kScale, kFloor, position = 'PLR', skips = {}, isNationsEvent = () => false,
     nationOfTeamName = nationOfTeam, starters = lineup, gameOf, templateWords = false, homeBy = 'event',
-    regionOfNation = () => null } = config;
+    regionOfNation = () => null, resultGames = () => false, minRecent = 0 } = config;
   const readTournament = config.tournamentOf ?? (page => tournamentOf(page));
   const rosterOptions = { starters };
   const seriesOptions = gameOf ? { gameOf } : {};
@@ -448,13 +636,16 @@ export function createLiquipediaElo(config) {
    * list them): { date, event, tier, region, international, nations, host, teams: [[player], [player]], names: [team,
    * team], rosters, games, winner, bestOf }. A series whose team has no roster near it, or too few players to field a
    * lineup, is left out (`unplayable`); `aliased` and `borrowed` list the teams found by abbreviation and at another event.
+   * A series that records a winner but no game counts as one game, its winner's (`result` true), at the tournaments
+   * `resultGames` names; elsewhere it is left out.
    */
   function seriesInOrder(tournaments) {
     const find = rosterFinder(tournaments, { templateWords });
     const out = [], unplayable = [], borrowed = new Set(), aliased = new Set();
     tournaments.forEach((tournament, at) => {
       for (const series of tournament.series) {
-        if (series.walkover || !series.games.length) continue;
+        const games = series.games.length || !resultGames(tournament) ? series.games : [{ winner: series.winner, result: true }];
+        if (series.walkover || !games.length) continue;
         if (series.opponents.some(opponent => opponent.kind !== 'team')) continue;
         const found = series.opponents.map(opponent => find(at, opponent.team));
         if (found.some(entry => !entry || startersOf(entry.roster).length < lineup)) {
@@ -466,7 +657,7 @@ export function createLiquipediaElo(config) {
           if (entry.borrowed) borrowed.add(label);
           if (entry.alias) aliased.add(`${label} → ${entry.roster.team}`);
         });
-        const won = [1, 2].map(side => series.games.filter(game => game.winner === side).length);
+        const won = [1, 2].map(side => games.filter(game => game.winner === side).length);
         out.push({
           date: series.date ?? tournament.start, event: tournament.title, tier: tournament.tier, region: tournament.region,
           international: tournament.region == null, nations: tournament.nations, page: series.page, index: series.index,
@@ -476,7 +667,7 @@ export function createLiquipediaElo(config) {
           teams: found.map(entry => startersOf(entry.roster)),
           rosters: found.map(entry => entry.roster),
           // A series names its format rarely: a finished one is best of twice its winner's games less one.
-          games: series.games, winner: series.winner, bestOf: series.bestOf ?? 2 * Math.max(...won) - 1,
+          games, winner: series.winner, bestOf: series.bestOf ?? 2 * Math.max(...won) - 1,
         });
       }
     });
@@ -488,14 +679,17 @@ export function createLiquipediaElo(config) {
   /**
    * Elo over `series` (seriesInOrder's), game by game. `scale`: kScale; `starts`: each region's starting Elo
    * (regionLevels'), a newcomer's his home's (`homes`: key → region, homesOf), else his first event's region's, else
-   * `starts.world` (the world's mean, for a newcomer of no known region), else `start`; `holdout`: the date from which each
+   * `starts.world` (the world's mean, for a newcomer of no known region), else `start`; `seeds`: what a newcomer brings
+   * from elsewhere (Map(key → { above: how far above his region's level, in Elo, games: the games behind it })), added to
+   * that start; `holdout`: the date from which each
    * game's prediction is scored, before it is played (log loss, Brier score, the same for the international events alone
-   * and, with `homes`, for the games between two regions' sides, and calibration by tenths of the expected score).
+   * and, with `homes`, for the games between two regions' sides, and calibration by tenths of the expected score);
+   * `recentFrom`: the date from which a player's games count as recent (`recent`).
    * `onGame(one, game, expected, sides)` is told of each game before it moves anyone, its sides' players as they stand
-   * (each one's `games` those he had played before).
+   * (each one's `games` those he had played before, `brought` those of his seed).
    * → { players: Map(key → player), games, scored, lan }
    */
-  function runElo(series, { scale = kScale, starts = {}, homes = null, holdout = null, onGame = null } = {}) {
+  function runElo(series, { scale = kScale, starts = {}, homes = null, seeds = null, holdout = null, recentFrom: since = null, onGame = null } = {}) {
     const players = new Map();
     const scored = { all: newScore(), international: newScore(), cross: newScore(),
       bins: Array.from({ length: 10 }, () => ({ n: 0, expected: 0, won: 0 })) };
@@ -505,8 +699,9 @@ export function createLiquipediaElo(config) {
       const key = playerKey(entry);
       let player = players.get(key);
       if (!player) {
-        player = { key, name: entry.name, elo: starts[homes?.get(key)] ?? starts[one.region] ?? starts.world ?? start, games: 0, wins: 0,
-          first: one.date, last: one.date, flags: new Map(), regions: new Map(), team: null };
+        const seed = seeds?.get(key);
+        player = { key, name: entry.name, elo: (starts[homes?.get(key)] ?? starts[one.region] ?? starts.world ?? start) + (seed?.above ?? 0),
+          games: 0, wins: 0, brought: seed?.games ?? 0, recent: 0, first: one.date, last: one.date, flags: new Map(), regions: new Map(), team: null };
         players.set(key, player);
       }
       return player;
@@ -547,6 +742,7 @@ export function createLiquipediaElo(config) {
           for (const player of side) {
             player.elo += kFactor(player.games, scale) * delta;
             player.games++;
+            if (since && one.date >= since) player.recent++;
             if ((s === 0) === (won === 1)) player.wins++;
           }
         });
@@ -691,15 +887,20 @@ export function createLiquipediaElo(config) {
       ['world', Math.round(start - zero)]].sort((x, y) => x[0].localeCompare(y[0])));
   }
 
+  /** The first of the `activeDays` to `asOf`: from then on a game is recent (runElo's `recentFrom`). */
+  const recentFrom = asOf => new Date(Date.parse(asOf) - activeDays * DAY).toISOString().slice(0, 10);
+
   /**
-   * The rated players of a run, strongest first: those with `minGames` behind them whose last game is within
-   * `activeDays` of the export's last day (`asOf`). Each as the snapshot keeps it: his flag from his cards or his page
+   * The rated players of a run, strongest first: those with `minGames` behind them (a seed's games counted) whose last game
+   * is within `activeDays` of the export's last day (`asOf`), and who have played `minRecent` games or more in those days (a
+   * run's `recent`, its `recentFrom` recentFrom(asOf)). Each as the snapshot keeps it: his flag from his cards or his page
    * (`people`), his nation from his national team or his flag (`national`), his region the home his start was his
    * region's level by (`homes`, homesOf's), else the region whose events he has played most games in.
    */
   function ratedPlayers(players, asOf, people = new Map(), national = new Map(), homes = null) {
     return [...players.values()]
-      .filter(player => player.games >= minGames && daysBetween(player.last, asOf) <= activeDays)
+      .filter(player => player.games + (player.brought ?? 0) >= minGames && daysBetween(player.last, asOf) <= activeDays
+        && (!minRecent || player.recent >= minRecent))
       .map(player => ({ key: player.key, name: player.name, flag: flagOf(player, people), nation: nationOfPlayer(player, people, national),
         side: national.get(player.key)?.team ?? null, elo: Math.round(player.elo * 10) / 10, games: player.games, wins: player.wins,
         last: player.last, team: player.team, region: homes?.get(player.key) ?? homeOf(player) }))
@@ -712,11 +913,11 @@ export function createLiquipediaElo(config) {
    * ratedPlayers rates them then, each with the flag, nation and national team the whole record gives him (`whole`, the run
    * of every game's players): a player's country is his, whichever year it is.
    */
-  function playersAsOf(series, asOf, { starts = {}, homes = null, people = new Map(), national = new Map(), whole }) {
-    const { players } = runElo(series.filter(one => one.date <= asOf), { starts, homes });
+  function playersAsOf(series, asOf, { starts = {}, homes = null, seeds = null, people = new Map(), national = new Map(), whole }) {
+    const { players } = runElo(series.filter(one => one.date <= asOf), { starts, homes, seeds, recentFrom: recentFrom(asOf) });
     return ratedPlayers(players, asOf, people, national, homes).map(player => {
       const all = whole.get(player.key);
-      return { ...player, flag: flagOf(all, people), nation: nationOfPlayer(all, people, national) };
+      return { ...player, flag: flagOf(all, people), nation: nationOfPlayer(all, people, national), recent: players.get(player.key).recent };
     });
   }
 
@@ -764,5 +965,5 @@ export function createLiquipediaElo(config) {
   }
 
   return { gameRating, kFactor, readTournaments, startersOf, seriesInOrder, runElo, crossRegion, homeEdge, homesOf, regionLevels,
-    ratedPlayers, playersAsOf, playerOf, tupleOf, nationsOf, leftOut };
+    recentFrom, ratedPlayers, playersAsOf, playerOf, tupleOf, nationsOf, leftOut };
 }

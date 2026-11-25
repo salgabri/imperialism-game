@@ -109,7 +109,7 @@
 // Counter-Strike — exact, from the model's own maps (src/sports/counterStrike.js): a series is best of three, each map won
 //   with Elo's odds for the gap (mapOdds) and played round by round at the strength that makes it so (strengthFor), each
 //   round's odds moved toward the side that won the one before in its half (roundOdds), to 13 with overtimes of six from
-//   12–12 (mapTable). The events are its rounds (`pts` 0) and each map's end (`pts` 1), so the chart knows every round
+//   12–12 (mapTable), or in an earlier season's rounds where the model names them. The events are its rounds (`pts` 0) and each map's end (`pts` 1), so the chart knows every round
 //   played: P(A wins) is the map in play's chance from its state (mapChance), then the maps left, exactly. Match-day form,
 //   one draw on every map's gap, is integrated over its normal spread with seven-point Gauss–Hermite quadrature, each node
 //   weighed by how likely it made every round played so far (roundsChance; a finished map with no rounds known, by its
@@ -142,7 +142,7 @@ import { deciderOdds as unionDeciderOdds, goldenRate as unionGoldenRate, POINTS 
   SLICE_MODEL as UNION_SLICE_MODEL, sliceMeans as unionSliceMeans } from '../sports/rugbyUnion.js';
 import { bestOfFive, bestOfThree, daySetChances, matchOdds, RUBBER_MODEL } from '../sports/tennis.js';
 import { chanceFrom, gameOdds, gameRates, gameTable, overtimeOdds, SERIES_MODEL } from '../sports/rocketLeague.js';
-import { mapChance, mapOdds, mapState, mapTable, MAPS_MODEL, roundsChance, strengthFor } from '../sports/counterStrike.js';
+import { clockOf, mapChance, mapOdds, mapState, mapTable, MAPS_MODEL, roundsChance, strengthFor } from '../sports/counterStrike.js';
 import { chanceFrom as valorantChanceFrom, mapBeta as valorantBeta, mapOdds as valorantOdds, mapTable as valorantTable, ROUNDS_MODEL }
   from '../sports/valorant.js';
 import { gameOdds as nexusOdds, GAMES_MODEL } from '../sports/leagueOfLegends.js';
@@ -219,10 +219,10 @@ export function footballRate(log) {
  *     attacker's rating points ahead in every game, formSd the spread of match-day form in rating points; the clock gives
  *     each game twelve units, ten of regulation, the fifth to seventh games extending the shortest series as overtime
  *     periods do; `goals` an earlier season's goal rate between equals, today's when absent)
- * | { kind:'maps', gap, formSd, length:52, ot:26, maxOt:1, toWin:2 } (Counter-Strike; gap is the attacker's rating points
- *     ahead in every map, formSd the spread of match-day form in rating points; the clock gives each map twenty-six units,
- *     a round each in regulation and two for its overtime, the third map extending the shortest series as an overtime
- *     period does)
+ * | { kind:'maps', gap, formSd, length:52, ot:26, maxOt:1, toWin:2, half?, momentum? } (Counter-Strike; gap is the attacker's
+ *     rating points ahead in every map, formSd the spread of match-day form in rating points; the clock gives each map
+ *     twenty-six units, a round each in regulation and two for its overtime, the third map extending the shortest series as
+ *     an overtime period does; `half` and `momentum` an earlier season's rounds a half and momentum, today's when absent)
  * | { kind:'rounds', gap, formSd, length:52, ot:26, maxOt:1, toWin:2 } (Valorant: its maps played round by round; gap and
  *     formSd as Rocket League's; the clock gives each map twenty-six units, its rounds and overtime, the third map extending
  *     the shortest series)
@@ -266,9 +266,13 @@ export function liveModelFor(sport, attacker, defender, effA, effD, drama, home 
   }
   if (prepared.maps && isNum(prepared.gap)) {
     const variation = isNum(drama) ? clamp(num(drama), 0, 12) : DEFAULT_DRAMA;
+    const half = prepared.maps.half ?? MAPS_MODEL.HALF, momentum = prepared.maps.momentum ?? MAPS_MODEL.MOMENTUM;
+    const { block, length: shortest } = clockOf(half);
     return {
       kind: 'maps', gap: num(prepared.gap), formSd: MAPS_MODEL.FORM_AT_BALANCED * (variation / 6) ** 2,
-      length: MAPS_MODEL.LENGTH, ot: MAPS_MODEL.BLOCK, maxOt: MAPS_MODEL.MAPS - MAPS_MODEL.TO_WIN, toWin: MAPS_MODEL.TO_WIN,
+      length: shortest, ot: block, maxOt: MAPS_MODEL.MAPS - MAPS_MODEL.TO_WIN, toWin: MAPS_MODEL.TO_WIN,
+      // An earlier season's rounds; today's model names none.
+      ...(half !== MAPS_MODEL.HALF || momentum !== MAPS_MODEL.MOMENTUM ? { half, momentum } : {}),
     };
   }
   if (Array.isArray(prepared.rubbers) && TIE_RUBBERS.has(prepared.rubbers.length)) {
@@ -604,7 +608,10 @@ export function isLiveModel(model) {
   }
   if (model.kind === 'maps' || model.kind === 'rounds' || model.kind === 'games') {
     return ['gap', 'formSd', 'length', 'ot'].every(finite) && model.formSd >= 0 && model.length > 0 && model.ot > 0
-      && Number.isInteger(model.maxOt) && model.maxOt >= 0 && Number.isInteger(model.toWin) && model.toWin >= 1;
+      && Number.isInteger(model.maxOt) && model.maxOt >= 0 && Number.isInteger(model.toWin) && model.toWin >= 1
+      // Counter-Strike's earlier seasons name their rounds.
+      && (model.half === undefined || (model.kind === 'maps' && Number.isInteger(model.half) && model.half >= 1 && model.half <= 30))
+      && (model.momentum === undefined || (model.kind === 'maps' && finite('momentum') && model.momentum >= 0 && model.momentum <= 3));
   }
   if (model.kind === 'rubbers') {
     return ['formSd', 'length', 'ot'].every(finite) && model.formSd >= 0 && model.length > 0 && model.ot > 0
@@ -1364,9 +1371,10 @@ const mapsCache = new WeakMap();
  */
 function mapsTables(model) {
   if (mapsCache.has(model)) return mapsCache.get(model);
+  const { half = MAPS_MODEL.HALF, momentum = MAPS_MODEL.MOMENTUM } = model;
   const nodes = HERMITE.map(([t, weight]) => {
     const p = mapOdds(model.gap + t * model.formSd);
-    return { weight, p, table: mapTable(strengthFor(p)) };
+    return { weight, p, table: mapTable(strengthFor(p, momentum, half), momentum, half) };
   });
   const tables = { nodes, cache: new Map() };
   mapsCache.set(model, tables);
@@ -1384,7 +1392,7 @@ function mapsAt(model, a, d, done = [], current = []) {
   const { nodes, cache } = mapsTables(model);
   const key = `${a}|${d}|${done.map(map => map.rounds.length ? map.rounds.join('') : map.winner.toLowerCase()).join('/')}|${current.join('')}`;
   if (cache.has(key)) return cache.get(key);
-  const state = mapState(current);
+  const state = mapState(current, model.half);
   let chance = 0, total = 0;
   for (const node of nodes) {
     let likely = node.weight * roundsChance(node.table, current);

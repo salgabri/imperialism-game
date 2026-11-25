@@ -1,0 +1,11 @@
+Counter-Strike seasons 2001-2025 (cs-<year>.json): attribution and licence
+=============================================================
+
+The ratings in these files are computed by this project from the results of Liquipedia's Counter-Strike wiki
+(https://liquipedia.net/counterstrike/): an Elo of every player, built map by map from every 5v5 series of its S-, A- and B-Tier events
+(Counter-Strike 1.6's and Source's from December 2000 to 2012, Global Offensive's and Counter-Strike 2's from 2012), as it
+stood on the last day of each year; each player's country is the one his record gives him. Liquipedia publishes no ratings:
+these are not its numbers. See docs/design/counter-strike.md, "Earlier seasons".
+
+Credit: Liquipedia (https://liquipedia.net/counterstrike/) and its contributors; each player's source links his page there.
+Licence: CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/). These files are shared under the same licence.

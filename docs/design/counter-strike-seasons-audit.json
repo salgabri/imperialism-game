@@ -1,0 +1,2416 @@
+{
+  "generatedBy": "scripts/build-counter-strike-seasons.mjs",
+  "licence": {
+    "name": "CC BY-SA 3.0",
+    "url": "https://creativecommons.org/licenses/by-sa/3.0/"
+  },
+  "teamSize": 7,
+  "minPlayers": 5,
+  "minNations": 4,
+  "todaysRounds": {
+    "half": 12,
+    "momentum": 0.57
+  },
+  "seasons": [
+    {
+      "id": "cs-2025",
+      "version": "cs-2025-c2224103",
+      "label": "Liquipedia Elo, end of 2025",
+      "date": "2025-12-31",
+      "from": "2012-09-21",
+      "to": "2025-12-21",
+      "games": [
+        "Global Offensive and Counter-Strike 2"
+      ],
+      "series": 51746,
+      "maps": 96393,
+      "results": 0,
+      "rated": 1328,
+      "carried": 0,
+      "minGames": 20,
+      "minRecent": 5,
+      "levels": {
+        "Global Offensive and Counter-Strike 2": {
+          "AF": 1214,
+          "ASIA": 1319,
+          "CIS": 1544,
+          "EU": 1500,
+          "MENA": 1299,
+          "NA": 1339,
+          "OCE": 1277,
+          "SA": 1455,
+          "world": 1438
+        }
+      },
+      "top": [
+        "Aleksib 2302.3 → 90",
+        "huNter- 2288.1 → 90",
+        "molodoy 2246.5 → 88",
+        "magixx 2204.3 → 86",
+        "esenthial 2203.5 → 86"
+      ],
+      "nations": [
+        "Russia 83.2 (magixx 86, sh1ro 86, Boombl4 82, donk 82, m0NESY 80, robo 78, Krad 78; +160)",
+        "Ukraine 81.2 (esenthial 86, b1t 80, cmtry 80, s1mple 80, zont1x 80, Woro2k 80, npl 76; +69)",
+        "Brazil 80 (KSCERATO 84, yuurih 83, lux 79, biguzera 77, arT 77, kauez 76, noway 74; +190)",
+        "France 79.6 (apEX 85, ZywOo 82, Lucky 79, Ex3rcice 78, NBK- 74, afro 71, Kyojin 71; +16)",
+        "Denmark 77.6 (HooXi 80, dev1ce 78, acoR 77, karrigan 77, TeSeS 76, Chr1zN 76, stavn 75; +67)",
+        "Mongolia 76.4 (bLitz 80, mzinho 80, Techno4K 79, 910 73, kabal 70, MiQ 69, cool4st 68; +30)",
+        "Poland 76 (fanatyk 78, siuhy 76, SpavaQ 76, kisserek 75, dycha 75, KEi 74, SaMey 74; +64)",
+        "United States 75.6 (vanity 78, Swisher 77, EliGE 76, Grim 74, nitr0 73, Stewie2K 70, RUSH 69; +112)",
+        "Turkey 75.4 (woxic 79, Calyx 76, xfl0ud 75, jottAAA 74, XANTARES 73, imoRR 69, paz 69; +9)",
+        "Kazakhstan 75.2 (molodoy 88, Qikert 77, khaN 72, modeSavage 71, tasman 68, m1te 68, neaLaN 68; +28)",
+        "Sweden 75 (upE 77, nilo 75, LNZ 75, KRIMZ 74, phzy 74, twist 74, Brollan 73; +44)",
+        "Israel 73.6 (Spinx 81, xertioN 80, flameZ 79, HeavyGod 67, anarkez 61, NertZ 60)",
+        "Canada 73 (NAF 79, Twistzz 79, daps 73, stanislaw 70, HexT 64, Walco 63, FaNg 63; +17)",
+        "Argentina 72.6 (Noktse 79, try 74, Luken 71, BK1 71, buda 68, nex7 67, luchov 67; +28)",
+        "Germany 72.6 (s1n 76, faveN 73, Krimbo 72, slaxz- 71, k1to 71, syrsoN 70, prosus 70; +11)",
+        "Portugal 72.6 (story 78, krazy 75, ewjerkz 72, MUTiRiS 69, rmn 69, PR 69, arrozdoce 68; +17)",
+        "Belarus 72.2 (MaSvAl 75, tN1R 74, senka 72, gr1ks 72, xeedo 68, m1QUSE 68, 1eeR 64; +6)",
+        "Australia 72 (jks 77, malta 74, dexter 72, INS 69, Liazz 68, Vexite 67, aliStair 66; +31)",
+        "Finland 72 (Aleksib 90, allu 72, Jimpphat 70, Aerial 67, myltsi 61, podi 60, Banjo 60; +8)",
+        "Spain 71.6 (mopoz 76, alex 72, SunPayus 71, dav1g 70, sausol 69, Martinez 55)",
+        "China 71.2 (Starry 73, Attacker 72, Moseyuh 72, westmelon 71, z4kr 68, Mercury 67, Jee 66; +26)",
+        "Lithuania 70.8 (dziugss 79, jL 72, EspiranTo 72, Bymas 71, ryu 60, spardaus 59, MAGILA 59; +4)",
+        "Czechia 70.6 (SHOCK 78, beastik 71, Dytor 70, ZEDKO 67, NEOFRAG 67, K1-FiDa 67, oskar 65; +8)",
+        "Uruguay 69.6 (max 83, dgt 76, zock 68, timo 66, cbass 55)",
+        "Bulgaria 68.8 (SPELLAN 73, Duplicate 72, Rainwaker 68, CeRq 67, SHiPZ 64, h4rn 64, REDSTAR 62; +8)",
+        "Serbia 68.4 (nexa 74, nopzy 68, VLDN 68, Kind0 66, Dragon 66, choiv7 65, nEMANHA 64; +3)",
+        "Hungary 68.2 (torzsi 86, sl3nd 74, gejmzilla 66, Aaron 61, xelex 54, xavi 53)",
+        "Kosovo 67.8 (makazze 73, ammar 72, Krabeni 69, sinnopsyy 63, juanflatroo 62, cerber 62, gxx- 58; +3)",
+        "Norway 67.8 (rain 82, hallzerk 72, jkaem 66, Brave 61, berzerk 58)",
+        "Great Britain 67.6 (mezii 71, Thomas 69, smooya 67, Gizmy 66, volt 65, AZUWU 65, Girafffe 62; +6)",
+        "Romania 67.6 (ragga 73, iM 70, lauNX 67, Blytz 64, ADRON 64, MoDo 64, adamS 63; +19)",
+        "Slovakia 67.6 (STYKO 71, frozen 68, matys 68, M1key 67, The eLiVe 64, Pepo 64, SiKO 56; +1)",
+        "South Africa 67.2 (JT 73, Sonic 72, Fadey 68, Doru 63, Triton 60, FROZ3N 59, ELUSIVE 58; +9)",
+        "Latvia 67 (YEKINDAR 75, keen 68, broky 68, shield 67, shadiy 57, Frip 55)",
+        "N. Macedonia 65.2 (kyxsan 80, stressarN 65, aidKiT 64, 2high 59, CacaNito 58, dan1 57, connex 53; +1)",
+        "New Zealand 52.6 (Gratisfaction 67, chelleos 56, supar 51, ADDICT 47, cookie 42)",
+        "India 49.6 (R2B2 55, Bhavi 53, Ph1NNN 52, Rossi 45, f1redup 43)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "B1NGO",
+          "Nami",
+          "juna",
+          "Goody",
+          "chudy",
+          "leo_drk",
+          "R3LiFwOw",
+          "MAIROLLS",
+          "chshekin",
+          "andrew",
+          "SeveN89",
+          "fakzwall",
+          "guidimon",
+          "tory",
+          "yoomswa",
+          "Kat",
+          "goddess",
+          "GooseBreeder",
+          "emy",
+          "poppins",
+          "zockie"
+        ],
+        "offTheMap": 3,
+        "fewerThanFive": 62
+      },
+      "formats": {
+        "mr12": 11947,
+        "mr15": 0
+      },
+      "half": 12,
+      "momentum": 0.57,
+      "real": {
+        "maps": 8954,
+        "rounds": 21.838,
+        "overtime": 0.127,
+        "favourite": 0.603
+      },
+      "model": {
+        "rounds": 21.6,
+        "overtime": 0.115
+      }
+    },
+    {
+      "id": "cs-2024",
+      "version": "cs-2024-089a4846",
+      "label": "Liquipedia Elo, end of 2024",
+      "date": "2024-12-31",
+      "from": "2012-09-21",
+      "to": "2024-12-30",
+      "games": [
+        "Global Offensive and Counter-Strike 2"
+      ],
+      "series": 46353,
+      "maps": 84441,
+      "results": 0,
+      "rated": 1288,
+      "carried": 0,
+      "minGames": 20,
+      "minRecent": 5,
+      "levels": {
+        "Global Offensive and Counter-Strike 2": {
+          "AF": 1205,
+          "ASIA": 1306,
+          "CIS": 1537,
+          "EU": 1500,
+          "MENA": 1271,
+          "NA": 1344,
+          "OCE": 1302,
+          "SA": 1458,
+          "world": 1435
+        }
+      },
+      "top": [
+        "Aleksib 2329.2 → 91",
+        "huNter- 2229.7 → 87",
+        "NiKo 2199.4 → 86",
+        "apEX 2177.5 → 85",
+        "torzsi 2153.2 → 84"
+      ],
+      "nations": [
+        "Russia 82.2 (robo 83, magixx 83, nafany 83, sh1ro 81, Boombl4 81, Krad 80, degster 78; +143)",
+        "France 80.8 (apEX 85, ZywOo 82, Lucky 79, Ex3rcice 79, shox 79, NBK- 75, kennyS 74; +19)",
+        "Ukraine 80.6 (Woro2k 82, b1t 82, s1mple 81, esenthial 81, cmtry 77, zont1x 74, cptkurtka023 72; +50)",
+        "Denmark 78.6 (dev1ce 81, HooXi 80, stavn 78, cadiaN 77, Chr1zN 77, TeSeS 77, acoR 77; +61)",
+        "Brazil 78.2 (KSCERATO 80, yuurih 79, arT 78, biguzera 78, felps 76, hardzao 75, lux 74; +171)",
+        "Mongolia 77.8 (mzinho 82, bLitz 82, Techno4K 81, 910 76, kabal 68, MiQ 66, sk0R 65; +28)",
+        "Finland 75.8 (Aleksib 91, sAw 76, allu 74, juho 69, Aerial 69, Jimpphat 68, xseveN 64; +16)",
+        "Turkey 75.8 (woxic 80, Calyx 79, jottAAA 74, XANTARES 73, imoRR 73, xfl0ud 72, paz 71; +6)",
+        "United States 75.6 (skadoodle 79, floppy 77, EliGE 75, Swisher 74, nitr0 73, SLIGHT 71, Stewie2K 70; +99)",
+        "Poland 75.2 (siuhy 77, dycha 77, sNx 76, Snax 73, KEi 73, SaMey 72, Qlocuu 71; +62)",
+        "Sweden 74.6 (olofmeister 78, Plopski 75, nilo 75, nawwk 73, KRIMZ 72, Silence 72, Chawzyyy 72; +46)",
+        "Canada 74 (NAF 80, Twistzz 79, daps 73, stanislaw 71, Jonji 67, joel 63, FaNg 63; +21)",
+        "Kazakhstan 73.8 (Qikert 79, khaN 78, molodoy 72, Lack1 70, alkarenn 70, buster 69, SYPH0 69; +15)",
+        "Portugal 73.8 (story 81, krazy 75, ewjerkz 72, MUTiRiS 71, rmn 70, arrozdoce 68, pr 66; +16)",
+        "China 73.4 (advent 78, Starry 73, zhokiNg 73, DD 72, westmelon 71, aumaN 71, Attacker 70; +35)",
+        "Czechia 72.4 (SHOCK 75, Dytor 74, blogg1s 72, PR 71, majky 70, ZEDKO 68, beastik 68; +17)",
+        "Israel 72.4 (flameZ 79, Spinx 78, xertioN 78, HeavyGod 64, BluePho3nix 63, anarkez 61, NertZ 61; +4)",
+        "Bulgaria 72.2 (SPELLAN 75, Duplicate 73, Rainwaker 72, CeRq 71, REDSTAR 70, h4rn 66, SHiPZ 64; +11)",
+        "Germany 72.2 (tiziaN 74, s1n 72, faveN 72, Krimbo 72, syrsoN 71, k1to 71, tabseN 70; +15)",
+        "Hungary 71 (torzsi 84, sl3nd 73, msN 68, Kamion 67, kory 63, Aaron 63, gejmzilla 62; +3)",
+        "Australia 70.4 (jks 76, dexter 72, AZR 70, aliStair 67, Rickeh 67, INS 66, Liazz 66; +25)",
+        "Estonia 69.8 (ropz 81, eku 68, Jyo 68, aNdu 66, supra 66, fejtZ 59, xezr 59; +2)",
+        "Great Britain 69.6 (mezii 71, MiGHTYMAX 70, smooya 69, Ducky 69, Surreal 69, Thomas 68, volt 68; +10)",
+        "Argentina 69.2 (Noktse 75, BK1 68, deco 68, buda 68, try 67, luchov 65, naz 64; +30)",
+        "Romania 68.8 (iM 71, Blytz 71, ragga 69, fnl 69, BTN 64, ADRON 63, MoDo 63; +22)",
+        "Slovakia 68.8 (STYKO 72, M1key 69, GuardiaN 69, luko 67, frozen 67, The eLiVe 66, outex 62; +5)",
+        "Norway 68.6 (rain 81, hallzerk 67, jkaem 66, truth 66, Grus 63, sense 63, shyyne 60; +2)",
+        "Belarus 68 (tN1R 72, 1eeR 69, MaSvAl 68, m1QUSE 66, sad 65, gr1ks 64, Brilliance 62; +4)",
+        "Spain 67.6 (mopoz 72, alex 69, SunPayus 67, dav1g 66, sausol 64, Martinez 50)",
+        "Lithuania 67.2 (dziugss 76, jL 73, Bymas 67, MAGILA 61, ryu 59, tAk 57, Sterzig 54)",
+        "Serbia 67 (nexa 75, aVN 66, choiv7 66, VLDN 66, nEMANHA 62, Kind0 62, Dragon 61; +3)",
+        "Latvia 66.4 (keen 70, YEKINDAR 69, broky 67, shield 66, shadiy 60, 4X1s 56, Frip 55; +1)",
+        "Kosovo 66.2 (makazze 70, ammar 66, sinnopsyy 65, Krabeni 65, juanflatroo 65, gxx- 58, v1w 57; +7)",
+        "South Africa 66 (Sonic 74, JT 69, Fadey 68, MisteM 61, SloWye 58, flexeeee 58, FROZ3N 55; +9)",
+        "N. Macedonia 63.6 (kyxsan 81, aidKiT 63, CacaNito 60, xicoz 57, dan1 57, 2high 57, vAloN 56; +1)",
+        "Uzbekistan 60.4 (DSSj 65, kanshineF 60, wetfy 60, Ryujin 59, fr0k 58, icyvlone 56)",
+        "India 52.8 (R2B2 55, Bhavi 53, Ph1NNN 53, Defaulter 52, Mcg1LLzZz 51, Crazy_Gamer 50, f1redup 43)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "cynic",
+          "poizon",
+          "B1NGO",
+          "baz",
+          "supLexN1",
+          "righi",
+          "Nami",
+          "leo_drk",
+          "Goody",
+          "guidimon",
+          "zockie"
+        ],
+        "offTheMap": 2,
+        "fewerThanFive": 59
+      },
+      "formats": {
+        "mr12": 9811,
+        "mr15": 0
+      },
+      "half": 12,
+      "momentum": 0.55,
+      "real": {
+        "maps": 7333,
+        "rounds": 21.768,
+        "overtime": 0.122,
+        "favourite": 0.594
+      },
+      "model": {
+        "rounds": 21.62,
+        "overtime": 0.115
+      }
+    },
+    {
+      "id": "cs-2023",
+      "version": "cs-2023-81120461",
+      "label": "Liquipedia Elo, end of 2023",
+      "date": "2023-12-31",
+      "from": "2012-09-21",
+      "to": "2023-12-17",
+      "games": [
+        "Global Offensive and Counter-Strike 2"
+      ],
+      "series": 41454,
+      "maps": 74624,
+      "results": 0,
+      "rated": 1451,
+      "carried": 0,
+      "minGames": 20,
+      "minRecent": 5,
+      "levels": {
+        "Global Offensive and Counter-Strike 2": {
+          "AF": 1213,
+          "ASIA": 1293,
+          "CIS": 1531,
+          "EU": 1500,
+          "MENA": 1282,
+          "NA": 1348,
+          "OCE": 1311,
+          "SA": 1477,
+          "world": 1433
+        }
+      },
+      "top": [
+        "Aleksib 2230.2 → 87",
+        "Woro2k 2223.5 → 87",
+        "apEX 2181.1 → 85",
+        "s1mple 2134.8 → 83",
+        "ropz 2125.8 → 83"
+      ],
+      "nations": [
+        "Russia 81.2 (magixx 82, Boombl4 82, nafany 81, sh1ro 81, Krad 80, Perfecto 78, deko 78; +105)",
+        "France 80.6 (apEX 85, ZywOo 82, shox 79, Lucky 79, Ex3rcice 78, NBK- 75, AMANEK 74; +32)",
+        "Denmark 79.8 (dev1ce 82, acoR 80, HooXi 80, stavn 79, cadiaN 78, karrigan 77, refrezh 77; +83)",
+        "Ukraine 79 (Woro2k 87, s1mple 83, b1t 77, baaaaZzz 75, zont1x 73, DemQQ 72, byr9 71; +47)",
+        "Germany 76.4 (Spiidi 79, Krimbo 77, prosus 77, tiziaN 75, syrsoN 74, tabseN 74, s1n 72; +60)",
+        "Brazil 76.2 (hardzao 78, felps 76, KSCERATO 76, arT 76, biguzera 75, yuurih 75, Tuurtle 75; +165)",
+        "Poland 76.2 (dycha 81, sNx 77, siuhy 76, KEi 75, Goofy 72, hades 71, Furlan 71; +78)",
+        "Sweden 75.4 (nawwk 78, Plopski 78, KRIMZ 74, JW 74, nilo 73, hampus 73, REZ 72; +55)",
+        "Kazakhstan 73.6 (Qikert 83, Lack1 76, buster 71, neaLaN 69, mou 69, sorrow 67, HObbit 66; +7)",
+        "Canada 73.4 (NAF 78, Twistzz 77, daps 75, Jonji 69, steel 68, stanislaw 68, FaNg 65; +13)",
+        "Finland 73.2 (Aleksib 87, allu 75, Aerial 70, ZOREE 68, Jimpphat 66, xseveN 66, Twista 64; +21)",
+        "China 73 (advent 79, zhokiNg 73, aumaN 72, westmelon 71, Starry 70, Attacker 69, z4kr 68; +37)",
+        "Bulgaria 72.8 (SPELLAN 76, bubble 74, Duplicate 73, Rainwaker 72, dream3r 69, REDSTAR 67, Rock1nG 66; +20)",
+        "Turkey 72.8 (Calyx 77, woxic 77, imoRR 73, XANTARES 71, xfl0ud 66, MAJ3R 65, Wicadia 63; +3)",
+        "United States 72.2 (floppy 76, EliGE 75, nitr0 72, Grim 69, oSee 69, Swisher 69, SLIGHT 69; +119)",
+        "Australia 71.4 (jks 75, malta 74, AZR 71, dexter 71, tucks 66, aliStair 65, Liazz 65; +39)",
+        "Israel 71.2 (flameZ 79, Spinx 79, xertioN 76, anarkez 62, HeavyGod 60, shushan 60, NertZ 56; +3)",
+        "Slovakia 71.2 (Zero 75, STYKO 73, The eLiVe 72, frozen 69, luko 67, M1key 66, queztone 65; +10)",
+        "Czechia 71 (SHOCK 74, ZEDKO 73, blogg1s 72, NEOFRAG 69, K1-FiDa 67, beastik 66, Dytor 65; +18)",
+        "Spain 71 (mopoz 76, SunPayus 73, alex 70, dav1g 70, sausol 66, bladE 61, enanoks 55; +3)",
+        "Great Britain 70.6 (smooya 72, MiGHTYMAX 71, mezii 71, Surreal 70, Ducky 69, AZUWU 66, MMS 66; +21)",
+        "Hungary 70.6 (torzsi 82, sl3nd 69, msN 69, Kamion 68, bodito 65, Aaron 64, kory 64; +5)",
+        "Norway 70.2 (rain 82, jkaem 68, zEVES 67, truth 67, hallzerk 67, ruyter 66, Viktha 66; +41)",
+        "Argentina 70 (Noktse 73, rox 73, deco 70, try 68, buda 66, meyern 66, BK1 64; +26)",
+        "Portugal 69.6 (story 76, stadodo 69, MUTiRiS 68, ewjerkz 68, rmn 67, JUST 66, arrozdoce 65; +21)",
+        "Estonia 69.2 (ropz 83, eku 69, Jyo 68, supra 64, aNdu 62, HS 61, fejtZ 60; +5)",
+        "Mongolia 69 (bLitz 74, Techno4K 72, mzinho 69, kabal 65, erkaSt 65, ANNIHILATION 64, sk0R 63; +20)",
+        "Bosnia & Herz. 68.6 (huNter- 79, NiKo 78, sarenii 63, Katalic 62, brutmonster 61, simke 61)",
+        "Serbia 67.6 (nexa 75, Impulse 71, aVN 66, VLDN 64, nEMANHA 62, choiv7 62, Kind0 61; +6)",
+        "N. Macedonia 66.2 (kyxsan 77, stYleEeZ 68, aidKiT 64, CacaNito 61, NENO 61, dan1 58, xicoz 57; +2)",
+        "Latvia 66 (keen 68, broky 68, YEKINDAR 67, EIZA 65, shield 62, krii 57)",
+        "Belarus 65.6 (MaSvAl 69, sad 68, hurtslxrd 66, lollipop21k 63, mds 62, boX 62, tN1R 61; +3)",
+        "Romania 64.4 (adamS 67, iM 67, ragga 66, smekk 61, Blytz 61, CHANKY 61, BTN 60; +14)",
+        "South Africa 64.4 (Sonic 70, JT 69, Fadey 67, Doru 59, flexeeee 57, MisteM 57, Triton 56; +7)",
+        "Kosovo 64 (sinnopsyy 69, juanflatroo 69, gulito 62, gxx- 61, arbnorz 59, SENER1 59, deb0 57; +10)",
+        "Uruguay 62.8 (max 76, dgt 75, zock 57, nasher 56, cbass 50)",
+        "Belgium 60.6 (Keoz 72, Nexius 66, Stev0se 56, simix 55, ritchiEE 54, CrePoW 52)",
+        "Lithuania 60.6 (jL 68, Bymas 67, Sterzig 58, MAGILA 57, tAk 53, ryu 53, entz 50)",
+        "New Zealand 58.4 (Sico 69, Gratisfaction 67, chelleos 54, ADDICT 52, supar 50, val 50, Feral 48; +2)",
+        "Austria 58.2 (sesL 61, BLACKEAGLE 58, Orbit 58, farmaG 58, S3NSEY 56, sehza 55)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "cynic",
+          "poizon",
+          "baz",
+          "B1NGO",
+          "supLexN1",
+          "ProbLeM",
+          "MRN1",
+          "bew",
+          "NikoM",
+          "leo_drk",
+          "peqexino",
+          "andrew",
+          "zame",
+          "Crisis",
+          "Mirror",
+          "fakzwall",
+          "tor1towOw",
+          "zockie"
+        ],
+        "offTheMap": 1,
+        "fewerThanFive": 57
+      },
+      "formats": {
+        "mr12": 1820,
+        "mr15": 9171
+      },
+      "half": 15,
+      "momentum": 0.57,
+      "real": {
+        "maps": 6508,
+        "rounds": 26.983,
+        "overtime": 0.109,
+        "favourite": 0.61
+      },
+      "model": {
+        "rounds": 26.87,
+        "overtime": 0.102
+      }
+    },
+    {
+      "id": "cs-2022",
+      "version": "cs-2022-087ebf0e",
+      "label": "Liquipedia Elo, end of 2022",
+      "date": "2022-12-31",
+      "from": "2012-09-21",
+      "to": "2022-12-25",
+      "games": [
+        "Global Offensive"
+      ],
+      "series": 36229,
+      "maps": 63626,
+      "results": 0,
+      "rated": 1280,
+      "carried": 0,
+      "minGames": 20,
+      "minRecent": 5,
+      "levels": {
+        "Global Offensive": {
+          "AF": 1240,
+          "ASIA": 1283,
+          "CIS": 1528,
+          "EU": 1500,
+          "MENA": 1308,
+          "NA": 1364,
+          "OCE": 1328,
+          "SA": 1489,
+          "world": 1435
+        }
+      },
+      "top": [
+        "Aleksib 2224.8 → 87",
+        "sh1ro 2173.9 → 85",
+        "qikert 2161 → 84",
+        "magixx 2131.4 → 83",
+        "dev1ce 2127.9 → 83"
+      ],
+      "nations": [
+        "Russia 82.2 (sh1ro 85, magixx 83, nafany 83, Boombl4 80, Perfecto 80, electroNic 79, X5G7V 77; +83)",
+        "Denmark 80.6 (dev1ce 83, HooXi 81, stavn 81, cadiaN 79, acoR 79, refrezh 78, raalz 78; +71)",
+        "Brazil 79.2 (KSCERATO 81, arT 80, yuurih 80, hardzao 78, felps 77, boltz 75, biguzera 73; +124)",
+        "Finland 77 (Aleksib 87, allu 78, zehN 76, juho 72, ZOREE 72, Aerial 71, sLowi 70; +22)",
+        "France 77 (apEX 80, shox 79, NBK- 77, ZywOo 76, Lucky 73, AMANEK 73, kennyS 73; +31)",
+        "Ukraine 76.8 (s1mple 83, Woro2k 80, b1t 76, amster 73, byr9 72, j3kie 71, SENSEi 69; +28)",
+        "Kazakhstan 75.8 (qikert 84, Lack1 77, buster 74, neaLaN 73, Hobbit 71, mou 70, kade0 70; +8)",
+        "Sweden 74.8 (Plopski 78, KRIMZ 77, REZ 74, hampus 73, JW 72, nawwk 72, nilo 72; +51)",
+        "Germany 74.4 (Spiidi 78, tiziaN 76, syrsoN 76, SnacKZ1 71, JDC 71, k1to 70, Krimbo 70; +47)",
+        "Poland 74.2 (dycha 78, sNx 76, KEi 74, mhL 72, Goofy 71, Furlan 71, hades 71; +69)",
+        "Canada 74 (NAF 81, Twistzz 77, daps 76, Jonji 69, stanislaw 67, FaNg 65, aris 62; +11)",
+        "Bulgaria 73.8 (v1c7oR 75, Duplicate 74, SPELLAN 74, bubble 73, Rainwaker 73, spyleadeR 72, CeRq 71; +21)",
+        "United States 73.6 (EliGE 76, nitr0 74, oSee 73, floppy 73, Swisher 72, koosta 71, Stewie2K 70; +110)",
+        "China 72.8 (advent 78, zhokiNg 73, aumaN 72, westmelon 71, Starry 70, z4kr 69, Attacker 69; +32)",
+        "Great Britain 72.6 (smooya 73, MiGHTYMAX 73, mezii 73, ALEX 72, Surreal 72, Adam9130 68, Thomas 67; +12)",
+        "Turkey 71.4 (woxic 75, Calyx 73, paz 71, imoRR 70, XANTARES 68, Soulfly 63, mini 62; +4)",
+        "Australia 70.8 (jks 74, dexter 73, malta 73, Rickeh 68, aliStair 66, tucks 66, USTILO 65; +45)",
+        "Israel 70.6 (xertioN 77, flameZ 76, Spinx 71, HeavyGod 66, anarkez 63, shushan 58, meztal 56; +3)",
+        "Slovakia 70 (Zero 76, STYKO 70, GuardiaN 70, frozen 68, The eLiVe 66, queztone 65, luko 65; +9)",
+        "Estonia 69.8 (ropz 80, Jyo 70, eku 69, shokz 66, aNdu 64, HS 63, supra 63; +6)",
+        "Portugal 69.4 (story 77, stadodo 68, ewjerkz 68, MUTiRiS 67, rmn 67, arrozdoce 66, JUST 65; +20)",
+        "Spain 69.2 (mopoz 73, arki 70, SunPayus 68, ALEX 68, dav1g 67, sausol 62, EasTor 60; +2)",
+        "Czechia 69 (K1-FiDa 70, NEOFRAG 69, blogg1s 69, SHOCK 69, ZEDKO 68, Dytor 68, Valencio 66; +23)",
+        "Norway 68 (rain 82, truth 66, KORN 65, hallzerk 64, jkaem 63, Marcelious 63, ruyter 63; +16)",
+        "Bosnia & Herz. 67.8 (huNter- 80, NiKo 79, sarenii 62, Katalic 60, brutmonster 58, simke 58, dEE 57)",
+        "Serbia 67.6 (nexa 78, Impulse 70, aVN 65, emi 64, c0llins 61, VLDN 61, Kind0 60; +7)",
+        "Argentina 67.4 (rox 74, Noktse 71, deco 66, bichop 63, minimal 63, meyern 63, try 63; +25)",
+        "N. Macedonia 66.8 (stYleEeZ 71, kyxsan 69, aidKiT 68, CacaNito 64, NENO 62, dan1 62, 2high 58; +4)",
+        "Latvia 66.2 (YEKINDAR 71, hyskeee 67, broky 66, EIZA 64, R0b3n 63, Flarich 63, shield 60; +5)",
+        "Hungary 65.4 (torzsi 82, coolio 63, kory 62, bodito 61, Kamion 59, msN 59, gejmzilla 58; +2)",
+        "Kosovo 65.2 (sinnopsyy 71, juanflatroo 70, gulito 63, gxx- 62, SENER1 60, deb0 58, adon1s 57; +6)",
+        "Mongolia 65 (erkaSt 69, bLitz 65, kabal 65, Techno4K 64, sk0R 62, tamir 62, ANNIHILATION 61; +20)",
+        "South Africa 65 (Sonic 73, Fadey 68, JT 66, MisteM 59, blackpoisoN 59, Doru 57, bLazE 56; +6)",
+        "Belarus 64.4 (MaSvAl 65, boX 65, mds 65, sad 64, 1eeR 63, lollipop21k 61, tN1R 60; +3)",
+        "Romania 64.4 (lauNX 66, Blytz 66, regali 65, ragga 64, iM 61, adamS 61, XELLOW 60; +14)",
+        "Lithuania 62.8 (EspiranTo 72, Bymas 71, jL 60, Sterzig 58, maty 53, entz 52)",
+        "Belgium 58.6 (Keoz 71, Stev0se 57, simix 57, ritchiEE 55, Nexius 53)",
+        "Austria 56.4 (dukiiii 62, sesL 61, Orbit 55, S3NSEY 53, ReacTioNNN 51, chrissK 48, NinoZjE 46)",
+        "New Zealand 56 (Sico 68, chelleos 57, val 52, ADDICT 52, supar 51, Feral 47, slipary 47; +1)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "cynic",
+          "poizon",
+          "DeathZz",
+          "MRN1",
+          "B1NGO",
+          "ProbLeM",
+          "peqexino",
+          "NikoM",
+          "DeStRoYeR",
+          "andrew",
+          "leo_drk",
+          "pacman^v^",
+          "fakzwall",
+          "648",
+          "s0ne",
+          "tor1towOw",
+          "Kntz",
+          "zockie"
+        ],
+        "offTheMap": 4,
+        "fewerThanFive": 47
+      },
+      "formats": {
+        "mr12": 0,
+        "mr15": 7991
+      },
+      "half": 15,
+      "momentum": 0.57,
+      "real": {
+        "maps": 5236,
+        "rounds": 27.167,
+        "overtime": 0.12,
+        "favourite": 0.589
+      },
+      "model": {
+        "rounds": 26.85,
+        "overtime": 0.102
+      }
+    },
+    {
+      "id": "cs-2021",
+      "version": "cs-2021-ebcf4601",
+      "label": "Liquipedia Elo, end of 2021",
+      "date": "2021-12-31",
+      "from": "2012-09-21",
+      "to": "2021-12-31",
+      "games": [
+        "Global Offensive"
+      ],
+      "series": 32089,
+      "maps": 55629,
+      "results": 0,
+      "rated": 1258,
+      "carried": 0,
+      "minGames": 20,
+      "minRecent": 5,
+      "levels": {
+        "Global Offensive": {
+          "AF": 1245,
+          "ASIA": 1296,
+          "CIS": 1536,
+          "EU": 1500,
+          "MENA": 1306,
+          "NA": 1399,
+          "OCE": 1361,
+          "SA": 1494,
+          "world": 1443
+        }
+      },
+      "top": [
+        "sh1ro 2200.1 → 86",
+        "shox 2185.8 → 85",
+        "Aleksib 2173.1 → 85",
+        "s1mple 2168.1 → 85",
+        "nafany 2145.2 → 84"
+      ],
+      "nations": [
+        "Russia 83.2 (sh1ro 86, nafany 84, Perfecto 83, Boombl4 82, electroNic 81, Krad 80, X5G7V 80; +79)",
+        "France 80.6 (shox 85, apEX 83, NBK- 81, ZywOo 79, kennyS 75, misutaaa 75, AMANEK 73; +26)",
+        "Denmark 80.2 (dev1ce 84, acoR 81, stavn 79, Xyp9x 79, cadiaN 78, gla1ve 78, HooXi 77; +74)",
+        "Brazil 78.8 (KSCERATO 80, arT 80, yuurih 79, boltz 79, felps 76, coldzera 73, TACO 73; +90)",
+        "Sweden 77.4 (olofmeister 80, Plopski 78, KRIMZ 78, twist 77, REZ 74, JW 74, Brollan 74; +66)",
+        "Ukraine 77.2 (s1mple 85, b1t 79, Edward 78, Woro2k 75, bondik 69, Topa 68, jR 68; +33)",
+        "Finland 76.6 (Aleksib 85, allu 80, zehN 74, ZOREE 73, sLowi 71, Aerial 69, sergej 68; +27)",
+        "Kazakhstan 76.6 (Qikert 82, Lack1 80, neaLaN 75, buster 74, AdreN 72, Hobbit 72, sorrow 71; +6)",
+        "Poland 76.4 (KEi 78, dycha 78, mhL 76, hades 76, siuhy 74, Furlan 73, Snax 72; +74)",
+        "Bulgaria 75.2 (SPELLAN 76, bubble 76, v1c7oR 75, Duplicate 75, CeRq 74, dream3r 73, Rainwaker 71; +15)",
+        "United States 74.4 (EliGE 78, oSee 76, floppy 74, Stewie2K 73, RUSH 71, CLASIA 70, tarik 70; +94)",
+        "Canada 74.2 (NAF 83, daps 76, Twistzz 74, Jonji 70, stanislaw 68, FaNg 67, HexT 61; +16)",
+        "China 73.8 (advent 77, DD 74, zhokiNg 74, aumaN 72, mitsuha 72, Attacker 70, westmelon 69; +45)",
+        "Germany 73.6 (Spiidi 76, syrsoN 76, tiziaN 75, k1to 71, denis 70, tabseN 69, kRYSTAL 69; +60)",
+        "Great Britain 73.6 (ALEX 76, smooya 74, MiGHTYMAX 73, mezii 73, Surreal 72, Thomas 69, Maza 62; +17)",
+        "Australia 71.4 (malta 74, AZR 74, jks 70, dexter 70, Rickeh 69, USTILO 67, sterling 67; +50)",
+        "Turkey 71.2 (woxic 75, Calyx 72, paz 72, imoRR 69, XANTARES 68, ngiN 63, MAJ3R 60; +2)",
+        "Slovakia 70.8 (Zero 78, GuardiaN 71, STYKO 70, HenkkyG 68, queztone 67, ZEDc 64, Adejis 64; +7)",
+        "Spain 70.4 (mopoz 75, dav1g 70, arki 70, ALEX 69, SunPayus 68, sausol 65, EasTor 61; +5)",
+        "Estonia 69.6 (Jyo 72, ropz 71, shokz 71, eku 68, supra 66, HS 65, fejtZ 61; +2)",
+        "Israel 69.4 (xertioN 82, flameZ 74, Spinx 69, anarkez 64, shushan 58, BluePho3nix 54, LaNrefNi 53; +1)",
+        "N. Macedonia 68.8 (stYleEeZ 73, aidKiT 71, kyxsan 71, CacaNito 65, dan1 64, Necrogenes1s 56)",
+        "Norway 68 (rain 82, ruyter 66, Marcelious 65, mikki 64, jkaem 63, Grus 63, Radifaction 63; +13)",
+        "Argentina 67.4 (rox 71, Noktse 68, try 67, meyern 67, minimal 64, 1962 63, deco 62; +10)",
+        "Czechia 67.2 (SHOCK 70, NEOFRAG 69, ZEDKO 69, K1-FiDa 64, blogg1s 64, manguss 62, beastik 62; +12)",
+        "Netherlands 66.8 (FASHR 76, chrisJ 71, CRUC1AL 66, eneshan 62, Bernard 59, rilax 59)",
+        "Belarus 66.2 (1eeR 69, boX 67, mds 66, T4RG3T 65, tN1R 64, znxxX 62, lollipop21k 61)",
+        "Portugal 66 (stadodo 69, fox 66, MUTiRiS 65, rmn 65, story 65, RIZZ 64, slaxx 63; +28)",
+        "Kosovo 65.8 (sinnopsyy 71, juanflatroo 70, gulito 65, gxx- 63, SENER1 60, deb0 59, cerber 58; +1)",
+        "Latvia 65.4 (hyskeee 69, YEKINDAR 67, EIZA 66, Flarich 63, broky 62, R0b3n 62, krii 56; +1)",
+        "Bosnia & Herz. 65.2 (huNter- 76, NiKo 75, sarenii 59, gi 58, IDZUO 58, Katalic 56, dEE 54)",
+        "Serbia 65.2 (nexa 76, Impulse 67, emi 63, aVN 62, Dragon 58, HOLMES 57, pTKKK 56; +5)",
+        "South Africa 64.6 (Sonic 73, JT 68, Detrony 62, flexeeee 60, ELUSIVE 60, Fadey 60, kaNibalistic 59; +17)",
+        "Romania 64.2 (ragga 66, iM 64, adamS 64, XELLOW 64, smekk 63, MoDo 63, swiiffter 62; +15)",
+        "Hungary 63.6 (torzsi 76, gejmzilla 62, bodito 61, coolio 60, kory 59, Aaron 57, fleav 56; +1)",
+        "Mongolia 63 (erkaSt 70, rate 62, kabal 62, dobu 62, Annihilation 59, tamir 59, sk0R 59; +14)",
+        "Lithuania 62.2 (EspiranTo 73, Bymas 63, kAliNkA 63, jL 59, entz 53)",
+        "New Zealand 60.2 (Gratisfaction 71, Sico 68, val 55, chelleos 54, ADDICT 53, RaZ 48)",
+        "Thailand 57.6 (qqGod 65, Geniuss 59, cbbk 55, Olivia 55, stk 54, RoLEX 49, Reality 48; +2)",
+        "Belgium 57.2 (Keoz 71, EMZ 57, MetaL 57, simix 51, Stev0se 50, ritchiEE 49)",
+        "Philippines 54 (Papichulo 58, witz 58, micr0 55, Pro. 54, JA 45)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "Bubzkji",
+          "cynic",
+          "poizon",
+          "DeathZz",
+          "bew",
+          "Ethan",
+          "NikoM",
+          "leo_drk",
+          "ProbLeM",
+          "DeStRoYeR",
+          "B1NGO",
+          "kustoM",
+          "rbz",
+          "MAIROLLS",
+          "Kntz",
+          "648",
+          "s0ne"
+        ],
+        "offTheMap": 7,
+        "fewerThanFive": 47
+      },
+      "formats": {
+        "mr12": 0,
+        "mr15": 9644
+      },
+      "half": 15,
+      "momentum": 0.62,
+      "real": {
+        "maps": 6482,
+        "rounds": 26.861,
+        "overtime": 0.105,
+        "favourite": 0.619
+      },
+      "model": {
+        "rounds": 26.73,
+        "overtime": 0.099
+      }
+    },
+    {
+      "id": "cs-2020",
+      "version": "cs-2020-c570e929",
+      "label": "Liquipedia Elo, end of 2020",
+      "date": "2020-12-31",
+      "from": "2012-09-21",
+      "to": "2020-12-29",
+      "games": [
+        "Global Offensive"
+      ],
+      "series": 27277,
+      "maps": 45940,
+      "results": 0,
+      "rated": 1237,
+      "carried": 0,
+      "minGames": 20,
+      "minRecent": 5,
+      "levels": {
+        "Global Offensive": {
+          "AF": 1238,
+          "ASIA": 1290,
+          "CIS": 1523,
+          "EU": 1500,
+          "MENA": 1294,
+          "NA": 1444,
+          "OCE": 1383,
+          "SA": 1501,
+          "world": 1447
+        }
+      },
+      "top": [
+        "Aleksib 2195.9 → 86",
+        "shox 2191.7 → 86",
+        "sh1ro 2191.5 → 86",
+        "device 2171.3 → 85",
+        "nafany 2138 → 84"
+      ],
+      "nations": [
+        "France 82.6 (shox 86, NBK- 83, apEX 83, kioShiMa 81, ZywOo 80, kennyS 75, misutaaa 75; +29)",
+        "Denmark 81 (device 85, gla1ve 81, Xyp9x 80, acoR 80, dupreeh 79, stavn 79, MSL 78; +73)",
+        "Russia 80 (sh1ro 86, nafany 84, magixx 78, flamie 76, electronic 76, Boombl4 76, Perfecto 76; +75)",
+        "Finland 79 (Aleksib 86, allu 80, sAw 77, zehN 76, sergej 76, ZOREE 75, Juho 73; +50)",
+        "Kazakhstan 77.8 (qikert 83, KrizzeN 82, buster 75, Lack1 75, kade0 74, AdreN 74, Hobbit 72; +8)",
+        "Brazil 77.6 (boltz 82, arT 77, KSCERATO 77, yuurih 76, coldzera 76, v$m 74, felps 73; +77)",
+        "Germany 77.2 (syrsoN 81, tiziaN 79, Spiidi 76, k1to 76, tabseN 74, denis 72, kressy 71; +54)",
+        "Sweden 76.8 (twist 79, olofmeister 77, tabz 77, flusha 76, JW 75, KRIMZ 75, Plopski 74; +52)",
+        "Ukraine 76.8 (s1mple 81, somedieyoung 80, Edward 79, Topa 72, ANGE1 72, bondik 71, starix 70; +18)",
+        "United States 76.8 (vanity 79, Brehze 77, nitr0 76, EliGE 76, dazzLe 76, tarik 74, RUSH 74; +86)",
+        "Canada 76.4 (NAF 81, daps 79, WARDELL 76, Jonji 73, stanislaw 73, Twistzz 73, steel 70; +20)",
+        "Bulgaria 74.8 (CeRq 82, SPELLAN 77, bubble 72, v1c7oR 72, Duplicate 71, Rock1nG 69, Rainwaker 67; +18)",
+        "China 73.6 (advent 77, DD 76, zhokiNg 74, aumaN 72, Attacker 69, mitsuha 68, Savage 68; +49)",
+        "Poland 72.8 (mhL 77, Goofy 75, Furlan 72, MINISE 70, Sidney 70, SZPERO 70, dycha 70; +77)",
+        "Australia 72.6 (AZR 76, malta 75, jks 74, dexter 69, yam 69, aliStair 67, Hatz 67; +58)",
+        "Serbia 70.4 (LETN1 77, nexa 75, Impulse 70, aVN 65, emi 65, HOLMES 61, soLo 59; +6)",
+        "Great Britain 69.8 (MiGHTYMAX 72, ALEX 71, Surreal 71, Thomas 68, smooya 67, fre1 64, mezii 63; +20)",
+        "Norway 69.8 (rain 82, zEVES 68, RUBINO 68, truth 66, jkaem 65, Grus 65, cromen 64; +9)",
+        "Portugal 68.6 (stadodo 71, fox 69, RIZZ 68, pr 68, MUTiRiS 67, rmn 67, Emp 65; +19)",
+        "Turkey 68.4 (woxic 71, paz 71, XANTARES 69, Calyx 69, imoRR 62, ngiN 62, CyderX 62; +6)",
+        "Estonia 67.8 (supra 72, HS 69, Jyo 69, shokz 68, FejtZ 61)",
+        "Spain 67.8 (arki 73, mopoz 69, loWel 68, SOKER 65, ALEX 64, EasTor 64, Kairi 62; +19)",
+        "Lithuania 67.6 (EspiranTo 75, nukkye 72, kAliNkA 67, pounh 64, Butters 60, Bymas 59, entz 57; +1)",
+        "Slovakia 67 (Zero 73, GuardiaN 72, STYKO 72, The eLiVe 61, MAXX 57, luko 57, NIO 56; +3)",
+        "Czechia 66.6 (SHOCK 70, NEOFRAG 70, ZEDKO 69, beastik 62, oskar 62, blogg1s 60, leckr 60; +8)",
+        "Kosovo 66 (sinnopsyy 68, juanflatroo 68, gulito 66, xhoci 65, b0r1 63, gxx- 58, SENER1 56)",
+        "Romania 65.2 (ragga 70, XELLOW 68, BTN 63, iM 63, SEMINTE 62, CHANKY 60, sXe 55; +1)",
+        "Argentina 65 (meyern 69, Noktse 67, Luken 64, 1962 63, Reversive 62, decov9jse 61, JonY BoY 58; +5)",
+        "Bosnia & Herz. 65 (huNter- 74, NiKo 73, sarenii 60, BENDJI 59, Katalic 59, dEE 56, Dumas 53)",
+        "Latvia 65 (YEKINDAR 68, hyskeee 68, R0b3n 66, Flarich 62, broky 61, reN 60, EIZA 58; +1)",
+        "Mongolia 64.4 (erkaSt 72, sk0R 63, ncl 63, rate 62, kabal 62, dobu 61, Annihilation 60; +14)",
+        "New Zealand 62.8 (Gratisfaction 75, Sico 69, ofnu 65, chelleos 54, ADDICT 51)",
+        "Netherlands 62.4 (D0cC 65, CRUC1AL 65, FASHR 64, G1DO 61, rilax 57, Bernard 56, v1N 53)",
+        "Hungary 61.6 (flash 67, bodito 62, coolio 60, torzsi 60, gejmzilla 59, Aaron 58, kory 58; +2)",
+        "South Africa 61.6 (Sonic 70, Fadey 61, JT 60, ELUSIVE 60, kaNibalistic 57, Dweezil 57, bLazE 56; +12)",
+        "Belgium 60 (to1nou 69, Keoz 68, ritchiEE 55, simix 54, Stev0se 54)",
+        "Thailand 58.6 (qqGod 65, Geniuss 61, wannafly 58, cbbk 55, Olivia 54, stk 54, PTC 54; +9)",
+        "Philippines 57.8 (Papichulo 60, witz 60, micr0 57, BORKUM 56, Pro. 56, Derek 54, JA 48)",
+        "Austria 56.6 (Orbit 62, sesL 59, ReacTioNNN 55, S3NSEY 54, dukiiii 53, MITSARAS 49)",
+        "Indonesia 56 (xccurate 73, BnTeT 69, mindfreak 53, f0rsakeN 45, Eeyore 40)",
+        "India 55.8 (Ace 60, Marzil 60, PoKI 54, HellrangeR 53, Excali 52, Psy 52, DEATHMAKER 51; +1)",
+        "Japan 55.8 (takej 61, Laz 57, Reita 55, barce 53, crow 53)",
+        "South Korea 55.8 (XigN 70, xeta 54, Jinx 53, soju_j 52, Lakia 50)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "Bubzkji",
+          "ableJ",
+          "leo_drk",
+          "poizon",
+          "CaNNiE",
+          "ProbLeM",
+          "Jamppi",
+          "Ethan",
+          "NikoM",
+          "DeathZz",
+          "DeStRoYeR",
+          "cam",
+          "Kntz",
+          "MAIROLLS",
+          "648",
+          "foxz",
+          "PRISM",
+          "rbz",
+          "SeveN89"
+        ],
+        "offTheMap": 9,
+        "fewerThanFive": 41
+      },
+      "formats": {
+        "mr12": 1,
+        "mr15": 9437
+      },
+      "half": 15,
+      "momentum": 0.66,
+      "real": {
+        "maps": 6361,
+        "rounds": 26.883,
+        "overtime": 0.114,
+        "favourite": 0.614
+      },
+      "model": {
+        "rounds": 26.64,
+        "overtime": 0.097
+      }
+    },
+    {
+      "id": "cs-2019",
+      "version": "cs-2019-56f5016a",
+      "label": "Liquipedia Elo, end of 2019",
+      "date": "2019-12-31",
+      "from": "2012-09-21",
+      "to": "2019-12-29",
+      "games": [
+        "Global Offensive"
+      ],
+      "series": 22587,
+      "maps": 36454,
+      "results": 0,
+      "rated": 1030,
+      "carried": 0,
+      "minGames": 20,
+      "minRecent": 5,
+      "levels": {
+        "Global Offensive": {
+          "AF": 1235,
+          "ASIA": 1276,
+          "CIS": 1509,
+          "EU": 1500,
+          "MENA": 1275,
+          "NA": 1444,
+          "OCE": 1380,
+          "SA": 1500,
+          "world": 1439
+        }
+      },
+      "top": [
+        "device 2211.9 → 86",
+        "DeadFox 2183.9 → 85",
+        "Aleksib 2182.9 → 85",
+        "CeRq 2161.1 → 84",
+        "NAF 2139.4 → 84"
+      ],
+      "nations": [
+        "Denmark 81.6 (device 86, gla1ve 81, Xyp9x 81, acoR 80, dupreeh 80, MSL 80, Magisk 78; +71)",
+        "France 80 (NBK- 83, kioShiMa 82, shox 81, apEX 78, kennyS 76, Happy 74, AMANEK 73; +24)",
+        "Finland 79.6 (Aleksib 85, allu 81, sAw 79, ZOREE 77, sergej 76, sLowi 74, zehN 74; +28)",
+        "United States 77.8 (nitr0 80, Brehze 79, EliGE 78, dazzLe 76, tarik 76, vanity 75, Stewie2K 74; +73)",
+        "Sweden 77.6 (flusha 78, JW 78, olofmeister 78, KRIMZ 78, twist 76, friberg 76, tabz 74; +47)",
+        "Canada 77.4 (NAF 84, daps 80, Twistzz 76, stanislaw 75, Wardell 72, Jonji 71, ANDROID 70; +10)",
+        "Ukraine 77.4 (Zeus 80, Edward 80, somedieyoung 78, s1mple 77, ANGE1 72, starix 70, bondik 66; +13)",
+        "Russia 76 (WorldEdit 77, almazer 77, Jerry 76, magixx 75, sh1ro 75, Krad 75, nafany 73; +56)",
+        "Brazil 75.8 (boltz 78, coldzera 77, arT 75, KSCERATO 75, yuurih 74, fer 72, TACO 72; +47)",
+        "Bulgaria 75 (CeRq 84, SPELLAN 74, v1c7oR 74, bubble 73, Rock1nG 70, Duplicate 66, SHiPZ 66; +11)",
+        "Serbia 73.4 (LETN1 81, nexa 77, LEGIJA 74, Impulse 68, emi 67, DJOXiC 64, aVN 63; +6)",
+        "Kazakhstan 73.2 (KrizzeN 79, qikert 74, dimasick 71, AdreN 71, Ramz1kBO$$ 71, fitch 70, buster 69; +8)",
+        "Germany 73 (syrsoN 75, tiziaN 74, Spiidi 73, nex 73, kressy 70, crisby 69, k1to 69; +34)",
+        "China 72.8 (advent 75, zhokiNg 73, DD 73, Attacker 73, aumaN 70, SLOWLY 69, somebody 68; +55)",
+        "Australia 72.2 (AZR 77, jks 76, malta 71, DickStacy 69, Liazz 68, tucks 68, yam 68; +43)",
+        "Poland 72 (reatz 74, mouz 72, Snax 72, Furlan 71, Goofy 71, mhL 70, morelz 70; +53)",
+        "Norway 71.4 (rain 83, Grus 70, Truth 69, jkaem 68, RUBINO 67, cromen 67, aNdz 67; +6)",
+        "Great Britain 69 (ALEX 71, MiGHTYMAX 69, Surreal 69, Thomas 68, smooya 68, dephh 64, Luzuh 64; +16)",
+        "Lithuania 67.6 (EspiranTo 78, nukkye 73, pounh 65, kAliNkA 62, Kvik 60, lukjjE 59, ButtersMJ 58)",
+        "Turkey 67.6 (paz 71, woxic 70, Calyx 69, mini 64, XANTARES 64, ngiN 62, Viresse 62; +6)",
+        "Slovakia 66.8 (GuardiaN 74, HenkkyG 70, STYKO 70, The eLiVe 60, frozen 60, Emenk 59, Shhhack 59)",
+        "South Korea 66.8 (XigN 71, HSK 69, solo 65, zeff 65, glow 64, stax 56, xeta 54; +4)",
+        "Spain 66.4 (mixwell 68, loWel 67, SOKER 66, arki 66, mopoz 65, xikii 64, EasTor 63; +13)",
+        "Estonia 66.2 (HS 73, Jyo 70, supra 67, FejtZ 62, shokz 59)",
+        "Bosnia & Herz. 65.6 (huNter- 75, NiKo 71, sarenii 63, BENDJI 61, pita 58, dEE 55)",
+        "Hungary 65.6 (DeadFox 85, flash 67, bodito 60, gejmzilla 58, fleav 58, kory 57, Aaron 54; +2)",
+        "Belarus 64.2 (mds 66, dOBRIY 65, ROBO 65, boX 65, lollipop21k 60, uNdo 57)",
+        "South Africa 64 (Sonic 72, Domsterr 65, JT 62, Detrony 61, blackpoisoN 60, ELUSIVE 60, takbok 59; +9)",
+        "Argentina 63.4 (meyern 68, Noktse 66, 1962 63, Reversive 61, Luken 59, nbl 58, JonY BoY 55; +3)",
+        "Mongolia 62.8 (erkaSt 73, ncl 62, Zilkenberg 60, kabal 60, Tsogoo 59, dobu 59, nin9 55; +9)",
+        "New Zealand 62 (Gratisfaction 77, Sico 66, ofnu 60, zewsy 57, RaZ 50)",
+        "Portugal 62 (fox 65, RIZZ 62, MUTiRiS 61, rmn 61, KILLDREAM 61, stadodo 60, pr 60; +7)",
+        "Latvia 61.2 (R0b3n 64, broky 63, ardiis 62, Flarich 59, YEKINDAR 58, lainNy 57, krii 57)",
+        "Thailand 61 (qqGod 67, Geniuss 61, cbbk 60, wannafly 59, TOR 58, PTC 57, Olivia 57; +9)",
+        "Indonesia 60.6 (xccurate 73, BnTeT 70, Gruvee 54, mindfreak 54, roseau 52, Sys 52, adrnkiNg 40; +1)",
+        "Israel 58.2 (ZENCER 60, hydra 59, anarkez 58, ponkt 58, LaNrefNi 56, Nertz 50)",
+        "India 56.2 (Marzil 59, havoK 58, Ace 57, Antidote 54, HellrangeR 53, DeathMakeR 52, HuNtR 51; +6)",
+        "Japan 56 (takej 60, poem 57, Laz 56, Reita 55, barce 52, crow 52, hornet 49; +3)",
+        "Philippines 54.8 (BORKUM 56, Papichulo 56, witz 56, kenzyy 54, Pro. 52, Derek 51)",
+        "Mexico 52.2 (MarKE 61, Link 55, SecretAgent 49, k1Nky 48, spaydeRRRR 48, blue 48)",
+        "Malaysia 51.4 (kaze 55, Subbey 52, aimaNNN 51, acAp 51, Avirity 48, d4v41 47)",
+        "Colombia 51.2 (points 56, sam_A 55, Daveys 52, sickLy 47, spamzzy 46)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "Bubzkji",
+          "ableJ",
+          "Ethan",
+          "poizon",
+          "hpp",
+          "Jamppi",
+          "ProbLeM",
+          "kustoM",
+          "DeathZz",
+          "NikoM",
+          "Kntz",
+          "MAIROLLS",
+          "foxz",
+          "cruzN",
+          "SeveN89",
+          "DeStRoYeR"
+        ],
+        "offTheMap": 12,
+        "fewerThanFive": 47
+      },
+      "formats": {
+        "mr12": 2,
+        "mr15": 6864
+      },
+      "half": 15,
+      "momentum": 0.71,
+      "real": {
+        "maps": 4578,
+        "rounds": 26.711,
+        "overtime": 0.1,
+        "favourite": 0.617
+      },
+      "model": {
+        "rounds": 26.48,
+        "overtime": 0.094
+      }
+    },
+    {
+      "id": "cs-2018",
+      "version": "cs-2018-f78d03a3",
+      "label": "Liquipedia Elo, end of 2018",
+      "date": "2018-12-31",
+      "from": "2012-09-21",
+      "to": "2018-12-30",
+      "games": [
+        "Global Offensive"
+      ],
+      "series": 18949,
+      "maps": 29504,
+      "results": 0,
+      "rated": 1081,
+      "carried": 0,
+      "minGames": 20,
+      "minRecent": 5,
+      "levels": {
+        "Global Offensive": {
+          "AF": 1186,
+          "ASIA": 1286,
+          "CIS": 1499,
+          "EU": 1500,
+          "MENA": 1272,
+          "NA": 1458,
+          "OCE": 1384,
+          "SA": 1502,
+          "world": 1440
+        }
+      },
+      "top": [
+        "kioShiMa 2285.3 → 89",
+        "DeadFox 2210.1 → 86",
+        "device 2202.9 → 86",
+        "Skadoodle 2147 → 84",
+        "Edward 2128.8 → 83"
+      ],
+      "nations": [
+        "Denmark 81.6 (device 86, gla1ve 81, Xyp9x 81, MSL 80, dupreeh 80, Magisk 77, Kjaerbye 76; +67)",
+        "France 80.6 (kioShiMa 89, Happy 80, NBK 79, shox 78, devoduvek 77, apEX 77, SmithZz 76; +36)",
+        "United States 77.8 (Skadoodle 84, nitr0 77, dazzLe 77, koosta 76, EliGE 75, Brehze 73, swag 73; +80)",
+        "Ukraine 77.6 (Edward 83, Zeus 81, s1mple 75, somedieyoung 75, ANGE1 74, starix 71, markeloff 70; +14)",
+        "Brazil 76.6 (boltz 80, coldzera 78, fer 76, TACO 75, FalleN 74, felps 73, nak 73; +60)",
+        "Canada 76.4 (NAF 81, daps 80, WARDELL 74, stanislaw 74, AZK 73, moose 72, Twistzz 72; +22)",
+        "Bulgaria 75.8 (CeRq 78, bubble 78, v1c7oR 77, SPELLAN 74, spyleadeR 72, dream3r 71, Rock1nG 70; +11)",
+        "Finland 75.6 (allu 79, Aleksib 79, zehN 75, sergej 74, sAw 71, ZOREE 70, Juho 70; +13)",
+        "Sweden 75.2 (olofmeister 77, twist 76, MODDII 75, KRIMZ 74, f0rest 74, flusha 74, Xizt 74; +59)",
+        "Kazakhstan 74.4 (KrizzeN 76, qikert 76, AdreN 75, dimasick 73, buster 72, fitch 68, mou 68; +7)",
+        "Russia 74.4 (WorldEdit 78, S0tF1k 74, almazer 74, Jerry 73, Dosia 73, hutji 72, flamie 71; +49)",
+        "Germany 73.4 (tiziaN 77, nex 75, luckeRRR 72, tabseN 72, syrsoN 71, kressy 69, Spiidi 69; +37)",
+        "Serbia 71.8 (LETN1 79, LEGIJA 75, nexa 72, DJOXiC 67, emi 66, Impulse 65, JORDAN 57; +6)",
+        "Australia 71.6 (AZR 77, jks 75, yam 70, Rickeh 68, liazz 68, tucks 67, emagine 66; +56)",
+        "Poland 71.6 (Goofy 74, morelz 72, reatz 71, mouz 71, Snax 70, Furlan 69, SZPERO 69; +55)",
+        "Norway 71.2 (rain 83, zEVES 70, truth 69, jkaem 67, RUBINO 67, cromen 66, RoSeY 65; +9)",
+        "China 71 (DD 74, Mo 72, advent 72, zhokiNg 69, Savage 68, Attacker 68, tb 67; +54)",
+        "Slovakia 71 (GuardiaN 73, Zero 73, STYKO 70, queztone 70, MonttY 69, HenkkyG 68, The eLiVe 63; +3)",
+        "Lithuania 70.8 (EspiranTo 77, nukkye 76, HyPe 69, pounh 68, Kvik 64, Haflex 63, Carcass 62; +4)",
+        "Turkey 70.6 (paz 73, Calyx 73, DESPE 70, woxic 70, XANTARES 67, MAJ3R 66, mini 66; +5)",
+        "Great Britain 68.4 (smooya 72, ALEX 69, Thomas 68, Surreal 67, dephh 66, MiGHTYMAX 65, Luzuh 65; +14)",
+        "Hungary 68 (DeadFox 86, flash 67, ZEN 64, t3h f4rm3r 64, bodito 59, fleav 56, barcode 55; +2)",
+        "Spain 67.4 (Mixwell 70, loWel 69, SOKER 66, arki 66, mopoz 66, xikii 65, EasTor 64; +20)",
+        "Estonia 66.8 (HS 75, ViztA 66, Jyo 65, Dodz 65, fejtZ 63, sperr 54, cheti 53)",
+        "South Korea 66.2 (XigN 70, HSK 66, solo 66, glow 65, Argency 64, zeff 63, termi 55; +6)",
+        "Portugal 63.2 (fox 67, MUTiRiS 64, rmn 63, KILLDREAM 63, ZELIN 59, obj 57)",
+        "Romania 63.2 (jaxi 68, XELLOW 65, Blytz 62, WHiTE 61, BTN 60, SEMINTE 60, iM 60; +4)",
+        "Belgium 62.6 (to1nou 72, Ex6TenZ 71, MetaL 59, NpK 56, Monu 55, FARIS 54, YOUYOU 53; +1)",
+        "Argentina 61.8 (Noktse 65, nbl 63, 1962 62, Reversive 60, Straka 59, tutehen 54)",
+        "Mongolia 61.4 (erkaSt 71, ncl 60, kabal 60, dobu 59, Tsogoo 57, tamir 50, Machinegun 50; +3)",
+        "Netherlands 61 (FASHR 66, CRUC1AL 62, Clash 61, mikeS 59, Bernard 57)",
+        "Bosnia & Herz. 60.8 (huNter 71, NiKo 69, BENDJI 61, Dumas 54, dEE 49, xelboW 47)",
+        "New Zealand 60.6 (Gratisfaction 73, sico 61, ofnu 58, LONSDALE 56, zewsy 55, st3rl1ng 53, chelleos 52; +1)",
+        "Belarus 60.4 (dOBRIY 63, ROBO 61, roman 60, mds 60, uNdo 58, boX 58, Coffee 58; +5)",
+        "South Africa 60.2 (Sonic 64, Detrony 61, ELUSIVE 60, Domsterr 60, bLacKpoisoN 56, flexeeee 56, Golz 55; +6)",
+        "Indonesia 59.6 (xccurate 74, BnTeT 63, FrostMisty 54, roseau 54, Sys 53, willyKS 48, Eeyore 43)",
+        "Latvia 59.4 (YEKINDAR 63, Flarich 62, R0b3n 62, krii 55, ardiis 55)",
+        "United Arab Emirates 58.8 (KarriBob 64, kitkat 60, Nami 58, breAker 57, GreeNz 55)",
+        "Switzerland 58 (Maniac 66, rigoN 63, MALI 57, SolEk 54, Merca 50)",
+        "India 56.8 (Marzil 60, havoK 58, Ace 57, ribbi 55, Antidote 54, astaRR 54, Excali 53; +10)",
+        "Thailand 56.8 (qqGod 60, TOR 57, Olivia 56, stk 56, Leaf 55, RoLEX 55, veta 53; +10)",
+        "Japan 53.2 (takej 57, poem 57, Laz 53, Reita 50, barce 49, crow 49)",
+        "Malaysia 52.8 (pzKiD 58, xevR 53, aimaNNN 52, acAp 52, kaze 49, d4v41 46, YooNgHwe1 45; +1)",
+        "Philippines 50.6 (BORKUM 51, Kenzyy 51, Papichulo 51, witz 51, Retrac 49, Pro. 47, dispenser 45; +2)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "poizon",
+          "bitchiR",
+          "Jamppi",
+          "Meddo",
+          "NikoM",
+          "HSK",
+          "Kntz",
+          "MAIROLLS"
+        ],
+        "offTheMap": 8,
+        "fewerThanFive": 37
+      },
+      "formats": {
+        "mr12": 0,
+        "mr15": 7505
+      },
+      "half": 15,
+      "momentum": 0.87,
+      "real": {
+        "maps": 4661,
+        "rounds": 26.234,
+        "overtime": 0.091,
+        "favourite": 0.615
+      },
+      "model": {
+        "rounds": 26.07,
+        "overtime": 0.087
+      }
+    },
+    {
+      "id": "cs-2017",
+      "version": "cs-2017-008f00b2",
+      "label": "Liquipedia Elo, end of 2017",
+      "date": "2017-12-31",
+      "from": "2012-09-21",
+      "to": "2017-12-31",
+      "games": [
+        "Global Offensive"
+      ],
+      "series": 14326,
+      "maps": 21921,
+      "results": 0,
+      "rated": 985,
+      "carried": 0,
+      "minGames": 20,
+      "minRecent": 5,
+      "levels": {
+        "Global Offensive": {
+          "AF": 1189,
+          "ASIA": 1258,
+          "CIS": 1481,
+          "EU": 1500,
+          "MENA": 1285,
+          "NA": 1463,
+          "OCE": 1388,
+          "SA": 1515,
+          "world": 1437
+        }
+      },
+      "top": [
+        "kioShiMa 2280 → 89",
+        "Skadoodle 2268.3 → 89",
+        "DeadFox 2183.2 → 85",
+        "rain 2180.9 → 85",
+        "boltz 2156 → 84"
+      ],
+      "nations": [
+        "France 80.8 (kioShiMa 89, shox 82, SmithZz 79, NBK- 78, apEX 76, devoduvek 76, kennyS 72; +29)",
+        "United States 78.6 (Skadoodle 89, DaZeD 81, nitr0 75, RUSH 74, mitch 74, ShahZaM 73, seangares 73; +82)",
+        "Brazil 78 (boltz 84, coldzera 79, TACO 76, fer 76, felps 75, FalleN 74, steel 74; +41)",
+        "Sweden 77.8 (olofmeister 82, MODDII 78, KRIMZ 77, JW 76, Xizt 76, Maikelele 76, twist 76; +67)",
+        "Denmark 77.6 (dev1ce 82, MSL 78, karrigan 76, Xyp9x 76, k0nfig 76, cajunb 76, gla1ve 76; +60)",
+        "Canada 76.4 (stanislaw 81, NAF 78, shroud 75, AZK 74, daps 74, Jonji 70, SEMPHIS 70; +30)",
+        "Ukraine 74.8 (Edward 80, Zeus 78, ANGE1 73, starix 72, markeloff 71, s1mple 71, bondik 67; +12)",
+        "Poland 73.6 (morelz 76, Furlan 75, GruBy 74, Goofy 72, Snatchie 71, reatz 71, NEO 71; +42)",
+        "Slovakia 73.4 (GuardiaN 75, MonttY 74, STYKO 74, queztone 73, Zero 71, HenkkyG 65, frozen 62; +2)",
+        "Bulgaria 73 (nkl 77, SPELLAN 73, bubble 73, v1c7oR 72, spyleadeR 70, dream3r 70, CeRq 70; +12)",
+        "Turkey 73 (paz 77, Calyx 75, DESPE 72, XANTARES 71, MAJ3R 70, ngiN 68, woxic 67; +8)",
+        "Kazakhstan 72.6 (AdreN 80, HObbit 74, mou 73, dimasick 68, KrizzeN 68, Qikert 68, fitch 66; +6)",
+        "Norway 72.6 (rain 85, zEVES 73, RUBINO 70, Hallzerk 69, Radifaction 66, jkaem 66, becker 65; +10)",
+        "Russia 72.6 (WorldEdit 78, Dosia 76, ub1que 71, hutji 70, mir 68, flamie 67, keshandr 67; +28)",
+        "Australia 71 (AZR 75, jks 75, yam 70, Rickeh 68, pecks 67, kyoto 66, tucks 64; +39)",
+        "China 70.4 (advent 72, zhokiNg 71, Mo 71, DD 69, Attacker 69, Savage 64, shuadapai 63; +78)",
+        "Finland 70 (allu 76, zehN 70, Aleksib 69, juho 68, arvid 67, Juhob 67, ZOREE 67; +19)",
+        "Germany 69.6 (tiziaN 72, nex 69, syrsoN 69, Spiidi 69, kressy 69, crisby 69, kRYSTAL 69; +51)",
+        "Serbia 68.2 (LEGIJA 75, LETN1 72, DJOXiC 68, emi 64, nexa 62, k1Ng0r 54, shev 53)",
+        "Spain 67.6 (mopoz 70, loWel 70, mixwell 68, SOKER 65, arki 65, xikii 64, ALEX 63; +18)",
+        "Hungary 66.2 (DeadFox 85, flash 67, ZEN 62, NOFEAR 59, bodito 58, FLEAV 55, koloRRR 49)",
+        "Estonia 65.4 (HS 75, Gaborik 66, ViztA 64, FejtZ 64, HeLIX 58, sperr 53)",
+        "Lithuania 63.8 (EspiranTo 65, pounh 65, Aikas 63, haflex 63, kalinka 63, ButtersMJ 62, Kvik 62; +2)",
+        "Bosnia & Herz. 63.6 (NiKo 73, huNter 64, BENDJI 62, dipparn 60, pita 59, DUMAS 55, xelboW 51)",
+        "Mongolia 62.6 (erkaSt 65, ncl 64, Zilkenberg 63, Tsogoo 61, kabal 60, dobu 59, Machinegun 51; +1)",
+        "Belgium 62 (Ex6TenZ 73, to1nou 68, Monu 58, MetaL 57, FARIS 54, YOUYOU 53)",
+        "Great Britain 60.4 (ALEX 65, nEILZiNHo 61, smooya 60, MCK 58, stan1ey 58, fre1 57, weber 57; +17)",
+        "Portugal 59.8 (fox 66, MUTiRiS 61, rmn 60, zlynx 56, ZELIN 56, JUST 55, Pizituh 50)",
+        "Belarus 59.4 (ROBO 61, roman 60, mds 60, CyberFocus 59, uNdo 57, hitMouse 51, dERZKIY 48)",
+        "South Africa 59 (Sonic 61, Domsterr 59, flexeeee 59, bLacKpoisoN 58, Detrony 58, ELUSIVE 57, Golz 56; +11)",
+        "Indonesia 58.8 (xccurate 65, FrostMisty 58, roseau 58, Sys 57, BnTeT 56)",
+        "New Zealand 58.4 (Gratisfaction 66, ofnu 59, sico 57, zewsy 56, lonsdale 54, RaZ 50)",
+        "South Korea 58.4 (Argency 63, HSK 61, XigN 60, rindA 54, glow 54, solo 54, peri 54; +1)",
+        "United Arab Emirates 58.2 (t0ks 64, KarriBob 61, kitkat 57, Nami 55, breAker 54)",
+        "Romania 57.6 (iGm 61, XELLOW 60, BTN 56, r1d3r 56, XAj 55, cosmeeeN 54)",
+        "Thailand 56 (TOR 58, qqGod 57, stk 55, Leaf 55, Olivia 55, bnwGiggs 54, CigaretteS 52; +2)",
+        "India 55.4 (Psy 57, HellrangeR 57, havoK 55, astaRR 55, Ace 53, MithilF 45)",
+        "Malaysia 54 (pzKiD 59, xevR 54, kaze 53, aimaNNN 52, acAp 52)",
+        "Austria 52.6 (amigo 57, FeLy 54, chrissK 54, Nino 49, MITSARAS 49, ReacTioNNN 48, Shipta 45)",
+        "Mexico 52.2 (MarkE 56, SecretAgent 52, Chuti 51, k1Nky 51, spaydeRRRR 51)",
+        "Philippines 48 (Retrac 51, dispenser 48, DubsteP 48, GII 47, Hannibal 46)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 9,
+        "fewerThanFive": 36
+      },
+      "formats": {
+        "mr12": 0,
+        "mr15": 6542
+      },
+      "half": 15,
+      "momentum": 0.89,
+      "real": {
+        "maps": 3645,
+        "rounds": 26.166,
+        "overtime": 0.096,
+        "favourite": 0.625
+      },
+      "model": {
+        "rounds": 25.99,
+        "overtime": 0.085
+      }
+    },
+    {
+      "id": "cs-2016",
+      "version": "cs-2016-7147d1cb",
+      "label": "Liquipedia Elo, end of 2016",
+      "date": "2016-12-31",
+      "from": "2012-09-21",
+      "to": "2016-12-18",
+      "games": [
+        "Global Offensive"
+      ],
+      "series": 9961,
+      "maps": 15341,
+      "results": 0,
+      "rated": 825,
+      "carried": 0,
+      "minGames": 20,
+      "minRecent": 5,
+      "levels": {
+        "Global Offensive": {
+          "AF": 1221,
+          "ASIA": 1291,
+          "CIS": 1462,
+          "EU": 1500,
+          "MENA": 1311,
+          "NA": 1469,
+          "OCE": 1419,
+          "SA": 1522,
+          "world": 1458
+        }
+      },
+      "top": [
+        "kioShiMa 2192.2 → 86",
+        "Skadoodle 2187 → 85",
+        "dev1ce 2151.5 → 84",
+        "shox 2101.8 → 82",
+        "olofmeister 2085.4 → 81"
+      ],
+      "nations": [
+        "France 81.2 (kioShiMa 86, shox 82, Happy 80, SmithZz 80, NBK 78, apEX 76, kennyS 72; +29)",
+        "Denmark 79.2 (dev1ce 84, Xyp9x 78, gla1ve 78, dupreeh 78, MSL 78, k0nfig 76, cajunb 75; +37)",
+        "Sweden 78.4 (olofmeister 81, Xizt 78, JW 78, friberg 78, KRiMZ 77, Maikelele 77, dennis 77; +57)",
+        "Brazil 78 (boltz 80, coldzera 79, felps 78, TACO 77, fer 76, FalleN 75, fnx 72; +14)",
+        "Canada 74.4 (NAF 80, shroud 75, stanislaw 74, daps 72, Uber 71, SEMPHIS 70, WARDELL 69; +22)",
+        "United States 74.2 (Skadoodle 85, RUSH 73, n0thing 72, mitch 71, Hiko 70, nitr0 70, tarik 69; +75)",
+        "Ukraine 74 (Edward 80, Zeus 79, s1mple 71, markeloff 70, ANGE1 70, bondik 67, kUcheR 66; +10)",
+        "Poland 72.8 (NEO 73, byali 73, pashaBiceps 73, Snax 73, morelz 72, Furlan 71, TaZ 70; +25)",
+        "Norway 72.4 (rain 77, zEVES 73, RUBINO 73, neto 70, jkaem 69, KORN 65, becker 65; +18)",
+        "Russia 71.4 (WorldEdit 78, Dosia 74, ub1que 69, flamie 69, seized 67, hutji 67, S0tF1k 66; +26)",
+        "Bulgaria 70.8 (nkl 77, dream3r 71, spyleadeR 70, v1c7oR 69, bubble 67, pNshr 58, psycho 55; +1)",
+        "China 70.6 (Mo 73, DD 72, advent 70, zhokiNg 70, Attacker 68, fancy1 66, qz 65; +77)",
+        "Germany 70.4 (tiziaN 72, crisby 71, Spiidi 70, reamux 70, syrsoN 69, kressy 69, r0bs3n 69; +73)",
+        "Australia 69.2 (AZR 72, jks 71, Yam 69, SPUNJ 68, Rickeh 66, sonic 64, emagine 63; +22)",
+        "Finland 69 (allu 74, Juhob 70, Twista 67, disturbed 67, sAw 67, stonde 67, arvid 67; +14)",
+        "Slovakia 68.8 (STYKO 73, GuardiaN 71, Zero 68, queztone 67, rdO 65, HenkkyG 64, MonttY 64; +2)",
+        "Kazakhstan 68.4 (AdreN 77, mou 70, HObbit 70, rafa 63, keeN 62, cau 61, dastan 60; +3)",
+        "Turkey 67.2 (DESPE 71, paz 69, TuGuX 67, Calyx 65, XANTARES 64, Parker 63, MAJ3R 62; +10)",
+        "Hungary 65.8 (DeadFox 80, flash 68, t3h f4rm3r 62, bodito 61, Barcode 58, rmL 56, NEY 56; +2)",
+        "Spain 65 (mixwell 70, loWel 70, SOKER 63, arki 61, bladE 61, Kairi 60, ALEX 59; +7)",
+        "Belgium 62.4 (Ex6TenZ 72, to1nou 66, NpK 62, YOUNS 57, FARIS 55)",
+        "Mongolia 62.4 (kabal 63, ncl 63, dobu 63, Zilkenberg 62, tsogoo 61, Machinegun 50)",
+        "Portugal 62.2 (fox 69, BLOODZ 61, MUTiRiS 61, rmn 60, KillDream 60, ZELIN 58, zpr 54; +3)",
+        "Great Britain 61.8 (RattlesnK 67, ALEX 65, nEILZiNHo 61, Esio 58, weber 58, AaroN 57, mole 57; +14)",
+        "Serbia 60.8 (LEGIJA 73, DJOXiC 61, emi 58, kassad 56, 1NTEL 56, axeler4 55, k1Ng0r 55)",
+        "Belarus 60.2 (dOBRIY 62, ROBO 62, roman 61, CyberFocus 59, uNdo 57, spaz 57, fAst 56; +2)",
+        "Argentina 59.2 (JonY BoY 64, nbl 58, Straka 58, tomi 58, tutehen 58)",
+        "South Korea 57.8 (Argency 62, HSK 59, XigN 59, Sound 55, rindA 54)",
+        "Thailand 57.8 (qqGod 59, TOR 59, Leaf 57, Olivia 57, stk 57, bnwGiggs 55, som 52)",
+        "Bosnia & Herz. 57.6 (pita 62, BENDJI 58, NiKo 58, huNter 56, DUMAS 54, xelboW 50)",
+        "South Africa 57 (Sonic 61, Detrony 58, ELUSIVE 57, Golz 57, blackpoisoN 52)",
+        "Malaysia 56.8 (pzKiD 61, acAp 56, kaze 56, xevR 56, aimaNNN 55)",
+        "New Zealand 56.2 (ofnu 62, zewsy 58, RaZ 54, BlackouT 54, sico 53, Gratisfaction 53, Lonsdale 49)",
+        "Austria 55.4 (vladir0x 61, FeLy 55, kakafu 54, MITSARAS 54, retrogott 53, Shipta 52, nokz 52; +1)",
+        "Indonesia 52.2 (BnTeT 55, FrostMisty 54, roseau 54, soifong 49, frgd[ibtJ] 49)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "Otgoo"
+        ],
+        "offTheMap": 8,
+        "fewerThanFive": 41
+      },
+      "formats": {
+        "mr12": 1,
+        "mr15": 5612
+      },
+      "half": 15,
+      "momentum": 0.89,
+      "real": {
+        "maps": 3070,
+        "rounds": 25.97,
+        "overtime": 0.083,
+        "favourite": 0.639
+      },
+      "model": {
+        "rounds": 25.94,
+        "overtime": 0.084
+      }
+    },
+    {
+      "id": "cs-2015",
+      "version": "cs-2015-38efaada",
+      "label": "Liquipedia Elo, end of 2015",
+      "date": "2015-12-31",
+      "from": "2012-09-21",
+      "to": "2015-12-27",
+      "games": [
+        "Global Offensive"
+      ],
+      "series": 6460,
+      "maps": 9637,
+      "results": 0,
+      "rated": 632,
+      "carried": 0,
+      "minGames": 20,
+      "minRecent": 5,
+      "levels": {
+        "Global Offensive": {
+          "AF": 1188,
+          "ASIA": 1303,
+          "CIS": 1490,
+          "EU": 1500,
+          "MENA": 1347,
+          "NA": 1467,
+          "OCE": 1504,
+          "SA": 1564,
+          "world": 1478
+        }
+      },
+      "top": [
+        "device 2214 → 87",
+        "Edward 2153.3 → 84",
+        "Skadoodle 2118.4 → 83",
+        "DaZeD 2115.7 → 83",
+        "kioShiMa 2102 → 82"
+      ],
+      "nations": [
+        "France 80 (kioShiMa 82, Happy 81, shox 80, NBK 79, SmithZz 78, apEX 76, kennyS 73; +32)",
+        "Denmark 79.8 (device 87, Xyp9x 81, dupreeh 80, MSL 76, cajunb 75, Nico 75, karrigan 74; +35)",
+        "Sweden 79.6 (Maikelele 82, KRiMZ 81, olofmeister 80, JW 78, flusha 77, Xizt 77, f0rest 77; +51)",
+        "United States 76.2 (Skadoodle 83, DaZeD 83, swag 73, nitr0 71, Hiko 71, FugLy 71, n0thing 70; +75)",
+        "Ukraine 75.8 (Edward 84, Zeus 80, markeloff 73, starix 72, ANGE1 70, bondik 69, kUcheR 67; +6)",
+        "Poland 73.8 (NEO 74, byali 74, pasha 74, Snax 74, mouz 73, SZPERO 71, TaZ 71; +17)",
+        "Brazil 73.6 (coldzera 77, boltz 74, TACO 73, FalleN 72, fer 72, steel 70, felps 68; +5)",
+        "Russia 72.6 (WorldEdit 80, flamie 73, seized 71, Dosia 71, ub1que 68, electronic 65, spaze 64; +29)",
+        "Canada 72.4 (AZK 77, shroud 72, NAF 71, Semphis 71, daps 71, FNS 67, Uber 65; +23)",
+        "Norway 72.4 (rain 78, RUBINO 72, jkaem 71, zEVES 71, neto 70, maak 69, Mystic 69; +16)",
+        "Germany 70.4 (stfN 73, r0bs3n 71, LUNTE 70, Spiidi 69, denis 69, tiziaN 68, nex 68; +59)",
+        "Slovakia 68.8 (GuardiaN 74, STYKO 73, Zero 68, queztone 65, villiG 64, barb1 63, uno 58; +2)",
+        "Australia 68.4 (jks 70, AZR 69, SPUNJ 69, yam 67, Havoc 67, dizzy 65, topguN 64; +14)",
+        "China 68 (aumaN 71, Mo 68, advent 67, zhokiNg 67, qz 67, DD 65, fancy1 60; +14)",
+        "Bulgaria 67.4 (nkl 72, dream3r 71, spyleadeR 66, v1c7oR 65, bubble 63)",
+        "Finland 66.4 (allu 70, natu 67, jOELZ 65, diSTURBED 65, REFLEX 65, juhob 65, Blasdfa 65; +12)",
+        "Hungary 66.4 (DeadFox 73, t3h f4rm3r 67, RAISY 65, ZEN 64, NOFEAR 63, bodito 63, Flash 60; +4)",
+        "Belgium 63.8 (Ex6TenZ 69, NpK 65, STRYKER 63, monu 62, YOUNS 60, to1nou 59, r0b 58; +2)",
+        "Great Britain 62.8 (RattlesnK 68, weber 63, ALEX 61, KritikaL 61, nEiLZiNHo 61, AaroN 60, mole 59; +10)",
+        "Portugal 62 (fox 70, MUTiRiS 62, rmn 60, AIm 59, KillDream 59, Pizituh 53)",
+        "Spain 62 (loWel 65, SOKER 63, ALEX 62, arki 60, Aguila 60, musambaN1 59, donQ 59; +8)",
+        "Kazakhstan 61.8 (AdreN 71, mou 62, rafa 60, cau 58, KeeN 58)",
+        "Turkey 60.6 (DESPE 64, TuGuX 62, e1 60, am0 59, xall 58, XANTARES 56, ONLY 55; +1)",
+        "Belarus 59.8 (CyberFocus 62, dOBRIY 61, uNdo 61, spaz 60, zoneR 55, roman 55, aka 55; +1)",
+        "Vietnam 56.8 (cLb 58, TuKoN 57, Zac 57, syken 56, d@rklord 56, JohnnyP 56)",
+        "Austria 55.6 (Schabi 57, MITSARAS 57, dukiiii 56, nokz 54, kakafu 54, vladir0x 54, H1T 49)",
+        "Serbia 54 (emi 56, kassad 55, k1Ng0r 55, axeler4 54, shev 50)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 0,
+        "fewerThanFive": 35
+      },
+      "formats": {
+        "mr12": 0,
+        "mr15": 5367
+      },
+      "half": 15,
+      "momentum": 0.95,
+      "real": {
+        "maps": 2886,
+        "rounds": 25.702,
+        "overtime": 0.066,
+        "favourite": 0.655
+      },
+      "model": {
+        "rounds": 25.69,
+        "overtime": 0.08
+      }
+    },
+    {
+      "id": "cs-2014",
+      "version": "cs-2014-91765353",
+      "label": "Liquipedia Elo, end of 2014",
+      "date": "2014-12-31",
+      "from": "2012-09-21",
+      "to": "2014-12-30",
+      "games": [
+        "Global Offensive"
+      ],
+      "series": 2949,
+      "maps": 4070,
+      "results": 0,
+      "rated": 298,
+      "carried": 0,
+      "minGames": 20,
+      "minRecent": 5,
+      "levels": {
+        "Global Offensive": {
+          "AF": 1383,
+          "ASIA": 1315,
+          "CIS": 1524,
+          "EU": 1500,
+          "MENA": 1437,
+          "NA": 1581,
+          "OCE": 1481,
+          "SA": 1549,
+          "world": 1500
+        }
+      },
+      "top": [
+        "KRiMZ 2178.6 → 85",
+        "olofmeister 2162.1 → 84",
+        "device 2146.6 → 84",
+        "DaZeD 2098.9 → 82",
+        "JW 2090.9 → 82"
+      ],
+      "nations": [
+        "Sweden 81.4 (KRiMZ 85, olofmeister 84, JW 82, flusha 80, pronax 76, SKYTTEN 76, friberg 72; +28)",
+        "France 79.4 (kioShiMa 81, shox 80, Happy 80, apEX 78, SmithZz 78, NBK 77, kennyS 74; +14)",
+        "Denmark 78.6 (device 84, dupreeh 79, Xyp9x 78, FeTiSh 77, Nico 75, smF 74, LOMME 72; +23)",
+        "Poland 76 (pasha 77, Snax 77, byali 76, NEO 76, TaZ 74, MINISE 68, mouz 67; +6)",
+        "United States 74.6 (DaZeD 82, Skadoodle 77, hazed 72, reltuC 71, Hiko 71, swag 71, tarik 71; +34)",
+        "Ukraine 74.4 (Edward 80, Zeus 76, starix 75, ANGE1 72, markeloff 69, kUcheR 67, ceh9 67; +4)",
+        "Canada 70.8 (AZK 75, semphis 73, FNS 70, shroud 68, NAF 68, daps 66, hades 63; +6)",
+        "Russia 69.2 (Dosia 73, WorldEdit 73, flamie 68, ub1que 66, seized 66, latro 61, mouseTT 60; +7)",
+        "Germany 68.2 (r0bs3n 72, Troubley 71, Kirby 67, Spiidi 66, tiziaN 65, qk-Mantis 65, denis 64; +35)",
+        "Norway 65.4 (prb 68, zEVES 67, RUBINO 64, cENTRYZ 64, hoyland 64, maak 63, rain 63; +3)",
+        "Finland 62.6 (REFLEX 66, natu 63, jOELZ 62, disturbed 61, ScurK 61, allu 61, xartE 60; +3)",
+        "Australia 62.2 (AZR 63, Havoc 63, SPUNJ 63, topguN 63, snypeR 59)",
+        "Spain 61.6 (loWel 64, MusambaN1 64, Kairi 61, meisoN 60, FlipiN 59, ALEX 59, TorPe 56)",
+        "Great Britain 60 (RE1EASE 66, RattlesnK 65, weber 62, ZED 54, hudzG 53, jakem 50)",
+        "Portugal 60 (fox 61, MUTiRiS 61, KillDream 61, rmn 59, emotioN 58)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 0,
+        "fewerThanFive": 35
+      },
+      "formats": {
+        "mr12": 0,
+        "mr15": 2102
+      },
+      "half": 15,
+      "momentum": 0.91,
+      "real": {
+        "maps": 986,
+        "rounds": 25.852,
+        "overtime": 0.07,
+        "favourite": 0.653
+      },
+      "model": {
+        "rounds": 25.86,
+        "overtime": 0.083
+      }
+    },
+    {
+      "id": "cs-2013",
+      "version": "cs-2013-3f92ff55",
+      "label": "Liquipedia Elo, end of 2013 (rough)",
+      "date": "2013-12-31",
+      "from": "2012-09-21",
+      "to": "2013-12-22",
+      "games": [
+        "Global Offensive"
+      ],
+      "series": 1413,
+      "maps": 1877,
+      "results": 0,
+      "rated": 283,
+      "carried": 195,
+      "minGames": 20,
+      "minRecent": 5,
+      "levels": {
+        "Global Offensive": {
+          "ASIA": 1331,
+          "CIS": 1509,
+          "EU": 1500,
+          "MENA": 1440,
+          "NA": 1577,
+          "OCE": 1535,
+          "SA": 1564,
+          "world": 1496
+        }
+      },
+      "top": [
+        "Ex6TenZ 2335.2 → 91",
+        "Xizt 2329.9 → 91",
+        "Get_RiGhT 2220.9 → 87",
+        "gla1ve 2203.2 → 86",
+        "SmithZz 2190.2 → 86"
+      ],
+      "nations": [
+        "Sweden 84.6 (Xizt 91, Get_RiGhT 87, MODDII 84, f0rest 82, SKYTTEN 79, dennis 77, schneider 76; +27)",
+        "France 80.6 (SmithZz 86, NBK 82, apEX 82, ioRek 77, Happy 76, shox 75, HaRts 75; +22)",
+        "Denmark 80.2 (gla1ve 86, FeTiSh 84, dev1ce 78, cajunb 77, LOMME 76, Nico 76, wantz 76; +36)",
+        "United States 75 (tck 80, sgares 77, DaZeD 74, sLip 72, n0thing 72, sobo 72, frozt 70; +17)",
+        "Ukraine 74.2 (Edward 79, ANGE1 78, Zeus 77, starix 69, kUcheR 68, ceh9 67, markeloff 66; +4)",
+        "Germany 72 (Troubley 75, Kirby 74, Spiidi 71, KRAEUTERHUMPEN 70, r0bs3n 70, qk-Mantis 70, disruptor 69; +21)",
+        "Poland 72 (TaZ 76, NEO 76, Snax 70, pasha 70, byali 68, Loord 66, peet 64; +4)",
+        "Great Britain 69.6 (RattlesnK 78, Hughsy 71, RE1EASE 68, nEiLZiNHo 67, Mx 64, PEZ 63, weber 62; +5)",
+        "Finland 67.8 (naSu 79, natu 71, disturbed 65, allu 63, Scurk 61, reflex 61, xartE 54; +2)",
+        "Russia 67.4 (Fox 76, Dosia 75, OverDrive 62, ed1k 62, seized 62, hooch 60, AERO 58; +3)",
+        "Canada 66 (semphis 79, FNS 64, AZK 63, montE 63, mosbeck 61, stan 61, Steel 59)",
+        "Norway 65.6 (DaY 70, cENTRYZ 70, prb 63, stingeR 63, m1kkis 62, tacky 60, centeks 58; +2)",
+        "Portugal 64.4 (MUTiRiS 72, fox 65, rmn 63, iNsideR 62, n3w 60)",
+        "Serbia 64 (LEGIJA 72, emi 63, k1Ng0r 63, YNk 61, kassad 61)",
+        "China 60.8 (tb 64, Rita 63, Mo 60, KingZ 59, d1o 58, ghostGOD 58, qz 58; +5)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 0,
+        "fewerThanFive": 34
+      },
+      "formats": {
+        "mr12": 0,
+        "mr15": 1499
+      },
+      "half": 15,
+      "momentum": 0.78,
+      "real": {
+        "maps": 343,
+        "rounds": 25.927,
+        "overtime": 0.05,
+        "favourite": 0.624
+      },
+      "model": {
+        "rounds": 26.01,
+        "overtime": 0.085
+      }
+    },
+    {
+      "id": "cs-2012",
+      "version": "cs-2012-3b764164",
+      "label": "Liquipedia Elo, end of 2012 (1.6 and Source)",
+      "date": "2012-12-31",
+      "from": "2000-12-08",
+      "to": "2012-12-16",
+      "games": [
+        "1.6",
+        "Source"
+      ],
+      "series": 8330,
+      "maps": 9898,
+      "results": 2209,
+      "rated": 403,
+      "carried": 0,
+      "minGames": 10,
+      "minRecent": 5,
+      "levels": {
+        "1.6": {
+          "AF": 1368,
+          "ASIA": 1494,
+          "CIS": 1499,
+          "EU": 1500,
+          "MENA": 1251,
+          "NA": 1480,
+          "OCE": 1435,
+          "SA": 1396,
+          "world": 1478
+        },
+        "Source": {
+          "ASIA": 1235,
+          "CIS": 1553,
+          "EU": 1500,
+          "MENA": 1479,
+          "NA": 1555,
+          "OCE": 1514,
+          "SA": 1438,
+          "world": 1503
+        }
+      },
+      "top": [
+        "MODDII 2328.7 → 91",
+        "Ex6TenZ 2198.4 → 86",
+        "Xizt 2113.9 → 83",
+        "Zeus 2108.4 → 82",
+        "RpK 2105 → 82"
+      ],
+      "nations": [
+        "Sweden 82.2 (MODDII 91, Xizt 83, RobbaN 81, GeT_RiGhT 78, kHRYSTAL 78, THREAT 76, Gux 76; +20)",
+        "Ukraine 77.2 (Zeus 82, Edward 80, starix 76, z1 74, craft1k 74, ANGE1 74, ceh9 73; +11)",
+        "Finland 75.2 (naSu 78, lurppis 77, BASiC 74, kononen 74, jigetus 73, aNGeldusT 73, aslak 71; +10)",
+        "Poland 74.8 (TaZ 80, NEO 78, Loord 74, pasha 72, kuben 70, dOk 69, drive 68; +6)",
+        "France 74.6 (RpK 82, SmithZz 80, NBK 77, shox 68, MAJ3R 66, mK 65, ioRek 64; +13)",
+        "Great Britain 74.2 (RattlesnK 79, wilzOOO 75, pt 74, Hughsy 73, hudzG 70, RE1EASE 67, PEZ 66; +11)",
+        "Denmark 73.8 (Friis 79, zonic 73, FeTiSh 73, karrigan 72, kev1n 72, trace 72, cajunb 70; +42)",
+        "Brazil 72.8 (fnx 80, bruno 74, BIT 70, nak 70, lrz 70, mch 68, FalleN 66; +10)",
+        "United States 72.8 (adreN 77, sunman 72, swag 72, fRoD 72, Storm 71, ry9n 70, tck 70; +43)",
+        "Germany 72 (roman 75, Roman R. 72, Kapio 71, Tixo 71, nooky 71, fel1x 69, tabseN 68; +64)",
+        "Russia 70.6 (LeX 75, Dosia 71, ROMJkE 71, Fox 69, xek 67, hooch 66, redman 66; +13)",
+        "Canada 68.6 (AZK 71, PEX 71, steel 69, montE 66, ele1Nt 66, semphis 66, CoNnOrRr93 59; +4)",
+        "China 68.2 (tb 73, Savage 72, xf 72, icb 62, Mo 62, KingZ 61)",
+        "Kazakhstan 63.6 (AdreN 70, N1ck3L 69, beAst 64, dastan 58, KeeN 57)",
+        "Norway 59.2 (stingeR 65, tacky 63, tiller 56, rod 56, PlintoN 56, Kirso 56, KRS 56; +4)",
+        "Portugal 59.2 (SHOUW 67, dzt 60, Fyx 57, ehz 57, bife 55, hldr 55, n3w 55)",
+        "Bulgaria 58.2 (Geko 60, shEMETA 59, MILENK0 58, minko 57, pNshr 57, bubble 53)",
+        "Austria 55 (maKz 64, DavoN 61, eli 50, ident 50, StifleRRR 50, koray 48, icho 47)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "impsta"
+        ],
+        "offTheMap": 0,
+        "fewerThanFive": 29
+      },
+      "formats": {
+        "mr12": 1,
+        "mr15": 850
+      },
+      "half": 15,
+      "momentum": 0.96,
+      "real": {
+        "maps": 221,
+        "rounds": 25.882,
+        "overtime": 0.054,
+        "favourite": 0.633
+      },
+      "model": {
+        "rounds": 25.64,
+        "overtime": 0.079
+      }
+    },
+    {
+      "id": "cs-2011",
+      "version": "cs-2011-2689815e",
+      "label": "Liquipedia Elo, end of 2011 (1.6 and Source)",
+      "date": "2011-12-31",
+      "from": "2000-12-08",
+      "to": "2011-12-20",
+      "games": [
+        "1.6",
+        "Source"
+      ],
+      "series": 7784,
+      "maps": 9138,
+      "results": 2085,
+      "rated": 418,
+      "carried": 0,
+      "minGames": 10,
+      "minRecent": 5,
+      "levels": {
+        "1.6": {
+          "AF": 1364,
+          "ASIA": 1486,
+          "CIS": 1488,
+          "EU": 1500,
+          "MENA": 1257,
+          "NA": 1474,
+          "OCE": 1428,
+          "SA": 1389,
+          "world": 1475
+        },
+        "Source": {
+          "ASIA": 1239,
+          "CIS": 1551,
+          "EU": 1500,
+          "MENA": 1480,
+          "NA": 1570,
+          "OCE": 1516,
+          "SA": 1403,
+          "world": 1504
+        }
+      },
+      "top": [
+        "Ex6TenZ 2181.1 → 85",
+        "ave 2164 → 85",
+        "MODDII 2129.4 → 83",
+        "RobbaN 2112.6 → 83",
+        "TaZ 2092.3 → 82"
+      ],
+      "nations": [
+        "Sweden 80.8 (MODDII 83, RobbaN 83, GeT_RiGhT 81, kHRYSTAL 79, Xizt 78, threat 77, dsn 77; +31)",
+        "France 77.4 (RpK 81, SmithZz 79, Shokkk 77, NBK 76, RegnaM 74, Geno 70, krL 69; +32)",
+        "Poland 77.4 (TaZ 82, NEO 81, Loord 76, pasha 75, kuben 73, dOK 65, drive 64; +8)",
+        "Ukraine 76.2 (Zeus 81, Edward 79, starix 75, ANGE1 74, markeloff 72, ceh9 72, craft1k 71; +15)",
+        "Denmark 75.6 (ave 85, zonic 74, FeTiSh 73, Friis 73, minet 73, trace 71, cajun 71; +28)",
+        "Finland 75.4 (naSu 78, lurppis 77, jigetus 75, kononen 74, aNGeldusT 73, plastE 71, BASiC 71; +14)",
+        "Great Britain 73.6 (RattlesnK 78, wilzOOO 76, Hughsy 73, wEZ 71, hudzG 70, ritch 69, HenryG 69; +13)",
+        "Brazil 73.2 (fnx 80, btt 73, bruno 72, nak 71, bit 70, FalleN 66, lrz 65; +23)",
+        "United States 72.2 (fRoD 74, Storm 73, AdreN 72, tck 71, Irukandji 71, hero 71, frozt 70; +29)",
+        "Germany 71 (roman 73, nooky 71, Roman R. 71, CHEF-KOCH 70, KRAEUTERHUMPEN 70, Kapio 70, Tixo 69; +23)",
+        "South Korea 70.6 (termi 78, Bail 76, solo 73, glow 66, peri 60, enemy 55)",
+        "Russia 69.8 (LeX 74, ROMJkE 71, Dosia 71, Fox 69, xek 64, hooch 64, hacker 62; +16)",
+        "Canada 68 (Legend 73, steel 68, montE 67, AZK 66, PEX 66, COLO 62, hRL 62; +7)",
+        "China 67.2 (tb 71, Savage 70, xf 70, GoodRifle 64, bigun 61, space 60, Richie 59; +2)",
+        "Portugal 64 (SHOUW 68, MUTiRiS 64, axoN 64, dzt 62, keznitt 62, rmn 61, ehz 59; +4)",
+        "Kazakhstan 63.2 (AdreN 71, Anv1k 66, mou 60, dastan 60, KeeN 59)",
+        "Spain 63 (MusambaN1 68, xhiroz 67, milicua 62, sioK 61, arki 57, YuRk0 56, diNk 55)",
+        "N. Macedonia 58.4 (NENO 60, CI@ 59, N1GHTMARE 58, helius 58, kalaN 57)",
+        "Chinese Taipei 58.2 (Nevan 63, Kandinsky 62, Evant 60, realment 55, Nitor 51)",
+        "Romania 57.8 (k1d0r 60, SNAPPLE 60, BTN 57, WHiTE 56, DaNy 56, tALAZIz 55)",
+        "Netherlands 57.4 (luosrevo 60, chrisJ 58, seezung 58, trx 56, headc 55, slaYn 54)",
+        "Peru 55.6 (Pock 60, mokotoN 57, xock 55, hadrok 54, wArpAtH 52)"
+      ],
+      "leftOut": {
+        "noCountry": [
+          "impsta"
+        ],
+        "offTheMap": 0,
+        "fewerThanFive": 29
+      },
+      "formats": {
+        "mr12": 1,
+        "mr15": 717
+      },
+      "half": 15,
+      "momentum": 0.96,
+      "real": {
+        "maps": 310,
+        "rounds": 24.935,
+        "overtime": 0.032,
+        "favourite": 0.665
+      },
+      "model": {
+        "rounds": 25.66,
+        "overtime": 0.079
+      }
+    },
+    {
+      "id": "cs-2010",
+      "version": "cs-2010-ed15bb6d",
+      "label": "Liquipedia Elo, end of 2010 (1.6 and Source)",
+      "date": "2010-12-31",
+      "from": "2000-12-08",
+      "to": "2010-12-13",
+      "games": [
+        "1.6",
+        "Source"
+      ],
+      "series": 7026,
+      "maps": 8160,
+      "results": 1932,
+      "rated": 519,
+      "carried": 0,
+      "minGames": 10,
+      "minRecent": 5,
+      "levels": {
+        "1.6": {
+          "AF": 1364,
+          "ASIA": 1488,
+          "CIS": 1479,
+          "EU": 1500,
+          "MENA": 1290,
+          "NA": 1476,
+          "OCE": 1435,
+          "SA": 1394,
+          "world": 1475
+        },
+        "Source": {
+          "ASIA": 1272,
+          "CIS": 1545,
+          "EU": 1500,
+          "MENA": 1480,
+          "NA": 1566,
+          "OCE": 1517,
+          "SA": 1399,
+          "world": 1505
+        }
+      },
+      "top": [
+        "ave 2197.4 → 86",
+        "Zeus 2132.3 → 83",
+        "RobbaN 2110.6 → 82",
+        "Edward 2084.4 → 81",
+        "Ex6TenZ 2078.9 → 81"
+      ],
+      "nations": [
+        "Sweden 78.6 (RobbaN 82, Get_RiGhT 80, kHRYSTAL 78, face 77, moddii 76, dsn 76, f0rest 76; +37)",
+        "Ukraine 78.2 (Zeus 83, Edward 81, starix 77, ceh9 76, markeloff 74, ANGE1 71, craft1k 69; +11)",
+        "Denmark 77 (ave 86, Sunde 76, minet 75, zonic 75, trace 73, FeTiSh 72, ArcadioN 69; +66)",
+        "United States 74.8 (adreN 76, fRoD 76, sunman 75, Storm 75, goodfornothing 72, Irukandji 72, hero 71; +57)",
+        "France 74.6 (RpK 77, Shokkk 77, SmithZz 74, RegnaM 73, victorztw 72, NBK 71, Geno 70; +36)",
+        "Great Britain 73.4 (RattlesnK 78, wilzOOO 77, Hughsy 72, HenryG 70, hudzG 70, ritch 68, PEZ 66; +10)",
+        "Brazil 72.4 (fnx 78, btt 75, bruno 70, nak 70, bit 69, prd 67, cky 67; +16)",
+        "China 72 (alex 80, tb 71, zy 70, Savage 70, xf 69, karl 68, virgo 67; +12)",
+        "Poland 71.8 (TaZ 77, NEO 76, Loord 71, pasha 68, kuben 67, ths 59, BS7 58; +3)",
+        "South Korea 71.6 (termi 79, bail 77, solo 73, glow 67, lsw 62, peri 61)",
+        "Germany 71.4 (roman 75, Tixo 71, KRAEUTERHUMPEN 71, nooky 70, Roman R. 70, Kapio 68, mooN 65; +23)",
+        "Finland 71 (naSu 73, lurppis 73, tihOp 70, natu 70, plastE 69, ruuit 69, kononen 69; +7)",
+        "Russia 70.4 (LeX 75, ROMJkE 71, Dosia 71, Fox 69, Dober 66, hooch 66, Ex 65; +20)",
+        "Czechia 68.4 (WT 74, pR 73, sneix 67, STR 67, Ice 61)",
+        "Canada 67.6 (Legend 77, AZK 70, PEX 70, steel 61, a2z 60, YaYooo 60, COLO 60; +11)",
+        "Kazakhstan 65.6 (AdreN 71, N1ck3L 70, beAst 65, MihaO 63, Nur1k 59, mou 59)",
+        "Spain 65.6 (MusambaN1 68, Kairi 68, xhiroz 67, neptuNo 63, FlipiN 62, sioK 61, FeldmaN 61; +1)",
+        "Norway 65 (prb 67, stingeR 66, Vertigo 65, m1kkis 64, hellzERk 63, KF3 63, RashiE 61; +4)",
+        "Portugal 61.8 (SHOUW 67, MUTiRiS 64, axoN 63, fox 58, Fyx 57, n3w 57, paradyze 56)",
+        "Belgium 61 (Ex6TenZ 81, Monu 60, nunji 60, nookbird 53, ciseta 51)",
+        "Chinese Taipei 61 (Dpker 64, Nevan 62, Kandinsky 61, cedrik 59, Evant 59)",
+        "Turkey 58.6 (gob b 64, marqnue 58, y4sin 58, RapeN 58, venza 55, COOL 54, xylm 54; +2)",
+        "Uzbekistan 57.4 (jtx 59, DiLeX 58, cEKKA 57, EXMI 57, Episode 56)",
+        "Australia 56 (ferg 60, yam 56, apoc 55, gazR 55, Pupajon 54, rize 53, Kurandus 52)",
+        "Austria 55.4 (GreX 66, uLTi 58, nokz 53, headi 51, John 49, mazze 49)",
+        "Netherlands 55 (luosrevo 58, seezung 56, dDd 55, trx 54, slaYn 52)",
+        "Peru 54.6 (durst 57, Pock 57, mokotoN 55, Hadrok 52, pultMAN 52, wArpAtH 49)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 8,
+        "fewerThanFive": 20
+      },
+      "formats": {
+        "mr12": 0,
+        "mr15": 1033
+      },
+      "half": 15,
+      "momentum": 0.96,
+      "real": {
+        "maps": 469,
+        "rounds": 25.817,
+        "overtime": 0.058,
+        "favourite": 0.659
+      },
+      "model": {
+        "rounds": 25.76,
+        "overtime": 0.081
+      }
+    },
+    {
+      "id": "cs-2009",
+      "version": "cs-2009-a517e631",
+      "label": "Liquipedia Elo, end of 2009 (1.6 and Source)",
+      "date": "2009-12-31",
+      "from": "2000-12-08",
+      "to": "2009-12-19",
+      "games": [
+        "1.6",
+        "Source"
+      ],
+      "series": 5901,
+      "maps": 6635,
+      "results": 1802,
+      "rated": 478,
+      "carried": 0,
+      "minGames": 10,
+      "minRecent": 5,
+      "levels": {
+        "1.6": {
+          "AF": 1360,
+          "ASIA": 1496,
+          "CIS": 1468,
+          "EU": 1500,
+          "MENA": 1311,
+          "NA": 1468,
+          "OCE": 1442,
+          "SA": 1382,
+          "world": 1472
+        },
+        "Source": {
+          "ASIA": 1287,
+          "CIS": 1550,
+          "EU": 1500,
+          "MENA": 1489,
+          "NA": 1596,
+          "OCE": 1533,
+          "SA": 1414,
+          "world": 1511
+        }
+      },
+      "top": [
+        "ave 2126 → 83",
+        "RobbaN 2111.9 → 82",
+        "GeT_RiGhT 2083.3 → 81",
+        "mJe 2011 → 78",
+        "dsn 2006.6 → 78"
+      ],
+      "nations": [
+        "Sweden 79.2 (RobbaN 82, GeT_RiGhT 81, dsn 78, f0rest 78, kHRYSTAL 77, face 77, Tentpole 75; +38)",
+        "Denmark 76.6 (ave 83, mJe 78, whimp 76, Sunde 74, zonic 72, minet 71, rytme 70; +54)",
+        "Great Britain 73.6 (wilzOOO 77, RattlesnK 76, pt 74, wEZ 72, Hughsy 69, ritch 68, HenryG 66; +16)",
+        "South Korea 73.6 (termi 76, ari 75, bail 74, hee 72, solo 71, glow 64, lsw 62; +1)",
+        "Brazil 73.4 (fnx 78, ton 73, cogu 73, btt 72, bruno 71, nak 70, bit 69; +14)",
+        "Finland 71.8 (naSu 74, tihOp 72, natu 71, plastE 71, contE 71, ruuit 70, lurppis 68; +16)",
+        "Poland 71.6 (TaZ 75, LUq 74, NEO 74, Loord 69, pasha 66, kuben 66, dOk 62; +6)",
+        "France 71.4 (SmithZz 73, CrZ 72, mateOo 72, RpK 71, Shokkk 69, Geno 69, victorztw 68; +27)",
+        "United States 70.8 (Rambo 73, fRoD 71, Storm 70, sunman 70, clowN 70, hero 70, Irukandji 70; +38)",
+        "Germany 70.6 (roman 73, CHEF-KOCH 72, Roman R. 71, Tixo 69, todi 68, dav1d 68, nooky 68; +27)",
+        "China 70 (alex 76, zy 72, savage 69, tb 67, Virgo 66, karl 66, xf 65; +7)",
+        "Ukraine 69.8 (Zeus 73, Edward 72, ANGE1 69, craft1k 68, starix 67, weiss 66, strike 65; +15)",
+        "Russia 69.6 (LeX 75, ROMJkE 71, Dosia 69, Fox 67, Flatra 66, hooch 65, c0m 65; +22)",
+        "Kazakhstan 66 (AdreN 68, N1ck3L 68, Anv1k 66, beAst 65, MihaO 63, Turbo 58, mou 54)",
+        "Spain 65.8 (MusambaN1 68, Kairi 68, xhiroz 68, neptuNo 63, dumbazo 62, FeldmaN 62, GuMmY 62; +7)",
+        "Norway 63.8 (DaY 67, REAL 66, Vertigo 63, stingeR 62, torri 61, QUZ 61, m1kkis 60; +4)",
+        "Canada 63.6 (Legend 70, AZK 65, PEX 65, bishop 59, Semphis 59, a2z 57, YaYooo- 57; +2)",
+        "Netherlands 63 (Xertion 66, Blaze 63, Proph 63, AirRaid 62, tommeh 61, Newlly 60, ferrid 59; +2)",
+        "Austria 61.8 (gore 69, GreX 65, maKz 60, uLTi 60, headi 55, mazze 55, john 53)",
+        "Romania 60.6 (Creature 63, K1d0r 61, Darky 61, PeRRy 61, Dece 57, Marius 57, SeDaN 55; +2)",
+        "Portugal 59.4 (SHOUW 63, mNTw 59, axoN 59, Fyx 58, n3w 58, QUICK 57, fox 55)",
+        "Belgium 58.8 (Ex6TenZ 74, NwK 62, Apolli 53, deki 53, nookbird 52, Flex0r 52, ciseta 51)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 1,
+        "fewerThanFive": 25
+      },
+      "formats": {
+        "mr12": 0,
+        "mr15": 704
+      },
+      "half": 15,
+      "momentum": 0.96,
+      "real": {
+        "maps": 274,
+        "rounds": 26.409,
+        "overtime": 0.073,
+        "favourite": 0.591
+      },
+      "model": {
+        "rounds": 25.84,
+        "overtime": 0.083
+      }
+    },
+    {
+      "id": "cs-2008",
+      "version": "cs-2008-1dd14b10",
+      "label": "Liquipedia Elo, end of 2008 (1.6 and Source)",
+      "date": "2008-12-31",
+      "from": "2000-12-08",
+      "to": "2008-12-14",
+      "games": [
+        "1.6",
+        "Source"
+      ],
+      "series": 4811,
+      "maps": 5289,
+      "results": 1442,
+      "rated": 349,
+      "carried": 0,
+      "minGames": 10,
+      "minRecent": 5,
+      "levels": {
+        "1.6": {
+          "AF": 1357,
+          "ASIA": 1513,
+          "CIS": 1440,
+          "EU": 1500,
+          "MENA": 1314,
+          "NA": 1470,
+          "OCE": 1444,
+          "SA": 1378,
+          "world": 1469
+        },
+        "Source": {
+          "ASIA": 1271,
+          "CIS": 1546,
+          "EU": 1500,
+          "MENA": 1485,
+          "NA": 1576,
+          "OCE": 1519,
+          "SA": 1416,
+          "world": 1508
+        }
+      },
+      "top": [
+        "RobbaN 2125.4 → 83",
+        "ave 2073.8 → 81",
+        "mJe 2072.1 → 81",
+        "Tentpole 2044.3 → 80",
+        "ari 2002.6 → 78"
+      ],
+      "nations": [
+        "Sweden 77.6 (RobbaN 83, Tentpole 80, dsn 75, f0rest 75, zet 75, walle 75, Snajdan 72; +40)",
+        "Denmark 76.4 (ave 81, mJe 81, whimp 77, Sunde 72, Friis 71, zonic 70, Rytme 69; +38)",
+        "South Korea 74.4 (ari 78, termi 76, bail 74, hee 73, solo 71, glow 63, lsw 61)",
+        "Great Britain 74.2 (Mangiacapra 75, pt 75, RattlesnK 75, wilzOOO 75, wEZ 71, ritch 66, Hughsy 66; +15)",
+        "Brazil 72.4 (fnx 76, ton 73, cogu 72, btt 72, bit 69, bruno 68, nak 68; +15)",
+        "Poland 71 (LUq 74, TaZ 74, NEO 73, Loord 68, pionas 66, kuben 65, BEn 59)",
+        "United States 70.8 (clowN 73, Warmach1ne 72, dominator 70, org 70, Devour 69, daffsta 69, masternook 69; +37)",
+        "Finland 70.2 (naSu 74, tihOp 70, contE 70, plastE 69, ruuit 68, lurppis 68, topsikrt 65; +5)",
+        "France 69.4 (MaT 72, mSx 70, HaRts 69, SmithZz 68, ioRek 68, RpK 66, R!Go 66; +13)",
+        "Ukraine 69 (Zeus 72, Edward 71, weiss 68, B1ad3 67, Strike 67, xaoc 67, Kane 66; +7)",
+        "Germany 68 (CHEF-KOCH 72, roman 68, Roman R. 68, dav1d 67, nooky 65, ph0s 65, disruptor 65; +14)",
+        "Russia 67.6 (LeX 73, ROMJkE 67, Flatra 66, Sally 66, Xenitron 66, c0m 66, HuxFlux 64; +21)",
+        "Netherlands 65.4 (Xertion 68, Blaze 65, proph 65, Darky 65, AirRaid 64, minto 49)",
+        "Norway 65.2 (elemeNt 74, prb 66, REAL 66, infected 60, noLA 60, syrtekz 58, gem 55; +1)",
+        "China 62.4 (alex 72, savage 65, bigun 61, 3# 60, prom1se 54)",
+        "Spain 61.4 (MusambaN1 65, GuMmY 64, FlipiN 64, DrastyK 58, sioK 56, MoMaN 54, r1bera 51)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 4,
+        "fewerThanFive": 30
+      },
+      "formats": {
+        "mr12": 0,
+        "mr15": 506
+      },
+      "half": 15,
+      "momentum": 0.96,
+      "real": {
+        "maps": 189,
+        "rounds": 25.677,
+        "overtime": 0.053,
+        "favourite": 0.608
+      },
+      "model": {
+        "rounds": 25.92,
+        "overtime": 0.084
+      }
+    },
+    {
+      "id": "cs-2007",
+      "version": "cs-2007-dae9e417",
+      "label": "Liquipedia Elo, end of 2007 (1.6 and Source)",
+      "date": "2007-12-31",
+      "from": "2000-12-08",
+      "to": "2007-12-19",
+      "games": [
+        "1.6",
+        "Source"
+      ],
+      "series": 3913,
+      "maps": 4308,
+      "results": 1117,
+      "rated": 339,
+      "carried": 0,
+      "minGames": 10,
+      "minRecent": 5,
+      "levels": {
+        "1.6": {
+          "AF": 1376,
+          "ASIA": 1501,
+          "CIS": 1419,
+          "EU": 1500,
+          "MENA": 1309,
+          "NA": 1469,
+          "OCE": 1422,
+          "SA": 1377,
+          "world": 1467
+        },
+        "Source": {
+          "ASIA": 1342,
+          "CIS": 1545,
+          "EU": 1500,
+          "MENA": 1511,
+          "NA": 1616,
+          "OCE": 1543,
+          "SA": 1456,
+          "world": 1530
+        }
+      },
+      "top": [
+        "Rambo 2082.7 → 81",
+        "RobbaN 2066.5 → 81",
+        "f0rest 2029.3 → 79",
+        "dsn 2024.6 → 79",
+        "HeatoN 2010.3 → 78"
+      ],
+      "nations": [
+        "Sweden 78.6 (RobbaN 81, f0rest 79, dsn 79, HeatoN 78, Tentpole 76, ins 75, walle 72; +41)",
+        "United States 75.8 (Rambo 81, fRoD 76, Storm 76, Warden 76, Mustang 70, Griff 69, Dominator 69; +33)",
+        "China 72.8 (tK 76, Jungle 74, Alex 74, sakula 72, Savage 68, Bigun 63, Aqi 62; +1)",
+        "Poland 72 (LUq 75, TaZ 75, NEO 74, loord 68, kuben 68, ruloN 55)",
+        "Brazil 71 (ton 72, fnx 72, btt 71, gAuLeS 70, cogu 70, Lance 68, bruno 67; +4)",
+        "Denmark 70.8 (mJe 74, ave 73, hpx 70, spx 69, whimp 68, Friis 67, zitic 66; +38)",
+        "Germany 70.8 (CHEF-KOCH 75, Roman R. 73, roman 69, MooN 69, approx 68, paN 66, Tixo 66; +29)",
+        "Finland 70.6 (Shiri 74, natu 71, naSu 71, tihOp 69, Twista 68, lurppis 68, contE 67; +11)",
+        "France 69 (MaT 72, mSx 70, HaRts 69, ioRek 68, R!Go 66, RoScO 63, Geno 62; +10)",
+        "Norway 69 (Naikon 73, elemeNt 73, DaY 69, prb 65, REAL 65, KF3 62, enoksen 61; +5)",
+        "Russia 65.8 (LeX 70, Sally 66, Snoop 66, Flatra 64, ROMJkE 63, Xenitron 63, groove 62; +20)",
+        "Ukraine 65.4 (Zeus 66, weiss 66, Edward 65, B1ad3 65, strike 65, xaoc 65, starix 63; +6)",
+        "Canada 65 (shaGuar 73, solraK 66, STruK 64, tuned 63, Shredder 59, Lin 57)",
+        "Netherlands 63.6 (xertion 66, prophet 63, Blaze 63, AirRaid 63, darky 63, tommeh 60, ferrid 59; +5)",
+        "South Korea 60.6 (termi 65, bail 62, hee 62, solo 60, miffy 54)",
+        "Austria 59.6 (gore 66, uLTi 62, seste 58, sQuad 57, apathy 55)",
+        "Great Britain 59.4 (Hughsy 62, beta 60, Toomy 59, HenryG 58, jon0o 58, url 58, RattlesnK 57; +1)",
+        "Spain 57.8 (FlipiN 62, milicua 61, DrastyK 58, DeyF 54, sioK 54, r1bera 48)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 0,
+        "fewerThanFive": 16
+      },
+      "formats": {
+        "mr12": 26,
+        "mr15": 538
+      },
+      "half": 15,
+      "momentum": 0.96,
+      "real": {
+        "maps": 221,
+        "rounds": 25.937,
+        "overtime": 0.063,
+        "favourite": 0.647
+      },
+      "model": {
+        "rounds": 25.85,
+        "overtime": 0.083
+      }
+    },
+    {
+      "id": "cs-2006",
+      "version": "cs-2006-a4f951d7",
+      "label": "Liquipedia Elo, end of 2006 (1.6 and Source)",
+      "date": "2006-12-31",
+      "from": "2000-12-08",
+      "to": "2006-12-20",
+      "games": [
+        "1.6",
+        "Source"
+      ],
+      "series": 3054,
+      "maps": 3366,
+      "results": 779,
+      "rated": 287,
+      "carried": 0,
+      "minGames": 10,
+      "minRecent": 5,
+      "levels": {
+        "1.6": {
+          "AF": 1368,
+          "ASIA": 1496,
+          "CIS": 1399,
+          "EU": 1500,
+          "MENA": 1302,
+          "NA": 1466,
+          "OCE": 1419,
+          "SA": 1355,
+          "world": 1459
+        },
+        "Source": {
+          "ASIA": 1479,
+          "CIS": 1561,
+          "EU": 1500,
+          "MENA": 1518,
+          "NA": 1616,
+          "OCE": 1611,
+          "SA": 1481,
+          "world": 1538
+        }
+      },
+      "top": [
+        "RobbaN 2079.4 → 81",
+        "HeatoN 2019.3 → 79",
+        "f0rest 1959.6 → 76",
+        "dsn 1947.8 → 76",
+        "mikk 1913 → 75"
+      ],
+      "nations": [
+        "Sweden 77.2 (RobbaN 81, HeatoN 79, f0rest 76, dsn 76, ahl 74, Tentpole 73, zet 73; +30)",
+        "China 73.4 (mikk 75, tK 75, Jungle 73, alex 73, sakula 71, baseulki 68, BB 68; +10)",
+        "Poland 71.4 (LUq 74, TaZ 74, NEO 73, Loord 68, kuben 68, RedruM 59, ruloN 53)",
+        "Denmark 70.6 (Drally 73, mJe 72, whimp 71, hpx 69, ave 68, Bloddy 67, KK 67; +8)",
+        "Norway 70.2 (Naikon 74, elemeNt 74, DaY 70, prb 67, REAL 66, XeqtR 66, xione 66; +9)",
+        "Finland 68 (naSu 70, natu 70, lurppis 68, contE 66, toNppa 66, Shiri 65, barrack 65; +4)",
+        "Germany 67.8 (Roman R. 70, CHEF-KOCH 69, Tixo 68, Bodo 66, roman 66, neo 66, Kapio 65; +15)",
+        "United States 67.8 (volcano 68, sunman 68, tr1p 68, s0nNy 68, fRoD 67, Rambo 67, Storm 67; +27)",
+        "Brazil 66.8 (gAuLeS 68, ton 67, Eduzin 67, cogu 66, btt 66, KIKO 65, pava 65; +9)",
+        "Russia 65.8 (LeX 70, Snoop 67, Sally 65, Flatra 64, Rado 63, hooch 63, F_1N 63; +22)",
+        "South Korea 65.6 (ryu 67, mal 66, BeBe 66, termi 66, bail 63, hee 63, solo 60; +3)",
+        "France 64 (MaT 65, Xp3 64, HaRts 64, Geno 64, OliGan 63, Ozstrik3r 63, MaYeRs 63; +12)",
+        "Iceland 62.6 (andrig 63, deNos 63, romiM 63, WarDrake 62, sPiKe_ 62)",
+        "Spain 62.6 (FlipiN 65, MusambaN1 64, GuMmY 62, milicua 62, DrastyK 60, DeyF 56, MoMaN 51)",
+        "Canada 61.8 (shaGuar 69, Stevenson 61, royle 60, LaRi 60, blackpanther 59, Grt 58)",
+        "Great Britain 58.8 (Mangiacapra 65, aKuJii 61, shaq 58, w1cked 55, AdY 55, ZaG 46)",
+        "Netherlands 57.2 (MasterMe 58, r0y 58, Bishop 58, xire 57, Muh 55)",
+        "Ukraine 57 (craft1k 58, starix 58, yxo 57, Edward 56, raz0r 56, Zeus 56, kekc 53; +1)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 0,
+        "fewerThanFive": 17
+      },
+      "formats": {
+        "mr12": 0,
+        "mr15": 577
+      },
+      "half": 15,
+      "momentum": 0.96,
+      "real": {
+        "maps": 244,
+        "rounds": 25.303,
+        "overtime": 0.061,
+        "favourite": 0.574
+      },
+      "model": {
+        "rounds": 25.94,
+        "overtime": 0.085
+      }
+    },
+    {
+      "id": "cs-2005",
+      "version": "cs-2005-421ee6f7",
+      "label": "Liquipedia Elo, end of 2005 (1.6)",
+      "date": "2005-12-31",
+      "from": "2000-12-08",
+      "to": "2005-12-18",
+      "games": [
+        "1.6"
+      ],
+      "series": 2289,
+      "maps": 2439,
+      "results": 506,
+      "rated": 249,
+      "carried": 0,
+      "minGames": 10,
+      "minRecent": 5,
+      "levels": {
+        "1.6": {
+          "AF": 1362,
+          "ASIA": 1469,
+          "CIS": 1408,
+          "EU": 1500,
+          "MENA": 1292,
+          "NA": 1473,
+          "OCE": 1413,
+          "SA": 1332,
+          "world": 1451
+        }
+      },
+      "top": [
+        "ahl 2006.7 → 78",
+        "fisker 1970.8 → 77",
+        "Naikon 1944.2 → 76",
+        "HeatoN 1943.5 → 76",
+        "Potti 1920.7 → 75"
+      ],
+      "nations": [
+        "Sweden 75.8 (ahl 78, fisker 77, HeatoN 76, Potti 75, Snajdan 73, vilden 71, Calippo 71; +39)",
+        "Norway 71.4 (Naikon 76, elemeNt 74, DarK 70, prb 69, XeqtR 68, xione 68, DaY 67; +8)",
+        "China 70.8 (alex 72, Jungle 71, mikk 71, tK 71, sakula 69, 117 61, Aqi 60; +6)",
+        "Denmark 69.4 (Drally 74, hpx 70, mJe 68, Bloddy 68, whimp 67, spx 67, eGene 64; +4)",
+        "United States 67.2 (Volcano 68, sunman 68, tr1p 68, Storm 66, fRoD 66, medias 66, sm0og1er 64; +21)",
+        "Russia 66.4 (LeX 70, Snoop 68, Sally 66, hooch 64, F_1N 64, groove 62, Rado 62; +13)",
+        "Germany 65.6 (Roman R. 72, neo 66, Blizzard 65, Hanso 64, final 61, n!tro 61, night 61; +9)",
+        "Brazil 65.4 (Crash 68, gAuLeS 65, eduzin 65, cogu 65, pava 64, pred 63, KIKO 62; +17)",
+        "South Korea 65.2 (rishNarchK 68, BeBe 67, mal 67, ryu 62, ssamba 62, Termi 62, Solo 57; +4)",
+        "Finland 64.4 (naSu 66, natu 65, barrack 64, Shiri 64, Kuppi 63, lurppis 63, GuardiaN 60; +4)",
+        "Spain 64.2 (FlipiN 67, MusambaN1 65, milicua 64, Ferchu 63, GuMmY 62, DrastyK 62, Gargola 60)",
+        "Canada 63.6 (shaGuar 68, LaRi 63, evaN 63, blackpanther 62, Stevenson 62, In_Flames 59, Royle 59)",
+        "France 61 (PoM 62, HaRts 62, MaYeRs 61, dim2k 60, YoRLiN 60, KaRa 60, ScariuM 60; +12)",
+        "Austria 60.4 (gore 66, uLTi 64, PapsT 63, sQuad 55, hades 54, pyr0 53, omikron 49)",
+        "Great Britain 58 (Mangiacapra 64, aKuJii 61, ShaQ 61, duck 54, ZaG 50)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 0,
+        "fewerThanFive": 9
+      },
+      "formats": {
+        "mr12": 75,
+        "mr15": 464
+      },
+      "half": 15,
+      "momentum": 0.96,
+      "real": {
+        "maps": 121,
+        "rounds": 25.686,
+        "overtime": 0.05,
+        "favourite": 0.57
+      },
+      "model": {
+        "rounds": 25.9,
+        "overtime": 0.084
+      }
+    },
+    {
+      "id": "cs-2004",
+      "version": "cs-2004-318b5d2e",
+      "label": "Liquipedia Elo, end of 2004 (1.6, rough)",
+      "date": "2004-12-31",
+      "from": "2000-12-08",
+      "to": "2004-12-19",
+      "games": [
+        "1.6"
+      ],
+      "series": 1708,
+      "maps": 1827,
+      "results": 434,
+      "rated": 196,
+      "carried": 0,
+      "minGames": 10,
+      "minRecent": 5,
+      "levels": {
+        "1.6": {
+          "AF": 1361,
+          "ASIA": 1412,
+          "CIS": 1438,
+          "EU": 1500,
+          "MENA": 1308,
+          "NA": 1479,
+          "OCE": 1410,
+          "SA": 1310,
+          "world": 1446
+        }
+      },
+      "top": [
+        "ahl 2034.3 → 79",
+        "HeatoN 1997.7 → 78",
+        "Naikon 1970.3 → 77",
+        "Fisker 1954.2 → 76",
+        "elemeNt 1946.4 → 76"
+      ],
+      "nations": [
+        "Sweden 76.4 (ahl 79, HeatoN 78, Fisker 76, Potti 75, vilden 74, archie 74, Bullen 73; +39)",
+        "Norway 72.6 (Naikon 77, elemeNt 76, knoxville 71, DarK 70, XeqtR 69, Juve9le 57)",
+        "United States 68.2 (Volcano 71, boms 68, Rambo 68, Bullseye 67, PaTyoJoN 67, sunman 67, Moto 67; +23)",
+        "Denmark 67.8 (Drally 73, spx 68, KK 67, whimp 66, EraZ 65, eGene 65)",
+        "South Korea 66.8 (filibuster 68, ovErsoul 68, BeBe 66, RishNarchK 66, mal 66)",
+        "Germany 65 (Johnny R. 70, Roman R. 67, todi 64, nitro 62, neo 62, CHEF-KOCH 61, night 60; +8)",
+        "Brazil 64.2 (crash 68, gAuLeS 66, Eduzin 63, aliche 62, dread 62, Pred 62, KIKO 62; +6)",
+        "Russia 64.2 (LeX 65, Rado 64, hooch 64, Flatra 64, Romashka 64, Sally 63, Snoop 63; +11)",
+        "Finland 63 (diGitaL 65, coali 64, natu 63, kuviCk 62, Tico 61, Guardian 59, tihOp 58; +2)",
+        "Canada 62.8 (shaGuar 67, neville 64, blackpanther 61, LaRi 61, Stevenson 61, Steel 58, In_Flames 57)",
+        "Austria 61 (impi 65, gore 64, PapsT 61, sQuad 58, seste 57, hades 56, pyr0 55)",
+        "Great Britain 59.4 (Harriman 63, ShaQ 63, Mangiacapra 62, duck 55, ZaG 54)",
+        "France 58.6 (dim2k 60, MaYeRs 60, OliGan 58, Issam 58, Baldours 57, bisou 57, Xc!teR 57; +2)",
+        "Spain 58.6 (Ferchu 61, MusambaN1 60, Gargola 59, DrastyK 58, Dev1 55)",
+        "Chile 50.2 (Raider 51, CalquiN 51, MiusenHausen 51, SirDeath 51, CachenchoXP 47)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 0,
+        "fewerThanFive": 10
+      },
+      "formats": {
+        "mr12": 188,
+        "mr15": 123
+      },
+      "half": 12,
+      "momentum": 0.96,
+      "real": {
+        "maps": 26,
+        "rounds": 22.038,
+        "overtime": 0.192,
+        "favourite": 0.615
+      },
+      "model": {
+        "rounds": 20.57,
+        "overtime": 0.09
+      }
+    },
+    {
+      "id": "cs-2003",
+      "version": "cs-2003-ca7fb50f",
+      "label": "Liquipedia Elo, end of 2003 (1.6, rough)",
+      "date": "2003-12-31",
+      "from": "2000-12-08",
+      "to": "2003-12-29",
+      "games": [
+        "1.6"
+      ],
+      "series": 1275,
+      "maps": 1350,
+      "results": 329,
+      "rated": 233,
+      "carried": 0,
+      "minGames": 10,
+      "minRecent": 5,
+      "levels": {
+        "1.6": {
+          "AF": 1367,
+          "ASIA": 1385,
+          "CIS": 1410,
+          "EU": 1500,
+          "MENA": 1311,
+          "NA": 1456,
+          "OCE": 1414,
+          "SA": 1257,
+          "world": 1429
+        }
+      },
+      "top": [
+        "ahl 2079.8 → 81",
+        "Potti 2028.3 → 79",
+        "HeatoN 2024.9 → 79",
+        "fisker 2010.1 → 78",
+        "Naikon 1920.5 → 75"
+      ],
+      "nations": [
+        "Sweden 77.6 (ahl 81, Potti 79, HeatoN 79, fisker 78, archie 71, tiny 70, GudeN 70; +79)",
+        "Norway 72.8 (Naikon 75, elemeNt 75, knoxville 73, Damien 71, DarK 70, Luke 70, XeqtR 69; +1)",
+        "Germany 69.2 (Johnny R. 70, Roman R. 70, DarkSun 69, MYS 69, koj 68, Bodo 66, neo 66; +17)",
+        "United States 66 (Rambo 68, Volcano 66, Moto 66, Bullseye 65, boms 65, method 63, KSharp 63; +8)",
+        "Austria 64 (gore 67, impi 66, uLTi 64, PapsT 62, kju 61, sQuad 59)",
+        "Denmark 63.8 (spx 66, calc 64, VicoN 64, Afflictor 63, B!tch 62, Kram 62, NituZ 61; +10)",
+        "Great Britain 61.2 (Wright 65, Harriman 61, ShaQ 61, Mangiacapra 60, Grim 59, DArtagnan 53)",
+        "Finland 60.8 (diGitaL 66, biggs 63, mysse 59, Tico 58, sheep 58, Darkkis 57)",
+        "France 60.6 (Emkill 63, SubaRu 63, HaRts 60, PoM 59, bisou 58, SnipeR 58, JoN1oP 57; +13)",
+        "Brazil 60.2 (Eduzin 63, Pred 60, Corassa 60, pava 59, KIKO 59)",
+        "Romania 60 (CreatuRe 60, Darky 60, FlopP 60, Gh3r0s 60, PeRRy 60)",
+        "China 59 (alex 59, ipig 59, LuckyBoy 59, mahdi 59, spr1te 59)",
+        "Czechia 57.2 (ace 58, Dave 57, Eraser 57, Neharia 57, Obluda 57)",
+        "Spain 57 (Ferchu 58, nAFAI 58, MusambaN1 57, Gargola 56, Dev1 56, LuCiFeR 52)",
+        "Russia 52.6 (Xenitron 59, brhr 51, groove 51, keks 51, Medic 51, Mosk 51)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 0,
+        "fewerThanFive": 13
+      },
+      "formats": {
+        "mr12": 280,
+        "mr15": 192
+      },
+      "half": 12,
+      "momentum": 0.96,
+      "real": {
+        "maps": 49,
+        "rounds": 20.224,
+        "overtime": 0.061,
+        "favourite": 0.714
+      },
+      "model": {
+        "rounds": 20.55,
+        "overtime": 0.089
+      }
+    },
+    {
+      "id": "cs-2002",
+      "version": "cs-2002-d8f3a60d",
+      "label": "Liquipedia Elo, end of 2002 (1.6, rough)",
+      "date": "2002-12-31",
+      "from": "2000-12-08",
+      "to": "2002-12-30",
+      "games": [
+        "1.6"
+      ],
+      "series": 660,
+      "maps": 703,
+      "results": 180,
+      "rated": 125,
+      "carried": 0,
+      "minGames": 10,
+      "minRecent": 5,
+      "levels": {
+        "1.6": {
+          "AF": 1303,
+          "ASIA": 1276,
+          "CIS": 1361,
+          "EU": 1500,
+          "NA": 1429,
+          "OCE": 1392,
+          "SA": 1196,
+          "world": 1387
+        }
+      },
+      "top": [
+        "Medion 1913.4 → 75",
+        "ahl 1855.2 → 72",
+        "Hyb 1832.3 → 71",
+        "Potti 1812.3 → 70",
+        "HeatoN 1811.2 → 70"
+      ],
+      "nations": [
+        "Sweden 71.6 (Medion 75, ahl 72, Hyb 71, Potti 70, HeatoN 70, Filur 69, Fisker 69; +21)",
+        "Norway 68.4 (Naikon 70, elemeNt 69, XeqtR 69, Damien 67, knoxville 67, DarK 64, Starwatch 62)",
+        "Germany 65.6 (koj 70, hazz 66, ash 65, giant 64, cracken 63, Jap 63, Celebrator 63; +13)",
+        "United States 64.8 (Rambo 68, Moto 66, Fontana 64, Bullseye 63, KSharp 63, kane 62, Chameleon 61; +7)",
+        "France 62 (SubaRu 64, Emkill 63, Olicharan 61, SnipeR 61, r0nan 61, Kush 60, XpLo 59; +4)",
+        "Finland 61.6 (biggs 63, myssE 62, zet0r 61, Finl 61, scratch 61, natu 60, Robin 59; +4)",
+        "Denmark 61.2 (VicoN 62, Arjon 61, Garn 61, JambazZ 61, torM 61, JackieBoy 61, AttermanN 58; +2)",
+        "Brazil 54 (crash 56, BlooD 54, gAuLeS 54, vip 53, Eduzin 53, HellMaster 51, Akira 51; +3)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 0,
+        "fewerThanFive": 15
+      },
+      "formats": {
+        "mr12": 189,
+        "mr15": 3
+      },
+      "half": 12,
+      "momentum": 0.96,
+      "real": {
+        "maps": 11,
+        "rounds": 20.364,
+        "overtime": 0,
+        "favourite": 0.182
+      },
+      "model": {
+        "rounds": 20.88,
+        "overtime": 0.098
+      }
+    },
+    {
+      "id": "cs-2001",
+      "version": "cs-2001-f6693d39",
+      "label": "Liquipedia Elo, end of 2001 (1.6, rough)",
+      "date": "2001-12-31",
+      "from": "2000-12-08",
+      "to": "2001-12-30",
+      "games": [
+        "1.6"
+      ],
+      "series": 380,
+      "maps": 399,
+      "results": 129,
+      "rated": 111,
+      "carried": 0,
+      "minGames": 10,
+      "minRecent": 5,
+      "levels": {
+        "1.6": {
+          "AF": 1307,
+          "ASIA": 1282,
+          "CIS": 1348,
+          "EU": 1500,
+          "NA": 1460,
+          "OCE": 1409,
+          "SA": 1262,
+          "world": 1400
+        }
+      },
+      "top": [
+        "Medion 1919.8 → 75",
+        "Hyb 1846.3 → 72",
+        "Potti 1820 → 71",
+        "HeatoN 1818.8 → 71",
+        "Atreju 1730.9 → 67"
+      ],
+      "nations": [
+        "Sweden 71 (Medion 75, Hyb 72, Potti 71, HeatoN 71, Trance 66, vesslan 66, Mson 65; +9)",
+        "Finland 66.2 (Fukush 67, Muranen 67, Prkl 66, Zibbo 66, myssE 65, natu 65, Robin 65; +8)",
+        "Canada 66 (Brormir 67, Poutine 67, Simonak 67, Steel 67, reek 62, crow 55, george 53; +2)",
+        "Germany 64.8 (koj 66, Jap 65, Volli 65, lyric 64, Speiky 64, TheKaiser 64, hazz 62; +11)",
+        "United States 62.4 (Rambo 67, Scarface 62, Moto 61, BigDog 61, Bullseye 61, KSharp 61, Chameleon 61; +3)",
+        "France 62.2 (Atreju 67, XpLo 64, denpxc 63, Rodhan 61, Hourdeau 56, Maarek 56, oRgy 56; +2)",
+        "Denmark 62 (CrashJack 64, Afflictor 62, NituZ 62, JackieBoy 61, Majestic 61, B!tch 60, MuGGz 60; +3)",
+        "Brazil 56.2 (CarT 57, VanJames 57, Crash 56, Carva 56, Sanke 55, Tyson 55, BlooD 55; +8)",
+        "Russia 55 (Alarik 55, KaLbI4 55, MadFan 55, NooK 55, Rider 55)"
+      ],
+      "leftOut": {
+        "noCountry": [],
+        "offTheMap": 0,
+        "fewerThanFive": 4
+      },
+      "formats": {
+        "mr12": 59,
+        "mr15": 2
+      },
+      "half": 12,
+      "momentum": 0.96,
+      "real": {
+        "maps": 1,
+        "rounds": 24,
+        "overtime": 0,
+        "favourite": 1
+      },
+      "model": {
+        "rounds": 20.5,
+        "overtime": 0.087
+      }
+    }
+  ]
+}
