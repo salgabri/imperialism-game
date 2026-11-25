@@ -44,8 +44,16 @@ export function crestFile(id, year) {
   return twin ? crestFile(twin, year) : own;
 }
 
+/**
+ * Which drawing of the crests their addresses ask for. A returning player's browser keeps a crest for a month
+ * (vercel.json), so a crest redrawn under its old name would keep its old look that long: the drawing raised to 2 when
+ * the crests were cut out of the paper they were saved on (25 November 2026). Raise it when crests already shown are
+ * redrawn and must show at once; each returning player then asks once more for each crest it shows.
+ */
+export const CREST_DRAWING = 2;
+
 /** The URL of the crest club `id` wears in season year `year`, or null when it has none (it keeps its monogram). */
 export function crestUrl(id, year) {
   const file = crestFile(id, year);
-  return file ? `${import.meta.env.BASE_URL}club-logos/${file}.webp` : null;
+  return file ? `${import.meta.env.BASE_URL}club-logos/${file}.webp?v=${CREST_DRAWING}` : null;
 }

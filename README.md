@@ -135,7 +135,7 @@ npm run sync:fiba-results # FIBA's 2023–2026 men's games from 34 pinned Wikipe
 npm run build-clubs      # regenerate the club layer for both sports
 npm run sync:domestic-clubs # country club snapshots from the cache (EFEM requests need permission)
 npm run sync:club-logos  # club crests: Wikidata via QLever (network, cached), Wikipedia's answers from the pinned cache only
-npm run sync:club-logos -- --pages # only the crests club-logos.json "pages" names, from their file pages (network, cached)
+npm run sync:club-logos -- --pages # only the crests club-logos.json "pages" and "cuts" name, from their file pages (network, cached)
 npm run build:club-colours # re-read each club's colour from its crest after a crest or correction changes (--check to verify)
 npm run build:domestic   # rebuild country maps from snapshots and boundaries (about 3 minutes)
 npm run test:domestic    # country maps, sections and seeded country campaigns
@@ -312,7 +312,9 @@ then revalidated in the background for 30 more. Kept a day, they cost a
 returning player about 185 requests a day on the Flags map, since the worker's
 background refresh of each one reached the host once the browser's copy was a
 day old. An image changed under the same name keeps its old look for up to a
-month, so a fix that must show at once needs a new file name. `public/fonts/`
+month, so a fix that must show at once needs a new file name, or, for crests, a
+new drawing in their address (`CREST_DRAWING` in `src/data/crests.js`, which
+makes every returning player ask once more for each crest it shows). `public/fonts/`
 is cached for a day and revalidated in the background for a week.
 Everything else revalidates on every load: `index.html` and the season and
 country files keep their names from one release to the next and must match the
@@ -3024,7 +3026,7 @@ Cleveland, the Milwaukee and Atlanta Braves and the Philadelphia Warriors, which
 monograms by the user's choice). A crest that differs at about 64 px is another crest
 (the earlier "same at chip size" rulings for Calgary, Pittsburgh and Buffalo are gone).
 A picture saved on a white box has the box cleared (`background` in
-`crest-eras.json`). Eight more flags of the day came of the same round (Egypt's
+`crest-eras.json`, [Cutouts](#crest-cutouts)). Eight more flags of the day came of the same round (Egypt's
 Federation of Arab Republics flag, DR Congo's of 1966, Puerto Rico's dark blue,
 Zambia's darker green, Russia's of 1991, Ethiopia's of 1996, the Philippines' navy,
 Poland's vermilion); Chinese Taipei flies the Chinese Taipei Olympic flag, today too
@@ -3099,10 +3101,14 @@ only another language's Wikipedia has a club's crest of today, the record names 
 sync reads that Wikipedia's file page and its own upload; `SOURCES.tsv` then links
 that page. A record may also pin a standard thumbnail (`thumb`: 120, 250, 330 or 500 px)
 instead of the original, as college football's 138 school crests do, since
-`upload.wikimedia.org` answers a run of originals with HTTP 429, and name the colour of a
-box the picture was saved on (`background`), which the drawing clears. A women's side may
+`upload.wikimedia.org` answers a run of originals with HTTP 429, and say what of its
+picture is the paper it was saved on, which the drawing clears (`background`, `tolerance`,
+`inset`, `clear`, `keep`: [Cutouts](#crest-cutouts) below). A women's side may
 have a `pages` record of its own, and `--pages` gives a club named in `twins` its twin's
-crest, new or committed.
+crest, new or committed. A crest the full sync drew is cut out by a `cuts` record instead,
+which pins the thumbnail it drew (`image` on `upload.wikimedia.org`, its SHA-256) beside the
+same fields; its file, licence and `SOURCES.tsv` row stay as committed, and `--pages` redraws
+it too.
 
 The clubs of today's country maps that had no crest got one wherever Wikipedia has it
 (17 November 2026). Of the 4,184 clubs on the 128 FM 26 maps, 1,208 had none, over a
@@ -3175,6 +3181,33 @@ only "see the file page": 41 Italian and French logos kept as non-free, Rayo Val
 archived fair-use crest, and 26 free files of German Wikipedia and Commons).
 `src/data/clubLogos.js` lists which clubs have a crest, so the game never
 requests a missing file.
+
+### Crest cutouts
+
+Many crests come from pictures that were never cut out: an old GIF or a JPEG on white
+paper, or a PNG whose paper was cleared round the crest but not inside its letters. On a
+club's land the paper showed as white, a box round about 490 crests and white counters in
+others (the user saw the Houston Colt .45s' O and 4 white on the Texas map, 25 November
+2026). A crest's record (`crest-eras.json`, or `pages` and `cuts` in `club-logos.json`) says
+what of its picture is paper, and `scripts/lib/crest-cutout.mjs` clears it before the crest
+is trimmed: `background`, the box's colour, cleared from the picture's edges inwards across
+every pixel within `tolerance` of it (40 per channel; more for a JPEG's noise or a drop
+shadow, less for a pale crest), so white shut inside the crest's outline stays; `inset`, a
+frame line at the picture's edge; and `clear`, the areas inside the crest that are paper too,
+`'enclosed'` for all those the box leaves (with `keep` for the crest's own white) or a point
+in each. The cut's edge is un-mixed, so no light fringe is left, and specks of paper go too.
+
+Every crest was looked at on 25 November 2026: those without transparency before and after
+with each enclosed area numbered, the rest by seven reviewers, every one they listed by eye.
+1,243 are cut (769 period crests, 234 `pages` crests, 240 crests the full sync drew); white
+that is the crest's own stays, as do a few flat fields of another colour that are the logo's
+own (the White Sox' squares of 1969-1975). Three pictures no cut can mend stay as they are:
+a stadium photograph for Limane Yacouba Sylla FC, SK Kladno's photographed crest of
+2008-2010 and El Shams SC's patterned square (docs/design/period-marks.md, "Cutouts").
+A crest's address names the drawing it asks for (`?v=2`, `CREST_DRAWING` in
+`src/data/crests.js`), so returning players see the redrawn crests at once rather than
+after their browser's month-old copy expires. `scripts/crest-cutout.test.mjs` checks the
+cut and every record.
 
 ## Capitals
 

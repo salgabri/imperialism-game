@@ -154,12 +154,8 @@ first skyline roundel today's. A crest of another design with no picture keeps t
 monogram.
 
 A period picture saved on a solid white box (an archived thumbnail, a PNG of a scan)
-names the box in `crest-eras.json` (`"background": "#ffffff"`), and
-`scripts/lib/crest-image.mjs` clears it: a fill from the picture's edges through every
-pixel near that colour, so the crest's own white inside its outline stays. 152 period
-crests clear a box this way, each checked before and after on a contact sheet; two keep
-theirs (ASVEL's Adecco logo of 2002, whose white field is the design, and Newtown's N
-shield of 1960, whose white body touches the picture's edge).
+names the box in `crest-eras.json` (`"background": "#ffffff"`), and the drawing clears
+it, with the paper inside the crest where the record names it ("Cutouts" below).
 
 The season on screen reaches every mark through `SeasonYear`
 (`src/components/seasonYear.js`): App provides the campaign's `dataYear`, or the
@@ -619,6 +615,58 @@ and Serbia and Montenegro's to 2005/06 and the CM 01/02 Update Team's, whose gam
 Montenegro, to 2010/11; they are the same clubs as Montenegro's of today and wear those crests
 (`d499-…`), the one exception to the checks below.
 
+### Cutouts
+
+Many crests come from pictures that were never cut out: an archived GIF or a JPEG on white
+paper, a PNG whose uploader cleared the paper round the crest but not inside its letters. On a
+club's land that paper showed as white: a whole box round about 490 crests, and white in the
+counters of free-standing lettering, under crowns and between laurels and shields, as in the
+Houston Colt .45s' crest of 1962-1964, whose O and 4 the user saw white on the Texas map
+(25 November 2026).
+
+A crest's record says what of its picture is paper (`scripts/lib/crest-cutout.mjs`), and
+`crestWebp` (`scripts/lib/crest-image.mjs`) clears it before it trims the crest:
+
+- `background`: the box's colour, cleared from the picture's edges inwards (through what is
+  transparent already) across every pixel within `tolerance` of it, 40 per channel by default.
+  A JPEG's noisy box or a grey drop shadow takes up to 140, a pale crest whose outline is faint
+  down to 6. The crest's own areas of that colour, shut inside its outline, stay.
+- `inset`: a frame line along the picture's edge, in pixels ('top right bottom left').
+- `clear`: the areas inside the crest that are paper too: 'enclosed' for every one the box
+  leaves, or points ('x,y x,y', pixels of the original, an SVG's as drawn), each clearing the
+  area of its own colour round it, so a box's other colour (a black corner) clears as well.
+  With 'enclosed', `keep` names the areas that are the crest's own white.
+
+The edge of what is cleared is un-mixed: a pixel that blended the paper with the crest takes
+the crest's colour, as transparent as it was pale, so no light fringe shows on dark land, while
+a pixel beside the crest's own white stays as it is. Specks of the paper beside the cut and
+faint islands left in it go too.
+
+On 25 November 2026 every crest was looked at. The 793 drawn from pictures without
+transparency went on contact sheets with the box cleared and with every enclosed area cleared,
+and the doubtful ones area by area, each area numbered. The 5,613 others with any white
+were looked at by seven reviewers sheet by sheet, and each one they listed (about 900) by eye
+before and after, with the strongest tolerance that clears only along the outline picked by
+measure. 1,243 crests are cut: 769 period crests (`crest-eras.json`), 234 crests of today with a
+`pages` record and 240 the full sync drew, which `club-logos.json` names under `cuts` with the
+thumbnail it drew (its SOURCES.tsv row stays). The 207 period crests that cleared a box before
+are drawn the new way too, ASVEL's Adecco logo of 2002 and Newtown's N shield of 1960 among
+them, whose box earlier cuts had to leave.
+
+Left as they were: white that is the crest's own (a roundel's field, a white ball, animal or
+lettering on a dark field, an even keyline round an American logo); a flat field of another
+colour that is the logo's own (the White Sox' blue and red squares of 1969-1975, Precision
+Football's black disc); and three pictures no cut mends: a stadium photograph for Limane
+Yacouba Sylla FC (`d384-12076506`), SK Kladno's photographed crest of 2008-2010 and El
+Shams SC's patterned square. A few dozen crests show the opposite fault, white of the crest's
+own that came see-through in the source file (a ball's panels, a band behind a name): no cut
+gives it back.
+
+A crest redrawn under its old name would show its old look for up to a month to a returning
+player (README "Caching"), so a crest's address names the drawing it asks for
+(`CREST_DRAWING` in `src/data/crests.js`, `?v=2` since this pass), and the worker caches
+either.
+
 ## Checks
 
 `scripts/club-crests.test.mjs`, on the census (`scripts/lib/crest-census.mjs`): every club
@@ -652,3 +700,10 @@ caricatures as monograms and the crests of today read from file pages; and TeamM
 SquadFlag drawing the crest of the season on screen. `scripts/historic-maps.test.mjs`
 checks every name of the day sourced, Chinese Taipei's and RTF's among them.
 `npm run test:flag-symbols` runs `build-historic-flags --check`.
+
+`scripts/crest-cutout.test.mjs`: the cut on drawn pictures (the box cleared from the edges
+and the crest's own white kept; a point's area, 'enclosed' and `keep`; a transparent
+surround cut by points alone; an un-mixed edge and the white beside it; a frame, a box of
+another colour and a corner of a third; specks and faint islands; the areas listed for
+points); every record's cut sound, and a `cuts` record only for a club's own crest file of
+today that no `pages` record names.

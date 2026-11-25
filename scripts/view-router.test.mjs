@@ -9,6 +9,7 @@ import { exportCampaign, loadSave } from '../src/engine/storage.js';
 import { SAVE_KEY } from '../src/config.js';
 import { NATIONS, buildClub, selectLineup } from '../src/data/teams.js';
 import { clubLogoFile } from '../src/data/clubLogos.js';
+import { CREST_DRAWING } from '../src/data/crests.js';
 import { getSport } from '../src/sports/index.js';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -833,7 +834,7 @@ test('setupMapFlags: the step-1 card in Flags mode flies each starting nation’
     const sport = getSport('football');
     const club = id => buildClub(sport.clubs.find(row => row.id === id), sport);
     const arsenal = club('f-arsenal'), chelsea = club('f-chelsea');
-    const crestOf = id => `/club-logos/${clubLogoFile(id)}.webp`;
+    const crestOf = id => `/club-logos/${clubLogoFile(id)}.webp?v=${CREST_DRAWING}`;
     app.opening = () => ({ included: [arsenal, chelsea], own: { 208: arsenal.id, 276: chelsea.id }, scopeName: 'Fixture' });
     const clubs = app.setupMapFlags({ ...setup, layer: 'clubs', clubScope: 'all' });
     assert.deepEqual(clubs.flagPatterns.map(pattern => [pattern.ownerId, pattern.crestUrl, pattern.color, pattern.url === pattern.crestUrl]),

@@ -28,7 +28,8 @@ const compiled = await build({
   stdin: {
     contents: `export { default as TeamMark } from './src/components/TeamMark.jsx';
       export { default as SquadFlag } from './src/screens/squad/SquadFlag.jsx';
-      export { clubLogoFile, clubLogoUrl } from './src/data/clubLogos.js';`,
+      export { clubLogoFile, clubLogoUrl } from './src/data/clubLogos.js';
+      export { crestUrl } from './src/data/crests.js';`,
     resolveDir: fileURLToPath(root), loader: 'jsx',
   },
   bundle: true, write: false, platform: 'node', format: 'cjs', external: ['react'], jsx: 'automatic',
@@ -36,7 +37,7 @@ const compiled = await build({
 });
 const module = { exports: {} };
 new Function('require', 'module', 'exports', compiled.outputFiles[0].text)(createRequire(import.meta.url), module, module.exports);
-const { TeamMark, SquadFlag, clubLogoFile, clubLogoUrl } = module.exports;
+const { TeamMark, SquadFlag, clubLogoFile, clubLogoUrl, crestUrl } = module.exports;
 const dom = new JSDOM('<!doctype html><html><body></body></html>');
 after(() => dom.window.close());
 
@@ -108,12 +109,14 @@ test('a club mark is its crest in the monogram box, a club without one keeps its
   assert.equal(box.getAttribute('aria-hidden'), 'true');
   assert.equal(box.hasAttribute('title'), false, 'smoke reads span[title] as the team name');
   assert.equal(box.textContent, '', 'no monogram letters behind the crest');
-  assert.equal(box.querySelector('img').getAttribute('src'), clubLogoUrl('f-arsenal'));
+  // The mark asks for the crests' current drawing (src/data/crests.js CREST_DRAWING).
+  assert.equal(box.querySelector('img').getAttribute('src'), crestUrl('f-arsenal'));
+  assert.ok(crestUrl('f-arsenal').startsWith(`${clubLogoUrl('f-arsenal')}?v=`));
   assert.equal(box.querySelector('img').getAttribute('alt'), '');
 
   // Setup passes a club's team id as `id`.
   const setup = render(React.createElement(TeamMark, { id: 'f-arsenal', code: 'ARS', isClub: true, width: 24 }));
-  assert.equal(setup.querySelector('img').getAttribute('src'), clubLogoUrl('f-arsenal'));
+  assert.equal(setup.querySelector('img').getAttribute('src'), crestUrl('f-arsenal'));
 
   const monogram = render(React.createElement(TeamMark, { teamId: 'f-not-a-club', code: 'NAC', isClub: true, width: 24 }));
   assert.equal(monogram.querySelector('.fi-team-monogram').textContent, 'NAC');
@@ -137,7 +140,7 @@ test('a nation\'s flag chip loads lazily: React sets loading before src, and nev
 test('a claimed player\'s former club shows its crest in the squad tables', () => {
   const club = render(React.createElement(SquadFlag, { teamId: 'f-arsenal', isClub: true, width: 16, height: 12 }));
   assert.ok(club.querySelector('.squad-flag.squad-flag--logo'));
-  assert.equal(club.querySelector('img').getAttribute('src'), clubLogoUrl('f-arsenal'));
+  assert.equal(club.querySelector('img').getAttribute('src'), crestUrl('f-arsenal'));
   const plain = render(React.createElement(SquadFlag, { teamId: 'f-not-a-club', isClub: true, width: 16, height: 12 }));
   assert.equal(plain.querySelector('img'), null, 'a club without a crest keeps the plain block');
   assert.ok(!plain.querySelector('.squad-flag--logo'));

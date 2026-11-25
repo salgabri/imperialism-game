@@ -8,7 +8,7 @@ import App from '../src/App.jsx';
 import { FLAG_CODES } from '../src/data/flags.js';
 import { FLAG_SYMBOLS } from '../src/data/flagSymbols.js';
 import { FLAG_HEIGHT, FLAG_WIDTH, GRID_STRETCH, flagFit } from '../src/engine/flagFit.js';
-import { clubLogoUrl } from '../src/data/clubLogos.js';
+import { crestUrl } from '../src/data/crests.js';
 import { DEPENDENCIES, HISTORIC_NATIONS, HISTORIC_THROUGH, NATIONS, buildClub, makeRng, teamEff } from '../src/data/teams.js';
 import { SAVE_KEY } from '../src/config.js';
 import { campaignStorageKey, exportCampaign, listCampaigns, writeSave } from '../src/engine/storage.js';
@@ -226,8 +226,8 @@ function flagAssetsMatch(banner, code) {
     && sx >= px - eps && sy >= py - eps && sx + sw <= px + pw + eps && sy + sh <= py + ph + eps;
 }
 
-/** A club's crest URL when it has one (README "Club crests"). */
-const crestOf = team => (team?.kind === 'club' ? clubLogoUrl(team.id) : null);
+/** A club's crest URL of today when it has one, as the map asks for it (README "Club crests"). */
+const crestOf = team => (team?.kind === 'club' ? crestUrl(team.id, null) : null);
 /** The monogram a club with no crest shows on its land in Flags mode: its code (README "Club crests"). */
 const monogramOf = team => (team?.kind === 'club' && !crestOf(team) ? team.code || null : null);
 /** Whether a team's land carries a banner in Flags mode: a nation's flag, a club's crest or, without one, its monogram. */

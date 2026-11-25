@@ -15,6 +15,7 @@ import { loadSave, writeSave } from '../src/engine/storage.js';
 import { decodeDomestic } from '../src/engine/domestic.js';
 import { fieldedNations } from '../src/engine/footballSets.js';
 import { buildClub, buildTeam, makeRng } from '../src/data/teams.js';
+import { CREST_DRAWING } from '../src/data/crests.js';
 import { getSport } from '../src/sports/index.js';
 import { ROOT, bundleApp, bundleComponents, syncAppFixture, withDom } from './lib/app-harness.mjs';
 
@@ -155,7 +156,7 @@ test('a build serves the world maps and the fonts hashed in assets/, so a first 
 
 test('offline, every navigation in scope gets the game, but opening a data file directly does not', () => {
   for (const url of ['/', '/index.html', '/?playtest', '/sub/', '/sub/index.html?playtest']) assert.equal(FILE_NAVIGATION.test(url), false, url);
-  for (const url of ['/football/ea-fc-26.json', '/club-logos/b-boston-celtics.webp', '/flags-symbols/README.md', '/sub/domestic/826.json']) {
+  for (const url of ['/football/ea-fc-26.json', '/club-logos/b-boston-celtics.webp', '/club-logos/b-boston-celtics.webp?v=2', '/flags-symbols/README.md', '/sub/domestic/826.json']) {
     assert.equal(FILE_NAVIGATION.test(url), true, url);
   }
 });
@@ -466,16 +467,18 @@ const moldova = () => decodeDomestic(JSON.parse(readFileSync(publicFile('domesti
 test('a campaign keeps each team\'s crest or flag once, with the field and emblem the map draws a flag from', () => {
   // Clubs: Arsenal, Real Madrid and Union Berlin share their domestic twins' crests (Union Berlin's twin since
   // 17 November 2026).
+  // A crest's address names the drawing it asks for (CREST_DRAWING).
+  const crest = file => `/club-logos/${file}.webp?v=${CREST_DRAWING}`;
   const clubs = clubsOf(['f-arsenal', 'f-real-madrid', 'f-1-fc-union-berlin'].map(id => football.clubs.find(club => club.id === id)));
-  assert.deepEqual(teamMarkUrls(clubs), ['/club-logos/d826-602.webp', '/club-logos/d724-1736.webp', '/club-logos/d276-121182.webp']);
-  assert.deepEqual(teamMarkUrls({ old: { ...clubs['f-arsenal'], id: 'old' } }), ['/club-logos/d826-602.webp'], 'found by its origin');
+  assert.deepEqual(teamMarkUrls(clubs), [crest('d826-602'), crest('d724-1736'), crest('d276-121182')]);
+  assert.deepEqual(teamMarkUrls({ old: { ...clubs['f-arsenal'], id: 'old' } }), [crest('d826-602')], 'found by its origin');
   // Nations: France's flag; Portugal's, which the map lays out from a field and an emblem.
   const rng = makeRng(20261101);
   const nations = Object.fromEntries(['250', '620'].map(id => [id, buildTeam(id, rng, football)]));
   assert.deepEqual(teamMarkUrls(nations), ['/flags/fr.svg', '/flags/pt.svg', '/flags-symbols/pt-field.svg', '/flags-symbols/pt-symbol.svg']);
   // A country: Moldova's 12 clubs, one of them (FC Stăuceni) with only its monogram.
   const rows = moldova();
-  const crests = rows.filter(row => existsSync(publicFile(`club-logos/${row.id}.webp`))).map(row => `/club-logos/${row.id}.webp`);
+  const crests = rows.filter(row => existsSync(publicFile(`club-logos/${row.id}.webp`))).map(row => crest(row.id));
   assert.equal(crests.length, rows.length - 1);
   assert.deepEqual(teamMarkUrls(clubsOf(rows)), crests);
 });
@@ -487,7 +490,7 @@ test('every crest and flag a campaign can keep is in public/, and the worker cac
     ...['football', 'womens-football', 'basketball', 'american-football', 'baseball', 'hockey', 'rugby-league'].map(id => teamMarkUrls(clubsOf(getSport(id).clubs, getSport(id))))].flat();
   assert.ok(urls.some(url => url.startsWith('/flags-symbols/')) && urls.length > 300, `${urls.length} files`);
   for (const url of urls) {
-    assert.ok(existsSync(publicFile(url.slice(1))), url);
+    assert.ok(existsSync(publicFile(url.slice(1).replace(/\?v=\d+$/, ''))), url);
     assert.ok(isRuntimeCached(`https://imperialism.test${url}`), url);
   }
 });

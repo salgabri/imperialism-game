@@ -728,7 +728,9 @@
     "cfb-troy": {
       "file": "Troy Trojans logo.svg",
       "sha256": "4dbf454f4e84152410a06ef3145156d94a2924675610961404e49aeaa0713146",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "cfb-tulane": {
       "file": "Tulane Green Wave logo.svg",
@@ -875,15 +877,19 @@
     },
     "d024-76": {
       "file": "EC Primeiro de Maio (logo).png",
-      "sha256": "bd3fe4408cb88fdf0a83d6e9957167a241020b248504dd288393df1b39256a15"
+      "sha256": "bd3fe4408cb88fdf0a83d6e9957167a241020b248504dd288393df1b39256a15",
+      "background": "#ffffff"
     },
     "d024-8626853": {
       "file": "Desportivo Huíla.jpg",
-      "sha256": "24b6211cbc511a01982ba40cdec3064393bdea08064436dd96e4c3b59cf3cd67"
+      "sha256": "24b6211cbc511a01982ba40cdec3064393bdea08064436dd96e4c3b59cf3cd67",
+      "background": "#ffffff",
+      "clear": "68,12"
     },
     "d024-95068460": {
       "file": "Wiliete S.C. logo.png",
-      "sha256": "e78cddf9004d90343cc592f44062aa9b10aa5fa8506cfaca4610699d3035c962"
+      "sha256": "e78cddf9004d90343cc592f44062aa9b10aa5fa8506cfaca4610699d3035c962",
+      "clear": "88,52 70,51"
     },
     "d024-2000113602": {
       "file": "C.D. Lunda Sul logo.png",
@@ -892,7 +898,8 @@
     "d031-485431": {
       "file": "MOİK (Bakı).jpg",
       "sha256": "0fc62d54bbdbb6c14ec7b94ba655e6590ac9a644c82d3b542c92643c9949e524",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff"
     },
     "d031-59001469": {
       "file": "Gabala FK logo.svg",
@@ -959,7 +966,9 @@
     },
     "d032-14002958": {
       "file": "Escudo CN5.png",
-      "sha256": "4d0b3bf18772723adc5ea6adfaaefe2485d9d1beae2ebd487aa0dfef98aede4b"
+      "sha256": "4d0b3bf18772723adc5ea6adfaaefe2485d9d1beae2ebd487aa0dfef98aede4b",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d032-14022190": {
       "file": "Escudo del Club Sportivo Belgrano de San Francisco.svg",
@@ -985,7 +994,8 @@
     },
     "d036-15083825": {
       "file": "Sunshine Coast Wanderers.jpg",
-      "sha256": "51a98c070a6b2abe045535d9ad6486996e996bb766ce2bc89a2416a6daa03f36"
+      "sha256": "51a98c070a6b2abe045535d9ad6486996e996bb766ce2bc89a2416a6daa03f36",
+      "background": "#ffffff"
     },
     "d040-6002479": {
       "file": "Schwarz-Weiß Bregenz logo.svg",
@@ -1043,11 +1053,15 @@
     },
     "d056-257": {
       "file": "RWDM Brussels logo.png",
-      "sha256": "99f26975ff2215c5becb9d5412a94a5b0686970b99ae061b3b2fb3971a65c56a"
+      "sha256": "99f26975ff2215c5becb9d5412a94a5b0686970b99ae061b3b2fb3971a65c56a",
+      "background": "#ffffff",
+      "clear": "96,281 70,291 70,280"
     },
     "d056-261": {
       "file": "Union Rochefortoise logo.png",
-      "sha256": "95e4f7108ccfe5db362e6f9125b49074ae7546b13f327bc765e25bc8f1d3122a"
+      "sha256": "95e4f7108ccfe5db362e6f9125b49074ae7546b13f327bc765e25bc8f1d3122a",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d056-527945": {
       "file": "Logo Francs Borains.png",
@@ -1094,7 +1108,9 @@
     },
     "d056-2000274502": {
       "file": "RoyaleUnionTubize-Braine logo.png",
-      "sha256": "893f16a18ad5c8b895082ac93d7d7b1afff784c4b05814e244659da7c18fd451"
+      "sha256": "893f16a18ad5c8b895082ac93d7d7b1afff784c4b05814e244659da7c18fd451",
+      "background": "#ffffff",
+      "tolerance": 8
     },
     "d068-120066": {
       "file": "Club Jorge Wilstermann.svg",
@@ -1122,7 +1138,9 @@
     },
     "d072-5340742": {
       "file": "Defence Force XI.png",
-      "sha256": "4639cb5f91c92d666ffb90cd14b6e1bb588753a563b39a0b8fa53da5e0fe4417"
+      "sha256": "4639cb5f91c92d666ffb90cd14b6e1bb588753a563b39a0b8fa53da5e0fe4417",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d072-13186807": {
       "file": "Security Systems F.C. logo.png",
@@ -1169,7 +1187,8 @@
     },
     "d096-23086530": {
       "file": "Menglait FC logo.jpeg",
-      "sha256": "6e565d19d305841752660e6bbe0c1d4af2ba78320b004b0dffb2999a0f14c525"
+      "sha256": "6e565d19d305841752660e6bbe0c1d4af2ba78320b004b0dffb2999a0f14c525",
+      "background": "#ffffff"
     },
     "d096-23190075": {
       "file": "Rimba Star FC logo.png",
@@ -1209,7 +1228,8 @@
     },
     "d100-138446": {
       "file": "Rilski-sportist small.png",
-      "sha256": "fba12f93725d502fec65dc2d9ac09732181df27bff001f0a627d5eb2712787f7"
+      "sha256": "fba12f93725d502fec65dc2d9ac09732181df27bff001f0a627d5eb2712787f7",
+      "background": "#ffffff"
     },
     "d100-138447": {
       "file": "Marekold3.png",
@@ -1255,7 +1275,8 @@
     },
     "d104-23197255": {
       "file": "Rakhine United Football Club.jpg",
-      "sha256": "9ddd280207df89eb63624637c3dd67fc59a7be109459ef3cb8f00c6cf92b9dda"
+      "sha256": "9ddd280207df89eb63624637c3dd67fc59a7be109459ef3cb8f00c6cf92b9dda",
+      "background": "#ffffff"
     },
     "d104-23203675": {
       "file": "Myawady.png",
@@ -1297,19 +1318,24 @@
     },
     "d120-5340785": {
       "file": "Unisport de Bafang.jpg",
-      "sha256": "96f8e3edca5a3f84a8c34f1587227b970ae2d6b00ac162db38c3ea2c16927005"
+      "sha256": "96f8e3edca5a3f84a8c34f1587227b970ae2d6b00ac162db38c3ea2c16927005",
+      "background": "#ffffff"
     },
     "d120-8632779": {
       "file": "Aigle Royal.jpg",
-      "sha256": "3d93b84702385fa659441a6caa90f47b38797dbb9a3658c65a73150fb935ace1"
+      "sha256": "3d93b84702385fa659441a6caa90f47b38797dbb9a3658c65a73150fb935ace1",
+      "background": "#ffffff"
     },
     "d120-12028915": {
       "file": "AS Fortuna logo.png",
-      "sha256": "9b03b1559d8aa7370d46e28f7d4c604584c332031e837cfbb3b6a42566837beb"
+      "sha256": "9b03b1559d8aa7370d46e28f7d4c604584c332031e837cfbb3b6a42566837beb",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d124-20035168": {
       "file": "AS Blainville 2021.jpg",
-      "sha256": "5fe0265d48bf5d91b671e321aaf5d4bfa73c1f13397402486c9f91d3c87c3f55"
+      "sha256": "5fe0265d48bf5d91b671e321aaf5d4bfa73c1f13397402486c9f91d3c87c3f55",
+      "background": "#ffffff"
     },
     "d124-20500265": {
       "file": "Sigma FC logo.png",
@@ -1317,7 +1343,8 @@
     },
     "d124-20500779": {
       "file": "Royal Select Beauport.jpg",
-      "sha256": "40d1ae74bf62d80671f6352a11993559fff740798e90f65758bbf7bb1f92ebb7"
+      "sha256": "40d1ae74bf62d80671f6352a11993559fff740798e90f65758bbf7bb1f92ebb7",
+      "background": "#ffffff"
     },
     "d124-2000040901": {
       "file": "FC Continentals team logo.webp",
@@ -1334,7 +1361,8 @@
     },
     "d124-2000132527": {
       "file": "FC Laval logo.png",
-      "sha256": "fb4c4763cb94321c86f087ace88a4e7a206f7bc5a78769ca8cd2b8d18ca355f6"
+      "sha256": "fb4c4763cb94321c86f087ace88a4e7a206f7bc5a78769ca8cd2b8d18ca355f6",
+      "background": "#ffffff"
     },
     "d124-2000150742": {
       "file": "CS Saint-Laurent.png",
@@ -1347,11 +1375,13 @@
     },
     "d152-104363": {
       "file": "Deportes Temuco.jpg",
-      "sha256": "80a92028cdc7b26985051177579c7d18e1ae8f0b6d815ae76b655398cfe0eacd"
+      "sha256": "80a92028cdc7b26985051177579c7d18e1ae8f0b6d815ae76b655398cfe0eacd",
+      "background": "#ffffff"
     },
     "d152-130783": {
       "file": "Provincial Osorno.jpg",
-      "sha256": "7e089f23527c2d9296f0853b70d947499c914c08a6b57b3d9499a236d276cfa8"
+      "sha256": "7e089f23527c2d9296f0853b70d947499c914c08a6b57b3d9499a236d276cfa8",
+      "background": "#ffffff"
     },
     "d152-130789": {
       "file": "C.D. Universidad de Concepción.svg",
@@ -1476,7 +1506,8 @@
     "d156-2000439194": {
       "file": "Jiangxi Dingnan United F.C.svg",
       "sha256": "65ec0cd65dba00a8606b92b3db0049a0119105f7f93f28ea0279d3fd3f687a49",
-      "thumb": 330
+      "thumb": 330,
+      "clear": "156,195 220,193"
     },
     "d156-2000473016": {
       "file": "Kunming City F.C.svg",
@@ -1562,11 +1593,13 @@
     },
     "d196-138180": {
       "file": "Doxa Katokopias new.jpg",
-      "sha256": "69a6e145b90000fc1f126b9d927d3e228f3b2231172b2ac31a49e666c9578c21"
+      "sha256": "69a6e145b90000fc1f126b9d927d3e228f3b2231172b2ac31a49e666c9578c21",
+      "background": "#ffffff"
     },
     "d196-138183": {
       "file": "Digenis Morfou.gif",
-      "sha256": "c454028029c818e00caf08f39bec4ec5830a4455be352fd19ef8a47227948a46"
+      "sha256": "c454028029c818e00caf08f39bec4ec5830a4455be352fd19ef8a47227948a46",
+      "background": "#ffffff"
     },
     "d196-149278": {
       "file": "Ayia Napa FC logo.svg",
@@ -1576,7 +1609,9 @@
     "d196-149279": {
       "file": "PAEEKLogo.png",
       "sha256": "b9b56419fef579994857c9cae54ed9a9f6b270890ceac4926404a6b61060dcfe",
-      "wiki": "el"
+      "wiki": "el",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d196-26030981": {
       "file": "Karmiotissa FC logo.png",
@@ -1632,7 +1667,8 @@
     },
     "d218-2000074927": {
       "file": "Club La Union.png",
-      "sha256": "88682d2c26d727129e3cde23f98816b48aa973447cecf1ff925e7cdf2df51922"
+      "sha256": "88682d2c26d727129e3cde23f98816b48aa973447cecf1ff925e7cdf2df51922",
+      "background": "#ffffff"
     },
     "d218-2000075054": {
       "file": "Libertad FC Ecuador.svg",
@@ -1673,7 +1709,8 @@
     "d231-5340864": {
       "file": "Adama City FC.jpg",
       "sha256": "2b9ef572f66ebb17f0fd745b8cc24f980bd2243d26ff15c837a20390c345525b",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff"
     },
     "d231-5340874": {
       "file": "Ethio Electric S.C.svg",
@@ -1683,7 +1720,8 @@
     "d231-13100000": {
       "file": "Dire Dawa S.C logo.png",
       "sha256": "9942e05ac728a2cb170e6298b21c2ea1a351c4fcee39d26a1a833536f904f34e",
-      "wiki": "ru"
+      "wiki": "ru",
+      "clear": "20,37 70,11 100,31 81,20 30,24 20,48 52,12 20,58 97,71 44,18 18,32 93,80 23,70 28,26 99,48 99,59 52,18 24,25 58,11 62,11 89,31 92,32 96,33 98,37 74,89"
     },
     "d231-13105238": {
       "file": "Sidama Coffee SC logo.png",
@@ -1691,17 +1729,21 @@
     },
     "d231-13161724": {
       "file": "Wolaita Dicha S.C. Logo.jpg",
-      "sha256": "7072f4e67e5b2e2fbf1d2d3c0bda1b247440e322126e8ac645b5dce92ccb53f5"
+      "sha256": "7072f4e67e5b2e2fbf1d2d3c0bda1b247440e322126e8ac645b5dce92ccb53f5",
+      "background": "#ffffff"
     },
     "d231-13199942": {
       "file": "Welwalo Adigrat University FC.jpg",
       "sha256": "a1cc11aee80e36f3014abe7fa22ebf67f173aba26221c1dc18097bdccc4e7f30",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff"
     },
     "d231-13212020": {
       "file": "Suhul Shire FC.jpg",
       "sha256": "eb949f8d2b26ca22f50ecaf6682e454b7ecb4d24a35f882d0794455522f2468e",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d231-13231055": {
       "file": "Wolkite City F.C.svg",
@@ -1716,7 +1758,9 @@
     "d246-514046": {
       "file": "Ekenäs IF logo.png",
       "sha256": "e5356177617b6717e2b511af34f7d35e803d4ca09985c8170f1397f113d544b9",
-      "wiki": "fi"
+      "wiki": "fi",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d250-2051": {
       "file": "Logo US Saint-Malo - 2012.svg",
@@ -1744,7 +1788,8 @@
     },
     "d268-1300526": {
       "file": "FC Sioni Bolnisi.jpg",
-      "sha256": "d8c2ac02687815804528fb88be943d8e729fa64c34cc8661633af668ee50f36d"
+      "sha256": "d8c2ac02687815804528fb88be943d8e729fa64c34cc8661633af668ee50f36d",
+      "background": "#ffffff"
     },
     "d268-59007876": {
       "file": "FC Gagra logo.svg",
@@ -1777,7 +1822,9 @@
     },
     "d275-5623531": {
       "file": "Shabab Al-Dhahiriya SC.png",
-      "sha256": "5273be78fe98b1956225a2954bf229f4dbea9e955f4d6c548d75ac6ed87b289c"
+      "sha256": "5273be78fe98b1956225a2954bf229f4dbea9e955f4d6c548d75ac6ed87b289c",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d275-23091021": {
       "file": "Taraji Wadi Al-Nes.png",
@@ -1789,7 +1836,8 @@
     },
     "d275-23091025": {
       "file": "Thaqafi Tulkarem.jpg",
-      "sha256": "e475bec31a55a7bb5c1a1fc7387f3dfeeb0e9b0b0ff7c2bdc85db45cc66c41f0"
+      "sha256": "e475bec31a55a7bb5c1a1fc7387f3dfeeb0e9b0b0ff7c2bdc85db45cc66c41f0",
+      "background": "#ffffff"
     },
     "d275-23159016": {
       "file": "Shabab Rafah (logo).png",
@@ -1869,7 +1917,9 @@
     },
     "d320-87000758": {
       "file": "Deportivo Coatepeque.jpg",
-      "sha256": "826cebfa3011dfa229a8b4d69c214ab1a593157b4036aadae3d50bfde241546f"
+      "sha256": "826cebfa3011dfa229a8b4d69c214ab1a593157b4036aadae3d50bfde241546f",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d320-87000912": {
       "file": "Deportivo mixco.png",
@@ -1879,20 +1929,24 @@
     "d320-87000913": {
       "file": "Club deportivo guastatoya.jpg",
       "sha256": "75dc3c2ac3264807aa3de6b7907f14aa6f5b27c1cf827aa40d0331fd1cab000a",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff"
     },
     "d320-87001733": {
       "file": "Dep san pedro.jpg",
       "sha256": "03578abdfcfbc61643a03d9ac89f90af8ed47486737c16141f4f799d020fadd1",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff"
     },
     "d340-87000115": {
       "file": "CAI Hn.gif",
-      "sha256": "9604dbed10d4345148ec9299ead3dd3802ddb8f3a90aeb8fe9abb921c1362974"
+      "sha256": "9604dbed10d4345148ec9299ead3dd3802ddb8f3a90aeb8fe9abb921c1362974",
+      "background": "#ffffff"
     },
     "d340-87032282": {
       "file": "Lobos UPNFM logo.png",
-      "sha256": "933c73504e417471aa1c58363644afa9d78990606849e301df89d97d8f8234e5"
+      "sha256": "933c73504e417471aa1c58363644afa9d78990606849e301df89d97d8f8234e5",
+      "clear": "232,312 249,313 152,313 253,268 207,270 151,265 225,266"
     },
     "d340-87038007": {
       "file": "Olancho FC Badge.png",
@@ -1955,11 +2009,15 @@
     },
     "d352-7840110": {
       "file": "Afturelding.JPG",
-      "sha256": "d43b1c3c5275f3ac888be32959cd8c6d02daa4b8e504459222bb5546a818099c"
+      "sha256": "d43b1c3c5275f3ac888be32959cd8c6d02daa4b8e504459222bb5546a818099c",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d352-7840141": {
       "file": "Njarðvík (men's football) logo.png",
-      "sha256": "f89d9555564cd2e14692350f95e8b767abd04252c36c06956d38ccdac0701538"
+      "sha256": "f89d9555564cd2e14692350f95e8b767abd04252c36c06956d38ccdac0701538",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d352-39001207": {
       "file": "Grótta logo.png",
@@ -2029,19 +2087,23 @@
     },
     "d360-135518": {
       "file": "Persikota.jpeg",
-      "sha256": "4de35f6e9069a42d57f761dbb21ac2deeb7d5c2b786f311594b574a81d2105aa"
+      "sha256": "4de35f6e9069a42d57f761dbb21ac2deeb7d5c2b786f311594b574a81d2105aa",
+      "background": "#ffffff"
     },
     "d360-5622732": {
       "file": "Pspsriau.jpeg",
-      "sha256": "7cc36654367e84adf9abc4e991d868742b21fff2446ec48b958d9d1be4911c3b"
+      "sha256": "7cc36654367e84adf9abc4e991d868742b21fff2446ec48b958d9d1be4911c3b",
+      "background": "#ffffff"
     },
     "d360-7742876": {
       "file": "Persibo.jpeg",
-      "sha256": "f0034a65f5f64b2cb35883f5a8ac1c6529e7dc2e27b92aa26c3ac1f9177226a5"
+      "sha256": "f0034a65f5f64b2cb35883f5a8ac1c6529e7dc2e27b92aa26c3ac1f9177226a5",
+      "background": "#ffffff"
     },
     "d360-41021342": {
       "file": "Persewar Waropen.jpeg",
-      "sha256": "e7c4e565c7c6269105cc2664841b579c1de6cbd4ab009e3f9c8f9ff746d00e9b"
+      "sha256": "e7c4e565c7c6269105cc2664841b579c1de6cbd4ab009e3f9c8f9ff746d00e9b",
+      "background": "#ffffff"
     },
     "d360-41051597": {
       "file": "Madura United F.C. logo.png",
@@ -2049,7 +2111,8 @@
     },
     "d360-2000004194": {
       "file": "Persekat tegal.jpeg",
-      "sha256": "07b9750ca550ef2d892707f8a222651c2d311e151e10bec696411df1a3d8bcb7"
+      "sha256": "07b9750ca550ef2d892707f8a222651c2d311e151e10bec696411df1a3d8bcb7",
+      "background": "#ffffff"
     },
     "d364-135292": {
       "file": "Chooka Talesh.png",
@@ -2067,7 +2130,8 @@
     },
     "d364-1023029": {
       "file": "Iranjavan FC logo.png",
-      "sha256": "ff32767bfd82a34b97a40c63b324e8f2316d645fe1b69572c0078c978e0aeee0"
+      "sha256": "ff32767bfd82a34b97a40c63b324e8f2316d645fe1b69572c0078c978e0aeee0",
+      "clear": "140,303 164,303 196,300"
     },
     "d364-23000082": {
       "file": "Sepidrood S.C. Logo.png",
@@ -2077,12 +2141,15 @@
     "d364-23021299": {
       "file": "Shahrdaribandarabbas.jpg",
       "sha256": "bed409d32bbeb33e4011723c4db96439381ad309ec5bddc84d98aace82825d23",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff"
     },
     "d364-23033445": {
       "file": "ShahidGhandi.jpg",
       "sha256": "c934107405329e42d322e04719cc85aec07673f4efa556679d0b577585148e09",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d364-23061663": {
       "file": "Naft Masjed Soleyman.png",
@@ -2100,7 +2167,8 @@
     "d364-23114211": {
       "file": "لوگو شهرداری بندر ماهشهر.jpeg",
       "sha256": "a174d4088f9bbe9c69ca77c7cfc0b8cc1719b329b715fd4ab2e5dcab9c0e0d2e",
-      "wiki": "fa"
+      "wiki": "fa",
+      "background": "#ffffff"
     },
     "d364-23131213": {
       "file": "Mes Shahr-e Babak F.C. logo.png",
@@ -2131,7 +2199,8 @@
     "d364-2000389848": {
       "file": "Palayesh Naft BandarAbbas Logo.jpg",
       "sha256": "ece68c954e56cd92f3ad19c7637b2afdb195d233e3843f9998afea02210bd1f1",
-      "wiki": "fa"
+      "wiki": "fa",
+      "background": "#ffffff"
     },
     "d368-145742": {
       "file": "Zakho SC logo.svg",
@@ -2231,7 +2300,9 @@
     "d376-7861701": {
       "file": "Hapoel herzlya.gif",
       "sha256": "f41f577cb842e718bd0ff5e6c4838c3ef6ff75330d038e26dd4c0a74174eecf2",
-      "wiki": "he"
+      "wiki": "he",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d376-7862556": {
       "file": "HapoelMigdalHaEmekLogo.png",
@@ -2241,7 +2312,9 @@
     "d376-7862562": {
       "file": "Hapoel Kfar Shalem Logo.png",
       "sha256": "ea2706722ed6ea2d7f68f8cc8dff78a57aaead90df767fbd076ba96635fae0cb",
-      "wiki": "he"
+      "wiki": "he",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d376-42006473": {
       "file": "Maccabi Jaffa FC.png",
@@ -2250,7 +2323,8 @@
     "d376-42012394": {
       "file": "SportsClubDimona.png",
       "sha256": "584b9920fe53f8feb072b52c91d81f80c8391f3c9aadbb3ccec0bcf0486fb6d1",
-      "wiki": "he"
+      "wiki": "he",
+      "clear": "257,36"
     },
     "d376-42018773": {
       "file": "Iron Nesher FC New Logo.png",
@@ -2259,7 +2333,10 @@
     },
     "d376-42021605": {
       "file": "Ironim.jpg",
-      "sha256": "29e70973598b293a9b470707fb725c9735e9de815f83661361d9b9eb27596009"
+      "sha256": "29e70973598b293a9b470707fb725c9735e9de815f83661361d9b9eb27596009",
+      "background": "#ffffff",
+      "inset": "0 0 3 2",
+      "clear": "151,176 180,150 112,187"
     },
     "d376-42027989": {
       "file": "MaccabiBneiReine2022.png",
@@ -2297,11 +2374,13 @@
     },
     "d388-105999": {
       "file": "Constant Spring.png",
-      "sha256": "41a9efb2f50c4aa16186739ad896ccde37bf8d1ce2cc73d158ac50df0348ecf4"
+      "sha256": "41a9efb2f50c4aa16186739ad896ccde37bf8d1ce2cc73d158ac50df0348ecf4",
+      "background": "#ffffff"
     },
     "d388-790977": {
       "file": "August Town.png",
-      "sha256": "2a0c4a803a4406e5ac6fbdf49d8715df82d66e61b264203e889389ffc582bd69"
+      "sha256": "2a0c4a803a4406e5ac6fbdf49d8715df82d66e61b264203e889389ffc582bd69",
+      "background": "#ffffff"
     },
     "d388-790980": {
       "file": "Humble Lions FC.png",
@@ -2407,7 +2486,9 @@
     },
     "d404-2000200690": {
       "file": "Marasugar.png",
-      "sha256": "4921ca566efb5d9381184b99be40dcbfc4ca4e96b6d960a2c0ed989a249eb7f2"
+      "sha256": "4921ca566efb5d9381184b99be40dcbfc4ca4e96b6d960a2c0ed989a249eb7f2",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d408-5622838": {
       "file": "Amrokkang SC logo (2018).png",
@@ -2449,7 +2530,8 @@
     },
     "d417-59094697": {
       "file": "FC Toktogul.jpg",
-      "sha256": "90a6340bc8c2bc5ea11959eb795bc7cf7fde9f56f3fb99a3ef9ecb464619360b"
+      "sha256": "90a6340bc8c2bc5ea11959eb795bc7cf7fde9f56f3fb99a3ef9ecb464619360b",
+      "background": "#ffffff"
     },
     "d417-59118819": {
       "file": "FC Asia Talas logo.png",
@@ -2498,7 +2580,9 @@
     },
     "d422-5631609": {
       "file": "Nahda Barelias logo.png",
-      "sha256": "92b6925e608227c1492ca68801769e34fb4819dbae4ba610feb2c4b857844f94"
+      "sha256": "92b6925e608227c1492ca68801769e34fb4819dbae4ba610feb2c4b857844f94",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d422-23098952": {
       "file": "AC Sporting Beirut logo.png",
@@ -2520,7 +2604,9 @@
     },
     "d434-5341596": {
       "file": "Nasr Benghazi.png",
-      "sha256": "af7e254e048c507cd794a107dcd1793cc07dcbbc3d90800f74df97a5766baa1f"
+      "sha256": "af7e254e048c507cd794a107dcd1793cc07dcbbc3d90800f74df97a5766baa1f",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d434-5341601": {
       "file": "Al-Hilal Benghazi (logo).png",
@@ -2548,7 +2634,9 @@
     },
     "d434-13199918": {
       "file": "AnwarSC.png",
-      "sha256": "68483ad2fa530235624d008c6016f27d4e045e2996bddbc8177843a57330468d"
+      "sha256": "68483ad2fa530235624d008c6016f27d4e045e2996bddbc8177843a57330468d",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d434-13199921": {
       "file": "IttihadMisurata.png",
@@ -2571,7 +2659,9 @@
     },
     "d458-23501271": {
       "file": "Bukit Tambun FC.png",
-      "sha256": "598961d8cca16bb5d9e931568c005e591068f5106f14f3dc7006697bc47a15e4"
+      "sha256": "598961d8cca16bb5d9e931568c005e591068f5106f14f3dc7006697bc47a15e4",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d458-23501374": {
       "file": "Bunga Raya F.C.png",
@@ -2607,7 +2697,8 @@
     },
     "d484-2000043038": {
       "file": "Logo Aragon FC.png",
-      "sha256": "2a30374eaae127c5e4bf16aef9ef1cfa6e62125828aa85e230c2e5e3b5fd9ac5"
+      "sha256": "2a30374eaae127c5e4bf16aef9ef1cfa6e62125828aa85e230c2e5e3b5fd9ac5",
+      "clear": "166,95 179,258"
     },
     "d484-2000135707": {
       "file": "Tritones Logo.png",
@@ -2657,7 +2748,8 @@
     "d504-5380014": {
       "file": "Husa logo 2013.png",
       "sha256": "ab6d99bb825ed4624f2d185e9b6db5d8037a9261fe80adc82cd7718512632e34",
-      "thumb": 330
+      "thumb": 330,
+      "clear": "126,70 207,69 181,68 152,69 144,76 189,76"
     },
     "d504-5380015": {
       "file": "شعار نادي أولمبيك خريبكة.png",
@@ -2674,7 +2766,9 @@
       "file": "Kac.gif",
       "sha256": "565c0c43d6438d3cc5d7c41befc3dd011688eb6dbb0bb12d5e8507983bd9c0b9",
       "thumb": 330,
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d504-8630098": {
       "file": "Union Touarga Sportif logo.png",
@@ -2683,12 +2777,14 @@
     "d504-12021584": {
       "file": "Widad Fez logo.jpg",
       "sha256": "6f7e2ec322e70b2ecf4f9e15a00f26e38252f3f94aa682c8fdd12f4e9bca26cb",
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff"
     },
     "d504-12065961": {
       "file": "Maroc-CAK.jpg",
       "sha256": "5f5cacd8b8da2b7c9f4b9ac6edcb602714a32e5c97a3eb7cc932c4ffc5a8c0ba",
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff"
     },
     "d504-13165097": {
       "file": "شعار نادي سريع وادي زم.png",
@@ -2711,7 +2807,8 @@
     },
     "d508-13104518": {
       "file": "Textáfrica do Chimoio.jpg",
-      "sha256": "90d7df32db64366a8b0f2d6c31abce8680a7e6a28e3f813f09ec97ba25a4d6af"
+      "sha256": "90d7df32db64366a8b0f2d6c31abce8680a7e6a28e3f813f09ec97ba25a4d6af",
+      "background": "#ffffff"
     },
     "d508-13105929": {
       "file": "GD Estrela Vermelha.png",
@@ -2720,7 +2817,9 @@
     },
     "d512-135325": {
       "file": "Seebclub.jpg",
-      "sha256": "911cfb9c0491dc04e7d580605d917eda1ad8f9d45ca9d40c8d9e689ed6a18931"
+      "sha256": "911cfb9c0491dc04e7d580605d917eda1ad8f9d45ca9d40c8d9e689ed6a18931",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d512-1016231": {
       "file": "Al-Nahda Badge.png",
@@ -2728,7 +2827,9 @@
     },
     "d512-5625063": {
       "file": "AlKhabouraLogo.jpg",
-      "sha256": "3dae88aa583ddae65a5ba6c9f1411876471b9d74387c510b9ad0d4997e9954bd"
+      "sha256": "3dae88aa583ddae65a5ba6c9f1411876471b9d74387c510b9ad0d4997e9954bd",
+      "background": "#ffffff",
+      "clear": "47,201 75,202 153,226 92,226 72,223"
     },
     "d512-23090721": {
       "file": "Al Rustaq Club logo.png",
@@ -2742,15 +2843,19 @@
     },
     "d540-432911": {
       "file": "JS Baco (shield).png",
-      "sha256": "b484e2fd4b3dd7f1dcca20c0b8b6b97104d30a5f738194f62412f91a516c865d"
+      "sha256": "b484e2fd4b3dd7f1dcca20c0b8b6b97104d30a5f738194f62412f91a516c865d",
+      "background": "#ffffff"
     },
     "d540-432913": {
       "file": "FCN Gaitcha.png",
-      "sha256": "a1e343743b99e8f2c3b64644461248fc584a9e76d700b34a32d2eeb17a413998"
+      "sha256": "a1e343743b99e8f2c3b64644461248fc584a9e76d700b34a32d2eeb17a413998",
+      "background": "#ffffff"
     },
     "d540-432914": {
       "file": "AS Mont-Dore.png",
-      "sha256": "2eb99928a264c999b042bac0414d5eff471bd884ac1c5e55a9670268aed6b927"
+      "sha256": "2eb99928a264c999b042bac0414d5eff471bd884ac1c5e55a9670268aed6b927",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d540-432915": {
       "file": "ASMagenta.png",
@@ -2758,7 +2863,8 @@
     },
     "d540-23209629": {
       "file": "HlEGHENSPORT 400x400.png",
-      "sha256": "eaa4151512033e64de29d17e7ab027e19f41db6ec4b637aaafa64ec0fc194b2b"
+      "sha256": "eaa4151512033e64de29d17e7ab027e19f41db6ec4b637aaafa64ec0fc194b2b",
+      "background": "#ffffff"
     },
     "d540-23209632": {
       "file": "AS Tiga Sport logo.png",
@@ -2774,7 +2880,9 @@
     },
     "d554-88000404": {
       "file": "Wellington Olympic AFC.jpg",
-      "sha256": "bbdf5b99f7f434c7069b4d965a36fbcac5be2af866b0bfe6b733b13f367f56e7"
+      "sha256": "bbdf5b99f7f434c7069b4d965a36fbcac5be2af866b0bfe6b733b13f367f56e7",
+      "background": "#ffffff",
+      "clear": "204,62 110,88 133,286"
     },
     "d554-88000949": {
       "file": "East Coast Bays AFC logo.png",
@@ -2783,7 +2891,9 @@
     "d558-5375180": {
       "file": "WalterFerretti.png",
       "sha256": "7b8f995128d828f15ce2b5219e1e8e960f7ee468fe379792e6e320fbfcd43ca5",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d558-80034062": {
       "file": "Escudo club deportivo Atlético Junior de Managua.png",
@@ -2796,7 +2906,9 @@
     },
     "d566-5340749": {
       "file": "Enyimba International F.C. logo.png",
-      "sha256": "008f40f0ff8c69286348dce10025f5509b9457a9e0c6b35dc636c97888d3690d"
+      "sha256": "008f40f0ff8c69286348dce10025f5509b9457a9e0c6b35dc636c97888d3690d",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d566-5340760": {
       "file": "Plateau United.png",
@@ -2812,7 +2924,8 @@
     },
     "d566-8632215": {
       "file": "Gateway FC.jpg",
-      "sha256": "b91f9c31cd11f0b0027a1a44e3f8673c5013a9b7e6fc797ae9c9587e789add13"
+      "sha256": "b91f9c31cd11f0b0027a1a44e3f8673c5013a9b7e6fc797ae9c9587e789add13",
+      "background": "#ffffff"
     },
     "d566-8632634": {
       "file": "Bayelsa United F.C. logo.png",
@@ -2829,11 +2942,13 @@
     },
     "d566-2000153392": {
       "file": "Doma United F.C. logo.jpg",
-      "sha256": "057f1c4c85ea1fa3080221258f48ba42ba3e1599b5096cfac83f800933472383"
+      "sha256": "057f1c4c85ea1fa3080221258f48ba42ba3e1599b5096cfac83f800933472383",
+      "background": "#ffffff"
     },
     "d566-2000306824": {
       "file": "Inter Lagos F.C.jpg",
-      "sha256": "5a394dcb90831b58e88b5b3f0bb55069626142b6668b1abfb62b62c80c141e36"
+      "sha256": "5a394dcb90831b58e88b5b3f0bb55069626142b6668b1abfb62b62c80c141e36",
+      "background": "#eb008b"
     },
     "d578-1294": {
       "file": "Brattvåg IL Logo.png",
@@ -2852,11 +2967,13 @@
     "d591-308258": {
       "file": "Alianza FC.jpg",
       "sha256": "18a1ba19d224364f57dae8f07870bfd7428731e4392320df28b154fa36965cc8",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff"
     },
     "d591-308261": {
       "file": "SD Atletico Nacional.jpg",
-      "sha256": "4c5427da79af0b7542afec8ae6338a001ea7c3eb9b9c975d5370f1f85dc8e316"
+      "sha256": "4c5427da79af0b7542afec8ae6338a001ea7c3eb9b9c975d5370f1f85dc8e316",
+      "background": "#ffffff"
     },
     "d591-80024200": {
       "file": "Costa del Este FC.png",
@@ -2864,12 +2981,15 @@
     },
     "d600-5280336": {
       "file": "Club 3 Febrero.png",
-      "sha256": "52231d53afffabd51ad413f2e9d1e52291f2f33ffc671c1ef082fa49512ae4bf"
+      "sha256": "52231d53afffabd51ad413f2e9d1e52291f2f33ffc671c1ef082fa49512ae4bf",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d600-5280416": {
       "file": "ClubOlimpiaDeIta.jpg",
       "sha256": "194a909a71ca18aa72b903d3af0efb15a350fae32b9a4bec8a560e0f417235f2",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff"
     },
     "d600-79003052": {
       "file": "MartínLedesma.png",
@@ -2899,11 +3019,15 @@
     },
     "d604-77029556": {
       "file": "Deportivo Binacional.png",
-      "sha256": "e3409a5cc68f379d9e3bf28e0647a8f2be83dfd3d64287b3fa403428c67853be"
+      "sha256": "e3409a5cc68f379d9e3bf28e0647a8f2be83dfd3d64287b3fa403428c67853be",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d604-77044601": {
       "file": "ChavelinesJuniors.png",
-      "sha256": "4efa0f7aadf558874c211b885bbfbd24505217aded719bf47c978d2f698a7016"
+      "sha256": "4efa0f7aadf558874c211b885bbfbd24505217aded719bf47c978d2f698a7016",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d604-2000261238": {
       "file": "Comerciantes FC 2025 logo.png",
@@ -3017,7 +3141,9 @@
     },
     "d643-1521": {
       "file": "Logo of FC Dynamo Stavropol.png",
-      "sha256": "1447ef24d5b1cb1ff6f0a58e2ed4ea382e5befba6ee08d722668dc658ff7be79"
+      "sha256": "1447ef24d5b1cb1ff6f0a58e2ed4ea382e5befba6ee08d722668dc658ff7be79",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d643-1523": {
       "file": "PFC Krylia Sovetov Samara.svg",
@@ -3086,7 +3212,8 @@
     },
     "d646-1012120": {
       "file": "SC Kiyovu Sport.jpg",
-      "sha256": "007081189bfc3face2606dec3fc5b488f3ca03a64a2350cce70189b65a77d8b9"
+      "sha256": "007081189bfc3face2606dec3fc5b488f3ca03a64a2350cce70189b65a77d8b9",
+      "background": "#ffffff"
     },
     "d682-135425": {
       "file": "Al-Najmah SC Logo.svg",
@@ -3101,7 +3228,8 @@
       "file": "AlqlaahFC.jpeg",
       "sha256": "33c9fcf3e565b90fa77108f9803c6256f1a9af3e61bf99456aa7638b7a67cd55",
       "thumb": 330,
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff"
     },
     "d682-1025851": {
       "file": "شعار النادي.png",
@@ -3111,12 +3239,14 @@
     "d682-1025857": {
       "file": "Altarajiclub.jpg",
       "sha256": "a4f3d79eb5cc3eb28ef9982e53cde244fa12dddf20398e6ef31c7a724e451ac8",
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff"
     },
     "d682-1030683": {
       "file": "نادي السد السعودي.jpg",
       "sha256": "d66f3983e3c1d217b9cf8adb827ea1ada6776dc92395e84e33f79f16c530bacc",
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff"
     },
     "d682-1030684": {
       "file": "نادي الصفا.png",
@@ -3127,7 +3257,8 @@
     "d682-1031610": {
       "file": "الريان.jpg",
       "sha256": "7809bf930bbe713ab3dbb0a1667018d6be9b04a301d54adae139700069c5f2f3",
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff"
     },
     "d682-1031614": {
       "file": "Diriyah Club Logo.svg",
@@ -3169,7 +3300,8 @@
     "d682-7920490": {
       "file": "Al sharq.jpg",
       "sha256": "f901928c1697bd87ddcb58b000a74c51a10124f63af362bb6cd6dc0039ea3439",
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff"
     },
     "d682-23002919": {
       "file": "Al-Nojoom FC logo.png",
@@ -3184,7 +3316,9 @@
     "d682-23002941": {
       "file": "نادي النعيرية.jpg",
       "sha256": "7ff444b404ba0937ec90b30d606996e80bf7e8cfcc85e0115dc51e423e368786",
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff",
+      "inset": 2
     },
     "d682-23002945": {
       "file": "شعار نادي الصقر.png",
@@ -3198,15 +3332,20 @@
     "d682-23269740": {
       "file": "نادي الساحل.png",
       "sha256": "1fa265b567f52cb65cfddd4f2627bec59ff7b2bd69be5590aee2f6987e2091ad",
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d686-5341075": {
       "file": "Stade de Mbour.jpg",
-      "sha256": "9968a96341f85461646916f25670bb895937a0957bc96b2dda06888b32d32009"
+      "sha256": "9968a96341f85461646916f25670bb895937a0957bc96b2dda06888b32d32009",
+      "background": "#ffffff"
     },
     "d686-13158638": {
       "file": "Mbour Petite-Côte FC.jpg",
-      "sha256": "c1a81456b2fb2467d2df1e8e770e02fd5450820995519d70e81a3a354522c58e"
+      "sha256": "c1a81456b2fb2467d2df1e8e770e02fd5450820995519d70e81a3a354522c58e",
+      "background": "#ffffff",
+      "clear": "62,142 141,142"
     },
     "d688-136468": {
       "file": "Gfkdubocicalogo.png",
@@ -3270,7 +3409,8 @@
     },
     "d703-2000260278": {
       "file": "Dynamo Malzenice.jpg",
-      "sha256": "6bffd931b764e9f04c5b12a4ca55ee92d1866c9aecf59157983458a64510bfa9"
+      "sha256": "6bffd931b764e9f04c5b12a4ca55ee92d1866c9aecf59157983458a64510bfa9",
+      "background": "#ffffff"
     },
     "d704-135394": {
       "file": "CAHCMC logo (2025).svg",
@@ -3341,7 +3481,9 @@
     },
     "d710-65025773": {
       "file": "Platinum City F.C. logo.png",
-      "sha256": "23c46f5daa5efaf51dfb3dd4684c5406e8020a4efcf71fb39b0c4e623039880f"
+      "sha256": "23c46f5daa5efaf51dfb3dd4684c5406e8020a4efcf71fb39b0c4e623039880f",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d710-65025781": {
       "file": "Magesi F.C. logo.png",
@@ -3349,7 +3491,9 @@
     },
     "d710-65028800": {
       "file": "Hungry Lions Football Club.jpg",
-      "sha256": "34a8bd1cddf71cd8565cabd429a72872818529ea192b07bd3de07461c72e36e6"
+      "sha256": "34a8bd1cddf71cd8565cabd429a72872818529ea192b07bd3de07461c72e36e6",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d710-65039207": {
       "file": "Richards Bay F.C. logo.png",
@@ -3357,7 +3501,9 @@
     },
     "d710-65045804": {
       "file": "Venda Football Club logo.jpg",
-      "sha256": "bbf949c27747b95200574cb9544b2c3378dc76320c6b41ec858a3f93e90dad2a"
+      "sha256": "bbf949c27747b95200574cb9544b2c3378dc76320c6b41ec858a3f93e90dad2a",
+      "background": "#ffffff",
+      "clear": "182,44"
     },
     "d710-2000038055": {
       "file": "TS Galaxy.png",
@@ -3366,7 +3512,8 @@
     "d710-2000375249": {
       "file": "Marumo Gallants FC.jpg",
       "sha256": "39af83be33ccdcd23d72d97d15c0a8c1580fda6aeff2428476f765c413408f3b",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff"
     },
     "d710-2000472395": {
       "file": "Siwelele F.C. logo.svg",
@@ -3375,39 +3522,49 @@
     },
     "d716-1200094": {
       "file": "De-mbare copy.jpg",
-      "sha256": "3bbd922aae2335320d617eed5ff51d8efba643dd4f834f6461a03887f94a44f3"
+      "sha256": "3bbd922aae2335320d617eed5ff51d8efba643dd4f834f6461a03887f94a44f3",
+      "background": "#ffffff"
     },
     "d716-5340956": {
       "file": "Black Rhinos Football Club.jpg",
-      "sha256": "000ea57d343e2497765826ffe74e99b04464e384ca5bce6cb09d629ae3f6326a"
+      "sha256": "000ea57d343e2497765826ffe74e99b04464e384ca5bce6cb09d629ae3f6326a",
+      "background": "#000000"
     },
     "d716-13147665": {
       "file": "ZPC Kariba F.C.png",
-      "sha256": "de2a00d08ad6b874d6eb9b25a441ee564ebc26a395e9148ffb9ca59fcf587e6a"
+      "sha256": "de2a00d08ad6b874d6eb9b25a441ee564ebc26a395e9148ffb9ca59fcf587e6a",
+      "background": "#d9d9d9"
     },
     "d716-13156593": {
       "file": "Bulawayo Chiefs F.C.jpg",
-      "sha256": "0e9d059d4cf0213602728a0819dcb40482a30ba3b272d2775569f95be86b4ae3"
+      "sha256": "0e9d059d4cf0213602728a0819dcb40482a30ba3b272d2775569f95be86b4ae3",
+      "background": "#000000"
     },
     "d716-13156596": {
       "file": "Triangle United F.C.png",
-      "sha256": "63135dcbbccd3b5cb3664f8f895e8de8a905bde561ccf5e31562d2b74d362655"
+      "sha256": "63135dcbbccd3b5cb3664f8f895e8de8a905bde561ccf5e31562d2b74d362655",
+      "clear": "129,34 82,35"
     },
     "d716-13183429": {
       "file": "Ngezi Platinum F.C.jpg",
-      "sha256": "4185c9a82ebb190c43d4c2d2755a947ee98674c6b61ea51bad123c40b8c13124"
+      "sha256": "4185c9a82ebb190c43d4c2d2755a947ee98674c6b61ea51bad123c40b8c13124",
+      "background": "#ffffff"
     },
     "d716-13194687": {
       "file": "Yadah Stars F.C.jpg",
-      "sha256": "69a8478708e800e40b31842ed7a84bad47bc18c40b8eab80ae559fa4b955b3c4"
+      "sha256": "69a8478708e800e40b31842ed7a84bad47bc18c40b8eab80ae559fa4b955b3c4",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d716-13196187": {
       "file": "Herentals F.C.jpg",
-      "sha256": "a44da97c7cad0d53889c449263e12b77d9a7424393990a036b270c50392b53e5"
+      "sha256": "a44da97c7cad0d53889c449263e12b77d9a7424393990a036b270c50392b53e5",
+      "background": "#ffffff"
     },
     "d716-95058370": {
       "file": "Manica Diamonds F.C.jpg",
-      "sha256": "07b5e90da5249bd826955c4c803b8f693e71ff8df1f3da7d6fcb1cbea7df0c69"
+      "sha256": "07b5e90da5249bd826955c4c803b8f693e71ff8df1f3da7d6fcb1cbea7df0c69",
+      "background": "#ffffff"
     },
     "d716-95063408": {
       "file": "TelOne F.C. logo.png",
@@ -3434,7 +3591,9 @@
     },
     "d748-13214384": {
       "file": "Manzini Sundowns.png",
-      "sha256": "4485f9c3e16d2cbe2f8017d11f34c0bc660bf7ed3ca0a80c5348c623a7eaced6"
+      "sha256": "4485f9c3e16d2cbe2f8017d11f34c0bc660bf7ed3ca0a80c5348c623a7eaced6",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d748-2000136563": {
       "file": "Nsingizini Hotspurs Official green lineLogo 22 2023 Design 001.png",
@@ -3447,7 +3606,8 @@
     },
     "d760-135477": {
       "file": "Al-Jihad SC logo.png",
-      "sha256": "322d71a3c75ae7002adcc4c780545c342efac2c81dabdf30a5ef1a7032542422"
+      "sha256": "322d71a3c75ae7002adcc4c780545c342efac2c81dabdf30a5ef1a7032542422",
+      "background": "#ffffff"
     },
     "d760-135478": {
       "file": "Al-Jaish SC (Syria) logo - 2026.png",
@@ -3475,16 +3635,21 @@
     },
     "d760-23482483": {
       "file": "Al-Horgelah FC.jpg",
-      "sha256": "68a1ff623f6fc6412234947de2551b57033a194d717ff6e3ea5327f2218db37a"
+      "sha256": "68a1ff623f6fc6412234947de2551b57033a194d717ff6e3ea5327f2218db37a",
+      "background": "#f1da36",
+      "tolerance": 110
     },
     "d762-484440": {
       "file": "Regar-TadAZ Tursunzoda.png",
-      "sha256": "8e53bfcf74d2e4df19a5af48e5ef925953f4d4a31af03b7e5f1c43c900cd0c00"
+      "sha256": "8e53bfcf74d2e4df19a5af48e5ef925953f4d4a31af03b7e5f1c43c900cd0c00",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d762-485419": {
       "file": "Fc Panjsher.jpg",
       "sha256": "2f06361946a1e3306fc36fa366397c055fe172b74042ec225c512e16933c79e7",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff"
     },
     "d762-59017715": {
       "file": "Khosilot Farkhor logo.png",
@@ -3500,7 +3665,9 @@
     },
     "d764-23295563": {
       "file": "Nongbua Pitchaya F.C. logo 2017.png",
-      "sha256": "262739972c1620c1555a061ec17b80a8eb37dc3c3777505dbf478cc9cc99f9b9"
+      "sha256": "262739972c1620c1555a061ec17b80a8eb37dc3c3777505dbf478cc9cc99f9b9",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d764-23295583": {
       "file": "Ranong PJ United logo.png",
@@ -3513,7 +3680,9 @@
     },
     "d764-23483006": {
       "file": "Nakhon Si United 2019.png",
-      "sha256": "f2ffcf18da686a82441bf4e269d5c3066c099da2dbdac6d32158952bb7af27d7"
+      "sha256": "f2ffcf18da686a82441bf4e269d5c3066c099da2dbdac6d32158952bb7af27d7",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d764-2000117797": {
       "file": "Customs Ladkrabang United 2021.png",
@@ -3526,7 +3695,9 @@
     },
     "d780-82000481": {
       "file": "Point Fortin Civic FC.png",
-      "sha256": "6e9dcfa80c8f5f29417431782ff075a3029209dfa7314fe3984cabecf8308e98"
+      "sha256": "6e9dcfa80c8f5f29417431782ff075a3029209dfa7314fe3984cabecf8308e98",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d780-82089281": {
       "file": "AC Port of Spain logo.png",
@@ -3534,11 +3705,14 @@
     },
     "d784-135442": {
       "file": "Al Urooba Club.png",
-      "sha256": "106ba4d94268cc7cceffd8df4be706fc610eef88b5ffa55c27862880fe4e2796"
+      "sha256": "106ba4d94268cc7cceffd8df4be706fc610eef88b5ffa55c27862880fe4e2796",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d784-7880049": {
       "file": "Al-Dhaid Cultural Sports Club.png",
-      "sha256": "cd1b717c41c97630847b7a5797e2fb298ad26d778e643ab58c812f63c28f2f97"
+      "sha256": "cd1b717c41c97630847b7a5797e2fb298ad26d778e643ab58c812f63c28f2f97",
+      "clear": "93,184 167,143 114,186 141,226 162,221 87,217 99,219"
     },
     "d784-7880051": {
       "file": "Al Rams FC.png",
@@ -3563,7 +3737,8 @@
     "d784-2000017205": {
       "file": "DCFC+Logo.jpg",
       "sha256": "84db62017c85169c05813b1fd8067f56cd16324f5518c5e5e440cf711b6d3cc4",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff"
     },
     "d784-2000073663": {
       "file": "Fursan Hispania FC.png",
@@ -3597,12 +3772,15 @@
     },
     "d788-8629435": {
       "file": "El Gawafel Sportives de Gafsa.png",
-      "sha256": "6f347ff0c00dfbd041ae23b9cb0efc0e2094d0ce0cb0808ee5aefece37e2ecc4"
+      "sha256": "6f347ff0c00dfbd041ae23b9cb0efc0e2094d0ce0cb0808ee5aefece37e2ecc4",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d788-8633857": {
       "file": "CSK - logo.jpg",
       "sha256": "2ec84c52dd49fc16ea036af90ab5f613f7f8b4f9dcfd5c051ecc75ae071cf35f",
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff"
     },
     "d788-8633858": {
       "file": "شعار الجمعية الرياضية بأريانة.png",
@@ -3617,7 +3795,9 @@
     "d788-12019352": {
       "file": "شعار القلعة الرياضية.png",
       "sha256": "5c2255554068531008acd62099b55460704d43667386b4c69894cf9dd4235ebf",
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d788-12019353": {
       "file": "JSO Logo.png",
@@ -3631,7 +3811,9 @@
     "d788-13117335": {
       "file": "سبورتينغ المكنين.png",
       "sha256": "e3ec450cf5c33674e1601aec62e48d3b3f63d271fac82b0349f065267a185d80",
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d788-13170097": {
       "file": "الاتحاد الرياضي بتطاوين.png",
@@ -3652,7 +3834,8 @@
     },
     "d792-130362": {
       "file": "Pendikspor.JPG",
-      "sha256": "027644a23f4e35b7fceafcd397abfaae04060996d9a76f943e92eb6bc5281af6"
+      "sha256": "027644a23f4e35b7fceafcd397abfaae04060996d9a76f943e92eb6bc5281af6",
+      "background": "#ffffff"
     },
     "d792-130364": {
       "file": "Artvin Hopaspor logo.png",
@@ -3680,11 +3863,13 @@
     "d792-452949": {
       "file": "Edirnespor1.png",
       "sha256": "27168a85a5fc36534d3b1461ccc1ca5288d07cddfc7f8d9ad933113b72d2247c",
-      "wiki": "tr"
+      "wiki": "tr",
+      "background": "#ffffff"
     },
     "d792-454194": {
       "file": "Ankarademirspor.jpg",
-      "sha256": "cfeb3c3b31685b57719ede1f82e32e42147783354d09680e25cea4390826853e"
+      "sha256": "cfeb3c3b31685b57719ede1f82e32e42147783354d09680e25cea4390826853e",
+      "background": "#ffffff"
     },
     "d792-456063": {
       "file": "Muğlaspor.png",
@@ -3707,13 +3892,15 @@
       "file": "Ksk logo.png",
       "sha256": "5d2973b8ae759423cfa614aa082ccdd310adccd02bb4c4ad2d9062efec496c5a",
       "thumb": 330,
-      "wiki": "tr"
+      "wiki": "tr",
+      "background": "#ffffff"
     },
     "d792-70002930": {
       "file": "Karacabey Belediyespor.png",
       "sha256": "301f05048da4160d5eb00b48740e4ab9878d7cdac2d08305be4120d3181ca0b6",
       "thumb": 330,
-      "wiki": "tr"
+      "wiki": "tr",
+      "background": "#ffffff"
     },
     "d792-70018774": {
       "file": "Silivrispor.png",
@@ -3734,7 +3921,8 @@
     "d792-70054533": {
       "file": "ÇankayaFK16.png",
       "sha256": "7946217727c7b214e403823d47e024c79073950e29a06585ab6b28fdfd2d2036",
-      "wiki": "tr"
+      "wiki": "tr",
+      "clear": "163,50 110,67 127,59 163,67 180,59 189,67 110,50 189,50 136,67 136,41 162,41 136,50 154,33 127,34 172,61 153,61 171,33 119,61 145,36 145,61 102,59 196,59 186,42 112,42 119,36 178,39 162,29 136,29"
     },
     "d792-70054558": {
       "file": "Erzurumspor F.K. logo.svg",
@@ -3828,7 +4016,8 @@
       "file": "Mardin 1969 SK.png",
       "sha256": "3246f6b52b645b13453d9c602c9704b3e25bf549bb455e71c28fbeaab99ffeee",
       "thumb": 330,
-      "wiki": "tr"
+      "wiki": "tr",
+      "background": "#ffffff"
     },
     "d792-70108717": {
       "file": "Musspor.png",
@@ -3844,7 +4033,9 @@
     },
     "d800-13198838": {
       "file": "UPDF FC logo.png",
-      "sha256": "86cbce414ed3745a09749d011b750ad6a7718a5b40381cbc24b1375383f5ac97"
+      "sha256": "86cbce414ed3745a09749d011b750ad6a7718a5b40381cbc24b1375383f5ac97",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d800-13205634": {
       "file": "Kitara-FC-logo.png",
@@ -3857,7 +4048,9 @@
     },
     "d800-2000239225": {
       "file": "National Enterprises Corporation FC logo.png",
-      "sha256": "055b04b4983224ad7e6c150267d36b72dc743d144512c2f622084a2154e1517d"
+      "sha256": "055b04b4983224ad7e6c150267d36b72dc743d144512c2f622084a2154e1517d",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d804-1902": {
       "file": "FC Zorya Luhansk logo.svg",
@@ -3890,7 +4083,8 @@
     "d804-71046355": {
       "file": "НИВА логотип.jpg",
       "sha256": "9de3c217439f9db7cc40f47fdf1b7bada6f7e7c3999d37e1487471506e69d963",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff"
     },
     "d804-71065401": {
       "file": "FC Trostianets logo.png",
@@ -3906,7 +4100,8 @@
     },
     "d804-2000088118": {
       "file": "Skala-2013.jpg",
-      "sha256": "14fe4729373eb893fa63f6ef825be00d708343e0f8ac42c61fc23c977c9c4a95"
+      "sha256": "14fe4729373eb893fa63f6ef825be00d708343e0f8ac42c61fc23c977c9c4a95",
+      "background": "#ffffff"
     },
     "d807-116192": {
       "file": "FK Makedonija Gorce Petrov.svg",
@@ -3919,11 +4114,14 @@
     },
     "d807-130864": {
       "file": "FB IMG 1784745584523.jpg",
-      "sha256": "216f2685854270bd49a22afc59a4e17d2eadeb79f1c69434461ff6d28638d1e1"
+      "sha256": "216f2685854270bd49a22afc59a4e17d2eadeb79f1c69434461ff6d28638d1e1",
+      "background": "#ffffff"
     },
     "d807-130865": {
       "file": "GFK Tikvesh.png",
-      "sha256": "d4f098779a570e9774d1a5a5e8ce42537504dd040d6f9be00eda7ede10c18949"
+      "sha256": "d4f098779a570e9774d1a5a5e8ce42537504dd040d6f9be00eda7ede10c18949",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d807-8401295": {
       "file": "BregalnicaStip.png",
@@ -3983,7 +4181,9 @@
       "file": "نادي بلدية المحلة.jpg",
       "sha256": "96da58af99b57deb3f8fe1ef31e7843bbd2d2dc658fdd364265236f394b51c15",
       "thumb": 330,
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff",
+      "clear": "84,310 211,311 159,287"
     },
     "d818-8631278": {
       "file": "Tala'ea El Gaish Logo 2017.png",
@@ -4012,15 +4212,21 @@
     },
     "d834-13214851": {
       "file": "Pamba S.C.jpg",
-      "sha256": "28b50cbfc3db06a6fbd63f510372ad769c708e24e047ea63c7e9010c3483a048"
+      "sha256": "28b50cbfc3db06a6fbd63f510372ad769c708e24e047ea63c7e9010c3483a048",
+      "background": "#ffffff",
+      "inset": "4 0 0 0"
     },
     "d834-13228845": {
       "file": "Namungo fc (logo).png",
-      "sha256": "1e01ccb6032560117ba7bf39ecbc72e546945876552b91dad8241801bd025074"
+      "sha256": "1e01ccb6032560117ba7bf39ecbc72e546945876552b91dad8241801bd025074",
+      "background": "#0a0a0a",
+      "tolerance": 70
     },
     "d834-23080082": {
       "file": "Mtibwa Sugar FC.jpg",
-      "sha256": "54bd86a5cb50ef6b3b42b168432713c1dc34b8addfc476d0b1d23107a7f72df4"
+      "sha256": "54bd86a5cb50ef6b3b42b168432713c1dc34b8addfc476d0b1d23107a7f72df4",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d834-2000018410": {
       "file": "Dodoma Jiji FC logo.png",
@@ -4028,11 +4234,14 @@
     },
     "d834-2000022654": {
       "file": "Singida Black Stars logo.png",
-      "sha256": "a4ccec9eb236dd107479b22cb9683385a68b7d60cafb5e2cdd6174aebe5509ac"
+      "sha256": "a4ccec9eb236dd107479b22cb9683385a68b7d60cafb5e2cdd6174aebe5509ac",
+      "background": "#ffffff"
     },
     "d834-2000113957": {
       "file": "TRA United logo.png",
-      "sha256": "66d2254d62557e2579556c08d5be365c8e8915f0b14ebecc8c8a15009677bb38"
+      "sha256": "66d2254d62557e2579556c08d5be365c8e8915f0b14ebecc8c8a15009677bb38",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d840-20047503": {
       "file": "Loudoun United FC logo.svg",
@@ -4046,7 +4255,8 @@
     },
     "d840-2000244168": {
       "file": "Club de Lyon FC logo.png",
-      "sha256": "a5cc373d86328a8fb33412da61d46a6c9803750f361a3abee505dc53e1d8bae5"
+      "sha256": "a5cc373d86328a8fb33412da61d46a6c9803750f361a3abee505dc53e1d8bae5",
+      "background": "#ffffff"
     },
     "d840-2000343918": {
       "file": "Arizona monsoon fc logo.png",
@@ -4054,7 +4264,8 @@
     },
     "d840-2000343921": {
       "file": "Irvine zeta fc logo.png",
-      "sha256": "242a2204ffe9cf428006a69a5e5517657e42df37ee0dfedecdd943188fb63d1d"
+      "sha256": "242a2204ffe9cf428006a69a5e5517657e42df37ee0dfedecdd943188fb63d1d",
+      "background": "#ffffff"
     },
     "d854-5340765": {
       "file": "Racing Club de Bobo.png",
@@ -4062,11 +4273,15 @@
     },
     "d854-5340766": {
       "file": "Association Sportive des Fonctionnaires de Bobo.png",
-      "sha256": "850b78630bfdd6ad95a7caa49bac9fb8c44ffc25ee56a4a9c642a2d37eafc660"
+      "sha256": "850b78630bfdd6ad95a7caa49bac9fb8c44ffc25ee56a4a9c642a2d37eafc660",
+      "background": "#ffffff",
+      "clear": "80,66"
     },
     "d854-5340768": {
       "file": "ASEC Koudougou.jpg",
-      "sha256": "a07968a98126899b35561ef188dd58b21adb2f9a19b63a9b15d08f419c29301b"
+      "sha256": "a07968a98126899b35561ef188dd58b21adb2f9a19b63a9b15d08f419c29301b",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d854-5370405": {
       "file": "Rail Club du Kadiogo.png",
@@ -4088,7 +4303,8 @@
     },
     "d858-78037929": {
       "file": "CA Terremoto.png",
-      "sha256": "b6366949de3ac5f20398fca0041ae3f0d2236341b96d4adcc859d5c3e1d9f6ea"
+      "sha256": "b6366949de3ac5f20398fca0041ae3f0d2236341b96d4adcc859d5c3e1d9f6ea",
+      "background": "#ffffff"
     },
     "d858-78082439": {
       "file": "Universitariosalto.png",
@@ -4096,7 +4312,8 @@
     },
     "d860-484434": {
       "file": "Sogdiana Jizak.jpg",
-      "sha256": "6520f5084ebb570746400573c269a8ea1b82f234b98ab1f1afb25a089e6fc97f"
+      "sha256": "6520f5084ebb570746400573c269a8ea1b82f234b98ab1f1afb25a089e6fc97f",
+      "background": "#ffffff"
     },
     "d860-485457": {
       "file": "Qizilqum FC logo.png",
@@ -4126,7 +4343,8 @@
     "d860-2000022734": {
       "file": "Turon logo1.jpg",
       "sha256": "ad5c777d870a95ee659172892ec8e237d0af7ade71fd5c33c34412a6e1b7a8e9",
-      "wiki": "uz"
+      "wiki": "uz",
+      "background": "#ffffff"
     },
     "d860-2000091387": {
       "file": "FK Olympic Tashkent logo.png",
@@ -4144,7 +4362,8 @@
     },
     "d860-2000355205": {
       "file": "FC Zaamin.jpeg",
-      "sha256": "7c28ae1f12929cd97c4ebbd388608a5a69fd6d75c2c80aabf92c1fe9ff1b6cfa"
+      "sha256": "7c28ae1f12929cd97c4ebbd388608a5a69fd6d75c2c80aabf92c1fe9ff1b6cfa",
+      "background": "#ffffff"
     },
     "d862-23014584": {
       "file": "Aragua fc logo png.png",
@@ -4158,7 +4377,9 @@
     },
     "d862-2000255139": {
       "file": "Deportivo Miranda FC.png",
-      "sha256": "991dd9c6e9a326e5ea6887abab8e3c4d7bc65d511c9c166239eee72e1ae08529"
+      "sha256": "991dd9c6e9a326e5ea6887abab8e3c4d7bc65d511c9c166239eee72e1ae08529",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d894-5341703": {
       "file": "Leopards F.C. logo.png",
@@ -4166,7 +4387,8 @@
     },
     "d894-5341707": {
       "file": "Green Buffaloes FC.jpg",
-      "sha256": "3d24abe0086cfd8518aaeabddd62427c36bf799ebae85e905c8f3302ef26b67d"
+      "sha256": "3d24abe0086cfd8518aaeabddd62427c36bf799ebae85e905c8f3302ef26b67d",
+      "background": "#ffffff"
     },
     "d894-13106467": {
       "file": "Mufulira Wanderers (logo).png",
@@ -4179,11 +4401,13 @@
     },
     "d894-13215510": {
       "file": "Trident F.C. logo.png",
-      "sha256": "2ffcea87d077941173e8417cfe8229fd6aadf234919b3b4f025c1c1cf9a587f9"
+      "sha256": "2ffcea87d077941173e8417cfe8229fd6aadf234919b3b4f025c1c1cf9a587f9",
+      "background": "#ffffff"
     },
     "d894-2000208090": {
       "file": "Mutondo Stars logo.jpg",
-      "sha256": "98a4b8780e651ef4dfc71207d6bb2befee216318604aabd9262c14124a2235e4"
+      "sha256": "98a4b8780e651ef4dfc71207d6bb2befee216318604aabd9262c14124a2235e4",
+      "background": "#ffffff"
     },
     "dKOS-8351581": {
       "file": "FC Llapi.svg",
@@ -4368,7 +4592,8 @@
     "d031-1300097": {
       "file": "Shamkir FC logo.png",
       "sha256": "61d64c33456a4f8269197b8f138320412c572af85f640032c0f8ae62869a9284",
-      "thumb": 250
+      "thumb": 250,
+      "clear": "103,72 64,75 84,95 99,47"
     },
     "d040-16032291": {
       "file": "SV Gloggnitz.png",
@@ -4380,19 +4605,22 @@
       "file": "Logo FC Marchfeld.jpg",
       "sha256": "df6c816c1dda9ce5bb623a95e290f4c846e219bb91dd0c6d51902485abc3230e",
       "thumb": 330,
-      "wiki": "de"
+      "wiki": "de",
+      "background": "#ffffff"
     },
     "d040-5603912": {
       "file": "Logo SC Karlsdorf.jpg",
       "sha256": "28516a09857d26ed56f35cffd89df71ddaa41e80710f2578134f88f5e49cabac",
       "thumb": 330,
-      "wiki": "de"
+      "wiki": "de",
+      "background": "#ffffff"
     },
     "d051-483918": {
       "file": "FK Araks Ararat.png",
       "sha256": "461a2f3f9841dd8d577a2f01965cb10595178618b4554e94057ad547d507e518",
       "thumb": 330,
-      "wiki": "fa"
+      "wiki": "fa",
+      "background": "#ffffff"
     },
     "d100-22017621": {
       "file": "Litex Lowetsch.png",
@@ -4415,13 +4643,15 @@
       "file": "Эмблема ФК Динамо Дуала.png",
       "sha256": "c2c2a33558fb5a64f25e00d4fc9756a33fe2912fe6fa998fbbb71c56a92f2082",
       "thumb": 330,
-      "wiki": "ru"
+      "wiki": "ru",
+      "background": "#ffffff"
     },
     "d180-13173118": {
       "file": "Renaissance FC.png",
       "sha256": "e454e83d1045c67d86860cc0a71f4198b3a038cfc646b1394b39c452a40c570c",
       "thumb": 330,
-      "wiki": "pt"
+      "wiki": "pt",
+      "background": "#ffffff"
     },
     "d191-441": {
       "file": "Logo HNK Rijeka.svg",
@@ -4445,7 +4675,8 @@
       "file": "Себета Сити.jpg",
       "sha256": "31188348c0e7867e7e9f577edd514d5cc85297cb7aa937ae66f769379732a701",
       "thumb": 330,
-      "wiki": "ru"
+      "wiki": "ru",
+      "background": "#ffffff"
     },
     "d270-12021627": {
       "file": "Logo Samger FC.gif",
@@ -4457,13 +4688,15 @@
       "file": "Logo Brikama United.jpg",
       "sha256": "b74cca944fe17b3606e649d0422f8d93757323f742fc5f0dc5b1a7c42babc05f",
       "thumb": 120,
-      "wiki": "de"
+      "wiki": "de",
+      "background": "#ffffff"
     },
     "d320-5395169": {
       "file": "Sacachispas de chiquimula.png",
       "sha256": "d17fc27041bdee15619cb109012438c1ea89730f358cfd16a3ea317eaf5aeaf1",
       "thumb": 120,
-      "wiki": "pl"
+      "wiki": "pl",
+      "background": "#ffffff"
     },
     "d340-87010722": {
       "file": "Хутикальпа (лого).png",
@@ -4484,17 +4717,20 @@
     "d404-12084360": {
       "file": "Administration Police FC.jpg",
       "sha256": "4be142db06048f51d2fbe1209d204a9a0bbe0ecf60d3481185bef363961bd2e0",
-      "thumb": 250
+      "thumb": 250,
+      "background": "#ffffff"
     },
     "d410-66010577": {
       "file": "Yangju Citizen.jpg",
       "sha256": "f65d7954d0f4f71449ed66ee54eafe5e7cad8ae42efee710a27b4a5227a4a426",
-      "thumb": 250
+      "thumb": 250,
+      "background": "#ffffff"
     },
     "d418-23447422": {
       "file": "BIS Football Club.jpg",
       "sha256": "863d6911cf79103a6106d489dee48cccca07caa4c55ae285cc9ab80af6e8811a",
-      "thumb": 330
+      "thumb": 330,
+      "background": "#ffffff"
     },
     "d418-5624443": {
       "file": "Vientiane F.C. logo.png",
@@ -4547,7 +4783,8 @@
     "d710-2000127078": {
       "file": "Upington City FC.jpg",
       "sha256": "aee16b9f9bb8b0af8a64bd506cbe04e10ad066f81fc4fc83b40390174825772a",
-      "thumb": 250
+      "thumb": 250,
+      "background": "#ffffff"
     },
     "d760-135470": {
       "file": "Homs Al Fidaa SC logo.png",
@@ -4569,7 +4806,9 @@
       "file": "Isparta32spor.png",
       "sha256": "14b2fa98990153f89895f0b6c5cd645d2950db1a7b8ff8a9cf8ab99f574a49ff",
       "thumb": 250,
-      "wiki": "tr"
+      "wiki": "tr",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d792-70078180": {
       "file": "Karaman FK Logo.png",
@@ -4581,7 +4820,8 @@
       "file": "Derincespor A.Ş.png",
       "sha256": "5150ea9b96e91e438deb976dc41f7472c5786944f60a607ed2d8c8cfafb0b5e7",
       "thumb": 330,
-      "wiki": "tr"
+      "wiki": "tr",
+      "background": "#ffffff"
     },
     "d804-2000032124": {
       "file": "FC Livyi Bereh Kyiv logo.png",
@@ -4598,7 +4838,10 @@
       "file": "КМК фк лого.jpg",
       "sha256": "c65b94cd57664b3d78e45a8ecf3cc3ed74cd7d118529ad525965a11e1a1e68cb",
       "thumb": 330,
-      "wiki": "uk"
+      "wiki": "uk",
+      "background": "#ffffff",
+      "tolerance": 60,
+      "inset": "0 0 3 0"
     },
     "d840-20030692": {
       "file": "Miami United FC.png",
@@ -4619,12 +4862,14 @@
     "d894-13227215": {
       "file": "Maestro United F.C. Logo.jpg",
       "sha256": "252c42f9f369282c8f3c6b383f7d456ee0af6e154abc35b1d06bc2b62a3ae28a",
-      "thumb": 250
+      "thumb": 250,
+      "background": "#ffffff"
     },
     "w-glasgow-city-fc": {
       "file": "Glasgow City FC (2011).jpg",
       "sha256": "aa588e53b58a3ae734de691205cd081b8cb70117b5fb44a8806f895e725c2bcb",
-      "background": "#ffffff"
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "w-badalona-women": {
       "file": "FC Levante Badalona.png",
@@ -4649,7 +4894,8 @@
       "file": "Logo-RRC-Stockay-Warfusée.jpeg",
       "sha256": "358cacc3e336cd0d9087d267c3aa6f40614527e29de9e539657f79d017ee778b",
       "thumb": 120,
-      "wiki": "fr"
+      "wiki": "fr",
+      "background": "#ffffff"
     },
     "d056-206": {
       "file": "Logo Union Namur.png",
@@ -4678,18 +4924,23 @@
       "file": "Gazelle FA Garoua Logo.png",
       "sha256": "968344728fdd12076910c9cb679779632a0ba3bd59f18d37fc6063e9c6185908",
       "thumb": 330,
-      "wiki": "fr"
+      "wiki": "fr",
+      "background": "#ffffff"
     },
     "d170-130801": {
       "file": "Реал Картахена (логотип).png",
       "sha256": "298c361a9230b8367be6c0ea35de214b6b4aedb745bdca7198b82b9232f05281",
       "thumb": 120,
-      "wiki": "ru"
+      "wiki": "ru",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d170-2000521377": {
       "file": "Escudo yumbo f.c.jpg",
       "sha256": "2284086eb9edf05bc6050502156057b29ce913672c223d972f675a3f4126c4a5",
-      "thumb": 250
+      "thumb": 250,
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d188-80029240": {
       "file": "Sporting Football Club 2019.png",
@@ -4725,7 +4976,9 @@
       "file": "Nations FC logo.png",
       "sha256": "04dbd7ff0c63f8cdd4e5a298dd160f95ae9d6fb0fd16f4b08acf16621d6e87e3",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d288-13205978": {
       "file": "Young Apostles FC logo.png",
@@ -4783,13 +5036,16 @@
       "file": "Hamedan paas-b-new.gif",
       "sha256": "f8875ef840cc23825ed16d0c63df70ab2e447f4f3959ddd19aebfae539780bc8",
       "thumb": 250,
-      "wiki": "ru"
+      "wiki": "ru",
+      "background": "#ffffff"
     },
     "d384-12078139": {
       "file": "SOL FC Abobo Logo.jpg",
       "sha256": "2eb66ac731353b8aa34a0694ec9be4896aa50e49ff19d1854fde20c363446cec",
       "thumb": 120,
-      "wiki": "fr"
+      "wiki": "fr",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d388-105993": {
       "file": "Montego Bay United FC logo.png",
@@ -4843,7 +5099,8 @@
       "file": "APS Bomet FC emblema.png",
       "sha256": "ab0aa3032e08c18504310a421994ae8948e7def5f4d970f24ed69faedf03d599",
       "thumb": 330,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff"
     },
     "d404-2000354849": {
       "file": "Nairobi United FC emblema.png",
@@ -4867,42 +5124,53 @@
       "file": "Mārupes SC emblema.png",
       "sha256": "85595a9eb449adfede9fdac8587b9f5124c1adaa1dadb1378c2bd11591651d82",
       "thumb": 250,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "clear": "142,186 127,190 128,184 163,217 95,218 105,221 128,222 70,35"
     },
     "d428-2000182614": {
       "file": "Jfk Ventspils.png",
       "sha256": "e2b7804e3aa3fab40d45c3d72b7e461e49f3245286e7bb798c5e0ec6484905a7",
-      "thumb": 120
+      "thumb": 120,
+      "background": "#ffffff"
     },
     "d440-1300738": {
       "file": "Tauras 42.png",
       "sha256": "9074727335f0c27d40f1469da8a0d79def1d87dcac588dd5b9b1bbe3c206d2b4",
       "thumb": 120,
-      "wiki": "el"
+      "wiki": "el",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d440-47074892": {
       "file": "FK Jonava logo.png",
       "sha256": "72659a783fcd8e79eb728283512197ab3d08aeaa5fc5f4621bfa7aa328b369f0",
       "thumb": 120,
-      "wiki": "lv"
+      "wiki": "lv",
+      "background": "#ffffff"
     },
     "d440-485281": {
       "file": "FK Nevezis.png",
       "sha256": "621dc66b0ae462c7caf71760d13831c3db37c20245c59b8c27f74b92dd4e0048",
       "thumb": 330,
-      "wiki": "fa"
+      "wiki": "fa",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d504-5380022": {
       "file": "JSM.Logo.jpg",
       "sha256": "815a994cabaade9cd61cf61732aec034a7e8c98b25769ed36dd032cfd68f9d86",
       "thumb": 120,
-      "wiki": "ary"
+      "wiki": "ary",
+      "background": "#ffffff"
     },
     "d508-5340962": {
       "file": "Clube Ferroviário de Nampula.jpg",
       "sha256": "e64c58390a83083d4c8715f8f0c85af4eed18b7e0fb0a295f4f8445c0054c91c",
       "thumb": 120,
-      "wiki": "uk"
+      "wiki": "uk",
+      "background": "#0b4a1b",
+      "tolerance": 70
     },
     "d512-23090723": {
       "file": "Al-Samail Club emblema.png",
@@ -4950,7 +5218,9 @@
       "file": "Club Deportivo Universitario logo.png",
       "sha256": "ab548dc608b7982d96b274788fbcb1a9e4b81b267a53d2e1f7484c83e0462627",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d600-79012071": {
       "file": "Club Deportivo Capiatá emblema.png",
@@ -4980,7 +5250,9 @@
       "file": "AJEL Rufisque logo.png",
       "sha256": "4dcb3fc7b24571dd396375823aa70f4ec0d526192809ca0d268c2e01d379d710",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d686-13107466": {
       "file": "Guédiawaye FC logo.png",
@@ -5016,7 +5288,8 @@
       "file": "Radnicki-obrenovac-logo.jpg",
       "sha256": "17cad32050bb8aa6f89b5e695ce3f2f357a8776f482f030b563f13520829856a",
       "thumb": 120,
-      "wiki": "pt"
+      "wiki": "pt",
+      "background": "#ffffff"
     },
     "d688-5754183": {
       "file": "FK Železničar Inđija.png",
@@ -5070,7 +5343,9 @@
       "file": "Calvary FC emblema.png",
       "sha256": "e75d5582e26138b26bbebd786a71f152a097179c14eb2f008dc049d6ac6ac328",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d800-2000234127": {
       "file": "Lugazi emblema.png",
@@ -5091,7 +5366,8 @@
     "d818-13153608": {
       "file": "Kahrabaa Ismailia Co.jpg",
       "sha256": "14145b831c361d864e33d08eabb80d68e518ec9f8f3dfec1f159da27393dc788",
-      "thumb": 250
+      "thumb": 250,
+      "background": "#ffffff"
     },
     "d818-5370009": {
       "file": "Tersana sc.png",
@@ -5103,7 +5379,9 @@
       "file": "Мафунзо фк лого.png",
       "sha256": "cb1e23d788759ffc0e7ce3f0b1c547e7fbb6b4eca1938a181ecb4eccbe4eb5f6",
       "thumb": 120,
-      "wiki": "uk"
+      "wiki": "uk",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d834-13146768": {
       "file": "Mbeya City FC logo.png",
@@ -5133,7 +5411,9 @@
       "file": "Vitesse FC (Bobo-Dioulasso) logo.png",
       "sha256": "06d37adcb98d302f9a1411517434e9ede3011d11d729b92275be1857eeb25a2c",
       "thumb": 330,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d894-13106471": {
       "file": "Chambishi FC logo.png",
@@ -5151,7 +5431,8 @@
       "file": "Indeni FC emblema.png",
       "sha256": "8620c8ee1b2e103e61791556b2c37287250d5b8193c033e0de72363eb2795e97",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff"
     },
     "d031-2000284826": {
       "file": "Difai FK loqo.png",
@@ -5175,7 +5456,9 @@
       "wayback": "https://web.archive.org/web/20230524202111im_/https://upload.wikimedia.org/wikipedia/sr/7/7d/FK_Romanija.png",
       "page": "https://sr.wikipedia.org/wiki/File:FK_Romanija.png",
       "licence": "not recorded: its file page names no licence (a local upload without a licence template); the club's article showed it as its crest (archived capture 20230524)",
-      "nonFree": true
+      "nonFree": true,
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d100-22067410": {
       "file": "FC Sevlievo.jpg",
@@ -5183,12 +5466,15 @@
       "wayback": "https://web.archive.org/web/20251228192206im_/https://upload.wikimedia.org/wikipedia/en/1/1b/FC_Sevlievo.jpg",
       "page": "https://en.wikipedia.org/wiki/File:FC_Sevlievo.jpg",
       "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20251228)",
-      "nonFree": true
+      "nonFree": true,
+      "background": "#ffffff"
     },
     "d104-23348857": {
       "file": "Sagaing United FC logo.jpg",
       "sha256": "cb9e1a9b5d79b4b5044ea69404d4114a75b8e1e0a49ffa22d0c13b43aace8d80",
-      "thumb": 250
+      "thumb": 250,
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d104-23486489": {
       "file": "ChinLand-FC.png",
@@ -5237,7 +5523,8 @@
       "wayback": "https://web.archive.org/web/20250427000923im_/https://upload.wikimedia.org/wikipedia/commons/2/2b/DEPORTIVO_SAN_BENITO_FC_PETEN_GUATEMALA.png",
       "page": "https://commons.wikimedia.org/wiki/File:DEPORTIVO_SAN_BENITO_FC_PETEN_GUATEMALA.png",
       "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20250427)",
-      "nonFree": true
+      "nonFree": true,
+      "background": "#ffffff"
     },
     "d320-87000492": {
       "file": "Deportivo Mictlan.png",
@@ -5245,7 +5532,8 @@
       "wayback": "https://web.archive.org/web/20251123172631im_/https://upload.wikimedia.org/wikipedia/en/f/f8/Deportivo_Mictlan.png",
       "page": "https://en.wikipedia.org/wiki/File:Deportivo_Mictlan.png",
       "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20251123)",
-      "nonFree": true
+      "nonFree": true,
+      "background": "#ffffff"
     },
     "d356-40008502": {
       "file": "Rainbow AC.svg",
@@ -5259,25 +5547,31 @@
       "file": "Bouaké Football Club.png",
       "sha256": "9abc676666a94a74ee4be924a32ea0e002d34e9e9368048134ac8e6d7e283571",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff"
     },
     "d384-12078182": {
       "file": "Mouna FC.png",
       "sha256": "4a20d9cfa341bcb2a84b2a720b77f4f6467cee0e5cb5c1a826cc99af3a1d1a2d",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d384-12078795": {
       "file": "Racing Club Abidjan.png",
       "sha256": "16a77bdb9f1d6398e1e3155ea8ec11df81fe374a3c17e6257402f200ed1ab930",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d384-12083321": {
       "file": "Zoman FC.png",
       "sha256": "7111d759f944736688a335e6686805f62b1d2a91231f7bbe53f152b588a26e13",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff"
     },
     "d410-136422": {
       "file": "Gangneung City FC.png",
@@ -5285,25 +5579,33 @@
       "wayback": "https://web.archive.org/web/20161202152558im_/https://upload.wikimedia.org/wikipedia/en/thumb/2/29/Gangneung_City_FC.png/220px-Gangneung_City_FC.png",
       "page": "https://en.wikipedia.org/wiki/File:Gangneung_City_FC.png",
       "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20161202)",
-      "nonFree": true
+      "nonFree": true,
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d508-13101240": {
       "file": "Clube Ferroviário de Nacala.png",
       "sha256": "89d663eb1cd75acd181c8fe7fbdcbd50bc88ed474fce8c46e7a12dbdcbe0f57f",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d508-95054481": {
       "file": "Baía de Pemba Futebol Clube.png",
       "sha256": "c681b8280be26b08dd1e8a3e0b1d56dd4c82769279d0f57d8c089b2c11a39613",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "tolerance": 20
     },
     "d508-95055274": {
       "file": "Ferroviário da Lichinga.png",
       "sha256": "0a80d7422f4a0268e40599b78004f1319fe34d86c2041006baabc49a5a094025",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "tolerance": 70
     },
     "d566-23017449": {
       "file": "Mightyjetslogo.svg",
@@ -5311,7 +5613,8 @@
       "wayback": "https://web.archive.org/web/20211027040238im_/https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Mightyjetslogo.svg/200px-Mightyjetslogo.svg.png",
       "page": "https://commons.wikimedia.org/wiki/File:Mightyjetslogo.svg",
       "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20211027)",
-      "nonFree": true
+      "nonFree": true,
+      "background": "#ed1c24"
     },
     "d600-5280221": {
       "file": "Sport colombia.png",
@@ -5325,37 +5628,47 @@
       "file": "Police FC RWA.gif",
       "sha256": "f8186daf5d60f02e493729241b2f4b48fc7ce8a93afb874a62e405e9882086f9",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff"
     },
     "d646-13160675": {
       "file": "Gicumbi FC.gif",
       "sha256": "08123788c535a05cade434d16a53745c7320ecdef38324693d9e679ef538ae74",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff"
     },
     "d646-13160697": {
       "file": "Marines FC.gif",
       "sha256": "6632aba056d9f17b413a1321ca880eed19a7b5a8c7ce611fea0e29caf9fa204d",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff"
     },
     "d646-13160776": {
       "file": "Musanze FC.gif",
       "sha256": "733c4463aff47b68103c06a6022eb02a3e731a65d6f17014252ab320dd7c3dda",
       "thumb": 250,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "tolerance": 70,
+      "clear": "enclosed",
+      "keep": "103,57"
     },
     "d646-13162689": {
       "file": "Bugesera FC.gif",
       "sha256": "a61f9479a6145a496cb22b11024a5c668cc02da284dbc3486534048c5fa14d89",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff"
     },
     "d646-13176662": {
       "file": "AS Muhanga.gif",
       "sha256": "f2a0ec7154b1d5c57d3791c36a5fa4c182a1dc3e9965d9b9dfd812fc341c2728",
       "thumb": 330,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "clear": "enclosed"
     },
     "d646-2000092403": {
       "file": "Rutsiro FC.png",
@@ -5367,7 +5680,8 @@
       "file": "Alwashm club.jpeg",
       "sha256": "39b3969ef57bba1d621ccac2960e56886d4236109accbe082e05922c71a2a6cf",
       "thumb": 120,
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff"
     },
     "d682-23228258": {
       "file": "FC Zulfy.png",
@@ -5375,19 +5689,23 @@
       "wayback": "https://web.archive.org/web/20130913163045im_/https://upload.wikimedia.org/wikipedia/ar/thumb/3/38/FC_Zulfy.png/314px-FC_Zulfy.png",
       "page": "https://ar.wikipedia.org/wiki/File:FC_Zulfy.png",
       "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20130913)",
-      "nonFree": true
+      "nonFree": true,
+      "background": "#ffffff"
     },
     "d686-12076710": {
       "file": "Jamono Fatick.png",
       "sha256": "a9835cf20698eeaee0a633f7ba64cc0757696086f29185f7dbac7cbba01af74e",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff"
     },
     "d686-48037361": {
       "file": "CNEPS Excellence.png",
       "sha256": "fa59222de98fcc5226fb408dd7b48c2f3076581e2e78ee533b1533fe3da15685",
       "thumb": 330,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d686-8627520": {
       "file": "ASC La Linguère.png",
@@ -5423,13 +5741,17 @@
       "file": "Espoir FC de Tsévié.png",
       "sha256": "bcd97e37dfa8af7859bb134f063e4bc6077e8f3ee85172b636318caf46f2df02",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d792-70081025": {
       "file": "Alanya Kestelspor.png",
       "sha256": "fcebfea784e96b1bc9e19b98eb9d92d600f2e5b2251003a0863d0a04cbc0f347",
       "thumb": 250,
-      "wiki": "tr"
+      "wiki": "tr",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d792-70135917": {
       "file": "Adana 01 FK (2).png",
@@ -5443,7 +5765,8 @@
       "wayback": "https://web.archive.org/web/20151217165425im_/https://upload.wikimedia.org/wikipedia/en/0/0f/Forest_Zambia.png",
       "page": "https://en.wikipedia.org/wiki/File:Forest_Zambia.png",
       "licence": "Fair use (as its file page stated, archived 2017; the file is deleted since)",
-      "nonFree": true
+      "nonFree": true,
+      "background": "#ffffff"
     },
     "d096-23190064": {
       "file": "Bahtera Kemudi Sekawan Football Club logo.png",
@@ -5462,7 +5785,8 @@
       "file": "Logo Adhyaksa FC Bekasi.jpg",
       "sha256": "b1a339b7e69a2861cc76153039a360d0804ecc2734529cd2131efa0183d9d997",
       "thumb": 120,
-      "wiki": "id"
+      "wiki": "id",
+      "background": "#000000"
     },
     "d360-5622866": {
       "file": "Persipal logo 2017.png",
@@ -5474,7 +5798,8 @@
       "file": "USMO.png",
       "sha256": "7ed31d671f3cafce98ef6441bc139357d0f3985ef961f3f621e770cbf2802636",
       "thumb": 120,
-      "wiki": "ar"
+      "wiki": "ar",
+      "background": "#ffffff"
     },
     "d591-308263": {
       "file": "DAU-300x300.png",
@@ -5494,19 +5819,24 @@
       "file": "Dongthapfclogo.jpg",
       "sha256": "020f15551ff67b501874bee1d02e0fda046ac4fe5ac61949173052bfc4d2cdeb",
       "thumb": 120,
-      "wiki": "de"
+      "wiki": "de",
+      "background": "#ffffff",
+      "clear": "54,79 71,48 27,72 90,67 50,33"
     },
     "d792-457415": {
       "file": "Kepez Belediyespor logosu.jpg",
       "sha256": "0599b134bf0c402662dc1bb12821ff20f8d93a05b2027e45e7dfce92a306d682",
       "thumb": 330,
-      "wiki": "tr"
+      "wiki": "tr",
+      "background": "#ffffff"
     },
     "d834-13228843": {
       "file": "Polisi Tanzania FC logo.png",
       "sha256": "e4fb27cfc63fd6ce5dba2d41fe14be864dd16d358b407a67df3369674dd50764",
       "thumb": 330,
-      "wiki": "lt"
+      "wiki": "lt",
+      "background": "#ffffff",
+      "tolerance": 110
     },
     "d214-82083094": {
       "file": "Salcedo FC 2025.jpg",
@@ -5514,13 +5844,1315 @@
       "wayback": "https://web.archive.org/web/20251016165729im_/https://upload.wikimedia.org/wikipedia/commons/a/a7/Salcedo_FC_2025.jpg",
       "page": "https://commons.wikimedia.org/wiki/File:Salcedo_FC_2025.jpg",
       "licence": "not recorded: no copy of its file page was found; the club's article showed it as its crest (archived capture 20251016)",
-      "nonFree": true
+      "nonFree": true,
+      "background": "#ffffff"
     },
     "d404-12091761": {
       "file": "Muranga Sports Excellence Academy.png",
       "sha256": "90584edb58b08ef1b3d6ff5a61c565abd16ed1733a7749938c3afe5d410dc3a9",
       "thumb": 120,
       "wiki": "lt"
+    }
+  },
+  "cuts": {
+    "d012-5340071": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/CS_Constantine.png/250px-CS_Constantine.png",
+      "sha256": "1d64063deaa8f3088ef6c68deb297faa25ad3ad136d4bc139360500786162bd7",
+      "clear": "132,230"
+    },
+    "d012-5340073": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Mouloudia_logo_2024.png/250px-Mouloudia_logo_2024.png",
+      "sha256": "6f27ee561786ecbcfa3a85f08e93ce7fd7f0085cd162803b1c9726fa7d1e0099",
+      "background": "#ffffff"
+    },
+    "d024-5390054": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/3/3e/Acad%C3%A9mica_Petr%C3%B3leos_do_Lobito_Logo.png",
+      "sha256": "4906d7e0615651e1ecf8ed95a90b5ca4688ad1d33443eb1a02c3f6c297aa651d",
+      "background": "#ffffff"
+    },
+    "d024-12004622": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/1/1a/FC_Bravos_do_Maquis_Logo.png/250px-FC_Bravos_do_Maquis_Logo.png",
+      "sha256": "3061cf88e31dbf773a61b4cf2f9f172a812044af7d635497d96b1943e87a66ed",
+      "background": "#ffffff"
+    },
+    "d024-12012510": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/2/23/Kabuscorp_S.C.P._logo.png",
+      "sha256": "3bd4d11c268e35ab0570da5a61b135b66287e54bd4653d3813e08df760013345",
+      "background": "#ffffff"
+    },
+    "d031-130845": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/5/51/ShahdaghQusarLogo.jpg/250px-ShahdaghQusarLogo.jpg",
+      "sha256": "974f2787f7e7cf296473132c5a1857a0cdd0f4ac3831e0d4071d7e9b88a03c73",
+      "background": "#ffffff"
+    },
+    "d031-59008336": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Qaradag-lokbatan-2026-logo.png/250px-Qaradag-lokbatan-2026-logo.png",
+      "sha256": "ff5627ffcb91c7e3996738b3e8634973117c139c628e64450547901ccd0e09c4",
+      "background": "#ffffff"
+    },
+    "d032-83": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/2017_cdeoficial_shield.png/250px-2017_cdeoficial_shield.png",
+      "sha256": "51f17b48fed46d6eb1343b93a3aa6e477ccc693e9f1fe02d77667df496e351aa",
+      "background": "#ffffff"
+    },
+    "d032-102482": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/6/68/Dep_moron_logo16.png/250px-Dep_moron_logo16.png",
+      "sha256": "d1509522b85a4ecedd421baa1e057197576f977bd47714e2d40fcc1a273377a5",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d032-952710": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Midland_escudo.png/250px-Midland_escudo.png",
+      "sha256": "96106115a52f7514b393ef044e8df479a3817f7e75f6fdba189f3d7fec27bb47",
+      "background": "#ffffff"
+    },
+    "d032-14064697": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Agropec_escudo.png/250px-Agropec_escudo.png",
+      "sha256": "71f320b3f044a0398fe91361c93b82e7258c916039ff01b22c8be2c6bbb20019",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d036-122985": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/3/34/Adelaide_City_Logo.png/250px-Adelaide_City_Logo.png",
+      "sha256": "f3b6376894867c449e5fc46395b032663ec20dd1ca479d5040ee29fbd7ca61ce",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d036-130211": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/5/59/Green_Gully_SC.png/250px-Green_Gully_SC.png",
+      "sha256": "fe5ff341892feea5d043c730744a179b6e54268f4f8f3a0a9fa101e4244c2e6a",
+      "background": "#ffffff",
+      "tolerance": 70
+    },
+    "d036-15006537": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/0/01/Olympic_FC_logo.jpg/250px-Olympic_FC_logo.jpg",
+      "sha256": "a5d803fb99e943604c262434ce373393b90661609583a4e8c4eaec3210705103",
+      "background": "#ffffff",
+      "clear": "enclosed"
+    },
+    "d036-15083326": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/2/27/Gold_Coast_United_Logo_2018.png/250px-Gold_Coast_United_Logo_2018.png",
+      "sha256": "e25bcd1490f530c41048a16fa64f841a7dd95ecb220034042d522b86af6eeb6b",
+      "background": "#ffffff"
+    },
+    "d036-2000091668": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/f/ff/Rockdale_Ilinden_FC.png",
+      "sha256": "180d2af70d16e90470e5b51467ca26edd15982efcc734b3ac27aa0f3a8175f56",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d040-130837": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Logo_DSV_Leoben.jpg/250px-Logo_DSV_Leoben.jpg",
+      "sha256": "e4b13299c85fc26820990c89ca3717801ac8895282a8ef2e5e4ad91ba3d34dbc",
+      "background": "#ffffff"
+    },
+    "d040-137962": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/8/8a/FC_Blau-Wei%C3%9F_Linz_logo.svg/250px-FC_Blau-Wei%C3%9F_Linz_logo.svg.png",
+      "sha256": "c9238f78871a2f7f1a80dc5b6bfca0733ae40edb23ba48b375931b95c5c0c450",
+      "background": "#ffffff"
+    },
+    "d040-5603845": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/99/SC-ESV_Parndorf_1919_logo.png/250px-SC-ESV_Parndorf_1919_logo.png",
+      "sha256": "2ee64f91362f7c6d9b9cd427fee56e171ac891840ff951839f55daa1b78a857e",
+      "background": "#ffffff"
+    },
+    "d040-5604963": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/94/FC_Dornbirn_1913_logo.png/250px-FC_Dornbirn_1913_logo.png",
+      "sha256": "b40a6664d395f35beddc383de5e998ad27bcafb27a5713e25e99d5fdbfcb5d0b",
+      "background": "#ffffff"
+    },
+    "d040-16008951": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/BSK1933_Logo.jpg/250px-BSK1933_Logo.jpg",
+      "sha256": "051db1661ae16b25a63bfaf036994c548d0669b8e3d3b5eee2fa4ea05599ad73",
+      "background": "#ffffff"
+    },
+    "d040-2000373534": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/44/Kremser_SC_logo.webp/250px-Kremser_SC_logo.webp",
+      "sha256": "815b0d3528f00984737471e9c7b82c705e30e72c09ef697531b64f51580a3122",
+      "background": "#ffffff"
+    },
+    "d056-248": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/PX_Logo.png/250px-PX_Logo.png",
+      "sha256": "13abfa71aa765cddb05dae29c3cde153d4016fa8eb377ceba4e7a2cc9a7eb837",
+      "background": "#ffffff"
+    },
+    "d056-6600029": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/8/81/Rupelboomlogo.gif/250px-Rupelboomlogo.gif",
+      "sha256": "2ac0234dcc55f0435f594e41ac7edca16fd300f85e6265f368d91043997b1699",
+      "background": "#ffffff"
+    },
+    "d072-5340741": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/0/03/Township_Rollers_%28logo%29.png/250px-Township_Rollers_%28logo%29.png",
+      "sha256": "e815138d626283cfeb624ffd835edd63f0f5916b7c69d9d74eb4287b9d7144a6",
+      "background": "#ffffff",
+      "tolerance": 70
+    },
+    "d072-13226318": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/8/8e/Morupule_Wanderers_F.C._logo_2024.jpg/250px-Morupule_Wanderers_F.C._logo_2024.jpg",
+      "sha256": "2e5b46e01ebcf23bdb4a81875c3eab641302d4932fdd281013691b32365b49a1",
+      "background": "#ffffff"
+    },
+    "d076-301100": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e0/Agremia%C3%A7%C3%A3o_Sportiva_Arapiraquense.svg/250px-Agremia%C3%A7%C3%A3o_Sportiva_Arapiraquense.svg.png",
+      "sha256": "57dc6c3dac2c26af9841e1720f124cf8f3af451646faf2c6063154175475244d",
+      "background": "#ffffff"
+    },
+    "d076-314600": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/d/dc/Cianorte_futebol_clube_logo.jpg/250px-Cianorte_futebol_clube_logo.jpg",
+      "sha256": "1d9444fbcb19c8c9e52652219cf9c261949cb84d8c1dc7a512df4af0a314505a",
+      "background": "#ffffff"
+    },
+    "d096-5626771": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/8/85/Duli_Pengiran_Muda_Mahkota_FC_%28emblem%29.png/250px-Duli_Pengiran_Muda_Mahkota_FC_%28emblem%29.png",
+      "sha256": "9742d6757378944a6af00e14056d4f28baa3b7776946d1e8fdfac1312a598caf",
+      "background": "#ffffff"
+    },
+    "d100-349": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e6/Levski_Sofia_crest_%282026%29.svg/250px-Levski_Sofia_crest_%282026%29.svg.png",
+      "sha256": "cf1bd3342cae859cd8c3b3a8cb0f471ec9441e4d0e6148e30119fa151c7dfc47",
+      "background": "#ffffff"
+    },
+    "d116-23084466": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b0/Kirivong_Sok_Sen_Chey_FC_Crest.png/250px-Kirivong_Sok_Sen_Chey_FC_Crest.png",
+      "sha256": "6724295d0071044302f08d23c744099266f48f96532b15994bdec7f1fcde1855",
+      "clear": "72,81 182,76"
+    },
+    "d120-391": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/8/86/Bamboutos_FC.png",
+      "sha256": "841c2b420d1c2cd97575863e12ae7c8d6c8f259965f6dbeb4d5d85c488c0eae8",
+      "background": "#ffffff"
+    },
+    "d124-20500263": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/7/70/Vaughan_Azzurri_Logo.png/250px-Vaughan_Azzurri_Logo.png",
+      "sha256": "d95daef3aea33d869904571eea6d86364b4961fbafe72992dfdce9e978a50e61",
+      "background": "#ffffff"
+    },
+    "d124-2000163945": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/7/7b/Lavaldynamites.png",
+      "sha256": "90d3d4cc9e7685dfa3dab3fed696f0ed4134b1304fdfbe5037be62b04c65bfb7",
+      "background": "#ffffff"
+    },
+    "d124-2000173592": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/9/98/Halton_United_logo.png",
+      "sha256": "5042f3e79a1834b686908b727d331d8cb1cc20167efbe4bddd9213831376966c",
+      "background": "#ffffff",
+      "tolerance": 70
+    },
+    "d152-400": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/7/70/O%27Higgins_FC.png/250px-O%27Higgins_FC.png",
+      "sha256": "0c53dfeeaca38e1113585d15703a7517633baa2b9efeaa5d662d3e53223501c6",
+      "background": "#ffffff"
+    },
+    "d152-404": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2d/Emblema_del_Club_Universidad_de_Chile.png/250px-Emblema_del_Club_Universidad_de_Chile.png",
+      "sha256": "30a9301e8fca5cbb7103fbcb5f624f322affd698e43d09723d0cf3fa1a5a611c",
+      "background": "#ffffff"
+    },
+    "d152-104361": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d6/CD_Concepci%C3%B3n_logo.jpg/250px-CD_Concepci%C3%B3n_logo.jpg",
+      "sha256": "e07ede534513ea36f9eebfa4686579ac2e26325c26f165b9ec768ffc55d864c6",
+      "background": "#ffffff"
+    },
+    "d152-130779": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/1/10/Santiago_morning.png",
+      "sha256": "c4a92c360762c512f3192452bb7aeac3e28b78decd6243160a763d1473b555cf",
+      "background": "#ffffff"
+    },
+    "d152-75035851": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Deportes_Recoleta_logo.png/250px-Deportes_Recoleta_logo.png",
+      "sha256": "5f853dace1dad41ca77bc5bb27ad360560d1c831b5da8fca6332592e8dba3644",
+      "background": "#ffffff"
+    },
+    "d158-2000201262": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9a/AC_Taipei_logo.png/250px-AC_Taipei_logo.png",
+      "sha256": "e5347629cbdf046a6755d8b7c5e7c05c439e36e3177311245cfd1001d9fe0fe1",
+      "background": "#ffffff"
+    },
+    "d170-120936": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4e/Envigado_FC_logo_2018.png/250px-Envigado_FC_logo_2018.png",
+      "sha256": "477dddc65c415cf5c309e7cdc88b9de44a3157685d0f2bd346a43455bdd56cf2",
+      "background": "#ffffff"
+    },
+    "d170-130803": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/ESCUDO_DEP_QUINDIO_2023.png/250px-ESCUDO_DEP_QUINDIO_2023.png",
+      "sha256": "ec3ddbdf1b9a5a7fdcc2e70b65f5c48f24a00eb4ea1a73409de9b95e2162382f",
+      "background": "#ffffff",
+      "tolerance": 70
+    },
+    "d170-76045729": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/b/bb/Orsomarso_SC_logo.png/250px-Orsomarso_SC_logo.png",
+      "sha256": "ae6bb80711c7288d9d3f17ffbac881ab6171955b834e5632525ead089a2e71cc",
+      "background": "#ffffff"
+    },
+    "d180-13132453": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/90/Csdonboscologo.gif/250px-Csdonboscologo.gif",
+      "sha256": "1920c3e1cc4f90a5d9f31af69b40015daa5bff41a8e521d24924ae52ea025683",
+      "background": "#ffffff",
+      "tolerance": 70
+    },
+    "d180-13186802": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b0/Simba_Kolwezi_logo.jpg/250px-Simba_Kolwezi_logo.jpg",
+      "sha256": "517f7c9791fed877b51df571544f2ed89c9d12ac97faa961f31102a800ba1fa8",
+      "background": "#ffffff"
+    },
+    "d191-126302": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c3/HNK_Vukovar_91.svg/250px-HNK_Vukovar_91.svg.png",
+      "sha256": "47daafe80a5be15e5e82f115849a0983a0e6592824c80b47751680216b3dd601",
+      "background": "#ffffff"
+    },
+    "d191-24024682": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/c/ce/NK_Marsonia.png",
+      "sha256": "cbad4a2f71fb6288830fa3a8758ba063d20ea687f9b1a9ef5774408fe1d1469a",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d196-26001619": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/7/76/AEZZakakiouLogo.png",
+      "sha256": "22c1fd55e4b601835d2809df3593a8fcfc0d01983416c374dd140e4fb3d03d52",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d196-26001627": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/0/01/Othellos_Athienou.gif",
+      "sha256": "850d7cc1a25f3c1a3ec35a549522c7a28095d71b4a4b08e313e613673bc67aed",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d203-136153": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4f/FC_Vyso%C4%8Dina_Jihlava.png/250px-FC_Vyso%C4%8Dina_Jihlava.png",
+      "sha256": "fa8c542220be914c1643b10abcead74b7ec557e632674cc44f115715652e91c6",
+      "background": "#ffffff"
+    },
+    "d203-136196": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/0/0e/FK_Admira_Prague_logo.gif",
+      "sha256": "c0ce7b71ac5fdecfe8c1f2128d03496da2697bbf2399dd362570c2e59acb9be4",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d203-136210": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/7/71/FK_Slavoj_Vy%C5%A1ehrad_logo.gif",
+      "sha256": "98a5fd59a1774a1d6cfdac4d33bb1ac09b44c868caacb531563878a584681e68",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d203-136289": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/1_SC_Znojmo_FK.gif/250px-1_SC_Znojmo_FK.gif",
+      "sha256": "189686a40ac37fda8590a6de3aebe95f99da8bfed2b79f804e0d08e095b3db90",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d203-5652959": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/5/51/FK_Banik_Sokolov%2C_2024_logo.png",
+      "sha256": "fb415eab1e9d04821554fa9bfbd12ee0b9ddaab7b57d87cb08f8e14b38f2ed86",
+      "background": "#ffffff"
+    },
+    "d208-497": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/6/61/Br%C3%B8nsh%C3%B8j_BK.png/250px-Br%C3%B8nsh%C3%B8j_BK.png",
+      "sha256": "201fd3922732a073fbb4d5390d80c2b8f0dd80a9abf6fb89b042fd8b76eaae57",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d208-930248": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/3/3f/Middelfart_BK_logo.jpg/250px-Middelfart_BK_logo.jpg",
+      "sha256": "57ff59e3a2fe696287c306f585c64ff8c77d38e5b82b73cce3acc6515051f248",
+      "background": "#ffffff"
+    },
+    "d208-933945": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/2/24/This_is_a_logo_for_B.93.jpg/250px-This_is_a_logo_for_B.93.jpg",
+      "sha256": "7556a2a138de685c4f238bc0f538a9364fb8f60fff8e6d131cbbc864e63cd2cf",
+      "background": "#ffffff"
+    },
+    "d218-5270423": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/UCat%C3%B3lica.png/250px-UCat%C3%B3lica.png",
+      "sha256": "d4c7f705d056c8dc10937c69370f20f8093ead78eb06d963714c59238bb52a16",
+      "clear": "123,148"
+    },
+    "d218-5270435": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/9_de_Octubre_FC_escudo.png/250px-9_de_Octubre_FC_escudo.png",
+      "sha256": "4493c46137500e9055cc3fdda588110b4c8682c2a66140210dc407ae678ac69a",
+      "background": "#ffffff"
+    },
+    "d218-80000716": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/6/61/Guayaquil_City_F.C._badge.jpg",
+      "sha256": "f55a6adcdd11e9126b38122155ade73ded165335a0399d026d300ecc86d7ddb1",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d218-80001277": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Escudoindependientedelvalle2023.png/250px-Escudoindependientedelvalle2023.png",
+      "sha256": "33bef8d1a6fddda3af16c65eb39232b3b5a6466dcd9c4fc1b11fe172321ee46b",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d231-13133267": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/3/34/Arba_minch_fc.gif",
+      "sha256": "61835d1261ad08b19024eae9be8c4ea16803b17cebc49f6f24fc5328fbdb18b3",
+      "background": "#ffffff"
+    },
+    "d231-13187232": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/3/3f/Fasil_Kenema_SC_logo.png/250px-Fasil_Kenema_SC_logo.png",
+      "sha256": "5ae1a9f244a9b8abbc76085b89dc5addcb929e79b4df1bbd03a0c935169e1b04",
+      "background": "#ffffff"
+    },
+    "d233-514345": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Viljandi_JK_Tulevik_logo.png/250px-Viljandi_JK_Tulevik_logo.png",
+      "sha256": "9da018affcc41128b41d49f217cc3e33571124ea73a43ce173e7c35681528861",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d242-130058": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/2/22/Nadi_FA.png",
+      "sha256": "323a4f4dfaa6805a318f6b0bbc5223f07dc1b81bba90848d18c94a19a006ad1a",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d242-130061": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/98/Suva-FC-Logo.jpg/250px-Suva-FC-Logo.jpg",
+      "sha256": "fbb6ae2b1cbf9ff5639cffd4a5858b3e578f75c42a6392fbbdba70086b442af0",
+      "background": "#ffffff"
+    },
+    "d242-130062": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/3/3d/Tavua_FC_Logo.gif",
+      "sha256": "c7765a453a854fe4e0f2b3c24f0875541199b4bfa0367e4cdda97801299b1632",
+      "background": "#ffffff"
+    },
+    "d268-483911": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9a/Locomotive_logo.png/250px-Locomotive_logo.png",
+      "sha256": "e74941c7b09d54a46e0003bc88fc83bdc7e3bdc7d397c4dd74c5a8bbd45acddb",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d268-59020465": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/c/ca/FC_Merani_Martvili_logo.png",
+      "sha256": "121cac6b917b3d0bf9d2acb981d45affad0b0c2e49c4d2a0e88ac9d54912936a",
+      "clear": "132,25"
+    },
+    "d268-59143706": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/8/81/Merani_tbilisi_91.png",
+      "sha256": "b0bf401f6ca870dac98a7f7cb2f7f4f6108d16d1c1a3cbbfc1deaf6dea3d41d8",
+      "background": "#ffffff"
+    },
+    "d276-947": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Hamburger_SV_logo.svg/250px-Hamburger_SV_logo.svg.png",
+      "sha256": "61493794689086b882c9efe31ea2b3676576f4b361dd31189dd7eb1833606d8c",
+      "background": "#ffffff"
+    },
+    "d276-957": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/SSV_Ulm_1846_Fussball.svg/250px-SSV_Ulm_1846_Fussball.svg.png",
+      "sha256": "9780cbc298c29240bc5394ec9339f3c38cf7ac4033fb115ab494cfc950a8241c",
+      "background": "#ffffff"
+    },
+    "d276-879209": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bf/BSC_Logo_rot_wei%E2%94%9C%C6%92.jpg/250px-BSC_Logo_rot_wei%E2%94%9C%C6%92.jpg",
+      "sha256": "0505d25360ce205fe14b428b22962f0d72722bb70eb1de9b440c518a2b2f32ba",
+      "background": "#ffffff"
+    },
+    "d276-879516": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Hallescher_FC_logo.svg/250px-Hallescher_FC_logo.svg.png",
+      "sha256": "c3e4b63c7f9633de11c8e4f7135d4aa3606530d909218655c05ade789c7d0084",
+      "background": "#ffffff"
+    },
+    "d288-8627094": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/e/eb/Heart_of_lions_logo.jpg",
+      "sha256": "d6491adc246ee3dfc0193c1f7acf74d0bbe0b948cdd67ea693fe0be125659dee",
+      "background": "#ffffff"
+    },
+    "d300-973": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4f/Ethnikos_Piraeus_FC_logo.png/250px-Ethnikos_Piraeus_FC_logo.png",
+      "sha256": "7c0bc710dd3a7ce4b5789b244132a6481a3797a67465ded632ca9883c67eb84e",
+      "background": "#ffffff"
+    },
+    "d300-129659": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/45/Apollon_Kalamarias.png/250px-Apollon_Kalamarias.png",
+      "sha256": "cfe4a5f193a4dcec4b095812e2b28b0dc5abc7f7c8d9bc3a3f7257e8004f0a14",
+      "background": "#ffffff",
+      "clear": "enclosed"
+    },
+    "d300-129667": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/45/PAS_Giannina_emblem_2017.png/250px-PAS_Giannina_emblem_2017.png",
+      "sha256": "6f2eaf8a58dfe92562f7b457298598d922a07c394b749486a538e1d7a7b57e31",
+      "background": "#ffffff"
+    },
+    "d320-5395158": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Antigua_GFC_LOGO.jpg/250px-Antigua_GFC_LOGO.jpg",
+      "sha256": "1846dc226dcce63ff6417f314db7e9a6148d1fa284f813d46e41e33a59854479",
+      "background": "#ffffff"
+    },
+    "d320-87000504": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/4/43/Toros_malacateco.png",
+      "sha256": "acb8583373a9a7432712cf847bfed8ab2f930c5524cd355bed6eb20ec38a1939",
+      "background": "#ffffff"
+    },
+    "d340-87000456": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/40/C.D._Real_Sociedad_logo.png/250px-C.D._Real_Sociedad_logo.png",
+      "sha256": "efb410d0d2e66d9de716cd8e47e22eeb66f44e2ce24642cabacb8d8a03a292f2",
+      "background": "#ffffff"
+    },
+    "d340-87019030": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5f/Parillas_One.gif/250px-Parillas_One.gif",
+      "sha256": "597327b6ee24909fdfd687ae39c45e16c01484d65f25880238bdf95e1f24dd08",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d340-87032277": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/98/Honduras_Progreso_club_logo.png/250px-Honduras_Progreso_club_logo.png",
+      "sha256": "39bb715e910e4702bce4ddcc02654a3a85f8c11333f0666531c5cb7833802ff4",
+      "background": "#ffffff"
+    },
+    "d348-7522639": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/9/99/III._Ker%C3%BCleti_TUE_logo.png",
+      "sha256": "e549690f32728bf27dddf0666fe87ba97fe885b48d8609e527483b828fc67ccd",
+      "background": "#ffffff"
+    },
+    "d352-130866": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/40/Emblem_of_%C3%8D%C3%BEr%C3%B3ttaf%C3%A9lag_Reykjav%C3%ADkur.jpg/250px-Emblem_of_%C3%8D%C3%BEr%C3%B3ttaf%C3%A9lag_Reykjav%C3%ADkur.jpg",
+      "sha256": "b35fde0c07b6a709a35900fa3bcc839c7bd60cdb10a353f27c01bee1c20d1e92",
+      "background": "#ffffff"
+    },
+    "d360-5622745": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/b/bc/Persijap.png",
+      "sha256": "ee1eec2295af9bd0d1132689410db29ff292a8efe50faa4a978cdc5ad874c477",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d360-41001022": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/PSBS_Biak_crest.jpg/250px-PSBS_Biak_crest.jpg",
+      "sha256": "07d40286a1dd207f73f2fef888533bbba89ed7a9fb8077b2ab48d9f7cb3f358c",
+      "background": "#ffffff"
+    },
+    "d368-1021554": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4f/Maysan_SC_logo.png/250px-Maysan_SC_logo.png",
+      "sha256": "288c507aa40e8c3f2321668b9ede5e047298f2b6097cc3274f8deb20c6cf86e9",
+      "background": "#ffffff"
+    },
+    "d376-1088": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/c/c1/Ironi_Rishom_LeZion.png",
+      "sha256": "20a4976330d91a7195ba38c4e4862e8645c9581c82ca9f2e092e611cd8038ebb",
+      "clear": "185,93 172,91"
+    },
+    "d384-8632449": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/a/ac/SC_Gagnoa_Logo.png",
+      "sha256": "f291374ec44c677f519e0bdc95339dcd31cad117ecaba0c7f1370c8ae36e0312",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d388-105998": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/9/9c/Harbour_View_F.C.png",
+      "sha256": "7dca9fc5cd1444cc61a0641445f7df758ab9c0dea695ee0804551898f28b3b14",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d388-106001": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/a/ac/Arnett_Gardens_F.C._logo.png/250px-Arnett_Gardens_F.C._logo.png",
+      "sha256": "7315b42325f9212d2f6c55b28fcf074b625bf6e9a2271ed94c094a34fdf0b84d",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d388-790963": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/5/57/Waterhouse_Football_Club_logo.jpg/250px-Waterhouse_Football_Club_logo.jpg",
+      "sha256": "06c4eaaa1df6ba65d041ca441707dc7f7c904bc73a7dc95fe0b82143bd74a91c",
+      "background": "#000000"
+    },
+    "d388-81009561": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b3/Molynes_United_F.C._logo.png/250px-Molynes_United_F.C._logo.png",
+      "sha256": "e0e03ed2b28927f5c232391fb45fefcc713fa454e3a7874ebc68cca772c0796e",
+      "background": "#ffffff",
+      "inset": "0 0 2 0"
+    },
+    "d388-81043972": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/1/19/Mount_Pleasant_Football_Academy_Logo.png",
+      "sha256": "0f3361c65c2e721888764b7362926577c5e7b4cdd486b820f84146476a782b4e",
+      "clear": "34,77 77,195 107,202 136,129"
+    },
+    "d400-135252": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5c/Al_Buqa%27a.png/250px-Al_Buqa%27a.png",
+      "sha256": "8b0e0009d36f0ff273abbb2b99abb0a34430f5c10c5b88b9b37c4d635d9e6547",
+      "background": "#ffffff"
+    },
+    "d400-135257": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b9/Al-Ramtha_SC_Logo.png/250px-Al-Ramtha_SC_Logo.png",
+      "sha256": "eb7545576719f712d726212e0a3f8357ac1857af9ecb8f02dea52660db76e653",
+      "clear": "157,174"
+    },
+    "d404-751587": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/4/4c/MathareUnited.png",
+      "sha256": "748151e29c9b5698a3901491478957edef7fc6ac832fe9778be350ed03c4405c",
+      "background": "#ffffff"
+    },
+    "d404-5340905": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/48/Kenya_Commercial_Bank.png/250px-Kenya_Commercial_Bank.png",
+      "sha256": "1c0d3a0559249c0dc075feb3e097edb5da23d00d4ae7ec1435c955acfdb692e6",
+      "background": "#ffffff",
+      "clear": "87,166 60,173 161,236 137,173 161,221 137,158 165,170"
+    },
+    "d404-5340908": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/f/f9/Shabana_FC_%28logo%29.jpg",
+      "sha256": "b295cc410767318bad01b299ddad16f58f6d1c09441ca2779e6a9a27d70206f3",
+      "background": "#ffffff"
+    },
+    "d404-12015976": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/2/2c/Bandari_FC_Kenya_logo.jpg/250px-Bandari_FC_Kenya_logo.jpg",
+      "sha256": "5ff0f44598e9e35efbce0ed2d441b1831900236bead61d529835b606b8977e12",
+      "background": "#ffffff"
+    },
+    "d404-13104763": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/1/1f/Bidco_FC_logo.gif/250px-Bidco_FC_logo.gif",
+      "sha256": "2ac66a3a6802a1b52275b5270079a26ae35f643c465146577815aec370cff594",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d404-13127932": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/1/1b/F.C._Kariobangi_Sharks_logo.jpg/250px-F.C._Kariobangi_Sharks_logo.jpg",
+      "sha256": "9a0a2080f60839a811c1b2d4d94add0b0281e5c9de93f6d9da1a0d25b309f822",
+      "background": "#ffffff"
+    },
+    "d404-13137121": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d4/Kakamega_Homeboyz_F.C._logo.jpg/250px-Kakamega_Homeboyz_F.C._logo.jpg",
+      "sha256": "d26f0b69f5c27aa99d16c25bfe04f8b30216bb78ebf7ad3b0c6fc3c1260705ae",
+      "background": "#ffffff"
+    },
+    "d404-13159536": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c5/F.C._Talanta_logo.jpg/250px-F.C._Talanta_logo.jpg",
+      "sha256": "f540420c2911b3c78dd39c467b98615d5d9ff5b904322775e8b66c133da45bce",
+      "background": "#ffffff"
+    },
+    "d410-5711057": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d2/Busan_Transportation_Corporation_FC.png/250px-Busan_Transportation_Corporation_FC.png",
+      "sha256": "ea7a46346317450ee016a1d1a6e14278f102d5679fd9daa7fba05f481423f4ef",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d414-1199": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/3/31/Al-Jahra_SC_logo.png",
+      "sha256": "2cb4354f27436b75c04f1885ef814f09a99b02a06e7f4706520ba42618725e4e",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d414-135245": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d4/Al-Arabi_SC_logo.png/250px-Al-Arabi_SC_logo.png",
+      "sha256": "033939045ea99493130c8527b980516f7d3a17e317c8b4212a182839e6042b71",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d414-135246": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4a/Kuwait_Sporting_Club_logo.png/250px-Kuwait_Sporting_Club_logo.png",
+      "sha256": "27d41f10bdb3de628033e9a98ad78778bdbd1e21435047ada454464effbea2b7",
+      "background": "#ffffff"
+    },
+    "d414-135301": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c2/Khaitan%2Csc%2Ckuw.gif/250px-Khaitan%2Csc%2Ckuw.gif",
+      "sha256": "ca31984ca940a0921e3e2be3e90d89615d2009cd7749c4197d88cce1c0a58a88",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d414-135306": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4f/Al-SahelClub.png/250px-Al-SahelClub.png",
+      "sha256": "4535653aab95de6f77db6462b99919f989638ad9fbef4945ed0ad24a30fbfbbf",
+      "background": "#ffffff"
+    },
+    "d422-5623956": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/3/3c/Shabab_Al_Sahel_logo.png/250px-Shabab_Al_Sahel_logo.png",
+      "sha256": "486cc954b54664f05f9a17e017596ffa375d883870f374f291a7f54c26f09180",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d422-2000256496": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/b/b3/Shabab_Baalbeck_logo.png",
+      "sha256": "22e0a2d765bf52a6562cbc1b0201e903b1dec17d5d57d7b6af8d473a0a075415",
+      "clear": "99,62 148,62 51,61 75,62 124,61"
+    },
+    "d428-483870": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/ValmieraFC-Logo.png/250px-ValmieraFC-Logo.png",
+      "sha256": "1f12a4e37a105d1aa5f8e7cc151fa9089fb16a9dacfafbdace71a99ed81365a8",
+      "background": "#ffffff"
+    },
+    "d434-5341597": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/49/Al_Akhdar_Al_Bayda%27.png/250px-Al_Akhdar_Al_Bayda%27.png",
+      "sha256": "8c46194210cfb99773119ddac16e8724152e928761567af0140c3d27b349dcef",
+      "background": "#ffffff"
+    },
+    "d442-1300770": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/2/2a/FC_Rodange_91_logo.png",
+      "sha256": "1e131b7394cc65d80a4fdb097ed2e08e14d231fed578ee3b6113c73e992f68a0",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d458-135351": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/1/16/Kuala_Lumpur_City_F.C..png/250px-Kuala_Lumpur_City_F.C..png",
+      "sha256": "af5572012a13d9e90a4725569fcc95a17f5b90c4a36b11fdf15f1afe3ebd78ea",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d458-23396078": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Logo_Kuching_City_FC.jpg/250px-Logo_Kuching_City_FC.jpg",
+      "sha256": "ae7684f3958d0240bd7defc3c8e53fa00f4e7f8abf3b2080e5030888731f3216",
+      "background": "#ffffff"
+    },
+    "d458-23502547": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b9/Kelantan_The_Real_Warriors.png/250px-Kelantan_The_Real_Warriors.png",
+      "sha256": "1eae1a494e4f628abd4e3c99b2b4d318b0588964fa96a04a8010a2c25a0b34e2",
+      "background": "#ffffff"
+    },
+    "d484-5661082": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/42/Coras_Logo.png/250px-Coras_Logo.png",
+      "sha256": "eedef9bca5ae98f6388ae10224c9a07d5dee65e34d57bd9a88324fef652ddfee",
+      "background": "#ffffff"
+    },
+    "d484-5666502": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/1/11/Logo_Inter_Playa.png/250px-Logo_Inter_Playa.png",
+      "sha256": "ede2a1183f46b634264f67c8ab97ef187672ff8b7acdfe70cce83e6fe4f697e6",
+      "clear": "85,194 163,194 103,243 50,239 161,239"
+    },
+    "d484-51008744": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/96/Alebrijes_de_Oaxaca_Logo.png/250px-Alebrijes_de_Oaxaca_Logo.png",
+      "sha256": "2749647b4b9e80ae18c69f693117ac78c1e8e0f2c71f892faf0125f13b872483",
+      "background": "#ffffff",
+      "tolerance": 70
+    },
+    "d484-51014509": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/45/Gavilanes_de_Matamoros_Logo.png/250px-Gavilanes_de_Matamoros_Logo.png",
+      "sha256": "38b62b132d591eecc5119c69f8c60de45ed8273546744f4babd82e9759a18cf1",
+      "background": "#ffffff"
+    },
+    "d484-2000193551": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/8/89/La_Paz_Fc_logo.png/250px-La_Paz_Fc_logo.png",
+      "sha256": "cde79aac66fe6761c55aa95cb76171fd76961736760fe1dc7752d898d33cebe7",
+      "background": "#ffffff",
+      "tolerance": 70
+    },
+    "d498-59128431": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/2c/FCM_Ungheni.png",
+      "sha256": "a2eb8685e3a81139818d04f8df58acdc21508215525a012cace4df4637fd04ba",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d499-5753204": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/44/Arsenal-tivat-logo.png/250px-Arsenal-tivat-logo.png",
+      "sha256": "b1cb241ae3c5fe64a49c736597ca5318f570f055a65a6a287b627ce01d01328a",
+      "background": "#ffffff"
+    },
+    "d504-106052": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/8/84/Difa%C3%A2_El_Jadidi_%28logo%29.png/250px-Difa%C3%A2_El_Jadidi_%28logo%29.png",
+      "sha256": "d1d61f5512315bcc89516a398ba4b64bab970bb99723018a9b6644d36bc061d1",
+      "background": "#ffffff",
+      "tolerance": 70
+    },
+    "d504-8632632": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/43/Rachad_Bernoussi_%28logo%29.png/250px-Rachad_Bernoussi_%28logo%29.png",
+      "sha256": "764e90e2beaec3a10c7513c2be4e0017064640974f3c21e304cc5703bd626550",
+      "background": "#ffffff"
+    },
+    "d504-13165101": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Olympique_dcheira_logo.jpg/250px-Olympique_dcheira_logo.jpg",
+      "sha256": "0bf8f4340375a08ce98e5fcc0f888a0cc4e93492c4eb17045075adf952c3ce09",
+      "background": "#ffffff",
+      "inset": "1 0 0 0"
+    },
+    "d508-5340959": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/3/34/Ferroviario_Maputo.gif",
+      "sha256": "7ea6a5d403d6bcf9e43e4ff44e1aa4ff7993d7986b6cf5d4f63d9927c7a16782",
+      "background": "#ffffff"
+    },
+    "d508-13186885": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/2/22/Vilankulofc.gif/250px-Vilankulofc.gif",
+      "sha256": "4ab332bc99a839ef49047ea4e620ad2a4827a47c868badfe9298e0e06538b3a0",
+      "background": "#ffffff"
+    },
+    "d512-135327": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/5/55/Sur_SC_logo.png/250px-Sur_SC_logo.png",
+      "sha256": "e81586d21a3335745ea5aa703cddb6b698623fa6ea149fbdf23cdf1e80d38027",
+      "background": "#ffffff",
+      "clear": "114,234 185,241 184,233 123,208 93,208"
+    },
+    "d512-1016232": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/b/bf/SahamClubLogo.jpg/250px-SahamClubLogo.jpg",
+      "sha256": "739a71b4553c82bd29b1260025e597cedc81f63077ea17209ab8f3e70db336fa",
+      "background": "#ffffff"
+    },
+    "d512-23071761": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/7/7e/Al-ShababClubOmanLogo.jpeg/250px-Al-ShababClubOmanLogo.jpeg",
+      "sha256": "fa8f4d96959c3722cc811d30e0aff6320ddb523084e0e631d215a8beadc558e5",
+      "background": "#ffffff",
+      "inset": "0 0 60 0"
+    },
+    "d528-2322": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/b/bf/ASWH_%28logo%29.png",
+      "sha256": "d5398f07266d3043ac93c221cd1d81e10a46416669da44f6ffe566958d82c258",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d528-2351": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/2/29/HSC_%2721_logo.png",
+      "sha256": "2a5441c7509283ec97845e73176b88a1a1e20423ee038c56261bbfdd9964b4bc",
+      "background": "#ffffff"
+    },
+    "d528-862777": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/42/ONS_Sneek_logo.png/250px-ONS_Sneek_logo.png",
+      "sha256": "2ef38c78d1576789c42784f9c01aa7c2e33c25548d50fc8ad1ffed21d07c7f98",
+      "background": "#ffffff"
+    },
+    "d528-37049067": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/2/26/SV_TEC_logo.png",
+      "sha256": "a5b3910d8c89b9bcdafbab926a0512e4d6bd5f4a547b207d90e3f66206f787c8",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d554-432304": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/3/37/Fencibles.gif",
+      "sha256": "800d533c5fea4c27d371027d9e0888623e7c5570aca0142ef83e2f1a02687b62",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d554-23210224": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/f/ff/Cashmere_Technical_logo.png",
+      "sha256": "ebcbe8396dfcf1c2ea956d85e2165417702a92933ef12065ee8f9a0c74895837",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d554-88000394": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/8/8a/Western_Suburbs_FC_Logo.svg/250px-Western_Suburbs_FC_Logo.svg.png",
+      "sha256": "c3687595ef950b26860ea4cf19bc0c6b5c7955b31577bd46a771398bd4920d9b",
+      "background": "#ffffff"
+    },
+    "d554-88000396": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/1/11/Eastern_Suburbs_Logo.jpeg/250px-Eastern_Suburbs_Logo.jpeg",
+      "sha256": "7e39987752dcfc140afbe2025018f874c6e5fe0d1a8f1101a5f4b7a79c493a18",
+      "background": "#ffffff"
+    },
+    "d558-5375175": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Escudo_del_Real_Estel%C3%AD.png/250px-Escudo_del_Real_Estel%C3%AD.png",
+      "sha256": "64fdbabb84a8f4cbb5ff275ea269d315ee97dbc504ba78a0820d0d5fd4efb9f0",
+      "background": "#ffffff"
+    },
+    "d558-86006015": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/Managua_FC_Logo.png/250px-Managua_FC_Logo.png",
+      "sha256": "151563b94084d5ab9d515851742f227fca3c3e15e103cc11d121a20cf36a9a64",
+      "background": "#ffffff"
+    },
+    "d566-5340759": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/e/ed/Warri_Wolves_F.C._Logo.jpeg",
+      "sha256": "0faa5d4f349684a975e38a0be237f071b8410b270e96836a7cccd3fec7e82c37",
+      "background": "#012265"
+    },
+    "d566-13190761": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/0/09/Remo_Stars_F.C.png",
+      "sha256": "ddc2cd8908f69f0fa7354c7b870e2f121876338f616eb0ef464cb67f817ed4fa",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d566-2000378388": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/b/b9/Baraufclogo.jpg",
+      "sha256": "cd68c52fc6b38cd2fbc6a7da6343cc62bb42554a2bd3f60eba8da270e9d860a1",
+      "background": "#ffffff"
+    },
+    "d578-1374": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/RaufossFotball.png/250px-RaufossFotball.png",
+      "sha256": "308105aed8c0530fb7fbe1a8ef6dab78f38d64d70066b5597d1fe4b58efa8042",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d578-53000361": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/90/Sotra_SK_logo.png/250px-Sotra_SK_logo.png",
+      "sha256": "035b6fb4e9369b03c2a8a30498d32abe11d86b720a0fc8ddd2b1d8f5c4547a04",
+      "background": "#ffffff",
+      "tolerance": 10
+    },
+    "d591-308266": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Logo_Atletico_Chiriqui.jpg/250px-Logo_Atletico_Chiriqui.jpg",
+      "sha256": "506c84e8714edfb3a7e2ec57933086c57c99f4192488a9419ed1bded49dee83b",
+      "background": "#ffffff"
+    },
+    "d600-5280210": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/44/Resistencia_SC.png/250px-Resistencia_SC.png",
+      "sha256": "f3564b6931038c52ebc45479efb3bf87f47c99f5ba266d07c9beb423715d5a47",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d600-5280212": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Sportivo_Ite%C3%B1o.png/250px-Sportivo_Ite%C3%B1o.png",
+      "sha256": "7ca5a24f7807ffc94b6e3a816c384dfe674189d767e081c12203e3bb34e7a737",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d600-79012073": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Logo-santani.png",
+      "sha256": "3e30b04738d34ecbd29b0bc1676f99302f9ed866d7f61a1cc7419eac75f29c3f",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d604-5290630": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Logo_de_Club_Atletico_Torino.png/250px-Logo_de_Club_Atletico_Torino.png",
+      "sha256": "5a7e47cde91abb09efba3a0c4e140f7ffd8daecb73737996f538e1a0c6014f94",
+      "background": "#ffffff"
+    },
+    "d604-77060049": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/8/83/CarlosSteinBadge.png/250px-CarlosSteinBadge.png",
+      "sha256": "7afa343bb0850c176b2cf7497fc5aaf3c5ebfb104e7a040f38539201aa0c1dbd",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d604-77060228": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/b/b7/PirataFCLogo.png",
+      "sha256": "4c2b872281d115d9c09c7822a13d717193642b79469cc63ebe5c4e138206ede6",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d604-77064268": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c0/DeportivoLlacuabamba.png/250px-DeportivoLlacuabamba.png",
+      "sha256": "077bfb8deb6e949a38a0fae8c59e7815bf256dd7f6d9cc4b2e56135ba075792f",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d616-129571": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/45/Stal_Stalowa_Wola_crest.png/250px-Stal_Stalowa_Wola_crest.png",
+      "sha256": "bad0a25d5e2e2cd58b6d8fa282b6b8c0085bf853d6a2e73e1b80781f8d3e7875",
+      "background": "#ffffff"
+    },
+    "d616-714211": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Legionovia_Legionowo_crest.png/250px-Legionovia_Legionowo_crest.png",
+      "sha256": "19ec509e421350fe066eff9332daff44e7e3e71c59614f00376272106312c59f",
+      "background": "#ffffff"
+    },
+    "d620-1479": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/7/7a/F.C._Tirsense_logo.svg/250px-F.C._Tirsense_logo.svg.png",
+      "sha256": "a1a150b4502adbcc1420e95f3fec9a65c3db57e0a018da93b66585893f663a6e",
+      "clear": "135,90"
+    },
+    "d620-1490": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/8/87/Sporting_Espinho.png",
+      "sha256": "b744291876257ce862f0968d9936070727670550f10c366866dd5812ed854f9d",
+      "clear": "27,54"
+    },
+    "d620-2484": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/8/87/Amora_F.C._logo.svg/250px-Amora_F.C._logo.svg.png",
+      "sha256": "bfed9e10ecc518ec00adf063766d723a84fa1abbee22a3517e315e52f52f320d",
+      "clear": "86,60 133,36 44,69 176,28 36,40 216,46 209,71 171,66"
+    },
+    "d620-741496": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/c/c4/Real_Sport_Clube.png",
+      "sha256": "ed47b2c3f9a348aca794160c4e9018071ee47f872d37bace5322c8d2a4af29b0",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d620-7000476": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Primeiro_Emblema_do_Lusitano_Gin%C3%A1sio_Clube.jpg/250px-Primeiro_Emblema_do_Lusitano_Gin%C3%A1sio_Clube.jpg",
+      "sha256": "87e34d44dbf75940ec295d1c519c7b9bf8817f0bd3e2eff102ec597b914b7250",
+      "background": "#d8d8d8",
+      "tolerance": 70
+    },
+    "d642-57065617": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/1/14/ACS_Dumbr%C4%83vi%C8%9Ba_logo.png/250px-ACS_Dumbr%C4%83vi%C8%9Ba_logo.png",
+      "sha256": "97a59c1aeac7ac71a5dc36579f7de8967406d23bcac32a703e69079fad8ee8fa",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d642-57170885": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4d/SCM_R%C3%A2mnicu_V%C3%A2lcea_logo.png/250px-SCM_R%C3%A2mnicu_V%C3%A2lcea_logo.png",
+      "sha256": "85bfffaa07234ec84f2cb547e9f8011b6259fdd28595d5103fc3e361fc93b675",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d643-1527": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/6/6c/FC_Rotor_Volgograd_logo.png/250px-FC_Rotor_Volgograd_logo.png",
+      "sha256": "7667d5aa3f8d11cc0be440a06789299aa77e8ace87b7787f98492d4c6b091b59",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d643-130497": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/5/58/Saturnlogo.png",
+      "sha256": "8998a7293c82cd4cb57ef5fd8e0612ee1ecaaa9f67dfb6fbc3d645125ff3822b",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d646-5340971": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4d/Rayon_Sports_F.C._logo.png/250px-Rayon_Sports_F.C._logo.png",
+      "sha256": "85b69403f835b02d0d8a5f6468f212f57d6b357f38900ddcd0fae5856ba62fe0",
+      "background": "#ffffff"
+    },
+    "d646-5340983": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/8/8f/Arm%C3%A9e_Patriotique_Rwandaise_FC_%28logo%29.jpg/250px-Arm%C3%A9e_Patriotique_Rwandaise_FC_%28logo%29.jpg",
+      "sha256": "1596cbbbb1e56f5652e86ec1113472e62d863091b71dbe717e6eebe6ee8a4922",
+      "background": "#ffffff",
+      "tolerance": 70
+    },
+    "d682-1025868": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9a/Alkakwabfclogo.png/250px-Alkakwabfclogo.png",
+      "sha256": "ff0a94063c8239b481c1a2bdfa1c1d170627c6c629584ec0772e9c0ba73ab930",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d682-23002952": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/8/85/AlJeelLogo.png/250px-AlJeelLogo.png",
+      "sha256": "0c0d0f4163f78e004a85b62c441e6cf3c5d2c83c11353647cb0460789c8ce92d",
+      "clear": "182,209 181,202"
+    },
+    "d682-23335643": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Al_Ain_FC_%28Saudi_Football_Club%29_Logo.png/250px-Al_Ain_FC_%28Saudi_Football_Club%29_Logo.png",
+      "sha256": "e1ed5e6dda1750b94236bb6be236e9861e405fa01761ec66ea44c5d33b30588b",
+      "background": "#ffffff",
+      "tolerance": 70
+    },
+    "d686-8632697": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a9/US_Ouakam_logo.jpg/250px-US_Ouakam_logo.jpg",
+      "sha256": "36a6ec48a7acadee15d4706e2fb2e5e08552c92a20257208b31d6c2c15416e49",
+      "background": "#ffffff"
+    },
+    "d688-5740900": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/7/76/FK_Loznica_Grb_%28Emblem%29.gif",
+      "sha256": "d0cfdce55a615bc120b7634bd781d64832feb5b5261ee909bd3630e962b7e15f",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d688-5743000": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/JedinstvoUb.grb.webp/250px-JedinstvoUb.grb.webp",
+      "sha256": "3a35c643b84f15107304f827661f9f28412229879f9d1d66d765ea174aa237b1",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d688-5744631": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/98/FKVozdovac.png/250px-FKVozdovac.png",
+      "sha256": "6fb7e441c6d53cac6504e628239af1bd839a591ce0f70b9da891a2479b11198f",
+      "clear": "155,223 114,226"
+    },
+    "d703-63035357": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c1/Fcvsskosice.png/250px-Fcvsskosice.png",
+      "sha256": "6e5f15f7c7d5c2a755505c851dec07f31afdfd7ded1bef7e86e565e71b2fa87b",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d704-5622890": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f5/Quy_Nhon_United_FC_logo.jpg/250px-Quy_Nhon_United_FC_logo.jpg",
+      "sha256": "9308c1f6b3cdd902af7b4167cc332788f84a9e7b07faaa4012934acfed75184c",
+      "background": "#ffffff"
+    },
+    "d704-5627026": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4d/Hoang_Anh_Gia_Lai_FC_logo.png/250px-Hoang_Anh_Gia_Lai_FC_logo.png",
+      "sha256": "49fe30ece1459ca9f6048e10be3ecb0f25073f4189d53248e056a556c5b91c8a",
+      "background": "#ffffff"
+    },
+    "d710-65033935": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/Orbit_College_FC_logo.jpg/250px-Orbit_College_FC_logo.jpg",
+      "sha256": "54a100bf4ee174cdf56b4f61abb8f12f1b0a4b20657e3af262b29cfa3fd8d399",
+      "background": "#ffffff",
+      "clear": "enclosed"
+    },
+    "d710-65034030": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/a/ad/Milford_FC_logo.jpg/250px-Milford_FC_logo.jpg",
+      "sha256": "0610bd463a480a8b9bb41512509652813a255b665c8341e9e7fb6f713cd38c43",
+      "background": "#ffffff"
+    },
+    "d710-2000034502": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/1/1f/Sekhukhune_United_F.C._logo.png/250px-Sekhukhune_United_F.C._logo.png",
+      "sha256": "dcd609bde4da6cde7543a38f4816b79757649e706924037a14b1b10c48fb1afe",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d716-5340946": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/6/6b/Highlanders_FC.png",
+      "sha256": "1c85d4904bae0042143caf0dd66c4721bdb6f9fafb36d24b17c9ea3cc95e80f0",
+      "background": "#ffffff",
+      "tolerance": 110,
+      "clear": "135,181 127,161 123,160"
+    },
+    "d716-12012787": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/1/1f/Hwange_Colliery_F.C.png",
+      "sha256": "c812e2bd60b56d2968d5d34551cb817de6fee530c9c21ed86c48b7d967b0727c",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d716-13114765": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/2/2f/FC_Platinum.png/250px-FC_Platinum.png",
+      "sha256": "4e86a5dc382cbfe6aa3e33fbdd1dd27a612e770d335c1c8bb60ed93a079e600f",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d724-67180027": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a0/CD_Badajoz_Shield.png/250px-CD_Badajoz_Shield.png",
+      "sha256": "0a131185b07d3dd723406ae9ca8aed33b01b30c6661331c46cbafb2a7337cdbd",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d724-67290895": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/40/CFIntercity.png/250px-CFIntercity.png",
+      "sha256": "1bc75fed77bd4bc8224480979b2fe5fea358c3e86e1e9211437dbd7abf24eeb8",
+      "background": "#ffffff"
+    },
+    "d756-137925": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/4/46/FCWohlen.png",
+      "sha256": "421f57873bb4520a14ab96575c85d2ef67c543c883591948242244acb81ca252",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d756-137938": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/f/f2/FC_Tuggen.png",
+      "sha256": "309601950fc4d4619901c8d268764b0b3afd81941d39c7449e7acffe4767cd2e",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d756-5725060": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Logo_Schwarz_FC_K%C3%B6niz.jpg/250px-Logo_Schwarz_FC_K%C3%B6niz.jpg",
+      "sha256": "129b2b67d5c81178493c6bfd2d6f4578d6f82456106d6c6a450e44fa611abb64",
+      "background": "#ffffff"
+    },
+    "d756-98000411": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/1/19/FC_Breitenrain.png",
+      "sha256": "2bec28b3bee6e65bd4ec2e5ebd6836ee7fda857757d1345fa0fb54b9e79c51de",
+      "background": "#ffffff",
+      "tolerance": 70
+    },
+    "d760-135467": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/93/Al-Fotuwa_SC_logo.png/250px-Al-Fotuwa_SC_logo.png",
+      "sha256": "14300cc7cfce3a996738ec4c7135debdc5cb151c305eb4de6e686604b4facf42",
+      "background": "#ffffff"
+    },
+    "d760-135472": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4e/Al-Shorta_SC_%28Syria%29_logo.png/250px-Al-Shorta_SC_%28Syria%29_logo.png",
+      "sha256": "474697e42763cffe23eefb04029e1469ca817a9ed68b3f840466484c5b52e019",
+      "background": "#ffffff"
+    },
+    "d760-135474": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/2/2b/Al-Muhafaza_SC_logo.png",
+      "sha256": "987e11657e3c239a00291d4f9a03698babba47ba03c0726897b8b3b8c5bde052",
+      "background": "#ffffff",
+      "clear": "enclosed"
+    },
+    "d760-135476": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/d/de/Al-Karamah_SC_logo.png/250px-Al-Karamah_SC_logo.png",
+      "sha256": "4fd9db59276722786beb28d4024f986ade3c3dbbd9faa0ecd0c2dd3b751cbd8b",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d760-1037839": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/4/4b/Al-JazeeraClub.png",
+      "sha256": "c1fbe55188a52afbba919bf7c61c0386b25aa4ca18f84dfdb4e575eee0d6bf28",
+      "background": "#ffffff"
+    },
+    "d764-5625051": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/Rayong_F.C._logo_2025_version.png/250px-Rayong_F.C._logo_2025_version.png",
+      "sha256": "e583560b11ac5593abb1c8dddbb7d677bcae6e6e51725754c010b46287934ca7",
+      "background": "#ffffff"
+    },
+    "d764-5637854": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b0/Suphanburi_F.C..png/250px-Suphanburi_F.C..png",
+      "sha256": "6f377efaf99eb75e60360c5d777197877e40c327c14da26321a18a6e90415f6e",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d764-5637859": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Nakhon_Pathom_United_logo_2022.png/250px-Nakhon_Pathom_United_logo_2022.png",
+      "sha256": "0df488a6b717d371b83095dd5e638bed28381f6c535d6199a9a5b8118c1625ac",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d764-23038393": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/44/Ratchaburi_Mitr_Phol_logo_2019.png/250px-Ratchaburi_Mitr_Phol_logo_2019.png",
+      "sha256": "89ba9dd5e8a5a86e56ac3d36a3d6141c45156e2fa6f2dcf2f2f942f0bbfe01c8",
+      "background": "#ffffff"
+    },
+    "d764-23077993": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/4/49/Phraeunitedlogo2.jpg",
+      "sha256": "cf268ac3c7c444631ecac971e869050c47d06ae8b66951ad0ec55606b2c097d8",
+      "background": "#ffffff"
+    },
+    "d764-2000292732": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4f/Pattaya_United_F.C..png/250px-Pattaya_United_F.C..png",
+      "sha256": "0e78794b58d11c414cfc62f0afaeb391c1b523ed300f6f76d96d16df8115c41f",
+      "background": "#ffffff"
+    },
+    "d768-5341686": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/1/1a/Etoile_Filante_du_Togo.png",
+      "sha256": "3c1b82f0cedf639a7e10f4bda0091db1178420b70f5c0159fb8aa8b7aaa75e54",
+      "clear": "8,24"
+    },
+    "d768-5341688": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/2/2b/ASKO_Kara.png",
+      "sha256": "da1e5845e053bb97318851f992bb4c020f0b76ec7d6380e4e60447c02fff746d",
+      "background": "#ffffff"
+    },
+    "d768-5390142": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/0/0f/Gomido.png",
+      "sha256": "78d70c8e5139dc485babf4542dd13473c087f961a98ed381ae04cc1173c1a7dc",
+      "background": "#ffffff"
+    },
+    "d768-5390144": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/1/11/AC_Semassi_FC_logo.gif",
+      "sha256": "c2ad2945ea74cbf44e1621a1812e4e78c7b767accb9d3f9b7623e1a9822807d2",
+      "background": "#ffffff"
+    },
+    "d780-102373": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/a/a7/Police_FC_%28Trinidad_%26_Tobago%29.png",
+      "sha256": "fc0c57b4548abf4d39efe890b544d7a9847ebe2634a7b63517656d7e4f6d9013",
+      "background": "#ffffff",
+      "tolerance": 70
+    },
+    "d784-23154119": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/a/a6/Masfout_Club.png",
+      "sha256": "d033d9ec2fe9263dc4ca0ea1f47d4063cfe32e927737572aeeb3f8808c7c00b9",
+      "background": "#ffffff",
+      "tolerance": 70
+    },
+    "d788-5390019": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/8/88/Logoasdjerba.png",
+      "sha256": "dc20cd5f7abb23eb075dc705d8d477bb10a4eebe94ba0b0734359df8f14b3af9",
+      "background": "#ffffff"
+    },
+    "d788-8633862": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/4/4b/Avenir_Sportif_de_Kasserine_%28logo%29.png",
+      "sha256": "bedb20dac20acad3fee1422feb3025eaad8488d3f54191dd809c39259366f2f4",
+      "background": "#ffffff"
+    },
+    "d788-12004712": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/b/bd/Espoir_Sportif_de_Jerba_Midoun_%28crest%29.png",
+      "sha256": "024e01441e7ae3d16c440bb55756ade0f3f449d9d2fcd0e000f25761b3455650",
+      "background": "#ffffff"
+    },
+    "d788-12019349": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/b/ba/OC_Kerkennah.png",
+      "sha256": "819f130e1ad73d7eb15378c25a573a8f35a05c2cb607ed725162e7136e7debe7",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d792-130298": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/5/51/Kahramanmara%C5%9Fspor_%28logo%29.gif",
+      "sha256": "f873c94e42796bb3d0265e722fc4af0be7fa339bfae4c78e4cbb691ddf848179",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d792-130380": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/e/e3/Sanliurfaspor.gif",
+      "sha256": "a0f6282282ba0fa3d2f0dc9d40496ec6e50177e9dc0a30b43799a1f2fbfa4de9",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d792-453682": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/3/3a/Inegolspor.png",
+      "sha256": "66fea0f5f18e59e4a932a94580ed0d262b7765d94adb2d6f646692bcb4037233",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d800-5340992": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/EXPRESS-FC-LOGO.png/250px-EXPRESS-FC-LOGO.png",
+      "sha256": "6240874f16c989fcfee9b20d037dedbe45ef559fef63086e8b134c354f86b158",
+      "clear": "107,69 90,69 147,32"
+    },
+    "d800-12019927": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/1/1e/URA-FC-logo.png",
+      "sha256": "e300c54c891d57aff25f221ad5b8d4435c97c16c61098edb6eee56bc52d8845b",
+      "background": "#ffffff"
+    },
+    "d800-13198839": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/1/10/MBARARA-CITY-LOGO.jpg/250px-MBARARA-CITY-LOGO.jpg",
+      "sha256": "831122fa17e11e002ee579e850793d8f7deb1cd560ea348e0316da60a7c97b44",
+      "background": "#ffffff"
+    },
+    "d800-13211467": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/3/3b/Wakiso-giants-fc.png",
+      "sha256": "5af2ca2f30c05c2bfe604dc59a4668e775a6582d34c27abbab386d0391eddafc",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d800-23047969": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4a/POLICE-FC-LOGO.png/250px-POLICE-FC-LOGO.png",
+      "sha256": "816e30472da2ec36305804714c99bb24002c4ba4fe71c33654c072a634e76048",
+      "background": "#ffffff"
+    },
+    "d804-71034278": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d8/FC_Kulykiv-Bilka_Logo.jpg/250px-FC_Kulykiv-Bilka_Logo.jpg",
+      "sha256": "512799d34e790921610fcfad9e7536dcc1656ea9b66b79c676855eb192fa0dd7",
+      "background": "#ffffff"
+    },
+    "d807-138162": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/42/FK_Belasica_New_Logo.jpg/250px-FK_Belasica_New_Logo.jpg",
+      "sha256": "cb9237ee247bf3b388592e2a4f56b8df64da656afa19c2ac59b430f7ba44cb97",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d834-5340938": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/3/30/Wajela_jela.png/250px-Wajela_jela.png",
+      "sha256": "0e6593c41cecba19a82116cd044c646e92a1c52feecaf70fe406a4b19a7044ee",
+      "background": "#ffffff"
+    },
+    "d834-13129515": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/2/2c/Coastal_Union_FC_%28logo%29.png/250px-Coastal_Union_FC_%28logo%29.png",
+      "sha256": "e8dd5f9af877a410e789d27a1781c9a42e15cc488b5c5c0985504710b712eaef",
+      "background": "#ffffff",
+      "tolerance": 6
+    },
+    "d840-20047484": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e2/El_Farolito_SC_logo.png/250px-El_Farolito_SC_logo.png",
+      "sha256": "1eb3609b114c2500637aa01488842a11f7b3aca5be565a58ddd0d235f409792a",
+      "background": "#ffffff",
+      "clear": "enclosed"
+    },
+    "d840-2000008034": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/0/0f/Fort_Wayne_Fever_%28emblem%29.jpg",
+      "sha256": "6f8eab3daec2ce70e0f26fa58bcf60148581a61fdf287f2543ba2e60d4fd6361",
+      "background": "#ffffff"
+    },
+    "d854-5341697": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/4/4b/ASFA-Yennenga_logo.png",
+      "sha256": "0d70b2b89bc29104ab5f09a0e3a28565b37163ce7166d1af68e6d7332c80f6ef",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d854-13139370": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/47/Logo_Majestic.png/250px-Logo_Majestic.png",
+      "sha256": "6344416ae67e46c5e659a8a14d18ace95bb5ee28b8dd2daa519b191b68f409ca",
+      "background": "#ffffff"
+    },
+    "d858-116315": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/44/Hurac%C3%A1n_Buceo_logo.png/250px-Hurac%C3%A1n_Buceo_logo.png",
+      "sha256": "26b1b3a538077e0532f5e550374162bfeedd587e9b20a8ef3887bf20493a6036",
+      "background": "#ffffff"
+    },
+    "d858-5512789": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/COF_Nuevo_escudo_2021.png/250px-COF_Nuevo_escudo_2021.png",
+      "sha256": "e23cbed45befc1339c192dc9384d202bfb0ed834f351d3340b638cc3e88750e6",
+      "background": "#ffffff"
+    },
+    "d860-477907": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/7/7a/FC_Dinamo_Samarqand_Logo.jpg",
+      "sha256": "9b4bedbbbcfc9d91424a20bce5ccfbf9a1345e780b6e754b24d7fa12ff2abe7b",
+      "background": "#ffffff"
+    },
+    "d860-484435": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/6/6e/FC_Andijon_logo.png",
+      "sha256": "7b8e905d5261e8127003c6f529908ef9f6367de81f8ef149f54a2b9b85b42f35",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d862-5300232": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/44/Metropolitanos_FC.png/250px-Metropolitanos_FC.png",
+      "sha256": "979a60981f29d2943b421cc2842a4405a0bf6168a9d44c6fc8c33e9e12dd7d4d",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d862-2000255137": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/f/fe/CS_Mar%C3%ADtimo_de_La_Guaira.png/250px-CS_Mar%C3%ADtimo_de_La_Guaira.png",
+      "sha256": "8a7b2456b7f13715ac7735d544287e7421f0949481e1d06ca02085f2cdabfc20",
+      "background": "#ffffff",
+      "tolerance": 110
+    },
+    "d894-5341704": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/f/f5/RedArrowsFClogo.jpeg/250px-RedArrowsFClogo.jpeg",
+      "sha256": "41fba1a7e58c80c7290b3f1382f00a6ba6acb53ae6fd9d7bfcdab52a66a22ddf",
+      "background": "#ffffff"
+    },
+    "d894-5341706": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/f/f8/NkanaFclogo.png",
+      "sha256": "14940e4f8ff1eae8ba299926d99956e306113b2ca4de740f20e235dec306782d",
+      "background": "#ffffff"
+    },
+    "d894-5341711": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/9/94/Zanaco_FC.png/250px-Zanaco_FC.png",
+      "sha256": "a4f594929a7a55e59c992b25f0e0ad5ea5ad029cb44fa913eeef4f94a3ee087c",
+      "background": "#ffffff",
+      "tolerance": 70
+    },
+    "el-besiktas": {
+      "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Be%C5%9Fikta%C5%9F_logo.png/250px-Be%C5%9Fikta%C5%9F_logo.png",
+      "sha256": "2fad58f85600a33d8f6323e8b81af7a16392f4dc9f900cb49be59767ddd52932",
+      "background": "#ffffff"
     }
   },
   "twins": {

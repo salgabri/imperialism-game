@@ -8,9 +8,9 @@
 //     --refresh  ask Wikidata again (downloaded images stay cached; Wikipedia's answers are never asked again)
 //     --pin      record the SHA-256 of every Wikipedia answer the run reads in scripts/data/club-logos-wikipedia.json
 //   node scripts/sync-club-logos.mjs --pages
-//     rewrite only the crests scripts/data/club-logos.json "pages" names (below), from their file pages; every other
-//     crest, its SOURCES.tsv row and src/data/clubLogos.js stay as committed. It reads no Wikipedia API answer and asks
-//     Wikidata nothing, so it runs while the full sync cannot (no API answer is pinned).
+//     rewrite only the crests scripts/data/club-logos.json "pages" names (below), from their file pages, and those its
+//     "cuts" name; every other crest, its SOURCES.tsv row and src/data/clubLogos.js stay as committed. It reads no
+//     Wikipedia API answer and asks Wikidata nothing, so it runs while the full sync cannot (no API answer is pinned).
 //
 // Sources (cached under the gitignored data-src/club-logos/, so reruns are offline). Every request goes through
 // scripts/lib/polite-fetch.mjs (one generic User-Agent, robots.txt read first and obeyed):
@@ -52,12 +52,17 @@
 //     wider than the original), whose bytes are then pinned and drawn: upload.wikimedia.org answers a run of originals
 //     with HTTP 429 and asks for its standard thumbnails instead, so college football's 138 school crests are 330px
 //     thumbnails. So are 287 of the 748 crests the country maps' clubs gained on 17 November 2026; 86 of those came from
-//     another language's file page. A record may name the colour of a box the picture was saved on (`background`,
-//     '#ffffff'), which the drawing clears as the period crests' is. A women's club may have a record of its own. A
+//     another language's file page. A record may say what of its picture is the paper it was saved on (`background`,
+//     `tolerance`, `inset`, `clear`, `keep`: scripts/lib/crest-cutout.mjs), which the drawing clears as the period
+//     crests' is. A women's club may have a record of its own. A
 //     crest whose file Wikipedia has deleted since comes from the Wayback Machine's copy of the picture its article
 //     showed (`wayback`: the archived picture's im_ address, with `page`, the file page it had, `licence`, as that page
 //     stated or "not recorded", and `nonFree`), as the period crests' archived pictures do.
-//     --pages also gives a club that wears its twin's file (an all-leagues or women's club) its twin's crest, new or
+//   - A crest the full sync drew whose picture shows the paper it was saved on is cut out by a record of
+//     scripts/data/club-logos.json "cuts" (club id -> { image, sha256, ...the same cut fields }): `image` is the thumbnail
+//     the full sync drew, on upload.wikimedia.org, pinned by its SHA-256. Its file, licence and SOURCES.tsv row stay as
+//     committed, so the cut needs no Wikipedia answer, and --pages draws it too.
+//   - --pages also gives a club that wears its twin's file (an all-leagues or women's club) its twin's crest, new or
 //     committed, when it has none, as the full sync would.
 //
 // Writes:
@@ -71,6 +76,7 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import sharp from 'sharp';
+import { cutOf } from './lib/crest-cutout.mjs';
 import { crestWebp } from './lib/crest-image.mjs';
 import { filePageFacts, filePageUrl } from './lib/wiki-file-page.mjs';
 import { CLUBS as FOOTBALL_CLUBS } from '../src/data/clubs.football.js';
@@ -350,7 +356,7 @@ async function committedCrests() {
 
 const overrides = existsSync(overridesFile) ? JSON.parse(await readFile(overridesFile, 'utf8')) : {};
 const itemOverrides = overrides.items || {}, fileOverrides = overrides.files || {}, twinOverrides = overrides.twins || {};
-const pageOverrides = overrides.pages || {};
+const pageOverrides = overrides.pages || {}, cutOverrides = overrides.cuts || {};
 
 const domestic = await domesticClubs();
 const domesticById = new Map(domestic.map(club => [club.id, club]));
@@ -442,8 +448,8 @@ for (const [id, record] of Object.entries(pageOverrides)) {
   if (!club) throw new Error(`club-logos.json "pages" names unknown club ${id}`);
   if (!record?.file || !/^[0-9a-f]{64}$/.test(record.sha256 ?? '')) throw new Error(`club-logos.json "pages" ${id}: give its file and its original's SHA-256`);
   if (record.thumb !== undefined && !STANDARD_THUMBS.has(record.thumb)) throw new Error(`club-logos.json "pages" ${id}: thumb ${record.thumb} is no standard width (${[...STANDARD_THUMBS].join(', ')})`);
-  // A picture saved on a solid box names the box's colour, which the drawing clears (as the period crests' do).
-  if (record.background !== undefined && !/^#[0-9a-f]{6}$/.test(record.background)) throw new Error(`club-logos.json "pages" ${id}: background is a #rrggbb colour`);
+  // What of the picture is paper is cleared, as the period crests' is (scripts/lib/crest-cutout.mjs).
+  const cut = cutOf(record, `club-logos.json "pages" ${id}`);
   const name = fileName(record.file);
   // A file since deleted from Wikipedia comes from the Wayback Machine's copy (`wayback`: the archived picture, which
   // its article showed as the club's crest), with the file page it had and the licence its record states.
@@ -460,8 +466,22 @@ for (const [id, record] of Object.entries(pageOverrides)) {
     throw new Error(`${id}: ${source} (SHA-256 ${sha256(bytes)}) is not the ${record.thumb ? 'thumbnail' : 'original'} pinned in ${path.relative(root, overridesFile)} "pages". Nothing was written.`);
   }
   club.twin = null; // a file of its own
-  pageCrests.set(id, { webp: await crestWebp(bytes, { svg: !record.thumb && /\.svg$/i.test(info.original), background: record.background ?? null }),
+  pageCrests.set(id, { webp: await crestWebp(bytes, { svg: !record.thumb && /\.svg$/i.test(info.original), cut }),
     crest: { file: id, name, info, from: 'page' } });
+}
+
+// The "cuts": crests the full sync drew, drawn again from the same thumbnail with its paper cleared. Their files,
+// licences and SOURCES.tsv rows stay as committed.
+const cutCrests = new Map(); // club id -> its WebP
+for (const [id, record] of Object.entries(cutOverrides)) {
+  if (!clubs.some(entry => entry.id === id)) throw new Error(`club-logos.json "cuts" names unknown club ${id}`);
+  if (pageOverrides[id]) throw new Error(`club-logos.json "cuts" ${id}: its "pages" record says how its picture is cut`);
+  if (!/^https:\/\/upload\.wikimedia\.org\/wikipedia\/[^?#]+$/.test(record?.image ?? '') || !/^[0-9a-f]{64}$/.test(record.sha256 ?? '')) throw new Error(`club-logos.json "cuts" ${id}: give its image's address on upload.wikimedia.org and its SHA-256`);
+  const cut = cutOf(record, `club-logos.json "cuts" ${id}`);
+  if (!cut) throw new Error(`club-logos.json "cuts" ${id}: nothing to cut`);
+  const bytes = await download(record.image);
+  if (sha256(bytes) !== record.sha256) throw new Error(`${id}: ${record.image} (SHA-256 ${sha256(bytes)}) is not the image pinned in ${path.relative(root, overridesFile)} "cuts". Nothing was written.`);
+  cutCrests.set(id, await crestWebp(bytes, { cut }));
 }
 
 const qids = pagesOnly ? [] : [...new Set(clubs.map(club => club.qid).filter(Boolean))].sort();
@@ -498,7 +518,10 @@ await Promise.all(clubs.filter(club => !pagesOnly && !club.twin && !pageCrests.h
     try {
       bytes = await download(info.thumb);
       reason = candidate.from === 'override' ? null : await crestReason(candidate.name, candidate.from, info, bytes);
-      if (!reason) webp = await crestWebp(bytes);
+      // A crest "cuts" names is drawn cut, from the very image it pins.
+      const pinned = cutOverrides[club.id]?.sha256;
+      if (!reason && pinned && sha256(bytes) !== pinned) reason = 'not the image "cuts" pins';
+      if (!reason) webp = pinned ? cutCrests.get(club.id) : await crestWebp(bytes);
     } catch (error) {
       reason = bytes ? `unreadable image (${error.message.split('\n')[0]})` : 'download failed (rerun to retry)';
     }
@@ -515,6 +538,10 @@ for (const [id, { webp, crest }] of pageCrests) {
   // twin's) lists the new source too.
   if (pagesOnly) for (const [other, entry] of crests) if (other !== id && entry.file === id) crests.set(other, { ...crest, label: entry.label });
   crests.set(id, { ...crest, label: crests.get(id)?.label });
+}
+if (pagesOnly) for (const [id, webp] of cutCrests) {
+  if (crests.get(id)?.file !== id) throw new Error(`club-logos.json "cuts" ${id}: the club wears no crest file of its own`);
+  await writeCrest(id, webp);
 }
 if (!pagesOnly) for (const club of clubs.filter(entry => entry.twin && crests.has(entry.twin))) crests.set(club.id, { ...crests.get(club.twin), file: club.twin });
 // --pages: an all-leagues or women's club without a crest shares its twin's, new or committed, as the full sync would

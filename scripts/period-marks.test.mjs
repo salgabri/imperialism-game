@@ -130,7 +130,7 @@ const compiled = await build({
     contents: `export { default as TeamMark } from './src/components/TeamMark.jsx';
       export { default as SquadFlag } from './src/screens/squad/SquadFlag.jsx';
       export { SeasonYear } from './src/components/seasonYear.js';
-      export { crestFile, crestUrl, rememberTwins } from './src/data/crests.js';`,
+      export { CREST_DRAWING, crestFile, crestUrl, rememberTwins } from './src/data/crests.js';`,
     resolveDir: fileURLToPath(root), loader: 'jsx',
   },
   bundle: true, write: false, platform: 'node', format: 'cjs', external: ['react'], jsx: 'automatic',
@@ -138,7 +138,9 @@ const compiled = await build({
 });
 const bundled = { exports: {} };
 new Function('require', 'module', 'exports', compiled.outputFiles[0].text)(createRequire(import.meta.url), bundled, bundled.exports);
-const { TeamMark, SquadFlag, SeasonYear, crestFile, crestUrl, rememberTwins } = bundled.exports;
+const { TeamMark, SquadFlag, SeasonYear, CREST_DRAWING, crestFile, crestUrl, rememberTwins } = bundled.exports;
+// A crest's address: its file, and the drawing of the crests it asks for (src/data/crests.js).
+const crestAt = file => `/club-logos/${file}.webp?v=${CREST_DRAWING}`;
 const dom = new JSDOM('<!doctype html><html><body></body></html>');
 after(() => dom.window.close());
 const render = element => {
@@ -176,7 +178,7 @@ test('a club wears today\'s crest in a season of today and outside its eras, its
     for (const [from, through, file] of eras) {
       assert.equal(crestFile(id, from), file, `${id} ${from}`);
       assert.equal(crestFile(id, through), file, `${id} ${through}`);
-      assert.equal(crestUrl(id, from), file ? `/club-logos/${file}.webp` : null);
+      assert.equal(crestUrl(id, from), file ? crestAt(file) : null);
     }
   }
   const id = Object.keys(CREST_ERAS).find(key => clubLogoFile(key)) ?? 'b-boston-celtics';
@@ -418,11 +420,11 @@ test('TeamMark and SquadFlag draw the crest of the season on screen', () => {
   const at = year => render(React.createElement(SeasonYear.Provider, { value: year },
     React.createElement(TeamMark, { id, teamId: id, code: 'XYZ', color: '#123456', isClub: true, width: 28 })));
   const today = at(null).querySelector('img')?.getAttribute('src') ?? null;
-  assert.equal(today, clubLogoFile(id) ? `/club-logos/${clubLogoFile(id)}.webp` : null);
+  assert.equal(today, clubLogoFile(id) ? crestAt(clubLogoFile(id)) : null);
   const then = at(from);
-  if (file) assert.equal(then.querySelector('img').getAttribute('src'), `/club-logos/${file}.webp`);
+  if (file) assert.equal(then.querySelector('img').getAttribute('src'), crestAt(file));
   else assert.equal(then.textContent, 'XYZ', 'no picture of the crest of the day: the monogram');
   const flag = render(React.createElement(SeasonYear.Provider, { value: from },
     React.createElement(SquadFlag, { teamId: id, isClub: true, width: 16 })));
-  assert.equal(flag.querySelector('img')?.getAttribute('src') ?? null, file ? `/club-logos/${file}.webp` : null);
+  assert.equal(flag.querySelector('img')?.getAttribute('src') ?? null, file ? crestAt(file) : null);
 });

@@ -4,7 +4,9 @@
 //
 // Reads scripts/data/crest-eras.json: `crests`, each period crest by its file key ('<club id>.<first year>') with its
 // source (a Wikipedia or Commons file, or an archived copy of one on the Wayback Machine), licence and the SHA-256 of
-// the original, cached under the gitignored data-src/crest-eras/files/; and `clubs`, each club's eras
+// the original, cached under the gitignored data-src/crest-eras/files/, and what of the original is the paper it was
+// saved on, to be cleared (`background`, `tolerance`, `inset`, `clear`, `keep`: scripts/lib/crest-cutout.mjs, docs/design/
+// period-marks.md "Cutouts"); and `clubs`, each club's eras
 // [first year, last year, file key | today's file of another id | null], in the season years the game uses. A club is
 // its id, or its id and country ('<club id>@<country>', the country as its season maps name it) where the seasons give
 // that id to clubs of two countries (a namesake: f-valencia is Venezuela's Valencia FC in 1995/96 and Valencia CF in
@@ -12,8 +14,8 @@
 // No network: the originals come from the cache, where the research put them (data-src/crest-eras/BRIEF.md).
 //
 // Writes:
-//   public/club-logos/<key>.webp         each period crest, trimmed and fitting 128x128 as scripts/sync-club-logos.mjs
-//                                         draws today's crests (scripts/lib/crest-image.mjs)
+//   public/club-logos/<key>.webp         each period crest, cut out, trimmed and fitting 128x128 as
+//                                         scripts/sync-club-logos.mjs draws today's crests (scripts/lib/crest-image.mjs)
 //   public/club-logos/SOURCES-eras.tsv   each period crest's club, years, source file, licence and page
 //   src/data/clubCrestEras.js            CREST_ERAS for src/data/crests.js, by club id: a namesake's eras of every country
 //                                         in one list, each with its country as a fourth element
@@ -24,6 +26,7 @@ import { existsSync } from 'node:fs';
 import { readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { cutOf } from './lib/crest-cutout.mjs';
 import { crestWebp } from './lib/crest-image.mjs';
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
@@ -47,8 +50,9 @@ for (const [key, crest] of Object.entries(crests)) {
   // that serves the archived bytes as they were (`id_`, or `im_` for an image).
   if (crest.kind === 'wayback') assert.match(crest.wayback || '', /^https:\/\/web\.archive\.org\/web\/\d{4,14}(id|im)_\//, `${key}: a Wayback crest names its capture`);
   else assert.match(crest.download || '', /^https:\/\/upload\.wikimedia\.org\//, `${key}: a Wikimedia crest names its original file`);
-  // A picture saved on a solid box names the box's colour, which the drawing clears (scripts/lib/crest-image.mjs).
-  if (crest.background != null) assert.match(crest.background, /^#[0-9a-f]{6}$/, `${key}: background is a #rrggbb colour`);
+  // A picture saved on a solid box names the box's colour, and the areas inside the crest that show it too, which the
+  // drawing clears (scripts/lib/crest-cutout.mjs).
+  cutOf(crest, key);
 }
 const todays = new Set((await readdir(outDir)).filter(name => name.endsWith('.webp') && !/\.\d{4}\.webp$/.test(name)).map(name => name.slice(0, -5)));
 const used = new Set();
@@ -91,7 +95,7 @@ for (const key of Object.keys(crests).sort(byId)) {
   const bytes = await readFile(cache);
   assert.equal(sha256(bytes), crest.sha256, `${key}: ${crest.cache} is not the pinned original`);
   const isSvg = /\.svg$/i.test(crest.cache) || bytes.subarray(0, 512).toString('utf8').includes('<svg');
-  outputs.set(path.join(outDir, `${key}.webp`), await crestWebp(bytes, { svg: isSvg, background: crest.background ?? null }));
+  outputs.set(path.join(outDir, `${key}.webp`), await crestWebp(bytes, { svg: isSvg, cut: cutOf(crest, key) }));
 }
 
 const tsv = [
