@@ -656,11 +656,16 @@ them, whose box earlier cuts had to leave.
 Left as they were: white that is the crest's own (a roundel's field, a white ball, animal or
 lettering on a dark field, an even keyline round an American logo); a flat field of another
 colour that is the logo's own (the White Sox' blue and red squares of 1969-1975, Precision
-Football's black disc); and three pictures no cut mends: a stadium photograph for Limane
-Yacouba Sylla FC (`d384-12076506`), SK Kladno's photographed crest of 2008-2010 and El
-Shams SC's patterned square. A few dozen crests show the opposite fault, white of the crest's
-own that came see-through in the source file (a ball's panels, a band behind a name): no cut
-gives it back.
+Football's black disc). Three pictures no cut mends, a stadium photograph for Limane Yacouba
+Sylla FC (`d384-12076506`), SK Kladno's photographed crest of 2008-2010 (`f-sk-kladno.2008`) and
+El Shams SC's patterned square (`d818-13153579`), gave way to the clubs' crests on 26 November
+2026: Lithuanian Wikipedia's for Limane Yacouba Sylla, the shield on Commons that Egyptian Arabic
+Wikipedia shows as El Shams's logo (`background` clears its white box), and the roundel SK
+Kladno's website showed in 2009, as Romanian Wikipedia uploaded it on 24 September 2009 (the
+same as Russian Wikipedia's copy of June 2007 and German Wikipedia's vector of October 2008, so
+dated to the club's First League seasons). A few dozen crests show the opposite fault, white of
+the crest's own that came see-through in the source file (a ball's panels, a band behind a
+name): no cut gives it back.
 
 A crest redrawn under its old name would show its old look for up to a month to a returning
 player (README "Caching"), so a crest's address names the drawing it asks for

@@ -4206,9 +4206,15 @@
       "sha256": "89ea208bd56b3b7bddfd9cfcae9f2e487d2e6113db77bfb86cefbc41acdd14bd",
       "thumb": 330
     },
+    "d384-12076506": {
+      "file": "Limane Yacouba Sylla FC Sassandra.png",
+      "sha256": "128d266fb75278c2a6b58ccd0a03a05020cf681cc9418338be22152c9faf1563",
+      "wiki": "lt"
+    },
     "d818-13153579": {
-      "file": "El Shams SC.jpg",
-      "sha256": "b2fd2e55677a141a10ddd71d088799e897edb39c750473a4c523f8f9a30527d1"
+      "file": "شعار نادي الشمس الرياضي الجديد.png",
+      "sha256": "886f48ebf24956c6c09ff7ece2acd9e5d523987d43e7414373eb782ba02763b1",
+      "background": "#ffffff"
     },
     "d834-13214851": {
       "file": "Pamba S.C.jpg",

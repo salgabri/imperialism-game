@@ -3201,9 +3201,16 @@ Every crest was looked at on 25 November 2026: those without transparency before
 with each enclosed area numbered, the rest by seven reviewers, every one they listed by eye.
 1,243 are cut (769 period crests, 234 `pages` crests, 240 crests the full sync drew); white
 that is the crest's own stays, as do a few flat fields of another colour that are the logo's
-own (the White Sox' squares of 1969-1975). Three pictures no cut can mend stay as they are:
-a stadium photograph for Limane Yacouba Sylla FC, SK Kladno's photographed crest of
-2008-2010 and El Shams SC's patterned square (docs/design/period-marks.md, "Cutouts").
+own (the White Sox' squares of 1969-1975). Three pictures no cut could mend were not crests
+at all: a stadium photograph for Limane Yacouba Sylla FC (its English article's lead image),
+SK Kladno's crest photographed on a wall for 2008-2010 (Czech Wikipedia's infobox) and El
+Shams SC's badge set on a patterned photograph. On 26 November 2026 each gave way to its
+club's crest, from the articles of the same Wikidata item: Lithuanian Wikipedia's shield for
+Limane Yacouba Sylla; the shield Egyptian Arabic Wikipedia shows as El Shams's logo (on
+Commons since May 2026, beside the sun badge it calls the old one), cut from its white box;
+and for Kladno the roundel its website showed in its First League seasons, as Romanian
+Wikipedia uploaded it on 24 September 2009 (Russian Wikipedia's copy of 2007 and German
+Wikipedia's vector of 2008 show the same).
 A crest's address names the drawing it asks for (`?v=2`, `CREST_DRAWING` in
 `src/data/crests.js`), so returning players see the redrawn crests at once rather than
 after their browser's month-old copy expires. `scripts/crest-cutout.test.mjs` checks the
