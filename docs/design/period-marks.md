@@ -663,14 +663,45 @@ El Shams SC's patterned square (`d818-13153579`), gave way to the clubs' crests 
 Wikipedia shows as El Shams's logo (`background` clears its white box), and the roundel SK
 Kladno's website showed in 2009, as Romanian Wikipedia uploaded it on 24 September 2009 (the
 same as Russian Wikipedia's copy of June 2007 and German Wikipedia's vector of October 2008, so
-dated to the club's First League seasons). A few dozen crests show the opposite fault, white of
-the crest's own that came see-through in the source file (a ball's panels, a band behind a
-name): no cut gives it back.
+dated to the club's First League seasons).
+
+Some crests show the opposite fault: white of the crest's own that the uploader cleared with
+the paper, so their file leaves it see-through. On a club's land it showed as land: the Tampa
+Bay Lightning's bolt of 1993-2007, the panels on one side of FC Bulle's and UD Logroñés' balls,
+the bands of BKMA Yerevan's shield (which the same crest of 2020 shows white), FK BASK's
+roundel round its white letters. The same record names that white, and after the cut the
+drawing paints it back:
+
+- `fill`: 'enclosed' for every see-through area the crest's outline shuts in, or points
+  ('x,y x,y'), each filling the area round it. 'enclosed' passes over an area where the cut
+  cleared paper (by its points, its 'enclosed' areas or as a pocket), and a point's area must
+  not reach the picture's edge.
+- `hollow`: with 'enclosed', the see-through areas that are the crest's by design (a ring's
+  inside, a free-standing letter's counter).
+- `fence`: lines that shut an area whose outline is open: the Lightning's bolt runs out between
+  the words Tampa and Bay, and Maccabi Kiryat Ata's ball runs on under its star, so an arc of
+  the ball's circle shuts it there. Points joined in turn, one line from the next apart with
+  '; '; the white runs up to the line.
+
+What is filled shows as on white paper: a pixel at its edge that is part transparent takes
+white behind it, so the outline round the white keeps its smooth edge.
+
+On 26 November 2026 the 132 crests the reviewers had listed as half white, half see-through
+were looked at again, each see-through area numbered and each fill drawn before and after on
+coloured land. 41 are filled: 17 period crests, 9 with a `pages` record and 15 under `cuts`
+(12 of them new, each pinning the thumbnail the full sync drew). Five had had their last white
+cleared the day before to match the rest (the Lightning's bolt tip, Şamkir's ball, Boston
+United's ring, Al-Ramtha's bar, Kirivong Sok Sen Chey's field), and those `clear`s are gone.
+Left see-through: what may be the design (the seams of the Kings' and SuperSonics' balls, a
+thin ring between two rings, Anderlecht's middle column), balls whose panels run on into the
+crest round them with no outline to fence (Bnei Reineh's, Hapoel Ashkelon's), specks too
+small to show, and the few whose missing part is not white (Talant FC's shadow, FC Gossau's
+light blue F and C).
 
 A crest redrawn under its old name would show its old look for up to a month to a returning
 player (README "Caching"), so a crest's address names the drawing it asks for
-(`CREST_DRAWING` in `src/data/crests.js`, `?v=2` since this pass), and the worker caches
-either.
+(`CREST_DRAWING` in `src/data/crests.js`: `?v=2` since the cut, `?v=3` since the fill), and the
+worker caches either.
 
 ## Checks
 

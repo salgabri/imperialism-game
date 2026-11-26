@@ -53,13 +53,15 @@
 //     with HTTP 429 and asks for its standard thumbnails instead, so college football's 138 school crests are 330px
 //     thumbnails. So are 287 of the 748 crests the country maps' clubs gained on 17 November 2026; 86 of those came from
 //     another language's file page. A record may say what of its picture is the paper it was saved on (`background`,
-//     `tolerance`, `inset`, `clear`, `keep`: scripts/lib/crest-cutout.mjs), which the drawing clears as the period
-//     crests' is. A women's club may have a record of its own. A
+//     `tolerance`, `inset`, `clear`, `keep`) and what white of the crest's own it left see-through (`fill`, `hollow`,
+//     `fence`: scripts/lib/crest-cutout.mjs), which the drawing clears and fills as the period crests' is. A women's club
+//     may have a record of its own. A
 //     crest whose file Wikipedia has deleted since comes from the Wayback Machine's copy of the picture its article
 //     showed (`wayback`: the archived picture's im_ address, with `page`, the file page it had, `licence`, as that page
 //     stated or "not recorded", and `nonFree`), as the period crests' archived pictures do.
-//   - A crest the full sync drew whose picture shows the paper it was saved on is cut out by a record of
-//     scripts/data/club-logos.json "cuts" (club id -> { image, sha256, ...the same cut fields }): `image` is the thumbnail
+//   - A crest the full sync drew whose picture shows the paper it was saved on, or leaves its own white see-through, is
+//     cut out or filled by a record of scripts/data/club-logos.json "cuts" (club id -> { image, sha256, ...the same cut
+//     fields }): `image` is the thumbnail
 //     the full sync drew, on upload.wikimedia.org, pinned by its SHA-256. Its file, licence and SOURCES.tsv row stay as
 //     committed, so the cut needs no Wikipedia answer, and --pages draws it too.
 //   - --pages also gives a club that wears its twin's file (an all-leagues or women's club) its twin's crest, new or

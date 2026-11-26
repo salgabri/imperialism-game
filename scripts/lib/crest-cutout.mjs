@@ -13,9 +13,20 @@
 //                counters), or 'x,y x,y …', a point of the original in each
 //   keep         with clear 'enclosed', the areas that are the crest's own white: 'x,y x,y …'
 //
+// The opposite fault has fields of its own: white of the crest's that the picture leaves see-through, cleared by its
+// uploader with the paper (a ball's panels, the band behind a name). After the cut, it is painted white again:
+//
+//   fill         'enclosed' for every see-through area the crest encloses (but one the cut cleared paper in), or
+//                'x,y x,y …', a point in each
+//   hollow       with fill 'enclosed', the see-through areas that are the crest's by design (a ring's inside, the counter
+//                of a free-standing letter): 'x,y x,y …'
+//   fence        lines that shut an area to fill where the crest's outline leaves it open to the outside: points
+//                'x,y x,y …' joined in turn, one line from another apart with '; '
+//
 // Points are pixels of the original (an SVG's as crestWebp draws it). What is cleared keeps a clean edge: a pixel beside
 // it that mixes the paper's colour with the crest's becomes the crest's colour, as transparent as the mix was pale, so no
-// light fringe shows on a dark land.
+// light fringe shows on a dark land. What is filled is the crest as it shows on white paper: a pixel at its edge that is
+// part transparent shows on white.
 import assert from 'node:assert/strict';
 
 const TOLERANCE = 40;
@@ -23,8 +34,11 @@ const CLEAR = 16; // an alpha below this is transparent
 const FAINT = 110; // a pixel this near the box's colour, per channel, is no more than a trace of the crest
 const HEX = /^#[0-9a-f]{6}$/;
 const POINTS = /^\d+,\d+(?: \d+,\d+)*$/;
+const FENCE = /^\d+,\d+(?: \d+,\d+)+(?:; \d+,\d+(?: \d+,\d+)+)*$/;
 const RINGS = 3; // how far from what is cleared a pixel may still mix its colour
-const FIELDS = ['background', 'tolerance', 'inset', 'clear', 'keep'];
+const SEE_THROUGH = 128; // an alpha below this is see-through, for what is filled
+const FILL_RINGS = 2; // how far from what is filled a part transparent pixel is its edge
+const FIELDS = ['background', 'tolerance', 'inset', 'clear', 'keep', 'fill', 'hollow', 'fence'];
 
 const rgb = hex => [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
 const points = text => text.split(' ').map(point => point.split(',').map(Number));
@@ -35,18 +49,24 @@ export function cutOf(record, label = 'crest') {
   const cut = {};
   for (const field of FIELDS) if (record?.[field] !== undefined) cut[field] = record[field];
   if (!Object.keys(cut).length) return null;
-  const { background, tolerance, inset, clear, keep } = cut;
+  const { background, tolerance, inset, clear, keep, fill, hollow, fence } = cut;
   assert(background === undefined || HEX.test(background), `${label}: background is a #rrggbb colour`);
   assert(tolerance === undefined || (Number.isInteger(tolerance) && tolerance > 0 && tolerance < 256), `${label}: tolerance is 1 to 255`);
   assert(inset === undefined || Number.isInteger(inset) || /^\d+ \d+ \d+ \d+$/.test(inset), `${label}: inset is a number of pixels, or 'top right bottom left'`);
   assert(clear === undefined || clear === 'enclosed' || POINTS.test(clear), `${label}: clear is 'enclosed' or points 'x,y x,y'`);
   assert(keep === undefined || (clear === 'enclosed' && POINTS.test(keep)), `${label}: keep is points 'x,y x,y', with clear 'enclosed'`);
-  assert(background !== undefined || clear !== undefined, `${label}: a cut names a background or areas to clear`);
+  assert(fill === undefined || fill === 'enclosed' || POINTS.test(fill), `${label}: fill is 'enclosed' or points 'x,y x,y'`);
+  assert(hollow === undefined || (fill === 'enclosed' && POINTS.test(hollow)), `${label}: hollow is points 'x,y x,y', with fill 'enclosed'`);
+  assert(fence === undefined || (fill !== undefined && FENCE.test(fence)), `${label}: fence is lines of points 'x,y x,y; x,y x,y', with a fill`);
+  assert(!(clear === 'enclosed' && fill === 'enclosed'), `${label}: clear 'enclosed' and fill 'enclosed' undo each other`);
+  assert(background !== undefined || clear !== undefined || fill !== undefined, `${label}: a cut names a background or areas to clear or fill`);
   assert(background !== undefined || (inset === undefined && clear !== 'enclosed'), `${label}: inset and clear 'enclosed' need the box's colour (background)`);
+  assert(tolerance === undefined || background !== undefined || clear !== undefined, `${label}: tolerance is for a background or areas to clear`);
   return cut;
 }
 
-/** An RGBA picture ({ data, width, height }) cut as `cut` (cutOf) says: the same size, its paper transparent. */
+/** An RGBA picture ({ data, width, height }) cut as `cut` (cutOf) says: the same size, its paper transparent and the
+ * white it lost filled. */
 export function cutOut(picture, cut) {
   const { width, height } = picture;
   const N = width * height;
@@ -58,11 +78,13 @@ export function cutOut(picture, cut) {
   // 0: the crest; else the colour the pixel was cleared as, by its place in `papers`.
   const cleared = new Uint8Array(N);
   const papers = [null, box ?? [255, 255, 255]];
+  let boxed = null; // what the box's flood from the edges reached
   if (box) {
     const edges = [];
     for (let x = 0; x < width; x++) edges.push(x, (height - 1) * width + x);
     for (let y = 0; y < height; y++) edges.push(y * width, y * width + width - 1);
     flood(image, cleared, edges, 1, p => data[p * 4 + 3] < CLEAR || isNear(image, p, box));
+    boxed = cleared.slice();
     clearPockets(image, cleared, box);
   }
   if (cut.clear === 'enclosed') {
@@ -85,7 +107,98 @@ export function cutOut(picture, cut) {
   }
   const out = softenEdges(image, cleared, papers);
   if (box) dropCrumbs(out, width, height, box);
+  if (cut.fill) {
+    // Paper the cut found inside the crest: its points, 'enclosed' areas and pockets, which no fill gives back. What the
+    // box's flood reached is outside the crest, or inside an area whose mouth a fence shuts, where the fill repaints it.
+    const paper = new Uint8Array(N);
+    for (let p = 0; p < N; p++) if (cleared[p] && !boxed?.[p] && picture.data[p * 4 + 3] >= SEE_THROUGH) paper[p] = 1;
+    fillIn(out, width, height, cut, paper);
+  }
   return { data: out, width, height };
+}
+
+/**
+ * The see-through areas `cut.fill` names painted white, in place: 'enclosed' for every area of see-through pixels (side
+ * by side) that reaches neither the picture's edge nor any `paper` the cut cleared, but those `cut.hollow` names, or the
+ * areas of the points it gives, which must not reach the edge. `cut.fence` draws lines across their mouths first. Their
+ * part transparent edge, up to FILL_RINGS pixels deep, shows on white too.
+ */
+function fillIn(data, width, height, cut, paper) {
+  const N = width * height;
+  const fence = new Uint8Array(N);
+  const inside = ([x, y], what) => assert(x < width && y < height, `${what} ${x},${y} is outside the ${width}x${height} picture`);
+  for (const line of cut.fence ? cut.fence.split('; ').map(points) : []) {
+    for (const point of line) inside(point, 'fence point');
+    for (let k = 1; k < line.length; k++) drawLine(fence, width, line[k - 1], line[k]);
+  }
+  const open = p => !fence[p] && data[p * 4 + 3] < SEE_THROUGH;
+  const sides = p => {
+    const x = p % width;
+    return [x > 0 ? p - 1 : -1, x < width - 1 ? p + 1 : -1, p >= width ? p - width : -1, p < N - width ? p + width : -1].filter(q => q >= 0);
+  };
+  const label = new Int32Array(N).fill(-1);
+  const areas = [];
+  for (let start = 0; start < N; start++) {
+    if (label[start] >= 0 || !open(start)) continue;
+    const area = { pixels: [start], edge: false, paper: false };
+    label[start] = areas.length;
+    for (let k = 0; k < area.pixels.length; k++) {
+      const p = area.pixels[k], x = p % width;
+      if (x === 0 || x === width - 1 || p < width || p >= N - width) area.edge = true;
+      if (paper[p]) area.paper = true;
+      for (const q of sides(p)) if (label[q] < 0 && open(q)) { label[q] = areas.length; area.pixels.push(q); }
+    }
+    areas.push(area);
+  }
+  const areaAt = point => {
+    inside(point, 'point');
+    const p = point[1] * width + point[0];
+    assert(open(p), `point ${point} is not see-through`);
+    return areas[label[p]];
+  };
+  let chosen;
+  if (cut.fill === 'enclosed') {
+    const hollow = new Set((cut.hollow ? points(cut.hollow) : []).map(areaAt));
+    chosen = areas.filter(area => !area.edge && !area.paper && !hollow.has(area));
+  } else {
+    chosen = points(cut.fill).map(point => {
+      const area = areaAt(point);
+      assert(!area.edge, `the see-through area at ${point} reaches the picture's edge: fence its mouth`);
+      return area;
+    });
+  }
+  const filled = new Uint8Array(N);
+  for (const area of chosen) for (const p of area.pixels) filled[p] = 1;
+  // The fence's own pixels beside what is filled are filled too, so the white runs up to its line.
+  for (let p = 0; p < N; p++) if (fence[p] && data[p * 4 + 3] < SEE_THROUGH && sides(p).some(q => filled[q] === 1)) filled[p] = 2;
+  let front = [];
+  for (let p = 0; p < N; p++) if (filled[p] === 1) front.push(p);
+  for (let k = 0; k < FILL_RINGS; k++) {
+    const next = [];
+    for (const p of front) for (const q of sides(p)) {
+      if (!filled[q] && !fence[q] && data[q * 4 + 3] > 0 && data[q * 4 + 3] < 255) { filled[q] = 3; next.push(q); }
+    }
+    front = next;
+  }
+  for (let p = 0; p < N; p++) if (filled[p]) {
+    const i = p * 4, a = data[i + 3] / 255;
+    for (let c = 0; c < 3; c++) data[i + c] = byte(data[i + c] * a + 255 * (1 - a));
+    data[i + 3] = 255;
+  }
+}
+
+/** A line of pixels from a to b, each beside the last or corner to corner, marked in `mask`: no area side by side
+ * crosses it. */
+function drawLine(mask, width, [x0, y0], [x1, y1]) {
+  const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+  let err = dx + dy, x = x0, y = y0;
+  for (;;) {
+    mask[y * width + x] = 1;
+    if (x === x1 && y === y1) return;
+    const e2 = 2 * err;
+    if (e2 >= dy) { err += dy; x += sx; }
+    if (e2 <= dx) { err += dx; y += sy; }
+  }
 }
 
 /** The areas of colour `hex` inside a crest that the box's clearing leaves, as `clear` and `keep` name them, the largest

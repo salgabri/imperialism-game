@@ -3018,7 +3018,8 @@
    "verified": "sheets saved1.png: orange basketball with a white disc, green ΠΑΟ and shamrock, 1908 below, four yellow stars over it, green bars with «Π.Α.Ο. - ΜΠΑΣΚΕΤ» above and below; 100px GIF (byte-identical to the reference thumbnail an earlier round saved as 2002-100px-Panathinaikos_basketball.gif)",
    "league": "euroleague",
    "background": "#ffffff",
-   "tolerance": 110
+   "tolerance": 110,
+   "fill": "enclosed"
   },
   "el-panathinaikos.2009": {
    "club": "Panathinaikos",
@@ -3136,7 +3137,8 @@
    "evidence": "the club's dove symbol, on en since 2010; no source pictures the crest of its seasons here, so the nearest picture stands for them",
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing",
-   "background": "#ffffff"
+   "background": "#ffffff",
+   "fill": "enclosed"
   },
   "el-pesaro.2002": {
    "club": "el-pesaro",
@@ -5150,7 +5152,8 @@
    "cache": "data-src/crest-eras/files/missing/f-ales/1995-Olympique_Al_s_logo.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"Olympique Alès\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
-   "league": "missing"
+   "league": "missing",
+   "fill": "188,329 149,330 213,274 174,245 206,355 246,270 134,358 133,291 188,207 244,326 176,372 95,334"
   },
   "f-alessandria.1998": {
    "club": "Alessandria",
@@ -8485,7 +8488,7 @@
    "league": "seasons",
    "background": "#ffffff",
    "tolerance": 110,
-   "clear": "enclosed"
+   "fill": "enclosed"
   },
   "f-botev-galabovo.2018": {
    "club": "Botev Galabovo",
@@ -10122,7 +10125,8 @@
    "verified": "contact sheet (missing logos, November 2026)",
    "league": "missing",
    "background": "#ffffff",
-   "tolerance": 110
+   "tolerance": 110,
+   "fill": "enclosed"
   },
   "f-cesena.2011": {
    "club": "Cesena",
@@ -12758,7 +12762,9 @@
    "verified": "checked by eye: sheet 01 cell 104",
    "league": "seasons",
    "background": "#ffffff",
-   "tolerance": 110
+   "tolerance": 110,
+   "fill": "enclosed",
+   "fence": "34,138 42,149 52,147"
   },
   "f-desna-chernigiv.2021": {
    "club": "Desna Chernigiv",
@@ -13542,7 +13548,9 @@
    "cache": "data-src/crest-eras/files/missing/f-dungannon-swifts/2008-Dungannon_Swifts_F.C._logo.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"Dungannon Swifts F.C.\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
-   "league": "missing"
+   "league": "missing",
+   "fill": "270,320",
+   "fence": "250,178 258,206; 259,328 246,358"
   },
   "f-duque-de-caxias-futebol-clube.2015": {
    "club": "Duque de Caxias Futebol Clube",
@@ -17795,7 +17803,8 @@
    "cache": "data-src/crest-eras/files/missing/f-fk-bask-1903-beograd/2009-FK_BASK_Beograd_crest_.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"FK BASK\" (November 2026, second pass); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
-   "league": "missing"
+   "league": "missing",
+   "fill": "enclosed"
   },
   "f-fk-bask-1903.2012": {
    "club": "FK BASK 1903",
@@ -17809,7 +17818,8 @@
    "cache": "data-src/crest-eras/files/missing/f-fk-bask-1903/2012-FK_BASK_Beograd_crest_.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"FK BASK\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
-   "league": "missing"
+   "league": "missing",
+   "fill": "enclosed"
   },
   "f-fk-bsk-borca.2013": {
    "club": "FK BSK Borca",
@@ -20108,7 +20118,8 @@
    "cache": "data-src/crest-eras/files/missing/f-gs-panegialios/2016-Panegialios_F.C._logo.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"Panegialios F.C.\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
-   "league": "missing"
+   "league": "missing",
+   "fill": "112,71"
   },
   "f-guangdong-hongyuan.2002": {
    "club": "Guangdong Hongyuan",
@@ -21412,7 +21423,8 @@
    "cache": "data-src/crest-eras/files/missing/f-hnk-zadar/2024-HNK_Zadar_logo.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"HNK Zadar\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
-   "league": "missing"
+   "league": "missing",
+   "fill": "129,239"
   },
   "f-hoek.2003": {
    "club": "Hoek",
@@ -25121,7 +25133,8 @@
    "cache": "data-src/crest-eras/files/missing/f-llaneros/1995-Llaneros_de_Guanare.png",
    "evidence": "crest of today: the infobox of de.wikipedia's article \"Llaneros de Guanare\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
-   "league": "missing"
+   "league": "missing",
+   "fill": "enclosed"
   },
   "f-llanidloes.1995": {
    "club": "Llanidloes",
@@ -26486,7 +26499,8 @@
    "cache": "data-src/crest-eras/files/missing/f-minyor-radnevo/2008-PFC_Minyor_Radnevo_logo.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"FC Minyor Radnevo\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
-   "league": "missing"
+   "league": "missing",
+   "fill": "enclosed"
   },
   "f-mitra-kutai-fc.2019": {
    "club": "Mitra Kutai FC",
@@ -31110,7 +31124,8 @@
    "cache": "data-src/crest-eras/files/missing/f-prestatyn-town/2010-Prestatyn_Town_FC_logo.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"Prestatyn Town F.C.\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
-   "league": "missing"
+   "league": "missing",
+   "fill": "170,366 275,413 55,413 147,373 185,378 72,373 295,375 97,368 231,368 32,368"
   },
   "f-preston.1995": {
    "club": "Preston",
@@ -33347,7 +33362,8 @@
    "cache": "data-src/crest-eras/files/missing/f-san-marino/2002-San_Marino_Calcio_logo.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"San Marino Calcio\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
-   "league": "missing"
+   "league": "missing",
+   "fill": "264,373"
   },
   "f-san-martin-de-mendoza.2001": {
    "club": "San Martín de Mendoza",
@@ -39936,7 +39952,8 @@
    "cache": "data-src/crest-eras/files/missing/f-wa-mostaganem/1995-WA_Mostaganem.png",
    "evidence": "crest of today: the infobox of en.wikipedia's article \"WA Mostaganem\" (November 2026); no source dates the crest of its seasons, so today's stands for them (the undated rule)",
    "verified": "contact sheet (missing logos, November 2026)",
-   "league": "missing"
+   "league": "missing",
+   "fill": "295,121"
   },
   "f-waitakere-city.1995": {
    "club": "Waitakere City",
@@ -44212,7 +44229,8 @@
    "evidence": "en.wikipedia.org article Tampa Bay Lightning: logos used 1992 to 2007",
    "verified": "grey roundel with black lightning bolt, Tampa Bay / LIGHTNING script",
    "league": "nhl",
-   "clear": "53,184"
+   "fill": "100,100 120,202",
+   "fence": "118,42 143,47"
   },
   "nhl-tampa-bay-lightning.2008": {
    "club": "Tampa Bay Lightning",

@@ -3211,10 +3211,19 @@ Commons since May 2026, beside the sun badge it calls the old one), cut from its
 and for Kladno the roundel its website showed in its First League seasons, as Romanian
 Wikipedia uploaded it on 24 September 2009 (Russian Wikipedia's copy of 2007 and German
 Wikipedia's vector of 2008 show the same).
-A crest's address names the drawing it asks for (`?v=2`, `CREST_DRAWING` in
+
+The opposite fault, white of the crest's own that its uploader cleared with the paper (the
+Tampa Bay Lightning's bolt of 1993-2007, half the panels of a ball, the band behind a name),
+has fields of its own, painted white after the cut: `fill`, `'enclosed'` for every
+see-through area the crest's outline shuts in (with `hollow` for those that are its by
+design) or a point in each; and `fence`, lines that shut an area whose outline is open. What
+is filled shows as on white paper. The 132 crests the reviewers listed as half white, half
+see-through were looked at again on 26 November 2026, and 41 are filled.
+
+A crest's address names the drawing it asks for (`?v=3`, `CREST_DRAWING` in
 `src/data/crests.js`), so returning players see the redrawn crests at once rather than
 after their browser's month-old copy expires. `scripts/crest-cutout.test.mjs` checks the
-cut and every record.
+cut, the fill and every record.
 
 ## Capitals
 

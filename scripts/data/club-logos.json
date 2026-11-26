@@ -1883,7 +1883,8 @@
     },
     "d300-129664": {
       "file": "Panegialios F.C. logo.png",
-      "sha256": "3acc423333965fa172841cbf61fde01167453b58b1e521fc9f166ce1612e5368"
+      "sha256": "3acc423333965fa172841cbf61fde01167453b58b1e521fc9f166ce1612e5368",
+      "fill": "146,87"
     },
     "d300-129682": {
       "file": "Doxa Drama F.C. emblem.png",
@@ -2324,7 +2325,9 @@
       "file": "SportsClubDimona.png",
       "sha256": "584b9920fe53f8feb072b52c91d81f80c8391f3c9aadbb3ccec0bcf0486fb6d1",
       "wiki": "he",
-      "clear": "257,36"
+      "clear": "257,36",
+      "fill": "420,270",
+      "fence": "445,338 461,324 469,310"
     },
     "d376-42018773": {
       "file": "Iron Nesher FC New Logo.png",
@@ -2356,7 +2359,9 @@
     "d376-2000045200": {
       "file": "MaccabiQiryatAta-Bialik-2020.png",
       "sha256": "198f7e9a1ad56a1cb6a3fb1e9850156cc6353e250a53d2a6c6a81b10fb83017e",
-      "wiki": "he"
+      "wiki": "he",
+      "fill": "680,640",
+      "fence": "960,277 989,296 1017,318 1043,341 1067,366 1089,393 1110,421 1128,451 1144,481 1159,513 1171,546 1180,579 1187,613 1192,648 1195,683 1195,717 1192,752 1187,787 1180,821 1171,854 1159,887 1144,919 1128,950 1110,979 1089,1007 1067,1034 1043,1059"
     },
     "d380-1115": {
       "file": "AC Carpi crest.svg",
@@ -2433,7 +2438,8 @@
     "d398-494162": {
       "file": "FC Aktobe Logo.svg",
       "sha256": "aafcaa2b0fcc399c20dec0e183ce5572ef41dcee7e212614cf997dff4ab893ab",
-      "thumb": 330
+      "thumb": 330,
+      "fill": "250,254"
     },
     "d398-494164": {
       "file": "FC Caspiy logo.png",
@@ -2474,7 +2480,8 @@
     },
     "d400-135255": {
       "file": "Al Jazeera Club.png",
-      "sha256": "3490d4b79b19d2c2eb3b7cb45e517c6c835d349ffb7a57512be1760fb165add5"
+      "sha256": "3490d4b79b19d2c2eb3b7cb45e517c6c835d349ffb7a57512be1760fb165add5",
+      "fill": "27,234 275,253 266,220"
     },
     "d400-23159241": {
       "file": "Sama Al-Sarhan logo.png",
@@ -2929,7 +2936,8 @@
     },
     "d566-8632634": {
       "file": "Bayelsa United F.C. logo.png",
-      "sha256": "3be6398201c579d671ffd5b837e2e50205dee53fb87d802821ed7f86d292c148"
+      "sha256": "3be6398201c579d671ffd5b837e2e50205dee53fb87d802821ed7f86d292c148",
+      "fill": "enclosed"
     },
     "d566-13187451": {
       "file": "Osun United F.C. logo.png",
@@ -4599,7 +4607,7 @@
       "file": "Shamkir FC logo.png",
       "sha256": "61d64c33456a4f8269197b8f138320412c572af85f640032c0f8ae62869a9284",
       "thumb": 250,
-      "clear": "103,72 64,75 84,95 99,47"
+      "fill": "enclosed"
     },
     "d040-16032291": {
       "file": "SV Gloggnitz.png",
@@ -4990,7 +4998,8 @@
       "file": "Young Apostles FC logo.png",
       "sha256": "f68f79d23a7cedba65a115c01346e95de700c01b28883cc90ced8eb01bb92f23",
       "thumb": 120,
-      "wiki": "lt"
+      "wiki": "lt",
+      "fill": "47,24"
     },
     "d288-2000142421": {
       "file": "Holy Stars FC logo.png",
@@ -5161,7 +5170,8 @@
       "thumb": 330,
       "wiki": "fa",
       "background": "#ffffff",
-      "tolerance": 110
+      "tolerance": 110,
+      "fill": "enclosed"
     },
     "d504-5380022": {
       "file": "JSM.Logo.jpg",
@@ -5977,6 +5987,12 @@
       "sha256": "815b0d3528f00984737471e9c7b82c705e30e72c09ef697531b64f51580a3122",
       "background": "#ffffff"
     },
+    "d051-59036309": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/e/ed/FC_BKMA_Yerevan_logo.svg/250px-FC_BKMA_Yerevan_logo.svg.png",
+      "sha256": "f0a62cc4b9aa0cff57e8c5c1599d061c0cfa4a917da7763ea599bcf86918c2d6",
+      "fill": "enclosed",
+      "fence": "28,20 1,42; 247,168 246,199"
+    },
     "d056-248": {
       "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/PX_Logo.png/250px-PX_Logo.png",
       "sha256": "13abfa71aa765cddb05dae29c3cde153d4016fa8eb377ceba4e7a2cc9a7eb837",
@@ -6021,7 +6037,7 @@
     "d116-23084466": {
       "image": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b0/Kirivong_Sok_Sen_Chey_FC_Crest.png/250px-Kirivong_Sok_Sen_Chey_FC_Crest.png",
       "sha256": "6724295d0071044302f08d23c744099266f48f96532b15994bdec7f1fcde1855",
-      "clear": "72,81 182,76"
+      "fill": "enclosed"
     },
     "d120-391": {
       "image": "https://upload.wikimedia.org/wikipedia/en/8/86/Bamboutos_FC.png",
@@ -6062,7 +6078,8 @@
     "d152-130779": {
       "image": "https://upload.wikimedia.org/wikipedia/en/1/10/Santiago_morning.png",
       "sha256": "c4a92c360762c512f3192452bb7aeac3e28b78decd6243160a763d1473b555cf",
-      "background": "#ffffff"
+      "background": "#ffffff",
+      "fill": "enclosed"
     },
     "d152-75035851": {
       "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Deportes_Recoleta_logo.png/250px-Deportes_Recoleta_logo.png",
@@ -6100,6 +6117,11 @@
       "image": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b0/Simba_Kolwezi_logo.jpg/250px-Simba_Kolwezi_logo.jpg",
       "sha256": "517f7c9791fed877b51df571544f2ed89c9d12ac97faa961f31102a800ba1fa8",
       "background": "#ffffff"
+    },
+    "d188-80000641": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/1/1c/Municipal_Grecia_-_Team_Badge.png/250px-Municipal_Grecia_-_Team_Badge.png",
+      "sha256": "4e40fa6a37a57fc05f524a8a59a4962099337a474b6695a340a9b499a60dc4d5",
+      "fill": "enclosed"
     },
     "d191-126302": {
       "image": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c3/HNK_Vukovar_91.svg/250px-HNK_Vukovar_91.svg.png",
@@ -6189,6 +6211,11 @@
       "sha256": "33bef8d1a6fddda3af16c65eb39232b3b5a6466dcd9c4fc1b11fe172321ee46b",
       "background": "#ffffff",
       "tolerance": 110
+    },
+    "d231-5340871": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/3/3a/Hawassa_City_S.C.svg/250px-Hawassa_City_S.C.svg.png",
+      "sha256": "75ab64f24447f28068653a9c695f2d9a05029db34b3b77a166df73ef3e3fe80a",
+      "fill": "130,43 136,32 115,39"
     },
     "d231-13133267": {
       "image": "https://upload.wikimedia.org/wikipedia/en/3/34/Arba_minch_fc.gif",
@@ -6378,7 +6405,7 @@
     "d400-135257": {
       "image": "https://upload.wikimedia.org/wikipedia/en/thumb/b/b9/Al-Ramtha_SC_Logo.png/250px-Al-Ramtha_SC_Logo.png",
       "sha256": "eb7545576719f712d726212e0a3f8357ac1857af9ecb8f02dea52660db76e653",
-      "clear": "157,174"
+      "fill": "enclosed"
     },
     "d404-751587": {
       "image": "https://upload.wikimedia.org/wikipedia/en/4/4c/MathareUnited.png",
@@ -6406,6 +6433,12 @@
       "sha256": "2ac66a3a6802a1b52275b5270079a26ae35f643c465146577815aec370cff594",
       "background": "#ffffff",
       "tolerance": 110
+    },
+    "d404-13104771": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/Posta_Rangers_F.C._logo.png/250px-Posta_Rangers_F.C._logo.png",
+      "sha256": "8c1480237993d260c67e3c2d9cebee1201913e42002301dbcd14a00b9c8acb74",
+      "fill": "150,172",
+      "fence": "207,152 207,184"
     },
     "d404-13127932": {
       "image": "https://upload.wikimedia.org/wikipedia/en/thumb/1/1b/F.C._Kariobangi_Sharks_logo.jpg/250px-F.C._Kariobangi_Sharks_logo.jpg",
@@ -6476,6 +6509,11 @@
       "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/49/Al_Akhdar_Al_Bayda%27.png/250px-Al_Akhdar_Al_Bayda%27.png",
       "sha256": "8c46194210cfb99773119ddac16e8724152e928761567af0140c3d27b349dcef",
       "background": "#ffffff"
+    },
+    "d440-1211": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/0/01/FK_Ekranas.svg/250px-FK_Ekranas.svg.png",
+      "sha256": "0dee563c7be31e6fd50fccb2be9d6283580914781001cf9c9d27429da6f91162",
+      "fill": "enclosed"
     },
     "d442-1300770": {
       "image": "https://upload.wikimedia.org/wikipedia/en/2/2a/FC_Rodange_91_logo.png",
@@ -6668,6 +6706,12 @@
       "sha256": "506c84e8714edfb3a7e2ec57933086c57c99f4192488a9419ed1bded49dee83b",
       "background": "#ffffff"
     },
+    "d600-120942": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/4/42/Colegialesclub.png",
+      "sha256": "d2eaf92b61b5648623213eb07c62b708e8eac6866a5656c1aedb202fda2d13b8",
+      "fill": "enclosed",
+      "fence": "165,85 164,99 160,113 154,126 146,137 136,147 125,155 112,161 98,165 84,166 70,165 56,161 44,155 32,147 22,137 14,126 8,113 4,99 3,85 4,71 8,57 14,44 22,33 32,23 43,15 56,9 70,5 84,4 98,5 112,9 125,15 136,23 146,33 154,44 160,57 164,71 165,85"
+    },
     "d600-5280210": {
       "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/44/Resistencia_SC.png/250px-Resistencia_SC.png",
       "sha256": "f3564b6931038c52ebc45479efb3bf87f47c99f5ba266d07c9beb423715d5a47",
@@ -6836,6 +6880,11 @@
       "sha256": "49fe30ece1459ca9f6048e10be3ecb0f25073f4189d53248e056a556c5b91c8a",
       "background": "#ffffff"
     },
+    "d704-5627068": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/c/cf/An_Giang_FC_logo.svg/250px-An_Giang_FC_logo.svg.png",
+      "sha256": "09ee0a5a774af72b87efca8593692f494c9f7911f74545fdf720217db0b425b2",
+      "fill": "230,114"
+    },
     "d710-65033935": {
       "image": "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/Orbit_College_FC_logo.jpg/250px-Orbit_College_FC_logo.jpg",
       "sha256": "54a100bf4ee174cdf56b4f61abb8f12f1b0a4b20657e3af262b29cfa3fd8d399",
@@ -6872,6 +6921,26 @@
       "background": "#ffffff",
       "tolerance": 110
     },
+    "d724-814590": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/1/16/Antequera_CF_logo.svg/250px-Antequera_CF_logo.svg.png",
+      "sha256": "397221570006474999640264d29705de84c9e25802868a24a14f1af4b9f0653f",
+      "fill": "184,30"
+    },
+    "d724-4200566": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/d/d6/Burgos_CF_logo.svg/250px-Burgos_CF_logo.svg.png",
+      "sha256": "dab2ecd955cab6f145edf2febe2551c564a6712cc404d4936c9f1075e03a3e43",
+      "fill": "65,273"
+    },
+    "d724-4212406": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/c/c3/Atl%C3%A9tico_Sanluque%C3%B1o_CF_logo.svg/250px-Atl%C3%A9tico_Sanluque%C3%B1o_CF_logo.svg.png",
+      "sha256": "67b9269240b90c7a02a6e7e191b847d419fcce8c3715143cbbe11a033efd2a0a",
+      "fill": "151,119 166,224"
+    },
+    "d724-67089705": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/7/78/UD_Logro%C3%B1%C3%A9s_logo.svg/250px-UD_Logro%C3%B1%C3%A9s_logo.svg.png",
+      "sha256": "e854df470b9222d915fec144ae06537f05e6372faf0ed006c0ead0d7bd3076f3",
+      "fill": "enclosed"
+    },
     "d724-67180027": {
       "image": "https://upload.wikimedia.org/wikipedia/en/thumb/a/a0/CD_Badajoz_Shield.png/250px-CD_Badajoz_Shield.png",
       "sha256": "0a131185b07d3dd723406ae9ca8aed33b01b30c6661331c46cbafb2a7337cdbd",
@@ -6882,6 +6951,11 @@
       "image": "https://upload.wikimedia.org/wikipedia/en/thumb/4/40/CFIntercity.png/250px-CFIntercity.png",
       "sha256": "1bc75fed77bd4bc8224480979b2fe5fea358c3e86e1e9211437dbd7abf24eeb8",
       "background": "#ffffff"
+    },
+    "d756-105613": {
+      "image": "https://upload.wikimedia.org/wikipedia/en/thumb/6/62/FC_Bulle_logo.svg/250px-FC_Bulle_logo.svg.png",
+      "sha256": "96a4335f2d0690904266f1a14151065e803714120d431202b597f59324d84816",
+      "fill": "enclosed"
     },
     "d756-137925": {
       "image": "https://upload.wikimedia.org/wikipedia/en/4/46/FCWohlen.png",

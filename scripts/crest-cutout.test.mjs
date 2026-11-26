@@ -1,6 +1,7 @@
 // Crests cut out of the pictures they were saved on (scripts/lib/crest-cutout.mjs; docs/design/period-marks.md,
 // "Cutouts"): the paper round a crest and inside its letters is cleared, its own white stays, its edge keeps no fringe,
-// and no crest the game ships stands on a white box.
+// no crest the game ships stands on a white box, and white of a crest's own that its picture left see-through is
+// filled again.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
@@ -12,15 +13,17 @@ import { cutOf, cutOut, enclosedAreas } from './lib/crest-cutout.mjs';
 const root = new URL('../', import.meta.url);
 const read = path => readFileSync(new URL(path, root), 'utf8');
 
-const INK = { '.': [255, 255, 255], '#': [0, 0, 160], '+': [128, 128, 208], g: [180, 180, 180], k: [0, 0, 0], r: [200, 0, 0], ' ': null };
+const INK = {
+  '.': [255, 255, 255], '#': [0, 0, 160], '+': [128, 128, 208], h: [0, 0, 160, 128], g: [180, 180, 180], k: [0, 0, 0], r: [200, 0, 0], ' ': null,
+};
 /** A picture drawn in characters, `scale` pixels each ('.': white paper, '#': the crest's blue, '+': half blue, half
- * white, 'g': grey, 'k': black, 'r': red, ' ': transparent). */
+ * white, 'h': the blue half transparent, 'g': grey, 'k': black, 'r': red, ' ': transparent). */
 function picture(rows, scale = 1) {
   const width = rows[0].length * scale, height = rows.length * scale;
   const data = Buffer.alloc(width * height * 4);
   for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
     const colour = INK[rows[Math.floor(y / scale)][Math.floor(x / scale)]];
-    if (colour) data.set([...colour, 255], (y * width + x) * 4);
+    if (colour) data.set(colour.length === 4 ? colour : [...colour, 255], (y * width + x) * 4);
   }
   return { data, width, height };
 }
@@ -164,13 +167,118 @@ test('the areas a cut leaves are listed largest first, each with a point inside'
   assert.ok(areas[0].at[1] > 24 && areas[1].at[1] < 24, 'the shield\'s field, then the O\'s counter');
 });
 
+// A ball drawn as a ring round a ring: the band between them and the hole in the middle are see-through.
+const BALL = picture([
+  '              ',
+  '  ##########  ',
+  '  #        #  ',
+  '  #  ####  #  ',
+  '  #  #  #  #  ',
+  '  #  ####  #  ',
+  '  #        #  ',
+  '  ##########  ',
+  '              ',
+], 4);
+const IN_BAND = [13, 9], IN_HOLE = [26, 17], OUTSIDE = [2, 2];
+
+test('a point fills the see-through area it lies in, \'enclosed\' every one but those hollow', () => {
+  const one = cutOut(BALL, { fill: IN_BAND.join(',') });
+  assert.deepEqual([alpha(one, ...IN_BAND), colour(one, ...IN_BAND)], [255, [255, 255, 255]], 'the band, white');
+  assert.deepEqual([alpha(one, ...IN_HOLE), alpha(one, ...OUTSIDE)], [0, 0], 'the hole and the outside stay see-through');
+  assert.deepEqual(colour(one, 9, 5), [0, 0, 160], 'the crest itself');
+  const all = cutOut(BALL, { fill: 'enclosed' });
+  assert.deepEqual([alpha(all, ...IN_BAND), alpha(all, ...IN_HOLE), alpha(all, ...OUTSIDE)], [255, 255, 0]);
+  const hollow = cutOut(BALL, { fill: 'enclosed', hollow: IN_HOLE.join(',') });
+  assert.deepEqual([alpha(hollow, ...IN_BAND), alpha(hollow, ...IN_HOLE)], [255, 0]);
+  assert.equal(BALL.data[(9 * BALL.width + 13) * 4 + 3], 0, 'the picture given is left as it was');
+  assert.throws(() => cutOut(BALL, { fill: OUTSIDE.join(',') }), /reaches the picture's edge/);
+  assert.throws(() => cutOut(BALL, { fill: '9,5' }), /9,5 is not see-through/);
+  assert.throws(() => cutOut(BALL, { fill: '90,5' }), /outside the 56x36 picture/);
+});
+
+test('a fence shuts the mouth of an area the crest leaves open, and the white runs up to it', () => {
+  const cup = picture([
+    '            ',
+    '  #      #  ',
+    '  #      #  ',
+    '  #      #  ',
+    '  ########  ',
+    '            ',
+  ], 4);
+  assert.throws(() => cutOut(cup, { fill: '20,8' }), /20,8 reaches the picture's edge: fence its mouth/);
+  for (const fill of ['20,8', 'enclosed']) {
+    const out = cutOut(cup, { fill, fence: '8,4 39,4' });
+    assert.deepEqual([alpha(out, 20, 8), alpha(out, 20, 4), alpha(out, 20, 3), alpha(out, 2, 8)], [255, 255, 0, 0], fill);
+  }
+  // A line of several points, and two lines.
+  const bent = cutOut(cup, { fill: '20,8', fence: '8,4 20,1 39,4' });
+  assert.deepEqual([alpha(bent, 20, 2), alpha(bent, 20, 0)], [255, 0]);
+  const halves = cutOut(cup, { fill: '14,8 30,8', fence: '8,4 39,4; 24,4 24,15' });
+  assert.deepEqual([alpha(halves, 14, 8), alpha(halves, 30, 8), alpha(halves, 24, 8)], [255, 255, 255], 'the fence between them is filled from both sides');
+});
+
+test('what is filled shows as on white paper: its part transparent edge too, not the crest\'s outer edge', () => {
+  const out = cutOut(picture([
+    '          ',
+    ' h######  ',
+    ' h#hhhh#  ',
+    ' h#h  h#  ',
+    ' h#hhhh#  ',
+    ' h######  ',
+    '          ',
+  ]), { fill: 'enclosed' });
+  assert.deepEqual([alpha(out, 4, 3), colour(out, 4, 3)], [255, [255, 255, 255]]);
+  const edge = colour(out, 3, 3);
+  assert.equal(alpha(out, 3, 3), 255);
+  assert.ok(Math.abs(edge[0] - 127) < 3 && Math.abs(edge[2] - 207) < 3, `the half blue shows on white (${edge})`);
+  assert.deepEqual([alpha(out, 1, 3), colour(out, 2, 3)], [128, [0, 0, 160]], 'the outer edge and the outline stay');
+});
+
+test('a fill comes after the cut and leaves what the cut cleared', () => {
+  const shield = picture([
+    '............',
+    '..#######...',
+    '..#.....#...',
+    '..#.....#...',
+    '..#######...',
+    '............',
+    '..########..',
+    '..#..  ..#..',
+    '..#..  ..#..',
+    '..########..',
+    '............',
+  ], 4);
+  for (const cut of [{ background: '#ffffff', clear: IN_O.join(','), fill: 'enclosed' }, { background: '#ffffff', clear: IN_O.join(','), fill: '22,30' }]) {
+    const out = cutOut(shield, cut);
+    assert.deepEqual([alpha(out, ...PAPER), alpha(out, ...IN_O)], [0, 0], `the paper and the O's counter (${cut.fill})`);
+    assert.deepEqual([alpha(out, 22, 30), colour(out, 22, 30), alpha(out, 13, 29)], [255, [255, 255, 255], 255], `the hole in the shield's field (${cut.fill})`);
+  }
+  // The box's flood runs into an open area through its mouth and clears the white left in it; fenced, the area is
+  // filled whole, that white too.
+  const cup = picture([
+    '............',
+    '..#      #..',
+    '..#  ..  #..',
+    '..#      #..',
+    '..########..',
+    '............',
+  ], 4);
+  const open = cutOut(cup, { background: '#ffffff', fill: 'enclosed' });
+  assert.deepEqual([alpha(open, 22, 10), alpha(open, 14, 10)], [0, 0], 'unfenced, the area is outside and its white paper');
+  const fenced = cutOut(cup, { background: '#ffffff', fill: 'enclosed', fence: '8,4 39,4' });
+  assert.deepEqual([alpha(fenced, 22, 10), alpha(fenced, 14, 10), alpha(fenced, 20, 2), alpha(fenced, 2, 10)], [255, 255, 0, 0]);
+});
+
 test('a record\'s cut is checked', () => {
   assert.equal(cutOf({ file: 'Crest.svg' }), null);
   assert.deepEqual(cutOf({ file: 'Crest.gif', background: '#ffffff', clear: '3,4 5,6' }), { background: '#ffffff', clear: '3,4 5,6' });
+  assert.deepEqual(cutOf({ file: 'Crest.svg', fill: 'enclosed', hollow: '3,4', fence: '1,1 2,2 3,3; 4,4 5,5' }), { fill: 'enclosed', hollow: '3,4', fence: '1,1 2,2 3,3; 4,4 5,5' });
   for (const [record, message] of [
     [{ background: 'white' }, /#rrggbb/], [{ background: '#ffffff', tolerance: 0 }, /tolerance/], [{ background: '#ffffff', inset: '1 2' }, /inset/],
     [{ background: '#ffffff', clear: '3;4' }, /clear/], [{ background: '#ffffff', clear: '3,4', keep: '1,1' }, /keep/], [{ tolerance: 40 }, /background or areas/],
-    [{ clear: 'enclosed' }, /need the box/],
+    [{ clear: 'enclosed' }, /need the box/], [{ fill: '3;4' }, /fill is/], [{ fill: '3,4', hollow: '1,1' }, /hollow/], [{ fence: '1,1 2,2' }, /fence/],
+    [{ fill: '3,4', fence: '1,1' }, /fence/], [{ background: '#ffffff', clear: 'enclosed', fill: 'enclosed' }, /undo each other/],
+    [{ fill: '3,4', tolerance: 40 }, /tolerance is for/],
   ]) assert.throws(() => cutOf(record, 'x'), message, JSON.stringify(record));
 });
 

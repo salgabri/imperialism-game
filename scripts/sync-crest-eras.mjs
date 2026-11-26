@@ -5,8 +5,9 @@
 // Reads scripts/data/crest-eras.json: `crests`, each period crest by its file key ('<club id>.<first year>') with its
 // source (a Wikipedia or Commons file, or an archived copy of one on the Wayback Machine), licence and the SHA-256 of
 // the original, cached under the gitignored data-src/crest-eras/files/, and what of the original is the paper it was
-// saved on, to be cleared (`background`, `tolerance`, `inset`, `clear`, `keep`: scripts/lib/crest-cutout.mjs, docs/design/
-// period-marks.md "Cutouts"); and `clubs`, each club's eras
+// saved on, to be cleared (`background`, `tolerance`, `inset`, `clear`, `keep`), and what white of the crest's own it left
+// see-through, to be filled (`fill`, `hollow`, `fence`: scripts/lib/crest-cutout.mjs, docs/design/period-marks.md
+// "Cutouts"); and `clubs`, each club's eras
 // [first year, last year, file key | today's file of another id | null], in the season years the game uses. A club is
 // its id, or its id and country ('<club id>@<country>', the country as its season maps name it) where the seasons give
 // that id to clubs of two countries (a namesake: f-valencia is Venezuela's Valencia FC in 1995/96 and Valencia CF in
