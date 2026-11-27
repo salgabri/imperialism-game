@@ -9,7 +9,8 @@ import path from 'node:path';
 import { politeFetch } from './polite-fetch.mjs';
 
 export const SITE = 'https://gol.gg';
-const PAUSE_MS = 1200;
+// Between two requests: gol.gg dropped the connections of a fetch at one a second after 5,000 pages (2026-11-15).
+export const PAUSE_MS = 10000;
 /** gol.gg's season codes: S14 is 2024, S16 2026. */
 export const seasonCode = year => `S${year - 2010}`;
 export const yearOfSeason = code => Number(String(code).replace(/^S/, '')) + 2010;
@@ -74,6 +75,11 @@ export async function seasonTournaments(year, cacheDir, { fetching = false, refr
 
 /** A tournament's name as gol.gg's paths spell it. */
 export const tournamentPath = name => encodeURIComponent(name);
+/** A tournament's match list and its players list, a season's teams list and its players list. */
+export const matchListUrl = name => `${SITE}/tournament/tournament-matchlist/${tournamentPath(name)}/`;
+export const playersListUrl = name => `${SITE}/players/list/season-ALL/split-ALL/tournament-${tournamentPath(name)}/`;
+export const teamsListUrl = year => `${SITE}/teams/list/season-${seasonCode(year)}/split-ALL/tournament-ALL/`;
+export const seasonPlayersUrl = year => `${SITE}/players/list/season-${seasonCode(year)}/split-ALL/tournament-ALL/`;
 
 // ---------- reading the pages ----------
 
@@ -90,16 +96,85 @@ export function plain(html) {
 /**
  * A tournament's series (`/tournament/tournament-matchlist/<name>/`), as its list gives them: [{ id, page: 'summary' or
  * 'game', title, left, right, leftWon, score: [left, right], stage, patch, date }]: `left` and `right` the two teams as
- * the row names them, `score` their games won.
+ * the row names them, `score` their games won, `leftWon` null in a series of two games won one each. `unlinked`: also the
+ * series played of which gol.gg keeps no page, only the score (`id` and `page` null).
  */
-export function readMatchList(html) {
+export function readMatchList(html, { unlinked = false } = {}) {
   const series = [];
-  const row = /<tr><td class='text-left'><a href='\.\.\/game\/stats\/(\d+)\/page-(summary|game)\/' title='([^']*)'>[^<]*<\/a><\/td><td class='text-right (text_victory|text_defeat)'>([^<]*)<\/td><td class='text-center'>(\d+) - (\d+)<\/td><td class='(?:text_victory|text_defeat)'>([^<]*)<\/td><td class='text-center'>([^<]*)<\/td><td class='text-center'>([^<]*)<\/td><td class='text-center'>([^<]*)<\/td><\/tr>/g;
-  for (const [, id, page, title, side, left, a, b, right, stage, patch, date] of String(html).matchAll(row)) {
-    series.push({ id: Number(id), page, title: plain(title), left: plain(left), right: plain(right), leftWon: side === 'text_victory',
-      score: [Number(a), Number(b)], stage: plain(stage), patch: plain(patch), date: plain(date) });
+  const row = /<tr><td class='text-left'>(?:<a href='\.\.\/game\/stats\/(\d+)\/page-(summary|game)\/' title='([^']*)'>[^<]*<\/a>|([^<]*))<\/td><td class='text-right(?: (text_victory|text_defeat))?'>([^<]*)<\/td><td class='text-center'>(\d+) - (\d+)<\/td><td(?: class='(?:text_victory|text_defeat)')?>([^<]*)<\/td><td class='text-center'>([^<]*)<\/td><td class='text-center'>([^<]*)<\/td><td class='text-center'>([^<]*)<\/td><\/tr>/g;
+  for (const [, id, page, title, label, side, left, a, b, right, stage, patch, date] of String(html).matchAll(row)) {
+    if (!id && !unlinked) continue;
+    series.push({ id: id ? Number(id) : null, page: page ?? null, title: plain(title ?? label), left: plain(left), right: plain(right),
+      leftWon: side ? side === 'text_victory' : null, score: [Number(a), Number(b)], stage: plain(stage), patch: plain(patch), date: plain(date) });
   }
   return series;
+}
+
+/**
+ * A statistics table's rows, each `{ id, title, cells }`: `cells` by its column's heading ("Games", "GPM", "Gold%"…), and the
+ * id and title of the row's own link (`link` 'player-stats' or 'team-stats').
+ */
+function readStatsTable(html, link) {
+  const table = String(html).split('<table').slice(1).map(part => part.slice(0, part.indexOf('</table>')))
+    .find(part => part.includes(`./${link}/`) && /<th[\s>]/.test(part) && />\s*Games\s*</.test(part));
+  if (!table) return [];
+  const columns = [...table.matchAll(/<th[^>]*>([\s\S]*?)<\/th>/g)].map(([, text]) => plain(text));
+  const rows = [];
+  for (const [, row] of table.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/g)) {
+    const [, id, title] = new RegExp(`href='\\./${link}/(\\d+)/[^']*'[^>]*title='([^']*?) stats'`).exec(row) ?? [];
+    if (!id) continue;
+    const cells = [...row.matchAll(/<td[^>]*>([\s\S]*?)<\/td>/g)].map(([, text]) => plain(text));
+    rows.push({ id: Number(id), title: plain(title), cells: Object.fromEntries(columns.map((column, i) => [column, cells[i] ?? ''])) });
+  }
+  return rows;
+}
+
+/** A tag gol.gg stored as UTF-8 read as Latin-1, as it was ("FÃ©nec" → "Fénec"); any other tag as it is. */
+export function mended(name) {
+  if (!/[Â-Å][\u0080-¿]/.test(name) || /[^\u0000-ÿ]/.test(name)) return name;
+  const decoded = Buffer.from(name, 'latin1').toString('utf8');
+  return decoded.includes('�') ? name : decoded;
+}
+
+/** "57.3%" → 0.573, "1,696" → 1696, "-" or nothing → null. */
+const statNumber = text => {
+  const match = /^(-?[\d,]*\.?\d+)(%?)$/.exec(String(text ?? '').trim());
+  if (!match) return null;
+  const value = Number(match[1].replace(/,/g, ''));
+  return match[2] ? Number((value / 100).toFixed(4)) : value;
+};
+
+/**
+ * A players list (`/players/list/season-…/split-…/tournament-…/`): each player's games and figures over them, [{ id, name,
+ * country (a two-letter code, or null), games, wins, kills, deaths, assists (a game), csm, gpm, dpm, vspm (a minute), kp, dmg,
+ * gold, vs (his share of his team's kills, damage, gold and vision score), soloKills, firstBlood }]; a figure gol.gg leaves
+ * blank is null.
+ */
+export function readPlayersTable(html) {
+  return readStatsTable(html, 'player-stats').map(({ id, title, cells }) => {
+    const number = column => statNumber(cells[column]);
+    const share = column => number(column) || null;
+    const games = number('Games') ?? 0;
+    return { id, name: mended(title), country: /^[A-Z]{2}$/.test(cells.Country) ? cells.Country : null, games,
+      wins: Math.round(games * (number('Win rate') ?? 0)), kills: number('Avg kills'), deaths: number('Avg deaths'),
+      assists: number('Avg assists'), csm: share('CSM'), gpm: share('GPM'), dpm: share('DPM'), vspm: share('VSPM'), kp: share('KP%'),
+      dmg: share('DMG%'), gold: share('Gold%'), vs: share('VS%'), soloKills: number('Solo Kills'), firstBlood: number('FB %') };
+  });
+}
+
+/**
+ * A teams list (`/teams/list/season-…/split-…/tournament-…/`): [{ id, name, region, games, wins, gpm, kills, deaths, nashors
+ * (a game), minutes }].
+ */
+export function readTeamsTable(html) {
+  return readStatsTable(html, 'team-stats').map(({ id, title, cells }) => {
+    const number = column => statNumber(cells[column]);
+    const games = number('Games') ?? 0;
+    const length = /^(\d+):(\d\d)$/.exec(cells['Game duration'] ?? '');
+    return { id, name: title, region: cells.Region || null, games, wins: Math.round(games * (number('Win rate') ?? 0)), gpm: number('GPM'),
+      dpm: number('DPM'), kills: number('Kills / game'), deaths: number('Deaths / game'), nashors: number('NASHPG'),
+      minutes: length ? Number(length[1]) + Number(length[2]) / 60 : null };
+  });
 }
 
 /** "36:10" → 2170 seconds; null for anything else. */

@@ -193,6 +193,9 @@ npm run build-valorant   # rebuild the Valorant nations from that snapshot (--ch
 npm run build:valorant-seasons # rebuild Valorant's earlier seasons, 2023-2025, from the sync's year-end snapshots (--check)
 npm run sync:league-of-legends # League of Legends' player Elo from gol.gg's results cached in data-src/golgg/ into scripts/data/league-of-legends-elo.json (--fetch fetches the pages the cache lacks)
 npm run build-league-of-legends # rebuild the League of Legends nations from that snapshot (--check compares byte for byte)
+npm run sync:league-of-legends-countries # the countries gol.gg lacks for players of 2016-2025, from esportsearnings.com and Wikidata, into scripts/data/league-of-legends-countries.json (--fetch)
+npm run sync:league-of-legends-seasons # League of Legends' 2016-2025 line-ups worked out from gol.gg's match and players lists, rated at each year's end into scripts/data/league-of-legends-seasons/ (--fetch, a page every 10 s)
+npm run build:league-of-legends-seasons # rebuild League of Legends' earlier seasons, 2016-2025, from those year-end snapshots (--check)
 npm run test:football-sets # EA and NBA 2K seasons, CM 01/02 parser and builder, loader, setup and saves
 npm run build:icons      # render favicon.ico, apple-touch-icon.png and the app icons from public/favicon.svg
 npm run build:fonts      # cut the Latin Extended + Vietnamese font files from the pinned Archivo sources (--check compares byte for byte)
@@ -440,7 +443,8 @@ manager of the theatre's favourite, with decisions from the first match.
    [earlier seasons](#counter-strike-seasons) 2025 back to 2001 (1.6's and Source's to 2012, each year in its own rounds),
    Valorant its 2026 then its
    [earlier seasons](#valorant-seasons) 2025 back to 2023 (the Elo of vlr.gg's results at each year's end) and League of
-   Legends its 2026 (the Elo of gol.gg's results to November).
+   Legends its 2026 (the Elo of gol.gg's results to November) then its [earlier seasons](#league-of-legends-seasons) 2025
+   back to 2016 (the Elo of gol.gg's results at each year's end).
    The Season list names a season by its years, adding "· computed", "· converted"
    or "· fan-made" where its label calls its ratings so ("1969/70 · computed"); a
    year with two seasons in the list (football's 1993/94 and 1989/90, the NFL's and AFL's of
@@ -1219,7 +1223,8 @@ games. Each player's rating is the same Elo, game by game, a newcomer starting a
 the leagues sets it, on a scale of (Elo − 100) / 25 (Bin's 2,511 is 96); held out on the last 180 days its predictions
 were calibrated (log loss 0.609). A player plays for the country gol.gg files him under, in the role he plays most; 1,315
 players have played within the year, and 40 nations have the five a game needs, from South Korea and China down. Nothing
-is estimated. See the [design notes](docs/design/league-of-legends.md).
+is estimated. Each year from 2016 is an [earlier season](#league-of-legends-seasons). See the
+[design notes](docs/design/league-of-legends.md).
 
 **Women's football** — `src/data/clubs.womens-football.js` and
 `src/data/rosters.womens-football.js`, from EA SPORTS FC 27's women's players, pulled 2026-11-07
@@ -2879,6 +2884,43 @@ year from 2023 to 2025, nations only. Pick one under **Season** in setup. Each s
 
 The [design notes](docs/design/valorant.md#earlier-seasons) give each season's nations and maps.
 
+## League of Legends seasons
+
+League of Legends can be played on ten earlier seasons as well as the built-in 2026: the end of
+every year from 2016 to 2025, nations only. Pick one under **Season** in setup. Each season is a
+file in `public/league-of-legends/` that loads only when chosen.
+
+- **Ratings** are the same Elo as the built-in season's, run over gol.gg's results of the year and
+  the year before up to 31 December: who was rated then (20 games behind him, one within the year),
+  each newcomer at his league's level, each nation's best player in each role and its best others,
+  seven in all. A season reads its Elo from its own base, so that its 25 strongest players average
+  what the built-in season's do: the best of each year are the best of their day (no higher than
+  98). 2016 has no year before it in gol.gg's lists, so it is marked rough.
+- **Line-ups:** gol.gg stopped answering a fetch of one page a series, so the earlier seasons are
+  read from two pages a tournament, its match list and its players list, ten seconds apart. Which
+  team each player played for is worked out from the two: a team's players share its record, and
+  each player's gold, damage, vision and kills over his shares of them read his team's own. On
+  2026's tournaments, whose series pages give the real line-ups, it puts 98.9% of the players'
+  games beside the right team-mates; on six series sampled from each earlier season, 97.9% of the
+  players in the side they played for. Roles come from the players' figures, each team's five at
+  one role each.
+- **Countries** gol.gg lacks (a tenth to a quarter of the players of 2016–2019) come from
+  esportsearnings.com's and Wikidata's lists, where the player's tag and leagues agree; a player
+  they do not settle plays for no nation.
+- **Each year's games:** a season's games are as long as its year's and as bloody: from 37.4
+  minutes and 24 kills a game in 2016 to 32.7 minutes and 31 kills in 2025 (the built-in season's
+  32.1 and 32).
+- **Credit:** `public/league-of-legends/ATTRIBUTION.txt` credits gol.gg, whose results the ratings
+  are computed from, and esportsearnings.com and Wikidata for the countries. To rebuild:
+
+  ```bash
+  npm run sync:league-of-legends-countries  # the countries gol.gg lacks, into scripts/data/league-of-legends-countries.json
+  npm run sync:league-of-legends-seasons    # the year-end snapshots in scripts/data/league-of-legends-seasons/, from the cache in data-src/golgg/
+  npm run build:league-of-legends-seasons   # the season files, their listing, the games table and the audit (--check compares byte for byte)
+  ```
+
+The [design notes](docs/design/league-of-legends.md#earlier-seasons) give each season's nations.
+
 ## Squad economics
 
 Beating a team claims one player. Strength (`EFF`) is the best-lineup rating, so
@@ -3536,6 +3578,7 @@ public/
   rocket-league/       the built-in earlier Rocket League seasons (rl-2016.json to rl-2025.json), fetched when chosen
   counter-strike/      the built-in earlier Counter-Strike seasons (cs-2001.json to cs-2025.json), fetched when chosen
   valorant/            the built-in earlier Valorant seasons (val-2023.json to val-2025.json), fetched when chosen
+  league-of-legends/   the built-in earlier League of Legends seasons (lol-2016.json to lol-2025.json), fetched when chosen
   fonts/               self-hosted Archivo and Archivo Narrow (Alegreya unused)
   textures/            former cartographic paper texture (unused since v4)
   flags/               176 vendored flag SVGs

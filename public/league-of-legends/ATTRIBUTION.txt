@@ -1,0 +1,11 @@
+League of Legends seasons 2016-2025 (lol-<year>.json): attribution
+===========================================================
+
+The ratings in these files are computed by this project from the match results gol.gg (Games of Legends, https://gol.gg)
+records: an Elo of every player, built game by game from the leagues and the international events of each year and the year
+before, each newcomer starting at his league's level, as it stood on the last day of the year. gol.gg publishes no ratings:
+these are not its numbers. Each player's country is the one gol.gg files him under, or, for players it files under none,
+the one esportsearnings.com or Wikidata does. See docs/design/league-of-legends.md, "Earlier seasons".
+
+Credit: gol.gg (https://gol.gg); each player's source links his page there.
+Countries gol.gg lacks: esportsearnings.com (https://www.esportsearnings.com) and Wikidata (https://www.wikidata.org, CC0).

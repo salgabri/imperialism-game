@@ -472,9 +472,10 @@ export const SEASON_NOTES = Object.freeze({
     + 'and at the end of each year from 2023, each year on its own map pool. A player plays for the nation he last played for '
     + 'at the Esports Nations Cup, else the flag vlr.gg files him under, and only if he has played within the year. Each '
     + 'nation fields its best five; one with fewer fields no team.',
-  'league-of-legends': 'Elo ratings computed from every game gol.gg records of the leagues and international events, from July '
-    + '2025 to November 2026. A player plays for the country gol.gg files him under, in the role he plays most, and only if he '
-    + 'has played within the year. Each nation fields its best player in each role; one with fewer than five fields no team.',
+  'league-of-legends': 'Elo ratings computed from every game gol.gg records of the leagues and international events: to November '
+    + '2026, and at the end of each year from 2016 (2016 rough), each year at its own length of game and its own kills. A player '
+    + 'plays for the country gol.gg files him under, in the role he plays most, and only if he has played within the year. Each '
+    + 'nation fields its best player in each role; one with fewer than five fields no team.',
   tennis: 'Elo ratings of the ATP\'s men: Tennis Abstract\'s own as of 2 November 2026 and at the end of 2016–2025; before '
     + '2016 computed from Jeff Sackmann\'s match results by its method (1960–1979 rough; before 1968 the amateurs\' majors and '
     + 'Davis Cup only). Each nation names its five best; '

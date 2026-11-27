@@ -27,6 +27,7 @@ import { BUILT_IN_RUGBY_LEAGUE_SEASONS } from '../data/rugbyLeagueSeasons.js';
 import { BUILT_IN_ROCKET_LEAGUE_SEASONS } from '../data/rocketLeagueSeasons.js';
 import { BUILT_IN_COUNTER_STRIKE_SEASONS } from '../data/counterStrikeSeasons.js';
 import { BUILT_IN_VALORANT_SEASONS } from '../data/valorantSeasons.js';
+import { BUILT_IN_LEAGUE_OF_LEGENDS_SEASONS } from '../data/leagueOfLegendsSeasons.js';
 import { CLUB_MAPS } from '../data/clubMaps.js';
 import { EUROPE_MAPS } from '../data/europeMaps.js';
 import { DOMESTIC_SEASON_ROWS } from '../data/domesticSeasons.js';
@@ -43,6 +44,7 @@ import { rugbyLeague } from '../sports/rugbyLeague.js';
 import { rocketLeague } from '../sports/rocketLeague.js';
 import { counterStrike } from '../sports/counterStrike.js';
 import { valorant } from '../sports/valorant.js';
+import { leagueOfLegends } from '../sports/leagueOfLegends.js';
 import { baseball } from '../sports/baseball.js';
 import { football } from '../sports/football.js';
 import { womensFootball } from '../sports/womensFootball.js';
@@ -125,6 +127,8 @@ const SET_KINDS = Object.freeze({
   cs: { prefix: 'cs-', id: /^cs-\d{4}$/, sport: 'counter-strike', nationsOnly: /^cs-/, calendar: true },
   // `val-<year>`: Valorant's players at the end of a year, by the Elo of vlr.gg's results, nations only.
   val: { prefix: 'val-', id: /^val-\d{4}$/, sport: 'valorant', nationsOnly: /^val-/, calendar: true },
+  // `lol-<year>`: League of Legends' players at the end of a year, by the Elo of gol.gg's results, nations only.
+  lol: { prefix: 'lol-', id: /^lol-\d{4}$/, sport: 'league-of-legends', nationsOnly: /^lol-/, calendar: true },
   // `nhl-<season end year>`: an NHL season's ratings from an EA NHL edition (NHL 94 rates 1993/94 → `nhl-1994`), its
   // nations by nationality and the NHL's clubs. A season no edition rated is computed from the NHL's statistics, or
   // converted from an edition's attributes (source.method, source.conversion). Before 1977/78 fewer than three nations
@@ -295,7 +299,7 @@ export const isSeasonTheatreMap = (mapId, id) => [...EUROPE_MAPS, ...CLUB_MAPS]
 export const BUILT_IN_SETS = listing([...BUILT_IN_SEASONS, ...BUILT_IN_WOMENS_SEASONS, ...BUILT_IN_BASKETBALL_SEASONS,
   ...BUILT_IN_AMERICAN_FOOTBALL_SEASONS, ...BUILT_IN_COLLEGE_FOOTBALL_SEASONS, ...BUILT_IN_BASEBALL_SEASONS, ...BUILT_IN_HOCKEY_SEASONS, ...BUILT_IN_TENNIS_SEASONS,
   ...BUILT_IN_WOMENS_TENNIS_SEASONS, ...BUILT_IN_RUGBY_LEAGUE_SEASONS, ...BUILT_IN_ROCKET_LEAGUE_SEASONS, ...BUILT_IN_COUNTER_STRIKE_SEASONS,
-  ...BUILT_IN_VALORANT_SEASONS]);
+  ...BUILT_IN_VALORANT_SEASONS, ...BUILT_IN_LEAGUE_OF_LEGENDS_SEASONS]);
 
 /** The era map a basketball or baseball season's clubs play on (null for any other set). */
 export const seasonMapOf = id => BUILT_IN_SETS.find(set => set.id === id)?.map ?? null;
@@ -419,9 +423,9 @@ export function decodeFootballSet(data, id = data?.id) {
     const playerOf = club => (club.league === EUROLEAGUE && setKindOf(data.id) === 'nba2k' ? player => [...player, euroleagueEstimate()] : player => [...player]);
     return { meta, rosters: null, clubs: clubs.map(club => ({ ...club, squad: club.squad.map(playerOf(club)) })), territory: NO_TERRITORY };
   }
-  // Tennis's seasons, Rocket League's, Counter-Strike's and Valorant's: nations only, each player `[name, position, rating,
-  // source]`.
-  if (['elo', 'wta', 'rl', 'cs', 'val'].includes(setKindOf(data.id))) {
+  // Tennis's seasons, Rocket League's, Counter-Strike's, Valorant's and League of Legends': nations only, each player
+  // `[name, position, rating, source]`.
+  if (['elo', 'wta', 'rl', 'cs', 'val', 'lol'].includes(setKindOf(data.id))) {
     const { nations, clubs, territory, ...meta } = data;
     return {
       meta,
@@ -564,9 +568,10 @@ KINDS.elo = { size: 4,
 KINDS.wta = KINDS.elo;
 // Rocket League's the same, each player `[name, 'PLR', rating, source]` as its built-in rosters hold them.
 KINDS.rl = KINDS.elo;
-// Counter-Strike's and Valorant's too.
+// Counter-Strike's and Valorant's too, and League of Legends', each player at the role he plays.
 KINDS.cs = KINDS.elo;
 KINDS.val = KINDS.elo;
+KINDS.lol = KINDS.elo;
 // A computed World Cup season: nations only, each its XI as `[name, position, rating, source]`, the built-in rosters'
 // shape. Its source says the ratings are computed (method 'computed'), from Elo of which day, by what rule
 // (conversion), and under which licence.
@@ -645,7 +650,7 @@ function validateFootballSet(data, id) {
   const rating = v => typeof v === 'number' && Number.isFinite(v) && v >= 1 && v <= 99;
   const nation = v => typeof v === 'string' && Object.hasOwn(NATIONS, v);
 
-  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "wc-<yyyy>", "nt-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "wwc-<yyyy>", "wol-<yyyy>", "nba-2k<nn>", "nba-stats-<yyyy>", "mlb-the-show-<nn>", "mlb-war-<yyyy>", "madden-<yyyy>", "pfa-<yyyy>", "cfb-<yyyy>", "nhl-<yyyy>", "nrl-<yyyy>", "nrl-sl-<yyyy>", "tennis-<yyyy>", "wta-<yyyy>", "rl-<yyyy>", "cs-<yyyy>" or "val-<yyyy>"');
+  if (!isFootballSetId(id)) fail('id must look like "cm0102-<yyyy>-<mm>", "cm-<yyyy>", "swos-<yyyy>", "wc-<yyyy>", "nt-<yyyy>", "ea-fifa-<nn>", "eaw-fifa-<nn>", "wwc-<yyyy>", "wol-<yyyy>", "nba-2k<nn>", "nba-stats-<yyyy>", "mlb-the-show-<nn>", "mlb-war-<yyyy>", "madden-<yyyy>", "pfa-<yyyy>", "cfb-<yyyy>", "nhl-<yyyy>", "nrl-<yyyy>", "nrl-sl-<yyyy>", "tennis-<yyyy>", "wta-<yyyy>", "rl-<yyyy>", "cs-<yyyy>", "val-<yyyy>" or "lol-<yyyy>"');
   if (!isObject(data)) fail('file is not a JSON object');
   if (data.format !== FOOTBALL_SET_FORMAT) fail(`unsupported format ${JSON.stringify(data.format)} (expected ${FOOTBALL_SET_FORMAT})`);
   if (data.id !== id) fail(`file id ${JSON.stringify(data.id)} does not match the requested data set`);
@@ -675,6 +680,7 @@ function validateFootballSet(data, id) {
   if (setKindOf(id) === 'rl') return validateTennisSeason(data, id, fail, ROCKET_LEAGUE_SEASON);
   if (setKindOf(id) === 'cs') return validateTennisSeason(data, id, fail, COUNTER_STRIKE_SEASON);
   if (setKindOf(id) === 'val') return validateTennisSeason(data, id, fail, VALORANT_SEASON);
+  if (setKindOf(id) === 'lol') return validateTennisSeason(data, id, fail, LEAGUE_OF_LEGENDS_SEASON);
   if (setKindOf(id) === 'wc') return validateWorldCupSeason(data, id, fail);
   if (setKindOf(id) === 'nt') return validateNationalTeamSeason(data, id, fail);
   if (setKindOf(id) === 'wwc' || setKindOf(id) === 'wol') return validateWomensTournamentSeason(data, id, fail);
@@ -944,26 +950,31 @@ function validateBasketballClubs(data, id, fail) {
 
 // What a nations-only season of Elo ratings holds: tennis's (two to five singles players a cup team) and Rocket League's
 // (three to five, of whom three play). Each also says why the home nations play as one.
-const TENNIS_SEASON = Object.freeze({ noun: 'a tennis season', least: 2, most: 5, count: 'two to five', position: 'SGL',
+const TENNIS_SEASON = Object.freeze({ noun: 'a tennis season', least: 2, most: 5, count: 'two to five', positions: ['SGL'],
   asOne: 'as the Davis Cup does' });
 const ROCKET_LEAGUE_SEASON = Object.freeze({ noun: 'a Rocket League season', least: 3, most: 5, count: 'three to five',
-  position: 'PLR', asOne: 'as Great Britain plays as one' });
+  positions: ['PLR'], asOne: 'as Great Britain plays as one' });
 // Counter-Strike's and Valorant's: five to seven a nation, of whom five play.
 const COUNTER_STRIKE_SEASON = Object.freeze({ noun: 'a Counter-Strike season', least: 5, most: 7, count: 'five to seven',
-  position: 'PLR', asOne: 'as Great Britain plays as one' });
+  positions: ['PLR'], asOne: 'as Great Britain plays as one' });
 const VALORANT_SEASON = Object.freeze({ noun: 'a Valorant season', least: 5, most: 7, count: 'five to seven',
-  position: 'PLR', asOne: 'as Great Britain plays as one' });
+  positions: ['PLR'], asOne: 'as Great Britain plays as one' });
+// League of Legends': five to seven a nation too, each at his role.
+const LEAGUE_OF_LEGENDS_SEASON = Object.freeze({ noun: 'a League of Legends season', least: 5, most: 7, count: 'five to seven',
+  positions: Object.keys(leagueOfLegends.formation), asOne: 'as Great Britain plays as one' });
 
 /**
  * A tennis season, the men's or the women's: the nations that field a cup team (two to five rated players each, strongest first, as
  * `[name, 'SGL', rating, source]`), no clubs, and its territory: the home nations held by the United Kingdom, every
  * nation it does not list inactive. Ratings are the season's Elo on the game's scale. A Rocket League season the same
  * (`rules` ROCKET_LEAGUE_SEASON): three to five `[name, 'PLR', rating, source]` a nation; a Counter-Strike or a Valorant
- * season's five to seven (COUNTER_STRIKE_SEASON, VALORANT_SEASON).
+ * season's five to seven (COUNTER_STRIKE_SEASON, VALORANT_SEASON), and a League of Legends season's, at their roles
+ * (LEAGUE_OF_LEGENDS_SEASON).
  */
 function validateTennisSeason(data, id, fail, rules = TENNIS_SEASON) {
   const isObject = v => v != null && typeof v === 'object' && !Array.isArray(v);
   const text = v => typeof v === 'string' && v.trim().length > 0;
+  const positions = rules.positions.map(position => `'${position}'`).join(' | ');
   const nations = data.nations;
   if (!isObject(nations)) fail('nations is missing');
   if (!Array.isArray(data.clubs) || data.clubs.length) fail(`${rules.noun} has nations only`);
@@ -978,11 +989,11 @@ function validateTennisSeason(data, id, fail, rules = TENNIS_SEASON) {
     const names = new Set();
     squad.forEach((player, j) => {
       const where = `${at}[${j}]`;
-      if (!Array.isArray(player) || player.length !== 4) fail(`${where} is not [name, '${rules.position}', rating, source]`);
+      if (!Array.isArray(player) || player.length !== 4) fail(`${where} is not [name, ${positions}, rating, source]`);
       const [name, pos, rating, source] = player;
       if (!text(name) || name !== name.trim() || names.has(name)) fail(`${where} has no name, or repeats one`);
       names.add(name);
-      if (pos !== rules.position) fail(`${where} position must be ${rules.position}`);
+      if (!rules.positions.includes(pos)) fail(`${where} position must be ${rules.positions.join(', ')}`);
       if (!Number.isInteger(rating) || rating < 1 || rating > 99) fail(`${where} rating must be a whole number 1-99`);
       if (!isObject(source) || !text(source.id) || !text(source.source) || typeof source.rawRating !== 'number') {
         fail(`${where} source must name the player and his Elo`);
@@ -1445,6 +1456,7 @@ export function seasonSport(set) {
       : setKindOf(meta.id) === 'rl' ? { ...rocketLeague, rosters, territory, ...identity }
       : setKindOf(meta.id) === 'cs' ? { ...counterStrike, rosters, territory, ...identity }
       : setKindOf(meta.id) === 'val' ? { ...valorant, rosters, territory, ...identity }
+      : setKindOf(meta.id) === 'lol' ? { ...leagueOfLegends, rosters, territory, ...identity }
       : setKindOf(meta.id) === 'nhl' ? { ...hockey, rosters, clubs, territory, clubMap: meta.map, ...identity }
       : setKindOf(meta.id) === 'nrl' ? { ...rugbyLeague, clubs, clubMap: meta.map, ...identity }
       // A women's season's unlisted nations are inactive, so nothing reads their strength in play; a computed one's

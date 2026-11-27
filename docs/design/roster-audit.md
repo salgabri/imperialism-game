@@ -18,8 +18,8 @@ npm run validate:football-elo -- --check       the same offline, from the cached
 ```
 
 `scripts/lib/roster-audit.mjs` holds the checks; `scripts/audit-rosters.mjs` prints and writes;
-`scripts/roster-audit.test.mjs` runs in `npm test`. The whole run reads 632 seasons (each of the fifteen sports'
-built-in one and the 617 earlier ones), about 29,900 teams and 432,000 player records, in about four seconds.
+`scripts/roster-audit.test.mjs` runs in `npm test`. The whole run reads 642 seasons (each of the fifteen sports'
+built-in one and the 627 earlier ones), about 30,200 teams and 434,000 player records, in about four seconds.
 `scripts/validate-football-elo.mjs` writes docs/design/football-elo-agreement.json ("Ratings against results" below).
 
 ## How a season is read

@@ -41,15 +41,21 @@ export const LEVEL_SPREAD = 500;
  */
 export const ELO_PER_POINT = 25;
 export const ELO_BASE = 100;
-export const gameRating = elo => Math.round((elo - ELO_BASE) / ELO_PER_POINT);
+export const gameRating = (elo, base = ELO_BASE) => Math.round((elo - base) / ELO_PER_POINT);
 export const SOURCE_ID = 'golgg';
 export const EDITION = 'gol.gg Elo';
 export const SITE_URL = 'https://gol.gg';
 
 // ---------- tournaments ----------
 
-/** A second tier's tournament: an academy league, a second division, a regional league below the first ("1st Div 2025" is not). */
-const SECOND_TIER = /\bCL\b|Academy|NACL|\bCD\b|Circuito Desafiante|\bDiv ?2\b|2nd Div|\bLR[NS]\b/i;
+/**
+ * A second tier's tournament: an academy league, a second division, a regional league below the first ("1st Div 2025" is
+ * not); in the earlier seasons also the Challenger Series of Europe and North America (EU CS, NA CS), Challengers Korea
+ * (CK), Brazil's Circuitão (BRCC), Czechia's Hitpoint Challengers, Spain's LVP2 and the LCS's Proving Grounds.
+ */
+const SECOND_TIER = /\bCL\b|Academy|NACL|\bCD\b|Circuito Desafiante|\bDiv ?2\b|2nd Div|\bLR[NS]\b|\bCS\b|\bCK\b|\bBRCC\b|Hitpoint Challengers|\bLVP2\b|Proving Grounds/i;
+/** A tournament between circuits, whatever region gol.gg files it under: a promotion, the European Masters, the Iberian Cup. */
+const BETWEEN_CIRCUITS = /\bpromo(tion)?\b|\bE(U|MEA) Masters?\b|Iberian Cup/i;
 
 /**
  * A tournament's circuit: gol.gg's region (KR, CN, EUW, FR, …), its second tier apart ("KR-2": the LCK's academy league),
@@ -59,7 +65,7 @@ const SECOND_TIER = /\bCL\b|Academy|NACL|\bCD\b|Circuito Desafiante|\bDiv ?2\b|2
  */
 export function circuitOf(tournament) {
   const name = tournament.trname, region = tournament.region;
-  if (/promotion/i.test(name)) return null;
+  if (BETWEEN_CIRCUITS.test(name)) return null;
   if (region === 'WR') {
     if (/\b(PCS|LCP)\b/.test(name)) return 'PCS';
     if (/kespa/i.test(name)) return 'KR';
@@ -68,6 +74,7 @@ export function circuitOf(tournament) {
   }
   if (/LTA South/i.test(name)) return 'LTA South';
   if (region === 'EUW' && /\bNLC\b/.test(name)) return 'NLC';
+  if (region === 'EUW' && /Challenge France/i.test(name)) return 'FR';
   return SECOND_TIER.test(name) ? `${region}-2` : region;
 }
 
@@ -155,10 +162,13 @@ export const nationOfPlayer = player => nationOfFlag(flagOf(player));
 /** The snapshot's row: `[key, name, flag, nation, role, elo, games, wins, last, team, circuit]`. */
 export const rowOf = p => [p.key, p.name, p.flag, p.nation, p.role, p.elo, p.games, p.wins, p.last, p.team, p.circuit];
 
-/** A snapshot row as a player of the game: his rating, role and nation, and the source a squad keeps. */
-export function playerOf([key, name, flag, nation, role, elo, games, wins, last, team, circuit], snapshotDate, eloRank) {
+/**
+ * A snapshot row as a player of the game: his rating (an earlier season's read from its own `base`), role and nation, and the
+ * source a squad keeps.
+ */
+export function playerOf([key, name, flag, nation, role, elo, games, wins, last, team, circuit], snapshotDate, eloRank, base = ELO_BASE) {
   const id = key.replace(/^gg:/, '');
-  return { key, name, flag, nation, role, elo, games, wins, last, team, circuit, rating: gameRating(elo),
+  return { key, name, flag, nation, role, elo, games, wins, last, team, circuit, rating: gameRating(elo, base),
     source: { id: key, source: SOURCE_ID, edition: EDITION, snapshotDate, rawRating: elo, rawScale: 'Elo', eloRank, games,
       lastPlayed: last, ...(team ? { team } : {}), url: `${SITE_URL}/players/player-stats/${id}/season-ALL/split-ALL/tournament-ALL/` } };
 }

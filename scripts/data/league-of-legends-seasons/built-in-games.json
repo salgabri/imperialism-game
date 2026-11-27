@@ -1,0 +1,15 @@
+{
+ "season": 2026,
+ "fetched": "2026-11-27",
+ "games": 8388,
+ "minutes": 31.503,
+ "kills": {
+  "winner": 22.649,
+  "loser": 9.818
+ },
+ "nashors": {
+  "winner": 1.177,
+  "loser": 0.195
+ },
+ "teams": 268
+}

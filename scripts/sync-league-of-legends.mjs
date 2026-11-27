@@ -14,7 +14,7 @@
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
-import { SITE, cached, golPage, readMatchList, seasonTournaments, tournamentPath } from './lib/golgg.mjs';
+import { PAUSE_MS, SITE, cached, golPage, readMatchList, seasonTournaments, tournamentPath } from './lib/golgg.mjs';
 import { calibrationOf, circuitLevels, groupOffsets, homesOf, leftOut, mostOf, ratedPlayers, runElo, scoredGames, scoreOf, scoreRows,
   snapshotText } from './lib/esports-elo.mjs';
 import { ACTIVE_DAYS, CIRCUIT_LEVELS, EDITION, K_SCALE, LEVEL_SPREAD, LINEUP, MIN_GAMES, TEAM_SIZE, nationOfPlayer, nationsOf, playerOf, playOf, readCache, rolesOf,
@@ -32,9 +32,10 @@ if (unknown.length) throw new Error(`Unknown option ${unknown[0]}`);
 const fetching = args.includes('--fetch');
 const refreshLists = args.includes('--refresh-lists');
 const maxSeries = Number(option('max-series') ?? Infinity);
-const pause = Number(option('pause') ?? 1200);
-// The first season read: 2024 (Season 14).
-const FIRST_YEAR = Number(option('from') ?? 2024);
+const pause = Number(option('pause') ?? PAUSE_MS);
+// The first season fetched, 2026 (Season 16): the earlier ones are read from two pages a tournament
+// (scripts/sync-league-of-legends-seasons.mjs), but for the series from July 2025 the cache already holds.
+const FIRST_YEAR = Number(option('from') ?? 2026);
 const LAST_YEAR = 2026;
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const cache = path.join(root, 'data-src', 'golgg');

@@ -83,7 +83,7 @@ test('the precache is the app shell only; seasons, country maps, flags and crest
     .map(file => `${folder}/${file}`);
   // Every sport's season folder (a sport with no earlier seasons has none) and the maps.
   const dataFolders = ['football', 'womens-football', 'basketball', 'american-football', 'college-football', 'baseball', 'hockey', 'tennis', 'womens-tennis',
-    'rugby-league', 'rocket-league', 'counter-strike', 'valorant', 'domestic']
+    'rugby-league', 'rocket-league', 'counter-strike', 'valorant', 'league-of-legends', 'domestic']
     .filter(folder => existsSync(publicFile(folder)));
   for (const folder of dataFolders) {
     for (const file of files(folder)) assert.equal(cacheOf(file), 'imperialism-data', file);

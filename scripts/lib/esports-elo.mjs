@@ -44,12 +44,18 @@ export const isOffensiveName = name => {
 /** The key the most games give, of a Map(key → count); ties to the first in key order. */
 export const mostOf = counts => [...(counts ?? new Map()).entries()].sort((x, y) => y[1] - x[1] || String(x[0]).localeCompare(String(y[0])))[0]?.[0] ?? null;
 
+/** An entry's share of his side's game: 1, or the part of a tournament's games he played where the games' own line-ups are not known. */
+const shareOf = entry => entry.share ?? 1;
+/** The shares of a side's entries together: five for five who played. */
+const sharesOf = side => side.reduce((sum, entry) => sum + shareOf(entry), 0);
+
 /** A player's home circuit: the one whose events he has played most games in, or null (international events only). */
 export const homeOf = player => mostOf(player?.circuits);
 
 /**
  * Elo over `series` in date order: [{ date, circuit, games: [{ sides: [[entry…], [entry…]], winner: 1 or 2 }] }], each
- * entry `{ key, name, flag?, team? }`. `scale`: the K scale. `starts`: a circuit's starting Elo for a newcomer who calls it
+ * entry `{ key, name, flag?, team?, share? }`: one with a `share` played only that part of the side's games, counts for it in
+ * the side's mean, and moves and counts his games by it (League of Legends' earlier seasons). `scale`: the K scale. `starts`: a circuit's starting Elo for a newcomer who calls it
  * home (`homes`: key → circuit, homesOf), or whose first game is in its event when he has no home there (`start` for any
  * other). `holdout`: the date from which each game's prediction is scored
  * before it is played (log loss, Brier score, calibration by tenths). `onGame(one, game, expected, sides)` is told of each
@@ -79,9 +85,9 @@ export function runElo(series, { scale, starts = {}, homes = null, start = START
         player.name = entry.name || player.name;
         if (entry.team) player.team = entry.team;
         player.last = one.date;
-        if (one.circuit) player.circuits.set(one.circuit, (player.circuits.get(one.circuit) ?? 0) + 1);
+        if (one.circuit) player.circuits.set(one.circuit, (player.circuits.get(one.circuit) ?? 0) + shareOf(entry));
       }));
-      const [a, b] = sides.map(side => side.reduce((sum, player) => sum + player.elo, 0) / side.length);
+      const [a, b] = sides.map((side, s) => side.reduce((sum, player, i) => sum + shareOf(game.sides[s][i]) * player.elo, 0) / sharesOf(game.sides[s]));
       const e = expected(a - b);
       const won = game.winner === 1 ? 1 : 0;
       if (onGame) onGame(one, game, e, sides);
@@ -92,11 +98,12 @@ export function runElo(series, { scale, starts = {}, homes = null, start = START
       }
       sides.forEach((side, s) => {
         const delta = s === 0 ? won - e : e - won;
-        for (const player of side) {
-          player.elo += kFactor(player.games, scale) * delta;
-          player.games++;
-          if ((s === 0) === (won === 1)) player.wins++;
-        }
+        side.forEach((player, i) => {
+          const share = shareOf(game.sides[s][i]);
+          player.elo += share * kFactor(player.games, scale) * delta;
+          player.games += share;
+          if ((s === 0) === (won === 1)) player.wins += share;
+        });
       });
       games++;
     }
@@ -123,7 +130,7 @@ export function homesOf(series, { until = null, byCountry = false } = {}) {
       if (!one.circuit) continue;
       if (!counts.has(entry.key)) counts.set(entry.key, new Map());
       const played = counts.get(entry.key);
-      played.set(one.circuit, (played.get(one.circuit) ?? 0) + 1);
+      played.set(one.circuit, (played.get(one.circuit) ?? 0) + shareOf(entry));
     }
   }
   const homes = new Map([...counts].map(([key, played]) => [key, mostOf(played)]));
@@ -171,10 +178,11 @@ export function circuitLevels(series, { until = null, tau = 150, levelSpread = I
           index.set(entry.key, i);
           counts.push(new Map());
         }
-        if (one.circuit) counts[i].set(one.circuit, (counts[i].get(one.circuit) ?? 0) + 1);
+        if (one.circuit) counts[i].set(one.circuit, (counts[i].get(one.circuit) ?? 0) + shareOf(entry));
         return i;
       }));
-      games.push({ sides, won: game.winner === 1 ? 1 : 0 });
+      const shares = game.sides.map(side => Float64Array.from(side, shareOf));
+      games.push({ sides, shares, all: game.sides.map(sharesOf), won: game.winner === 1 ? 1 : 0 });
     }
   }
   const circuits = [];
@@ -192,16 +200,17 @@ export function circuitLevels(series, { until = null, tau = 150, levelSpread = I
   const strength = i => (home[i] >= 0 ? theta[home[i]] : 0) + theta[C + i];
   for (let step = 1; step <= iterations; step++) {
     grad.fill(0);
-    for (const { sides, won } of games) {
+    for (const { sides, shares, all, won } of games) {
       let a = 0, b = 0;
-      for (const i of sides[0]) a += strength(i);
-      for (const i of sides[1]) b += strength(i);
-      const g = (won - expected(a / sides[0].length - b / sides[1].length)) * slope;
+      for (let n = 0; n < sides[0].length; n++) a += shares[0][n] * strength(sides[0][n]);
+      for (let n = 0; n < sides[1].length; n++) b += shares[1][n] * strength(sides[1][n]);
+      const g = (won - expected(a / all[0] - b / all[1])) * slope;
       sides.forEach((side, s) => {
-        const share = (s === 0 ? g : -g) / side.length;
-        for (const i of side) {
-          grad[C + i] += share;
-          if (home[i] >= 0) grad[home[i]] += share;
+        const share = (s === 0 ? g : -g) / all[s];
+        for (let n = 0; n < side.length; n++) {
+          const i = side[n];
+          grad[C + i] += share * shares[s][n];
+          if (home[i] >= 0) grad[home[i]] += share * shares[s][n];
         }
       });
     }
@@ -222,33 +231,34 @@ export function circuitLevels(series, { until = null, tau = 150, levelSpread = I
 /**
  * The games from `from` (to `to`, when given) as runElo(series, options) scores them, each before it is played, with its two
  * sides' circuits: a side's circuit is the home of `least` of its players or more, each player's home counted over the
- * games before this one (null for a side with no such circuit). `seasoned`: each of the ten had `minGames` behind him.
+ * games before this one (null for a side with no such circuit). `seasoned`: each of the ten had `minGames` behind him (but one
+ * whose share of the games is under a half).
  * `keys`: each row also keeps its sides' players' keys.
  * → [{ id, date, e, won, circuits: [first side's, second's], seasoned, keys? }]
  */
 export function scoredGames(series, options, { from, to = null, least = 3, minGames = 20, keys = false } = {}) {
   const counts = new Map();
   const rows = [];
-  const sideCircuit = side => {
+  const sideCircuit = (side, entries) => {
     const tally = new Map();
-    for (const player of side) {
+    side.forEach((player, i) => {
       const home = mostOf(counts.get(player.key));
-      if (home) tally.set(home, (tally.get(home) ?? 0) + 1);
-    }
+      if (home) tally.set(home, (tally.get(home) ?? 0) + shareOf(entries[i]));
+    });
     const [best] = [...tally.entries()].sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0]));
     return best && best[1] >= least ? best[0] : null;
   };
   runElo(series, { ...options, holdout: null, onGame: (one, game, e, sides) => {
     if (one.date >= from && (!to || one.date < to)) {
-      rows.push({ id: one.id, date: one.date, e, won: game.winner === 1 ? 1 : 0, circuits: sides.map(sideCircuit),
-        seasoned: sides.every(side => side.every(player => player.games >= minGames)),
+      rows.push({ id: one.id, date: one.date, e, won: game.winner === 1 ? 1 : 0, circuits: sides.map((side, s) => sideCircuit(side, game.sides[s])),
+        seasoned: sides.every((side, s) => side.every((player, i) => player.games >= minGames || shareOf(game.sides[s][i]) < 0.5)),
         ...(keys ? { keys: sides.map(side => side.map(player => player.key)) } : {}) });
     }
     if (!one.circuit) return;
-    for (const side of sides) for (const player of side) {
-      if (!counts.has(player.key)) counts.set(player.key, new Map());
-      const played = counts.get(player.key);
-      played.set(one.circuit, (played.get(one.circuit) ?? 0) + 1);
+    for (const side of game.sides) for (const entry of side) {
+      if (!counts.has(entry.key)) counts.set(entry.key, new Map());
+      const played = counts.get(entry.key);
+      played.set(one.circuit, (played.get(one.circuit) ?? 0) + shareOf(entry));
     }
   } });
   return rows;
@@ -323,7 +333,7 @@ export function ratedPlayers(players, asOf, { minGames, activeDays, nationOf, si
       const name = mostOf(player.names) ?? player.name;
       // A player whose tag is an insult plays for nobody (isOffensiveName).
       return { key: player.key, name, flag: flagOf(player), nation: isOffensiveName(name) ? null : nationOf(player),
-        side: sideOf(player), elo: Math.round(player.elo * 10) / 10, games: player.games, wins: player.wins, last: player.last,
+        side: sideOf(player), elo: Math.round(player.elo * 10) / 10, games: Math.round(player.games), wins: Math.round(player.wins), last: player.last,
         team: player.team, circuit: homeOf(player) };
     })
     .sort((a, b) => b.elo - a.elo || a.name.localeCompare(b.name));

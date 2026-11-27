@@ -1,5 +1,7 @@
 import { C } from '../theme.js';
 import { defineSportData } from './sportData.js';
+import { rulesMemo, rulesYear } from './eras.js';
+import { LEAGUE_OF_LEGENDS_GAMES } from '../data/leagueOfLegendsGames.js';
 import { GREAT_BRITAIN, HISTORIC_NATIONS, HOME_NATIONS, NATIONS, selectLineup } from '../data/teams.js';
 import { clamp, createScorerSampler, gauss, poisson } from '../engine/random.js';
 
@@ -36,6 +38,9 @@ export const WINNER_KILLS = 21.5;
 export const LOSER_KILLS = 10.5;
 export const WINNER_BARON = 0.91;
 export const LOSER_BARON = 0.16;
+/** How today's games go; an earlier season's go as its year's did (LEAGUE_OF_LEGENDS_GAMES, `leagueOfLegendsIn`). */
+export const GAMES_TODAY = Object.freeze({ minutes: LENGTH_MEAN, spread: LENGTH_SPREAD, winnerKills: WINNER_KILLS, loserKills: LOSER_KILLS,
+  winnerBaron: WINNER_BARON, loserBaron: LOSER_BARON });
 // A Baron spawns at twenty minutes.
 const BARON_FROM = 20;
 
@@ -97,19 +102,20 @@ export const gameClock = minutes => {
 const unitOf = minutes => clamp(Math.ceil(minutes / MINUTES_PER_UNIT), 1, BLOCK);
 
 /**
- * One game for a known winner (`winner` 'A' or 'D') → { minutes, kills: { A, D }, barons: [{ side, minute }], firstBlood:
- * { side, minute } }: its length, each side's kills (the winner's at their real mean, the loser's growing with the
- * game's length), the Barons taken and who drew first blood (a kill of the game, so the side with more kills more often).
+ * One game for a known winner (`winner` 'A' or 'D'), as its year's games went (`games`, today's unless given) → { minutes,
+ * kills: { A, D }, barons: [{ side, minute }], firstBlood: { side, minute } }: its length, each side's kills (the winner's at
+ * their real mean, the loser's growing with the game's length), the Barons taken and who drew first blood (a kill of the
+ * game, so the side with more kills more often).
  */
-export function playGame(rng, winner) {
+export function playGame(rng, winner, games = GAMES_TODAY) {
   const loser = winner === 'A' ? 'D' : 'A';
-  const minutes = clamp(LENGTH_MEAN + gauss(rng) * LENGTH_SPREAD, SHORTEST, LONGEST);
-  const kills = { [winner]: poisson(rng, WINNER_KILLS), [loser]: poisson(rng, LOSER_KILLS * (minutes / LENGTH_MEAN) ** 2) };
+  const minutes = clamp(games.minutes + gauss(rng) * games.spread, SHORTEST, LONGEST);
+  const kills = { [winner]: poisson(rng, games.winnerKills), [loser]: poisson(rng, games.loserKills * (minutes / games.minutes) ** 2) };
   if (kills[winner] === 0) kills[winner] = 1;
   const barons = [];
   if (minutes > BARON_FROM + 2) {
-    if (rng() < LOSER_BARON) barons.push({ side: loser, minute: BARON_FROM + rng() * (minutes - BARON_FROM) * 0.6 });
-    if (rng() < WINNER_BARON) barons.push({ side: winner, minute: BARON_FROM + (0.3 + 0.65 * rng()) * (minutes - BARON_FROM) });
+    if (rng() < games.loserBaron) barons.push({ side: loser, minute: BARON_FROM + rng() * (minutes - BARON_FROM) * 0.6 });
+    if (rng() < games.winnerBaron) barons.push({ side: winner, minute: BARON_FROM + (0.3 + 0.65 * rng()) * (minutes - BARON_FROM) });
   }
   barons.sort((x, y) => x.minute - y.minute);
   const total = kills.A + kills.D;
@@ -119,10 +125,11 @@ export function playGame(rng, winner) {
 
 /**
  * The whole series: sampleResult's own draws decide every game (so a seed gives the same score on both paths), then each
- * game is played out given its winner. Events: first blood (`pts` 0, the score counts games), each Baron, and the game's
- * end (`pts` 1, the winner's), named for its best player, with the kills from his side and the game's length.
+ * game is played out given its winner, as its year's games went (`yearOfGames`, today's unless given). Events: first blood
+ * (`pts` 0, the score counts games), each Baron, and the game's end (`pts` 1, the winner's), named for its best player, with
+ * the kills from his side and the game's length.
  */
-export function simulateSeries(rng, prepared, drama = 6) {
+export function simulateSeries(rng, prepared, drama = 6, yearOfGames = GAMES_TODAY) {
   const result = sampleResult(rng, prepared, drama);
   const standout = { A: createScorerSampler(prepared.lineupA, STANDOUT_WEIGHTS, STANDOUT_FLOOR),
     D: createScorerSampler(prepared.lineupD, STANDOUT_WEIGHTS, STANDOUT_FLOOR) };
@@ -130,7 +137,7 @@ export function simulateSeries(rng, prepared, drama = 6) {
   result.games.forEach((winner, k) => {
     const start = k * BLOCK;
     const loser = winner === 'A' ? 'D' : 'A';
-    const game = playGame(rng, winner);
+    const game = playGame(rng, winner, yearOfGames);
     if (game.firstBlood) {
       ev.push({ m: start + unitOf(game.firstBlood.minute), side: game.firstBlood.side, name: standout[game.firstBlood.side](rng),
         pts: 0, game: k + 1, kind: 'first-blood', clock: gameClock(game.firstBlood.minute) });
@@ -155,6 +162,14 @@ const territoryOf = rosters => ({
   inactive: Object.keys(NATIONS).filter(nation => !HOME_NATIONS.includes(nation) && !HISTORIC_NATIONS.includes(nation)
     && !Object.hasOwn(rosters, nation)),
 });
+
+/** A campaign's match with games as `yearOfGames` has them: the series and its events, each side's events under its team's id. */
+const simulateAs = yearOfGames => (rng, attacker, defender, drama, effA, effD, venue) => {
+  const prepared = prepareMatch(attacker, defender, effA, effD, venue);
+  const { ga, gd, ev, winner } = simulateSeries(rng, prepared, drama, yearOfGames);
+  return { ga, gd, regA: ga, regD: gd, tie: null, winner,
+    ev: ev.map(({ side, ...e }) => ({ ...e, tid: side === 'A' ? attacker.id : defender.id })) };
+};
 
 const leagueOfLegendsRules = {
   id: 'league-of-legends',
@@ -200,17 +215,36 @@ const leagueOfLegendsRules = {
   formatToast: e => (e.pts > 0 ? `GAME ${e.game} — ${e.score}`
     : e.kind === 'baron' ? 'BARON NASHOR' : `FIRST BLOOD — ${String(e.name).toUpperCase()}`),
 
+  /** The rules a campaign plays (matchSport): an earlier season's games (`leagueOfLegendsIn`), today's for the built-in one. */
+  rulesFor: settings => leagueOfLegendsIn(settings),
+
   prepareMatch,
   sampleResult,
-  simulate: (rng, attacker, defender, drama, effA, effD, venue) => {
-    const prepared = prepareMatch(attacker, defender, effA, effD, venue);
-    const { ga, gd, ev, winner } = simulateSeries(rng, prepared, drama);
-    return { ga, gd, regA: ga, regD: gd, tie: null, winner,
-      ev: ev.map(({ side, ...e }) => ({ ...e, tid: side === 'A' ? attacker.id : defender.id })) };
-  },
+  simulate: simulateAs(GAMES_TODAY),
 };
 
 export const leagueOfLegends = defineSportData({ ...leagueOfLegendsRules }, { clubs: false, territoryOf });
+
+/**
+ * League of Legends with an earlier season's games (`rules`: { year, games }): the same series, each game as long and as
+ * bloody as that year's were. Who wins is Elo's whatever the games, so a season's odds are today's and its simulation
+ * version too.
+ */
+export function leagueOfLegendsWith(rules) {
+  return defineSportData({ ...leagueOfLegendsRules, rules, simulate: simulateAs(rules.games) }, { clubs: false, territoryOf });
+}
+
+const seasonLeague = rulesMemo(year => leagueOfLegendsWith(Object.freeze({ year, games: LEAGUE_OF_LEGENDS_GAMES[year] })));
+
+/**
+ * League of Legends as a setup's or campaign's season played it (`settings`: `dataSet`, `dataYear`; matchSport): each earlier
+ * season with its own year's games (LEAGUE_OF_LEGENDS_GAMES). The built-in season, which has no data set, and a year the table
+ * lacks play today's (`leagueOfLegends` itself).
+ */
+export function leagueOfLegendsIn(settings) {
+  const year = rulesYear(settings);
+  return year != null && Object.hasOwn(LEAGUE_OF_LEGENDS_GAMES, year) ? seasonLeague(year) : leagueOfLegends;
+}
 
 /**
  * Squad-screen strength profile: the five who play and the best of them → { team, best } on the player-rating scale.

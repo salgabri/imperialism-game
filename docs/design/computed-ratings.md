@@ -296,7 +296,10 @@ the games between regions before each cut-off) was tested under one rule fixed b
 games between regions better, worsen those within a region by no more than the paired change's standard error, and push
 no region beyond two errors the other way. It failed in all three: Rocket League's leftover offsets change sign from year
 to year (Sub-Saharan Africa −222, −185, −2, +36, −213), Counter-Strike's best variant gained a third of its error, and
-Valorant's gained −0.0013 ± 0.0013 between circuits while costing +0.0019 ± 0.0005 within them. Women's tennis's Eastern
+Valorant's gained −0.0013 ± 0.0013 between circuits while costing +0.0019 ± 0.0005 within them. League of Legends' earlier
+seasons (2016–2025) leave Korea +70 ± 19 held out (+38 ± 15 in their own games) and the Pacific −76 ± 23; a higher K for
+the games between regions and a shift by each region's offset in the half-season before were tried on 2022–2025 and
+gained nothing (league-of-legends.md, "Ratings" under "Earlier seasons"). Women's tennis's Eastern
 Europe 1973–1979 (+36 ± 8) is a rising cohort Elo follows late; its newcomer levels moved it little and would change 43
 seasons, so they were not adopted.
 

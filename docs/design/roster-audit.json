@@ -2129,6 +2129,23 @@
    "findings": {}
   },
   {
+   "id": "lol-2025",
+   "sport": "league-of-legends",
+   "year": 2025,
+   "season": "2025",
+   "label": "gol.gg Elo, end of 2025",
+   "nations": 46,
+   "fielded": 46,
+   "clubs": 0,
+   "ratings": {
+    "players": 306,
+    "min": 29,
+    "median": 67,
+    "max": 98
+   },
+   "findings": {}
+  },
+  {
    "id": "eaw-fc-25",
    "sport": "womens-football",
    "year": 2025,
@@ -2355,6 +2372,23 @@
     "min": 57,
     "median": 76,
     "max": 99
+   },
+   "findings": {}
+  },
+  {
+   "id": "lol-2024",
+   "sport": "league-of-legends",
+   "year": 2024,
+   "season": "2024",
+   "label": "gol.gg Elo, end of 2024",
+   "nations": 41,
+   "fielded": 41,
+   "clubs": 0,
+   "ratings": {
+    "players": 279,
+    "min": 29,
+    "median": 66,
+    "max": 98
    },
    "findings": {}
   },
@@ -2591,6 +2625,23 @@
    "findings": {}
   },
   {
+   "id": "lol-2023",
+   "sport": "league-of-legends",
+   "year": 2023,
+   "season": "2023",
+   "label": "gol.gg Elo, end of 2023",
+   "nations": 42,
+   "fielded": 42,
+   "clubs": 0,
+   "ratings": {
+    "players": 288,
+    "min": 33,
+    "median": 62,
+    "max": 98
+   },
+   "findings": {}
+  },
+  {
    "id": "eaw-fifa-23",
    "sport": "womens-football",
    "year": 2023,
@@ -2800,6 +2851,23 @@
     "min": 54,
     "median": 76,
     "max": 99
+   },
+   "findings": {}
+  },
+  {
+   "id": "lol-2022",
+   "sport": "league-of-legends",
+   "year": 2022,
+   "season": "2022",
+   "label": "gol.gg Elo, end of 2022",
+   "nations": 41,
+   "fielded": 41,
+   "clubs": 0,
+   "ratings": {
+    "players": 281,
+    "min": 38,
+    "median": 70,
+    "max": 98
    },
    "findings": {}
   },
@@ -3016,6 +3084,23 @@
    "findings": {}
   },
   {
+   "id": "lol-2021",
+   "sport": "league-of-legends",
+   "year": 2021,
+   "season": "2021",
+   "label": "gol.gg Elo, end of 2021",
+   "nations": 43,
+   "fielded": 43,
+   "clubs": 0,
+   "ratings": {
+    "players": 295,
+    "min": 42,
+    "median": 72,
+    "max": 98
+   },
+   "findings": {}
+  },
+  {
    "id": "eaw-fifa-21",
    "sport": "womens-football",
    "year": 2021,
@@ -3227,6 +3312,23 @@
    "findings": {}
   },
   {
+   "id": "lol-2020",
+   "sport": "league-of-legends",
+   "year": 2020,
+   "season": "2020",
+   "label": "gol.gg Elo, end of 2020",
+   "nations": 37,
+   "fielded": 37,
+   "clubs": 0,
+   "ratings": {
+    "players": 246,
+    "min": 49,
+    "median": 77,
+    "max": 97
+   },
+   "findings": {}
+  },
+  {
    "id": "eaw-fifa-20",
    "sport": "womens-football",
    "year": 2020,
@@ -3432,6 +3534,23 @@
     "min": 53,
     "median": 76,
     "max": 99
+   },
+   "findings": {}
+  },
+  {
+   "id": "lol-2019",
+   "sport": "league-of-legends",
+   "year": 2019,
+   "season": "2019",
+   "label": "gol.gg Elo, end of 2019",
+   "nations": 37,
+   "fielded": 37,
+   "clubs": 0,
+   "ratings": {
+    "players": 242,
+    "min": 46,
+    "median": 72,
+    "max": 98
    },
    "findings": {}
   },
@@ -3647,6 +3766,23 @@
    "findings": {}
   },
   {
+   "id": "lol-2018",
+   "sport": "league-of-legends",
+   "year": 2018,
+   "season": "2018",
+   "label": "gol.gg Elo, end of 2018",
+   "nations": 29,
+   "fielded": 29,
+   "clubs": 0,
+   "ratings": {
+    "players": 190,
+    "min": 32,
+    "median": 77,
+    "max": 97
+   },
+   "findings": {}
+  },
+  {
    "id": "eaw-fifa-18",
    "sport": "womens-football",
    "year": 2018,
@@ -3855,6 +3991,23 @@
    "findings": {
     "namesakes-in-team": 1
    }
+  },
+  {
+   "id": "lol-2017",
+   "sport": "league-of-legends",
+   "year": 2017,
+   "season": "2017",
+   "label": "gol.gg Elo, end of 2017",
+   "nations": 16,
+   "fielded": 16,
+   "clubs": 0,
+   "ratings": {
+    "players": 108,
+    "min": 59,
+    "median": 79,
+    "max": 98
+   },
+   "findings": {}
   },
   {
    "id": "eaw-fifa-17",
@@ -4066,6 +4219,23 @@
     "min": 62,
     "median": 77,
     "max": 99
+   },
+   "findings": {}
+  },
+  {
+   "id": "lol-2016",
+   "sport": "league-of-legends",
+   "year": 2016,
+   "season": "2016",
+   "label": "gol.gg Elo, end of 2016 (rough)",
+   "nations": 11,
+   "fielded": 11,
+   "clubs": 0,
+   "ratings": {
+    "players": 69,
+    "min": 71,
+    "median": 84,
+    "max": 98
    },
    "findings": {}
   },
